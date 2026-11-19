@@ -1,0 +1,80 @@
+{
+  "feedback_url": "https://github.com/nonagenticai/conveyor/discussions",
+  "files": [
+    {
+      "bytes": 63245,
+      "path": "artefacts.json",
+      "records": 145,
+      "sha256": "1fa36787d5b08deffbbcf26100a5d5a3a9a10d63fd28da90fd7d06a0dc25942f"
+    },
+    {
+      "bytes": 1827593,
+      "path": "config.json",
+      "records": 2250,
+      "sha256": "b98c29d27ed0a69ba0cdffbde84e34ee3a6261aabec851d34b7f872e206b326d"
+    },
+    {
+      "bytes": 109,
+      "path": "evidence.json",
+      "records": 0,
+      "sha256": "30bf5f4995cafb783bb9c68f9c5bd6f096f37b02c8c8c555cd399e864eb05fb1"
+    },
+    {
+      "bytes": 110,
+      "path": "feedback.json",
+      "records": 0,
+      "sha256": "66cf6889d3fc7ca212cbf4d9169ff60941e6a4bd4650bb0850243700648b821f"
+    },
+    {
+      "bytes": 1170,
+      "path": "measure.json",
+      "records": 0,
+      "sha256": "dce7b8ad160e27c75313d653894a61a057c12649722e27a77ff26e2e6f0ab969"
+    },
+    {
+      "bytes": 27605,
+      "path": "msp.json",
+      "records": 33,
+      "sha256": "adaf738f3d7517c70c99d1b884d1938e4502174af37609431fd47b76673143c6"
+    },
+    {
+      "bytes": 16712,
+      "path": "organisation.json",
+      "records": 34,
+      "sha256": "b566fcabbfdf0c3b234e639f22896683b7a46bddbe57337bf2fd103ec77e1636"
+    },
+    {
+      "bytes": 177041,
+      "path": "programme.json",
+      "records": 70,
+      "sha256": "b4aa550932ff776cf32522407a30d7ac788b8fdabbee69d65c2c616ac775a9f8"
+    },
+    {
+      "bytes": 226,
+      "path": "secrets.json",
+      "records": 0,
+      "sha256": "ba1132c054ca7199da063d8eedc9140645a87f5df8d5467229685ec5236b6f83"
+    },
+    {
+      "bytes": 3010514,
+      "path": "snapshot.js",
+      "records": 0,
+      "sha256": "ac82f466a9e088a01ab1ebfaf6d6e23524e035ec1d4bd8e05b5aba85fb30aa37"
+    },
+    {
+      "bytes": 1844082,
+      "path": "work.json",
+      "records": 3208,
+      "sha256": "6f3542a0ca6c540a5c99e0b39e8f1aaaeea804afdec0db2542b29af6254976fa"
+    }
+  ],
+  "generated_at": "2026-11-19T07:25:30.824251215+00:00",
+  "git_sha": "f14b7d36b2f21ea415cffa81dcdc4c15a05b64e4",
+  "migration": {
+    "description": "coach",
+    "version": 57
+  },
+  "redaction": "no secret values, no encryption key ids, no emails, no OIDC subjects, no session or licence tokens",
+  "schema": "design-snapshot/v1",
+  "tenant": "nonagentic"
+}

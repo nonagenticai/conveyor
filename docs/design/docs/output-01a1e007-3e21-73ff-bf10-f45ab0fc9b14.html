@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>S03 — Domain and schema — aggregates, state machines, baseline domain migration · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>S03 — Domain and schema — aggregates, state machines, baseline domain migration</h1>
+<p><strong>Track:</strong> v1 · <strong>Tranche:</strong> 2 · <strong>Measured status:</strong> built · <strong>Plan:</strong> <code>docs/plans/slices/S03-domain-schema.md</code>
+<strong>Dependencies:</strong> S02 · <strong>Issues:</strong> none</p>
+<h2>Outcome</h2>
+<p>Fourteen aggregates as total Rust functions, plus the one migration that stores them, so no later slice invents a table: <code>crates/domain</code> holds the machines, <code>crates/store</code> the SQL, Postgres the same refusal.</p>
+<h2>Boundary</h2>
+<p><strong>IN</strong> — the 14 aggregates of §2.3+§2.4; <code>may_move</code>, run/approval/asset transitions; store modules taking <code>TenantId</code> under <code>_tx</code>; <code>0002_domain.sql</code> with columns, FKs, partial uniques, indexes, <code>ENABLE</code>+<code>FORCE</code> RLS and 14 policies; the <code>catalogue_entry.kind</code> vocabulary.</p>
+<p><strong>OUT</strong> — every route and action (S04–S06); board satellites <code>label</code>/<code>comment</code>/<code>task*</code>/<code>custom_field*</code>/<code>board_membership</code>/<code>webhook_subscription</code> (S05); channels and delivery (S06); outlines, quality, project_request (S07); models, views, portfolio registers (S08); documents, repositories, secrets (S09); conversations (S10); procedures (S11); workflow (S13).</p>
+<h2>Reuse sources</h2>
+<table><thead><tr><th>path</th><th>read this</th><th>carry</th><th>do not carry</th></tr></thead><tbody>
+<tr><td><code>02-DATA-ARCHITECTURE §2.3/§2.4</code></td><td>14 table bodies</td><td>verbatim</td><td>anything — a deviation is a contract change</td></tr>
+<tr><td><code>agent@83b8de7</code> — <code>crates/agent-api/src/{lease,tenancy}.rs</code>, <code>crates/agent-api/migrations/0190_b8_worker_lease.sql</code></td><td>conditional <code>UPDATE … RETURNING</code>, paired-null CHECK, <code>begin_scoped</code></td><td>claim shape, tx-local <code>set_config</code></td><td>resume targets, <code>ACTIVE_TENANT_HEADER</code></td></tr>
+<tr><td><code>strata_rag@b9426c3</code> <code>store_providers.rs</code></td><td><code>put_store_providers_tx</code></td><td>the <code>_tx</code> convention</td><td>its schema</td></tr>
+<tr><td><code>fr@6f7c509</code> <code>100_card_phase_lease.sql</code> §3.4; `…</td><td></td><td></td><td></td></tr>
+</tbody></table>
+<h2>Inception units</h2>
+<ol>
+<li><code>analysis</code> — current state and reuse: inventory what already exists, the contract and licence constraints, the build-vs-reuse decision, and the risks.</li>
+<li><code>architecture</code> — the project's design: aggregates, tables, actions, modules, integrations, the decision record, and acceptance.</li>
+</ol>
+<p>Both are documents on this project with <code>meta.category</code> set to <code>analysis</code> / <code>architecture</code>; both published is the inception standard.</p>
+<h2>Dependencies</h2>
+<p>Blocked-by: S02.</p>
+<h2>Acceptance</h2>
+<pre><code class="language-bash">set -euo pipefail
+source ~/.cargo/env          # CONTRACT §16 — cargo is not on PATH
+cargo test -p conveyor-domain      # proptests (a) and (d), ≥256 cases
+cargo test -p conveyor-store       # (b) and (c) need a database
+cargo run -p conveyor-server -- migrate &amp;&amp; cargo run -p conveyor-server -- migrate
+test "$(psql "$DATABASE_MIGRATE_URL" -tAc 'select count(*) from _sqlx_migrations')" -ge 2
+test -z "$(psql "$DATABASE_MIGRATE_URL" -tAc "select column_name from information_schema.columns…
+
+Verify: the gate script above (its executable acceptance)
+
+## Capabilities
+
+`architecture`
+
+## Gaps
+
+- None recorded beyond the inception units themselves.
+</code></pre>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Domain and schema — aggregates, state machines, baseline domain migration · conveyor output · published 2026-11-19T07:25:30.824251215+00:00</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

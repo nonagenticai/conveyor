@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>T16 SOP, RDF/OWL and process-document ingestion — architecture design · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>T16 — Architecture design</h1>
+<p>Project: T16 — SOP, RDF/OWL and process-document ingestion · Track: v2 · Tranche: 4 · Plan: docs/SPEC_V2.md §12
+Unit: #85 (this document is dependency-shaping work; blocked by T13 (#76) — T2 and P0 are built)
+Measured at: main@61edfcf8, 2026-11-18 · Project row: active, meta.depends_on = ["T2", "T13", "P0"]</p>
+<h2>Context and boundary</h2>
+<p>T16 owns one pipeline: a tenant supplies an SOP, an RDF/OWL/Turtle document or a process diagram; the
+conveyor stores it as an untrusted source, converts it into draft procedural knowledge (PKO) and a draft
+PDDL procedure, and publishes both behind a human gate. It owns the PKO aggregate, tenant editing, and
+capability/job design from an SOP (§5.6–§5.7); not the tool broker (T13 #76, <code>absent</code>), knowledge store,
+run engine, approval policy (T2, <code>built</code>) or T17.</p>
+<p>The executable carrier is <code>process</code>: migration 0035 renamed <code>procedure</code>/<code>procedure_step</code> to
+<code>process</code>/<code>process_step</code> and freed <code>procedure</code> for the SOP a step is judged against; §10.3 uses the old
+names, and this design follows the schema. External calls go through <code>tools.call</code> only (§11.3). The tool
+tables are absent, so live conversion waits; fixture conversion, PKO storage and the PDDL run path do not.</p>
+<h2>Aggregates, tables and actions</h2>
+<table><thead><tr><th>Aggregate</th><th>Table</th><th>State</th><th>Invariant</th></tr></thead><tbody>
+<tr><td>Source</td><td><code>governed_asset</code> (<code>migrations/0002_domain.sql</code>) + <code>document</code> (<code>migrations/0013_documents.sql</code>)</td><td><code>built</code>; writer <code>planned</code></td><td>untrusted, hashed, approved</td></tr>
+<tr><td>Procedure draft</td><td><code>process</code> / <code>process_step</code> (<code>migrations/0035_process_tree.sql</code>)</td><td><code>built</code>; columns <code>planned</code></td><td>draft until publish; publish validates PDDL, PKO pins, source</td></tr>
+<tr><td>Process map</td><td><code>process_map</code> (<code>migrations/0035_process_tree.sql</code>)</td><td><code>built</code></td><td>declarative, never the executor</td></tr>
+<tr><td>PKO</td><td><code>pko_release</code>, <code>pko_entity</code>, <code>pko_relation</code> (to create at #85, §10.3)</td><td><code>absent</code></td><td>release immutable; terms belong to it; no executable column</td></tr>
+<tr><td>Capability draft</td><td><code>capability</code> (<code>migrations/0020_capability.sql</code>), <code>capability_agent</code></td><td><code>built</code>; design actions <code>absent</code></td><td>unpublished until its gate</td></tr>
+<tr><td>Run evidence</td><td><code>run_step</code> (<code>migrations/0015_s11_procedure.sql</code>)</td><td><code>built</code>; columns <code>planned</code></td><td>fact state before and after a step</td></tr>
+</tbody></table>
+<p><strong>Columns (to create at #85, <code>migrations/0052_t16_pko.sql</code>).</strong> <code>process.source_asset_id</code>,
+<code>pko_release_id</code>, <code>converter_version</code>; <code>process_step.pddl_action</code>, <code>pddl_preconditions</code>, <code>pddl_effects</code>;
+<code>run_step.pddl_state_before</code>, <code>pddl_state_after</code>.</p>
+<p><strong>Invariants.</strong>
+I1 A source is untrusted: stored, hashed, approved; conversion never transitions a card (P2, P3).
+I2 A derived process carries <code>source_asset_id</code>; publish refuses an unapproved source with
+<code>422 source.unapproved</code> (to create at #85), while an invalid PDDL document or an unresolved PKO term
+refuses <code>422 pddl.invalid</code> / <code>422 pko.term_unresolved</code> (to create at #85).
+I3 A published <code>pko_release</code> is immutable; <code>pko.edit</code> copy-forwards; a step references only terms in the
+process's pinned release.
+I4 Action space and PKO never mix: <code>pko_entity</code> has no action column; <code>pddl_*</code> is only executable text.
+I5 No RDF store or reasoner; runtime reads relational rows only (D53).
+I6 All external calls use <code>tools.call</code>; one card and run per source (P1, P3, P8).</p>
+<p><strong>Actions — existing, resolving in <code>docs/design/data/actions.json</code>:</strong> the six verbs of
+<code>procedures.create|get|list|update|publish|retire</code>, <code>processes.create|get|list|update|publish|retire</code> and
+<code>process_maps.create|get|list|update|publish|retire</code>; <code>documents.ingest</code>, <code>knowledge.query</code>,
+<code>capabilities.list|get|bind_knowledge</code>, <code>capability_agents.create|get|list|update</code>,
+<code>approvals.request|decide</code>, <code>job_bindings.create|retire</code>.</p>
+<p><strong>Actions — to create at #85:</strong> <code>procedures.ingest_sop|ingest_process|ingest_rdf|draft|validate</code> (§10.4,
+§5.6); <code>pko.import_rdf|edit|publish|pin</code> (§10.4) plus <code>pko.get|list</code> (this design's read additions); <code>capabilities.design|publish</code> (§10.4, §5.7). No
+<code>procedures.publish</code> is created: that name already publishes the SOP judge, and the executable draft
+publishes through <code>processes.publish</code> (D3).</p>
+<p><strong>Events.</strong> <code>governed_asset.created|transitioned</code>, <code>procedure.published</code>, <code>process.published</code>; to create at
+#85: <code>procedure.ingested</code>, <code>pko.release_published</code>, <code>process.converted</code>.</p>
+<h2>Decisions</h2>
+<p><strong>D1 — the executable procedure is a <code>process</code> extension, with the source pointer checked at publish.</strong>
+Alternative: a new <code>procedure_draft</code> aggregate, checked only at bind. Consequence: one store and one
+publish/run path (P1); the plan's old table names need correction.</p>
+<p><strong>D2 — PKO is relational, with no triple store or reasoner; edits copy forward.</strong> Alternative: an embedded
+RDF store with in-place edits. Consequence: no SPARQL or inference; conversion must complete at publish, and
+an unmapped OWL construct is refused.</p>
+<p><strong>D3 — namespace split.</strong> Intake in <code>procedures.*</code>, PKO in <code>pko.*</code>, executable publication in
+<code>processes.publish</code>; a second <code>procedures.publish</code> is never created. Alternative: rename the SOP-judge
+family. Consequence: docs say "SOP" for the judge and "process" for the executable.</p>
+<p><strong>D4 — deterministic conversion for structural formats, generation for prose.</strong> Alternative: one LLM
+converter. Consequence: RDF/OWL and BPMN are reproducible; prose needs ledgered model calls and a human gate
+(P2, P5).</p>
+<p><strong>D5 — PDDL subset is STRIPS with typing over ground literals.</strong> No quantifiers or numeric fluents.
+Alternative: full PDDL 2.1. Consequence: some SOPs are refused by name; no planner dependency.</p>
+<p><strong>D6 — all backends through the T13 broker.</strong> Alternative: direct HTTP. Consequence: live paths wait for
+#76; T16 fails closed (<code>409 tool_not_ready</code>) rather than calling directly (P8).</p>
+<h2>Acceptance</h2>
+<p>Gate, verbatim (§12 T16): "a real SOP, an OWL file and a BPMN diagram are each ingested end to end; the
+procedure draft is published behind a human gate; a tenant edits a PKO entity and the change is versioned; a
+job bound to the procedure runs the PDDL steps; an unreviewed source never binds".</p>
+<ul>
+<li><strong>A1 — SOP end to end.</strong> PDF fixture → approved source → draft process with a PDDL step.
+Verify: <code>crates/actions/tests/t16_ingest.rs</code> (to create at #85).</li>
+<li><strong>A2 — OWL/Turtle end to end.</strong> Draft PKO release publishes after approval.
+Verify: <code>crates/actions/tests/t16_ingest.rs</code> (to create at #85).</li>
+<li><strong>A3 — BPMN end to end.</strong> Activities become steps, gateways become gates. Verify:
+<code>crates/actions/tests/t16_bpmn.rs</code> (to create at #85).</li>
+<li><strong>A4 — human gate.</strong> Publish refuses an unapproved process; <code>approvals.decide</code> clears it.
+Verify: <code>crates/actions/tests/t16_gate.rs</code> (to create at #85).</li>
+<li><strong>A5 — PKO edit versioned.</strong> <code>pko.edit</code> yields version 2; updating published rows is refused. Verify:
+<code>crates/actions/tests/t16_pko_version.rs</code> (to create at #85).</li>
+<li><strong>A6 — PDDL steps run.</strong> A bound job refuses a false precondition; an effect sets the next. Verify:
+<code>crates/actions/tests/t16_pddl_run.rs</code> (to create at #85).</li>
+<li><strong>A7 — unreviewed source never binds.</strong> A draft source refuses a binding; approval clears it. Verify:
+<code>crates/actions/tests/t16_source_bind.rs</code> (to create at #85).</li>
+</ul>
+<h2>Architecture artefacts</h2>
+<h3>PSA set at inception</h3>
+<p><strong>Principles applied (SPEC_V2 §3).</strong> P1 one process and one PKO release per version. P2 the converter drafts
+and never transitions. P3 every ingestion is a card and run. P4 the approver is not the converter. P5
+drafts, revisions and intake-to-publish time are measured (§5.7). P8 a missing T13 binding refuses before
+any call. P10 three tables, each with a named consumer. P11 layer, gate and batch settings are tenant rows.</p>
+<p><strong>Requirements catalog.</strong></p>
+<table><thead><tr><th>#</th><th>Requirement</th><th>Type</th><th>Source</th></tr></thead><tbody>
+<tr><td>R1</td><td>SOP intake from PDF, document or URL, with provenance</td><td>condition</td><td>§5.6</td></tr>
+<tr><td>R2</td><td>RDF/OWL/Turtle becomes draft PKO rows; no runtime store</td><td>constraint</td><td>§5.6, D53</td></tr>
+<tr><td>R3</td><td>BPMN/Visio/draw.io becomes a draft process and PKO rows</td><td>condition</td><td>§5.6</td></tr>
+<tr><td>R4</td><td>Derived artefacts publish only behind a human gate</td><td>constraint</td><td>§5.6, D47</td></tr>
+<tr><td>R5</td><td>PKO edits version; releases are immutable</td><td>constraint</td><td>§5.6, §12 T16</td></tr>
+<tr><td>R6</td><td>A bound job runs the PDDL steps</td><td>condition</td><td>§12 T16</td></tr>
+<tr><td>R7</td><td>An unreviewed source never binds</td><td>constraint</td><td>§12 T16</td></tr>
+<tr><td>R8</td><td>Tool calls use the broker</td><td>constraint</td><td>§11.3, D44</td></tr>
+</tbody></table>
+<p><strong>Stakeholder map (stakeholder × concern).</strong></p>
+<table><thead><tr><th>Stakeholder</th><th>Authority</th><th>Evidence</th><th>Gate</th><th>Blast radius</th><th>Measurement</th></tr></thead><tbody>
+<tr><td>Procedure owner</td><td>authors and approves the SOP</td><td>the source asset and its hash</td><td>publication</td><td>the owning department's work</td><td>the kata that measures the change</td></tr>
+<tr><td>Conversion job</td><td>builds and runs the converters</td><td>the conversion run and its draft</td><td>none (it drafts)</td><td>a bad draft, refused at publish</td><td>conversion result and term resolution</td></tr>
+<tr><td>Delivery job</td><td>consumes the published procedure</td><td>its binding and pinned release</td><td>run start</td><td>only its own runs</td><td>run acceptance</td></tr>
+<tr><td>Architecture board</td><td>reviews P1/P10 fit</td><td>the artefact and its links</td><td>publication</td><td>the procedure estate</td><td>the board's review record</td></tr>
+<tr><td>Security review</td><td>reviews untrusted documents</td><td>the ingestion record</td><td>publication</td><td>tenant documents</td><td>the review outcome</td></tr>
+<tr><td>Independent reviewer</td><td>verifies the evidence</td><td>#347's verdict</td><td>publication</td><td>this design</td><td>the review checklist</td></tr>
+</tbody></table>
+<p><strong>Driver → goal → objective.</strong> Driver: SOPs, ontologies and diagrams cannot execute. Goal: one
+governed pipeline produces reviewed procedural knowledge and an executable procedure. Objective: the five
+gate outcomes hold.</p>
+<p><strong>Solution concept.</strong> Source → <code>governed_asset(sop_source)</code> + <code>document</code> → conversion → draft
+<code>pko_release</code> + draft <code>process</code> → approval → publish → bind → run with PDDL.</p>
+<h3>Typed artefact</h3>
+<p><strong>Type:</strong> matrix · <strong>Phase/plateau:</strong> A / PSA · <strong>Status:</strong> draft · <strong>Version:</strong> 1 · <strong>Owner:</strong> T16
+delivery (#85) · <strong>Reviewer:</strong> the independent reviewer recorded on #347 · <strong>Review date:</strong> 2026-11-18 ·
+<strong>Project:</strong> T16 — SOP, RDF/OWL and process-document ingestion · <strong>Purpose/stakeholders/scope:</strong> which
+format yields which draft through which converter and gate; for procedure owners, conversion jobs and
+reviewers; scope §12 T16. <strong>Published document:</strong> this architecture design (published on #85). <strong>Links:</strong> derives from §5.6 and D53; realises R1–R7; reuses <code>governed_asset</code>, <code>document</code> and <code>process</code>.</p>
+<table><thead><tr><th>Source format</th><th>Converter</th><th>Draft output (publish path)</th></tr></thead><tbody>
+<tr><td>PDF/text SOP</td><td>generation + curation</td><td>process with PDDL steps; capability (<code>processes.publish</code>, <code>capabilities.publish</code>)</td></tr>
+<tr><td>Web URL</td><td>generation after a broker fetch</td><td>same</td></tr>
+<tr><td>RDF/OWL/Turtle</td><td>deterministic parser</td><td>PKO release with entities and relations (<code>pko.publish</code>)</td></tr>
+<tr><td>BPMN 2.0 XML</td><td>deterministic parser</td><td>process, activities → steps, gateways → gates (<code>processes.publish</code>)</td></tr>
+<tr><td>Visio export</td><td>deterministic parser</td><td>same</td></tr>
+<tr><td>draw.io export</td><td>deterministic parser</td><td>same</td></tr>
+</tbody></table>
+<p>Fixtures at <code>tests/fixtures/t16/</code>, one per row (to create at #85). A design artefact, not evidence;
+each cell is proved by Acceptance.</p>
+<h2>Migration and rollout</h2>
+<p>S0 waits on T13 (#76); T2/P0 are <code>built</code>. S1 adds migration 0052 (three tables, columns)
+forward-only, no backfill. S2 adds the PKO store, PDDL validator and domain types. S3 registers the actions;
+a missing broker binding refuses <code>409 tool_not_ready</code>. S4 lands deterministic converters and fixtures. S5
+lands prose generation behind the gate. S6 enables the bound-run PDDL path. S7, after T13, enables live
+backend calls. Rollback retires actions and bindings; published releases stay readable; no rows are deleted.</p>
+<h2>Links</h2>
+<ul>
+<li>Project brief: https://conveyor.nonagentic.ai/design/docs/output-01a1e008-5092-73e3-ae1b-107a29485e4b.html</li>
+<li>Issue: https://github.com/nonagenticai/conveyor/issues/85 · dependencies https://github.com/nonagenticai/conveyor/issues/76 and https://github.com/nonagenticai/conveyor/issues/73</li>
+<li>Architecture artefact standard: https://conveyor.nonagentic.ai/design/docs/output-01a1e9d1-2720-776c-9741-a5deb322086e.html</li>
+<li>Spec: §4.6, §5.6–§5.7, §8.1, §10.3, §10.4, §11, §12 T16 (gate); action registry <code>docs/design/data/actions.json</code></li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>SOP, RDF/OWL and process-document ingestion · conveyor output · published 2026-11-19T07:25:30.824251215+00:00 · FR Test</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

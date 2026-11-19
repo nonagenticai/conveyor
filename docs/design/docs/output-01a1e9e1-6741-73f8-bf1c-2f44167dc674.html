@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Tranche plan — the 14 tranches, their criteria and sequencing · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>Tranche plan</h1>
+<p><strong>Programme:</strong> conveyor buildout · <strong>Status:</strong> proposed for P0 acceptance (drafted 2026-11-17) ·
+<strong>Owner:</strong> the programme manager (interim) · <strong>Artefact:</strong> TP-1, over the T1 <code>programme_tranche</code> rows.</p>
+<h2>Tranches</h2>
+<p>The programme has 14 tranches (0–13), each the unit the programme manages and reviews together. A PI
+is the delivery rhythm inside a tranche; the tranche review is a programme decision, not a demo
+(P0 plan §7). The rows are <code>programme_tranche</code> records; this document is their accepted narrative.</p>
+<table><thead><tr><th>Tranche</th><th>Projects</th><th>Measured state</th><th>Entry criteria</th><th>Exit criteria</th><th>Review date</th></tr></thead><tbody>
+<tr><td>0</td><td>DESIGN-PUBLISH, P0, PLATFORM, S00, S01, SPEC-V2, T0</td><td>built; planned; standing</td><td>the programme is mandated and P0 exists</td><td>every project's acceptance evidenced; the review records continue, pause or stop</td><td>not set (the sponsor dates it)</td></tr>
+<tr><td>1</td><td>S02, T1, T11</td><td>built; proposed</td><td>the previous review decides continue</td><td>every project's acceptance evidenced; the review records continue, pause or stop</td><td>not set (the sponsor dates it)</td></tr>
+<tr><td>2</td><td>S03, T2</td><td>built; proposed</td><td>the previous review decides continue</td><td>every project's acceptance evidenced; the review records continue, pause or stop</td><td>not set (the sponsor dates it)</td></tr>
+<tr><td>3</td><td>S04, T13, T3</td><td>built; proposed</td><td>the previous review decides continue</td><td>every project's acceptance evidenced; the review records continue, pause or stop</td><td>not set (the sponsor dates it)</td></tr>
+<tr><td>4</td><td>S05, S07, S09, T10, T14, T16, T4, T9</td><td>built; proposed</td><td>the previous review decides continue</td><td>every project's acceptance evidenced; the review records continue, pause or stop</td><td>not set (the sponsor dates it)</td></tr>
+<tr><td>5</td><td>S06, S08, S17, T17, T7</td><td>built; proposed</td><td>the previous review decides continue</td><td>every project's acceptance evidenced; the review records continue, pause or stop</td><td>not set (the sponsor dates it)</td></tr>
+<tr><td>6</td><td>S06a, S06b, S10, S11</td><td>archived; built</td><td>the previous review decides continue</td><td>every project's acceptance evidenced; the review records continue, pause or stop</td><td>not set (the sponsor dates it)</td></tr>
+<tr><td>7</td><td>S06c, S15, S16</td><td>built</td><td>the previous review decides continue</td><td>every project's acceptance evidenced; the review records continue, pause or stop</td><td>not set (the sponsor dates it)</td></tr>
+<tr><td>8</td><td>S06d, S13, S19</td><td>built</td><td>the previous review decides continue</td><td>every project's acceptance evidenced; the review records continue, pause or stop</td><td>not set (the sponsor dates it)</td></tr>
+<tr><td>9</td><td>S18, S20, S21</td><td>built; partial</td><td>the previous review decides continue</td><td>every project's acceptance evidenced; the review records continue, pause or stop</td><td>not set (the sponsor dates it)</td></tr>
+<tr><td>10</td><td>S12, T5</td><td>built; proposed</td><td>the previous review decides continue</td><td>every project's acceptance evidenced; the review records continue, pause or stop</td><td>not set (the sponsor dates it)</td></tr>
+<tr><td>11</td><td>S14, T6, T8</td><td>partial; proposed</td><td>the previous review decides continue</td><td>every project's acceptance evidenced; the review records continue, pause or stop</td><td>not set (the sponsor dates it)</td></tr>
+<tr><td>12</td><td>T15</td><td>proposed</td><td>the previous review decides continue</td><td>every project's acceptance evidenced; the review records continue, pause or stop</td><td>not set (the sponsor dates it)</td></tr>
+<tr><td>13</td><td>T12</td><td>proposed</td><td>the previous review decides continue</td><td>every project's acceptance evidenced; the review records continue, pause or stop</td><td>not set (the sponsor dates it)</td></tr>
+</tbody></table>
+<h2>Entry and exit criteria</h2>
+<ul>
+<li><strong>Entry.</strong> Tranche 0 is entered on the programme mandate and P0's existence. Every later tranche is
+entered only when the previous tranche's review records <strong>continue</strong>; a <strong>pause</strong> or <strong>stop</strong> holds
+the chain at that tranche (P0 plan §7).</li>
+<li><strong>Exit.</strong> A tranche closes when every project in it meets its acceptance with published evidence
+and the review records one of continue, pause or stop. A review with no evidence is refused; a
+re-baseline goes through change control, never through the review itself.</li>
+<li><strong>The first tranche is authorised only after the definition set is accepted</strong>, and no delivery
+project starts before that authorisation (P0 plan §7).</li>
+</ul>
+<h2>Review dates</h2>
+<p><strong>Not set.</strong> The <code>programme_tranche.review_at</code> field is null for every row: the sponsor dates the
+reviews at P0's acceptance. The plan names the sequence and the criteria; it does not invent dates.
+The end-of-tranche review's evidence is the baseline, the benefit status against the profiles and
+the risk and issue register.</p>
+<h2>Sequencing</h2>
+<p>The order is the dependency levels of <code>docs/SPEC_V2.md</code> §12, measured by the coverage: tranche 0 is
+the programme definition (P0) and the platform/design foundations; tranche 1 the plan spine and the
+skeleton; each later tranche the projects whose prerequisites the earlier ones delivered. The
+programme does not need all 48 projects before it produces value; the definition gate prevents
+building the wrong 47.</p>
+<p><strong>Gap.</strong> The tranche rows and this plan are in place; the review that authorises tranche 0 is the
+sponsor's decision and is not yet taken. <code>tranche-review</code> is a visible gap in P0's checklist until
+the owner records it; the session does not fabricate a review.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Programme definition — vision, blueprint, plan and project briefs · conveyor output · published 2026-11-19T07:25:30.824251215+00:00 · FR Test</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

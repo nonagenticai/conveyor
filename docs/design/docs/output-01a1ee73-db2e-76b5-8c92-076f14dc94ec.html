@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>T3 PM job — evidence · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>T3 — Evidence</h1>
+<p>Project: T3 — PM job · Track: v2 · Tranche: 3 · Plan: docs/SPEC_V2.md §12
+Unit: #349 (the unit that publishes this output)
+Measured at: main@856cb8e53756b40170353802d9d5c97fdc024ac4, 2026-11-18 · Project row: closed</p>
+<h2>Claim</h2>
+<p>T3's §12 T3 gate — "PM runs a request end to end; cannot approve its own gate; a baseline change requires a change request" — is met at origin/main by the PM job merged in <code>c10d7599</code> (PR #313, issue #74): six PM actions charter, plan, route gates, change-control and close, while the store's single decision writer refuses the requester's own approving decision and the baseline path refuses an advance with no approved change request, each conjunct asserted by a named test.</p>
+<h2>Evidence</h2>
+<p>Merged code (all present at <code>origin/main</code>; later commits touching it: <code>d4dc2e0a</code>, <code>ed019409</code>, <code>e4b3c239</code>, <code>856cb8e5</code>, <code>07fcad89</code>):</p>
+<ul>
+<li><code>migrations/0049_pm_job.sql</code> — adds <code>project_baseline.change_id</code> with an FK to <code>project_register_item</code> and a partial index. Charter, closure, WBS, baseline and register storage are T1's (<code>0044</code>), reused.</li>
+<li><code>crates/actions/src/pm/mod.rs</code> — <code>pm_charter</code> (project, charter asset, charter gate, board and start card/run), <code>pm_plan</code> (WBS plus scope baseline and baseline gate, after an approved charter gate), <code>pm_route_gate</code> (a project gate with typed evidence), <code>pm_close</code> (writes the closure asset and closes), <code>pm_get</code> and <code>changes_request</code>. <code>assert_pm</code> refuses any binding that is not an active <code>job_key='pm'</code> job (<code>403 not_pm_job</code>); <code>resolve_evidence</code> refuses absent (<code>422 gate_evidence_missing</code>), non-live (<code>422 gate_evidence_not_live</code>) and unknown kinds. <code>apply_gate_effect_tx</code> approves the named asset, baseline or change and writes the trace edge, and is called from <code>crates/actions/src/control/approvals.rs:114</code>.</li>
+<li><code>crates/actions/src/spine/mod.rs:take_baseline_guarded</code> — an approved baseline advances only with an approved change whose <code>baseline_ref</code> names it, else <code>409 change_request_required</code> or <code>409 change_request_invalid</code>; it reads <code>crates/store/src/spine.rs:latest_approved_baseline_tx</code>, and <code>take_baseline_tx</code> persists the <code>change_id</code>.</li>
+<li><code>crates/store/src/approval.rs:record_decision_tx</code> — the one writer every decision path traverses refuses <code>requested_by == approver_id</code> with <code>RequesterCannotDecide</code> (<code>409 conflict</code>). The only exception is the #282 tenant policy (<code>crates/store/src/approval_policy.rs:allows_self_approval</code>, default <code>forbidden</code>).</li>
+<li><code>crates/domain/src/governance.rs:AssetKind</code> — widened to 0044's fifteen kinds, including <code>Charter</code> and <code>Closure</code>.</li>
+</ul>
+<p>Tests at origin/main — ten <code>#[tokio::test]</code> functions (the issue handoff's "25/25" does not match the source):</p>
+<ul>
+<li><code>crates/api/tests/pm_lifecycle.rs</code>: <code>the_pm_charters_plans_and_baselines_a_request</code> (charter, gate, three-node WBS, baseline, gate; <code>pm.get</code> reads back the approved baseline and gates; the charter asset is approved) and <code>only_pm_creates_and_closes</code> (a coach binding gets <code>403 not_pm_job</code>; no project row and no status change).</li>
+<li><code>crates/api/tests/pm_close_gate.rs</code>: <code>a_project_closes_only_after_the_closure_gate</code> (<code>409 closure_gate_missing</code>, project stays open; after approval the closure asset is approved and the project closes).</li>
+<li><code>crates/api/tests/pm_self_approval.rs</code>: <code>the_pm_cannot_decide_its_own_gate</code> (409 <code>conflict</code>, detail "the requester cannot decide their own gate", zero decision rows, gate pending, charter still draft) and <code>a_distinct_approver_is_recorded</code>.</li>
+<li><code>crates/api/tests/pm_baseline_change.rs</code>: <code>a_new_baseline_without_a_change_request_is_refused</code> (409 <code>change_request_required</code>, baseline row set unchanged) and <code>approved_change_request_advances_the_baseline</code> (open change, impact 5, <code>baseline_ref</code> set; approval advances the baseline with <code>change_id</code>).</li>
+<li><code>crates/api/tests/pm_gate_evidence.rs</code>: <code>a_live_contract_resolves_the_gate</code> (approved asset opens the gate; approval leaves a <code>governed_asset → project</code> trace edge), <code>a_draft_contract_refuses_the_gate</code> (draft and superseded both <code>422 gate_evidence_not_live</code>, no approval row), <code>a_gate_without_evidence_is_refused</code> (<code>422 gate_evidence_missing</code>, no approval row).</li>
+</ul>
+<p>Registry and declarations: <code>crates/actions/tests/registry.rs</code> lists the six actions and <code>crates/actions/tests/parity_http_mcp.rs</code> samples each; <code>docs/design/data/actions.json</code> declares all six; <code>scripts/v2-slice-artefacts.json</code> credits exactly those six to T3 with <code>gap: null</code> (<code>2d06e7d7</code>, PR #330); <code>docs/design/data/coverage.json</code> measures T3 <code>built</code>, actions <code>[6,6]</code>; <code>seed/programme.json</code> records T3 <code>status: closed</code>, <code>measured_status: built</code>.</p>
+<h2>Verification</h2>
+<p>Commands:</p>
+<pre><code>cargo test -p conveyor-api --test pm_lifecycle
+cargo test -p conveyor-api --test pm_close_gate
+cargo test -p conveyor-api --test pm_self_approval
+cargo test -p conveyor-api --test pm_baseline_change
+cargo test -p conveyor-api --test pm_gate_evidence
+cargo test -p conveyor-actions --test registry
+cargo test -p conveyor-actions --test parity_http_mcp
+python3 scripts/build-coverage.py --check
+node docs/design/scripts/check-coverage.cjs
+</code></pre>
+<p>Recorded CI, not re-run on 2026-11-18:</p>
+<ul>
+<li>Run <strong>44191738186</strong>, <code>merge_group</code> at head <code>c10d7599</code>, conclusion success — the green run at the merge sha. Its <code>checks</code> job ran <code>cargo fmt --check</code>, <code>clippy --all-targets --locked -D warnings</code>, <code>nextest run --no-tests=fail --locked</code> and <code>cargo test --doc</code>; <code>design-pack</code> and <code>dco</code> are skipped in <code>merge_group</code>.</li>
+<li>PR #313's final-head run <strong>44188361157</strong> (<code>c10020c</code>) is green on every job, including <code>design-pack</code>.</li>
+<li>The push run at the same merge sha, <strong>44194863888</strong>, is red overall: <code>checks</code> succeeded and only <code>design-pack</code> failed — <code>AssertionError: a non-built project has no open unit</code>, because #74 had closed while T3 still measured <code>proposed</code>. #330 (<code>2d06e7d7</code>) declared the six actions; its main push run <strong>44224631824</strong> is fully green.</li>
+</ul>
+<h2>Links</h2>
+<ul>
+<li>Brief: <a href="https://conveyor.nonagentic.ai/design/docs/output-01a1e008-6970-74b7-bfc3-8dcae400f07e.html">T3 — PM job</a></li>
+<li>Issue #74 (closed); PR #313 (merged <code>c10d7599</code>); PR #330 (declaration, <code>2d06e7d7</code>); PR #310/#305 (console-MSP reconciliation, <code>ed019409</code>).</li>
+<li>Siblings: <a href="https://conveyor.nonagentic.ai/design/docs/output-01a1e008-1538-71ad-a0e8-fcad2c7d42ec.html">T1 — Plan spine</a>, <a href="https://conveyor.nonagentic.ai/design/docs/output-01a1e008-614c-7177-beb5-8fe89c8e3d8e.html">T2 — Decision ladder</a>.</li>
+<li>Spec: <code>docs/SPEC_V2.md</code> §6.1, §5.4, §5.5, §10.3, §12 T3.</li>
+</ul>
+<h2>Gap</h2>
+<ol>
+<li><strong>Staffing is not proven as a PM act.</strong> No <code>pm.staff</code> action exists; <code>pm.charter</code> creates a board and a start card/run, and every test seeds the bindings it needs. The gate word "staffing" is a fixture precondition, not an assertion that the PM staffs a project.</li>
+<li><strong>"Runs a request end to end" is an action sequence, not an engine run.</strong> The tests call the actions over the in-process HTTP harness against real Postgres; no PM procedure is executed by the engine and no run's evidence is read back. The run-lifecycle half of P1.1 is unproven.</li>
+<li><strong>Typed evidence covers two kinds.</strong> P4's <code>architecture_contract</code> does not exist until T9; the resolver accepts <code>governed_asset</code> and <code>baseline</code> only — the scope correction recorded on #74. Draft, superseded, absent and unknown kinds are proven.</li>
+<li><strong>Self-approval refusal is the default, not absolute:</strong> #282 makes the policy tenant-configurable, and T3 proves the <code>forbidden</code> path, not <code>allowed</code>.</li>
+<li><strong><code>pm.close</code> is destructive without a declared target</strong> (on the <code>crates/actions/tests/destructive_gate.rs:UNGATED</code> burn-down; #283 owns emptying it). The published brief page still shows T3 <code>proposed</code>; the reconciled declaration measures it <code>built</code>.</li>
+</ol>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>PM job · conveyor output · published 2026-11-19T07:25:30.824251215+00:00 · FR Test</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

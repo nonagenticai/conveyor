@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>T10 SAFe cadence and MSP tranches — architecture design · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>T10 — Architecture design</h1>
+<p>Project: T10 — SAFe cadence and MSP tranches · Track: v2 · Tranche: 4 · Plan: docs/SPEC_V2.md §12
+Unit: #82 (this design is dependency-shaping work; blocked-by T1, T3 and P0)
+Measured at: main@61edfcf8, 2026-11-18 · Project row: active, meta.depends_on = ["T1", "T3", "P0"]</p>
+<h2>Context and boundary</h2>
+<p>T10 is the V2 Work capability the blueprint calls "programme cadence": P0 adopts the plan, T1
+supplies rows, T3 the PM job, T10 the execution. It runs under P0's live architecture contract, and
+its artefacts satisfy AS-1: type, phase/plateau, common metadata and one typed link.</p>
+<p>T10 owns the cadence execution actions (PI materialisation, demo gate, retro composition,
+refinement read), the benefits authoring and realization read (strategy, realization plan,
+realized versus planned), and one nullable column that ties a backlog item to the cadence that
+planned it.</p>
+<p>T10 must not duplicate: WSJF arithmetic (<code>crates/domain/src/spine.rs:wsjf</code>); tranche and review
+persistence or refusals (T1, <code>migrations/0044_plan_spine.sql:programme_tranche</code>); the lesson
+aggregate (T8); kata (T5); metrics and never-refused flagging (T11); TOGAF artefacts (T9); or the
+board, card, run, approval, document and <code>governed_asset</code> lifecycles. The blueprint's intermediate
+state is T0–T17; T10 is tranche 4 and may run parallel with T9.</p>
+<h2>Aggregates, tables and actions</h2>
+<table><thead><tr><th>Aggregate</th><th>State (table)</th><th>Invariants</th><th>Actions</th></tr></thead><tbody>
+<tr><td>Programme cadence</td><td><code>programme_cadence</code> (built)</td><td>one row per programme/kind/period; the action validates the state machine; a cadence closes once and links its outputs</td><td>existing <code>cadences.create</code>, <code>cadences.list</code>, <code>cadences.update</code>, <code>cadences.delete</code>; <code>cadences.plan</code>, <code>cadences.demo</code>, <code>cadences.retro</code>, <code>cadences.refine</code> <strong>(to create)</strong></td></tr>
+<tr><td>Backlog item</td><td><code>wbs_node</code> (built) + <code>wbs_node.planned_cadence_id</code> <strong>(to create)</strong></td><td>four WSJF inputs, <code>job_size &gt; 0</code>; one planned cadence and one card per item</td><td>existing <code>wbs.create</code>, <code>wbs.update</code>, <code>wbs.get</code>, <code>wbs.list</code>, <code>wbs.delete</code>, <code>cards.create</code></td></tr>
+<tr><td>Tranche</td><td><code>programme_tranche</code>, <code>programme_tranche_review</code> (built)</td><td>evidence carries baselines, benefit status and risk register; reviews append-only; a re-baseline is change control</td><td>existing <code>tranches.create</code>, <code>tranches.update</code>, <code>tranches.list</code>, <code>tranches.review</code>, <code>tranches.review_list</code>, <code>tranches.delete</code></td></tr>
+<tr><td>Benefit</td><td><code>benefit_profile</code>, <code>benefit_link</code>, <code>benefit_transition</code> (built)</td><td>six field groups; five map levels; a post-measurement requires a measured baseline</td><td>existing <code>benefits.create</code>, <code>benefits.update</code>, <code>benefits.get</code>, <code>benefits.list</code>, <code>benefits.link</code>, <code>benefits.unlink</code>, <code>benefits.link_list</code>, <code>benefits.transition_upsert</code>, <code>benefits.transition_list</code>, <code>benefits.delete</code>; <code>benefits.strategy</code>, <code>benefits.realization_plan</code>, <code>benefits.report</code> <strong>(to create)</strong></td></tr>
+<tr><td>Demo gate</td><td><code>approval</code> (built)</td><td><code>gate='demo'</code>; <code>meta.cadence_id</code>; <code>meta.evidence[]</code>; empty evidence refuses</td><td>existing <code>approvals.request</code>, <code>approvals.decide</code>, composed by <code>cadences.demo</code> <strong>(to create)</strong></td></tr>
+</tbody></table>
+<p>Built events: <code>programme_cadence.created|updated|deleted</code>, <code>programme_tranche.reviewed</code>,
+<code>benefit_profile.*</code>, <code>benefit_transition.*</code>. New <strong>(to create)</strong>, in the action's transaction:
+<code>programme_cadence.planned</code>, <code>.demoed</code>, <code>.closed</code>, <code>.refined</code>.</p>
+<p><strong>Materialisation.</strong> <code>cadences.plan</code> <strong>(to create)</strong> reads open <code>wbs_node</code> rows ordered by
+<code>(business_value + time_criticality + risk_reduction) / job_size</code> descending, resolves WIP from the
+target project's list <code>wip_limit</code> (pattern: <code>crates/actions/src/board/pull.rs</code>), creates one card
+per selected item within the remaining cap, sets <code>planned_cadence_id</code>, and raises one plan
+approval for a person. The score is computed, never written; a second call refuses planned items,
+so idempotency is by <code>planned_cadence_id</code>.</p>
+<p><strong>Demo.</strong> A deliverable is demonstrable only when its card is in a done list and
+<code>wbs_node.evidence</code> is a non-empty array. <code>cadences.demo</code> <strong>(to create)</strong> validates every completed
+deliverable, then records one <code>approval</code> with <code>gate='demo'</code> and the evidence refs; a
+missing evidence array refuses the whole demo. "No demo, no credit" is an approval outcome, not a
+status written onto the card.</p>
+<p><strong>Retro and refinement.</strong> <code>cadences.retro</code> <strong>(to create)</strong> composes T8's <code>lessons.propose</code> and
+T5's kata action, records their ids and closes the cadence. <code>cadences.refine</code> <strong>(to create)</strong>
+returns stale backlog items (derived from <code>updated_at</code> against the period) and emits
+<code>programme_cadence.refined</code>; it stores no stale flag.</p>
+<h2>Decisions</h2>
+<ul>
+<li><strong>D-T10-1 — the backlog is <code>wbs_node</code>.</strong> Alternative: a new <code>backlog_item</code> table. Consequence:
+one WSJF store and one backlog; SPEC_V2 §12 T10, carrying D-T1-4.</li>
+<li><strong>D-T10-2 — planning records <code>wbs_node.planned_cadence_id</code>.</strong> Alternative: a <code>cadence_card</code>
+join table or an id array in <code>meta</code>. Consequence: one nullable column and a partial index; an
+item cannot silently move cadence; D-T1-11 names cadence materialisation as T10's boundary.</li>
+<li><strong>D-T10-3 — WIP is <code>list.wip_limit</code>.</strong> Alternative: <code>programme.shared_config.wip</code>. Consequence:
+the board remains the only cap; a multi-project programme must resolve WIP per target project
+(open question 1). SPEC_V2 §8.2.</li>
+<li><strong>D-T10-4 — a demo is an <code>approval</code> row.</strong> Alternative: a <code>cadence_demo</code> table. Consequence: one
+gate primitive, evidence in <code>meta.evidence[]</code>, no new aggregate. SPEC_V2 §5.4, §8.2.</li>
+<li><strong>D-T10-5 — the retro owns no lesson or kata row.</strong> Alternative: T10 builds the lesson table.
+Consequence: acceptance-blocked-by T8; the brief's dependency list is incomplete; P10 forbids
+the duplicate.</li>
+<li><strong>D-T10-6 — stale is computed, never stored.</strong> Alternative: <code>wbs_node.meta.stale</code>. Consequence:
+refinement returns the list and emits an event; no second truth. P6.</li>
+<li><strong>D-T10-7 — strategy and realization plan are <code>governed_asset</code> rows.</strong> Alternative: new tables.
+Consequence: the existing lifecycle and publication gate apply; T10 adds authoring actions, not
+a store. <code>migrations/0044_plan_spine.sql:governed_asset_kind_check</code>.</li>
+<li><strong>D-T10-8 — no new scheduler.</strong> Alternative: an in-process cron. Consequence: cadence work is an
+ordinary run on the existing queue, staffed by <code>seed/organisation.json:programme_manager</code>
+(seeded <code>draft</code>). SPEC_V2 §10.6.</li>
+<li><strong>D-T10-9 — <code>realized</code> is reachable only through a transition.</strong> Alternative: accept
+<code>benefits.update(status)</code>. Consequence: T10 adds the guard at the update path or routes
+<code>realized</code> through <code>benefits.report</code>; without it §8.3 has a bypass.</li>
+</ul>
+<h2>Acceptance</h2>
+<p>Measured gate, verbatim (SPEC_V2 §12 T10): "PI planning materialises cards from the backlog by
+WSJF within WIP; a deliverable without evidence cannot demo; retro produces lessons; an
+end-of-tranche review with no baselines, benefit status or risk evidence is refused; a transition
+that never measured its baseline cannot report the benefit realized".</p>
+<p>All commands run from <code>crates/actions</code>.</p>
+<ol>
+<li><strong>PI planning.</strong> Verify: <code>cargo test --test plan_spine wsjf_recomputes_when_an_input_changes</code> (existing arithmetic) and <code>cargo test --test cadence_t10 pi_planning_materialises_by_wsjf_within_wip</code> (to create at <code>crates/actions/tests/cadence_t10.rs</code>).</li>
+<li><strong>Demo evidence.</strong> Verify: <code>cargo test --test cadence_t10 a_deliverable_without_evidence_cannot_demo</code> (to create at <code>crates/actions/tests/cadence_t10.rs</code>).</li>
+<li><strong>Retro lessons.</strong> Verify: <code>cargo test --test cadence_t10 retro_produces_lesson_and_kata_proposals</code> (to create at <code>crates/actions/tests/cadence_t10.rs</code>); the prerequisite is T8's <code>lessons.propose</code> resolving in <code>docs/design/data/actions.json</code>, which it does not today.</li>
+<li><strong>Tranche evidence.</strong> Verify: <code>cargo test --test plan_spine a_tranche_review_without_evidence_is_refused</code> (existing) and <code>cargo test --test cadence_t10 tranche_review_refuses_empty_evidence_objects</code> (to create at <code>crates/actions/tests/cadence_t10.rs</code>).</li>
+<li><strong>Benefit baseline.</strong> Verify: <code>cargo test --test spine_msp transition_requires_baseline_before_post</code> (existing, <code>crates/actions/tests/spine_msp.rs</code>) and <code>cargo test --test cadence_t10 a_transition_without_a_measured_baseline_cannot_report_realized</code> (to create at <code>crates/actions/tests/cadence_t10.rs</code>).</li>
+</ol>
+<p>No command is claimed to pass; the existing tests are named so the build unit keeps them green,
+and the new ones do not exist yet.</p>
+<h2>Architecture artefacts</h2>
+<p><strong>T10 inception artefact catalogue</strong> (a catalog of the PSA artefacts, one HLD matrix, two SD
+diagrams). Every row carries: owner <code>T10 delivery unit (#82)</code>; reviewer: the independent review and
+its fixes recorded on #347; review date <code>2026-11-18</code>; version <code>1</code>; project <code>T10 — SAFe cadence and MSP tranches</code>; purpose — the row's own Purpose column; stakeholders — the programme board, the SRO,
+the BCM, the PM, the coach and the reviewer; scope — T10's cadence and benefit execution, excluding
+T8's lessons, T11's metrics and T9's artefacts; status <code>proposed</code>; published document — this
+project's <code>architecture-design</code> output. A design artefact is not evidence.</p>
+<table><thead><tr><th>ID</th><th>Type</th><th>Phase/plateau</th><th>Title</th><th>Purpose</th><th>Links</th></tr></thead><tbody>
+<tr><td>T10-PSA-01</td><td>catalog</td><td>A / psa</td><td>Principles applicability</td><td>P6, P7, P8, P10 applied to cadence</td><td>derivation: P0 principles</td></tr>
+<tr><td>T10-PSA-02</td><td>catalog</td><td>A / psa</td><td>Requirements catalog</td><td>the five gate parts as requirements</td><td>realization: §12 T10</td></tr>
+<tr><td>T10-PSA-03</td><td>matrix</td><td>A / psa</td><td>Stakeholder map (stakeholder × concern)</td><td>board (cadence plan), SRO (tranche decision), BCM (benefit status), PM (backlog and WIP), coach (interruptions into retro), reviewer (evidence)</td><td>dependency: P0 blueprint</td></tr>
+<tr><td>T10-PSA-04</td><td>catalog</td><td>A / psa</td><td>Driver, goal, objective</td><td>why the cadence exists</td><td>derivation: P0 business case</td></tr>
+<tr><td>T10-PSA-05</td><td>diagram</td><td>A / psa</td><td>Solution concept</td><td>cadence → backlog → cards → evidence → review</td><td>reuse: T1 plan spine</td></tr>
+<tr><td>T10-PSA-06</td><td>catalog</td><td>A / psa</td><td>Decision record</td><td>D-T10-1..9</td><td>dependency: this design</td></tr>
+<tr><td>T10-HLD-01</td><td>matrix</td><td>C / hld</td><td>Cadence–aggregate matrix</td><td>aggregate × action ownership</td><td>realization: §10.3–§10.4</td></tr>
+<tr><td>T10-HLD-02</td><td>catalog</td><td>C / hld</td><td>Data entity catalog</td><td>tables, columns and invariants</td><td>reuse: migrations/0044, 0051</td></tr>
+<tr><td>T10-SD-01</td><td>diagram</td><td>D / sd</td><td>PI materialisation flow</td><td>order, WIP cap, idempotency</td><td>realization: D-T10-2, D-T10-3</td></tr>
+<tr><td>T10-SD-02</td><td>diagram</td><td>D / sd</td><td>Benefits realization flow</td><td>baseline, transition, measurement</td><td>realization: §8.3</td></tr>
+</tbody></table>
+<h2>Migration and rollout</h2>
+<p><code>0052_cadence_execution.sql</code> <strong>(to create, forward-only)</strong> adds nullable
+<code>wbs_node.planned_cadence_id uuid</code> with a foreign key to <code>programme_cadence(id)</code> and a partial
+index, and a UNIQUE <code>(tenant_id, programme_id, kind, period)</code> index on <code>programme_cadence</code> for the
+one-row-per-period invariant. <strong>No <code>state</code> CHECK:</strong> <code>state</code> is free text today
+(<code>migrations/0044_plan_spine.sql:programme_cadence</code>) and <code>cadences.update</code> writes any string, so the state machine
+is validated in the action, not by a constraint — open question 6 is answered this way. The unique
+index is checked against live rows before it is applied; if a duplicate exists, the migration
+refuses and the cleanup is a separate, owner-approved step. The actions are additive with
+<code>portfolio:read</code> and <code>portfolio:write</code> scopes. No new port, binary or database (SPEC_V2 §10.6).</p>
+<p>Sequence: migration, domain rules, actions, tests, <code>docs/design/data/actions.json</code>, then the read
+models the Portfolio and Programme screens consume (§10.5). Apart from the unique index, rollout
+changes no existing behaviour, so no flag; rollback disables the actions and ignores the nullable
+column, with no rewrite. Events are written in the action's transaction. P0's first-tranche
+authorisation remains the owner's act; T10 does not publish <code>tranche-review</code>.</p>
+<h2>Links</h2>
+<ul>
+<li>Brief: https://conveyor.nonagentic.ai/design/docs/output-01a1e008-1da4-772b-8e90-333cb334ce09.html</li>
+<li>Issue: #82; reviewer record: #347</li>
+<li>Spec: <code>docs/SPEC_V2.md</code> §12 T10, §8.2–§8.4, §10.3–§10.6</li>
+<li>Programme definition: <code>docs/plans/P0-programme-definition.md</code> §5, §7</li>
+<li>Blueprint: https://conveyor.nonagentic.ai/design/docs/output-01a1e006-dacb-76e0-a45b-4f94de2bde4c.html</li>
+<li>Artefact standard: https://conveyor.nonagentic.ai/design/docs/output-01a1e9d1-2720-776c-9741-a5deb322086e.html</li>
+<li>Coverage row: <code>docs/design/data/coverage.json:"T10"</code></li>
+<li>Sibling analysis: the <code>inception-analysis</code> output, published on this project</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>SAFe cadence and MSP tranches · conveyor output · published 2026-11-19T07:25:30.824251215+00:00 · FR Test</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Programme plan — tranches, projects and sequencing · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>Programme plan — tranches, projects and sequencing</h1>
+<p><strong>Programme:</strong> conveyor buildout · <strong>Status:</strong> adopted by P0 · <strong>Date:</strong> 2026-11-15
+<strong>Mapping of record:</strong> <code>seed/programme.json</code> (48 projects) · <strong>Measured truth:</strong> <code>data/coverage.json</code></p>
+<h2>1. How to read the plan</h2>
+<ul>
+<li>A <strong>project</strong> is one part of the conveyor: a V1 slice (<code>S##</code>), a V2 slice (<code>T##</code>), or a
+cross-cutting unit (<code>P0</code>, <code>SPEC-V2</code>, <code>DESIGN-PUBLISH</code>, <code>PLATFORM</code>). Every project has a plan path,
+a brief, and two inception units (<code>analysis</code>, <code>architecture</code>) before its build units are claimed.</li>
+<li>A <strong>tranche</strong> is the longest dependency path in the project graph, not a calendar phase. Two
+projects in the same tranche can run in parallel when their typed edges allow it.</li>
+<li>Every unit of work is a GitHub issue; every issue is one branch and one PR
+(<code>docs/plans/03-DELIVERY.md</code>).</li>
+</ul>
+<h2>2. The projects</h2>
+<table><thead><tr><th style="text-align: right">Tranche</th><th>Projects</th><th style="text-align: right">Count</th></tr></thead><tbody>
+<tr><td style="text-align: right">0</td><td><strong>DESIGN-PUBLISH</strong> Publish the SPEC_V2 studio design pack, live; <strong>P0</strong> Programme definition — vision, blueprint, plan and project briefs; <strong>PLATFORM</strong> CI, runners and platform; <strong>S00</strong> Usage inventory → parity/parity.yaml; <strong>S01</strong> UI spike — Leptos CSR vs Leptos SSR; <strong>SPEC-V2</strong> SPEC V2 — the organisational operating model; <strong>T0</strong> Model and contracts</td><td style="text-align: right">7</td></tr>
+<tr><td style="text-align: right">1</td><td><strong>S02</strong> Skeleton — workspace, tenancy, auth, jobs, SSE; <strong>T1</strong> Plan spine; <strong>T11</strong> Metrics, metering and maturity</td><td style="text-align: right">3</td></tr>
+<tr><td style="text-align: right">2</td><td><strong>S03</strong> Domain and schema — aggregates, state machines, baseline domain migration; <strong>T2</strong> Decision ladder</td><td style="text-align: right">2</td></tr>
+<tr><td style="text-align: right">3</td><td><strong>S04</strong> Action registry — derive, manifest, OpenAPI, MCP, invocation, external ingest; <strong>T3</strong> PM job; <strong>T13</strong> Tool platform</td><td style="text-align: right">3</td></tr>
+<tr><td style="text-align: right">4</td><td><strong>S05</strong> Board; <strong>S07</strong> Requirements, catalogues, revisions, quality scoring, search; <strong>S09</strong> Documents, repositories, secrets, workers UI, reports/metrics, billing display; <strong>T4</strong> Kanban coach; <strong>T9</strong> TOGAF profile; <strong>T10</strong> SAFe cadence; <strong>T14</strong> Estate toolkits; <strong>T16</strong> SOP, RDF/OWL and process-document ingestion</td><td style="text-align: right">8</td></tr>
+<tr><td style="text-align: right">5</td><td><strong>S06</strong> Control plane — claims, runs, approvals, andon, comms and notifications; <strong>S08</strong> Governance, modelling, render and export; <strong>S17</strong> Native benchmark harness; <strong>T7</strong> Operations; <strong>T17</strong> Tenant asset authoring</td><td style="text-align: right">5</td></tr>
+<tr><td style="text-align: right">6</td><td><strong>S06a</strong> mcp_server signed channel; <strong>S06b</strong> Agent direct interface; <strong>S10</strong> Copilot / AG-UI; <strong>S11</strong> Processes, steps and SOPs</td><td style="text-align: right">4</td></tr>
+<tr><td style="text-align: right">7</td><td><strong>S06c</strong> MCP tasks; <strong>S15</strong> Capability, knowledge and memory; <strong>S16</strong> Inference ledger and prompt audit</td><td style="text-align: right">3</td></tr>
+<tr><td style="text-align: right">8</td><td><strong>S06d</strong> Interaction connector standard; <strong>S13</strong> Process engine, judge, map and care-bus; <strong>S19</strong> Eval builder</td><td style="text-align: right">3</td></tr>
+<tr><td style="text-align: right">9</td><td><strong>S18</strong> Kata continuous improvement; <strong>S20</strong> Eval hillclimb; <strong>S21</strong> Message construction (the compiled prompt)</td><td style="text-align: right">3</td></tr>
+<tr><td style="text-align: right">10</td><td><strong>S12</strong> UI build-out; <strong>T5</strong> Kata</td><td style="text-align: right">2</td></tr>
+<tr><td style="text-align: right">11</td><td><strong>S14</strong> Cutover; <strong>T6</strong> Development project; <strong>T8</strong> Organisational memory</td><td style="text-align: right">3</td></tr>
+<tr><td style="text-align: right">12</td><td><strong>T15</strong> Tool authoring and BYO</td><td style="text-align: right">1</td></tr>
+<tr><td style="text-align: right">13</td><td><strong>T12</strong> One organisation loop</td><td style="text-align: right">1</td></tr>
+</tbody></table>
+<p>Total: <strong>48 projects</strong> (P0 + 47 delivery projects). Source: <code>seed/programme.json</code>; the tranche is
+computed from <code>meta.depends_on</code> by <code>scripts/build-coverage.py</code>.</p>
+<h2>3. Sequencing</h2>
+<ul>
+<li><strong>P0 gates T1–T17.</strong> No V2 delivery project starts until this definition set is accepted and its
+briefs are published (<code>docs/plans/P0-programme-definition.md</code> §1, §6).</li>
+<li><strong>The V2 spine is T0 → T1 → T2 → T3.</strong> T4 follows T3; T5 follows T2 and V1's S16–S20; T6 follows
+T5 <strong>and</strong> T13; T7 follows T2/T4 <strong>and</strong> T13; T8 follows T5; T9/T10 follow T1/T3; T11 is
+continuous; T12 follows all; T13 follows T2; T14 follows T13; T15 follows T13 and T6; T16
+follows T2 and T13; T17 follows T16 and T3 (<code>docs/SPEC_V2.md</code> §12).</li>
+<li><strong>The first three months are T0–T3 plus T13.</strong> They install the organisation spine and the tool
+spine; everything else is a job that uses them (<code>docs/SPEC_V2.md</code> §12).</li>
+<li><strong>V1's remaining slices</strong> (S00–S21) run on their own dependency edges; they are not re-opened by
+V2. S14 is the cutover that retires fr, RM and Planka; it does not block V2's spine.</li>
+</ul>
+<h2>4. Definition of done, per project</h2>
+<p>A project is done when:</p>
+<ol>
+<li>its <strong>brief</strong> is published on the project (<code>meta.category = project-brief</code>) and carries the
+outcome, boundary, reuse sources, typed dependencies, acceptance with a <code>Verify:</code> line,
+capabilities and plan path;</li>
+<li>its <strong>analysis</strong> and (for V2) <strong>architecture</strong> are published on the project — the inception
+standard (<code>docs/plans/P0-programme-definition.md</code> §5);</li>
+<li>its build units are claimed and merged with the plan's gate green;</li>
+<li>its <strong>evidence</strong> is recorded on the project and the coverage instrument's measured status
+reflects it; a claim without evidence is not done.</li>
+</ol>
+<h2>5. Change control</h2>
+<ul>
+<li>The seed is the mapping of record. A new project is a seed change, a plan document, a brief, and
+an issue; a project is never invented in a session and left out of the seed.</li>
+<li>A tranche change is a change to this plan and to <code>seed/programme.json</code> in the same PR; the
+coverage <code>--check</code> gate is the drift detector.</li>
+<li>A project whose plan no longer matches the programme is marked archived in the seed with a
+reason; it is not deleted from the record.</li>
+</ul>
+<h2>6. Acceptance of this plan</h2>
+<ul>
+<li>The programme plan lists 48 projects with their tranches and dependencies.</li>
+<li>The seed and <code>data/coverage.json</code> agree; <code>scripts/build-coverage.py --check</code> passes.</li>
+<li>P0's eight artefacts are published; T1–T17 remain blocked by P0 until P0 is accepted.</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Programme definition — vision, blueprint, plan and project briefs · conveyor output · published 2026-11-19T07:25:30.824251215+00:00</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>S05 — Board — projects, boards, lists, cards, labels, comments, tasks, custom fields, webhooks, SSE · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>S05 — Board — projects, boards, lists, cards, labels, comments, tasks, custom fields, webhooks, SSE</h1>
+<p><strong>Track:</strong> v1 · <strong>Tranche:</strong> 4 · <strong>Measured status:</strong> built · <strong>Plan:</strong> <code>docs/plans/slices/S05-board.md</code>
+<strong>Dependencies:</strong> S03, S04 · <strong>Issues:</strong> none</p>
+<h2>Outcome</h2>
+<p><code>project → board → list → card</code> plus satellites, on one action registry, one comment store, one membership model, one outbox. The 280-flow board↔project lookup becomes a foreign key.</p>
+<h2>Boundary</h2>
+<p><strong>IN</strong> — the 9 tables of §2.5; 39 actions; read projections; SSE <code>board:{id}</code>/<code>card:{id}</code>; the webhook emitter; the export/import CLI.</p>
+<p><strong>OUT</strong> — attachments and card-level memberships (SPEC §2: no table, route or action); claims, assignee and stopwatch writes (S06, contract §4); webhook <code>delivery</code> rows (a job); the UI (S12).</p>
+<h2>Reuse sources</h2>
+<table><thead><tr><th>path</th><th>read this</th><th>carry</th><th>do not carry</th></tr></thead><tbody>
+<tr><td><code>kanban/docs/openapi.json</code> (PLANKA <strong>2.0.0-rc.4</strong>, <strong>67 paths</strong>)</td><td><code>Card</code>,<code>List</code>,<code>Board</code>,<code>Label</code>,<code>Comment</code>,<code>Task*</code>,<code>CustomField*</code>,<code>BoardMembership</code>,<code>Webhook</code></td><td>field shapes</td><td>external ids as keys</td></tr>
+<tr><td>live <code>kanban</code> schema (33 tables, <code>50-schema-inventory.md</code>)</td><td>columns, FKs, indexes</td><td>constraints</td><td>row data (test only)</td></tr>
+<tr><td><code>30-rm-planka-mcp-n8n.md</code> §2</td><td>identity correction; <code>{event,data,prevData,user}</code></td><td>event names; comma-separated <code>events</code></td><td>instance-admin scoping</td></tr>
+<tr><td><code>20-fr.md</code> <code>cards</code>,<code>kanban</code>,<code>decompositions</code>,<code>projects</code></td><td>fr's…</td><td></td><td></td></tr>
+</tbody></table>
+<h2>Inception units</h2>
+<ol>
+<li><code>analysis</code> — current state and reuse: inventory what already exists, the contract and licence constraints, the build-vs-reuse decision, and the risks.</li>
+<li><code>architecture</code> — the project's design: aggregates, tables, actions, modules, integrations, the decision record, and acceptance.</li>
+</ol>
+<p>Both are documents on this project with <code>meta.category</code> set to <code>analysis</code> / <code>architecture</code>; both published is the inception standard.</p>
+<h2>Dependencies</h2>
+<p>Blocked-by: S03, S04.</p>
+<h2>Acceptance</h2>
+<pre><code class="language-bash">set -euo pipefail
+source ~/.cargo/env          # CONTRACT §16 — cargo is not on PATH
+command -v k6 || brew install k6   # k6 is not installed (CONTRACT §16)
+docker compose up -d db &amp;&amp; cargo run -p conveyor-server -- migrate --dev-seed
+CONVEYOR_DEV_AUTH=1 cargo run -p conveyor-server -- serve &amp;
+trap 'kill %1 2&gt;/dev/null || true' EXIT
+API=http://127.0.0.1:8930
+F=tests/fixtures/board/v1-1000.json
+T=$(psql "$DATABASE_URL" -tAc "select id from tenant where slug='dev-a'")   # pinned to dev-a:…
+
+Verify: the gate script above (its executable acceptance)
+
+## Capabilities
+
+`development`
+
+## Gaps
+
+- None recorded beyond the inception units themselves.
+</code></pre>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Board — projects, boards, lists, cards, labels, comments, tasks, custom fields, webhooks, SSE · conveyor output · published 2026-11-19T07:25:30.824251215+00:00</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

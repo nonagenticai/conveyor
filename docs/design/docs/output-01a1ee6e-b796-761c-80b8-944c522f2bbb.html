@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>T1 Plan spine — evidence · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>T1 — Evidence</h1>
+<p>Project: T1 — Plan spine · Track: v2 · Tranche: 1 · Plan: docs/SPEC_V2.md §12
+Unit: #349 (the unit that publishes this output)
+Measured at: main@856cb8e53756b40170353802d9d5c97fdc024ac4, 2026-11-18 · Project row: closed</p>
+<h2>Claim</h2>
+<p>T1's measured gate in <code>docs/SPEC_V2.md</code> §12 is met by the merge of PR #250 (<code>e3d7c4eb</code>, 2026-11-17): one frozen baseline, a refused impact-free change, a refused self-approval, WSJF recomputed on read, the computed in-flight portfolio, refused dependency cycles and the MSP rows that refuse an incomplete benefit profile and an incomplete benefits-map edge — each implemented in merged code and asserted by a merged test, with a green <code>ci</code> run at the merge sha.</p>
+<h2>Evidence</h2>
+<p>All paths resolve at <code>main@856cb8e</code>; unless stated otherwise the merge sha is <code>e3d7c4eb</code> (T1, PR #250, merged 2026-11-17T05:30Z).</p>
+<p>Code (merged): <code>migrations/0044_plan_spine.sql::wbs_node</code> (four typed WSJF inputs, <code>job_size &gt; 0</code>, acceptance/evidence by artefact), <code>::project_baseline</code> (frozen JSON snapshot), <code>::project_register_item</code> (constraint <code>project_register_item_change_impact</code>), <code>::project_dependency</code> (<code>project_dependency_not_self</code>, unique edge), <code>::programme_cadence</code>, <code>::programme_tranche</code>, <code>::programme_baseline</code>, <code>::benefit_profile</code>, <code>::benefit_link</code> (constraint <code>benefit_link_five_levels</code>), <code>::benefit_transition</code>, <code>::stakeholder_profile</code>, plus the extended <code>governed_asset.kind</code>. Every table is tenant-scoped, <code>version</code>ed and FORCE RLS.</p>
+<p>The refusals are typed in <code>crates/domain/src/spine.rs::wsjf</code>, <code>::validate_change</code>, <code>::benefit_profile_missing</code>, <code>::benefit_map_missing</code>, <code>::tranche_review_has_evidence</code>. Store behaviour: <code>crates/store/src/spine.rs::insert_dependency_tx</code> serialises edge creation with <code>pg_advisory_xact_lock</code> and refuses a cycle through a recursive CTE inside the creating transaction; <code>::in_flight_set_tx</code> reads <code>tenant.settings -&gt; 'portfolio' -&gt; 'in_flight'</code> (default <code>active,paused</code>); <code>::in_flight_tx</code> lists that set; <code>::take_baseline_tx</code> snapshots. Actions: <code>crates/actions/src/spine/mod.rs::wbs_create</code> (<code>wbs.create</code>), <code>::baselines_take</code>, <code>::registers_create</code>, <code>::project_dependencies_create</code>, <code>::portfolio_in_flight</code>, <code>::tranches_review</code>, <code>::benefits_create</code>, <code>::benefits_link</code>. The self-approval refusal is in the one store writer, <code>crates/store/src/approval.rs::record_decision_tx</code>, surfacing as <code>crates/domain/src/approval.rs::ApprovalError::RequesterCannotDecide</code> through <code>crates/actions/src/control/approvals.rs::approvals_decide</code>.</p>
+<p>Tests (merged, <code>e3d7c4eb</code>): <code>crates/actions/tests/plan_spine.rs</code> holds nine gate scenarios — <code>a_baseline_does_not_move_when_rows_change</code>, <code>a_change_request_without_impact_is_refused</code>, <code>wsjf_recomputes_when_an_input_changes</code> (also proves no <code>wsjf</code> column), <code>the_portfolio_lists_only_the_in_flight_set</code>, <code>a_two_node_dependency_cycle_is_refused</code>, <code>a_deep_dependency_cycle_leaves_no_row</code> (and no partial row), <code>a_benefit_without_baseline_target_method_or_owner_is_refused</code>, <code>a_benefit_map_edge_names_its_five_levels</code>, <code>a_tranche_review_without_evidence_is_refused</code> — plus <code>cadences_and_stakeholder_profiles_are_rows</code> (smoke). <code>crates/api/tests/approval_dual.rs::the_requester_cannot_decide_their_own_gate</code> asserts the refusal on a run gate and that no decision row is written.</p>
+<p>Merged after T1 (attributed, not T1's gate): <code>migrations/0051_tranche_review.sql::programme_tranche_review</code> plus <code>crates/actions/tests/spine_msp.rs</code> (edit/delete, durable review evidence, baseline-before-post) merged in <code>ed019409</code> (PR #310, 2026-11-18); before it, T1's review kept only the tranche state. The only <code>crates/store/tests/</code> file with "plan" in its name, <code>retire_plan_seed.rs</code>, is the plan-seeder retirement scan (PR #63, <code>12fe09ff</code>), not a T1 scenario; no store-level test asserts T1's queries.</p>
+<h2>Verification</h2>
+<p>An independent reader runs, against a checkout of <code>origin/main</code>:</p>
+<pre><code>cargo test -p conveyor-actions --test plan_spine
+cargo test -p conveyor-api --test approval_dual the_requester_cannot_decide_their_own_gate
+cargo test -p conveyor-actions --test spine_msp   # #305, not T1's gate
+</code></pre>
+<p>Each test binary starts its own <code>postgres:18</code> container and fails closed without one, unless <code>TEST_DATABASE_URL</code> names a superuser database.</p>
+<p>CI at the T1 merge sha: <code>gh run list --repo nonagenticai/conveyor --commit e3d7c4eb2bc1b0b4ee2a1b7ba561bf119d75a002</code> returns the push <code>ci</code> run 44024620693, conclusion <code>success</code>, every job green (<code>dco</code> skipped), with CodeQL and board also green. The <code>ed019409</code> push <code>ci</code> run 44242582995 is green too. This lane did not execute the tests itself; the pass claim rests on that CI record and the merge evidence in issue #72, not on a local run.</p>
+<h2>Links</h2>
+<ul>
+<li>Project brief: https://conveyor.nonagentic.ai/design/docs/output-01a1e008-1538-71ad-a0e8-fcad2c7d42ec.html</li>
+<li>Programme record: issue #72 (state CLOSED, closed 2026-11-17), PR #250.</li>
+<li>Published siblings: inception-analysis https://conveyor.nonagentic.ai/design/docs/output-01a1e683-1569-7742-bfcb-4c8ed08c0e51.html · architecture-design https://conveyor.nonagentic.ai/design/docs/output-01a1e683-33ff-75ab-ba17-a7d75400afc6.html</li>
+<li>§ refs: <code>docs/SPEC_V2.md</code> §5.1 (hierarchy, in-flight set), §5.3 (plan/state/execution, baseline vs forecast), §5.4 (gates, self-approval), §5.5 (register/change), §8.3 (MSP, benefit profile, tranche review), §10.3 (tables), §12 row T1.</li>
+</ul>
+<h2>Gap</h2>
+<ul>
+<li><code>programme.shared_config</code> is named in the §12 T1 scope and §10.3 ("<code>programme</code> extended with <code>shared_config</code>"), but <code>git grep shared_config origin/main -- migrations crates</code> returns nothing: no column and no inheritance exist. Not built.</li>
+<li><code>portfolio.in_flight</code> returns projects only (<code>InFlightOut</code> carries <code>programme_id</code>), while §5.1 defines the portfolio as every project <em>and programme</em> in flight. Programmes are not listed.</li>
+<li>Project types and DoD are named in the T1 row; T1 adds no template or DoD enforcement. The tests set the pre-existing <code>project.project_type_code='delivery'</code> and V1's <code>card_type.definition</code> carries DoD; neither behaviour is asserted here.</li>
+<li>P1.1 proves the snapshot is frozen but does not assert that existing runs keep their pins. P1.2 proves the impact block is mandatory; the person's decision and rationale ride T3's PM change control (PR #313), not a T1 test.</li>
+<li>The self-approval scenario is proven on a store-seeded run gate, not on a plan-spine baseline/change gate, and it is default policy that a tenant may override (the policy tables arrived in #282).</li>
+<li>Tranche-review durability is #305's <code>0051</code>, merged a day after T1 closed; T1 itself proves validation and the state transition only.</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Plan spine · conveyor output · published 2026-11-19T07:25:30.824251215+00:00 · FR Test</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>S09 — Documents, repositories, secrets, workers UI, reports/metrics, billing display · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>S09 — Documents, repositories, secrets, workers UI, reports/metrics, billing display</h1>
+<p><strong>Track:</strong> v1 · <strong>Tranche:</strong> 4 · <strong>Measured status:</strong> built · <strong>Plan:</strong> <code>docs/plans/slices/S09-documents-integrations.md</code>
+<strong>Dependencies:</strong> S03, S04 · <strong>Issues:</strong> none</p>
+<h2>Outcome</h2>
+<p>S09 ships four tables and a <strong>boundary</strong>: bytes in MinIO behind an authorized stream, write-only secrets, repositories as references, nine adjacent services reached only as declared actions with timeout and breaker — never a second worker manager, billing engine or KAG.</p>
+<h2>Boundary</h2>
+<p><strong>IN</strong> §2.10's four tables, the front-matter's actions, the <code>integrations</code> module, read-only workers/billing/observability displays, report queries over local tables, the strata handoff.
+<strong>OUT</strong> billing logic and metering writes (<strong><code>billing_service</code>, D12</strong>), worker scheduling (<strong><code>worker_management</code>, D14</strong>), artifact objects (<strong><code>artifacts</code></strong>), code analysis (<strong><code>coding-*</code></strong>), licence issuance (<strong><code>licenses</code></strong>), ingestion/embeddings (<strong><code>strata_ingest</code>/<code>strata_rag</code></strong>), screens (<strong>S12</strong>), <code>project_request.repository_url</code> (<strong>S07</strong>).
+<strong>UI surface declared for S12</strong>: <code>admin</code> — <code>actions.*</code>, <code>jobs.*</code>, <code>audit.list</code>, <code>licences.get</code>, <code>workers.list</code>, <code>billing.summary</code>; read models <code>/api/actions</code>, `audit_ev…</p>
+<h2>Reuse sources</h2>
+<table><thead><tr><th>path</th><th>read this</th><th>carry</th><th>do not carry</th></tr></thead><tbody>
+<tr><td>SPEC §2, §3 D12/D14, §5.2, §5.5</td><td>the nine-service list</td><td><code>object_store</code>; strata ingestion</td><td>absorbing any, KAG included</td></tr>
+<tr><td>01-CONTRACT §6, §9, §14</td><td>external-action fields</td><td>timeout + breaker; tenant from <code>membership</code></td><td>—</td></tr>
+<tr><td>02-DATA-ARCHITECTURE §2.10, §5, §8</td><td>the four tables' DDL</td><td>verbatim; <code>meta</code> read-whole rule</td><td>any fifth table or column</td></tr>
+<tr><td>02-source-map/20-fr <code>6f7c509792b3ca1fc1fb00c198aebcec83f0af29</code> <code>account</code>, <code>admin</code>, <code>operate</code>, <code>settings</code>, <code>integrations</code></td><td>repo registry, secret store, reports/workers reads</td><td>that sh…</td><td></td></tr>
+</tbody></table>
+<h2>Inception units</h2>
+<ol>
+<li><code>analysis</code> — current state and reuse: inventory what already exists, the contract and licence constraints, the build-vs-reuse decision, and the risks.</li>
+<li><code>architecture</code> — the project's design: aggregates, tables, actions, modules, integrations, the decision record, and acceptance.</li>
+</ol>
+<p>Both are documents on this project with <code>meta.category</code> set to <code>analysis</code> / <code>architecture</code>; both published is the inception standard.</p>
+<h2>Dependencies</h2>
+<p>Blocked-by: S03, S04.</p>
+<h2>Acceptance</h2>
+<pre><code class="language-bash">set -euo pipefail
+source ~/.cargo/env          # CONTRACT §16 — cargo is not on PATH
+cargo fmt --all --check
+cargo clippy --workspace --all-targets -- -D warnings
+cargo run -q -p conveyor-server -- --print-openapi --check-lock
+export DATABASE_MIGRATE_URL='postgres://postgres:postgres@127.0.0.1:5439/conveyor_dev'
+cargo run -q -p conveyor-server -- migrate      # twice; the second must be a no-op
+cargo test -p conveyor-api --test documents_roundtrip --test documents_limits \
+        --test…
+
+Verify: `cargo test --test &lt;missing&gt;`
+
+## Capabilities
+
+`development`, `design`
+
+## Gaps
+
+- None recorded beyond the inception units themselves.
+</code></pre>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Documents, repositories, secrets, workers UI, reports/metrics, billing display · conveyor output · published 2026-11-19T07:25:30.824251215+00:00</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

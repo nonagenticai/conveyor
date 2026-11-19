@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>T14 Estate toolkits — architecture design · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>T14 — Architecture design</h1>
+<p>Project: T14 — Estate toolkits · Track: v2 · Tranche: 4 · Plan: docs/SPEC_V2.md §12
+Unit: #83 (this document is dependency-shaping work; blocked-by T13 and P0)
+Measured at: main@61edfcf8, 2026-11-18 · Project row: active, meta.depends_on = ["T13", "P0"]</p>
+<h2>Context and boundary</h2>
+<p>T14 owns the import wave: which live services become toolkits, which contract each pins, which probe proves it, which binding grants it, and the zero-use and outage behaviour. It fits the blueprint — one workspace, one action registry, one Postgres, no new port (§10.6). T13 (#76, open, <code>status:claimed</code>) owns the four tables, broker, effect classes, credential profiles and storage adapter; T14 writes catalogue rows, probes and bindings over it. It must not duplicate the broker (§11.3), the <code>tool_call</code> ledger, the ops client, the captured locks or the coding fleet's code, nor own T15's authoring, T7's incidents or any rewrite (ADR 0007).</p>
+<h2>Aggregates, tables and actions</h2>
+<p><strong>Rows.</strong> <code>toolkit</code> is the root at <code>service@version</code>; <code>tool</code> rows are its operations; <code>tool_binding</code> pins a version to a job binding or run; <code>tool_call</code> is the ledger. All four are <code>planned</code> under T13 (#76, §11.8); none exists in <code>migrations/</code> at main@61edfcf8. T14 adds no table (P10); zero-use is a query.</p>
+<p>Reused (<code>built</code>): <code>migrations/0002_domain.sql:governed_asset</code>, <code>migrations/0013_documents.sql:secret</code>, <code>migrations/0001_platform.sql:event</code>, <code>:audit_event</code>, <code>migrations/0024_s16_inference_audit.sql:inference_call</code>, <code>migrations/0048_host_registry.sql:host_registry</code>, <code>migrations/0050_approval_policies.sql:approval_policy</code>.</p>
+<p><strong>Invariants.</strong>
+I1 one toolkit per service identity — destination alias plus contract, never port (8812 carries two services).
+I2 published versions are immutable; a change supersedes.
+I3 publication needs a read-only probe and one recorded live call.
+I4 a draft is unbound; <code>tools.call</code> fails <code>409 tool_not_ready</code> (P8).
+I5 a ceiling only narrows.
+I6 a failed probe unbinds new runs; in-flight finish (§11.9).
+I7 no caller-supplied URL; the alias is fixed.
+I8 no write tool without idempotency and read-back (§11.3).</p>
+<p><strong>Actions — existing, each resolves in <code>docs/design/data/actions.json</code> at main@61edfcf8:</strong> <code>ops.pods</code>, <code>ops.deployments</code>, <code>ops.events</code>, <code>ops.logs</code>, <code>ops.ci_status</code>, <code>ops.flux_status</code>, <code>ops.scale</code>, <code>ops.host_status</code>, <code>ops.host_logs</code>, <code>artifacts.list</code>, <code>billing.summary</code>, <code>coding_jobs.create</code>, <code>coding_jobs.get</code>, <code>retrieval.query</code>.</p>
+<p><strong>Actions — (to create):</strong> <code>toolkits.import_openapi|publish|list</code>, <code>tools.list|get|probe|call|publish|retire</code>, <code>tool_bindings.create|update|retire</code>, <code>tool_calls.list</code> — T13 (#76), §10.4/§11.8; <code>tools.zero_use</code> — (to create at #83), §11.9 and the T14 gate.</p>
+<p><strong>Events.</strong> <code>tool.called</code> (to create at T13) and <code>tool.probe_failed</code> (to create at #83), consumed by the binder to revoke new-run eligibility.</p>
+<h2>Decisions</h2>
+<p>D1 <strong>Import captured <code>openapi.lock.json</code>, not live introspection.</strong> Alternative: fetch <code>/openapi.json</code> at publish. Consequence: reproducible pins. The lock's pinned digest is compared with the probe's reported digest at publication; a mismatch is <code>409 tool_contract_stale</code> (to create at T13, #76), and the standing probe reports the same drift after publication.</p>
+<p>D2 <strong>Identity is the destination alias, not the port.</strong> Alternative: port-keyed names. Consequence: 8812's two services never collide.</p>
+<p>D3 <strong>Probes are read tools published with the toolkit.</strong> Alternative: external monitoring. Consequence: one ledger and schema; a non-read probe is refused.</p>
+<p>D4 <strong>No new tables.</strong> Alternative: a health or report table. Consequence: zero-use is computed from <code>tool_call</code>.</p>
+<p>D5 <strong>Planned services enter as <code>draft</code>, unbound.</strong> Alternative: omit them. Consequence: visible pipeline, fail-closed; drafts never callable.</p>
+<p>D6 <strong>Ops read tools share the client and declaration with <code>ops.*</code>.</strong> Alternative: bind tools to handlers, or omit ops. Consequence: P1 holds — one implementation, two surfaces — with a parity test.</p>
+<p>D7 <strong>The scientific scale-up is an approved <code>ops.scale</code> call, separate from the probe.</strong> Alternative: the probe auto-scales. Consequence: destructive effect, approval and audit; the gate is a scripted evidence run, not CI.</p>
+<p>D8 <strong>w2v and video-compiler pin the live contract and are superseded when <code>apps/media</code> replaces their stages (D58).</strong> Alternative: wait for the rewrite. Consequence: tools now; supersession is a versioned publish.</p>
+<h2>Acceptance</h2>
+<p>Gate, verbatim (§12 T14): "each published toolkit has a probe and one live call; <code>scientific_processor</code> is scaled up for its probe and one live call, then scaled back; a zero-use report exists; a backend outage unbinds new runs and in-flight runs finish".</p>
+<ul>
+<li><strong>A1 — a probe per published toolkit.</strong> Verify: <code>scripts/prove-estate.sh probe-all</code> (to create at #83) returns one green row per published toolkit, and <code>crates/actions/tests/estate_toolkits.rs::every_published_toolkit_has_a_read_only_probe</code> (to create at #83) refuses a probe declaring a write or spend effect.</li>
+<li><strong>A2 — one live call per published toolkit.</strong> Verify: <code>scripts/prove-estate.sh call-all</code> (to create at #83) plus <code>crates/actions/tests/estate_toolkits.rs::every_published_toolkit_has_one_live_call</code> (to create at #83); the resulting <code>tool_calls</code> rows are recorded on #83's evidence table.</li>
+<li><strong>A3 — scientific scale-up, probe, call, scale-back.</strong> Verify: <code>scripts/prove-estate.sh probe scientific_processor</code> and <code>… call scientific_processor</code> (to create at #83) around an approved <code>ops.scale</code>, then <code>kubectl -n &lt;namespace&gt; get deploy scientific_processor -o jsonpath='{.spec.replicas}'</code> → <code>0</code>.</li>
+<li><strong>A4 — zero-use report.</strong> Verify: <code>crates/actions/tests/estate_toolkits.rs::the_zero_use_report_flags_only_uncalled_tools</code> (to create at #83) — an uncalled tool is listed, a called one is not.</li>
+<li><strong>A5 — outage unbinds new runs, in-flight finish.</strong> Verify: <code>crates/actions/tests/estate_toolkits.rs::a_backend_outage_unbinds_new_runs_while_in_flight_finish</code> (to create at #83) — the new run is refused 409; the in-flight run finishes <code>succeeded</code> or <code>failed</code> (its <code>tool_call</code> may record a backend error), never refused mid-flight.</li>
+<li><strong>A6 — a draft is never callable.</strong> Verify: <code>crates/actions/tests/estate_toolkits.rs::a_draft_toolkit_is_unbound_and_uncallable</code> (to create at #83) — 409, no <code>tool_call</code> written.</li>
+</ul>
+<h2>Architecture artefacts</h2>
+<h3>PSA set at inception</h3>
+<p><strong>Principles applied (SPEC_V2 §3).</strong> P1 one record per fact: toolkit rows are the only catalogue. P2 tool selection is not an LLM decision. P5 probe and live call before publication. P8 draft or unhealthy means 409. P10 no new table. P11 ceilings, aliases and approvals are tenant rows.</p>
+<p><strong>Requirements.</strong> R1 every live §11.2 service has a published toolkit. R2 every job call goes through <code>tools.call</code> (§11.3). R3 effect classes gate each operation (§11.4). R4 the four tables and actions exist (§11.8). R5 probes, health and zero-use follow §11.9. R6 drafts stay uncallable (§11.2, P8). R7 the §8.1 metadata is carried.</p>
+<p><strong>Stakeholder map.</strong> Platform owner; delivery and verification jobs; operations; the media tenant; the AHTAPol tenant; architecture and security review; the independent reviewer on #347.</p>
+<p><strong>Driver → goal → objective.</strong> Driver: today's ad-hoc externals are not tool-ledgered (no <code>tool_call</code>) and are unowned. Goal: one governed catalogue over the live estate. Objective: every published toolkit has a probe and one live call; the three draft groups (<code>evidence_review</code>, <code>discovery</code> and the planned AHTAPol services) exist and are uncallable; the zero-use report names every uncalled tool; an outage unbinds new runs while in-flight runs finish.</p>
+<p><strong>Solution concept.</strong> Contract capture → draft → probe → contract test → publish → bind → probe schedule → zero-use retirement; drafts stop at step two.</p>
+<h3>Typed artefact</h3>
+<p><strong>Type:</strong> matrix · <strong>Phase/plateau:</strong> A / PSA · <strong>Status:</strong> draft · <strong>Version:</strong> 1 · <strong>Owner:</strong> T14 delivery (#83) · <strong>Reviewer:</strong> the independent reviewer recorded on #347 · <strong>Review date:</strong> 2026-11-18 · <strong>Project:</strong> T14 — Estate toolkits · <strong>Purpose/stakeholders/scope:</strong> which service becomes which toolkit, under which ceiling, proved by which evidence; for the platform owner, consuming job families and reviewers; scope is §12 T14. <strong>Links:</strong> derives from §11.2; realises R1–R6; reuses the captured locks.</p>
+<table><thead><tr><th>Toolkit (service identity)</th><th>Lifecycle</th><th>Probe</th><th>Ceiling</th><th>Gate evidence</th></tr></thead><tbody>
+<tr><td>coding fleet</td><td>planned — #76</td><td>gateway health read</td><td>write</td><td>live call</td></tr>
+<tr><td>strata_rag</td><td>planned — #83</td><td>retrieval read</td><td>read</td><td>live call</td></tr>
+<tr><td>strata_ingest</td><td>planned — #83</td><td>ingest status read</td><td>write</td><td>live call</td></tr>
+<tr><td>billing reads</td><td>planned — #83</td><td>summary read</td><td>read</td><td>live call</td></tr>
+<tr><td>licence reads</td><td>planned — #83</td><td>entitlement read</td><td>read</td><td>live call</td></tr>
+<tr><td>webscraper</td><td>planned — #83</td><td>health read</td><td>read</td><td>live call</td></tr>
+<tr><td>media_discovery</td><td>planned — #83</td><td>health read</td><td>read</td><td>live call</td></tr>
+<tr><td>scientific_processor</td><td>planned — #83</td><td>health read</td><td>spend</td><td>scale + call + scale back</td></tr>
+<tr><td>evidence_review</td><td>planned — draft #83</td><td>none</td><td>none</td><td>409 on call</td></tr>
+<tr><td>lean4_prover</td><td>planned — #83</td><td>health_live read</td><td>write</td><td>live call</td></tr>
+<tr><td>w2v orchestrator</td><td>planned — #83</td><td>health read</td><td>spend</td><td>live call</td></tr>
+<tr><td>video-compiler</td><td>planned — #83</td><td>health read</td><td>spend</td><td>live call</td></tr>
+<tr><td>ops read tools</td><td>planned — #83</td><td>ops.pods read</td><td>read</td><td>live call + parity test</td></tr>
+<tr><td>discovery (AHTAPol)</td><td>planned — draft #83</td><td>none</td><td>none</td><td>409 on call</td></tr>
+<tr><td>planned AHTAPol services</td><td>planned — draft #83</td><td>none</td><td>none</td><td>409 on call</td></tr>
+</tbody></table>
+<h2>Migration and rollout</h2>
+<p>S0 waits for #76. S1 verifies each lock against its destination. S2 seeds drafts for <code>evidence_review</code>, <code>discovery</code> and the planned AHTAPol services. S3 publishes read-only toolkits and probes. S4 publishes write and spend toolkits. S5 replaces <code>seed/organisation.json:definition.binding</code> strings with bindings per job family. S6 enables the probe, outage test and zero-use report. Rollback is <code>tools.retire</code> plus binding retirement; rows are never deleted; a retired binding refuses 409. T13 migrates <code>coding_jobs.*</code>, <code>retrieval.query</code>, <code>artifacts.list</code> and <code>billing.summary</code> first; the two paths never run together.</p>
+<h2>Links</h2>
+<ul>
+<li>Project brief: https://conveyor.nonagentic.ai/design/docs/output-01a1e008-3fe4-7239-b39b-d29131a4792f.html</li>
+<li>Issue: https://github.com/nonagenticai/conveyor/issues/83 · dependency https://github.com/nonagenticai/conveyor/issues/76</li>
+<li>Coverage row: <code>docs/evidence/v2-coverage.md</code> — <code>actions:tools</code></li>
+<li>Spec: §12 T14 (gate), §11.1–§11.10, §8.1, §10.4, §3 (P1, P2, P5, P8, P10, P11)</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Estate toolkits · conveyor output · published 2026-11-19T07:25:30.824251215+00:00 · FR Test</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>
