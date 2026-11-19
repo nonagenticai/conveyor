@@ -450,7 +450,7 @@
       "evidence": [
         "actions: capabilities.* found (capabilities.bind_knowledge, capabilities.get, capabilities.list)",
         "actions: pko.* absent",
-        "actions: procedures.* found (procedures.create, procedures.get, procedures.list…)"
+        "actions: procedures.* found (procedures.create, procedures.get, procedures.ingest_process…)"
       ]
     },
     {

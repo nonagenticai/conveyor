@@ -1658,7 +1658,6 @@
       "blocked_by": [
         "T11",
         "T15",
-        "T16",
         "T17",
         "T5",
         "T6",
@@ -1832,12 +1831,12 @@
       "evidence": [
         "docs/SPEC_V2.md"
       ],
-      "gap": "table pko_release, table pko_entity, table pko_relation",
+      "gap": null,
       "key": "T16",
       "measured": {
         "actions": [
-          0,
-          0
+          5,
+          5
         ],
         "modules": [
           0,
@@ -1845,7 +1844,7 @@
         ],
         "tables": [
           0,
-          3
+          0
         ]
       },
       "name": "SOP, RDF/OWL and process-document ingestion",
@@ -1859,7 +1858,7 @@
         "T9"
       ],
       "plan": "docs/SPEC_V2.md#12",
-      "status": "proposed",
+      "status": "built",
       "track": "v2",
       "tranche": 4,
       "units": {
@@ -1874,9 +1873,7 @@
       }
     },
     {
-      "blocked_by": [
-        "T16"
-      ],
+      "blocked_by": [],
       "evidence": [
         "docs/SPEC_V2.md"
       ],
@@ -2508,10 +2505,10 @@
       "by_status": {
         "absent": 0,
         "archived": 1,
-        "built": 36,
+        "built": 37,
         "partial": 2,
         "planned": 0,
-        "proposed": 8,
+        "proposed": 7,
         "standing": 1
       },
       "total": 48,
