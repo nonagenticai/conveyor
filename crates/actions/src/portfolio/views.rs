@@ -156,3 +156,26 @@ pub struct StakeholderOut {
     /// When the row last changed.
     pub updated_at: DateTime<Utc>,
 }
+
+// ── the programme refresh ───────────────────────────────────────────────────────────────
+
+/// `programmes.refresh` input: the embedded buildout document takes no parameters.
+///
+/// The call re-applies the image's `seed/programme.json` to the caller's tenant. It is not a
+/// function of any tenant input, so the schema is empty and an unknown member is refused.
+#[derive(Clone, Debug, Default, Serialize, Deserialize, JsonSchema)]
+#[serde(deny_unknown_fields)]
+pub struct ProgrammeRefreshIn {}
+
+/// What one refresh applied: the programme row plus its projects and any board it created.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct ProgrammeRefreshOut {
+    /// Rows inserted.
+    pub created: i64,
+    /// Rows whose content changed.
+    pub updated: i64,
+    /// Rows already at the seeded content.
+    pub skipped: i64,
+    /// Boards created for a seeded project that had none.
+    pub boards_created: i64,
+}

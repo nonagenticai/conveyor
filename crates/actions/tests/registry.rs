@@ -459,6 +459,7 @@ const EXPECTED: [&str; 485] = [
     "programmes.create",
     "programmes.get",
     "programmes.list",
+    "programmes.refresh",
     "programmes.update",
     "project_dependencies.create",
     "project_dependencies.delete",
@@ -664,7 +665,9 @@ fn the_registry_is_exactly_the_declared_set() {
     // `architecture.board_list`, all internal reads: 451 -> 454; external stays 18.
     // T11 (#84) adds eight `metrics.*` actions, all internal: 454 -> 462; external stays 18.
     // T16 (#85) adds five `procedures.*` actions, all internal: 462 -> 467; external stays 18.
-    assert_eq!((internal, external), (467, 18));
+    // #462 adds `programmes.refresh` (internal, idempotent write): 467 -> 468; external stays 18 —
+    // it applies the image's embedded programme seed to this tenant, never an external service.
+    assert_eq!((internal, external), (468, 18));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),

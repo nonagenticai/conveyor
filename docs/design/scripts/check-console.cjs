@@ -996,6 +996,7 @@ function startServer({ config, state, snapshot, noSnapshot }) {
           "approvals.list",
           "process_runs.start",
           "programmes.list",
+          "programmes.refresh",
           "programmes.update",
           "benefits.list",
           "benefits.create",
@@ -1290,6 +1291,12 @@ function startServer({ config, state, snapshot, noSnapshot }) {
             ],
             next_cursor: null,
           });
+        });
+      }
+      if (pathname === "/api/actions/programmes.refresh/invocations") {
+        return readBody(req, (body) => {
+          assert.deepEqual(body.input, {}, "the refresh sends an empty input");
+          json(res, 200, { created: 49, updated: 0, skipped: 0, boards_created: 48 });
         });
       }
       /* ── #305: the programme store — the reads the definition and plan pages issue ─── */
@@ -2383,7 +2390,7 @@ function readBody(req, done) {
       assert.equal(
         await page
           .locator(
-            '[data-v2="msp-save"], [data-v2="msp-delete"], [data-v2="msp-benefit-new"], [data-v2="msp-tranche-new"], [data-v2="msp-stakeholder-new"], [data-v2="msp-wbs-new"], [data-v2="msp-register-new"], [data-v2="msp-cadence-new"], [data-v2="msp-baseline-take"]',
+            '[data-v2="msp-save"], [data-v2="msp-delete"], [data-v2="msp-benefit-new"], [data-v2="msp-tranche-new"], [data-v2="msp-stakeholder-new"], [data-v2="msp-wbs-new"], [data-v2="msp-register-new"], [data-v2="msp-cadence-new"], [data-v2="msp-baseline-take"], [data-v2="programmes-refresh"]',
           )
           .count(),
         0,
@@ -3282,6 +3289,28 @@ function readBody(req, done) {
       assert.match(await page.locator("#main").innerText(), /No published snapshot is loaded|Sign in to operate/);
       assert.equal(errors.length, 0, "no unhandled page error: " + errors.join("; "));
       await page.screenshot({ path: shot("console-signed-in.png"), fullPage: true });
+      await page.close();
+    }
+
+    /* 2d — the programme refresh: the image's seed applied through the console. */
+    {
+      const page = await browser.newPage();
+      const errors = [];
+      page.on("pageerror", (error) => errors.push(String(error)));
+      await page.goto(`http://127.0.0.1:${signedIn.port}/studio.html#programme`);
+      await page.waitForSelector('#console-chip[data-state="in"]');
+      await page.waitForSelector('[data-v2="programmes-refresh"]');
+      await page.click('[data-v2="programmes-refresh"]');
+      await page.waitForFunction(() =>
+        document.querySelector("#toast").innerText.includes("49 created"),
+      );
+      assert.ok(
+        consoleState.requests.some(
+          (row) => row.path === "/api/actions/programmes.refresh/invocations",
+        ),
+        "programmes.refresh was sent",
+      );
+      assert.deepEqual(errors, [], "no page error on the programme refresh");
       await page.close();
     }
 

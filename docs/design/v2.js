@@ -730,6 +730,26 @@ window.installV2 = function (api, enterprise) {
     render();
     if (consoleOn()) consoleLoadMsp();
   }
+  // The programme's truth is generated in the repository and compiled into the image; this
+  // action re-applies it to the tenant. Idempotent — a second click reports every row skipped.
+  async function consoleRefreshProgramme() {
+    if (!consoleOn()) return;
+    try {
+      const out = await C.action("programmes.refresh", {});
+      cs.loaded = false;
+      cs.projects = [];
+      mspRefresh();
+      consoleLoad();
+      toast(
+        "Programme refreshed · " +
+          `${out.created || 0} created · ${out.updated || 0} updated · ${out.skipped || 0} skipped`,
+      );
+    } catch (error) {
+      msp().error = error;
+      render();
+      toast(consoleError(error));
+    }
+  }
   async function mspWrite(name, input, etag, message) {
     try {
       await C.action(name, input, etag == null ? {} : { etag: String(etag) });
@@ -847,7 +867,11 @@ window.installV2 = function (api, enterprise) {
         ["Status", B(p.status || "active", p.status === "active" || !p.status ? "green" : "amber")],
         ["Version", E(p.version == null ? "—" : "v" + p.version)],
       ])}${note("The programme row is the store's row. A definition artefact is a document; the gate is its publishable state, not a local approval.")}`,
-      source.readOnly ? "" : button("Edit programme", "msp-programme-edit", "", "small", "edit"),
+      `${source.readOnly ? "" : button("Edit programme", "msp-programme-edit", "", "small", "edit")}${
+        source.readOnly || !C.can("programmes.refresh")
+          ? ""
+          : button("Refresh programme", "programmes-refresh", "", "small", "replay")
+      }`,
     )}${panel(
       "Definition set",
       `${table(
@@ -7050,6 +7074,9 @@ git log origin/main --grep "#N"</pre><p class="muted">Then push <span class="mon
         break;
       case "msp-programme-edit":
         mspDialog("programme", "Edit programme", msp().programme || {}, mspSource());
+        break;
+      case "programmes-refresh":
+        consoleRefreshProgramme();
         break;
       case "msp-benefit-new":
         mspDialog("benefit", "New benefit profile", {}, mspSource());
