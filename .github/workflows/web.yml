@@ -1,0 +1,168 @@
+# The browser suite, on UI changes only.
+#
+# Owner ruling 2026-11-19: run the Playwright suite only when the change contains updated/new UI
+# code. The `paths` filter is the ruling, not an optimisation: a docs-only or Rust-only PR starts
+# no browser job at all.
+#
+# This is deliberately a second workflow rather than a job in ci-public.yml: the path filter is
+# evaluated by GitHub before any runner starts, so a non-UI PR costs zero minutes and shows no
+# skipped browser job. Like ci-public.yml it is self-contained (public repository, GitHub-hosted
+# runner, no secrets) — it cannot call the estate's private reusable workflow.
+name: web
+
+on:
+  pull_request:
+    paths:
+      - "apps/web/**"
+      - ".github/workflows/web.yml"
+  push:
+    branches: [main]
+    paths:
+      - "apps/web/**"
+      - ".github/workflows/web.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: web-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+permissions:
+  contents: read
+
+jobs:
+  web:
+    # The same public-repository gate as ci-public.yml: skipped, never red, while private.
+    if: ${{ !github.event.repository.private }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    env:
+      APP_ENV: development
+      CONVEYOR_DEV_AUTH: "1"
+      BIND_ADDR: 127.0.0.1:8930
+      CONVEYOR_EXTERNAL_INFERENCE_URL: http://127.0.0.1:8940
+      # The designed test double for the object store (#370): eval-interop needs it and no
+      # bucket is provisioned on a GitHub runner.
+      CONVEYOR_S3_BACKEND: memory
+      PG_IMAGE: postgres:18
+      REDIS_IMAGE: library/redis:8.10.1-alpine
+      DATABASE_URL: postgres://conveyor_runtime:conveyor_runtime_dev@127.0.0.1:55432/conveyor_e2e
+      DATABASE_MIGRATE_URL: postgres://conveyor_migrate:conveyor_migrate_dev@127.0.0.1:55432/conveyor_e2e
+      DATABASE_LISTEN_URL: postgres://conveyor_runtime:conveyor_runtime_dev@127.0.0.1:55432/conveyor_e2e
+      REDIS_URL: redis://127.0.0.1:56379/
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+
+      - name: Rust toolchain follows rust-toolchain.toml
+        run: |
+          set -euo pipefail
+          rustup show
+          rustc --version
+
+      - name: start Postgres 18 and Redis
+        run: |
+          set -euo pipefail
+          # Same measured flags as the checks job: --shm-size=1g because Postgres parallel
+          # workers allocate in /dev/shm (64 MB default), and NO tmpfs data dir because the
+          # suite creates a fresh migrated database per test and a tmpfs fills.
+          docker run -d --rm --name web-pg \
+            -e POSTGRES_PASSWORD=postgres \
+            --shm-size=1g \
+            -p 127.0.0.1:55432:5432 \
+            "$PG_IMAGE" -c fsync=off -c max_connections=300
+          docker run -d --rm --name web-redis \
+            --tmpfs /data -p 127.0.0.1:56379:6379 \
+            "$REDIS_IMAGE"
+          for _ in $(seq 1 60); do
+            docker exec web-pg pg_isready -h 127.0.0.1 -U postgres >/dev/null 2>&1 && break
+            sleep 1
+          done
+          docker exec web-pg pg_isready -h 127.0.0.1 -U postgres
+          for _ in $(seq 1 60); do
+            docker exec web-redis redis-cli ping >/dev/null 2>&1 && break
+            sleep 1
+          done
+          docker exec web-redis redis-cli ping
+
+      - name: create the e2e database and its two roles
+        run: |
+          set -euo pipefail
+          docker exec web-pg psql -U postgres -v ON_ERROR_STOP=1 -c "CREATE DATABASE conveyor_e2e"
+          docker exec -i web-pg psql -U postgres -d conveyor_e2e -v ON_ERROR_STOP=1 < scripts/db-roles.sql
+
+      - name: install cargo-leptos and the wasm target
+        run: |
+          set -euo pipefail
+          rustup target add wasm32-unknown-unknown
+          cargo install cargo-leptos --version 0.3.11 --locked
+
+      - name: build the server binary
+        run: cargo build --locked -p conveyor-server
+
+      - name: build and assemble the site root
+        run: |
+          set -euo pipefail
+          # The same two commands the image's web stage runs (Dockerfile): the bundle under
+          # target/site, then the source index.html and stylesheet beside it. No config.json:
+          # the server generates it from the live configuration.
+          cargo leptos build --release --frontend-only --cargo-locked
+          SITE="$RUNNER_TEMP/site"
+          mkdir -p "$SITE"
+          cp -a target/site/. "$SITE/"
+          rm -f "$SITE/config.json"
+          cp apps/web/index.html apps/web/style.css "$SITE/"
+
+      - name: migrate and seed the dev tenants
+        run: ./target/debug/conveyor migrate --dev-seed
+
+      - name: install the default process catalogue on dev-a
+        # The process, process-map and improvement specs assert the shipped catalogue
+        # (capability agents, 280 processes, the Py2Rust map). It is tenant content and never
+        # rides --seed; dev-b stays empty for the empty-tenant assertions.
+        run: ./target/debug/conveyor migrate --process-catalogue --tenant dev-a
+
+      - name: start serve, worker and the provider double
+        run: |
+          set -euo pipefail
+          # The image bakes the Leptos bundle at /srv/site; here the site root assembled above is
+          # what the server serves (crates/api/src/web.rs). The `runner` context is not available
+          # in job-level env, which is why this export lives in the step.
+          export CONVEYOR_WEB_ROOT="$RUNNER_TEMP/site"
+          nohup ./target/debug/conveyor serve > /tmp/conveyor-serve.log 2>&1 &
+          nohup ./target/debug/conveyor worker > /tmp/conveyor-worker.log 2>&1 &
+          nohup node apps/web/e2e/model-stub.mjs > /tmp/model-stub.log 2>&1 &
+          for _ in $(seq 1 60); do
+            curl -sf -H 'authorization: Bearer dev:alice' http://127.0.0.1:8930/health/ready >/dev/null && break
+            sleep 1
+          done
+          curl -sf -H 'authorization: Bearer dev:alice' http://127.0.0.1:8930/health/ready
+          # -o /dev/null, not `| head`: under `pipefail` head closing the pipe makes curl exit 23
+          # ("write error") even though the API answered — measured on the first run.
+          curl -sf -H 'authorization: Bearer dev:alice' http://127.0.0.1:8930/api/actions -o /dev/null
+
+      - name: install the web dependencies and a browser
+        run: |
+          set -euo pipefail
+          cd apps/web
+          npm ci
+          npx playwright install --with-deps chromium
+
+      - name: the whole Playwright suite
+        run: |
+          set -euo pipefail
+          cd apps/web
+          PLAYWRIGHT_CHANNEL=chromium \
+            BASE_URL=http://127.0.0.1:8930 \
+            DEV_AUTH_TOKEN=dev:alice \
+            npx playwright test --reporter=list
+
+      - name: server, worker and stub logs on failure
+        if: failure()
+        run: |
+          echo "=== conveyor serve"
+          tail -n 200 /tmp/conveyor-serve.log || true
+          echo "=== conveyor worker"
+          tail -n 200 /tmp/conveyor-worker.log || true
+          echo "=== model stub"
+          tail -n 50 /tmp/model-stub.log || true

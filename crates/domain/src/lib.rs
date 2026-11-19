@@ -55,6 +55,9 @@ pub mod inference;
 // S15: the work-package memory vocabularies and the digest a consolidation derives.
 pub mod memory;
 pub mod model;
+// T11 (SPEC_V2 §7.5, §15.1 D37/D50): the closed evidence vocabulary, the C0–C5 ladder and the
+// reconciliation verdict — the pure rules behind `metrics.*`.
+pub mod metrics;
 // T0 (SPEC_V2 §4.5, D61): the internal Executor seam — the kind vocabulary, the two live
 // implementations' validation contract, and the registry. Behaviour is T2's.
 pub mod executor;

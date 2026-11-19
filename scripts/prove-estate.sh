@@ -27,7 +27,7 @@ cd "$(dirname "$0")/.."
 NS=${CONVEYOR_NAMESPACE:-conveyor}
 DEPLOY=${CONVEYOR_DEPLOYMENT:-conveyor}
 TENANT=${CONVEYOR_TENANT:?set CONVEYOR_TENANT to the tenant slug}
-BINARY=${CONVEYOR_BINARY:-/usr/local/bin/service}
+BINARY=${CONVEYOR_BINARY:-/usr/local/bin/conveyor}
 KUBECTL=${KUBECTL:?set KUBECTL to a kubectl that reaches the deployed cluster}
 
 pod() {
@@ -48,6 +48,16 @@ action() {
 # One field out of an action's JSON answer (a strict dotted path, no jq dependency).
 field() {
   python3 -I -c 'import json,sys; d=json.load(sys.stdin); [d:=d[k] for k in sys.argv[1].split(".")]; print(d)' "$1"
+}
+
+# One brokered call per toolkit; a refusal is counted and reported, never swallowed.
+refused=0
+call() {
+  local tool=$1 input=$2
+  if ! action tools.call "{\"run_id\": \"$RUN_ID\", \"tool\": \"$tool\", \"input\": $input}"; then
+    echo "REFUSED: $tool (see the tool_call ledger for the destination's answer)" >&2
+    refused=$((refused + 1))
+  fi
 }
 
 psql_owner() {
@@ -76,25 +86,34 @@ seed)
   project_key="T14-PROOF"
   run_id=$(psql_owner <<SQL
 BEGIN;
+-- The GUC's own answer is not the seed's output: suppress it so the run id is the only line.
+\o /dev/null
 SELECT set_config('app.current_tenant', (SELECT id::text FROM tenant WHERE slug = '$TENANT'), true);
+\o
 INSERT INTO project (key, name) VALUES ('$project_key', 'T14 estate toolkit proof')
   ON CONFLICT (tenant_id, key) DO NOTHING;
-WITH started AS (
-  INSERT INTO run (project_id, status)
-    SELECT id, 'running' FROM project WHERE key = '$project_key'
-    RETURNING id
-)
+-- A project may carry only ONE live run (uq_run_project_live), so a second seed reuses the
+-- run the first one started rather than failing the way the first version of this script did.
+INSERT INTO run (project_id, status)
+  SELECT p.id, 'running' FROM project p
+   WHERE p.key = '$project_key'
+     AND NOT EXISTS (SELECT 1 FROM run r WHERE r.project_id = p.id AND r.status = 'running');
 INSERT INTO tool_binding (run_id, toolkit_id, effect_ceiling, enabled)
-  SELECT started.id, k.id, 'spend', true
-    FROM started, toolkit k
-   WHERE k.key IN ('coding', 'speech', 'transcription', 'image_gen')
+  SELECT r.id, k.id, 'spend', true
+    FROM run r JOIN project p ON p.id = r.project_id, toolkit k
+   WHERE p.key = '$project_key' AND r.status = 'running'
+     AND k.key IN ('coding', 'speech', 'transcription', 'image_gen')
      AND k.status = 'published'
      AND NOT EXISTS (
        SELECT 1 FROM tool_binding b
-        WHERE b.run_id = started.id AND b.toolkit_id = k.id);
+        WHERE b.run_id = r.id AND b.toolkit_id = k.id);
+-- The run id is read INSIDE the transaction: set_config(..., true) is transaction-local, so a
+-- SELECT after COMMIT runs without the tenant GUC and row-level security hides every row.
+-- (Never put a backtick in this heredoc: it is unquoted, so the shell would run it as a command.)
+SELECT r.id FROM run r JOIN project p ON p.id = r.project_id
+ WHERE p.key = '$project_key' AND r.status = 'running'
+ ORDER BY r.created_at DESC LIMIT 1;
 COMMIT;
-SELECT id FROM run WHERE project_id = (SELECT id FROM project WHERE key = '$project_key')
- ORDER BY created_at DESC LIMIT 1;
 SQL
 )
   echo "seeded run $run_id"
@@ -104,7 +123,24 @@ call-all)
   : "${RUN_ID:?set RUN_ID to the run the seed created}"
   # One declared operation per published toolkit (P1.2). The inputs are the actions' own documents:
   # a call is validated against the schema the publish copied from the registry.
-  action tools.call "{\"run_id\": \"$RUN_ID\", \"tool\": \"coding.jobs_get\", \"input\": {\"id\": \"probe-job\"}}"
+  #
+  # `coding.jobs_get` is the read-class call, but the coding service only answers for a job that
+  # exists — an invented id is a `400 invalid job id`, not a resolved read. So the proof creates
+  # one lint job (`coding.jobs_create`) and reads that job back.
+  create=$(python3 -I -c '
+import json, sys
+print(json.dumps({
+    "run_id": sys.argv[1],
+    "tool": "coding.jobs_create",
+    "input": {
+        "kind": "lint",
+        "input": {"source": {"kind": "inline", "files": [
+            {"path": "main.rs", "text": "fn main() {}\n"}]}},
+    },
+}))' "$RUN_ID")
+  job=$(action tools.call "$create" | field id)
+  echo "created coding job $job"
+  call coding.jobs_get "{\"id\": \"$job\"}"
 
   # `media.transcribe` takes a stored audio document; create a 0.1 s silent WAV first.
   wav=$(python3 -I -c '
@@ -118,10 +154,16 @@ print(base64.b64encode(buf.getvalue()).decode())')
     "{\"title\": \"estate proof audio\", \"content_type\": \"audio/wav\", \"content_base64\": \"$wav\"}" \
     | field id)
   echo "created audio document $document"
-  action tools.call "{\"run_id\": \"$RUN_ID\", \"tool\": \"transcription.transcribe\", \"input\": {\"document\": \"$document\"}}"
+  call transcription.transcribe "{\"document\": \"$document\"}"
+  call speech.synthesize "{\"text\": \"estate proof\"}"
+  call image_gen.generate "{\"prompt\": \"estate proof\"}"
 
-  action tools.call "{\"run_id\": \"$RUN_ID\", \"tool\": \"speech.synthesize\", \"input\": {\"text\": \"estate proof\"}}"
-  action tools.call "{\"run_id\": \"$RUN_ID\", \"tool\": \"image_gen.generate\", \"input\": {\"prompt\": \"estate proof\"}}"
+  # A destination that refuses is reported per toolkit and does not hide the calls after it; the
+  # exit status still says one of them failed.
+  if [ "$refused" -ne 0 ]; then
+    echo "$refused call(s) were refused by their destination — see the tool_call ledger" >&2
+    exit 1
+  fi
   ;;
 
 zero-use-report)

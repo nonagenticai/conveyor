@@ -42,8 +42,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/SPEC_V2.html",
       "source": "docs/SPEC_V2.md",
       "section": "Spec",
-      "sha256": "c39d27fd284804e20f8a66ed146fd1ac3dae5024c37094b9e65bfe447e33ed8f",
-      "bytes": 169528,
+      "sha256": "5bef7d6f326d5bfcac348aafcff7c98d136a3052ba237895c82b8967c2472fe3",
+      "bytes": 169718,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/SPEC_V2.md"
     },
     {
@@ -216,6 +216,24 @@ window.CONVEYOR_DOCUMENTS = {
       "sha256": "cc6d3023bff6f404bf70fe577adc9f1b425ab32e541a72d03c1f38fa4c996b0b",
       "bytes": 7795,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/2026-11-18-evidence-review-cutover.md"
+    },
+    {
+      "title": "The console's live engine proof (A5) — 2026-11-19 (#97)",
+      "path": "docs/evidence/2026-11-19-console-live-engine.html",
+      "source": "docs/evidence/2026-11-19-console-live-engine.md",
+      "section": "Evidence",
+      "sha256": "4c48e32f1b37ed25893cc87174797043a9d4ba5fcdabf546435ad7bd971c5e69",
+      "bytes": 1882,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/2026-11-19-console-live-engine.md"
+    },
+    {
+      "title": "The start agent completes READY — 2026-11-19 (#383)",
+      "path": "docs/evidence/2026-11-19-start-agent-ready.html",
+      "source": "docs/evidence/2026-11-19-start-agent-ready.md",
+      "section": "Evidence",
+      "sha256": "fe723d50f632b9dcf2760cc6638d95c63d6919e93dda7ff65bbb13e506743e23",
+      "bytes": 2498,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/2026-11-19-start-agent-ready.md"
     },
     {
       "title": "D23's amendment — the eval caller kind: an eval's model calls are attributable",
@@ -456,8 +474,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/evidence/v2-coverage.html",
       "source": "docs/evidence/v2-coverage.md",
       "section": "Evidence",
-      "sha256": "c87a79eeaff5d85aedf8d4c42a5f05d0aab890f3fe6dd28b62735c4bb2d28e32",
-      "bytes": 11292,
+      "sha256": "0b003457896434d4c3261039b20885de7378476fde7bb315b321f6845ac42fdd",
+      "bytes": 11343,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/v2-coverage.md"
     },
     {

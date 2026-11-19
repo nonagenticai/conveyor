@@ -1,7 +1,7 @@
 {
   "version": 1,
   "operations": {
-    "GET /api/actions": "b0a271a744ed4d1c6fbda8e20e38767786aed12ada4ec5cc6f11edf60cd50ac2",
+    "GET /api/actions": "82a93a5f5bb08626df102f1b87ce6c9517efa2ae080be42ccbb509cb736b5bd6",
     "GET /api/boards/{id}": "e1a5ad504ea61c9f6f4c9940f6bce0a13a06587c4545d9d52616852f0e67fa5b",
     "GET /api/boards/{id}/cards": "be3ca9f8fea011aa8b097206310d24ba4641698d2a8d239c5b2df6c48b784502",
     "GET /api/boards/{id}/webhooks": "5b77b802ff044156108b56072acb99bed0e2f9dfb5f2dc667b000af191cffd1b",
@@ -283,6 +283,14 @@
     "POST /api/actions/memory.recall/invocations": "ee6a4de3aa8ed9a55663ee66313fe67fa88e5e07a63238c46855bb86de8f66dc",
     "POST /api/actions/memory.remember/invocations": "458eb3da5d35d8c45d9289655802dcd979ce10e93b63858c36b97ee87e5e2c99",
     "POST /api/actions/messages.send/invocations": "262c3d348a8b939c1b5f4a2466d6a2b2628577208db9b7a946e7af78b284ed4e",
+    "POST /api/actions/metrics.flow/invocations": "613d880f6301eb9e0e90a88495ca6985432c0343cbfbb698d98a31368e0288fa",
+    "POST /api/actions/metrics.job/invocations": "d131cdae0d486dd8807eb095365d1a46c9bd119dc87fa478efa43a60ae74bc6e",
+    "POST /api/actions/metrics.maturity/invocations": "e7ec871d4bc310f53aa7317e0819f4225814ac8f1f8316522d4c4762fe31bab1",
+    "POST /api/actions/metrics.programme/invocations": "acf6d8167082dd7fca9bfe1d28c4906322f30bcd6c49d102e3d4194d58419aef",
+    "POST /api/actions/metrics.reconcile/invocations": "c5a72f6e1f0d421008967ca13dffbb211c4719d5921d2cf9b239ba121a44b66e",
+    "POST /api/actions/metrics.threshold_get/invocations": "e02f73a20fc86e824b4e288b5a2485e4f4d4d86cee156e99a8d409241b7b5144",
+    "POST /api/actions/metrics.threshold_update/invocations": "65246d71a99a178168cf2d48d03ba8acf24a0f2a34f60161a830cdd13bafcccd",
+    "POST /api/actions/metrics.usage/invocations": "b8ccfff9c7f0c4697df7ee05063087cbc3aee6148b0be2e65171d6b432e7c062",
     "POST /api/actions/model_elements.create/invocations": "0480c8baa053220d1ce058709889f664d27c7db9e9589326b81b28d7ff1a6718",
     "POST /api/actions/model_elements.delete/invocations": "b62a2a0ad2ec09e93a7155c714a77a139806819ff05c5bb09f60d4ca48b5bba9",
     "POST /api/actions/model_elements.list/invocations": "5693c0cc37f69f8109f55f7afc9baf99b9ffc17a61106b15fdb44684ea0664f7",

@@ -95,6 +95,9 @@ pub mod list;
 pub mod listen;
 // S15: work-package memory — the hot rows and the derived digest.
 pub mod memory;
+// T11 (SPEC_V2 §7.5, §11.9; issue #84): the metrics read models, the versioned threshold
+// configuration and the reconciliation record — no metric is stored (D37).
+pub mod metrics;
 pub mod migrate;
 pub mod model;
 pub mod outbox;

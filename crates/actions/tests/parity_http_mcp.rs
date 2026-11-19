@@ -2116,6 +2116,10 @@ async fn prepare(sample: &Sample, pg: &support::Pg, ctx: &Ctx) {
             let g = seed_parity_programme(pg, ctx).await;
             ctx.push("benefits.list", g);
         }
+        "metrics.programme" => {
+            let g = seed_parity_programme(pg, ctx).await;
+            ctx.push("metrics.programme", g);
+        }
         "benefits.link" => {
             let g = seed_parity_programme(pg, ctx).await;
             let b = seed_parity_benefit(pg, ctx, g).await;
@@ -6147,6 +6151,37 @@ fn spine_samples() -> Vec<Sample> {
                     "reason": "parity retirement",
                 })
             });
+            expecting(sample, 200)
+        },
+        expecting(plain("metrics.threshold_get", json!({}), None), 200),
+        expecting(
+            plain(
+                "metrics.threshold_update",
+                json!({"level": "C0", "metrics": {"runs.total": 0.0}}),
+                None,
+            ),
+            200,
+        ),
+        expecting(plain("metrics.maturity", json!({}), None), 200),
+        expecting(plain("metrics.flow", json!({}), None), 200),
+        expecting(
+            plain("metrics.usage", json!({"level": "tenant"}), None),
+            200,
+        ),
+        expecting(plain("metrics.job", json!({}), None), 422),
+        expecting(
+            plain(
+                "metrics.reconcile",
+                json!({"period_start": "2099-01-01", "period_end": "2099-01-01", "billing_total_usd": 0.0}),
+                None,
+            ),
+            200,
+        ),
+        {
+            let mut sample = plain("metrics.programme", json!({}), None);
+            sample.prepare = true;
+            sample.input =
+                Box::new(|ctx: &Ctx| json!({"programme_id": ctx.pop("metrics.programme")}));
             expecting(sample, 200)
         },
         {

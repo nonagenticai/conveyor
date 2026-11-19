@@ -59,6 +59,9 @@ pub mod media;
 pub mod produce;
 // S15: work-package memory — remember (the only writing action) and recall.
 pub mod memory;
+// T11 (SPEC_V2 §7.5, §11.9; issue #84): the metrics family — recompute-from-rows reads, the
+// versioned threshold configuration and the programme's MSP/governance metrics.
+pub mod metrics;
 pub mod model;
 pub mod openapi;
 // T7 (#170): the cluster operations read family — `ops.pods|deployments|events|logs|flux_status|
