@@ -77,6 +77,30 @@ jobs:
           if [ -z "$head_branch" ]; then
             head_branch="automation/issue-registry-$(date -u +%Y%m%dT%H%M%SZ)"
           fi
+          # ⛔ A branch whose PR is IN THE MERGE QUEUE cannot be updated: GitHub answers
+          # `GH006: Protected branch update failed … A pull request for this branch has been
+          # added to a merge queue`. This workflow runs on every push to main, so a busy queue
+          # turned it red over and over (measured 2026-11-19: run 44495172473 at 09:18Z, while
+          # 09:27Z and 09:35Z were green — the same code, a different queue state). A queued
+          # generated PR is already the deliverable; the refresh resumes on the next push after
+          # the queue lands. Checked BEFORE the regeneration so a no-op run costs seconds.
+          if [ -n "$open" ]; then
+            # `$owner`/`$name`/`$number` are GraphQL variables the `-f` flags bind, not shell
+            # expansions — the single quotes are deliberate (SC2016 is a false positive here).
+            # shellcheck disable=SC2016
+            queued="$(gh api graphql \
+              -f query='query($owner: String!, $name: String!, $number: Int!) {
+                repository(owner: $owner, name: $name) {
+                  pullRequest(number: $number) { mergeQueueEntry { state } }
+                }
+              }' \
+              -f owner="${REPO%%/*}" -f name="${REPO##*/}" -F number="$open" \
+              --jq '.data.repository.pullRequest.mergeQueueEntry.state // empty')"
+            if [ -n "$queued" ]; then
+              echo "Generated PR #$open ($head_branch) is in the merge queue ($queued); nothing to update this run." >> "$GITHUB_STEP_SUMMARY"
+              exit 0
+            fi
+          fi
           git checkout -B "$head_branch"
           scripts/fetch-issues.sh docs/design/data/issues.json
           # The registry is an input to the programme seed and the measured coverage, and the
@@ -158,9 +182,19 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
           git commit -s -m "docs: refresh the public issue registry and its derived data (automated)"
-          git push --force \
+          # The queue can reach the PR between the check above and this push (the run takes
+          # minutes). That ONE refusal is a no-op, not a failure; every other push failure still
+          # fails the step.
+          if ! git push --force \
             "https://x-access-token:${GH_TOKEN}@github.com/${REPO}.git" \
-            "HEAD:refs/heads/${head_branch}"
+            "HEAD:refs/heads/${head_branch}" 2>"$RUNNER_TEMP/push.err"; then
+            if grep -q 'GH006' "$RUNNER_TEMP/push.err" && grep -q 'merge queue' "$RUNNER_TEMP/push.err"; then
+              echo "Generated PR #$open is in the merge queue; the push was refused (GH006). Nothing to do." >> "$GITHUB_STEP_SUMMARY"
+              exit 0
+            fi
+            cat "$RUNNER_TEMP/push.err"
+            exit 1
+          fi
           if [ -n "$open" ]; then
             gh pr edit "$open" --repo "$REPO" --body-file "$RUNNER_TEMP/pr-body.md"
             echo "Updated the open generated PR #$open ($head_branch)." >> "$GITHUB_STEP_SUMMARY"
