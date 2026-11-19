@@ -6172,7 +6172,7 @@ fn spine_samples() -> Vec<Sample> {
         expecting(
             plain(
                 "metrics.reconcile",
-                json!({"period_start": "2026-11-01", "period_end": "2026-11-01"}),
+                json!({"period_start": "2099-01-01", "period_end": "2099-01-01", "billing_total_usd": 0.0}),
                 None,
             ),
             200,

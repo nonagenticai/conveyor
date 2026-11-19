@@ -822,71 +822,18 @@ async fn metrics_job(
 
 // ── the billing reconciliation (P2) ─────────────────────────────────────────────────────
 
-/// The `billing_service` client: a plain read of the overview, no auth (the action declares none).
-struct Billing {
-    base: String,
-    http: reqwest::Client,
-}
-
-impl Billing {
-    /// The client is **https-only** in production. The one exception is a loopback URL, which the
-    /// test stub uses; it never leaves the host. A plain-http in-cluster URL is refused and the
-    /// reconciliation records `unavailable` with the reason.
-    fn from_env() -> Result<Self, String> {
-        let base = crate::invoke::service_url("billing_service").ok_or_else(|| {
-            "billing_service is not configured (CONVEYOR_EXTERNAL_BILLING_SERVICE_URL)".to_owned()
-        })?;
-        let parsed = reqwest::Url::parse(&base)
-            .map_err(|error| format!("billing_service URL is invalid: {error}"))?;
-        let host = parsed
-            .host_str()
-            .ok_or_else(|| "billing_service URL has no host".to_owned())?;
-        let loopback = matches!(host, "127.0.0.1" | "::1" | "localhost");
-        if parsed.scheme() != "https" && !loopback {
-            return Err(format!(
-                "billing_service URL {base} is not https; only a loopback test URL may be http"
-            ));
-        }
-        let timeout_ms = std::env::var("CONVEYOR_EXTERNAL_BILLING_SERVICE_TIMEOUT_MS")
-            .ok()
-            .and_then(|value| value.parse::<u64>().ok())
-            .unwrap_or(5_000)
-            .clamp(100, 60_000);
-        let http = reqwest::Client::builder()
-            .timeout(std::time::Duration::from_millis(timeout_ms))
-            .build()
-            .map_err(|error| format!("billing_service client: {error}"))?;
-        Ok(Self {
-            base: base.trim_end_matches('/').to_owned(),
-            http,
-        })
-    }
-
-    async fn overview(&self, tenant: conveyor_domain::TenantId) -> Result<Value, String> {
-        let response = self
-            .http
-            .get(format!("{}/api/billing/overview", self.base))
-            .header("accept", "application/json")
-            .header("x-tenant-id", tenant.to_string())
-            .send()
-            .await
-            .map_err(|error| error.to_string())?;
-        let status = response.status();
-        if !status.is_success() {
-            return Err(format!("billing_service answered {status}"));
-        }
-        response
-            .json::<Value>()
-            .await
-            .map_err(|error| format!("billing_service body is not JSON: {error}"))
-    }
-}
-
+/// The billing figure is read by the **declared** `billing.summary` external action, never by a
+/// handler: the engine owns that path's timeout, breaker, idempotency and audit. This action
+/// consumes the attestation — the total, or the upstream error when that action could not read.
 /// `metrics.reconcile` — the conveyor's metering against billing's roll-up for one period.
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 pub struct ReconcileIn {
     pub period_start: NaiveDate,
     pub period_end: NaiveDate,
+    /// The billing roll-up total, as returned by the declared `billing.summary` action.
+    pub billing_total_usd: Option<f64>,
+    /// The upstream error when `billing.summary` could not read the service.
+    pub billing_error: Option<String>,
     /// Where an incident card is opened when the totals differ.
     pub board_id: Option<Uuid>,
     pub list_id: Option<Uuid>,
@@ -938,26 +885,25 @@ async fn metrics_reconcile(
     let conveyor_usd = store::metrics::conveyor_cost_tx(&mut *tx, ctx.tenant, since, until)
         .await
         .map_err(|error| metrics_error(error, ctx.action))?;
-    let billing = match Billing::from_env() {
-        Ok(client) => client,
-        Err(reason) => return record_unavailable(&mut *tx, ctx, input, &reason).await,
+    let (state, billing_usd, delta) = match (
+        input.billing_total_usd,
+        input.billing_error.as_deref(),
+    ) {
+        (Some(total), None) if total.is_finite() => {
+            let (state, delta) = rules::reconcile(conveyor_usd, total);
+            (state, total, delta)
+        }
+        (None, Some(error)) if !error.trim().is_empty() => {
+            return record_unavailable(&mut *tx, ctx, &input, error).await;
+        }
+        _ => {
+            return Err(ActionError::new(
+                422,
+                "billing_figure_required",
+                "name exactly one of billing_total_usd (from the declared billing.summary action) or billing_error (that action's upstream failure)",
+            ));
+        }
     };
-    let billing_usd = match billing.overview(ctx.tenant).await {
-        Ok(value) => match value.get("total_usd").and_then(Value::as_f64) {
-            Some(total) if total.is_finite() => total,
-            _ => {
-                return record_unavailable(
-                    &mut *tx,
-                    ctx,
-                    input,
-                    "billing_service overview carries no finite total_usd",
-                )
-                .await;
-            }
-        },
-        Err(reason) => return record_unavailable(&mut *tx, ctx, input, &reason).await,
-    };
-    let (state, delta) = rules::reconcile(conveyor_usd, billing_usd);
     let mut incident_card_id = None;
     if state == rules::ReconciliationState::Difference {
         let (Some(board_id), Some(list_id)) = (input.board_id, input.list_id) else {
@@ -1032,7 +978,7 @@ async fn metrics_reconcile(
 async fn record_unavailable(
     tx: &mut PgConnection,
     ctx: HandlerCtx,
-    input: ReconcileIn,
+    input: &ReconcileIn,
     reason: &str,
 ) -> Result<ReconcileOut, ActionError> {
     store::metrics::record_reconciliation_tx(

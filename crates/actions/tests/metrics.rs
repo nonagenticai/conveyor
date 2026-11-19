@@ -9,7 +9,6 @@
 mod support;
 
 use std::collections::HashMap;
-use std::sync::{Arc, Mutex};
 
 use chrono::{Duration as ChronoDuration, Utc};
 use serde_json::{Value, json};
@@ -352,22 +351,6 @@ async fn a_dependency_slip_names_the_benefits_it_puts_at_risk() {
 }
 
 // ── P2: the billing reconciliation ───────────────────────────────────────────────────────
-
-/// A controllable billing_service: every path answers the current JSON body.
-async fn billing_server(body: Arc<Mutex<Value>>) -> String {
-    let app = axum::Router::new().fallback(axum::routing::any(move || {
-        let body = body.clone();
-        async move { axum::Json(body.lock().expect("billing body").clone()) }
-    }));
-    let listener = tokio::net::TcpListener::bind("127.0.0.1:0")
-        .await
-        .expect("bind billing stub");
-    let addr = listener.local_addr().expect("billing addr");
-    tokio::spawn(async move {
-        let _ = axum::serve(listener, app).await;
-    });
-    format!("http://{addr}")
-}
 
 async fn price(pg: &support::Pg, model: &str) {
     sqlx::query(
@@ -828,16 +811,12 @@ async fn reconciliation_is_exact_or_opens_an_incident() {
         Utc::now(),
     )
     .await;
-    let body = Arc::new(Mutex::new(json!({"total_usd": 0.002})));
-    let base = billing_server(body.clone()).await;
-    support::set_env("CONVEYOR_EXTERNAL_BILLING_SERVICE_URL", &base);
-    support::set_env("CONVEYOR_EXTERNAL_BILLING_SERVICE_TIMEOUT_MS", "500");
     let today = Utc::now().date_naive();
     let (status, matched) = running
         .invoke(
             "metrics.reconcile",
             TOKEN,
-            json!({"period_start": today, "period_end": today, "board_id": board, "list_id": list}),
+            json!({"period_start": today, "period_end": today, "board_id": board, "list_id": list, "billing_total_usd": 0.002}),
             None,
             None,
             None,
@@ -849,12 +828,11 @@ async fn reconciliation_is_exact_or_opens_an_incident() {
     assert_eq!(matched["delta_usd"], 0.0);
     assert!(matched["incident_card_id"].is_null());
 
-    *body.lock().expect("body") = json!({"total_usd": 0.003});
     let (status, different) = running
         .invoke(
             "metrics.reconcile",
             TOKEN,
-            json!({"period_start": today, "period_end": today, "board_id": board, "list_id": list}),
+            json!({"period_start": today, "period_end": today, "board_id": board, "list_id": list, "billing_total_usd": 0.003}),
             None,
             None,
             None,
@@ -878,16 +856,12 @@ async fn reconciliation_is_exact_or_opens_an_incident() {
     assert_eq!(meta["conveyor_usd"], 0.002);
     assert_eq!(meta["billing_usd"], 0.003);
 
-    support::set_env(
-        "CONVEYOR_EXTERNAL_BILLING_SERVICE_URL",
-        "http://127.0.0.1:1",
-    );
     let yesterday = today - ChronoDuration::days(1);
     let (status, unavailable) = running
         .invoke(
             "metrics.reconcile",
             TOKEN,
-            json!({"period_start": yesterday, "period_end": yesterday}),
+            json!({"period_start": yesterday, "period_end": yesterday, "billing_error": "billing_service answered 503"}),
             None,
             None,
             None,
@@ -903,31 +877,6 @@ async fn reconciliation_is_exact_or_opens_an_incident() {
         "{unavailable}"
     );
     assert!(unavailable["conveyor_usd"].is_null(), "never a zero");
-    // The https-only rule: a plain-http in-cluster URL is refused before any request.
-    support::set_env(
-        "CONVEYOR_EXTERNAL_BILLING_SERVICE_URL",
-        "http://billing-service.billing.svc.cluster.local:8157",
-    );
-    let two_days = today - ChronoDuration::days(2);
-    let (status, refused) = running
-        .invoke(
-            "metrics.reconcile",
-            TOKEN,
-            json!({"period_start": two_days, "period_end": two_days}),
-            None,
-            None,
-            None,
-        )
-        .await;
-    assert_eq!(status, 200, "{refused}");
-    let refused = output(&refused);
-    assert_eq!(refused["state"], "unavailable", "{refused}");
-    assert!(
-        refused["upstream_error"]
-            .as_str()
-            .is_some_and(|value| value.contains("not https")),
-        "{refused}"
-    );
     let records: i64 =
         sqlx::query_scalar("SELECT count(*) FROM metric_reconciliation WHERE tenant_id = $1")
             .bind(seeded.tenant_id)
@@ -935,7 +884,7 @@ async fn reconciliation_is_exact_or_opens_an_incident() {
             .await
             .expect("records");
     assert_eq!(
-        records, 3,
+        records, 2,
         "today (re-run, now difference) + yesterday (unavailable)"
     );
 }
