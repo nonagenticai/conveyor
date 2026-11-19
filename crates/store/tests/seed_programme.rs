@@ -231,7 +231,9 @@ async fn seed_programme_tx_is_idempotent_and_rolls_back_whole() {
     let mut tx = conveyor_store::begin_scoped(&db.super_pool, tenant)
         .await
         .expect("scoped tx");
-    let second = seed_programme_tx(&mut tx, tenant).await.expect("second run");
+    let second = seed_programme_tx(&mut tx, tenant)
+        .await
+        .expect("second run");
     assert_eq!(second.created, 0, "a second run creates nothing");
     assert_eq!(second.updated, 0, "a second run updates nothing");
     assert_eq!(second.skipped, 49);
