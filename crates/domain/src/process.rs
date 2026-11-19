@@ -205,6 +205,15 @@ pub struct StepInput {
     /// nothing (S21 §6; the plan projection refuses a reference the producer does not declare).
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub outputs: Vec<String>,
+    /// The PDDL action text this step executes (T16, SPEC_V2 §5.6). Blank for a non-PDDL step.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub action_text: Option<String>,
+    /// The step's PDDL preconditions — ground literals (T16). Empty = always runnable.
+    #[serde(default, skip_serializing_if = "Value::is_null")]
+    pub pddl_preconditions: Value,
+    /// The step's PDDL effects — `{"add": [...], "delete": [...]}` (T16). Empty = no state change.
+    #[serde(default, skip_serializing_if = "Value::is_null")]
+    pub pddl_effects: Value,
 }
 
 impl StepInput {

@@ -1440,6 +1440,9 @@ async fn ensure_sops(
                         acceptance_criteria: sop.acceptance_criteria.clone(),
                         inspection: sop.inspection.clone(),
                         outputs: sop.outputs.clone(),
+                        source_asset_id: None,
+                        knowledge_pack_ref: String::new(),
+                        action_text: None,
                     },
                 )
                 .await
@@ -1537,6 +1540,11 @@ async fn apply_process(
             on_result: step.on_result.clone(),
             max_attempts: step.max_attempts,
             outputs: step.outputs.clone(),
+            // The seed catalogue carries no PDDL: a converted procedure is the only source of
+            // action text and literals (T16), and those land through the ingest path.
+            action_text: None,
+            pddl_preconditions: Value::Array(Vec::new()),
+            pddl_effects: serde_json::json!({"add": [], "delete": []}),
         });
     }
 

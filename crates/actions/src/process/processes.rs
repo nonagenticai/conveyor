@@ -40,6 +40,179 @@ const PROCESS_PUBLISHED: &str = "process.published";
 /// The event a successful retire appends.
 const PROCESS_RETIRED: &str = "process.retired";
 
+/// The gate name the publication approval carries — the action's own name, the same convention
+/// `require_approval_tx` uses for the destructive gate.
+const PUBLISH_GATE: &str = "processes.publish";
+
+/// T16 P5.1: a derived process cannot publish while its source is unreviewed.
+///
+/// This is checked BEFORE the approval gate and regardless of the tenant's policy: a waiver lets a
+/// tenant skip the publication approval, never the review of an untrusted document.
+async fn require_source_reviewed_tx(
+    tx: &mut PgConnection,
+    tenant: conveyor_domain::TenantId,
+    process: &conveyor_store::process::ProcessRecord,
+) -> Result<(), ActionError> {
+    let Some(source_id) = process.source_asset_id else {
+        return Ok(());
+    };
+    let asset = store::governance::get_asset_tx(&mut *tx, tenant, source_id)
+        .await
+        .map_err(|error| {
+            tracing::error!(%error, "read the derived process's source");
+            ActionError::internal()
+        })?
+        .ok_or_else(|| {
+            ActionError::new(
+                422,
+                "source.missing",
+                format!("the process was derived from source {source_id}, which no longer exists"),
+            )
+        })?;
+    if asset.status != conveyor_domain::AssetStatus::Approved {
+        return Err(ActionError::new(
+            422,
+            "source.unapproved",
+            format!(
+                "the source {source_id} is {:?}; a human must review it before the derived process can publish",
+                asset.status
+            ),
+        ));
+    }
+    Ok(())
+}
+
+/// T16 P2: the publication gate on a derived process.
+///
+/// A missing tenant policy row is `required` (the same strict default #282 established). The
+/// approval must name THIS version as its target and must carry at least one human decision: an
+/// agent, rule or triage decision is recorded evidence, never a human gate. The requester cannot
+/// decide its own gate — that rule lives in `store::approval::record_decision_tx`, the one writer
+/// every decision path traverses.
+async fn publication_gate_tx(
+    tx: &mut PgConnection,
+    ctx: &HandlerCtx,
+    process: &conveyor_store::process::ProcessRecord,
+) -> Result<Option<Uuid>, ActionError> {
+    if process.source_asset_id.is_none() {
+        return Ok(None);
+    }
+    // The approval id is the invoke envelope's (`approval_id` next to `input`), the same channel
+    // every destructive action uses — never a field inside the action's own document.
+    let approval_id = ctx.approval_id;
+    let waived = store::approval_policy::waives(&mut *tx, ctx.tenant, PUBLISH_GATE)
+        .await
+        .map_err(|error| {
+            tracing::error!(%error, "read the tenant's publication policy");
+            ActionError::internal()
+        })?;
+    if waived {
+        return Ok(None);
+    }
+    let Some(id) = approval_id else {
+        return Err(ActionError::new(
+            403,
+            "approval_required",
+            format!(
+                "{PUBLISH_GATE} on a derived process needs an approved approval for process {} named in `approval_id`",
+                process.id
+            ),
+        ));
+    };
+    let record = store::approval::get_approval_tx(&mut *tx, ctx.tenant, id)
+        .await
+        .map_err(|error| {
+            tracing::error!(%error, "read the publication approval");
+            ActionError::internal()
+        })?
+        .ok_or_else(|| {
+            ActionError::new(
+                403,
+                "approval_not_found",
+                format!("no approval {id} in this tenant"),
+            )
+        })?;
+    if record.approval.status != conveyor_domain::ApprovalStatus::Approved {
+        return Err(ActionError::new(
+            403,
+            "approval_not_approved",
+            format!(
+                "approval {id} is {}; only an approved gate releases the process",
+                record.approval.status
+            ),
+        ));
+    }
+    if record.approval.gate != PUBLISH_GATE {
+        return Err(ActionError::new(
+            403,
+            "approval_wrong_action",
+            format!(
+                "approval {id} was opened for {:?}, not {PUBLISH_GATE}",
+                record.approval.gate
+            ),
+        ));
+    }
+    let meta = store::approval::approval_meta_tx(&mut *tx, ctx.tenant, id)
+        .await
+        .map_err(|error| {
+            tracing::error!(%error, "read the publication approval's target");
+            ActionError::internal()
+        })?
+        .unwrap_or(serde_json::Value::Null);
+    let approved_target = meta
+        .get("target")
+        .and_then(serde_json::Value::as_str)
+        .unwrap_or_default();
+    if approved_target != process.id.to_string() {
+        return Err(ActionError::new(
+            403,
+            "approval_wrong_target",
+            format!(
+                "approval {id} authorises {approved_target:?}, not process {}",
+                process.id
+            ),
+        ));
+    }
+    let decisions = store::approval::list_decisions_for_approvals_tx(&mut *tx, ctx.tenant, &[id])
+        .await
+        .map_err(|error| {
+            tracing::error!(%error, "read the publication approval's decisions");
+            ActionError::internal()
+        })?;
+    let human = decisions.iter().any(|decision| {
+        decision.decision == "approve" && decision.decided_by_kind == "human"
+    });
+    if !human {
+        return Err(ActionError::new(
+            403,
+            "human_decision_required",
+            format!(
+                "approval {id} carries no human approval decision; a gate on a derived procedure is a person's act"
+            ),
+        ));
+    }
+    Ok(Some(id))
+}
+
+/// T16 P4: refuse a draft whose PDDL cannot be executed, before the prompt audit runs.
+fn validate_pddl_steps(steps: &[conveyor_store::process::ProcessStepRecord]) -> Result<(), ActionError> {
+    for (index, step) in steps.iter().enumerate() {
+        conveyor_domain::pddl::parse_preconditions(
+            "pddl_preconditions",
+            &step.pddl_preconditions,
+        )
+        .and_then(|_| conveyor_domain::pddl::parse_effects("pddl_effects", &step.pddl_effects))
+        .map_err(|error| {
+            ActionError::new(
+                422,
+                "pddl.invalid",
+                format!("step {}: {}", index + 1, error.detail),
+            )
+        })?;
+    }
+    Ok(())
+}
+
 /// The most gate codes a publish will read. A tenant's gate vocabulary is a handful of rows; this is a
 /// ceiling that cannot silently truncate one, not a page size.
 const GATE_SCAN_LIMIT: i64 = 500;
@@ -394,9 +567,15 @@ async fn processes_publish(
         ));
     }
 
+    // T16: the source review and the publication gate come before any validation work. A derived
+    // process is an untrusted document's output, and no tenant policy can waive the review.
+    require_source_reviewed_tx(&mut *tx, ctx.tenant, &current).await?;
+    let publication_approval = publication_gate_tx(&mut *tx, &ctx, &current).await?;
+
     let steps = store::process::list_steps_tx(&mut *tx, ctx.tenant, current.id)
         .await
         .map_err(|error| process_error(error, "processes.publish"))?;
+    validate_pddl_steps(&steps)?;
     let step_inputs = step_inputs_from_records(&steps);
     // One registry pass supplies both facts: `validate_publish` needs the idempotency flag, and the
     // plan projection needs the output schema a declared path must resolve in.
@@ -618,6 +797,14 @@ async fn processes_publish(
     let published = store::process::publish_tx(&mut *tx, ctx.tenant, current.id, None)
         .await
         .map_err(|error| process_error(error, "processes.publish"))?;
+    // T16 P2.2: the approval id is recorded against the released version in the same transaction
+    // that released it — a published derived process can never exist without the gate that
+    // authorised it.
+    if let Some(approval_id) = publication_approval {
+        store::process::set_process_approval_tx(&mut *tx, ctx.tenant, published.id, approval_id)
+            .await
+            .map_err(|error| process_error(error, "processes.publish"))?;
+    }
     let content = frozen_content(&step_inputs)?;
     let hash = content_hash(&content);
     let seq = i32::try_from(published.version).map_err(|error| {

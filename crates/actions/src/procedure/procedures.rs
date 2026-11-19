@@ -263,6 +263,7 @@ async fn procedures_publish(
             format!("the procedure is {}, not a draft", current.status),
         ));
     }
+    super::require_source_reviewed_tx(&mut *tx, ctx.tenant, current.source_asset_id).await?;
     validated(&current)?;
     let published = store::procedure::publish_tx(&mut *tx, ctx.tenant, current.id)
         .await

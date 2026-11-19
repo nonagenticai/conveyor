@@ -17,6 +17,7 @@
 //! [`strata`] — `strata_rag` behind `knowledge.query` and `memory.consolidate` (S15): query, document
 //! ingest, source prune and platform-pack leaves. A transport, not an external action.
 
+pub mod convert;
 pub mod external;
 pub mod github;
 pub mod imagegen;

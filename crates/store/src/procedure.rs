@@ -61,7 +61,7 @@ pub enum SopStoreError {
 /// cursor the caller cannot derive from the rows it was handed is not a cursor.
 const COLUMNS: &str = "id, key, title, description, status, version, lock_version, \
     definition_of_ready, definition_of_done, acceptance_criteria, inspection, outputs, \
-    created_at, updated_at";
+    source_asset_id, knowledge_pack_ref, action_text, created_at, updated_at";
 
 /// A procedure row as stored.
 #[derive(Clone, Debug)]
@@ -88,6 +88,13 @@ pub struct SopRecord {
     pub acceptance_criteria: Value,
     /// `{kind: laya|eval|checker, ...}`.
     pub inspection: Value,
+    /// The `governed_asset(kind='sop_source')` this SOP was converted from (T16); `None` when
+    /// hand-authored.
+    pub source_asset_id: Option<Uuid>,
+    /// The paired strata knowledge pack (`<store_id>/<job_id>`), `''` when none (T16).
+    pub knowledge_pack_ref: String,
+    /// The SOP's own PDDL action text (0058), when the converter produced one (T16).
+    pub action_text: Option<String>,
     /// The declared user-facing outputs.
     pub outputs: Value,
     /// Creation time.
@@ -110,6 +117,9 @@ struct SopRow {
     acceptance_criteria: Value,
     inspection: Value,
     outputs: Value,
+    source_asset_id: Option<Uuid>,
+    knowledge_pack_ref: String,
+    action_text: Option<String>,
     created_at: DateTime<Utc>,
     updated_at: DateTime<Utc>,
 }
@@ -129,6 +139,9 @@ impl From<SopRow> for SopRecord {
             acceptance_criteria: row.acceptance_criteria,
             inspection: row.inspection,
             outputs: row.outputs,
+            source_asset_id: row.source_asset_id,
+            knowledge_pack_ref: row.knowledge_pack_ref,
+            action_text: row.action_text,
             created_at: row.created_at,
             updated_at: row.updated_at,
         }
@@ -154,6 +167,12 @@ pub struct NewSop {
     pub inspection: Value,
     /// The declared outputs.
     pub outputs: Value,
+    /// The `governed_asset(kind='sop_source')` this SOP was converted from (T16).
+    pub source_asset_id: Option<Uuid>,
+    /// The paired strata knowledge pack (`<store_id>/<job_id>`), `''` when none (T16).
+    pub knowledge_pack_ref: String,
+    /// The SOP's own PDDL action text (T16); `None` for a hand-authored SOP.
+    pub action_text: Option<String>,
 }
 
 /// A partial edit of a draft; `None` leaves the column as it is.
@@ -190,8 +209,9 @@ pub async fn create_draft_tx(
     .await?;
     let sql = format!(
         "INSERT INTO procedure (tenant_id, key, title, description, version, definition_of_ready,
-                                definition_of_done, acceptance_criteria, inspection, outputs)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+                                definition_of_done, acceptance_criteria, inspection, outputs,
+                                source_asset_id, knowledge_pack_ref, action_text)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
          RETURNING {COLUMNS}"
     );
     match sqlx::query_as::<_, SopRow>(sqlx::AssertSqlSafe(sql))
@@ -205,6 +225,9 @@ pub async fn create_draft_tx(
         .bind(&input.acceptance_criteria)
         .bind(&input.inspection)
         .bind(&input.outputs)
+        .bind(input.source_asset_id)
+        .bind(&input.knowledge_pack_ref)
+        .bind(input.action_text.as_deref().filter(|text| !text.trim().is_empty()))
         .fetch_one(&mut *conn)
         .await
     {

@@ -213,6 +213,91 @@ pub async fn execute_step(
         }
     }
 
+    // ── the PDDL action space: a false precondition stops the run at this position ───────
+    //
+    // T16 P4.2. Evaluated against the run's own fact state — the previous position's recorded
+    // `pddl_state_after`, or the process version's `pddl_init` — never against a caller's claim.
+    // A false precondition claims the row and records the refusal through the ordinary
+    // record-and-chain path, so the step's `on_result` policy applies exactly as it does for any
+    // other deterministic failure; the default `fail` ends the run and no later step executes.
+    if !step.pddl_preconditions.is_null() {
+        let preconditions = match conveyor_domain::pddl::parse_preconditions(
+            "pddl_preconditions",
+            &step.pddl_preconditions,
+        ) {
+            Ok(list) => list,
+            Err(error) => {
+                return abandon(
+                    tx,
+                    StepFailure::permanent(format!("pddl.invalid: {}", error.detail)),
+                )
+                .await;
+            }
+        };
+        if !preconditions.is_empty() {
+            let state = match store::process::current_pddl_state_tx(
+                &mut tx,
+                tenant,
+                context.id,
+                position,
+            )
+            .await
+            {
+                Ok(state) => state,
+                Err(error) => {
+                    return abandon(
+                        tx,
+                        StepFailure::retryable(format!("database: {error}")),
+                    )
+                    .await;
+                }
+            };
+            let atoms = match conveyor_domain::pddl::parse_state("pddl_state", &state) {
+                Ok(atoms) => atoms,
+                Err(error) => {
+                    return abandon(
+                        tx,
+                        StepFailure::permanent(format!("pddl.invalid: {}", error.detail)),
+                    )
+                    .await;
+                }
+            };
+            if let Err(detail) =
+                conveyor_domain::pddl::check_preconditions(&atoms, &preconditions)
+            {
+                let next = claim_then(
+                    &mut tx,
+                    tenant,
+                    &context,
+                    &step,
+                    attempt,
+                    None,
+                    Some(PreparedFailure {
+                        message: format!(
+                            "pddl_precondition_false: step {position}: {detail}"
+                        ),
+                    }),
+                    next_position,
+                )
+                .await?;
+                tx.commit()
+                    .await
+                    .map_err(|error| StepFailure::retryable(format!("database: {error}")))?;
+                return continue_after(
+                    pool,
+                    tenant,
+                    app_key,
+                    &context,
+                    &process,
+                    &step,
+                    next,
+                    next_position,
+                )
+                .await;
+            }
+        }
+    }
+
     // ── a gated step parks on its approval before it is claimed ───────────────────────────
     //
     // The check is BEFORE the claim on purpose: a claimed step is invokable, so a gate opened
@@ -1659,6 +1744,12 @@ pub(crate) async fn record_and_chain(
         // A cancel or the reaper recorded this step first; its transaction owns the chain.
         return Ok(());
     };
+    // T16 P4.1: a succeeded step's effects apply and the fact state either side is recorded. A
+    // failure or skip leaves the state untouched (and the row's state columns NULL — the trace
+    // says "this step changed nothing" rather than inventing a state).
+    if recorded.status == "succeeded" {
+        record_pddl_state(conn, tenant, step, &recorded).await?;
+    }
     emit_step_changed(
         conn,
         tenant,
@@ -1669,6 +1760,65 @@ pub(crate) async fn record_and_chain(
     )
     .await?;
     chain_after_record(conn, tenant, context, step, &recorded, next_position).await
+}
+
+/// Apply a succeeded step's PDDL effects and record the fact state either side of it (T16 P4.1).
+///
+/// A step that declares no PDDL (no action text, no preconditions, no effects) is not a PDDL step
+/// and writes nothing — the columns stay NULL, which every reader treats as "no state change".
+async fn record_pddl_state(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    step: &ProcessStepRecord,
+    recorded: &RunStepRecord,
+) -> Result<(), StepFailure> {
+    let effects = match conveyor_domain::pddl::parse_effects(
+        "pddl_effects",
+        &step.pddl_effects,
+    ) {
+        Ok(effects) => effects,
+        Err(error) => {
+            return Err(StepFailure::permanent(format!(
+                "pddl.invalid: {}",
+                error.detail
+            )));
+        }
+    };
+    let declares_pddl = step
+        .action_text
+        .as_deref()
+        .is_some_and(|text| !text.trim().is_empty())
+        || !step.pddl_preconditions.is_null()
+            && step
+                .pddl_preconditions
+                .as_array()
+                .is_some_and(|items| !items.is_empty())
+        || !effects.is_empty();
+    if !declares_pddl {
+        return Ok(());
+    }
+    let before = store::process::current_pddl_state_tx(
+        conn,
+        tenant,
+        recorded.run_id,
+        recorded.position,
+    )
+    .await
+    .map_err(|error| StepFailure::retryable(format!("database: {error}")))?;
+    let atoms = conveyor_domain::pddl::parse_state("pddl_state", &before).map_err(|error| {
+        StepFailure::permanent(format!("pddl.invalid: {}", error.detail))
+    })?;
+    let after = conveyor_domain::pddl::apply_effects(&atoms, &effects);
+    store::process::set_run_step_pddl_state_tx(
+        conn,
+        tenant,
+        recorded.id,
+        &before,
+        &conveyor_domain::pddl::state_json(&after),
+    )
+    .await
+    .map_err(|error| StepFailure::retryable(format!("database: {error}")))?;
+    Ok(())
 }
 
 /// Continue from a recorded step: enqueue the next position, retry the attempt, or close the run.

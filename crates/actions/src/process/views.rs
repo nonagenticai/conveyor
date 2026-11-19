@@ -54,6 +54,15 @@ pub struct StepIn {
     /// The dot-paths into this step's output that later steps may reference (S21 §6).
     #[serde(default)]
     pub outputs: Vec<String>,
+    /// The PDDL action text this step executes (T16, SPEC_V2 §5.6); blank for a non-PDDL step.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub action_text: Option<String>,
+    /// The step's PDDL preconditions — ground literals (T16). Absent = always runnable.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub pddl_preconditions: Option<Value>,
+    /// The step's PDDL effects — `{"add": [...], "delete": [...]}` (T16).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub pddl_effects: Option<Value>,
 }
 
 /// `processes.create` input.

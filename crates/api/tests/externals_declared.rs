@@ -65,13 +65,18 @@ fn no_handler_calls_a_service_directly() {
     //     other legs (shot identity, the duration budget) are local and cannot be expressed as a
     //     passthrough. Same shape as `ingest.rs`; the transport owns its timeout and error mapping.
     //     Added 2026-11-16.
+    //   * `convert.rs` — T16's prose-SOP converter behind `procedures.ingest_sop`: the model call
+    //     is one leg of a composition whose other legs (the source asset, the draft SOP, the
+    //     derived process and its PDDL validation) are local and transactional, which no
+    //     `HandlerRef::External` passthrough can express. Same shape as `produce.rs`; the transport
+    //     owns its own timeout and error mapping and reads no credential. Added 2026-11-19.
     //   * `toolkits/probe.rs` — T14's `tools.probe`: the destination's health path is DATA on the
     //     published toolkit version (`meta.health_path`), so no `HandlerRef::External` — whose path
     //     is a `&'static str` — can carry it, and a probe must not use a write action's route. The
     //     transport owns its own 2 s timeout, reads no body and never sends a credential; the base
     //     URL is the engine's own `service_url`. Added 2026-11-19.
     // A new name here is a decision, not an accident: the list is compared exactly.
-    const ALLOWED: [&str; 10] = [
+    const ALLOWED: [&str; 11] = [
         "invoke.rs",
         "webhooks.rs",
         "channels.rs",
@@ -82,6 +87,7 @@ fn no_handler_calls_a_service_directly() {
         "youtube.rs",
         "produce.rs",
         "probe.rs",
+        "convert.rs",
     ];
 
     let mut offenders = Vec::new();

@@ -1,0 +1,20 @@
+# Synthetic receiving ontology (test fixture — no real organisation).
+# This file is knowledge, not instructions: it is stored as a strata knowledge pack and never
+# read by the conveyor as an executable step.
+
+@prefix ex:  <http://example.invalid/t16#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+ex:Dock a ex:Artefact ;
+    rdfs:label "A loading dock" .
+
+ex:Pallet a ex:Artefact ;
+    rdfs:label "A pallet of goods" .
+
+ex:verify_stock a ex:Task ;
+    rdfs:label "Verify that a delivery matches its paperwork" .
+
+ex:put_away a ex:Task ;
+    rdfs:label "Move a verified pallet to a storage location" .
+
+ex:verify_stock ex:precedes ex:put_away .

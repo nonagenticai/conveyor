@@ -87,6 +87,18 @@ pub struct ProcessRecord {
     pub outputs: Value,
     /// The capability the process belongs to, when it names one.
     pub capability_id: Option<Uuid>,
+    /// The untrusted source this version was derived from (T16). `None` for hand-authored.
+    pub source_asset_id: Option<Uuid>,
+    /// The paired strata knowledge pack (`<store_id>/<job_id>`), when the source had one (T16).
+    pub knowledge_pack_ref: String,
+    /// The converter that produced this draft (`prose@1`, `bpmn@1`, …); blank when not derived.
+    pub converter_version: String,
+    /// The PDDL domain text the converter produced (T16).
+    pub pddl_domain: String,
+    /// The typed initial fact state a run starts from (T16).
+    pub pddl_init: Value,
+    /// The approved publication gate that released this version (T16).
+    pub approval_id: Option<Uuid>,
     /// The owner.
     pub owner_user_id: Option<Uuid>,
     /// Creation time.
@@ -128,6 +140,12 @@ pub struct ProcessStepRecord {
     pub max_attempts: i32,
     /// The dot-paths into this step's output that later steps may reference (S21 §6).
     pub outputs: Vec<String>,
+    /// The PDDL action text this step executes (T16); `None` for a non-PDDL step.
+    pub action_text: Option<String>,
+    /// The step's PDDL preconditions — an array of ground literals (T16).
+    pub pddl_preconditions: Value,
+    /// The step's PDDL effects — `{"add": [...], "delete": [...]}` (T16).
+    pub pddl_effects: Value,
 }
 
 /// A process to create.
@@ -184,10 +202,12 @@ pub struct RunStepRecord {
 
 const PROCESS_COLUMNS: &str = "id, key, title, description, status, version, lock_version, \
                                card_type_id, list_kind, project_type_id, outputs, capability_id, \
-                               owner_user_id, created_at, updated_at";
+                               source_asset_id, knowledge_pack_ref, converter_version, pddl_domain, \
+                               pddl_init, approval_id, owner_user_id, created_at, updated_at";
 const STEP_COLUMNS: &str = "id, process_id, position, action, input_template, gate_kind, on_result, \
                             max_attempts, outputs, kind, actor, capability_id, process_agent_id, \
-                            procedure_id, child_process_key";
+                            procedure_id, child_process_key, action_text, pddl_preconditions, \
+                            pddl_effects";
 const RUN_STEP_COLUMNS: &str = "id, run_id, process_step_id, position, attempt, action, status, \
                                 input, output, error, judge, procedure_version";
 
@@ -205,6 +225,12 @@ struct ProcessRow {
     project_type_id: Option<Uuid>,
     outputs: Value,
     capability_id: Option<Uuid>,
+    source_asset_id: Option<Uuid>,
+    knowledge_pack_ref: String,
+    converter_version: String,
+    pddl_domain: String,
+    pddl_init: Value,
+    approval_id: Option<Uuid>,
     owner_user_id: Option<Uuid>,
     created_at: DateTime<Utc>,
     updated_at: DateTime<Utc>,
@@ -225,6 +251,12 @@ impl From<ProcessRow> for ProcessRecord {
             project_type_id: row.project_type_id,
             outputs: row.outputs,
             capability_id: row.capability_id,
+            source_asset_id: row.source_asset_id,
+            knowledge_pack_ref: row.knowledge_pack_ref,
+            converter_version: row.converter_version,
+            pddl_domain: row.pddl_domain,
+            pddl_init: row.pddl_init,
+            approval_id: row.approval_id,
             owner_user_id: row.owner_user_id,
             created_at: row.created_at,
             updated_at: row.updated_at,
@@ -249,6 +281,9 @@ struct StepRow {
     process_agent_id: Option<Uuid>,
     procedure_id: Option<Uuid>,
     child_process_key: Option<String>,
+    action_text: Option<String>,
+    pddl_preconditions: Value,
+    pddl_effects: Value,
 }
 
 impl From<StepRow> for ProcessStepRecord {
@@ -271,6 +306,9 @@ impl From<StepRow> for ProcessStepRecord {
             // The column only ever holds what `insert_steps_tx` wrote (an array of strings); a
             // hand-written row that is not one reads as "declares nothing", which is the safe side.
             outputs: serde_json::from_value(row.outputs).unwrap_or_default(),
+            action_text: row.action_text,
+            pddl_preconditions: row.pddl_preconditions,
+            pddl_effects: row.pddl_effects,
         }
     }
 }
@@ -416,10 +454,10 @@ pub async fn fork_version_tx(
         "INSERT INTO process_step
              (tenant_id, process_id, position, kind, actor, action, input_template, gate_kind,
               on_result, max_attempts, outputs, capability_id, process_agent_id, procedure_id,
-              child_process_key)
+              child_process_key, action_text, pddl_preconditions, pddl_effects)
          SELECT tenant_id, $2, position, kind, actor, action, input_template, gate_kind,
                 on_result, max_attempts, outputs, capability_id, process_agent_id, procedure_id,
-                child_process_key
+                child_process_key, action_text, pddl_preconditions, pddl_effects
            FROM process_step
           WHERE tenant_id = $1 AND process_id = $3",
     )
@@ -699,8 +737,8 @@ pub async fn insert_steps_tx(
         "INSERT INTO process_step
              (tenant_id, process_id, position, action, input_template, gate_kind, on_result,
               max_attempts, outputs, kind, actor, capability_id, process_agent_id, procedure_id,
-              child_process_key)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
+              child_process_key, action_text, pddl_preconditions, pddl_effects)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)
          RETURNING {STEP_COLUMNS}"
     );
     for (index, step) in steps.iter().enumerate() {
@@ -744,6 +782,19 @@ pub async fn insert_steps_tx(
             .bind(step.process_agent_id)
             .bind(step.procedure_id)
             .bind(step.child_process_key.as_deref())
+            // The PDDL half is NOT NULL in the schema; a caller that declares nothing (the
+            // domain default is JSON null) is normalised here, never sent as SQL NULL.
+            .bind(step.action_text.as_deref().filter(|text| !text.trim().is_empty()))
+            .bind(if step.pddl_preconditions.is_null() {
+                Value::Array(Vec::new())
+            } else {
+                step.pddl_preconditions.clone()
+            })
+            .bind(if step.pddl_effects.is_null() {
+                serde_json::json!({"add": [], "delete": []})
+            } else {
+                step.pddl_effects.clone()
+            })
             .fetch_one(&mut *conn)
             .await?;
         out.push(row.into());
@@ -764,6 +815,125 @@ pub async fn replace_steps_tx(
         .execute(&mut *conn)
         .await?;
     insert_steps_tx(&mut *conn, tenant, process_id, steps).await?;
+    Ok(())
+}
+
+/// The derivation facts T16 writes on a freshly created draft, in the creating transaction.
+///
+/// Kept out of [`NewProcess`] so the six existing constructors (the action, the seed and the store
+/// tests) do not each grow five T16-only fields: a hand-authored process carries the column
+/// defaults, and only a converted one calls this.
+#[derive(Clone, Debug)]
+pub struct ProcessDerivation {
+    /// The `governed_asset(kind='sop_source')` the draft came from.
+    pub source_asset_id: Uuid,
+    /// The paired strata knowledge pack (`<store_id>/<job_id>`), `''` when none.
+    pub knowledge_pack_ref: String,
+    /// The converter that produced the draft (`prose@1`, `bpmn@1`).
+    pub converter_version: String,
+    /// The PDDL domain text the converter produced.
+    pub pddl_domain: String,
+    /// The typed initial fact state.
+    pub pddl_init: Value,
+}
+
+/// Write the T16 derivation columns on a draft.
+pub async fn set_process_derivation_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    process_id: Uuid,
+    derivation: &ProcessDerivation,
+) -> Result<(), ProcessStoreError> {
+    let init = if derivation.pddl_init.is_null() {
+        Value::Array(Vec::new())
+    } else {
+        derivation.pddl_init.clone()
+    };
+    sqlx::query(
+        "UPDATE process
+            SET source_asset_id = $3, knowledge_pack_ref = $4, converter_version = $5,
+                pddl_domain = $6, pddl_init = $7, updated_at = now()
+          WHERE tenant_id = $1 AND id = $2",
+    )
+    .bind(tenant.as_uuid())
+    .bind(process_id)
+    .bind(derivation.source_asset_id)
+    .bind(&derivation.knowledge_pack_ref)
+    .bind(&derivation.converter_version)
+    .bind(&derivation.pddl_domain)
+    .bind(&init)
+    .execute(&mut *conn)
+    .await?;
+    Ok(())
+}
+
+/// Record the approved publication gate on the version it released (T16 P2.2).
+pub async fn set_process_approval_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    process_id: Uuid,
+    approval_id: Uuid,
+) -> Result<(), ProcessStoreError> {
+    sqlx::query(
+        "UPDATE process SET approval_id = $3, updated_at = now()
+          WHERE tenant_id = $1 AND id = $2",
+    )
+    .bind(tenant.as_uuid())
+    .bind(process_id)
+    .bind(approval_id)
+    .execute(&mut *conn)
+    .await?;
+    Ok(())
+}
+
+/// The fact state a step at `position` starts from (T16 P4).
+///
+/// The state threads through the run's own trace: the previous position's recorded
+/// `pddl_state_after`, or the process version's `pddl_init` for the first PDDL step. `[]` when the
+/// run has neither — an empty state is a real state, not an error.
+pub async fn current_pddl_state_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    run_id: Uuid,
+    position: i32,
+) -> Result<Value, ProcessStoreError> {
+    let state: Value = sqlx::query_scalar(
+        "SELECT COALESCE(
+            (SELECT pddl_state_after FROM run_step
+              WHERE tenant_id = $1 AND run_id = $2 AND position < $3
+                AND pddl_state_after IS NOT NULL
+              ORDER BY position DESC, attempt DESC LIMIT 1),
+            (SELECT p.pddl_init FROM run r
+               JOIN process p ON p.id = r.process_id AND p.tenant_id = r.tenant_id
+              WHERE r.tenant_id = $1 AND r.id = $2),
+            '[]'::jsonb)",
+    )
+    .bind(tenant.as_uuid())
+    .bind(run_id)
+    .bind(position)
+    .fetch_one(&mut *conn)
+    .await?;
+    Ok(state)
+}
+
+/// Write the fact state either side of a recorded run step (T16 P4.1).
+pub async fn set_run_step_pddl_state_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    run_step_id: Uuid,
+    before: &Value,
+    after: &Value,
+) -> Result<(), ProcessStoreError> {
+    sqlx::query(
+        "UPDATE run_step SET pddl_state_before = $3, pddl_state_after = $4
+          WHERE tenant_id = $1 AND id = $2",
+    )
+    .bind(tenant.as_uuid())
+    .bind(run_step_id)
+    .bind(before)
+    .bind(after)
+    .execute(&mut *conn)
+    .await?;
     Ok(())
 }
 

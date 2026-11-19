@@ -767,6 +767,7 @@ dependencies = [
  "inventory",
  "object_store",
  "openapiv3",
+ "quick-xml 0.42.0",
  "regex",
  "reqwest",
  "rmcp",
