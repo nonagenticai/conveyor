@@ -102,7 +102,7 @@ use serde_json::{Value, json};
 /// **T16 (#85) adds five internal**: `procedures.ingest_sop|ingest_process|ingest_rdf`,
 /// `procedures.validate` and `procedures.review_source` — the SOP/process-document intake and its
 /// source review (no `pko.*` action exists: owner decision 2026-11-19, #413).
-const EXPECTED: [&str; 485] = [
+const EXPECTED: [&str; 486] = [
     "actions.describe",
     "actions.list",
     "analyse.site",
