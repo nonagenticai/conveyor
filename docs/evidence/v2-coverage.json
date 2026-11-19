@@ -13,9 +13,9 @@
     "new": "absent"
   },
   "counts": {
-    "exists": 43,
+    "exists": 44,
     "extend": 8,
-    "new": 12
+    "new": 11
   },
   "rows": [
     {
@@ -591,9 +591,9 @@
       "spec_ref": "§10.4",
       "kind": "actions",
       "concept": "metrics",
-      "verdict": "new",
+      "verdict": "exists",
       "evidence": [
-        "actions: metrics.* absent"
+        "actions: metrics.* found (metrics.flow, metrics.job, metrics.maturity…)"
       ]
     },
     {

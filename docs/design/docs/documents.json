@@ -42,8 +42,8 @@
       "path": "docs/SPEC_V2.html",
       "source": "docs/SPEC_V2.md",
       "section": "Spec",
-      "sha256": "c39d27fd284804e20f8a66ed146fd1ac3dae5024c37094b9e65bfe447e33ed8f",
-      "bytes": 169528,
+      "sha256": "5bef7d6f326d5bfcac348aafcff7c98d136a3052ba237895c82b8967c2472fe3",
+      "bytes": 169718,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/SPEC_V2.md"
     },
     {
@@ -465,8 +465,8 @@
       "path": "docs/evidence/v2-coverage.html",
       "source": "docs/evidence/v2-coverage.md",
       "section": "Evidence",
-      "sha256": "c87a79eeaff5d85aedf8d4c42a5f05d0aab890f3fe6dd28b62735c4bb2d28e32",
-      "bytes": 11292,
+      "sha256": "0b003457896434d4c3261039b20885de7378476fde7bb315b321f6845ac42fdd",
+      "bytes": 11343,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/v2-coverage.md"
     },
     {

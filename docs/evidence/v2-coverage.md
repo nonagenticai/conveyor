@@ -5,9 +5,9 @@ code. The JSON beside this file is the record; this page is its rendered form.
 
 | Verdict | Meaning | Count |
 |---|---|---|
-| `exists` | implemented in code and backed by real rows | 43 |
+| `exists` | implemented in code and backed by real rows | 44 |
 | `extend` | a partial implementation exists (a page, a table, or a prefix) that must be extended | 8 |
-| `new` | absent | 12 |
+| `new` | absent | 11 |
 
 ## Rows
 
@@ -67,7 +67,7 @@ code. The JSON beside this file is the record; this page is its rendered form.
 | `actions:production` | §10.4 | actions | production | `exists` | actions: produce.* found (produce.script) |
 | `actions:tools` | §10.4 | actions | tools | `extend` | actions: tool_authoring.* absent<br>actions: tool_bindings.* absent<br>actions: tool_calls.* absent<br>actions: toolkits.* found (toolkits.publish)<br>actions: tools.* found (tools.probe, tools.usage) |
 | `actions:memory` | §10.4 | actions | memory | `new` | actions: lessons.* absent |
-| `actions:metrics` | §10.4 | actions | metrics | `new` | actions: metrics.* absent |
+| `actions:metrics` | §10.4 | actions | metrics | `exists` | actions: metrics.* found (metrics.flow, metrics.job, metrics.maturity…) |
 | `destination:Organisation` | §10.5 | destination | Organisation | `exists` | docs/design/v2.js: page 'organisation' registered<br>*The page renders the tenant's live industry, department, job, release and binding rows (T0, #34/#65).* |
 | `destination:Procedures` | §10.5 | destination | Procedures | `extend` | docs/design/v2.js: page 'procedures' registered<br>*The page and the V1 process/SOP tables exist; SOP/RDF/OWL ingestion, PKO editing and publish gates are T16.* |
 | `destination:Authoring` | §10.5 | destination | Authoring | `new` | docs/design/v2.js: page 'authoring' registered<br>*A design study only: no authoring actions, no intake queue, no draft catalogue (T17).* |
