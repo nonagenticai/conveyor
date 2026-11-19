@@ -1643,7 +1643,6 @@
         "T15",
         "T16",
         "T17",
-        "T4",
         "T5",
         "T6",
         "T7"
@@ -1988,22 +1987,22 @@
     {
       "blocked_by": [],
       "evidence": [
-        "docs/SPEC_V2.md"
+        "migrations/0057_coach.sql"
       ],
-      "gap": "no interruption taxonomy, closed remedy set or coach card",
+      "gap": null,
       "key": "T4",
       "measured": {
         "actions": [
-          0,
-          0
+          4,
+          4
         ],
         "modules": [
           0,
           0
         ],
         "tables": [
-          0,
-          0
+          2,
+          2
         ]
       },
       "name": "Kanban coach",
@@ -2017,7 +2016,7 @@
         "T9"
       ],
       "plan": "docs/SPEC_V2.md#12",
-      "status": "proposed",
+      "status": "built",
       "track": "v2",
       "tranche": 4,
       "units": {
@@ -2115,9 +2114,7 @@
       }
     },
     {
-      "blocked_by": [
-        "T4"
-      ],
+      "blocked_by": [],
       "evidence": [
         "docs/SPEC_V2.md"
       ],
@@ -2494,16 +2491,14 @@
       "by_status": {
         "absent": 0,
         "archived": 1,
-        "built": 34,
+        "built": 35,
         "partial": 2,
         "planned": 0,
-        "proposed": 10,
+        "proposed": 9,
         "standing": 1
       },
       "total": 48,
-      "uncovered": [
-        "T4"
-      ],
+      "uncovered": [],
       "with_open_units": 24,
       "without_open_units": 24
     },
