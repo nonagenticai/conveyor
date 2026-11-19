@@ -1091,7 +1091,7 @@ version = "0.1.0"
 dependencies = [
  "conveyor-domain",
  "fontdb 0.24.0",
- "pdf-writer",
+ "pdf-writer 0.15.0",
  "pulldown-cmark",
  "quick-xml 0.42.0",
  "resvg",
@@ -3395,6 +3395,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "pdf-writer"
+version = "0.15.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f5e456864a7a304047bff84977dc6fb162bd956475d40ba50b2dcecaada7f753"
+dependencies = [
+ "bitflags 2.13.2",
+ "itoa",
+ "memchr",
+ "ryu",
+]
+
+[[package]]
 name = "pem"
 version = "3.0.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5211,7 +5223,7 @@ dependencies = [
  "log",
  "miniz_oxide 0.8.9",
  "once_cell",
- "pdf-writer",
+ "pdf-writer 0.12.1",
  "resvg",
  "siphasher",
  "subsetter",
