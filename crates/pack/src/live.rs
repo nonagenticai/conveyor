@@ -71,6 +71,21 @@ pub async fn site_view(pool: &PgPool, args: SiteArgs<'_>) -> Result<SiteView, Sn
     let names = crate::outputs::author_names(&mut tx, &records).await?;
     tx.rollback().await?;
 
+    // ⛔ The live view is the PROGRAMME's view. A project outside a programme is a session
+    // fixture (a proof, a scratch reproduction), so its page row and its published documents are
+    // not public — the same rule `snapshot_tx` applies to the work sections (SPEC_V2 §5).
+    let bound: std::collections::HashSet<Uuid> = projects
+        .iter()
+        .filter(|project| project.programme_id.is_some())
+        .map(|project| project.id)
+        .collect();
+    let projects: Vec<_> = projects
+        .into_iter()
+        .filter(|project| project.programme_id.is_some())
+        .collect();
+    let records = in_programme(records, &bound, |record| record.project_id);
+    let attachments = in_programme(attachments, &bound, |attachment| attachment.project_id);
+
     let generated_at = generated_at(&records);
 
     // The issue registry is a commit-time artefact, not a database row: inject it before the
@@ -128,6 +143,18 @@ fn generated_at(records: &[DocumentRecord]) -> String {
         .unwrap_or_else(|| EMPTY_GENERATED_AT.to_owned())
 }
 
+/// Keep the rows whose project is part of the programme. A row with no project (a tenant-level
+/// note the tenant chose to publish) stays: the filter removes fixtures, not orphans.
+fn in_programme<T>(
+    rows: Vec<T>,
+    bound: &std::collections::HashSet<Uuid>,
+    project_of: impl Fn(&T) -> Option<Uuid>,
+) -> Vec<T> {
+    rows.into_iter()
+        .filter(|row| project_of(row).is_none_or(|id| bound.contains(&id)))
+        .collect()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -135,5 +162,27 @@ mod tests {
     #[test]
     fn an_empty_tenant_has_a_constant_clock() {
         assert_eq!(generated_at(&[]), EMPTY_GENERATED_AT);
+    }
+
+    /// P2.1 of #382: an unbound project's page row and published documents are not public.
+    #[test]
+    fn an_unbound_project_is_not_public() {
+        let t0 = Uuid::now_v7();
+        let t1 = Uuid::now_v7();
+        let bound: std::collections::HashSet<Uuid> = [t0, t1].into_iter().collect();
+        let unbound = Uuid::now_v7();
+        let rows = vec![
+            (Some(t0), "the programme's own"),
+            (Some(t1), "bound"),
+            (Some(unbound), "a scratch fixture"),
+            (None, "a tenant-level note"),
+        ];
+        let kept = in_programme(rows, &bound, |row| row.0);
+        let names: Vec<&str> = kept.iter().map(|row| row.1).collect();
+        assert_eq!(
+            names,
+            vec!["the programme's own", "bound", "a tenant-level note"],
+            "an unbound project's row and its documents are filtered; orphan rows stay"
+        );
     }
 }

@@ -13,6 +13,8 @@
 //! is normalised by the server, so the same rows produce the same bytes on every run. Any
 //! ordering that matters is in the `ORDER BY`.
 
+use std::collections::HashSet;
+
 use conveyor_domain::TenantId;
 use serde_json::{Value, json};
 use sqlx::PgConnection;
@@ -56,7 +58,7 @@ pub async fn snapshot_tx(
         tenant_id,
     )
     .await?;
-    let projects = rows(
+    let mut projects = rows(
         &mut *conn,
         "SELECT COALESCE(jsonb_agg(to_jsonb(t) ORDER BY t.key), '[]'::jsonb) FROM (
              SELECT p.id, p.key, p.name, p.description, p.status, p.programme_id,
@@ -69,7 +71,7 @@ pub async fn snapshot_tx(
     )
     .await?;
 
-    let boards = rows(
+    let mut boards = rows(
         &mut *conn,
         "SELECT COALESCE(jsonb_agg(to_jsonb(t) ORDER BY t.project_id, t.position, t.id), '[]'::jsonb) FROM (
              SELECT id, project_id, name, position, version, created_at
@@ -78,7 +80,7 @@ pub async fn snapshot_tx(
         tenant_id,
     )
     .await?;
-    let lists = rows(
+    let mut lists = rows(
         &mut *conn,
         "SELECT COALESCE(jsonb_agg(to_jsonb(t) ORDER BY t.board_id, t.position, t.id), '[]'::jsonb) FROM (
              SELECT id, board_id, name, position, kind, color, wip_limit, version
@@ -87,7 +89,7 @@ pub async fn snapshot_tx(
         tenant_id,
     )
     .await?;
-    let cards = rows(
+    let mut cards = rows(
         &mut *conn,
         "SELECT COALESCE(jsonb_agg(to_jsonb(t) ORDER BY t.created_at, t.id), '[]'::jsonb) FROM (
              SELECT c.id, c.board_id, c.list_id, c.card_type_id, c.parent_card_id, c.name,
@@ -115,7 +117,7 @@ pub async fn snapshot_tx(
         tenant_id,
     )
     .await?;
-    let runs = rows(
+    let mut runs = rows(
         &mut *conn,
         "SELECT COALESCE(jsonb_agg(to_jsonb(t) ORDER BY t.created_at, t.id), '[]'::jsonb) FROM (
              SELECT id, card_id, project_id, status, attempt, error_class, process_id,
@@ -127,7 +129,7 @@ pub async fn snapshot_tx(
         tenant_id,
     )
     .await?;
-    let run_steps = rows(
+    let mut run_steps = rows(
         &mut *conn,
         "SELECT COALESCE(jsonb_agg(to_jsonb(t) ORDER BY t.run_id, t.position, t.attempt, t.id), '[]'::jsonb) FROM (
              SELECT id, run_id, process_step_id, position, attempt, action, status, node_id,
@@ -138,7 +140,7 @@ pub async fn snapshot_tx(
         tenant_id,
     )
     .await?;
-    let approvals = rows(
+    let mut approvals = rows(
         &mut *conn,
         "SELECT COALESCE(jsonb_agg(to_jsonb(t) ORDER BY t.created_at, t.id), '[]'::jsonb) FROM (
              SELECT id, run_id, card_id, project_id, gate, kind, status, required_decisions,
@@ -148,7 +150,7 @@ pub async fn snapshot_tx(
         tenant_id,
     )
     .await?;
-    let approval_decisions = rows(
+    let mut approval_decisions = rows(
         &mut *conn,
         "SELECT COALESCE(jsonb_agg(to_jsonb(t) ORDER BY t.created_at, t.id), '[]'::jsonb) FROM (
              SELECT d.id, d.approval_id, d.approver_id, u.display_name AS approver_name,
@@ -159,7 +161,7 @@ pub async fn snapshot_tx(
         tenant_id,
     )
     .await?;
-    let comments = rows(
+    let mut comments = rows(
         &mut *conn,
         "SELECT COALESCE(jsonb_agg(to_jsonb(t) ORDER BY t.created_at, t.id), '[]'::jsonb) FROM (
              SELECT c.id, c.card_id, c.author_id, u.display_name AS author_name,
@@ -287,7 +289,7 @@ pub async fn snapshot_tx(
     // tenant, so the filter is the publication decision — never "every row that exists". The
     // projection is a white-list: id, owner, title and timestamps. A body, a content hash or free
     // metadata would be a second, unintended disclosure.
-    let documents = rows(
+    let mut documents = rows(
         &mut *conn,
         "SELECT COALESCE(jsonb_agg(to_jsonb(t) ORDER BY t.created_at, t.id), '[]'::jsonb) FROM (
              SELECT id, project_id, card_id, kind, title, category, unit, publishable,
@@ -486,6 +488,49 @@ pub async fn snapshot_tx(
     )
     .await?;
 
+    // ⛔ The public pack is the PROGRAMME's view (SPEC_V2 §5; the console already filters its
+    // project list the same way — `docs/design/v2.js:4193`). A project outside a programme is a
+    // session fixture — a proof, a scratch reproduction — never programme work, and its boards,
+    // runs, comments and approvals are not the programme's story. Filtered here, at the one
+    // snapshot every public surface reads, so a future fixture cannot become a distractor just
+    // by being created. The authenticated API (`GET /api/projects`) is unaffected: an operator
+    // still sees every row.
+    let bound_projects = ids_where(&projects, "programme_id", |field| !field.is_null());
+    retain_ids(&mut projects, "id", &bound_projects);
+    retain_ids(&mut boards, "project_id", &bound_projects);
+    let bound_boards = ids_where(&boards, "id", |_| true);
+    retain_ids(&mut lists, "board_id", &bound_boards);
+    retain_ids(&mut cards, "board_id", &bound_boards);
+    let bound_cards = ids_where(&cards, "id", |_| true);
+    retain_ids(&mut runs, "project_id", &bound_projects);
+    let bound_runs = ids_where(&runs, "id", |_| true);
+    retain_ids(&mut run_steps, "run_id", &bound_runs);
+    retain_ids(&mut comments, "card_id", &bound_cards);
+    // An approval belongs to the programme when it names a bound project or hangs from a card
+    // of one; a gate with neither parent is an orphan and is not public.
+    if let Some(rows) = approvals.as_array_mut() {
+        rows.retain(|row| {
+            row.get("project_id")
+                .and_then(Value::as_str)
+                .is_some_and(|id| bound_projects.contains(id))
+                || row
+                    .get("card_id")
+                    .and_then(Value::as_str)
+                    .is_some_and(|id| bound_cards.contains(id))
+        });
+    }
+    let bound_approvals = ids_where(&approvals, "id", |_| true);
+    retain_ids(&mut approval_decisions, "approval_id", &bound_approvals);
+    // A published output is public because it belongs to the programme. A document with no
+    // project is a tenant-level note the tenant chose to publish, and stays.
+    if let Some(rows) = documents.as_array_mut() {
+        rows.retain(|row| {
+            row.get("project_id")
+                .and_then(Value::as_str)
+                .is_none_or(|id| bound_projects.contains(id))
+        });
+    }
+
     Ok(SnapshotData {
         programme: json!({"programme": programme, "projects": projects}),
         // T0: the organisation spine (§4) — industries, the placed departments, the job
@@ -541,6 +586,34 @@ pub async fn snapshot_tx(
         }),
         secrets: json!({"secrets": secrets}),
     })
+}
+
+/// The `id`s of the rows whose `key` field satisfies `keep`.
+///
+/// The snapshot's sections are `jsonb_agg` arrays of row objects, so the scope filter is a set
+/// operation over the rendered values rather than a second `WHERE` on every query: the ids a
+/// section carries are already the ids the dependent sections name.
+fn ids_where(value: &Value, key: &str, keep: impl Fn(&Value) -> bool) -> HashSet<String> {
+    value
+        .as_array()
+        .map(|rows| {
+            rows.iter()
+                .filter(|row| row.get(key).is_some_and(&keep))
+                .filter_map(|row| row.get("id").and_then(Value::as_str).map(str::to_owned))
+                .collect()
+        })
+        .unwrap_or_default()
+}
+
+/// Keep only the rows whose `key` field names one of `ids`.
+fn retain_ids(value: &mut Value, key: &str, ids: &HashSet<String>) {
+    if let Some(rows) = value.as_array_mut() {
+        rows.retain(|row| {
+            row.get(key)
+                .and_then(Value::as_str)
+                .is_some_and(|id| ids.contains(id))
+        });
+    }
 }
 
 /// One `jsonb_agg` query: a single jsonb value, bound to the tenant.
