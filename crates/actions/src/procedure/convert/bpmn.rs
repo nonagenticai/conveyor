@@ -229,10 +229,10 @@ impl State {
             if !seen.insert(id) {
                 continue;
             }
-            if let Some(index) = self.index_by_id.get(id) {
-                if appended.insert(*index) {
-                    order.push(*index);
-                }
+            if let Some(index) = self.index_by_id.get(id)
+                && appended.insert(*index)
+            {
+                order.push(*index);
             }
             if let Some(targets) = self.flows.get(id) {
                 for target in targets {

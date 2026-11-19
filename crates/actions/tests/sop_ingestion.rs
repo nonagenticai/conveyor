@@ -234,22 +234,6 @@ async fn publish_judge(running: &support::Running, procedure_id: &str) {
     assert_eq!(status, 200, "{body}");
 }
 
-/// Publish a derived process through its gate (source reviewed, judge published, human decided).
-async fn publish_derived(running: &support::Running, process_id: &str, procedure_id: &str) {
-    let approval = publish_gate(running, process_id).await;
-    let (status, body) = running
-        .invoke_approved(
-            "processes.publish",
-            TOKEN,
-            json!({"process_id": process_id}),
-            None,
-            approval,
-        )
-        .await;
-    assert_eq!(status, 200, "{body}");
-    publish_judge(running, procedure_id).await;
-}
-
 // ── P1 — ingestion ───────────────────────────────────────────────────────────────────────
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
@@ -817,6 +801,7 @@ async fn a_false_precondition_stops_the_run() {
     )
     .await;
 
+    #[allow(clippy::type_complexity)]
     let rows: Vec<(i32, String, Option<String>, Option<Value>, Option<Value>)> = sqlx::query_as(
         "SELECT position, status, error, pddl_state_before, pddl_state_after FROM run_step \
           WHERE run_id = $1 ORDER BY position",
