@@ -119,6 +119,15 @@ window.CONVEYOR_DOCUMENTS = {
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0008-card-ledger.md"
     },
     {
+      "title": "Programme architecture and benefits realization",
+      "path": "docs/design/Program_Architecture_and_Benefits_Realization.html",
+      "source": "docs/design/Program_Architecture_and_Benefits_Realization.md",
+      "section": "Design",
+      "sha256": "b04c408f23e99cecc79ab12c285544d533dd7454797a78c000a739826b1f9474",
+      "bytes": 13342,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/design/Program_Architecture_and_Benefits_Realization.md"
+    },
+    {
       "title": "Web UI design",
       "path": "docs/design/README.html",
       "source": "docs/design/README.md",

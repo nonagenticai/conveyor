@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>Programme architecture and benefits realization · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/design/Program_Architecture_and_Benefits_Realization.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="programme-architecture-and-benefits-realization">Programme architecture and benefits realization</h1>
+<p><strong>Status:</strong> a public, reconstructed study. The workshop document this programme was designed from was input only and was never committed to this public repository; this page reconstructs its substance from the merged record — <code>docs/SPEC_V2.md</code> §8.1 and §8.3, <code>docs/plans/P0-programme-definition.md</code> §3–§7, and the design pack's programme and architecture layers — and cites what it rests on. The programme state is measured at a stated date; where a fact is a live row, the date is given.</p>
+<h2 id="1-purpose-and-provenance">1. Purpose and provenance</h2>
+<p>The conveyor buildout is delivered as a <strong>programme</strong>, not as one large project: a temporary organisation that exists to deliver benefits through projects, judged on the improvement operations realizes after those projects close. The design has two interlocking bodies of practice:</p>
+<ul>
+<li><strong>MSP</strong> supplies the programme's definition and its benefit track: the mandate, brief, blueprint, business case, benefits map and profiles, projects dossier, tranches and their reviews, and the measured realization of each benefit (SPEC_V2 §8.3).</li>
+<li><strong>TOGAF's ADM</strong> supplies the architecture capability: the Preliminary phase, the phase rail A–H, the typed artefacts and the contracts that close each phase, compliance and waivers (SPEC_V2 §8.1).</li>
+</ul>
+<p>The rigour layer was merged in #216: the V2 rows, the gates, the P0 definition set and the design study. T9 (#81) then built the architecture capability, T10 (#82) the tranche and benefits rows, and T11 (#84) the metrics that measure realization. The design pack's <code>programme</code> and <code>adm</code> screens are the design study; signed in, they read the live rows through the <code>programmes.*</code>, <code>benefits.*</code>, <code>tranches.*</code>, <code>stakeholders.*</code>, <code>cadences.*</code> and <code>architecture.*</code> action families.</p>
+<p>Two distinctions run through the whole model and are the reason it is rows rather than a document library:</p>
+<ol type="1">
+<li><strong>A capability is not a benefit.</strong> A delivered capability gives a team a new option. Whether the team uses it, and whether use improves performance, are separate questions. A benefit is a measurable improvement resulting from an outcome, valued by at least one stakeholder, that contributes to an organisational objective.</li>
+<li><strong>A tranche review is a programme decision, not a demo.</strong> A demo shows a deliverable; a tranche review decides <strong>continue, pause or stop</strong> on evidence — the baselines, the benefit status against the profiles, the risk register and the blueprint alignment.</li>
+</ol>
+<h2 id="2-the-programme-architecture">2. The programme architecture</h2>
+<p>P0's definition set is the programme's mandate for the buildout. Every item is a row with a parent, a version and a gate; the list is not a reading list.</p>
+<table>
+<thead>
+<tr>
+<th>Definition-set item (P0 §3)</th>
+<th>V2 row / action family</th>
+<th>Gate</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Mandate — strategic fit, position, drivers, boundaries, assurance, success and constraints</td>
+<td>a <code>governed_asset</code> of the programme-definition project</td>
+<td>the sponsoring group approves the mandate</td>
+</tr>
+<tr>
+<td>Programme brief — vision, benefit categories, cost/timescale/effort, risks, delivery options including doing nothing, candidate projects</td>
+<td><code>governed_asset(kind='programme_brief')</code></td>
+<td>the brief is approved and definition is authorised</td>
+</tr>
+<tr>
+<td>Blueprint — the target architecture and operating model</td>
+<td><code>governed_asset(kind='blueprint')</code>; the architecture artefacts</td>
+<td>the blueprint contract</td>
+</tr>
+<tr>
+<td>Business case — the options including doing nothing, the appraisal and cash flow, how the investment delivers the capabilities the benefits depend on</td>
+<td><code>governed_asset(kind='business_case')</code></td>
+<td>the investment decision</td>
+</tr>
+<tr>
+<td>Benefit profiles and the benefits map</td>
+<td><code>benefit_profile</code>, <code>benefit_link</code>; <code>benefits.*</code></td>
+<td>the BCM and SRO accept the profiles and the map</td>
+</tr>
+<tr>
+<td>Projects dossier — every project with its outputs, resources, timescales, dependencies, budget, contribution and risks</td>
+<td><code>project</code> rows plus programme membership</td>
+<td>first-tranche authorisation</td>
+</tr>
+<tr>
+<td>Programme plan and tranches — the definitive project list, sequencing, entry/exit criteria and review dates</td>
+<td>the T1 plan spine and <code>programme_tranche</code>; <code>tranches.*</code></td>
+<td>the end-of-tranche review</td>
+</tr>
+<tr>
+<td>Governance and organisation — roles (sponsoring group, SRO, programme board, programme office, programme manager, programme architect, BCM, PMO, quality), the decision ladder, assurance, the strategy set and the baseline trio</td>
+<td><code>governance_body</code>, positions and authority rows; <code>programme_baseline(kind='management'|'governance'|'boundary')</code></td>
+<td>the governance baseline</td>
+</tr>
+<tr>
+<td>Stakeholder profiles</td>
+<td><code>stakeholder_profile</code>; <code>stakeholders.profile_*</code></td>
+<td>the engagement plan</td>
+</tr>
+<tr>
+<td>Benefits management strategy and realization plan</td>
+<td><code>governed_asset(kind='benefits_strategy'|'benefits_realization_plan')</code></td>
+<td>transition readiness</td>
+</tr>
+<tr>
+<td>Reuse map, project briefs, the architecture/analysis pack, the Preliminary capability baseline</td>
+<td>the artefact repository and the project documents; the T9 capability</td>
+<td>the architecture contract per project</td>
+</tr>
+</tbody>
+</table>
+<p>The programme is also a <strong>ledger of registrations</strong>: a risk, issue, assumption, dependency, benefit or change is a <code>project_register_item</code> of one of six kinds, and a dependency that slips names the benefits it puts at risk through the benefit-map edges. The tranche is the unit the programme manages and reviews together; the PI cadence is the delivery rhythm inside it.</p>
+<h2 id="3-benefits-realization">3. Benefits realization</h2>
+<p>A benefit profile carries six field groups, and a profile missing a baseline, a target, a measurement method or an owner is refused:</p>
+<ol type="1">
+<li><strong>Identification and purpose</strong> — reference, description, category, objectives, observable outcome.</li>
+<li><strong>Performance</strong> — the affected KPIs, the baseline, the target, the measurement method and the financial value where it can be expressed.</li>
+<li><strong>Cost</strong> — the cost of realizing the benefit, including the business change it needs.</li>
+<li><strong>Conditions</strong> — the capabilities required, the outcomes that must already exist, and the changes to operating practice.</li>
+<li><strong>Uncertainty and dependencies</strong> — related risks and issues, and dependencies outside the programme.</li>
+<li><strong>Responsibility and attribution</strong> — who realizes it, the benefit owner (the BCM) and the operational area to which the improvement is attributed.</li>
+</ol>
+<p>The <strong>benefits map</strong> records each path — project output → capability → operational outcome → benefit or disbenefit → strategic objective — and the dependencies between benefits, on outputs and on capabilities. It answers two questions at every review: which benefit is put at risk when a project slips, and which operational area must change its practice before delivery creates value.</p>
+<p>The <strong>baseline is measured while the old practice is still observable</strong>. A benefit whose baseline was never measured cannot claim an improvement, and a project output is not a benefit. The transition record carries the baseline measurement, readiness, enactment, the post-transition measurement and the legacy retirement, with a post-closure owner. A profile's measurement fields, once the profile is approved, change only through a cited, approved change request; a benefit with an open transition cannot be retired.</p>
+<p>The programme metrics (T11) are read-time aggregates over those rows: benefits realised versus planned, tranche gate outcomes, the benefit-at-risk count, and the never-refused check. An <strong>unmeasured baseline is reported <code>unmeasured</code>, never zero.</strong></p>
+<h2 id="4-the-togaf-adm-capability">4. The TOGAF ADM capability</h2>
+<p>The ADM is implemented as a capability first and a project second. The <strong>Preliminary phase</strong> establishes six things before architecture work starts:</p>
+<ul>
+<li>the architecture principles catalogue — statement, rationale and implications per principle;</li>
+<li>the tailored ADM profile — which phases run, which artefacts are mandatory per phase and plateau, and which contract closes each phase;</li>
+<li>the artefact standard and its repository — typed catalogues, matrices and diagrams, each with its common metadata (owner, reviewer, review date, version, purpose, stakeholders, scope, project, and its published document or contract);</li>
+<li>the Architecture Board — its charter, membership and decision limits;</li>
+<li>the governance, contract and waiver baseline;</li>
+<li>the maturity (nine dimensions, 0–5) and skills (seven categories) baselines with their development milestones.</li>
+</ul>
+<p>The <strong>phase rail A–H</strong> then produces typed artefacts: vision and stakeholders at A; the business architecture at B; the information-systems architectures at C; the technology architecture at D; opportunities, solutions and the work packages at E; the migration plan at F; implementation governance at G; and change management at H, which records exactly one change or kata. A phase cannot close while a mandatory artefact is still draft, and a delivery project's design gate is refused when it has no live architecture contract. Reviews record one compliance level; a waiver names its accepting owner and its review date.</p>
+<p>The capability is a <strong>tailored ADM profile</strong> for software delivery, not a claim of TOGAF certification or full conformance; what is claimed is testable: the artefacts and gates the organisation uses are rows, the process runs, and a deviation is a decision record rather than a silent fork.</p>
+<h2 id="5-the-buildout-under-its-own-capability--measured-2026-11-19">5. The buildout under its own capability — measured 2026-11-19</h2>
+<p>The programme does not only describe MSP and TOGAF; it runs under them. Measured on the live programme at the stated date:</p>
+<ul>
+<li><strong>P0's definition set is published</strong> — 27 of 27 outputs, so the tranche-0 review could be taken on evidence.</li>
+<li><strong>Tranche 0 is closed and its review decision is <code>continue</code></strong>, authorised by the programme owner on 2026-11-17; tranches 1–13 are planned. Tranche 1's exit set is S02, T1 and T11.</li>
+<li><strong>The delivery projects carry published briefs and inception outputs</strong>; the inception gate refuses a build run until a project's analysis and architecture are published.</li>
+<li><strong>The six live benefit profiles (B1–B6) are <code>draft</code>, with their baselines <code>not measured</code></strong> and a measurement method recorded; the tranche-0 review evidence lists them unmeasured and records that the BCM is unstaffed as a risk. That is the honest state, not a zero.</li>
+<li><strong>Architecture contracts are the largest open gap.</strong> Only T9's project has a contract row, and it is not yet approved; the other delivery projects have none. The board's approval is the authority act, and it is tracked separately from this study.</li>
+</ul>
+<p>The units that close the gaps are themselves rows in the programme: T11's metrics (merged 2026-11-19, #404) measure realization; the seed of the buildout's own definition — its benefits, map, tranches and per-project ADM phase/plateau — is a pending unit; the board's contract approvals are a pending unit; and the closure and retirement gates (#302, #303) make a project's close and a profile's retirement evidence-bound.</p>
+<h2 id="6-the-measurement-and-refusal-discipline">6. The measurement and refusal discipline</h2>
+<p>The programme's claims rest on four rules that are enforced in code, not prose:</p>
+<ul>
+<li><strong>Metrics are computed from rows, never stored as opinion.</strong> A change to the source rows changes the figure; reading a metric writes nothing.</li>
+<li><strong>A gate that never refused is flagged.</strong> A gate with recorded decisions and no rejection is reported as never-refused with its counts, so a stamp cannot read as health.</li>
+<li><strong>A declared output that is unpublished blocks closure.</strong> A project cannot close while an output it declared is missing.</li>
+<li><strong>A retirement is a record, not a delete.</strong> A retired benefit or tranche keeps its row and its reason; an open transition blocks the retirement of its benefit.</li>
+</ul>
+<p>These are the mechanisms that let a tranche review or a benefit realization be taken on evidence. They are deliberately narrow: rows, gates and read models, with no certification badge and no second register.</p>
+<h2 id="7-what-this-study-does-not-claim">7. What this study does not claim</h2>
+<p>It does not claim MSP or TOGAF certification, or a compliance badge. It does not claim a live metamodel, a portfolio optimiser, a schedule solver or a benefit-forecasting model. It does not replace the charging system: <code>billing_service</code> remains the charging authority, and the conveyor's reconciliation compares its own derived figures with that roll-up and opens an incident on a difference; the transport and its TLS policy belong to the platform's external-action path. And it does not claim that the programme's own benefits are yet realized: at the measured date their baselines are unmeasured, which is exactly what a benefits discipline is supposed to make visible.</p>
+<h2 id="8-references">8. References</h2>
+<ul>
+<li><code>docs/SPEC_V2.md</code> §8.1 (TOGAF ADM), §8.3 (MSP), §10.3–§10.4 (the row and action families), §12 (the T0–T17 slices and their gates).</li>
+<li><code>docs/plans/P0-programme-definition.md</code> — the definition set (§3), the brief template (§4), the inception standard (§5), the benefit profiles and map (§6), the tranches and reviews (§7).</li>
+<li><code>docs/plans/03-DELIVERY.md</code> — the unit protocol, including the programme context every unit declares (tranche, brief, ADM phase/plateau, benefits).</li>
+<li><code>docs/design/README.md</code> — the design pack's own description of the programme and architecture surfaces.</li>
+<li>The units that built the layer: #216 (the rigour layer), #81/T9 (the ADM capability), #82/T10 (tranches and benefits), #84/T11 (metrics, metering and maturity), #302 (closure gate), #303 (retirement path).</li>
+</ul>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/design/Program_Architecture_and_Benefits_Realization.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>
