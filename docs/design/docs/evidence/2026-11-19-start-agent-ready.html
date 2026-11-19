@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>The start agent completes READY — 2026-11-19 (#383) · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/2026-11-19-start-agent-ready.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="the-start-agent-completes-ready--2026-11-19-383">The start agent completes READY — 2026-11-19 (#383)</h1>
+<p>The fix is <strong>database content</strong>, not a seed change. These are the rows that changed on the live tenant (<code>nonagentic</code>) and the run that proves them.</p>
+<h2 id="rows-changed">Rows changed</h2>
+<table>
+<thead>
+<tr>
+<th>Row</th>
+<th>Before</th>
+<th>After</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>capability_agent</code> <code>project_start_request_analysis</code></td>
+<td>v3, <code>allowed_actions</code> = <code>[documents.compose, documents.get, documents.list, cards.get, cards.comment]</code></td>
+<td><strong>v4</strong>, <code>allowed_actions</code> = <code>[]</code></td>
+</tr>
+<tr>
+<td><code>procedure</code> <code>project_start_request_analysis.ready</code></td>
+<td>v1, criteria <code>[brief_unchanged, scope_is_stated]</code></td>
+<td><strong>v2</strong> (<code>01a1f356-594c-7148-8cd2-fdc63205b6c9</code>), adds <code>answer_is_the_analysis</code> to the criteria and the definition of done</td>
+</tr>
+<tr>
+<td><code>process</code> <code>project_start_request_analysis.READY</code></td>
+<td>v1: <code>agent.run</code> → <code>cards.move</code></td>
+<td><strong>v2</strong>: <code>agent.run</code> (outputs <code>[output]</code>) → computed <code>documents.compose</code> (body <code>{{steps.1.output.output}}</code>, outputs <code>[id]</code>) → <code>cards.move</code></td>
+</tr>
+</tbody>
+</table>
+<p>The agent's surface is empty — the #307 pattern. The engine omits <code>tools</code> for an empty surface, the model answers in one turn, and the process stores the answer as the analysis document. The seed files are untouched: content lives in the database.</p>
+<h2 id="proof-run">Proof run</h2>
+<p>Project <code>A5-ENGINE-PROOF-2026-11-19D</code> (<code>project_type_code: it</code>), run <code>01a1f359-e318-747f-8324-b82b49db43bc</code>:</p>
+<table>
+<thead>
+<tr>
+<th>Step</th>
+<th>Action</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><code>agent.run</code></td>
+<td><strong>succeeded</strong>; judge accept, score 0.8361, against <code>[brief_unchanged, scope_is_stated, answer_is_the_analysis]</code></td>
+</tr>
+<tr>
+<td>2</td>
+<td><code>documents.compose</code></td>
+<td><strong>succeeded</strong></td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>cards.move</code></td>
+<td><strong>succeeded</strong></td>
+</tr>
+</tbody>
+</table>
+<p>No tool call was refused: the run's trace records one <code>inference.chat</code> (<code>ok</code>) and one <code>laya.judge</code> (<code>ok</code>).</p>
+<h2 id="observations-recorded-not-fixed-here">Observations recorded, not fixed here</h2>
+<ul>
+<li>A project created without <code>project_type_code</code> cannot move its start card (<code>card-move-not-allowed</code>), and <code>program</code> has no matrix entry for the start card type; the types that do are <code>architecture</code>, <code>it</code>, <code>kata</code>, <code>py2rust</code>.</li>
+<li>A failed run's coach run can hold the single worker past its job lease (two measured, both cancelled). This starves every queued step.</li>
+<li>The judge accepted a meta answer at 0.836 while the prompt template still says "answer with a short summary of what you did" — the wrong instruction for a tool-less agent. Prompt recipes have no authoring action today.</li>
+</ul>
+<h2 id="cleanup">Cleanup</h2>
+<p><code>A5-ENGINE-PROOF-2026-11-19B/-C/-D</code> are closed (version 2). Each close gate was approved under a scoped <code>projects.close</code> self-approval window that was restored to <code>forbidden</code> afterwards.</p>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/2026-11-19-start-agent-ready.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>
