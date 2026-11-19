@@ -393,7 +393,7 @@ async fn the_programme_is_downloadable_as_json_and_csv() {
     let mut lines = text.lines();
     assert_eq!(
         lines.next(),
-        Some("key,name,tranche,status,blocked_by,units_open,units_claimed,issues,evidence")
+        Some("key,name,tranche,status,blocked_by,units_open,units_claimed,issues,plan")
     );
     assert_eq!(
         lines.count(),

@@ -146,12 +146,13 @@ pub async fn site_view(pool: &PgPool, args: SiteArgs<'_>) -> Result<SiteView, Sn
 
 /// The programme's projects as CSV — the download for a reader who does not want the JSON.
 ///
-/// Columns: `key,name,tranche,status,blocked_by,units_open,units_claimed,issues,evidence`.
+/// Columns: `key,name,tranche,status,blocked_by,units_open,units_claimed,issues,plan`.
 /// `blocked_by` names the declared dependencies that are not `closed`; unit counts come from the
-/// committed issue registry the programme section carries. Ordered by key, like the JSON.
+/// committed issue registry the programme section carries; `plan` is the project's plan path.
+/// Ordered by key, like the JSON.
 pub(crate) fn programme_csv(programme: &Value) -> String {
     const HEADER: &str =
-        "key,name,tranche,status,blocked_by,units_open,units_claimed,issues,evidence";
+        "key,name,tranche,status,blocked_by,units_open,units_claimed,issues,plan";
     let empty = Vec::new();
     let projects = programme
         .get("projects")
@@ -331,7 +332,7 @@ mod tests {
         let lines: Vec<&str> = csv.lines().collect();
         assert_eq!(
             lines[0],
-            "key,name,tranche,status,blocked_by,units_open,units_claimed,issues,evidence"
+            "key,name,tranche,status,blocked_by,units_open,units_claimed,issues,plan"
         );
         assert_eq!(lines.len(), 4, "header plus three projects");
         assert_eq!(
