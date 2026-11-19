@@ -57,12 +57,17 @@ impl PageQuery {
 /// page, so the `/boards` index is one request instead of one detail read per project (#390).
 #[derive(Clone, Debug, Default, Deserialize)]
 pub struct ProjectsQuery {
-    #[serde(flatten)]
-    page: PageQuery,
+    cursor: Option<String>,
+    limit: Option<u32>,
     include: Option<String>,
 }
 
 impl ProjectsQuery {
+    /// The effective page size, clamped to `1..=MAX_LIMIT`. Same rule as `PageQuery`.
+    fn limit(&self) -> i64 {
+        i64::from(self.limit.unwrap_or(DEFAULT_LIMIT).clamp(1, MAX_LIMIT))
+    }
+
     /// Whether the caller asked for the boards with the page. Accepts a comma list.
     fn include_boards(&self) -> bool {
         self.include
@@ -107,8 +112,8 @@ pub async fn projects(
     _licence: RequireLicence,
     Query(query): Query<ProjectsQuery>,
 ) -> Result<Json<Value>, ApiError> {
-    let limit = query.page.limit();
-    let after = match query.page.cursor.as_deref() {
+    let limit = query.limit();
+    let after = match query.cursor.as_deref() {
         None => None,
         Some(raw) => Some(
             store::project::decode_cursor(raw)
