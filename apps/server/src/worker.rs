@@ -44,6 +44,7 @@
 //! this one is still running.
 
 use std::collections::HashSet;
+use std::sync::Arc;
 use std::time::Duration;
 
 use chrono::Utc;
@@ -103,6 +104,22 @@ pub const LEASE_SWEEP_LIMIT: i64 = 100;
 
 /// The lease length a `card.claim` waiter grants when its payload carries no `ttl_s`.
 pub const DEFAULT_CLAIM_TTL_SECS: i64 = 300;
+
+/// How many claimed jobs one worker runs at once (#421).
+///
+/// The tick used to await each handler inline (one poll loop, no timers), so a handler that
+/// never returned stopped every other job. Each claimed job now runs in its own task, bounded
+/// here, so a hung handler costs one permit rather than the queue.
+pub const MAX_IN_FLIGHT_JOBS: usize = 8;
+
+/// How long a handler may keep renewing its lease (#421).
+///
+/// Renewal exists so a legitimately long step is not reclaimed mid-flight and run twice (audit
+/// V1). A handler that never returns used to renew forever — hiding its own expiry from every
+/// other worker. Past this bound the renewal stops: the lease expires, the queue reclaims the row
+/// on a later attempt, and the attempts cap dead-letters it. A blocked poll cannot be preempted,
+/// so this bounds the damage, not the task.
+pub const MAX_JOB_RUNTIME: Duration = Duration::from_secs(1800);
 
 /// The `message.kind` one closed approval's hand-off message carries.
 ///
@@ -194,6 +211,13 @@ pub struct Worker {
     pool: PgPool,
     config: Config,
     licence: Option<LicenceSyncClient>,
+    /// How many claimed handlers may run at once, and therefore how many one tick may claim.
+    ///
+    /// The tick used to await every handler inline: one handler that never returned stopped the
+    /// poll loop, so a failed run's coach run held the only worker for as long as its model call
+    /// blocked and every queued step starved (#421). Each claimed job now runs in its own task,
+    /// bounded here, so a hung job costs one permit rather than the queue.
+    in_flight: Arc<tokio::sync::Semaphore>,
 }
 
 impl Worker {
@@ -223,6 +247,7 @@ impl Worker {
             pool,
             config,
             licence,
+            in_flight: Arc::new(tokio::sync::Semaphore::new(MAX_IN_FLIGHT_JOBS)),
         })
     }
 
@@ -237,9 +262,10 @@ impl Worker {
     }
 
     /// Poll until SIGTERM/Ctrl-C.
-    pub async fn run(mut self) -> Result<(), WorkerError> {
+    pub async fn run(self) -> Result<(), WorkerError> {
         tracing::info!(
             lease_secs = self.config.job_lease_secs,
+            concurrency = MAX_IN_FLIGHT_JOBS,
             "worker polling (kinds: event.prune, job.prune, model.prune, validation.prune, \
              idempotency.sweep, licence.sync, webhook.deliver, run.execute, run.reap, \
              process.step, card.lease_sweep, card.claim, approval.expire, delivery.send, \
@@ -247,6 +273,7 @@ impl Worker {
              copilot.proposal.sweep, copilot.proposal.execute, benchmark.run.poll, \
              benchmark.reap)"
         );
+        let this = Arc::new(self);
         let mut ticker = tokio::time::interval(TICK);
         ticker.set_missed_tick_behavior(tokio::time::MissedTickBehavior::Delay);
         loop {
@@ -254,17 +281,21 @@ impl Worker {
                 _ = ticker.tick() => {},
                 () = shutdown::signal() => break,
             }
-            if let Err(error) = self.tick().await {
+            if let Err(error) = this.tick().await {
                 tracing::warn!(%error, "worker tick failed; retrying next tick");
             }
         }
-        self.pool.close().await;
+        this.pool.close().await;
         tracing::info!("worker stopped");
         Ok(())
     }
 
     /// One tick: materialise schedules, then drain a bounded batch per tenant.
-    async fn tick(&mut self) -> Result<(), sqlx::Error> {
+    ///
+    /// A claimed job is spawned, not awaited: the loop must keep polling so one handler that
+    /// never returns cannot stop the queue (#421). The semaphore is acquired BEFORE the claim,
+    /// so the worker never claims a job it has no permit to run.
+    async fn tick(self: &Arc<Self>) -> Result<(), sqlx::Error> {
         match store::schedule::materialise_all(&self.pool, Utc::now()).await {
             Ok(created) if !created.is_empty() => {
                 tracing::info!(jobs = created.len(), "materialised scheduled jobs");
@@ -290,6 +321,10 @@ impl Worker {
             // takes effect on the next pass without restarting any process.
             let engaged = andon_engaged(&self.pool, tenant).await;
             for _ in 0..BATCH_PER_TENANT {
+                // No permit, no claim: a hung handler must cost one slot, never the loop.
+                let Ok(permit) = Arc::clone(&self.in_flight).try_acquire_owned() else {
+                    break;
+                };
                 let claimed = if engaged {
                     store::jobs::claim_with(
                         &self.pool,
@@ -309,7 +344,11 @@ impl Worker {
                         break;
                     }
                 };
-                self.run_job(&job).await;
+                let this = Arc::clone(self);
+                tokio::spawn(async move {
+                    this.run_job(&job).await;
+                    drop(permit);
+                });
             }
         }
         Ok(())
@@ -332,6 +371,7 @@ impl Worker {
         // Renew at a third of the lease: two consecutive failures still leave time to recover
         // before the lease actually expires.
         let every = Duration::from_secs((lease_secs / 3).max(1));
+        let deadline = tokio::time::Instant::now() + MAX_JOB_RUNTIME;
         tokio::spawn(async move {
             let mut ticker = tokio::time::interval(every);
             ticker.set_missed_tick_behavior(tokio::time::MissedTickBehavior::Delay);
@@ -339,6 +379,17 @@ impl Worker {
             ticker.tick().await;
             loop {
                 ticker.tick().await;
+                // A handler that never returns must not renew forever: past the bound the lease
+                // expires and the queue reclaims the row (#421). The task itself cannot be
+                // preempted, but the job no longer hides its own expiry from every other worker.
+                if tokio::time::Instant::now() >= deadline {
+                    tracing::warn!(
+                        job = %job_id,
+                        max_runtime_secs = MAX_JOB_RUNTIME.as_secs(),
+                        "handler outlived MAX_JOB_RUNTIME; renewal stops and the lease will expire"
+                    );
+                    return;
+                }
                 match store::jobs::renew(&pool, tenant, job_id, token, lease_secs as i64).await {
                     Ok(true) => {}
                     Ok(false) => {
