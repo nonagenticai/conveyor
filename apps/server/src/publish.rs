@@ -219,6 +219,13 @@ struct Outcome {
     files: usize,
 }
 
+/// The DCO trailer the public repository's `dco` job requires on every non-merge commit. The
+/// GitHub commit API attributes the commit to the sealed token's user, so the trailer names the
+/// same identity; the noreply address is the one GitHub exposes without a public email.
+fn sign_off(login: &str, id: u64) -> String {
+    format!("Signed-off-by: {login} <{id}+{login}@users.noreply.github.com>")
+}
+
 /// Commit the delta and open the PR (or report that the pack is unchanged).
 async fn publish(
     github: &GitHub,
@@ -270,9 +277,13 @@ async fn publish(
         });
     }
     let tree = github.create_tree(repo, &base_tree, &changes).await?;
+    // #400: the generated PR is born red without this. The dco job greps every non-merge commit
+    // for `^Signed-off-by: .+ <[^<>@ ]+@[^<> ]+>$`; the API-made commit carried none.
+    let (login, id) = github.user_identity().await?;
     let message = format!(
-        "design: publish the programme snapshot\n\nsnapshot: {manifest_sha}\ngenerated: {generated_at}\noutputs: {outputs}\nfiles: {}",
-        changes.len()
+        "design: publish the programme snapshot\n\nsnapshot: {manifest_sha}\ngenerated: {generated_at}\noutputs: {outputs}\nfiles: {}\n\n{}",
+        changes.len(),
+        sign_off(&login, id)
     );
     let commit = github
         .create_commit(repo, &message, &tree, std::slice::from_ref(&head))
@@ -527,5 +538,24 @@ mod tests {
                 "{keep} is hand-authored and must not be deleted"
             );
         }
+    }
+
+    #[test]
+    fn a_publish_commit_is_signed_off_for_the_token_user() {
+        let line = sign_off("georgiedekker", 11147883);
+        assert_eq!(
+            line,
+            "Signed-off-by: georgiedekker <11147883+georgiedekker@users.noreply.github.com>"
+        );
+        // The dco job's shape: `^Signed-off-by: .+ <[^<>@ ]+@[^<> ]+>$`. No spaces in the
+        // address, angle brackets exactly around it.
+        let address = line
+            .strip_prefix("Signed-off-by: ")
+            .and_then(|rest| rest.split_once('<'))
+            .map(|(_, address)| address)
+            .expect("a name and an address");
+        assert!(address.ends_with('>'), "{line}");
+        assert!(!address.contains(' '), "{line}");
+        assert!(address.contains('@'), "{line}");
     }
 }
