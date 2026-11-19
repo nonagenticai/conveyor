@@ -85,6 +85,9 @@ jobs:
           # generated PR is already the deliverable; the refresh resumes on the next push after
           # the queue lands. Checked BEFORE the regeneration so a no-op run costs seconds.
           if [ -n "$open" ]; then
+            # `$owner`/`$name`/`$number` are GraphQL variables the `-f` flags bind, not shell
+            # expansions — the single quotes are deliberate (SC2016 is a false positive here).
+            # shellcheck disable=SC2016
             queued="$(gh api graphql \
               -f query='query($owner: String!, $name: String!, $number: Int!) {
                 repository(owner: $owner, name: $name) {
