@@ -98,6 +98,9 @@ pub(crate) fn step_inputs_from_records(steps: &[ProcessStepRecord]) -> Vec<StepI
             on_result: Some(step.on_result.clone()),
             max_attempts: Some(step.max_attempts),
             outputs: step.outputs.clone(),
+            action_text: step.action_text.clone(),
+            pddl_preconditions: step.pddl_preconditions.clone(),
+            pddl_effects: step.pddl_effects.clone(),
         })
         .collect()
 }
@@ -144,6 +147,49 @@ pub(crate) fn validated_steps(steps: &[StepIn]) -> Result<Vec<StepInput>, Action
                 "must be at least 1",
             ));
         }
+        // The PDDL half (T16): a malformed literal is the caller's typing mistake, never a 500 at
+        // publish or — worse — a run that cannot evaluate its own step. Every literal is parsed
+        // here so the stored arrays are canonical and the executor never re-validates.
+        let preconditions = match step.pddl_preconditions.as_ref() {
+            None | Some(Value::Null) => Value::Array(Vec::new()),
+            Some(value) => {
+                let parsed =
+                    conveyor_domain::pddl::parse_preconditions("pddl_preconditions", value)
+                        .map_err(|error| {
+                            invalid(
+                                &format!("steps[{index}].pddl_preconditions"),
+                                "invalid_value",
+                                error.detail,
+                            )
+                        })?;
+                // The stored shape is an array of LITERAL STRINGS, never the parsed objects:
+                // the column is what the executor and every reader see, and the domain type is
+                // an implementation detail of this validation.
+                serde_json::json!(
+                    parsed
+                        .iter()
+                        .map(conveyor_domain::pddl::literal_text)
+                        .collect::<Vec<_>>()
+                )
+            }
+        };
+        let effects = match step.pddl_effects.as_ref() {
+            None | Some(Value::Null) => {
+                serde_json::json!({"add": [], "delete": []})
+            }
+            Some(value) => {
+                let parsed = conveyor_domain::pddl::parse_effects("pddl_effects", value).map_err(
+                    |error| {
+                        invalid(
+                            &format!("steps[{index}].pddl_effects"),
+                            "invalid_value",
+                            error.detail,
+                        )
+                    },
+                )?;
+                parsed.to_json()
+            }
+        };
         out.push(StepInput {
             // An `agent` step stores the primitive it runs (domain `AGENT_STEP_ACTION`). A caller
             // that omits it is normalised here rather than at publish, so the stored row and the
@@ -169,6 +215,14 @@ pub(crate) fn validated_steps(steps: &[StepIn]) -> Result<Vec<StepInput>, Action
             on_result: step.on_result.clone(),
             max_attempts: step.max_attempts,
             outputs: step.outputs.clone(),
+            action_text: step
+                .action_text
+                .as_deref()
+                .map(str::trim)
+                .filter(|text| !text.is_empty())
+                .map(str::to_owned),
+            pddl_preconditions: preconditions,
+            pddl_effects: effects,
         });
     }
     Ok(out)

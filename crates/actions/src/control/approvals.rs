@@ -852,3 +852,107 @@ pub(crate) async fn decisions_by_approval(
     }
     Ok(grouped)
 }
+
+/// The publication gate a derived artefact passes (T16, SPEC_V2 §5.6 "Gates").
+///
+/// A gate over one released version, not over a run: the target is the row id the approval must
+/// name, the gate name is the publishing action's own name, and the approval must carry **at
+/// least one `human` decision** — an agent, rule or triage decision is recorded evidence, never a
+/// person's act. A tenant's `approval_policy` row may waive the gate; a missing row is `required`
+/// (the #282 default). The requester-cannot-decide rule is enforced by the store's one decision
+/// writer, so this function never re-checks it.
+pub async fn require_human_gate_tx(
+    tx: &mut PgConnection,
+    ctx: &HandlerCtx,
+    gate: &'static str,
+    target: Uuid,
+) -> Result<Option<Uuid>, ActionError> {
+    let waived = store::approval_policy::waives(&mut *tx, ctx.tenant, gate)
+        .await
+        .map_err(|error| {
+            tracing::error!(%error, gate, "read the tenant's publication policy");
+            ActionError::internal()
+        })?;
+    if waived {
+        return Ok(None);
+    }
+    let Some(id) = ctx.approval_id else {
+        return Err(ActionError::new(
+            403,
+            "approval_required",
+            format!(
+                "{gate} on a derived artefact needs an approved approval for {target} named in `approval_id`"
+            ),
+        ));
+    };
+    let record = store::approval::get_approval_tx(&mut *tx, ctx.tenant, id)
+        .await
+        .map_err(|error| {
+            tracing::error!(%error, "read the publication approval");
+            ActionError::internal()
+        })?
+        .ok_or_else(|| {
+            ActionError::new(
+                403,
+                "approval_not_found",
+                format!("no approval {id} in this tenant"),
+            )
+        })?;
+    if record.approval.status != ApprovalStatus::Approved {
+        return Err(ActionError::new(
+            403,
+            "approval_not_approved",
+            format!(
+                "approval {id} is {}; only an approved gate releases the artefact",
+                record.approval.status
+            ),
+        ));
+    }
+    if record.approval.gate != gate {
+        return Err(ActionError::new(
+            403,
+            "approval_wrong_action",
+            format!(
+                "approval {id} was opened for {:?}, not {gate}",
+                record.approval.gate
+            ),
+        ));
+    }
+    let meta = store::approval::approval_meta_tx(&mut *tx, ctx.tenant, id)
+        .await
+        .map_err(|error| {
+            tracing::error!(%error, "read the publication approval's target");
+            ActionError::internal()
+        })?
+        .unwrap_or(Value::Null);
+    let approved_target = meta
+        .get("target")
+        .and_then(Value::as_str)
+        .unwrap_or_default();
+    if approved_target != target.to_string() {
+        return Err(ActionError::new(
+            403,
+            "approval_wrong_target",
+            format!("approval {id} authorises {approved_target:?}, not {target}"),
+        ));
+    }
+    let decisions = store::approval::list_decisions_for_approvals_tx(&mut *tx, ctx.tenant, &[id])
+        .await
+        .map_err(|error| {
+            tracing::error!(%error, "read the publication approval's decisions");
+            ActionError::internal()
+        })?;
+    let human = decisions
+        .iter()
+        .any(|decision| decision.decision == "approve" && decision.decided_by_kind == "human");
+    if !human {
+        return Err(ActionError::new(
+            403,
+            "human_decision_required",
+            format!(
+                "approval {id} carries no human approval decision; a gate on a derived artefact is a person's act"
+            ),
+        ));
+    }
+    Ok(Some(id))
+}

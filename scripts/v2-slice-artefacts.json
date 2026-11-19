@@ -254,10 +254,20 @@
       "gap": "no tool authoring, OpenAPI draft import or BYO tool binding"
     },
     "T16": {
-      "tables": [
-        "pko_release",
-        "pko_entity",
-        "pko_relation"
+      "actions": [
+        "procedures.ingest_process",
+        "procedures.ingest_rdf",
+        "procedures.ingest_sop",
+        "procedures.review_source",
+        "procedures.validate"
+      ],
+      "evidence": [
+        "migrations/0060_procedure_ingestion.sql",
+        "crates/actions/src/procedure/ingest.rs",
+        "crates/actions/src/procedure/convert/bpmn.rs",
+        "crates/domain/src/pddl.rs",
+        "crates/actions/tests/sop_ingestion.rs",
+        "crates/actions/tests/procedure_versioning.rs"
       ]
     },
     "T17": {

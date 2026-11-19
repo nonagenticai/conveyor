@@ -145,6 +145,30 @@ pub fn run_error(error: store::RunStoreError, action: &str) -> ActionError {
             "a run that names a release must name the job binding that pins it",
         ),
         store::RunStoreError::BindingNotFound => ActionError::resource_not_found("such binding"),
+        // T16: a retired/draft binding or a stale pin is the caller's refusal, not an internal
+        // failure — the same `409 job_binding_stale` the organisation family answers.
+        store::RunStoreError::Organisation(error)
+            if matches!(
+                error.as_ref(),
+                conveyor_store::organisation::OrganisationStoreError::StaleRelease { .. }
+            ) =>
+        {
+            let conveyor_store::organisation::OrganisationStoreError::StaleRelease {
+                binding_hash,
+                requested_hash,
+            } = *error
+            else {
+                unreachable!("guarded by the match arm above")
+            };
+            ActionError::new(
+                409,
+                "job_binding_stale",
+                format!(
+                    "the binding pins release {binding_hash} but the run requested {requested_hash}; \
+                     publish a new release and bind it"
+                ),
+            )
+        }
         store::RunStoreError::Organisation(error) => {
             tracing::error!(%error, action, "the organisation spine refused the run's binding");
             ActionError::internal()

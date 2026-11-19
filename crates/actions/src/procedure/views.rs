@@ -137,4 +137,12 @@ pub struct ProcedureOut {
     pub inspection: Value,
     /// The user-facing outputs.
     pub outputs: Value,
+    /// The source this SOP was converted from (T16); `null` when hand-authored.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub source_asset_id: Option<Uuid>,
+    /// The paired strata knowledge pack (T16); `""` when none.
+    pub knowledge_pack_ref: String,
+    /// The SOP's own PDDL action text (0058/T16), when the converter produced one.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub action_text: Option<String>,
 }

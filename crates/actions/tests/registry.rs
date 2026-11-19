@@ -99,7 +99,10 @@ use serde_json::{Value, json};
 /// **T11 (#84) adds eight internal**: `metrics.flow`, `metrics.job`, `metrics.maturity`,
 /// `metrics.programme`, `metrics.reconcile`, `metrics.threshold_get`, `metrics.threshold_update`
 /// and `metrics.usage`.
-const EXPECTED: [&str; 480] = [
+/// **T16 (#85) adds five internal**: `procedures.ingest_sop|ingest_process|ingest_rdf`,
+/// `procedures.validate` and `procedures.review_source` — the SOP/process-document intake and its
+/// source review (no `pko.*` action exists: owner decision 2026-11-19, #413).
+const EXPECTED: [&str; 485] = [
     "actions.describe",
     "actions.list",
     "analyse.site",
@@ -429,10 +432,15 @@ const EXPECTED: [&str; 480] = [
     "principles.update",
     "procedures.create",
     "procedures.get",
+    "procedures.ingest_process",
+    "procedures.ingest_rdf",
+    "procedures.ingest_sop",
     "procedures.list",
     "procedures.publish",
     "procedures.retire",
+    "procedures.review_source",
     "procedures.update",
+    "procedures.validate",
     "produce.speech",
     "process_maps.create",
     "process_maps.get",
@@ -655,7 +663,8 @@ fn the_registry_is_exactly_the_declared_set() {
     // #385 adds `architecture.maturity_list`, `architecture.skills_list` and
     // `architecture.board_list`, all internal reads: 451 -> 454; external stays 18.
     // T11 (#84) adds eight `metrics.*` actions, all internal: 454 -> 462; external stays 18.
-    assert_eq!((internal, external), (462, 18));
+    // T16 (#85) adds five `procedures.*` actions, all internal: 462 -> 467; external stays 18.
+    assert_eq!((internal, external), (467, 18));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),

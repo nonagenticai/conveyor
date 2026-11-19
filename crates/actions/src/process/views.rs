@@ -54,6 +54,15 @@ pub struct StepIn {
     /// The dot-paths into this step's output that later steps may reference (S21 §6).
     #[serde(default)]
     pub outputs: Vec<String>,
+    /// The PDDL action text this step executes (T16, SPEC_V2 §5.6); blank for a non-PDDL step.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub action_text: Option<String>,
+    /// The step's PDDL preconditions — ground literals (T16). Absent = always runnable.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub pddl_preconditions: Option<Value>,
+    /// The step's PDDL effects — `{"add": [...], "delete": [...]}` (T16).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub pddl_effects: Option<Value>,
 }
 
 /// `processes.create` input.
@@ -157,6 +166,13 @@ pub struct ProcessRunStartIn {
     /// The run's inputs (S11 §5.4).
     #[serde(default)]
     pub inputs: Value,
+    /// The organisation binding the run executes under (T16, SPEC_V2 §4.4). The store refuses a
+    /// retired or draft binding and a stale `release_hash`; the binding must pin THIS process.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub job_binding_id: Option<Uuid>,
+    /// The release the caller believes the binding pins; a mismatch is `409 job_binding_stale`.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub release_hash: Option<String>,
     /// The parent run, when this is a CHILD (a `call` step or the coach). The parent must be live
     /// and on the same card, and `step_id` is then required (CONTRACT §21).
     #[serde(default, skip_serializing_if = "Option::is_none")]

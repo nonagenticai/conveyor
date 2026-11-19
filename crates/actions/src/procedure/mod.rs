@@ -32,6 +32,8 @@ use uuid::Uuid;
 use crate::invoke::{ActionError, HandlerCtx};
 use crate::spec::FieldError;
 
+pub mod convert;
+pub mod ingest;
 pub mod procedures;
 pub mod views;
 
@@ -57,7 +59,48 @@ pub(crate) fn procedure_out(record: &SopRecord) -> ProcedureOut {
         acceptance_criteria: record.acceptance_criteria.clone(),
         inspection: record.inspection.clone(),
         outputs: record.outputs.clone(),
+        source_asset_id: record.source_asset_id,
+        knowledge_pack_ref: record.knowledge_pack_ref.clone(),
+        action_text: record.action_text.clone(),
     }
+}
+
+/// T16 P5.1: a derived artefact cannot publish while its source is unreviewed.
+///
+/// The same rule the executable process enforces, applied to the SOP judge: `None` (a
+/// hand-authored row) passes; a source that is not `approved` refuses with the source named.
+pub(crate) async fn require_source_reviewed_tx(
+    conn: &mut PgConnection,
+    tenant: conveyor_domain::TenantId,
+    source_asset_id: Option<Uuid>,
+) -> Result<(), ActionError> {
+    let Some(source_id) = source_asset_id else {
+        return Ok(());
+    };
+    let asset = store::governance::get_asset_tx(&mut *conn, tenant, source_id)
+        .await
+        .map_err(|error| {
+            tracing::error!(%error, "read the derived SOP's source");
+            ActionError::internal()
+        })?
+        .ok_or_else(|| {
+            ActionError::new(
+                422,
+                "source.missing",
+                format!("the SOP was derived from source {source_id}, which no longer exists"),
+            )
+        })?;
+    if asset.status != conveyor_domain::AssetStatus::Approved {
+        return Err(ActionError::new(
+            422,
+            "source.unapproved",
+            format!(
+                "the source {source_id} is {:?}; a human must review it before the derived SOP can publish",
+                asset.status
+            ),
+        ));
+    }
+    Ok(())
 }
 
 /// A `422` on one field of the caller's document.
@@ -252,5 +295,10 @@ pub(crate) fn new_sop(input: ProcedureCreateIn) -> NewSop {
             .unwrap_or_else(|| serde_json::json!([])),
         inspection: input.inspection.unwrap_or_else(|| serde_json::json!({})),
         outputs: input.outputs.unwrap_or_else(|| serde_json::json!([])),
+        // A hand-authored SOP carries no derivation; the T16 ingest path constructs its own
+        // `NewSop` with the source and pack set.
+        source_asset_id: None,
+        knowledge_pack_ref: String::new(),
+        action_text: None,
     }
 }

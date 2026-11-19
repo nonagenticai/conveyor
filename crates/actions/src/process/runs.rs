@@ -351,6 +351,32 @@ pub(crate) async fn process_runs_start(
     } else {
         input.inputs.clone()
     };
+    // T16 P4: a run that names a binding must name the binding that pins THIS process. The
+    // store refuses a retired/draft binding and a stale release hash; this refuses a binding for
+    // some other procedure, which no release-hash check could catch.
+    if let Some(binding_id) = input.job_binding_id {
+        let binding = store::organisation::job_binding_get_tx(&mut *tx, ctx.tenant, binding_id)
+            .await
+            .map_err(|error| match error {
+                store::organisation::OrganisationStoreError::NotFound(_) => {
+                    ActionError::resource_not_found("job binding")
+                }
+                other => {
+                    tracing::error!(error = %other, "read the run's job binding");
+                    ActionError::internal()
+                }
+            })?;
+        if binding.process_id != Some(process.id) {
+            return Err(ActionError::new(
+                422,
+                "binding_wrong_process",
+                format!(
+                    "the binding {binding_id} pins {:?}, not the published process {}",
+                    binding.process_id, process.id
+                ),
+            ));
+        }
+    }
     let new_run = store::run::NewRun {
         card_id: Some(card.id),
         project_id: board.project_id,
@@ -367,10 +393,11 @@ pub(crate) async fn process_runs_start(
         depth: 0,
         // The run pins the process version it executes (CONTRACT §21).
         process_version: process.version,
-        // A process run carries no job binding of its own (T0): the pin is a run's property,
-        // and process runs get theirs from the caller's card once T2 wires it.
-        job_binding_id: None,
-        release_hash: None,
+        // T16: the caller may pin the run to its organisation binding. The store resolves the
+        // pin (a retired/draft binding or a stale hash refuses before the INSERT); the handler
+        // has already required that the binding names THIS published process.
+        job_binding_id: input.job_binding_id,
+        release_hash: input.release_hash.clone(),
     };
     let run = match input.parent_run_id {
         Some(parent) => {

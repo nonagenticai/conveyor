@@ -76,6 +76,8 @@ pub mod process;
 pub mod spine;
 // SPEC D28 / CONTRACT §21: the procedure (SOP) a step is judged against.
 pub mod procedure;
+// T16 (SPEC_V2 §5.6, D53): the STRIPS ground-literal subset a step's PDDL action space uses.
+pub mod pddl;
 pub mod process_map;
 pub mod profile;
 // SPEC D27: a prompt compiled at run time from the process, capability and project/card facts.

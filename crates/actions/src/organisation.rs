@@ -810,6 +810,53 @@ async fn job_bindings_create(
 ) -> Result<BindingOut, ActionError> {
     let executor_kind = ExecutorKind::parse(input.executor_kind.trim()).map_err(executor_error)?;
     let status = status_in(input.status.as_deref())?;
+    // T16 P5.1: a binding pins a PUBLISHED process, and a derived one only while its source is
+    // reviewed. The existence check lives in the store; these are the two facts a binding must
+    // never be able to grant by naming a draft or an unreviewed document's output.
+    if let Some(process_id) = input.process_id {
+        let process = store::process::get_process_tx(&mut *tx, ctx.tenant, process_id)
+            .await
+            .map_err(|error| {
+                tracing::error!(%error, "read the process a binding names");
+                ActionError::internal()
+            })?
+            .ok_or_else(|| ActionError::resource_not_found("process"))?;
+        if process.status != "published" {
+            return Err(ActionError::new(
+                409,
+                "process.not_published",
+                format!(
+                    "the process {} is {}; a binding pins a published version",
+                    process.id, process.status
+                ),
+            ));
+        }
+        if let Some(source_id) = process.source_asset_id {
+            let asset = store::governance::get_asset_tx(&mut *tx, ctx.tenant, source_id)
+                .await
+                .map_err(|error| {
+                    tracing::error!(%error, "read the binding's derived source");
+                    ActionError::internal()
+                })?
+                .ok_or_else(|| {
+                    ActionError::new(
+                        422,
+                        "source.missing",
+                        format!("the process was derived from source {source_id}, which no longer exists"),
+                    )
+                })?;
+            if asset.status != conveyor_domain::AssetStatus::Approved {
+                return Err(ActionError::new(
+                    422,
+                    "source.unapproved",
+                    format!(
+                        "the source {source_id} is {:?}; a binding cannot name a process derived from an unreviewed source",
+                        asset.status
+                    ),
+                ));
+            }
+        }
+    }
     let row = store::organisation::job_binding_create_tx(
         &mut *tx,
         ctx.tenant,

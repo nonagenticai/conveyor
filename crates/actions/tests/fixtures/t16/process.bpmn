@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  id="definitions-t16-fixture"
+                  targetNamespace="http://example.invalid/t16">
+  <bpmn:process id="process_receiving" name="Synthetic receiving process" isExecutable="false">
+    <bpmn:startEvent id="start_receiving" name="Delivery arrives">
+      <bpmn:outgoing>flow_1</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:task id="task_verify" name="Verify the delivery">
+      <bpmn:incoming>flow_1</bpmn:incoming>
+      <bpmn:outgoing>flow_2</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:exclusiveGateway id="gateway_stock" name="Stock verified?">
+      <bpmn:incoming>flow_2</bpmn:incoming>
+      <bpmn:outgoing>flow_3</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:userTask id="task_putaway" name="Put the pallet away">
+      <bpmn:incoming>flow_3</bpmn:incoming>
+      <bpmn:outgoing>flow_4</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:endEvent id="end_receiving" name="Delivery stored">
+      <bpmn:incoming>flow_4</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="flow_1" sourceRef="start_receiving" targetRef="task_verify"/>
+    <bpmn:sequenceFlow id="flow_2" sourceRef="task_verify" targetRef="gateway_stock"/>
+    <bpmn:sequenceFlow id="flow_3" sourceRef="gateway_stock" targetRef="task_putaway"/>
+    <bpmn:sequenceFlow id="flow_4" sourceRef="task_putaway" targetRef="end_receiving"/>
+  </bpmn:process>
+</bpmn:definitions>
