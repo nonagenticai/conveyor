@@ -218,6 +218,15 @@
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/2026-11-18-evidence-review-cutover.md"
     },
     {
+      "title": "The start agent completes READY — 2026-11-19 (#383)",
+      "path": "docs/evidence/2026-11-19-start-agent-ready.html",
+      "source": "docs/evidence/2026-11-19-start-agent-ready.md",
+      "section": "Evidence",
+      "sha256": "fe723d50f632b9dcf2760cc6638d95c63d6919e93dda7ff65bbb13e506743e23",
+      "bytes": 2498,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/2026-11-19-start-agent-ready.md"
+    },
+    {
       "title": "D23's amendment — the eval caller kind: an eval's model calls are attributable",
       "path": "docs/evidence/D23-EVAL-CALLER.html",
       "source": "docs/evidence/D23-EVAL-CALLER.md",
