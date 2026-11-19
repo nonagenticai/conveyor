@@ -903,6 +903,31 @@ async fn reconciliation_is_exact_or_opens_an_incident() {
         "{unavailable}"
     );
     assert!(unavailable["conveyor_usd"].is_null(), "never a zero");
+    // The https-only rule: a plain-http in-cluster URL is refused before any request.
+    support::set_env(
+        "CONVEYOR_EXTERNAL_BILLING_SERVICE_URL",
+        "http://billing-service.billing.svc.cluster.local:8157",
+    );
+    let two_days = today - ChronoDuration::days(2);
+    let (status, refused) = running
+        .invoke(
+            "metrics.reconcile",
+            TOKEN,
+            json!({"period_start": two_days, "period_end": two_days}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{refused}");
+    let refused = output(&refused);
+    assert_eq!(refused["state"], "unavailable", "{refused}");
+    assert!(
+        refused["upstream_error"]
+            .as_str()
+            .is_some_and(|value| value.contains("not https")),
+        "{refused}"
+    );
     let records: i64 =
         sqlx::query_scalar("SELECT count(*) FROM metric_reconciliation WHERE tenant_id = $1")
             .bind(seeded.tenant_id)
@@ -910,7 +935,7 @@ async fn reconciliation_is_exact_or_opens_an_incident() {
             .await
             .expect("records");
     assert_eq!(
-        records, 2,
+        records, 3,
         "today (re-run, now difference) + yesterday (unavailable)"
     );
 }

@@ -829,8 +829,24 @@ struct Billing {
 }
 
 impl Billing {
-    fn from_env() -> Option<Self> {
-        let base = crate::invoke::service_url("billing_service")?;
+    /// The client is **https-only** in production. The one exception is a loopback URL, which the
+    /// test stub uses; it never leaves the host. A plain-http in-cluster URL is refused and the
+    /// reconciliation records `unavailable` with the reason.
+    fn from_env() -> Result<Self, String> {
+        let base = crate::invoke::service_url("billing_service").ok_or_else(|| {
+            "billing_service is not configured (CONVEYOR_EXTERNAL_BILLING_SERVICE_URL)".to_owned()
+        })?;
+        let parsed = reqwest::Url::parse(&base)
+            .map_err(|error| format!("billing_service URL is invalid: {error}"))?;
+        let host = parsed
+            .host_str()
+            .ok_or_else(|| "billing_service URL has no host".to_owned())?;
+        let loopback = matches!(host, "127.0.0.1" | "::1" | "localhost");
+        if parsed.scheme() != "https" && !loopback {
+            return Err(format!(
+                "billing_service URL {base} is not https; only a loopback test URL may be http"
+            ));
+        }
         let timeout_ms = std::env::var("CONVEYOR_EXTERNAL_BILLING_SERVICE_TIMEOUT_MS")
             .ok()
             .and_then(|value| value.parse::<u64>().ok())
@@ -839,8 +855,8 @@ impl Billing {
         let http = reqwest::Client::builder()
             .timeout(std::time::Duration::from_millis(timeout_ms))
             .build()
-            .ok()?;
-        Some(Self {
+            .map_err(|error| format!("billing_service client: {error}"))?;
+        Ok(Self {
             base: base.trim_end_matches('/').to_owned(),
             http,
         })
@@ -922,14 +938,9 @@ async fn metrics_reconcile(
     let conveyor_usd = store::metrics::conveyor_cost_tx(&mut *tx, ctx.tenant, since, until)
         .await
         .map_err(|error| metrics_error(error, ctx.action))?;
-    let Some(billing) = Billing::from_env() else {
-        return record_unavailable(
-            &mut *tx,
-            ctx,
-            input,
-            "billing_service is not configured (CONVEYOR_EXTERNAL_BILLING_SERVICE_URL)",
-        )
-        .await;
+    let billing = match Billing::from_env() {
+        Ok(client) => client,
+        Err(reason) => return record_unavailable(&mut *tx, ctx, input, &reason).await,
     };
     let billing_usd = match billing.overview(ctx.tenant).await {
         Ok(value) => match value.get("total_usd").and_then(Value::as_f64) {
