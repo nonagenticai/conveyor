@@ -651,11 +651,7 @@ async fn a_human_approval_publishes_the_procedure() {
     assert_eq!(out["status"], "published", "{view}");
     assert_eq!(out["source_asset_id"], asset_id.as_str(), "{view}");
     assert_eq!(out["converter_version"], "prose@1", "{view}");
-    assert_eq!(
-        out["approval_id"],
-        approval.to_string().as_str(),
-        "{view}"
-    );
+    assert_eq!(out["approval_id"], approval.to_string().as_str(), "{view}");
     let events: i64 = sqlx::query_scalar(
         "SELECT count(*) FROM event WHERE type = 'process.published' AND aggregate_id = $1",
     )
