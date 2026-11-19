@@ -80,6 +80,24 @@ test("the New project form offers the tenant's project types", async ({ page, re
   await expect(project).toBeVisible();
 });
 
+test("one page: the board index reads its projects without per-project detail reads", async ({
+  page,
+}) => {
+  const detailRequests: string[] = [];
+  page.on("request", (request) => {
+    const path = new URL(request.url()).pathname;
+    if (/^\/api\/projects\/[^/]+$/.test(path)) detailRequests.push(path);
+  });
+
+  await page.goto("/boards");
+  await expect(page.locator(".project").first()).toBeVisible();
+  // The boards come with the page; a project with none would still render, so assert one.
+  await expect(page.locator(".project .board-link").first()).toBeVisible();
+  // Let any trailing detail reads (if the screen still made them) land.
+  await page.waitForTimeout(500);
+  expect(detailRequests).toEqual([]);
+});
+
 test("a project, its card, an edit and an archive round-trip through the UI", async ({
   page,
   request,

@@ -10,6 +10,8 @@
 //! max 200, and never `OFFSET` — a concurrent drag inserts above the cursor and an offset
 //! page would skip a row (trap 6).
 
+use std::collections::HashMap;
+
 use axum::Json;
 use axum::extract::{Path, Query, State};
 use serde::Deserialize;
@@ -25,8 +27,8 @@ use crate::extract::{Caller, RequireLicence};
 use crate::state::AppState;
 
 use conveyor_actions::board::views::{
-    BoardView, CardOut, ProjectOut, ProjectView, WebhookOut, board_member_out, board_out, card_out,
-    custom_field_out, label_out, list_out, project_out, webhook_out,
+    BoardOut, BoardView, CardOut, ProjectOut, ProjectView, WebhookOut, board_member_out, board_out,
+    card_out, custom_field_out, label_out, list_out, project_out, webhook_out,
 };
 
 /// The page size when the caller does not name one (CONTRACT §5).
@@ -51,6 +53,30 @@ impl PageQuery {
     }
 }
 
+/// `?cursor=&limit=&include=`. `include=boards` returns each project's boards with the same
+/// page, so the `/boards` index is one request instead of one detail read per project (#390).
+#[derive(Clone, Debug, Default, Deserialize)]
+pub struct ProjectsQuery {
+    cursor: Option<String>,
+    limit: Option<u32>,
+    include: Option<String>,
+}
+
+impl ProjectsQuery {
+    /// The effective page size, clamped to `1..=MAX_LIMIT`. Same rule as `PageQuery`.
+    fn limit(&self) -> i64 {
+        i64::from(self.limit.unwrap_or(DEFAULT_LIMIT).clamp(1, MAX_LIMIT))
+    }
+
+    /// Whether the caller asked for the boards with the page. Accepts a comma list.
+    fn include_boards(&self) -> bool {
+        self.include
+            .as_deref()
+            .map(|value| value.split(',').any(|part| part.trim() == "boards"))
+            .unwrap_or(false)
+    }
+}
+
 fn bad_cursor(detail: &str) -> ApiError {
     ApiError::bad_request(format!("cursor: {detail}"))
 }
@@ -71,10 +97,11 @@ async fn begin(state: &AppState, tenant: TenantId) -> Result<ScopedTx, ApiError>
     tag = "board",
     params(
         ("cursor" = Option<String>, Query, description = "Opaque cursor from the previous page"),
-        ("limit" = Option<u32>, Query, description = "Page size, default 50, max 200")
+        ("limit" = Option<u32>, Query, description = "Page size, default 50, max 200"),
+        ("include" = Option<String>, Query, description = "`boards` adds each project's boards to the page")
     ),
     responses(
-        (status = 200, description = "One page of projects"),
+        (status = 200, description = "One page of projects; `include=boards` adds each project's boards"),
         (status = 401, description = "No credential, or one that is refused", body = crate::error::ProblemDetail),
         (status = 403, description = "The licence does not permit this tenant", body = crate::error::ProblemDetail)
     )
@@ -83,10 +110,10 @@ pub async fn projects(
     State(state): State<AppState>,
     caller: Caller,
     _licence: RequireLicence,
-    Query(page): Query<PageQuery>,
+    Query(query): Query<ProjectsQuery>,
 ) -> Result<Json<Value>, ApiError> {
-    let limit = page.limit();
-    let after = match page.cursor.as_deref() {
+    let limit = query.limit();
+    let after = match query.cursor.as_deref() {
         None => None,
         Some(raw) => Some(
             store::project::decode_cursor(raw)
@@ -108,12 +135,33 @@ pub async fn projects(
     } else {
         None
     };
-    tx.commit().await?;
-    let document = Page {
-        items: rows.iter().map(project_out).collect::<Vec<ProjectOut>>(),
-        next_cursor,
+    // #390: `include=boards` is the whole point — the index's boards arrive with the page in one
+    // bounded query, so it never issues a detail read per project.
+    let document = if query.include_boards() {
+        let ids: Vec<Uuid> = rows.iter().map(|project| project.id).collect();
+        let boards =
+            store::board::list_boards_for_projects_tx(&mut tx, caller.tenant, &ids).await?;
+        let mut by_project: HashMap<Uuid, Vec<BoardOut>> = HashMap::new();
+        for board in &boards {
+            by_project
+                .entry(board.project_id)
+                .or_default()
+                .push(board_out(board));
+        }
+        let items = rows
+            .iter()
+            .map(|project| ProjectView {
+                project: project_out(project),
+                boards: by_project.remove(&project.id).unwrap_or_default(),
+            })
+            .collect::<Vec<ProjectView>>();
+        serde_json::to_value(Page { items, next_cursor }).unwrap_or(Value::Null)
+    } else {
+        let items = rows.iter().map(project_out).collect::<Vec<ProjectOut>>();
+        serde_json::to_value(Page { items, next_cursor }).unwrap_or(Value::Null)
     };
-    Ok(Json(serde_json::to_value(document).unwrap_or(Value::Null)))
+    tx.commit().await?;
+    Ok(Json(document))
 }
 
 /// One project with its boards.
