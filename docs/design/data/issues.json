@@ -1,6 +1,163 @@
 {
   "issues": [
     {
+      "number": 422,
+      "title": "estate_toolkits: the in-flight test is a wall-clock race (CI run 135513313257)",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/422",
+      "updatedAt": "2026-11-19T12:48:08Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:ready",
+          "color": "0E8A16"
+        }
+      ]
+    },
+    {
+      "number": 421,
+      "title": "engine: an expired step lease survives a wedged worker and starves the queue",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/421",
+      "updatedAt": "2026-11-19T12:05:00Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:ready",
+          "color": "0E8A16"
+        }
+      ]
+    },
+    {
+      "number": 416,
+      "title": "coverage: T14 still measures as proposed, so every registry refresh is born red",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/416",
+      "updatedAt": "2026-11-19T13:51:20Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
+      "number": 413,
+      "title": "data: the \u00a710.3 schema gaps and the ladder's default rows live in the database",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/413",
+      "updatedAt": "2026-11-19T12:02:41Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
+      "number": 412,
+      "title": "fix(actions): drain a metered external call when its action is cancelled or times out",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/412",
+      "updatedAt": "2026-11-19T11:48:47Z",
+      "labels": [
+        {
+          "name": "bug",
+          "color": "d73a4a"
+        },
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
+      "number": 410,
+      "title": "audio tools: produce.speech and media.transcribe are refused by the minis' licence gate (auth: None)",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/410",
+      "updatedAt": "2026-11-19T10:32:54Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        }
+      ]
+    },
+    {
+      "number": 409,
+      "title": "prove-estate.sh: three defects the first live proof found (binary path, seed output, job id)",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/409",
+      "updatedAt": "2026-11-19T12:04:56Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
+      "number": 408,
+      "title": "ci: the issue-registry run fails GH006 when its generated PR is queued",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/408",
+      "updatedAt": "2026-11-19T11:20:45Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
+      "number": 400,
+      "title": "publish: the generated snapshot exposes the WBS study tab and its commit fails DCO",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/400",
+      "updatedAt": "2026-11-19T11:14:52Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        },
+        {
+          "name": "S12",
+          "color": "6E7781"
+        }
+      ]
+    },
+    {
       "number": 395,
       "title": "architecture: the board approves a contract for every delivery project",
       "state": "OPEN",
@@ -54,9 +211,9 @@
     {
       "number": 392,
       "title": "ci: run the browser suite only when UI code changes",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/392",
-      "updatedAt": "2026-11-19T07:45:52Z",
+      "updatedAt": "2026-11-19T12:10:59Z",
       "labels": [
         {
           "name": "unit",
@@ -119,15 +276,15 @@
       "title": "console: the New project form defaults to a project type production does not have",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/389",
-      "updatedAt": "2026-11-19T07:42:32Z",
+      "updatedAt": "2026-11-19T10:27:28Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:ready",
-          "color": "0E8A16"
+          "name": "status:claimed",
+          "color": "FBCA04"
         },
         {
           "name": "S12",
@@ -138,9 +295,9 @@
     {
       "number": 387,
       "title": "programme: the 20 declared outputs still unpublished \u2014 T9's ADM set, five evidence rows and four closure reviews",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/387",
-      "updatedAt": "2026-11-19T08:14:22Z",
+      "updatedAt": "2026-11-19T10:35:53Z",
       "labels": [
         {
           "name": "unit",
@@ -157,24 +314,24 @@
       "title": "console: the programme queue counts closure debt on closed projects",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/386",
-      "updatedAt": "2026-11-19T07:36:49Z",
+      "updatedAt": "2026-11-19T10:23:24Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:ready",
-          "color": "0E8A16"
+          "name": "status:claimed",
+          "color": "FBCA04"
         }
       ]
     },
     {
       "number": 385,
       "title": "console: the Architecture capability screen is live \u2014 reads and writes the architecture aggregates",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/385",
-      "updatedAt": "2026-11-19T08:15:31Z",
+      "updatedAt": "2026-11-19T10:22:17Z",
       "labels": [
         {
           "name": "unit",
@@ -189,26 +346,26 @@
     {
       "number": 383,
       "title": "engine: the project-start agent finishes READY instead of exhausting its turn cap on refused reads",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/383",
-      "updatedAt": "2026-11-19T07:25:03Z",
+      "updatedAt": "2026-11-19T11:36:34Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:ready",
-          "color": "0E8A16"
+          "name": "status:claimed",
+          "color": "FBCA04"
         }
       ]
     },
     {
       "number": 382,
       "title": "pack: the public snapshot carries only programme-bound projects",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/382",
-      "updatedAt": "2026-11-19T07:22:17Z",
+      "updatedAt": "2026-11-19T09:41:53Z",
       "labels": [
         {
           "name": "unit",
@@ -223,9 +380,9 @@
     {
       "number": 377,
       "title": "ci: gate.sh builds a per-worktree target instead of the guarded one",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/377",
-      "updatedAt": "2026-11-19T07:26:36Z",
+      "updatedAt": "2026-11-19T09:26:57Z",
       "labels": [
         {
           "name": "unit",
@@ -240,9 +397,9 @@
     {
       "number": 375,
       "title": "web: the cockpit edit form can detach while SSE refreshes the card",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/375",
-      "updatedAt": "2026-11-19T08:29:21Z",
+      "updatedAt": "2026-11-19T10:22:45Z",
       "labels": [
         {
           "name": "unit",
@@ -2564,17 +2721,17 @@
     {
       "number": 97,
       "title": "console: the live engine proof (A5) against the deployed revision",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/97",
-      "updatedAt": "2026-11-19T07:25:42Z",
+      "updatedAt": "2026-11-19T13:12:33Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:blocked",
-          "color": "D93F0B"
+          "name": "status:claimed",
+          "color": "FBCA04"
         }
       ]
     },
@@ -2710,28 +2867,7 @@
       "title": "T16 \u2014 SOP, RDF/OWL and process-document ingestion",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/85",
-      "updatedAt": "2026-11-19T07:49:04Z",
-      "labels": [
-        {
-          "name": "unit",
-          "color": "1D76DB"
-        },
-        {
-          "name": "status:ready",
-          "color": "0E8A16"
-        },
-        {
-          "name": "T16",
-          "color": "6E7781"
-        }
-      ]
-    },
-    {
-      "number": 84,
-      "title": "T11 \u2014 Metrics, metering and maturity",
-      "state": "OPEN",
-      "url": "https://github.com/nonagenticai/conveyor/issues/84",
-      "updatedAt": "2026-11-19T08:22:42Z",
+      "updatedAt": "2026-11-19T11:10:17Z",
       "labels": [
         {
           "name": "unit",
@@ -2742,8 +2878,25 @@
           "color": "FBCA04"
         },
         {
-          "name": "status:ready",
-          "color": "0E8A16"
+          "name": "T16",
+          "color": "6E7781"
+        }
+      ]
+    },
+    {
+      "number": 84,
+      "title": "T11 \u2014 Metrics, metering and maturity",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/84",
+      "updatedAt": "2026-11-19T12:50:38Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
         },
         {
           "name": "T11",
@@ -2754,9 +2907,9 @@
     {
       "number": 83,
       "title": "T14 \u2014 Estate toolkits",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/83",
-      "updatedAt": "2026-11-19T07:49:02Z",
+      "updatedAt": "2026-11-19T10:32:34Z",
       "labels": [
         {
           "name": "unit",
@@ -2861,15 +3014,15 @@
       "title": "T7 \u2014 Operations",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/78",
-      "updatedAt": "2026-11-19T08:02:40Z",
+      "updatedAt": "2026-11-19T10:27:13Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:blocked",
-          "color": "D93F0B"
+          "name": "status:ready",
+          "color": "0E8A16"
         },
         {
           "name": "T7",
