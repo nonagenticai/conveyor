@@ -43,7 +43,7 @@
       "title": "sheets: recover cell number formats on import",
       "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/373",
-      "updatedAt": "2026-11-18T23:33:08Z",
+      "updatedAt": "2026-11-18T23:51:23Z",
       "labels": [
         {
           "name": "unit",
@@ -2694,9 +2694,9 @@
     {
       "number": 75,
       "title": "T4 \u2014 Kanban coach",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/75",
-      "updatedAt": "2026-11-18T22:38:51Z",
+      "updatedAt": "2026-11-19T01:03:23Z",
       "labels": [
         {
           "name": "unit",

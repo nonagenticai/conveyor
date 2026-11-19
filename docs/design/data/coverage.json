@@ -2022,11 +2022,11 @@
       "tranche": 4,
       "units": {
         "blocked": 0,
-        "claimed": 1,
+        "claimed": 0,
         "numbers": [
           75
         ],
-        "open": 1,
+        "open": 0,
         "ready": 0,
         "unknown": 0
       }
@@ -2501,9 +2501,11 @@
         "standing": 1
       },
       "total": 48,
-      "uncovered": [],
-      "with_open_units": 25,
-      "without_open_units": 23
+      "uncovered": [
+        "T4"
+      ],
+      "with_open_units": 24,
+      "without_open_units": 24
     },
     "screens": {
       "actions_invoked": 25,

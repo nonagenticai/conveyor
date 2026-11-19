@@ -860,7 +860,7 @@
       "key": "T4",
       "name": "Kanban coach",
       "description": "SPEC_V2 slice T4 (docs/SPEC_V2.md §12)",
-      "status": "active",
+      "status": "draft",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/SPEC_V2.md#12",
