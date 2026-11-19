@@ -38,17 +38,17 @@ async fn a_refresh_applies_the_embedded_seed_and_a_second_is_all_skipped() {
     assert_eq!(output(&body)["skipped"], 0, "{body}");
     // The archived project (S06a) is skipped by design; the other 47 get their board.
     assert_eq!(
-        output(&body)["boards_created"], 47,
+        output(&body)["boards_created"],
+        47,
         "every non-archived seeded project gets its board: {body}"
     );
 
-    let projects: i64 = sqlx::query_scalar(
-        "SELECT count(*) FROM project WHERE tenant_id = $1 AND meta ? 'track'",
-    )
-    .bind(seeded.tenant_id)
-    .fetch_one(&pg.super_pool)
-    .await
-    .expect("count the tenant's projects");
+    let projects: i64 =
+        sqlx::query_scalar("SELECT count(*) FROM project WHERE tenant_id = $1 AND meta ? 'track'")
+            .bind(seeded.tenant_id)
+            .fetch_one(&pg.super_pool)
+            .await
+            .expect("count the tenant's projects");
     assert_eq!(projects, 48, "the tenant owns the seeded projects");
 
     let (status, body) = running
@@ -99,7 +99,14 @@ async fn a_viewer_cannot_refresh() {
         .expect("the viewer membership");
     tx.commit().await.expect("commit the viewer membership");
     let (status, body) = running
-        .invoke("programmes.refresh", "dev:viewer", json!({}), None, None, None)
+        .invoke(
+            "programmes.refresh",
+            "dev:viewer",
+            json!({}),
+            None,
+            None,
+            None,
+        )
         .await;
     assert_eq!(status, 403, "{body}");
 }
