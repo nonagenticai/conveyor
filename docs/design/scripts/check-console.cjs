@@ -1383,13 +1383,14 @@ function startServer({ config, state, snapshot, noSnapshot }) {
             "the request names a publication gate",
           );
           assert.ok(input.target, "the request names its target");
+          // The real service opens a PENDING gate; a second person decides it.
           const approval = {
             id: `gate-${state.procGates.length + 1}`,
             gate: input.gate,
             kind: input.kind,
-            status: "approved",
+            status: "pending",
             target: input.target,
-            approvals: 1,
+            approvals: 0,
             required_decisions: 1,
           };
           state.procGates.push(approval);
@@ -1943,6 +1944,7 @@ function startServer({ config, state, snapshot, noSnapshot }) {
           assert.ok(["approve", "reject"].includes(input.decision), "a valid decision");
           assert.ok(input.note, "the decision carries a note");
           approval.status = input.decision === "approve" ? "approved" : "rejected";
+          if (approval.status === "approved") approval.approvals = 1;
           json(res, 200, approval);
         });
       }
@@ -2717,6 +2719,7 @@ function readBody(req, done) {
       );
       const snapshotProcedures = await page.locator("#main").innerText();
       assert.match(snapshotProcedures, /published/i, "the published procedure rows render");
+      assert.doesNotMatch(snapshotProcedures, /pko/i, "the published page claims no PKO store");
       assert.equal(
         await page
           .locator(
@@ -3564,6 +3567,11 @@ function readBody(req, done) {
       await page.goto(`http://127.0.0.1:${signedIn.port}/studio.html#procedures`);
       await page.waitForSelector('#console-chip[data-state="in"]');
       await page.waitForSelector("text=Synthetic receiving SOP");
+      assert.doesNotMatch(
+        await page.locator("#main").innerText(),
+        /pko/i,
+        "the Procedures page claims no PKO store",
+      );
       assert.ok(
         consoleState.requests.some(
           (row) => row.path === "/api/actions/procedures.list/invocations",
@@ -3637,9 +3645,10 @@ function readBody(req, done) {
         ),
         "approvals.request was sent",
       );
-      await page.waitForSelector('[data-v2="proc-gate-approve"]');
-      await page.click('[data-v2="proc-gate-approve"]');
-      await page.waitForTimeout(200);
+      // A second person decides the listed gate; the publish then names it.
+      await page.waitForSelector('[data-v2="proc-gate-approve"][data-id="gate-1"]');
+      await page.click('[data-v2="proc-gate-approve"][data-id="gate-1"]');
+      await page.waitForTimeout(300);
       await page.click('[data-v2="proc-publish-process"]');
       await page.waitForTimeout(400);
       assert.ok(
@@ -3652,6 +3661,8 @@ function readBody(req, done) {
       // The judge gate: the procedure publish carries its own approved gate.
       await page.waitForSelector('[data-v2="proc-gate-procedure"]');
       await page.click('[data-v2="proc-gate-procedure"]');
+      await page.waitForSelector('[data-v2="proc-gate-approve"][data-id="gate-2"]');
+      await page.click('[data-v2="proc-gate-approve"][data-id="gate-2"]');
       await page.waitForTimeout(300);
       await page.click('[data-v2="proc-publish-procedure"]');
       await page.waitForTimeout(400);

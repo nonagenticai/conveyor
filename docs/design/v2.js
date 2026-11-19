@@ -6012,29 +6012,61 @@ window.installV2 = function (api, enterprise) {
     }
   }
 
-  async function consoleProcDecide(decision) {
+  // A gate is decided by a SECOND person: the requester's session cannot decide its own gate
+  // (the store refuses it), so each listed gate carries its own decision control and the
+  // decider's session works from the list, not from the requester's `p.gate` slot.
+  async function consoleProcDecide(approvalId, decision) {
     const p = procState();
-    if (!consoleOn() || !p.gate || !p.gate.id) {
+    if (!consoleOn() || !approvalId) {
       toast("Request a gate first");
       return;
     }
     p.actionError = null;
     try {
-      p.gate = await C.action("approvals.decide", {
-        approval_id: p.gate.id,
+      const decided = await C.action("approvals.decide", {
+        approval_id: approvalId,
         decision,
         note: decision === "approve" ? "Approved in the operator console" : "Rejected in the operator console",
       });
+      if (p.gate && p.gate.id === approvalId) p.gate = decided;
       p.gates = [];
       p.gatesFor = null;
       const process = procSelected(p);
       if (process) consoleLoadProcGates(process);
-      toast("Gate " + (p.gate.status || decision));
+      toast("Gate " + (decided.status || decision));
     } catch (error) {
       p.actionError = error;
       render();
       toast(consoleError(error));
     }
+  }
+
+  // The approved gate a publish may name, matched by ITS OWN gate name and target — not by the
+  // last request this session made. A listed approved gate is what lets the second person's
+  // decision release the artefact in the first person's session.
+  function procApprovedGate(p, gateName, target) {
+    const listed = list(p.gates).find(
+      (gate) => gate.status === "approved" && gate.gate === gateName && gate.target === target,
+    );
+    if (listed) return listed;
+    if (
+      p.gate &&
+      p.gate.status === "approved" &&
+      p.gate.gate === gateName &&
+      p.gate.target === target
+    ) {
+      return p.gate;
+    }
+    return null;
+  }
+
+  function procGateState(p, gateName, target) {
+    if (!target) return B("no draft", "");
+    const rows = list(p.gates).filter((gate) => gate.gate === gateName && gate.target === target);
+    if (rows.some((gate) => gate.status === "approved")) return B("approved", "green");
+    if (rows.some((gate) => gate.status === "pending")) return B("pending · a second person decides", "amber");
+    if (rows.some((gate) => gate.status === "rejected")) return B("rejected", "bad");
+    return B("none · request it below", "");
   }
 
   async function consoleProcPublish(which) {
@@ -6045,22 +6077,31 @@ window.installV2 = function (api, enterprise) {
       toast("Select a draft first");
       return;
     }
-    const approved = p.gate && p.gate.id && p.gate.status === "approved" ? p.gate.id : null;
-    const options = approved ? { approvalId: approved } : {};
+    const procedure = procProcedureFor(process);
+    const target = which === "procedure" ? (procedure || {}).id : process.id;
+    const gateName = which === "procedure" ? "procedures.publish" : "processes.publish";
+    if (!target) {
+      toast("No draft names this target yet");
+      return;
+    }
+    const gate = procApprovedGate(p, gateName, target);
+    const options = gate ? { approvalId: gate.id } : {};
     p.actionError = null;
     try {
       let output;
       if (which === "procedure") {
-        const procedure = procProcedureFor(process);
-        if (!procedure) throw new Error("No draft procedure matches this process key.");
-        output = await C.action("procedures.publish", { procedure_id: procedure.id }, options);
+        output = await C.action("procedures.publish", { procedure_id: target }, options);
       } else {
-        output = await C.action("processes.publish", { process_id: process.id }, options);
+        output = await C.action("processes.publish", { process_id: target }, options);
       }
       p.last = { kind: "publish", output };
       delete p.detail[process.id];
       consoleRefreshProcedures();
-      toast("Published · the source and the gate are recorded");
+      toast(
+        gate
+          ? "Published · the approved gate " + short(gate.id, 8) + " is recorded"
+          : "Published · no gate was required by the tenant policy",
+      );
     } catch (error) {
       p.actionError = error;
       render();
@@ -6319,6 +6360,8 @@ window.installV2 = function (api, enterprise) {
               ["Source asset", `<span class="mono">${E(selected.source_asset_id || "—")}</span>`],
               ["Recorded approval", `<span class="mono">${E(selected.approval_id || "—")}</span>`],
               ["Judge procedure", `<span class="mono">${E((selectedProcedure || {}).id || "—")}</span>`],
+              ["Executable gate", procGateState(p, "processes.publish", selected.id)],
+              ["Judge gate", procGateState(p, "procedures.publish", (selectedProcedure || {}).id)],
             ])}${
               C.can("approvals.request")
                 ? `${button("Request the executable gate", "proc-gate-process", "", "small", "shield")}${button("Request the judge gate", "proc-gate-procedure", "", "small", "shield")}`
@@ -6330,36 +6373,36 @@ window.installV2 = function (api, enterprise) {
             "Publication gates",
             `${
               p.gate
-                ? `${kv([
+                ? kv([
                     ["Last request", `<span class="mono">${E(p.gate.id || "—")}</span>`],
                     ["Gate", E(p.gate.gate || "—")],
                     ["Status", B(p.gate.status || "pending", procTone(p.gate.status))],
                     ["Approvals", `${E(p.gate.approvals || 0)} / ${E(p.gate.required_decisions || 1)}`],
-                  ])}${
-                    C.can("approvals.decide")
-                      ? `${button("Approve the gate", "proc-gate-approve", "", "small", "check")}${button("Reject the gate", "proc-gate-reject", "", "small", "close")}`
-                      : ""
-                  }`
+                  ])
                 : note("No gate has been requested in this session.")
             }${
               p.gates.length
                 ? table(
-                    ["Gate", "Status", "Target", "Approvals"],
+                    ["Gate", "Status", "Target", "Approvals", "Decision"],
                     p.gates.map(
                       (gate) =>
-                        `<tr><td class="mono">${E(gate.gate)}</td><td>${B(gate.status, procTone(gate.status))}</td><td class="mono">${E(short(gate.target || "—", 8))}</td><td>${E(gate.approvals)} / ${E(gate.required_decisions)}</td></tr>`,
+                        `<tr><td class="mono">${E(gate.gate)}</td><td>${B(gate.status, procTone(gate.status))}</td><td class="mono">${E(short(gate.target || "—", 8))}</td><td>${E(gate.approvals)} / ${E(gate.required_decisions)}</td><td>${
+                          gate.status === "pending" && C.can("approvals.decide")
+                            ? `${button("Approve", "proc-gate-approve", `data-id="${E(gate.id)}"`, "small", "check")}${button("Reject", "proc-gate-reject", `data-id="${E(gate.id)}"`, "small", "close")}`
+                            : `<span class="muted">—</span>`
+                        }</td></tr>`,
                     ),
                   )
                 : note("No pending or approved gate names this process.")
             }${note(
-              "The requester cannot decide their own gate. Publishing names the approved gate; the approval id and the source are recorded on the released version. A tenant policy that waives the gate publishes without one.",
+              "The requester cannot decide their own gate: a second person decides a listed gate, and publishing then names that approved gate. The approval id and the source are recorded on the released version. A tenant policy that waives the gate publishes without one.",
             )}${procResultPanel(p)}`,
           )}`
         : note("Select a draft process in Workspace first.");
     }
     return `<div class="page enterprise">${heading(
       "Procedures",
-      "The SOP/BPMN/RDF intake, the PDDL steps and the two human publication gates — no PKO store; an ontology becomes a strata knowledge pack.",
+      "The SOP/BPMN/RDF intake, the PDDL steps and the two human publication gates; an ontology becomes a strata knowledge pack.",
       `${route("Capabilities", "capabilities", "", "layers")}`,
       "PROCEDURES & AUTHORING",
     )}${consoleRibbon(
@@ -6386,7 +6429,7 @@ window.installV2 = function (api, enterprise) {
     let content = "";
     if (tab === "Workspace") {
       content =
-        `<div class="v2-meter"><div><span>Procedures</span><strong>${procedures.length}</strong><small>published rows from the snapshot</small></div><div><span>Processes</span><strong>${processes.length}</strong><small>${processes.filter((row) => row.status === "published").length} published</small></div><div><span>Steps</span><strong>${steps.length}</strong><small>process_step rows</small></div></div>` +
+        `<div class="v2-meter"><div><span>Procedures</span><strong>${procedures.length}</strong><small>rows in the snapshot</small></div><div><span>Processes</span><strong>${processes.length}</strong><small>${processes.filter((row) => row.status === "published").length} published</small></div><div><span>Steps</span><strong>${steps.length}</strong><small>process_step rows</small></div></div>` +
         `<div class="v2-split"><div>${panel(
           "Procedures",
           `${
@@ -6398,7 +6441,7 @@ window.installV2 = function (api, enterprise) {
                       `<tr><td class="mono">${E(row.key)}</td><td>${E(row.title)}</td><td>${B(row.status, procTone(row.status))}</td><td>v${E(row.version)}</td></tr>`,
                   ),
                 )
-              : note("No procedure is published in this snapshot.")
+              : note("No procedure row is in this snapshot.")
           }`,
           B(`${procedures.length} procedures`),
         )}</div><div>${panel(
@@ -6412,7 +6455,7 @@ window.installV2 = function (api, enterprise) {
                       `<tr class="${row.id === selectedId ? "selected" : ""}"><td><button class="e-project-link" data-v2="proc-process" data-id="${E(row.id)}"><span><strong class="mono">${E(row.key)}</strong><small>${E(row.title)}</small></span></button></td><td>${B(row.status, procTone(row.status))}</td><td>v${E(row.version)}</td></tr>`,
                   ),
                 )
-              : note("No process is published in this snapshot.")
+              : note("No process row is in this snapshot.")
           }`,
           B(`${processes.length} processes`),
         )}</div></div>`;
@@ -7586,10 +7629,10 @@ git log origin/main --grep "#N"</pre><p class="muted">Then push <span class="mon
         consoleProcRequestGate("procedures.publish");
         break;
       case "proc-gate-approve":
-        consoleProcDecide("approve");
+        consoleProcDecide(d.id, "approve");
         break;
       case "proc-gate-reject":
-        consoleProcDecide("reject");
+        consoleProcDecide(d.id, "reject");
         break;
       case "proc-publish-process":
         consoleProcPublish("process");

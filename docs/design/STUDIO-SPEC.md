@@ -231,7 +231,7 @@ prose recommendation from an LLM is displayed but never consumed by the engine.
 - **Budgets** are declared per run and job; exceeding one is `429 budget_exceeded` before the next
   call, never a silent truncation. Cost is derived at read time from the ledger.
 
-## Procedures, SOP and the PKO
+## Procedures, SOP and ontology ingestion
 
 A **procedure** is executable documentation: an ordered sequence of steps, each an action (PDDL), a
 tool call or a gate. Procedure design and management is first-class (D47).
@@ -240,27 +240,26 @@ tool call or a gate. Procedure design and management is first-class (D47).
   document is untrusted input: it enters as `governed_asset(kind='sop_source')` with provenance,
   never as instructions to the system.
 - **Conversion** — the intake job harvests and curates the domain knowledge the SOP implies, then
-  converts it into procedural knowledge (**PKO**) and a procedure draft whose steps are PDDL.
-- **Two spaces, never mixed (D53).** The action space is the PDDL step — actions with preconditions
-  and effects over typed facts. The procedural knowledge space is the PKO — tasks, steps, roles,
-  artefacts and constraints. A step references PKO terms; a PKO entity never contains an executable
-  step.
-- **PKO storage** — relational, conveyor-owned and tenant-editable: an immutable `pko_release` pins
-  `pko_entity` and `pko_relation` rows, layered base → industry → department → job. RDF/OWL/Turtle
-  documents are ingest material converted into draft rows; the conveyor runs no RDF store and no
-  reasoner.
+  converts it into a procedure draft whose steps are PDDL.
+- **Procedural knowledge is the procedure itself (D53, amended 2026-11-19).** The action space is
+  the PDDL step — actions with preconditions and effects over typed facts. Procedural knowledge is
+  the published procedure: its intent, ordered steps, actions, gates, declared outputs and failure
+  branches. There is no separate relational ontology store.
+- **Ontology ingestion** — RDF/OWL/Turtle documents are ingest material for **domain** knowledge:
+  the document is imported into `strata_ingest` and the returned job id becomes the procedure's
+  `knowledge_pack_ref`. The conveyor runs no RDF store, no graph store and no reasoner.
 - **Process documents** — BPMN 2.0 XML, Visio and draw.io exports ingest on the same path:
-  activities → steps, gateways → gates, plus PKO rows.
+  activities → steps, gateways → gates.
 - **Knowledge pairing** — the harvested domain knowledge is a pinned knowledge pack in `strata_rag`,
-  paired with the procedural knowledge; the procedure release names both. Readiness blocks a run
-  before the first step.
+  named by the procedure's `knowledge_pack_ref`; the published version and its pack are what a run
+  pins. Readiness blocks a run before the first step.
 - **Gates** — every SOP-derived artefact is a draft behind a review gate (default human). A batch
   never publishes itself, and no SOP can grant a tool or widen an effect ceiling.
 
 **Tenant asset authoring (D55).** The same intake pipeline drafts every tenant asset from chat
-input and documents: organisation, jobs, capabilities, procedures, PKO, knowledge packs, project
+input and documents: organisation, jobs, capabilities, procedures, knowledge packs, project
 templates, policies and tool requests. Every output is a draft behind a review gate; the asset order
-is dependency-ordered (industry → department → job/capability → procedure/PKO → knowledge pack →
+is dependency-ordered (industry → department → job/capability → procedure → knowledge pack →
 policies/templates → tools); a draft whose referenced asset is unpublished is refused; a chat
 message or document can never grant a tool, widen an effect ceiling or change an approval policy.
 The authoring job family is ordinary jobs on the two executors; the pipeline is a procedure, not a

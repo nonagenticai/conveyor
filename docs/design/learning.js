@@ -807,8 +807,8 @@ window.installLearning = function (api, enterprise) {
       },
       {
         id: "RV-04",
-        kind: "PKO release",
-        object: "pko@4 · verify_release",
+        kind: "Procedure release",
+        object: "proc-implement@8 · verify_release",
         reviewer: "Capability owner",
         decisions: "1 person",
         evidence: "term usage · validation report",
@@ -882,7 +882,7 @@ window.installLearning = function (api, enterprise) {
       l.designTab === "Effective configuration"
         ? `<div class="l-tagline">${B("Job release · draft", "purple")}${B(orgConfig.release)}${B(configReady() ? "Ready for review" : "Blocked", configReady() ? "green" : "amber")}</div><h2>What this job knows, layer by layer</h2><p>Base → industry → department archetype → ordered departments → job. A conflicting department value is a compile error until a job-layer row resolves it.</p>`
         : l.designTab === "Review & release"
-          ? `<div class="l-tagline">${B("Queue", "purple")}${B("Person approval required")}</div><h2>Review and release</h2><p>Every correction, pack version, PKO draft, lesson promotion and binding revision waits here for a person with the named authority.</p>`
+          ? `<div class="l-tagline">${B("Queue", "purple")}${B("Person approval required")}</div><h2>Review and release</h2><p>Every correction, pack version, procedure draft, lesson promotion and binding revision waits here for a person with the named authority.</p>`
           : `<div class="l-tagline">${B(l.scope === "capability" ? "Binding authority" : l.scope === "run" ? "Runtime projection" : "Selection policy · proposal", l.scope === "capability" ? "green" : "purple")}${B("capability@17")}${B("Future runs only")}</div><h2>${E(l.scope === "capability" ? "A reusable knowledge contract" : l.scope === "process" ? "The right sources for this job" : l.scope === "agent" ? "A role with bounded context" : "Explain this model call")}</h2><p>${E(l.scope === "capability" ? "Bind governed domain knowledge once. Processes and agents select relevant passages within this boundary; every call can explain the selection." : l.scope === "process" ? "Procedural knowledge is the published procedure itself: intent, ordered steps, actions, declared outputs, gates and failure branches." : l.scope === "agent" ? p.role : "Instructions → published procedure → capability / role → cited knowledge → project and card data. Source identity travels into the compiled hash.")}</p>`;
     const mainAction =
       l.designTab === "Effective configuration"
