@@ -96,9 +96,10 @@ use serde_json::{Value, json};
 /// **T9 adds 26 internal**: the `architecture.*` family (see the block below `approvals.request`).
 /// **#76 adds 1 internal**: `tools.call`, the tool broker (it dispatches a declared external
 /// action and adds no external target).
-/// **T11 (#84) adds four internal**: `metrics.maturity`, `metrics.programme`,
-/// `metrics.threshold_get` and `metrics.threshold_update`.
-const EXPECTED: [&str; 476] = [
+/// **T11 (#84) adds eight internal**: `metrics.flow`, `metrics.job`, `metrics.maturity`,
+/// `metrics.programme`, `metrics.reconcile`, `metrics.threshold_get`, `metrics.threshold_update`
+/// and `metrics.usage`.
+const EXPECTED: [&str; 480] = [
     "actions.describe",
     "actions.list",
     "analyse.site",
@@ -361,10 +362,14 @@ const EXPECTED: [&str; 476] = [
     "members.set_role",
     "memory.recall",
     "memory.remember",
+    "metrics.flow",
+    "metrics.job",
     "metrics.maturity",
     "metrics.programme",
+    "metrics.reconcile",
     "metrics.threshold_get",
     "metrics.threshold_update",
+    "metrics.usage",
     "messages.send",
     "model_elements.create",
     "model_elements.delete",
@@ -649,8 +654,8 @@ fn the_registry_is_exactly_the_declared_set() {
     // catalogue, and the probe's destination is configuration, not a declared action.
     // #385 adds `architecture.maturity_list`, `architecture.skills_list` and
     // `architecture.board_list`, all internal reads: 451 -> 454; external stays 18.
-        // T11 (#84) adds four `metrics.*` actions, all internal: 454 -> 458; external stays 18.
-    assert_eq!((internal, external), (458, 18));
+    // T11 (#84) adds eight `metrics.*` actions, all internal: 454 -> 462; external stays 18.
+    assert_eq!((internal, external), (462, 18));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),

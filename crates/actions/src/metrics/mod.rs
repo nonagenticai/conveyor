@@ -12,7 +12,7 @@
 
 use std::collections::BTreeMap;
 
-use chrono::{DateTime, Duration, Utc};
+use chrono::{DateTime, Duration, NaiveDate, Utc};
 use conveyor_domain::metrics::{self as rules, MaturityLevel, Threshold};
 use conveyor_store as store;
 use schemars::JsonSchema;
@@ -21,6 +21,7 @@ use serde_json::Value;
 use sqlx::PgConnection;
 use uuid::Uuid;
 
+use crate::board::views::CardCreateIn;
 use crate::invoke::{ActionError, HandlerCtx};
 
 /// The default evidence window when a caller names none: the last 90 days.
@@ -512,4 +513,540 @@ fn reconciliation_verdict(
     billing_usd: f64,
 ) -> (rules::ReconciliationState, f64) {
     rules::reconcile(conveyor_usd, billing_usd)
+}
+
+// ── the metering levels (P1.2) ───────────────────────────────────────────────────────────
+
+/// `metrics.usage` — one metering level, recomputed from the ledgers.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct UsageIn {
+    /// `tenant | department | programme | project | job | run | step | call`.
+    pub level: String,
+    /// The row to scope to, where the level supports one.
+    pub id: Option<Uuid>,
+    pub since: Option<DateTime<Utc>>,
+    pub until: Option<DateTime<Utc>>,
+}
+
+/// One metering row.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct UsageRowOut {
+    pub key: String,
+    pub calls: i64,
+    pub tool_calls: i64,
+    pub tokens: i64,
+    pub cost_usd: f64,
+    pub tool_cost_usd: f64,
+    pub priced_calls: i64,
+    pub unpriced_calls: i64,
+    pub runs: i64,
+}
+
+/// The level's rows; the sum of the child level equals its parent.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct UsageOut {
+    pub level: String,
+    pub rows: Vec<UsageRowOut>,
+}
+
+#[crate::action(
+    name = "metrics.usage",
+    version = 1,
+    kind = "internal",
+    scopes = ["portfolio:read"],
+    idempotent = true,
+    timeout_ms = 30000,
+    effect = "read",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn metrics_usage(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: UsageIn,
+) -> Result<UsageOut, ActionError> {
+    let level = store::metrics::MeteringLevel::parse(&input.level).ok_or_else(|| {
+        ActionError::new(
+            422,
+            "unknown_metering_level",
+            format!(
+                "unknown level {:?}; expected tenant, department, programme, project, job, run, step or call",
+                input.level
+            ),
+        )
+    })?;
+    let (since, until) = window(input.since, input.until);
+    let rows =
+        store::metrics::usage_by_level_tx(&mut *tx, ctx.tenant, level, since, until, input.id)
+            .await
+            .map_err(|error| metrics_error(error, ctx.action))?;
+    Ok(UsageOut {
+        level: level.as_str().to_owned(),
+        rows: rows.into_iter().map(usage_row_out).collect(),
+    })
+}
+
+fn usage_row_out(row: store::metrics::UsageRow) -> UsageRowOut {
+    UsageRowOut {
+        key: row.key,
+        calls: row.calls,
+        tool_calls: row.tool_calls,
+        tokens: row.tokens,
+        cost_usd: row.cost_usd,
+        tool_cost_usd: row.tool_cost_usd,
+        priced_calls: row.priced_calls,
+        unpriced_calls: row.unpriced_calls,
+        runs: row.runs,
+    }
+}
+
+// ── flow (P1.1/P1.4) ────────────────────────────────────────────────────────────────────
+
+/// `metrics.flow` — the flow family over the board's own rows.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct FlowIn {
+    pub project_id: Option<Uuid>,
+    pub since: Option<DateTime<Utc>>,
+    pub until: Option<DateTime<Utc>>,
+}
+
+/// A figure whose source ledger does not exist yet: unavailable with the reason, never zero.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct UnavailableOut {
+    pub metric: String,
+    pub reason: String,
+}
+
+/// The flow metrics and the figures this slice cannot compute.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct FlowOut {
+    pub wip: i64,
+    pub throughput: i64,
+    pub lead_time_seconds: Option<f64>,
+    pub cycle_time_seconds: Option<f64>,
+    pub queue_time_seconds: Option<f64>,
+    pub block_time_seconds: Option<f64>,
+    pub flow_efficiency: Option<f64>,
+    pub unavailable: Vec<UnavailableOut>,
+}
+
+#[crate::action(
+    name = "metrics.flow",
+    version = 1,
+    kind = "internal",
+    scopes = ["portfolio:read"],
+    idempotent = true,
+    timeout_ms = 30000,
+    effect = "read",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn metrics_flow(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: FlowIn,
+) -> Result<FlowOut, ActionError> {
+    let (since, until) = window(input.since, input.until);
+    let flow = store::metrics::flow_tx(&mut *tx, ctx.tenant, input.project_id, since, until)
+        .await
+        .map_err(|error| metrics_error(error, ctx.action))?;
+    Ok(FlowOut {
+        wip: flow.wip,
+        throughput: flow.throughput,
+        lead_time_seconds: flow.lead_time_seconds,
+        cycle_time_seconds: flow.cycle_time_seconds,
+        queue_time_seconds: flow.queue_time_seconds,
+        block_time_seconds: flow.block_time_seconds,
+        flow_efficiency: flow.flow_efficiency,
+        unavailable: vec![
+            UnavailableOut {
+                metric: "knowledge.lesson_promotion_rate".to_owned(),
+                reason: "the lesson ledger (T8) is not in the schema".to_owned(),
+            },
+            UnavailableOut {
+                metric: "knowledge.pack_hit_rate".to_owned(),
+                reason: "no knowledge-retrieval ledger exists; inference_call records the prompt, not the pack hit".to_owned(),
+            },
+        ],
+    })
+}
+
+// ── the job and the run drill-down (P1.3) ───────────────────────────────────────────────
+
+/// `metrics.job` — the job's metering and, with a run id, its step/call drill-down.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct JobIn {
+    pub job_binding_id: Option<Uuid>,
+    pub run_id: Option<Uuid>,
+    pub since: Option<DateTime<Utc>>,
+    pub until: Option<DateTime<Utc>>,
+}
+
+/// One step's spend.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct StepOut {
+    pub step_id: Option<Uuid>,
+    pub action: Option<String>,
+    pub position: Option<i32>,
+    pub tokens: i64,
+    pub cost_usd: f64,
+    pub tool_cost_usd: f64,
+}
+
+/// One call at the drill-down grain.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct CallOut {
+    pub id: Uuid,
+    pub model: String,
+    pub tokens: i64,
+    pub cost_usd: Option<f64>,
+    pub created_at: DateTime<Utc>,
+}
+
+/// One tool call at the drill-down grain.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct ToolCallOut {
+    pub id: Uuid,
+    pub tool_key: String,
+    pub cost_usd: Option<f64>,
+    pub created_at: DateTime<Utc>,
+}
+
+/// The run total and the rows that sum to it.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct RunOut {
+    pub run_id: Uuid,
+    pub tokens: i64,
+    pub cost_usd: f64,
+    pub tool_cost_usd: f64,
+    pub steps: Vec<StepOut>,
+    pub calls: Vec<CallOut>,
+    pub tool_calls: Vec<ToolCallOut>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct JobOut {
+    pub levels: Vec<UsageRowOut>,
+    pub run: Option<RunOut>,
+}
+
+#[crate::action(
+    name = "metrics.job",
+    version = 1,
+    kind = "internal",
+    scopes = ["portfolio:read"],
+    idempotent = true,
+    timeout_ms = 30000,
+    effect = "read",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn metrics_job(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: JobIn,
+) -> Result<JobOut, ActionError> {
+    if input.job_binding_id.is_none() && input.run_id.is_none() {
+        return Err(ActionError::new(
+            422,
+            "missing_scope",
+            "name a job_binding_id or a run_id",
+        ));
+    }
+    let (since, until) = window(input.since, input.until);
+    let mut levels = Vec::new();
+    if let Some(job_binding_id) = input.job_binding_id {
+        levels = store::metrics::usage_by_level_tx(
+            &mut *tx,
+            ctx.tenant,
+            store::metrics::MeteringLevel::Job,
+            since,
+            until,
+            Some(job_binding_id),
+        )
+        .await
+        .map_err(|error| metrics_error(error, ctx.action))?
+        .into_iter()
+        .map(usage_row_out)
+        .collect();
+    }
+    let run = match input.run_id {
+        Some(run_id) => {
+            let drill = store::metrics::run_drilldown_tx(&mut *tx, ctx.tenant, run_id)
+                .await
+                .map_err(|error| metrics_error(error, ctx.action))?;
+            Some(RunOut {
+                run_id: drill.run_id,
+                tokens: drill.tokens,
+                cost_usd: drill.cost_usd,
+                tool_cost_usd: drill.tool_cost_usd,
+                steps: drill
+                    .steps
+                    .into_iter()
+                    .map(|step| StepOut {
+                        step_id: step.step_id,
+                        action: step.action,
+                        position: step.position,
+                        tokens: step.tokens,
+                        cost_usd: step.cost_usd,
+                        tool_cost_usd: step.tool_cost_usd,
+                    })
+                    .collect(),
+                calls: drill
+                    .calls
+                    .into_iter()
+                    .map(|call| CallOut {
+                        id: call.id,
+                        model: call.model,
+                        tokens: call.tokens,
+                        cost_usd: call.cost_usd,
+                        created_at: call.created_at,
+                    })
+                    .collect(),
+                tool_calls: drill
+                    .tool_calls
+                    .into_iter()
+                    .map(|call| ToolCallOut {
+                        id: call.id,
+                        tool_key: call.tool_key,
+                        cost_usd: call.cost_usd,
+                        created_at: call.created_at,
+                    })
+                    .collect(),
+            })
+        }
+        None => None,
+    };
+    Ok(JobOut { levels, run })
+}
+
+// ── the billing reconciliation (P2) ─────────────────────────────────────────────────────
+
+/// The `billing_service` client: a plain read of the overview, no auth (the action declares none).
+struct Billing {
+    base: String,
+    http: reqwest::Client,
+}
+
+impl Billing {
+    fn from_env() -> Option<Self> {
+        let base = crate::invoke::service_url("billing_service")?;
+        let timeout_ms = std::env::var("CONVEYOR_EXTERNAL_BILLING_SERVICE_TIMEOUT_MS")
+            .ok()
+            .and_then(|value| value.parse::<u64>().ok())
+            .unwrap_or(5_000)
+            .clamp(100, 60_000);
+        let http = reqwest::Client::builder()
+            .timeout(std::time::Duration::from_millis(timeout_ms))
+            .build()
+            .ok()?;
+        Some(Self {
+            base: base.trim_end_matches('/').to_owned(),
+            http,
+        })
+    }
+
+    async fn overview(&self, tenant: conveyor_domain::TenantId) -> Result<Value, String> {
+        let response = self
+            .http
+            .get(format!("{}/api/billing/overview", self.base))
+            .header("accept", "application/json")
+            .header("x-tenant-id", tenant.to_string())
+            .send()
+            .await
+            .map_err(|error| error.to_string())?;
+        let status = response.status();
+        if !status.is_success() {
+            return Err(format!("billing_service answered {status}"));
+        }
+        response
+            .json::<Value>()
+            .await
+            .map_err(|error| format!("billing_service body is not JSON: {error}"))
+    }
+}
+
+/// `metrics.reconcile` — the conveyor's metering against billing's roll-up for one period.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct ReconcileIn {
+    pub period_start: NaiveDate,
+    pub period_end: NaiveDate,
+    /// Where an incident card is opened when the totals differ.
+    pub board_id: Option<Uuid>,
+    pub list_id: Option<Uuid>,
+}
+
+/// The verdict and its figures. An unreachable billing service is `unavailable`, never a zero.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct ReconcileOut {
+    pub state: String,
+    pub conveyor_usd: Option<f64>,
+    pub billing_usd: Option<f64>,
+    pub delta_usd: Option<f64>,
+    pub incident_card_id: Option<Uuid>,
+    pub upstream_error: Option<String>,
+}
+
+#[crate::action(
+    name = "metrics.reconcile",
+    version = 1,
+    kind = "internal",
+    scopes = ["portfolio:write"],
+    idempotent = false,
+    timeout_ms = 60000,
+    effect = "write",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn metrics_reconcile(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: ReconcileIn,
+) -> Result<ReconcileOut, ActionError> {
+    if input.period_end < input.period_start {
+        return Err(ActionError::new(
+            422,
+            "invalid_period",
+            "period_end must be on or after period_start",
+        ));
+    }
+    let since = input
+        .period_start
+        .and_hms_opt(0, 0, 0)
+        .map(|value| value.and_utc())
+        .ok_or_else(ActionError::internal)?;
+    let until = (input.period_end + Duration::days(1))
+        .and_hms_opt(0, 0, 0)
+        .map(|value| value.and_utc())
+        .ok_or_else(ActionError::internal)?;
+    let conveyor_usd = store::metrics::conveyor_cost_tx(&mut *tx, ctx.tenant, since, until)
+        .await
+        .map_err(|error| metrics_error(error, ctx.action))?;
+    let Some(billing) = Billing::from_env() else {
+        return record_unavailable(
+            &mut *tx,
+            ctx,
+            input,
+            "billing_service is not configured (CONVEYOR_EXTERNAL_BILLING_SERVICE_URL)",
+        )
+        .await;
+    };
+    let billing_usd = match billing.overview(ctx.tenant).await {
+        Ok(value) => match value.get("total_usd").and_then(Value::as_f64) {
+            Some(total) if total.is_finite() => total,
+            _ => {
+                return record_unavailable(
+                    &mut *tx,
+                    ctx,
+                    input,
+                    "billing_service overview carries no finite total_usd",
+                )
+                .await;
+            }
+        },
+        Err(reason) => return record_unavailable(&mut *tx, ctx, input, &reason).await,
+    };
+    let (state, delta) = rules::reconcile(conveyor_usd, billing_usd);
+    let mut incident_card_id = None;
+    if state == rules::ReconciliationState::Difference {
+        let (Some(board_id), Some(list_id)) = (input.board_id, input.list_id) else {
+            return Err(ActionError::new(
+                422,
+                "incident_target_required",
+                format!(
+                    "the totals differ (conveyor {conveyor_usd}, billing {billing_usd}); name board_id and list_id so the incident card can be opened"
+                ),
+            ));
+        };
+        let name = format!(
+            "Billing reconciliation {}..{}",
+            input.period_start, input.period_end
+        );
+        let card = crate::board::cards::cards_create(
+            &mut *tx,
+            ctx.clone(),
+            CardCreateIn {
+                board_id,
+                list_id,
+                name,
+                description: Some(format!(
+                    "conveyor {conveyor_usd} vs billing {billing_usd}; delta {delta}"
+                )),
+                card_type_code: "incident".to_owned(),
+                due_at: None,
+                parent_card_id: None,
+                meta: Some(serde_json::json!({
+                    "period_start": input.period_start.to_string(),
+                    "period_end": input.period_end.to_string(),
+                    "conveyor_usd": conveyor_usd,
+                    "billing_usd": billing_usd,
+                    "delta_usd": delta,
+                })),
+            },
+        )
+        .await?
+        .value;
+        incident_card_id = Some(Uuid::parse_str(&card.id).map_err(|error| {
+            tracing::error!(%error, "metrics.reconcile: the incident card id is not a uuid");
+            ActionError::internal()
+        })?);
+    }
+    store::metrics::record_reconciliation_tx(
+        &mut *tx,
+        ctx.tenant,
+        store::metrics::NewReconciliation {
+            period_start: input.period_start,
+            period_end: input.period_end,
+            conveyor_usd: Some(conveyor_usd),
+            billing_usd: Some(billing_usd),
+            delta_usd: Some(delta),
+            state: state.as_str(),
+            upstream_error: None,
+            incident_card_id,
+            actor: Some(ctx.actor_id),
+        },
+    )
+    .await
+    .map_err(|error| metrics_error(error, ctx.action))?;
+    Ok(ReconcileOut {
+        state: state.as_str().to_owned(),
+        conveyor_usd: Some(conveyor_usd),
+        billing_usd: Some(billing_usd),
+        delta_usd: Some(delta),
+        incident_card_id,
+        upstream_error: None,
+    })
+}
+
+async fn record_unavailable(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: ReconcileIn,
+    reason: &str,
+) -> Result<ReconcileOut, ActionError> {
+    store::metrics::record_reconciliation_tx(
+        tx,
+        ctx.tenant,
+        store::metrics::NewReconciliation {
+            period_start: input.period_start,
+            period_end: input.period_end,
+            conveyor_usd: None,
+            billing_usd: None,
+            delta_usd: None,
+            state: rules::ReconciliationState::Unavailable.as_str(),
+            upstream_error: Some(reason),
+            incident_card_id: None,
+            actor: Some(ctx.actor_id),
+        },
+    )
+    .await
+    .map_err(|error| metrics_error(error, ctx.action))?;
+    Ok(ReconcileOut {
+        state: rules::ReconciliationState::Unavailable.as_str().to_owned(),
+        conveyor_usd: None,
+        billing_usd: None,
+        delta_usd: None,
+        incident_card_id: None,
+        upstream_error: Some(reason.to_owned()),
+    })
 }

@@ -6163,10 +6163,25 @@ fn spine_samples() -> Vec<Sample> {
             200,
         ),
         expecting(plain("metrics.maturity", json!({}), None), 200),
+        expecting(plain("metrics.flow", json!({}), None), 200),
+        expecting(
+            plain("metrics.usage", json!({"level": "tenant"}), None),
+            200,
+        ),
+        expecting(plain("metrics.job", json!({}), None), 422),
+        expecting(
+            plain(
+                "metrics.reconcile",
+                json!({"period_start": "2026-11-01", "period_end": "2026-11-01"}),
+                None,
+            ),
+            200,
+        ),
         {
             let mut sample = plain("metrics.programme", json!({}), None);
             sample.prepare = true;
-            sample.input = Box::new(|ctx: &Ctx| json!({"programme_id": ctx.pop("metrics.programme")}));
+            sample.input =
+                Box::new(|ctx: &Ctx| json!({"programme_id": ctx.pop("metrics.programme")}));
             expecting(sample, 200)
         },
         {

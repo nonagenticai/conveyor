@@ -225,10 +225,11 @@ async fn metric_thresholds_are_tenant_isolated() {
 
     let tenant_a = TenantId::from_uuid(a.tenant).expect("non-nil");
     let mut tx = begin_scoped(&db.runtime, tenant_a).await.expect("scope A");
-    let levels: Vec<String> = sqlx::query_scalar("SELECT level FROM metric_threshold ORDER BY level")
-        .fetch_all(&mut *tx)
-        .await
-        .expect("read A");
+    let levels: Vec<String> =
+        sqlx::query_scalar("SELECT level FROM metric_threshold ORDER BY level")
+            .fetch_all(&mut *tx)
+            .await
+            .expect("read A");
     assert_eq!(levels, vec!["C0"], "A sees only its own threshold");
 
     // A forged write under A's scope fails the policy's WITH CHECK.
@@ -242,8 +243,16 @@ async fn metric_thresholds_are_tenant_isolated() {
     assert!(forged.is_err(), "a forged tenant_id must be refused");
     tx.rollback().await.expect("roll back");
 
-    let n = count(&db.owner, "SELECT count(*) FROM metric_threshold".to_owned()).await;
+    let n = count(
+        &db.owner,
+        "SELECT count(*) FROM metric_threshold".to_owned(),
+    )
+    .await;
     assert_eq!(n, 0, "the owner without a scope sees nothing (FORCE RLS)");
-    let n = count(&db.super_pool, "SELECT count(*) FROM metric_threshold".to_owned()).await;
+    let n = count(
+        &db.super_pool,
+        "SELECT count(*) FROM metric_threshold".to_owned(),
+    )
+    .await;
     assert_eq!(n, 2, "the superuser sees both rows");
 }

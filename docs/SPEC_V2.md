@@ -1210,7 +1210,7 @@ in §11.8.
 | production | `produce.brief`, `produce.script`, `produce.asset`, `produce.speech`, `produce.render`, `produce.still`, `produce.deck`, `produce.qc`, `produce.publish_youtube` |
 | tools | `tools.list\|get\|probe\|call\|publish\|retire`, `toolkits.import_openapi\|publish\|list`, `tool_bindings.create\|update\|retire`, `tool_calls.list`, `tool_authoring.draft\|validate\|test\|review` (§11.8) |
 | memory | `lessons.propose\|review\|promote` |
-| metrics | `metrics.flow`, `metrics.job`, `metrics.programme`, `metrics.maturity`, `metrics.threshold_get`, `metrics.threshold_update` (the C0–C5 threshold configuration, D50) |
+| metrics | `metrics.flow`, `metrics.job`, `metrics.usage`, `metrics.programme`, `metrics.maturity`, `metrics.reconcile`, `metrics.threshold_get`, `metrics.threshold_update` (the metering levels, the billing reconciliation and the C0–C5 threshold configuration, D50/D52) |
 
 Every action is an `ActionSpec` (V1 §5.5): one declaration → HTTP + MCP + OpenAPI + generated client.
 

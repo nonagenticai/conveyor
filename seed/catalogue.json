@@ -1838,6 +1838,25 @@
         ],
         "human_task": false
       }
+    },
+    {
+      "code": "incident",
+      "label": "Incident",
+      "definition": {
+        "rules": [
+          "an incident is opened from a detected failure or difference; it is not a planning card"
+        ],
+        "inputs": [],
+        "outputs": [
+          "incident_resolution"
+        ],
+        "acceptance": [
+          "READY: service_severity_and_timestamps_recorded",
+          "DOING: mitigation_after_a_dry_run",
+          "QA: resolution_cites_its_evidence"
+        ],
+        "human_task": false
+      }
     }
   ],
   "entries": [
@@ -3965,16 +3984,30 @@
       "code": "architecture",
       "label": "Architecture",
       "meta": {
-        "description": "TOGAF ADM project: Preliminary and A–H as WBS phase nodes, a typed artefact repository, contracts and compliance reviews (T9). Its phases are the ADM's, not catalogue process phases, so meta.phases stays empty and no process map is derived.",
+        "description": "TOGAF ADM project: Preliminary and A\u2013H as WBS phase nodes, a typed artefact repository, contracts and compliance reviews (T9). Its phases are the ADM's, not catalogue process phases, so meta.phases stays empty and no process map is derived.",
         "phases": [],
         "card_types": [],
         "matrix": {
           "project_start_request_analysis": {
-            "intake": ["active", "archive"],
-            "active": ["waiting", "done", "archive"],
-            "waiting": ["active", "archive"],
-            "done": ["archive"],
-            "archive": ["intake"]
+            "intake": [
+              "active",
+              "archive"
+            ],
+            "active": [
+              "waiting",
+              "done",
+              "archive"
+            ],
+            "waiting": [
+              "active",
+              "archive"
+            ],
+            "done": [
+              "archive"
+            ],
+            "archive": [
+              "intake"
+            ]
           }
         }
       },
@@ -3984,7 +4017,7 @@
     {
       "kind": "project_type",
       "code": "py2rust",
-      "label": "Python → Rust rewrite",
+      "label": "Python \u2192 Rust rewrite",
       "meta": {
         "description": "A rewrite of one or more Python source repositories, pinned to SHAs, into one Rust service: plan the slices, port them, prove parity with the sources, and collect the cutover evidence (py2rust RS-D1..RS-D6, George 2026-11-03).",
         "phases": [
