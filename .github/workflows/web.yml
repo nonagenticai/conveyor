@@ -43,9 +43,6 @@ jobs:
       # The designed test double for the object store (#370): eval-interop needs it and no
       # bucket is provisioned on a GitHub runner.
       CONVEYOR_S3_BACKEND: memory
-      # The image bakes the Leptos bundle at /srv/site; on a runner the job assembles the same
-      # tree under $RUNNER_TEMP and the server serves it from here (crates/api/src/web.rs).
-      CONVEYOR_WEB_ROOT: ${{ runner.temp }}/site
       PG_IMAGE: postgres:18
       REDIS_IMAGE: library/redis:8.10.1-alpine
       DATABASE_URL: postgres://conveyor_runtime:conveyor_runtime_dev@127.0.0.1:55432/conveyor_e2e
@@ -128,6 +125,10 @@ jobs:
       - name: start serve, worker and the provider double
         run: |
           set -euo pipefail
+          # The image bakes the Leptos bundle at /srv/site; here the site root assembled above is
+          # what the server serves (crates/api/src/web.rs). The `runner` context is not available
+          # in job-level env, which is why this export lives in the step.
+          export CONVEYOR_WEB_ROOT="$RUNNER_TEMP/site"
           nohup ./target/debug/conveyor serve > /tmp/conveyor-serve.log 2>&1 &
           nohup ./target/debug/conveyor worker > /tmp/conveyor-worker.log 2>&1 &
           nohup node apps/web/e2e/model-stub.mjs > /tmp/model-stub.log 2>&1 &
