@@ -19,12 +19,15 @@
 -- ── 1. procedure — the derived SOP names its source and its knowledge pack ────────────────
 ALTER TABLE procedure
     ADD COLUMN source_asset_id   uuid REFERENCES governed_asset (id),
-    ADD COLUMN knowledge_pack_ref text NOT NULL DEFAULT '';
+    ADD COLUMN knowledge_pack_ref text NOT NULL DEFAULT '',
+    ADD COLUMN approval_id       uuid REFERENCES approval (id);
 
 COMMENT ON COLUMN procedure.source_asset_id IS
     'The governed_asset(kind=''sop_source'') this SOP was converted from; NULL for a hand-authored SOP (T16, #85).';
 COMMENT ON COLUMN procedure.knowledge_pack_ref IS
     'The paired strata knowledge pack (`<store_id>/<job_id>`), when the conversion produced one (T16, #85).';
+COMMENT ON COLUMN procedure.approval_id IS
+    'The approved publication gate that released this derived SOP; set by procedures.publish (T16, #85).';
 
 -- ── 2. process — the executable derived from the source ───────────────────────────────────
 -- `pddl_domain` is the domain text the converter produced (the human-readable contract);

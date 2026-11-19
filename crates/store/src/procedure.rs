@@ -61,7 +61,7 @@ pub enum SopStoreError {
 /// cursor the caller cannot derive from the rows it was handed is not a cursor.
 const COLUMNS: &str = "id, key, title, description, status, version, lock_version, \
     definition_of_ready, definition_of_done, acceptance_criteria, inspection, outputs, \
-    source_asset_id, knowledge_pack_ref, action_text, created_at, updated_at";
+    source_asset_id, knowledge_pack_ref, action_text, approval_id, created_at, updated_at";
 
 /// A procedure row as stored.
 #[derive(Clone, Debug)]
@@ -95,6 +95,8 @@ pub struct SopRecord {
     pub knowledge_pack_ref: String,
     /// The SOP's own PDDL action text (0058), when the converter produced one (T16).
     pub action_text: Option<String>,
+    /// The approved publication gate that released this derived SOP (T16).
+    pub approval_id: Option<Uuid>,
     /// The declared user-facing outputs.
     pub outputs: Value,
     /// Creation time.
@@ -120,6 +122,7 @@ struct SopRow {
     source_asset_id: Option<Uuid>,
     knowledge_pack_ref: String,
     action_text: Option<String>,
+    approval_id: Option<Uuid>,
     created_at: DateTime<Utc>,
     updated_at: DateTime<Utc>,
 }
@@ -142,6 +145,7 @@ impl From<SopRow> for SopRecord {
             source_asset_id: row.source_asset_id,
             knowledge_pack_ref: row.knowledge_pack_ref,
             action_text: row.action_text,
+            approval_id: row.approval_id,
             created_at: row.created_at,
             updated_at: row.updated_at,
         }
@@ -173,6 +177,25 @@ pub struct NewSop {
     pub knowledge_pack_ref: String,
     /// The SOP's own PDDL action text (T16); `None` for a hand-authored SOP.
     pub action_text: Option<String>,
+}
+
+/// Record the approved publication gate on the derived SOP it released (T16 P2.2).
+pub async fn set_procedure_approval_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    id: Uuid,
+    approval_id: Uuid,
+) -> Result<(), SopStoreError> {
+    sqlx::query(
+        "UPDATE procedure SET approval_id = $3, updated_at = now()
+          WHERE tenant_id = $1 AND id = $2",
+    )
+    .bind(tenant.as_uuid())
+    .bind(id)
+    .bind(approval_id)
+    .execute(&mut *conn)
+    .await?;
+    Ok(())
 }
 
 /// A partial edit of a draft; `None` leaves the column as it is.

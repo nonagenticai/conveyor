@@ -264,10 +264,34 @@ async fn procedures_publish(
         ));
     }
     super::require_source_reviewed_tx(&mut *tx, ctx.tenant, current.source_asset_id).await?;
+    // T16 P2: a CONVERTED SOP judge is an SOP-derived artefact, so it passes the same human gate
+    // the executable does. A hand-authored SOP keeps the ordinary publish path.
+    let approval = if current.source_asset_id.is_some() {
+        crate::control::approvals::require_human_gate_tx(
+            &mut *tx,
+            &ctx,
+            "procedures.publish",
+            current.id,
+        )
+        .await?
+    } else {
+        None
+    };
     validated(&current)?;
     let published = store::procedure::publish_tx(&mut *tx, ctx.tenant, current.id)
         .await
         .map_err(|error| procedure_error(error, "procedures.publish"))?;
+    if let Some(approval_id) = approval {
+        // The gate is recorded in the transaction that released the version.
+        store::procedure::set_procedure_approval_tx(
+            &mut *tx,
+            ctx.tenant,
+            published.id,
+            approval_id,
+        )
+        .await
+        .map_err(|error| procedure_error(error, "procedures.publish"))?;
+    }
     emit_procedure_event(&mut *tx, &ctx, PROCEDURE_PUBLISHED, &published).await?;
     Ok(HandlerOutput::ok(procedure_out(&published)).with_etag(etag_of(published.lock_version)))
 }

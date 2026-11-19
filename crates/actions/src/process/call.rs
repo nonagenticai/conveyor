@@ -260,6 +260,10 @@ async fn start_in_tx(
                 // A process `call` step starts from a `process_step`; the workflow kind is for a
                 // workflow parent's procedure node (0037).
                 workflow_step_id: None,
+                // A child run inherits nothing from an organisation binding (T16): the parent's
+                // pin is the parent's, and a child's executor is its own process.
+                job_binding_id: None,
+                release_hash: None,
             },
         )
         .await

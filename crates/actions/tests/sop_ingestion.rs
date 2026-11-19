@@ -186,16 +186,16 @@ async fn review_source(running: &support::Running, asset_id: &str) -> (u16, Valu
         .await
 }
 
-/// Request and decide the publication gate the way a tenant does: alice asks, the reviewer decides.
-async fn publish_gate(running: &support::Running, process_id: &str) -> uuid::Uuid {
+/// Request and decide one publication gate the way a tenant does: alice asks, the reviewer decides.
+async fn gate_for(running: &support::Running, gate: &str, target: &str) -> uuid::Uuid {
     let (status, requested) = running
         .invoke(
             "approvals.request",
             TOKEN,
             json!({
-                "gate": "processes.publish",
+                "gate": gate,
                 "kind": "publication",
-                "target": process_id,
+                "target": target,
                 "description": "Release the derived procedure",
             }),
             None,
@@ -219,16 +219,22 @@ async fn publish_gate(running: &support::Running, process_id: &str) -> uuid::Uui
     uuid::Uuid::parse_str(&approval_id).expect("approval id")
 }
 
-/// Publish the derived SOP judge (the executable's steps are judged against it).
+/// The executable's gate.
+async fn publish_gate(running: &support::Running, process_id: &str) -> uuid::Uuid {
+    gate_for(running, "processes.publish", process_id).await
+}
+
+/// Publish the derived SOP judge behind its own gate (T16: a converted SOP is an SOP-derived
+/// artefact, so it passes the same human gate before the executable's steps can name it).
 async fn publish_judge(running: &support::Running, procedure_id: &str) {
+    let approval = gate_for(running, "procedures.publish", procedure_id).await;
     let (status, body) = running
-        .invoke(
+        .invoke_approved(
             "procedures.publish",
             TOKEN,
             json!({"procedure_id": procedure_id}),
             None,
-            None,
-            None,
+            approval,
         )
         .await;
     assert_eq!(status, 200, "{body}");
@@ -242,8 +248,10 @@ async fn a_pdf_sop_becomes_a_pddl_procedure_draft() {
     let (pg, _seeded, running) = fixture().await;
     let (base, draft_content) = stub_inference().await;
     support::set_env("CONVEYOR_EXTERNAL_INFERENCE_URL", &base);
-    // The real fixture path: a PDF carried as base64, exactly what a browser upload sends.
-    let pdf = std::fs::read("tests/fixtures/t16/sop.txt").expect("the SOP fixture");
+    // The real fixture path: a PDF carried as base64, exactly what a browser upload sends. The
+    // bytes are a minimal synthetic PDF — the content is the model's to read, and the stub
+    // answers the draft, so the fixture's job is to be a well-formed upload of the declared type.
+    let pdf: &[u8] = b"%PDF-1.4\n1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj\n2 0 obj<</Type/Pages/Count 0/Kids []>>endobj\ntrailer<</Root 1 0 R>>\n%%EOF\n";
     draft_content.lock().await.clone_from(&receiving_draft());
 
     let (status, body) = running
@@ -258,7 +266,7 @@ async fn a_pdf_sop_becomes_a_pddl_procedure_draft() {
                     "kind": "pdf",
                     "media_type": "application/pdf",
                     "filename": "receiving.pdf",
-                    "content_base64": b64(&pdf),
+                    "content_base64": b64(pdf),
                 },
             }),
             None,
@@ -506,9 +514,29 @@ async fn the_drafting_job_cannot_publish_its_own_procedure() {
         .await;
     assert_eq!(status, 201, "{body}");
     let process_id = field(&body, "process_id").to_owned();
+    let procedure_id = field(&body, "procedure_id").to_owned();
     let asset_id = field(&body, "source_asset_id").to_owned();
     let (status, body) = review_source(&running, &asset_id).await;
     assert_eq!(status, 200, "{body}");
+
+    // The converted SOP judge is SOP-derived too: its own publish needs a human gate, and the
+    // ingesting actor cannot supply one to itself.
+    let (status, body) = running
+        .invoke(
+            "procedures.publish",
+            TOKEN,
+            json!({"procedure_id": procedure_id}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 403, "{body}");
+    assert_eq!(
+        body["type"].as_str().unwrap_or_default(),
+        "approval_required",
+        "{body}"
+    );
 
     // The drafting caller (alice) attempts publication with no gate: refused, still a draft.
     let (status, body) = running
@@ -716,19 +744,114 @@ fn board_active_lane(board: &Value) -> Option<String> {
     None
 }
 
-async fn start_run(running: &support::Running, card_id: &str, key: &str) -> String {
+async fn start_run(
+    running: &support::Running,
+    card_id: &str,
+    key: &str,
+    binding: Option<(&str, &str)>,
+) -> (u16, Value) {
+    let mut input = json!({"card_id": card_id, "process_key": key, "inputs": {}});
+    if let Some((binding_id, release_hash)) = binding {
+        input["job_binding_id"] = json!(binding_id);
+        input["release_hash"] = json!(release_hash);
+    }
     let (status, _headers, body) = running
         .invoke_full(
             "process_runs.start",
             TOKEN,
-            json!({"card_id": card_id, "process_key": key, "inputs": {}}),
+            input,
             None,
-            Some(&format!("t16-{key}-start")),
+            // No idempotency key: two starts in one test are two different attempts, and a
+            // replayed key would return the first run instead of exercising the binding.
+            None,
             None,
         )
         .await;
-    assert_eq!(status, 201, "{body}");
-    field(&body, "id").to_owned()
+    (status, body)
+}
+
+/// A job, its release and a `procedure` binding pinned to `process_id`.
+/// Returns `(binding_id, release_hash, binding_version)`.
+async fn bind_process(
+    running: &support::Running,
+    process_id: &str,
+    tag: &str,
+) -> (String, String, i64) {
+    let (status, industry) = running
+        .invoke(
+            "industries.create",
+            TOKEN,
+            json!({"key": format!("logi-{tag}"), "name": format!("Logistics {tag}")}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert!(status == 200 || status == 201, "{industry}");
+    let industry_id = field(&industry, "id").to_owned();
+    let (status, department) = running
+        .invoke(
+            "departments.create",
+            TOKEN,
+            json!({"name": format!("Receiving {tag}"), "industry_id": industry_id, "ordinal": 1, "is_primary": true}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert!(status == 200 || status == 201, "{department}");
+    let department_id = field(&department, "id").to_owned();
+    let (status, job) = running
+        .invoke(
+            "job_catalogue.create",
+            TOKEN,
+            json!({
+                "job_key": format!("job_{tag}"),
+                "industry_id": industry_id,
+                "family": "operations",
+                "title": format!("Job {tag}"),
+                "departments": [{"department_id": department_id, "ordinal": 1, "is_primary": true}],
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert!(status == 200 || status == 201, "{job}");
+    let job_id = field(&job, "id").to_owned();
+    let (status, release) = running
+        .invoke(
+            "job_releases.publish",
+            TOKEN,
+            json!({"job_id": job_id}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert!(status == 200 || status == 201, "{release}");
+    let release_id = field(&release, "id").to_owned();
+    let (status, binding) = running
+        .invoke(
+            "job_bindings.create",
+            TOKEN,
+            json!({
+                "job_id": job_id,
+                "release_id": release_id,
+                "executor_kind": "procedure",
+                "process_id": process_id,
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert!(status == 200 || status == 201, "{binding}");
+    (
+        field(&binding, "id").to_owned(),
+        field(&binding, "release_hash").to_owned(),
+        output(&binding)["version"].as_i64().unwrap_or(1),
+    )
 }
 
 /// Drive the run's steps exactly as the worker does: one `process.step` execution per position.
@@ -750,9 +873,32 @@ async fn drive_steps(pg: &support::Pg, seeded: &support::Seeded, run_id: &str, p
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn a_bound_job_runs_the_pddl_steps() {
     let (pg, seeded, running) = fixture().await;
-    let (_process_id, card_id) =
+    let (process_id, card_id) =
         published_pddl_process(&running, "pddl-run", &["stock_verified"], "stock_verified").await;
-    let run_id = start_run(&running, &card_id, "pddl-run").await;
+    // The scenario's Given: a job binding pinned to the published procedure.
+    let (binding_id, release_hash, binding_version) =
+        bind_process(&running, &process_id, "run").await;
+    let (status, body) = start_run(
+        &running,
+        &card_id,
+        "pddl-run",
+        Some((&binding_id, &release_hash)),
+    )
+    .await;
+    assert_eq!(status, 201, "{body}");
+    let run_id = field(&body, "id").to_owned();
+    // The run records the binding and the release it resolved.
+    let pinned: (Option<uuid::Uuid>, Option<String>) =
+        sqlx::query_as("SELECT job_binding_id, release_hash FROM run WHERE id = $1")
+            .bind(uuid::Uuid::parse_str(&run_id).expect("run id"))
+            .fetch_one(&pg.super_pool)
+            .await
+            .expect("the run's binding pin");
+    assert_eq!(
+        pinned.0,
+        Some(uuid::Uuid::parse_str(&binding_id).expect("binding id"))
+    );
+    assert_eq!(pinned.1.as_deref(), Some(release_hash.as_str()));
     drive_steps(&pg, &seeded, &run_id, &[1, 2]).await;
 
     // Every step is recorded with the fact state either side of it, in position order.
@@ -778,6 +924,33 @@ async fn a_bound_job_runs_the_pddl_steps() {
         .await
         .expect("the run row");
     assert_eq!(run_status, "succeeded");
+
+    // A retired binding can never start another run (SPEC_V2 §4.4): the store resolves the pin
+    // before the INSERT and refuses `409 job_binding_stale`.
+    let (status, retired) = running
+        .invoke(
+            "job_bindings.retire",
+            TOKEN,
+            json!({"id": binding_id, "version": binding_version}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{retired}");
+    let (status, body) = start_run(
+        &running,
+        &card_id,
+        "pddl-run",
+        Some((&binding_id, &release_hash)),
+    )
+    .await;
+    assert_eq!(status, 409, "{body}");
+    assert_eq!(
+        body["type"].as_str().unwrap_or_default(),
+        "job_binding_stale",
+        "{body}"
+    );
 }
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
@@ -787,7 +960,9 @@ async fn a_false_precondition_stops_the_run() {
     // stop at position 2 and never record position 3 (there is none) nor apply the effect.
     let (_process_id, card_id) =
         published_pddl_process(&running, "pddl-stop", &["dock_cleared"], "stock_verified").await;
-    let run_id = start_run(&running, &card_id, "pddl-stop").await;
+    let (status, body) = start_run(&running, &card_id, "pddl-stop", None).await;
+    assert_eq!(status, 201, "{body}");
+    let run_id = field(&body, "id").to_owned();
     drive_steps(&pg, &seeded, &run_id, &[1]).await;
     // Position 2 fails deterministically; `execute_step` returns the failure to its caller (the
     // job), so the test asserts the recorded row rather than the returned error.
@@ -882,7 +1057,10 @@ async fn an_unreviewed_source_cannot_bind() {
         "{body}"
     );
 
-    // A binding cannot name the draft version at all.
+    // A binding cannot name the draft version at all — and a derived process is a draft for as
+    // long as its source is unreviewed, so an unreviewed source's procedure can never be bound.
+    // (The binding's own `source.unapproved` branch in the handler is defence in depth: a
+    // published derived process always has an approved source, so no public path reaches it.)
     let (status, body) = running
         .invoke(
             "job_bindings.create",

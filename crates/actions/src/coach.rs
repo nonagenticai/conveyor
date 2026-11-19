@@ -508,6 +508,8 @@ async fn coach_interrupt(
             parent_run_id: None,
             step_id: None,
             workflow_step_id: None,
+            job_binding_id: None,
+            release_hash: None,
         },
     )
     .await?;
@@ -780,6 +782,8 @@ async fn coach_remedy(
                 parent_run_id: None,
                 step_id: None,
                 workflow_step_id: None,
+                job_binding_id: None,
+                release_hash: None,
             },
         )
         .await?;

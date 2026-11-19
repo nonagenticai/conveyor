@@ -324,6 +324,8 @@ pub(crate) async fn insert_start_card_and_run(
             parent_run_id: None,
             step_id: None,
             workflow_step_id: None,
+            job_binding_id: None,
+            release_hash: None,
         },
     )
     .await

@@ -123,15 +123,38 @@ async fn publish_derived(
         .await;
     assert_eq!(status, 200, "{body}");
     // The judge must be published before the executable: every step names the SOP it is judged
-    // against, and publish refuses a step whose judge is still a draft.
-    let (status, body) = running
+    // against, and publish refuses a step whose judge is still a draft. The judge is SOP-derived,
+    // so it passes its own human gate.
+    let (status, requested) = running
         .invoke(
+            "approvals.request",
+            TOKEN,
+            json!({"gate": "procedures.publish", "kind": "publication", "target": procedure_id}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{requested}");
+    let judge_approval = field(&requested, "id").to_owned();
+    let (status, decided) = running
+        .invoke(
+            "approvals.decide",
+            REVIEWER,
+            json!({"approval_id": judge_approval, "decision": "approve"}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{decided}");
+    let (status, body) = running
+        .invoke_approved(
             "procedures.publish",
             TOKEN,
             json!({"procedure_id": procedure_id}),
             None,
-            None,
-            None,
+            uuid::Uuid::parse_str(&judge_approval).expect("approval id"),
         )
         .await;
     assert_eq!(status, 200, "{body}");
