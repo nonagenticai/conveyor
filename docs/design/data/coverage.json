@@ -1,131 +1,139 @@
 {
   "actions_invoked": [
     {
-      "line": 1237,
+      "line": 1330,
       "name": "approvals.decide"
     },
     {
-      "line": 189,
+      "line": 1230,
+      "name": "architecture.artifacts_entries"
+    },
+    {
+      "line": 1231,
+      "name": "architecture.artifacts_links"
+    },
+    {
+      "line": 204,
       "name": "card_types.list"
     },
     {
-      "line": 378,
+      "line": 393,
       "name": "cards.claim"
     },
     {
-      "line": 362,
+      "line": 377,
       "name": "cards.comment"
     },
     {
-      "line": 310,
+      "line": 325,
       "name": "cards.create"
     },
     {
-      "line": 339,
+      "line": 354,
       "name": "cards.move"
     },
     {
-      "line": 393,
+      "line": 408,
       "name": "cards.release"
     },
     {
-      "line": 2420,
+      "line": 2513,
       "name": "documents.compose"
     },
     {
-      "line": 2907,
+      "line": 3000,
       "name": "documents.compose"
     },
     {
-      "line": 2702,
+      "line": 2795,
       "name": "documents.create"
     },
     {
-      "line": 2773,
+      "line": 2866,
       "name": "documents.delete"
     },
     {
-      "line": 2719,
+      "line": 2812,
       "name": "documents.download"
     },
     {
-      "line": 2752,
+      "line": 2845,
       "name": "documents.download"
     },
     {
-      "line": 2442,
+      "line": 2535,
       "name": "documents.get"
     },
     {
-      "line": 2737,
+      "line": 2830,
       "name": "documents.get"
     },
     {
-      "line": 1074,
+      "line": 1089,
       "name": "documents.list"
     },
     {
-      "line": 1097,
+      "line": 1112,
       "name": "documents.list"
     },
     {
-      "line": 1124,
+      "line": 1139,
       "name": "documents.list"
     },
     {
-      "line": 2670,
+      "line": 2763,
       "name": "documents.list"
     },
     {
-      "line": 2804,
+      "line": 2897,
       "name": "documents.preview"
     },
     {
-      "line": 2850,
+      "line": 2943,
       "name": "documents.return"
     },
     {
-      "line": 2591,
+      "line": 2684,
       "name": "documents.revision_get"
     },
     {
-      "line": 2552,
+      "line": 2645,
       "name": "documents.revision_list"
     },
     {
-      "line": 1260,
+      "line": 1353,
       "name": "process_runs.start"
     },
     {
-      "line": 180,
+      "line": 195,
       "name": "programmes.list"
     },
     {
-      "line": 655,
+      "line": 670,
       "name": "programmes.list"
     },
     {
-      "line": 2351,
+      "line": 2444,
       "name": "projects.close"
     },
     {
-      "line": 2234,
+      "line": 2327,
       "name": "projects.create"
     },
     {
-      "line": 2242,
+      "line": 2335,
       "name": "projects.update"
     },
     {
-      "line": 1210,
+      "line": 1303,
       "name": "runs.cancel"
     },
     {
-      "line": 1188,
+      "line": 1281,
       "name": "runs.get"
     },
     {
-      "line": 1165,
+      "line": 1258,
       "name": "runs.list"
     }
   ],
@@ -2212,8 +2220,8 @@
       "key": "T9",
       "measured": {
         "actions": [
-          26,
-          26
+          29,
+          29
         ],
         "modules": [
           1,
@@ -2255,9 +2263,9 @@
       "evidence": [
         "docs/design/v2.js"
       ],
-      "gap": "design study; the ADM rows and actions are T9",
+      "gap": null,
       "key": "adm",
-      "status": "proposed",
+      "status": "live",
       "title": "Architecture capability"
     },
     {
@@ -2503,12 +2511,12 @@
       "without_open_units": 24
     },
     "screens": {
-      "actions_invoked": 25,
+      "actions_invoked": 27,
       "by_status": {
         "legacy": 7,
-        "live": 10,
+        "live": 11,
         "mixed": 1,
-        "proposed": 8
+        "proposed": 7
       },
       "total": 26
     }

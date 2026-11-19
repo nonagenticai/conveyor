@@ -1,7 +1,7 @@
 {
   "version": 1,
   "operations": {
-    "GET /api/actions": "486630f535cb05a4944e13b4cda817de165782c733831866c8510b1f0b03e6cb",
+    "GET /api/actions": "b0a271a744ed4d1c6fbda8e20e38767786aed12ada4ec5cc6f11edf60cd50ac2",
     "GET /api/boards/{id}": "e1a5ad504ea61c9f6f4c9940f6bce0a13a06587c4545d9d52616852f0e67fa5b",
     "GET /api/boards/{id}/cards": "be3ca9f8fea011aa8b097206310d24ba4641698d2a8d239c5b2df6c48b784502",
     "GET /api/boards/{id}/webhooks": "5b77b802ff044156108b56072acb99bed0e2f9dfb5f2dc667b000af191cffd1b",
@@ -47,6 +47,7 @@
     "POST /api/actions/architecture.artifacts_update/invocations": "ddb0141a299a2f2e1c0a21321960e7c9fc60e5542e9c2a7f272321917ae24f37",
     "POST /api/actions/architecture.board_decide/invocations": "33d1b31fec1f18537bfd289af3f0a0c98ecd64d34a4669fc245d2db8166ad940",
     "POST /api/actions/architecture.board_get/invocations": "757b24f7f58f408e63045d27ca81b263cb2ab5756f610c476b5210ab2c23d5b0",
+    "POST /api/actions/architecture.board_list/invocations": "18cc15237d6de47711a99ad54406a487694c84ad26b5e467bd1194615009c05e",
     "POST /api/actions/architecture.board_open/invocations": "32d5f7ebbf260ae63064a23d6c8ad53bb157f757f7d229e031435954c32dbfc9",
     "POST /api/actions/architecture.contracts_approve/invocations": "90d1d8d3c7dec456dff1cb8be53ec098593599a2a6dca7eaa6b8f9f3fbdba0ed",
     "POST /api/actions/architecture.contracts_get/invocations": "d3ef4c500eda77f583712960458b25015b2fbc5cfdcac3888fc2d9f7c9071046",
@@ -54,6 +55,7 @@
     "POST /api/actions/architecture.contracts_request/invocations": "8dd12f726453adcc344daccb1e51cc91f554356ac5e49e9bfd913939429b219c",
     "POST /api/actions/architecture.contracts_supersede/invocations": "0c3d910c3e55717e19a2d07cfb2cc7268b8242c07b382cedd019c7fd443e4edf",
     "POST /api/actions/architecture.maturity_assess/invocations": "e507464411c5cd7576200255c2220b9da97d818324113defe87653f97564487e",
+    "POST /api/actions/architecture.maturity_list/invocations": "8afac81d5d14fb05b5c3abd6f11653337e45946f171fe8f28723ac99ee9132fb",
     "POST /api/actions/architecture.maturity_plan/invocations": "037a23588c60981f2a99780c0c1bc3bd5d66cee02030be711580911e86c8264c",
     "POST /api/actions/architecture.phases_advance/invocations": "cd0d51a8fe81f42386afd0090c5d91290306a50cece7ddea2f417a8f25f6f125",
     "POST /api/actions/architecture.profile_get/invocations": "f66e6cb4a385a31750fa79789049206f9c734817f1879b1474cb103070650007",
@@ -62,6 +64,7 @@
     "POST /api/actions/architecture.reviews_record/invocations": "a36c2d3bffe3b8c8298a9082d5757feaceaa748dcd36d7925ece68e755113efd",
     "POST /api/actions/architecture.reviews_waive/invocations": "d8182ef4a3af8db0eacb932c5d188cbabbd6d83c9db14ed6cce8bd0073257b72",
     "POST /api/actions/architecture.skills_assess/invocations": "27c9e6ea637405beaefe71d1c417d09b7c42221343c33db34219ba760432e178",
+    "POST /api/actions/architecture.skills_list/invocations": "147b68c35995aa374c78743ae8bb298d6b4f10988b66f18b67565b67e1b7747c",
     "POST /api/actions/artifacts.list/invocations": "5ffda7fcfc8e1707666f42e3189d50760a2bec7589878fa599d7d92e116d2cf7",
     "POST /api/actions/audit.list/invocations": "f08fd6574e6ac314263b6df0fc843699fde6a4eebf9f761c84548d908c755c06",
     "POST /api/actions/baselines.get/invocations": "9e523e441feff165c6a712bed78c339b802c84091fe21b48d745f067b64d5005",
