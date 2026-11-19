@@ -1,11 +1,11 @@
 {
   "issues": [
     {
-      "number": 422,
-      "title": "estate_toolkits: the in-flight test is a wall-clock race (CI run 135513313257)",
+      "number": 427,
+      "title": "coverage: T11 still measures as proposed, so every registry refresh is born red",
       "state": "OPEN",
-      "url": "https://github.com/nonagenticai/conveyor/issues/422",
-      "updatedAt": "2026-11-19T12:48:08Z",
+      "url": "https://github.com/nonagenticai/conveyor/issues/427",
+      "updatedAt": "2026-11-19T14:34:37Z",
       "labels": [
         {
           "name": "unit",
@@ -14,6 +14,36 @@
         {
           "name": "status:ready",
           "color": "0E8A16"
+        }
+      ]
+    },
+    {
+      "number": 426,
+      "title": "pre-push gate: says PUSH BLOCKED and pushes anyway, after 30-minute runner-pod timeouts",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/426",
+      "updatedAt": "2026-11-19T14:24:16Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        }
+      ]
+    },
+    {
+      "number": 422,
+      "title": "estate_toolkits: the in-flight test is a wall-clock race (CI run 135513313257)",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/422",
+      "updatedAt": "2026-11-19T14:23:52Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
         }
       ]
     },
