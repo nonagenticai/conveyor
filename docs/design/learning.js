@@ -1617,13 +1617,13 @@ window.installLearning = function (api, enterprise) {
     const subjects = [
       ["knowledge", "Knowledge extraction", "missing content · extraction fidelity", "extraction-suite v2", "40 cases", "Ready"],
       ["retrieval", "Retrieval", "expected-evidence recall · citation coverage", "retrieval-regression v3", "80 held-out", "Measuring"],
-      ["pko", "Procedural knowledge", "undefined terms · invalid relations · constraints", "pko-validation v1", "24 terms", "Ready"],
+      ["procedure", "Procedural knowledge", "missing action text · invalid PDDL literals · gates", "procedure-validation v1", "24 criteria", "Ready"],
       ["memory", "Memory", "recall usefulness · stale or conflicting facts", "memory-policy v2", "80 held-out", "Candidate"],
       ["scope", "Scope policies", "cross-card/project exclusion · authorised recall", "isolation-suite v1", "32 cases", "Ready"],
       ["job", "Job outcomes", "acceptance · failure · latency · cost", "architecture-v3", "80 held-out", "Baseline"],
     ];
     const selected = subjects.find((s) => s[0] === l.evalSubject) || subjects[1];
-    return `<div class="v2-ribbon" role="note"><strong>V2 · PROPOSED</strong><span>Per-object evaluation: extraction, retrieval, PKO, memory, scope policy and job outcome subjects, with a memory disabled/current/candidate comparison and a cutoff-bound replay. The S17–S21 instruments are the seed; no new evaluation action is claimed.</span><span class="v2-src">Local fixture</span></div>${metrics([
+    return `<div class="v2-ribbon" role="note"><strong>V2 · PROPOSED</strong><span>Per-object evaluation: extraction, retrieval, procedural knowledge, memory, scope policy and job outcome subjects, with a memory disabled/current/candidate comparison and a cutoff-bound replay. The S17–S21 instruments are the seed; no new evaluation action is claimed.</span><span class="v2-src">Local fixture</span></div>${metrics([
       ["Subjects", String(subjects.length), "one per knowledge/memory object"],
       ["Held-out cases", "80", "paired, never pooled"],
       ["Human reviews", "1 pending", "separate from model assessment"],

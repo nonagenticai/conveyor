@@ -41,10 +41,10 @@ screen:
    to a state transition. Refinements & laya config: a tenant refinement overrides a platform
    threshold or fail action, creates a new version and is itself a gated policy change; every
    decision row pins the policy, refinement and laya config versions it used.
-4. **Procedures → PKO → Authoring.** Procedures: capability → procedure → step; SOP intake
-   (single or batch), RDF/OWL/Turtle and BPMN/Visio/draw.io conversion, the PDDL action space, the
-   relational PKO, knowledge-pack pairing and publish. An unreviewed SOP-derived procedure refuses
-   publication; a PDDL step with an unknown PKO term refuses; a publish with an unpublished pack
+4. **Procedures → Authoring.** Procedures: capability → procedure → step; SOP intake
+   (single or batch), RDF/OWL/Turtle and BPMN/Visio/draw.io conversion, the PDDL action space,
+   the knowledge-pack pairing and publish. An unreviewed SOP-derived procedure refuses
+   publication; a PDDL step with an unknown action refuses; a publish with an unpublished pack
    refuses `409 procedure_not_ready`. Authoring: a chat brief produces drafts only; a draft whose
    referenced asset is unpublished refuses `422 asset_dependency_unpublished`.
 5. **Run inspector and the tool estate.** Execution room: the run pins its job binding and release
@@ -70,14 +70,14 @@ screen:
    benchmark harness, hillclimb lab and inference/prompt audit. Metering adds the tenant,
    department, programme, project, job, run, step and call levels with one derivation and billing
    reconciliation. The knowledge design, sources & retrieval and memory explorer path is retained;
-   procedural knowledge now pins the PKO release and organisational memory adds reviewed lessons.
+   a procedure now pins the knowledge pack its steps read, and organisational memory adds reviewed lessons.
 9. **Knowledge and memory workbench.** Knowledge design: switch to Effective configuration, resolve
    a `department_conflict` at the job layer, compare Current/Draft and inspect the dependent jobs.
    Sources & retrieval: inspect the original beside an extracted passage, see the seven distinct
    states and quality signals, run a retrieval test with expected evidence and save a missed case
    for review. Memory: inspect a claim, open Current/History/Derivation, correct by adding a
-   successor, exclude from recall and rebuild the digest from a dry-run diff. Procedures: open a PKO
-   term, follow its usage to procedure steps and refuse an invalid relation. Execution: open Explain
+   successor, exclude from recall and rebuild the digest from a dry-run diff. Procedures: open a procedure
+   draft, follow its source and steps, and refuse an invalid conversion. Execution: open Explain
    context and see what was selected, excluded or truncated, with the reason and hash — never the
    compiled prompt text. Evals: compare memory disabled/current/candidate and replay with a time
    cutoff. Review & release: the queue shows the reviewer, evidence and gate; nothing publishes
@@ -105,7 +105,7 @@ A job is **configuration, not a loop**. Its release carries:
 | placement | industry, ordered departments, optional region | conveyor (`job_catalogue`) |
 | charter | purpose, outcomes, non-goals, escalation path | conveyor (release instruction) |
 | capability binding | one or more capabilities | conveyor (`job_binding`) |
-| `procedure_ref` | published procedure version(s), each pinning its PKO release | conveyor (`procedure`) |
+| `procedure_ref` | published procedure version(s), each pinning the knowledge pack its steps read | conveyor (`procedure`) |
 | executor | `procedure \| internal_agent` (D46) | conveyor (`job_binding`) |
 | `model_ref`, `params` | inference-router model and parameters | conveyor (release) |
 | `prompt_recipe` | compiled-prompt recipe (`prompt_ref@version`) | conveyor (release) |
@@ -435,7 +435,7 @@ job, work package and run:
 
 | | **Knowledge** | **Memory** |
 |---|---|---|
-| **Procedural** | `capability → procedure → step(PDDL) → action\|gate` + the pinned PKO release (conveyor) | `run`/`run_step`/`approval`/`action_invocation`/`event` (conveyor) |
+| **Procedural** | `capability → procedure → step(PDDL) → action\|gate` + the pinned knowledge pack (conveyor) | `run`/`run_step`/`approval`/`action_invocation`/`event` (conveyor) |
 | **Domain** | layered kinds + one versioned `capability` pack in `strata_rag`, pinned per job | work-package memory: hot rows in conveyor, one cold digest per card in `strata_rag` |
 | **Organisational** | curated lessons promoted to a source draft (D36) | lesson memory: proposed → reviewed → promoted/rejected |
 
@@ -526,16 +526,15 @@ The **scope selector** groups the levels by **organisation, work, execution and 
 can appear in several authorised views without creating several memory stores; a tenant
 administrator's ability to inspect records is separate from an agent's permission to recall them.
 
-### Procedural knowledge — the PKO term workspace
+### Procedural knowledge — the procedure and its pack
 
-The PKO is edited as structured terms and relations, not as a diagram. Each term carries its
-definition, kind, permitted relationships (with cardinality), constraints, source evidence, owner
-and release. Terms link to the procedure steps that use them; a searchable, kind-filterable table
-handles routine editing, and a local two-hop graph helps exploration with the table as the
-accessible authority. An edit creates a draft release and a review gate; an unknown term or an
-invalid relation is refused (`422 pko_term_unknown` / `422 pko_relation_invalid`), and a term with
-no definition blocks publication (`409 pko_not_ready`). RDF/OWL/Turtle and BPMN/Visio/draw.io remain
-ingest material converted into draft rows behind the same gate.
+Procedural knowledge is the published procedure itself: its intent, ordered steps, actions, gates,
+declared outputs and failure branches. There is no separate ontology store to edit. A procedure
+names the domain knowledge pack its steps read (`knowledge_pack_ref`); the pack is a pinned
+`strata_rag` release and readiness blocks a run before its first step (`409 procedure_not_ready`).
+RDF/OWL/Turtle and BPMN/Visio/draw.io remain ingest material: an ontology is imported into
+`strata_ingest` and its job id becomes the procedure's pack reference, behind the same source
+review and publication gates.
 
 ### Explain context — why a run received or excluded information
 
@@ -555,14 +554,14 @@ transcript.
 
 ### Evaluation from every object
 
-The existing S17–S21 instruments gain contextual entry points from sources, passages, packs, PKO
-terms, memory records, policies and jobs. The subject table makes the measured thing explicit:
+The existing S17–S21 instruments gain contextual entry points from sources, passages, packs, procedures,
+memory records, policies and jobs. The subject table makes the measured thing explicit:
 
 | Subject | What the tenant measures |
 |---|---|
 | Knowledge extraction | missing content, incorrect extraction and evidence fidelity |
 | Retrieval | expected-evidence recall, relevance and citation coverage |
-| Procedural knowledge (PKO) | undefined terms, invalid relationships, contradictory constraints and scenario coverage |
+| Procedural knowledge | missing action text, invalid PDDL literals, contradictory effects and scenario coverage |
 | Memory | recall usefulness, stale/conflicting facts, unsupported synthesis and digest omissions |
 | Scope policies | cross-card/project/tenant exclusion and authorised recall |
 | Job outcomes | acceptance, failures, latency, context size and cost |
@@ -575,7 +574,7 @@ human review status, model assessment and measured outcome stay visibly separate
 ### Review and release
 
 The review path is a queue, not a decorative stepper. Items from all three surfaces — source
-corrections, pack versions and binding revisions, PKO release drafts, memory lesson promotions and
+corrections, pack versions and binding revisions, procedure drafts, memory lesson promotions and
 policy refinements — appear with the required reviewer role (source owner, capability owner, tenant
 admin), required decisions, evidence references and age. The change-set lifecycle is **Draft → In
 review → Approved → Published (immutable) → Superseded / Rolled back**. Approval records the person,
@@ -627,7 +626,7 @@ only daily checks derived from real answers.
 | Effective job-release configuration over industry/department/job, `department_conflict`, job-layer resolution, dependents | **V2 · proposed** (T0/T3); no V2 code |
 | Seven-state source transformation, passage inspector, correction drafts, per-object evaluation and candidate cases | **V2 · proposed design extension**; no committed table or action |
 | Memory taxonomy, Current/History/Derivation, successor/exclude/digest-rebuild/policy-compare actions | **V1 hot rows and consolidation + proposed curation views** |
-| PKO term workspace, permitted relationships, graph and impact review | **V2 · proposed** (T16) |
+| Procedure workspace, source review, PDDL steps, knowledge-pack pairing and publication gates | **V2 · implemented** (T16, #448) |
 | Explain-context manifest | V1 records `prompt_sha256`; the detailed manifest is proposed under SPEC_V2 §7.7 |
 | Review queue and change-set lifecycle | **proposed**; the existing approval rows are the seed |
 
@@ -769,7 +768,7 @@ The page never loads a Mermaid runtime and makes no external request. The diagra
   check, prompt compile, gates), the seven-step tool-broker sequence with its 409/403/422/429
   refusals, the run state machine and the L0–L3 decision ladder;
 - three ER diagrams (organisation/work, execution/decisions, knowledge/tools), the knowledge
-  pipeline (SOP/RDF/BPMN/chat → PKO + PDDL + pack → review → publish → pin → run) and the memory /
+  pipeline (SOP/RDF/BPMN/chat → PDDL + pack → review → publish → pin → run) and the memory /
   lesson lifecycle;
 - the one improvement loop and the T0–T17 slice DAG.
 
@@ -812,7 +811,7 @@ are additive.
 | Agents / executors | `agents` | internal agent configuration | R + P note |
 | **Tools** | `toolkits` | toolkits, bindings & grants, calls, probes, BYO, authoring, storage, credential profiles | **P** |
 | Project types | `types` | definition, used by, versions | R + P V2 types |
-| **Procedures** | `procedures` | workspace, SOP intake, RDF/OWL & process docs, PDDL, PKO term workspace, pairing, process map, publish | **P** |
+| **Procedures** | `procedures` | workspace, SOP intake, RDF/OWL & process docs, PDDL, knowledge-pack pairing, process map, publish | **P** |
 | Capabilities | `capabilities` | definition, used by, versions | R |
 | **Authoring** | `authoring` | intake queue, drafts, review & publish, dependency status | **P** |
 | Assurance & baselines | `assurance` | traceability, architecture cycle, registers, baselines | R |
@@ -849,7 +848,7 @@ programme layer (`programme_tranche`, `benefit_profile`, `benefit_link`, `benefi
 `artifact_type`, `adm_profile`, `architecture_contract`, `architecture_compliance_review`,
 `architecture_waiver`, `governance_body`, `architecture_maturity`,
 `architecture_skill_assessment`); the decision
-tables and laya client; PM/coach/kata/development/operations jobs; lessons; PKO and SOP/RDF/BPMN
+tables and laya client; PM/coach/kata/development/operations jobs; lessons; SOP/RDF/BPMN
 ingestion; tenant asset authoring; the tool estate (`tool`, `toolkit`, `tool_binding`, `tool_call`,
 the broker, BYO and authoring); metering roll-ups; the MinIO storage adapter; and the knowledge and
 memory workbench (effective job-release configuration, the seven-state source transformation,
@@ -859,7 +858,7 @@ manifest and per-object evaluation). The studio renders these as labelled previe
 The V1 retention is concrete: capability packs, `strata_ingest`/`strata_rag` retrieval, hot
 work-package rows and cold digests, lesson promotion, the compiled-prompt pipeline and the S17–S21
 instruments exist in the Rust app. The workbench's organisation inheritance, source/passage
-inspector, record taxonomy and actions, PKO term workspace, explain-context manifest and object
+inspector, record taxonomy and actions, procedure workspace, explain-context manifest and object
 evaluation are design previews; no table or action was added by this pack.
 
 ## Files and boundaries
@@ -869,7 +868,7 @@ workbenches; `enterprise.js` / `enterprise.css` supply the programme surfaces an
 retrieval workbench; `learning.js` / `learning.css` add knowledge design, the effective
 configuration and review surfaces, scoped memory and measurement; `v2.js` / `v2.css` add the
 SPEC_V2 destinations (portfolio, plan, organisation, jobs, procedures, authoring, improve,
-operations, tools, metering), the PKO term workspace, the explain-context panel and the V2 sidebar
+operations, tools, metering), the procedure workspace, the explain-context panel and the V2 sidebar
 and banners; `architecture.js` / `architecture.css` add the System architecture page, its ArchiMate
 model and the UI map; `architecture/diagrams/` holds the Mermaid `.mmd` sources and their
 pre-rendered light/dark SVG pairs; `job-catalogue.js` and `coding-catalogue.js` are local source
@@ -975,7 +974,7 @@ mode and exits 0.
   deep links and breadcrumbs,
   programme switching and WSJF, dependency-cycle refusal, change control with and without a
   rationale, dual control and the decision ladder, release/binding/stale-binding refusal, SOP and
-  PDDL refusals, PKO versioning, publish readiness, authoring dependency blocks, kata/lesson/
+  PDDL refusals, procedure versioning, publish readiness, authoring dependency blocks, kata/lesson/
   adoption gates, dry-run and destructive approvals, the andon cord, probe unbinding, effect
   ceilings, the tool-call ledger, BYO and tool authoring, metering drill-down and the run-inspector
   binding/tools panel — plus the V1 banners on the legacy surfaces.
@@ -985,7 +984,7 @@ mode and exits 0.
   rollback and supersession); the seven source states, passage locator and correction draft, quality
   signals, retrieval test with expected evidence and the candidate eval case; the memory taxonomy,
   six questions, Current/History/Derivation, successor/exclude/digest actions and one-reference
-  lesson refusal; the PKO term workspace, usage and invalid-relation refusal; the explain-context
+  lesson refusal; the procedure workspace, usage and validation refusal; the explain-context
   manifest with reasons, budget, hash and reconstruction status; and the object-evaluation subjects
   and memory three-arm comparison — at 1440/1024/390.
 - `check-architecture.cjs` covers the System architecture destination: title/breadcrumb/sidebar and

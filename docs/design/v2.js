@@ -6069,6 +6069,12 @@ window.installV2 = function (api, enterprise) {
     return null;
   }
 
+  const procSelfGate = (gate) => {
+    const me = C && C.me ? C.me() : null;
+    const id = me && me.principal ? me.principal.id : null;
+    return !!(id && gate.requested_by === id);
+  };
+
   function procGateState(p, gateName, target) {
     if (!target) return B("no draft", "");
     const rows = list(p.gates).filter((gate) => gate.gate === gateName && gate.target === target);
@@ -6396,9 +6402,9 @@ window.installV2 = function (api, enterprise) {
                     p.gates.map(
                       (gate) =>
                         `<tr><td class="mono">${E(gate.gate)}</td><td>${B(gate.status, procTone(gate.status))}</td><td class="mono">${E(short(gate.target || "—", 8))}</td><td>${E(gate.approvals)} / ${E(gate.required_decisions)}</td><td>${
-                          gate.status === "pending" && C.can("approvals.decide")
+                          gate.status === "pending" && C.can("approvals.decide") && !procSelfGate(gate)
                             ? `${button("Approve", "proc-gate-approve", `data-id="${E(gate.id)}"`, "small", "check")}${button("Reject", "proc-gate-reject", `data-id="${E(gate.id)}"`, "small", "close")}`
-                            : `<span class="muted">—</span>`
+                            : `<span class="muted">${gate.status === "pending" ? "another person decides" : "—"}</span>`
                         }</td></tr>`,
                     ),
                   )

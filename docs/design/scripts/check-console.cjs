@@ -1392,6 +1392,7 @@ function startServer({ config, state, snapshot, noSnapshot }) {
             target: input.target,
             approvals: 0,
             required_decisions: 1,
+            requested_by: "u-2",
           };
           state.procGates.push(approval);
           json(res, 200, approval);
@@ -3645,9 +3646,30 @@ function readBody(req, done) {
         ),
         "approvals.request was sent",
       );
-      // A second person decides the listed gate; the publish then names it.
+      // BOTH gates are requested before either is decided: the publish must select the
+      // approved gate by its OWN name and target, never by the last request this session made.
+      await page.click('[data-v2="proc-gate-procedure"]');
+      await page.waitForFunction(() =>
+        document.querySelector("#main").innerText.includes("procedures.publish"),
+      );
+      assert.equal(
+        consoleState.requests.filter(
+          (row) => row.path === "/api/actions/approvals.request/invocations",
+        ).length,
+        2,
+        "both gates were requested",
+      );
+
+      // A second person decides the executable gate; the process publish names gate-1 even
+      // though the judge gate (gate-2) was requested last.
       await page.waitForSelector('[data-v2="proc-gate-approve"][data-id="gate-1"]');
       await page.click('[data-v2="proc-gate-approve"][data-id="gate-1"]');
+      await page.waitForFunction(() => {
+        const row = [...document.querySelectorAll("#main tr")].find((tr) =>
+          tr.innerText.includes("processes.publish"),
+        );
+        return !!row && row.innerText.includes("approved");
+      });
       await page.waitForTimeout(300);
       await page.click('[data-v2="proc-publish-process"]');
       await page.waitForTimeout(400);
@@ -3658,12 +3680,10 @@ function readBody(req, done) {
         "processes.publish was sent",
       );
 
-      // The judge gate: the procedure publish carries its own approved gate.
-      await page.waitForSelector('[data-v2="proc-gate-procedure"]');
-      await page.click('[data-v2="proc-gate-procedure"]');
+      // The judge's own approval releases the judge.
       await page.waitForSelector('[data-v2="proc-gate-approve"][data-id="gate-2"]');
       await page.click('[data-v2="proc-gate-approve"][data-id="gate-2"]');
-      await page.waitForTimeout(300);
+      await page.waitForTimeout(400);
       await page.click('[data-v2="proc-publish-procedure"]');
       await page.waitForTimeout(400);
       assert.ok(
