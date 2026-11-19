@@ -4968,6 +4968,14 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
         plain("procedures.update", json!({}), None),
         plain("procedures.publish", json!({}), None),
         plain("procedures.retire", json!({}), None),
+        // T16 (#85): the SOP/process-document intake and its gates. Sampled at the validation
+        // boundary like the S13 verbs above — an empty input is a 422 on both transports, and
+        // the dedicated suites cover the success paths.
+        plain("procedures.ingest_sop", json!({}), None),
+        plain("procedures.ingest_process", json!({}), None),
+        plain("procedures.ingest_rdf", json!({}), None),
+        plain("procedures.validate", json!({}), None),
+        plain("procedures.review_source", json!({}), None),
         plain("process_maps.get", json!({}), None),
         plain("process_maps.create", json!({}), None),
         plain("process_maps.update", json!({}), None),
