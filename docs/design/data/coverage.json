@@ -1,15 +1,15 @@
 {
   "actions_invoked": [
     {
-      "line": 1330,
+      "line": 1354,
       "name": "approvals.decide"
     },
     {
-      "line": 1230,
+      "line": 1254,
       "name": "architecture.artifacts_entries"
     },
     {
-      "line": 1231,
+      "line": 1255,
       "name": "architecture.artifacts_links"
     },
     {
@@ -37,71 +37,71 @@
       "name": "cards.release"
     },
     {
-      "line": 2513,
+      "line": 2537,
       "name": "documents.compose"
     },
     {
-      "line": 3000,
+      "line": 3024,
       "name": "documents.compose"
     },
     {
-      "line": 2795,
+      "line": 2819,
       "name": "documents.create"
     },
     {
-      "line": 2866,
+      "line": 2890,
       "name": "documents.delete"
     },
     {
-      "line": 2812,
+      "line": 2836,
       "name": "documents.download"
     },
     {
-      "line": 2845,
+      "line": 2869,
       "name": "documents.download"
     },
     {
-      "line": 2535,
+      "line": 2559,
       "name": "documents.get"
     },
     {
-      "line": 2830,
+      "line": 2854,
       "name": "documents.get"
     },
     {
-      "line": 1089,
+      "line": 1113,
       "name": "documents.list"
     },
     {
-      "line": 1112,
+      "line": 1136,
       "name": "documents.list"
     },
     {
-      "line": 1139,
+      "line": 1163,
       "name": "documents.list"
     },
     {
-      "line": 2763,
+      "line": 2787,
       "name": "documents.list"
     },
     {
-      "line": 2897,
+      "line": 2921,
       "name": "documents.preview"
     },
     {
-      "line": 2943,
+      "line": 2967,
       "name": "documents.return"
     },
     {
-      "line": 2684,
+      "line": 2708,
       "name": "documents.revision_get"
     },
     {
-      "line": 2645,
+      "line": 2669,
       "name": "documents.revision_list"
     },
     {
-      "line": 1353,
+      "line": 1377,
       "name": "process_runs.start"
     },
     {
@@ -113,27 +113,31 @@
       "name": "programmes.list"
     },
     {
-      "line": 2444,
+      "line": 738,
+      "name": "programmes.refresh"
+    },
+    {
+      "line": 2468,
       "name": "projects.close"
     },
     {
-      "line": 2327,
+      "line": 2351,
       "name": "projects.create"
     },
     {
-      "line": 2335,
+      "line": 2359,
       "name": "projects.update"
     },
     {
-      "line": 1303,
+      "line": 1327,
       "name": "runs.cancel"
     },
     {
-      "line": 1281,
+      "line": 1305,
       "name": "runs.get"
     },
     {
-      "line": 1258,
+      "line": 1282,
       "name": "runs.list"
     }
   ],
@@ -2523,7 +2527,7 @@
       "without_open_units": 27
     },
     "screens": {
-      "actions_invoked": 27,
+      "actions_invoked": 28,
       "by_status": {
         "legacy": 7,
         "live": 11,

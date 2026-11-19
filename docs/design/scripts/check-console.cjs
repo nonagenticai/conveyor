@@ -3297,6 +3297,9 @@ function readBody(req, done) {
       const page = await browser.newPage();
       const errors = [];
       page.on("pageerror", (error) => errors.push(String(error)));
+      // The 401 case above leaves the stub refusing /api/projects; the programme page reads
+      // them, and a 401 there (correctly) clears the session. Reset the fixture for this case.
+      consoleState.failProjects = 0;
       await page.goto(`http://127.0.0.1:${signedIn.port}/studio.html#programme`);
       await page.waitForSelector('#console-chip[data-state="in"]');
       await page.waitForSelector('[data-v2="programmes-refresh"]');
