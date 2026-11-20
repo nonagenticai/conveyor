@@ -102,7 +102,7 @@ use serde_json::{Value, json};
 /// **T16 (#85) adds five internal**: `procedures.ingest_sop|ingest_process|ingest_rdf`,
 /// `procedures.validate` and `procedures.review_source` — the SOP/process-document intake and its
 /// source review (no `pko.*` action exists: owner decision 2026-11-19, #413).
-const EXPECTED: [&str; 490] = [
+const EXPECTED: [&str; 491] = [
     "actions.describe",
     "actions.list",
     "analyse.site",
@@ -464,6 +464,7 @@ const EXPECTED: [&str; 490] = [
     "programmes.create",
     "programmes.get",
     "programmes.list",
+    "programmes.refresh",
     "programmes.update",
     "project_dependencies.create",
     "project_dependencies.delete",
@@ -673,7 +674,9 @@ fn the_registry_is_exactly_the_declared_set() {
     // store, `billing.summary` over the ledger, `workers.list`/`providers.list` over the queue
     // and host registry) and retires `graphs.list` with the service it described: internal
     // 473 -> 477, external 18 -> 13. Every remaining external destination is a Rust service.
-    assert_eq!((internal, external), (477, 13));
+    // #462 adds `programmes.refresh` (internal, idempotent write): 477 -> 478; external stays 13 —
+    // it applies the image's embedded programme seed to this tenant, never an external service.
+    assert_eq!((internal, external), (478, 13));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),

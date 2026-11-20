@@ -1,31 +1,31 @@
 {
   "actions_invoked": [
     {
-      "line": 1342,
+      "line": 1366,
       "name": "approvals.decide"
     },
     {
-      "line": 6079,
+      "line": 6103,
       "name": "approvals.decide"
     },
     {
-      "line": 5866,
+      "line": 5890,
       "name": "approvals.list"
     },
     {
-      "line": 5867,
+      "line": 5891,
       "name": "approvals.list"
     },
     {
-      "line": 6039,
+      "line": 6063,
       "name": "approvals.request"
     },
     {
-      "line": 1242,
+      "line": 1266,
       "name": "architecture.artifacts_entries"
     },
     {
-      "line": 1243,
+      "line": 1267,
       "name": "architecture.artifacts_links"
     },
     {
@@ -53,111 +53,111 @@
       "name": "cards.release"
     },
     {
-      "line": 2554,
+      "line": 2578,
       "name": "documents.compose"
     },
     {
-      "line": 3041,
+      "line": 3065,
       "name": "documents.compose"
     },
     {
-      "line": 2836,
+      "line": 2860,
       "name": "documents.create"
     },
     {
-      "line": 2907,
+      "line": 2931,
       "name": "documents.delete"
     },
     {
-      "line": 2853,
+      "line": 2877,
       "name": "documents.download"
     },
     {
-      "line": 2886,
+      "line": 2910,
       "name": "documents.download"
     },
     {
-      "line": 2576,
+      "line": 2600,
       "name": "documents.get"
     },
     {
-      "line": 2871,
+      "line": 2895,
       "name": "documents.get"
     },
     {
-      "line": 1101,
+      "line": 1125,
       "name": "documents.list"
     },
     {
-      "line": 1124,
+      "line": 1148,
       "name": "documents.list"
     },
     {
-      "line": 1151,
+      "line": 1175,
       "name": "documents.list"
     },
     {
-      "line": 2804,
+      "line": 2828,
       "name": "documents.list"
     },
     {
-      "line": 2938,
+      "line": 2962,
       "name": "documents.preview"
     },
     {
-      "line": 2984,
+      "line": 3008,
       "name": "documents.return"
     },
     {
-      "line": 2725,
+      "line": 2749,
       "name": "documents.revision_get"
     },
     {
-      "line": 2686,
+      "line": 2710,
       "name": "documents.revision_list"
     },
     {
-      "line": 5947,
+      "line": 5971,
       "name": "procedures.ingest_process"
     },
     {
-      "line": 5939,
+      "line": 5963,
       "name": "procedures.ingest_rdf"
     },
     {
-      "line": 5955,
+      "line": 5979,
       "name": "procedures.ingest_sop"
     },
     {
-      "line": 5823,
+      "line": 5847,
       "name": "procedures.list"
     },
     {
-      "line": 6152,
+      "line": 6176,
       "name": "procedures.publish"
     },
     {
-      "line": 6000,
+      "line": 6024,
       "name": "procedures.review_source"
     },
     {
-      "line": 5982,
+      "line": 6006,
       "name": "procedures.validate"
     },
     {
-      "line": 1365,
+      "line": 1389,
       "name": "process_runs.start"
     },
     {
-      "line": 5846,
+      "line": 5870,
       "name": "processes.get"
     },
     {
-      "line": 5826,
+      "line": 5850,
       "name": "processes.list"
     },
     {
-      "line": 6154,
+      "line": 6178,
       "name": "processes.publish"
     },
     {
@@ -169,27 +169,31 @@
       "name": "programmes.list"
     },
     {
-      "line": 2485,
+      "line": 750,
+      "name": "programmes.refresh"
+    },
+    {
+      "line": 2509,
       "name": "projects.close"
     },
     {
-      "line": 2368,
+      "line": 2392,
       "name": "projects.create"
     },
     {
-      "line": 2376,
+      "line": 2400,
       "name": "projects.update"
     },
     {
-      "line": 1315,
+      "line": 1339,
       "name": "runs.cancel"
     },
     {
-      "line": 1293,
+      "line": 1317,
       "name": "runs.get"
     },
     {
-      "line": 1270,
+      "line": 1294,
       "name": "runs.list"
     }
   ],
@@ -2583,7 +2587,7 @@
       "without_open_units": 31
     },
     "screens": {
-      "actions_invoked": 39,
+      "actions_invoked": 40,
       "by_status": {
         "legacy": 7,
         "live": 14,

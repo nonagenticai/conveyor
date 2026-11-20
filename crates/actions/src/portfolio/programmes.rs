@@ -20,9 +20,9 @@ use crate::invoke::{ActionError, HandlerCtx};
 use crate::spec::HandlerOutput;
 
 use super::{
-    IdIn, Page, ProgrammeCreateIn, ProgrammeListIn, ProgrammeOut, ProgrammeUpdateIn,
-    emit_portfolio_event, etag_of, invalid, portfolio_error, require_precondition_with, trimmed,
-    version_i64,
+    IdIn, Page, ProgrammeCreateIn, ProgrammeListIn, ProgrammeOut, ProgrammeRefreshIn,
+    ProgrammeRefreshOut, ProgrammeUpdateIn, emit_portfolio_event, etag_of, invalid,
+    portfolio_error, require_precondition_with, trimmed, version_i64,
 };
 
 /// One programme as every action of this family returns it.
@@ -222,5 +222,43 @@ async fn programmes_list(
     Ok(Page {
         items: rows.iter().map(programme_out).collect(),
         next_cursor,
+    })
+}
+
+/// Re-apply the image's embedded buildout programme to the caller's tenant.
+///
+/// The programme's truth is generated in the repository (`seed/programme.json` by
+/// `scripts/build-programme-seed.py`) and compiled into the image, but the tenant's rows only
+/// change when the seed is applied. `migrate --seed` is the operator's CLI path; this action is
+/// the console's, so the live programme can be refreshed without a pod step. It is idempotent:
+/// a second call creates nothing and reports every row skipped. The seed owns the `meta` keys it
+/// names and preserves the others a later job wrote.
+#[crate::action(
+    name = "programmes.refresh",
+    version = 1,
+    kind = "internal",
+    scopes = ["portfolio:write"],
+    idempotent = true,
+    timeout_ms = 60000,
+    effect = "write",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn programmes_refresh(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    _input: ProgrammeRefreshIn,
+) -> Result<ProgrammeRefreshOut, ActionError> {
+    let counts = store::seed_programme::seed_programme_tx(&mut *tx, ctx.tenant)
+        .await
+        .map_err(|error| {
+            tracing::error!(%error, "apply the embedded programme seed");
+            ActionError::internal()
+        })?;
+    Ok(ProgrammeRefreshOut {
+        created: counts.created,
+        updated: counts.updated,
+        skipped: counts.skipped,
+        boards_created: counts.boards_created,
     })
 }

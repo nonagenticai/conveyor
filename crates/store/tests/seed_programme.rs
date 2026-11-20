@@ -9,7 +9,7 @@
 #[path = "support/mod.rs"]
 mod support;
 
-use conveyor_store::seed_programme::seed_programme;
+use conveyor_store::seed_programme::{seed_programme, seed_programme_tx};
 
 #[tokio::test]
 async fn seed_programme_is_idempotent() {
@@ -212,4 +212,56 @@ async fn seed_programme_refuses_an_unknown_tenant() {
         .await
         .expect_err("an unknown slug is a typed refusal");
     assert!(error.to_string().contains("no tenant with slug"));
+}
+
+#[tokio::test]
+async fn seed_programme_tx_is_idempotent_and_rolls_back_whole() {
+    let db = support::TestDb::fresh().await;
+    let seeded = support::seed_tenant(&db.super_pool, "progtx").await;
+    let tenant = conveyor_domain::TenantId::from_uuid(seeded.tenant).expect("non-nil tenant");
+
+    let mut tx = conveyor_store::begin_scoped(&db.super_pool, tenant)
+        .await
+        .expect("scoped tx");
+    let first = seed_programme_tx(&mut tx, tenant).await.expect("first run");
+    assert_eq!(first.created, 49, "the programme and its 48 projects");
+    assert_eq!(first.skipped, 0);
+    tx.commit().await.expect("commit");
+
+    let mut tx = conveyor_store::begin_scoped(&db.super_pool, tenant)
+        .await
+        .expect("scoped tx");
+    let second = seed_programme_tx(&mut tx, tenant)
+        .await
+        .expect("second run");
+    assert_eq!(second.created, 0, "a second run creates nothing");
+    assert_eq!(second.updated, 0, "a second run updates nothing");
+    assert_eq!(second.skipped, 49);
+    tx.commit().await.expect("commit");
+
+    // A rollback publishes nothing: the caller owns the transaction.
+    let other = support::seed_tenant(&db.super_pool, "progtx-rollback").await;
+    let before: i64 = sqlx::query_scalar("SELECT count(*) FROM project WHERE tenant_id = $1")
+        .bind(other.tenant)
+        .fetch_one(&db.super_pool)
+        .await
+        .expect("count the tenant's fixture rows");
+    let other_tenant = conveyor_domain::TenantId::from_uuid(other.tenant).expect("non-nil tenant");
+    let mut tx = conveyor_store::begin_scoped(&db.super_pool, other_tenant)
+        .await
+        .expect("scoped tx");
+    let pending = seed_programme_tx(&mut tx, other_tenant)
+        .await
+        .expect("pending run");
+    assert_eq!(pending.created, 49);
+    tx.rollback().await.expect("rollback");
+    let after: i64 = sqlx::query_scalar("SELECT count(*) FROM project WHERE tenant_id = $1")
+        .bind(other.tenant)
+        .fetch_one(&db.super_pool)
+        .await
+        .expect("count projects after the rollback");
+    assert_eq!(
+        after, before,
+        "a rolled-back seed adds no project row to the tenant"
+    );
 }
