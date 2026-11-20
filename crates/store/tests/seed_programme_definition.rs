@@ -109,15 +109,15 @@ async fn a_repeated_seed_is_a_no_op_and_never_overwrites_a_published_row() {
         .expect("first run");
     assert_eq!(first[0].1.benefits, 6);
 
-    // A published profile is not the seed's to rewrite.
+    // A profile moved out of draft is not the seed's to rewrite.
     sqlx::query(
-        "UPDATE benefit_profile SET status = 'approved', version = version + 1
+        "UPDATE benefit_profile SET status = 'active', version = version + 1
           WHERE tenant_id = $1 AND reference = 'B1'",
     )
     .bind(seeded.tenant)
     .execute(&db.super_pool)
     .await
-    .expect("publish B1");
+    .expect("activate B1");
 
     let second = seed_programme(&db.super_pool, Some("msp-repeat"))
         .await
@@ -134,7 +134,7 @@ async fn a_repeated_seed_is_a_no_op_and_never_overwrites_a_published_row() {
     .fetch_one(&db.super_pool)
     .await
     .expect("B1 status");
-    assert_eq!(status, "approved", "the published row is untouched");
+    assert_eq!(status, "active", "the non-draft row is untouched");
     let benefits: i64 =
         sqlx::query_scalar("SELECT count(*) FROM benefit_profile WHERE tenant_id = $1")
             .bind(seeded.tenant)
