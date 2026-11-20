@@ -109,6 +109,23 @@ test("the report is the server's; the label and round controls hit their actions
   await expect(page.getByText("Noise floor:")).toBeVisible();
   await expect(page.getByText("Headroom:")).toBeVisible();
 
+  // (a2) Provenance, not just arithmetic: those are the same numbers `eval_runs.report`
+  // returns for the run the screen is showing. A browser-side recomputation would agree with
+  // itself and could still disagree with the server; this pins the server's own means.
+  const evalId = page.url().split("/")[4];
+  const seededRuns = await invoke<{ items: { id: string }[] }>(request, "eval_runs.list", {
+    eval_id: evalId,
+    limit: 1,
+  });
+  const seededReport = await invoke<{ metrics: { key: string; mean: number | null }[] }>(
+    request,
+    "eval_runs.report",
+    { run_id: seededRuns.items[0].id },
+  );
+  const serverMean = (key: string) => seededReport.metrics.find((m) => m.key === key)?.mean;
+  expect(serverMean("correct")).toBeCloseTo(0.58, 5);
+  expect(serverMean("grounded")).toBeCloseTo(0.68, 5);
+
   const url = page.url().replace(/\/report$/, "");
 
   // (b) `eval_results.label` is the human queue. Every seeded result is already `ok`, and a
@@ -179,5 +196,104 @@ test("an instrument can be authored from the screen", async ({ page }) => {
     page.locator(".panel", { hasText: "Metrics" }).locator("tbody tr", { hasText: metricKey }),
   ).toHaveCount(1);
 
+  await expect(page.locator(".problem")).toHaveCount(0);
+});
+
+// P3.2: detail rows page past one page and the whole-run score never moves.
+//
+// The screen asks `eval_results.list` for 50 rows at a time and follows its `next_cursor`; the
+// tiles come from `eval_runs.report`, which counts case slots and grades, never a page. The
+// instrument is built through the real actions in the order the engine's own gate names —
+// cases and metrics first, then the two sign-offs, then the split draw — because the version
+// digest hashes the cases and metrics, and signing earlier voids the signature the moment the
+// next row lands. 56 > the 50-row page, so one Load more is the whole proof.
+test("results page past one page and the whole-run score does not change", async ({
+  page,
+  request,
+}) => {
+  test.skip(
+    !isDevAuth(),
+    "the deployed suite logs in as one principal: it cannot request and decide both eval gates",
+  );
+  test.setTimeout(240_000);
+  const stamp = Date.now();
+
+  const created = await invoke<{ id: string }>(request, "evals.create", {
+    name: `e2e paging ${stamp}`,
+    subject_kind: "completions",
+    entry_action: "inference.chat",
+    // The dev stack's provider double answers as `stub-model`; a run whose served model
+    // disagrees with the declared one is refused as `served_model_mismatch`.
+    model_ref: "stub-model",
+    // A non-empty schema makes the case input the action's request verbatim; `inference.chat`
+    // requires `messages`, so each case carries the router's own shape.
+    inputs_schema: { type: "object", required: ["messages"] },
+  });
+  const version = await invoke<{ id: string }>(request, "eval_versions.create", {
+    eval_id: created.id,
+  });
+  const cases = Array.from({ length: 56 }, (_, i) => ({
+    input: JSON.stringify({
+      messages: [{ role: "user", content: `e2e paging case ${stamp} #${i}` }],
+    }),
+    expected: "Stub answer: the copilot path works.",
+    tags: [i < 40 ? "train" : "test"],
+  }));
+  await invoke(request, "eval_cases.import", { version_id: version.id, cases });
+  await invoke(request, "eval_metrics.create", {
+    version_id: version.id,
+    key: "exact",
+    role: "quality",
+    kind: "binary",
+    label: "exact",
+    grader_kind: "programmatic",
+    grader: { expect: "exact" },
+  });
+  for (const gate of ["eval_inputs", "eval_grading"]) {
+    const approval = await invoke<{ id: string }>(request, "eval_signoffs.request", {
+      eval_id: created.id,
+      gate,
+      ask: `e2e paging ${gate}`,
+    });
+    await decideAsReviewer(request, "eval_signoffs.decide", approval.id);
+  }
+  await invoke(request, "evals.draw_split", { eval_id: created.id, train_ratio: 0.7 });
+  const started = await invoke<{ run: { id: string } }>(request, "eval_runs.start", {
+    eval_id: created.id,
+  });
+
+  // The worker records one result per case. `graded` is the report's own count, so this waits
+  // on the same figure the screen will render.
+  await expect
+    .poll(
+      async () => {
+        const report = await invoke<{ graded: number }>(request, "eval_runs.report", {
+          run_id: started.run.id,
+        });
+        return report.graded;
+      },
+      { timeout: 180_000, intervals: [1000, 2000, 3000] },
+    )
+    .toBe(56);
+
+  await page.goto(`/evals/${created.id}/report`);
+  const resultRows = page.locator('table[aria-label="Run results"] tbody tr');
+  await expect(resultRows).toHaveCount(50);
+  const score = page.locator(".tile", { hasText: "Mean exact" }).locator(".tv");
+  const firstPageScore = await score.innerText();
+
+  await page.getByRole("button", { name: "Load more" }).click();
+  await expect(resultRows).toHaveCount(56);
+  await expect(score).toHaveText(firstPageScore);
+
+  // The whole-run figure is the server's count of slots, not the rows on screen.
+  const report = await invoke<{ cases: number; graded: number }>(
+    request,
+    "eval_runs.report",
+    { run_id: started.run.id },
+  );
+  expect(report.cases).toBe(56);
+  expect(report.graded).toBe(56);
+  await expect(page.locator(".tile", { hasText: /^Results/ }).locator(".tv")).toHaveText("56");
   await expect(page.locator(".problem")).toHaveCount(0);
 });

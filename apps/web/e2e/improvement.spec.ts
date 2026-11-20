@@ -25,6 +25,12 @@ test("the seeded suite shows its control points, and no control is offered a bas
 
   // A control is never offered as the subject baseline.
   await expect(page.getByRole("button", { name: "Promote" })).toHaveCount(0);
+
+  // The trend/candidate controls are live controls: the agent list is the tenant's real rows
+  // and the start button is enabled. The start path itself refuses in dev with the API's own
+  // 503 (the next test), so an inert button here would hide the refusal behind a dead control.
+  await expect(page.getByLabel("Capability agent")).toBeEnabled();
+  await expect(page.getByRole("button", { name: "Start a candidate" })).toBeEnabled();
   await expect(page.locator(".problem")).toHaveCount(0);
 });
 
