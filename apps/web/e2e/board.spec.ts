@@ -222,7 +222,10 @@ test("a label, a lane and an unarchive round-trip through the UI", async ({ page
   await page.getByRole("button", { name: "Create label" }).click();
   await expect(page.locator(".label", { hasText: label })).toBeVisible();
 
-  const row = page
+  // The panel's per-card rows, scoped to the labels panel: an unscoped `div` filter reaches the
+  // card's own selects first.
+  const labelsPanel = page.locator("section.panel", { hasText: "Board labels" });
+  const row = labelsPanel
     .locator("div")
     .filter({ hasText: title })
     .filter({ has: page.locator("select") })
