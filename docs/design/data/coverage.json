@@ -297,18 +297,17 @@
           223,
           224,
           225,
-          393,
-          394,
           395,
           410,
           426,
           433,
           434,
           435,
-          462
+          462,
+          476
         ],
-        "open": 16,
-        "ready": 7,
+        "open": 15,
+        "ready": 5,
         "unknown": 0
       }
     },
@@ -1031,7 +1030,7 @@
       "tranche": 10,
       "units": {
         "blocked": 0,
-        "claimed": 1,
+        "claimed": 5,
         "numbers": [
           6,
           26,
@@ -1044,10 +1043,13 @@
           391,
           392,
           400,
-          459
+          459,
+          468,
+          470,
+          471
         ],
-        "open": 6,
-        "ready": 4,
+        "open": 5,
+        "ready": 0,
         "unknown": 0
       }
     },
@@ -1132,8 +1134,8 @@
           8,
           29
         ],
-        "open": 2,
-        "ready": 2,
+        "open": 1,
+        "ready": 1,
         "unknown": 0
       }
     },
@@ -1651,13 +1653,13 @@
       "tranche": 1,
       "units": {
         "blocked": 0,
-        "claimed": 0,
+        "claimed": 1,
         "numbers": [
           84,
           458
         ],
         "open": 1,
-        "ready": 1,
+        "ready": 0,
         "unknown": 0
       }
     },
@@ -1912,12 +1914,12 @@
       "tranche": 5,
       "units": {
         "blocked": 0,
-        "claimed": 0,
+        "claimed": 1,
         "numbers": [
           87
         ],
         "open": 1,
-        "ready": 1,
+        "ready": 0,
         "unknown": 0
       }
     },
@@ -2166,7 +2168,7 @@
       "track": "v2",
       "tranche": 5,
       "units": {
-        "blocked": 1,
+        "blocked": 0,
         "claimed": 0,
         "numbers": [
           78,
@@ -2174,7 +2176,7 @@
           171,
           172
         ],
-        "open": 1,
+        "open": 0,
         "ready": 0,
         "unknown": 0
       }
@@ -2519,8 +2521,8 @@
       },
       "total": 48,
       "uncovered": [],
-      "with_open_units": 22,
-      "without_open_units": 26
+      "with_open_units": 21,
+      "without_open_units": 27
     },
     "screens": {
       "actions_invoked": 27,

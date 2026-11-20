@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./fixture";
 
 // The seeded audit (dev-a, `seed.rs::measure_improve`) has four findings: one open high, one
 // open medium, one accepted, one rejected — plus a newer queued audit that must not hide it.

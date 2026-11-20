@@ -1,0 +1,89 @@
+# The native acceptance contract (S14 P3.1, conveyor#8).
+#
+# `scripts/acceptance.py` reads this file and refuses to call a release reachable on partial
+# evidence: every required context below must be `success` on the commit under test, every
+# surface must answer its declared status, and every command must select at least `min_tests`
+# tests. The repository's own required-check authority (the `main` ruleset, measured
+# 2026-11-20) must not name a context this file omits.
+#
+# 401 is declared only where authentication is the correct answer (`/mcp`, `/api/me`); it is
+# never accepted as "reachable" for a public surface.
+
+[meta]
+repo = "nonagenticai/conveyor"
+base_url = "https://conveyor.nonagentic.ai"
+main_branch = "main"
+
+[[contexts]]
+name = "checks"
+conclusion = "success"
+
+[[contexts]]
+name = "image"
+conclusion = "success"
+
+[[contexts]]
+name = "service-image"
+conclusion = "success"
+
+[[contexts]]
+name = "lint"
+conclusion = "success"
+
+[[contexts]]
+name = "no-private-refs"
+conclusion = "success"
+
+[[contexts]]
+name = "secret-scan"
+conclusion = "success"
+
+# The deployed surfaces. A 404, a 422 or any 5xx is a refusal, never a pass.
+[[probes]]
+path = "/health"
+status = 200
+
+[[probes]]
+path = "/health/ready"
+status = 200
+
+[[probes]]
+path = "/design/"
+status = 200
+
+[[probes]]
+path = "/design/data/coverage.json"
+status = 200
+
+[[probes]]
+path = "/mcp"
+status = 401
+allow = [401]
+
+[[probes]]
+path = "/api/me"
+status = 401
+allow = [401]
+
+# Executable checks. `zero_selected` names the runner's own zero-test signal; `min_tests` is the
+# floor this release must clear (measured at the receipt, never lowered to make a run pass).
+[[commands]]
+name = "workspace"
+run = "cargo nextest run --no-tests=fail --color never --locked"
+zero_selected = "nextest"
+min_tests = 3000
+timeout_seconds = 3600
+
+[[commands]]
+name = "doctests"
+run = "cargo test --doc --locked"
+zero_selected = "libtest"
+min_tests = 5
+timeout_seconds = 1800
+
+[[commands]]
+name = "search-eval"
+run = "cargo test -p conveyor-api --test search_eval -- --ignored"
+zero_selected = "libtest"
+min_tests = 1
+timeout_seconds = 900

@@ -260,6 +260,31 @@ enum AdminCommand {
         #[arg(long)]
         tenant: String,
     },
+    /// Create or converge a fresh tenant and install its content (S14 P5).
+    ///
+    /// Idempotent: the tenant is resolved by slug (or the given id), `platform::create`
+    /// converges, the catalogue and process catalogue create nothing on a second run, and each
+    /// schedule is upserted by kind. Content is installed through the real action engine.
+    Install {
+        /// The canonical tenant slug.
+        #[arg(long)]
+        tenant: String,
+        /// The tenant's display name.
+        #[arg(long)]
+        name: String,
+        /// The first admin's verified email (the identity they sign in with).
+        #[arg(long = "admin-email")]
+        admin_email: String,
+        /// The first admin's display name.
+        #[arg(long = "admin-name")]
+        admin_name: String,
+        /// Adopt this tenant id instead of resolving by slug / minting one.
+        #[arg(long = "tenant-id")]
+        tenant_id: Option<Uuid>,
+        /// The install manifest (default `seed/tenant-install.json`).
+        #[arg(long)]
+        manifest: Option<PathBuf>,
+    },
     /// Seal every pre-`0014` plaintext webhook signing secret under the tenant KEK. Idempotent.
     ResealWebhooks,
 }
@@ -1039,6 +1064,30 @@ async fn admin(command: AdminCommand) -> Result<(), RunError> {
                     ),
                 ));
             }
+        }
+        AdminCommand::Install {
+            tenant,
+            name,
+            admin_email,
+            admin_name,
+            tenant_id,
+            manifest,
+        } => {
+            let report = admin::install::run(
+                &pool,
+                &admin::install::InstallArgs {
+                    slug: &tenant,
+                    name: &name,
+                    admin_email: &admin_email,
+                    admin_name: &admin_name,
+                    tenant_id,
+                    manifest,
+                },
+                &config.app_key,
+            )
+            .await
+            .map_err(|error| RunError::Refused(error.to_string()))?;
+            println!("{}", serde_json::to_string_pretty(&report.json())?);
         }
         AdminCommand::Action {
             command:

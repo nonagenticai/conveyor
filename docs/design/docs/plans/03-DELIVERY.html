@@ -177,7 +177,7 @@ gh pr list --repo nonagenticai/conveyor --state all --search &quot;#N&quot;
 git ls-remote --heads origin &quot;issue/N-*&quot;                         # origin = your fork
 git ls-remote --heads https://github.com/nonagenticai/conveyor &quot;issue/N-*&quot;
 git log upstream/main --grep &quot;#N&quot; --oneline</code></pre>
-<p>Never force-push a branch you do not own. The 2-PR cap counts maintainer PRs in this repository; a fork PR does not count against it (record the count on the day with the command above).</p>
+<p>Never force-push a branch you do not own.</p>
 <h2 id="abandonment-and-adoption">Abandonment and adoption</h2>
 <p>A claim is <strong>abandoned</strong> when 48 hours have passed since both the last push to its branch and the last comment on its issue. A claim that is merely idle is not abandoned — a status comment holds it, and waiting on CI or on a blocker is normal.</p>
 <p>Any session may adopt an abandoned claim after the four checks, without the original session's permission. Adoption is:</p>
@@ -214,7 +214,7 @@ git log upstream/main --grep &quot;#N&quot; --oneline</code></pre>
 <tbody>
 <tr>
 <td>Rust</td>
-<td><code>rbuild --gate</code> (or the issue's declared command)</td>
+<td><code>cargo fmt --all -- --check</code> and <code>cargo metadata --locked --format-version 1</code>; the compile verdict is the repo's GitHub preflight (<code>gh workflow run preflight.yml --ref &lt;branch&gt;</code>)</td>
 </tr>
 <tr>
 <td>docs/skills only</td>
@@ -247,17 +247,11 @@ git log upstream/main --grep &quot;#N&quot; --oneline</code></pre>
 <li><strong>A review request means a human decision is pending.</strong> Assignee = whoever must act; add a reviewer only when a decision is actually pending, and mark the PR <code>status:needs-human</code>. <code>delivery.yml</code> clears every other request on our PRs, so a request without that label is a notification nobody is going to act on.</li>
 <li>The issue closes via <code>Closes #N</code>. If it did not, close it with the evidence.</li>
 </ul>
-<h2 id="ci-budget-and-wip-cap">CI budget and WIP cap</h2>
+<h2 id="ci-budget">CI budget</h2>
 <ul>
 <li><strong>2 pipeline runs per issue</strong>: the PR run and the merge run. Every run is a verdict, never a probe.</li>
 <li><strong>A docs-only PR skips the checks and the build.</strong> When every changed path is documentation (<code>docs/**</code>, any <code>*.md</code>, <code>.claude/**</code>), the public CI's <code>classify</code> job marks the change as non-code and <code>checks</code>, <code>image</code> and <code>service-image</code> are <strong>created and skipped</strong> — a job-level <code>if</code>, never <code>paths-ignore</code>, which would leave the required contexts missing. (The private archetype has its own classifier, gitops-production#5166.) Budget such an issue as one short run, not a full suite — <strong>this applies to the PR run only; the merge run is still a full suite until #32.</strong> One code path — a <code>Cargo.toml</code>, a migration, <code>.gitignore</code>, a workflow file — puts the whole suite back.</li>
-<li><strong>At most 2 open unit PRs at a time</strong> (the workspace suite runs on <code>arc-large</code>, whose measured pool max is 2). More only queues and makes sessions wait on CI. Count open PRs whose head matches <code>issue/*</code> <strong>in this repository</strong>; a fork PR is not a maintainer PR and does not count:</li>
-</ul>
-<pre class="bash"><code>gh pr list --state open --json number,headRefName,headRepositoryOwner \
-  --jq &#39;[.[] | select(.headRefName | startswith(&quot;issue/&quot;))
-             | select(.headRepositoryOwner.login == &quot;nonagenticai&quot;)] | length&#39;</code></pre>
-<ul>
-<li><code>issue-deliver</code> checks this cap and refuses the PR when it is full. <strong>Claims (branches) are unlimited; PRs are not</strong> — <code>issue-pickup</code> never refuses a claim on this basis.</li>
+<li><strong>One issue is one branch and exactly one PR.</strong> Claims and concurrent lanes are unlimited — there is no repository-wide ceiling on open <code>issue/*</code> PRs, and a session never waits on a count. Parallel lanes cost CI runs; that cost is managed in the pipeline, never by refusing work.</li>
 </ul>
 <h2 id="handoff--mandatory-when-stopping-before-merge">Handoff — mandatory when stopping before merge</h2>
 <p>Post as a comment on the issue. The next session reads the latest one first.</p>

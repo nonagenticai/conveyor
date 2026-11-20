@@ -6,6 +6,8 @@
 //! `upstream-token` tools run after the configuration and the pool exist.
 
 pub mod action;
+/// `conveyor admin install` — create or converge a fresh tenant and install its content.
+pub mod install;
 /// `conveyor admin intake` — a GitHub issue becomes a card on a project's board.
 pub mod intake;
 /// `conveyor admin retire-plan-seed` — archive the retired plan-seed cards.
