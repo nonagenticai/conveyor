@@ -246,10 +246,20 @@ test("a label, a lane and an unarchive round-trip through the UI", async ({ page
   await expect(page.locator(".lane", { hasText: lane })).toBeVisible();
 
   // Archive, then unarchive from the panel: the button reads the card's current version first.
-  const card = page.locator(".card", { hasText: title });
+  // The card is a `feature`: the seeded delivery matrix gives `bug` no archive→intake edge, so
+  // a bug card's unarchive is refused by the type, not by the screen.
+  const featureName = `e2e feature ${stamp}`;
+  await invoke(request, "cards.create", {
+    board_id: fixture.boardId,
+    list_id: fixture.intake.id,
+    name: featureName,
+    card_type_code: "feature",
+  });
+  await page.reload();
+  const card = page.locator(".card", { hasText: featureName });
   await card.getByRole("button", { name: "Archive" }).click();
-  await expect(page.locator(".archived")).toContainText(title);
+  await expect(page.locator(".archived")).toContainText(featureName);
   await page.locator(".archived").getByRole("button", { name: "Unarchive" }).click();
-  await expect(page.locator(".card", { hasText: title })).toBeVisible();
+  await expect(page.locator(".card", { hasText: featureName })).toBeVisible();
   await expect(page.locator(".problem")).toHaveCount(0);
 });
