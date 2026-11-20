@@ -182,14 +182,17 @@ pub async fn run(
     let slug = args.slug.trim();
     // Resolve by slug first: a second run adopts the id the first run created, so the command
     // converges instead of colliding on the unique slug.
-    let tenant_id = match args.tenant_id {
-        Some(id) => id,
+    let tenant = match args.tenant_id {
+        Some(id) => {
+            TenantId::from_uuid(id).map_err(|error| InstallError::Tenant(error.to_string()))?
+        }
         None => store::tenants::id_by_slug(pool, slug)
             .await?
-            .unwrap_or_else(Uuid::now_v7),
+            .unwrap_or_else(|| {
+                TenantId::from_uuid(Uuid::now_v7()).expect("a v7 uuid is a non-nil tenant")
+            }),
     };
-    let tenant =
-        TenantId::from_uuid(tenant_id).map_err(|error| InstallError::Tenant(error.to_string()))?;
+    let tenant_id = tenant.as_uuid();
 
     // The audit row of a CLI-created tenant names a real person: the first admin's row is
     // converged first and used as the actor.

@@ -39,11 +39,11 @@ async fn a_fresh_tenant_is_installed_and_a_second_run_converges() {
         .expect("the first install");
 
     // The tenant, its admin and the membership exist under the slug.
-    let tenant_id = store::tenants::id_by_slug(pool, "install-a")
+    let tenant = store::tenants::id_by_slug(pool, "install-a")
         .await
         .expect("look up the tenant")
         .expect("the tenant exists");
-    assert_eq!(tenant_id, first.tenant_id);
+    assert_eq!(tenant.as_uuid(), first.tenant_id);
     let admin_email: Option<String> =
         sqlx::query_scalar("SELECT email FROM app_user WHERE id = $1")
             .bind(first.admin_user_id)
@@ -53,7 +53,7 @@ async fn a_fresh_tenant_is_installed_and_a_second_run_converges() {
     assert_eq!(admin_email.as_deref(), Some("install-admin@example.test"));
     let admin_role: Option<String> =
         sqlx::query_scalar("SELECT role FROM membership WHERE tenant_id = $1 AND user_id = $2")
-            .bind(tenant_id)
+            .bind(tenant.as_uuid())
             .bind(first.admin_user_id)
             .fetch_optional(pool)
             .await
@@ -69,7 +69,6 @@ async fn a_fresh_tenant_is_installed_and_a_second_run_converges() {
     assert!(!first.schedules.is_empty(), "the manifest arms schedules");
 
     // The schedules are tenant-scoped rows, not a manifest claim.
-    let tenant = conveyor_domain::TenantId::from_uuid(tenant_id).expect("non-nil tenant");
     let caller = ActionCaller::new(pool, tenant, "conveyor")
         .await
         .expect("the tenant's service actor");
