@@ -461,7 +461,7 @@
       "key": "S12",
       "name": "UI build-out",
       "description": "Plan: docs/plans/slices/S12-ui-buildout.md",
-      "status": "active",
+      "status": "closed",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/plans/slices/S12-ui-buildout.md",
@@ -514,7 +514,7 @@
       "key": "S13",
       "name": "Process engine, judge, map and care-bus — the process is the executor, the DAG retained as the tool-sequence engine, the 348 flows re-authored",
       "description": "Plan: docs/plans/slices/S13-n8n-engine.md",
-      "status": "active",
+      "status": "closed",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/plans/slices/S13-n8n-engine.md",
@@ -1104,7 +1104,7 @@
       "key": "T9",
       "name": "TOGAF ADM capability",
       "description": "SPEC_V2 slice T9 (docs/SPEC_V2.md §12)",
-      "status": "active",
+      "status": "closed",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/SPEC_V2.md#12",
@@ -1149,7 +1149,7 @@
       "key": "T10",
       "name": "SAFe cadence and MSP tranches",
       "description": "SPEC_V2 slice T10 (docs/SPEC_V2.md §12)",
-      "status": "active",
+      "status": "closed",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/SPEC_V2.md#12",
@@ -1364,7 +1364,7 @@
       "key": "T16",
       "name": "SOP, RDF/OWL and process-document ingestion",
       "description": "SPEC_V2 slice T16 (docs/SPEC_V2.md §12)",
-      "status": "active",
+      "status": "closed",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/SPEC_V2.md#12",
@@ -1545,7 +1545,7 @@
           435,
           462,
           476,
-          501
+          508
         ],
         "depends_on": [],
         "plan_status": "active",
