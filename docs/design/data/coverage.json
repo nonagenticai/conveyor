@@ -2397,9 +2397,9 @@
       "evidence": [
         "docs/design/v2.js"
       ],
-      "gap": "aggregates are fixture (T11)",
+      "gap": null,
       "key": "metering",
-      "status": "mixed",
+      "status": "live",
       "title": "Metering"
     },
     {
@@ -2531,8 +2531,8 @@
       "actions_invoked": 28,
       "by_status": {
         "legacy": 7,
-        "live": 12,
-        "mixed": 1,
+        "live": 13,
+        "mixed": 0,
         "proposed": 6
       },
       "total": 26
