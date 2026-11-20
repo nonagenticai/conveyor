@@ -11,12 +11,73 @@
 
 use chrono::{DateTime, Utc};
 use conveyor_domain::TenantId;
-use sqlx::PgPool;
+use sqlx::{PgConnection, PgPool};
 use uuid::Uuid;
 
 use crate::audit::{self, AuditEntry};
 use crate::invite;
 use crate::scope::begin_scoped;
+
+/// Create or converge the human `app_user` a tenant's first admin signs in as, keyed by the
+/// VERIFIED EMAIL (the same key the identity path rebinds on).
+///
+/// Shared by [`create`] (the platform wizard) and the operator installer (`conveyor admin
+/// install`), so a CLI-created tenant names a **real person** in its audit row instead of a
+/// synthetic id. Returns `(user id, created)`.
+pub async fn ensure_human(
+    conn: &mut PgConnection,
+    email: &str,
+    display_name: &str,
+) -> Result<(Uuid, bool), PlatformError> {
+    // Reuse an existing person by email; only a human may hold a tenant membership.
+    let existing: Option<(Uuid, String, String, String)> = sqlx::query_as(
+        "SELECT id, kind, status, display_name FROM app_user
+          WHERE lower(email) = lower($1)
+          ORDER BY created_at, id
+          LIMIT 1",
+    )
+    .bind(email)
+    .fetch_optional(&mut *conn)
+    .await?;
+
+    match existing {
+        Some((id, kind, status, current_name)) => {
+            if kind != "human" {
+                return Err(PlatformError::EmailNotHuman);
+            }
+            let display_name = if current_name.trim().is_empty() {
+                display_name.trim()
+            } else {
+                current_name.as_str()
+            };
+            if status != "active" || current_name.trim().is_empty() {
+                sqlx::query(
+                    "UPDATE app_user SET status = 'active',
+                            display_name = CASE WHEN display_name = '' THEN $2 ELSE display_name END,
+                            updated_at = now()
+                      WHERE id = $1",
+                )
+                .bind(id)
+                .bind(display_name)
+                .execute(&mut *conn)
+                .await?;
+            }
+            Ok((id, false))
+        }
+        None => {
+            let id: Uuid = sqlx::query_scalar(
+                "INSERT INTO app_user (oidc_subject, email, display_name, kind, status)
+                 VALUES (NULL, $1, $2, 'human', 'active')
+                 RETURNING id",
+            )
+            .bind(email)
+            .bind(display_name)
+            .fetch_one(&mut *conn)
+            .await?;
+            Ok((id, true))
+        }
+    }
+}
 
 /// The synced entitlement summary the list and detail show.
 #[derive(Clone, Debug)]
@@ -282,53 +343,7 @@ pub async fn create(pool: &PgPool, new: NewTenant<'_>) -> Result<CreatedTenant, 
     }
 
     // Reuse an existing person by email; only a human may hold a tenant membership.
-    let existing: Option<(Uuid, String, String, String)> = sqlx::query_as(
-        "SELECT id, kind, status, display_name FROM app_user
-          WHERE lower(email) = lower($1)
-          ORDER BY created_at, id
-          LIMIT 1",
-    )
-    .bind(email)
-    .fetch_optional(&mut *tx)
-    .await?;
-
-    let (admin_user_id, created_user) = match existing {
-        Some((id, kind, status, current_name)) => {
-            if kind != "human" {
-                return Err(PlatformError::EmailNotHuman);
-            }
-            let display_name = if current_name.trim().is_empty() {
-                display_name.trim()
-            } else {
-                current_name.as_str()
-            };
-            if status != "active" || current_name.trim().is_empty() {
-                sqlx::query(
-                    "UPDATE app_user SET status = 'active',
-                            display_name = CASE WHEN display_name = '' THEN $2 ELSE display_name END,
-                            updated_at = now()
-                      WHERE id = $1",
-                )
-                .bind(id)
-                .bind(display_name)
-                .execute(&mut *tx)
-                .await?;
-            }
-            (id, false)
-        }
-        None => {
-            let id: Uuid = sqlx::query_scalar(
-                "INSERT INTO app_user (oidc_subject, email, display_name, kind, status)
-                 VALUES (NULL, $1, $2, 'human', 'active')
-                 RETURNING id",
-            )
-            .bind(email)
-            .bind(display_name)
-            .fetch_one(&mut *tx)
-            .await?;
-            (id, true)
-        }
-    };
+    let (admin_user_id, created_user) = ensure_human(&mut tx, email, display_name).await?;
 
     sqlx::query(
         "INSERT INTO membership (tenant_id, user_id, role) VALUES ($1, $2, 'admin')
