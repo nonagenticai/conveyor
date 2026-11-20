@@ -1604,6 +1604,11 @@ pub async fn insert_benefit_tx(
             PlanError::BenefitProfileIncomplete { missing },
         ));
     }
+    if new.status == "realized" {
+        // §8.3: the realization record is what proves an improvement. A row that does not exist
+        // yet cannot carry one, so a profile is never born realized.
+        return Err(PlanStoreError::Illegal(PlanError::BenefitBaselineMissing));
+    }
     let sql = format!(
         "INSERT INTO benefit_profile
             (tenant_id, programme_id, project_id, register_item_id, reference, description,
@@ -1851,6 +1856,17 @@ pub async fn update_benefit_tx(
     }
     if current.status == "retired" {
         return Err(PlanStoreError::Illegal(PlanError::BenefitRetired));
+    }
+    if patch.status.as_deref() == Some("realized") {
+        // §8.3: a benefit whose baseline was never measured cannot claim an improvement. The
+        // realization record is the only proof that both readings exist; consult it here so the
+        // status cannot advance past it.
+        let measured = get_transition_tx(&mut *conn, tenant, id)
+            .await?
+            .is_some_and(|t| t.baseline_measured_at.is_some() && t.post_measured_at.is_some());
+        if !measured {
+            return Err(PlanStoreError::Illegal(PlanError::BenefitBaselineMissing));
+        }
     }
     let approved =
         current.status != "draft" || benefit_is_approved_tx(&mut *conn, tenant, id).await?;
