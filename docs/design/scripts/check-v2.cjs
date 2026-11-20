@@ -414,7 +414,33 @@ const shot = (name) => path.join(process.env.CONVEYOR_QA_OUTPUT || os.tmpdir(), 
             programme: { feedback: [], projects: [] },
             work: { boards: [], lists: [], cards: [] },
             organisation: {},
-            measure: {},
+            measure: {
+              inference: {
+                by_caller: [{ caller_kind: "agent_run", calls: 7, total_tokens: 900 }],
+                by_model: [
+                  {
+                    model: "stub-model",
+                    calls: 7,
+                    prompt_tokens: 600,
+                    completion_tokens: 300,
+                    total_tokens: 900,
+                    cache_hits: 2,
+                  },
+                ],
+                totals: {
+                  calls: 7,
+                  prompt_tokens: 600,
+                  completion_tokens: 300,
+                  total_tokens: 900,
+                  cache_hit_calls: 2,
+                  cache_miss_calls: 5,
+                  cache_write_calls: 0,
+                  unknown_cache_calls: 0,
+                  non_ok_calls: 0,
+                },
+              },
+              note: "tokens are stored; cost is derived by the pinned price version",
+            },
           };
         },
       });
@@ -438,6 +464,56 @@ const shot = (name) => path.join(process.env.CONVEYOR_QA_OUTPUT || os.tmpdir(), 
       check(!text.includes("data/manifest.json"), `${id} carries no dead data link`);
       check(!text.includes("data/programme.json"), `${id} carries no dead programme link`);
     }
+
+    // 9c. Metering reads the live measurement (#458). It is a design destination — `?design=1`
+    // is the reviewer's mode the public visitor never gets — so the live shape is exercised here
+    // with the snapshot injected above: the by-caller/by-model rows and totals come from the
+    // payload, no fixture figure survives, and the snapshot's own cost note is shown.
+    await nav("metering", "?design=1");
+    const metered = await page.locator("#main").innerText();
+    check(metered.includes("agent_run"), "metering renders the live caller rows");
+    check(metered.includes("stub-model"), "metering renders the live model rows");
+    check(metered.includes("Cache hits"), "metering renders the cache-hit total");
+    check(metered.includes("5 misses"), "the cache figures are the payload's");
+    check(
+      !metered.includes("18.4M") && !metered.includes("$412.80"),
+      "metering shows no fixture number",
+    );
+    check(
+      metered.includes("cost is derived by the pinned price version"),
+      "metering carries the snapshot's cost note",
+    );
+
+    // 9d. A snapshot without `measure` says so; it never borrows a fixture roll-up.
+    await page.addInitScript(() => {
+      Object.defineProperty(window, "CONVEYOR_SNAPSHOT", {
+        configurable: true,
+        set() {},
+        get() {
+          return {
+            schema: "design-snapshot/v1",
+            tenant: "nonagentic",
+            generated_at: "2026-11-16T00:00:00Z",
+            git_sha: "a".repeat(40),
+            payload_sha256: "b".repeat(64),
+            programme: { feedback: [], projects: [] },
+            work: { boards: [], lists: [], cards: [] },
+            organisation: {},
+            measure: {},
+          };
+        },
+      });
+    });
+    await nav("metering", "?design=1");
+    const unmetered = await page.locator("#main").innerText();
+    check(
+      unmetered.includes("No measurement published"),
+      "a snapshot without measure.inference says the measurement is not published",
+    );
+    check(
+      !unmetered.includes("18.4M") && !unmetered.includes("$412.80"),
+      "the no-measure page shows no fixture number",
+    );
 
     check(errors.length === 0, "no browser runtime errors: " + errors.join(" | "));
     check(failed.length === 0, "no failed assets: " + failed.join(" | "));

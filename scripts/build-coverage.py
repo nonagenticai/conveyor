@@ -126,10 +126,14 @@ SCREEN_OVERRIDES = {
         "evidence": ["docs/design/architecture.js"],
         "gap": "a drawn study, not a V2 aggregate",
     },
+    # The Metering destination reads the published snapshot's `measure.inference` (T11):
+    # calls, tokens and cache hits by caller and by model, with the snapshot's own cost note.
+    # A snapshot without the section says so; the fixture roll-up stays in the no-snapshot
+    # design study only (#458).
     "metering": {
-        "status": "mixed",
+        "status": "live",
         "evidence": ["docs/design/v2.js"],
-        "gap": "aggregates are fixture (T11)",
+        "gap": None,
     },
     # The MSP destination is live: signed in its five tabs read/write the programme store, and
     # signed out it renders the published `msp` snapshot read-only (issue #305). The status is
