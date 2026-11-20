@@ -66,9 +66,9 @@
     {
       "number": 450,
       "title": "estate: the last External tool destinations are served in Rust",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/450",
-      "updatedAt": "2026-11-19T22:13:37Z",
+      "updatedAt": "2026-11-20T02:21:42Z",
       "labels": [
         {
           "name": "unit",
