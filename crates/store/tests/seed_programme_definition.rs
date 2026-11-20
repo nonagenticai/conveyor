@@ -68,9 +68,14 @@ async fn a_fresh_tenant_seeds_its_msp_definition() {
     .expect("tranches");
     assert_eq!(tranches.len(), 14);
     assert_eq!(tranches[0], (0, "closed".to_owned()));
+    assert_eq!(
+        tranches[1],
+        (1, "authorised".to_owned()),
+        "the tranche-0 continue review authorises tranche 1: {tranches:?}"
+    );
     assert!(
-        tranches[1..].iter().all(|(_, state)| state == "planned"),
-        "tranches 1–13 are planned: {tranches:?}"
+        tranches[2..].iter().all(|(_, state)| state == "planned"),
+        "tranches 2–13 are planned: {tranches:?}"
     );
     let reviewed: Option<String> = sqlx::query_scalar(
         "SELECT review_at::text FROM programme_tranche
@@ -149,4 +154,54 @@ async fn a_repeated_seed_is_a_no_op_and_never_overwrites_a_published_row() {
             .await
             .expect("tranche count");
     assert_eq!(tranches, 14);
+}
+
+/// P1.2 — the seed's authorised tranche 1 is what the start gate reads: a seeded tranche-1
+/// project starts, and the gate keeps refusing while the tranche is still planned.
+#[tokio::test]
+async fn a_seeded_tranche_one_project_starts_after_the_continue_review() {
+    use conveyor_domain::TenantId;
+    use conveyor_store::begin_scoped;
+    use conveyor_store::spine::assert_project_tranche_authorised_tx;
+
+    let db = support::TestDb::fresh().await;
+    let seeded = support::seed_tenant(&db.super_pool, "msp-gate").await;
+    seed_programme(&db.super_pool, Some("msp-gate"))
+        .await
+        .expect("seed");
+
+    let project: uuid::Uuid = sqlx::query_scalar(
+        "SELECT id FROM project
+          WHERE tenant_id = $1 AND key = 'T1' AND programme_id IS NOT NULL",
+    )
+    .bind(seeded.tenant)
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("the seeded T1 project");
+    let tenant = TenantId::from_uuid(seeded.tenant).expect("tenant id");
+
+    let mut tx = begin_scoped(&db.owner, tenant).await.expect("scope");
+    let allowed = assert_project_tranche_authorised_tx(&mut tx, tenant, project).await;
+    tx.commit().await.expect("commit");
+    assert!(
+        allowed.is_ok(),
+        "a seeded tranche-1 project starts: {allowed:?}"
+    );
+
+    // The negative arm: the same project is refused while its tranche is still planned.
+    sqlx::query(
+        "UPDATE programme_tranche SET state = 'planned'
+          WHERE tenant_id = $1 AND number = 1",
+    )
+    .bind(seeded.tenant)
+    .execute(&db.super_pool)
+    .await
+    .expect("put tranche 1 back to planned");
+    let mut tx = begin_scoped(&db.owner, tenant).await.expect("scope");
+    let refused = assert_project_tranche_authorised_tx(&mut tx, tenant, project).await;
+    tx.rollback().await.expect("rollback");
+    assert!(
+        refused.is_err(),
+        "a planned tranche cannot start: {refused:?}"
+    );
 }
