@@ -197,8 +197,14 @@ async fn fixture() -> (common::TestDb, Fixture) {
 
     let (bound_project, bound_board, bound_card, bound_incident, bound_run, bound_approval) =
         project_tree(&db, tenant, Some(programme), "BOUND").await;
-    let (unbound_project, unbound_board, unbound_card, unbound_incident, unbound_run, unbound_approval) =
-        project_tree(&db, tenant, None, "SCRATCH").await;
+    let (
+        unbound_project,
+        unbound_board,
+        unbound_card,
+        unbound_incident,
+        unbound_run,
+        unbound_approval,
+    ) = project_tree(&db, tenant, None, "SCRATCH").await;
     (
         db,
         Fixture {
