@@ -288,6 +288,8 @@ jobs:
           python3 scripts/ci/board.py --self-test
           node docs/design/scripts/check-coverage.cjs --self-test
           node docs/design/scripts/check-data.cjs
+          node docs/design/scripts/check-outputs.cjs --self-test
+          node docs/design/scripts/check-outputs.cjs
           node docs/design/scripts/check-docs.cjs
           python3 docs/design/scripts/build-docs.py --check
       - name: the pack's surfaces

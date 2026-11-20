@@ -358,6 +358,7 @@
     "programmes.create",
     "programmes.get",
     "programmes.list",
+    "programmes.refresh",
     "programmes.update",
     "project_dependencies.create",
     "project_dependencies.delete",

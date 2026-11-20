@@ -1134,6 +1134,7 @@ function startServer({ config, state, snapshot, outputs }) {
           "processes.publish",
           "process_runs.start",
           "programmes.list",
+          "programmes.refresh",
           "programmes.update",
           "benefits.list",
           "benefits.create",
@@ -1638,6 +1639,12 @@ function startServer({ config, state, snapshot, outputs }) {
       }
 
       /* ── #305: the programme store — the writes the dialogs issue ──────────────────── */
+      if (pathname === "/api/actions/programmes.refresh/invocations") {
+        return readBody(req, () => {
+          // The image's embedded seed applied to the tenant: every row created on a fresh tenant.
+          json(res, 200, { created: 49, updated: 0, skipped: 0 });
+        });
+      }
       if (pathname === "/api/actions/programmes.update/invocations") {
         return readBody(req, (body) => {
           const input = body.input || {};
@@ -3907,6 +3914,31 @@ function readBody(req, done) {
       );
       assert.deepEqual(errors, [], "no page error on the procedures destination");
       await page.screenshot({ path: shot("console-procedures.png"), fullPage: true });
+      await page.close();
+    }
+
+    /* 2d — the programme refresh: the image's seed applied through the console. */
+    {
+      const page = await browser.newPage();
+      const errors = [];
+      page.on("pageerror", (error) => errors.push(String(error)));
+      // The 401 case above leaves the stub refusing /api/projects; the programme page reads
+      // them, and a 401 there (correctly) clears the session. Reset the fixture for this case.
+      consoleState.failProjects = 0;
+      await page.goto(`http://127.0.0.1:${signedIn.port}/studio.html#programme`);
+      await page.waitForSelector('#console-chip[data-state="in"]');
+      await page.waitForSelector('[data-v2="programmes-refresh"]');
+      await page.click('[data-v2="programmes-refresh"]');
+      await page.waitForFunction(() =>
+        document.querySelector("#toast").innerText.includes("49 created"),
+      );
+      assert.ok(
+        consoleState.requests.some(
+          (row) => row.path === "/api/actions/programmes.refresh/invocations",
+        ),
+        "programmes.refresh was sent",
+      );
+      assert.deepEqual(errors, [], "no page error on the programme refresh");
       await page.close();
     }
 

@@ -3966,6 +3966,12 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
         },
         plain("programmes.list", json!({"limit": 10}), None),
         {
+            // The refresh applies the image's seed. The MCP half replays the HTTP half's
+            // recorded outcome under the same idempotency key, so the transports compare the
+            // same application (a re-execution would report `skipped` where the other ran).
+            expecting(plain("programmes.refresh", json!({}), None), 200)
+        },
+        {
             let mut sample = plain("stakeholders.create", json!({}), None);
             sample.input = Box::new(|ctx: &Ctx| {
                 json!({
