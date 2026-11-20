@@ -569,3 +569,19 @@ jobs:
             docker push "$ref:$tag"
           done
           echo "pushed $ref:$sha $ref:$run $ref:latest"
+
+  # The coding gate: the app runs this repository's HEAD through its own lint plan (fmt,
+  # clippy) in a kata Pod, from one reusable workflow pinned to one coding commit. The licence
+  # token is an Actions secret; a fork PR never receives it, so the called job skips there.
+  #
+  # `kind: lint`, not `check`: measured 2026-11-20, a full `check` on this workspace did not
+  # finish inside the 1800 s runner deadline. The lint half is the verdict the Pod can give.
+  # The secret is passed explicitly, not `secrets: inherit`: zizmor's `secrets-inherit` audit
+  # (medium) gates this repository's lint job.
+  gate:
+    uses: nonagenticai/coding/.github/workflows/gate.yml@ee24e1b774fd177c5911c33194093c488ec08836
+    with:
+      client_ref: ee24e1b774fd177c5911c33194093c488ec08836
+      kind: lint
+    secrets:
+      CODING_GATE_TOKEN: ${{ secrets.CODING_GATE_TOKEN }}
