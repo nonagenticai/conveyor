@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Tailored ADM profile · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>Tailored ADM profile</h1>
+<p><strong>Programme:</strong> conveyor buildout · <strong>Status:</strong> proposed for P0 acceptance (drafted 2026-11-17) · <strong>Date:</strong> 2026-11-17 · <strong>Owner:</strong> the
+programme architect (<code>architect</code>) · <strong>Reviewer:</strong> the Architecture Board (charter proposed in PF-1;
+rows are T9's) · <strong>Artefact:</strong> ADM-1, <code>adm_profile</code>, Preliminary.</p>
+<h2>Phases</h2>
+<p>The profile runs the full ADM for software delivery: <strong>Preliminary</strong> once per organisation, then
+<strong>A–H</strong> per architecture initiative. It is a tailored profile, not a claim of TOGAF certification
+(<code>docs/SPEC_V2.md</code> §8.1's scope note).</p>
+<table><thead><tr><th>Phase</th><th>Runs when</th><th>Closes on</th></tr></thead><tbody>
+<tr><td><strong>Preliminary</strong></td><td>once, before the first architecture project</td><td>the capability baseline accepted (this profile, PF-1, AS-1, MA-1, SA-1, the board charter)</td></tr>
+<tr><td><strong>A — Vision</strong></td><td>every architecture initiative</td><td>the Statement of Architecture Work approved</td></tr>
+<tr><td><strong>B — Business</strong></td><td>every initiative whose PSA is approved</td><td>the business contract</td></tr>
+<tr><td><strong>C — Information systems</strong></td><td>when B produced a changed data or application view</td><td>the IS contract (data + application)</td></tr>
+<tr><td><strong>D — Technology</strong></td><td>when the solution changes the platform or its deployment</td><td>the technology contract</td></tr>
+<tr><td><strong>E — Opportunities and solutions</strong></td><td>every initiative that proceeds past D</td><td>the solution contract</td></tr>
+<tr><td><strong>F — Migration planning</strong></td><td>every initiative that will deliver</td><td>the migration/delivery contract</td></tr>
+<tr><td><strong>G — Implementation governance</strong></td><td>per delivery project under a live contract</td><td>the compliance review</td></tr>
+<tr><td><strong>H — Change management</strong></td><td>at closure and on every change request</td><td>exactly one typed outcome: a change, or a kata candidate</td></tr>
+</tbody></table>
+<p>A phase is not skippable in this profile: every phase closes on its mandatory set and its contract.
+The mechanical refusal (<code>architecture.phases.advance</code>, which names the missing artefact or the
+contract's state and writes no contract row — <code>docs/plans/T9-architecture-capability.md</code> §4.3) is
+T9's deliverable; until it exists, the programme architect's review enforces the rule.</p>
+<p><strong>Tailoring for this programme.</strong> Conveyor is one workspace with one data model and one delivery
+estate, so the typical initiative is a delivery project on an existing blueprint, not a new
+enterprise architecture. Its architecture inception is therefore a <strong>PSA</strong> (Phase A–E at the
+project-start plateau) under the blueprint, not a fresh B–D cycle. A project that changes the
+blueprint itself (a new aggregate, a new store, a new estate service) escalates to the <strong>HLD</strong> set
+and, if it changes the deployment or the technology standard, the <strong>SD</strong> set. The escalation rule is
+the one in the P0 plan §5: a deviation from the blueprint is a decision record, never a silent fork.</p>
+<h2>Artefacts by phase and plateau</h2>
+<p>The mandatory artefact set is the standard's catalogue filtered by this profile. Each artefact is a
+catalogue, matrix or diagram with the common metadata (title, status, version, author/date,
+reviewer/date, related initiative, purpose/stakeholders/scope, published document or contract) and
+at least one derivation/realization/reuse/dependency link (AS-1). The set grows with the maturity
+assessment (MA-1); this is the set the programme commits to now.</p>
+<table><thead><tr><th>Phase</th><th>Plateau</th><th>Mandatory artefacts (types)</th><th>Contract</th></tr></thead><tbody>
+<tr><td>Preliminary</td><td>capability</td><td>Principles catalog (PF-1); tailored ADM profile (this); artefact standard (AS-1); maturity and skills baseline (MA-1, SA-1); board charter</td><td>capability accepted</td></tr>
+<tr><td>A</td><td>PSA</td><td>Stakeholder map and matrix; driver/goal/objective catalogue; requirements catalogue; solution concept diagram; <strong>Statement of Architecture Work</strong></td><td>SAW</td></tr>
+<tr><td>B</td><td>PSA</td><td>Business service/function and value-stream catalogues; business interaction, actor/role and capability/organisation matrices; business footprint and functional-decomposition diagrams</td><td>business contract</td></tr>
+<tr><td>C</td><td>PSA</td><td>Data entity/component catalogue; data-entity/business-function and application/data matrices; conceptual and logical data diagrams; application portfolio and interface catalogues</td><td>IS contract</td></tr>
+<tr><td>D</td><td>PSA</td><td>Technology standards and portfolio catalogues; application/technology matrix; platform-decomposition and environments diagrams</td><td>technology contract</td></tr>
+<tr><td>E</td><td>HLD</td><td>Gap analysis, candidate solutions and work packages; <strong>project context diagram</strong>; <strong>benefits diagram</strong></td><td>solution contract</td></tr>
+<tr><td>F</td><td>HLD</td><td>Roadmap, increments, dependencies, cost/benefit; migration and delivery contracts</td><td>migration contract</td></tr>
+<tr><td>G</td><td>SD</td><td>Per-delivery <strong>compliance review</strong> against the governing contract, its compliance level and its waivers</td><td>compliance review</td></tr>
+<tr><td>H</td><td>SD</td><td>Change record with impact, or a kata candidate; a <strong>Request for Architecture Work</strong> when the architecture no longer meets its purpose</td><td>change review</td></tr>
+</tbody></table>
+<p><strong>Requirements management is continuous</strong>, not a phase: the requirements catalogue types each
+requirement as condition/constraint/assumption/delta and trace-links it to the artefacts, contracts,
+cards and evidence that realise it (<code>docs/SPEC_V2.md</code> §8.5's trace chain).</p>
+<p><strong>Plateaus.</strong> The <strong>PSA</strong> is the project-start set. The <strong>HLD</strong> adds the business, data, application
+and technology views; the <strong>SD</strong> adds process, interface, migration and platform detail. A delivery
+project's brief names the plateau its own architecture inception must satisfy. The programme's
+default: every T-project inception satisfies the PSA; a project that changes the blueprint satisfies
+the HLD; a project that changes the estate satisfies the SD.</p>
+<p><strong>What this profile does not yet have.</strong> The <code>adm_profile</code>, <code>artifact_type</code> and <code>architecture_contract</code>
+rows are T9's deliverable (#81, proposed). This document is the baseline those rows will encode.
+Until they land, the profile is applied by review: a project's architecture inception is checked
+against this table by the programme architect, and the result is a <code>decision</code>/<code>evidence</code> document,
+not a gate row. A missing artefact is a visible gap in the project's checklist; it is not yet a
+mechanical refusal. The gap is recorded as a kata candidate on the kata project.</p>
+<h2>Contracts</h2>
+<p>Four contract kinds govern the phases (<code>docs/SPEC_V2.md</code> §8.1; <code>docs/plans/T9-architecture-capability.md</code>
+§4.3):</p>
+<ol>
+<li><strong>Statement of Architecture Work (SAW)</strong> — opens Phase A: the assignment, scope,
+responsibilities and acceptance criteria; distinct from the designs produced under it. This P0
+definition set is the programme's SAW-equivalent; each delivery project's brief plus its inception
+pair is the project's.</li>
+<li><strong>Delivery contract</strong> — after Phase F: the delivery commitments and the method by which
+compliance will be assessed. In this programme the delivery contract is the project's accepted
+brief and its gate evidence; a change is a new version and re-opens the gate.</li>
+<li><strong>Statement of intent / business usage agreement</strong> — at completion: intended use, ownership and
+measures of effectiveness. In this programme it is the closure review's decision record.</li>
+<li><strong>Request for Architecture Work</strong> — Phase H: further architecture work when the current
+architecture no longer meets its purpose; the board reviews it.</li>
+</ol>
+<p>A contract change is a new version and re-opens its gate; the approved version's body is immutable.
+When T9 lands, a delivery design gate resolves only against a live approved contract trace-linked to
+the delivery project — absent, draft or superseded all refuse and no approval row is written. Until
+then, the project's brief and its inception pair are the evidence the review uses.</p>
+<h2>Adoption</h2>
+<p>This profile is proposed as the programme's default <code>adm_profile</code>; P0's definition-set acceptance is
+the adopting act.
+Every delivery brief names the plateau its own architecture inception satisfies and the contract it
+operates under. The profile is reviewed at each tranche review against the maturity assessment: a
+mandatory artefact that no project produced, or a phase that never refused, is evidence that the
+profile is mis-tailored — and the correction is a decision record, not a silent edit.</p>
+<p><strong>Board and rows gap.</strong> The Architecture Board's charter, membership, commissioning authority and
+decision limits are proposed with PF-1. The board's <code>governance_body</code> rows, the <code>adm_profile</code> row and
+the <code>architecture_contract</code> rows are T9's; until then, the proposal is recorded by this document and the
+board's decisions are recorded as <code>decision</code> documents on P0. That gap is a kata candidate, not an
+exception to the phases.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Programme definition — vision, blueprint, plan and project briefs · conveyor output · published 2026-11-20T11:50:50.848127361+00:00 · FR Test</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

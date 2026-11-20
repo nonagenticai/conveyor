@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Artefact standard · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>Artefact standard</h1>
+<p><strong>Programme:</strong> conveyor buildout · <strong>Status:</strong> seeded with the ADM profile's adoption on 2026-11-19; the standard has no versioned row of its own · <strong>Artefact:</strong> AS-1, the <code>artifact_type</code> standard · <strong>Record:</strong> ten seeded types in <code>artifact_type</code>; cells in <code>architecture_artifact_entry</code> · <strong>Board decision:</strong> <code>01a1f2c8-e26f-79ce-a082-5526648a47c5</code></p>
+<p>The standard every architecture artefact in the programme is recorded under: ten seeded types, one entry shape, four link kinds, and a repository search. The rows are the standard; this document is the readable copy. The standard's three artefact kinds are catalogue, matrix and diagram; a fourth, <code>principles_catalog</code>, is the principles catalogue's own kind, because a principle entry has a fixed shape rather than a free-form one.</p>
+<h2>Common metadata</h2>
+<p>Every artefact is a row in <code>architecture_artifact</code> carrying its title (stable across versions), <code>artifact_kind</code>, <code>phase_code</code>, <code>plateau</code>, <code>status</code> (<code>draft</code>, <code>in_review</code>, <code>approved</code>, <code>superseded</code> or <code>archived</code> — the migration's set), a monotonic version, purpose and scope, and a <code>meta</code> block with author, reviewer, review date, the status and version copy, and — for diagrams — the viewpoint, building block and elements. The three Preliminary artefacts carry all of it: PF-1, for example, is approved at version 2 with author "programme architect (maintainer sessions)" and reviewer "the Architecture Board", its purpose and scope stated as rows.</p>
+<p>An artefact missing any of this is a draft, not an artefact. An approved version's body is immutable; a supersede writes version <em>n+1</em> through <code>architecture.artifacts_supersede</code>. The metadata is rows, not prose: a document may render it, the row is the record. The <code>meta</code> copy of status and version is the one field known to drift — PF-1's copy still reads "draft for board approval" on an approved version 2 row — so the row's own columns are authoritative wherever the two disagree.</p>
+<h2>Catalogues</h2>
+<p>A catalogue is one-axis. Every entry is a row <code>(axis_a, axis_b, value)</code>: <code>axis_a</code> carries the item identifier, <code>axis_b</code> the item name, and <code>value</code> the item's fields. PF-1 is the live example — ten entries, <code>axis_a</code> <code>P1</code>–<code>P10</code>, <code>axis_b</code> the principle's short name (for P1, "One model, one store, one action registry"), and <code>value</code> holding the statement, rationale, implications and evidence. The identifier is unique within its catalogue, and an entry that cannot name its use or structure is not an entry.</p>
+<h2>Matrices</h2>
+<p>A matrix is two-axis: both axes are declared, and every populated cell is an entry row carrying its own <code>value</code>. The seeded standard has one matrix type, the Stakeholder Map (stakeholder × concern, Phase A, PSA). A matrix with an undeclared axis is a draft, and an empty cell is an explicit absence rather than a missing row. The same entry shape serves catalogues and matrices, which is what makes a matrix joinable rather than a separate artefact model.</p>
+<h2>Diagrams</h2>
+<p>A diagram's row carries the building block, the elements and the viewpoint — the metadata and the viewpoint, not the pixels. The two live diagrams are the Principle Derivation Diagram (viewpoint "ArchiMate 3.1 / Motivation", elements benefit → principle) and the Principle Realization Diagram (viewpoint "ArchiMate 3.1 / Implementation", elements principle → enforcing code or gate). Their content is the entry rows: derivation records <code>(B5 One model, P1, {relation: derivation, note})</code>; realization records <code>(P1, implementation, {relation: realization, evidence: ...})</code>. A diagram without a viewpoint is a picture, not an artefact.</p>
+<p>The honest gap: the repository holds the metadata, the cells and the evidence targets, but no image. There is no rendered drawing, no image store and no viewer; a reader reconstructs the diagram from its viewpoint and cells. That satisfies the standard's definition — the row is the record — and it is not a graphical artefact anyone can look at.</p>
+<h2>Links</h2>
+<p>Every artefact carries at least one typed link, created by <code>architecture.artifacts_link</code>. The four edge kinds are:</p>
+<table><thead><tr><th>Edge</th><th>Meaning</th></tr></thead><tbody>
+<tr><td><code>derivation</code></td><td>this artefact derives from that one</td></tr>
+<tr><td><code>realization</code></td><td>this artefact realizes that one</td></tr>
+<tr><td><code>reuse</code></td><td>this artefact reuses that one</td></tr>
+<tr><td><code>dependency</code></td><td>this artefact depends on that one without deriving or realizing it</td></tr>
+</tbody></table>
+<p>The live Preliminary set carries two links: a <code>derivation</code> from the Principle Derivation Diagram to PF-1, and a <code>realization</code> from PF-1 to the Principle Realization Diagram. No <code>reuse</code> or <code>dependency</code> link exists yet — reuse will be exercised when a project's artefact reuses a programme artefact. Each diagram cell repeats its relation in <code>value.relation</code>, and the two agree with the edge kind. No link kind is enforced by the phase gate today: <code>advance_phase_tx</code> checks the profile's approved types and a live contract only, so a linkless artefact is a standards failure, not a mechanical refusal.</p>
+<h2>Repository</h2>
+<p>The seeded ten, all mandatory:</p>
+<table><thead><tr><th>Key</th><th>Name</th><th>Kind</th><th>Phase</th><th>Plateau</th></tr></thead><tbody>
+<tr><td><code>stakeholder_map</code></td><td>Stakeholder Map</td><td><code>matrix</code></td><td>a</td><td>psa</td></tr>
+<tr><td><code>driver_goal_objective</code></td><td>Driver/Goal/Objective Catalog</td><td><code>catalog</code></td><td>a</td><td>psa</td></tr>
+<tr><td><code>requirements_catalog</code></td><td>Requirements Catalog</td><td><code>catalog</code></td><td>a</td><td>psa</td></tr>
+<tr><td><code>solution_concept</code></td><td>Solution Concept Diagram</td><td><code>diagram</code></td><td>a</td><td>psa</td></tr>
+<tr><td><code>business_capability_map</code></td><td>Business Capability Map</td><td><code>diagram</code></td><td>b</td><td>hld</td></tr>
+<tr><td><code>data_entity_catalog</code></td><td>Data Entity/Data Component Catalog</td><td><code>catalog</code></td><td>c</td><td>hld</td></tr>
+<tr><td><code>technology_standards</code></td><td>Technology Standards Catalog</td><td><code>catalog</code></td><td>d</td><td>hld</td></tr>
+<tr><td><code>principles_catalog</code></td><td>Principles Catalog</td><td><code>principles_catalog</code></td><td>preliminary</td><td>psa</td></tr>
+<tr><td><code>principle_derivation</code></td><td>Principle Derivation Diagram</td><td><code>diagram</code></td><td>preliminary</td><td>psa</td></tr>
+<tr><td><code>principle_realization</code></td><td>Principle Realization Diagram</td><td><code>diagram</code></td><td>preliminary</td><td>psa</td></tr>
+</tbody></table>
+<p>The repository is rows, not a file store. <code>architecture.repository_search</code> searches artefacts across projects, phases and plateaus, so reuse is a query rather than a memory, and <code>architecture.artifacts_entries</code> reads a single artefact's cells. Four gaps are recorded rather than papered over. First, the standard is seeded by <code>seed_standard_tx</code> in <code>crates/store/src/architecture.rs</code>, and none of the 26 <code>architecture.*</code> actions creates a type: <code>artifact_type</code> has one write path, so extending the standard is a code change and a release, not a repository act. Second, there is no XMI, XML or bundle export or import — interoperability is the API contract, not a file. Third, no rendered diagram and no image store, as above. Fourth, the standard is thin against the design: ten types, no SD-plateau type, and no type for phases E–H; the P0 artefact table is the target, reached by seeding more types.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>TOGAF ADM capability · conveyor output · published 2026-11-20T11:50:50.848127361+00:00 · FR Test</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>
