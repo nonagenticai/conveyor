@@ -50,7 +50,7 @@ async fn a_project_is_edited_under_if_match_and_meta_is_merged() {
             json!({
                 "id": id,
                 "name": "Programme project (edited)",
-                "meta": {"plan": "docs/plans/slices/S02-skeleton.md"},
+                "meta": {"note": "docs/plans/slices/S02-skeleton.md"},
             }),
             Some(&etag),
             None,
@@ -61,14 +61,14 @@ async fn a_project_is_edited_under_if_match_and_meta_is_merged() {
     let first = output(&updated);
     assert_eq!(first["project"]["name"], "Programme project (edited)");
     assert_eq!(
-        first["project"]["meta"]["plan"],
+        first["project"]["meta"]["note"],
         "docs/plans/slices/S02-skeleton.md"
     );
     let next = first["project"]["version"].as_i64().expect("version");
     assert_eq!(next, version + 1, "an edit bumps the version");
     let next_etag = format!("\"{next}\"");
 
-    // A second edit that does not mention `meta` must not erase the plan.
+    // A second edit that does not mention `meta` must not erase the note.
     let (status, described) = running
         .invoke(
             "projects.update",
@@ -83,7 +83,7 @@ async fn a_project_is_edited_under_if_match_and_meta_is_merged() {
     let second = output(&described);
     assert_eq!(second["project"]["description"], "Edited description");
     assert_eq!(
-        second["project"]["meta"]["plan"], "docs/plans/slices/S02-skeleton.md",
+        second["project"]["meta"]["note"], "docs/plans/slices/S02-skeleton.md",
         "the meta merge preserves keys the edit did not name"
     );
 

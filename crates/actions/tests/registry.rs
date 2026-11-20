@@ -102,7 +102,10 @@ use serde_json::{Value, json};
 /// **T16 (#85) adds five internal**: `procedures.ingest_sop|ingest_process|ingest_rdf`,
 /// `procedures.validate` and `procedures.review_source` — the SOP/process-document intake and its
 /// source review (no `pko.*` action exists: owner decision 2026-11-19, #413).
-const EXPECTED: [&str; 490] = [
+/// **#508 adds 6 internal**: the three project transitions (`projects.activate|pause|archive`),
+/// `projects.baseline`, `projects.programme_meta` and `tranches.authorise` — the write path's
+/// bypasses close. 490 → **496**.
+const EXPECTED: [&str; 496] = [
     "actions.describe",
     "actions.list",
     "analyse.site",
@@ -475,10 +478,15 @@ const EXPECTED: [&str; 490] = [
     "project_requests.promote",
     "project_requests.reject",
     "project_requests.update",
+    "projects.activate",
+    "projects.archive",
+    "projects.baseline",
     "projects.close",
     "projects.create",
     "projects.execute",
     "projects.get",
+    "projects.pause",
+    "projects.programme_meta",
     "projects.update",
     "prompt_audits.check",
     "prompt_audits.get",
@@ -555,6 +563,7 @@ const EXPECTED: [&str; 490] = [
     "trace_links.create",
     "trace_links.delete",
     "trace_links.list",
+    "tranches.authorise",
     "tranches.create",
     "tranches.delete",
     "tranches.list",
@@ -673,7 +682,9 @@ fn the_registry_is_exactly_the_declared_set() {
     // store, `billing.summary` over the ledger, `workers.list`/`providers.list` over the queue
     // and host registry) and retires `graphs.list` with the service it described: internal
     // 473 -> 477, external 18 -> 13. Every remaining external destination is a Rust service.
-    assert_eq!((internal, external), (477, 13));
+    // #508 adds six internal actions (the three project transitions, `projects.baseline`,
+    // `projects.programme_meta`, `tranches.authorise`): 477 -> 483; external stays 13.
+    assert_eq!((internal, external), (483, 13));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),

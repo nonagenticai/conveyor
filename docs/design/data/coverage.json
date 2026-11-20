@@ -37,35 +37,35 @@
       "name": "cards.release"
     },
     {
-      "line": 2539,
+      "line": 2561,
       "name": "documents.compose"
     },
     {
-      "line": 3026,
+      "line": 3048,
       "name": "documents.compose"
     },
     {
-      "line": 2821,
+      "line": 2843,
       "name": "documents.create"
     },
     {
-      "line": 2892,
+      "line": 2914,
       "name": "documents.delete"
     },
     {
-      "line": 2838,
+      "line": 2860,
       "name": "documents.download"
     },
     {
-      "line": 2871,
+      "line": 2893,
       "name": "documents.download"
     },
     {
-      "line": 2561,
+      "line": 2583,
       "name": "documents.get"
     },
     {
-      "line": 2856,
+      "line": 2878,
       "name": "documents.get"
     },
     {
@@ -81,23 +81,23 @@
       "name": "documents.list"
     },
     {
-      "line": 2789,
+      "line": 2811,
       "name": "documents.list"
     },
     {
-      "line": 2923,
+      "line": 2945,
       "name": "documents.preview"
     },
     {
-      "line": 2969,
+      "line": 2991,
       "name": "documents.return"
     },
     {
-      "line": 2710,
+      "line": 2732,
       "name": "documents.revision_get"
     },
     {
-      "line": 2671,
+      "line": 2693,
       "name": "documents.revision_list"
     },
     {
@@ -113,16 +113,12 @@
       "name": "programmes.list"
     },
     {
-      "line": 2470,
+      "line": 2492,
       "name": "projects.close"
     },
     {
       "line": 2353,
       "name": "projects.create"
-    },
-    {
-      "line": 2361,
-      "name": "projects.update"
     },
     {
       "line": 1313,
@@ -2527,7 +2523,7 @@
       "without_open_units": 26
     },
     "screens": {
-      "actions_invoked": 27,
+      "actions_invoked": 26,
       "by_status": {
         "legacy": 7,
         "live": 13,

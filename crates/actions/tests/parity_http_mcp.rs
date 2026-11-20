@@ -1932,6 +1932,9 @@ async fn seed_arch_contract(pg: &support::Pg, ctx: &Ctx, project: Uuid) -> Uuid 
                 phase_code: "f".to_owned(),
                 title: format!("Parity contract {}", Uuid::now_v7().simple()),
                 body: json!({}),
+                // The sweep runs actions as alice; a contract she approves must be one she did
+                // not request (#508).
+                requested_by: support::reviewer_id(pg).await,
                 supersedes_id: None,
             },
         )
@@ -1956,6 +1959,7 @@ async fn seed_arch_live_contract(pg: &support::Pg, ctx: &Ctx, project: Uuid) -> 
             contract,
             record.version,
             ctx.alice_user,
+            None,
         )
         .await
         .expect("approve the contract");
@@ -3295,6 +3299,44 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
             expect_status: None,
         },
         on_prepared("projects.close", None),
+        // #508's write-path actions: each sample is a deterministic refusal (no such row), so
+        // the two transports must answer the same thing without any seeded state.
+        expecting(
+            plain("projects.activate", json!({"id": Uuid::nil()}), None),
+            404,
+        ),
+        expecting(
+            plain("projects.pause", json!({"id": Uuid::nil()}), None),
+            404,
+        ),
+        expecting(
+            plain("projects.archive", json!({"id": Uuid::nil()}), None),
+            404,
+        ),
+        expecting(
+            plain(
+                "projects.programme_meta",
+                json!({"id": Uuid::nil(), "meta": {"tranche": 1}}),
+                None,
+            ),
+            404,
+        ),
+        expecting(
+            plain(
+                "projects.baseline",
+                json!({"project_id": Uuid::nil(), "wbs": []}),
+                None,
+            ),
+            409,
+        ),
+        expecting(
+            plain(
+                "tranches.authorise",
+                json!({"review_id": Uuid::nil()}),
+                None,
+            ),
+            404,
+        ),
         Sample {
             // A fresh project at version 1; the sample edits its own row, so the two transports
             // compare one edit and one replay.

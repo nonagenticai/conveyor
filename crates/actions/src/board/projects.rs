@@ -25,7 +25,10 @@ use crate::invoke::{ActionError, HandlerCtx};
 use crate::process::views::ProcessRunStartIn;
 use crate::spec::HandlerOutput;
 
-use super::{ProjectCloseIn, ProjectCreateIn, ProjectExecuteIn, ProjectUpdateIn, views::IdIn};
+use super::{
+    ProjectCloseIn, ProjectCreateIn, ProjectExecuteIn, ProjectProgrammeMetaIn, ProjectUpdateIn,
+    views::IdIn,
+};
 
 /// The board every new project gets, and the template it reads its lanes from. Both live in
 /// `store` so the seeds give a project exactly the board this action gives it.
@@ -154,7 +157,10 @@ async fn projects_create(
             key,
             name: title.to_owned(),
             description: input.description.unwrap_or_default(),
-            status: None,
+            // A project that belongs to a programme starts in `draft`: activation goes through
+            // `projects.activate`, which reads its tranche. A standalone project keeps the
+            // store's `active` default.
+            status: input.programme_id.map(|_| "draft".to_owned()),
             programme_id: input.programme_id,
             project_type_code: input.project_type_code,
             phase_code: None,
@@ -506,6 +512,167 @@ async fn projects_close(
     Ok(project_view(&project, &boards))
 }
 
+/// The `meta` keys the programme owns: the seed writes them, every gate reads them, and only a
+/// programme-level action may change them.
+const PROGRAMME_META_KEYS: [&str; 12] = [
+    "tranche",
+    "adm_phase",
+    "plateau",
+    "expected_outputs",
+    "closure_outputs",
+    "output_class",
+    "track",
+    "measured_status",
+    "depends_on",
+    "plan",
+    "plan_status",
+    "status_source",
+];
+
+fn is_programme_meta(key: &str) -> bool {
+    PROGRAMME_META_KEYS.contains(&key)
+}
+
+/// A status-guarded transition shared by the transitions that are not `close` (CONTRACT §3).
+async fn transition_project(
+    tx: &mut PgConnection,
+    ctx: &HandlerCtx,
+    id: Uuid,
+    from: &[&str],
+    to: &str,
+    action: &str,
+) -> Result<ProjectView, ActionError> {
+    let Some(project) =
+        store::project::transition_project_status_tx(&mut *tx, ctx.tenant, id, from, to)
+            .await
+            .map_err(|error| store_error(error, action))?
+    else {
+        let current = load_project(tx, ctx.tenant, id).await?;
+        return Err(ActionError::new(
+            409,
+            "conflict",
+            format!(
+                "project {} is {}; only a {} project moves to {to}",
+                current.id,
+                current.status,
+                from.join(" or ")
+            ),
+        ));
+    };
+    let boards = store::board::list_boards_tx(&mut *tx, ctx.tenant, project.id)
+        .await
+        .map_err(|error| store_error(error, action))?;
+    Ok(project_view(&project, &boards))
+}
+
+/// Activate a draft (or paused) project. A programme project activates only inside an authorised
+/// tranche: the start gate reads the tranche, never the caller's intent.
+#[crate::action(
+    name = "projects.activate",
+    version = 1,
+    kind = "internal",
+    scopes = ["projects:write"],
+    idempotent = false,
+    timeout_ms = 30000,
+    effect = "write",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn projects_activate(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: IdIn,
+) -> Result<ProjectView, ActionError> {
+    let project = load_project(tx, ctx.tenant, input.id).await?;
+    if project.status != "draft" && project.status != "paused" {
+        return Err(ActionError::new(
+            409,
+            "conflict",
+            format!(
+                "project {} is {}; only a draft or paused project can be activated",
+                project.id, project.status
+            ),
+        ));
+    }
+    if project.programme_id.is_some()
+        && let Some((number, state)) =
+            store::spine::project_tranche_state_tx(&mut *tx, ctx.tenant, project.id)
+                .await
+                .map_err(|error| {
+                    tracing::error!(%error, "projects.activate: read the project's tranche");
+                    ActionError::internal()
+                })?
+        && !matches!(state.as_str(), "authorised" | "closed")
+    {
+        return Err(ActionError::new(
+            409,
+            "tranche_not_authorised",
+            format!(
+                "project {} sits in tranche {number} whose state is '{state}'",
+                project.id
+            ),
+        ));
+    }
+    transition_project(
+        tx,
+        &ctx,
+        input.id,
+        &["draft", "paused"],
+        "active",
+        "projects.activate",
+    )
+    .await
+}
+
+/// Pause an active project. Pausing is reversible through `projects.activate`.
+#[crate::action(
+    name = "projects.pause",
+    version = 1,
+    kind = "internal",
+    scopes = ["projects:write"],
+    idempotent = false,
+    timeout_ms = 30000,
+    effect = "write",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn projects_pause(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: IdIn,
+) -> Result<ProjectView, ActionError> {
+    transition_project(tx, &ctx, input.id, &["active"], "paused", "projects.pause").await
+}
+
+/// Archive a closed project. Archiving is terminal for the row; the archive *decision* is a
+/// governance record (the rework's retirement record), not a second approval here.
+#[crate::action(
+    name = "projects.archive",
+    version = 1,
+    kind = "internal",
+    scopes = ["projects:write"],
+    idempotent = false,
+    timeout_ms = 30000,
+    effect = "write",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn projects_archive(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: IdIn,
+) -> Result<ProjectView, ActionError> {
+    transition_project(
+        tx,
+        &ctx,
+        input.id,
+        &["closed"],
+        "archived",
+        "projects.archive",
+    )
+    .await
+}
+
 /// Edit a project's own fields. Version-guarded: a stale `If-Match` writes nothing.
 #[crate::action(
     name = "projects.update",
@@ -524,6 +691,26 @@ async fn projects_update(
     input: ProjectUpdateIn,
 ) -> Result<HandlerOutput<ProjectView>, ActionError> {
     let action = "projects.update";
+    // Status is not an edit: the transitions are `projects.activate`, `projects.pause`,
+    // `projects.close` and `projects.archive`, each with its own gate and approval target.
+    if input.status.is_some() {
+        return Err(invalid(
+            "status",
+            "status_not_editable",
+            "status changes through projects.activate, projects.pause, projects.close or projects.archive",
+        ));
+    }
+    // The programme owns these keys: the seed writes them and every gate reads them. A general
+    // edit that could erase them would neuter the gate that depends on them.
+    if let Some(serde_json::Value::Object(extra)) = input.meta.as_ref()
+        && let Some(key) = extra.keys().find(|key| is_programme_meta(key))
+    {
+        return Err(invalid(
+            "meta",
+            "meta_key_protected",
+            format!("`{key}` is programme-owned and cannot be written through projects.update"),
+        ));
+    }
     let project = load_project(tx, ctx.tenant, input.id).await?;
     let boards = store::board::list_boards_tx(&mut *tx, ctx.tenant, project.id)
         .await
@@ -537,18 +724,6 @@ async fn projects_update(
         && name.trim().is_empty()
     {
         return Err(invalid("name", "required", "must not be empty"));
-    }
-    if let Some(status) = input.status.as_deref()
-        && !matches!(
-            status,
-            "draft" | "active" | "paused" | "closed" | "archived"
-        )
-    {
-        return Err(invalid(
-            "status",
-            "invalid_value",
-            "must be draft, active, paused, closed or archived",
-        ));
     }
     // A type that names no live catalogue row would make every move deny, so it is refused
     // here exactly as `projects.create` refuses it (#206).
@@ -581,9 +756,6 @@ async fn projects_update(
     if input.description.is_some() {
         changed.push("description");
     }
-    if input.status.is_some() {
-        changed.push("status");
-    }
     if input.project_type_code.is_some() {
         changed.push("project_type_code");
     }
@@ -597,8 +769,7 @@ async fn projects_update(
         return Err(invalid(
             "name",
             "invalid_value",
-            "nothing to update: supply name, description, status, project_type_code, repo_url \
-             or meta",
+            "nothing to update: supply name, description, project_type_code, repo_url or meta",
         ));
     }
     // Metadata is merged, not replaced: the seed owns keys this action does not (`issues`,
@@ -617,7 +788,8 @@ async fn projects_update(
     let patch = ProjectPatch {
         name: input.name.map(|name| name.trim().to_owned()),
         description: input.description,
-        status: input.status,
+        // Always None: a supplied status was refused above.
+        status: None,
         project_type_code: input.project_type_code,
         repo_url: input.repo_url,
         meta,
@@ -648,6 +820,107 @@ async fn projects_update(
         aggregate_type: "project".to_owned(),
         aggregate_id: updated.id,
         payload: serde_json::json!({"id": updated.id, "changed": changed}),
+        correlation_id: None,
+        causation_id: None,
+    };
+    store::outbox::append(&mut *tx, ctx.tenant, &event)
+        .await
+        .map_err(|error| {
+            tracing::error!(%error, "append project event");
+            ActionError::internal()
+        })?;
+    let etag = crate::control::etag_of(i64::try_from(updated.version.get()).unwrap_or(i64::MAX));
+    Ok(HandlerOutput::ok(project_view(&updated, &boards)).with_etag(etag))
+}
+
+/// `projects.programme_meta` — the programme's own write path for the keys it owns.
+///
+/// `projects.update` refuses these keys; the seed and this action are the two writers. The
+/// console uses it to set a project's class, tranche and plan path under the programme's
+/// `portfolio:write` authority.
+#[crate::action(
+    name = "projects.programme_meta",
+    version = 1,
+    kind = "internal",
+    scopes = ["portfolio:write"],
+    idempotent = false,
+    timeout_ms = 30000,
+    effect = "write",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn projects_programme_meta(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: ProjectProgrammeMetaIn,
+) -> Result<HandlerOutput<ProjectView>, ActionError> {
+    let action = "projects.programme_meta";
+    let serde_json::Value::Object(extra) = input.meta else {
+        return Err(invalid("meta", "invalid_value", "meta must be an object"));
+    };
+    if extra.is_empty() {
+        return Err(invalid(
+            "meta",
+            "required",
+            "supply at least one programme-owned key",
+        ));
+    }
+    if let Some(key) = extra.keys().find(|key| !is_programme_meta(key)) {
+        return Err(invalid(
+            "meta",
+            "meta_key_not_programme",
+            format!("`{key}` is not programme-owned; edit it through projects.update"),
+        ));
+    }
+    let project = load_project(tx, ctx.tenant, input.id).await?;
+    let boards = store::board::list_boards_tx(&mut *tx, ctx.tenant, project.id)
+        .await
+        .map_err(|error| store_error(error, action))?;
+    let expected = crate::control::require_precondition_with(
+        &ctx,
+        action,
+        serde_json::to_value(project_view(&project, &boards)).unwrap_or(serde_json::Value::Null),
+    )?;
+    let mut merged = project.meta.clone();
+    if let serde_json::Value::Object(target) = &mut merged {
+        for (key, value) in extra {
+            target.insert(key, value);
+        }
+    }
+    let patch = ProjectPatch {
+        name: None,
+        description: None,
+        status: None,
+        project_type_code: None,
+        repo_url: None,
+        meta: Some(merged),
+    };
+    let updated = store::project::update_project_tx(
+        &mut *tx, ctx.tenant, input.id, expected, &patch,
+    )
+    .await
+    .map_err(|error| match error {
+        store::project::ProjectStoreError::NotFound => ActionError::resource_not_found("project"),
+        store::project::ProjectStoreError::VersionMismatch { current } => {
+            ActionError::precondition(format!(
+                "{action}: the project is at version {}, not the version the caller supplied",
+                current.get()
+            ))
+        }
+        other => {
+            tracing::error!(error = %other, "programme project meta");
+            ActionError::internal()
+        }
+    })?;
+    let boards = store::board::list_boards_tx(&mut *tx, ctx.tenant, updated.id)
+        .await
+        .map_err(|error| store_error(error, action))?;
+    let event = store::NewEvent {
+        topic: format!("project:{}", updated.id),
+        event_type: "project.updated".to_owned(),
+        aggregate_type: "project".to_owned(),
+        aggregate_id: updated.id,
+        payload: serde_json::json!({"id": updated.id, "changed": ["meta"]}),
         correlation_id: None,
         causation_id: None,
     };

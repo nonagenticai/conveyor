@@ -460,6 +460,32 @@ pub async fn close_project_tx(
     Ok(row.map(Into::into))
 }
 
+/// A status-guarded transition that is not `close` (CONTRACT §3): `None` means the project is
+/// absent or not in one of `from`.
+pub async fn transition_project_status_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    id: Uuid,
+    from: &[&str],
+    to: &str,
+) -> Result<Option<Project>, sqlx::Error> {
+    let from: Vec<String> = from.iter().map(|state| (*state).to_owned()).collect();
+    let row: Option<ProjectRow> = sqlx::query_as(
+        "UPDATE project
+            SET status = $3, version = version + 1, updated_at = now()
+          WHERE tenant_id = $1 AND id = $2 AND status = ANY($4)
+          RETURNING id, key, name, description, status, programme_id, project_type_code,
+                    phase_code, owner_user_id, repo_url, meta, version",
+    )
+    .bind(tenant.as_uuid())
+    .bind(id)
+    .bind(to)
+    .bind(from)
+    .fetch_optional(&mut *conn)
+    .await?;
+    Ok(row.map(Into::into))
+}
+
 /// A project-page cursor: `base64url("<key>|<uuid>")`, unpadded (CONTRACT §5).
 ///
 /// The pair is the sort key of the last row of the previous page: `key` is unique per

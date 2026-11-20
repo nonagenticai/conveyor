@@ -419,7 +419,54 @@ async fn pm_plan(
     input: PmPlanIn,
 ) -> Result<HandlerOutput<PmPlanOut>, ActionError> {
     assert_pm(&mut *tx, ctx.tenant, input.job_binding_id).await?;
-    let charter_gate = approved_gate(&mut *tx, ctx.tenant, input.project_id, "charter").await?;
+    plan_project(tx, &ctx, input.project_id, input.wbs, input.baseline_kind).await
+}
+
+/// `projects.baseline` — the charter-gated plan without a PM job binding.
+///
+/// `pm.plan` is the PM's route and requires an active PM binding. A programme actor baselining a
+/// chartered project has no PM binding, which is why the programme had zero project baselines.
+/// Both routes take the same charter gate and open the same baseline approval.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct ProjectBaselineIn {
+    /// The project.
+    pub project_id: Uuid,
+    /// The WBS, parents before children.
+    pub wbs: Vec<PmWbsNode>,
+    /// `scope | schedule | cost`; `scope` when absent.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub baseline_kind: Option<String>,
+}
+
+#[crate::action(
+    name = "projects.baseline",
+    version = 1,
+    kind = "internal",
+    scopes = ["projects:write"],
+    idempotent = false,
+    timeout_ms = 30000,
+    effect = "write",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn projects_baseline(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: ProjectBaselineIn,
+) -> Result<HandlerOutput<PmPlanOut>, ActionError> {
+    plan_project(tx, &ctx, input.project_id, input.wbs, input.baseline_kind).await
+}
+
+/// The charter-gated plan shared by `pm.plan` and `projects.baseline`: WBS nodes, the baseline
+/// and its approval, all in the caller's transaction.
+async fn plan_project(
+    tx: &mut PgConnection,
+    ctx: &HandlerCtx,
+    project_id: Uuid,
+    wbs: Vec<PmWbsNode>,
+    baseline_kind: Option<String>,
+) -> Result<HandlerOutput<PmPlanOut>, ActionError> {
+    let charter_gate = approved_gate(&mut *tx, ctx.tenant, project_id, "charter").await?;
     let Some(_charter_gate) = charter_gate else {
         return Err(ActionError::new(
             409,
@@ -427,8 +474,8 @@ async fn pm_plan(
             "the charter gate must be approved before the project can be planned",
         ));
     };
-    let mut wbs_ids = Vec::with_capacity(input.wbs.len());
-    for node in &input.wbs {
+    let mut wbs_ids = Vec::with_capacity(wbs.len());
+    for node in &wbs {
         let parent_id = match node.parent_index {
             Some(index) => Some(*wbs_ids.get(index).ok_or_else(|| {
                 ActionError::new(
@@ -443,7 +490,7 @@ async fn pm_plan(
             &mut *tx,
             ctx.tenant,
             &NewWbsNode {
-                project_id: input.project_id,
+                project_id,
                 parent_id,
                 position: None,
                 kind: node.kind.clone(),
@@ -466,7 +513,7 @@ async fn pm_plan(
         })?;
         wbs_ids.push(row.id);
     }
-    let kind = input.baseline_kind.unwrap_or_else(|| "scope".to_owned());
+    let kind = baseline_kind.unwrap_or_else(|| "scope".to_owned());
     if !matches!(kind.as_str(), "scope" | "schedule" | "cost") {
         return Err(ActionError::new(
             422,
@@ -474,23 +521,17 @@ async fn pm_plan(
             "baseline_kind must be scope, schedule or cost",
         ));
     }
-    let baseline = store::spine::take_baseline_tx(
-        &mut *tx,
-        ctx.tenant,
-        input.project_id,
-        &kind,
-        ctx.actor_id,
-        None,
-    )
-    .await
-    .map_err(|error| {
-        tracing::error!(%error, "pm.plan: take baseline");
-        ActionError::internal()
-    })?;
+    let baseline =
+        store::spine::take_baseline_tx(&mut *tx, ctx.tenant, project_id, &kind, ctx.actor_id, None)
+            .await
+            .map_err(|error| {
+                tracing::error!(%error, "pm.plan: take baseline");
+                ActionError::internal()
+            })?;
     let approval_id = open_gate(
         &mut *tx,
-        &ctx,
-        input.project_id,
+        ctx,
+        project_id,
         "baseline",
         "pm",
         1,

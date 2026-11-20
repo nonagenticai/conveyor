@@ -86,7 +86,7 @@ async fn create_project(running: &support::Running, title: &str) -> (String, Str
 async fn declare_outputs(running: &support::Running, project: &str, outputs: &[&str]) {
     let (status, body) = running
         .invoke(
-            "projects.update",
+            "projects.programme_meta",
             TOKEN,
             json!({"id": project, "meta": {"expected_outputs": outputs}}),
             Some("\"1\""),

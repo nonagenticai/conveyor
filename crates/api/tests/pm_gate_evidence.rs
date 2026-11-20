@@ -63,6 +63,7 @@ async fn fixture() -> Fixture {
             phase_code: "f".to_owned(),
             title: "Delivery contract".to_owned(),
             body: json!({}),
+            requested_by: seeded.user_id,
             supersedes_id: None,
         },
     )
@@ -74,6 +75,7 @@ async fn fixture() -> Fixture {
         contract.id,
         contract.version,
         seeded.user_id,
+        None,
     )
     .await
     .expect("approve the governing contract");

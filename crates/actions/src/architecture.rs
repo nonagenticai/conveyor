@@ -923,6 +923,10 @@ pub struct ContractOut {
     pub approved_by: Option<String>,
     /// When.
     pub approved_at: Option<DateTime<Utc>>,
+    /// Who requested it; `None` on a contract that predates the column.
+    pub requested_by: Option<String>,
+    /// True when no requester is recorded (a legacy row needing a waiver decision).
+    pub requester_unknown: bool,
     /// Supersedes.
     pub supersedes_id: Option<String>,
     /// Superseded by.
@@ -943,6 +947,8 @@ fn contract_out(record: &ContractRecord) -> ContractOut {
         approval_id: record.approval_id.map(|id| id.to_string()),
         approved_by: record.approved_by.map(|id| id.to_string()),
         approved_at: record.approved_at,
+        requested_by: record.requested_by.map(|id| id.to_string()),
+        requester_unknown: record.requested_by.is_none(),
         supersedes_id: record.supersedes_id.map(|id| id.to_string()),
         superseded_by_id: record.superseded_by_id.map(|id| id.to_string()),
         version: record.version,
@@ -971,6 +977,7 @@ async fn architecture_contracts_request(
         phase_code: input.phase_code,
         title: input.title,
         body: input.body,
+        requested_by: ctx.actor_id,
         supersedes_id: input.supersedes_id,
     };
     let record = store::architecture::request_contract_tx(&mut *tx, ctx.tenant, &new)
@@ -1043,6 +1050,18 @@ async fn architecture_contracts_list(
     }))
 }
 
+/// `architecture.contracts_approve` — approve a draft contract, by an actor other than its
+/// requester.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct ContractApproveIn {
+    /// The contract.
+    pub id: Uuid,
+    /// The board decision that approves it. Optional here; the rework requires it for every
+    /// delivery contract so the approval is provable.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub approval_id: Option<Uuid>,
+}
+
 #[crate::action(
     name = "architecture.contracts_approve",
     version = 1,
@@ -1057,12 +1076,24 @@ async fn architecture_contracts_list(
 async fn architecture_contracts_approve(
     tx: &mut PgConnection,
     ctx: HandlerCtx,
-    input: ContractIdIn,
+    input: ContractApproveIn,
 ) -> Result<HandlerOutput<ContractOut>, ActionError> {
     let current = store::architecture::get_contract_tx(&mut *tx, ctx.tenant, input.id)
         .await
         .map_err(|error| arch_error(error, ctx.action))?
         .ok_or_else(|| ActionError::resource_not_found("such architecture contract"))?;
+    // The requester is recorded at request time; the approver must be a different actor. A
+    // legacy row with no requester is allowed through and reads `requester_unknown: true`.
+    if current
+        .requested_by
+        .is_some_and(|requester| requester == ctx.actor_id)
+    {
+        return Err(ActionError::new(
+            409,
+            "requester_is_approver",
+            "a contract is approved by an actor other than the one that requested it",
+        ));
+    }
     let expected =
         require_precondition_with(&ctx, ctx.action, json!({ "version": current.version }))?;
     let record = store::architecture::approve_contract_tx(
@@ -1071,6 +1102,7 @@ async fn architecture_contracts_approve(
         input.id,
         i64::try_from(expected.get()).unwrap_or(i64::MAX),
         ctx.actor_id,
+        input.approval_id,
     )
     .await
     .map_err(|error| arch_error(error, ctx.action))?;
@@ -1546,6 +1578,13 @@ pub struct BoardDecideIn {
     /// The evidence the decision was taken on.
     #[serde(default)]
     pub evidence: Value,
+    /// What the decision is about: `board`, `contract`, `artifact`, `adm_profile` or `waiver`.
+    /// A decision about the board itself (`board`) with `approved` activates it.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub subject_kind: Option<String>,
+    /// The subject's id; absent only for a decision about the board itself.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub subject_id: Option<Uuid>,
 }
 
 /// The recorded decision.
@@ -1578,6 +1617,8 @@ async fn architecture_board_decide(
         &input.decision,
         input.evidence,
         ctx.actor_id,
+        input.subject_kind.as_deref(),
+        input.subject_id,
     )
     .await
     .map_err(|error| arch_error(error, ctx.action))?;

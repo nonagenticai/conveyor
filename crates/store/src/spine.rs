@@ -1061,12 +1061,16 @@ pub struct TrancheRecord {
     pub review_at: Option<DateTime<Utc>>,
     /// Why the tranche was retired; empty unless `state='retired'`.
     pub retired_reason: String,
+    /// When the tranche was authorised, if it has been.
+    pub authorised_at: Option<DateTime<Utc>>,
+    /// The review that authorised it.
+    pub authorisation_review_id: Option<Uuid>,
     /// The If-Match version.
     pub version: i64,
 }
 
 const TRANCHE_COLUMNS: &str = "id, programme_id, number, state, entry_criteria, exit_criteria, \
-    baseline_ref, review_at, retired_reason, version";
+    baseline_ref, review_at, retired_reason, authorised_at, authorisation_review_id, version";
 
 /// Create a tranche.
 pub async fn insert_tranche_tx(
@@ -1211,6 +1215,77 @@ pub async fn review_tranche_tx(
         .fetch_optional(&mut *conn)
         .await?;
     row.ok_or(PlanStoreError::NotFound { what: "tranche" })
+}
+
+/// Authorise the tranche after `review_id`'s `continue` decision.
+///
+/// The normal path performs this in the same write as the review; this is the **repair** path for
+/// a review whose authorisation never landed. It links the existing review and never creates one,
+/// and a repeat call returns the same link without writing.
+pub async fn authorise_tranche_from_review_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    review_id: Uuid,
+) -> Result<TrancheRecord, PlanStoreError> {
+    let sql = format!(
+        "SELECT {TRANCHE_REVIEW_COLUMNS} FROM programme_tranche_review
+          WHERE tenant_id = $1 AND id = $2"
+    );
+    let review: Option<TrancheReviewRecord> = sqlx::query_as(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(review_id)
+        .fetch_optional(&mut *conn)
+        .await?;
+    let review = review.ok_or(PlanStoreError::NotFound {
+        what: "tranche review",
+    })?;
+    if review.decision != "continue" {
+        return Err(PlanStoreError::Illegal(PlanError::TrancheReviewNotContinue));
+    }
+    let reviewed = get_tranche_tx(&mut *conn, tenant, review.tranche_id)
+        .await?
+        .ok_or(PlanStoreError::NotFound { what: "tranche" })?;
+    let number = reviewed.number + 1;
+    let next_sql = format!(
+        "SELECT {TRANCHE_COLUMNS} FROM programme_tranche
+          WHERE tenant_id = $1 AND programme_id = $2 AND number = $3"
+    );
+    let next: Option<TrancheRecord> = sqlx::query_as(AssertSqlSafe(next_sql))
+        .bind(tenant.as_uuid())
+        .bind(reviewed.programme_id)
+        .bind(number)
+        .fetch_optional(&mut *conn)
+        .await?;
+    let next = next.ok_or(PlanStoreError::NotFound {
+        what: "next tranche",
+    })?;
+    if next.state == "authorised" && next.authorisation_review_id == Some(review.id) {
+        return Ok(next);
+    }
+    if next.state != "planned" {
+        return Err(PlanStoreError::Conflict {
+            what: "next tranche",
+            why: "the next tranche is not planned and was not authorised by this review",
+        });
+    }
+    let sql = format!(
+        "UPDATE programme_tranche
+            SET state = 'authorised', authorised_at = now(),
+                authorisation_review_id = $4, version = version + 1, updated_at = now()
+          WHERE tenant_id = $1 AND programme_id = $2 AND number = $3 AND state = 'planned'
+         RETURNING {TRANCHE_COLUMNS}"
+    );
+    sqlx::query_as(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(reviewed.programme_id)
+        .bind(number)
+        .bind(review.id)
+        .fetch_optional(&mut *conn)
+        .await?
+        .ok_or(PlanStoreError::Conflict {
+            what: "next tranche",
+            why: "the tranche changed between the read and the write",
+        })
 }
 
 /// The programme tranche that governs a project's start: its number and state, when the

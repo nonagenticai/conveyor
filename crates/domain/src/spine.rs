@@ -108,6 +108,9 @@ pub enum PlanError {
     /// A tranche review with no baselines, benefit status or risk evidence is refused.
     #[error("a tranche review needs baselines, benefit status and the risk register as evidence")]
     TrancheReviewEvidenceMissing,
+    /// Only a `continue` decision authorises the next tranche.
+    #[error("only a continue review authorises the next tranche")]
+    TrancheReviewNotContinue,
     /// A dependency edge closed a cycle.
     #[error("the dependency {from} -> {to} would close a cycle")]
     DependencyCycle {

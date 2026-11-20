@@ -108,6 +108,11 @@ fn spine_error(error: PlanStoreError, action: &str) -> ActionError {
             "tranche_evidence_missing",
             "a tranche review needs baselines, benefit status and the risk register",
         ),
+        PlanStoreError::Illegal(PlanError::TrancheReviewNotContinue) => ActionError::new(
+            409,
+            "tranche_review_not_continue",
+            "only a continue review authorises the next tranche",
+        ),
         PlanStoreError::Illegal(PlanError::BenefitBaselineMissing) => invalid(
             "baseline",
             "benefit_baseline_missing",
@@ -574,6 +579,10 @@ pub struct TrancheOut {
     pub review_at: Option<DateTime<Utc>>,
     /// Why the tranche was retired; empty unless `state='retired'`.
     pub retired_reason: String,
+    /// When the tranche was authorised, if it has been.
+    pub authorised_at: Option<DateTime<Utc>>,
+    /// The review that authorised it.
+    pub authorisation_review_id: Option<String>,
     /// The If-Match version.
     pub version: i64,
 }
@@ -589,6 +598,8 @@ fn tranche_out(record: &TrancheRecord) -> TrancheOut {
         baseline_ref: record.baseline_ref.map(|id| id.to_string()),
         review_at: record.review_at,
         retired_reason: record.retired_reason.clone(),
+        authorised_at: record.authorised_at,
+        authorisation_review_id: record.authorisation_review_id.map(|id| id.to_string()),
         version: record.version,
     }
 }
@@ -1808,6 +1819,38 @@ async fn tranches_review(
     .await
     .map_err(|error| spine_error(error, ctx.action))?;
     emit_spine_event(&mut *tx, &ctx, "programme_tranche", record.id, "reviewed").await?;
+    Ok(HandlerOutput::ok(tranche_out(&record)).with_etag(etag_of(record.version)))
+}
+
+/// `tranches.authorise` — repair a `continue` review whose next-tranche authorisation never
+/// landed, linking the existing review. It cannot manufacture a review.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct TrancheAuthoriseIn {
+    /// The `continue` review whose next-tranche authorisation never landed.
+    pub review_id: Uuid,
+}
+
+#[crate::action(
+    name = "tranches.authorise",
+    version = 1,
+    kind = "internal",
+    scopes = ["portfolio:write"],
+    idempotent = true,
+    timeout_ms = 30000,
+    effect = "write",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn tranches_authorise(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: TrancheAuthoriseIn,
+) -> Result<HandlerOutput<TrancheOut>, ActionError> {
+    let record =
+        store::spine::authorise_tranche_from_review_tx(&mut *tx, ctx.tenant, input.review_id)
+            .await
+            .map_err(|error| spine_error(error, ctx.action))?;
+    emit_spine_event(&mut *tx, &ctx, "programme_tranche", record.id, "authorised").await?;
     Ok(HandlerOutput::ok(tranche_out(&record)).with_etag(etag_of(record.version)))
 }
 
