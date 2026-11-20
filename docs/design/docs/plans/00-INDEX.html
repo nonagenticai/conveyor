@@ -173,6 +173,9 @@
 <p><strong>Pass 9 (2026-11-10 — D31, the interaction connector standard).</strong> George ruled that web, Telegram and MCP are <strong>three instances of one class of user-interaction app</strong>, not three special cases: one standard with multicast and first response, thin per-connector code, and config entered through the web UI and stored in Postgres. Added <strong>SPEC D31</strong>, <strong>CONTRACT §8</strong> (identity/grants/multicast/floor), <strong>migration <code>0038_s06d_connector_standard</code></strong> (<code>channel_action_grant</code>, <code>interaction_dispatch</code>, the open kind vocabulary, the <code>service</code> decider kind and the Telegram identity backfill), and <strong>S06d</strong> (<code>channel::connectors</code>, <code>channel::command</code>, the generic inbound route, <code>interaction.dispatch</code>/<code>interaction.close</code>, the seven <code>channels.*</code> admin actions). The machine floor now also closes roles/invites/departments/webhooks and <code>boards.set_member</code>. New totals: <strong>85 tables · 274 actions · 82 events</strong>. S12 gains the screen contract in <code>handoffs/S12-connectors.md</code>. Migration numbers 0035/0036 belong to the S12 lane's process tree and S19 output grade; S06d is 0037 in the merged lane.</p>
 <hr />
 <h2 id="slices">Slices</h2>
+<blockquote>
+<p>⚠️ <strong>This table is the build record of the 2026-11-07/08 planning passes, not live status.</strong> Live delivery status is derived once — GitHub issue state, then the design pack's coverage, then the plan frontmatter (<code>scripts/programme_state.py</code>) — and published as the tracked programme issue (#435, label <code>programme</code>), <code>https://conveyor.nonagentic.ai/design/data/programme.json</code> and <code>…/programme.csv</code>. A "remaining" note here may be stale; the issue is not.</p>
+</blockquote>
 <table>
 <thead>
 <tr>

@@ -300,6 +300,20 @@ pub async fn run_with_pool(
     })
 }
 
+/// One snapshot section as the standalone JSON file the CLI writes.
+///
+/// The live `/design/data/programme.json` route serves this from memory, so the download and the
+/// file `conveyor snapshot` writes are the same bytes: one header, one redaction pass, one
+/// ordering.
+pub(crate) fn section_json(section: &Value, generated_at: &str) -> Result<String, SnapshotError> {
+    let mut value = section.clone();
+    redact(&mut value);
+    let value = with_header(value, SCHEMA, generated_at);
+    let mut text = serde_json::to_string_pretty(&value)?;
+    text.push('\n');
+    Ok(text)
+}
+
 /// Add the schema and timestamp so every file is self-describing.
 fn with_header(mut value: Value, schema: &str, generated_at: &str) -> Value {
     if let Some(object) = value.as_object_mut() {

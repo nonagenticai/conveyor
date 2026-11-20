@@ -376,6 +376,14 @@ Default priority is issue-number order; a dependency blocker always overrides it
 `status:blocked` issue. Blockers are named in the body; when the blocker lands, the owner of that
 issue flips it to `status:ready`.
 
+⭐ **The programme's live delivery record is #435** (label `programme`): one generated table of
+every project — status, tranche, what blocks it, its units — refreshed from this queue by
+`.github/workflows/issue-registry.yml`. The same rows download as
+`https://conveyor.nonagentic.ai/design/data/programme.json` and `…/programme.csv`. Status there is
+derived once (`scripts/programme_state.py`: issue state, then coverage, then plan frontmatter), so
+a row that disagrees with the labels is a generator defect to report, never a second truth to
+maintain by hand.
+
 For the whole-queue truth report — ready-with-branch, claimed-without-branch, abandoned-claim,
 PR-without-`Closes`, open-issue-with-merged-PR, and the branch-to-issue map — run the
 `/issue-sweep` skill. It reports and never edits; the owning session (or an adopter, after the 48 h

@@ -17,7 +17,7 @@
         "issues": [],
         "depends_on": [],
         "plan_status": "planned",
-        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "status_source": "github issue state > measured coverage > plan frontmatter",
         "measured_status": "built",
         "tranche": 0,
         "expected_outputs": [
@@ -41,7 +41,7 @@
         "issues": [],
         "depends_on": [],
         "plan_status": "planned",
-        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "status_source": "github issue state > measured coverage > plan frontmatter",
         "measured_status": "built",
         "tranche": 0,
         "expected_outputs": [
@@ -69,7 +69,7 @@
           "S00"
         ],
         "plan_status": "planned",
-        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "status_source": "github issue state > measured coverage > plan frontmatter",
         "measured_status": "built",
         "tranche": 1,
         "expected_outputs": [
@@ -95,7 +95,7 @@
           "S02"
         ],
         "plan_status": "planned",
-        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "status_source": "github issue state > measured coverage > plan frontmatter",
         "measured_status": "built",
         "tranche": 2,
         "expected_outputs": [
@@ -124,7 +124,7 @@
           "S03"
         ],
         "plan_status": "planned",
-        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "status_source": "github issue state > measured coverage > plan frontmatter",
         "measured_status": "built",
         "tranche": 3,
         "expected_outputs": [
@@ -151,7 +151,7 @@
           "S04"
         ],
         "plan_status": "planned",
-        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "status_source": "github issue state > measured coverage > plan frontmatter",
         "measured_status": "built",
         "tranche": 4,
         "expected_outputs": [
@@ -181,7 +181,7 @@
           "S05"
         ],
         "plan_status": "planned",
-        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "status_source": "github issue state > measured coverage > plan frontmatter",
         "measured_status": "built",
         "tranche": 5,
         "expected_outputs": [
@@ -209,7 +209,7 @@
           "S06"
         ],
         "plan_status": "superseded",
-        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "status_source": "github issue state > measured coverage > plan frontmatter",
         "measured_status": "archived",
         "tranche": 6,
         "expected_outputs": [
@@ -236,7 +236,7 @@
           "S06"
         ],
         "plan_status": "planned",
-        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "status_source": "github issue state > measured coverage > plan frontmatter",
         "measured_status": "built",
         "tranche": 6,
         "expected_outputs": [
@@ -265,7 +265,7 @@
           "S06b"
         ],
         "plan_status": "built 2026-11-09",
-        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "status_source": "github issue state > measured coverage > plan frontmatter",
         "measured_status": "built",
         "tranche": 7,
         "expected_outputs": [
@@ -296,7 +296,7 @@
           "S06c"
         ],
         "plan_status": "built",
-        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "status_source": "github issue state > measured coverage > plan frontmatter",
         "measured_status": "built",
         "tranche": 8,
         "expected_outputs": [
@@ -323,7 +323,7 @@
           "S04"
         ],
         "plan_status": "planned",
-        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "status_source": "github issue state > measured coverage > plan frontmatter",
         "measured_status": "built",
         "tranche": 4,
         "expected_outputs": [
@@ -351,7 +351,7 @@
           "S07"
         ],
         "plan_status": "planned",
-        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "status_source": "github issue state > measured coverage > plan frontmatter",
         "measured_status": "built",
         "tranche": 5,
         "expected_outputs": [
@@ -385,7 +385,7 @@
           "S04"
         ],
         "plan_status": "planned",
-        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "status_source": "github issue state > measured coverage > plan frontmatter",
         "measured_status": "built",
         "tranche": 4,
         "expected_outputs": [
@@ -414,7 +414,7 @@
           "S06"
         ],
         "plan_status": "planned",
-        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "status_source": "github issue state > measured coverage > plan frontmatter",
         "measured_status": "built",
         "tranche": 6,
         "expected_outputs": [
@@ -445,7 +445,7 @@
           "S07"
         ],
         "plan_status": "built 2026-11-09 (steps 1–12); amended 2026-11-09 (process/step/SOP split — migration 0033)",
-        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "status_source": "github issue state > measured coverage > plan frontmatter",
         "measured_status": "built",
         "tranche": 6,
         "expected_outputs": [
@@ -498,7 +498,7 @@
           "S18"
         ],
         "plan_status": "built",
-        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "status_source": "github issue state > measured coverage > plan frontmatter",
         "measured_status": "built",
         "tranche": 10,
         "expected_outputs": [
@@ -532,7 +532,7 @@
           "S15"
         ],
         "plan_status": "built (2026-11-10; session 2 closed W4/W5/D29, the catalogue E2E and the BYO token path; session 3 closed the step contract, gate/call seed content, the run lifecycle, the judge record, map authoring, the bus replay proof and the install path; the DAG plan is superseded; the engine is retained — owner ruling 2026-11-09)",
-        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "status_source": "github issue state > measured coverage > plan frontmatter",
         "measured_status": "built",
         "tranche": 8,
         "expected_outputs": [
@@ -564,7 +564,7 @@
           "S13"
         ],
         "plan_status": "executed (2026-11-18; gitops-production",
-        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "status_source": "github issue state > measured coverage > plan frontmatter",
         "measured_status": "partial",
         "tranche": 11,
         "expected_outputs": [
@@ -597,7 +597,7 @@
           "S11"
         ],
         "plan_status": "planned",
-        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "status_source": "github issue state > measured coverage > plan frontmatter",
         "measured_status": "built",
         "tranche": 7,
         "expected_outputs": [
@@ -629,7 +629,7 @@
           "S11"
         ],
         "plan_status": "built 2026-11-09",
-        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "status_source": "github issue state > measured coverage > plan frontmatter",
         "measured_status": "built",
         "tranche": 7,
         "expected_outputs": [
@@ -660,7 +660,7 @@
           "S09"
         ],
         "plan_status": "built 2026-11-09",
-        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "status_source": "github issue state > measured coverage > plan frontmatter",
         "measured_status": "built",
         "tranche": 5,
         "expected_outputs": [
@@ -691,7 +691,7 @@
           "S17"
         ],
         "plan_status": "planned",
-        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "status_source": "github issue state > measured coverage > plan frontmatter",
         "measured_status": "built",
         "tranche": 9,
         "expected_outputs": [
@@ -727,7 +727,7 @@
           "S16"
         ],
         "plan_status": "planned",
-        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "status_source": "github issue state > measured coverage > plan frontmatter",
         "measured_status": "built",
         "tranche": 8,
         "expected_outputs": [
@@ -755,7 +755,7 @@
           "S19"
         ],
         "plan_status": "planned",
-        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "status_source": "github issue state > measured coverage > plan frontmatter",
         "measured_status": "built",
         "tranche": 9,
         "expected_outputs": [
@@ -786,7 +786,7 @@
           "S16"
         ],
         "plan_status": "plan written 2026-11-09",
-        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "status_source": "github issue state > measured coverage > plan frontmatter",
         "measured_status": "partial",
         "tranche": 9,
         "expected_outputs": [
@@ -814,7 +814,7 @@
         ],
         "depends_on": [],
         "plan_status": "draft",
-        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "status_source": "github issue state > measured coverage > plan frontmatter",
         "measured_status": "built",
         "tranche": 0,
         "expected_outputs": [
@@ -846,7 +846,7 @@
           "P0"
         ],
         "plan_status": "draft",
-        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "status_source": "github issue state > measured coverage > plan frontmatter",
         "measured_status": "built",
         "tranche": 1,
         "expected_outputs": [
@@ -878,7 +878,7 @@
           "P0"
         ],
         "plan_status": "draft",
-        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "status_source": "github issue state > measured coverage > plan frontmatter",
         "measured_status": "built",
         "tranche": 2,
         "expected_outputs": [
@@ -910,7 +910,7 @@
           "P0"
         ],
         "plan_status": "draft",
-        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "status_source": "github issue state > measured coverage > plan frontmatter",
         "measured_status": "built",
         "tranche": 3,
         "expected_outputs": [
@@ -942,7 +942,7 @@
           "P0"
         ],
         "plan_status": "draft",
-        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "status_source": "github issue state > measured coverage > plan frontmatter",
         "measured_status": "built",
         "tranche": 4,
         "expected_outputs": [
@@ -979,7 +979,7 @@
           "P0"
         ],
         "plan_status": "draft",
-        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "status_source": "github issue state > measured coverage > plan frontmatter",
         "measured_status": "proposed",
         "tranche": 10,
         "expected_outputs": [
@@ -1014,7 +1014,7 @@
           "P0"
         ],
         "plan_status": "draft",
-        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "status_source": "github issue state > measured coverage > plan frontmatter",
         "measured_status": "proposed",
         "tranche": 11,
         "expected_outputs": [
@@ -1053,7 +1053,7 @@
           "P0"
         ],
         "plan_status": "draft",
-        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "status_source": "github issue state > measured coverage > plan frontmatter",
         "measured_status": "built",
         "tranche": 5,
         "expected_outputs": [
@@ -1085,7 +1085,7 @@
           "P0"
         ],
         "plan_status": "draft",
-        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "status_source": "github issue state > measured coverage > plan frontmatter",
         "measured_status": "built",
         "tranche": 11,
         "expected_outputs": [
@@ -1119,7 +1119,7 @@
           "P0"
         ],
         "plan_status": "draft",
-        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "status_source": "github issue state > measured coverage > plan frontmatter",
         "measured_status": "built",
         "tranche": 4,
         "expected_outputs": [
@@ -1164,7 +1164,7 @@
           "P0"
         ],
         "plan_status": "draft",
-        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "status_source": "github issue state > measured coverage > plan frontmatter",
         "measured_status": "built",
         "tranche": 4,
         "expected_outputs": [
@@ -1196,7 +1196,7 @@
           "P0"
         ],
         "plan_status": "draft",
-        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "status_source": "github issue state > measured coverage > plan frontmatter",
         "measured_status": "built",
         "tranche": 1,
         "expected_outputs": [
@@ -1244,7 +1244,7 @@
           "P0"
         ],
         "plan_status": "draft",
-        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "status_source": "github issue state > measured coverage > plan frontmatter",
         "measured_status": "proposed",
         "tranche": 13,
         "expected_outputs": [
@@ -1278,7 +1278,7 @@
           "P0"
         ],
         "plan_status": "draft",
-        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "status_source": "github issue state > measured coverage > plan frontmatter",
         "measured_status": "built",
         "tranche": 3,
         "expected_outputs": [
@@ -1310,7 +1310,7 @@
           "P0"
         ],
         "plan_status": "draft",
-        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "status_source": "github issue state > measured coverage > plan frontmatter",
         "measured_status": "built",
         "tranche": 4,
         "expected_outputs": [
@@ -1343,7 +1343,7 @@
           "P0"
         ],
         "plan_status": "draft",
-        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "status_source": "github issue state > measured coverage > plan frontmatter",
         "measured_status": "proposed",
         "tranche": 12,
         "expected_outputs": [
@@ -1379,7 +1379,7 @@
           "P0"
         ],
         "plan_status": "draft",
-        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "status_source": "github issue state > measured coverage > plan frontmatter",
         "measured_status": "built",
         "tranche": 4,
         "expected_outputs": [
@@ -1412,7 +1412,7 @@
           "P0"
         ],
         "plan_status": "draft",
-        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "status_source": "github issue state > measured coverage > plan frontmatter",
         "measured_status": "proposed",
         "tranche": 5,
         "expected_outputs": [
@@ -1450,7 +1450,7 @@
         ],
         "depends_on": [],
         "plan_status": "active",
-        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "status_source": "github issue state > measured coverage > plan frontmatter",
         "measured_status": "built",
         "tranche": 0,
         "expected_outputs": [
@@ -1480,7 +1480,7 @@
         ],
         "depends_on": [],
         "plan_status": "active",
-        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "status_source": "github issue state > measured coverage > plan frontmatter",
         "measured_status": "built",
         "tranche": 0,
         "expected_outputs": [
@@ -1549,7 +1549,7 @@
         ],
         "depends_on": [],
         "plan_status": "active",
-        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "status_source": "github issue state > measured coverage > plan frontmatter",
         "measured_status": "standing",
         "tranche": 0,
         "expected_outputs": [
@@ -1577,7 +1577,7 @@
         ],
         "depends_on": [],
         "plan_status": "active",
-        "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+        "status_source": "github issue state > measured coverage > plan frontmatter",
         "measured_status": "built",
         "tranche": 0,
         "expected_outputs": [

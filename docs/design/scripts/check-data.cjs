@@ -35,8 +35,26 @@ const TOKEN =
 const IP = /\b(?:\d{1,3}\.){3}\d{1,3}\b/;
 const HOME_PATH = /(?:~\/|\/Users\/[A-Za-z0-9._-]+|\/home\/[A-Za-z0-9._-]+)/;
 
+// #433: the programme's download contract. `programme.json` is served live from the tenant's rows
+// and is never a committed file, so this asserts the page's links, not a payload — and it runs
+// BEFORE the snapshot gate, because the committed pack is DESIGN mode and would exit early.
+const v2Path = path.join(root, "v2.js");
+if (fs.existsSync(v2Path)) {
+  const v2 = fs.readFileSync(v2Path, "utf8");
+  const downloads = ['href="data/programme.json"', 'href="data/programme.csv"'].filter((href) =>
+    v2.includes(href),
+  );
+  if (downloads.length === 2) {
+    ok("v2.js links the programme downloads");
+  } else {
+    bad(`v2.js must link data/programme.json and data/programme.csv (found ${downloads.length}/2)`);
+  }
+  if (failures.length) report();
+}
+
 if (!fs.existsSync(dataDir)) {
-  console.log("check-data: no data/ directory — DESIGN mode (nothing to verify)");
+  ok("DESIGN mode: no data/ directory (nothing else to verify)");
+  report();
   process.exit(0);
 }
 
@@ -49,7 +67,8 @@ if (!fs.existsSync(manifestPath)) {
     fs.existsSync(snapshotJsPath) &&
     /window\.CONVEYOR_SNAPSHOT = null;\s*$/.test(fs.readFileSync(snapshotJsPath, "utf8"));
   if (!fs.existsSync(snapshotJsPath) || stub) {
-    console.log("check-data: no snapshot yet — DESIGN mode (nothing to verify)");
+    ok("DESIGN mode: no snapshot yet (nothing else to verify)");
+    report();
     process.exit(0);
   }
   bad("data/snapshot.js carries a payload but manifest.json is absent");
