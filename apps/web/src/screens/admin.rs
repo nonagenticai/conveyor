@@ -129,13 +129,52 @@ struct LicenceView {
     checked_at: DateTime<Utc>,
 }
 
+/// One `(kind, status)` bucket of the conveyor's durable queue (`workers.list`).
+#[derive(Clone, Debug, Deserialize)]
+struct WorkerQueueRow {
+    kind: String,
+    status: String,
+    count: i64,
+}
+
+/// One host the conveyor's agent may reach (`workers.list`).
+#[derive(Clone, Debug, Deserialize)]
+struct WorkerHostRow {
+    name: String,
+    role: String,
+    mechanism: String,
+    #[serde(default)]
+    units: Vec<String>,
+    enabled: bool,
+}
+
+/// The worker inventory: the queue's depth and the host registry. Internal, not external.
+#[derive(Clone, Debug, Deserialize)]
+struct WorkersView {
+    #[serde(default)]
+    queue: Vec<WorkerQueueRow>,
+    #[serde(default)]
+    hosts: Vec<WorkerHostRow>,
+}
+
+/// The ledger figure `billing.summary` reports over its window. Internal, not external.
+#[derive(Clone, Debug, Deserialize)]
+struct BillingView {
+    from: DateTime<Utc>,
+    to: DateTime<Utc>,
+    inference_calls: i64,
+    tool_calls: i64,
+    total_usd: f64,
+}
+
 #[derive(Clone)]
 enum TabData {
     Actions(Vec<ActionEntry>),
     Jobs(Vec<JobView>),
     Audit(Vec<AuditView>),
     Licence(LicenceView),
-    External(Value),
+    Workers(WorkersView),
+    Billing(BillingView),
 }
 
 fn parse<T: serde::de::DeserializeOwned>(value: Value, what: &str) -> Result<T, ApiError> {
@@ -199,18 +238,20 @@ fn load(
                     )?;
                     Ok(TabData::Licence(licence))
                 }
-                Tab::Workers => Ok(TabData::External(
+                Tab::Workers => Ok(TabData::Workers(parse(
                     client
                         .invoke("workers.list", json!({}), InvokeOptions::default())
                         .await?
                         .output,
-                )),
-                Tab::Billing => Ok(TabData::External(
+                    "workers",
+                )?)),
+                Tab::Billing => Ok(TabData::Billing(parse(
                     client
                         .invoke("billing.summary", json!({}), InvokeOptions::default())
                         .await?
                         .output,
-                )),
+                    "billing",
+                )?)),
             }
         }
     })
@@ -306,7 +347,6 @@ pub fn AdminScreen() -> impl IntoView {
                         Some(Ok(body)) => view! {
                             <AdminBody
                                 body=body
-                                tab=tab
                                 job_status=job_status
                                 detail=detail
                                 describe=describe
@@ -324,7 +364,6 @@ pub fn AdminScreen() -> impl IntoView {
 #[component]
 fn AdminBody(
     body: TabData,
-    tab: RwSignal<Tab>,
     job_status: RwSignal<Option<String>>,
     detail: RwSignal<Option<Result<ActionSpec, String>>>,
     describe: Callback<String>,
@@ -468,13 +507,74 @@ fn AdminBody(
                 <p class="muted">"The synced entitlement is authoritative; this screen never writes it."</p>
             </section>
         }.into_any(),
-        TabData::External(value) => view! {
+        TabData::Workers(workers) => {
+            let queue = workers.queue;
+            let hosts = workers.hosts;
+            view! {
+                <section class="panel">
+                    <div class="ph"><span>"Workers"</span></div>
+                    <p class="muted">
+                        "The conveyor's own durable queue and the hosts its agent can reach."
+                    </p>
+                    <h3>"Queue"</h3>
+                    {if queue.is_empty() {
+                        view! { <Empty message="No queued work.".to_owned()/> }.into_any()
+                    } else {
+                        view! {
+                            <div style="overflow-x:auto">
+                                <table class="table">
+                                    <thead><tr><th>"Kind"</th><th>"Status"</th><th>"Count"</th></tr></thead>
+                                    <tbody>
+                                        {queue.into_iter().map(|row| view! {
+                                            <tr>
+                                                <td class="mono">{row.kind}</td>
+                                                <td><StatusPill status=row.status/></td>
+                                                <td class="num">{row.count}</td>
+                                            </tr>
+                                        }).collect_view()}
+                                    </tbody>
+                                </table>
+                            </div>
+                        }.into_any()
+                    }}
+                    <h3>"Hosts"</h3>
+                    {if hosts.is_empty() {
+                        view! { <p class="muted">"No hosts are registered."</p> }.into_any()
+                    } else {
+                        view! {
+                            <div style="overflow-x:auto">
+                                <table class="table">
+                                    <thead><tr><th>"Name"</th><th>"Role"</th><th>"Mechanism"</th><th>"Units"</th><th>"Enabled"</th></tr></thead>
+                                    <tbody>
+                                        {hosts.into_iter().map(|host| view! {
+                                            <tr>
+                                                <td class="mono">{host.name}</td>
+                                                <td>{host.role}</td>
+                                                <td>{host.mechanism}</td>
+                                                <td class="mono">{host.units.join(", ")}</td>
+                                                <td>{if host.enabled { "yes" } else { "no" }}</td>
+                                            </tr>
+                                        }).collect_view()}
+                                    </tbody>
+                                </table>
+                            </div>
+                        }.into_any()
+                    }}
+                </section>
+            }.into_any()
+        }
+        TabData::Billing(billing) => view! {
             <section class="panel">
-                <div class="ph"><span>{tab.get().label()}</span></div>
-                <p class="muted">
-                    "This tab reads an external service through the action engine. An unconfigured service is an error, not an empty list."
-                </p>
-                <pre class="code">{pretty(&value)}</pre>
+                <div class="ph"><span>"Billing"</span></div>
+                <p class="muted">"The ledger figure over its window; this screen never writes it."</p>
+                <table class="table">
+                    <tbody>
+                        <tr><th>"Window"</th><td>{format!("{} → {}", billing.from.to_rfc3339(), billing.to.to_rfc3339())}</td></tr>
+                        <tr><th>"Inference calls"</th><td class="num">{billing.inference_calls}</td></tr>
+                        <tr><th>"Tool calls"</th><td class="num">{billing.tool_calls}</td></tr>
+                        <tr><th>"Total"</th><td class="num">{format!("${:.6}", billing.total_usd)}</td></tr>
+                    </tbody>
+                </table>
             </section>
         }.into_any(),
     }
