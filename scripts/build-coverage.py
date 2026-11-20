@@ -144,6 +144,14 @@ SCREEN_OVERRIDES = {
         "evidence": ["docs/design/v2.js"],
         "gap": None,
     },
+    # The Procedures destination is live (issue #448): signed in it drives the T16 intake, the
+    # source review and the two human publication gates; signed out it renders the published
+    # `config.procedures/processes/process_steps` rows read-only.
+    "procedures": {
+        "status": "live",
+        "evidence": ["docs/design/v2.js"],
+        "gap": None,
+    },
     # The Architecture capability destination is live (issue #385): signed in its four tabs
     # read the architecture aggregates through the registered actions and write through them;
     # signed out it renders the published `architecture` snapshot read-only, and the design
