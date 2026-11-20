@@ -1374,7 +1374,10 @@ where they are. A job that explicitly searches — rather than the executor grou
 toolkit like any other tool. (V1's twelve external actions — S09 Part B added eight, including
 `coding_jobs.create|get`, `retrieval.query`, `artifacts.list`, `billing.summary` — are the seed of this registry and
 migrate in T13: the backend operations onto toolkit operations, `artifacts.list` onto the storage adapter (§11.10).
-They do not run beside it as a second path.)
+They do not run beside it as a second path. **Settled by #450 (2026-11-19):** `artifacts.list` reads the document
+catalogue, `billing.summary` reads the ledger (#46), `workers.list`/`providers.list` read the durable queue and the
+host registry (§11.2), and the worker-graph catalogue read is retired with the service it described — the four
+remaining are internal actions, so no External action names a non-Rust destination.)
 
 1. **Resolve** the binding and the pinned tool version; missing binding or version fails closed (`409 tool_not_ready`)
    before any network call.
@@ -1500,8 +1503,8 @@ writes and reads the platform's shared MinIO instance directly — not a private
 enforced by key prefix and bucket policy: a mandatory tenant prefix (`tenant/<tenant_id>/`), project/run prefixes
 beneath it, server-side encryption, a content hash per object, a size cap, and no bucket administration from a job. Credentials
 are sealed broker credential profiles; a job never sees an S3 key. `artifact_service` and `storage-api` keep serving
-their existing consumers; the conveyor keeps no compatibility shim by default — whether V1's `artifacts.list` callers
-are migrated to the adapter or routed through a shim is settled in T13 (§15.2 #17).
+their existing consumers; the conveyor keeps no compatibility shim — `artifacts.list` was migrated onto this
+catalogue's own store by #450 (§15.2 #17).
 
 ---
 
@@ -1699,7 +1702,8 @@ closed — one runtime, two live executor kinds behind an internal seam.
 16. **Programme shared-config keys.** T1 authors the first key set; which keys a programme may lock and which a
     project may override is tenant policy. *Open.*
 17. **`artifact_service` compatibility.** D57 removes the dependency; whether V1's `artifacts.list` callers move to
-    the MinIO adapter inside T13, or a temporary shim is kept, is a T13 implementation decision. *Open.*
+    the MinIO adapter inside T13, or a temporary shim is kept, is a T13 implementation decision.
+    **Resolved (#450, 2026-11-19):** `artifacts.list` reads the conveyor's own document/object catalogue; no shim.
 18. **`mlx-api` consolidation.** `modality-gateway` folds into `mlx-api`, which may be rewritten in Rust; the owning
     repo, the rewrite order and how the w2v stages call it are decided with the w2v migration (`SPEC_LEGACY_KAG.md`).
     *Open.*

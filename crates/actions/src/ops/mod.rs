@@ -38,6 +38,7 @@ use crate::control::invalid;
 use crate::invoke::ActionError;
 
 pub mod host;
+pub mod incidents;
 pub mod reads;
 pub mod writes;
 
@@ -203,6 +204,26 @@ pub struct RollbackIn {
     /// The revision to restore; defaults to the revision before the current one.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub revision: Option<u32>,
+    /// Return the request that WOULD be made and change nothing.
+    #[serde(default)]
+    pub dry_run: bool,
+}
+
+/// `ops.flag_flip` input — one environment variable on one Deployment's container.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+#[serde(deny_unknown_fields)]
+pub struct FlagFlipIn {
+    /// The namespace of the workload.
+    pub namespace: String,
+    /// The Deployment whose container carries the flag.
+    pub deployment: String,
+    /// The container; the Deployment's first container when omitted.
+    #[serde(default)]
+    pub container: Option<String>,
+    /// The environment variable's name (`[A-Za-z_][A-Za-z0-9_]*`).
+    pub flag: String,
+    /// The value to set.
+    pub value: String,
     /// Return the request that WOULD be made and change nothing.
     #[serde(default)]
     pub dry_run: bool,

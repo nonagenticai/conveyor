@@ -256,11 +256,24 @@ jobs:
   # crates/actions/tests/support/ and apps/server/tests/common/ short-circuits its own per-binary
   # `docker run` on those variables. max_connections=300: nextest is process-per-test and the
   # image default of 100 times out pools.
-  checks:
+  # ⛔ THE MATRIX JOB IS NOT THE REQUIRED CONTEXT. GitHub names a matrix job's checks after the
+  # matrix value — `checks (1)`, `checks (2)` — while ruleset 27178695 requires the literal name
+  # `checks`. Renaming this job to `checks` and leaving the matrix would make every PR wait on a
+  # context that can never report. The aggregator below carries the required name and is
+  # deliberately independent of the shard count: add or drop a shard and `checks` never changes.
+  checks-shard:
     needs: classify
     if: ${{ !github.event.repository.private && needs.classify.outputs.docs_only != 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 120
+    # TWO SHARDS, because the suite was 729 s of a 917 s job and a public repo's GitHub-hosted
+    # runner is free: splitting the tests shortens the WALL CLOCK, which caching alone does not.
+    # fmt, clippy, doctests, the audit and the contract fixtures stay on shard 1 — `nextest`
+    # cannot partition doctests, and running them on both would run them twice.
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2]
     env:
       CARGO_PROFILE_DEV_DEBUG: "0"
       TEST_DATABASE_URL: postgres://postgres:postgres@127.0.0.1:5432/postgres
@@ -286,16 +299,21 @@ jobs:
             exit 1
           fi
 
-      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
+      # `swatinem/rust-cache`, not `actions/cache`. The registry-only step this replaces carried
+      # the comment "the target directory is multi-gigabyte and would thrash the 10 GB cache
+      # budget" — true of a raw `target/` copy, and beside the point. rust-cache prunes to its own
+      # budget and caches DEPENDENCIES rather than the workspace's own crates, which is where the
+      # 700 s went. `shared-key` is shared by both shards so they write ONE entry instead of two
+      # half-entries competing for the same budget.
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
         with:
-          # Registry only: the target directory is multi-gigabyte and would thrash the 10 GB
-          # cache budget. Compiling is what a free public runner is for.
-          path: |
-            ~/.cargo/registry/index
-            ~/.cargo/registry/cache
-            ~/.cargo/git/db
-          key: cargo-${{ runner.os }}-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: cargo-${{ runner.os }}-
+          prefix-key: v1-rust
+          shared-key: checks
+          cache-all-crates: "false"
+          cache-on-failure: "false"
+          # A PR's merge ref cannot share an entry with main; saving one there only evicts main's.
+          save-if: ${{ github.ref == 'refs/heads/main' }}
+          env-vars: CARGO_PROFILE_DEV_DEBUG
 
       - name: start Postgres 18 and Redis (the archetype's postgres_image / redis_image)
         run: |
@@ -336,25 +354,41 @@ jobs:
 
       # Fixtures only: no network, no git, no clock. The live board check is board.yml, hourly.
       - name: board contract fixtures
+        if: matrix.shard == 1
         run: bash scripts/ci/tests/board.sh
 
       - name: cargo fmt
+        if: matrix.shard == 1
         run: cargo fmt --all -- --check
 
       - name: cargo clippy
+        if: matrix.shard == 1
         run: cargo clippy --all-targets --locked -- -D warnings
 
-      - name: cargo nextest (0.9.150 pinned, sha256-verified)
+      - name: cargo nextest (0.9.150 pinned, sha256-verified; shard ${{ matrix.shard }} of 2)
+        env:
+          # Through the environment, not interpolated into the script: `run:` text built from an
+          # expression is zizmor's template-injection finding, and this workflow's own `lint` job
+          # gates that at medium.
+          SHARD: ${{ matrix.shard }}
         run: |
           set -euo pipefail
           curl -fsSL -o "$RUNNER_TEMP/nextest.tgz" \
             "https://github.com/nextest-rs/nextest/releases/download/cargo-nextest-0.9.150/cargo-nextest-0.9.150-x86_64-unknown-linux-gnu.tar.gz"
           echo "b0959bc64232974224cf9fb22c915845398c0e8668fa7831eb5b43fb1eef781f  $RUNNER_TEMP/nextest.tgz" | sha256sum -c -
           tar -xzf "$RUNNER_TEMP/nextest.tgz" -C "$RUNNER_TEMP" cargo-nextest
-          "$RUNNER_TEMP/cargo-nextest" nextest run --no-tests=fail --color never --locked
-          cargo test --doc --locked
+          # `count:M/N` partitions by TEST CASE, so both shards do real work; `--no-tests=fail`
+          # keeps a shard that selected nothing visible as a red rather than a silent pass.
+          "$RUNNER_TEMP/cargo-nextest" nextest run --no-tests=fail --color never --locked \
+            --partition "count:${SHARD}/2"
+
+      # Doctests are invisible to nextest, so they cannot be partitioned: shard 1 owns them.
+      - name: cargo test --doc
+        if: matrix.shard == 1
+        run: cargo test --doc --locked
 
       - name: cargo audit 0.22.2 (pinned, sha256-verified)
+        if: matrix.shard == 1
         run: |
           set -euo pipefail
           curl -fsSL -o "$RUNNER_TEMP/audit.tgz" \
@@ -362,6 +396,34 @@ jobs:
           echo "7fb9497f8594b389e5fce5ef9b92db08432996895b2e0c5a0167a69ed445c428  $RUNNER_TEMP/audit.tgz" | sha256sum -c -
           tar -xzf "$RUNNER_TEMP/audit.tgz" -C "$RUNNER_TEMP"
           "$RUNNER_TEMP/cargo-audit-x86_64-unknown-linux-musl-v0.22.2/cargo-audit" audit
+
+  # The REQUIRED context (ruleset 27178695). It runs no tests: its only job is to name the
+  # verdict for every shard, so the ruleset never has to know how many shards exist.
+  #
+  # `always()` so a failed shard still produces a red `checks` rather than a missing context —
+  # the file's own classify comment records what a MISSING required context costs (every queued
+  # PR sits in AWAITING_CHECKS forever). A docs-only PR skips the shards by design and passes.
+  checks:
+    needs: [classify, checks-shard]
+    if: ${{ always() && !github.event.repository.private }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: every shard passed
+        env:
+          SHARD_RESULT: ${{ needs.checks-shard.result }}
+          DOCS_ONLY: ${{ needs.classify.outputs.docs_only }}
+        run: |
+          set -euo pipefail
+          if [ "${DOCS_ONLY}" = "true" ]; then
+            echo "docs-only PR: the code gates were skipped by classify"
+            exit 0
+          fi
+          if [ "${SHARD_RESULT}" != "success" ]; then
+            echo "::error::checks-shard finished '${SHARD_RESULT}', not 'success'"
+            exit 1
+          fi
+          echo "every shard passed"
 
   # The image that deploys. On a PR this is a build+smoke check only (fork tokens are read-only).
   # On main it also pushes to ghcr.io with the automatic token — no stored credential.
@@ -388,8 +450,36 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: set up buildx (a cache mount is a BuildKit feature)
+        uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
+
+      # ⛔ A CACHE MOUNT IS NOT A CACHE ACROSS RUNS. The Dockerfile's
+      # `--mount=type=cache,target=/src/target` lives on the BUILDER, and a GitHub-hosted runner
+      # is a fresh builder every time — that, not the compile itself, is why this job measured
+      # 1121 s. `cache-to: type=gha` exports LAYERS, so what survives between runs is everything
+      # before the first `COPY . .`: apt and the pinned rustup toolchain, which were being paid
+      # once per stage. Exported on main only — a PR's entry is branch-scoped and would only
+      # evict the default branch's.
       - name: build
-        run: docker build --file Dockerfile --build-arg GIT_SHA="$GITHUB_SHA" --tag "$IMG" .
+        # The merge queue re-validates a tree; it does not release one. Building the deployable
+        # here cost ~924 s per merge (measured on #473). A job whose steps are all skipped still
+        # concludes success, so the required `image` context keeps reporting on the queue ref.
+        if: ${{ github.event_name != 'merge_group' }}
+        env:
+          CACHE_TO: ${{ github.ref == 'refs/heads/main' && 'type=gha,mode=max,scope=image' || '' }}
+        run: |
+          set -euo pipefail
+          # Every element is quoted: an unquoted `type=gha,scope=image` reads to shellcheck as a
+          # comma-separated array element (SC2054), which actionlint fails this repository's lint
+          # job on. The conditional append is an `if`, not `[ -n ] && …`, because the `&&` form
+          # returns 1 when the test fails and `set -e` would abort a green build.
+          args=(--file Dockerfile
+                --build-arg "GIT_SHA=$GITHUB_SHA"
+                --tag "$IMG"
+                --load
+                --cache-from "type=gha,scope=image")
+          if [ -n "${CACHE_TO:-}" ]; then args+=(--cache-to "$CACHE_TO"); fi
+          docker buildx build "${args[@]}" .
 
       # The default smoke would start the server, which exits on the missing DATABASE_URL /
       # BIND_ADDR / OIDC issuer before proving anything; instead check that the binary runs and
@@ -400,6 +490,8 @@ jobs:
       # Measured twice on ARC: run 42642725695 and run 42648606596, both "write /dev/stdout: broken
       # pipe". A bash pattern match on the captured variable has no reader to exit early.
       - name: smoke
+        # Same event gate as `build`: nothing to smoke when nothing was built.
+        if: ${{ github.event_name != 'merge_group' }}
         run: |
           set -euo pipefail
           docker run --rm "$IMG" --version

@@ -1,139 +1,139 @@
 {
   "actions_invoked": [
     {
-      "line": 1330,
+      "line": 1340,
       "name": "approvals.decide"
     },
     {
-      "line": 1230,
+      "line": 1240,
       "name": "architecture.artifacts_entries"
     },
     {
-      "line": 1231,
+      "line": 1241,
       "name": "architecture.artifacts_links"
     },
     {
-      "line": 204,
+      "line": 214,
       "name": "card_types.list"
     },
     {
-      "line": 393,
+      "line": 403,
       "name": "cards.claim"
     },
     {
-      "line": 377,
+      "line": 387,
       "name": "cards.comment"
     },
     {
-      "line": 325,
+      "line": 335,
       "name": "cards.create"
     },
     {
-      "line": 354,
+      "line": 364,
       "name": "cards.move"
     },
     {
-      "line": 408,
+      "line": 418,
       "name": "cards.release"
     },
     {
-      "line": 2513,
+      "line": 2539,
       "name": "documents.compose"
     },
     {
-      "line": 3000,
+      "line": 3026,
       "name": "documents.compose"
     },
     {
-      "line": 2795,
+      "line": 2821,
       "name": "documents.create"
     },
     {
-      "line": 2866,
+      "line": 2892,
       "name": "documents.delete"
     },
     {
-      "line": 2812,
+      "line": 2838,
       "name": "documents.download"
     },
     {
-      "line": 2845,
+      "line": 2871,
       "name": "documents.download"
     },
     {
-      "line": 2535,
+      "line": 2561,
       "name": "documents.get"
     },
     {
-      "line": 2830,
+      "line": 2856,
       "name": "documents.get"
     },
     {
-      "line": 1089,
+      "line": 1099,
       "name": "documents.list"
     },
     {
-      "line": 1112,
+      "line": 1122,
       "name": "documents.list"
     },
     {
-      "line": 1139,
+      "line": 1149,
       "name": "documents.list"
     },
     {
-      "line": 2763,
+      "line": 2789,
       "name": "documents.list"
     },
     {
-      "line": 2897,
+      "line": 2923,
       "name": "documents.preview"
     },
     {
-      "line": 2943,
+      "line": 2969,
       "name": "documents.return"
     },
     {
-      "line": 2684,
+      "line": 2710,
       "name": "documents.revision_get"
     },
     {
-      "line": 2645,
+      "line": 2671,
       "name": "documents.revision_list"
     },
     {
-      "line": 1353,
+      "line": 1363,
       "name": "process_runs.start"
     },
     {
-      "line": 195,
+      "line": 205,
       "name": "programmes.list"
     },
     {
-      "line": 670,
+      "line": 680,
       "name": "programmes.list"
     },
     {
-      "line": 2444,
+      "line": 2470,
       "name": "projects.close"
     },
     {
-      "line": 2327,
+      "line": 2353,
       "name": "projects.create"
     },
     {
-      "line": 2335,
+      "line": 2361,
       "name": "projects.update"
     },
     {
-      "line": 1303,
+      "line": 1313,
       "name": "runs.cancel"
     },
     {
-      "line": 1281,
+      "line": 1291,
       "name": "runs.get"
     },
     {
-      "line": 1258,
+      "line": 1268,
       "name": "runs.list"
     }
   ],
@@ -278,7 +278,7 @@
       "tranche": 0,
       "units": {
         "blocked": 1,
-        "claimed": 4,
+        "claimed": 7,
         "numbers": [
           17,
           22,
@@ -297,8 +297,6 @@
           223,
           224,
           225,
-          386,
-          393,
           394,
           395,
           410,
@@ -306,10 +304,13 @@
           433,
           434,
           435,
-          450
+          462,
+          476,
+          477,
+          484
         ],
-        "open": 17,
-        "ready": 8,
+        "open": 18,
+        "ready": 5,
         "unknown": 0
       }
     },
@@ -874,8 +875,8 @@
       "key": "S09",
       "measured": {
         "actions": [
-          27,
-          27
+          26,
+          26
         ],
         "modules": [
           1,
@@ -1032,7 +1033,7 @@
       "tranche": 10,
       "units": {
         "blocked": 0,
-        "claimed": 1,
+        "claimed": 2,
         "numbers": [
           6,
           26,
@@ -1044,7 +1045,11 @@
           390,
           391,
           392,
-          400
+          400,
+          459,
+          468,
+          470,
+          471
         ],
         "open": 7,
         "ready": 5,
@@ -1127,13 +1132,13 @@
       "tranche": 11,
       "units": {
         "blocked": 0,
-        "claimed": 0,
+        "claimed": 1,
         "numbers": [
           8,
           29
         ],
         "open": 2,
-        "ready": 2,
+        "ready": 1,
         "unknown": 0
       }
     },
@@ -1653,10 +1658,11 @@
         "blocked": 0,
         "claimed": 0,
         "numbers": [
-          84
+          84,
+          458
         ],
-        "open": 0,
-        "ready": 0,
+        "open": 1,
+        "ready": 1,
         "unknown": 0
       }
     },
@@ -1665,8 +1671,7 @@
         "T15",
         "T17",
         "T5",
-        "T6",
-        "T7"
+        "T6"
       ],
       "evidence": [
         "docs/SPEC_V2.md"
@@ -1868,13 +1873,13 @@
       "tranche": 4,
       "units": {
         "blocked": 0,
-        "claimed": 0,
+        "claimed": 1,
         "numbers": [
           85,
           448
         ],
         "open": 1,
-        "ready": 1,
+        "ready": 0,
         "unknown": 0
       }
     },
@@ -1911,8 +1916,8 @@
       "track": "v2",
       "tranche": 5,
       "units": {
-        "blocked": 1,
-        "claimed": 0,
+        "blocked": 0,
+        "claimed": 1,
         "numbers": [
           87
         ],
@@ -2136,18 +2141,18 @@
     {
       "blocked_by": [],
       "evidence": [
-        "docs/SPEC_V2.md"
+        "crates/ops"
       ],
-      "gap": "no incident, runbook or postmortem rows and no operations tool call set",
+      "gap": null,
       "key": "T7",
       "measured": {
         "actions": [
-          0,
-          0
+          15,
+          15
         ],
         "modules": [
-          0,
-          0
+          1,
+          1
         ],
         "tables": [
           0,
@@ -2162,19 +2167,19 @@
         "T17"
       ],
       "plan": "docs/SPEC_V2.md#12",
-      "status": "proposed",
+      "status": "built",
       "track": "v2",
       "tranche": 5,
       "units": {
         "blocked": 0,
-        "claimed": 1,
+        "claimed": 0,
         "numbers": [
           78,
           170,
           171,
           172
         ],
-        "open": 1,
+        "open": 0,
         "ready": 0,
         "unknown": 0
       }
@@ -2511,10 +2516,10 @@
       "by_status": {
         "absent": 0,
         "archived": 1,
-        "built": 38,
+        "built": 39,
         "partial": 2,
         "planned": 0,
-        "proposed": 6,
+        "proposed": 5,
         "standing": 1
       },
       "total": 48,

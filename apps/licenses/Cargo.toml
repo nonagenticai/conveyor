@@ -23,7 +23,7 @@ clap = { workspace = true }
 conveyor-auth = { path = "../../crates/auth" }
 conveyor-domain = { path = "../../crates/domain" }
 conveyor-platform = { path = "../../crates/platform" }
-getrandom = "0.3"
+getrandom = "0.4"
 jsonwebtoken = { workspace = true }
 metrics-exporter-prometheus = { workspace = true }
 reqwest = { workspace = true }

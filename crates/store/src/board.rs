@@ -297,6 +297,28 @@ pub async fn list_boards_tx(
     Ok(rows.into_iter().map(Into::into).collect())
 }
 
+/// Every board of a bounded set of projects, in one read. The `/boards` index asks for its
+/// page's boards this way so one page is one query, not one detail read per project (#390).
+pub async fn list_boards_for_projects_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    project_ids: &[Uuid],
+) -> Result<Vec<Board>, sqlx::Error> {
+    if project_ids.is_empty() {
+        return Ok(Vec::new());
+    }
+    let rows: Vec<BoardRow> = sqlx::query_as(
+        "SELECT id, project_id, name, version FROM board
+          WHERE tenant_id = $1 AND project_id = ANY($2)
+          ORDER BY project_id, position, id",
+    )
+    .bind(tenant.as_uuid())
+    .bind(project_ids)
+    .fetch_all(&mut *conn)
+    .await?;
+    Ok(rows.into_iter().map(Into::into).collect())
+}
+
 /// The lane kinds a live `board_template` row declares.
 ///
 /// `None` means the template is absent, inactive, or names no lane — the caller refuses rather

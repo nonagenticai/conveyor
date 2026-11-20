@@ -78,6 +78,8 @@ pub mod delivery;
 pub mod document;
 pub mod eval;
 pub mod governance;
+// #450: the host registry read — the inventory of hosts the conveyor may reach (§10.4.1).
+pub mod host;
 pub mod idempotency;
 pub mod identity;
 pub mod interaction;

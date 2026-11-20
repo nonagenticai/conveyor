@@ -169,7 +169,7 @@ impl Session {
             request["sessionId"] = Value::String(self.session_id.clone());
         }
         self.socket
-            .send(Message::Text(request.to_string()))
+            .send(Message::Text(request.to_string().into()))
             .await
             .map_err(|error| {
                 CapabilityError::Failed(format!("cdp {method}: cannot send the request: {error}"))

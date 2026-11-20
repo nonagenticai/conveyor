@@ -42,8 +42,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/SPEC_V2.html",
       "source": "docs/SPEC_V2.md",
       "section": "Spec",
-      "sha256": "5bef7d6f326d5bfcac348aafcff7c98d136a3052ba237895c82b8967c2472fe3",
-      "bytes": 169718,
+      "sha256": "574ce33870f05190c0c1487f4c898e5ca861b4203110cd74c3598f624a9c84bc",
+      "bytes": 170159,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/SPEC_V2.md"
     },
     {
@@ -119,12 +119,21 @@ window.CONVEYOR_DOCUMENTS = {
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0008-card-ledger.md"
     },
     {
+      "title": "Programme architecture and benefits realization",
+      "path": "docs/design/Program_Architecture_and_Benefits_Realization.html",
+      "source": "docs/design/Program_Architecture_and_Benefits_Realization.md",
+      "section": "Design",
+      "sha256": "b04c408f23e99cecc79ab12c285544d533dd7454797a78c000a739826b1f9474",
+      "bytes": 13342,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/design/Program_Architecture_and_Benefits_Realization.md"
+    },
+    {
       "title": "Web UI design",
       "path": "docs/design/README.html",
       "source": "docs/design/README.md",
       "section": "Design",
-      "sha256": "64786247f5c9d1b0fabc8f56eda5f212d9dea08b63d1c02a6783f019fdc3a36f",
-      "bytes": 18536,
+      "sha256": "04767f41c850d5de89efe822cad9b11a877b8f8da701c3d0a8b6bcb250830b74",
+      "bytes": 18768,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/design/README.md"
     },
     {
@@ -735,8 +744,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/slices/S09-documents-integrations.html",
       "source": "docs/plans/slices/S09-documents-integrations.md",
       "section": "Plans",
-      "sha256": "3b6678c555c2538cdc5aa9934bad9b4cd7828970a34ccda9cae22118c5339427",
-      "bytes": 22878,
+      "sha256": "f22757af3303bfeb36eb2aac979b8cacc9d74533c8ad3d49fa5bcca61cde083a",
+      "bytes": 23001,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S09-documents-integrations.md"
     },
     {
