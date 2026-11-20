@@ -174,7 +174,10 @@ async fn assert_pm(
 }
 
 /// Insert one approval and return its id.
-async fn open_gate(
+///
+/// `pub(crate)`: `projects.charter` (the existing-project charter path) opens the same gate
+/// `pm.charter` opens, and must not grow a second approval writer.
+pub(crate) async fn open_gate(
     conn: &mut PgConnection,
     ctx: &HandlerCtx,
     project_id: Uuid,
@@ -198,7 +201,7 @@ async fn open_gate(
 }
 
 /// The id of the newest approved gate with this name on the project.
-async fn approved_gate(
+pub(crate) async fn approved_gate(
     conn: &mut PgConnection,
     tenant: store::TenantId,
     project_id: Uuid,

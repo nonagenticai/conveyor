@@ -106,7 +106,13 @@ use serde_json::{Value, json};
 /// **#508 adds 6 internal**: the three project transitions (`projects.activate|pause|archive`),
 /// `projects.baseline`, `projects.programme_meta` and `tranches.authorise` — the write path's
 /// bypasses close. 491 → **497**.
-const EXPECTED: [&str; 497] = [
+/// **#511 adds 3 internal**: `programmes.baseline`, `programmes.baseline_approve` and
+/// `programmes.baselines_list` — the MSP management/governance/boundary trio's writer,
+/// approver and read. 497 → **500**.
+/// **#511 (rework path) adds 2 internal**: `projects.charter` (charter an EXISTING project) and
+/// `projects.reopen` (the closed → active transition the retrospective's `rework` verdict
+/// authorises). 500 → **502**.
+const EXPECTED: [&str; 502] = [
     "actions.describe",
     "actions.list",
     "analyse.site",
@@ -465,6 +471,9 @@ const EXPECTED: [&str; 497] = [
     "processes.retire",
     "processes.update",
     "produce.script",
+    "programmes.baseline",
+    "programmes.baseline_approve",
+    "programmes.baselines_list",
     "programmes.create",
     "programmes.get",
     "programmes.list",
@@ -483,12 +492,14 @@ const EXPECTED: [&str; 497] = [
     "projects.activate",
     "projects.archive",
     "projects.baseline",
+    "projects.charter",
     "projects.close",
     "projects.create",
     "projects.execute",
     "projects.get",
     "projects.pause",
     "projects.programme_meta",
+    "projects.reopen",
     "projects.update",
     "prompt_audits.check",
     "prompt_audits.get",
@@ -688,7 +699,11 @@ fn the_registry_is_exactly_the_declared_set() {
     // it applies the image's embedded programme seed to this tenant, never an external service.
     // #508 adds six internal actions (the three project transitions, `projects.baseline`,
     // `projects.programme_meta`, `tranches.authorise`): 478 -> 484; external stays 13.
-    assert_eq!((internal, external), (484, 13));
+    // #511 adds three internal actions (`programmes.baseline|baseline_approve|baselines_list`):
+    // 484 -> 487; external stays 13.
+    // #511's rework path adds two internal actions (`projects.charter|reopen`): 487 -> 489;
+    // external stays 13.
+    assert_eq!((internal, external), (489, 13));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),

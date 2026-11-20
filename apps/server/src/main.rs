@@ -291,7 +291,8 @@ enum AdminCommand {
 
 #[derive(Debug, Subcommand)]
 enum ActionCommand {
-    /// Invoke one internal action as the tenant's service actor.
+    /// Invoke one internal action as the tenant's service actor, or as the member `--actor-id`
+    /// names.
     Invoke {
         /// The tenant slug.
         #[arg(long)]
@@ -308,6 +309,13 @@ enum ActionCommand {
         /// without this flag a destructive invoke from the CLI could never satisfy its gate.
         #[arg(long)]
         approval_id: Option<uuid::Uuid>,
+        /// Act as this active member instead of the tenant's first active member.
+        ///
+        /// A governance act must be performed by a DISTINCT approver, and the tenant carries a
+        /// `conveyor-approver` for exactly that (#511). The id is validated against the tenant's
+        /// membership; a stranger is refused, never attributed.
+        #[arg(long = "actor-id")]
+        actor_id: Option<uuid::Uuid>,
     },
 }
 
@@ -1096,6 +1104,7 @@ async fn admin(command: AdminCommand) -> Result<(), RunError> {
                     name,
                     input,
                     approval_id,
+                    actor_id,
                 },
         } => {
             let tenant_id = store::tenants::id_by_slug(&pool, &tenant)
@@ -1103,9 +1112,10 @@ async fn admin(command: AdminCommand) -> Result<(), RunError> {
                 .ok_or_else(|| RunError::Refused(format!("no tenant {tenant:?}")))?;
             let document: serde_json::Value = serde_json::from_slice(&std::fs::read(&input)?)?;
             let input = document.get("input").cloned().unwrap_or(document);
-            let caller = admin::action::ActionCaller::new(&pool, tenant_id, &config.app_key)
-                .await
-                .map_err(|error| RunError::Refused(error.to_string()))?;
+            let caller =
+                admin::action::ActionCaller::new_as(&pool, tenant_id, &config.app_key, actor_id)
+                    .await
+                    .map_err(|error| RunError::Refused(error.to_string()))?;
             let output = caller
                 .call_gated(&name, input, None, approval_id)
                 .await

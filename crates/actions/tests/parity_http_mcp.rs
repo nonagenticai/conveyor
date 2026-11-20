@@ -585,6 +585,25 @@ async fn seed_project(pg: &support::Pg, ctx: &Ctx) -> Uuid {
     .await
 }
 
+/// A CLOSED project carrying the retrospective's `rework` verdict, for `projects.reopen`:
+/// each round gets its own row, so the reopen is a real transition in both rounds.
+async fn seed_reopenable_project(pg: &support::Pg, ctx: &Ctx) -> Uuid {
+    let key = format!("PR-{}", Uuid::now_v7().simple());
+    scoped(pg, ctx, async |conn| {
+        sqlx::query_scalar(
+            "INSERT INTO project (tenant_id, key, name, status, meta)
+             VALUES ($1, $2, 'Prepared rework', 'closed', '{\"viability\":\"rework\"}'::jsonb)
+             RETURNING id",
+        )
+        .bind(ctx.tenant_id)
+        .bind(key)
+        .fetch_one(&mut *conn)
+        .await
+        .expect("prepared reopenable project")
+    })
+    .await
+}
+
 async fn seed_list(pg: &support::Pg, ctx: &Ctx) -> Uuid {
     let board = Uuid::parse_str(&ctx.board_id).expect("board uuid");
     let name = format!("Prepared lane {}", Uuid::now_v7().simple());
@@ -1621,6 +1640,23 @@ async fn seed_parity_baseline(pg: &support::Pg, ctx: &Ctx, project: Uuid) -> Uui
     id
 }
 
+/// Seed one programme baseline taken by the SECOND member, so the approving caller is distinct.
+async fn seed_programme_baseline(pg: &support::Pg, ctx: &Ctx, programme: Uuid) -> Uuid {
+    let mut tx = begin_scoped(&pg.owner, ctx.tenant).await.expect("scope");
+    let id: Uuid = sqlx::query_scalar(
+        "INSERT INTO programme_baseline (tenant_id, programme_id, kind, snapshot, taken_by)
+         VALUES ($1, $2, 'management', '{}'::jsonb, $3) RETURNING id",
+    )
+    .bind(ctx.tenant_id)
+    .bind(programme)
+    .bind(ctx.bob_user)
+    .fetch_one(&mut *tx)
+    .await
+    .expect("insert programme baseline");
+    tx.commit().await.expect("commit");
+    id
+}
+
 async fn seed_parity_register(pg: &support::Pg, ctx: &Ctx, project: Uuid) -> Uuid {
     let mut tx = begin_scoped(&pg.owner, ctx.tenant).await.expect("scope");
     let id: Uuid = sqlx::query_scalar(
@@ -2351,6 +2387,14 @@ async fn prepare(sample: &Sample, pg: &support::Pg, ctx: &Ctx) {
             let id = seed_project(pg, ctx).await;
             ctx.push(sample.name, id);
         }
+        "projects.charter" => {
+            let id = seed_project(pg, ctx).await;
+            ctx.push(sample.name, id);
+        }
+        "projects.reopen" => {
+            let id = seed_reopenable_project(pg, ctx).await;
+            ctx.push(sample.name, id);
+        }
         // S13: an edit, a publish and a read each need a fresh draft; retire needs a published row.
         "workflows.get" | "workflows.update" | "workflows.publish" => {
             let id = seed_workflow(pg, ctx, "draft").await;
@@ -2677,6 +2721,16 @@ async fn prepare(sample: &Sample, pg: &support::Pg, ctx: &Ctx) {
         // ── S08 Part A's portfolio surface ───────────────────────────────────────────────
         "programmes.get" | "programmes.update" => {
             let id = seed_programme(pg, ctx).await;
+            ctx.push(sample.name, id);
+        }
+        "programmes.baseline" | "programmes.baselines_list" => {
+            let id = seed_programme(pg, ctx).await;
+            ctx.push(sample.name, id);
+        }
+        "programmes.baseline_approve" => {
+            // Taken by the SECOND member, so the approving caller is a distinct principal.
+            let programme = seed_programme(pg, ctx).await;
+            let id = seed_programme_baseline(pg, ctx, programme).await;
             ctx.push(sample.name, id);
         }
         "stakeholders.get" | "stakeholders.update" | "stakeholders.delete" => {
@@ -3299,6 +3353,33 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
             expect_status: None,
         },
         on_prepared("projects.close", None),
+        {
+            // #511's rework path: an existing project gains a charter and its gate. `prepare`
+            // gives each round its own project, so the 201 is a real write, not a replay.
+            let mut sample = plain("projects.charter", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "project_id": ctx.pop("projects.charter"),
+                    "charter": "The parity sample charters an existing project.",
+                })
+            });
+            expecting(sample, 201)
+        },
+        {
+            // A closed project with the retrospective's `rework` verdict; a fresh row per round
+            // keeps the reopen a real transition rather than a replayed refusal.
+            let mut sample = plain("projects.reopen", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "id": ctx.pop("projects.reopen"),
+                    "reason": "the retrospective found the delivery must be redone",
+                    "decision_ref": "PARITY-REWORK-1",
+                })
+            });
+            expecting(sample, 200)
+        },
         // #508's write-path actions: each sample is a deterministic refusal (no such row), so
         // the two transports must answer the same thing without any seeded state.
         expecting(
@@ -3970,6 +4051,31 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
             // recorded outcome under the same idempotency key, so the transports compare the
             // same application (a re-execution would report `skipped` where the other ran).
             expecting(plain("programmes.refresh", json!({}), None), 200)
+        },
+        {
+            let mut sample = plain("programmes.baseline", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(
+                |ctx: &Ctx| json!({"programme_id": ctx.pop("programmes.baseline"), "kind": "management"}),
+            );
+            expecting(sample, 201)
+        },
+        {
+            let mut sample = plain("programmes.baselines_list", json!({}), None);
+            sample.prepare = true;
+            sample.input =
+                Box::new(|ctx: &Ctx| json!({"programme_id": ctx.pop("programmes.baselines_list")}));
+            expecting(sample, 200)
+        },
+        {
+            // The baseline is seeded with the SECOND member as its taker, so the caller's
+            // approval is the distinct-approver path rather than a `self_approval` refusal.
+            let mut sample = plain("programmes.baseline_approve", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(
+                |ctx: &Ctx| json!({"baseline_id": ctx.pop("programmes.baseline_approve")}),
+            );
+            expecting(sample, 200)
         },
         {
             let mut sample = plain("stakeholders.create", json!({}), None);

@@ -116,6 +116,43 @@ pub struct ProjectProgrammeMetaIn {
     pub meta: Value,
 }
 
+/// `projects.charter` — write a charter for an EXISTING project and open its charter gate.
+///
+/// `pm.charter` creates a project AND its charter; this is the retrospective rework's path for
+/// a project that already exists, and it refuses when the charter gate is already approved.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct ProjectCharterIn {
+    /// The existing project.
+    pub project_id: Uuid,
+    /// The charter body.
+    pub charter: String,
+    /// The charter's title; `Charter — {project name}` when absent.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub title: Option<String>,
+}
+
+/// `projects.charter`'s result.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct ProjectCharterOut {
+    /// The project that gained the charter.
+    pub project_id: Uuid,
+    /// The charter asset.
+    pub charter_asset_id: Uuid,
+    /// The charter gate.
+    pub approval_id: Uuid,
+}
+
+/// `projects.reopen` — the one backward transition, only for a closed `rework` verdict.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct ProjectReopenIn {
+    /// The closed project.
+    pub id: Uuid,
+    /// Why the project is reopened; recorded under `meta.reopen_reason`.
+    pub reason: String,
+    /// The decision that authorises the reopen; recorded under `meta.reopen_decision_ref`.
+    pub decision_ref: String,
+}
+
 /// `projects.close` — a status-guarded transition, not a version-guarded edit.
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 pub struct ProjectCloseIn {
@@ -132,7 +169,8 @@ pub struct ProjectCloseIn {
 /// (`422 status_not_editable`): the transitions are `projects.activate`, `projects.pause`,
 /// `projects.close` and `projects.archive`, each with its own gate. Programme-owned `meta` keys
 /// (`tranche`, `adm_phase`, `plateau`, `expected_outputs`, `closure_outputs`, `depends_on`,
-/// `plan`, `plan_status`, `status_source`) are refused the same way (`422 meta_key_protected`).
+/// `plan`, `plan_status`, `status_source`, `viability`) are refused the same way
+/// (`422 meta_key_protected`).
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 pub struct ProjectUpdateIn {
     /// The project id.

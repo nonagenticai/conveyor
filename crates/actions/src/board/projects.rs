@@ -10,8 +10,9 @@
 //! `project_type`/`repository_url` are the signed channel's names for
 //! `project_type_code`/`repo_url` and S06a maps them (S05 §5).
 
-use conveyor_domain::{CatalogueKind, ListKind};
+use conveyor_domain::{AssetKind, CatalogueKind, ListKind};
 use conveyor_store as store;
+use conveyor_store::governance::NewAsset;
 use conveyor_store::project::{NewProject, ProjectPatch};
 use sqlx::PgConnection;
 use uuid::Uuid;
@@ -26,8 +27,8 @@ use crate::process::views::ProcessRunStartIn;
 use crate::spec::HandlerOutput;
 
 use super::{
-    ProjectCloseIn, ProjectCreateIn, ProjectExecuteIn, ProjectProgrammeMetaIn, ProjectUpdateIn,
-    views::IdIn,
+    ProjectCharterIn, ProjectCharterOut, ProjectCloseIn, ProjectCreateIn, ProjectExecuteIn,
+    ProjectProgrammeMetaIn, ProjectReopenIn, ProjectUpdateIn, views::IdIn,
 };
 
 /// The board every new project gets, and the template it reads its lanes from. Both live in
@@ -512,9 +513,175 @@ async fn projects_close(
     Ok(project_view(&project, &boards))
 }
 
+/// `projects.charter` — the retrospective rework's charter path: the project already exists.
+///
+/// `pm.charter` creates the project AND its charter, so it cannot re-charter a project that was
+/// closed and is being reworked. This writes the same asset and opens the same gate for an
+/// EXISTING project. It refuses once the charter gate is approved: re-chartering a chartered
+/// project would open a second gate over the same lifecycle, which is the bypass this action
+/// exists to avoid, not repeat.
+#[crate::action(
+    name = "projects.charter",
+    version = 1,
+    kind = "internal",
+    scopes = ["portfolio:write"],
+    idempotent = false,
+    timeout_ms = 30000,
+    effect = "write",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn projects_charter(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: ProjectCharterIn,
+) -> Result<HandlerOutput<ProjectCharterOut>, ActionError> {
+    if input.charter.trim().is_empty() {
+        return Err(invalid("charter", "required", "must not be empty"));
+    }
+    let project = load_project(tx, ctx.tenant, input.project_id).await?;
+    if let Some(approval_id) =
+        crate::pm::approved_gate(&mut *tx, ctx.tenant, project.id, "charter").await?
+    {
+        return Err(ActionError::new(
+            409,
+            "charter_approved",
+            format!(
+                "project {} already has an approved charter gate ({approval_id})",
+                project.id
+            ),
+        ));
+    }
+    let title = input
+        .title
+        .as_deref()
+        .map(str::trim)
+        .filter(|title| !title.is_empty())
+        .map(str::to_owned)
+        .unwrap_or_else(|| format!("Charter — {}", project.name));
+    let mut charter = NewAsset::new(
+        AssetKind::Charter,
+        format!("{}-CHARTER", project.key),
+        title,
+    );
+    charter.body = input.charter;
+    charter.project_id = Some(project.id);
+    charter.owner_user_id = Some(ctx.actor_id);
+    charter.author_id = Some(ctx.actor_id);
+    let asset = store::governance::insert_asset_tx(&mut *tx, ctx.tenant, &charter)
+        .await
+        .map_err(|error| {
+            tracing::error!(%error, "projects.charter: insert charter");
+            ActionError::internal()
+        })?;
+    let approval_id = crate::pm::open_gate(
+        &mut *tx,
+        &ctx,
+        project.id,
+        "charter",
+        "pm",
+        1,
+        serde_json::json!({
+            "charter_asset_id": asset.id.to_string(),
+            "description": format!("Approve the charter for {}", project.key),
+        }),
+    )
+    .await?;
+    Ok(HandlerOutput::created(ProjectCharterOut {
+        project_id: project.id,
+        charter_asset_id: asset.id,
+        approval_id,
+    }))
+}
+
+/// `projects.reopen` — the retrospective rework's one backward transition.
+///
+/// Only a CLOSED project whose `meta.viability` is exactly `"rework"` moves back to `active`.
+/// The verdict is written by `projects.programme_meta` (which now owns the key), and the reason
+/// and decision reference are recorded on the row, so the reopen is a governance record rather
+/// than a status edit.
+#[crate::action(
+    name = "projects.reopen",
+    version = 1,
+    kind = "internal",
+    scopes = ["portfolio:write"],
+    idempotent = false,
+    timeout_ms = 30000,
+    effect = "write",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn projects_reopen(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: ProjectReopenIn,
+) -> Result<ProjectView, ActionError> {
+    let action = "projects.reopen";
+    if input.reason.trim().is_empty() {
+        return Err(invalid("reason", "required", "must not be empty"));
+    }
+    if input.decision_ref.trim().is_empty() {
+        return Err(invalid("decision_ref", "required", "must not be empty"));
+    }
+    let current = load_project(tx, ctx.tenant, input.id).await?;
+    if current.status != "closed" {
+        return Err(ActionError::new(
+            409,
+            "conflict",
+            format!(
+                "project {} is {}; only a closed project can be reopened",
+                current.id, current.status
+            ),
+        ));
+    }
+    let verdict = current.meta.get("viability");
+    if verdict.and_then(serde_json::Value::as_str) != Some("rework") {
+        let current_verdict = match verdict {
+            Some(serde_json::Value::String(value)) => format!("\"{value}\""),
+            Some(value) => value.to_string(),
+            None => "absent".to_owned(),
+        };
+        return Err(ActionError::new(
+            409,
+            "rework_verdict_missing",
+            format!(
+                "project {} has meta.viability {current_verdict}; only a project the retrospective \
+                 judged \"rework\" can be reopened",
+                current.id
+            ),
+        ));
+    }
+    let reopened = store::project::reopen_project_tx(
+        &mut *tx,
+        ctx.tenant,
+        input.id,
+        input.reason.trim(),
+        input.decision_ref.trim(),
+    )
+    .await
+    .map_err(|error| store_error(error, action))?;
+    let Some(project) = reopened else {
+        // A concurrent transition won between the read and the update: the same conflict the
+        // status guard above answers.
+        let current = load_project(tx, ctx.tenant, input.id).await?;
+        return Err(ActionError::new(
+            409,
+            "conflict",
+            format!(
+                "project {} is {}; only a closed project can be reopened",
+                current.id, current.status
+            ),
+        ));
+    };
+    let boards = store::board::list_boards_tx(&mut *tx, ctx.tenant, project.id)
+        .await
+        .map_err(|error| store_error(error, action))?;
+    Ok(project_view(&project, &boards))
+}
+
 /// The `meta` keys the programme owns: the seed writes them, every gate reads them, and only a
 /// programme-level action may change them.
-const PROGRAMME_META_KEYS: [&str; 12] = [
+const PROGRAMME_META_KEYS: [&str; 13] = [
     "tranche",
     "adm_phase",
     "plateau",
@@ -527,6 +694,9 @@ const PROGRAMME_META_KEYS: [&str; 12] = [
     "plan",
     "plan_status",
     "status_source",
+    // The retrospective's verdict. `projects.reopen` reads it; `projects.programme_meta` is the
+    // only write path, so a general edit cannot manufacture a rework.
+    "viability",
 ];
 
 fn is_programme_meta(key: &str) -> bool {

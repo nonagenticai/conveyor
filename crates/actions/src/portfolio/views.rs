@@ -20,6 +20,7 @@
 use chrono::{DateTime, Utc};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
+use serde_json::Value;
 use uuid::Uuid;
 
 pub use crate::board::views::IdIn;
@@ -155,6 +156,54 @@ pub struct StakeholderOut {
     pub created_at: DateTime<Utc>,
     /// When the row last changed.
     pub updated_at: DateTime<Utc>,
+}
+
+// ── programme baselines ─────────────────────────────────────────────────────────────────
+
+/// `programmes.baseline` — the programme and the trio kind to freeze.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct ProgrammeBaselineTakeIn {
+    /// The programme to baseline, resolved under the caller's tenant.
+    pub programme_id: Uuid,
+    /// `management | governance | boundary`.
+    pub kind: String,
+}
+
+/// `programmes.baseline_approve` — the baseline to approve.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct ProgrammeBaselineApproveIn {
+    /// The baseline to approve, resolved under the caller's tenant.
+    pub baseline_id: Uuid,
+}
+
+/// `programmes.baselines_list` — the programme whose baselines are read.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct ProgrammeBaselineListIn {
+    /// The programme whose baselines are read.
+    pub programme_id: Uuid,
+}
+
+/// One programme baseline as the `programmes.baseline*` actions return it.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct ProgrammeBaselineOut {
+    /// The row id.
+    pub id: String,
+    /// The programme the baseline belongs to.
+    pub programme_id: String,
+    /// `management | governance | boundary`.
+    pub kind: String,
+    /// The frozen snapshot: the programme, its tranches and its projects.
+    pub snapshot: Value,
+    /// When it was taken.
+    pub taken_at: DateTime<Utc>,
+    /// Who took it.
+    pub taken_by: String,
+    /// Who approved it, when a distinct approver has.
+    pub approved_by: Option<String>,
+    /// The row version (`ETag`).
+    pub version: i64,
+    /// When the baseline was taken.
+    pub created_at: DateTime<Utc>,
 }
 
 // ── the programme refresh ───────────────────────────────────────────────────────────────
