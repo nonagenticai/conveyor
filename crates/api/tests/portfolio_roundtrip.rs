@@ -316,8 +316,9 @@ fn s08_owns_no_principles_or_decisions_action() {
     // The nine portfolio actions that survive; T1 adds the three MSP stakeholder-profile
     // actions under the same prefix, so this count was eight; #305's profile_delete adds the
     // ninth. #462's programmes.refresh extends the programmes family to five (the S08 four plus
-    // the seed refresh) — a documented addition, not a resurrection.
-    assert_eq!(owners["programmes"], 5);
+    // the seed refresh) — a documented addition, not a resurrection. #511 adds the MSP trio's
+    // take/approve/list, extending the programmes family to eight.
+    assert_eq!(owners["programmes"], 8);
     assert_eq!(owners["stakeholders"], 9);
     // The S08 registers aggregate migration 0011 removed stays dead. `registers.*` now names
     // T1's one six-kind plan-spine register (create/get/list/update) plus #305's delete — a
