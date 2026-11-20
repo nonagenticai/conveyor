@@ -409,7 +409,7 @@ mod tests {
         let registry = conveyor_actions::registry();
         assert_eq!(
             registry.len(),
-            497,
+            502,
             "the live registry: S04–S11 + S16 (216) + S17's 8 benchmark actions (224) + S13's 6 \
              workflows actions (230) + S19 Part B's 7 eval actions (237) + S13's 3 workflow_runs \
              (240) + S15's 3 knowledge/memory actions (243) + S15 step 5's 7 capability actions \
@@ -434,7 +434,9 @@ mod tests {
 (404) + #282's three approval-policy actions (approval_policies.list, approval_policies.get, approval_policies.set) (407) + T3's six PM actions (pm.charter|plan|get|route_gate|close, changes.request) (413) + #305's fourteen MSP edit/read actions (benefits update/delete/link_list/unlink/transition_list/transition_upsert, tranches update/delete/review_list, cadences update/delete, wbs.delete, registers.delete, stakeholders.profile_delete) (427) + #154's analyse.site (428) + #164's analyse.video (429) + #303's two retirement actions (benefits.retire, tranches.retire) (431) + #295's cards.ledger_append and cards.ledger_list (433) + T9's twenty-six architecture actions (artifacts list/get/entries/links/create/update/approve/supersede/link, repository_search, profile get/tailor, board open/get/decide, contracts request/get/list/approve/supersede, phases_advance, reviews record/waive, maturity assess/plan, skills_assess) (459) + T13's tools.call (460) + #366's two spreadsheet actions (462) + T4's four coach actions (coach.interrupt|triage|remedy|escalate) (466) + T14's three estate-toolkit actions (toolkits.publish, tools.probe, tools.usage) (469) + #385's three \
              architecture reads (maturity_list, skills_list, board_list) (472) + T11's eight metrics actions (metrics.flow, metrics.job, metrics.usage, metrics.programme, metrics.maturity, metrics.reconcile, metrics.threshold_get, metrics.threshold_update) (480) + T16's five procedures actions (procedures.ingest_sop, procedures.ingest_process, procedures.ingest_rdf, procedures.validate, procedures.review_source) (485) + T7's six operations actions (ops.incident|triage|mitigate|postmortem|resolve, ops.flag_flip) (491) + #450's retirement of the worker-graph read, with the four V1 displays served internally (490) + #462's programmes.refresh (491) + #508's six \
              write-path actions (projects.activate|pause|archive|baseline|programme_meta, \
-             tranches.authorise) (497). \
+             tranches.authorise) (497) + #511's five \
+             rework-path actions (programmes.baseline|baseline_approve|baselines_list, \
+             projects.charter, projects.reopen) (502). \
              The count is asserted here because this crate serves the registry; a lane that adds \
              an action bumps it."
         );
