@@ -60,6 +60,8 @@ READBACK_MAP = {
     "architecture.board_decide": "architecture.board_get",
     "approvals.decide": "approvals.list",
     "documents.publish": "documents.get",
+    "documents.compose": "documents.get",
+    "registers.create": "registers.get",
     "pm.close": "pm.get",
     "projects.reopen": "projects.get",
     "projects.charter": "pm.get",
@@ -290,6 +292,11 @@ def run_record(args, transport):
     )
 
     if args.dry_run:
+        planned_read = (
+            {"id": f"<from write output: {args.read_id_from_output}>"}
+            if args.read_id_from_output
+            else read_input
+        )
         print_plan(
             "write", action, payload,
             transport.build(
@@ -298,7 +305,7 @@ def run_record(args, transport):
             evidence=args.evidence,
         )
         print_plan(
-            "read-back", read_action, read_input,
+            "read-back", read_action, planned_read,
             transport.build(read_action, actor_id=actor_id),
         )
         return 0
@@ -308,6 +315,13 @@ def run_record(args, transport):
         if_match=if_match,
     )
     print_result("write", action, write_result)
+    if args.read_id_from_output:
+        created_id = write_result.get(args.read_id_from_output)
+        if not isinstance(created_id, str) or not created_id:
+            fail(
+                f"the write returned no {args.read_id_from_output!r}; cannot read it back"
+            )
+        read_input = {"id": created_id}
     read_result = execute(transport, read_action, read_input, actor_id=actor_id)
     if not has_row(read_result):
         fail(f"read-back {read_action} returned no row; the {action} write is unverified")
@@ -335,6 +349,8 @@ if log:
 name = argv[argv.index("--name") + 1] if "--name" in argv else None
 if name and os.environ.get("PROGRAMME_RECORD_EMPTY") == name:
     print("null")
+elif name == "documents.compose":
+    print(json.dumps({"id": "doc-1", "title": "composed"}))
 else:
     print(json.dumps({"ok": True, "action": name, "input": payload}))
 """
@@ -520,6 +536,27 @@ def self_test():
         verify_if_match,
     )
 
+    def verify_created_id(completed):
+        problems = []
+        if actions() != ["documents.compose", "documents.get"]:
+            problems.append(f"calls were {actions()!r}")
+        elif calls()[1]["input"] != {"id": "doc-1"}:
+            problems.append(f"the read-back input was {calls()[1]['input']!r}")
+        return problems
+
+    run_case(
+        "read-back id comes from the write output",
+        [
+            "--action", "documents.compose",
+            "--input", '{"title":"t","body":"body"}',
+            "--evidence", evidence,
+            "--read-id-from-output", "id",
+        ],
+        fake_env,
+        True,
+        verify_created_id,
+    )
+
     run_case(
         "write with no mapping refuses",
         ["--action", "ops.unmapped", "--input", "{}", "--evidence", evidence],
@@ -587,9 +624,9 @@ def self_test():
 
     print()
     if failures:
-        print(f"SELF-TEST FAILED: {len(failures)} of 9 cases: {', '.join(failures)}")
+        print(f"SELF-TEST FAILED: {len(failures)} of 10 cases: {', '.join(failures)}")
         return 1
-    print("SELF-TEST OK: 9 cases passed")
+    print("SELF-TEST OK: 10 cases passed")
     return 0
 
 
@@ -605,6 +642,11 @@ def main(argv=None):
     parser.add_argument("--evidence", metavar="PATH", help="required for a write")
     parser.add_argument("--approval-id", metavar="UUID", help="approved gate for the write")
     parser.add_argument("--actor-id", metavar="UUID", help="act as this actor")
+    parser.add_argument(
+        "--read-id-from-output",
+        metavar="FIELD",
+        help="read the row back by the id this field carries in the write output",
+    )
     parser.add_argument(
         "--if-match", type=int, metavar="VERSION", help="the row version the write is made against"
     )
