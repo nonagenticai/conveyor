@@ -39,7 +39,7 @@ name: delivery
 
 on:
   pull_request:
-    types: [opened, reopened, synchronize, ready_for_review, labeled, unlabeled, review_requested]
+    types: [opened, reopened, synchronize, ready_for_review]
   push:
     branches: [main]
   schedule:
