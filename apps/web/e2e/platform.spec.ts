@@ -1,4 +1,4 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Page } from "./fixture";
 
 // S12 wave 2, the Platform surface. Two real modes, no mocked API:
 //   * a tenant admin is refused the surface;
