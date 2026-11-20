@@ -212,7 +212,8 @@ test("a label, a lane and an unarchive round-trip through the UI", async ({ page
   await allowSelfApproval(request, "cards.archive");
 
   await page.goto(`/board/${fixture.boardId}`);
-  await expect(page.getByRole("heading", { name: title })).toBeVisible();
+  // The screen's heading is the board's name, not the project's; the fixture's card is the mark.
+  await expect(page.locator(".card", { hasText: title })).toBeVisible();
 
   // A label: created through the panel's form, then attached to the start card's row.
   const label = `e2e-label-${stamp}`;
