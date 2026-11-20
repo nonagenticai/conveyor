@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>T3 PM job — closure review · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>T3 — Closure review</h1>
+<p>Project: T3 — PM job · Track: v2 · Tranche: 3 · Plan: docs/SPEC_V2.md §12
+Unit: #349 (the unit that publishes this output)
+Measured at: main@07fcad894dc660ac20e6b5ec6f321750b91c880f, 2026-11-18 · Project row: closed</p>
+<h2>Outcome vs acceptance</h2>
+<p>§12 T3 gate: <strong>"PM runs a request end to end; cannot approve its own gate; a baseline change requires a change request."</strong></p>
+<p><strong>1. PM runs a request end to end — partial.</strong> Charter, WBS, baseline, typed-evidence gates and closure are proven as an action sequence over the in-process HTTP harness against real Postgres by ten tests across five binaries. <code>assert_pm</code> refuses any binding that is not an active <code>job_key='pm'</code> job (<code>403 not_pm_job</code>), and <code>pm_get</code> reads back the approved baseline and gates. Three pieces are unproven: there is no <code>pm.staff</code> action — every test seeds its own bindings, so "staffing" is a fixture precondition, not a PM act; there is no PM procedure under <code>seed/processes</code> and no engine-executed run whose evidence is read back, so "runs" is an action sequence, not a run; and the typed-evidence resolver accepts <code>governed_asset</code> and <code>baseline</code> only — the P4 <code>architecture_contract</code> is T9's, and the unknown-kind refusal is code-only, with no test naming it.</p>
+<p><strong>2. Cannot approve its own gate — pass.</strong> <code>record_decision_tx</code>, the one writer every decision path traverses, refuses <code>requested_by == approver_id</code> with <code>RequesterCannotDecide</code> (<code>409</code>). <code>pm_self_approval</code> asserts zero decision rows, the gate still pending and the charter still draft, and that a distinct approver is recorded. The tenant-configurable <code>allowed</code> branch (#282, <code>approval_policy::allows_self_approval</code>) is not exercised: the default is proven, not the exception.</p>
+<p><strong>3. A baseline change requires a change request — partial.</strong> <code>take_baseline_guarded</code> refuses <code>409 change_request_required</code> without an approved change naming the approved baseline, <code>409 change_request_invalid</code> for a wrong one, and <code>changes.request</code> records the impact block and <code>baseline_ref</code> so the two rows cite each other. But the guard sits on <code>baselines.take</code> only. <code>pm.plan</code> writes its baseline through the unguarded <code>take_baseline_tx</code> (<code>crates/actions/src/pm/mod.rs:467</code> at this head) and has no existing-baseline precondition, while <code>project_baseline</code> (0044) has no uniqueness; a second <code>pm.plan</code> after the charter gate therefore appends an unapproved baseline that its own gate can approve, advancing the approved baseline with no change row. Both P3 tests exercise <code>baselines.take</code>; neither calls <code>pm.plan</code> twice.</p>
+<h2>Evidence</h2>
+<ul>
+<li><code>migrations/0049_pm_job.sql</code> — <code>project_baseline.change_id</code> FK to <code>project_register_item</code> and a partial index; resolves at main@07fcad89.</li>
+<li><code>crates/actions/src/pm/mod.rs</code> — six actions (<code>pm.charter|plan|get|route_gate|close</code>, <code>changes.request</code>), <code>assert_pm</code>, <code>resolve_evidence</code>, <code>apply_gate_effect_tx</code>; the last is called from <code>crates/actions/src/control/approvals.rs:114</code>. It carries #348's later <code>pm.close</code> approval target; the gate assertions are unchanged.</li>
+<li><code>crates/store/src/approval.rs:record_decision_tx</code>; <code>crates/store/src/approval_policy.rs:allows_self_approval</code>; <code>crates/actions/src/spine/mod.rs:take_baseline_guarded</code>, called from <code>baselines.take</code> at line 1280.</li>
+<li>Tests: <code>crates/api/tests/pm_lifecycle.rs</code>, <code>pm_close_gate.rs</code>, <code>pm_self_approval.rs</code>, <code>pm_baseline_change.rs</code>, <code>pm_gate_evidence.rs</code> — ten <code>#[tokio::test]</code> functions (the #74 handoff's "25/25" counts binary-level assertions, not test functions as measured).</li>
+<li>Declarations: <code>docs/design/data/actions.json</code> declares all six; <code>scripts/v2-slice-artefacts.json</code> credits T3 with <code>gap: null</code>; <code>docs/design/data/coverage.json</code> T3 <code>built</code>, actions <code>[6,6]</code>; <code>seed/programme.json</code> T3 <code>status: closed</code>, <code>measured_status: built</code>.</li>
+<li>Recorded CI: run <strong>44191738186</strong>, <code>merge_group</code>, head <code>c10d7599</code>, conclusion <strong>success</strong>; its <code>checks</code> job ran fmt, clippy, nextest and audit green. PR #313 merged at <code>c10d7599</code>.</li>
+<li>The project's published <code>evidence</code> output (this session) carries the claim and the gap list; this review matches it, with gap 5 resolved below.</li>
+</ul>
+<h2>Open items</h2>
+<ol>
+<li><strong>PM staffing.</strong> No <code>pm.staff</code>. Owner: T3 follow-up unit. Next: settle issue #74's open question 2 (binding write vs card assignment), then add the action and its test.</li>
+<li><strong>Engine-executed end-to-end run.</strong> Owner: T3 follow-up unit. Next: author the PM procedure and execute it through the engine, reading the run's evidence back.</li>
+<li><strong><code>architecture_contract</code> evidence.</strong> Owner: T9 (#81). Next: add the kind and a <code>gate_evidence_unknown_kind</code> test.</li>
+<li><strong>Self-approval <code>allowed</code> branch.</strong> Owner: #282 policy owner. Next: test the allowed path, or record the configurable exception explicitly.</li>
+<li><strong><code>pm.close</code> target — closed at this head.</strong> #348 (<code>07fcad89</code>, #283) gives <code>pm.close</code> an approval target and empties <code>UNGATED</code> in <code>crates/actions/tests/destructive_gate.rs</code>; the two PM tests now invoke it gated. Nothing remains.</li>
+<li><strong>NEW — <code>pm.plan</code> re-baseline bypass.</strong> Owner: T3 follow-up unit, highest priority. Next: route the plan's baseline through <code>take_baseline_guarded</code> (or refuse a second plan) and add the negative test.</li>
+<li><strong>Brief-page staleness.</strong> The published brief still shows T3 <code>proposed</code>; the declaration measures <code>closed</code>/<code>built</code>. Owner: programme docs refresh.</li>
+</ol>
+<h2>Decision</h2>
+<p>T3 is <strong>CLOSED</strong>, measured at main@07fcad89. Its row is first recorded closed at <code>96b98972</code> (2026-11-18 03:04Z); the closure-gate unit #302 did not land until <code>18e06aca</code> (08:19Z) and closed at 08:46Z, so the gate did not judge this close. Under the now-live gate, T3's declared set would have blocked it until this <code>closure-review</code> and the <code>evidence</code> output were published — the gap #349 exists to close. This review is the durable record of that close: clause 2 passes; clauses 1 and 3 pass on the tested paths but remain partial against the gate's words; and the follow-ups above are carried, with the <code>pm.plan</code> bypass as the one that needs a claimed unit rather than a note.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>PM job · conveyor output · published 2026-11-20T11:50:50.848127361+00:00 · FR Test</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>
