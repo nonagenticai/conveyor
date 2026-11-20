@@ -36,6 +36,9 @@ ROOT = Path(__file__).resolve().parents[1]
 PROGRAMME_NAME = "conveyor buildout"
 PROGRAMME_KEY = "conveyor-buildout"
 REPO_URL = "https://github.com/nonagenticai/conveyor"
+# The buildout's own MSP definition (benefits, map, tranches, project ADM). The generator merges
+# each project's ADM phase/plateau into its meta; the loader seeds the benefits/links/tranches.
+DEFINITION_PATH = ROOT / "seed" / "programme-definition.json"
 STANDARD_PATH = ROOT / "seed" / "output-standard.json"
 CONSOLE_STANDARD_PATH = ROOT / "docs" / "design" / "data" / "output-standard.js"
 # The exported registry (`scripts/fetch-issues.sh`). It is the workflow's first step, so reading
@@ -45,6 +48,19 @@ ISSUES_FILE = ROOT / "docs" / "design" / "data" / "issues.json"
 
 def load_standard() -> dict:
     return json.loads(STANDARD_PATH.read_text(encoding="utf-8"))
+
+def definition_project_meta() -> dict[str, dict[str, str]]:
+    """The ADM placement per project, from the checked-in definition (empty when absent)."""
+    if not DEFINITION_PATH.exists():
+        return {}
+    document = json.loads(DEFINITION_PATH.read_text(encoding="utf-8"))
+    out: dict[str, dict[str, str]] = {}
+    for key, entry in (document.get("projects") or {}).items():
+        phase = (entry or {}).get("adm_phase", "")
+        plateau = (entry or {}).get("plateau", "")
+        if phase and plateau:
+            out[key] = {"adm_phase": phase, "plateau": plateau}
+    return out
 
 
 def standard_class(std: dict, project: dict, measured_status: str) -> dict:
@@ -448,6 +464,7 @@ def build(issues: list[dict]) -> dict:
 
     coverage = coverage_statuses()
     std = load_standard()
+    adm = definition_project_meta()
     out_projects = []
     for project in sorted(projects, key=project_order):
         project_issues = sorted(issues_by_project.get(project["key"], []), key=lambda i: i["number"])
@@ -477,6 +494,7 @@ def build(issues: list[dict]) -> dict:
                     "tranche": measured.get("tranche", 0),
                     "expected_outputs": list(cls["now"]),
                     "closure_outputs": list(cls["closure"]),
+                    **adm.get(project["key"], {}),
                     **({"gate": project["gate"]} if project.get("gate") else {}),
                 },
             }

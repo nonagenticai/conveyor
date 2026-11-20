@@ -211,8 +211,7 @@ git ls-remote --heads https://github.com/nonagenticai/conveyor "issue/N-*"
 git log upstream/main --grep "#N" --oneline
 ```
 
-Never force-push a branch you do not own. The 2-PR cap counts maintainer PRs in this repository;
-a fork PR does not count against it (record the count on the day with the command above).
+Never force-push a branch you do not own.
 
 ## Abandonment and adoption
 
@@ -266,7 +265,7 @@ gate.
 
 | stack | gate |
 |---|---|
-| Rust | `rbuild --gate` (or the issue's declared command) |
+| Rust | `cargo fmt --all -- --check` and `cargo metadata --locked --format-version 1`; the compile verdict is the repo's GitHub preflight (`gh workflow run preflight.yml --ref <branch>`) |
 | docs/skills only | `git diff --check` + every relative Markdown link resolves |
 
 - Paste the command, result and SHA into the PR body. **No PR until green.**
@@ -316,7 +315,7 @@ gh pr create --base main --head issue/N-<slug> \
   notification nobody is going to act on.
 - The issue closes via `Closes #N`. If it did not, close it with the evidence.
 
-## CI budget and WIP cap
+## CI budget
 
 - **2 pipeline runs per issue**: the PR run and the merge run. Every run is a verdict, never a
   probe.
@@ -328,18 +327,9 @@ gh pr create --base main --head issue/N-<slug> \
   run, not a full suite — **this applies to the PR run only; the merge run is still a full suite
   until #32.** One code path — a `Cargo.toml`, a migration, `.gitignore`, a workflow file — puts
   the whole suite back.
-- **At most 2 open unit PRs at a time** (the workspace suite runs on `arc-large`, whose measured
-  pool max is 2). More only queues and makes sessions wait on CI. Count open PRs whose head
-  matches `issue/*` **in this repository**; a fork PR is not a maintainer PR and does not count:
-
-```bash
-gh pr list --state open --json number,headRefName,headRepositoryOwner \
-  --jq '[.[] | select(.headRefName | startswith("issue/"))
-             | select(.headRepositoryOwner.login == "nonagenticai")] | length'
-```
-
-- `issue-deliver` checks this cap and refuses the PR when it is full. **Claims (branches) are
-  unlimited; PRs are not** — `issue-pickup` never refuses a claim on this basis.
+- **One issue is one branch and exactly one PR.** Claims and concurrent lanes are unlimited —
+  there is no repository-wide ceiling on open `issue/*` PRs, and a session never waits on a count.
+  Parallel lanes cost CI runs; that cost is managed in the pipeline, never by refusing work.
 
 ## Handoff — mandatory when stopping before merge
 

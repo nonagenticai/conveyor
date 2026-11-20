@@ -5,19 +5,19 @@
       "name": "approvals.decide"
     },
     {
-      "line": 6064,
+      "line": 6066,
       "name": "approvals.decide"
     },
     {
-      "line": 5851,
+      "line": 5853,
       "name": "approvals.list"
     },
     {
-      "line": 5852,
+      "line": 5854,
       "name": "approvals.list"
     },
     {
-      "line": 6024,
+      "line": 6026,
       "name": "approvals.request"
     },
     {
@@ -117,31 +117,31 @@
       "name": "documents.revision_list"
     },
     {
-      "line": 5932,
+      "line": 5934,
       "name": "procedures.ingest_process"
     },
     {
-      "line": 5924,
+      "line": 5926,
       "name": "procedures.ingest_rdf"
     },
     {
-      "line": 5940,
+      "line": 5942,
       "name": "procedures.ingest_sop"
     },
     {
-      "line": 5808,
+      "line": 5810,
       "name": "procedures.list"
     },
     {
-      "line": 6137,
+      "line": 6139,
       "name": "procedures.publish"
     },
     {
-      "line": 5985,
+      "line": 5987,
       "name": "procedures.review_source"
     },
     {
-      "line": 5967,
+      "line": 5969,
       "name": "procedures.validate"
     },
     {
@@ -149,15 +149,15 @@
       "name": "process_runs.start"
     },
     {
-      "line": 5831,
+      "line": 5833,
       "name": "processes.get"
     },
     {
-      "line": 5811,
+      "line": 5813,
       "name": "processes.list"
     },
     {
-      "line": 6139,
+      "line": 6141,
       "name": "processes.publish"
     },
     {
@@ -334,7 +334,7 @@
       "tranche": 0,
       "units": {
         "blocked": 1,
-        "claimed": 4,
+        "claimed": 3,
         "numbers": [
           17,
           22,
@@ -353,18 +353,16 @@
           223,
           224,
           225,
-          393,
-          394,
           395,
           410,
           426,
           433,
-          434,
           435,
-          462
+          462,
+          476
         ],
-        "open": 16,
-        "ready": 7,
+        "open": 14,
+        "ready": 5,
         "unknown": 0
       }
     },
@@ -1087,7 +1085,7 @@
       "tranche": 10,
       "units": {
         "blocked": 0,
-        "claimed": 1,
+        "claimed": 5,
         "numbers": [
           6,
           26,
@@ -1100,10 +1098,13 @@
           391,
           392,
           400,
-          459
+          459,
+          468,
+          470,
+          471
         ],
-        "open": 6,
-        "ready": 4,
+        "open": 5,
+        "ready": 0,
         "unknown": 0
       }
     },
@@ -1139,7 +1140,7 @@
       "tranche": 8,
       "units": {
         "blocked": 0,
-        "claimed": 0,
+        "claimed": 1,
         "numbers": [
           7,
           136,
@@ -1147,7 +1148,7 @@
           198
         ],
         "open": 1,
-        "ready": 1,
+        "ready": 0,
         "unknown": 0
       }
     },
@@ -1188,8 +1189,8 @@
           8,
           29
         ],
-        "open": 2,
-        "ready": 2,
+        "open": 1,
+        "ready": 1,
         "unknown": 0
       }
     },
@@ -1707,13 +1708,13 @@
       "tranche": 1,
       "units": {
         "blocked": 0,
-        "claimed": 0,
+        "claimed": 1,
         "numbers": [
           84,
           458
         ],
         "open": 1,
-        "ready": 1,
+        "ready": 0,
         "unknown": 0
       }
     },
@@ -1968,12 +1969,12 @@
       "tranche": 5,
       "units": {
         "blocked": 0,
-        "claimed": 0,
+        "claimed": 1,
         "numbers": [
           87
         ],
         "open": 1,
-        "ready": 1,
+        "ready": 0,
         "unknown": 0
       }
     },
@@ -2222,7 +2223,7 @@
       "track": "v2",
       "tranche": 5,
       "units": {
-        "blocked": 1,
+        "blocked": 0,
         "claimed": 0,
         "numbers": [
           78,
@@ -2230,7 +2231,7 @@
           171,
           172
         ],
-        "open": 1,
+        "open": 0,
         "ready": 0,
         "unknown": 0
       }
@@ -2457,9 +2458,9 @@
       "evidence": [
         "docs/design/v2.js"
       ],
-      "gap": "V2 destination; no backend call",
+      "gap": null,
       "key": "operations",
-      "status": "proposed",
+      "status": "live",
       "title": "Operations"
     },
     {
@@ -2575,16 +2576,16 @@
       },
       "total": 48,
       "uncovered": [],
-      "with_open_units": 22,
-      "without_open_units": 26
+      "with_open_units": 21,
+      "without_open_units": 27
     },
     "screens": {
       "actions_invoked": 39,
       "by_status": {
         "legacy": 7,
-        "live": 12,
+        "live": 13,
         "mixed": 1,
-        "proposed": 6
+        "proposed": 5
       },
       "total": 26
     }

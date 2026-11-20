@@ -45,13 +45,23 @@ jobs:
   # Code/doc classifier. A docs-only PR must still CREATE the required contexts (`checks`,
   # `image`, `service-image`) and SKIP their work; `paths-ignore` would leave those contexts
   # missing and the PR unmergeable. An empty or unreadable diff is not a docs-only licence —
-  # it runs the full suite. The merge run is always full (EVENT_NAME != pull_request).
+  # it runs the full suite.
+  #
+  # `generated_only` is the automation fast path: a change whose every path is the generated set
+  # (`seed/programme.json`, `docs/design/data/**`, `docs/design/docs/**` — the `issue-registry.yml`
+  # dirty gate) skips the Rust suite and the image builds on a PR and on the queue. It NEVER skips
+  # on a push to main: the Dockerfile bakes `docs/design/**` into the server image and
+  # `seed/programme.json` is compiled in (`crates/store/src/seed_programme.rs`), so main must build
+  # and publish the image that carries them. The 8 service images carry neither, so
+  # `publish-service-images` skips on a generated-only push. A malformed generated JSON fails
+  # `classify` before anything is skipped.
   classify:
     if: ${{ !github.event.repository.private }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     outputs:
       docs_only: ${{ steps.classify.outputs.docs_only }}
+      generated_only: ${{ steps.classify.outputs.generated_only }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
@@ -60,17 +70,55 @@ jobs:
       - id: classify
         env:
           EVENT_NAME: ${{ github.event_name }}
-          BASE_SHA: ${{ github.event.pull_request.base.sha }}
-          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PR_BASE: ${{ github.event.pull_request.base.sha }}
+          PR_HEAD: ${{ github.event.pull_request.head.sha }}
+          PUSH_BEFORE: ${{ github.event.before }}
+          PUSH_HEAD: ${{ github.sha }}
+          MQ_BASE: ${{ github.event.merge_group.base_sha }}
+          MQ_HEAD: ${{ github.event.merge_group.head_sha }}
         run: |
           set -euo pipefail
-          if [ "$EVENT_NAME" != "pull_request" ]; then
-            echo "docs_only=false" >> "$GITHUB_OUTPUT"
+          echo "docs_only=false" >> "$GITHUB_OUTPUT"
+          echo "generated_only=false" >> "$GITHUB_OUTPUT"
+          case "$EVENT_NAME" in
+            pull_request) diff_range="${PR_BASE}...${PR_HEAD}" ;;
+            push)         diff_range="${PUSH_BEFORE}..${PUSH_HEAD}" ;;
+            merge_group)  diff_range="${MQ_BASE}..${MQ_HEAD}" ;;
+            *)            diff_range="" ;;
+          esac
+          if [ -z "${diff_range}" ] || [[ "${diff_range}" == ".."* ]]; then
             exit 0
           fi
-          changed="$(git diff --name-only "$BASE_SHA...$HEAD_SHA")"
+          if ! changed="$(git diff --name-only "$diff_range")"; then
+            exit 0
+          fi
           if [ -z "$changed" ]; then
-            echo "docs_only=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          generated_only=true
+          while IFS= read -r path; do
+            if [ -z "$path" ]; then
+              continue
+            fi
+            case "$path" in
+              seed/programme.json|docs/design/data/*|docs/design/docs/*) ;;
+              *) generated_only=false ;;
+            esac
+          done <<< "$changed"
+          if [ "$generated_only" = "true" ]; then
+            while IFS= read -r path; do
+              case "$path" in
+                *.json)
+                  if ! jq empty "$path"; then
+                    echo "::error::$path is not valid JSON; the generated set may not skip the suite"
+                    exit 1
+                  fi
+                  ;;
+              esac
+            done <<< "$changed"
+          fi
+          echo "generated_only=$generated_only" >> "$GITHUB_OUTPUT"
+          if [ "$EVENT_NAME" != "pull_request" ]; then
             exit 0
           fi
           non_docs=0
@@ -85,14 +133,14 @@ jobs:
           done <<< "$changed"
           if [ "$non_docs" -eq 0 ]; then
             echo "docs_only=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "docs_only=false" >> "$GITHUB_OUTPUT"
           fi
 
   # DCO 1.1. Every contributor commit in the PR carries a `Signed-off-by:` trailer; GitHub's own
   # merge commit is not a contributor commit (`--no-merges`). A failure names each offending sha.
+  # Runs on the queue too: a required context that never reports on `merge_group` stalls every
+  # entry until timeout, so `dco` could not become required until this job ran there.
   dco:
-    if: ${{ !github.event.repository.private && github.event_name == 'pull_request' }}
+    if: ${{ !github.event.repository.private && (github.event_name == 'pull_request' || github.event_name == 'merge_group') }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -102,8 +150,8 @@ jobs:
           persist-credentials: false
       - name: every commit is signed off
         env:
-          BASE_SHA: ${{ github.event.pull_request.base.sha }}
-          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          BASE_SHA: ${{ github.event.merge_group.base_sha || github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.merge_group.head_sha || github.event.pull_request.head.sha }}
         run: |
           set -euo pipefail
           missing=""
@@ -230,6 +278,8 @@ jobs:
         run: |
           python3 scripts/build-coverage.py --check
           python3 scripts/build-v2-coverage.py --check
+          python3 scripts/build-programme-seed.py --check
+          python3 scripts/check-programme-definition.py
           python3 scripts/check-output-standard.py --self-test
           python3 scripts/check-output-standard.py
           python3 scripts/ci/board.py --self-test
@@ -263,7 +313,9 @@ jobs:
   # deliberately independent of the shard count: add or drop a shard and `checks` never changes.
   checks-shard:
     needs: classify
-    if: ${{ !github.event.repository.private && needs.classify.outputs.docs_only != 'true' }}
+    # The suite skips on a generated-only PR or queue entry; it still runs on a push to main,
+    # because the Dockerfile bakes the design data and the seed into the image that is built there.
+    if: ${{ !github.event.repository.private && needs.classify.outputs.docs_only != 'true' && (github.event_name == 'push' || needs.classify.outputs.generated_only != 'true') }}
     runs-on: ubuntu-latest
     timeout-minutes: 120
     # TWO SHARDS, because the suite was 729 s of a 917 s job and a public repo's GitHub-hosted
@@ -413,10 +465,16 @@ jobs:
         env:
           SHARD_RESULT: ${{ needs.checks-shard.result }}
           DOCS_ONLY: ${{ needs.classify.outputs.docs_only }}
+          GENERATED_ONLY: ${{ needs.classify.outputs.generated_only }}
+          EVENT_NAME: ${{ github.event_name }}
         run: |
           set -euo pipefail
           if [ "${DOCS_ONLY}" = "true" ]; then
             echo "docs-only PR: the code gates were skipped by classify"
+            exit 0
+          fi
+          if [ "${GENERATED_ONLY}" = "true" ] && [ "${EVENT_NAME}" != "push" ]; then
+            echo "generated-only change: the code gates were skipped by classify"
             exit 0
           fi
           if [ "${SHARD_RESULT}" != "success" ]; then
@@ -461,6 +519,12 @@ jobs:
       # once per stage. Exported on main only — a PR's entry is branch-scoped and would only
       # evict the default branch's.
       - name: build
+        # The merge queue re-validates a tree; it does not release one. Building the deployable
+        # here cost ~924 s per merge (measured on #473). A job whose steps are all skipped still
+        # concludes success, so the required `image` context keeps reporting on the queue ref.
+        # A generated-only PR is the same case: main is where the design data and the seed reach
+        # the image, so only the PR and queue runs may skip the build.
+        if: ${{ github.event_name == 'push' || (github.event_name != 'merge_group' && needs.classify.outputs.generated_only != 'true') }}
         env:
           CACHE_TO: ${{ github.ref == 'refs/heads/main' && 'type=gha,mode=max,scope=image' || '' }}
         run: |
@@ -486,6 +550,8 @@ jobs:
       # Measured twice on ARC: run 42642725695 and run 42648606596, both "write /dev/stdout: broken
       # pipe". A bash pattern match on the captured variable has no reader to exit early.
       - name: smoke
+        # Same gate as `build`: nothing to smoke when nothing was built.
+        if: ${{ github.event_name == 'push' || (github.event_name != 'merge_group' && needs.classify.outputs.generated_only != 'true') }}
         run: |
           set -euo pipefail
           docker run --rm "$IMG" --version
@@ -525,6 +591,8 @@ jobs:
           persist-credentials: false
 
       - name: build
+        # The service template holds no generated file; a generated-only change cannot alter it.
+        if: ${{ github.event_name == 'push' || needs.classify.outputs.generated_only != 'true' }}
         run: |
           set -euo pipefail
           docker build --file docker/Dockerfile.service \
@@ -533,6 +601,7 @@ jobs:
             --tag "$IMG" .
 
       - name: smoke
+        if: ${{ github.event_name == 'push' || needs.classify.outputs.generated_only != 'true' }}
         run: |
           set -euo pipefail
           docker run -d --rm --name svc -e BIND_ADDR=0.0.0.0:8080 -p 127.0.0.1::8080 "$IMG"
@@ -565,7 +634,11 @@ jobs:
   # Deployment and its four CronJobs, so pushing this binary there would auto-deploy the rewrite on
   # the next reconcile (measured constraint, #95).
   publish-service-images:
-    if: ${{ !github.event.repository.private && github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') }}
+    needs: classify
+    # The service images carry no generated file (they copy one binary), so a generated-only push
+    # to main — an automation merge — publishes nothing. The server `image` job above still runs:
+    # that is the image the Dockerfile bakes docs/design and the seed into.
+    if: ${{ !github.event.repository.private && github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && needs.classify.outputs.generated_only != 'true' }}
     runs-on: ubuntu-latest
     # One cold Rust build per matrix entry; the server `image` job above allows 60.
     timeout-minutes: 45

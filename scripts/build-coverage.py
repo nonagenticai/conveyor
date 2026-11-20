@@ -157,6 +157,15 @@ SCREEN_OVERRIDES = {
         "evidence": ["docs/design/v2.js"],
         "gap": None,
     },
+    # The Operations destination is live (issue #434): the published snapshot's `ops` section
+    # carries the incident cards T7 writes — service, severity, the four lifecycle timestamps,
+    # the runbook procedure and the postmortem asset — and the screen renders them read-only.
+    # The on-call, read/write and andon tabs are reference text; no browser write path exists.
+    "operations": {
+        "status": "live",
+        "evidence": ["docs/design/v2.js"],
+        "gap": None,
+    },
 }
 
 FRONT = re.compile(r"^---\n(.*?)\n---\n", re.S)

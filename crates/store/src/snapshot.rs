@@ -39,6 +39,10 @@ pub struct SnapshotData {
     /// `architecture.json` data: the TOGAF ADM capability's rows — profiled standard, artefacts
     /// with their entries and links, contracts, the board, and the two assessment baselines.
     pub architecture: Value,
+    /// `ops.json` data: the incident cards the T7 lifecycle writes — service, severity, the four
+    /// timestamps and the runbook/postmortem links. Never the triage narrative or the evidence:
+    /// those are the operator's text, not the programme's public record.
+    pub ops: Value,
     /// `measure.json` data: inference aggregates (no prompt or response bodies exist).
     pub measure: Value,
     /// Secret **metadata** — never a value, never a key id.
@@ -575,6 +579,40 @@ pub async fn snapshot_tx(
         tenant_id,
     )
     .await?;
+    // The incident lifecycle (T7, SPEC_V2 §9.2). An incident is an ordinary `incident` card whose
+    // `meta` carries the record — so the public section selects those named keys only, never the
+    // whole object: `triage_narrative`, `mitigation` and `evidence` are the operator's text. The
+    // runbook is a published procedure and the postmortem a governed asset; the id join gives the
+    // reader the titles without a second file. The joins compare `::text` so a hand-edited meta
+    // value that is not a uuid is a non-match, not a 500 on the public route.
+    let mut incidents = rows(
+        &mut *conn,
+        "SELECT COALESCE(jsonb_agg(to_jsonb(t) ORDER BY t.created_at, t.id), '[]'::jsonb) FROM (
+             SELECT c.id, c.board_id, c.name, c.created_at, c.updated_at,
+                    c.meta ->> 'service' AS service,
+                    c.meta ->> 'severity' AS severity,
+                    c.meta ->> 'detected_at' AS detected_at,
+                    c.meta ->> 'triaged_at' AS triaged_at,
+                    c.meta ->> 'mitigated_at' AS mitigated_at,
+                    c.meta ->> 'resolved_at' AS resolved_at,
+                    c.meta ->> 'runbook_procedure_id' AS runbook_procedure_id,
+                    p.key AS runbook_key,
+                    p.title AS runbook_title,
+                    c.meta ->> 'postmortem_asset_id' AS postmortem_asset_id,
+                    a.title AS postmortem_title
+               FROM card c
+               JOIN card_type ct ON ct.id = c.card_type_id AND ct.code = 'incident'
+               LEFT JOIN procedure p
+                      ON p.tenant_id = c.tenant_id
+                     AND p.id::text = c.meta ->> 'runbook_procedure_id'
+               LEFT JOIN governed_asset a
+                      ON a.tenant_id = c.tenant_id
+                     AND a.id::text = c.meta ->> 'postmortem_asset_id'
+              WHERE c.tenant_id = $1
+         ) t",
+        tenant_id,
+    )
+    .await?;
     // ⛔ The public pack is the PROGRAMME's view (SPEC_V2 §5; the console already filters its
     // project list the same way — `docs/design/v2.js:4193`). A project outside a programme is a
     // session fixture — a proof, a scratch reproduction — never programme work, and its boards,
@@ -588,6 +626,9 @@ pub async fn snapshot_tx(
     let bound_boards = ids_where(&boards, "id", |_| true);
     retain_ids(&mut lists, "board_id", &bound_boards);
     retain_ids(&mut cards, "board_id", &bound_boards);
+    // An incident is a card: the same programme boundary decides whether it is the programme's
+    // public record.
+    retain_ids(&mut incidents, "board_id", &bound_boards);
     let bound_cards = ids_where(&cards, "id", |_| true);
     retain_ids(&mut runs, "project_id", &bound_projects);
     let bound_runs = ids_where(&runs, "id", |_| true);
@@ -683,6 +724,9 @@ pub async fn snapshot_tx(
             "board": architecture_board,
             "maturity": architecture_maturity,
             "skills": architecture_skills
+        }),
+        ops: json!({
+            "incidents": incidents
         }),
         measure: json!({
             "inference": {

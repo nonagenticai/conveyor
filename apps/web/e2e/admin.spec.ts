@@ -1,4 +1,4 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Page } from "./fixture";
 
 import { invoke } from "./helpers";
 
@@ -38,12 +38,27 @@ test("the registry, its schema, the audit trail, the licence and the honest exte
   await expect(page.locator("table", { hasText: "App" })).toContainText("conveyor");
   await expect(page.getByText("checked")).toBeVisible();
 
-  // Workers and billing are external services that dev does not configure. The tab must
-  // name the reason, never draw zeros that look like a healthy empty result.
+  // Workers is the conveyor's own inventory now: the durable queue and the host registry, not
+  // an external service. The queue has the scheduled kinds in dev; no host is registered.
   await page.getByRole("button", { name: "Workers", exact: true }).click();
-  await expect(page.locator(".problem")).toBeVisible();
+  const workers = page.locator("section.panel", {
+    hasText: "The conveyor's own durable queue",
+  });
+  await expect(workers).toBeVisible();
+  await expect(workers.getByRole("heading", { name: "Queue" })).toBeVisible();
+  // A fresh seed may have no queued work yet; the panel must say so, never hide the section.
+  await expect(
+    workers.locator("table.table tbody tr").first().or(workers.getByText("No queued work.")),
+  ).toBeVisible();
+  await expect(page.getByText("No hosts are registered.")).toBeVisible();
 
-  await expect(page.locator(".problem")).toContainText("no base URL is configured");
+  // Billing is the local ledger summary now (issue #450), not an external service.
+  await page.getByRole("button", { name: "Billing", exact: true }).click();
+  const billing = page.locator("section.panel", { hasText: "The ledger figure over its window" });
+  await expect(billing).toBeVisible();
+  await expect(billing).toContainText("Inference calls");
+  await expect(billing).toContainText("Total");
+  await expect(page.locator(".problem")).toHaveCount(0);
 });
 
 test("a second tenant reads its own manifest and its own audit trail", async ({ page }) => {
