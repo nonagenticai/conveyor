@@ -1,0 +1,35 @@
+# The GitHub-hosted compile gate (rbuild retired 2026-11-20).
+#
+# WHY: a session learns "does it compile, is it formatted, is clippy clean?" from a push, on a
+# free GitHub-hosted runner, per branch, in parallel — instead of shipping the tree to a build
+# host. The reusable workflow below runs `cargo fmt --check` and
+# `cargo clippy --all-targets --locked -- -D warnings`, the two steps a Rust PR fails on first.
+#
+# NOT a second CI and NOT the "never push to see what CI says" rule: this fires on the branch a
+# session must push anyway, writes no required status, and runs no test suite. `ci-public.yml`
+# remains the verdict, and the merge queue never waits on this.
+#
+# The reusable workflow is the PUBLIC archetype, pinned by SHA. `cache_shared_key: checks` is
+# conveyor's PR-CI shared key, so the dependency cache the last `main` run saved is restored; a
+# preflight never saves (`save-if` is main-only), so it cannot evict the cache it borrows.
+# `needs_postgres` stays at its false default: conveyor has no `sqlx::query!` macros, so a
+# database is not needed to COMPILE.
+name: preflight
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ['issue/**', 'lane/**', 'slice/**']
+
+concurrency:
+  group: 'preflight-${{ github.ref }}'
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  preflight:
+    uses: nonagenticai/ci-workflows/.github/workflows/rust-preflight.yml@d2ae87a417b00013838ba18841cdd1642b83fb89
+    with:
+      cache_shared_key: checks

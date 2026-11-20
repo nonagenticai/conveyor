@@ -1,0 +1,43 @@
+# The native acceptance harness (S14 P3.1, conveyor#8).
+#
+# The PR pipeline proves the build; this job proves the *release*: the required contexts on a
+# commit concluded success, the deployed surfaces answer their declared status, and (on a
+# dispatch) the executable checks each select at least their declared minimum. A missing
+# context, a 404/422/5xx or a zero-selected run fails the job.
+#
+# Scheduled daily so a surface that starts answering 401/404 (a broken route, a stale volume)
+# is an alarm, not a discovery at the next cutover. Manual dispatch runs the full suite.
+name: acceptance
+
+on:
+  workflow_dispatch:
+    inputs:
+      skip_commands:
+        description: "Skip the executable checks (contexts and deployed probes only)"
+        type: boolean
+        default: false
+  schedule:
+    - cron: "20 6 * * *"
+
+permissions:
+  contents: read
+  checks: read
+  actions: read
+
+jobs:
+  acceptance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - name: the harness can refuse
+        run: python3 scripts/acceptance.py --self-test
+      - name: the release is reachable
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 scripts/acceptance.py \
+            --sha "${{ github.sha }}" \
+            ${{ (github.event_name == 'schedule' || inputs.skip_commands) && '--skip-commands' || '' }}

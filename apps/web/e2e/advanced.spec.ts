@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./fixture";
 
 // One switch, not a panel per screen: the same root attribute deepens every wireframe.
 test("Advanced deepens the screen and toggles back", async ({ page }) => {

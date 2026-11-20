@@ -230,6 +230,8 @@ jobs:
         run: |
           python3 scripts/build-coverage.py --check
           python3 scripts/build-v2-coverage.py --check
+          python3 scripts/build-programme-seed.py --check
+          python3 scripts/check-programme-definition.py
           python3 scripts/check-output-standard.py --self-test
           python3 scripts/check-output-standard.py
           python3 scripts/ci/board.py --self-test
@@ -461,6 +463,10 @@ jobs:
       # once per stage. Exported on main only — a PR's entry is branch-scoped and would only
       # evict the default branch's.
       - name: build
+        # The merge queue re-validates a tree; it does not release one. Building the deployable
+        # here cost ~924 s per merge (measured on #473). A job whose steps are all skipped still
+        # concludes success, so the required `image` context keeps reporting on the queue ref.
+        if: ${{ github.event_name != 'merge_group' }}
         env:
           CACHE_TO: ${{ github.ref == 'refs/heads/main' && 'type=gha,mode=max,scope=image' || '' }}
         run: |
@@ -486,6 +492,8 @@ jobs:
       # Measured twice on ARC: run 42642725695 and run 42648606596, both "write /dev/stdout: broken
       # pipe". A bash pattern match on the captured variable has no reader to exit early.
       - name: smoke
+        # Same event gate as `build`: nothing to smoke when nothing was built.
+        if: ${{ github.event_name != 'merge_group' }}
         run: |
           set -euo pipefail
           docker run --rm "$IMG" --version

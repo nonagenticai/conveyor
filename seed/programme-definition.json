@@ -1,0 +1,413 @@
+{
+  "version": 1,
+  "programme": {
+    "name": "conveyor buildout",
+    "status": "active"
+  },
+  "benefits": [
+    {
+      "reference": "B1",
+      "description": "Auditable decisions",
+      "category": "strategic",
+      "target": "every choice has a decision row",
+      "baseline": "not measured - no instrument exists (recorded as a kata on the kata project)",
+      "measurement_method": "Count decision rows per run from the action ledger.",
+      "owner_role": "BCM",
+      "project_key": null
+    },
+    {
+      "reference": "B2",
+      "description": "Less bespoke tooling",
+      "category": "programme benefit",
+      "target": "every service a job uses is a toolkit; a toolkit with no calls in a cycle is retired or justified",
+      "baseline": "not measured - no instrument exists (recorded as a kata on the kata project)",
+      "measurement_method": "The tool_call ledger's per-toolkit counts, read at the tranche review; retirement is a decision.",
+      "owner_role": "BCM",
+      "project_key": "T13"
+    },
+    {
+      "reference": "B3",
+      "description": "Self-development",
+      "category": "programme benefit",
+      "target": "one self-development run reaches live verification on evidence; a second is repeatable",
+      "baseline": "not measured - no instrument exists (recorded as a kata on the kata project)",
+      "measurement_method": "The development project's run, CI and deploy records; the lane and PR are the evidence.",
+      "owner_role": "BCM",
+      "project_key": "T6"
+    },
+    {
+      "reference": "B4",
+      "description": "Public collaboration",
+      "category": "programme benefit",
+      "target": "at least one outside contribution changes a published output; every output is reachable",
+      "baseline": "not measured - no instrument exists (recorded as a kata on the kata project)",
+      "measurement_method": "The GitHub issue registry and merged PR authors; the publications are recorded on the programme issues.",
+      "owner_role": "BCM",
+      "project_key": "DESIGN-PUBLISH"
+    },
+    {
+      "reference": "B5",
+      "description": "One model",
+      "category": "programme benefit",
+      "target": "the T0 gate exists and refuses a second store; the registry has one home",
+      "baseline": "not measured - no instrument exists (recorded as a kata on the kata project)",
+      "measurement_method": "The T0 gate test and the absorption inventory; a second store is a defect.",
+      "owner_role": "BCM",
+      "project_key": "T0"
+    },
+    {
+      "reference": "B6",
+      "description": "Predictable delivery",
+      "category": "programme benefit",
+      "target": "the seed, coverage and published checklist agree at every tranche review",
+      "baseline": "not measured - no instrument exists (recorded as a kata on the kata project)",
+      "measurement_method": "coverage.json and seed/programme.json regenerated and checked in CI; the P0 checklist counts the published set.",
+      "owner_role": "BCM",
+      "project_key": "P0"
+    }
+  ],
+  "links": [
+    {
+      "output_ref": "T2 decision ladder",
+      "capability_ref": "every choice is traceable to a policy and a person",
+      "operational_outcome": "O3 Every decision is auditable",
+      "benefit": "B1",
+      "strategic_objective": "decision ladder (rule -> laya -> generation -> human)",
+      "kind": "benefit"
+    },
+    {
+      "output_ref": "T13 tool platform",
+      "capability_ref": "services with no calls are retired",
+      "operational_outcome": "O4 Every tool is governed",
+      "benefit": "B2",
+      "strategic_objective": "versioned toolkit with a probe, binding and ledger",
+      "kind": "benefit"
+    },
+    {
+      "output_ref": "T6 development project",
+      "capability_ref": "the conveyor changes itself with rollback",
+      "operational_outcome": "O5 The conveyor develops and operates itself",
+      "benefit": "B3",
+      "strategic_objective": "development projects under gates",
+      "kind": "benefit"
+    },
+    {
+      "output_ref": "DESIGN-PUBLISH public site",
+      "capability_ref": "an outside review changes a published output",
+      "operational_outcome": "O6 The public can see and challenge the design",
+      "benefit": "B4",
+      "strategic_objective": "public repository and published outputs",
+      "kind": "benefit"
+    },
+    {
+      "output_ref": "T0 model and contracts",
+      "capability_ref": "a concept has one table",
+      "operational_outcome": "O1 One model, one store",
+      "benefit": "B5",
+      "strategic_objective": "one store and one action registry",
+      "kind": "benefit"
+    },
+    {
+      "output_ref": "P0 + T1 plan spine",
+      "capability_ref": "the plan and the measurement agree",
+      "operational_outcome": "O2 Jobs, not code paths",
+      "benefit": "B6",
+      "strategic_objective": "programme plan and coverage instrument",
+      "kind": "benefit"
+    }
+  ],
+  "tranches": [
+    {
+      "number": 0,
+      "state": "closed",
+      "entry": "the programme is mandated and P0 exists",
+      "exit": "every project in tranche 0 (DESIGN-PUBLISH, P0, PLATFORM, S00, S01, SPEC-V2, T0) meets its acceptance with published evidence, and the review records continue, pause or stop",
+      "review_at": "2026-11-17T00:00:00Z"
+    },
+    {
+      "number": 1,
+      "state": "planned",
+      "entry": "the tranche 0 review decides continue; its exit criteria are met",
+      "exit": "every project in tranche 1 (S02, T1, T11) meets its acceptance with published evidence, and the review records continue, pause or stop",
+      "review_at": null
+    },
+    {
+      "number": 2,
+      "state": "planned",
+      "entry": "the tranche 1 review decides continue; its exit criteria are met",
+      "exit": "every project in tranche 2 (S03, T2) meets its acceptance with published evidence, and the review records continue, pause or stop",
+      "review_at": null
+    },
+    {
+      "number": 3,
+      "state": "planned",
+      "entry": "the tranche 2 review decides continue; its exit criteria are met",
+      "exit": "every project in tranche 3 (S04, T13, T3) meets its acceptance with published evidence, and the review records continue, pause or stop",
+      "review_at": null
+    },
+    {
+      "number": 4,
+      "state": "planned",
+      "entry": "the tranche 3 review decides continue; its exit criteria are met",
+      "exit": "every project in tranche 4 (S05, S07, S09, T10, T14, T16, T4, T9) meets its acceptance with published evidence, and the review records continue, pause or stop",
+      "review_at": null
+    },
+    {
+      "number": 5,
+      "state": "planned",
+      "entry": "the tranche 4 review decides continue; its exit criteria are met",
+      "exit": "every project in tranche 5 (S06, S08, S17, T17, T7) meets its acceptance with published evidence, and the review records continue, pause or stop",
+      "review_at": null
+    },
+    {
+      "number": 6,
+      "state": "planned",
+      "entry": "the tranche 5 review decides continue; its exit criteria are met",
+      "exit": "every project in tranche 6 (S06a, S06b, S10, S11) meets its acceptance with published evidence, and the review records continue, pause or stop",
+      "review_at": null
+    },
+    {
+      "number": 7,
+      "state": "planned",
+      "entry": "the tranche 6 review decides continue; its exit criteria are met",
+      "exit": "every project in tranche 7 (S06c, S15, S16) meets its acceptance with published evidence, and the review records continue, pause or stop",
+      "review_at": null
+    },
+    {
+      "number": 8,
+      "state": "planned",
+      "entry": "the tranche 7 review decides continue; its exit criteria are met",
+      "exit": "every project in tranche 8 (S06d, S13, S19) meets its acceptance with published evidence, and the review records continue, pause or stop",
+      "review_at": null
+    },
+    {
+      "number": 9,
+      "state": "planned",
+      "entry": "the tranche 8 review decides continue; its exit criteria are met",
+      "exit": "every project in tranche 9 (S18, S20, S21) meets its acceptance with published evidence, and the review records continue, pause or stop",
+      "review_at": null
+    },
+    {
+      "number": 10,
+      "state": "planned",
+      "entry": "the tranche 9 review decides continue; its exit criteria are met",
+      "exit": "every project in tranche 10 (S12, T5) meets its acceptance with published evidence, and the review records continue, pause or stop",
+      "review_at": null
+    },
+    {
+      "number": 11,
+      "state": "planned",
+      "entry": "the tranche 10 review decides continue; its exit criteria are met",
+      "exit": "every project in tranche 11 (S14, T6, T8) meets its acceptance with published evidence, and the review records continue, pause or stop",
+      "review_at": null
+    },
+    {
+      "number": 12,
+      "state": "planned",
+      "entry": "the tranche 11 review decides continue; its exit criteria are met",
+      "exit": "every project in tranche 12 (T15) meets its acceptance with published evidence, and the review records continue, pause or stop",
+      "review_at": null
+    },
+    {
+      "number": 13,
+      "state": "planned",
+      "entry": "the tranche 12 review decides continue; its exit criteria are met",
+      "exit": "every project in tranche 13 (T12) meets its acceptance with published evidence, and the review records continue, pause or stop",
+      "review_at": null
+    }
+  ],
+  "projects": {
+    "S00": {
+      "adm_phase": "G",
+      "plateau": "delivery"
+    },
+    "S01": {
+      "adm_phase": "G",
+      "plateau": "delivery"
+    },
+    "S02": {
+      "adm_phase": "G",
+      "plateau": "delivery"
+    },
+    "S03": {
+      "adm_phase": "G",
+      "plateau": "delivery"
+    },
+    "S04": {
+      "adm_phase": "G",
+      "plateau": "delivery"
+    },
+    "S05": {
+      "adm_phase": "G",
+      "plateau": "delivery"
+    },
+    "S06": {
+      "adm_phase": "G",
+      "plateau": "delivery"
+    },
+    "S06a": {
+      "adm_phase": "G",
+      "plateau": "delivery"
+    },
+    "S06b": {
+      "adm_phase": "G",
+      "plateau": "delivery"
+    },
+    "S06c": {
+      "adm_phase": "G",
+      "plateau": "delivery"
+    },
+    "S06d": {
+      "adm_phase": "G",
+      "plateau": "delivery"
+    },
+    "S07": {
+      "adm_phase": "G",
+      "plateau": "delivery"
+    },
+    "S08": {
+      "adm_phase": "G",
+      "plateau": "delivery"
+    },
+    "S09": {
+      "adm_phase": "G",
+      "plateau": "delivery"
+    },
+    "S10": {
+      "adm_phase": "G",
+      "plateau": "delivery"
+    },
+    "S11": {
+      "adm_phase": "G",
+      "plateau": "delivery"
+    },
+    "S12": {
+      "adm_phase": "G",
+      "plateau": "delivery"
+    },
+    "S13": {
+      "adm_phase": "G",
+      "plateau": "delivery"
+    },
+    "S14": {
+      "adm_phase": "G",
+      "plateau": "delivery"
+    },
+    "S15": {
+      "adm_phase": "G",
+      "plateau": "delivery"
+    },
+    "S16": {
+      "adm_phase": "G",
+      "plateau": "delivery"
+    },
+    "S17": {
+      "adm_phase": "G",
+      "plateau": "delivery"
+    },
+    "S18": {
+      "adm_phase": "G",
+      "plateau": "delivery"
+    },
+    "S19": {
+      "adm_phase": "G",
+      "plateau": "delivery"
+    },
+    "S20": {
+      "adm_phase": "G",
+      "plateau": "delivery"
+    },
+    "S21": {
+      "adm_phase": "G",
+      "plateau": "delivery"
+    },
+    "T0": {
+      "adm_phase": "G",
+      "plateau": "capability"
+    },
+    "T1": {
+      "adm_phase": "G",
+      "plateau": "capability"
+    },
+    "T2": {
+      "adm_phase": "G",
+      "plateau": "capability"
+    },
+    "T3": {
+      "adm_phase": "G",
+      "plateau": "capability"
+    },
+    "T4": {
+      "adm_phase": "G",
+      "plateau": "capability"
+    },
+    "T5": {
+      "adm_phase": "G",
+      "plateau": "capability"
+    },
+    "T6": {
+      "adm_phase": "G",
+      "plateau": "capability"
+    },
+    "T7": {
+      "adm_phase": "G",
+      "plateau": "capability"
+    },
+    "T8": {
+      "adm_phase": "G",
+      "plateau": "capability"
+    },
+    "T9": {
+      "adm_phase": "G",
+      "plateau": "capability"
+    },
+    "T10": {
+      "adm_phase": "G",
+      "plateau": "capability"
+    },
+    "T11": {
+      "adm_phase": "G",
+      "plateau": "capability"
+    },
+    "T12": {
+      "adm_phase": "G",
+      "plateau": "capability"
+    },
+    "T13": {
+      "adm_phase": "G",
+      "plateau": "capability"
+    },
+    "T14": {
+      "adm_phase": "G",
+      "plateau": "capability"
+    },
+    "T15": {
+      "adm_phase": "G",
+      "plateau": "capability"
+    },
+    "T16": {
+      "adm_phase": "G",
+      "plateau": "capability"
+    },
+    "T17": {
+      "adm_phase": "G",
+      "plateau": "capability"
+    },
+    "DESIGN-PUBLISH": {
+      "adm_phase": "Preliminary",
+      "plateau": "definition"
+    },
+    "P0": {
+      "adm_phase": "Preliminary",
+      "plateau": "definition"
+    },
+    "PLATFORM": {
+      "adm_phase": "Preliminary",
+      "plateau": "definition"
+    },
+    "SPEC-V2": {
+      "adm_phase": "Preliminary",
+      "plateau": "definition"
+    }
+  }
+}
