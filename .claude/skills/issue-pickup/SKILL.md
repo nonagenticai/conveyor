@@ -81,9 +81,8 @@ gh issue comment N --body 'Claimed. Branch `issue/N-<slug>` at `<sha>`.'
   read without cloning.
 - If the remote SHA is not yours, you lost: fetch the branch and join. Never force-push.
 - Refuse to create a branch in the shared root checkout. Work only in `.worktrees/issue-N`.
-- **Claims are unlimited.** The WIP cap is a PR cap, not a claim cap: `issue-pickup` never refuses
-  a claim on this basis. `issue-deliver` refuses the PR when 2 or more open `issue/*` PRs already
-  exist — the third is not opened.
+- **Claims are unlimited.** One issue is one branch and exactly one PR; concurrent lanes are
+  unlimited, and no repository-wide PR count gates a claim. The push is what claims the work.
 
 ### Resume a previous session's work
 

@@ -151,7 +151,7 @@ pub async fn run(pool: &PgPool, tenant: TenantId, payload: &Value) -> Result<(),
         other => JobFailure::permanent(format!("snapshot: {other}")),
     })?;
 
-    let files = collect_pack(&pack_root, &temp.0)
+    let files = collect_pack(&temp.0)
         .map_err(|error| JobFailure::permanent(format!("collecting the pack: {error}")))?;
     let github = GitHub::new(token).map_err(|error| {
         JobFailure::permanent(format!("the GitHub client is not configured: {error}"))
@@ -377,47 +377,16 @@ fn deletions(remote: &[TreeEntry], targets: &BTreeMap<String, Vec<u8>>) -> Vec<T
 
 /// The full pack the image serves plus the generated data and output pages.
 ///
-/// The pack's own `data/` (placeholder snapshot + issue registry), root `index.html` (derived),
-/// `scripts/`, `legacy/`, Markdown sources and the placeholder `docs/outputs.js` are not
-/// published. The generated `data/` and `docs/` come from the temp snapshot.
-fn collect_pack(pack: &Path, temp: &Path) -> std::io::Result<BTreeMap<String, Vec<u8>>> {
+/// The generated files the publisher owns: the snapshot's data files plus the published output
+/// pages and index. Everything else under `docs/design/` is hand-authored and comes from the
+/// target branch, never from the deployed image: the image can be older than main, and committing
+/// its copy silently reverts main (#477 — measured as a 9-line drift in `actions_invoked[*].line`
+/// on a publish PR, because the image's `v2.js` was older than main's).
+fn collect_pack(temp: &Path) -> std::io::Result<BTreeMap<String, Vec<u8>>> {
     let mut files = BTreeMap::new();
-    collect_dir(pack, "", &mut files)?;
     collect_flat(&temp.join("data"), "data", &mut files)?;
     collect_flat(&temp.join("docs"), "docs", &mut files)?;
     Ok(files)
-}
-
-fn collect_dir(root: &Path, rel: &str, out: &mut BTreeMap<String, Vec<u8>>) -> std::io::Result<()> {
-    for entry in std::fs::read_dir(root)? {
-        let entry = entry?;
-        let name = entry.file_name().to_string_lossy().into_owned();
-        if name.starts_with('.') {
-            continue;
-        }
-        let child = if rel.is_empty() {
-            name.clone()
-        } else {
-            format!("{rel}/{name}")
-        };
-        let path = entry.path();
-        if path.is_dir() {
-            if rel.is_empty() && matches!(name.as_str(), "scripts" | "legacy" | "data") {
-                continue;
-            }
-            collect_dir(&path, &child, out)?;
-            continue;
-        }
-        if name.ends_with(".md")
-            || (rel.is_empty() && (name == "index.html" || name == "issues.json"))
-            || child == "docs/outputs.js"
-            || (child.starts_with("docs/output-") && child.ends_with(".html"))
-        {
-            continue;
-        }
-        out.insert(child, std::fs::read(&path)?);
-    }
-    Ok(())
 }
 
 fn collect_flat(
@@ -557,5 +526,18 @@ mod tests {
         assert!(address.ends_with('>'), "{line}");
         assert!(!address.contains(' '), "{line}");
         assert!(address.contains('@'), "{line}");
+    }
+
+    #[test]
+    fn a_publish_commits_only_the_generated_files() {
+        let temp = TempDir::new().expect("temp dir");
+        std::fs::create_dir_all(temp.0.join("data")).expect("data dir");
+        std::fs::write(temp.0.join("data/snapshot.js"), b"snapshot").expect("write data");
+        std::fs::create_dir_all(temp.0.join("docs")).expect("docs dir");
+        std::fs::write(temp.0.join("docs/output-1.html"), b"page").expect("write page");
+
+        let files = collect_pack(&temp.0).expect("collect");
+        let paths: Vec<&str> = files.keys().map(String::as_str).collect();
+        assert_eq!(paths, ["data/snapshot.js", "docs/output-1.html"]);
     }
 }

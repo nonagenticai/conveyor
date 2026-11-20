@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./fixture";
 
 // The palette is the guarantee that "simple" never means "you cannot do the thing": it is
 // the same role-filtered manifest the server serves, and the payload is the action's input.

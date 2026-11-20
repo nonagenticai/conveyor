@@ -1,0 +1,9 @@
+{
+  "_note": "The content `conveyor admin install` puts into a fresh tenant beyond the catalogue and the default process catalogue. `knowledge` is empty at this baseline: no knowledge pack exists in the seed (a tenant's packs are imported from its own documents in the ingestion tranches), so binding one would be a dangling reference. A tenant with no pack is a valid tenant. The three schedules are the engine's own housekeeping kinds, copied from the live tenant (measured 2026-11-20).",
+  "knowledge": [],
+  "schedules": [
+    { "kind": "run.reap", "cron": "* * * * *", "enabled": true, "payload": {} },
+    { "kind": "runner.reap", "cron": "*/15 * * * *", "enabled": true, "payload": {} },
+    { "kind": "validation.prune", "cron": "35 3 * * *", "enabled": true, "payload": {} }
+  ]
+}

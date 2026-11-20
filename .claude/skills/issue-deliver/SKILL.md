@@ -16,15 +16,14 @@ The authority is `docs/plans/03-DELIVERY.md`. One issue = one branch = exactly o
    and `push: main` only). Use `~/.claude/scripts/commit-with-retry.sh "msg"`; never
    `--no-verify` or `SKIP=`.
 3. **Run the declared gate at the exact head**:
-   - Rust: `rbuild --gate` (or the issue's own command).
+   - Rust: `cargo fmt --all -- --check` and `cargo metadata --locked --format-version 1`; the
+     compile verdict is the repo's GitHub preflight (`gh workflow run preflight.yml --ref
+     <branch>`), and the PR's CI is the final gate.
    - Docs/skills: `git diff --check` + every relative Markdown link resolves.
    Paste command, result and SHA. **No PR until green.**
-4. **Respect the WIP cap** before opening a PR — ≤2 open `issue/*` PRs including this one:
-   ```bash
-   gh pr list --state open --json headRefName \
-     --jq '[.[] | select(.headRefName | startswith("issue/"))] | length'
-   ```
-   If full, refuse to open the PR and wait for a merge (or hand off); do not open a third.
+4. **One issue is one branch and exactly one PR.** Concurrent lanes are unlimited — there is no
+   repository-wide ceiling on open `issue/*` PRs, so nothing here waits on a count. Never open a
+   second PR for the same issue, and never a draft PR to probe CI.
 5. **Open exactly one non-draft PR**:
    ```bash
    gh pr create --base main --head issue/N-<slug> \
