@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./fixture";
 
 // S12 §6 step 1. Two real modes, no mocked API: the default context carries a credential (the
 // dev cookie locally, a Keycloak SSO session against a deployed app), the second deliberately

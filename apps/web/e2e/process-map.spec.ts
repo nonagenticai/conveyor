@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./fixture";
 
 // Screen 22 — the process map. Two reads only (`process_maps.list` / `process_maps.get`),
 // against the shipped catalogue: `migrate --process-catalogue` installs one versioned map

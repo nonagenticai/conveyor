@@ -4325,8 +4325,10 @@ window.installV2 = function (api, enterprise) {
   /* ------------------------------------------------------------------ sidebar */
   // The public site carries the programme. The V2 design destinations are the operator
   // console's; they are not announced signed-out and a direct hash gets a sign-in gate. The
-  // destinations that can read a published snapshot (`programme`, `adm`) stay in this set and
-  // gate themselves when the snapshot does not carry their rows.
+  // destinations that can read a published snapshot (`programme`, `adm`) stay in this set so a
+  // direct hash still renders, and they are announced only when the snapshot carries their rows.
+  // #470: `live` alone is not that test — an empty or partial snapshot (the homepage/no-config
+  // shape) must not announce `programme`; a published definition must.
   const PUBLIC_PAGES = new Set([
     "portfolio",
     "projects",
@@ -4344,7 +4346,7 @@ window.installV2 = function (api, enterprise) {
   function publicSidebar() {
     const projectCount = live ? snapshotProjects().length : 0;
     return `<div class="brand"><span class="brand-mark">${I("layers")}</span><div><div class="brand-word">conveyor</div><div class="brand-sub">THE OPERATING SYSTEM FOR WORK</div></div></div><div class="tenant-switch"><span class="tenant-mark">N</span><span class="grow">Public programme<small>conveyor.nonagentic.ai/design</small></span></div><nav>
-      <div class="nav-group"><div class="nav-label">PROGRAMME</div>${N("portfolio", "Portfolio", "layers")}${live ? N("programme", "Programme definition", "shield") : ""}${N("projects", "Projects", "projects", projectCount)}${N("outputs", "Outputs", "file")}${N("plan", "Plan &amp; WBS", "board")}${N("validation", "Validation", "check")}${N("execution", "Execution room", "run")}${N("documents", "Documents", "file")}${N("contribute", "Contribute", "grid")}${N("architecture", "System architecture", "model")}</div></nav><div class="sidebar-bottom"><b>Position → release → binding → run</b><div class="row"><i class="dot green"></i>${live ? "LIVE programme" : "No snapshot loaded"}</div></div>`;
+      <div class="nav-group"><div class="nav-label">PROGRAMME</div>${N("portfolio", "Portfolio", "layers")}${live && list((live.programme || {}).programme).length ? N("programme", "Programme definition", "shield") : ""}${N("projects", "Projects", "projects", projectCount)}${N("outputs", "Outputs", "file")}${N("plan", "Plan &amp; WBS", "board")}${N("validation", "Validation", "check")}${N("execution", "Execution room", "run")}${N("documents", "Documents", "file")}${N("contribute", "Contribute", "grid")}${N("architecture", "System architecture", "model")}</div></nav><div class="sidebar-bottom"><b>Position → release → binding → run</b><div class="row"><i class="dot green"></i>${live ? "LIVE programme" : "No snapshot loaded"}</div></div>`;
   }
 
   function sidebar() {
