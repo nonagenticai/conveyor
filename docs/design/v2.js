@@ -55,7 +55,16 @@ window.installV2 = function (api, enterprise) {
   // is the offline DESIGN study. Present, the rows the platform actually owns replace the
   // fixtures they cover, and the pages with no live source keep the DESIGN ribbon.
   const S = window.CONVEYOR_SNAPSHOT;
-  const live = S && S.schema === "design-snapshot/v1" ? S : null;
+  // The surface checks render the design fixtures, not the working tree's published payload: on
+  // a publish branch `data/snapshot.js` is the live pack and would hide every fixture the checks
+  // assert. The checks set this flag before any page script runs; a visitor never does (#468).
+  const qaNoSnapshot = window.CONVEYOR_QA_NO_SNAPSHOT === true;
+  if (qaNoSnapshot) {
+    // The generated outputs index is a publish branch's live payload too; the public empty-shape
+    // assertions need the placeholder, exactly as for the snapshot.
+    window.CONVEYOR_OUTPUTS = null;
+  }
+  const live = !qaNoSnapshot && S && S.schema === "design-snapshot/v1" ? S : null;
   // The V2 product-design study is not part of the public programme site. It stays available
   // to signed-in operators, and to a reviewer who asks for it explicitly with `?design=1`
   // (the mode `check-v2.cjs` exercises). Without either, a design destination is a sign-in gate.
@@ -4331,7 +4340,7 @@ window.installV2 = function (api, enterprise) {
   function publicSidebar() {
     const projectCount = live ? snapshotProjects().length : 0;
     return `<div class="brand"><span class="brand-mark">${I("layers")}</span><div><div class="brand-word">conveyor</div><div class="brand-sub">THE OPERATING SYSTEM FOR WORK</div></div></div><div class="tenant-switch"><span class="tenant-mark">N</span><span class="grow">Public programme<small>conveyor.nonagentic.ai/design</small></span></div><nav>
-      <div class="nav-group"><div class="nav-label">PROGRAMME</div>${N("portfolio", "Portfolio", "layers")}${live ? N("programme", "Programme definition", "shield") : ""}${N("projects", "Projects", "projects", projectCount)}${N("outputs", "Outputs", "file")}${N("plan", "Plan &amp; WBS", "board")}${N("validation", "Validation", "check")}${N("execution", "Execution room", "run")}${N("documents", "Documents", "file")}${N("contribute", "Contribute", "grid")}${N("architecture", "System architecture", "model")}</div></nav><div class="sidebar-bottom"><b>Position → release → binding → run</b><div class="row"><i class="dot green"></i>${live ? "LIVE programme" : "No snapshot loaded"}</div></div>`;
+      <div class="nav-group"><div class="nav-label">PROGRAMME</div>${N("portfolio", "Portfolio", "layers")}${N("projects", "Projects", "projects", projectCount)}${N("outputs", "Outputs", "file")}${N("plan", "Plan &amp; WBS", "board")}${N("validation", "Validation", "check")}${N("execution", "Execution room", "run")}${N("documents", "Documents", "file")}${N("contribute", "Contribute", "grid")}${N("architecture", "System architecture", "model")}</div></nav><div class="sidebar-bottom"><b>Position → release → binding → run</b><div class="row"><i class="dot green"></i>${live ? "LIVE programme" : "No snapshot loaded"}</div></div>`;
   }
 
   function sidebar() {
