@@ -32,8 +32,8 @@ pub const EMPTY_GENERATED_AT: &str = "1970-01-01T00:00:00Z";
 /// Everything the public routes serve for one tenant.
 #[derive(Debug, Clone)]
 pub struct SiteView {
-    /// `window.CONVEYOR_SNAPSHOT = {…};` — the programme, organisation, config, work, artefacts
-    /// and measure sections, plus the issue registry and feedback list.
+    /// `window.CONVEYOR_SNAPSHOT = {…};` — the programme, organisation, config, work, artefacts,
+    /// architecture, ops and measure sections, plus the issue registry and feedback list.
     pub snapshot_js: String,
     /// `window.CONVEYOR_OUTPUTS = {…};` — the published-output index.
     pub outputs_js: String,
