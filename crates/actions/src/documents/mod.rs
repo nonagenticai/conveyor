@@ -24,6 +24,8 @@ use crate::invoke::{ActionError, HandlerCtx};
 use crate::spec::FieldError;
 
 pub mod actions;
+// #450: `artifacts.list` — the V1 catalogue name served from this store (§11.3, §11.10, D57).
+pub mod artifacts;
 pub mod ingest;
 pub mod repositories;
 pub mod revisions;
