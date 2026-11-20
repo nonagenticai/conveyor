@@ -594,24 +594,35 @@ async fn projects_activate(
             ),
         ));
     }
-    if project.programme_id.is_some()
-        && let Some((number, state)) =
-            store::spine::project_tranche_state_tx(&mut *tx, ctx.tenant, project.id)
-                .await
-                .map_err(|error| {
-                    tracing::error!(%error, "projects.activate: read the project's tranche");
-                    ActionError::internal()
-                })?
-        && !matches!(state.as_str(), "authorised" | "closed")
-    {
-        return Err(ActionError::new(
-            409,
-            "tranche_not_authorised",
-            format!(
-                "project {} sits in tranche {number} whose state is '{state}'",
-                project.id
-            ),
-        ));
+    if project.programme_id.is_some() {
+        let state = store::spine::project_tranche_state_tx(&mut *tx, ctx.tenant, project.id)
+            .await
+            .map_err(|error| {
+                tracing::error!(%error, "projects.activate: read the project's tranche");
+                ActionError::internal()
+            })?;
+        // Fail closed: a programme project with no tranche row is a data defect, not an
+        // ungoverned project. Only an authorised (or already closed) tranche lets it start.
+        let Some((number, state)) = state else {
+            return Err(ActionError::new(
+                409,
+                "tranche_not_authorised",
+                format!(
+                    "project {} belongs to a programme that declares no tranche; it cannot start",
+                    project.id
+                ),
+            ));
+        };
+        if !matches!(state.as_str(), "authorised" | "closed") {
+            return Err(ActionError::new(
+                409,
+                "tranche_not_authorised",
+                format!(
+                    "project {} sits in tranche {number} whose state is '{state}'",
+                    project.id
+                ),
+            ));
+        }
     }
     transition_project(
         tx,

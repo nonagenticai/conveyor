@@ -277,8 +277,29 @@ async fn activate_requires_authorised_tranche() {
     let programme = create_programme(&running, "Tranche-gated programme").await;
     let project = create_project(&running, "Gated project", Some(&programme)).await;
     set_meta(&pg, seeded.tenant_id, &project, "tranche", json!(1)).await;
-    create_tranche(&running, &programme, 1).await;
 
+    // No tranche row at all: a programme project fails closed, never starts ungoverned.
+    let (status, body) = running
+        .invoke(
+            "projects.activate",
+            TOKEN,
+            json!({"id": project}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 409, "{body}");
+    assert_eq!(error_code(&body), "tranche_not_authorised", "{body}");
+    assert!(
+        body["detail"]
+            .as_str()
+            .unwrap_or_default()
+            .contains("declares no tranche"),
+        "{body}"
+    );
+
+    create_tranche(&running, &programme, 1).await;
     let (status, body) = running
         .invoke(
             "projects.activate",
@@ -471,6 +492,7 @@ async fn legacy_contract_requester_flagged() {
     .expect("clear the requester");
 
     let version = contract["version"].as_i64().expect("version").to_string();
+    // The missing requester cannot be excluded, so no approval without a board decision.
     let (status, body) = running
         .invoke(
             "architecture.contracts_approve",
@@ -481,8 +503,43 @@ async fn legacy_contract_requester_flagged() {
             None,
         )
         .await;
+    assert_eq!(status, 409, "{body}");
+    assert_eq!(error_code(&body), "requester_unknown", "{body}");
+
+    // The board decision is the independent authority; the row still reads its flag.
+    let board = create_board(&pg, seeded.tenant_id).await;
+    let (status, body) = running
+        .invoke(
+            "architecture.board_decide",
+            TOKEN,
+            json!({
+                "body_id": board,
+                "decision": "approved",
+                "evidence": {"legacy": "no recorded requester"},
+                "subject_kind": "contract",
+                "subject_id": contract["id"]
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "{body}");
+    let approval_id = text(output(&body), "approval_id");
+
+    let (status, body) = running
+        .invoke(
+            "architecture.contracts_approve",
+            REVIEWER,
+            json!({"id": contract["id"], "approval_id": approval_id}),
+            Some(&version),
+            None,
+            None,
+        )
+        .await;
     assert_eq!(status, 200, "{body}");
     assert_eq!(output(&body)["requester_unknown"], true, "{body}");
+    assert_eq!(output(&body)["approval_id"], approval_id, "{body}");
 }
 
 // ── C. tranche authorisation repair ──────────────────────────────────────────────────────
@@ -629,6 +686,22 @@ async fn board_decision_is_a_row_and_activates_the_board() {
     assert_eq!(status, 201, "{body}");
     let approval_id = text(output(&body), "approval_id");
     assert!(!approval_id.is_empty());
+
+    // The decision is a durable row: the actor, the outcome, the subject and a timestamp.
+    let (decided_by, decision, subject, stamped): (Option<Uuid>, String, Option<String>, bool) =
+        sqlx::query_as(
+            "SELECT requested_by, status, meta->>'subject_kind', created_at IS NOT NULL
+               FROM approval WHERE tenant_id = $1 AND id = $2",
+        )
+        .bind(seeded.tenant_id)
+        .bind(Uuid::parse_str(&approval_id).expect("approval id"))
+        .fetch_one(&pg.super_pool)
+        .await
+        .expect("the decision row");
+    assert_eq!(decided_by, Some(seeded.user_id));
+    assert_eq!(decision, "approved");
+    assert_eq!(subject.as_deref(), Some("board"));
+    assert!(stamped, "the decision carries its timestamp");
 
     let (status, body) = running
         .invoke(

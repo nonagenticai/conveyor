@@ -1238,6 +1238,15 @@ pub async fn get_body_tx(
         .await?)
 }
 
+/// What a board decision is about.
+#[derive(Clone, Copy, Debug, Default)]
+pub struct BoardSubject<'a> {
+    /// `board | contract | artifact | adm_profile | waiver`.
+    pub kind: Option<&'a str>,
+    /// The subject's id; absent for a decision about the board itself.
+    pub id: Option<Uuid>,
+}
+
 /// Record a board decision; the approval row is the decision's durable record.
 pub async fn decide_board_tx(
     conn: &mut PgConnection,
@@ -1246,8 +1255,7 @@ pub async fn decide_board_tx(
     decision: &str,
     evidence: Value,
     decided_by: Uuid,
-    subject_kind: Option<&str>,
-    subject_id: Option<Uuid>,
+    subject: BoardSubject<'_>,
 ) -> Result<Uuid, ArchitectureStoreError> {
     if decision != "approved" && decision != "rejected" {
         return Err(ArchitectureStoreError::Conflict {
@@ -1255,6 +1263,10 @@ pub async fn decide_board_tx(
             why: "the decision must be approved or rejected",
         });
     }
+    let BoardSubject {
+        kind: subject_kind,
+        id: subject_id,
+    } = subject;
     let subject_kind = match subject_kind {
         Some(kind)
             if matches!(

@@ -1094,6 +1094,15 @@ async fn architecture_contracts_approve(
             "a contract is approved by an actor other than the one that requested it",
         ));
     }
+    // A legacy row has no requester to exclude. It is approved only against a board decision,
+    // which is the independent authority the missing requester cannot provide.
+    if current.requested_by.is_none() && input.approval_id.is_none() {
+        return Err(ActionError::new(
+            409,
+            "requester_unknown",
+            "a contract with no recorded requester is approved only against a board decision",
+        ));
+    }
     let expected =
         require_precondition_with(&ctx, ctx.action, json!({ "version": current.version }))?;
     let record = store::architecture::approve_contract_tx(
@@ -1617,8 +1626,10 @@ async fn architecture_board_decide(
         &input.decision,
         input.evidence,
         ctx.actor_id,
-        input.subject_kind.as_deref(),
-        input.subject_id,
+        store::architecture::BoardSubject {
+            kind: input.subject_kind.as_deref(),
+            id: input.subject_id,
+        },
     )
     .await
     .map_err(|error| arch_error(error, ctx.action))?;
