@@ -30,7 +30,11 @@ TENANT=${TENANT:-nonagentic}
 NAMESPACE=${NAMESPACE:-nonagentic-ops}
 DEPLOYMENT=${DEPLOYMENT:-ops-proof}
 STATE=${STATE:-/tmp/ops-live-proof.state}
-KUBECTL_SSH=(ssh -i "$HOME/.ssh/strato-vps" -o ConnectTimeout=10 admin@100.81.177.99)
+# The host and key are the operator's, from the environment — never committed (the public repo
+# refuses internal hostnames and tailnet addresses; the same values live in the conveyor-api skill).
+: "${CONVEYOR_SSH_KEY:?export CONVEYOR_SSH_KEY (the operator key; see the conveyor-api skill)}"
+: "${CONVEYOR_HOST:?export CONVEYOR_HOST (user@host; see the conveyor-api skill)}"
+KUBECTL_SSH=(ssh -i "$CONVEYOR_SSH_KEY" -o ConnectTimeout=10 "$CONVEYOR_HOST")
 KUBECTL=(sudo KUBECONFIG=/etc/rancher/k3s/k3s.yaml kubectl)
 
 say() { printf '%s\n' "$*"; }
@@ -43,8 +47,7 @@ kube() { "${KUBECTL_SSH[@]}" "${KUBECTL[*]} $*"; }
 # it, so this is the raw documented form).
 invoke_gated() {
   local action="$1" approval="$2" input="$3"
-  ssh -i "${CONVEYOR_SSH_KEY:-$HOME/.ssh/strato-vps}" -o ConnectTimeout=10 \
-    "${CONVEYOR_HOST:-admin@100.81.177.99}" \
+  ssh -i "$CONVEYOR_SSH_KEY" -o ConnectTimeout=10 "$CONVEYOR_HOST" \
     sudo KUBECONFIG=/etc/rancher/k3s/k3s.yaml kubectl -n "${CONVEYOR_NAMESPACE:-conveyor}" \
     exec -i "${CONVEYOR_DEPLOY:-deploy/conveyor}" -- \
     conveyor admin action invoke --tenant "$TENANT" --name "$action" \
