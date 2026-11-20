@@ -49,16 +49,18 @@ write the programme store — `programmes.list`/`update`, `benefits.list`/`creat
 `profile_update`/`profile_delete` and `cadences.list`/`create`/`update`/`delete`, every edit
 carrying `If-Match`. Signed out, the tabs render the published `msp` snapshot read-only;
 `?design=1` keeps the fixture study. The two distinctions hold throughout: a capability is not a
-benefit, and a tranche review is a programme decision, not a demo.
+benefit, and a tranche review is a programme decision, not a demo. The narrative study of the
+programme architecture and benefits realization is
+[`Program_Architecture_and_Benefits_Realization.md`](Program_Architecture_and_Benefits_Realization.md).
 
-**Architecture capability** (`adm`, design study) is the TOGAF ADM layer proposed in SPEC_V2
-§8.1: the Preliminary phase (principles, tailored profile, Architecture Board, maturity and
-skills), the phase rail A–H with its typed artefacts and contracts, the artefact repository
-(catalog, matrix and diagram, with entries and derivation/realization/reuse links), and the
-board/compliance register with the six compliance levels and the waiver discipline. Its controls
-demonstrate the refusals the model depends on — a phase cannot close while a mandatory artefact is
-draft, a review records one compliance level, a waiver needs an accepting owner and a review date,
-and Phase H records exactly one change or kata — and change only the local fixture state.
+**Architecture capability** (`adm`) is the TOGAF ADM layer of SPEC_V2 §8.1: the Preliminary
+phase (principles, tailored profile, Architecture Board, maturity and skills), the phase rail A–H
+with its typed artefacts and contracts, the artefact repository (catalog, matrix and diagram, with
+entries and derivation/realization/reuse links), and the board/compliance register with the six
+compliance levels and the waiver discipline. Signed in, the screen reads the live architecture rows
+and the public snapshot; `?design=1` keeps the fixture study. Its controls demonstrate the refusals the model depends on — a phase
+cannot close while a mandatory artefact is draft, a review records one compliance level, a waiver
+needs an accepting owner and a review date, and Phase H records exactly one change or kata.
 
 **Outputs** is the programme register: every output across all projects with its project, unit,
 category, author, state and public URL, filtered by those fields and paged with `next_cursor`.

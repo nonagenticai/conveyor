@@ -1,6 +1,7 @@
 /* SPEC_V2 pack — the organisational operating model.
-   Local interaction study only: every record below is a fixture, no backend is called,
-   and every V2 destination is marked PROPOSED because SPEC_V2 is a draft with no V2 code. */
+   Local interaction study only: every record below is a fixture and this file calls no backend.
+   The live console reads and writes the real rows behind these screens; `?design=1` keeps this
+   study, and a signed-out direct hash is a sign-in gate (docs/design/README.md). */
 "use strict";
 window.installV2 = function (api, enterprise) {
   const {
@@ -55,7 +56,16 @@ window.installV2 = function (api, enterprise) {
   // is the offline DESIGN study. Present, the rows the platform actually owns replace the
   // fixtures they cover, and the pages with no live source keep the DESIGN ribbon.
   const S = window.CONVEYOR_SNAPSHOT;
-  const live = S && S.schema === "design-snapshot/v1" ? S : null;
+  // The surface checks render the design fixtures, not the working tree's published payload: on
+  // a publish branch `data/snapshot.js` is the live pack and would hide every fixture the checks
+  // assert. The checks set this flag before any page script runs; a visitor never does (#468).
+  const qaNoSnapshot = window.CONVEYOR_QA_NO_SNAPSHOT === true;
+  if (qaNoSnapshot) {
+    // The generated outputs index is a publish branch's live payload too; the public empty-shape
+    // assertions need the placeholder, exactly as for the snapshot.
+    window.CONVEYOR_OUTPUTS = null;
+  }
+  const live = !qaNoSnapshot && S && S.schema === "design-snapshot/v1" ? S : null;
   // The V2 product-design study is not part of the public programme site. It stays available
   // to signed-in operators, and to a reviewer who asks for it explicitly with `?design=1`
   // (the mode `check-v2.cjs` exercises). Without either, a design destination is a sign-in gate.
@@ -3506,7 +3516,9 @@ window.installV2 = function (api, enterprise) {
       { id: "BEN-02", kind: "benefit", title: "Fulfilment time −40%", owner: "pm", status: "Tracking", severity: "—", note: "planned vs realised at closure" },
     ],
     /* The MSP layer: programme definition, benefit profiles, the benefits map, tranches and
-       realization. Local fixtures — no V2 table or action exists yet (SPEC_V2 §8.3, D62). */
+       realization. These are this study's fixtures; the live surface reads and writes the
+       programme store through programmes.*, benefits.*, tranches.*, stakeholders.* and
+       cadences.* (SPEC_V2 §8.3). */
     programmeDefinition: {
       key: "PGM-CB",
       name: "conveyor buildout",
@@ -3564,7 +3576,8 @@ window.installV2 = function (api, enterprise) {
     ],
     /* The TOGAF ADM capability: the Preliminary phase (principles, tailored profile, board,
        maturity, skills), the phase rail with typed artefacts, the contracts and the compliance
-       and waiver register. Local fixtures — no V2 table or action exists (SPEC_V2 §8.1, D63). */
+       and waiver register. These are this study's fixtures; the live screen reads the architecture
+       rows through architecture.* (SPEC_V2 §8.1, T9). */
     architectureCapability: {
       key: "ARCH-CB",
       name: "conveyor buildout architecture capability",
