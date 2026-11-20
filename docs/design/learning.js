@@ -807,8 +807,8 @@ window.installLearning = function (api, enterprise) {
       },
       {
         id: "RV-04",
-        kind: "PKO release",
-        object: "pko@4 · verify_release",
+        kind: "Procedure release",
+        object: "proc-implement@8 · verify_release",
         reviewer: "Capability owner",
         decisions: "1 person",
         evidence: "term usage · validation report",
@@ -882,7 +882,7 @@ window.installLearning = function (api, enterprise) {
       l.designTab === "Effective configuration"
         ? `<div class="l-tagline">${B("Job release · draft", "purple")}${B(orgConfig.release)}${B(configReady() ? "Ready for review" : "Blocked", configReady() ? "green" : "amber")}</div><h2>What this job knows, layer by layer</h2><p>Base → industry → department archetype → ordered departments → job. A conflicting department value is a compile error until a job-layer row resolves it.</p>`
         : l.designTab === "Review & release"
-          ? `<div class="l-tagline">${B("Queue", "purple")}${B("Person approval required")}</div><h2>Review and release</h2><p>Every correction, pack version, PKO draft, lesson promotion and binding revision waits here for a person with the named authority.</p>`
+          ? `<div class="l-tagline">${B("Queue", "purple")}${B("Person approval required")}</div><h2>Review and release</h2><p>Every correction, pack version, procedure draft, lesson promotion and binding revision waits here for a person with the named authority.</p>`
           : `<div class="l-tagline">${B(l.scope === "capability" ? "Binding authority" : l.scope === "run" ? "Runtime projection" : "Selection policy · proposal", l.scope === "capability" ? "green" : "purple")}${B("capability@17")}${B("Future runs only")}</div><h2>${E(l.scope === "capability" ? "A reusable knowledge contract" : l.scope === "process" ? "The right sources for this job" : l.scope === "agent" ? "A role with bounded context" : "Explain this model call")}</h2><p>${E(l.scope === "capability" ? "Bind governed domain knowledge once. Processes and agents select relevant passages within this boundary; every call can explain the selection." : l.scope === "process" ? "Procedural knowledge is the published procedure itself: intent, ordered steps, actions, declared outputs, gates and failure branches." : l.scope === "agent" ? p.role : "Instructions → published procedure → capability / role → cited knowledge → project and card data. Source identity travels into the compiled hash.")}</p>`;
     const mainAction =
       l.designTab === "Effective configuration"
@@ -1617,13 +1617,13 @@ window.installLearning = function (api, enterprise) {
     const subjects = [
       ["knowledge", "Knowledge extraction", "missing content · extraction fidelity", "extraction-suite v2", "40 cases", "Ready"],
       ["retrieval", "Retrieval", "expected-evidence recall · citation coverage", "retrieval-regression v3", "80 held-out", "Measuring"],
-      ["pko", "Procedural knowledge (PKO)", "undefined terms · invalid relations · constraints", "pko-validation v1", "24 terms", "Ready"],
+      ["procedure", "Procedural knowledge", "missing action text · invalid PDDL literals · gates", "procedure-validation v1", "24 criteria", "Ready"],
       ["memory", "Memory", "recall usefulness · stale or conflicting facts", "memory-policy v2", "80 held-out", "Candidate"],
       ["scope", "Scope policies", "cross-card/project exclusion · authorised recall", "isolation-suite v1", "32 cases", "Ready"],
       ["job", "Job outcomes", "acceptance · failure · latency · cost", "architecture-v3", "80 held-out", "Baseline"],
     ];
     const selected = subjects.find((s) => s[0] === l.evalSubject) || subjects[1];
-    return `<div class="v2-ribbon" role="note"><strong>V2 · PROPOSED</strong><span>Per-object evaluation: extraction, retrieval, PKO, memory, scope policy and job outcome subjects, with a memory disabled/current/candidate comparison and a cutoff-bound replay. The S17–S21 instruments are the seed; no new evaluation action is claimed.</span><span class="v2-src">Local fixture</span></div>${metrics([
+    return `<div class="v2-ribbon" role="note"><strong>V2 · PROPOSED</strong><span>Per-object evaluation: extraction, retrieval, procedural knowledge, memory, scope policy and job outcome subjects, with a memory disabled/current/candidate comparison and a cutoff-bound replay. The S17–S21 instruments are the seed; no new evaluation action is claimed.</span><span class="v2-src">Local fixture</span></div>${metrics([
       ["Subjects", String(subjects.length), "one per knowledge/memory object"],
       ["Held-out cases", "80", "paired, never pooled"],
       ["Human reviews", "1 pending", "separate from model assessment"],

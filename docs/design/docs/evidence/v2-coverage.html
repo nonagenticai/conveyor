@@ -37,17 +37,17 @@
 <tr>
 <td><code>exists</code></td>
 <td>implemented in code and backed by real rows</td>
-<td>44</td>
+<td>46</td>
 </tr>
 <tr>
 <td><code>extend</code></td>
 <td>a partial implementation exists (a page, a table, or a prefix) that must be extended</td>
-<td>8</td>
+<td>6</td>
 </tr>
 <tr>
 <td><code>new</code></td>
 <td>absent</td>
-<td>11</td>
+<td>8</td>
 </tr>
 </tbody>
 </table>
@@ -337,30 +337,6 @@
 <td>migrations: CREATE TABLE laya_inference_config</td>
 </tr>
 <tr>
-<td><code>table:pko_release</code></td>
-<td>§10.3</td>
-<td>table</td>
-<td>pko_release</td>
-<td><code>new</code></td>
-<td>migrations: no CREATE/ALTER TABLE pko_release</td>
-</tr>
-<tr>
-<td><code>table:pko_entity</code></td>
-<td>§10.3</td>
-<td>table</td>
-<td>pko_entity</td>
-<td><code>new</code></td>
-<td>migrations: no CREATE/ALTER TABLE pko_entity</td>
-</tr>
-<tr>
-<td><code>table:pko_relation</code></td>
-<td>§10.3</td>
-<td>table</td>
-<td>pko_relation</td>
-<td><code>new</code></td>
-<td>migrations: no CREATE/ALTER TABLE pko_relation</td>
-</tr>
-<tr>
 <td><code>actions:programme/plan</code></td>
 <td>§10.4</td>
 <td>actions</td>
@@ -397,8 +373,8 @@
 <td>§10.4</td>
 <td>actions</td>
 <td>procedures</td>
-<td><code>extend</code></td>
-<td>actions: capabilities.* found (capabilities.bind_knowledge, capabilities.get, capabilities.list)<br>actions: pko.* absent<br>actions: procedures.* found (procedures.create, procedures.get, procedures.ingest_process…)</td>
+<td><code>exists</code></td>
+<td>actions: capabilities.* found (capabilities.bind_knowledge, capabilities.get, capabilities.list)<br>actions: procedures.* found (procedures.create, procedures.get, procedures.ingest_process…)</td>
 </tr>
 <tr>
 <td><code>actions:authoring</code></td>
@@ -517,8 +493,8 @@
 <td>§10.5</td>
 <td>destination</td>
 <td>Procedures</td>
-<td><code>extend</code></td>
-<td>docs/design/v2.js: page 'procedures' registered<br><em>The page and the V1 process/SOP tables exist; SOP/RDF/OWL ingestion, PKO editing and publish gates are T16.</em></td>
+<td><code>exists</code></td>
+<td>docs/design/v2.js: page 'procedures' registered<br><em>The page operates the T16 intake live (SOP/BPMN/RDF), the source review and the two human publication gates; signed out it renders the published procedure/process/step rows read-only (#448).</em></td>
 </tr>
 <tr>
 <td><code>destination:Authoring</code></td>

@@ -313,6 +313,40 @@ async fn a_pdf_sop_becomes_a_pddl_procedure_draft() {
         steps[1].3,
         json!({"add": ["stored"], "delete": ["dock_free"]})
     );
+
+    // P1 (the Procedures destination): the READ VIEW carries the derivation facts, not only
+    // the table — source, converter, pack and each step's action text and PDDL.
+    let (status, view) = running
+        .invoke(
+            "processes.get",
+            TOKEN,
+            json!({"process_id": process_id}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{view}");
+    let out = output(&view);
+    assert_eq!(out["source_asset_id"], asset_id.as_str(), "{view}");
+    assert_eq!(out["converter_version"], "prose@1", "{view}");
+    assert_eq!(out["knowledge_pack_ref"], "", "{view}");
+    assert!(out["approval_id"].is_null(), "{view}");
+    let view_steps = out["steps"].as_array().expect("the steps array");
+    assert_eq!(view_steps.len(), 2, "{view}");
+    assert_eq!(view_steps[0]["action_text"], "verify_stock", "{view}");
+    assert_eq!(view_steps[0]["pddl_preconditions"], json!([]), "{view}");
+    assert_eq!(
+        view_steps[0]["pddl_effects"],
+        json!({"add": ["stock_verified"], "delete": []}),
+        "{view}"
+    );
+    assert_eq!(
+        view_steps[1]["pddl_preconditions"],
+        json!(["stock_verified"]),
+        "{view}"
+    );
+    assert_eq!(view_steps[1]["action_text"], "put_away", "{view}");
 }
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
@@ -601,6 +635,23 @@ async fn a_human_approval_publishes_the_procedure() {
         Some(approval),
         "the approval is recorded"
     );
+    // P1: the published READ VIEW names the approval and the source that authorised it.
+    let (status, view) = running
+        .invoke(
+            "processes.get",
+            TOKEN,
+            json!({"process_id": process_id}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{view}");
+    let out = output(&view);
+    assert_eq!(out["status"], "published", "{view}");
+    assert_eq!(out["source_asset_id"], asset_id.as_str(), "{view}");
+    assert_eq!(out["converter_version"], "prose@1", "{view}");
+    assert_eq!(out["approval_id"], approval.to_string().as_str(), "{view}");
     let events: i64 = sqlx::query_scalar(
         "SELECT count(*) FROM event WHERE type = 'process.published' AND aggregate_id = $1",
     )

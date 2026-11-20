@@ -212,10 +212,8 @@ window.ArchitecturePack = (function () {
     "er-knowledge-tools": `erDiagram
   CAPABILITY ||--o{ PROCEDURE : realises
   PROCEDURE ||--o{ PROCEDURE_STEP : orders
-  PROCEDURE }o--|| PKO_RELEASE : pins
-  PKO_RELEASE ||--o{ PKO_ENTITY : contains
-  PKO_ENTITY ||--o{ PKO_RELATION : subject
-  PROCEDURE_STEP }o--o{ PKO_ENTITY : references
+  PROCEDURE }o--|| KNOWLEDGE_PACK : pins
+  PROCEDURE_STEP }o--o{ KNOWLEDGE_PACK : reads
   CAPABILITY }o--o{ KNOWLEDGE_PACK : pinned
   CARD ||--o{ MEMORY_HOT : writes
   CARD ||--o{ MEMORY_DIGEST : consolidates
@@ -231,7 +229,6 @@ window.ArchitecturePack = (function () {
   S4["Chat or document brief"]:::src
   ING["Intake - governed_asset"]:::v1
   CONV["Conversion job"]:::v2
-  PKO["PKO draft - entities and relations"]:::v2
   PROC["Procedure draft - PDDL steps"]:::v2
   PACK["Knowledge pack draft - strata_rag"]:::v1
   REV["Review gate - a person"]:::v2
@@ -243,10 +240,8 @@ window.ArchitecturePack = (function () {
   S3 --> ING
   S4 --> ING
   ING --> CONV
-  CONV --> PKO
   CONV --> PROC
   CONV --> PACK
-  PKO --> REV
   PROC --> REV
   PACK --> REV
   REV --> PUB
@@ -438,14 +433,14 @@ window.ArchitecturePack = (function () {
       title: "Knowledge, memory and the tool estate",
       spec: "§7.6, §11.1, §11.8, §10.3",
       caption:
-        "Procedural knowledge (procedure + PKO) and domain knowledge (packs) are pinned per job. Hot memory lives in the conveyor; one digest per card lives in strata_rag. Tools are versioned and bound; every call is ledgered.",
+        "Procedural knowledge (the procedure's steps) and domain knowledge (packs) are pinned per job. Hot memory lives in the conveyor; one digest per card lives in strata_rag. Tools are versioned and bound; every call is ledgered.",
       tall: true,
     },
     "knowledge-pipeline": {
       title: "Knowledge pipeline — source to pinned release",
       spec: "§5.6, §5.7, D47, D53",
       caption:
-        "SOPs, RDF/OWL/Turtle, process documents and chat are untrusted input. Conversion drafts PKO rows, PDDL steps and a knowledge pack behind a human review gate; an unreviewed source never binds.",
+        "SOPs, RDF/OWL/Turtle, process documents and chat are untrusted input. Conversion drafts PDDL steps, and an ontology becomes a strata knowledge-pack import, behind a human review gate; an unreviewed source never binds.",
     },
     "memory-lifecycle": {
       title: "Memory and lesson lifecycle",
@@ -493,7 +488,7 @@ window.ArchitecturePack = (function () {
     ["Agents", "agents", "capability_agent · internal_agent executor", "§4.5, D46", "R + P"],
     ["Tools", "toolkits", "tool · toolkit · tool_binding · tool_call · broker", "§11.1–§11.9, D41", "P"],
     ["Project types", "types", "Project type template · gates · WBS kinds", "§5.2", "R + P"],
-    ["Procedures", "procedures", "capability · procedure · step · SOP · PKO · publish", "§5.6, D47, D53", "P"],
+    ["Procedures", "procedures", "capability · procedure · step · SOP · knowledge pack · publish", "§5.6, D47, D53", "P"],
     ["Capabilities", "capabilities", "Capability · procedure binding", "§7.6", "R"],
     ["Authoring", "authoring", "Tenant asset intake · drafts · review · publish", "§5.7, D55", "P"],
     ["Assurance & baselines", "assurance", "Trace chain · ADM phases · baseline · closure", "§8", "R"],
@@ -990,7 +985,7 @@ window.ArchitecturePack = (function () {
       ${panel(
         "New versus reused",
         "§10.3",
-        `<div class="arch-matrix"><div><span class="mono">NEW IN V2</span><p>industry · department · job_catalogue · job_release · job_binding · wbs_node · project_baseline · project_register_item · project_dependency · programme_cadence · decision · decision_option · decision_policy · decision_policy_refinement · laya_inference_config · pko_release · pko_entity · pko_relation · lesson · tool · toolkit · tool_binding · tool_call</p></div><div><span class="mono">REUSED FROM V1</span><p>tenant · programme (extended) · project · card · run · run_step · approval · governed_asset (extended) · trace_link · event · job · audit_event · inference_call · eval* · benchmark* · procedure / procedure_step (extended) · secret</p></div></div>`,
+        `<div class="arch-matrix"><div><span class="mono">NEW IN V2</span><p>industry · department · job_catalogue · job_release · job_binding · wbs_node · project_baseline · project_register_item · project_dependency · programme_cadence · decision · decision_option · decision_policy · decision_policy_refinement · laya_inference_config · lesson · tool · toolkit · tool_binding · tool_call</p></div><div><span class="mono">REUSED FROM V1</span><p>tenant · programme (extended) · project · card · run · run_step · approval · governed_asset (extended) · trace_link · event · job · audit_event · inference_call · eval* · benchmark* · procedure / procedure_step (extended) · secret</p></div></div>`,
       )}
     </div>`;
 

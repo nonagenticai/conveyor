@@ -154,6 +154,7 @@ window.installV2 = function (api, enterprise) {
     runDetailLoading: null,
     loadingAll: false,
     adm: consoleAdmState(),
+    proc: null,
   };
   const consoleIssueUrl = (number) =>
     `https://github.com/nonagenticai/conveyor/issues/${encodeURIComponent(number)}`;
@@ -186,6 +187,7 @@ window.installV2 = function (api, enterprise) {
     cs.runDetailLoading = null;
     cs.loadingAll = false;
     cs.adm = consoleAdmState();
+    cs.proc = null;
   }
 
   async function consoleLoad() {
@@ -3302,11 +3304,8 @@ window.installV2 = function (api, enterprise) {
     draftId: "AD-13",
     brief: "",
     packReady: false,
-    pkoVersion: 3,
-    pkoTerm: "PKO-T01",
-    pkoKind: "all",
-    pkoQuery: "",
-    pkoFormal: false,
+    procProcess: null,
+    procProcedure: null,
     explainMissing: false,
     explainRetired: false,
     lesson: "LSN-15",
@@ -3762,34 +3761,19 @@ window.installV2 = function (api, enterprise) {
       { id: "CR-017", title: "Move portal gate to PI-2026.4", baseline: "B2", impact: "schedule −14 d · cost −€0.2m · risk low", rationale: "Programme board rationale recorded", state: "Approved" },
     ],
     sops: [
-      { id: "SOP-01", name: "Tenant onboarding SOP", source: "PDF · tenant-supplied", pages: 18, state: "Draft PKO + PDDL", provenance: "untrusted input · governed_asset(sop_source)" },
+      { id: "SOP-01", name: "Tenant onboarding SOP", source: "PDF · tenant-supplied", pages: 18, state: "Draft · PDDL", provenance: "untrusted input · governed_asset(sop_source)" },
       { id: "SOP-02", name: "Release verification SOP", source: "URL · internal wiki", pages: 9, state: "Review", provenance: "untrusted input · provenance recorded" },
       { id: "SOP-03", name: "Incident response SOP", source: "Document · batch (3)", pages: 24, state: "Published", provenance: "reviewed · procedure v2 · pack capability@17" },
     ],
-    pko: {
-      release: "pko@3",
-      entities: [
-        { id: "PKO-T01", name: "verify_release", kind: "task", attrs: "requires evidence", synonyms: "release check" },
-        { id: "PKO-T02", name: "approve_baseline", kind: "task", attrs: "dual control", synonyms: "baseline approval" },
-        { id: "PKO-R01", name: "release manager", kind: "role", attrs: "accountable", synonyms: "RM" },
-        { id: "PKO-A01", name: "release evidence", kind: "artefact", attrs: "run + eval", synonyms: "proof" },
-        { id: "PKO-C01", name: "no unverified release", kind: "constraint", attrs: "hard", synonyms: "gate" },
-      ],
-      relations: [
-        ["PKO-T01", "requires", "PKO-A01", "1..*"],
-        ["PKO-R01", "performs", "PKO-T01", "1"],
-        ["PKO-T02", "constrained_by", "PKO-C01", "1"],
-      ],
-    },
     intakes: [
       { id: "IN-31", kind: "Chat", text: "We need a small IT delivery department with PM, backend and verification jobs.", produces: ["organisation draft", "job drafts", "project template"], state: "Drafted" },
-      { id: "IN-32", kind: "Document", text: "Tenant SOP bundle (3 files)", produces: ["capability", "procedure", "PKO rows", "knowledge pack"], state: "In review" },
+      { id: "IN-32", kind: "Document", text: "Tenant SOP bundle (3 files)", produces: ["capability", "procedure", "knowledge pack"], state: "In review" },
       { id: "IN-33", kind: "Chat", text: "Add a tool request for a missing billing read operation.", produces: ["tool request", "tool draft"], state: "Blocked on dependency" },
     ],
     drafts: [
       { id: "AD-11", asset: "Department: delivery", depends: "industry software", state: "Draft", review: "human" },
       { id: "AD-12", asset: "Job: backend engineer", depends: "department delivery · capability delivery", state: "Draft", review: "human" },
-      { id: "AD-13", asset: "Procedure: implement change", depends: "job draft · PKO terms", state: "Review", review: "human" },
+      { id: "AD-13", asset: "Procedure: implement change", depends: "job draft · PDDL terms", state: "Review", review: "human" },
       { id: "AD-14", asset: "Knowledge pack: identity", depends: "procedure draft", state: "Unpublished", review: "human" },
     ],
     katas: [
@@ -4094,62 +4078,6 @@ window.installV2 = function (api, enterprise) {
   }
 
   // Existing pages keep their ids and behaviour; V2 destinations are additive and link to them.
-  const pkoDetail = {
-    "PKO-T01": {
-      definition:
-        "Verify that a release has review evidence and a passed probe before it is published.",
-      evidence: "SOP-02 · p.4 · release verification procedure",
-      owner: "release manager",
-      release: "pko@3",
-      constraints: ["no unverified release"],
-      steps: ["proc-implement v7 · step 04 (gate)"],
-    },
-    "PKO-T02": {
-      definition:
-        "Approve a baseline only when the required approvals and evidence references are present.",
-      evidence: "SOP-01 · p.9 · baseline control",
-      owner: "project office",
-      release: "pko@3",
-      constraints: ["dual control"],
-      steps: ["proc-close v3 · step 02 (gate)"],
-    },
-    "PKO-R01": {
-      definition:
-        "The role accountable for release verification and for recording the verdict.",
-      evidence: "SOP-02 · roles table",
-      owner: "delivery",
-      release: "pko@3",
-      constraints: ["accountable"],
-      steps: ["proc-implement v7 · step 04"],
-    },
-    "PKO-A01": {
-      definition:
-        "The run record, evaluation evidence and read-back that prove a release was verified.",
-      evidence: "SOP-02 · appendix B",
-      owner: "verification",
-      release: "pko@3",
-      constraints: ["evidence before progression"],
-      steps: ["proc-implement v7 · step 04", "proc-close v3 · step 01"],
-    },
-    "PKO-C01": {
-      definition:
-        "A hard constraint: a release with no verification evidence cannot be published.",
-      evidence: "SOP-02 · §4.1",
-      owner: "verification",
-      release: "pko@3",
-      constraints: ["hard", "fails closed"],
-      steps: ["proc-implement v7 · step 04 (gate)"],
-    },
-  };
-  const pkoPredicates = {
-    requires: { permitted: true, cardinality: "1..*" },
-    performs: { permitted: true, cardinality: "1" },
-    constrained_by: { permitted: true, cardinality: "1" },
-    contains: {
-      permitted: false,
-      reason: "a task cannot contain another task in the base layer",
-    },
-  };
   const legacy = {
     overview: enterprise.pages.overview,
     projects: enterprise.pages.projects,
@@ -4358,6 +4286,7 @@ window.installV2 = function (api, enterprise) {
     "projects",
     "plan",
     "validation",
+    "procedures",
     "execution",
     "outputs",
     "documents",
@@ -4370,7 +4299,7 @@ window.installV2 = function (api, enterprise) {
   function publicSidebar() {
     const projectCount = live ? snapshotProjects().length : 0;
     return `<div class="brand"><span class="brand-mark">${I("layers")}</span><div><div class="brand-word">conveyor</div><div class="brand-sub">THE OPERATING SYSTEM FOR WORK</div></div></div><div class="tenant-switch"><span class="tenant-mark">N</span><span class="grow">Public programme<small>conveyor.nonagentic.ai/design</small></span></div><nav>
-      <div class="nav-group"><div class="nav-label">PROGRAMME</div>${N("portfolio", "Portfolio", "layers")}${live && list((live.programme || {}).programme).length ? N("programme", "Programme definition", "shield") : ""}${N("projects", "Projects", "projects", projectCount)}${N("outputs", "Outputs", "file")}${N("plan", "Plan &amp; WBS", "board")}${N("validation", "Validation", "check")}${N("execution", "Execution room", "run")}${N("documents", "Documents", "file")}${N("contribute", "Contribute", "grid")}${N("architecture", "System architecture", "model")}</div></nav><div class="sidebar-bottom"><b>Position → release → binding → run</b><div class="row"><i class="dot green"></i>${live ? "LIVE programme" : "No snapshot loaded"}</div></div>`;
+      <div class="nav-group"><div class="nav-label">PROGRAMME</div>${N("portfolio", "Portfolio", "layers")}${live && list((live.programme || {}).programme).length ? N("programme", "Programme definition", "shield") : ""}${N("projects", "Projects", "projects", projectCount)}${N("outputs", "Outputs", "file")}${N("plan", "Plan &amp; WBS", "board")}${N("validation", "Validation", "check")}${N("procedures", "Procedures", "flow")}${N("execution", "Execution room", "run")}${N("documents", "Documents", "file")}${N("contribute", "Contribute", "grid")}${N("architecture", "System architecture", "model")}</div></nav><div class="sidebar-bottom"><b>Position → release → binding → run</b><div class="row"><i class="dot green"></i>${live ? "LIVE programme" : "No snapshot loaded"}</div></div>`;
   }
 
   function sidebar() {
@@ -5855,80 +5784,838 @@ window.installV2 = function (api, enterprise) {
   }
 
   /* ------------------------------------------------------------------ Procedures */
+  // T16: the destination IS the intake and its gates. Signed in it reads and writes the
+  // platform's own procedures and processes; signed out it renders the published snapshot
+  // (config.procedures / processes / process_steps) read-only; `?design=1` keeps the study.
+  // The owner decision of 2026-11-19 removed the PKO store: procedural knowledge is the
+  // procedure/step/PDDL space, and an RDF/OWL document becomes a strata knowledge pack.
   function procedures() {
-    const tab = v.tab.procedures || "Workspace";
-    const sop = F.sops[v.sop] || F.sops[0];
-    const pko = F.pko;
-    const capRows = db.capabilities.slice(0, 5).map((c) => {
-      const n = (c.processes || []).length;
-      return `<div class="v2-step"><span class="n">${I("flow")}</span><span class="grow"><strong>${E(c.name)}</strong><small>${n} procedure(s) · ${E(c.knowledge || "knowledge pin required")}</small></span>${B(c.status, c.status === "Published" ? "green" : "amber")}</div>`;
-    }).join("");
-    const sopRows = F.sops.map((s, i) =>
-      `<tr class="${i === v.sop ? "selected" : ""}"><td><button class="e-project-link" data-v2="sop" data-index="${i}"><span><strong>${E(s.name)}</strong><small>${E(s.source)}</small></span></button></td><td>${E(s.provenance)}</td><td>${s.pages}</td><td>${B(s.state, s.state === "Published" ? "green" : "amber")}</td></tr>`
-    ).join("");
-    const term = pko.entities.find((e) => e.id === v.pkoTerm) || pko.entities[0];
-    const detail = pkoDetail[term.id] || {};
-    const pkoRows = pko.entities
-      .filter(
-        (e) =>
-          (v.pkoKind === "all" || e.kind === v.pkoKind) &&
-          (!v.pkoQuery ||
-            (
-              e.name +
-              " " +
-              e.id +
-              " " +
-              ((pkoDetail[e.id] || {}).definition || "")
-            )
-              .toLowerCase()
-              .includes(v.pkoQuery)),
-      )
-      .map(
-        (e) =>
-          `<tr class="${e.id === term.id ? "selected" : ""}"><td><button class="e-project-link" data-v2="pko-term" data-id="${e.id}"><span><strong class="mono">${E(e.name)}</strong><small>${E(e.id)}</small></span></button></td><td>${B(e.kind)}</td><td>${E(e.attrs)}</td><td>${E((pkoDetail[e.id] || {}).owner || "—")}</td></tr>`,
-      )
-      .join("");
-    const related = pko.relations.filter(
-      (r) => r[0] === term.id || r[2] === term.id,
+    if (consoleOn()) return proceduresLive();
+    if (live && live.config) return proceduresSnapshot();
+    if (studyOn()) return proceduresStudy();
+    return `<div class="page enterprise">${heading(
+      "Procedures",
+      "The SOP intake, the PDDL steps and the human publication gates.",
+      "",
+      "PROCEDURES & AUTHORING",
+    )}${note("The procedure rows are not published on this pack. The intake and its gates are operator actions: sign in at the app origin, or ask for the design study with <span class=\"mono\">?design=1</span>.", "bad")}</div>`;
+  }
+
+  function procState() {
+    if (!cs.proc) {
+      cs.proc = {
+        loaded: false,
+        loading: false,
+        error: null,
+        procedures: [],
+        processes: [],
+        detail: {},
+        loadingDetail: null,
+        detailError: null,
+        gates: [],
+        gatesFor: null,
+        gatesLoading: false,
+        last: null,
+        gate: null,
+        actionError: null,
+      };
+    }
+    return cs.proc;
+  }
+
+  async function consoleLoadProcedures() {
+    const p = procState();
+    if (!consoleOn() || p.loading || p.loaded) return;
+    p.loading = true;
+    p.error = null;
+    try {
+      const [procedurePage, processPage] = await Promise.all([
+        C.can("procedures.list")
+          ? C.action("procedures.list", { page: { limit: 200 } })
+          : Promise.resolve({ items: [] }),
+        C.can("processes.list")
+          ? C.action("processes.list", { page: { limit: 200 } })
+          : Promise.resolve({ items: [] }),
+      ]);
+      p.procedures = list(procedurePage.items);
+      p.processes = list(processPage.items);
+      p.loaded = true;
+    } catch (error) {
+      p.error = error;
+    } finally {
+      p.loading = false;
+      render();
+    }
+  }
+
+  async function consoleLoadProcDetail(processId) {
+    const p = procState();
+    if (!consoleOn() || !processId || p.detail[processId] || p.loadingDetail === processId) return;
+    p.loadingDetail = processId;
+    p.detailError = null;
+    try {
+      p.detail[processId] = await C.action("processes.get", { process_id: processId });
+    } catch (error) {
+      p.detailError = error;
+    } finally {
+      p.loadingDetail = null;
+      render();
+    }
+  }
+
+  async function consoleLoadProcGates(process) {
+    const p = procState();
+    if (!consoleOn() || !process || !C.can("approvals.list")) return;
+    if (p.gatesFor === process.id || p.gatesLoading) return;
+    p.gatesFor = process.id;
+    p.gatesLoading = true;
+    p.actionError = null;
+    try {
+      const procedure = procProcedureFor(process);
+      const targets = [process.id, procedure && procedure.id].filter(Boolean);
+      const [pending, approved] = await Promise.all([
+        C.action("approvals.list", { status: "pending", page: { limit: 200 } }),
+        C.action("approvals.list", { status: "approved", page: { limit: 200 } }),
+      ]);
+      p.gates = [...list(pending.items), ...list(approved.items)].filter((gate) =>
+        targets.includes(gate.target),
+      );
+    } catch (error) {
+      p.actionError = error;
+    } finally {
+      p.gatesLoading = false;
+      render();
+    }
+  }
+
+  function consoleRefreshProcedures() {
+    const p = procState();
+    p.loaded = false;
+    p.detail = {};
+    p.gates = [];
+    p.gatesFor = null;
+    p.actionError = null;
+    consoleLoadProcedures();
+  }
+
+  const procInput = (name) => {
+    const el = $(`[data-v2-input="${name}"]`);
+    return el && typeof el.value === "string" ? el.value.trim() : "";
+  };
+
+  const procSource = async (kind) => {
+    const fileEl = $(`[data-v2-input="proc-${kind}-file"]`);
+    const file = fileEl && fileEl.files && fileEl.files[0];
+    if (file) {
+      const bytes = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(String(reader.result || "").split(",").pop() || "");
+        reader.onerror = () => reject(reader.error || new Error("the file could not be read"));
+        reader.readAsDataURL(file);
+      });
+      const fallback = kind === "bpmn" ? "bpmn" : kind === "rdf" ? "rdf" : "text";
+      return {
+        kind: file.type === "application/pdf" ? "pdf" : fallback,
+        media_type: file.type || undefined,
+        filename: file.name,
+        content_base64: bytes,
+      };
+    }
+    const text = procInput(`proc-${kind}-text`);
+    if (text) {
+      return { kind: kind === "sop" ? "text" : kind, media_type: "text/plain", text };
+    }
+    // The action's SourceIn carries `kind: "url"`; the field is the fallback when no file or
+    // text was supplied, so a document behind an address is ingest material too.
+    const url = procInput(`proc-${kind}-url`);
+    if (url) return { kind: "url", url };
+    throw new Error("Paste the document, attach a file, or give a URL.");
+  };
+
+  async function consoleProcIngest(kind) {
+    const p = procState();
+    if (!consoleOn()) return;
+    p.actionError = null;
+    p.last = null;
+    try {
+      const title = procInput(`proc-${kind}-title`);
+      const sourceKey = procInput(`proc-${kind}-source-key`);
+      const processKey = procInput(`proc-${kind}-process-key`);
+      if (!title || !sourceKey) throw new Error("A title and a source key are required.");
+      const source = await procSource(kind);
+      let output;
+      if (kind === "rdf") {
+        const storeId = procInput("proc-rdf-store-id");
+        if (!storeId) throw new Error("An RDF import needs the strata store id.");
+        output = await C.action("procedures.ingest_rdf", {
+          title,
+          source_key: sourceKey,
+          source,
+          strata_store_id: storeId,
+        });
+      } else if (kind === "bpmn") {
+        if (!processKey) throw new Error("A BPMN conversion needs a process key.");
+        output = await C.action("procedures.ingest_process", {
+          title,
+          process_key: processKey,
+          source_key: sourceKey,
+          source,
+        });
+      } else {
+        if (!processKey) throw new Error("An SOP ingest needs a process key.");
+        output = await C.action("procedures.ingest_sop", {
+          title,
+          process_key: processKey,
+          source_key: sourceKey,
+          source,
+        });
+      }
+      p.last = { kind, output };
+      if (output && output.process_id) v.procProcess = String(output.process_id);
+      if (output && output.procedure_id) v.procProcedure = String(output.procedure_id);
+      consoleRefreshProcedures();
+      toast("Draft created · nothing is published and no tool was granted");
+    } catch (error) {
+      p.actionError = error;
+      render();
+      toast(consoleError(error));
+    }
+  }
+
+  async function consoleProcValidate() {
+    const p = procState();
+    if (!consoleOn() || !v.procProcess) {
+      toast("Select a draft process first");
+      return;
+    }
+    p.actionError = null;
+    try {
+      const output = await C.action("procedures.validate", { process_id: v.procProcess });
+      p.last = { kind: "validate", output };
+    } catch (error) {
+      p.actionError = error;
+    }
+    render();
+  }
+
+  async function consoleProcReview(decision) {
+    const p = procState();
+    const detail = v.procProcess ? p.detail[v.procProcess] : null;
+    const assetId = detail && detail.source_asset_id;
+    if (!consoleOn() || !assetId) {
+      toast("The selected draft names no source asset");
+      return;
+    }
+    p.actionError = null;
+    try {
+      const output = await C.action("procedures.review_source", {
+        asset_id: assetId,
+        decision,
+        note: procInput("proc-review-note"),
+      });
+      p.last = { kind: "review", output };
+      delete p.detail[v.procProcess];
+      consoleLoadProcDetail(v.procProcess);
+    } catch (error) {
+      p.actionError = error;
+    }
+    render();
+  }
+
+  function procProcedureFor(process) {
+    const p = procState();
+    if (!process) return null;
+    return (
+      p.procedures.find((row) => row.id === v.procProcedure && row.key === process.key) ||
+      p.procedures.find((row) => row.key === process.key) ||
+      null
     );
-    const relRows = related
+  }
+
+  async function consoleProcRequestGate(gate) {
+    const p = procState();
+    if (!consoleOn()) return;
+    const process = procSelected(p);
+    if (!process) {
+      toast("Select a draft first");
+      return;
+    }
+    const target = gate === "procedures.publish" ? (procProcedureFor(process) || {}).id : process.id;
+    if (!target) {
+      toast("No draft names this target yet");
+      return;
+    }
+    p.actionError = null;
+    try {
+      p.gate = await C.action("approvals.request", {
+        gate,
+        kind: "publication",
+        target,
+        description:
+          gate === "procedures.publish"
+            ? "Release the converted SOP judge"
+            : "Release the executable procedure",
+      });
+      p.gates = [];
+      p.gatesFor = null;
+      consoleLoadProcGates(process);
+      toast("Gate requested · a second person decides");
+    } catch (error) {
+      p.actionError = error;
+      render();
+      toast(consoleError(error));
+    }
+  }
+
+  // A gate is decided by a SECOND person: the requester's session cannot decide its own gate
+  // (the store refuses it), so each listed gate carries its own decision control and the
+  // decider's session works from the list, not from the requester's `p.gate` slot.
+  function consoleReloadProcGates() {
+    const p = procState();
+    p.gates = [];
+    p.gatesFor = null;
+    const process = procSelected(p);
+    if (process) consoleLoadProcGates(process);
+    render();
+  }
+
+  async function consoleProcDecide(approvalId, decision) {
+    const p = procState();
+    if (!consoleOn() || !approvalId) {
+      toast("Request a gate first");
+      return;
+    }
+    p.actionError = null;
+    try {
+      const decided = await C.action("approvals.decide", {
+        approval_id: approvalId,
+        decision,
+        note: decision === "approve" ? "Approved in the operator console" : "Rejected in the operator console",
+      });
+      if (p.gate && p.gate.id === approvalId) p.gate = decided;
+      p.gates = [];
+      p.gatesFor = null;
+      const process = procSelected(p);
+      if (process) consoleLoadProcGates(process);
+      toast("Gate " + (decided.status || decision));
+    } catch (error) {
+      p.actionError = error;
+      render();
+      toast(consoleError(error));
+    }
+  }
+
+  // The approved gate a publish may name, matched by ITS OWN gate name and target — not by the
+  // last request this session made. A listed approved gate is what lets the second person's
+  // decision release the artefact in the first person's session.
+  function procApprovedGate(p, gateName, target) {
+    const listed = list(p.gates).find(
+      (gate) => gate.status === "approved" && gate.gate === gateName && gate.target === target,
+    );
+    if (listed) return listed;
+    if (
+      p.gate &&
+      p.gate.status === "approved" &&
+      p.gate.gate === gateName &&
+      p.gate.target === target
+    ) {
+      return p.gate;
+    }
+    return null;
+  }
+
+  const procSelfGate = (gate) => {
+    const me = C && C.me ? C.me() : null;
+    const id = me && me.principal ? me.principal.id : null;
+    return !!(id && gate.requested_by === id);
+  };
+
+  function procGateState(p, gateName, target) {
+    if (!target) return B("no draft", "");
+    const rows = list(p.gates).filter((gate) => gate.gate === gateName && gate.target === target);
+    if (rows.some((gate) => gate.status === "approved")) return B("approved", "green");
+    if (rows.some((gate) => gate.status === "pending")) return B("pending · a second person decides", "amber");
+    if (rows.some((gate) => gate.status === "rejected")) return B("rejected", "bad");
+    return B("none · request it below", "");
+  }
+
+  async function consoleProcPublish(which) {
+    const p = procState();
+    if (!consoleOn()) return;
+    const process = procSelected(p);
+    if (!process) {
+      toast("Select a draft first");
+      return;
+    }
+    const procedure = procProcedureFor(process);
+    const target = which === "procedure" ? (procedure || {}).id : process.id;
+    const gateName = which === "procedure" ? "procedures.publish" : "processes.publish";
+    if (!target) {
+      toast("No draft names this target yet");
+      return;
+    }
+    const gate = procApprovedGate(p, gateName, target);
+    const options = gate ? { approvalId: gate.id } : {};
+    p.actionError = null;
+    try {
+      let output;
+      if (which === "procedure") {
+        output = await C.action("procedures.publish", { procedure_id: target }, options);
+      } else {
+        output = await C.action("processes.publish", { process_id: target }, options);
+      }
+      p.last = { kind: "publish", output };
+      delete p.detail[process.id];
+      consoleRefreshProcedures();
+      toast(
+        gate
+          ? "Published · the approved gate " + short(gate.id, 8) + " is recorded"
+          : "Published · no gate was required by the tenant policy",
+      );
+    } catch (error) {
+      p.actionError = error;
+      render();
+      toast(consoleError(error));
+    }
+  }
+
+  const procTone = (status) =>
+    status === "published" || status === "approved"
+      ? "green"
+      : status === "draft" || status === "pending"
+        ? "amber"
+        : "";
+
+  const procErrorNote = (p) => {
+    const error = p.error || p.actionError || p.detailError;
+    return error ? note("<strong>Request refused</strong> · " + E(consoleError(error)), "bad") : "";
+  };
+
+  function procSelected(p) {
+    if (!v.procProcess) return null;
+    return p.detail[v.procProcess] || p.processes.find((row) => row.id === v.procProcess) || null;
+  }
+
+  const procField = (label, name, placeholder) =>
+    `<label class="field full"><span>${E(label)}</span><input data-v2-input="${name}" placeholder="${E(placeholder)}" aria-label="${E(label)}"></label>`;
+  const procText = (label, name, placeholder) =>
+    `<label class="field full"><span>${E(label)}</span><textarea data-v2-input="${name}" rows="4" placeholder="${E(placeholder)}" aria-label="${E(label)}"></textarea></label>`;
+
+  const procIntakeForm = (kind) => {
+    const n = (field) => `proc-${kind}-${field}`;
+    return `<div class="form-grid">${procField("Title", n("title"), "Synthetic receiving SOP")}${
+      kind === "rdf" ? "" : procField("Process key", n("process-key"), "receiving")
+    }${procField("Source key", n("source-key"), "receiving-sop")}${
+      kind === "rdf" ? procField("Strata store id", n("store-id"), "the tenant's strata_ingest store uuid") : ""
+    }${procField("Source URL", n("url"), "https://…")}${procText("Or paste the document", n("text"), "Paste the SOP text, the BPMN XML or the Turtle source")}<label class="field full"><span>Or attach a file</span><input type="file" data-v2-input="${n("file")}" aria-label="Attach the source document"></label></div>`;
+  };
+
+  const procResultPanel = (p) => {
+    if (!p.last) {
+      return note("No result yet. An ingest answers the source asset, the draft judge and the draft process — nothing is published.");
+    }
+    const kind = p.last.kind;
+    const output = p.last.output || {};
+    if (kind === "validate") {
+      const checks = list(output.checks);
+      return panel(
+        "Validation",
+        `${output.valid ? note("Every check passes; the human gate still decides.", "ok") : note("The draft is not valid.", "bad")}${table(
+          ["Check"],
+          checks.length ? checks.map((check) => `<tr><td>${E(check)}</td></tr>`) : [`<tr><td>No checks were returned.</td></tr>`],
+        )}`,
+      );
+    }
+    if (kind === "review") {
+      return panel(
+        "Source review",
+        `${kv([
+          ["Asset", `<span class="mono">${E(output.asset_id || "—")}</span>`],
+          ["Status", B(output.status || "—", procTone(output.status))],
+        ])}${note("A source decision is a person's act: the approval unblocks the derived drafts, and it never publishes them.")}`,
+      );
+    }
+    if (kind === "publish") {
+      return panel(
+        "Published",
+        `${kv([
+          ["Id", `<span class="mono">${E(output.id || "—")}</span>`],
+          ["Status", B(output.status || "published", procTone(output.status))],
+          ["Version", E(output.version == null ? "—" : output.version)],
+        ])}${note("The released version records its source and, when one was required, the human approval that authorised it.")}`,
+      );
+    }
+    const rows = [];
+    for (const key of [
+      "source_asset_id",
+      "procedure_id",
+      "process_id",
+      "document_id",
+      "steps",
+      "converter_version",
+      "knowledge_pack_ref",
+      "capability_id",
+      "agent_id",
+      "job_id",
+    ]) {
+      if (output[key] != null && output[key] !== "") {
+        rows.push([key, `<span class="mono">${E(String(output[key]))}</span>`]);
+      }
+    }
+    return panel(
+      "Ingest result · " + E(kind),
+      `${rows.length ? kv(rows) : note("The action returned no draft.")}${note("Every derived artefact is a draft: nothing is published and no tool grant was requested.")}`,
+    );
+  };
+
+  const procProcedureRows = (p) =>
+    p.procedures
       .map(
-        (r) =>
-          `<tr><td class="mono">${E(r[0])}</td><td>${E(r[1])}</td><td class="mono">${E(r[2])}</td><td>${E(r[3])}</td></tr>`,
+        (row) =>
+          `<tr class="${row.id === v.procProcedure ? "selected" : ""}"><td><span class="mono">${E(row.key)}</span><small>${E(short(row.id, 8))}</small></td><td>${E(row.title)}</td><td>${B(row.status, procTone(row.status))}</td><td>v${E(row.version)}</td><td class="mono">${E(row.source_asset_id ? short(row.source_asset_id, 8) : "—")}</td><td class="mono">${E(row.knowledge_pack_ref ? short(row.knowledge_pack_ref, 18) : "—")}</td></tr>`,
       )
       .join("");
-    const permitted = Object.entries(pkoPredicates)
-      .filter(([, p]) => p.permitted)
-      .map(([k, p]) => `${k} (${p.cardinality})`)
-      .join(" · ");
-    const graph = related
-      .map((r) => {
-        const otherId = r[0] === term.id ? r[2] : r[0];
-        const other = pko.entities.find((e) => e.id === otherId) || {
-          name: otherId,
-          kind: "unknown",
-        };
-        return `<div class="v2-pko-edge"><span class="mono">${E(r[1])}</span><div class="node"><strong>${E(other.name)}</strong><small>${E(other.kind)}</small></div></div>`;
+
+  const procProcessRows = (p, selectable) =>
+    p.processes
+      .map((row) => {
+        const name = selectable
+          ? `<button class="e-project-link" data-v2="proc-process" data-id="${E(row.id)}"><span><strong class="mono">${E(row.key)}</strong><small>${E(row.title)}</small></span></button>`
+          : `<span><strong class="mono">${E(row.key)}</strong><small>${E(row.title)}</small></span>`;
+        return `<tr class="${row.id === v.procProcess ? "selected" : ""}"><td>${name}</td><td>${B(row.status, procTone(row.status))}</td><td>v${E(row.version)}</td><td>${list(row.steps).length || "—"}</td><td class="mono">${E(row.converter_version ? short(row.converter_version, 14) : "—")}</td><td class="mono">${E(row.knowledge_pack_ref ? short(row.knowledge_pack_ref, 18) : "—")}</td></tr>`;
       })
       .join("");
-    const formal = `<div class="v2-code">entity ${E(term.id)} {
-  name: ${E(term.name)}
-  kind: ${E(term.kind)}
-  attributes: ${E(term.attrs)}
-  synonyms: ${E(term.synonyms)}
-  constraints: ${E((detail.constraints || []).join(", "))}
-  release: ${E(detail.release || pko.release)}
-}</div>`;
-    const stepRows = [
-      "01 · read the card and pinned sources (action)",
-      "02 · draft the change (internal_agent · generation)",
-      "03 · run tests (tool call)",
-      "04 · independent review (gate)",
-      "05 · merge (gate · human)",
-    ].map((s) => {
-      const [n, ...rest] = s.split(" · ");
-      return `<div class="v2-step"><span class="n">${E(n)}</span><span class="grow">${E(rest.join(" · "))}</span></div>`;
-    }).join("");
+
+  function proceduresLive() {
+    const p = procState();
+    if (!p.loaded && !p.loading && !p.error) consoleLoadProcedures();
+    const selected = procSelected(p);
+    if (v.procProcess && !p.detail[v.procProcess] && p.loadingDetail !== v.procProcess) {
+      consoleLoadProcDetail(v.procProcess);
+    }
+    if (selected) consoleLoadProcGates(selected);
+    const tab = v.tab.procedures || "Workspace";
+    const selectedProcedure = selected ? procProcedureFor(selected) : null;
+    const drafts = p.procedures.filter((row) => row.status === "draft");
+    const published = p.procedures.filter((row) => row.status === "published");
+    const steps = selected ? list(selected.steps) : [];
+    let content = "";
+    if (tab === "Workspace") {
+      content =
+        `<div class="v2-meter"><div><span>Draft procedures</span><strong>${drafts.length}</strong><small>awaiting review and the gate</small></div><div><span>Published procedures</span><strong>${published.length}</strong><small>immutable versions</small></div><div><span>Processes</span><strong>${p.processes.length}</strong><small>${p.processes.filter((row) => row.status === "draft").length} draft</small></div></div>` +
+        `<div class="v2-split"><div>${panel(
+          "Procedures",
+          `${
+            p.loading
+              ? note("Loading the tenant's procedures…")
+              : p.procedures.length
+                ? table(["Key", "Title", "Status", "Version", "Source", "Knowledge pack"], [procProcedureRows(p)])
+                : note("No procedure has been created in this tenant.")
+          }${note("A converted SOP produces a draft judge (procedure) and a draft executable (process); nothing publishes itself.")}`,
+          B(`${p.procedures.length} procedures`),
+        )}</div><div>${panel(
+          "Processes",
+          `${
+            p.processes.length
+              ? table(["Key", "Status", "Version", "Steps", "Converter", "Knowledge pack"], [procProcessRows(p, true)])
+              : note("No process has been created in this tenant.")
+          }${note("Select a process to read its steps, its source and its gates.")}`,
+          B(`${p.processes.length} processes`),
+        )}</div></div>`;
+    } else if (tab === "SOP intake") {
+      content = `<div class="v2-split"><div>${panel(
+        "SOP intake",
+        procIntakeForm("sop"),
+        C.can("procedures.ingest_sop") ? button("Ingest the SOP", "proc-ingest-sop", "", "primary", "plus") : "",
+      )}</div><div>${procResultPanel(p)}</div></div>${note(
+        "A customer document is untrusted input: it enters as <span class='mono'>governed_asset(kind='sop_source')</span> with provenance, and the derived procedures stay drafts behind a human source review and the publication gate. An SOP can never grant a tool.",
+      )}`;
+    } else if (tab === "RDF/OWL & process docs") {
+      content =
+        panel(
+          "Ingestion paths",
+          `<p class="muted">Documents are ingest material; the converter produces draft rows behind a review gate. The conveyor runs no RDF store and no reasoner: an ontology becomes a strata knowledge pack.</p>${table(
+            ["Input", "Conversion", "Produces", "Gate"],
+            [
+              ["SOP (PDF, text, URL)", "prose → PDDL steps", "draft judge + draft process + capability/agent/job drafts", "source review · human publication gate"],
+              ["BPMN 2.0 XML", "activities → steps; gateways → gate steps", "PDDL procedure draft + draft process", "source review · human publication gate"],
+              ["RDF / OWL / Turtle", "submitted to strata_ingest", "a strata knowledge pack the drafts name", "the import job + review"],
+            ].map((row) => `<tr>${row.map((cell) => `<td>${E(cell)}</td>`).join("")}</tr>`),
+          )}`,
+        ) +
+        `<div class="v2-split"><div>${panel(
+          "BPMN 2.0",
+          procIntakeForm("bpmn"),
+          C.can("procedures.ingest_process") ? button("Convert the BPMN", "proc-ingest-bpmn", "", "small", "replay") : "",
+        )}</div><div>${panel(
+          "RDF / OWL / Turtle",
+          procIntakeForm("rdf"),
+          C.can("procedures.ingest_rdf") ? button("Import the ontology", "proc-ingest-rdf", "", "small", "branch") : "",
+        )}</div></div>${procResultPanel(p)}${note(
+          "The diagram is a source document; the procedure is the executable artefact. A knowledge pack is pinned by reference — the conveyor never hosts embeddings.",
+        )}`;
+    } else if (tab === "PDDL steps") {
+      content = selected
+        ? `${panel(
+            "PDDL steps · " + E(selected.key),
+            `${
+              steps.length
+                ? table(
+                    ["#", "Kind", "Actor", "Action", "Action text", "Preconditions", "Effects", "Judge"],
+                    steps.map(
+                      (step) =>
+                        `<tr><td>${E(step.position)}</td><td>${E(step.kind)}</td><td>${E(step.actor)}</td><td class="mono">${E(step.action || "—")}</td><td>${E(step.action_text || "—")}</td><td class="mono">${E(JSON.stringify(step.pddl_preconditions || []))}</td><td class="mono">${E(JSON.stringify(step.pddl_effects || []))}</td><td class="mono">${E(step.procedure_id ? short(step.procedure_id, 8) : "—")}</td></tr>`,
+                    ),
+                  )
+                : note("This draft carries no steps.")
+            }`,
+            C.can("procedures.validate") ? button("Validate the draft", "proc-validate", "", "small", "check") : "",
+          )}${procResultPanel(p)}${note(
+            "A step is an action (PDDL), a tool call or a gate. Validation checks the literals, each step's judge and that no tool grant was requested.",
+          )}`
+        : note("Select a draft process in Workspace first.");
+    } else if (tab === "Knowledge pairing") {
+      content = selected
+        ? `${panel(
+            "Procedure ↔ knowledge pairing",
+            `${flow([
+              ["Procedure", selected.key],
+              ["Source asset", short(selected.source_asset_id || "—", 8)],
+              ["Knowledge pack", selected.knowledge_pack_ref || "none"],
+              ["Run", "pins the published version"],
+            ])}${kv([
+              ["Source asset", `<span class="mono">${E(selected.source_asset_id || "—")}</span>`],
+              ["Knowledge pack", `<span class="mono">${E(selected.knowledge_pack_ref || "none")}</span>`],
+              ["Converter", E(selected.converter_version || "—")],
+              ["Recorded approval", `<span class="mono">${E(selected.approval_id || "—")}</span>`],
+              ["Judge procedure", `<span class="mono">${E((selectedProcedure || {}).id || "—")}</span>`],
+            ])}${note(
+              "An RDF/OWL document is imported into strata_ingest and its job id is the knowledge pack a converted draft names. The conveyor hosts no RDF store, no graph store and no reasoner; a procedure pins the pack and the published version, never a mutable release.",
+            )}`,
+          )}${panel(
+            "The source",
+            `<label class="field full"><span>Review note</span><input data-v2-input="proc-review-note" placeholder="Why the source is accepted or refused" aria-label="Review note"></label>${
+              C.can("procedures.review_source")
+                ? `${button("Approve the source", "proc-review-approve", "", "small", "shield")}${button("Reject the source", "proc-review-reject", "", "small", "close")}`
+                : note("processes:write is required to review a source.")
+            }${procResultPanel(p)}`,
+          )}`
+        : note("Select a draft process in Workspace first.");
+    } else if (tab === "Process map") {
+      content = panel(
+        "Process map",
+        `${flow([
+          ["Intent", "card"],
+          ["Activities", "steps"],
+          ["Gateways", "gate steps"],
+          ["Evidence", "run + artefact"],
+        ])}${note(
+          "A BPMN diagram becomes a procedure draft: activities → steps, gateways → gate steps. The diagram is a source document, not the executable artefact.",
+        )}${
+          selected
+            ? kv([
+                ["Selected process", `<span class="mono">${E(selected.key)}</span>`],
+                ["Steps", E(steps.length)],
+                ["Status", B(selected.status, procTone(selected.status))],
+              ])
+            : ""
+        }`,
+      );
+    } else {
+      content = selected
+        ? `${panel(
+            "Publish readiness · " + E(selected.key),
+            `${kv([
+              ["Status", B(selected.status, procTone(selected.status))],
+              ["Source asset", `<span class="mono">${E(selected.source_asset_id || "—")}</span>`],
+              ["Recorded approval", `<span class="mono">${E(selected.approval_id || "—")}</span>`],
+              ["Judge procedure", `<span class="mono">${E((selectedProcedure || {}).id || "—")}</span>`],
+              ["Executable gate", procGateState(p, "processes.publish", selected.id)],
+              ["Judge gate", procGateState(p, "procedures.publish", (selectedProcedure || {}).id)],
+            ])}${
+              C.can("approvals.request")
+                ? `${button("Request the executable gate", "proc-gate-process", "", "small", "shield")}${button("Request the judge gate", "proc-gate-procedure", "", "small", "shield")}`
+                : ""
+            }${C.can("processes.publish") ? button("Publish the process", "proc-publish-process", "", "primary", "shield") : ""}${
+              C.can("procedures.publish") ? button("Publish the judge", "proc-publish-procedure", "", "small", "shield") : ""
+            }`,
+          )}${panel(
+            "Publication gates",
+            `${
+              p.gate
+                ? kv([
+                    ["Last request", `<span class="mono">${E(p.gate.id || "—")}</span>`],
+                    ["Gate", E(p.gate.gate || "—")],
+                    ["Status", B(p.gate.status || "pending", procTone(p.gate.status))],
+                    ["Approvals", `${E(p.gate.approvals || 0)} / ${E(p.gate.required_decisions || 1)}`],
+                  ])
+                : note("No gate has been requested in this session.")
+            }${
+              p.gates.length
+                ? table(
+                    ["Gate", "Status", "Target", "Approvals", "Decision"],
+                    p.gates.map(
+                      (gate) =>
+                        `<tr><td class="mono">${E(gate.gate)}</td><td>${B(gate.status, procTone(gate.status))}</td><td class="mono">${E(short(gate.target || "—", 8))}</td><td>${E(gate.approvals)} / ${E(gate.required_decisions)}</td><td>${
+                          gate.status === "pending" && C.can("approvals.decide") && !procSelfGate(gate)
+                            ? `${button("Approve", "proc-gate-approve", `data-id="${E(gate.id)}"`, "small", "check")}${button("Reject", "proc-gate-reject", `data-id="${E(gate.id)}"`, "small", "close")}`
+                            : `<span class="muted">${gate.status === "pending" ? "another person decides" : "—"}</span>`
+                        }</td></tr>`,
+                    ),
+                  )
+                : note("No pending or approved gate names this process.")
+            }${
+              C.can("approvals.list")
+                ? `<div class="toolbar">${button("Reload the gates", "proc-gate-reload", "", "small", "replay")}</div>`
+                : ""
+            }${note(
+              "The requester cannot decide their own gate: a second person decides a listed gate, and publishing then names that approved gate. The approval id and the source are recorded on the released version. A tenant policy that waives the gate publishes without one.",
+            )}${procResultPanel(p)}`,
+          )}`
+        : note("Select a draft process in Workspace first.");
+    }
+    return `<div class="page enterprise">${heading(
+      "Procedures",
+      "The SOP/BPMN/RDF intake, the PDDL steps and the two human publication gates; an ontology becomes a strata knowledge pack.",
+      `${route("Capabilities", "capabilities", "", "layers")}`,
+      "PROCEDURES & AUTHORING",
+    )}${consoleRibbon(
+      "T16 live: the intake writes drafts, the source review and the two publication gates are human acts.",
+      true,
+    )}${tabs(
+      ["Workspace", "SOP intake", "RDF/OWL & process docs", "PDDL steps", "Knowledge pairing", "Process map", "Publish"],
+      tab,
+      "procedures",
+    )}${content}${procErrorNote(p)}</div>`;
+  }
+
+  function proceduresSnapshot() {
+    const config = (live && live.config) || {};
+    const procedures = list(config.procedures);
+    const processes = list(config.processes);
+    const steps = list(config.process_steps);
+    const selectedId = v.procProcess || ((processes[0] || {}).id) || null;
+    const selected = processes.find((row) => row.id === selectedId) || null;
+    const selectedSteps = steps
+      .filter((step) => step.process_id === selectedId)
+      .sort((a, b) => a.position - b.position);
+    const tab = v.tab.procedures || "Workspace";
+    let content = "";
+    if (tab === "Workspace") {
+      content =
+        `<div class="v2-meter"><div><span>Procedures</span><strong>${procedures.length}</strong><small>rows in the snapshot</small></div><div><span>Processes</span><strong>${processes.length}</strong><small>${processes.filter((row) => row.status === "published").length} published</small></div><div><span>Steps</span><strong>${steps.length}</strong><small>process_step rows</small></div></div>` +
+        `<div class="v2-split"><div>${panel(
+          "Procedures",
+          `${
+            procedures.length
+              ? table(
+                  ["Key", "Title", "Status", "Version"],
+                  procedures.map(
+                    (row) =>
+                      `<tr><td class="mono">${E(row.key)}</td><td>${E(row.title)}</td><td>${B(row.status, procTone(row.status))}</td><td>v${E(row.version)}</td></tr>`,
+                  ),
+                )
+              : note("No procedure row is in this snapshot.")
+          }`,
+          B(`${procedures.length} procedures`),
+        )}</div><div>${panel(
+          "Processes",
+          `${
+            processes.length
+              ? table(
+                  ["Key", "Status", "Version"],
+                  processes.map(
+                    (row) =>
+                      `<tr class="${row.id === selectedId ? "selected" : ""}"><td><button class="e-project-link" data-v2="proc-process" data-id="${E(row.id)}"><span><strong class="mono">${E(row.key)}</strong><small>${E(row.title)}</small></span></button></td><td>${B(row.status, procTone(row.status))}</td><td>v${E(row.version)}</td></tr>`,
+                  ),
+                )
+              : note("No process row is in this snapshot.")
+          }`,
+          B(`${processes.length} processes`),
+        )}</div></div>`;
+    } else if (tab === "PDDL steps") {
+      content = selected
+        ? panel(
+            "Steps · " + E(selected.key),
+            `${
+              selectedSteps.length
+                ? table(
+                    ["#", "Kind", "Actor", "Action", "Judge"],
+                    selectedSteps.map(
+                      (step) =>
+                        `<tr><td>${E(step.position)}</td><td>${E(step.kind)}</td><td>${E(step.actor)}</td><td class="mono">${E(step.action || "—")}</td><td class="mono">${E(step.procedure_id ? short(step.procedure_id, 8) : "—")}</td></tr>`,
+                    ),
+                  )
+                : note("This process carries no published step rows.")
+            }`,
+          )
+        : note("Select a process in Workspace.");
+    } else if (tab === "Knowledge pairing") {
+      content = panel(
+        "Procedure ↔ knowledge pairing",
+        `${flow([
+          ["Procedure", selected ? selected.key : "—"],
+          ["Knowledge pack", "operator detail"],
+          ["Run", "pins the published version"],
+        ])}${note(
+          "The public window publishes the procedure and step structure; the derivation facts (the governed source, the knowledge pack reference and the converter) are operator detail and are read after signing in.",
+        )}`,
+      );
+    } else if (tab === "Process map") {
+      content = panel(
+        "Process map",
+        `${flow([
+          ["Intent", "card"],
+          ["Activities", "steps"],
+          ["Gateways", "gate steps"],
+          ["Evidence", "run + artefact"],
+        ])}${note("The published process_step rows are the map the snapshot carries.")}`,
+      );
+    } else {
+      content =
+        panel(
+          "Ingestion paths",
+          `<p class="muted">Documents are ingest material; the converter produces draft rows behind a review gate. The conveyor runs no RDF store and no reasoner: an ontology becomes a strata knowledge pack.</p>${table(
+            ["Input", "Conversion", "Produces", "Gate"],
+            [
+              ["SOP (PDF, text, URL)", "prose → PDDL steps", "draft judge + draft process", "source review · human publication gate"],
+              ["BPMN 2.0 XML", "activities → steps; gateways → gate steps", "PDDL procedure draft + draft process", "source review · human publication gate"],
+              ["RDF / OWL / Turtle", "submitted to strata_ingest", "a strata knowledge pack the drafts name", "the import job + review"],
+            ].map((row) => `<tr>${row.map((cell) => `<td>${E(cell)}</td>`).join("")}</tr>`),
+          )}`,
+        ) +
+        note(
+          "The intake is an operator action: sign in at the app origin to upload a document, review its source and decide its publication gate. This published page is read-only and makes no API request.",
+        );
+    }
+    return `<div class="page enterprise">${heading(
+      "Procedures",
+      "The published procedure and process rows: the intake's results, their steps and their judges.",
+      `${route("Capabilities", "capabilities", "", "layers")}`,
+      "PROCEDURES & AUTHORING",
+    )}${ribbon("Published snapshot: procedure, process and process_step rows. The intake and its gates are operator actions.", true)}${tabs(
+      ["Workspace", "SOP intake", "RDF/OWL & process docs", "PDDL steps", "Knowledge pairing", "Process map", "Publish"],
+      tab,
+      "procedures",
+    )}${content}</div>`;
+  }
+
+  function proceduresStudy() {
+    const tab = v.tab.procedures || "Workspace";
+    const sop = F.sops[v.sop] || F.sops[0];
+    const capRows = list(db.capabilities)
+      .slice(0, 5)
+      .map(
+        (c) =>
+          `<div class="v2-step"><span class="n">${I("flow")}</span><span class="grow"><strong>${E(c.name)}</strong><small>${list(c.processes).length} procedure(s) · ${E(c.knowledge || "knowledge pin required")}</small></span>${B(c.status, c.status === "Published" ? "green" : "amber")}</div>`,
+      )
+      .join("");
+    const sopRows = F.sops
+      .map(
+        (row, index) =>
+          `<tr class="${index === v.sop ? "selected" : ""}"><td><button class="e-project-link" data-v2="sop" data-index="${index}"><span><strong>${E(row.name)}</strong><small>${E(row.source)}</small></span></button></td><td>${E(row.provenance)}</td><td>${E(row.pages)}</td><td>${B(row.state, row.state === "Published" ? "green" : "amber")}</td></tr>`,
+      )
+      .join("");
     let content = "";
     if (tab === "Workspace") {
       content =
@@ -5936,83 +6623,130 @@ window.installV2 = function (api, enterprise) {
           ["Capability", "what the tenant can do"],
           ["Procedure", "published, versioned, pinned"],
           ["Step", "PDDL action | tool call | gate"],
-          ["PKO", "procedural knowledge terms"],
           ["Knowledge pack", "pinned in strata_rag"],
         ]) +
-        panel("Capability → procedure workspace", capRows, button("Open the procedure editor", "navigate", 'data-page="processes"', "small", "flow")) +
-        note("Procedure design and management is first-class (D47): ordered steps, each an action (PDDL), a tool call or a gate. A published procedure is immutable; editing creates a draft and a gate.");
+        panel(
+          "Capability → procedure workspace",
+          capRows,
+          button("Open the procedure editor", "navigate", 'data-page="processes"', "small", "flow"),
+        ) +
+        note(
+          "Procedure design and management is first-class (D47): ordered steps, each an action (PDDL), a tool call or a gate. A published procedure is immutable; editing creates a draft and a gate.",
+        );
     } else if (tab === "SOP intake") {
-      const detail =
-        kv([
-          ["Source", E(sop.source)],
-          ["Provenance", E(sop.provenance)],
-          ["State", B(sop.state, sop.state === "Published" ? "green" : "amber")],
-          ["Outputs", "PKO rows · PDDL procedure draft · knowledge pack pairing"],
-        ]) +
-        note("A customer document is untrusted input: it enters as <span class='mono'>governed_asset(kind='sop_source')</span> with provenance, never as instructions to the system.") +
+      const detail = kv([
+        ["Source", E(sop.source)],
+        ["Provenance", E(sop.provenance)],
+        ["State", B(sop.state, sop.state === "Published" ? "green" : "amber")],
+        ["Outputs", "draft judge · PDDL procedure draft · knowledge pack reference"],
+      ]) +
+        note(
+          "A customer document is untrusted input: it enters as <span class='mono'>governed_asset(kind='sop_source')</span> with provenance, never as instructions to the system.",
+        ) +
         button("Publish this procedure", "sop-publish", "", "small", "shield") +
         (v.review === "sop-published"
-          ? note("<strong>Published behind the review gate</strong> · the procedure release names the PKO pin and the knowledge pack. A batch never publishes itself.", "ok")
+          ? note("<strong>Published behind the review gate</strong> · the procedure release names the knowledge pack. A batch never publishes itself.", "ok")
           : v.review === "sop-refused"
             ? note("<strong>422 review_required</strong> · the SOP-derived artefacts are still drafts. An unreviewed SOP never binds a job.", "bad")
             : "");
-      content =
-        `<div class="v2-split"><div>${panel("SOP intake · single or batch", table(["SOP", "Source", "Pages", "State"], [sopRows]), `${button("Start batch intake", "sop-intake", "", "small", "plus")}${button("Advance conversion", "sop-advance", "", "small", "replay")}`)}</div><div>${panel(E(sop.name), detail)}</div></div>`;
+      content = `<div class="v2-split"><div>${panel(
+        "SOP intake · single or batch",
+        table(["SOP", "Source", "Pages", "State"], [sopRows]),
+        `${button("Start batch intake", "sop-intake", "", "small", "plus")}${button("Advance conversion", "sop-advance", "", "small", "replay")}`,
+      )}</div><div>${panel(E(sop.name), detail)}</div></div>`;
     } else if (tab === "RDF/OWL & process docs") {
       content =
-        panel("Ingestion paths", `<p class="muted">Documents are ingest material; the converter produces draft rows behind a review gate. The conveyor runs no RDF store and no reasoner.</p><div class="e-table-scroll"><table class="v2-matrix"><thead><tr><th>Input</th><th>Conversion</th><th>Produces</th><th>Gate</th></tr></thead><tbody><tr><td>RDF / OWL / Turtle</td><td>entity + relation extraction</td><td>pko_entity · pko_relation rows</td><td>per-asset review</td></tr><tr><td>BPMN 2.0 XML</td><td>activities → steps; gateways → gates</td><td>PDDL procedure draft + PKO rows</td><td>review · publish</td></tr><tr><td>Visio export</td><td>activities → steps; gateways → gates</td><td>procedure draft + PKO rows</td><td>review · publish</td></tr><tr><td>draw.io export</td><td>activities → steps; gateways → gates</td><td>procedure draft + PKO rows</td><td>review · publish</td></tr><tr><td>Existing policy / procedure export</td><td>text curation</td><td>procedure or policy draft</td><td>review · publish</td></tr></tbody></table></div>`, button("Convert the sample BPMN", "convert-doc", "", "small", "replay")) +
+        panel(
+          "Ingestion paths",
+          `<p class="muted">Documents are ingest material; the converter produces draft rows behind a review gate. The conveyor runs no RDF store and no reasoner: an ontology becomes a strata knowledge pack.</p><div class="e-table-scroll"><table class="v2-matrix"><thead><tr><th>Input</th><th>Conversion</th><th>Produces</th><th>Gate</th></tr></thead><tbody><tr><td>SOP (PDF, URL, document)</td><td>prose → PDDL steps</td><td>draft judge + draft process</td><td>review · publish</td></tr><tr><td>RDF / OWL / Turtle</td><td>submitted to strata_ingest</td><td>a strata knowledge pack</td><td>the import job + review</td></tr><tr><td>BPMN 2.0 XML</td><td>activities → steps; gateways → gates</td><td>PDDL procedure draft</td><td>review · publish</td></tr><tr><td>Visio / draw.io export</td><td>activities → steps; gateways → gates</td><td>procedure draft</td><td>review · publish</td></tr><tr><td>Existing policy / procedure export</td><td>text curation</td><td>procedure or policy draft</td><td>review · publish</td></tr></tbody></table></div>`,
+          button("Convert the sample BPMN", "convert-doc", "", "small", "replay"),
+        ) +
         note("The diagram is a source document; the procedure is the executable artefact. The same review gate applies to a single document and a batch.");
     } else if (tab === "PDDL steps") {
       content =
-        panel("Action space · PDDL", `<div class="v2-code">(:action implement_change
+        panel(
+          "Action space · PDDL",
+          `<div class="v2-code">(:action implement_change
   :parameters (?job - role ?card - work_package)
   :precondition (and (approved ?card) (knowledge-ready delivery))
-  :effect (and (implemented ?card) (evidence-required ?card)))</div>${note("A step references PKO terms; a PKO entity never contains an executable step. The action space and the procedural knowledge space are separate concepts (D53).")}${button("Validate the step", "pddl-check", "", "small", "check")}`, B("procedure v7 · PDDL", "green")) +
-        panel("Steps in proc-implement v7", `${stepRows}${route("Open the process editor", "processes", "small", "flow")}`);
-    } else if (tab === "PKO editor") {
-      content =
-        `<div class="v2-split"><div>${panel(`PKO release ${pko.release}`, `<p class="muted">Relational, conveyor-owned and tenant-editable: an immutable <span class="mono">pko_release</span> pins entities and relations; layered base → industry → department → job.</p><div class="toolbar"><span class="mono muted">KIND</span>${["all", "task", "role", "artefact", "constraint"].map((k) => `<button class="btn ${v.pkoKind === k ? "selected" : ""}" data-v2="pko-kind" data-id="${k}">${E(k)}</button>`).join("")}<label class="input-search">${I("search")}<input data-v2-input="pko-search" placeholder="Search terms…" value="${E(v.pkoQuery)}" aria-label="Search PKO terms"></label></div>${table(["Entity", "Kind", "Attributes", "Owner"], [pkoRows])}`, button("Edit an entity → new release", "pko-edit", "", "small", "edit"))}</div><div>${panel(
-          "Term · " + term.name,
-          `${kv([
-            ["Definition", E(detail.definition || "No definition recorded.")],
-            ["Kind", B(term.kind)],
-            ["Attributes", E(term.attrs)],
-            ["Synonyms", E(term.synonyms)],
-            ["Constraints", E((detail.constraints || []).join(" · ") || "none")],
-            ["Source evidence", E(detail.evidence || "—")],
-            ["Owner", E(detail.owner || "—")],
-            ["Release", `<span class="mono">${E(detail.release || pko.release)}</span>`],
-            ["Permitted relationships", E(permitted)],
-          ])}${button(v.pkoFormal ? "Hide formal representation" : "Show formal representation", "pko-formal", "", "small", "code")}${v.pkoFormal ? formal : ""}${note("Every edit creates a draft release behind a review gate; a published release is never mutated.")}${button("Validate the term", "pko-validate", "", "small", "check")}${button("Attempt an invalid relation", "pko-add-relation", "", "small", "plus")}`,
-          B(term.id, "purple"),
-        )}</div></div><div class="v2-split"><div>${panel(
-          "Relations for " + term.name,
-          `${table(["Subject", "Predicate", "Object", "Cardinality"], [relRows])}${note("Permitted predicates: " + E(permitted) + ". An invalid relation is refused with <span class='mono'>422 pko_relation_invalid</span>; a term with no definition refuses publication.")}${button("Check publish readiness", "pko-publish-check", "", "small", "shield")}`,
-        )}</div><div>${panel(
-          "Usage & local graph",
-          `<h3>Procedure steps using this term</h3><ul class="v2-used-by">${(detail.steps || []).map((s) => `<li>${E(s)}</li>`).join("")}</ul><h3>Relationships · 2 hops</h3><div class="v2-pko-graph" aria-label="Local PKO relationship graph"><div class="node selected"><strong>${E(term.name)}</strong><small>${E(term.kind)} · ${E(term.id)}</small></div>${graph}</div>${note("The graph is a local study. The table above is the authoritative accessible view; the conveyor runs no graph store or reasoner.")}${button("Evaluate this term", "pko-eval", "", "small", "chart")}`,
-        )}</div></div>`;
+  :effect (and (implemented ?card) (evidence-required ?card)))</div>${note("The action space is the procedure's steps: each step is an action (PDDL), a tool call or a gate. The knowledge space is a pinned pack, not a store the conveyor hosts.")}${button("Validate the step", "pddl-check", "", "small", "check")}`,
+          B("procedure v7 · PDDL", "green"),
+        ) +
+        panel(
+          "Steps in proc-implement v7",
+          `${[
+            "01 · read the card and pinned sources (action)",
+            "02 · draft the change (internal_agent · generation)",
+            "03 · run tests (tool call)",
+            "04 · independent review (gate)",
+            "05 · merge (gate · human)",
+          ]
+            .map((line) => {
+              const [n, ...rest] = line.split(" · ");
+              return `<div class="v2-step"><span class="n">${E(n)}</span><span class="grow">${E(rest.join(" · "))}</span></div>`;
+            })
+            .join("")}${route("Open the process editor", "processes", "small", "flow")}`,
+        );
     } else if (tab === "Knowledge pairing") {
-      content =
-        panel("Procedure ↔ knowledge pairing", `${flow([["Procedure v7", "pinned"], ["PKO release", pko.release], ["Domain pack", "capability@17 · strata_rag"], ["Run", "pins both"]])}${kv([["Domain pack", "capability@17 · published · required"], ["PKO release", `${pko.release} · immutable`], ["Readiness", v.packReady ? B("ready", "green") : B("blocked · capability_not_ready", "amber")], ["Retrieval", "pinned leaf ids · strata_rag owns embeddings"], ["Consolidation", "one cold digest per card in strata_rag"]])}${note("The procedure's release names both the procedural knowledge (PKO) and the domain knowledge pack. The conveyor never hosts embeddings or a model; retrieval is strata_rag.")}${route("Open knowledge design", "knowledge-design", "small", "branch")}`, B("pairing required", "green"));
+      content = panel(
+        "Procedure ↔ knowledge pairing",
+        `${flow([
+          ["Procedure v7", "pinned"],
+          ["Knowledge pack", "capability@17 · strata_rag"],
+          ["Run", "pins both"],
+        ])}${kv([
+          ["Domain pack", "capability@17 · published · required"],
+          ["Source provenance", "the governed sop_source is reviewed before the draft publishes"],
+          ["Readiness", v.packReady ? B("ready", "green") : B("blocked · capability_not_ready", "amber")],
+          ["Retrieval", "pinned leaf ids · strata_rag owns embeddings"],
+          ["Consolidation", "one cold digest per card in strata_rag"],
+        ])}${note("The procedure names the knowledge pack its steps read. The conveyor never hosts embeddings or a model; retrieval is strata_rag.")}${route("Open knowledge design", "knowledge-design", "small", "branch")}`,
+        B("pairing required", "green"),
+      );
     } else if (tab === "Process map") {
-      content =
-        panel("Process map", `${flow([["Intent", "card"], ["Activities", "steps"], ["Gateways", "approvals"], ["Evidence", "run + artefact"]])}${note("A BPMN diagram becomes a procedure draft: activities → steps, gateways → gates. The diagram is a source document, not the executable artefact.")}${route("Open the existing process map", "processes", "small", "flow")}`);
+      content = panel(
+        "Process map",
+        `${flow([
+          ["Intent", "card"],
+          ["Activities", "steps"],
+          ["Gateways", "approvals"],
+          ["Evidence", "run + artefact"],
+        ])}${note("A BPMN diagram becomes a procedure draft: activities → steps, gateways → gates. The diagram is a source document, not the executable artefact.")}${route("Open the existing process map", "processes", "small", "flow")}`,
+      );
     } else {
       const checks = [
         "Review gate: human reviewer approved the draft",
-        "PKO release pinned and reviewed",
         "Knowledge pack published and readable",
         "Tool grants unchanged by the SOP",
         "No SOP widened an effect ceiling",
-      ].map((x, i) => {
-        const mark = i === 2 && !v.packReady ? "—" : "✓";
-        return `<div class="v2-step"><span class="n">${mark}</span><span class="grow">${E(x)}</span></div>`;
-      }).join("");
-      content =
-        panel("Publish readiness", `${checks}${v.packReady ? note("All readiness checks pass. Publish opens a human gate; publication is not automatic.", "ok") : note("<strong>409 procedure_not_ready</strong> · the required knowledge pack capability@18 is unpublished. Publishing is refused before any run.", "bad")}`, `${button(v.packReady ? "Mark pack unpublished" : "Toggle pack availability", "toggle-pack", "", "small")}${button("Publish procedure v8", "publish-procedure", "", "primary", "shield")}`);
+      ]
+        .map((x, i) => {
+          const mark = i === 1 && !v.packReady ? "—" : "✓";
+          return `<div class="v2-step"><span class="n">${mark}</span><span class="grow">${E(x)}</span></div>`;
+        })
+        .join("");
+      content = panel(
+        "Publish readiness",
+        `${checks}${
+          v.packReady
+            ? note("All readiness checks pass. Publish opens a human gate; publication is not automatic.", "ok")
+            : note("<strong>409 procedure_not_ready</strong> · the required knowledge pack capability@18 is unpublished. Publishing is refused before any run.", "bad")
+        }`,
+        `${button(v.packReady ? "Mark pack unpublished" : "Toggle pack availability", "toggle-pack", "", "small")}${button("Publish procedure v8", "publish-procedure", "", "primary", "shield")}`,
+      );
     }
-    return `<div class="page enterprise">${heading("Procedures", "Capability → procedure → step, with SOP/RDF/OWL and BPMN/Visio/draw.io intake, the PDDL action space, the relational PKO and the knowledge pack pairing.", `${route("Capabilities", "capabilities", "", "layers")}${route("Authoring", "authoring", "", "book")}`, "PROCEDURES & AUTHORING")}${ribbon("V2 procedure spine: procedure/procedure_step with PDDL text and a PKO pin, pko_release/entity/relation, and the SOP→PKO→procedure conversion. Proposed in T16.")}${tabs(["Workspace", "SOP intake", "RDF/OWL & process docs", "PDDL steps", "PKO editor", "Knowledge pairing", "Process map", "Publish"], tab, "procedures")}${content}</div>`;
+    return `<div class="page enterprise">${heading(
+      "Procedures",
+      "Capability → procedure → step, with SOP/RDF/OWL and BPMN/Visio/draw.io intake, the PDDL action space and the knowledge pack pairing.",
+      `${route("Capabilities", "capabilities", "", "layers")}${route("Authoring", "authoring", "", "book")}`,
+      "PROCEDURES & AUTHORING",
+    )}${ribbon(
+      "V2 procedure spine: procedure/procedure_step with PDDL text and a knowledge pack reference, the source review and the human publication gate. Proposed in T16.",
+    )}${tabs(
+      ["Workspace", "SOP intake", "RDF/OWL & process docs", "PDDL steps", "Knowledge pairing", "Process map", "Publish"],
+      tab,
+      "procedures",
+    )}${content}</div>`;
   }
 
   /* ------------------------------------------------------------------ Authoring */
@@ -6026,7 +6760,7 @@ window.installV2 = function (api, enterprise) {
         `<div class="v2-step"><span class="n">${i.kind === "Chat" ? I("chat") : I("file")}</span><span class="grow"><strong>${E(i.id)} · ${E(i.kind)}</strong><small>${E(i.text)}</small><span class="mono muted">Produces: ${i.produces.map(E).join(" · ")}</span></span>${B(i.state, i.state === "In review" ? "amber" : "green")}</div>`
       ).join("");
       content =
-        `<div class="v2-split"><div>${panel("Intake queue · chat + documents", `${rows}<div class="form-grid" style="margin-top:12px"><label class="field full"><span>Chat brief</span><textarea data-v2-input="brief" rows="3" placeholder="Describe the department, jobs, procedures or policies you need">${E(v.brief || "")}</textarea></label><label class="field full"><span>Document</span><input type="file" aria-label="Attach a document" disabled><small>Local study · no file leaves the browser</small></label></div>`, button("Draft from the brief", "intake-chat", "", "primary", "plus"))}</div><div>${panel("What the intake produces", `${flow([["Chat / document", "untrusted input"], ["Authoring job", "ordinary job"], ["Asset drafts", "review gate"], ["Publication", "a release and a gate"]])}${note("Every output is a draft behind a review gate (tenant-configurable, default human). A chat message or document can never grant a tool, widen an effect ceiling, approve its own artefact or change an approval policy.")}${note("Asset order is dependency-ordered: industry → department → job/capability → procedure/PKO → knowledge pack → policies/templates → tools. A draft whose referenced asset is unpublished is refused.")}`)}</div></div>`;
+        `<div class="v2-split"><div>${panel("Intake queue · chat + documents", `${rows}<div class="form-grid" style="margin-top:12px"><label class="field full"><span>Chat brief</span><textarea data-v2-input="brief" rows="3" placeholder="Describe the department, jobs, procedures or policies you need">${E(v.brief || "")}</textarea></label><label class="field full"><span>Document</span><input type="file" aria-label="Attach a document" disabled><small>Local study · no file leaves the browser</small></label></div>`, button("Draft from the brief", "intake-chat", "", "primary", "plus"))}</div><div>${panel("What the intake produces", `${flow([["Chat / document", "untrusted input"], ["Authoring job", "ordinary job"], ["Asset drafts", "review gate"], ["Publication", "a release and a gate"]])}${note("Every output is a draft behind a review gate (tenant-configurable, default human). A chat message or document can never grant a tool, widen an effect ceiling, approve its own artefact or change an approval policy.")}${note("Asset order is dependency-ordered: industry → department → job/capability → procedure → knowledge pack → policies/templates → tools. A draft whose referenced asset is unpublished is refused.")}`)}</div></div>`;
     } else if (tab === "Draft catalogue") {
       const rows = F.drafts.map((d) =>
         `<tr class="${d.id === draft.id ? "selected" : ""}"><td><button class="e-project-link" data-v2="draft" data-id="${d.id}"><span><strong>${E(d.asset)}</strong><small class="mono">${E(d.id)}</small></span></button></td><td><small>${E(d.depends)}</small></td><td>${B(d.state, d.state === "Draft" ? "amber" : d.state === "Review" ? "purple" : "green")}</td><td>${E(d.review)}</td></tr>`
@@ -6053,12 +6787,12 @@ window.installV2 = function (api, enterprise) {
           ["Industry", v.packReady ? "published" : "draft"],
           ["Department", "draft"],
           ["Job / capability", "draft"],
-          ["Procedure / PKO", "review"],
+          ["Procedure", "review"],
           ["Knowledge pack", "unpublished"],
           ["Policies / templates", "draft"],
           ["Tools", "request only"],
         ]) +
-        panel("Review depth per asset", `${table(["Asset class", "Review", "Publication"], [["Organisation (industry, department)", "human · tenant admin", "release + gate"], ["Job catalogue / job draft", "human · department owner", "release + binding"], ["Capability / procedure / PKO", "human · domain reviewer", "versioned release"], ["Knowledge pack", "human · knowledge owner", "pinned pack version"], ["Policy / approval", "human · governance", "gated policy change"], ["Tool request", "security review", "tool publication"]].map((r) => `<tr><td>${E(r[0])}</td><td>${E(r[1])}</td><td>${E(r[2])}</td></tr>`))}${note("A person reviews and publishes. The authoring job family is ordinary jobs on the two executors; the pipeline is a procedure, not a hard-coded wizard.")}`);
+        panel("Review depth per asset", `${table(["Asset class", "Review", "Publication"], [["Organisation (industry, department)", "human · tenant admin", "release + gate"], ["Job catalogue / job draft", "human · department owner", "release + binding"], ["Capability / procedure", "human · domain reviewer", "versioned release"], ["Knowledge pack", "human · knowledge owner", "pinned pack version"], ["Policy / approval", "human · governance", "gated policy change"], ["Tool request", "security review", "tool publication"]].map((r) => `<tr><td>${E(r[0])}</td><td>${E(r[1])}</td><td>${E(r[2])}</td></tr>`))}${note("A person reviews and publishes. The authoring job family is ordinary jobs on the two executors; the pipeline is a procedure, not a hard-coded wizard.")}`);
     } else {
       const rows = F.drafts.map((d) =>
         `<div class="v2-step"><span class="n">${d.state === "Unpublished" ? "!" : d.state === "Review" ? "…" : "✓"}</span><span class="grow"><strong>${E(d.asset)}</strong><small>depends on ${E(d.depends)} · ${E(d.state)}</small></span>${B(d.state, d.state === "Unpublished" ? "amber" : "green")}</div>`
@@ -6604,7 +7338,7 @@ git log origin/main --grep "#N"</pre><p class="muted">Then push <span class="mon
     ),
     knowledge: wrapLegacy(
       legacy.knowledge,
-      "V1 keeps the source, pack, retrieval and work-package memory path. The source transformation inspector, seven-state model, retrieval test and object-evaluation entry points are V2 · PROPOSED extensions; procedural knowledge adds the PKO pin and organisational memory adds reviewed lessons.",
+      "V1 keeps the source, pack, retrieval and work-package memory path. The source transformation inspector, seven-state model, retrieval test and object-evaluation entry points are V2 · PROPOSED extensions; procedural knowledge adds the knowledge-pack pin and organisational memory adds reviewed lessons.",
     ),
     agents: wrapLegacy(
       () => cataloguePage("agents"),
@@ -6636,7 +7370,7 @@ git log origin/main --grep "#N"</pre><p class="muted">Then push <span class="mon
   // Signed out, a design-study destination is not part of the public site — even by direct
   // hash. The public pages are the programme; the rest is the operator console's after sign-in.
   const signInGate = (title) =>
-    `<div class="page enterprise">${heading(title, "This destination is part of the conveyor design study and is available after sign-in.", "", "DESIGN STUDY")}${note("The public site carries the programme: Portfolio, Projects, Plan, Validation, Execution, Documents, Contribute and the system architecture. Sign in at the top of the page to open the operator console's design destinations.")}</div>`;
+    `<div class="page enterprise">${heading(title, "This destination is part of the conveyor design study and is available after sign-in.", "", "DESIGN STUDY")}${note("The public site carries the programme: Portfolio, Projects, Plan, Validation, Procedures, Execution, Documents, Contribute and the system architecture. Sign in at the top of the page to open the operator console's design destinations.")}</div>`;
   for (const key of Object.keys(pages)) {
     if (PUBLIC_PAGES.has(key)) continue;
     const inner = pages[key];
@@ -6689,10 +7423,6 @@ git log origin/main --grep "#N"</pre><p class="muted">Then push <span class="mon
       consoleOutputAttachFile(attachment);
       return;
     }
-    const el = event.target.closest('[data-v2-input="pko-search"]');
-    if (!el) return;
-    v.pkoQuery = el.value.trim().toLowerCase();
-    render();
   });
   document.addEventListener("click", (event) => {
     const el = event.target.closest("[data-v2]");
@@ -7143,7 +7873,7 @@ git log origin/main --grep "#N"</pre><p class="muted">Then push <span class="mon
         break;
       case "sop-advance":
         F.sops[v.sop].state =
-          F.sops[v.sop].state === "Draft PKO + PDDL" ? "Review" : F.sops[v.sop].state;
+          F.sops[v.sop].state === "Draft · PDDL" ? "Review" : F.sops[v.sop].state;
         render();
         toast("Conversion advanced · review gate remains open");
         break;
@@ -7157,48 +7887,53 @@ git log origin/main --grep "#N"</pre><p class="muted">Then push <span class="mon
         render();
         break;
       case "convert-doc":
-        toast("BPMN converted to a procedure draft + PKO rows · review gate opened");
+        toast("BPMN converted to a procedure draft · review gate opened");
         break;
       case "pddl-check":
-        toast("422 pko_term_unknown · PKO-T99 is not in pko@" + v.pkoVersion);
+        toast("The step validates against its published judge · the human gate remains");
         break;
-      case "pko-edit":
-        v.pkoVersion++;
-        F.pko.release = "pko@" + v.pkoVersion;
-        render();
-        toast("New PKO release draft pko@" + v.pkoVersion + " · review gate opened");
-        break;
-      case "pko-term":
-        v.pkoTerm = d.id;
+      case "proc-process":
+        v.procProcess = d.id;
         render();
         break;
-      case "pko-kind":
-        v.pkoKind = d.id;
-        render();
+      case "proc-ingest-sop":
+        consoleProcIngest("sop");
         break;
-      case "pko-formal":
-        v.pkoFormal = !v.pkoFormal;
-        render();
+      case "proc-ingest-bpmn":
+        consoleProcIngest("bpmn");
         break;
-      case "pko-validate":
-        toast(
-          "422 pko_relation_invalid · task 'contains' task is not permitted in pko@" +
-            v.pkoVersion,
-        );
+      case "proc-ingest-rdf":
+        consoleProcIngest("rdf");
         break;
-      case "pko-add-relation":
-        toast(
-          "422 pko_relation_invalid · a task cannot contain another task in the base layer",
-        );
+      case "proc-validate":
+        consoleProcValidate();
         break;
-      case "pko-publish-check":
-        toast(
-          "409 pko_not_ready · PKO-T99 has no definition · publication refused",
-        );
+      case "proc-review-approve":
+        consoleProcReview("approve");
         break;
-      case "pko-eval":
-        state.workbench = { tab: "Object evaluation", subject: "pko" };
-        navigate("evals");
+      case "proc-review-reject":
+        consoleProcReview("reject");
+        break;
+      case "proc-gate-process":
+        consoleProcRequestGate("processes.publish");
+        break;
+      case "proc-gate-procedure":
+        consoleProcRequestGate("procedures.publish");
+        break;
+      case "proc-gate-reload":
+        consoleReloadProcGates();
+        break;
+      case "proc-gate-approve":
+        consoleProcDecide(d.id, "approve");
+        break;
+      case "proc-gate-reject":
+        consoleProcDecide(d.id, "reject");
+        break;
+      case "proc-publish-process":
+        consoleProcPublish("process");
+        break;
+      case "proc-publish-procedure":
+        consoleProcPublish("procedure");
         break;
       case "job-eval":
         state.workbench = { tab: "Object evaluation", subject: "job" };

@@ -5,7 +5,6 @@ flowchart LR
   S4["Chat or document brief"]:::src
   ING["Intake - governed_asset"]:::v1
   CONV["Conversion job"]:::v2
-  PKO["PKO draft - entities and relations"]:::v2
   PROC["Procedure draft - PDDL steps"]:::v2
   PACK["Knowledge pack draft - strata_rag"]:::v1
   REV["Review gate - a person"]:::v2
@@ -17,10 +16,8 @@ flowchart LR
   S3 --> ING
   S4 --> ING
   ING --> CONV
-  CONV --> PKO
   CONV --> PROC
   CONV --> PACK
-  PKO --> REV
   PROC --> REV
   PACK --> REV
   REV --> PUB
