@@ -188,7 +188,8 @@ pub async fn run(
             .await?
             .unwrap_or_else(Uuid::now_v7),
     };
-    let tenant = TenantId::from_uuid(tenant_id).map_err(|error| InstallError::Tenant(error.to_string()))?;
+    let tenant =
+        TenantId::from_uuid(tenant_id).map_err(|error| InstallError::Tenant(error.to_string()))?;
 
     // The audit row of a CLI-created tenant names a real person: the first admin's row is
     // converged first and used as the actor.
@@ -225,7 +226,11 @@ pub async fn run(
             ))
         })?;
 
-    let manifest = read_manifest(args.manifest.as_deref().unwrap_or(Path::new(DEFAULT_MANIFEST)))?;
+    let manifest = read_manifest(
+        args.manifest
+            .as_deref()
+            .unwrap_or(Path::new(DEFAULT_MANIFEST)),
+    )?;
     let caller = ActionCaller::new(pool, tenant, app_key).await?;
 
     let mut knowledge = Vec::new();
@@ -240,7 +245,9 @@ pub async fn run(
         if let Some(score) = binding.min_score {
             input["min_score"] = json!(score);
         }
-        caller.call("capabilities.bind_knowledge", input, None).await?;
+        caller
+            .call("capabilities.bind_knowledge", input, None)
+            .await?;
         knowledge.push(binding.capability.clone());
     }
 
@@ -288,7 +295,10 @@ fn read_manifest(path: &Path) -> Result<InstallManifest, InstallError> {
 }
 
 /// Resolve a capability's stable code to its row id through the registered read action.
-async fn capability_id_by_code(caller: &ActionCaller<'_>, code: &str) -> Result<Uuid, InstallError> {
+async fn capability_id_by_code(
+    caller: &ActionCaller<'_>,
+    code: &str,
+) -> Result<Uuid, InstallError> {
     let detail = caller
         .call("capabilities.get", json!({"code": code}), None)
         .await?;

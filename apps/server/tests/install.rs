@@ -51,14 +51,13 @@ async fn a_fresh_tenant_is_installed_and_a_second_run_converges() {
             .await
             .expect("the admin row");
     assert_eq!(admin_email.as_deref(), Some("install-admin@example.test"));
-    let admin_role: Option<String> = sqlx::query_scalar(
-        "SELECT role FROM membership WHERE tenant_id = $1 AND user_id = $2",
-    )
-    .bind(tenant_id)
-    .bind(first.admin_user_id)
-    .fetch_optional(pool)
-    .await
-    .expect("the membership");
+    let admin_role: Option<String> =
+        sqlx::query_scalar("SELECT role FROM membership WHERE tenant_id = $1 AND user_id = $2")
+            .bind(tenant_id)
+            .bind(first.admin_user_id)
+            .fetch_optional(pool)
+            .await
+            .expect("the membership");
     assert_eq!(admin_role.as_deref(), Some("admin"));
 
     // The catalogue and the process catalogue are content, so a fresh tenant owns some.
@@ -96,7 +95,10 @@ async fn a_fresh_tenant_is_installed_and_a_second_run_converges() {
     let second = run(pool, &args("install-a"), "conveyor")
         .await
         .expect("the second install");
-    assert_eq!(second.tenant_id, first.tenant_id, "the slug resolves to the same id");
+    assert_eq!(
+        second.tenant_id, first.tenant_id,
+        "the slug resolves to the same id"
+    );
     assert_eq!(second.processes, 0, "a second run creates no process");
     assert_eq!(second.sops, 0, "a second run creates no SOP");
     assert_eq!(second.agents, 0, "a second run creates no agent");
