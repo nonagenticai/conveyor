@@ -1,4 +1,4 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Page } from "./fixture";
 
 const baseURL = process.env.BASE_URL ?? "http://127.0.0.1:8931";
 

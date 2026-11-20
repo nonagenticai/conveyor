@@ -465,6 +465,15 @@ const shot = (name) => path.join(process.env.CONVEYOR_QA_OUTPUT || os.tmpdir(), 
       check(!text.includes("data/programme.json"), `${id} carries no dead programme link`);
     }
 
+    // #470: a live snapshot must not make the signed-out sidebar announce the
+    // Programme-definition design destination. The public site carries the programme pages; the
+    // V2 design study's own sidebar (signed in, or `?design=1`) is the only one that names it.
+    await nav("portfolio");
+    check(
+      (await page.locator('#sidebar [data-page="programme"]').count()) === 0,
+      "a live snapshot does not announce the programme destination publicly",
+    );
+
     // 9c. Metering reads the live measurement (#458). It is a design destination — `?design=1`
     // is the reviewer's mode the public visitor never gets — so the live shape is exercised here
     // with the snapshot injected above: the by-caller/by-model rows and totals come from the

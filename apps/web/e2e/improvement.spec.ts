@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./fixture";
 
 // Screen 14 — Improvement. The fixture is the seeded suite and its two control runs (gold and
 // empty) in dev-a; nothing is route-mocked. Two facts this spec exists to hold:
