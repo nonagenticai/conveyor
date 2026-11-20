@@ -335,6 +335,11 @@ judge proves accept, reject-rerun, the two-reject BLOCK and the outage wait; the
 re-delivery after `FLUSHALL` and the DLQ; the default catalogue is exactly 280; the dispositions have no `delta:`
 row; and with Redis stopped the Postgres-only limb still passes.
 
+**Scope correction (2026-11-10 audit §Scope correction).** Old-flow retirement — step 15b, the 348 live flows
+and any `active flows = 0` check — is **not** a launch gate and not a precondition of S14. The n8n trace
+fixtures (`fixtures/{a,b,c}`, `gate5`) stay as the engine's regression test; nothing in this gate waits on the
+old system being switched off.
+
 ## 8. Traps
 
 - **The bus is not the record.** If a handler writes to Redis-only state, a Redis restart loses it. Every outcome
