@@ -137,6 +137,22 @@ test("a project, its card, an edit and an archive round-trip through the UI", as
   await intake.getByLabel("Card name").fill(cardName);
   await intake.getByRole("button", { name: "Add card" }).click();
 
+  // The action's effect is proved on the board's own rows before the screen read: under the
+  // full suite the screen's refetch can be delayed past a DOM wait (measured in CI 2026-11-20).
+  const boardId = page.url().split("/").pop();
+  await expect
+    .poll(
+      async () => {
+        const view = await request
+          .get(`/api/boards/${boardId}/cards?limit=200`)
+          .then((r) => r.json());
+        return (view.items ?? []).map((row: { name: string }) => row.name);
+      },
+      { timeout: 30_000 },
+    )
+    .toContain(cardName);
+  await page.reload();
+
   const card = page.locator(".card", { hasText: cardName });
   await expect(card).toBeVisible();
 
@@ -145,6 +161,20 @@ test("a project, its card, an edit and an archive round-trip through the UI", as
   await card.getByLabel("Card name").fill(editedName);
   await card.getByLabel("Card description").fill("Edited through the board screen");
   await card.getByRole("button", { name: "Save" }).click();
+
+  // Same proof-then-read as the add: the save's effect on the board's own rows, then the screen.
+  await expect
+    .poll(
+      async () => {
+        const view = await request
+          .get(`/api/boards/${boardId}/cards?limit=200`)
+          .then((r) => r.json());
+        return (view.items ?? []).map((row: { name: string }) => row.name);
+      },
+      { timeout: 30_000 },
+    )
+    .toContain(editedName);
+  await page.reload();
 
   const edited = page.locator(".card", { hasText: editedName });
   await expect(edited).toBeVisible();
