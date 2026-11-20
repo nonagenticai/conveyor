@@ -198,7 +198,6 @@
     "fixtures.fail",
     "fixtures.slow",
     "fixtures.timeout",
-    "graphs.list",
     "industries.create",
     "industries.get",
     "industries.list",

@@ -6,8 +6,9 @@
 //! - **No `reqwest::` outside the executor.** A handler that calls a service directly bypasses the timeout, the
 //!   breaker, the idempotency claim and the audit row — so the source is scanned for one, and the only permitted
 //!   file is `invoke.rs`, which owns the engine's call.
-//! - **A display never writes.** `workers.*`, `providers.*`, `graphs.*`, `artifacts.*`, `billing.*` and
-//!   `retrieval.*` must all be `effect = read`. Absorption by accretion (S09 trap 4) starts with one write.
+//! - **A display never writes.** `workers.*`, `providers.*`, `artifacts.*`, `billing.*` and
+//!   `retrieval.*` must all be `effect = read`. Absorption by accretion (S09 trap 4) starts with one
+//!   write. Since #450 the first four are internal reads of conveyor state; the rule is unchanged.
 
 use std::collections::BTreeSet;
 use std::path::{Path, PathBuf};
@@ -123,16 +124,15 @@ fn no_handler_calls_a_service_directly() {
 #[test]
 fn the_displays_are_read_only_and_carry_a_timeout() {
     let registry = conveyor_actions::registry::registry();
-    let displays = [
+    // #450: the V1 displays read conveyor state. They stay read-only displays with a bounded
+    // timeout — the kind changed, the security property did not.
+    let local = [
         "workers.list",
         "providers.list",
-        "graphs.list",
         "artifacts.list",
         "billing.summary",
-        "coding_jobs.get",
-        "retrieval.query",
     ];
-    for name in displays {
+    for name in local {
         let spec = registry
             .get(name)
             .unwrap_or_else(|| panic!("{name} is not registered"));
@@ -148,8 +148,30 @@ fn the_displays_are_read_only_and_carry_a_timeout() {
         );
         assert_eq!(
             spec.kind,
+            conveyor_actions::ActionKind::Internal,
+            "{name} reads this tenant's own rows; it reaches no external service"
+        );
+    }
+    // `graphs.list` described a service that no longer exists (§11.2); it must stay retired.
+    assert!(
+        registry.get("graphs.list").is_none(),
+        "graphs.list was retired with worker-management"
+    );
+    // The displays that still reach a Rust service keep the external contract.
+    for name in ["coding_jobs.get", "retrieval.query"] {
+        let spec = registry
+            .get(name)
+            .unwrap_or_else(|| panic!("{name} is not registered"));
+        assert_eq!(spec.effect, conveyor_actions::Effect::Read, "{name}");
+        assert!(
+            spec.timeout_ms > 0 && spec.timeout_ms <= 30_000,
+            "{name} needs a bounded timeout, saw {}ms",
+            spec.timeout_ms
+        );
+        assert_eq!(
+            spec.kind,
             conveyor_actions::ActionKind::External,
-            "{name} is an external service's data, never a local copy"
+            "{name} is an external service's data"
         );
     }
 
@@ -173,23 +195,19 @@ fn the_displays_are_read_only_and_carry_a_timeout() {
 fn every_external_action_declares_its_services_path_prefix() {
     //   service              prefix   measured from
     //   strata_rag           /api     src/api/mod.rs:71 (`/api/query`)
-    //   artifacts            /api     /api/artifacts
-    //   billing_service      /api     /api/billing/overview
     //   coding               /api     /api/jobs, /api/jobs/status
     //   inference            /api     /api/chat/completions
     //   laya                 /v1      the Jev System-1 bridge: /v1/systemone (care-bus' measured client)
     //   fixtures             ""       tests/fixtures/external/openapi.json: /echo, /fail, /slow, /timeout
-    //   worker_management    ""       the Python services mount bare: /workers, /providers, /graphs
     //   image_gen            ""       mlx_inference mounts its OpenAI-compatible routes bare:
     //                                 http/capabilities.rs:57-70 (`/v1/images/generations`)
     //   tts                  /api     the narration route `tts_compat.rs` mounts: /api/tts/synthesize
     //   asr                  /v1      the OpenAI-shaped transcription route: /v1/audio/transcriptions
-    const PREFIXES: [(&str, &str); 11] = [
-        ("worker_management", ""),
+    // #450 removed the `artifacts`, `billing_service` and `worker_management` rows: those actions
+    // are internal reads now, so no external path reaches those services.
+    const PREFIXES: [(&str, &str); 8] = [
         ("fixtures", ""),
         ("image_gen", ""),
-        ("artifacts", "/api"),
-        ("billing_service", "/api"),
         ("coding", "/api"),
         ("strata_rag", "/api"),
         ("inference", "/api"),

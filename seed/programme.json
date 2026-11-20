@@ -445,7 +445,8 @@
           390,
           391,
           392,
-          400
+          400,
+          459
         ],
         "depends_on": [
           "S01",
@@ -1103,13 +1104,14 @@
       "key": "T11",
       "name": "Metrics, metering and maturity",
       "description": "SPEC_V2 slice T11 (docs/SPEC_V2.md §12)",
-      "status": "closed",
+      "status": "active",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/SPEC_V2.md#12",
         "track": "v2",
         "issues": [
-          84
+          84,
+          458
         ],
         "depends_on": [
           "P0"
@@ -1439,7 +1441,6 @@
           223,
           224,
           225,
-          386,
           393,
           394,
           395,
@@ -1448,7 +1449,8 @@
           433,
           434,
           435,
-          450
+          450,
+          462
         ],
         "depends_on": [],
         "plan_status": "active",
