@@ -10,8 +10,7 @@
     "profile_hash": "sha256:59f1fe0c41417b730f5760afc39afa4fecc27cad950695c7883ef1f05deda0d5"
   },
   "legacy": {
-    "capability_adopted_at": "2026-11-19T07:50:26.220655+00:00",
-    "policy": "A project created before the profile was adopted is a retrospective-waiver candidate: its missing ADM artefacts are P2, never a fabricated backfill. A project created after adoption must hold the full set (P1)."
+    "policy": "Superseded 2026-11-20: there is no pre-adoption discount. A project's mandatory artefact set starts at phase A and is P1 for every live project; the Preliminary capability set is checked once by capability_artefacts. A project with meta.viability fold or close-by-decision is not applicable."
   },
   "programme": {
     "project_key": "P0",
@@ -26,6 +25,7 @@
     "tranche_review_without_authorisation": "P0",
     "project_in_unauthorised_tranche": "P0",
     "closed_without_closure_review": "P0",
+    "closure_outputs_undeclared": "P1",
     "unpublished_declared_output": "P1",
     "benefit_profile_incomplete": "P1",
     "benefit_baseline_placeholder": "P1",
@@ -39,10 +39,11 @@
     "requester_is_approver": "P0",
     "compliance_review_missing": "P1",
     "waiver_invalid": "P1",
-    "mandatory_artefacts": "P2",
+    "capability_artefacts": "P1",
+    "mandatory_artefacts": "P1",
     "seed_live_drift": "P1",
     "derivation_missing": "P1",
     "status_source_drift": "P2"
   },
-  "dispositions": ["conformant", "waiver", "remediate", "correct-the-claim", "unprovable"]
+  "dispositions": ["rework", "fold", "waiver", "correct-the-claim", "unprovable"]
 }

@@ -402,8 +402,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/evidence/conformance-gap-register.html",
       "source": "docs/evidence/conformance-gap-register.md",
       "section": "Evidence",
-      "sha256": "54ad8c0070587cf9bd80142e52a2936b1d14ab4bcf879ce90e603ee2eae26df0",
-      "bytes": 10305,
+      "sha256": "f040c70e9a3caa27ed50f94749a2a44cb68bb81aff40fa9f0305be3492b3f241",
+      "bytes": 23111,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/conformance-gap-register.md"
     },
     {
