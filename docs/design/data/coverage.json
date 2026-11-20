@@ -278,7 +278,7 @@
       "tranche": 0,
       "units": {
         "blocked": 1,
-        "claimed": 7,
+        "claimed": 3,
         "numbers": [
           17,
           22,
@@ -297,19 +297,15 @@
           223,
           224,
           225,
-          394,
           395,
           410,
           426,
           433,
-          434,
           435,
           462,
-          476,
-          477,
-          484
+          476
         ],
-        "open": 18,
+        "open": 14,
         "ready": 5,
         "unknown": 0
       }
@@ -1033,7 +1029,7 @@
       "tranche": 10,
       "units": {
         "blocked": 0,
-        "claimed": 2,
+        "claimed": 5,
         "numbers": [
           6,
           26,
@@ -1051,8 +1047,8 @@
           470,
           471
         ],
-        "open": 7,
-        "ready": 5,
+        "open": 5,
+        "ready": 0,
         "unknown": 0
       }
     },
@@ -1088,7 +1084,7 @@
       "tranche": 8,
       "units": {
         "blocked": 0,
-        "claimed": 0,
+        "claimed": 1,
         "numbers": [
           7,
           136,
@@ -1096,7 +1092,7 @@
           198
         ],
         "open": 1,
-        "ready": 1,
+        "ready": 0,
         "unknown": 0
       }
     },
@@ -1132,12 +1128,12 @@
       "tranche": 11,
       "units": {
         "blocked": 0,
-        "claimed": 1,
+        "claimed": 0,
         "numbers": [
           8,
           29
         ],
-        "open": 2,
+        "open": 1,
         "ready": 1,
         "unknown": 0
       }
@@ -1656,13 +1652,13 @@
       "tranche": 1,
       "units": {
         "blocked": 0,
-        "claimed": 0,
+        "claimed": 1,
         "numbers": [
           84,
           458
         ],
         "open": 1,
-        "ready": 1,
+        "ready": 0,
         "unknown": 0
       }
     },
@@ -2406,9 +2402,9 @@
       "evidence": [
         "docs/design/v2.js"
       ],
-      "gap": "V2 destination; no backend call",
+      "gap": null,
       "key": "operations",
-      "status": "proposed",
+      "status": "live",
       "title": "Operations"
     },
     {
@@ -2531,9 +2527,9 @@
       "actions_invoked": 27,
       "by_status": {
         "legacy": 7,
-        "live": 12,
+        "live": 13,
         "mixed": 0,
-        "proposed": 7
+        "proposed": 6
       },
       "total": 26
     }

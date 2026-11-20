@@ -1,11 +1,62 @@
 {
   "issues": [
     {
+      "number": 496,
+      "title": "ci: the generated fast path, dco on the queue, and the true delivery rules",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/496",
+      "updatedAt": "2026-11-20T13:26:17Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
+      "number": 489,
+      "title": "ci: a label change stops starting the delivery workflow",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/489",
+      "updatedAt": "2026-11-20T11:42:31Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
+      "number": 487,
+      "title": "docs: the delivery contract stops capping open PRs and stops naming rbuild",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/487",
+      "updatedAt": "2026-11-20T11:08:12Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
       "number": 484,
       "title": "ci: the merge queue stops rebuilding the image",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/484",
-      "updatedAt": "2026-11-20T08:31:50Z",
+      "updatedAt": "2026-11-20T11:00:20Z",
       "labels": [
         {
           "name": "unit",
@@ -20,9 +71,9 @@
     {
       "number": 477,
       "title": "publish: the worker commits the deployed image's whole pack, reverting main",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/477",
-      "updatedAt": "2026-11-20T08:10:27Z",
+      "updatedAt": "2026-11-20T11:57:49Z",
       "labels": [
         {
           "name": "unit",
@@ -67,9 +118,9 @@
     {
       "number": 471,
       "title": "console: the Admin Workers and Billing tabs render the external-service panel for local actions",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/471",
-      "updatedAt": "2026-11-20T07:37:10Z",
+      "updatedAt": "2026-11-20T10:58:48Z",
       "labels": [
         {
           "name": "unit",
@@ -90,15 +141,15 @@
       "title": "publish: the generated pack carries a programme destination the shell does not announce",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/470",
-      "updatedAt": "2026-11-20T07:10:54Z",
+      "updatedAt": "2026-11-20T11:57:51Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:ready",
-          "color": "0E8A16"
+          "name": "status:claimed",
+          "color": "FBCA04"
         },
         {
           "name": "S12",
@@ -174,15 +225,15 @@
       "title": "console: the Metering screen reads the live inference aggregates (T11 built)",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/458",
-      "updatedAt": "2026-11-19T21:45:10Z",
+      "updatedAt": "2026-11-20T11:33:51Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:ready",
-          "color": "0E8A16"
+          "name": "status:claimed",
+          "color": "FBCA04"
         },
         {
           "name": "T11",
@@ -261,9 +312,9 @@
     {
       "number": 434,
       "title": "console: the Operations screen reads the incident lifecycle (T7 built)",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/434",
-      "updatedAt": "2026-11-20T07:27:06Z",
+      "updatedAt": "2026-11-20T13:26:17Z",
       "labels": [
         {
           "name": "unit",
@@ -520,9 +571,9 @@
     {
       "number": 394,
       "title": "seed: the buildout's MSP definition and benefits map travel with the repository",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/394",
-      "updatedAt": "2026-11-20T08:29:33Z",
+      "updatedAt": "2026-11-20T11:48:54Z",
       "labels": [
         {
           "name": "unit",
@@ -575,9 +626,9 @@
     {
       "number": 391,
       "title": "web: the deployed OIDC suite cannot run from a clean checkout",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/391",
-      "updatedAt": "2026-11-20T07:13:42Z",
+      "updatedAt": "2026-11-20T11:53:07Z",
       "labels": [
         {
           "name": "unit",
@@ -3928,15 +3979,15 @@
       "title": "S12: hillclimb and inference-usage screens with their specs",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/28",
-      "updatedAt": "2026-11-13T06:32:24Z",
+      "updatedAt": "2026-11-20T12:00:04Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:ready",
-          "color": "0E8A16"
+          "name": "status:claimed",
+          "color": "FBCA04"
         },
         {
           "name": "S12",
@@ -3949,15 +4000,15 @@
       "title": "S12: eval report and sign-off screens with their specs",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/27",
-      "updatedAt": "2026-11-13T06:32:22Z",
+      "updatedAt": "2026-11-20T12:00:02Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:ready",
-          "color": "0E8A16"
+          "name": "status:claimed",
+          "color": "FBCA04"
         },
         {
           "name": "S12",
@@ -3970,15 +4021,15 @@
       "title": "S12: measurement UI \u2014 eval report, paging, benchmark arms",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/26",
-      "updatedAt": "2026-11-19T22:09:21Z",
+      "updatedAt": "2026-11-20T11:05:42Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:ready",
-          "color": "0E8A16"
+          "name": "status:claimed",
+          "color": "FBCA04"
         },
         {
           "name": "S12",
@@ -4302,9 +4353,9 @@
     {
       "number": 8,
       "title": "S14 \u2014 independent deployment, native acceptance, and one release-SHA receipt",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/8",
-      "updatedAt": "2026-11-20T08:25:09Z",
+      "updatedAt": "2026-11-20T11:08:12Z",
       "labels": [
         {
           "name": "unit",
@@ -4325,15 +4376,15 @@
       "title": "S13 \u2014 the stage editor and the retirement-gate cleanup (W4/W5 done)",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/7",
-      "updatedAt": "2026-11-13T06:31:50Z",
+      "updatedAt": "2026-11-20T12:00:08Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:ready",
-          "color": "0E8A16"
+          "name": "status:claimed",
+          "color": "FBCA04"
         },
         {
           "name": "S13",
@@ -4346,15 +4397,15 @@
       "title": "S12 \u2014 finish the UI: remaining screens and measurement",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/6",
-      "updatedAt": "2026-11-15T15:52:32Z",
+      "updatedAt": "2026-11-20T12:00:06Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:ready",
-          "color": "0E8A16"
+          "name": "status:claimed",
+          "color": "FBCA04"
         },
         {
           "name": "S12",
