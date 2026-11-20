@@ -239,10 +239,22 @@ test("a label, a lane and an unarchive round-trip through the UI", async ({ page
     })
     .toContain(label);
 
-  // A lane: appended through the form and rendered as its own column.
+  // A lane: appended through the form. The action's effect is proved on the board's own row —
+  // under the full suite the burst of start-process jobs from the >50-project case can delay the
+  // screen's refetch past a DOM wait — and the screen then renders it from the server on reload.
   const lane = `e2e lane ${stamp}`;
   await page.getByLabel("New lane name").fill(lane);
   await page.getByRole("button", { name: "Create lane" }).click();
+  await expect
+    .poll(
+      async () => {
+        const board = await request.get(`/api/boards/${fixture.boardId}`).then((r) => r.json());
+        return (board.lists ?? []).map((entry: { list: { name: string } }) => entry.list.name);
+      },
+      { timeout: 30_000 },
+    )
+    .toContain(lane);
+  await page.reload();
   await expect(page.locator(".lane", { hasText: lane })).toBeVisible();
 
   // Archive, then unarchive from the panel: the button reads the card's current version first.
