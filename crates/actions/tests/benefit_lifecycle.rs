@@ -474,3 +474,120 @@ async fn a_profile_in_transition_cannot_retire() {
     assert_eq!(status, 200, "{body}");
     assert_eq!(output(&body)["status"], "retired", "{body}");
 }
+
+/// P1.1/P1.2 — `realized` is gated on the realization record: both the baseline and the
+/// post-transition measurement must exist, and a refused update leaves the row untouched.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_realized_status_needs_a_complete_transition() {
+    let (pg, running, seeded) = fixture().await;
+    let programme = create_programme(&running, "Realization programme").await;
+    let owner = owner_job(&pg, &seeded).await;
+    let (benefit, version) =
+        create_benefit(&running, &programme, None, "BEN-01", "active", owner).await;
+
+    let (status, body) = running
+        .invoke(
+            "benefits.update",
+            TOKEN,
+            json!({"id": benefit, "status": "realized"}),
+            Some("\"1\""),
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 422, "{body}");
+    assert_eq!(
+        body["errors"][0]["code"], "benefit_baseline_missing",
+        "{body}"
+    );
+    let unchanged = get_benefit(&running, &benefit).await;
+    assert_eq!(unchanged["status"], "active", "{unchanged}");
+    assert_eq!(unchanged["version"].as_i64(), Some(version), "{unchanged}");
+
+    sqlx::query(
+        "INSERT INTO benefit_transition (tenant_id, benefit_id, baseline_measured_at)
+         VALUES ($1, $2::uuid, now())",
+    )
+    .bind(seeded.tenant_id)
+    .bind(&benefit)
+    .execute(&pg.super_pool)
+    .await
+    .expect("transition row");
+
+    let (status, body) = running
+        .invoke(
+            "benefits.update",
+            TOKEN,
+            json!({"id": benefit, "status": "realized"}),
+            Some("\"1\""),
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(
+        status, 422,
+        "a baseline alone cannot claim realization: {body}"
+    );
+    assert_eq!(
+        body["errors"][0]["code"], "benefit_baseline_missing",
+        "{body}"
+    );
+
+    sqlx::query(
+        "UPDATE benefit_transition SET post_measured_at = now() WHERE benefit_id = $1::uuid",
+    )
+    .bind(&benefit)
+    .execute(&pg.super_pool)
+    .await
+    .expect("post-transition measurement");
+    let (status, body) = running
+        .invoke(
+            "benefits.update",
+            TOKEN,
+            json!({"id": benefit, "status": "realized"}),
+            Some("\"1\""),
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{body}");
+    assert_eq!(output(&body)["status"], "realized", "{body}");
+}
+
+/// P2.1 — a profile is never born realized: the realization record can only reference a row that
+/// already exists, so creation refuses the status outright.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_created_benefit_cannot_start_realized() {
+    let (pg, running, seeded) = fixture().await;
+    let programme = create_programme(&running, "Born-realized programme").await;
+    let owner = owner_job(&pg, &seeded).await;
+    let (status, body) = running
+        .invoke(
+            "benefits.create",
+            TOKEN,
+            json!({
+                "programme_id": programme,
+                "reference": "BEN-01",
+                "description": "BEN-01 benefit",
+                "baseline": {"value": 14, "measured_at": "2026-11-01"},
+                "target": {"value": 8},
+                "measurement_method": "card and run timestamps, weekly",
+                "benefit_owner_job_id": owner,
+                "status": "realized",
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 422, "{body}");
+    assert_eq!(
+        body["errors"][0]["code"], "benefit_baseline_missing",
+        "{body}"
+    );
+    let listed = list_benefits(&running, &programme, true).await;
+    assert!(
+        listed.is_empty(),
+        "a profile must not exist after the refusal: {listed:?}"
+    );
+}
