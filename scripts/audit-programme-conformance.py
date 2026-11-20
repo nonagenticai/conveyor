@@ -58,9 +58,14 @@ def read_outputs(path: Path) -> dict[str, Any]:
         text = path.read_text(encoding="utf-8")
     except FileNotFoundError:
         fail(f"{path} is missing")
-    match = re.search(r"window\.CONVEYOR_OUTPUTS\s*=\s*(\{.*\});\s*$", text, re.S)
+    match = re.search(r"window\.CONVEYOR_OUTPUTS\s*=\s*(\{.*\}|null)\s*;\s*$", text, re.S)
     if not match:
         fail(f"{path} has no CONVEYOR_OUTPUTS assignment")
+    # The checked-in placeholder is `null`: the pack carries no published-output index until the
+    # publish path overwrites it. Treat that as an empty index; the output checks then report
+    # every declared output as unpublished (the publish path runs strict with the real index).
+    if match.group(1) == "null":
+        return {}
     return json.loads(match.group(1))
 
 

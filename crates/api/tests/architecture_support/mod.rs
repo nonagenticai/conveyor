@@ -259,13 +259,23 @@ pub async fn request_contract(
 }
 
 pub async fn approve_contract(running: &support::Running, id: &str) -> Value {
-    ok(
-        running,
-        "architecture.contracts_approve",
-        json!({ "id": id }),
-        Some("\"1\""),
-    )
-    .await
+    // The requester is the admin; the approver must be the second principal (#508).
+    let (status, body) = running
+        .invoke(
+            "architecture.contracts_approve",
+            support::REVIEWER,
+            json!({ "id": id }),
+            Some("\"1\""),
+            None,
+            None,
+        )
+        .await;
+    let out = output(&body).clone();
+    assert_eq!(
+        status, 200,
+        "architecture.contracts_approve as the reviewer: {out}"
+    );
+    out
 }
 
 /// Request and approve one contract; returns its id (now live).
