@@ -122,9 +122,11 @@ test("the report is the server's; the label and round controls hit their actions
     "eval_runs.report",
     { run_id: seededRuns.items[0].id },
   );
-  const serverMean = (key: string) => seededReport.metrics.find((m) => m.key === key)?.mean;
-  expect(serverMean("correct")).toBeCloseTo(0.58, 5);
-  expect(serverMean("grounded")).toBeCloseTo(0.68, 5);
+  const serverMean = (key: string) =>
+    seededReport.metrics.find((m) => m.key === key)?.mean?.toFixed(2);
+  // The same two decimals the tiles show, from the server's unrounded means (0.5833…, 0.6833…).
+  expect(serverMean("correct")).toBe("0.58");
+  expect(serverMean("grounded")).toBe("0.68");
 
   const url = page.url().replace(/\/report$/, "");
 
