@@ -232,6 +232,12 @@ pub async fn run_with_pool(
     )?;
     write_file(
         &args.out,
+        "ops.json",
+        with_header(data.ops, SCHEMA, &generated_at),
+        &mut files,
+    )?;
+    write_file(
+        &args.out,
         "measure.json",
         with_header(data.measure, SCHEMA, &generated_at),
         &mut files,
@@ -326,6 +332,7 @@ pub(crate) fn snapshot_js(
         "msp": data.msp,
         "artefacts": data.artefacts,
         "architecture": data.architecture,
+        "ops": data.ops,
         "measure": data.measure,
     });
     redact(&mut value);

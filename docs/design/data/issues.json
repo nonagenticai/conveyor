@@ -1,6 +1,23 @@
 {
   "issues": [
     {
+      "number": 496,
+      "title": "ci: the generated fast path, dco on the queue, and the true delivery rules",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/496",
+      "updatedAt": "2026-11-20T13:26:17Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
       "number": 489,
       "title": "ci: a label change stops starting the delivery workflow",
       "state": "CLOSED",
@@ -56,7 +73,7 @@
       "title": "publish: the worker commits the deployed image's whole pack, reverting main",
       "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/477",
-      "updatedAt": "2026-11-20T10:58:49Z",
+      "updatedAt": "2026-11-20T11:57:49Z",
       "labels": [
         {
           "name": "unit",
@@ -124,7 +141,7 @@
       "title": "publish: the generated pack carries a programme destination the shell does not announce",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/470",
-      "updatedAt": "2026-11-20T11:04:34Z",
+      "updatedAt": "2026-11-20T11:57:51Z",
       "labels": [
         {
           "name": "unit",
@@ -295,9 +312,9 @@
     {
       "number": 434,
       "title": "console: the Operations screen reads the incident lifecycle (T7 built)",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/434",
-      "updatedAt": "2026-11-20T07:27:06Z",
+      "updatedAt": "2026-11-20T13:26:17Z",
       "labels": [
         {
           "name": "unit",
@@ -3962,7 +3979,7 @@
       "title": "S12: hillclimb and inference-usage screens with their specs",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/28",
-      "updatedAt": "2026-11-20T11:42:33Z",
+      "updatedAt": "2026-11-20T12:00:04Z",
       "labels": [
         {
           "name": "unit",
@@ -3983,7 +4000,7 @@
       "title": "S12: eval report and sign-off screens with their specs",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/27",
-      "updatedAt": "2026-11-20T11:38:39Z",
+      "updatedAt": "2026-11-20T12:00:02Z",
       "labels": [
         {
           "name": "unit",
@@ -4359,15 +4376,15 @@
       "title": "S13 \u2014 the stage editor and the retirement-gate cleanup (W4/W5 done)",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/7",
-      "updatedAt": "2026-11-13T06:31:50Z",
+      "updatedAt": "2026-11-20T12:00:08Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:ready",
-          "color": "0E8A16"
+          "name": "status:claimed",
+          "color": "FBCA04"
         },
         {
           "name": "S13",
@@ -4380,7 +4397,7 @@
       "title": "S12 \u2014 finish the UI: remaining screens and measurement",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/6",
-      "updatedAt": "2026-11-20T11:50:37Z",
+      "updatedAt": "2026-11-20T12:00:06Z",
       "labels": [
         {
           "name": "unit",

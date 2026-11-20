@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>T13 Tool platform — inception analysis · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>T13 Tool platform — inception analysis</h1>
+<p>The capability T13 adds is the tool spine: one broker between a run step and a job backend,
+one ledger row per call, an effect ceiling that is data, a closed input schema, and tenant-prefixed
+object storage whose key never reaches the prompt.</p>
+<h2>Current state</h2>
+<ul>
+<li>A job reaches a backend today only through V1 external actions: <code>crates/actions/src/integrations/external.rs:150</code> declares <code>HandlerRef::External</code> for eight targets (<code>workers.list</code>, <code>providers.list</code>, <code>graphs.list</code>, <code>artifacts.list</code>, <code>billing.summary</code>, <code>coding_jobs.create</code>, <code>coding_jobs.get</code>, <code>retrieval.query</code>), dispatched by <code>invoke_external</code> (<code>crates/actions/src/invoke.rs:1030</code>, call site <code>:835</code>). There is no binding row, no pinned toolkit version and no effect ceiling on that path.</li>
+<li>No tool tables exist: the migrations stop at <code>0051_tranche_review.sql</code>, and <code>tool</code>, <code>toolkit</code>, <code>tool_binding</code>, <code>tool_call</code> have no <code>CREATE TABLE</code>.</li>
+<li>No <code>tools.*</code> action family is registered; the registry's 420 actions carry none.</li>
+<li>Effect classes exist but are barely declared: <code>Effect</code> is <code>read | write | spend | destructive</code> (<code>crates/actions/src/spec.rs:51</code>), yet almost no action declares <code>destructive</code> and nothing gates on it for tools.</li>
+<li>Input validation exists and is partial: <code>validate_input</code> (<code>crates/actions/src/spec.rs:1203</code>) runs before dispatch (<code>invoke.rs:804</code>) and enforces <code>$ref</code>/<code>$defs</code>, <code>allOf</code>, <code>anyOf</code>/<code>oneOf</code>, <code>type</code>, <code>enum</code>, <code>required</code>, <code>properties</code>, <code>additionalProperties:false</code> and <code>items</code>. It does not enforce <code>pattern</code>, numeric or length bounds, and no <code>422 tool_input_invalid</code> code exists.</li>
+<li>Object storage exists for documents only: <code>Objects::from_env</code> (<code>crates/actions/src/integrations/objects.rs:78</code>) reads <code>CONVEYOR_S3_*</code>, and <code>key_for</code> (<code>:161</code>) returns <code>t/&lt;tenant&gt;/&lt;document&gt;/&lt;hash16&gt;</code> — tenant-prefixed, content-addressed, unencrypted, with no project/run prefix and no job-facing storage operation.</li>
+</ul>
+<h2>Reuse sources</h2>
+<ul>
+<li><strong>In this repository:</strong> the action registry and its one <code>ActionSpec</code> declaration (HTTP, MCP and OpenAPI from one source); the run/step executor and its typed failures; <code>secret</code> (<code>migrations/0013_documents.sql:27</code>) for credential storage; <code>approval_decision</code> (<code>migrations/0002_domain.sql:231</code>) and the policy-driven destructive gate (#317) for approvals; <code>governed_asset</code> (<code>:253</code>) for a tool draft; <code>event</code>, <code>audit_event</code> and <code>inference_call</code> for traces.</li>
+<li><strong>In the wider estate:</strong> the external backends themselves (coding, artifacts, billing, retrieval) stay where they are; only their address moves into a toolkit.</li>
+<li><strong>Upstream:</strong> <code>nonagenticai_mcp_server</code> remains reference only (D44) — never a runtime dependency.</li>
+</ul>
+<h2>Build vs reuse</h2>
+<ul>
+<li><strong>Build</strong> the four tables and the <code>tools.*</code> family: they are the ownership boundary and have no V1 counterpart.</li>
+<li><strong>Build</strong> the broker as the one call path; V1's eight external actions move onto toolkit operations rather than running beside it. No second control plane, and the <code>externals_declared</code> guard proves it.</li>
+<li><strong>Reuse</strong> <code>secret</code> for credentials (a binding names a credential alias, never a key), the approvals model for destructive calls, and the output standard for the artefact a tool returns.</li>
+<li><strong>Boundary:</strong> the broker owns resolution, the ceiling, the ledger and the storage key; it does not own the backend's health, the model, or the V1 job queue.</li>
+</ul>
+<h2>Risks</h2>
+<ul>
+<li><strong>A second control plane.</strong> If the eight external actions keep their direct dispatch, jobs can bypass the binding, ceiling and ledger. Reveal: <code>crates/api/tests/externals_declared.rs::no_handler_calls_a_service_directly</code> plus a zero-hit grep for a direct handler call.</li>
+<li><strong>A ceiling that can be raised at run time.</strong> If the binding's ceiling is read from the caller's input, a job widens its own authority. Reveal: the <code>403 tool_effect_forbidden</code> scenario.</li>
+<li><strong>A credential in the prompt.</strong> If the storage adapter passes the S3 key or a signed URL into the model context, the secret leaks into an audit trail. Reveal: the compiled-prompt scenario in P5.2.</li>
+<li><strong>A schema that accepts the invalid.</strong> Without <code>pattern</code> and bounds, a backend receives input the operator never approved. Reveal: the <code>422 tool_input_invalid</code> scenario with a zero request count.</li>
+<li><strong>Migration numbering.</strong> <code>0052</code> collides with another session's in-flight migration; the ledger check catches it at the PR head.</li>
+</ul>
+<h2>Open questions</h2>
+<ol>
+<li>Do the <code>inference-router</code> and laya external calls migrate as tools? Default: no — they are the L1/L2 rungs, not job tools (§11.2).</li>
+<li>Do V1's <code>artifacts.list</code> callers move to the storage adapter or keep a shim? Default: move, no shim (§15.2 #17).</li>
+<li>§11.10 says <code>tenant/&lt;tenant_id&gt;/</code>; <code>key_for</code> says <code>t/&lt;tenant&gt;/</code>. Default: §11.10 spelling; V1 keys re-prefix, no dual scheme.</li>
+<li>Where does "the tenant's configured approvals" for a destructive tool live? Default: the tenant's existing approval configuration, no second approvals model.</li>
+</ol>
+<h2>Links</h2>
+<p>Issue #76 · SPEC_V2 §11.1, §11.3, §11.4, §11.8, §11.10, §12 T13 · ADR 0004, ADR 0005 · <code>seed/programme.json</code> T13.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Tool platform · conveyor output · published 2026-11-20T11:50:50.848127361+00:00 · FR Test</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

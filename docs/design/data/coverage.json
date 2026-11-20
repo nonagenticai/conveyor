@@ -1,139 +1,195 @@
 {
   "actions_invoked": [
     {
-      "line": 1340,
+      "line": 1342,
       "name": "approvals.decide"
     },
     {
-      "line": 1240,
+      "line": 6064,
+      "name": "approvals.decide"
+    },
+    {
+      "line": 5851,
+      "name": "approvals.list"
+    },
+    {
+      "line": 5852,
+      "name": "approvals.list"
+    },
+    {
+      "line": 6024,
+      "name": "approvals.request"
+    },
+    {
+      "line": 1242,
       "name": "architecture.artifacts_entries"
     },
     {
-      "line": 1241,
+      "line": 1243,
       "name": "architecture.artifacts_links"
     },
     {
-      "line": 214,
+      "line": 216,
       "name": "card_types.list"
     },
     {
-      "line": 403,
+      "line": 405,
       "name": "cards.claim"
     },
     {
-      "line": 387,
+      "line": 389,
       "name": "cards.comment"
     },
     {
-      "line": 335,
+      "line": 337,
       "name": "cards.create"
     },
     {
-      "line": 364,
+      "line": 366,
       "name": "cards.move"
     },
     {
-      "line": 418,
+      "line": 420,
       "name": "cards.release"
     },
     {
-      "line": 2539,
+      "line": 2541,
       "name": "documents.compose"
     },
     {
-      "line": 3026,
+      "line": 3028,
       "name": "documents.compose"
     },
     {
-      "line": 2821,
+      "line": 2823,
       "name": "documents.create"
     },
     {
-      "line": 2892,
+      "line": 2894,
       "name": "documents.delete"
     },
     {
-      "line": 2838,
+      "line": 2840,
       "name": "documents.download"
     },
     {
-      "line": 2871,
+      "line": 2873,
       "name": "documents.download"
     },
     {
-      "line": 2561,
+      "line": 2563,
       "name": "documents.get"
     },
     {
-      "line": 2856,
+      "line": 2858,
       "name": "documents.get"
     },
     {
-      "line": 1099,
+      "line": 1101,
       "name": "documents.list"
     },
     {
-      "line": 1122,
+      "line": 1124,
       "name": "documents.list"
     },
     {
-      "line": 1149,
+      "line": 1151,
       "name": "documents.list"
     },
     {
-      "line": 2789,
+      "line": 2791,
       "name": "documents.list"
     },
     {
-      "line": 2923,
+      "line": 2925,
       "name": "documents.preview"
     },
     {
-      "line": 2969,
+      "line": 2971,
       "name": "documents.return"
     },
     {
-      "line": 2710,
+      "line": 2712,
       "name": "documents.revision_get"
     },
     {
-      "line": 2671,
+      "line": 2673,
       "name": "documents.revision_list"
     },
     {
-      "line": 1363,
+      "line": 5932,
+      "name": "procedures.ingest_process"
+    },
+    {
+      "line": 5924,
+      "name": "procedures.ingest_rdf"
+    },
+    {
+      "line": 5940,
+      "name": "procedures.ingest_sop"
+    },
+    {
+      "line": 5808,
+      "name": "procedures.list"
+    },
+    {
+      "line": 6137,
+      "name": "procedures.publish"
+    },
+    {
+      "line": 5985,
+      "name": "procedures.review_source"
+    },
+    {
+      "line": 5967,
+      "name": "procedures.validate"
+    },
+    {
+      "line": 1365,
       "name": "process_runs.start"
     },
     {
-      "line": 205,
+      "line": 5831,
+      "name": "processes.get"
+    },
+    {
+      "line": 5811,
+      "name": "processes.list"
+    },
+    {
+      "line": 6139,
+      "name": "processes.publish"
+    },
+    {
+      "line": 207,
       "name": "programmes.list"
     },
     {
-      "line": 680,
+      "line": 682,
       "name": "programmes.list"
     },
     {
-      "line": 2470,
+      "line": 2472,
       "name": "projects.close"
     },
     {
-      "line": 2353,
+      "line": 2355,
       "name": "projects.create"
     },
     {
-      "line": 2361,
+      "line": 2363,
       "name": "projects.update"
     },
     {
-      "line": 1313,
+      "line": 1315,
       "name": "runs.cancel"
     },
     {
-      "line": 1291,
+      "line": 1293,
       "name": "runs.get"
     },
     {
-      "line": 1268,
+      "line": 1270,
       "name": "runs.list"
     }
   ],
@@ -278,7 +334,7 @@
       "tranche": 0,
       "units": {
         "blocked": 1,
-        "claimed": 4,
+        "claimed": 3,
         "numbers": [
           17,
           22,
@@ -301,12 +357,11 @@
           410,
           426,
           433,
-          434,
           435,
           462,
           476
         ],
-        "open": 15,
+        "open": 14,
         "ready": 5,
         "unknown": 0
       }
@@ -1085,7 +1140,7 @@
       "tranche": 8,
       "units": {
         "blocked": 0,
-        "claimed": 0,
+        "claimed": 1,
         "numbers": [
           7,
           136,
@@ -1093,7 +1148,7 @@
           198
         ],
         "open": 1,
-        "ready": 1,
+        "ready": 0,
         "unknown": 0
       }
     },
@@ -2403,9 +2458,9 @@
       "evidence": [
         "docs/design/v2.js"
       ],
-      "gap": "V2 destination; no backend call",
+      "gap": null,
       "key": "operations",
-      "status": "proposed",
+      "status": "live",
       "title": "Operations"
     },
     {
@@ -2525,12 +2580,12 @@
       "without_open_units": 27
     },
     "screens": {
-      "actions_invoked": 27,
+      "actions_invoked": 39,
       "by_status": {
         "legacy": 7,
-        "live": 12,
+        "live": 13,
         "mixed": 1,
-        "proposed": 6
+        "proposed": 5
       },
       "total": 26
     }

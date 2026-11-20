@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Kata — B1 baseline: Auditable decisions · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>Kata — B1 baseline: Auditable decisions</h1>
+<h2>Context</h2>
+<p>The benefit profile <strong>B1 Auditable decisions</strong> requires a measured baseline before the programme can claim an
+improvement (P0 plan §6; SPEC_V2 §8.3). No baseline for this benefit was measured: the programme has
+no instrument that records the old practice, so the profile states the baseline as <em>not measured</em> and
+this kata is the system issue that records the missing measurement.</p>
+<p>The measure is the decision rate: a decision row for every choice, and a gate that never refuses in a cycle. The method named in the profile is: Count decision rows per run from the action ledger; a refusing gate is a test at the action boundary.</p>
+<h2>Decision</h2>
+<p>Measure the baseline while the old practice is still observable, before the transition the benefit
+depends on. Record the result against the benefit row and update the profile's Performance group from
+<em>not measured</em> to the measured value. The interim owner is the programme manager; the BCM position is
+unstaffed (the skills assessment records the gap), and the benefit owner is re-attributed when it is
+staffed.</p>
+<h2>Consequences</h2>
+<p>Until the baseline is measured, B1 cannot claim an improvement, and a tranche review cannot hold
+the programme to its target. The measurement is a programme task, not a code change; if the
+instrument itself does not exist, that is a second kata.</p>
+<h2>Evidence</h2>
+<ul>
+<li>The benefit row B1 and its profile document (P0).</li>
+<li>The measurement method above, and the owner's record.</li>
+<li>The tranche review that accepts the measured baseline.</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Kata continuous improvement · conveyor output · published 2026-11-20T11:50:50.848127361+00:00 · FR Test</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>
