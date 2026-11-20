@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>T5 Kata — inception analysis · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>T5 — Inception analysis</h1>
+<p>Project: T5 — Kata · Track: v2 · Tranche: 10 · Plan: docs/SPEC_V2.md §12
+Unit: #77 (this document is dependency-shaping work; blocked-by T2, S16–S20 and P0)
+Measured at: main@61edfcf8, 2026-11-18 · Project row: active, meta.depends_on = ["T2", "S16", "S17", "S18", "S19", "S20", "P0"]</p>
+<h2>Current state</h2>
+<p>State labels: <code>built | partial | planned | absent | proposed</code>. Every citation resolves at <code>origin/main</code>.</p>
+<ul>
+<li><strong>built</strong> — capability and flow: <code>seed/capability.json:kata</code> is active; <code>seed/catalogue.json:kata</code> is a project type and <code>seed/catalogue.json:kata_wip</code> caps it at one. <code>seed/processes/named.yaml:kata.open</code> is one agent step with <code>kata.open.sop</code>, called as a child by the coach (<code>seed/processes/named.yaml:child_process_key</code>); only a replayable flow opens a kata, and a failed kata keeps the cord.</li>
+<li><strong>built</strong> — the V1 verdict: <code>migrations/0034_s18_kata_arm.sql:benchmark_run</code> carries <code>subject_version</code>, <code>improvement_verdict ∈ keep|revert|inconclusive</code> and <code>improvement_of_run_id</code>; <code>apps/server/src/benchmark_improvement.rs:run</code> observes with <code>benchmark_runs.get</code>, judges with <code>benchmark_runs.compare</code> (controls passed, McNemar p &lt; 0.05) and never promotes.</li>
+<li><strong>built</strong> — the instrument: <code>migrations/0026_s19_eval.sql:eval_case</code> has <code>split ∈ train|test|none</code>; <code>eval_version</code> pins a drawn split by <code>split_sha256</code> and <code>split_locked_at</code>; <code>eval_run</code> carries <code>variant ∈ baseline|vN</code>, <code>change_md</code> and <code>change_patch</code>; <code>migrations/0036_s19_output_grade.sql:eval_grade</code> scores output; after <code>migrations/0035_process_tree.sql:benchmark_run</code> §8, <code>benchmark_run.subject_kind</code> is <code>process</code> (with <code>process_id</code>) and <code>eval.subject_kind</code> is <code>process</code>; the SOP is the separate <code>procedure</code> table.</li>
+<li><strong>built</strong> — sign-off: <code>crates/actions/src/eval/signoffs.rs:signoff_requires_human</code> refuses every non-user principal; a sign-off is an <code>approval</code> row carrying the instrument digest, and editing a case voids it.</li>
+<li><strong>built</strong> — support: <code>migrations/0035_process_tree.sql:procedure</code> (versioned SOP), <code>migrations/0002_domain.sql:project_type_code</code>, <code>migrations/0050_approval_policies.sql:approval_policy</code>, <code>crates/actions/src/control/andon.rs:ANDON_ENGAGED</code> (tenant-wide cord).</li>
+<li><strong>partial</strong> — the seeded kata type is V1's replay-flow kata (phases setup/preliminary/execution, "Kata K1-K21"), not §6.3's six Gets; no code reads a six-Gets state.</li>
+<li><strong>partial</strong> — measurement is benchmark-shaped: an eval run can carry a change patch and a variant, but no row links a candidate to an adoption decision, and <code>improvement_verdict</code> is a judgement, not the revert.</li>
+<li><strong>absent</strong> — no action beginning <code>kata.</code> in <code>docs/design/data/actions.json</code>; the measurement entry points are the built <code>benchmark_runs.start|get|compare</code> and <code>eval_runs.start</code>.</li>
+<li><strong>absent</strong> — no candidate, measurement, propagation or outcome table in <code>migrations/</code>.</li>
+<li><strong>absent</strong> — no decision-time held-out enforcement: the split label exists, but no action refuses an adoption measured on <code>train</code>.</li>
+<li><strong>absent</strong> — no <code>lesson</code> table and no <code>lessons.*</code> action; §7.6 promotion has no mechanism.</li>
+<li><strong>absent</strong> — no kata-tenant policy of D45: tenancy exists, but nothing gives a kata its own approvals and budget.</li>
+<li><strong>refused</strong> — a kata may not edit its instrument, approve its own adoption, measure on the training split only, or open a second kata for an open signature (§6.3, §9.3).</li>
+</ul>
+<h2>Reuse sources</h2>
+<table><thead><tr><th>Source</th><th>Analysis question</th></tr></thead><tbody>
+<tr><td>In repo — S18 verdict</td><td>Does <code>improvement_verdict</code> generalise from a benchmark pair to an eval run and a procedure version, and what is added for revert?</td></tr>
+<tr><td>In repo — eval and benchmark</td><td>Which version, split and sign-off fields must a kata pin, and can measurement reuse <code>eval_runs.start</code>?</td></tr>
+<tr><td>In repo — <code>procedure</code>, <code>job_release</code></td><td>How is the target version identified, and what restores it on revert?</td></tr>
+<tr><td>In repo — <code>approval</code>, <code>approval_policy</code>, <code>andon</code></td><td>Can adoption reuse the policy row and the human-only refusal pattern, and who releases the cord?</td></tr>
+<tr><td>Wider estate — knowledge/retrieval capability</td><td>What does promotion publish, and is the kata a proposer only?</td></tr>
+<tr><td>Wider estate — system-one and coding fleet capabilities</td><td>Which change class may L1 select, and how does an adopted code candidate become a development project?</td></tr>
+<tr><td>Upstream — Postgres, sqlx, workspace crates</td><td>Can every rule stay a constraint or action in <code>crates/actions</code>, with no second runtime?</td></tr>
+</tbody></table>
+<h2>Build vs reuse</h2>
+<ul>
+<li><strong>Kata lifecycle: build</strong> as <code>kata.*</code> actions over four new tables, reusing <code>project</code>, <code>card</code>, <code>run</code>, <code>approval</code> and <code>event</code>; no second runtime.</li>
+<li><strong>Verdict: reuse</strong> the comparability rule in <code>benchmark_improvement</code> for benchmark measurements and apply it to eval measurements.</li>
+<li><strong>Instrument: reuse</strong> <code>eval</code>/<code>benchmark</code> rows and <code>eval_signoffs</code>; kata never defines a metric, draws a split, or signs an instrument.</li>
+<li><strong>Adoption: reuse</strong> <code>approval</code> plus <code>approval_policy</code>; the kata proposes only and the deciding principal is a person.</li>
+<li><strong>Revert: build</strong> one outcome that restores the recorded base version through the target's own publish action.</li>
+<li><strong>Lessons: defer</strong> to organisational memory's <code>lessons.propose</code>; T5 emits candidates at propagation.</li>
+<li><strong>Licence/contract:</strong> workspace crates only; public repository, so no private host, path, token or credential enters code or this document; no new service or port.</li>
+</ul>
+<h2>Risks</h2>
+<ul>
+<li>A train-split measurement is adopted → <strong>check:</strong> an adoption refusal test on <code>split &lt;&gt; 'test'</code>.</li>
+<li>The instrument is edited between prediction and measurement → <strong>check:</strong> pin <code>eval_version.digest</code> and <code>split_sha256</code>; a mismatch voids the measurement.</li>
+<li>The kata approves its own change → <strong>check:</strong> the approver principal is compared to the kata run's executor.</li>
+<li>Revert is recorded but nothing restored → <strong>check:</strong> the base version is read back after <code>kata.close</code>.</li>
+<li>A second kata opens on the same signature → <strong>check:</strong> partial unique index on the open state.</li>
+<li><code>kata_executor</code> is mistaken for the kata job → <strong>check:</strong> <code>crates/auth/src/principal.rs:is_kata_executor</code> is a machine tenant-admin role, not a job.</li>
+<li>A failed kata releases the cord on a timer → <strong>check:</strong> no release path from <code>kata.close</code>.</li>
+</ul>
+<h2>Open questions</h2>
+<ol>
+<li>Which held-out label counts for adoption: <code>test</code> only, or a separately named holdout split that S19 must add?</li>
+<li>Does an eval-based kata measure a procedure version through a new SOP subject kind, since <code>migrations/0035_process_tree.sql</code> moves the measured subject to <code>process</code>?</li>
+<li>Who owns the kata tenant's read access to a target tenant's version: a scoped grant at open, or a pinned reference?</li>
+<li>Is propagation one approval per target job, or one programme-level approval?</li>
+</ol>
+<h2>Links</h2>
+<ul>
+<li>Brief: https://conveyor.nonagentic.ai/design/docs/output-01a1e008-7d05-75d4-ae9d-4e2d485271b4.html</li>
+<li>Issue: #77</li>
+<li>Spec: <code>docs/SPEC_V2.md</code> §6.3, §7.6, §9.3, §9.4, §10.4, §12 T5; decisions D31 and D45</li>
+<li>Inception standard: <code>docs/plans/P0-programme-definition.md</code> §5</li>
+<li>P0 published references: blueprint, business case, architecture principles, artefact standard and reuse map at the public design site</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Kata · conveyor output · published 2026-11-20T11:50:50.848127361+00:00 · FR Test</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

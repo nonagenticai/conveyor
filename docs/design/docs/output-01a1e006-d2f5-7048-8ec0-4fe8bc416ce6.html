@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Vision and mandate · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>Vision and mandate</h1>
+<p><strong>Programme:</strong> conveyor buildout · <strong>Owner:</strong> George · <strong>Status:</strong> adopted by P0 · <strong>Date:</strong> 2026-11-15</p>
+<h2>Purpose</h2>
+<p>The conveyor is the operating model for an organisation's work. It carries work as positions,
+projects, boards, cards, runs and approvals; it carries proof as runs, evidence, decisions and
+instruments; and it makes the organisation itself explicit as industry → department → job, with
+immutable releases and tenant-scoped bindings. It is one Rust application, not a fleet of
+services that each know a fragment of the model (<code>docs/SPEC_V2.md</code> §1, §2).</p>
+<p>The programme exists to finish that model and to run it. V1 built the machine that carries work;
+V2 adds the organisation that works the machine. The last whole-tree V1 checkpoint measured 83
+tables and 243 actions, with the registry past 290 served operations as S19–S21 landed
+(<code>docs/SPEC_V2.md</code> §1.1). Those are a floor, not a live figure.</p>
+<h2>Outcomes</h2>
+<ol>
+<li><strong>One model, one store.</strong> A programme, its projects, their work, their decisions and their
+evidence are rows in one Postgres database with one action registry, not concepts imported from
+other applications (<code>docs/SPEC_V2.md</code> §10).</li>
+<li><strong>Jobs, not code paths.</strong> PM, kanban coach, kata, development and operations are configured
+positions that receive cards, decide with rules and laya, and generate with LLMs behind gates
+(<code>docs/SPEC_V2.md</code> §6).</li>
+<li><strong>Every decision is auditable.</strong> A rule, a laya choice and a human decision produce the same
+decision row, pinned to the policy, refinement and configuration versions that produced it
+(<code>docs/SPEC_V2.md</code> §7).</li>
+<li><strong>Every tool is governed.</strong> Each cluster service a job may call is a versioned, bound, audited
+toolkit; every call is ledgered; a destructive call without the tenant's configured approvals is
+refused (<code>docs/SPEC_V2.md</code> §11).</li>
+<li><strong>The conveyor develops and operates itself</strong> under the gates it imposes on any work — with the
+gates that judge it outside its own reach (<code>docs/SPEC_V2.md</code> §9).</li>
+<li><strong>The public can see and challenge the design.</strong> The repository is public, the programme site
+reads Postgres, and every published output has a stable URL; input arrives as GitHub issues and
+design pull requests, never as an in-app public account.</li>
+</ol>
+<h2>Boundary</h2>
+<ul>
+<li><strong>Not a conversational agent.</strong> The agent platform is a user-interaction front end over MCP; it
+holds no runtime dependency and is not a second system of record (<code>docs/SPEC_V2.md</code> §1.2, D33).</li>
+<li><strong>Not customer care.</strong> <code>care-bus-agents</code> stays a standalone demo; the conveyor is for project,
+continuous-line and line-management work (<code>docs/SPEC_V2.md</code> §1.2, D48).</li>
+<li><strong>Not a document manager.</strong> The public outputs are the programme's intermediate work products;
+engineering documentation stays beside the code in <code>docs/</code>.</li>
+<li><strong>Not a rewrite of V1.</strong> V1's built slices are not re-opened; V2 extends them (<code>docs/SPEC_V2.md</code>,
+preamble).</li>
+<li><strong>Not an in-app community.</strong> Comments, accounts and moderation are out of frame; the public
+conversation is GitHub.</li>
+</ul>
+<h2>Who it serves</h2>
+<p>First, the organisation that builds it: the owner, the maintainer sessions and outside
+contributors working the programme in this repository. Then, opt-in tenants: a tenant that does not
+use a V2 aggregate does not ship it (<code>docs/SPEC_V2.md</code> §12, P10). The licensing frame is per-tenant
+and opt-in; there is no per-app delegation.</p>
+<h2>Mandate and success</h2>
+<p>P0's definition set is the programme's mandate: the programme does not start T1–T17 until this set
+is accepted and its briefs are the contracts those projects are held to
+(<code>docs/plans/P0-programme-definition.md</code> §1, §6).</p>
+<p>The programme is succeeding when:</p>
+<ul>
+<li>T12's one-organisation loop runs end to end, audited and within budget (<code>docs/SPEC_V2.md</code> §12);</li>
+<li>a gate that never refuses is flagged as a defect, not celebrated (<code>docs/SPEC_V2.md</code> §14, R5);</li>
+<li>every V1 and V2 project has a brief, a published inception analysis and architecture, and its
+build evidence is recorded on the project;</li>
+<li>the programme site shows the measured truth — projects, expected outputs, published outputs and
+gaps — without a hand-maintained status.</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Programme definition — vision, blueprint, plan and project briefs · conveyor output · published 2026-11-20T11:50:50.848127361+00:00</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>
