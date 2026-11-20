@@ -1135,6 +1135,7 @@ function startServer({ config, state, snapshot, outputs }) {
           "process_runs.start",
           "programmes.list",
           "programmes.update",
+          "programmes.refresh",
           "benefits.list",
           "benefits.create",
           "benefits.update",
@@ -1644,6 +1645,14 @@ function startServer({ config, state, snapshot, outputs }) {
           if (input.status !== undefined) row.status = input.status;
           row.version += 1;
           json(res, 200, row);
+        });
+      }
+      // #517: the programme refresh - the console's button calls this action and toasts its
+      // counts. The stub answers the same shape the live action does (created/updated/skipped);
+      // 49 is the row count the case asserts in the toast.
+      if (pathname === "/api/actions/programmes.refresh/invocations") {
+        return readBody(req, () => {
+          json(res, 200, { created: 49, updated: 0, skipped: 0 });
         });
       }
       if (pathname === "/api/actions/benefits.create/invocations") {
