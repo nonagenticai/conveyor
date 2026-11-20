@@ -6338,7 +6338,12 @@ window.installV2 = function (api, enterprise) {
   }
 
   /* ------------------------------------------------------------------ Metering */
+  // Live: the platform publishes `measure.inference` (calls, tokens and cache hits by caller and
+  // by model) and a `note` that fixes the cost rule. The screen renders those rows and nothing
+  // else; the design study's fixture roll-ups appear only where no snapshot is loaded, and a
+  // snapshot without the section says so rather than borrowing a fixture number (#458).
   function metering() {
+    if (live) return meteringLive();
     const tab = v.tab.metering || "Roll-ups";
     const levels = ["tenant", "department", "programme", "project", "job", "run", "step", "call"];
     const m = F.meter[v.meterLevel] || F.meter.tenant;
@@ -6368,6 +6373,61 @@ window.installV2 = function (api, enterprise) {
         panel("Reconciliation", `${kv([["Conveyor metering", "$412.80 tenant total"], ["billing_service", "$412.80 · exact"], ["Divergence policy", "open an incident, never a silent difference"], ["Price version", "pinned per read"], ["Attribution gap", "0.4% · reported separately"]])}${note("The same derivation feeds the API and the UI; a panel never recomputes cost from a stale cache.")}`);
     }
     return `<div class="page enterprise">${heading("Metering", "Roll-ups at tenant, department, programme, project and job; drill-down to run, step and tool call; one derivation reconciled with billing.", `${route("Portfolio", "portfolio", "", "layers")}${route("Measure", "usage", "", "chart")}`, "MEASURE & IMPROVE")}${ribbon("V2 metering (D52): read models over inference_call and tool_call, attribution, C0–C5 metrics and billing reconciliation. Proposed in T11.", count.calls > 0)}${tabs(["Roll-ups", "Attribution", "Metrics & maturity"], tab, "metering")}${content}</div>`;
+  }
+
+  /// The live Metering screen: `measure.inference` from the published snapshot, or one honest
+  /// sentence when the snapshot carries none. No fixture roll-up, no invented cost figure — the
+  /// snapshot's own `note` states the cost rule (it is derived at read time, never stored).
+  function meteringLive() {
+    const measure = live.measure || {};
+    const inference = measure.inference || null;
+    const num = (value) => Number(value || 0).toLocaleString("en-US");
+    const stat = (label, value, sub) =>
+      `<div class="metric"><div class="label"><i class="dot green"></i>${E(label)}</div><div class="metric-number">${E(value)}</div><small>${E(sub)}</small></div>`;
+    const head = `${heading("Metering", "The platform's own inference aggregates, read from the published snapshot: calls, tokens and cache hits by caller and by model.", `${route("Portfolio", "portfolio", "", "layers")}${route("Usage", "usage", "", "chart")}`, "MEASURE & IMPROVE")}${ribbon("Live measurement: <span class=\"mono\">measure.inference</span> from the published snapshot. Cost is a read-time derivation, never a stored figure.", true)}`;
+    const ruled = measure.note ? note(E(measure.note)) : "";
+    if (!inference) {
+      return `<div class="page enterprise">${head}${panel(
+        "No measurement published",
+        `<p class="muted">This snapshot carries no <span class="mono">measure.inference</span> section, so there is nothing to report. The screen shows no fixture number in that case.</p>`,
+      )}${ruled}</div>`;
+    }
+    const totals = inference.totals || {};
+    const tiles = `<div class="metrics">${[
+      stat("Calls", num(totals.calls), `${num(totals.non_ok_calls)} not ok`),
+      stat(
+        "Tokens",
+        num(totals.total_tokens),
+        `${num(totals.prompt_tokens)} prompt · ${num(totals.completion_tokens)} completion`,
+      ),
+      stat(
+        "Cache hits",
+        num(totals.cache_hit_calls),
+        `${num(totals.cache_miss_calls)} misses · ${num(totals.cache_write_calls)} writes · ${num(totals.unknown_cache_calls)} unknown`,
+      ),
+    ].join("")}</div>`;
+    const callerRows = list(inference.by_caller).map(
+      (row) =>
+        `<tr><td>${E(row.caller_kind || "unknown")}</td><td>${num(row.calls)}</td><td>${num(row.total_tokens)}</td></tr>`,
+    );
+    const modelRows = list(inference.by_model).map(
+      (row) =>
+        `<tr><td>${E(row.model || "unknown")}</td><td>${num(row.calls)}</td><td>${num(row.prompt_tokens)}</td><td>${num(row.completion_tokens)}</td><td>${num(row.total_tokens)}</td><td>${num(row.cache_hits)}</td></tr>`,
+    );
+    return `<div class="page enterprise">${head}${tiles}${panel(
+      "By caller",
+      callerRows.length
+        ? table(["Caller", "Calls", "Tokens"], callerRows)
+        : `<p class="muted">The snapshot carries no caller rows.</p>`,
+    )}${panel(
+      "By model",
+      modelRows.length
+        ? table(
+            ["Model", "Calls", "Prompt tokens", "Completion tokens", "Total tokens", "Cache hits"],
+            modelRows,
+          )
+        : `<p class="muted">The snapshot carries no model rows.</p>`,
+    )}${ruled}</div>`;
   }
 
   /* ------------------------------------------------------------------ Contribute */
