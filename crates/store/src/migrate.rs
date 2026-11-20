@@ -241,7 +241,10 @@ mod tests {
                 // T16 (#85): the derived SOP/process provenance, the executable PDDL state and
                 // the publication approval (0060_procedure_ingestion.sql, SPEC_V2 §5.6; the PKO
                 // tables are deliberately absent — owner decision 2026-11-19, knowledge in strata).
-                (60, "procedure ingestion".to_owned())
+                (60, "procedure ingestion".to_owned()),
+                // #508: the contract's requester, recorded at request time and never rewritten
+                // (0061_contract_requester.sql, SPEC_V2 §8.1 — the approver must differ).
+                (61, "contract requester".to_owned())
             ],
             "the embedded migration set is {embedded:?}; a wrong sqlx::migrate! path or a \
              file outside the set changes it"

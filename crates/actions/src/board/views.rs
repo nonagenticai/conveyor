@@ -105,6 +105,17 @@ pub struct ProjectCreateIn {
     pub key: Option<String>,
 }
 
+/// `projects.programme_meta` — the programme-owned keys, written under `portfolio:write`.
+///
+/// `projects.update` refuses these keys; the seed and this action are the two writers.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct ProjectProgrammeMetaIn {
+    /// The project.
+    pub id: Uuid,
+    /// The programme-owned keys to merge.
+    pub meta: Value,
+}
+
 /// `projects.close` — a status-guarded transition, not a version-guarded edit.
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 pub struct ProjectCloseIn {
@@ -117,9 +128,11 @@ pub struct ProjectCloseIn {
 
 /// `projects.update` — a version-guarded edit of the project's own fields.
 ///
-/// Every field is optional; a field that is absent is unchanged. `status` uses the same vocabulary
-/// as the table (`draft | active | paused | closed | archived`); closing and archiving have their
-/// own action (`projects.close`), so this is for an explicit edit, not the close transition.
+/// Every field is optional; a field that is absent is unchanged. `status` is refused
+/// (`422 status_not_editable`): the transitions are `projects.activate`, `projects.pause`,
+/// `projects.close` and `projects.archive`, each with its own gate. Programme-owned `meta` keys
+/// (`tranche`, `adm_phase`, `plateau`, `expected_outputs`, `closure_outputs`, `depends_on`,
+/// `plan`, `plan_status`, `status_source`) are refused the same way (`422 meta_key_protected`).
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 pub struct ProjectUpdateIn {
     /// The project id.

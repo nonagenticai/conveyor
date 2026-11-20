@@ -373,7 +373,7 @@
         "actions: programmes.* found (programmes.create, programmes.get, programmes.list…)",
         "actions: project_dependencies.* found (project_dependencies.create, project_dependencies.delete, project_dependencies.list)",
         "actions: registers.* found (registers.create, registers.delete, registers.get…)",
-        "actions: tranches.* found (tranches.create, tranches.delete, tranches.list…)",
+        "actions: tranches.* found (tranches.authorise, tranches.create, tranches.delete…)",
         "actions: wbs.* found (wbs.create, wbs.delete, wbs.get…)"
       ]
     },

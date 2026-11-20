@@ -1134,6 +1134,7 @@ function startServer({ config, state, snapshot, outputs }) {
           "processes.publish",
           "process_runs.start",
           "programmes.list",
+          "programmes.refresh",
           "programmes.update",
           "programmes.refresh",
           "benefits.list",
@@ -1190,8 +1191,12 @@ function startServer({ config, state, snapshot, outputs }) {
           "documents.revision_list",
           "documents.revision_get",
           "documents.revision_restore",
-          "projects.create",
+          "projects.activate",
+          "projects.archive",
           "projects.close",
+          "projects.create",
+          "projects.pause",
+          "projects.programme_meta",
           "projects.update",
           "publish.start",
           "publish.status",
@@ -1635,6 +1640,12 @@ function startServer({ config, state, snapshot, outputs }) {
       }
 
       /* ── #305: the programme store — the writes the dialogs issue ──────────────────── */
+      if (pathname === "/api/actions/programmes.refresh/invocations") {
+        return readBody(req, () => {
+          // The image's embedded seed applied to the tenant: every row created on a fresh tenant.
+          json(res, 200, { created: 49, updated: 0, skipped: 0 });
+        });
+      }
       if (pathname === "/api/actions/programmes.update/invocations") {
         return readBody(req, (body) => {
           const input = body.input || {};
@@ -2025,6 +2036,49 @@ function startServer({ config, state, snapshot, outputs }) {
             version: 1,
           };
           json(res, 201, { project });
+        });
+        return;
+      }
+      if (pathname === "/api/actions/projects.programme_meta/invocations") {
+        return readBody(req, (body) => {
+          try {
+            const input = body.input || {};
+            const target =
+              input.id === "p-s02"
+                ? state.project
+                : input.id === "p-noboard"
+                  ? state.noBoard
+                  : null;
+            if (!target) {
+              // The create-time class/plan write: the row was just created at version 1.
+              assert.equal(
+                req.headers["if-match"],
+                '"1"',
+                "the create-time programme write is versioned",
+              );
+              state.planPatches.push(input.meta && input.meta.plan);
+              state.createPatches.push(input.meta || {});
+              return json(res, 200, { project: { id: input.id, version: 2 } });
+            }
+            assert.equal(
+              req.headers["if-match"],
+              `"${target.version}"`,
+              "projects.programme_meta carries If-Match",
+            );
+            assert.ok(input.meta && typeof input.meta === "object", "programme_meta sends an object");
+            target.meta = Object.assign({}, target.meta, input.meta);
+            target.version += 1;
+            json(res, 200, {
+              project: target,
+              boards:
+                input.id === "p-s02"
+                  ? [{ id: "b-s02", project_id: "p-s02", name: "Board", version: 1 }]
+                  : [],
+            });
+          } catch (error) {
+            console.error("stub projects.programme_meta:", error);
+            json(res, 500, { title: "Internal", detail: String(error) });
+          }
         });
         return;
       }
@@ -2988,6 +3042,12 @@ function readBody(req, done) {
         consoleState.requests.some((row) => row.path === "/api/actions/projects.update/invocations"),
         "projects.update was sent",
       );
+      assert.ok(
+        consoleState.requests.some(
+          (row) => row.path === "/api/actions/projects.programme_meta/invocations",
+        ),
+        "projects.programme_meta was sent",
+      );
       assert.equal(
         consoleState.project.name,
         "Skeleton — edited in the console",
@@ -3322,7 +3382,7 @@ function readBody(req, done) {
       assert.deepEqual(createPatch.closure_outputs, ["evidence", "closure-review"]);
       assert.equal(createPatch.track, "v2", "the class facts are written");
       assert.equal(createPatch.measured_status, "proposed");
-      assert.equal(createPatch.tranche, 4, "the tranche reaches projects.update");
+      assert.equal(createPatch.tranche, 4, "the tranche reaches projects.programme_meta");
 
       await page.click('[data-v2="feedback-intake"][data-issue="9"]');
       await page.waitForSelector("text=Issue #9 intaken as a card");

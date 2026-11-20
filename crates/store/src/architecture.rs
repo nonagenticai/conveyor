@@ -277,6 +277,8 @@ pub struct ContractRecord {
     pub approved_by: Option<Uuid>,
     /// When.
     pub approved_at: Option<DateTime<Utc>>,
+    /// Who requested it; `None` on a contract that predates the column.
+    pub requested_by: Option<Uuid>,
     /// Supersedes.
     pub supersedes_id: Option<Uuid>,
     /// Superseded by.
@@ -398,7 +400,7 @@ const PROFILE_COLUMNS: &str = "id, key, name, phase_set, artifact_requirements, 
 const BODY_COLUMNS: &str = "id, kind, key, name, charter, commissioning_authority, \
     decision_limits, members, status, version";
 const CONTRACT_COLUMNS: &str = "id, project_id, kind, phase_code, title, body, status, \
-    approval_id, approved_by, approved_at, supersedes_id, superseded_by_id, version";
+    approval_id, approved_by, approved_at, requested_by, supersedes_id, superseded_by_id, version";
 const REVIEW_COLUMNS: &str = "id, project_id, contract_id, level, findings, evidence, outcome, \
     reviewed_by, reviewed_at, version";
 const WAIVER_COLUMNS: &str = "id, review_id, owner_user_id, reason, cost_impact, risk_impact, \
@@ -1236,6 +1238,15 @@ pub async fn get_body_tx(
         .await?)
 }
 
+/// What a board decision is about.
+#[derive(Clone, Copy, Debug, Default)]
+pub struct BoardSubject<'a> {
+    /// `board | contract | artifact | adm_profile | waiver`.
+    pub kind: Option<&'a str>,
+    /// The subject's id; absent for a decision about the board itself.
+    pub id: Option<Uuid>,
+}
+
 /// Record a board decision; the approval row is the decision's durable record.
 pub async fn decide_board_tx(
     conn: &mut PgConnection,
@@ -1244,6 +1255,7 @@ pub async fn decide_board_tx(
     decision: &str,
     evidence: Value,
     decided_by: Uuid,
+    subject: BoardSubject<'_>,
 ) -> Result<Uuid, ArchitectureStoreError> {
     if decision != "approved" && decision != "rejected" {
         return Err(ArchitectureStoreError::Conflict {
@@ -1251,9 +1263,66 @@ pub async fn decide_board_tx(
             why: "the decision must be approved or rejected",
         });
     }
+    let BoardSubject {
+        kind: subject_kind,
+        id: subject_id,
+    } = subject;
+    let subject_kind = match subject_kind {
+        Some(kind)
+            if matches!(
+                kind,
+                "board" | "contract" | "artifact" | "adm_profile" | "waiver"
+            ) =>
+        {
+            Some(kind)
+        }
+        Some(_other) => {
+            return Err(ArchitectureStoreError::Conflict {
+                what: "board decision",
+                why: "the subject kind must be board, contract, artifact, adm_profile or waiver",
+            });
+        }
+        None => None,
+    };
+    match (subject_kind, subject_id) {
+        (Some("board"), Some(_)) => {
+            return Err(ArchitectureStoreError::Conflict {
+                what: "board decision",
+                why: "a decision about the board itself takes no subject id",
+            });
+        }
+        (Some("board"), None) | (None, None) => {}
+        (Some(_), None) | (None, Some(_)) => {
+            return Err(ArchitectureStoreError::Conflict {
+                what: "board decision",
+                why: "a subject decision needs both subject_kind and subject_id",
+            });
+        }
+        _ => {}
+    }
     get_body_tx(&mut *conn, tenant, body_id)
         .await?
         .ok_or(ArchitectureStoreError::NotFound("governance body"))?;
+    // A subject that does not exist would make the decision unreferenceable; refuse it here.
+    if let (Some(kind), Some(subject)) = (subject_kind, subject_id) {
+        let table = match kind {
+            "contract" => "architecture_contract",
+            "artifact" => "architecture_artifact",
+            "adm_profile" => "adm_profile",
+            "waiver" => "architecture_waiver",
+            _ => unreachable!("subject_kind was validated above"),
+        };
+        let exists: bool = sqlx::query_scalar(AssertSqlSafe(format!(
+            "SELECT EXISTS (SELECT 1 FROM {table} WHERE tenant_id = $1 AND id = $2)"
+        )))
+        .bind(tenant.as_uuid())
+        .bind(subject)
+        .fetch_one(&mut *conn)
+        .await?;
+        if !exists {
+            return Err(ArchitectureStoreError::NotFound("board decision subject"));
+        }
+    }
     let id: Uuid = sqlx::query_scalar(
         "INSERT INTO approval
             (tenant_id, gate, kind, status, required_decisions, requested_by, meta)
@@ -1263,9 +1332,27 @@ pub async fn decide_board_tx(
     .bind(tenant.as_uuid())
     .bind(decision)
     .bind(decided_by)
-    .bind(json!({ "body_id": body_id, "evidence": evidence }))
+    .bind(json!({
+        "body_id": body_id,
+        "evidence": evidence,
+        "subject_kind": subject_kind,
+        "subject_id": subject_id,
+    }))
     .fetch_one(&mut *conn)
     .await?;
+    // A board convened by its own decision is active from that decision. Nothing writes the
+    // status directly: this is the one writer, and it writes what the decision says.
+    if subject_kind == Some("board") && decision == "approved" {
+        sqlx::query(
+            "UPDATE governance_body
+                SET status = 'active', version = version + 1, updated_at = now()
+              WHERE tenant_id = $1 AND id = $2 AND status = 'draft'",
+        )
+        .bind(tenant.as_uuid())
+        .bind(body_id)
+        .execute(&mut *conn)
+        .await?;
+    }
     Ok(id)
 }
 
@@ -1282,6 +1369,8 @@ pub struct NewContract {
     pub title: String,
     /// The body.
     pub body: Value,
+    /// The actor that requested it; the approver must be a different actor.
+    pub requested_by: Uuid,
     /// The contract it replaces, if any.
     pub supersedes_id: Option<Uuid>,
 }
@@ -1317,8 +1406,8 @@ pub async fn request_contract_tx(
     }
     let sql = format!(
         "INSERT INTO architecture_contract
-            (tenant_id, project_id, kind, phase_code, title, body, supersedes_id)
-         VALUES ($1, $2, $3, $4, $5, $6, $7)
+            (tenant_id, project_id, kind, phase_code, title, body, supersedes_id, requested_by)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
          RETURNING {CONTRACT_COLUMNS}"
     );
     let record: ContractRecord = sqlx::query_as(AssertSqlSafe(sql))
@@ -1329,6 +1418,7 @@ pub async fn request_contract_tx(
         .bind(new.title.trim())
         .bind(&new.body)
         .bind(new.supersedes_id)
+        .bind(new.requested_by)
         .fetch_one(&mut *conn)
         .await
         .map_err(ArchitectureStoreError::Database)?;
@@ -1356,6 +1446,7 @@ pub async fn approve_contract_tx(
     id: Uuid,
     expected: i64,
     approved_by: Uuid,
+    approval_id: Option<Uuid>,
 ) -> Result<ContractRecord, ArchitectureStoreError> {
     let current = get_contract_tx(&mut *conn, tenant, id)
         .await?
@@ -1389,9 +1480,35 @@ pub async fn approve_contract_tx(
             why: "a live contract of this kind exists; supersede it first",
         });
     }
+    // A cited board decision must actually be about this contract: an approval row with the
+    // board's gate, an `approved` outcome and this contract as its subject. Without that, the
+    // contract's `approval_id` would name a decision about something else.
+    if let Some(approval_id) = approval_id {
+        let valid: bool = sqlx::query_scalar(
+            "SELECT EXISTS (
+                SELECT 1 FROM approval
+                 WHERE tenant_id = $1 AND id = $2 AND gate = 'architecture_board'
+                   AND status = 'approved'
+                   AND meta->>'subject_kind' = 'contract'
+                   AND meta->>'subject_id' = $3
+            )",
+        )
+        .bind(tenant.as_uuid())
+        .bind(approval_id)
+        .bind(id.to_string())
+        .fetch_one(&mut *conn)
+        .await?;
+        if !valid {
+            return Err(ArchitectureStoreError::Conflict {
+                what: "architecture contract",
+                why: "the cited board decision does not approve this contract",
+            });
+        }
+    }
     let sql = format!(
         "UPDATE architecture_contract
             SET status = 'live', approved_by = $4, approved_at = now(),
+                approval_id = COALESCE($5, approval_id),
                 version = version + 1, updated_at = now()
           WHERE tenant_id = $1 AND id = $2 AND version = $3 AND status = 'draft'
          RETURNING {CONTRACT_COLUMNS}"
@@ -1401,6 +1518,7 @@ pub async fn approve_contract_tx(
         .bind(id)
         .bind(expected)
         .bind(approved_by)
+        .bind(approval_id)
         .fetch_optional(&mut *conn)
         .await?
         .ok_or(ArchitectureStoreError::Stale("architecture contract"))

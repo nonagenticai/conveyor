@@ -65,7 +65,7 @@ async fn declare(
 ) {
     let (status, body) = running
         .invoke(
-            "projects.update",
+            "projects.programme_meta",
             TOKEN,
             json!({
                 "id": project,

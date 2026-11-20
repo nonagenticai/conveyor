@@ -1481,7 +1481,7 @@ window.installV2 = function (api, enterprise) {
         ["Download", downloads],
       ])}${
         signed
-          ? `<div class="console-actions">${C.can("projects.update") ? button("Edit project", "project-edit", `data-id="${E(current.id)}"`, "small", "edit") : ""}${C.can("projects.close") ? button("Close project", "project-close", `data-id="${E(current.id)}"`, "small", "archive") : ""}</div>`
+          ? `<div class="console-actions">${C.can("projects.update") ? button("Edit project", "project-edit", `data-id="${E(current.id)}"`, "small", "edit") : ""}${C.can("projects.update") && (current.status === "draft" || current.status === "paused") ? button("Activate", "project-activate", `data-id="${E(current.id)}"`, "small") : ""}${C.can("projects.update") && current.status === "active" ? button("Pause", "project-pause", `data-id="${E(current.id)}"`, "small") : ""}${C.can("projects.update") && current.status === "closed" ? button("Archive", "project-archive", `data-id="${E(current.id)}"`, "small") : ""}${C.can("projects.close") ? button("Close project", "project-close", `data-id="${E(current.id)}"`, "small", "archive") : ""}</div>`
           : ""
       }`,
       signed ? `<span class="console-live">live</span>` : "",
@@ -2392,12 +2392,16 @@ window.installV2 = function (api, enterprise) {
       const created = await C.action("projects.create", payload);
       projectId = created && created.project ? created.project.id : null;
       if (!projectId) throw new Error("projects.create returned no project");
-      // `projects.create` has no meta input: the class and plan are a second, explicit patch.
-      // It is merged into the row's existing meta (projects.update preserves absent keys).
+      // `projects.create` has no meta input: the class and plan are a second, explicit write.
+      // The programme owns these keys, so the write goes through `projects.programme_meta`.
       const meta = classMeta(cls, tranche);
       if (plan.trim()) meta.plan = plan.trim();
       try {
-        await C.action("projects.update", { id: projectId, meta });
+        await C.action(
+          "projects.programme_meta",
+          { id: projectId, meta },
+          { etag: created.project.version },
+        );
       } catch (error) {
         // The project exists — say exactly that, never a false "create refused".
         cs.lastError = error;
@@ -2420,7 +2424,6 @@ window.installV2 = function (api, enterprise) {
   function consoleProjectEdit(id) {
     const project = projectById(id);
     if (!project) return;
-    const statuses = ["draft", "active", "paused", "closed", "archived"];
     const currentClass = classOfProject(project);
     const classes = OUTPUT_CLASSES.map(
       (cls) =>
@@ -2429,12 +2432,7 @@ window.installV2 = function (api, enterprise) {
     const keep = currentClass
       ? ""
       : `<option value="" selected>Keep the current expected outputs (no matching class)</option>`;
-    const body = `<div class="dialog-body console-dialog-body"><label class="field full"><span>Name</span><input id="project-name" value="${E(project.name)}"></label><label class="field full"><span>Description</span><textarea id="project-description" rows="3">${E(project.description || "")}</textarea></label><label class="field full"><span>Status</span><select id="project-status">${statuses
-      .map(
-        (status) =>
-          `<option value="${status}" ${status === project.status ? "selected" : ""}>${status}</option>`,
-      )
-      .join("")}</select></label><label class="field full"><span>Delivery class</span><select id="project-class">${keep}${classes}</select></label><label class="field full"><span>Tranche</span><input id="project-tranche" type="number" min="0" step="1" value="${E((project.meta || {}).tranche ?? "")}"></label><label class="field full"><span>Repository URL</span><input id="project-repo" value="${E(project.repo_url || "")}" spellcheck="false"></label><label class="field full"><span>Plan path (docs/…)</span><input id="project-plan" value="${E(((project.meta || {}).plan) || "")}" spellcheck="false"></label><p class="muted">Choosing a class recomputes the expected due-now and at-closure outputs; other meta keys are preserved. The seed owns its own 48 rows — a later seed run restores their class and sets.</p></div>`;
+    const body = `<div class="dialog-body console-dialog-body"><label class="field full"><span>Name</span><input id="project-name" value="${E(project.name)}"></label><label class="field full"><span>Description</span><textarea id="project-description" rows="3">${E(project.description || "")}</textarea></label><label class="field full"><span>Delivery class</span><select id="project-class">${keep}${classes}</select></label><label class="field full"><span>Tranche</span><input id="project-tranche" type="number" min="0" step="1" value="${E((project.meta || {}).tranche ?? "")}"></label><label class="field full"><span>Repository URL</span><input id="project-repo" value="${E(project.repo_url || "")}" spellcheck="false"></label><label class="field full"><span>Plan path (docs/…)</span><input id="project-plan" value="${E(((project.meta || {}).plan) || "")}" spellcheck="false"></label><p class="muted">Choosing a class recomputes the expected due-now and at-closure outputs; other meta keys are preserved. The seed owns its own 48 rows — a later seed run restores their class and sets.</p></div>`;
     openDialog(
       `${project.key} · edit`,
       body,
@@ -2448,7 +2446,6 @@ window.installV2 = function (api, enterprise) {
     if (!project) return;
     const name = (document.getElementById("project-name") || {}).value || "";
     const description = (document.getElementById("project-description") || {}).value || "";
-    const status = (document.getElementById("project-status") || {}).value || project.status;
     const repoUrl = (document.getElementById("project-repo") || {}).value || "";
     const plan = (document.getElementById("project-plan") || {}).value || "";
     const tranche = (document.getElementById("project-tranche") || {}).value || "";
@@ -2466,18 +2463,26 @@ window.installV2 = function (api, enterprise) {
       meta.tranche = Number(tranche);
     }
     try {
-      await C.action(
+      // The project's own fields and the programme-owned meta are two writes with two
+      // authorities; the second takes the version the first produced.
+      const updated = await C.action(
         "projects.update",
         {
           id: project.id,
           name: name.trim(),
           description: description.trim(),
-          status,
           repo_url: repoUrl.trim(),
-          meta,
         },
         { etag: project.version },
       );
+      const nextVersion = updated && updated.project ? updated.project.version : null;
+      if (nextVersion && Object.keys(meta).length) {
+        await C.action(
+          "projects.programme_meta",
+          { id: project.id, meta },
+          { etag: nextVersion },
+        );
+      }
       closeWorkspaceDialog();
       cs.loaded = false;
       cs.byProject = {};
@@ -2501,6 +2506,23 @@ window.installV2 = function (api, enterprise) {
       `${button("Close project", "project-close-save", `data-id="${E(project.id)}"`, "primary", "archive")}${btn("Cancel", "close-dialog")}`,
       true,
     );
+  }
+
+  // A status transition is its own action: `projects.update` no longer writes status.
+  async function consoleProjectTransition(id, action, verb, done) {
+    try {
+      await C.action(action, { id });
+      closeWorkspaceDialog();
+      cs.loaded = false;
+      cs.byProject = {};
+      toast(done);
+      render();
+      consoleLoad();
+    } catch (error) {
+      cs.lastError = error;
+      toast(`${verb} refused · ` + consoleError(error));
+      render();
+    }
   }
 
   async function consoleProjectCloseSave(id) {
@@ -7499,6 +7521,15 @@ git log origin/main --grep "#N"</pre><p class="muted">Then push <span class="mon
         break;
       case "project-close-save":
         consoleProjectCloseSave(d.id);
+        break;
+      case "project-activate":
+        consoleProjectTransition(d.id, "projects.activate", "Activate", "Project activated");
+        break;
+      case "project-pause":
+        consoleProjectTransition(d.id, "projects.pause", "Pause", "Project paused");
+        break;
+      case "project-archive":
+        consoleProjectTransition(d.id, "projects.archive", "Archive", "Project archived");
         break;
       /* execution room — every case is the action it names */
       case "run-start":
