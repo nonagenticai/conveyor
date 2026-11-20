@@ -1,11 +1,138 @@
 {
   "issues": [
     {
+      "number": 484,
+      "title": "ci: the merge queue stops rebuilding the image",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/484",
+      "updatedAt": "2026-11-20T08:31:50Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
+      "number": 477,
+      "title": "publish: the worker commits the deployed image's whole pack, reverting main",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/477",
+      "updatedAt": "2026-11-20T08:10:27Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
+      "number": 476,
+      "title": "copilot_rounds: the round-cap turn fails as a 502 under full-suite load (inference stub transport race)",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/476",
+      "updatedAt": "2026-11-20T07:51:32Z",
+      "labels": [
+        {
+          "name": "bug",
+          "color": "d73a4a"
+        }
+      ]
+    },
+    {
+      "number": 472,
+      "title": "ci: a conveyor PR reaches a verdict in single-digit minutes (drop the duplicate gate job, cache and shard the compiles)",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/472",
+      "updatedAt": "2026-11-20T08:10:07Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
+      "number": 471,
+      "title": "console: the Admin Workers and Billing tabs render the external-service panel for local actions",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/471",
+      "updatedAt": "2026-11-20T07:37:10Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        },
+        {
+          "name": "S12",
+          "color": "6E7781"
+        }
+      ]
+    },
+    {
+      "number": 470,
+      "title": "publish: the generated pack carries a programme destination the shell does not announce",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/470",
+      "updatedAt": "2026-11-20T07:10:54Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:ready",
+          "color": "0E8A16"
+        },
+        {
+          "name": "S12",
+          "color": "6E7781"
+        }
+      ]
+    },
+    {
+      "number": 468,
+      "title": "publish: the generated snapshot announces the Programme definition in the public sidebar",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/468",
+      "updatedAt": "2026-11-20T07:33:21Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:ready",
+          "color": "0E8A16"
+        },
+        {
+          "name": "S12",
+          "color": "6E7781"
+        }
+      ]
+    },
+    {
       "number": 462,
       "title": "console: the Programme page refreshes the live programme from the embedded seed (no pod step)",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/462",
-      "updatedAt": "2026-11-19T23:21:34Z",
+      "updatedAt": "2026-11-20T08:25:59Z",
       "labels": [
         {
           "name": "unit",
@@ -85,7 +212,7 @@
       "title": "T16 \u2014 the Procedures destination live over the intake and its gates",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/448",
-      "updatedAt": "2026-11-19T23:10:15Z",
+      "updatedAt": "2026-11-20T08:25:58Z",
       "labels": [
         {
           "name": "unit",
@@ -136,15 +263,15 @@
       "title": "console: the Operations screen reads the incident lifecycle (T7 built)",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/434",
-      "updatedAt": "2026-11-19T15:36:32Z",
+      "updatedAt": "2026-11-20T07:27:06Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:ready",
-          "color": "0E8A16"
+          "name": "status:claimed",
+          "color": "FBCA04"
         }
       ]
     },
@@ -310,7 +437,7 @@
       "title": "audio tools: produce.speech and media.transcribe are refused by the minis' licence gate (auth: None)",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/410",
-      "updatedAt": "2026-11-19T10:32:54Z",
+      "updatedAt": "2026-11-20T07:21:40Z",
       "labels": [
         {
           "name": "unit",
@@ -355,9 +482,9 @@
     {
       "number": 400,
       "title": "publish: the generated snapshot exposes the WBS study tab and its commit fails DCO",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/400",
-      "updatedAt": "2026-11-19T21:49:02Z",
+      "updatedAt": "2026-11-20T08:06:14Z",
       "labels": [
         {
           "name": "unit",
@@ -395,24 +522,24 @@
       "title": "seed: the buildout's MSP definition and benefits map travel with the repository",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/394",
-      "updatedAt": "2026-11-19T07:47:54Z",
+      "updatedAt": "2026-11-20T08:29:33Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:ready",
-          "color": "0E8A16"
+          "name": "status:claimed",
+          "color": "FBCA04"
         }
       ]
     },
     {
       "number": 393,
       "title": "docs: the programme architecture and benefits realization study (public-safe)",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/393",
-      "updatedAt": "2026-11-19T21:34:50Z",
+      "updatedAt": "2026-11-20T08:28:49Z",
       "labels": [
         {
           "name": "unit",
@@ -450,15 +577,15 @@
       "title": "web: the deployed OIDC suite cannot run from a clean checkout",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/391",
-      "updatedAt": "2026-11-19T07:42:36Z",
+      "updatedAt": "2026-11-20T07:13:42Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:needs-human",
-          "color": "5319E7"
+          "name": "status:claimed",
+          "color": "FBCA04"
         },
         {
           "name": "S12",
@@ -3041,15 +3168,15 @@
       "title": "T17 \u2014 Tenant asset authoring",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/87",
-      "updatedAt": "2026-11-19T21:45:18Z",
+      "updatedAt": "2026-11-20T08:09:31Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:ready",
-          "color": "0E8A16"
+          "name": "status:claimed",
+          "color": "FBCA04"
         },
         {
           "name": "T17",
@@ -3228,9 +3355,9 @@
     {
       "number": 78,
       "title": "T7 \u2014 Operations",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/78",
-      "updatedAt": "2026-11-19T23:17:03Z",
+      "updatedAt": "2026-11-20T08:06:52Z",
       "labels": [
         {
           "name": "unit",
@@ -4177,15 +4304,15 @@
       "title": "S14 \u2014 independent deployment, native acceptance, and one release-SHA receipt",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/8",
-      "updatedAt": "2026-11-13T06:31:52Z",
+      "updatedAt": "2026-11-20T08:25:09Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:ready",
-          "color": "0E8A16"
+          "name": "status:claimed",
+          "color": "FBCA04"
         },
         {
           "name": "S14",

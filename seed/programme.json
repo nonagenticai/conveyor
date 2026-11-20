@@ -446,7 +446,10 @@
           391,
           392,
           400,
-          459
+          459,
+          468,
+          470,
+          471
         ],
         "depends_on": [
           "S01",
@@ -966,7 +969,7 @@
       "key": "T7",
       "name": "Operations",
       "description": "SPEC_V2 slice T7 (docs/SPEC_V2.md §12)",
-      "status": "active",
+      "status": "closed",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/SPEC_V2.md#12",
@@ -1441,7 +1444,6 @@
           223,
           224,
           225,
-          393,
           394,
           395,
           410,
@@ -1449,7 +1451,10 @@
           433,
           434,
           435,
-          462
+          462,
+          476,
+          477,
+          484
         ],
         "depends_on": [],
         "plan_status": "active",
