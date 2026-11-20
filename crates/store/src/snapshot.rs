@@ -37,7 +37,8 @@ pub struct SnapshotData {
     /// `artefacts.json` data: governed assets and document metadata.
     pub artefacts: Value,
     /// `architecture.json` data: the TOGAF ADM capability's rows — profiled standard, artefacts
-    /// with their entries and links, contracts, the board, and the two assessment baselines.
+    /// with their entries and links, contracts, the board, the compliance reviews and waivers,
+    /// and the two assessment baselines.
     pub architecture: Value,
     /// `ops.json` data: the incident cards the T7 lifecycle writes — service, severity, the four
     /// timestamps and the runbook/postmortem links. Never the triage narrative or the evidence:
@@ -408,7 +409,8 @@ pub async fn snapshot_tx(
         &mut *conn,
         "SELECT COALESCE(jsonb_agg(to_jsonb(t) ORDER BY t.programme_id, t.number), '[]'::jsonb) FROM (
              SELECT id, programme_id, number, state, entry_criteria, exit_criteria, baseline_ref,
-                    review_at, version, created_at, updated_at
+                    review_at, authorised_at, authorisation_review_id, version, created_at,
+                    updated_at
                FROM programme_tranche WHERE tenant_id = $1
          ) t",
         tenant_id,
@@ -550,6 +552,31 @@ pub async fn snapshot_tx(
         tenant_id,
     )
     .await?;
+    let mut architecture_reviews = rows(
+        &mut *conn,
+        "SELECT COALESCE(jsonb_agg(to_jsonb(t) ORDER BY t.reviewed_at DESC, t.project_id, t.id), '[]'::jsonb) FROM (
+             SELECT r.id, r.project_id, r.contract_id, r.level, r.outcome, r.reviewed_by,
+                    u.display_name AS reviewed_by_name, r.reviewed_at, r.version,
+                    r.created_at, r.updated_at
+               FROM architecture_compliance_review r
+               LEFT JOIN app_user u ON u.id = r.reviewed_by
+              WHERE r.tenant_id = $1
+         ) t",
+        tenant_id,
+    )
+    .await?;
+    let mut architecture_waivers = rows(
+        &mut *conn,
+        "SELECT COALESCE(jsonb_agg(to_jsonb(t) ORDER BY t.reassessment_at DESC, t.review_id, t.id), '[]'::jsonb) FROM (
+             SELECT w.id, w.review_id, w.owner_user_id, u.display_name AS owner_name,
+                    w.reassessment_at, w.status, w.version, w.created_at, w.updated_at
+               FROM architecture_waiver w
+               LEFT JOIN app_user u ON u.id = w.owner_user_id
+              WHERE w.tenant_id = $1
+         ) t",
+        tenant_id,
+    )
+    .await?;
     let architecture_board = rows(
         &mut *conn,
         "SELECT COALESCE(jsonb_agg(to_jsonb(t) ORDER BY t.key), '[]'::jsonb) FROM (
@@ -658,10 +685,15 @@ pub async fn snapshot_tx(
                 .is_none_or(|id| bound_projects.contains(id))
         });
     }
-    // The architecture rows follow the same programme boundary: an artefact or contract tied to a
-    // project outside the programme is not the public capability's story; a row with no project is
-    // programme-level and stays (as documents do).
-    for row_set in [&mut architecture_artifacts, &mut architecture_contracts] {
+    // The architecture rows follow the same programme boundary: an artefact, contract or
+    // compliance review tied to a project outside the programme is not the public capability's
+    // story; a row with no project is programme-level and stays (as documents do). A waiver hangs
+    // from a review, so it follows the review's boundary.
+    for row_set in [
+        &mut architecture_artifacts,
+        &mut architecture_contracts,
+        &mut architecture_reviews,
+    ] {
         if let Some(rows) = row_set.as_array_mut() {
             rows.retain(|row| {
                 row.get("project_id")
@@ -670,6 +702,8 @@ pub async fn snapshot_tx(
             });
         }
     }
+    let bound_reviews = ids_where(&architecture_reviews, "id", |_| true);
+    retain_ids(&mut architecture_waivers, "review_id", &bound_reviews);
 
     Ok(SnapshotData {
         programme: json!({"programme": programme, "projects": projects}),
@@ -721,6 +755,8 @@ pub async fn snapshot_tx(
             "artifacts": architecture_artifacts,
             "links": architecture_links,
             "contracts": architecture_contracts,
+            "compliance_reviews": architecture_reviews,
+            "waivers": architecture_waivers,
             "board": architecture_board,
             "maturity": architecture_maturity,
             "skills": architecture_skills

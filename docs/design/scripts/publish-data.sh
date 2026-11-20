@@ -31,6 +31,12 @@ fi
 # The snapshot's evidence index is relative to the repo root, so run from there.
 cd "$root"
 
+# The pack is assembled in a temp directory and copied in only after the conformance audit.
+# A failed audit therefore leaves the published data and output pages untouched.
+tmp="$(mktemp -d)"
+trap 'rm -rf "$tmp"' EXIT
+mkdir -p "$tmp/data" "$tmp/docs" "$tmp/conformance"
+
 # 0. Markdown -> standalone HTML. The pack is published verbatim, so the pages must exist
 #    here; check-docs.cjs gates the committed output without needing pandoc.
 python3 "$pack/scripts/build-docs.py"
@@ -39,12 +45,11 @@ python3 "$pack/scripts/build-docs.py"
 #    is an IMAGE INPUT (`include_str!`), so it changes only in a repository PR and never during a
 #    publish. The plan seed is retired: execution state (boards, cards, runs) is never seeded, so
 #    there is no plan document to regenerate. Refresh the registry only.
-"$root/scripts/fetch-issues.sh" "$data/issues.json"
+"$root/scripts/fetch-issues.sh" "$tmp/data/issues.json"
 
 # 2. The rows come from the live database, not from a fixture.
-mkdir -p "$data"
-snapshot_args=(snapshot --tenant "$tenant" --out "$data" --issues "$data/issues.json")
-snapshot_args+=(--outputs-dir "$pack/docs")
+snapshot_args=(snapshot --tenant "$tenant" --out "$tmp/data" --issues "$tmp/data/issues.json")
+snapshot_args+=(--outputs-dir "$tmp/docs")
 snapshot_args+=(--git-sha "$(git -C "$root" rev-parse HEAD)")
 if [ -n "${SNAPSHOT_DATABASE_URL:-}" ]; then
   snapshot_args+=(--database-url "$SNAPSHOT_DATABASE_URL")
@@ -54,7 +59,25 @@ if [ -n "${GENERATED_AT:-}" ]; then
 fi
 "$conveyor" "${snapshot_args[@]}"
 
-# 3. Mirror the pack (including data/ and docs/) and let the homepage's own gate decide.
+# 3. The conformance audit runs on the fresh snapshot before anything is published. Report-only
+#    is the default while the first baseline is being accepted; CONFORMANCE_STRICT=1 turns the
+#    P0/P1 ratchet into a publish gate.
+audit_args=(--snapshot "$tmp/data" --out "$tmp/conformance")
+if [ "${CONFORMANCE_STRICT:-0}" = "1" ]; then
+  python3 "$root/scripts/audit-programme-conformance.py" "${audit_args[@]}" \
+    --strict --fail-on P0,P1 --baseline "$root/docs/evidence/conformance-baseline.json"
+else
+  python3 "$root/scripts/audit-programme-conformance.py" "${audit_args[@]}" --report
+  echo "publish-data: conformance audit is report-only (set CONFORMANCE_STRICT=1 to gate)"
+fi
+cp "$tmp/conformance/conformance-gap-register.json" "$tmp/data/conformance.json"
+cp "$tmp/conformance/conformance-gap-register.md" "$tmp/data/conformance.md"
+
+# 4. Only now does the fresh pack replace the published one.
+rsync -a "$tmp/data/" "$data/"
+rsync -a "$tmp/docs/" "$pack/docs/"
+
+# 5. Mirror the pack (including data/ and docs/) and let the homepage's own gate decide.
 # `issues.json` is an INPUT to the snapshot (the redacted registry is inside programme.json).
 # It is not mirrored: the published data is the snapshot, not the raw GitHub export.
 # `--delete` removes files that are no longer part of the pack (the retired v1 studies, stale

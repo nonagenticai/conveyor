@@ -398,6 +398,15 @@ window.CONVEYOR_DOCUMENTS = {
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/analysis-capture-2026-11-15.md"
     },
     {
+      "title": "MSP/TOGAF conformance gap register",
+      "path": "docs/evidence/conformance-gap-register.html",
+      "source": "docs/evidence/conformance-gap-register.md",
+      "section": "Evidence",
+      "sha256": "54ad8c0070587cf9bd80142e52a2936b1d14ab4bcf879ce90e603ee2eae26df0",
+      "bytes": 10305,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/conformance-gap-register.md"
+    },
+    {
       "title": "The evidence-review service — capture and drop table (2026-11-18)",
       "path": "docs/evidence/evidence-review-capture-2026-11-18.html",
       "source": "docs/evidence/evidence-review-capture-2026-11-18.md",

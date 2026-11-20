@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "standard": "SPEC_V2 §8.1 (tailored TOGAF ADM) and §8.3 (MSP as rows and gates)",
+  "sources": {
+    "output_standard": "seed/output-standard.json",
+    "programme_seed": "seed/programme.json",
+    "programme_definition": "seed/programme-definition.json",
+    "snapshot_schema": "design-snapshot/v1",
+    "profile_key": "conveyor-software-delivery",
+    "profile_hash": "sha256:59f1fe0c41417b730f5760afc39afa4fecc27cad950695c7883ef1f05deda0d5"
+  },
+  "legacy": {
+    "capability_adopted_at": "2026-11-19T07:50:26.220655+00:00",
+    "policy": "A project created before the profile was adopted is a retrospective-waiver candidate: its missing ADM artefacts are P2, never a fabricated backfill. A project created after adoption must hold the full set (P1)."
+  },
+  "programme": {
+    "project_key": "P0",
+    "required_baselines": ["management", "governance", "boundary"],
+    "tranche_states_authorising_delivery": ["authorised", "in_review", "closed"],
+    "closure_review_category": "closure-review"
+  },
+  "rules": {
+    "snapshot_schema_stale": "P2",
+    "programme_outputs": "P1",
+    "tranche_plan": "P2",
+    "tranche_review_without_authorisation": "P0",
+    "project_in_unauthorised_tranche": "P0",
+    "closed_without_closure_review": "P0",
+    "unpublished_declared_output": "P1",
+    "benefit_profile_incomplete": "P1",
+    "benefit_baseline_placeholder": "P1",
+    "realized_without_transition": "P0",
+    "transition_order": "P1",
+    "programme_baselines": "P1",
+    "profile_adopted": "P0",
+    "board_not_approved": "P1",
+    "contract_missing": "P1",
+    "contract_unapproved": "P1",
+    "requester_is_approver": "P0",
+    "compliance_review_missing": "P1",
+    "waiver_invalid": "P1",
+    "mandatory_artefacts": "P2",
+    "seed_live_drift": "P1",
+    "derivation_missing": "P1",
+    "status_source_drift": "P2"
+  },
+  "dispositions": ["conformant", "waiver", "remediate", "correct-the-claim", "unprovable"]
+}

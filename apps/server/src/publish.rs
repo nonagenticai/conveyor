@@ -336,17 +336,20 @@ fn targets(files: &BTreeMap<String, Vec<u8>>) -> BTreeMap<String, Vec<u8>> {
 /// The generated files the publisher owns: the snapshot's data files and the published output
 /// pages. Everything else under `docs/design/` is hand-authored (documents, decisions, scripts,
 /// the issue registry) and a publish never deletes it.
-const GENERATED_DATA: [&str; 12] = [
+const GENERATED_DATA: [&str; 15] = [
     "programme.json",
     "organisation.json",
     "config.json",
     "work.json",
     "msp.json",
+    "architecture.json",
     "artefacts.json",
     "measure.json",
     "secrets.json",
     "evidence.json",
     "feedback.json",
+    "conformance.json",
+    "conformance.md",
     "snapshot.js",
     "manifest.json",
 ];
@@ -466,6 +469,16 @@ mod tests {
     }
 
     #[test]
+    fn generated_data_includes_the_conformance_and_architecture_files() {
+        for name in ["architecture.json", "conformance.json", "conformance.md"] {
+            assert!(
+                GENERATED_DATA.contains(&name),
+                "{name} is generated and must be deletable when a later pack omits it"
+            );
+        }
+    }
+
+    #[test]
     fn stale_generated_pages_are_deleted_and_hand_authored_files_are_not() {
         let mut files = BTreeMap::new();
         files.insert("docs/output-new.html".to_owned(), b"x".to_vec());
@@ -475,6 +488,9 @@ mod tests {
             entry("docs/design/docs/output-old.html"),
             entry("docs/design/docs/outputs.js"),
             entry("docs/design/data/snapshot.js"),
+            entry("docs/design/data/architecture.json"),
+            entry("docs/design/data/conformance.json"),
+            entry("docs/design/data/conformance.md"),
             entry("docs/design/data/issues.json"),
             entry("docs/design/data/coverage.json"),
             entry("docs/design/docs/documents.js"),
@@ -492,6 +508,9 @@ mod tests {
         assert!(deletes.contains(&"docs/design/docs/output-old.html".to_owned()));
         assert!(deletes.contains(&"docs/design/docs/outputs.js".to_owned()));
         assert!(deletes.contains(&"docs/design/data/snapshot.js".to_owned()));
+        assert!(deletes.contains(&"docs/design/data/architecture.json".to_owned()));
+        assert!(deletes.contains(&"docs/design/data/conformance.json".to_owned()));
+        assert!(deletes.contains(&"docs/design/data/conformance.md".to_owned()));
         for keep in [
             "docs/design/data/issues.json",
             "docs/design/data/coverage.json",
