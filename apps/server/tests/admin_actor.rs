@@ -80,6 +80,42 @@ async fn a_named_actor_creates_as_itself_and_a_stranger_is_refused() {
         "the named actor owns the project: {created}"
     );
 
+    // The precondition is the CALL's, not the payload's: a stale `If-Match` is refused and the
+    // current version writes. This is the path the record harness needs for the actions whose
+    // edits are version-guarded (`projects.programme_meta`, `documents.publish`).
+    let project_id: uuid::Uuid = created["id"]
+        .as_str()
+        .expect("the project id")
+        .parse()
+        .expect("a uuid");
+    let version = created["version"].as_i64().expect("the project version");
+    let written = caller
+        .call_gated(
+            "projects.programme_meta",
+            serde_json::json!({"id": project_id, "meta": {"viability": "rework"}}),
+            Some(version),
+            None,
+        )
+        .await
+        .expect("the current version writes");
+    assert_eq!(
+        written["project"]["meta"]["viability"], "rework",
+        "{written}"
+    );
+    let stale = caller
+        .call_gated(
+            "projects.programme_meta",
+            serde_json::json!({"id": project_id, "meta": {"viability": "fold"}}),
+            Some(version - 1),
+            None,
+        )
+        .await;
+    assert!(
+        matches!(&stale, Err(CallError::Action { status: 412, .. })),
+        "a stale If-Match is refused: {:?}",
+        stale.err().map(|error| error.to_string()),
+    );
+
     // A user with no membership of this tenant can never be the actor.
     let stranger = uuid::Uuid::now_v7();
     let refused = ActionCaller::new_as(pool, tenant, "conveyor", Some(stranger)).await;

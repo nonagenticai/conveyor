@@ -136,7 +136,7 @@ class Transport:
         self.command = command or os.environ.get("PROGRAMME_RECORD_CMD")
         self.tenant = os.environ.get("TENANT") or DEFAULT_TENANT
 
-    def build(self, action, approval_id=None, actor_id=None):
+    def build(self, action, approval_id=None, actor_id=None, if_match=None):
         tail = [
             "conveyor", "admin", "action", "invoke",
             "--tenant", self.tenant,
@@ -147,6 +147,8 @@ class Transport:
             tail += ["--approval-id", approval_id]
         if actor_id:
             tail += ["--actor-id", actor_id]
+        if if_match is not None:
+            tail += ["--if-match", str(if_match)]
         if self.command:
             return shlex.split(self.command) + tail
         key = os.environ.get("CONVEYOR_SSH_KEY")
@@ -164,8 +166,10 @@ class Transport:
         ] + tail
 
 
-def execute(transport, action, payload, approval_id=None, actor_id=None):
-    command = transport.build(action, approval_id=approval_id, actor_id=actor_id)
+def execute(transport, action, payload, approval_id=None, actor_id=None, if_match=None):
+    command = transport.build(
+        action, approval_id=approval_id, actor_id=actor_id, if_match=if_match
+    )
     stdin = json.dumps(payload, separators=(",", ":")) + "\n"
     try:
         completed = subprocess.run(
@@ -269,6 +273,7 @@ def run_record(args, transport):
     payload = load_json_arg(args.input, "--input")
     actor_id = uuid_arg(args.actor_id, "--actor-id")
     approval_id = uuid_arg(args.approval_id, "--approval-id")
+    if_match = args.if_match
 
     if is_read_only(action):
         command = transport.build(action, actor_id=actor_id)
@@ -287,7 +292,9 @@ def run_record(args, transport):
     if args.dry_run:
         print_plan(
             "write", action, payload,
-            transport.build(action, approval_id=approval_id, actor_id=actor_id),
+            transport.build(
+                action, approval_id=approval_id, actor_id=actor_id, if_match=if_match
+            ),
             evidence=args.evidence,
         )
         print_plan(
@@ -297,7 +304,8 @@ def run_record(args, transport):
         return 0
 
     write_result = execute(
-        transport, action, payload, approval_id=approval_id, actor_id=actor_id
+        transport, action, payload, approval_id=approval_id, actor_id=actor_id,
+        if_match=if_match,
     )
     print_result("write", action, write_result)
     read_result = execute(transport, read_action, read_input, actor_id=actor_id)
@@ -488,6 +496,30 @@ def self_test():
         verify_write,
     )
 
+    def verify_if_match(completed):
+        problems = []
+        recorded = calls()
+        if len(recorded) != 2:
+            problems.append(f"calls were {actions()!r}")
+        else:
+            write = recorded[0]["argv"]
+            read = recorded[1]["argv"]
+            if "--if-match" not in write:
+                problems.append("the write did not carry --if-match")
+            elif write[write.index("--if-match") + 1] != "7":
+                problems.append("the write carried the wrong version")
+            if "--if-match" in read:
+                problems.append("the read-back carried --if-match")
+        return problems
+
+    run_case(
+        "if-match is passed to the write only",
+        write_argv + ["--if-match", "7"],
+        fake_env,
+        True,
+        verify_if_match,
+    )
+
     run_case(
         "write with no mapping refuses",
         ["--action", "ops.unmapped", "--input", "{}", "--evidence", evidence],
@@ -555,9 +587,9 @@ def self_test():
 
     print()
     if failures:
-        print(f"SELF-TEST FAILED: {len(failures)} of 8 cases: {', '.join(failures)}")
+        print(f"SELF-TEST FAILED: {len(failures)} of 9 cases: {', '.join(failures)}")
         return 1
-    print("SELF-TEST OK: 8 cases passed")
+    print("SELF-TEST OK: 9 cases passed")
     return 0
 
 
@@ -573,6 +605,9 @@ def main(argv=None):
     parser.add_argument("--evidence", metavar="PATH", help="required for a write")
     parser.add_argument("--approval-id", metavar="UUID", help="approved gate for the write")
     parser.add_argument("--actor-id", metavar="UUID", help="act as this actor")
+    parser.add_argument(
+        "--if-match", type=int, metavar="VERSION", help="the row version the write is made against"
+    )
     parser.add_argument("--dry-run", action="store_true", help="print the plan; invoke nothing")
     parser.add_argument("--check", action="store_true", help="read-only probe")
     parser.add_argument("--self-test", action="store_true", help="run the fake-transport tests")

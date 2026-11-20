@@ -316,6 +316,10 @@ enum ActionCommand {
         /// membership; a stranger is refused, never attributed.
         #[arg(long = "actor-id")]
         actor_id: Option<uuid::Uuid>,
+        /// The row version the call is made against (`If-Match`), for the actions that require
+        /// one. Without it those actions answer 412, which is exactly what the engine should do.
+        #[arg(long = "if-match")]
+        if_match: Option<i64>,
     },
 }
 
@@ -1105,6 +1109,7 @@ async fn admin(command: AdminCommand) -> Result<(), RunError> {
                     input,
                     approval_id,
                     actor_id,
+                    if_match,
                 },
         } => {
             let tenant_id = store::tenants::id_by_slug(&pool, &tenant)
@@ -1117,7 +1122,7 @@ async fn admin(command: AdminCommand) -> Result<(), RunError> {
                     .await
                     .map_err(|error| RunError::Refused(error.to_string()))?;
             let output = caller
-                .call_gated(&name, input, None, approval_id)
+                .call_gated(&name, input, if_match, approval_id)
                 .await
                 .map_err(|error| RunError::Refused(error.to_string()))?;
             println!("{}", serde_json::to_string_pretty(&output)?);
