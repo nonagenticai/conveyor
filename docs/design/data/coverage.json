@@ -2403,9 +2403,9 @@
       "evidence": [
         "docs/design/v2.js"
       ],
-      "gap": "V2 destination; no backend call",
+      "gap": null,
       "key": "operations",
-      "status": "proposed",
+      "status": "live",
       "title": "Operations"
     },
     {
@@ -2528,9 +2528,9 @@
       "actions_invoked": 27,
       "by_status": {
         "legacy": 7,
-        "live": 11,
+        "live": 12,
         "mixed": 1,
-        "proposed": 7
+        "proposed": 6
       },
       "total": 26
     }

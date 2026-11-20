@@ -19,22 +19,24 @@ struct Fixture {
     bound_project: Uuid,
     bound_board: Uuid,
     bound_card: Uuid,
+    bound_incident: Uuid,
     bound_run: Uuid,
     bound_approval: Uuid,
     unbound_project: Uuid,
     unbound_board: Uuid,
     unbound_card: Uuid,
+    unbound_incident: Uuid,
     unbound_run: Uuid,
     unbound_approval: Uuid,
 }
 
-/// One project with a board, a lane, a card, a run, an approval and a comment.
+/// One project with a board, a lane, a card, an incident, a run, an approval and a comment.
 async fn project_tree(
     db: &common::TestDb,
     tenant: TenantId,
     programme: Option<Uuid>,
     key: &str,
-) -> (Uuid, Uuid, Uuid, Uuid, Uuid) {
+) -> (Uuid, Uuid, Uuid, Uuid, Uuid, Uuid) {
     let mut tx = store::begin_scoped(&db.owner, tenant)
         .await
         .expect("scoped tx");
@@ -107,8 +109,73 @@ async fn project_tree(
     )
     .await
     .expect("insert the comment");
+    // The T7 incident: an ordinary `incident` card whose meta carries the record, with a
+    // published runbook procedure and a postmortem governed asset linked by id. The snapshot
+    // must expose the named keys and the two titles, never the narrative/evidence text.
+    let incident_type: Uuid = sqlx::query_scalar(
+        "INSERT INTO card_type (tenant_id, code, label) VALUES ($1, 'incident', 'Incident')
+         ON CONFLICT (tenant_id, code) DO UPDATE SET label = EXCLUDED.label RETURNING id",
+    )
+    .bind(tenant.as_uuid())
+    .fetch_one(&mut *tx)
+    .await
+    .expect("upsert the incident card type");
+    let runbook: Uuid = sqlx::query_scalar(
+        "INSERT INTO procedure (tenant_id, key, title, status)
+         VALUES ($1, $2, 'Crash-loop runbook', 'published') RETURNING id",
+    )
+    .bind(tenant.as_uuid())
+    .bind(format!("crash-loop-{key}"))
+    .fetch_one(&mut *tx)
+    .await
+    .expect("insert the runbook procedure");
+    let postmortem: Uuid = sqlx::query_scalar(
+        "INSERT INTO governed_asset (tenant_id, kind, key, title, project_id)
+         VALUES ($1, 'postmortem', $2, 'Postmortem: crash loop', $3) RETURNING id",
+    )
+    .bind(tenant.as_uuid())
+    .bind(format!("incident-{key}"))
+    .bind(project.id)
+    .fetch_one(&mut *tx)
+    .await
+    .expect("insert the postmortem asset");
+    let incident = store::card::insert_card_tx(
+        &mut tx,
+        tenant,
+        &store::card::NewCard {
+            list_id: lane.id,
+            card_type_id: incident_type,
+            name: format!("Incident {key}"),
+            description: String::new(),
+            position: Decimal::ZERO,
+            parent_card_id: None,
+            due_at: None,
+            assignee_id: None,
+            created_by: None,
+            meta: serde_json::json!({
+                "service": "conveyor",
+                "severity": "sev2",
+                "detected_at": "2026-11-20T00:00:00Z",
+                "triaged_at": "2026-11-20T00:01:00Z",
+                "mitigated_at": "2026-11-20T00:02:00Z",
+                "resolved_at": "2026-11-20T00:03:00Z",
+                "runbook_procedure_id": runbook.to_string(),
+                "postmortem_asset_id": postmortem.to_string(),
+                "triage_narrative": "operator text that must not be public",
+            }),
+        },
+    )
+    .await
+    .expect("insert the incident");
     tx.commit().await.expect("commit the fixture");
-    (project.id, board.id, card.id, run.id, approval.id)
+    (
+        project.id,
+        board.id,
+        card.id,
+        incident.id,
+        run.id,
+        approval.id,
+    )
 }
 
 async fn fixture() -> (common::TestDb, Fixture) {
@@ -128,10 +195,16 @@ async fn fixture() -> (common::TestDb, Fixture) {
     .await
     .expect("insert the programme");
 
-    let (bound_project, bound_board, bound_card, bound_run, bound_approval) =
+    let (bound_project, bound_board, bound_card, bound_incident, bound_run, bound_approval) =
         project_tree(&db, tenant, Some(programme), "BOUND").await;
-    let (unbound_project, unbound_board, unbound_card, unbound_run, unbound_approval) =
-        project_tree(&db, tenant, None, "SCRATCH").await;
+    let (
+        unbound_project,
+        unbound_board,
+        unbound_card,
+        unbound_incident,
+        unbound_run,
+        unbound_approval,
+    ) = project_tree(&db, tenant, None, "SCRATCH").await;
     (
         db,
         Fixture {
@@ -139,11 +212,13 @@ async fn fixture() -> (common::TestDb, Fixture) {
             bound_project,
             bound_board,
             bound_card,
+            bound_incident,
             bound_run,
             bound_approval,
             unbound_project,
             unbound_board,
             unbound_card,
+            unbound_incident,
             unbound_run,
             unbound_approval,
         },
@@ -259,5 +334,46 @@ async fn a_bound_project_keeps_its_whole_work_tree() {
             .iter()
             .any(|row| row.get("card_id") == Some(&serde_json::json!(f.bound_card))),
         "a bound card keeps its comments"
+    );
+}
+
+/// The T7 incident record is a card; the `ops` section follows the programme boundary like the
+/// work sections, and it carries the named lifecycle keys and the runbook/postmortem titles —
+/// never the operator's narrative or evidence text (#434).
+#[tokio::test]
+async fn the_ops_section_carries_only_programme_bound_incidents() {
+    let (db, f) = fixture().await;
+    let data = snapshot(&db, f.tenant).await;
+    let incidents = &data.ops["incidents"];
+    assert!(
+        has(incidents, f.bound_incident),
+        "the programme's own incident is public"
+    );
+    assert!(
+        !has(incidents, f.unbound_incident),
+        "a scratch incident is not the programme: {incidents}"
+    );
+    let row = incidents
+        .as_array()
+        .expect("incidents is an array")
+        .iter()
+        .find(|row| row["id"] == serde_json::json!(f.bound_incident.to_string()))
+        .expect("the bound incident row");
+    assert_eq!(row["service"], "conveyor");
+    assert_eq!(row["severity"], "sev2");
+    assert_eq!(row["runbook_key"], "crash-loop-BOUND");
+    assert_eq!(row["runbook_title"], "Crash-loop runbook");
+    assert_eq!(row["postmortem_title"], "Postmortem: crash loop");
+    assert!(row["detected_at"].is_string());
+    assert!(row["mitigated_at"].is_string());
+    assert!(row["resolved_at"].is_string());
+    let text = incidents.to_string();
+    assert!(
+        !text.contains("triage_narrative"),
+        "the operator narrative key is not public"
+    );
+    assert!(
+        !text.contains("operator text that must not be public"),
+        "the operator narrative text leaked into the public section"
     );
 }

@@ -906,6 +906,28 @@ const SNAPSHOT = {
       },
     ],
   },
+  // #434: the T7 incident record as the snapshot's `ops` section. One card, its runbook
+  // selection resolved to a published procedure title and its linked postmortem asset.
+  ops: {
+    incidents: [
+      {
+        id: "inc-1",
+        board_id: "b-s02",
+        name: "Incident: checkout-api (sev2)",
+        service: "checkout-api",
+        severity: "sev2",
+        detected_at: "2026-11-14T01:00:00Z",
+        triaged_at: "2026-11-14T01:01:00Z",
+        mitigated_at: "2026-11-14T01:02:00Z",
+        resolved_at: "2026-11-14T01:03:00Z",
+        runbook_procedure_id: "proc-1",
+        runbook_key: "crash-loop",
+        runbook_title: "Crash-loop runbook",
+        postmortem_asset_id: "asset-1",
+        postmortem_title: "Postmortem: crash loop",
+      },
+    ],
+  },
   measure: {},
 };
 
@@ -2432,6 +2454,27 @@ function readBody(req, done) {
       assert.match(contributeText, /#2/, "a ready unit links its issue");
       assert.match(contributeText, /Unassigned/, "an unlinked ready unit is grouped honestly");
       assert.match(contributeText, /How a unit is claimed/, "the claim protocol renders");
+      // #434: the Operations destination reads the incident record from the snapshot. It is a
+      // design destination (not announced to a signed-out visitor), so the reviewer mode
+      // `?design=1` is how its live branch renders without a sign-in.
+      await page.goto(
+        `http://127.0.0.1:${snapshotServer.port}/studio.html?design=1#operations`,
+      );
+      await page.waitForSelector(".page");
+      await page.waitForTimeout(200);
+      const operationsText = await page.locator("#main").innerText();
+      assert.match(
+        operationsText,
+        /Incident: checkout-api \(sev2\)/,
+        "the live operations screen renders the incident card",
+      );
+      assert.match(operationsText, /Crash-loop runbook/, "the runbook selection renders its procedure title");
+      assert.match(operationsText, /Postmortem: crash loop/, "the linked postmortem renders");
+      assert.doesNotMatch(
+        operationsText,
+        /operator text that must not be public/,
+        "no operator narrative is public",
+      );
       assert.equal(snapshotState.requests.length, 0, "the public pack makes no API request");
       // #305: the published msp snapshot drives the programme definition and plan spine read-only.
       await page.click('[data-action="navigate"][data-page="programme"]');
