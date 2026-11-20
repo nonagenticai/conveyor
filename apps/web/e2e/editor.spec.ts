@@ -4,7 +4,7 @@ import { invoke } from "./helpers";
 
 // Screen 7 — the process view's stage editor. ADR 0002 was superseded by the process model: the
 // editor is an ordered list of stages, not a graph. A draft saves the whole list under If-Match;
-// a published version is frozen; validation belongs to the server, at publish.
+// a published version is frozen; validation belongs to the server, not the client.
 //
 // The process created here is the spec's own, so the seeded catalogue is untouched.
 
@@ -25,12 +25,17 @@ test("the stages render in order and a save round-trips through processes.update
   // A new draft has no steps, and the editor says so before the first Add.
   await expect(page.getByText("No steps yet. Add one below.")).toBeVisible();
 
+  // The SOP reference is a procedure row id (a UUID), not a free string: take one from the
+  // seeded catalogue, so the step points at a real SOP.
+  const sops = await invoke<{ items: { id: string }[] }>(request, "procedures.list", { limit: 1 });
+  const sop = sops.items[0].id;
+
   // Stage one, through the editor's own inputs.
   await page.getByRole("button", { name: "Add step" }).click();
   await page.getByLabel("Step 1 kind").fill("agent");
   await page.getByLabel("Step 1 actor").fill("process_agent");
   await page.getByLabel("Step 1 action").fill("cards.comment");
-  await page.getByLabel("Step 1 SOP").fill("sop-e2e-1");
+  await page.getByLabel("Step 1 SOP").fill(sop);
 
   // Stage two: the list order is the array order, so this is appended, not inserted.
   await page.getByRole("button", { name: "Add step" }).click();
@@ -48,16 +53,16 @@ test("the stages render in order and a save round-trips through processes.update
   }>(request, "processes.get", { process_id: created.id });
   expect(read.status).toBe("draft");
   expect(read.steps.map((step) => step.kind)).toEqual(["agent", "computed"]);
-  expect(read.steps[0].procedure_id).toBe("sop-e2e-1");
+  expect(read.steps[0].procedure_id).toBe(sop);
 
   await page.reload();
   await expect(page.getByLabel("Step 1 kind")).toHaveValue("agent");
-  await expect(page.getByLabel("Step 1 SOP")).toHaveValue("sop-e2e-1");
+  await expect(page.getByLabel("Step 1 SOP")).toHaveValue(sop);
   await expect(page.getByLabel("Step 2 kind")).toHaveValue("computed");
   await expect(page.locator(".problem")).toHaveCount(0);
 });
 
-test("an invalid definition is refused by the server at publish, in its own words", async ({
+test("an invalid definition is refused by the server on save, in its own words", async ({
   page,
   request,
 }) => {
@@ -73,19 +78,18 @@ test("an invalid definition is refused by the server at publish, in its own word
   // allowed to be incomplete — and publish is where the rules run.
   await page.getByLabel("Step 1 kind").fill("computed");
   await page.getByLabel("Step 1 actor").fill("system");
+  // The save itself is refused by the action, in its own words — not by a client-side check.
   await page.getByRole("button", { name: "Save steps" }).click();
-  await expect(page.getByText(/Saved 1 steps/)).toBeVisible();
+  await expect(page.getByRole("status")).toContainText(
+    "Step 1: a computed step needs an action.",
+  );
 
-  await page.getByRole("button", { name: "Publish" }).click();
-  const refused = page.locator(".callout.bad", { hasText: "Publish refused" });
-  await expect(refused).toBeVisible();
-  await expect(refused).toContainText(/computed step must name a registered action/);
-
-  // Nothing was published: the row is still a draft.
-  const read = await invoke<{ status: string }>(request, "processes.get", {
+  // Nothing was written: the draft still has no steps.
+  const read = await invoke<{ status: string; steps: unknown[] }>(request, "processes.get", {
     process_id: created.id,
   });
   expect(read.status).toBe("draft");
+  expect(read.steps).toHaveLength(0);
 });
 
 test("a process id from nowhere is the API's refusal, not a blank page", async ({ page }) => {
