@@ -92,6 +92,8 @@ pub struct OutputEntry {
     pub attachments: Vec<AttachmentEntry>,
     /// The page path, relative to the pack root (`docs/output-<id>.html`).
     pub path: String,
+    /// When the row last became public; `None` on a legacy published row.
+    pub published_at: Option<String>,
     /// When the output last changed.
     pub updated_at: String,
 }
@@ -199,6 +201,7 @@ pub fn render_outputs(
             author,
             attachments: attachment_entries,
             path: format!("docs/output-{}.html", record.id),
+            published_at: record.published_at.map(|at| at.to_rfc3339()),
             updated_at: record.updated_at.to_rfc3339(),
         });
     }
@@ -421,11 +424,16 @@ mod tests {
             author: Some("A Person".to_owned()),
             attachments: Vec::new(),
             path: "docs/output-id-1.html".to_owned(),
+            published_at: Some("2026-11-13T00:00:00Z".to_owned()),
             updated_at: "2026-11-13T00:00:00Z".to_owned(),
         }];
         let js = outputs_js(&entries, "2026-11-13T00:00:00Z").expect("index");
         assert!(js.starts_with("window.CONVEYOR_OUTPUTS = {"), "{js}");
         assert!(js.contains("\"schema\":\"design-outputs/v1\""), "{js}");
+        assert!(
+            js.contains("\"published_at\":\"2026-11-13T00:00:00Z\""),
+            "{js}"
+        );
         assert!(js.contains("A note"), "{js}");
     }
 }
