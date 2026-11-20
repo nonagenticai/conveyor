@@ -492,8 +492,8 @@
       "path": "docs/plans/00-INDEX.html",
       "source": "docs/plans/00-INDEX.md",
       "section": "Plans",
-      "sha256": "360588f322d58428e9bf2709f57b6d24b6d85d401817f0690a228347c95b9e66",
-      "bytes": 250278,
+      "sha256": "c69c3716cf0a64925a4d21c7848cb0d45607c924a266b5c4b0b3688569d1998a",
+      "bytes": 250504,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/00-INDEX.md"
     },
     {
@@ -780,8 +780,8 @@
       "path": "docs/plans/slices/S13-n8n-engine.html",
       "source": "docs/plans/slices/S13-n8n-engine.md",
       "section": "Plans",
-      "sha256": "e43492310c7a938ee9fbfdbcfc775f8e60504e21c7be986790bd7c3980f273eb",
-      "bytes": 28248,
+      "sha256": "215b89f9e03249df69ab88f11541c6b06baad27fc35cbca1c53195662fe08c9e",
+      "bytes": 28611,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S13-n8n-engine.md"
     },
     {
