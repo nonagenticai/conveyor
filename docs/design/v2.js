@@ -1,6 +1,7 @@
 /* SPEC_V2 pack — the organisational operating model.
-   Local interaction study only: every record below is a fixture, no backend is called,
-   and every V2 destination is marked PROPOSED because SPEC_V2 is a draft with no V2 code. */
+   Local interaction study only: every record below is a fixture and this file calls no backend.
+   The live console reads and writes the real rows behind these screens; `?design=1` keeps this
+   study, and a signed-out direct hash is a sign-in gate (docs/design/README.md). */
 "use strict";
 window.installV2 = function (api, enterprise) {
   const {
@@ -3515,7 +3516,9 @@ window.installV2 = function (api, enterprise) {
       { id: "BEN-02", kind: "benefit", title: "Fulfilment time −40%", owner: "pm", status: "Tracking", severity: "—", note: "planned vs realised at closure" },
     ],
     /* The MSP layer: programme definition, benefit profiles, the benefits map, tranches and
-       realization. Local fixtures — no V2 table or action exists yet (SPEC_V2 §8.3, D62). */
+       realization. These are this study's fixtures; the live surface reads and writes the
+       programme store through programmes.*, benefits.*, tranches.*, stakeholders.* and
+       cadences.* (SPEC_V2 §8.3). */
     programmeDefinition: {
       key: "PGM-CB",
       name: "conveyor buildout",
@@ -3573,7 +3576,8 @@ window.installV2 = function (api, enterprise) {
     ],
     /* The TOGAF ADM capability: the Preliminary phase (principles, tailored profile, board,
        maturity, skills), the phase rail with typed artefacts, the contracts and the compliance
-       and waiver register. Local fixtures — no V2 table or action exists (SPEC_V2 §8.1, D63). */
+       and waiver register. These are this study's fixtures; the live screen reads the architecture
+       rows through architecture.* (SPEC_V2 §8.1, T9). */
     architectureCapability: {
       key: "ARCH-CB",
       name: "conveyor buildout architecture capability",
