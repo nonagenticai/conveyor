@@ -1,11 +1,95 @@
 {
   "issues": [
     {
+      "number": 517,
+      "title": "console: check-console's programme-refresh case never renders its control (stub manifest + handler)",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/517",
+      "updatedAt": "2026-11-20T21:59:44Z",
+      "labels": [
+        {
+          "name": "bug",
+          "color": "d73a4a"
+        },
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
+      "number": 515,
+      "title": "pack: the T16 merge reverted the published outputs (165 pages + outputs.js)",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/515",
+      "updatedAt": "2026-11-20T20:58:50Z",
+      "labels": [
+        {
+          "name": "bug",
+          "color": "d73a4a"
+        },
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
+      "number": 512,
+      "title": "ci: the web job's board spec can lose a refetch race after Add card and Save",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/512",
+      "updatedAt": "2026-11-20T20:53:22Z",
+      "labels": [
+        {
+          "name": "bug",
+          "color": "d73a4a"
+        },
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
+      "number": 511,
+      "title": "programme: the standard corrected and the authority record repaired",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/511",
+      "updatedAt": "2026-11-20T19:26:40Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:blocked",
+          "color": "D93F0B"
+        },
+        {
+          "name": "programme",
+          "color": "5319E7"
+        }
+      ]
+    },
+    {
       "number": 508,
       "title": "programme: the write path refuses status, meta and self-approval bypasses",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/508",
-      "updatedAt": "2026-11-20T19:02:04Z",
+      "updatedAt": "2026-11-20T22:22:07Z",
       "labels": [
         {
           "name": "unit",
@@ -265,9 +349,9 @@
     {
       "number": 462,
       "title": "console: the Programme page refreshes the live programme from the embedded seed (no pod step)",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/462",
-      "updatedAt": "2026-11-20T08:25:59Z",
+      "updatedAt": "2026-11-20T20:53:22Z",
       "labels": [
         {
           "name": "unit",
@@ -385,7 +469,7 @@
       "title": "conveyor-buildout \u2014 the SPEC_V2 programme",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/435",
-      "updatedAt": "2026-11-19T15:39:52Z",
+      "updatedAt": "2026-11-20T21:24:09Z",
       "labels": [
         {
           "name": "programme",
@@ -413,9 +497,9 @@
     {
       "number": 433,
       "title": "publish: the programme's delivery record \u2014 programme.json, CSV and one tracked issue",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/433",
-      "updatedAt": "2026-11-20T17:36:55Z",
+      "updatedAt": "2026-11-20T21:56:03Z",
       "labels": [
         {
           "name": "unit",

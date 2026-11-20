@@ -333,8 +333,8 @@
       "track": "programme",
       "tranche": 0,
       "units": {
-        "blocked": 1,
-        "claimed": 4,
+        "blocked": 2,
+        "claimed": 1,
         "numbers": [
           17,
           22,
@@ -356,13 +356,11 @@
           395,
           410,
           426,
-          433,
           435,
-          462,
           476,
-          508
+          511
         ],
-        "open": 15,
+        "open": 13,
         "ready": 5,
         "unknown": 0
       }
