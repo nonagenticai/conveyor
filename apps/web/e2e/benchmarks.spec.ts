@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./fixture";
 
 // The seeded suite is the embedded verified50 artifact; the two runs are controls (`gold`
 // resolves all eight seeded case rows, `empty` none). S18's conveyor arm is measurable now;

@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./fixture";
 
 test("the matrix shows both numbers and locks admin and the kernel", async ({ page }) => {
   await page.goto("/settings/roles");

@@ -1,4 +1,4 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Page } from "./fixture";
 
 // Runs FIRST (the `00-` prefix): the assertions below pin dev-a's seeded ledger to exactly 12
 // calls, and later specs legitimately add `inference_call` rows when they execute a run (the
