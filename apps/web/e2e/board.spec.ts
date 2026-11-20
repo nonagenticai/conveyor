@@ -182,3 +182,96 @@ test("a board beyond 200 cards pages instead of hiding the tail", async ({ page,
   await expect(tail).toBeVisible({ timeout: 10_000 });
   await expect(page.locator(".problem")).toHaveCount(0);
 });
+
+// P2.1: the index is a keyset page too. 51 real projects put the index past its 50-row page,
+// and the tail is one cursor away — never silently dropped.
+test("more than 50 projects page instead of hiding the tail", async ({ page, request }) => {
+  const stamp = Date.now();
+  for (let index = 0; index < 51; index += 1) {
+    await invoke(request, "projects.create", { title: `e2e paging project ${stamp} ${index}` });
+  }
+
+  await page.goto("/boards");
+  await expect(page.getByRole("heading", { name: "Board", exact: true })).toBeVisible();
+  const projects = page.locator(".project");
+  await expect(projects).toHaveCount(50);
+  const loadMore = page.getByRole("button", { name: "Load more projects" });
+  await expect(loadMore).toBeVisible();
+  await loadMore.click();
+  await expect.poll(async () => projects.count()).toBeGreaterThan(50);
+  await expect(page.locator(".problem")).toHaveCount(0);
+});
+
+// P2.2: the authoring verbs the board declares — a label, a lane and an unarchive — each
+// round-trip through their actions. The card row has no label pill, so the label's proof is
+// the card's own API row; the lane and the unarchive are visible on the screen.
+test("a label, a lane and an unarchive round-trip through the UI", async ({ page, request }) => {
+  const stamp = Date.now();
+  const title = `e2e authoring ${stamp}`;
+  const fixture = await createBoardCard(request, title);
+  await allowSelfApproval(request, "cards.archive");
+
+  await page.goto(`/board/${fixture.boardId}`);
+  // The screen's heading is the board's name, not the project's; the fixture's card is the mark.
+  await expect(page.locator(".card", { hasText: title })).toBeVisible();
+
+  // A label: created through the panel's form, then attached to the start card's row.
+  const label = `e2e-label-${stamp}`;
+  await page.getByLabel("Label name").fill(label);
+  await page.getByLabel("Label color").fill("teal");
+  await page.getByRole("button", { name: "Create label" }).click();
+  await expect(page.locator(".label", { hasText: label })).toBeVisible();
+
+  // The panel's per-card rows, scoped to the labels panel: an unscoped `div` filter reaches the
+  // card's own selects first.
+  const labelsPanel = page.locator("section.panel", { hasText: "Board labels" });
+  const row = labelsPanel
+    .locator("div")
+    .filter({ hasText: title })
+    .filter({ has: page.locator("select") })
+    .last();
+  await row.locator("select").selectOption({ label });
+  await row.getByRole("button", { name: "Add label" }).click();
+  await expect
+    .poll(async () => {
+      const view = await request.get(`/api/cards/${fixture.card.id}`).then((r) => r.json());
+      return (view.labels ?? []).map((entry: { name: string }) => entry.name);
+    })
+    .toContain(label);
+
+  // A lane: appended through the form. The action's effect is proved on the board's own row —
+  // under the full suite the burst of start-process jobs from the >50-project case can delay the
+  // screen's refetch past a DOM wait — and the screen then renders it from the server on reload.
+  const lane = `e2e lane ${stamp}`;
+  await page.getByLabel("New lane name").fill(lane);
+  await page.getByRole("button", { name: "Create lane" }).click();
+  await expect
+    .poll(
+      async () => {
+        const board = await request.get(`/api/boards/${fixture.boardId}`).then((r) => r.json());
+        return (board.lists ?? []).map((entry: { list: { name: string } }) => entry.list.name);
+      },
+      { timeout: 30_000 },
+    )
+    .toContain(lane);
+  await page.reload();
+  await expect(page.locator(".lane", { hasText: lane })).toBeVisible();
+
+  // Archive, then unarchive from the panel: the button reads the card's current version first.
+  // The card is a `feature`: the seeded delivery matrix gives `bug` no archive→intake edge, so
+  // a bug card's unarchive is refused by the type, not by the screen.
+  const featureName = `e2e feature ${stamp}`;
+  await invoke(request, "cards.create", {
+    board_id: fixture.boardId,
+    list_id: fixture.intake.id,
+    name: featureName,
+    card_type_code: "feature",
+  });
+  await page.reload();
+  const card = page.locator(".card", { hasText: featureName });
+  await card.getByRole("button", { name: "Archive" }).click();
+  await expect(page.locator(".archived")).toContainText(featureName);
+  await page.locator(".archived").getByRole("button", { name: "Unarchive" }).click();
+  await expect(page.locator(".card", { hasText: featureName })).toBeVisible();
+  await expect(page.locator(".problem")).toHaveCount(0);
+});
