@@ -1,0 +1,1490 @@
+#!/usr/bin/env python3
+"""Audit MSP/TOGAF conformance against the programme's own record.
+
+The audit is read-only. It compares four sources — the checked-in seed (the plan), the public
+snapshot (the live record at publish time), the output standard and the repository — and emits a
+stable, severity-ranked gap register. It never edits the programme and never treats a seed row as
+evidence that a gate happened.
+
+Usage:
+    python3 scripts/audit-programme-conformance.py --self-test
+    python3 scripts/audit-programme-conformance.py --check-standard
+    python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --report
+    python3 scripts/audit-programme-conformance.py --snapshot <fresh> --strict --fail-on P0,P1
+
+The snapshot is frozen at publish. CI audits the checked-in snapshot as a report; the publish
+script audits a fresh temp snapshot before it mirrors anything.
+"""
+
+from __future__ import annotations
+
+import argparse
+import hashlib
+import json
+import re
+import sys
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Any
+
+ROOT = Path(__file__).resolve().parents[1]
+DEFAULT_SNAPSHOT = ROOT / "docs" / "design" / "data"
+DEFAULT_STANDARD = ROOT / "governance" / "conformance.json"
+DEFAULT_BASELINE = ROOT / "docs" / "evidence" / "conformance-baseline.json"
+DEFAULT_OUT = ROOT / "docs" / "evidence"
+SEVERITY_ORDER = {"P0": 0, "P1": 1, "P2": 2, "P3": 3}
+PLACEHOLDER = re.compile(
+    r"(not measured|no instrument|unknown|tbd|to be determined|n/?a|placeholder|none)",
+    re.IGNORECASE,
+)
+SCRIPT_REF = re.compile(r"(scripts/[A-Za-z0-9_./-]+\.(?:py|sh|cjs))")
+
+
+def fail(message: str) -> None:
+    sys.exit(f"audit-programme-conformance: {message}")
+
+
+def read_json(path: Path) -> Any:
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except FileNotFoundError:
+        fail(f"{path} is missing")
+    except json.JSONDecodeError as error:
+        fail(f"{path} is not JSON: {error}")
+
+
+def read_outputs(path: Path) -> dict[str, Any]:
+    try:
+        text = path.read_text(encoding="utf-8")
+    except FileNotFoundError:
+        fail(f"{path} is missing")
+    match = re.search(r"window\.CONVEYOR_OUTPUTS\s*=\s*(\{.*\});\s*$", text, re.S)
+    if not match:
+        fail(f"{path} has no CONVEYOR_OUTPUTS assignment")
+    return json.loads(match.group(1))
+
+
+def parse_time(value: Any) -> datetime | None:
+    if not isinstance(value, str) or not value:
+        return None
+    try:
+        return datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError:
+        return None
+
+
+def non_empty(value: Any) -> bool:
+    if isinstance(value, str):
+        return bool(value.strip())
+    return value is not None and value != [] and value != {}
+
+
+def profile_core(profile: dict[str, Any]) -> dict[str, Any]:
+    return {
+        key: profile.get(key)
+        for key in ("key", "phase_set", "artifact_requirements", "contract_kinds")
+    }
+
+
+def profile_hash(profile: dict[str, Any]) -> str:
+    text = json.dumps(profile_core(profile), sort_keys=True, separators=(",", ":"))
+    return "sha256:" + hashlib.sha256(text.encode("utf-8")).hexdigest()
+
+
+class Dataset:
+    """One audit's inputs, with small lookup helpers."""
+
+    def __init__(
+        self,
+        *,
+        programme: dict[str, Any],
+        msp: dict[str, Any],
+        architecture: dict[str, Any],
+        manifest: dict[str, Any],
+        outputs: dict[str, Any],
+        coverage: dict[str, Any],
+        issues: dict[str, Any],
+        seed: dict[str, Any],
+        definition: dict[str, Any],
+        output_standard: dict[str, Any],
+        standard: dict[str, Any],
+        repo_root: Path,
+    ) -> None:
+        self.programme = programme
+        self.msp = msp
+        self.architecture = architecture
+        self.manifest = manifest
+        self.outputs = outputs
+        self.coverage = coverage
+        self.issues = issues
+        self.seed = seed
+        self.definition = definition
+        self.output_standard = output_standard
+        self.standard = standard
+        self.repo_root = repo_root
+        self.projects = [
+            row for row in programme.get("projects", []) if isinstance(row, dict)
+        ]
+        self.by_key = {row.get("key"): row for row in self.projects if row.get("key")}
+        self.by_id = {row.get("id"): row for row in self.projects if row.get("id")}
+        self.seed_by_key = {
+            row.get("key"): row
+            for row in seed.get("projects", [])
+            if isinstance(row, dict) and row.get("key")
+        }
+        self.tranches = [
+            row for row in msp.get("tranches", []) if isinstance(row, dict)
+        ]
+        self.tranche_by_number = {
+            row.get("number"): row for row in self.tranches if row.get("number") is not None
+        }
+        self.tranche_by_id = {
+            row.get("id"): row for row in self.tranches if row.get("id")
+        }
+        self.reviews = [
+            row for row in msp.get("tranche_reviews", []) if isinstance(row, dict)
+        ]
+        self.benefits = [
+            row for row in msp.get("benefit_profiles", []) if isinstance(row, dict)
+        ]
+        self.links = [row for row in msp.get("benefit_links", []) if isinstance(row, dict)]
+        self.transitions = [
+            row for row in msp.get("benefit_transitions", []) if isinstance(row, dict)
+        ]
+        self.contracts = [
+            row for row in architecture.get("contracts", []) if isinstance(row, dict)
+        ]
+        self.reviews_arch = [
+            row
+            for row in architecture.get("compliance_reviews", [])
+            if isinstance(row, dict)
+        ]
+        self.waivers = [
+            row for row in architecture.get("waivers", []) if isinstance(row, dict)
+        ]
+        self.artefacts = [
+            row for row in architecture.get("artifacts", []) if isinstance(row, dict)
+        ]
+        self.artifact_types = {
+            row.get("id"): row
+            for row in architecture.get("standard", [])
+            if isinstance(row, dict) and row.get("id")
+        }
+        self.published: dict[str, set[str]] = {}
+        for row in outputs.get("outputs", []):
+            if not isinstance(row, dict):
+                continue
+            key = row.get("project_key")
+            category = row.get("category")
+            if isinstance(key, str) and isinstance(category, str):
+                self.published.setdefault(key, set()).add(category)
+        self.coverage_by_key = {
+            row.get("key"): row
+            for row in coverage.get("projects", [])
+            if isinstance(row, dict) and row.get("key")
+        }
+        self.profile = next(
+            (
+                row
+                for row in architecture.get("profiles", [])
+                if isinstance(row, dict)
+                and row.get("key") == standard.get("sources", {}).get("profile_key")
+            ),
+            None,
+        )
+        self.adopted_at = parse_time(
+            standard.get("legacy", {}).get("capability_adopted_at")
+        )
+
+    def class_for(self, project: dict[str, Any]) -> dict[str, Any] | None:
+        facts = {
+            "key": project.get("key"),
+            "track": project.get("meta", {}).get("track"),
+            "status": project.get("status"),
+            "measured_status": project.get("meta", {}).get("measured_status"),
+        }
+        for cls in self.output_standard.get("classes", []):
+            if all(facts.get(key) == value for key, value in cls.get("when", {}).items()):
+                return cls
+        return None
+
+    def declared(self, key: str, include_closure: bool = True) -> list[str]:
+        project = self.by_key.get(key, {})
+        meta = project.get("meta", {}) or {}
+        out: list[str] = []
+        fields = ("expected_outputs", "closure_outputs") if include_closure else ("expected_outputs",)
+        for field in fields:
+            for category in meta.get(field) or []:
+                if category not in out:
+                    out.append(category)
+        return out
+
+    def phase(self, key: str) -> tuple[str | None, str | None]:
+        entry = self.definition.get("projects", {}).get(key) or {}
+        meta = self.by_key.get(key, {}).get("meta", {})
+        phase = entry.get("adm_phase") or meta.get("adm_phase")
+        plateau = entry.get("plateau") or meta.get("plateau")
+        return (str(phase).lower() if phase else None, plateau)
+
+    def created_before_adoption(self, key: str) -> bool:
+        project = self.by_key.get(key, {})
+        created = parse_time(project.get("created_at"))
+        return bool(created and self.adopted_at and created < self.adopted_at)
+
+
+class Audit:
+    def __init__(self, data: Dataset, standard: dict[str, Any]) -> None:
+        self.data = data
+        self.standard = standard
+        self.gaps: list[dict[str, Any]] = []
+
+    def add(
+        self,
+        rule: str,
+        severity: str,
+        subject: str,
+        detail: str,
+        *,
+        disposition: str = "remediate",
+        evidence: Any = None,
+    ) -> None:
+        self.gaps.append(
+            {
+                "rule": rule,
+                "severity": severity,
+                "subject": subject,
+                "detail": detail,
+                "disposition": disposition,
+                "evidence": evidence,
+            }
+        )
+
+    def unprovable(self, rule: str, subject: str, detail: str) -> None:
+        self.add(rule, "P2", subject, detail, disposition="unprovable")
+
+    def run(self) -> list[dict[str, Any]]:
+        self.snapshot_schema()
+        self.programme_outputs()
+        self.tranche_plan()
+        self.tranche_authorisation()
+        self.project_tranche()
+        self.closure()
+        self.declared_outputs()
+        self.benefits()
+        self.programme_baselines()
+        self.profile_and_board()
+        self.contracts()
+        self.compliance()
+        self.waivers()
+        self.artefacts()
+        self.drift()
+        self.derivation()
+        self.gaps.sort(
+            key=lambda gap: (
+                SEVERITY_ORDER.get(gap["severity"], 9),
+                gap["rule"],
+                str(gap["subject"]),
+            )
+        )
+        return self.gaps
+
+    # ── MSP ───────────────────────────────────────────────────────────────────────────
+
+    def snapshot_schema(self) -> None:
+        expected = self.standard.get("sources", {}).get("snapshot_schema")
+        schema = self.data.manifest.get("schema")
+        if schema != expected:
+            self.add(
+                "snapshot_schema_stale",
+                "P2",
+                "manifest",
+                f"snapshot schema is {schema!r}, expected {expected!r}",
+                disposition="unprovable",
+            )
+        tranches = self.data.msp.get("tranches")
+        if isinstance(tranches, list) and tranches and not isinstance(tranches[0], dict):
+            self.unprovable("snapshot_schema_stale", "msp.tranches", "tranche rows are not objects")
+        elif isinstance(tranches, list) and tranches and all(
+            "authorised_at" not in row for row in tranches if isinstance(row, dict)
+        ):
+            self.unprovable(
+                "snapshot_schema_stale",
+                "msp.tranches",
+                "tranche authorisation columns are absent; the snapshot predates the conformance projection",
+            )
+        if "compliance_reviews" not in self.data.architecture:
+            self.unprovable(
+                "snapshot_schema_stale",
+                "architecture.compliance_reviews",
+                "the snapshot predates the compliance-review projection",
+            )
+        if "waivers" not in self.data.architecture:
+            self.unprovable(
+                "snapshot_schema_stale",
+                "architecture.waivers",
+                "the snapshot predates the waiver projection",
+            )
+
+    def programme_outputs(self) -> None:
+        key = self.standard.get("programme", {}).get("project_key", "P0")
+        project = self.data.by_key.get(key)
+        if project is None:
+            self.add("programme_outputs", "P1", key, "the programme-definition project is absent")
+            return
+        cls = self.data.class_for(project)
+        if cls is None:
+            self.add("programme_outputs", "P1", key, "no output-standard class matches the project")
+            return
+        published = self.data.published.get(key, set())
+        for category in cls.get("now", []):
+            if category not in published:
+                self.add(
+                    "programme_outputs",
+                    "P1",
+                    f"{key}:{category}",
+                    "declared programme output is not published",
+                )
+
+    def tranche_plan(self) -> None:
+        for tranche in self.data.tranches:
+            number = tranche.get("number")
+            subject = f"tranche {number}"
+            for field in ("entry_criteria", "exit_criteria"):
+                if not non_empty(tranche.get(field)):
+                    self.add("tranche_plan", "P2", subject, f"{field} is missing")
+            if tranche.get("state") == "closed":
+                reviews = [
+                    row for row in self.data.reviews if row.get("tranche_id") == tranche.get("id")
+                ]
+                if not reviews:
+                    self.add("tranche_plan", "P2", subject, "closed without a review record")
+                if not non_empty(tranche.get("review_at")):
+                    self.add("tranche_plan", "P2", subject, "closed without a review date")
+
+    def tranche_authorisation(self) -> None:
+        authorising = set(
+            self.standard.get("programme", {}).get("tranche_states_authorising_delivery", [])
+        )
+        for review in self.data.reviews:
+            if review.get("decision") != "continue":
+                continue
+            tranche = self.data.tranche_by_id.get(review.get("tranche_id"))
+            if tranche is None:
+                self.add(
+                    "tranche_review_without_authorisation",
+                    "P1",
+                    str(review.get("tranche_id")),
+                    "review names a tranche that is not in the register",
+                )
+                continue
+            number = tranche.get("number")
+            next_tranche = self.data.tranche_by_number.get((number or 0) + 1)
+            subject = f"tranche {number} review"
+            if next_tranche is None:
+                self.add(
+                    "tranche_review_without_authorisation",
+                    "P1",
+                    subject,
+                    "continue has no next tranche to authorise",
+                )
+                continue
+            state = next_tranche.get("state")
+            if state not in authorising:
+                self.add(
+                    "tranche_review_without_authorisation",
+                    "P0",
+                    subject,
+                    f"continue did not authorise tranche {next_tranche.get('number')}: state is {state!r}",
+                )
+                continue
+            if "authorisation_review_id" in next_tranche:
+                linked = next_tranche.get("authorisation_review_id")
+                if linked is None:
+                    self.add(
+                        "tranche_review_without_authorisation",
+                        "P1",
+                        subject,
+                        f"tranche {next_tranche.get('number')} is {state} but names no review",
+                    )
+                elif linked != review.get("id"):
+                    self.add(
+                        "tranche_review_without_authorisation",
+                        "P0",
+                        subject,
+                        f"tranche {next_tranche.get('number')} names a different review ({linked})",
+                    )
+            else:
+                self.unprovable(
+                    "tranche_review_without_authorisation",
+                    subject,
+                    "the snapshot does not carry the authorisation link",
+                )
+
+    def project_tranche(self) -> None:
+        authorising = set(
+            self.standard.get("programme", {}).get("tranche_states_authorising_delivery", [])
+        )
+        for project in self.data.projects:
+            key = project.get("key", "?")
+            status = project.get("status")
+            if status not in {"active", "closed", "archived"}:
+                continue
+            number = project.get("meta", {}).get("tranche")
+            try:
+                number = int(number)
+            except (TypeError, ValueError):
+                self.add("project_in_unauthorised_tranche", "P2", key, "no tranche is declared")
+                continue
+            tranche = self.data.tranche_by_number.get(number)
+            if tranche is None:
+                self.add(
+                    "project_in_unauthorised_tranche",
+                    "P1",
+                    key,
+                    f"tranche {number} is not in the register",
+                )
+                continue
+            if tranche.get("state") in authorising:
+                continue
+            severity = "P0" if status == "closed" else "P1"
+            if status == "archived":
+                severity = "P2"
+            self.add(
+                "project_in_unauthorised_tranche",
+                severity,
+                key,
+                f"project is {status} in tranche {number} whose state is {tranche.get('state')!r}",
+            )
+
+    def closure(self) -> None:
+        closure_category = (
+            self.standard.get("programme", {}).get("closure_review_category", "closure-review")
+        )
+        for project in self.data.projects:
+            if project.get("status") != "closed":
+                continue
+            key = project.get("key", "?")
+            cls = self.data.class_for(project) or {}
+            required = closure_category in (cls.get("closure") or [])
+            declared = self.data.declared(key)
+            published = self.data.published.get(key, set())
+            if closure_category not in declared and not required:
+                continue
+            if closure_category in published:
+                continue
+            if key == self.standard.get("programme", {}).get("project_key", "P0"):
+                if "tranche-review" in published:
+                    continue
+            severity = "P0" if closure_category in declared else "P1"
+            self.add(
+                "closed_without_closure_review",
+                severity,
+                key,
+                "project is closed but its class-required closure review is not published",
+            )
+
+    def declared_outputs(self) -> None:
+        for project in self.data.projects:
+            key = project.get("key", "?")
+            if project.get("status") == "archived":
+                continue
+            declared = self.data.declared(
+                key, include_closure=project.get("status") == "closed"
+            )
+            if not declared:
+                continue
+            missing = sorted(set(declared) - self.data.published.get(key, set()))
+            if not missing:
+                continue
+            severity = "P1" if project.get("status") in {"active", "closed"} else "P2"
+            self.add(
+                "unpublished_declared_output",
+                severity,
+                key,
+                "declared outputs are not published: " + ", ".join(missing),
+            )
+
+    def benefits(self) -> None:
+        linked = {row.get("benefit_id") for row in self.data.links}
+        for benefit in self.data.benefits:
+            ref = benefit.get("reference", "?")
+            missing = []
+            for field in ("target", "measurement_method", "operational_area"):
+                if not non_empty(benefit.get(field)):
+                    missing.append(field)
+            if not (benefit.get("owner_job_id") or benefit.get("benefit_owner_job_id")):
+                missing.append("owner")
+            if benefit.get("id") not in linked:
+                missing.append("benefits-map edge")
+            if missing:
+                self.add(
+                    "benefit_profile_incomplete",
+                    "P1",
+                    ref,
+                    "missing " + ", ".join(missing),
+                )
+            baseline = benefit.get("baseline")
+            if not non_empty(baseline):
+                self.add(
+                    "benefit_baseline_placeholder",
+                    "P1",
+                    ref,
+                    "no baseline is recorded",
+                )
+            elif isinstance(baseline, str):
+                if PLACEHOLDER.search(baseline):
+                    self.add(
+                        "benefit_baseline_placeholder",
+                        "P1",
+                        ref,
+                        f"baseline is a placeholder: {baseline!r}",
+                    )
+                else:
+                    self.add(
+                        "benefit_baseline_placeholder",
+                        "P2",
+                        ref,
+                        "baseline is a free string, not a measurement record",
+                    )
+            elif isinstance(baseline, dict):
+                absent = [
+                    field
+                    for field in ("value", "unit", "measured_at", "method")
+                    if not non_empty(baseline.get(field))
+                ]
+                if absent:
+                    self.add(
+                        "benefit_baseline_placeholder",
+                        "P1",
+                        ref,
+                        "measurement record is missing " + ", ".join(absent),
+                    )
+            else:
+                self.add(
+                    "benefit_baseline_placeholder",
+                    "P1",
+                    ref,
+                    f"baseline has unexpected type {type(baseline).__name__}",
+                )
+            if benefit.get("status") == "realized":
+                rows = [
+                    row
+                    for row in self.data.transitions
+                    if row.get("benefit_id") == benefit.get("id")
+                ]
+                ok = any(
+                    row.get("baseline_measured_at")
+                    and row.get("post_measured_at")
+                    and non_empty(row.get("evidence"))
+                    for row in rows
+                )
+                if not ok:
+                    self.add(
+                        "realized_without_transition",
+                        "P0",
+                        ref,
+                        "realized without a measured baseline, post-measurement and evidence",
+                    )
+        for transition in self.data.transitions:
+            benefit = next(
+                (
+                    row
+                    for row in self.data.benefits
+                    if row.get("id") == transition.get("benefit_id")
+                ),
+                {},
+            )
+            subject = benefit.get("reference", str(transition.get("benefit_id")))
+            baseline = parse_time(transition.get("baseline_measured_at"))
+            enacted = parse_time(transition.get("enacted_at"))
+            post = parse_time(transition.get("post_measured_at"))
+            if post and not baseline:
+                self.add(
+                    "transition_order",
+                    "P0",
+                    subject,
+                    "post-transition measurement without a measured baseline",
+                )
+            if baseline and enacted and baseline > enacted:
+                self.add(
+                    "transition_order",
+                    "P1",
+                    subject,
+                    "baseline measured after the transition was enacted",
+                )
+            if enacted and post and enacted > post:
+                self.add(
+                    "transition_order",
+                    "P1",
+                    subject,
+                    "post-measurement predates enactment",
+                )
+            if "baseline_value" not in transition or "post_value" not in transition:
+                self.unprovable(
+                    "transition_order",
+                    subject,
+                    "the snapshot carries timestamps but not the measured values",
+                )
+
+    def programme_baselines(self) -> None:
+        present = {
+            row.get("kind")
+            for row in self.data.msp.get("programme_baselines", [])
+            if isinstance(row, dict)
+        }
+        for kind in self.standard.get("programme", {}).get("required_baselines", []):
+            if kind not in present:
+                self.add(
+                    "programme_baselines",
+                    "P1",
+                    kind,
+                    f"the programme has no {kind} baseline",
+                )
+
+    # ── TOGAF ────────────────────────────────────────────────────────────────────────
+
+    def profile_and_board(self) -> None:
+        profile = self.data.profile
+        if profile is None:
+            self.add(
+                "profile_adopted",
+                "P0",
+                self.standard.get("sources", {}).get("profile_key", "profile"),
+                "the adopted ADM profile is absent from the snapshot",
+            )
+        else:
+            if profile.get("status") != "adopted":
+                self.add(
+                    "profile_adopted",
+                    "P0",
+                    profile.get("key", "profile"),
+                    f"profile status is {profile.get('status')!r}, not 'adopted'",
+                )
+            expected = self.standard.get("sources", {}).get("profile_hash")
+            actual = profile_hash(profile)
+            if expected and expected != actual:
+                self.add(
+                    "profile_adopted",
+                    "P0",
+                    profile.get("key", "profile"),
+                    f"profile hash is {actual}, standard pins {expected}",
+                )
+        boards = [
+            row
+            for row in self.data.architecture.get("board", [])
+            if isinstance(row, dict) and row.get("kind") == "architecture_board"
+        ]
+        if not boards:
+            self.add("board_not_approved", "P1", "board", "no architecture board is recorded")
+        elif not any(row.get("status") == "active" for row in boards):
+            self.add(
+                "board_not_approved",
+                "P1",
+                "board",
+                "the architecture board is not active",
+            )
+
+    def contracts(self) -> None:
+        for project in self.data.projects:
+            key = project.get("key", "?")
+            if key == "T0" or not key.startswith("T"):
+                continue
+            track = (project.get("meta") or {}).get("track")
+            if track and track != "v2":
+                continue
+            if project.get("status") not in {"active", "closed"}:
+                continue
+            live = [
+                row
+                for row in self.data.contracts
+                if row.get("project_id") == project.get("id") and row.get("status") == "live"
+            ]
+            if not live:
+                self.add(
+                    "contract_missing",
+                    "P1",
+                    key,
+                    "delivery project has no live architecture contract",
+                )
+                continue
+            for contract in live:
+                if not non_empty(contract.get("approved_at")):
+                    self.add(
+                        "contract_unapproved",
+                        "P1",
+                        key,
+                        f"live contract {contract.get('kind')} has no approval",
+                    )
+                if "requested_by" not in contract:
+                    self.unprovable(
+                        "requester_is_approver",
+                        key,
+                        "the snapshot does not carry the contract requester",
+                    )
+                elif (
+                    contract.get("requested_by")
+                    and contract.get("requested_by") == contract.get("approved_by")
+                ):
+                    self.add(
+                        "requester_is_approver",
+                        "P0",
+                        key,
+                        "the contract's requester approved it",
+                    )
+
+    def compliance(self) -> None:
+        if "compliance_reviews" not in self.data.architecture:
+            return
+        for project in self.data.projects:
+            key = project.get("key", "?")
+            if project.get("status") != "closed":
+                continue
+            if key == "T0" or not key.startswith("T"):
+                continue
+            track = (project.get("meta") or {}).get("track")
+            if track and track != "v2":
+                continue
+            contracts = [
+                row
+                for row in self.data.contracts
+                if row.get("project_id") == project.get("id") and row.get("status") == "live"
+            ]
+            for contract in contracts:
+                reviews = [
+                    row
+                    for row in self.data.reviews_arch
+                    if row.get("project_id") == project.get("id")
+                    and row.get("contract_id") == contract.get("id")
+                ]
+                if not reviews:
+                    self.add(
+                        "compliance_review_missing",
+                        "P1",
+                        key,
+                        "closed delivery project has no Phase-G compliance review",
+                    )
+                    continue
+                for review in reviews:
+                    if review.get("level") != "non_conformant":
+                        continue
+                    active_waiver = any(
+                        row.get("review_id") == review.get("id")
+                        and row.get("status") == "active"
+                        and parse_time(row.get("reassessment_at"))
+                        and parse_time(row.get("reassessment_at")) > datetime.now(timezone.utc)
+                        for row in self.data.waivers
+                    )
+                    if not active_waiver:
+                        self.add(
+                            "compliance_review_missing",
+                            "P0",
+                            key,
+                            "a non-conformant review has no active waiver",
+                        )
+
+    def waivers(self) -> None:
+        if "waivers" not in self.data.architecture:
+            return
+        for waiver in self.data.waivers:
+            subject = str(waiver.get("id"))
+            missing = [
+                field
+                for field in ("owner_user_id", "reason", "reassessment_at")
+                if not non_empty(waiver.get(field))
+            ]
+            if missing:
+                self.add(
+                    "waiver_invalid",
+                    "P1",
+                    subject,
+                    "waiver is missing " + ", ".join(missing),
+                )
+                continue
+            if waiver.get("status") == "active":
+                expires = parse_time(waiver.get("reassessment_at"))
+                if expires and expires < datetime.now(timezone.utc):
+                    self.add(
+                        "waiver_invalid",
+                        "P2",
+                        subject,
+                        "active waiver is past its reassessment date",
+                    )
+
+    def artefacts(self) -> None:
+        profile = self.data.profile or {}
+        requirements = profile.get("artifact_requirements") or {}
+        phases = ["preliminary", "a", "b", "c", "d", "e", "f", "g", "h"]
+        for project in self.data.projects:
+            key = project.get("key", "?")
+            phase, _plateau = self.data.phase(key)
+            if phase not in phases:
+                continue
+            limit = phases.index(phase)
+            required: set[str] = set()
+            for ph in phases[: limit + 1]:
+                for plateau, kinds in (requirements.get(ph) or {}).items():
+                    if isinstance(kinds, list):
+                        required.update(kinds)
+            if not required:
+                continue
+            actual = set()
+            for artefact in self.data.artefacts:
+                if artefact.get("project_id") != project.get("id"):
+                    continue
+                if artefact.get("status") != "approved":
+                    continue
+                artifact_type = self.data.artifact_types.get(artefact.get("artifact_type_id"))
+                if artifact_type and artifact_type.get("key"):
+                    actual.add(artifact_type["key"])
+                elif artefact.get("artifact_kind"):
+                    actual.add(artefact["artifact_kind"])
+            missing = sorted(required - actual)
+            if not missing:
+                continue
+            severity = "P2" if self.data.created_before_adoption(key) else "P1"
+            self.add(
+                "mandatory_artefacts",
+                severity,
+                key,
+                "missing approved artefacts: " + ", ".join(missing),
+            )
+
+    # ── Cross-source ─────────────────────────────────────────────────────────────────
+
+    def drift(self) -> None:
+        missing_meta = []
+        for project in self.data.projects:
+            key = project.get("key", "?")
+            seed = self.data.seed_by_key.get(key)
+            if seed and seed.get("status") != project.get("status"):
+                severity = (
+                    "P1"
+                    if seed.get("status") == "closed" and project.get("status") != "closed"
+                    else "P2"
+                )
+                self.add(
+                    "seed_live_drift",
+                    severity,
+                    key,
+                    f"seed status {seed.get('status')!r} != live status {project.get('status')!r}",
+                )
+            coverage = self.data.coverage_by_key.get(key)
+            if coverage:
+                measured = coverage.get("status")
+                live = project.get("status")
+                if measured == "proposed" and live in {"active", "closed"}:
+                    self.add(
+                        "status_source_drift",
+                        "P2",
+                        key,
+                        f"coverage says {measured!r}, the register says {live!r}",
+                    )
+                elif measured == "built" and live == "draft":
+                    self.add(
+                        "status_source_drift",
+                        "P2",
+                        key,
+                        "coverage says built, the register says draft",
+                    )
+            phase, _ = self.data.phase(key)
+            if phase and not project.get("meta", {}).get("adm_phase"):
+                missing_meta.append(key)
+        if missing_meta:
+            self.unprovable(
+                "seed_live_drift",
+                "live project meta",
+                "adm_phase is absent from the live meta for " + ", ".join(sorted(missing_meta)),
+            )
+
+    def derivation(self) -> None:
+        issues = self.data.issues.get("issues", self.data.issues)
+        if not isinstance(issues, list):
+            self.unprovable("derivation_missing", "#435", "the issue registry is not readable")
+            return
+        issue = next(
+            (row for row in issues if isinstance(row, dict) and row.get("number") == 435),
+            None,
+        )
+        if issue is None:
+            self.unprovable("derivation_missing", "#435", "issue #435 is absent from the registry")
+            return
+        body = issue.get("body") or ""
+        if not isinstance(body, str) or not body.strip():
+            self.unprovable(
+                "derivation_missing",
+                "#435",
+                "the issue registry redacts the body; the derivation claim cannot be checked",
+            )
+            return
+        for reference in sorted(set(SCRIPT_REF.findall(body))):
+            if not (self.data.repo_root / reference).exists():
+                self.add(
+                    "derivation_missing",
+                    "P1",
+                    "#435",
+                    f"the tracking issue names a script that does not exist: {reference}",
+                )
+
+
+def load_dataset(
+    snapshot: Path,
+    seed_dir: Path,
+    standard: dict[str, Any],
+    repo_root: Path,
+    outputs_path: Path | None,
+) -> Dataset:
+    data_dir = snapshot
+    return Dataset(
+        programme=read_json(data_dir / "programme.json"),
+        msp=read_json(data_dir / "msp.json"),
+        architecture=read_json(data_dir / "architecture.json"),
+        manifest=read_json(data_dir / "manifest.json") if (data_dir / "manifest.json").exists() else {},
+        outputs=read_outputs(outputs_path or data_dir.parent / "docs" / "outputs.js"),
+        coverage=read_json(data_dir / "coverage.json") if (data_dir / "coverage.json").exists() else {},
+        issues=read_json(data_dir / "issues.json") if (data_dir / "issues.json").exists() else {},
+        seed=read_json(seed_dir / "programme.json"),
+        definition=read_json(seed_dir / "programme-definition.json"),
+        output_standard=read_json(
+            repo_root / standard.get("sources", {}).get("output_standard", "seed/output-standard.json")
+        ),
+        standard=standard,
+        repo_root=repo_root,
+    )
+
+
+def render_markdown(
+    gaps: list[dict[str, Any]], dataset: Dataset, snapshot: Path
+) -> str:
+    counts = {severity: 0 for severity in SEVERITY_ORDER}
+    for gap in gaps:
+        counts[gap["severity"]] = counts.get(gap["severity"], 0) + 1
+    manifest = dataset.manifest
+    lines = [
+        "# MSP/TOGAF conformance gap register",
+        "",
+        f"Snapshot: `{manifest.get('git_sha', 'unknown')}` generated `{manifest.get('generated_at', 'unknown')}` "
+        f"from `{snapshot}`.",
+        "",
+        "| Severity | Count |",
+        "|---|---:|",
+    ]
+    for severity in SEVERITY_ORDER:
+        lines.append(f"| {severity} | {counts.get(severity, 0)} |")
+    lines.extend(["", "## P0 and P1", "", "| Rule | Subject | Severity | Detail |", "|---|---|---|---|"])
+    important = [gap for gap in gaps if gap["severity"] in {"P0", "P1"}]
+    if not important:
+        lines.append("| — | — | — | none |")
+    for gap in important:
+        detail = gap["detail"].replace("|", "\\|")
+        if len(detail) > 300:
+            detail = detail[:297] + "…"
+        lines.append(
+            f"| `{gap['rule']}` | `{gap['subject']}` | {gap['severity']} | {detail} |"
+        )
+    lines.extend(
+        [
+            "",
+            "## Projects",
+            "",
+            "| Project | Status | Tranche | P0 | P1 | P2 | P3 |",
+            "|---|---|---:|---:|---:|---:|---:|",
+        ]
+    )
+    by_project: dict[str, dict[str, int]] = {}
+    for gap in gaps:
+        subject = str(gap["subject"]).split(":")[0]
+        by_project.setdefault(subject, {})
+        by_project[subject][gap["severity"]] = by_project[subject].get(gap["severity"], 0) + 1
+    for key in sorted(dataset.by_key):
+        project = dataset.by_key[key]
+        row = by_project.get(key, {})
+        lines.append(
+            f"| {key} | {project.get('status', '')} | {project.get('meta', {}).get('tranche', '')} | "
+            f"{row.get('P0', 0)} | {row.get('P1', 0)} | {row.get('P2', 0)} | {row.get('P3', 0)} |"
+        )
+    lines.append("")
+    return "\n".join(lines)
+
+
+def gap_key(gap: dict[str, Any]) -> tuple[str, str]:
+    return (str(gap["rule"]), str(gap["subject"]))
+
+
+def baseline_entries(gaps: list[dict[str, Any]], standard: dict[str, Any]) -> dict[str, Any]:
+    expires = "2027-02-18"
+    entries = [
+        {
+            "rule": gap["rule"],
+            "subject": gap["subject"],
+            "severity": gap["severity"],
+            "owner": "programme owner",
+            "expires": expires,
+            "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
+        }
+        for gap in gaps
+        if gap["severity"] in {"P0", "P1"}
+    ]
+    entries.sort(key=lambda row: (SEVERITY_ORDER[row["severity"]], row["rule"], row["subject"]))
+    return {
+        "version": 1,
+        "standard": "governance/conformance.json",
+        "entries": entries,
+    }
+
+
+def check_strict(
+    gaps: list[dict[str, Any]], baseline: dict[str, Any], fail_on: set[str]
+) -> list[str]:
+    failures: list[str] = []
+    current = {gap_key(gap): gap for gap in gaps}
+    recorded = {
+        (str(entry.get("rule")), str(entry.get("subject"))): entry
+        for entry in baseline.get("entries", [])
+        if isinstance(entry, dict)
+    }
+    today = datetime.now(timezone.utc).date()
+    for key, gap in current.items():
+        if gap["severity"] not in fail_on:
+            continue
+        entry = recorded.get(key)
+        if entry is None:
+            failures.append(
+                f"new {gap['severity']}: {gap['rule']} {gap['subject']} — {gap['detail']}"
+            )
+            continue
+        if SEVERITY_ORDER[gap["severity"]] < SEVERITY_ORDER.get(entry.get("severity"), 9):
+            failures.append(
+                f"worsened to {gap['severity']}: {gap['rule']} {gap['subject']} — {gap['detail']}"
+            )
+        expires = entry.get("expires")
+        if isinstance(expires, str):
+            try:
+                if datetime.fromisoformat(expires).date() < today:
+                    failures.append(
+                        f"baseline expired: {gap['rule']} {gap['subject']} (expired {expires})"
+                    )
+            except ValueError:
+                pass
+    return failures
+
+
+def standard_checks(standard: dict[str, Any], seed_dir: Path) -> None:
+    if standard.get("version") != 1:
+        fail("standard version must be 1")
+    if "projects" in standard:
+        fail("the standard must not duplicate per-project obligations; it is a rule matrix")
+    rules = standard.get("rules")
+    if not isinstance(rules, dict) or not rules:
+        fail("standard.rules must be a non-empty object")
+    known = {
+        "snapshot_schema_stale",
+        "programme_outputs",
+        "tranche_plan",
+        "tranche_review_without_authorisation",
+        "project_in_unauthorised_tranche",
+        "closed_without_closure_review",
+        "unpublished_declared_output",
+        "benefit_profile_incomplete",
+        "benefit_baseline_placeholder",
+        "realized_without_transition",
+        "transition_order",
+        "programme_baselines",
+        "profile_adopted",
+        "board_not_approved",
+        "contract_missing",
+        "contract_unapproved",
+        "requester_is_approver",
+        "compliance_review_missing",
+        "waiver_invalid",
+        "mandatory_artefacts",
+        "seed_live_drift",
+        "derivation_missing",
+        "status_source_drift",
+    }
+    unknown = sorted(set(rules) - known)
+    missing = sorted(known - set(rules))
+    if unknown:
+        fail(f"unknown rules: {unknown}")
+    if missing:
+        fail(f"rules missing from the matrix: {missing}")
+    for rule, severity in rules.items():
+        if severity not in SEVERITY_ORDER:
+            fail(f"rule {rule} has unknown severity {severity!r}")
+    sources = standard.get("sources", {})
+    for field in ("output_standard", "programme_seed", "programme_definition"):
+        path = sources.get(field)
+        if not path or not (ROOT / path).exists():
+            fail(f"source {field} does not resolve: {path!r}")
+    expected = sources.get("profile_hash", "")
+    if not expected.startswith("sha256:") or len(expected) != 71:
+        fail("sources.profile_hash must be sha256:<64 hex>")
+    output_standard = read_json(ROOT / sources["output_standard"])
+    p0 = next(
+        (cls for cls in output_standard.get("classes", []) if cls.get("name") == "p0"), None
+    )
+    if p0 is None or len(p0.get("now", [])) != 21:
+        fail("seed/output-standard.json must define the p0 class with 21 categories")
+    seed = read_json(ROOT / sources["programme_seed"])
+    definition = read_json(ROOT / sources["programme_definition"])
+    seed_keys = {row.get("key") for row in seed.get("projects", [])}
+    definition_keys = set(definition.get("projects", {}))
+    if seed_keys != definition_keys:
+        fail("seed/programme.json and seed/programme-definition.json disagree on project keys")
+
+
+# ── Self-test ────────────────────────────────────────────────────────────────────────
+
+
+def self_test() -> None:
+    standard = read_json(DEFAULT_STANDARD)
+    standard_checks(standard, ROOT / "seed")
+    output_standard = read_json(ROOT / standard["sources"]["output_standard"])
+
+    def base() -> Dataset:
+        profile = {
+            "key": standard["sources"]["profile_key"],
+            "status": "adopted",
+            "phase_set": ["preliminary", "a", "b", "c", "d", "e", "f", "g", "h"],
+            "artifact_requirements": {
+                "preliminary": {"psa": ["principles_catalog"]},
+                "a": {"psa": ["solution_concept"]},
+            },
+            "contract_kinds": {"a": "statement_of_architecture_work"},
+        }
+        local_standard = json.loads(json.dumps(standard))
+        local_standard["sources"]["profile_hash"] = profile_hash(profile)
+        p0 = next(cls for cls in output_standard["classes"] if cls.get("name") == "p0")
+        projects = [
+            {
+                "id": "p0",
+                "key": "P0",
+                "status": "closed",
+                "created_at": "2026-11-10T00:00:00+00:00",
+                "meta": {
+                    "track": "programme",
+                    "tranche": 0,
+                    "adm_phase": "preliminary",
+                    "plateau": "psa",
+                    "expected_outputs": p0["now"],
+                    "closure_outputs": [],
+                    "measured_status": "built",
+                },
+            },
+            {
+                "id": "t1",
+                "key": "T1",
+                "status": "active",
+                "created_at": "2026-11-20T00:00:00+00:00",
+                "meta": {
+                    "track": "v2",
+                    "tranche": 1,
+                    "adm_phase": "a",
+                    "plateau": "psa",
+                    "expected_outputs": ["project-brief", "evidence"],
+                    "closure_outputs": ["closure-review"],
+                    "measured_status": "built",
+                },
+            },
+        ]
+        outputs = {
+            "outputs": [
+                {"project_key": "P0", "category": category} for category in p0["now"]
+            ]
+            + [
+                {"project_key": "T1", "category": "project-brief"},
+                {"project_key": "T1", "category": "evidence"},
+            ]
+        }
+        tranches = [
+            {"id": "tr0", "number": 0, "state": "closed", "entry_criteria": "x",
+             "exit_criteria": "y", "review_at": "2026-11-18T00:00:00+00:00"},
+            {"id": "tr1", "number": 1, "state": "authorised",
+             "authorised_at": "2026-11-18T00:00:00+00:00",
+             "authorisation_review_id": "rev0", "entry_criteria": "x", "exit_criteria": "y"},
+        ]
+        msp = {
+            "tranches": tranches,
+            "tranche_reviews": [
+                {"id": "rev0", "tranche_id": "tr0", "decision": "continue",
+                 "reviewed_at": "2026-11-18T00:00:00+00:00",
+                 "evidence": {"baselines": {}, "benefit_status": {}, "risk_register": {}}}
+            ],
+            "benefit_profiles": [
+                _benefit("B1", "b1")
+            ],
+            "benefit_links": [{"benefit_id": "b1"}],
+            "benefit_transitions": [],
+            "programme_baselines": [
+                {"kind": "management"}, {"kind": "governance"}, {"kind": "boundary"}
+            ],
+        }
+        architecture = {
+            "profiles": [profile],
+            "standard": [
+                {"id": "type-principles", "key": "principles_catalog", "phase_code": "preliminary", "plateau": "psa"},
+                {"id": "type-solution", "key": "solution_concept", "phase_code": "a", "plateau": "psa"},
+            ],
+            "artifacts": [
+                {"id": "a1", "project_id": "p0", "artifact_type_id": "type-principles", "status": "approved"},
+                {"id": "a2", "project_id": "t1", "artifact_type_id": "type-principles", "status": "approved"},
+                {"id": "a3", "project_id": "t1", "artifact_type_id": "type-solution", "status": "approved"},
+            ],
+            "links": [],
+            "contracts": [
+                {"id": "c1", "project_id": "t1", "kind": "statement_of_architecture_work",
+                 "status": "live", "approved_at": "2026-11-20T01:00:00+00:00",
+                 "approved_by": "u1", "requested_by": "u2"}
+            ],
+            "compliance_reviews": [
+                {"id": "r1", "project_id": "t1", "contract_id": "c1", "level": "compliant",
+                 "reviewed_at": "2026-11-20T02:00:00+00:00"}
+            ],
+            "waivers": [],
+            "board": [{"kind": "architecture_board", "status": "active"}],
+        }
+        programme = {"programme": [{"name": "P"}], "projects": projects}
+        seed = {
+            "projects": [
+                {"key": "P0", "status": "closed"},
+                {"key": "T1", "status": "active"},
+            ]
+        }
+        definition = {
+            "projects": {
+                "P0": {"adm_phase": "preliminary", "plateau": "psa"},
+                "T1": {"adm_phase": "a", "plateau": "psa"},
+            }
+        }
+        coverage = {
+            "projects": [
+                {"key": "P0", "status": "built"},
+                {"key": "T1", "status": "built"},
+            ]
+        }
+        issues = {
+            "issues": [
+                {"number": 435, "body": "generated by scripts/build-programme-seed.py"}
+            ]
+        }
+        manifest = {"schema": "design-snapshot/v1", "git_sha": "test", "generated_at": "test"}
+        return Dataset(
+            programme=programme,
+            msp=msp,
+            architecture=architecture,
+            manifest=manifest,
+            outputs=outputs,
+            coverage=coverage,
+            issues=issues,
+            seed=seed,
+            definition=definition,
+            output_standard=output_standard,
+            standard=local_standard,
+            repo_root=ROOT,
+        )
+
+    def _benefit(reference: str, ident: str) -> dict[str, Any]:
+        return {
+            "id": ident,
+            "reference": reference,
+            "target": "target",
+            "measurement_method": "method",
+            "operational_area": "area",
+            "owner_job_id": "job",
+            "baseline": {
+                "value": 1,
+                "unit": "count",
+                "measured_at": "2026-11-19T00:00:00+00:00",
+                "method": "method",
+            },
+            "status": "active",
+        }
+
+    def audit(data: Dataset) -> list[dict[str, Any]]:
+        return Audit(data, data.standard).run()
+
+    # A conformant base emits nothing.
+    base_gaps = audit(base())
+    if base_gaps:
+        fail(f"the self-test base is not conformant: {base_gaps}")
+
+    def expect(mutate, rule: str) -> None:
+        data = base()
+        mutate(data)
+        found = {gap["rule"] for gap in audit(data)}
+        if rule not in found:
+            fail(f"mutating for {rule} produced {sorted(found)}")
+
+    def drop_authorisation(data: Dataset) -> None:
+        data.tranche_by_number[1]["state"] = "planned"
+        data.tranche_by_number[1]["authorisation_review_id"] = None
+
+    expect(drop_authorisation, "tranche_review_without_authorisation")
+    expect(drop_authorisation, "project_in_unauthorised_tranche")
+
+    def drop_output(data: Dataset) -> None:
+        data.published["P0"].discard("vision")
+
+    expect(drop_output, "programme_outputs")
+
+    def close_without_review(data: Dataset) -> None:
+        data.by_key["T1"]["status"] = "closed"
+        data.published["T1"].discard("closure-review")
+
+    expect(close_without_review, "closed_without_closure_review")
+
+    def placeholder(data: Dataset) -> None:
+        data.benefits[0]["baseline"] = "not measured - no instrument exists"
+
+    expect(placeholder, "benefit_baseline_placeholder")
+
+    def missing_area(data: Dataset) -> None:
+        data.benefits[0]["operational_area"] = ""
+
+    expect(missing_area, "benefit_profile_incomplete")
+
+    def realized(data: Dataset) -> None:
+        data.benefits[0]["status"] = "realized"
+
+    expect(realized, "realized_without_transition")
+
+    def self_approval(data: Dataset) -> None:
+        data.contracts[0]["requested_by"] = data.contracts[0]["approved_by"]
+
+    expect(self_approval, "requester_is_approver")
+
+    def no_contract(data: Dataset) -> None:
+        data.contracts.clear()
+
+    expect(no_contract, "contract_missing")
+
+    def draft_board(data: Dataset) -> None:
+        data.architecture["board"][0]["status"] = "draft"
+
+    expect(draft_board, "board_not_approved")
+
+    def draft_profile(data: Dataset) -> None:
+        data.profile["status"] = "draft"
+
+    expect(draft_profile, "profile_adopted")
+
+    def no_baselines(data: Dataset) -> None:
+        data.msp["programme_baselines"] = []
+
+    expect(no_baselines, "programme_baselines")
+
+    def seed_drift(data: Dataset) -> None:
+        data.seed_by_key["T1"]["status"] = "closed"
+
+    expect(seed_drift, "seed_live_drift")
+
+    def missing_derivation(data: Dataset) -> None:
+        data.issues["issues"][0]["body"] = "generated by scripts/programme_state.py"
+
+    expect(missing_derivation, "derivation_missing")
+
+    def transition_without_baseline(data: Dataset) -> None:
+        row = {"benefit_id": "b1", "post_measured_at": "2026-11-20T00:00:00+00:00"}
+        data.msp["benefit_transitions"].append(row)
+        data.transitions.append(row)
+
+    expect(transition_without_baseline, "transition_order")
+
+    def invalid_waiver(data: Dataset) -> None:
+        row = {"id": "w1", "status": "active"}
+        data.architecture["waivers"].append(row)
+        data.waivers.append(row)
+
+    expect(invalid_waiver, "waiver_invalid")
+
+    # The run is deterministic: same inputs, same bytes.
+    first = json.dumps([gap for gap in audit(base())], sort_keys=True)
+    second = json.dumps([gap for gap in audit(base())], sort_keys=True)
+    if first != second:
+        fail("two audits of the same input differ")
+    print("audit-programme-conformance: self-test OK")
+
+
+# ── CLI ──────────────────────────────────────────────────────────────────────────────
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--snapshot", type=Path, default=DEFAULT_SNAPSHOT)
+    parser.add_argument("--outputs", type=Path, default=None)
+    parser.add_argument("--seed-dir", type=Path, default=ROOT / "seed")
+    parser.add_argument("--standard", type=Path, default=DEFAULT_STANDARD)
+    parser.add_argument("--repo-root", type=Path, default=ROOT)
+    parser.add_argument("--baseline", type=Path, default=DEFAULT_BASELINE)
+    parser.add_argument("--out", type=Path, default=DEFAULT_OUT)
+    parser.add_argument("--report", action="store_true")
+    parser.add_argument("--strict", action="store_true")
+    parser.add_argument("--fail-on", default="P0,P1")
+    parser.add_argument("--write-baseline", type=Path, default=None)
+    parser.add_argument("--check-standard", action="store_true")
+    parser.add_argument("--self-test", action="store_true")
+    args = parser.parse_args()
+
+    if args.self_test:
+        self_test()
+        return
+    standard = read_json(args.standard)
+    standard_checks(standard, args.seed_dir)
+    if args.check_standard:
+        print("audit-programme-conformance: standard OK")
+        return
+
+    dataset = load_dataset(
+        args.snapshot.resolve(), args.seed_dir.resolve(), standard, args.repo_root.resolve(), args.outputs
+    )
+    gaps = Audit(dataset, standard).run()
+
+    if args.report or args.write_baseline or args.strict:
+        args.out.mkdir(parents=True, exist_ok=True)
+        try:
+            snapshot_path = str(args.snapshot.resolve().relative_to(ROOT))
+        except ValueError:
+            snapshot_path = args.snapshot.name
+        report = {
+            "version": 1,
+            "snapshot": {
+                "git_sha": dataset.manifest.get("git_sha"),
+                "generated_at": dataset.manifest.get("generated_at"),
+                "tenant": dataset.manifest.get("tenant"),
+                "path": snapshot_path,
+            },
+            "counts": {
+                severity: sum(1 for gap in gaps if gap["severity"] == severity)
+                for severity in SEVERITY_ORDER
+            },
+            "gaps": gaps,
+        }
+        (args.out / "conformance-gap-register.json").write_text(
+            json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+        )
+        (args.out / "conformance-gap-register.md").write_text(
+            render_markdown(gaps, dataset, args.snapshot), encoding="utf-8"
+        )
+
+    if args.write_baseline:
+        args.write_baseline.parent.mkdir(parents=True, exist_ok=True)
+        baseline = baseline_entries(gaps, standard)
+        args.write_baseline.write_text(
+            json.dumps(baseline, indent=2, sort_keys=False) + "\n", encoding="utf-8"
+        )
+        print(f"audit-programme-conformance: wrote {len(baseline['entries'])} baseline entries")
+
+    if args.strict:
+        if not args.baseline.exists():
+            fail(f"strict audit requires a baseline at {args.baseline}")
+        baseline = read_json(args.baseline)
+        fail_on = {item.strip() for item in args.fail_on.split(",") if item.strip()}
+        failures = check_strict(gaps, baseline, fail_on)
+        if failures:
+            for failure in failures:
+                print(f"FAIL {failure}", file=sys.stderr)
+            sys.exit(1)
+        print("audit-programme-conformance: strict audit OK")
+
+
+if __name__ == "__main__":
+    main()
