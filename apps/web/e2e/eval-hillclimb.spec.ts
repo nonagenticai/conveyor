@@ -61,9 +61,9 @@ test("a climb starts, lists, opens and stops, and an empty eval says so", async 
   await expect(page.getByText("No climb on this eval.")).toBeVisible();
 
   // Start through the screen's own form. The noise band must sit above the measured floor for
-  // six held-out cases (1/sqrt(2·6) ≈ 0.289); 0.35 is above it.
+  // six held-out cases — the action reports 0.4082 (1/sqrt(6)) — so 0.45 is above it.
   await page.getByLabel("Target metric").fill("exact");
-  await page.getByLabel("Noise band").fill("0.35");
+  await page.getByLabel("Noise band").fill("0.45");
   await page.getByRole("button", { name: "Start climb" }).click();
   const row = page.locator("table.wtbl tbody tr", { hasText: "exact" });
   await expect(row).toHaveCount(1);
