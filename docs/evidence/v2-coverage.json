@@ -13,9 +13,9 @@
     "new": "absent"
   },
   "counts": {
-    "exists": 44,
-    "extend": 8,
-    "new": 11
+    "exists": 46,
+    "extend": 6,
+    "new": 8
   },
   "rows": [
     {
@@ -360,36 +360,6 @@
       ]
     },
     {
-      "id": "table:pko_release",
-      "spec_ref": "§10.3",
-      "kind": "table",
-      "concept": "pko_release",
-      "verdict": "new",
-      "evidence": [
-        "migrations: no CREATE/ALTER TABLE pko_release"
-      ]
-    },
-    {
-      "id": "table:pko_entity",
-      "spec_ref": "§10.3",
-      "kind": "table",
-      "concept": "pko_entity",
-      "verdict": "new",
-      "evidence": [
-        "migrations: no CREATE/ALTER TABLE pko_entity"
-      ]
-    },
-    {
-      "id": "table:pko_relation",
-      "spec_ref": "§10.3",
-      "kind": "table",
-      "concept": "pko_relation",
-      "verdict": "new",
-      "evidence": [
-        "migrations: no CREATE/ALTER TABLE pko_relation"
-      ]
-    },
-    {
       "id": "actions:programme/plan",
       "spec_ref": "§10.4",
       "kind": "actions",
@@ -446,10 +416,9 @@
       "spec_ref": "§10.4",
       "kind": "actions",
       "concept": "procedures",
-      "verdict": "extend",
+      "verdict": "exists",
       "evidence": [
         "actions: capabilities.* found (capabilities.bind_knowledge, capabilities.get, capabilities.list)",
-        "actions: pko.* absent",
         "actions: procedures.* found (procedures.create, procedures.get, procedures.ingest_process…)"
       ]
     },
@@ -612,11 +581,11 @@
       "spec_ref": "§10.5",
       "kind": "destination",
       "concept": "Procedures",
-      "verdict": "extend",
+      "verdict": "exists",
       "evidence": [
         "docs/design/v2.js: page 'procedures' registered"
       ],
-      "note": "The page and the V1 process/SOP tables exist; SOP/RDF/OWL ingestion, PKO editing and publish gates are T16."
+      "note": "The page operates the T16 intake live (SOP/BPMN/RDF), the source review and the two human publication gates; signed out it renders the published procedure/process/step rows read-only (#448)."
     },
     {
       "id": "destination:Authoring",

@@ -535,6 +535,80 @@ function freshState() {
         required_decisions: 1,
       },
     ],
+    // T16 — a converted SOP's draft judge and draft executable, shaped exactly as the actions
+    // return them (the page is tested against the contract, not a simplified fixture).
+    procedures: [
+      {
+        id: "proc-1",
+        key: "receiving",
+        title: "Synthetic receiving SOP",
+        description: "Converted from a synthetic SOP.",
+        status: "draft",
+        version: 1,
+        lock_version: 1,
+        definition_of_ready: {},
+        definition_of_done: {},
+        acceptance_criteria: [
+          { criterion: "step 1 `verify_stock` executes and its declared effect holds" },
+        ],
+        inspection: { kind: "checker", rule: "non_empty" },
+        outputs: [],
+        source_asset_id: "asset-1",
+        knowledge_pack_ref: "",
+        action_text: "receiving",
+        created_at: "2026-11-19T00:00:00Z",
+        updated_at: "2026-11-19T00:00:00Z",
+      },
+    ],
+    processes: [
+      {
+        id: "proc-run-1",
+        key: "receiving",
+        title: "Synthetic receiving SOP",
+        description: "Converted from a synthetic SOP.",
+        status: "draft",
+        version: 1,
+        lock_version: 1,
+        card_type_code: null,
+        owner_user_id: null,
+        outputs: [],
+        source_asset_id: "asset-1",
+        knowledge_pack_ref: "",
+        converter_version: "prose@1",
+        approval_id: null,
+        steps: [
+          {
+            position: 1,
+            kind: "computed",
+            actor: "system",
+            action: "procedures.list",
+            input_template: {},
+            on_result: "fail",
+            max_attempts: 1,
+            outputs: [],
+            action_text: "verify_stock",
+            pddl_preconditions: [],
+            pddl_effects: { add: ["stock_verified"], delete: [] },
+          },
+          {
+            position: 2,
+            kind: "gate",
+            actor: "human",
+            gate_kind: "approval",
+            input_template: {},
+            on_result: "fail",
+            max_attempts: 1,
+            outputs: [],
+            action_text: "put_away",
+            pddl_preconditions: ["stock_verified"],
+            pddl_effects: { add: ["stored"], delete: [] },
+          },
+        ],
+        created_at: "2026-11-19T00:00:00Z",
+        updated_at: "2026-11-19T00:00:00Z",
+      },
+    ],
+    procGates: [],
     msp: freshMsp(),
     requests: [],
     listBodies: [],
@@ -718,7 +792,37 @@ const SNAPSHOT = {
     cards: [{ id: "c-1", board_id: "b-s02", list_id: "l-done" }],
     runs: [],
   },
-  config: {},
+  // T16: the published procedure shape the signed-out page renders.
+  config: {
+    procedures: [
+      {
+        id: "proc-1",
+        key: "receiving",
+        title: "Synthetic receiving SOP",
+        status: "published",
+        version: 2,
+      },
+    ],
+    processes: [
+      {
+        id: "proc-run-1",
+        key: "receiving",
+        title: "Synthetic receiving SOP",
+        status: "published",
+        version: 2,
+      },
+    ],
+    process_steps: [
+      {
+        id: "ps-1",
+        process_id: "proc-run-1",
+        position: 1,
+        kind: "computed",
+        actor: "system",
+        action: "procedures.list",
+      },
+    ],
+  },
   organisation: {},
   artefacts: {
     documents: [
@@ -1016,6 +1120,18 @@ function startServer({ config, state, snapshot, outputs }) {
           "catalogues.list",
           "approvals.decide",
           "approvals.list",
+          "approvals.request",
+          "procedures.list",
+          "procedures.get",
+          "procedures.ingest_sop",
+          "procedures.ingest_process",
+          "procedures.ingest_rdf",
+          "procedures.validate",
+          "procedures.review_source",
+          "procedures.publish",
+          "processes.list",
+          "processes.get",
+          "processes.publish",
           "process_runs.start",
           "programmes.list",
           "programmes.update",
@@ -1206,6 +1322,138 @@ function startServer({ config, state, snapshot, outputs }) {
         return readBody(req, () =>
           json(res, 200, { items: LIVE_ADM.skills, next_cursor: null }),
         );
+      }
+      if (pathname === "/api/actions/procedures.list/invocations") {
+        return json(res, 200, { items: state.procedures, next_cursor: null });
+      }
+      if (pathname === "/api/actions/processes.list/invocations") {
+        return json(res, 200, { items: state.processes, next_cursor: null });
+      }
+      if (pathname === "/api/actions/processes.get/invocations") {
+        return readBody(req, (body) => {
+          const found = state.processes.find((row) => row.id === body.input.process_id);
+          assert.ok(found, "processes.get names a real process");
+          json(res, 200, found);
+        });
+        return;
+      }
+      if (pathname === "/api/actions/procedures.get/invocations") {
+        return readBody(req, (body) => {
+          const found = state.procedures.find((row) => row.id === body.input.procedure_id);
+          assert.ok(found, "procedures.get names a real procedure");
+          json(res, 200, found);
+        });
+        return;
+      }
+      if (pathname === "/api/actions/procedures.ingest_sop/invocations") {
+        return readBody(req, (body) => {
+          const input = body.input || {};
+          assert.equal(input.title, "Synthetic receiving SOP", "ingest_sop sends the title");
+          assert.equal(input.process_key, "receiving-stub", "ingest_sop sends the process key");
+          assert.equal(input.source_key, "receiving-sop-stub", "ingest_sop sends the source key");
+          assert.equal(input.source.kind, "text", "a pasted SOP is a text source");
+          assert.match(String(input.source.text || ""), /Receive stock/i, "the SOP body travels");
+          const procedure = {
+            ...state.procedures[0],
+            id: "proc-new",
+            key: input.process_key,
+            title: input.title,
+          };
+          const process = {
+            ...state.processes[0],
+            id: "run-new",
+            key: input.process_key,
+            title: input.title,
+          };
+          state.procedures.push(procedure);
+          state.processes.push(process);
+          json(res, 201, {
+            source_asset_id: "asset-1",
+            procedure_id: procedure.id,
+            process_id: process.id,
+            steps: 2,
+            converter_version: "prose@1",
+            knowledge_pack_ref: "",
+          });
+        });
+        return;
+      }
+      if (pathname === "/api/actions/procedures.validate/invocations") {
+        return readBody(req, (body) => {
+          assert.equal(body.input.process_id, "run-new", "validate names the draft it was given");
+          json(res, 200, {
+            valid: true,
+            checks: ["the PDDL literals parse", "every step names a published judge"],
+          });
+        });
+        return;
+      }
+      if (pathname === "/api/actions/procedures.review_source/invocations") {
+        return readBody(req, (body) => {
+          assert.equal(body.input.asset_id, "asset-1", "the review names the draft's source asset");
+          assert.equal(body.input.decision, "approve", "the approve control sends approve");
+          assert.ok(body.input.note, "the review carries the operator's note");
+          json(res, 200, { asset_id: body.input.asset_id, status: "approved" });
+        });
+        return;
+      }
+      if (pathname === "/api/actions/approvals.request/invocations") {
+        return readBody(req, (body) => {
+          const input = body.input || {};
+          assert.ok(
+            ["processes.publish", "procedures.publish"].includes(input.gate),
+            "the request names a publication gate",
+          );
+          assert.ok(input.target, "the request names its target");
+          // The real service opens a PENDING gate; a second person decides it.
+          const approval = {
+            id: `gate-${state.procGates.length + 1}`,
+            gate: input.gate,
+            kind: input.kind,
+            status: "pending",
+            target: input.target,
+            approvals: 0,
+            required_decisions: 1,
+            requested_by: "u-2",
+          };
+          state.procGates.push(approval);
+          json(res, 200, approval);
+        });
+        return;
+      }
+      if (pathname === "/api/actions/approvals.list/invocations") {
+        return readBody(req, (body) => {
+          const status = (body.input || {}).status;
+          json(res, 200, {
+            items: state.procGates.filter((row) => row.status === status),
+            next_cursor: null,
+          });
+        });
+        return;
+      }
+      if (pathname === "/api/actions/processes.publish/invocations") {
+        return readBody(req, (body) => {
+          assert.equal(body.input.process_id, "run-new", "the process publish names the draft");
+          assert.equal(
+            body.approval_id,
+            "gate-1",
+            "the approval id rides the CALL body, never the input",
+          );
+          json(res, 200, { id: body.input.process_id, status: "published", version: 2 });
+        });
+        return;
+      }
+      if (pathname === "/api/actions/procedures.publish/invocations") {
+        return readBody(req, (body) => {
+          assert.equal(body.input.procedure_id, "proc-new", "the judge publish names the draft judge");
+          assert.equal(
+            body.approval_id,
+            "gate-2",
+            "the judge publish carries its own approved gate",
+          );
+          json(res, 200, { id: body.input.procedure_id, status: "published", version: 2 });
+        });
+        return;
       }
       if (pathname === "/api/actions/cards.create/invocations") {
         return readBody(req, (body) => {
@@ -1712,11 +1960,14 @@ function startServer({ config, state, snapshot, outputs }) {
       if (pathname === "/api/actions/approvals.decide/invocations") {
         return readBody(req, (body) => {
           const input = body.input || {};
-          const approval = state.approvals.find((row) => row.id === input.approval_id);
+          const approval =
+            state.approvals.find((row) => row.id === input.approval_id) ||
+            state.procGates.find((row) => row.id === input.approval_id);
           assert.ok(approval, "approvals.decide names a real gate");
           assert.ok(["approve", "reject"].includes(input.decision), "a valid decision");
           assert.ok(input.note, "the decision carries a note");
           approval.status = input.decision === "approve" ? "approved" : "rejected";
+          if (approval.status === "approved") approval.approvals = 1;
           json(res, 200, approval);
         });
       }
@@ -2580,6 +2831,30 @@ function readBody(req, done) {
         0,
         "the snapshot capability makes no API request",
       );
+      // T16: the Procedures destination is public and read-only on the snapshot.
+      await page.goto(`http://127.0.0.1:${snapshotServer.port}/studio.html#procedures`);
+      await page.reload();
+      await page.waitForSelector(".page");
+      await page.waitForFunction(() =>
+        document.querySelector("#main").innerText.includes("Synthetic receiving SOP"),
+      );
+      const snapshotProcedures = await page.locator("#main").innerText();
+      assert.match(snapshotProcedures, /published/i, "the published procedure rows render");
+      assert.doesNotMatch(snapshotProcedures, /pko/i, "the published page claims no PKO store");
+      assert.equal(
+        await page
+          .locator(
+            '[data-v2="proc-ingest-sop"], [data-v2="proc-ingest-bpmn"], [data-v2="proc-gate-process"], [data-v2="proc-publish-process"]',
+          )
+          .count(),
+        0,
+        "the snapshot procedures page carries no write control",
+      );
+      assert.equal(
+        snapshotState.requests.length,
+        0,
+        "the snapshot procedures page makes no API request",
+      );
       await page.close();
     }
 
@@ -3442,6 +3717,143 @@ function readBody(req, done) {
       assert.match(await page.locator("#main").innerText(), /No published snapshot is loaded|Sign in to operate/);
       assert.equal(errors.length, 0, "no unhandled page error: " + errors.join("; "));
       await page.screenshot({ path: shot("console-signed-in.png"), fullPage: true });
+      await page.close();
+    }
+
+    /* 2c — the Procedures destination: the intake, the source review and the two gates. */
+    {
+      const page = await browser.newPage();
+      const errors = [];
+      page.on("pageerror", (error) => errors.push(String(error)));
+      await page.goto(`http://127.0.0.1:${signedIn.port}/studio.html#procedures`);
+      await page.waitForSelector('#console-chip[data-state="in"]');
+      await page.waitForSelector("text=Synthetic receiving SOP");
+      assert.doesNotMatch(
+        await page.locator("#main").innerText(),
+        /pko/i,
+        "the Procedures page claims no PKO store",
+      );
+      assert.ok(
+        consoleState.requests.some(
+          (row) => row.path === "/api/actions/procedures.list/invocations",
+        ),
+        "the page reads procedures.list",
+      );
+      assert.ok(
+        consoleState.requests.some(
+          (row) => row.path === "/api/actions/processes.list/invocations",
+        ),
+        "the page reads processes.list",
+      );
+
+      // The SOP intake: paste a document and ingest it. Nothing is published.
+      await page.click('[data-v2="tab"][data-key="procedures"][data-value="SOP intake"]');
+      await page.fill('[data-v2-input="proc-sop-title"]', "Synthetic receiving SOP");
+      await page.fill('[data-v2-input="proc-sop-process-key"]', "receiving-stub");
+      await page.fill('[data-v2-input="proc-sop-source-key"]', "receiving-sop-stub");
+      await page.fill('[data-v2-input="proc-sop-text"]', "Receive stock, verify it, put it away.");
+      await page.click('[data-v2="proc-ingest-sop"]');
+      await page.waitForSelector("text=Draft created");
+      assert.ok(
+        consoleState.requests.some(
+          (row) => row.path === "/api/actions/procedures.ingest_sop/invocations",
+        ),
+        "procedures.ingest_sop was sent",
+      );
+      assert.match(
+        await page.locator("#main").innerText(),
+        /process_id/,
+        "the ingest result names the draft",
+      );
+
+      // The PDDL steps read the derivation facts the P1 view carries.
+      await page.click('[data-v2="tab"][data-key="procedures"][data-value="PDDL steps"]');
+      await page.waitForSelector("text=verify_stock");
+      const pddl = await page.locator("#main").innerText();
+      assert.match(pddl, /put_away/, "the step action text renders");
+      assert.match(pddl, /stock_verified/, "the PDDL precondition renders");
+
+      await page.click('[data-v2="proc-validate"]');
+      await page.waitForSelector("text=Every check passes");
+      assert.ok(
+        consoleState.requests.some(
+          (row) => row.path === "/api/actions/procedures.validate/invocations",
+        ),
+        "procedures.validate was sent",
+      );
+
+      // The source review is a human act and names the draft's own asset.
+      await page.click('[data-v2="tab"][data-key="procedures"][data-value="Knowledge pairing"]');
+      await page.waitForSelector('[data-v2-input="proc-review-note"]');
+      await page.fill('[data-v2-input="proc-review-note"]', "the synthetic source is safe");
+      await page.click('[data-v2="proc-review-approve"]');
+      await page.waitForSelector("text=Source review");
+      assert.ok(
+        consoleState.requests.some(
+          (row) => row.path === "/api/actions/procedures.review_source/invocations",
+        ),
+        "procedures.review_source was sent",
+      );
+
+      // The executable gate: request, decide, publish — the approval rides the CALL.
+      await page.click('[data-v2="tab"][data-key="procedures"][data-value="Publish"]');
+      await page.waitForSelector('[data-v2="proc-gate-process"]');
+      await page.click('[data-v2="proc-gate-process"]');
+      await page.waitForSelector("text=Gate requested");
+      assert.ok(
+        consoleState.requests.some(
+          (row) => row.path === "/api/actions/approvals.request/invocations",
+        ),
+        "approvals.request was sent",
+      );
+      // BOTH gates are requested before either is decided: the publish must select the
+      // approved gate by its OWN name and target, never by the last request this session made.
+      await page.click('[data-v2="proc-gate-procedure"]');
+      await page.waitForFunction(() =>
+        document.querySelector("#main").innerText.includes("procedures.publish"),
+      );
+      assert.equal(
+        consoleState.requests.filter(
+          (row) => row.path === "/api/actions/approvals.request/invocations",
+        ).length,
+        2,
+        "both gates were requested",
+      );
+
+      // A second person decides the executable gate; the process publish names gate-1 even
+      // though the judge gate (gate-2) was requested last.
+      await page.waitForSelector('[data-v2="proc-gate-approve"][data-id="gate-1"]');
+      await page.click('[data-v2="proc-gate-approve"][data-id="gate-1"]');
+      await page.waitForFunction(() => {
+        const row = [...document.querySelectorAll("#main tr")].find((tr) =>
+          tr.innerText.includes("processes.publish"),
+        );
+        return !!row && row.innerText.includes("approved");
+      });
+      await page.waitForTimeout(300);
+      await page.click('[data-v2="proc-publish-process"]');
+      await page.waitForTimeout(400);
+      assert.ok(
+        consoleState.requests.some(
+          (row) => row.path === "/api/actions/processes.publish/invocations",
+        ),
+        "processes.publish was sent",
+      );
+
+      // The judge's own approval releases the judge.
+      await page.waitForSelector('[data-v2="proc-gate-approve"][data-id="gate-2"]');
+      await page.click('[data-v2="proc-gate-approve"][data-id="gate-2"]');
+      await page.waitForTimeout(400);
+      await page.click('[data-v2="proc-publish-procedure"]');
+      await page.waitForTimeout(400);
+      assert.ok(
+        consoleState.requests.some(
+          (row) => row.path === "/api/actions/procedures.publish/invocations",
+        ),
+        "procedures.publish was sent",
+      );
+      assert.deepEqual(errors, [], "no page error on the procedures destination");
+      await page.screenshot({ path: shot("console-procedures.png"), fullPage: true });
       await page.close();
     }
 

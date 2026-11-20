@@ -42,8 +42,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/SPEC_V2.html",
       "source": "docs/SPEC_V2.md",
       "section": "Spec",
-      "sha256": "574ce33870f05190c0c1487f4c898e5ca861b4203110cd74c3598f624a9c84bc",
-      "bytes": 170159,
+      "sha256": "e7b6a666c2b3a57294cf9517404d4e26fbd6745febeafe0a243c3a597233a663",
+      "bytes": 170681,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/SPEC_V2.md"
     },
     {
@@ -132,8 +132,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/design/README.html",
       "source": "docs/design/README.md",
       "section": "Design",
-      "sha256": "04767f41c850d5de89efe822cad9b11a877b8f8da701c3d0a8b6bcb250830b74",
-      "bytes": 18768,
+      "sha256": "d3b662cbc0c8f2be23247983e1bd02dc90bd204a63ff7d220847239810447e2e",
+      "bytes": 18752,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/design/README.md"
     },
     {
@@ -141,8 +141,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/design/STUDIO-SPEC.html",
       "source": "docs/design/STUDIO-SPEC.md",
       "section": "Design",
-      "sha256": "3f6f9d7d8464dca40aa9ddf1d5493b108d97cbece28f8bd813561d2e93065b1a",
-      "bytes": 76066,
+      "sha256": "b15114cbf2a516af4399505c193e9e8e6b41bb0daf779daae7121f78780a402e",
+      "bytes": 75949,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/design/STUDIO-SPEC.md"
     },
     {
@@ -492,8 +492,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/evidence/v2-coverage.html",
       "source": "docs/evidence/v2-coverage.md",
       "section": "Evidence",
-      "sha256": "e072f4bf8e36e1c28a4894564be087ab5c7ede2aabb1353db2c5942e2547b68c",
-      "bytes": 11353,
+      "sha256": "ac41c9af95a1dd690d3a11268921f2669972ee5c40bb033e7849f54486ec78ca",
+      "bytes": 11077,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/v2-coverage.md"
     },
     {

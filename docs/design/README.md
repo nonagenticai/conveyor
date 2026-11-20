@@ -143,8 +143,8 @@ the eight pack checks and `build-docs.py --check`.
   releases, tenant-scoped bindings and the stale-binding refusal; the authority matrix, approval
   policies, the rule → laya → generation → human decision ladder, tenant refinements and laya config.
 - **Procedures & authoring:** capability → procedure → step, SOP intake (single/batch), RDF/OWL and
-  BPMN/Visio/draw.io conversion, the PDDL action space, the relational PKO, knowledge-pack pairing
-  and publish; chat/document intake drafts every tenant asset behind a review gate.
+  BPMN/Visio/draw.io conversion, the PDDL action space, the knowledge-pack pairing and publish;
+  chat/document intake drafts every tenant asset behind a review gate.
 - **Tools:** toolkit versions, bindings and effect ceilings, the `tool_call` ledger, probes, BYO
   OpenAPI/MCP tools, governed tool authoring, the direct MinIO storage adapter and credential
   profiles. V1's coding catalogue (367 API operations) remains as a banner-labelled reference.

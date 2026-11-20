@@ -1,10 +1,8 @@
 erDiagram
   CAPABILITY ||--o{ PROCEDURE : realises
   PROCEDURE ||--o{ PROCEDURE_STEP : orders
-  PROCEDURE }o--|| PKO_RELEASE : pins
-  PKO_RELEASE ||--o{ PKO_ENTITY : contains
-  PKO_ENTITY ||--o{ PKO_RELATION : subject
-  PROCEDURE_STEP }o--o{ PKO_ENTITY : references
+  PROCEDURE }o--|| KNOWLEDGE_PACK : pins
+  PROCEDURE_STEP }o--o{ KNOWLEDGE_PACK : reads
   CAPABILITY }o--o{ KNOWLEDGE_PACK : pinned
   CARD ||--o{ MEMORY_HOT : writes
   CARD ||--o{ MEMORY_DIGEST : consolidates
