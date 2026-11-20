@@ -126,7 +126,7 @@
     },
     {
       "number": 1,
-      "state": "planned",
+      "state": "authorised",
       "entry": "the tranche 0 review decides continue; its exit criteria are met",
       "exit": "every project in tranche 1 (S02, T1, T11) meets its acceptance with published evidence, and the review records continue, pause or stop",
       "review_at": null
