@@ -38,7 +38,7 @@ LINK_FIELDS = (
     "benefit",
     "strategic_objective",
 )
-TRANCHE_STATES = {"planned", "active", "closed", "paused", "stopped"}
+TRANCHE_STATES = {"planned", "authorised", "in_review", "active", "closed", "paused", "stopped"}
 
 
 def fail(message: str) -> None:

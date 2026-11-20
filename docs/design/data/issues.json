@@ -1,11 +1,74 @@
 {
   "issues": [
     {
+      "number": 503,
+      "title": "programme: the seed records tranche 1 as authorised after the continue review",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/503",
+      "updatedAt": "2026-11-20T17:31:38Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        },
+        {
+          "name": "T9",
+          "color": "6E7781"
+        }
+      ]
+    },
+    {
+      "number": 502,
+      "title": "benefits: a realized status needs a measured transition",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/502",
+      "updatedAt": "2026-11-20T17:31:35Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        },
+        {
+          "name": "T10",
+          "color": "6E7781"
+        }
+      ]
+    },
+    {
+      "number": 501,
+      "title": "programme: the conformance standard, snapshot exposure and the retro gap register",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/501",
+      "updatedAt": "2026-11-20T17:25:31Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        },
+        {
+          "name": "programme",
+          "color": "5319E7"
+        }
+      ]
+    },
+    {
       "number": 496,
       "title": "ci: the generated fast path, dco on the queue, and the true delivery rules",
       "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/496",
-      "updatedAt": "2026-11-20T13:26:17Z",
+      "updatedAt": "2026-11-20T17:02:34Z",
       "labels": [
         {
           "name": "unit",
@@ -139,9 +202,9 @@
     {
       "number": 470,
       "title": "publish: the generated pack carries a programme destination the shell does not announce",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/470",
-      "updatedAt": "2026-11-20T11:57:51Z",
+      "updatedAt": "2026-11-20T17:11:30Z",
       "labels": [
         {
           "name": "unit",
@@ -223,9 +286,9 @@
     {
       "number": 458,
       "title": "console: the Metering screen reads the live inference aggregates (T11 built)",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/458",
-      "updatedAt": "2026-11-20T11:33:51Z",
+      "updatedAt": "2026-11-20T17:36:24Z",
       "labels": [
         {
           "name": "unit",
@@ -331,7 +394,7 @@
       "title": "publish: the programme's delivery record \u2014 programme.json, CSV and one tracked issue",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/433",
-      "updatedAt": "2026-11-19T21:30:30Z",
+      "updatedAt": "2026-11-20T17:36:42Z",
       "labels": [
         {
           "name": "unit",
@@ -3979,7 +4042,7 @@
       "title": "S12: hillclimb and inference-usage screens with their specs",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/28",
-      "updatedAt": "2026-11-20T12:00:04Z",
+      "updatedAt": "2026-11-20T17:31:18Z",
       "labels": [
         {
           "name": "unit",
@@ -4000,7 +4063,7 @@
       "title": "S12: eval report and sign-off screens with their specs",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/27",
-      "updatedAt": "2026-11-20T12:00:02Z",
+      "updatedAt": "2026-11-20T17:31:16Z",
       "labels": [
         {
           "name": "unit",
@@ -4019,9 +4082,9 @@
     {
       "number": 26,
       "title": "S12: measurement UI \u2014 eval report, paging, benchmark arms",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/26",
-      "updatedAt": "2026-11-20T11:05:42Z",
+      "updatedAt": "2026-11-20T17:11:26Z",
       "labels": [
         {
           "name": "unit",
@@ -4376,7 +4439,7 @@
       "title": "S13 \u2014 the stage editor and the retirement-gate cleanup (W4/W5 done)",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/7",
-      "updatedAt": "2026-11-20T12:00:08Z",
+      "updatedAt": "2026-11-20T17:31:14Z",
       "labels": [
         {
           "name": "unit",
@@ -4397,7 +4460,7 @@
       "title": "S12 \u2014 finish the UI: remaining screens and measurement",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/6",
-      "updatedAt": "2026-11-20T12:00:06Z",
+      "updatedAt": "2026-11-20T17:31:13Z",
       "labels": [
         {
           "name": "unit",

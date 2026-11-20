@@ -1104,13 +1104,14 @@
       "key": "T9",
       "name": "TOGAF ADM capability",
       "description": "SPEC_V2 slice T9 (docs/SPEC_V2.md §12)",
-      "status": "closed",
+      "status": "active",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/SPEC_V2.md#12",
         "track": "v2",
         "issues": [
-          81
+          81,
+          503
         ],
         "depends_on": [
           "T1",
@@ -1148,13 +1149,14 @@
       "key": "T10",
       "name": "SAFe cadence and MSP tranches",
       "description": "SPEC_V2 slice T10 (docs/SPEC_V2.md §12)",
-      "status": "closed",
+      "status": "active",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/SPEC_V2.md#12",
         "track": "v2",
         "issues": [
-          82
+          82,
+          502
         ],
         "depends_on": [
           "T1",
@@ -1181,7 +1183,7 @@
       "key": "T11",
       "name": "Metrics, metering and maturity",
       "description": "SPEC_V2 slice T11 (docs/SPEC_V2.md §12)",
-      "status": "active",
+      "status": "closed",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/SPEC_V2.md#12",
@@ -1542,7 +1544,8 @@
           433,
           435,
           462,
-          476
+          476,
+          501
         ],
         "depends_on": [],
         "plan_status": "active",
