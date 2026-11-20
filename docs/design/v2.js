@@ -6111,7 +6111,165 @@ window.installV2 = function (api, enterprise) {
   }
 
   /* ------------------------------------------------------------------ Operations */
+  // The live read of the T7 incident record (SPEC_V2 §9.2, #434). An incident is an `incident`
+  // card: `ops.incident|triage|mitigate|postmortem|resolve` write its meta, and the published
+  // snapshot carries the service, severity, the four timestamps and the runbook/postmortem
+  // titles. Read-only by the owner's decision — every write stays on the operator/agent path.
   function operations() {
+    if (live && live.ops) return operationsLive();
+    return operationsStudy();
+  }
+
+  function operationsLive() {
+    const O = live.ops || {};
+    const incidents = list(O.incidents);
+    const OPERATIONS_TABS = [
+      "Incidents",
+      "Runbooks",
+      "Postmortems",
+      "On-call",
+      "Read & write",
+      "Andon",
+    ];
+    const tab = OPERATIONS_TABS.includes(v.tab.operations) ? v.tab.operations : "Incidents";
+    // The state is derived from the four timestamps the lifecycle writes; never a guessed field.
+    const stateOf = (i) =>
+      i.resolved_at ? "resolved" : i.mitigated_at ? "mitigated" : i.triaged_at ? "triaging" : "open";
+    const toneOf = (state) =>
+      state === "resolved"
+        ? "green"
+        : state === "open"
+          ? "amber"
+          : state === "mitigated"
+            ? "purple"
+            : "";
+    const when = (value) =>
+      value ? E(String(value).slice(0, 19).replace("T", " ")) : "—";
+    const inc = incidents.find((i) => i.id === v.incident) || incidents[0] || null;
+    let content = "";
+    if (tab === "Incidents") {
+      const rows = incidents.map(
+        (i) =>
+          `<tr class="${inc && i.id === inc.id ? "selected" : ""}"><td><button class="e-project-link" data-v2="incident" data-id="${E(i.id)}"><span><strong>${E(i.name)}</strong><small>${E(i.service || "—")}</small></span></button></td><td>${B(i.severity || "—", i.severity === "sev1" ? "bad" : "amber")}</td><td>${when(i.detected_at)}</td><td>${when(i.resolved_at)}</td><td>${B(stateOf(i), toneOf(stateOf(i)))}</td></tr>`,
+      );
+      content = inc
+        ? `<div class="v2-split"><div>${panel(
+            "Incidents",
+            `${table(["Incident", "Severity", "Detected", "Resolved", "State"], rows)}`,
+            B(`${incidents.length} incident${incidents.length === 1 ? "" : "s"}`, "green"),
+          )}</div><div>${panel(
+            E(inc.name),
+            `${kv([
+              ["Service", E(inc.service || "—")],
+              ["Severity", B(inc.severity || "—", inc.severity === "sev1" ? "bad" : "amber")],
+              ["State", B(stateOf(inc), toneOf(stateOf(inc)))],
+              ["Detected", when(inc.detected_at)],
+              ["Triaged", when(inc.triaged_at)],
+              ["Mitigated", when(inc.mitigated_at)],
+              ["Resolved", when(inc.resolved_at)],
+              [
+                "Runbook",
+                inc.runbook_key
+                  ? `<span class="mono">${E(inc.runbook_key)}</span> · ${E(inc.runbook_title || "")}`
+                  : "—",
+              ],
+              [
+                "Postmortem",
+                inc.postmortem_asset_id
+                  ? E(inc.postmortem_title || inc.postmortem_asset_id)
+                  : "—",
+              ],
+            ])}${note(
+              "Read-only: the lifecycle is written by <span class='mono'>ops.incident</span>, <span class='mono'>ops.triage</span>, <span class='mono'>ops.mitigate</span>, <span class='mono'>ops.postmortem</span> and <span class='mono'>ops.resolve</span>. The severity and the runbook selection come from the published set; a mitigation is a destructive action under the tenant's approvals.",
+            )}`,
+          )}</div></div>`
+        : panel(
+            "Incidents",
+            note(
+              "No incident is in the published record. An incident is opened by <span class='mono'>ops.incident</span>; this screen is the read side only.",
+            ),
+          );
+    } else if (tab === "Runbooks") {
+      const groups = new Map();
+      incidents.forEach((i) => {
+        if (!i.runbook_procedure_id) return;
+        const row = groups.get(i.runbook_procedure_id) || {
+          key: i.runbook_key || i.runbook_procedure_id,
+          title: i.runbook_title || "",
+          count: 0,
+          last: i.detected_at || "",
+        };
+        row.count += 1;
+        if ((i.detected_at || "") > row.last) row.last = i.detected_at || "";
+        groups.set(i.runbook_procedure_id, row);
+      });
+      const rows = [...groups.values()].map(
+        (r) =>
+          `<tr><td class="mono">${E(r.key)}</td><td>${E(r.title || "—")}</td><td>${r.count}</td><td>${when(r.last)}</td></tr>`,
+      );
+      content = groups.size
+        ? panel(
+            "Runbooks",
+            `${table(["Runbook", "Procedure title", "Incidents", "Last detected"], rows)}${note(
+              "A runbook is a <strong>published procedure</strong> (SPEC_V2 §9.2). The incident records the selection; the procedure body stays on the Documents surface.",
+            )}`,
+          )
+        : panel(
+            "Runbooks",
+            note(
+              "No incident has selected a runbook yet. A triage names one published procedure; nothing else is a runbook.",
+            ),
+          );
+    } else if (tab === "Postmortems") {
+      const withPostmortem = incidents.filter((i) => i.postmortem_asset_id);
+      const rows = withPostmortem.map(
+        (i) =>
+          `<tr><td>${E(i.postmortem_title || i.postmortem_asset_id)}</td><td>${E(i.name)}</td><td>${when(i.resolved_at)}</td><td>${B(i.resolved_at ? "resolved" : "open", i.resolved_at ? "green" : "amber")}</td></tr>`,
+      );
+      content = withPostmortem.length
+        ? panel(
+            "Postmortems",
+            `${table(["Postmortem", "Incident", "Resolved", "State"], rows)}${note(
+              "One postmortem per incident: a governed asset linked from the card. A systemic finding opens exactly one kata candidate.",
+            )}`,
+          )
+        : panel(
+            "Postmortems",
+            note(
+              "No incident carries a postmortem yet. One closes each resolved incident, and only after a mitigation.",
+            ),
+          );
+    } else if (tab === "On-call") {
+      content =
+        panel(
+          "On-call and escalation",
+          `${flow([["Alert", "detect"], ["Laya triage", "severity + runbook"], ["On-call", "human"], ["Break-glass", "tenant-configured"], ["Post-hoc review", "mandatory"]])}${kv([["Default autonomy", "human approval"], ["Break-glass", "incident commander · tenant-configured · post-hoc review"], ["Escalation", "card → parent WBS → PM → programme; coach can escalate to a human"], ["Pages", "still a human decision"]])}`,
+        ) +
+        note(
+          "The full write set ships in v1; autonomy is configuration, not a reduced feature. A destructive action without the tenant's configured approvals is refused.",
+        );
+    } else if (tab === "Read & write") {
+      content = panel(
+        "Kubernetes and git verbs",
+        `${table(["Verb", "Effect class", "Gate"], [["pods · deployments · events · logs · metrics · Flux status · git/CI status", "read", "none · audit only"], ["rollout restart", "destructive", "dry-run + dual control + read-back"], ["scale", "destructive", "dry-run + dual control + read-back"], ["rollback", "destructive", "dry-run + dual control + read-back"], ["feature-flag flip", "destructive", "dry-run + dual control + read-back"], ["PR / branch / merge", "write | destructive", "job authority · merge gate"]].map((r) => `<tr><td>${E(r[0])}</td><td>${effects(r[1].split(" | "))}</td><td>${E(r[2])}</td></tr>`))}${note("The ops connector uses a namespace-scoped service account, never cluster-admin. The action registry declares every verb; the tool version carries the effect class, not the HTTP method.")}`,
+        B("read-first", "green"),
+      );
+    } else {
+      content = panel(
+        "Andon cord",
+        `${note(
+          "The andon cord is an incident-class action, not a pause button for one run: it stops new runs for a tenant or programme, keeps the record and alerts the on-call. Only a person releases it, and the release is recorded. A failed kata keeps it pulled.",
+        )}${kv([["Scope", "tenant or programme"], ["Effect", "stops new runs · keeps the record · alerts on-call"], ["Release", "a person only"], ["Related", "a failed kata keeps the cord until released"]])}`,
+      );
+    }
+    return `<div class="page enterprise">${heading("Operations", "Incidents, on-call, runbooks, read-first k8s/git actions and postmortems — the platform perspective as a job family.", `${route("Improve", "improve", "", "chart")}${route("Tools", "toolkits", "", "tools")}`, "OPERATIONS")}${consoleRibbon(
+      "The published incident record: service, severity, the four lifecycle timestamps, the runbook selection and the linked postmortem, read from the live snapshot. Read-only — writes stay on the operator/agent path.",
+      true,
+    )}${tabs(OPERATIONS_TABS, tab, "operations")}${content}</div>`;
+  }
+
+  // DESIGN mode: the SPEC_V2 study with local fixtures, kept for the checkout with no snapshot.
+  function operationsStudy() {
     const tab = v.tab.operations || "Incidents";
     const inc = F.incidents.find((i) => i.id === v.incident) || F.incidents[0];
     const rb = F.runbooks.find((r) => r.id === v.runbook) || F.runbooks[0];

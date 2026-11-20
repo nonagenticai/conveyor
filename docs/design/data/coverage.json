@@ -282,7 +282,7 @@
       "tranche": 0,
       "units": {
         "blocked": 1,
-        "claimed": 4,
+        "claimed": 3,
         "numbers": [
           17,
           22,
@@ -305,12 +305,11 @@
           410,
           426,
           433,
-          434,
           435,
           462,
           476
         ],
-        "open": 15,
+        "open": 14,
         "ready": 5,
         "unknown": 0
       }
@@ -1089,7 +1088,7 @@
       "tranche": 8,
       "units": {
         "blocked": 0,
-        "claimed": 0,
+        "claimed": 1,
         "numbers": [
           7,
           136,
@@ -1097,7 +1096,7 @@
           198
         ],
         "open": 1,
-        "ready": 1,
+        "ready": 0,
         "unknown": 0
       }
     },
@@ -2407,9 +2406,9 @@
       "evidence": [
         "docs/design/v2.js"
       ],
-      "gap": "V2 destination; no backend call",
+      "gap": null,
       "key": "operations",
-      "status": "proposed",
+      "status": "live",
       "title": "Operations"
     },
     {
@@ -2532,9 +2531,9 @@
       "actions_invoked": 28,
       "by_status": {
         "legacy": 7,
-        "live": 11,
+        "live": 12,
         "mixed": 1,
-        "proposed": 7
+        "proposed": 6
       },
       "total": 26
     }
