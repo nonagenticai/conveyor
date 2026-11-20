@@ -1,143 +1,143 @@
 {
   "actions_invoked": [
     {
-      "line": 1354,
+      "line": 1363,
       "name": "approvals.decide"
     },
     {
-      "line": 1254,
+      "line": 1263,
       "name": "architecture.artifacts_entries"
     },
     {
-      "line": 1255,
+      "line": 1264,
       "name": "architecture.artifacts_links"
     },
     {
-      "line": 204,
+      "line": 213,
       "name": "card_types.list"
     },
     {
-      "line": 393,
+      "line": 402,
       "name": "cards.claim"
     },
     {
-      "line": 377,
+      "line": 386,
       "name": "cards.comment"
     },
     {
-      "line": 325,
+      "line": 334,
       "name": "cards.create"
     },
     {
-      "line": 354,
+      "line": 363,
       "name": "cards.move"
     },
     {
-      "line": 408,
+      "line": 417,
       "name": "cards.release"
     },
     {
-      "line": 2537,
+      "line": 2562,
       "name": "documents.compose"
     },
     {
-      "line": 3024,
+      "line": 3049,
       "name": "documents.compose"
     },
     {
-      "line": 2819,
+      "line": 2844,
       "name": "documents.create"
     },
     {
-      "line": 2890,
+      "line": 2915,
       "name": "documents.delete"
     },
     {
-      "line": 2836,
+      "line": 2861,
       "name": "documents.download"
     },
     {
-      "line": 2869,
+      "line": 2894,
       "name": "documents.download"
     },
     {
-      "line": 2559,
+      "line": 2584,
       "name": "documents.get"
     },
     {
-      "line": 2854,
+      "line": 2879,
       "name": "documents.get"
     },
     {
-      "line": 1113,
+      "line": 1122,
       "name": "documents.list"
     },
     {
-      "line": 1136,
+      "line": 1145,
       "name": "documents.list"
     },
     {
-      "line": 1163,
+      "line": 1172,
       "name": "documents.list"
     },
     {
-      "line": 2787,
+      "line": 2812,
       "name": "documents.list"
     },
     {
-      "line": 2921,
+      "line": 2946,
       "name": "documents.preview"
     },
     {
-      "line": 2967,
+      "line": 2992,
       "name": "documents.return"
     },
     {
-      "line": 2708,
+      "line": 2733,
       "name": "documents.revision_get"
     },
     {
-      "line": 2669,
+      "line": 2694,
       "name": "documents.revision_list"
     },
     {
-      "line": 1377,
+      "line": 1386,
       "name": "process_runs.start"
     },
     {
-      "line": 195,
+      "line": 204,
       "name": "programmes.list"
     },
     {
-      "line": 670,
+      "line": 679,
       "name": "programmes.list"
     },
     {
-      "line": 738,
+      "line": 747,
       "name": "programmes.refresh"
     },
     {
-      "line": 2468,
+      "line": 2493,
       "name": "projects.close"
     },
     {
-      "line": 2351,
+      "line": 2376,
       "name": "projects.create"
     },
     {
-      "line": 2359,
+      "line": 2384,
       "name": "projects.update"
     },
     {
-      "line": 1327,
+      "line": 1336,
       "name": "runs.cancel"
     },
     {
-      "line": 1305,
+      "line": 1314,
       "name": "runs.get"
     },
     {
-      "line": 1282,
+      "line": 1291,
       "name": "runs.list"
     }
   ],
@@ -301,7 +301,6 @@
           223,
           224,
           225,
-          386,
           393,
           394,
           395,
@@ -310,10 +309,10 @@
           433,
           434,
           435,
-          450
+          462
         ],
-        "open": 17,
-        "ready": 8,
+        "open": 16,
+        "ready": 7,
         "unknown": 0
       }
     },
@@ -878,8 +877,8 @@
       "key": "S09",
       "measured": {
         "actions": [
-          27,
-          27
+          26,
+          26
         ],
         "modules": [
           1,
@@ -1048,10 +1047,11 @@
           390,
           391,
           392,
-          400
+          400,
+          459
         ],
-        "open": 7,
-        "ready": 5,
+        "open": 6,
+        "ready": 4,
         "unknown": 0
       }
     },
@@ -1657,10 +1657,11 @@
         "blocked": 0,
         "claimed": 0,
         "numbers": [
-          84
+          84,
+          458
         ],
-        "open": 0,
-        "ready": 0,
+        "open": 1,
+        "ready": 1,
         "unknown": 0
       }
     },
@@ -1669,8 +1670,7 @@
         "T15",
         "T17",
         "T5",
-        "T6",
-        "T7"
+        "T6"
       ],
       "evidence": [
         "docs/SPEC_V2.md"
@@ -1872,13 +1872,13 @@
       "tranche": 4,
       "units": {
         "blocked": 0,
-        "claimed": 0,
+        "claimed": 1,
         "numbers": [
           85,
           448
         ],
         "open": 1,
-        "ready": 1,
+        "ready": 0,
         "unknown": 0
       }
     },
@@ -1915,13 +1915,13 @@
       "track": "v2",
       "tranche": 5,
       "units": {
-        "blocked": 1,
+        "blocked": 0,
         "claimed": 0,
         "numbers": [
           87
         ],
         "open": 1,
-        "ready": 0,
+        "ready": 1,
         "unknown": 0
       }
     },
@@ -2140,18 +2140,18 @@
     {
       "blocked_by": [],
       "evidence": [
-        "docs/SPEC_V2.md"
+        "crates/ops"
       ],
-      "gap": "no incident, runbook or postmortem rows and no operations tool call set",
+      "gap": null,
       "key": "T7",
       "measured": {
         "actions": [
-          0,
-          0
+          15,
+          15
         ],
         "modules": [
-          0,
-          0
+          1,
+          1
         ],
         "tables": [
           0,
@@ -2166,12 +2166,12 @@
         "T17"
       ],
       "plan": "docs/SPEC_V2.md#12",
-      "status": "proposed",
+      "status": "built",
       "track": "v2",
       "tranche": 5,
       "units": {
-        "blocked": 0,
-        "claimed": 1,
+        "blocked": 1,
+        "claimed": 0,
         "numbers": [
           78,
           170,
@@ -2515,16 +2515,16 @@
       "by_status": {
         "absent": 0,
         "archived": 1,
-        "built": 38,
+        "built": 39,
         "partial": 2,
         "planned": 0,
-        "proposed": 6,
+        "proposed": 5,
         "standing": 1
       },
       "total": 48,
       "uncovered": [],
-      "with_open_units": 21,
-      "without_open_units": 27
+      "with_open_units": 22,
+      "without_open_units": 26
     },
     "screens": {
       "actions_invoked": 28,

@@ -98,6 +98,9 @@ pub mod tools;
 // `refinements.*` and `laya_configs.*`.
 pub mod ladder;
 pub mod views;
+// #450 (SPEC_V2 §11.2): the worker and provider inventory — the durable queue and the host
+// registry, served where the retired `worker-management` external used to be read.
+pub mod workers;
 // S13: `workflows.*` — the engine's authoring surface (one document, versioned by key).
 pub mod workflow;
 // #182 slice A: the tenant's own YouTube channel — OAuth client, connect, status, disconnect.

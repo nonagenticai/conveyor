@@ -169,6 +169,20 @@ fn declaring_targets() -> Vec<(&'static str, Value)> {
             "ops.host_restart_unit",
             json!({"host": "mini2", "unit": "com.nonagentic.conveyor-probe"}),
         ),
+        // T7 (#78): the incident-scoped mitigation and the fourth write verb.
+        (
+            "ops.mitigate",
+            json!({
+                "incident_id": id,
+                "action": "ops.scale",
+                "input": {"namespace": "conveyor", "deployment": "conveyor", "replicas": 3},
+            }),
+        ),
+        (
+            "ops.flag_flip",
+            json!({"namespace": "conveyor", "deployment": "conveyor",
+                   "flag": "FEATURE_X", "value": "on"}),
+        ),
     ]
 }
 

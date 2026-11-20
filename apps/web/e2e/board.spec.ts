@@ -45,6 +45,59 @@ test("a pointer drag moves a card into another lane", async ({ page, request }) 
   ).toBeVisible({ timeout: 10_000 });
 });
 
+test("the New project form offers the tenant's project types", async ({ page, request }) => {
+  const catalogue = await invoke<{ items: { code: string; label: string }[] }>(
+    request,
+    "catalogues.list",
+    { kind: "project_type", include_inactive: false },
+  );
+  const codes = catalogue.items.map((row) => row.code);
+  expect(codes.length).toBeGreaterThan(0);
+
+  await page.goto("/boards");
+  const select = page.getByLabel("Project type");
+  await expect(select).toBeVisible();
+  await expect(select.locator("option")).toHaveCount(codes.length);
+  const offered = await select
+    .locator("option")
+    .evaluateAll((options) => options.map((option) => option.value));
+  expect(offered).toEqual(codes);
+  const selected = await select.inputValue();
+  expect(codes).toContain(selected);
+
+  // The default is one the server accepts: create through the form and see the row.
+  const title = `Playwright type ${Date.now()}`;
+  await page.getByLabel("Project title").fill(title);
+  await page.getByRole("button", { name: "Create project" }).click();
+  const project = page.locator(".project", { hasText: title });
+  const loadMore = page.getByRole("button", { name: "Load more projects" });
+  await expect(page.locator(".project").first()).toBeVisible();
+  for (let attempt = 0; attempt < 10 && !(await project.isVisible()); attempt += 1) {
+    if (!(await loadMore.isVisible())) break;
+    await loadMore.click();
+    await expect(loadMore).toBeEnabled({ timeout: 10_000 }).catch(() => {});
+  }
+  await expect(project).toBeVisible();
+});
+
+test("one page: the board index reads its projects without per-project detail reads", async ({
+  page,
+}) => {
+  const detailRequests: string[] = [];
+  page.on("request", (request) => {
+    const path = new URL(request.url()).pathname;
+    if (/^\/api\/projects\/[^/]+$/.test(path)) detailRequests.push(path);
+  });
+
+  await page.goto("/boards");
+  await expect(page.locator(".project").first()).toBeVisible();
+  // The boards come with the page; a project with none would still render, so assert one.
+  await expect(page.locator(".project .board-link").first()).toBeVisible();
+  // Let any trailing detail reads (if the screen still made them) land.
+  await page.waitForTimeout(500);
+  expect(detailRequests).toEqual([]);
+});
+
 test("a project, its card, an edit and an archive round-trip through the UI", async ({
   page,
   request,

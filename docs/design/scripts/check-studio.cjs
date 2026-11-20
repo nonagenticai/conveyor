@@ -21,6 +21,11 @@ const shot = (name) =>
     viewport: { width: 1440, height: 1000 },
     deviceScaleFactor: 1,
   });
+  // #468: on a publish branch the pack carries the live snapshot; these fixtures are the design
+  // study's, so the page runs in the no-snapshot shape.
+  await page.addInitScript(() => {
+    window.CONVEYOR_QA_NO_SNAPSHOT = true;
+  });
   const errors = [],
     external = [],
     failed = [];

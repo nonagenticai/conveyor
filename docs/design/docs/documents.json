@@ -42,8 +42,8 @@
       "path": "docs/SPEC_V2.html",
       "source": "docs/SPEC_V2.md",
       "section": "Spec",
-      "sha256": "5bef7d6f326d5bfcac348aafcff7c98d136a3052ba237895c82b8967c2472fe3",
-      "bytes": 169718,
+      "sha256": "574ce33870f05190c0c1487f4c898e5ca861b4203110cd74c3598f624a9c84bc",
+      "bytes": 170159,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/SPEC_V2.md"
     },
     {
@@ -735,8 +735,8 @@
       "path": "docs/plans/slices/S09-documents-integrations.html",
       "source": "docs/plans/slices/S09-documents-integrations.md",
       "section": "Plans",
-      "sha256": "3b6678c555c2538cdc5aa9934bad9b4cd7828970a34ccda9cae22118c5339427",
-      "bytes": 22878,
+      "sha256": "f22757af3303bfeb36eb2aac979b8cacc9d74533c8ad3d49fa5bcca61cde083a",
+      "bytes": 23001,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S09-documents-integrations.md"
     },
     {

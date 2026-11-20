@@ -1,4 +1,4 @@
-//! The eight external displays and dispatches (S09 §5.1).
+//! The external dispatches that reach another service (S09 §5.1, completed by #450).
 //!
 //! Every one of these is a **declared action**, not an HTTP call a handler makes: the spec names the service, the
 //! method and the path, and the engine's `invoke_external` owns the timeout, the process-local breaker, the
@@ -8,9 +8,10 @@
 //! The base URL is per service: `CONVEYOR_EXTERNAL_<SERVICE>_URL`. An unset service is `ActionError::unconfigured`
 //! — a visible refusal, never a call to a guessable default.
 //!
-//! What is deliberately NOT here: any local copy of a worker inventory, a billing engine or a model catalogue.
-//! Reading `worker_management`'s database would make the conveyor its owner (S09 §8.4), so the only thing this
-//! module knows about those services is their address.
+//! Every destination left here is a Rust service: the coding fleet, a mac-mini model server (speech,
+//! transcription, images, model calls), the strata retriever, the third-party laya judge, and the
+//! local fixtures transport. The five V1 displays that named a Python destination or a service that
+//! no longer exists were moved onto conveyor state in #450 — see the note above `coding_jobs.create`.
 //!
 //! ⚠️ **`HandlerRef` has no path templating**: the path is static and a `GET` carries no body. So `coding_jobs.get`
 //! is a POST with the id in the body against `/api/jobs/status`, and the coding gateway must serve that route.
@@ -158,80 +159,11 @@ const fn spec(target: Target) -> ActionSpec {
     }
 }
 
-/// `workers.list` — the worker inventory, read-only (§5.5).
-fn workers_list() -> ActionSpec {
-    spec(Target {
-        name: "workers.list",
-        service: "worker_management",
-        method: "GET",
-        path: "/workers",
-        scopes: READ,
-        timeout_ms: 5_000,
-        effect: Effect::Read,
-        idempotent: true,
-    })
-}
-inventory::submit! { ActionRegistration::new(workers_list) }
-
-/// `providers.list` — the model providers, read-only.
-fn providers_list() -> ActionSpec {
-    spec(Target {
-        name: "providers.list",
-        service: "worker_management",
-        method: "GET",
-        path: "/providers",
-        scopes: READ,
-        timeout_ms: 5_000,
-        effect: Effect::Read,
-        idempotent: true,
-    })
-}
-inventory::submit! { ActionRegistration::new(providers_list) }
-
-/// `graphs.list` — the worker graph catalogue, read-only.
-fn graphs_list() -> ActionSpec {
-    spec(Target {
-        name: "graphs.list",
-        service: "worker_management",
-        method: "GET",
-        path: "/graphs",
-        scopes: READ,
-        timeout_ms: 5_000,
-        effect: Effect::Read,
-        idempotent: true,
-    })
-}
-inventory::submit! { ActionRegistration::new(graphs_list) }
-
-/// `artifacts.list` — the artifact catalogue, display only (§5.1).
-fn artifacts_list() -> ActionSpec {
-    spec(Target {
-        name: "artifacts.list",
-        service: "artifacts",
-        method: "GET",
-        path: "/api/artifacts",
-        scopes: READ,
-        timeout_ms: 5_000,
-        effect: Effect::Read,
-        idempotent: true,
-    })
-}
-inventory::submit! { ActionRegistration::new(artifacts_list) }
-
-/// `billing.summary` — the cost/budget overview, display only (D12: `billing_service` owns billing).
-fn billing_summary() -> ActionSpec {
-    spec(Target {
-        name: "billing.summary",
-        service: "billing_service",
-        method: "GET",
-        path: "/api/billing/overview",
-        scopes: READ,
-        timeout_ms: 5_000,
-        effect: Effect::Read,
-        idempotent: true,
-    })
-}
-inventory::submit! { ActionRegistration::new(billing_summary) }
+// The V1 displays that named a Python destination — `workers.list`, `providers.list`,
+// `graphs.list`, `artifacts.list`, `billing.summary` — are no longer externals (issue #450):
+// the worker inventory is `crate::workers` over the durable queue and the host registry
+// (§11.2), the artifact catalogue is `documents::artifacts` over the document store (§11.3,
+// D57), and the billing figure is `metrics::billing_summary` over the ledger (#46).
 
 /// `coding_jobs.create` — dispatch a coding task; the run keeps the returned ref (§5.3).
 fn coding_jobs_create() -> ActionSpec {

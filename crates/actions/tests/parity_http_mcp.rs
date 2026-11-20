@@ -4205,7 +4205,6 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
         // points at the stub; the answer is the same small document on both transports.
         plain("workers.list", json!({}), None),
         plain("providers.list", json!({}), None),
-        plain("graphs.list", json!({}), None),
         plain("artifacts.list", json!({}), None),
         plain("billing.summary", json!({}), None),
         plain("coding_jobs.create", json!({}), None),
@@ -5274,6 +5273,68 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
             plain(
                 "ops.rollback",
                 json!({"namespace": "conveyor", "deployment": "conveyor"}),
+                None,
+            ),
+            403,
+        ),
+        // ── #78: the incident lifecycle (T7, SPEC_V2 §9.2/§10.4) ──────────────────────────
+        // The four card-scoped actions name an incident that does not exist, so both transports
+        // answer the SAME `card` 404; `ops.mitigate` names no approval, so its destructive gate
+        // refuses 403 before anything else — exactly like `ops.restart` above.
+        expecting(
+            plain(
+                "ops.incident",
+                json!({"board_id": "00000000-0000-0000-0000-000000000000",
+                       "list_id": "00000000-0000-0000-0000-000000000000",
+                       "service": "conveyor", "severity": "sev2"}),
+                None,
+            ),
+            404,
+        ),
+        expecting(
+            plain(
+                "ops.triage",
+                json!({"incident_id": "00000000-0000-0000-0000-000000000000",
+                       "severity": "sev2",
+                       "runbook_procedure_id": "00000000-0000-0000-0000-000000000000"}),
+                None,
+            ),
+            404,
+        ),
+        expecting(
+            plain(
+                "ops.mitigate",
+                json!({"incident_id": "00000000-0000-0000-0000-000000000000",
+                       "action": "ops.scale",
+                       "input": {"namespace": "conveyor", "deployment": "conveyor",
+                                 "replicas": 2}}),
+                None,
+            ),
+            403,
+        ),
+        expecting(
+            plain(
+                "ops.postmortem",
+                json!({"incident_id": "00000000-0000-0000-0000-000000000000",
+                       "evidence": {},
+                       "postmortem": {"title": "t", "body": "b"}}),
+                None,
+            ),
+            404,
+        ),
+        expecting(
+            plain(
+                "ops.resolve",
+                json!({"incident_id": "00000000-0000-0000-0000-000000000000"}),
+                None,
+            ),
+            404,
+        ),
+        expecting(
+            plain(
+                "ops.flag_flip",
+                json!({"namespace": "conveyor", "deployment": "conveyor",
+                       "flag": "FEATURE_X", "value": "on"}),
                 None,
             ),
             403,
@@ -6869,9 +6930,6 @@ fn every_registered_action_returns_the_same_body_over_http_and_mcp() {
     support::set_env("SANDBOX_NAMESPACE", "swe-bench");
     // S09's external displays: every service resolves to the same stub, whose catch-all answers any path.
     for service in [
-        "worker_management",
-        "artifacts",
-        "billing_service",
         "coding",
         "strata_rag",
         // S10: the copilot's model call.

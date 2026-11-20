@@ -41,18 +41,9 @@ const RAW: &[(&str, &str)] = &[
         "retrieval",
         include_str!("../../../../seed/toolkits/retrieval.json"),
     ),
-    (
-        "artifacts",
-        include_str!("../../../../seed/toolkits/artifacts.json"),
-    ),
-    (
-        "billing",
-        include_str!("../../../../seed/toolkits/billing.json"),
-    ),
-    (
-        "worker_management",
-        include_str!("../../../../seed/toolkits/worker_management.json"),
-    ),
+    // The `artifacts`, `billing` and `worker_management` manifests were removed by #450: their
+    // actions are internal now, and a toolkit binds External handlers only (SPEC_V2 §11.2,
+    // §11.3, D57; #46).
 ];
 
 /// One toolkit's published declaration.

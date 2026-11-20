@@ -29,6 +29,11 @@ const shot = (name) => path.join(process.env.CONVEYOR_QA_OUTPUT || os.tmpdir(), 
   let count = 0;
   try {
     const page = await browser.newPage({ viewport: { width: 1440, height: 1060 } });
+    // #468: on a publish branch `data/snapshot.js` is the live pack; this check asserts the
+    // design fixtures, so it asks the app for the no-snapshot shape before any page script.
+    await page.addInitScript(() => {
+      window.CONVEYOR_QA_NO_SNAPSHOT = true;
+    });
     const errors = [],
       failed = [],
       external = [];
@@ -394,6 +399,8 @@ const shot = (name) => path.join(process.env.CONVEYOR_QA_OUTPUT || os.tmpdir(), 
     // panel names only files the window actually serves. The snapshot is injected before the
     // page scripts so `live` is true without an HTTP server or a real publish.
     await page.addInitScript(() => {
+      // #468: this section wants the live shape; the design-fixture flag above must stand down.
+      window.CONVEYOR_QA_NO_SNAPSHOT = false;
       Object.defineProperty(window, "CONVEYOR_SNAPSHOT", {
         configurable: true,
         set() {},

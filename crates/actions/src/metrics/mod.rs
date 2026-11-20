@@ -820,11 +820,73 @@ async fn metrics_job(
     Ok(JobOut { levels, run })
 }
 
+// ── billing.summary — the ledger figure (issue #450) ────────────────────────────────────
+
+/// The window `billing.summary` reports over.
+#[derive(Clone, Debug, Default, Serialize, Deserialize, JsonSchema)]
+pub struct BillingSummaryIn {
+    /// Days back from now; default 30, bounded `1..=365`.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub window_days: Option<i64>,
+}
+
+/// The conveyor's own usage for one window.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct BillingSummaryOut {
+    /// The window's start (inclusive).
+    pub from: DateTime<Utc>,
+    /// The window's end (exclusive, `now` at read time).
+    pub to: DateTime<Utc>,
+    /// Derived spend: inference from the price catalogue plus the ledger's tool cost.
+    pub total_usd: f64,
+    /// Model calls in the window.
+    pub inference_calls: i64,
+    /// Tool calls in the window.
+    pub tool_calls: i64,
+}
+
+/// The cost/budget overview, derived from the conveyor's own ledger.
+///
+/// V1 read this from a separate Python billing service. #46 (owner, 2026-11-16) ruled billing is
+/// the GPU-surface usage figure derived at read time from `inference_call`/`tool_call`; this
+/// action is that figure under the name the console already calls. An empty window is a zero
+/// with zero calls — never an upstream error.
+#[crate::action(
+    name = "billing.summary",
+    version = 1,
+    kind = "internal",
+    scopes = ["integrations:read"],
+    idempotent = true,
+    timeout_ms = 30000,
+    effect = "read",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn billing_summary(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: BillingSummaryIn,
+) -> Result<BillingSummaryOut, ActionError> {
+    let days = input.window_days.unwrap_or(30).clamp(1, 365);
+    let until = Utc::now();
+    let since = until - Duration::days(days);
+    let summary = store::metrics::usage_summary_tx(&mut *tx, ctx.tenant, since, until)
+        .await
+        .map_err(|error| metrics_error(error, ctx.action))?;
+    Ok(BillingSummaryOut {
+        from: since,
+        to: until,
+        total_usd: summary.total_usd,
+        inference_calls: summary.inference_calls,
+        tool_calls: summary.tool_calls,
+    })
+}
+
 // ── the billing reconciliation (P2) ─────────────────────────────────────────────────────
 
-/// The billing figure is read by the **declared** `billing.summary` external action, never by a
+/// The billing figure is read by the **declared** `billing.summary` read action, never by a
 /// handler: the engine owns that path's timeout, breaker, idempotency and audit. This action
-/// consumes the attestation — the total, or the upstream error when that action could not read.
+/// consumes the attestation — the total, or the failure when that action could not read.
 /// `metrics.reconcile` — the conveyor's metering against billing's roll-up for one period.
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 pub struct ReconcileIn {
