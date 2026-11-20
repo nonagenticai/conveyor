@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>T11 Metrics, metering and maturity — architecture design · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>T11 — Architecture design</h1>
+<p>Project: T11 — Metrics, metering and maturity · Track: v2 · Tranche: 1 · Plan: docs/SPEC_V2.md §12
+Unit: #84 (this design is dependency-shaping work; blocked-by P0 only)
+Measured at: main@61edfcf8, 2026-11-18 · Project row: active, meta.depends_on = ["P0"]</p>
+<h2>Context and boundary</h2>
+<p>T11 owns the measurement layer over the conveyor's own rows: the §7.5 metric families (flow, quality, cost, governance, knowledge), D52 metering roll-ups and drill-down, C0–C5 maturity with configured thresholds (D37), billing reconciliation and the never-refused gate flag. It is continuous: it starts once T0/T1 supply attribution (<code>run.job_binding_id</code>, <code>department</code>, <code>wbs_node</code>) and grows as other slices add source rows.</p>
+<p>It must not duplicate:</p>
+<ul>
+<li><strong><code>analyse.*</code></strong> — measures the subject of a project; T11 measures this system's process (§10.4.1).</li>
+<li><strong>the eval and benchmark instrument</strong> — S17–S20 own definitions, versions and sign-offs; T11 reads and never edits an instrument that judges it (§9.3).</li>
+<li><strong><code>billing_service</code></strong> — charging stays there; T11 reconciles, and a divergence opens an incident.</li>
+<li><strong>the inference-router's ledger</strong> — each service keeps its own; T11 reads the conveyor's <code>inference_call</code>, never another service's database.</li>
+<li><strong>the portfolio read model (D49)</strong> — T11 supplies numbers; it does not own the in-flight set.</li>
+<li><strong>T9's <code>architecture_maturity</code></strong> — a capability assessment, not process maturity.</li>
+</ul>
+<p>It fits the blueprint: one Postgres, one action registry, no new port (8930), no second frontend runtime; the console reads the same derivation the API serves.</p>
+<h2>Aggregates, tables and actions</h2>
+<p>Aggregates: <strong>metric definition</strong>, <strong>maturity</strong> (thresholds, assessments, levels), <strong>metering</strong> (derived views, no state), <strong>reconciliation</strong>, <strong>price history</strong>.</p>
+<p>Existing source tables, owned by other slices:</p>
+<table><thead><tr><th>Table</th><th>Role</th></tr></thead><tbody>
+<tr><td><code>migrations/0024_s16_inference_audit.sql:inference_call</code></td><td>tokens, cache class, run attribution; no money column</td></tr>
+<tr><td><code>migrations/0002_domain.sql:run</code>, <code>card</code>, <code>approval</code>, <code>approval_decision</code></td><td>flow timestamps, gate decisions</td></tr>
+<tr><td><code>migrations/0015_s11_procedure.sql:run_step</code></td><td>step grain</td></tr>
+<tr><td><code>migrations/0025_s17_benchmark.sql:benchmark_run</code>; <code>migrations/0026_s19_eval.sql:eval_metric</code>, <code>eval_run</code>, <code>eval_case_result</code>; <code>migrations/0036_s19_output_grade.sql:eval_grade</code></td><td>quality evidence</td></tr>
+<tr><td><code>migrations/0002_domain.sql:project</code>, <code>programme</code>; <code>migrations/0044_plan_spine.sql:wbs_node</code>, <code>programme_tranche</code></td><td>programme and project attribution</td></tr>
+<tr><td><code>migrations/0040_organisation.sql:job_binding</code>; <code>migrations/0001_platform.sql:department</code></td><td>job and department attribution</td></tr>
+<tr><td><code>migrations/0045_commercial_price.sql:commercial_price</code>; <code>migrations/0050_approval_policies.sql:approval_policy</code></td><td>current price; gate policy</td></tr>
+<tr><td><code>migrations/0001_platform.sql:audit_event</code></td><td>every invocation's <code>status</code> (<code>ok|refused|error</code>), action and resource — the refusal and never-refused-gate source</td></tr>
+</tbody></table>
+<p>New tables:</p>
+<table><thead><tr><th>Table (to create)</th><th>Invariants</th><th>Trace</th></tr></thead><tbody>
+<tr><td><code>metric_definition</code></td><td>one row per metric key; family, source rows, window, threshold, threshold version and calibration evidence mandatory; tenant RLS</td><td>D37, D50, §12 T11</td></tr>
+<tr><td><code>maturity_threshold</code></td><td>C0–C5 bounds per dimension, versioned; an approved version is superseded, never edited</td><td>D37, D50</td></tr>
+<tr><td><code>maturity_assessment</code></td><td>immutable; scores and evidence refs are inputs, the level is computed — a caller-supplied level is refused; stores threshold version and evidence hash</td><td>D37</td></tr>
+<tr><td><code>commercial_price_version</code></td><td>price history with <code>valid_from</code>; a report pins the version in force, so a price edit cannot rewrite history; <code>commercial_price</code> stays the current-price projection</td><td>§7.5, D52</td></tr>
+<tr><td><code>billing_reconciliation</code></td><td>one row per tenant × period; derived and billing figures, delta, outcome, incident ref; a divergent row without an incident ref is refused</td><td>§12 T11 gate, D52</td></tr>
+</tbody></table>
+<p>Actions — existing, all resolving in <code>docs/design/data/actions.json</code>: <code>inference_usage.report</code>, <code>inference_calls.list</code>, <code>billing.summary</code>, <code>eval_runs.report</code>, <code>eval_climbs.compare</code>, <code>evals.list</code>, <code>runs.list</code>, <code>approvals.list</code>.</p>
+<p>Actions — proposed, <code>(to create)</code>: <code>metrics.flow</code>, <code>metrics.job</code>, <code>metrics.programme</code>, <code>metrics.maturity</code> (§10.4); <code>metrics.metering</code> (the D52 levels); <code>metrics.reconcile</code>, <code>metrics.gates</code> (the two gate clauses); <code>metrics.config.get|set</code> (D50).</p>
+<p>Invariants:</p>
+<ol>
+<li><strong>No stored metric or cost.</strong> Every response names its source rows and the threshold or price version; recomputing twice gives the same figures and writes nothing.</li>
+<li><strong>Partition.</strong> Every call lands in exactly one bucket; buckets sum to the tenant total; unattributed calls are reported separately.</li>
+<li><strong>Recorded joins only.</strong> A call belongs to its run → card → project → programme; job attribution is <code>run.job_binding_id</code>; department is the binding's primary department, with others as a breakdown, never an invented split.</li>
+<li><strong>A level changes only through an assessment.</strong> No action sets a level; crossing a recorded threshold with new evidence is the only transition.</li>
+<li><strong>A divergence is an incident.</strong> A non-zero delta produces a divergent row and an incident card; no retry loop.</li>
+<li><strong>Minimum sample.</strong> A gate below the configured minimum is "no signal", not "never refused".</li>
+</ol>
+<p>Events <code>(to create)</code>: <code>metric.flagged</code>, <code>maturity.level_changed</code>, <code>billing.reconciliation_diverged</code>.</p>
+<h2>Decisions</h2>
+<ul>
+<li><strong>D-T11-1 — read models, not stored metrics.</strong> Alternative: materialised daily roll-ups. Consequence: each read is windowed and indexed, and a recompute test is mandatory (D37).</li>
+<li><strong>D-T11-2 — thresholds are versioned tenant configuration with platform defaults.</strong> Alternative: constants in code. Consequence: calibration is a data change, not a deploy (D37, D50).</li>
+<li><strong>D-T11-3 — price history is versioned.</strong> Alternative: the current <code>commercial_price</code> row. Consequence: a migration adds <code>commercial_price_version</code> and backfills one row per model, making history reproducible (§7.5, D52).</li>
+<li><strong>D-T11-4 — reconciliation is exact at the billing grain: tenant × UTC day × project × actor × app × provider × model, on tokens and money.</strong> Alternative: a percentage tolerance, or a coarser grain at which project, actor and app differences net out unflagged. Consequence: T11 compares at the charging system's own grain, and every coarser view is a sum of reconciled rows; any unexplained difference opens an incident, so boundaries are fixed and tested (§7.5, §12 T11).</li>
+<li><strong>D-T11-5 — maturity is its own aggregate.</strong> Alternative: thresholds inside <code>metric_definition</code>. Consequence: maturity needs immutable assessments, evidence refs and supersession (D37).</li>
+<li><strong>D-T11-6 — C0–C5 is process maturity over the measured families; the nine-dimension assessment stays in T9's <code>architecture_maturity</code>.</strong> Alternative: merge them. Consequence: two instruments, each with one owner, labelled distinctly in the UI (D37, §8.1).</li>
+<li><strong>D-T11-7 — five actions beyond §10.4's four (<code>metrics.metering</code>, <code>metrics.reconcile</code>, <code>metrics.gates</code>, <code>metrics.config.get</code>, <code>metrics.config.set</code>).</strong> Alternative: fold the three reads into the four and keep configuration off the action surface. Consequence: the §10.4 family grows by five and the addition is recorded on the unit's issue, not silently.</li>
+</ul>
+<h2>Acceptance</h2>
+<p>The project's measured gate, verbatim from <code>docs/SPEC_V2.md</code> §12 T11: <strong>“every metric and every metering level recomputes from rows; the reconciliation with <code>billing_service</code> is exact or opens an incident; a C0–C5 level changes only when the measured evidence crosses its recorded threshold; a gate that never refused is flagged”.</strong></p>
+<ol>
+<li><strong>Recomputes from rows.</strong> Verify: <code>rg -n 'metrics\.' docs/design/data/actions.json</code> (empty at <code>origin/main</code> today; the build must show the family), then <code>(to create at crates/actions/tests/metrics_recompute.rs)</code> — every bucket recomputed twice, identical, no write to a metric table; <code>cargo test -p conveyor-actions --test inference</code> guards the ledger.</li>
+<li><strong>Reconciliation exact or incident.</strong> Verify: <code>rg -n 'billing_summary' crates/actions/src/integrations/external.rs</code> shows the read-only boundary, then <code>(to create at crates/actions/tests/metrics_reconcile.rs)</code> — a one-token delta yields a divergent row with an incident ref and no retry.</li>
+<li><strong>Level changes only on measured evidence.</strong> Verify: <code>rg -n 'maturity_threshold' migrations/</code> (empty today), then <code>(to create at crates/actions/tests/maturity_levels.rs)</code> — identical evidence gives the same level; a threshold crossing with new evidence gives a new assessment; a caller-supplied level is refused.</li>
+<li><strong>Never-refused gate is flagged.</strong> Verify: <code>rg -n 'approval_decision' migrations/0002_domain.sql</code> shows the <code>approve|reject</code> vocabulary, then <code>(to create at crates/actions/tests/metrics_gates.rs)</code> — a gate at the minimum sample with zero refusals is flagged once; below it, not flagged.</li>
+<li><strong>Regression.</strong> Verify: <code>cargo test -p conveyor-actions --test eval_cost_walk</code> and <code>cargo test -p conveyor-actions --test inference</code>; the build unit records the result.</li>
+</ol>
+<h2>Architecture artefacts</h2>
+<h3>The PSA set at inception</h3>
+<ul>
+<li><strong>Principles applied.</strong> P1 — one record per fact: every metric is a read model over the one
+ledger and the one set of gate rows; no figure is stored twice. P3 — no completion without
+evidence: a maturity level is an assessment carrying its evidence refs, never a stored opinion.
+P5 — measurement before adoption: a procedure change is judged on an instrument T11 reads and
+never edits. P9 — every model call is ledgered and budgeted: <code>inference_call</code> is the cost source.
+P10 — no speculative aggregate: each new table exists because a named action writes it and a
+gate clause reads it. P11 — thresholds, sample minimums and price history are versioned
+tenant-scoped rows with platform defaults, not code constants.</li>
+<li><strong>Requirements.</strong> SPEC_V2 §7.5 (the metric families), §9.3 (the eval and benchmark instruments
+are judged, not edited), §10.4.1 (<code>analyse.*</code> measures a subject; T11 measures this system's
+process), §11.9 (inference and metering), §12 row T11 (the measured gate); decisions D37, D50,
+D52.</li>
+<li><strong>Stakeholder map.</strong> The tenant administrator (thresholds and calibration), the PM (flow and
+gate effectiveness), the billing owner (the reconciliation and its incidents), the programme's
+governance (maturity evidence), the eval owner (never edited, only read), and the delivery teams
+whose work is measured.</li>
+<li><strong>Driver, goal and objective.</strong> Driver: the programme cannot claim a benefit or a cost it cannot
+recompute — a stored figure or a stale price makes the claim unfalsifiable. Goal: every metric
+and every D52 metering level recomputes from rows, and the reconciliation is exact or opens an
+incident. Objective: a benefit transition cites a measured delta, and a gate that never refused
+is visible rather than silent.</li>
+<li><strong>Solution concept.</strong> Read-model actions over the existing ledger, run and gate rows; versioned
+<code>metric_definition</code> and <code>maturity_threshold</code> rows; immutable <code>maturity_assessment</code> rows that
+compute their level; <code>commercial_price_version</code> for reproducible cost; one
+<code>billing_reconciliation</code> row per tenant × period whose divergence opens an incident. No metrics
+runtime, no time-series store, no new port.</li>
+</ul>
+<h3>The typed artefact</h3>
+<p><strong>T11 Metric-by-Level Matrix</strong> — a typed <strong>matrix</strong>. Axis A: the metric families of §7.5 plus maturity. Axis B: the D52 levels — tenant, department, programme, project, job, run, step/call. A cell holds <code>&lt;source rows&gt; → &lt;serving action&gt;</code>; a cell marked <code>absent</code> is an explicit absence, not an omission.</p>
+<table><thead><tr><th>Level \ Family</th><th>Flow</th><th>Quality</th><th>Cost</th><th>Governance</th><th>Knowledge</th><th>Maturity</th></tr></thead><tbody>
+<tr><td>Tenant</td><td>card, list, event, run → <code>metrics.flow</code></td><td>eval*, benchmark*, run → <code>metrics.programme</code></td><td>inference_call, tool_call (T13), run → <code>metrics.metering</code></td><td>audit_event, approval → <code>metrics.gates</code></td><td>decision, inference_call → absent</td><td>assessment(tenant) → <code>metrics.maturity</code></td></tr>
+<tr><td>Department / industry</td><td>card, run + job_binding → <code>metrics.flow</code></td><td>eval*, run + job_binding → <code>metrics.programme</code></td><td>+ job_binding → <code>metrics.metering</code></td><td>audit_event, approval + job_binding → <code>metrics.gates</code></td><td>absent</td><td>assessment(department) → <code>metrics.maturity</code></td></tr>
+<tr><td>Programme / portfolio</td><td>+ project → <code>metrics.flow</code></td><td>eval*, run, project → <code>metrics.programme</code></td><td>+ project → <code>metrics.metering</code></td><td>approval, audit_event, project → <code>metrics.gates</code></td><td>decision, project → absent</td><td>assessment(programme) → <code>metrics.maturity</code></td></tr>
+<tr><td>Project</td><td>card, list, event, run → <code>metrics.flow</code></td><td>eval*, run, card → <code>metrics.programme</code></td><td>+ card, wbs_node → <code>metrics.metering</code></td><td>approval, audit_event, card → <code>metrics.gates</code></td><td>decision, card → absent</td><td>assessment(project) → <code>metrics.maturity</code></td></tr>
+<tr><td>Job</td><td>card, run (job_binding_id) → <code>metrics.flow</code></td><td>run, eval* → <code>metrics.job</code></td><td>+ run, tool_call (T13) → <code>metrics.metering</code></td><td>run, approval → <code>metrics.gates</code></td><td>decision, inference_call → absent</td><td>absent (maturity is assessed at project and above)</td></tr>
+<tr><td>Run</td><td>run, run_step → <code>metrics.flow</code></td><td>run, approval → <code>metrics.job</code></td><td>run_step, inference_call → <code>metrics.metering</code></td><td>approval, audit_event(resource_id) → <code>metrics.gates</code></td><td>decision → absent</td><td>absent</td></tr>
+<tr><td>Step / call</td><td>run_step → <code>metrics.flow</code></td><td>run_step, eval_case_result → <code>metrics.job</code></td><td>inference_call rows → <code>metrics.metering</code></td><td>absent (no gate at step grain)</td><td>inference_call(prompt_sha) → absent</td><td>absent</td></tr>
+</tbody></table>
+<p>Serving actions: <code>metrics.flow</code>, <code>metrics.job</code>, <code>metrics.programme</code>, <code>metrics.maturity</code> are §10.4's four; <code>metrics.metering</code> and <code>metrics.gates</code> are this design's additions (D-T11-7). The Knowledge row is entirely absent: no §10.4 action serves it and the build unit must either name one (<code>metrics.knowledge</code>) or fold it into <code>metrics.flow</code> — recorded as an open question in the analysis. <code>tool_call</code> does not exist before T13 and its cells read "not recorded", never zero.</p>
+<ul>
+<li><strong>Type / phase / plateau:</strong> matrix; phase C; plateau hld.</li>
+<li><strong>Owner:</strong> the T11 build unit (#84). <strong>Reviewer:</strong> the independent reviewer recorded on #347.</li>
+<li><strong>Review date:</strong> 2026-11-18. <strong>Version:</strong> 1. <strong>Status:</strong> draft — a design artefact, not evidence.</li>
+<li><strong>Purpose:</strong> prove every level has a source-row set and one serving action, with no hidden store.</li>
+<li><strong>Stakeholders:</strong> PM, coach and operations measurement consumers; the billing owner; the tenant administrator; the reviewer.</li>
+<li><strong>Scope:</strong> the §7.5 families and D52 levels; excludes <code>analyse.*</code> and T9's architecture maturity.</li>
+<li><strong>Project:</strong> T11 (#84). <strong>Published document:</strong> this architecture design, as the project's <code>architecture</code> document.</li>
+<li><strong>Links:</strong> derivation → <code>docs/SPEC_V2.md</code> §7.5 and §12 T11; realization → D37, D52; reuse → <code>docs/design/data/actions.json</code> and the migration tables above.</li>
+</ul>
+<h2>Migration and rollout</h2>
+<ul>
+<li>One lane, one PR. Migrations take the next free number after <code>migrations/0051_tranche_review.sql</code>; no new service, port, Redis or frontend runtime.</li>
+<li>Order: attribution audit; configuration tables with platform-default seeds; <code>commercial_price_version</code> plus backfill; the <code>metrics.*</code> reads; reconciliation and its incident path; <code>maturity_assessment</code>; the Portfolio, Organisation and Measure panels.</li>
+<li><code>tool_call</code> does not exist before T13 (#76): tool spend reports "not recorded", never zero, and its matrix cell stays explicitly empty.</li>
+<li>Rollback: read actions are removable, configuration rows are retired rather than deleted, assessment and reconciliation rows are append-only and kept.</li>
+<li>The live proof is the gate recorded on the project as its run and evidence output; this document and its matrix prove nothing alone.</li>
+</ul>
+<h2>Links</h2>
+<ul>
+<li>Brief: https://conveyor.nonagentic.ai/design/docs/output-01a1e008-25c1-776f-932f-c0ea29c05de8.html</li>
+<li>Issue: #84. Reviewer record: #347.</li>
+<li>Coverage row: <code>docs/design/data/coverage.json</code> (T11).</li>
+<li>Spec: <code>docs/SPEC_V2.md</code> §7.5, §8.1, §10.4, §11.9, §12 T11; decisions D37, D50, D52.</li>
+<li>Inception standard: <code>docs/plans/P0-programme-definition.md</code> §5.</li>
+<li>Artefact standard: the project's published <code>artifact-standard</code> document (§8.1).</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Metrics, metering and maturity · conveyor output · published 2026-11-20T07:33:41.908746784+00:00 · FR Test</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

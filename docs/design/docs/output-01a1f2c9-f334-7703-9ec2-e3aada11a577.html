@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>T8 — Evidence · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>T8 — Evidence</h1>
+<p>Project: T8 — Organisational memory · Track: v2 · Tranche: 11 · Plan: docs/SPEC_V2.md §12 · Measured at: main@f14b7d36, 2026-11-19 · Project row: active
+Unit: #79</p>
+<h2>Claim</h2>
+<p>At <code>main@f14b7d36</code> the only merged artefact attributable to T8 is one table. <code>migrations/0056_cadence_tranche.sql</code> creates <code>lesson</code>, but it merged as part of T10 (#82, PR #368, commit <code>e452523f</code>), and T10 also added the single writer that inserts a retro's lesson proposal. The capability T8's §12 gate names — a lesson with one evidence ref refused, two independent refs plus a person's review promoting a source draft, a bad run never becoming doctrine — does not exist at this baseline: no <code>lessons.*</code> action is in the registry, there is no <code>lesson_review</code> table, and no promotion, independence or review code or test exists. The programme row reads <code>measured_status: built</code> only because the slice descriptor's entire T8 entry is <code>{"tables": ["lesson"]}</code> — a table-presence measure, never the gate. Issue #79 remains OPEN and <code>status:blocked</code> on #77.</p>
+<h2>Evidence</h2>
+<p>Everything below resolves at <code>main@f14b7d36</code>.</p>
+<table><thead><tr><th>Path</th><th>What it is</th></tr></thead><tbody>
+<tr><td><code>migrations/0056_cadence_tranche.sql::lesson</code> (line 10)</td><td>The table: <code>programme_id</code>, <code>cadence_id</code>, <code>finding_key</code>, <code>statement</code>, <code>evidence jsonb</code> default <code>[]</code>, <code>independent_count integer &gt;= 0</code>, <code>state ∈ proposed|reviewed|promoted|rejected</code>, <code>source</code> default <code>retro</code>, forced RLS, unique <code>(tenant_id, cadence_id, finding_key)</code>. The header attributes it to T10 / issue #82.</td></tr>
+<tr><td><code>crates/store/src/spine.rs::propose_lesson_tx</code> (line 2824)</td><td>T10's only writer. Its doc comment says the refs "are stored as given (T8 owns the independent-ref rule)"; <code>independent_count</code> is the evidence array's length.</td></tr>
+<tr><td><code>crates/store/tests/retro.rs:106</code></td><td>T10's retro test — the only test that calls the writer.</td></tr>
+<tr><td><code>crates/domain/src/spine.rs::RetroFindingWithoutLesson</code> (line 165)</td><td>T10's rule that a retro cannot close while a finding has no lesson.</td></tr>
+<tr><td><code>scripts/v2-slice-artefacts.json</code> (T8 entry, line 132)</td><td><code>"T8": { "tables": ["lesson"] }</code> — the entire measured claim.</td></tr>
+<tr><td><code>seed/programme.json</code> (T8 row, line 997)</td><td><code>status: active</code>, <code>measured_status: built</code>, <code>issues: [79]</code>, <code>depends_on: ["T5","P0"]</code>.</td></tr>
+<tr><td><code>docs/SPEC_V2.md:1212</code></td><td>The plan names <code>lessons.propose|review|promote</code>; plan text, not a registered action.</td></tr>
+</tbody></table>
+<p>Absent, verified empty at the same ref:</p>
+<ul>
+<li><code>git grep -n '"lessons\.' origin/main -- docs/design/data/actions.json</code> returns nothing although the file exists (<code>memory.remember</code> is present); the registry has no <code>lessons.*</code> name.</li>
+<li><code>git grep -n 'lesson_review' origin/main -- migrations crates</code> returns nothing: no review table, no evidence-hash review, no reviewer.</li>
+<li><code>crates/store/tests/lesson.rs</code> and <code>crates/actions/tests/lessons.rs</code> — the two files #79 names as "to create" — are absent from <code>git ls-tree origin/main</code>.</li>
+<li>No promotion, source-draft or <code>governed_asset</code>-of-kind-<code>lesson</code> code exists, and nothing resolves or counts independent roots over cards, runs or incidents.</li>
+</ul>
+<h2>Verification</h2>
+<p>An independent reader, against a checkout of <code>origin/main</code>:</p>
+<pre><code>git grep -n '"lessons\.' origin/main -- docs/design/data/actions.json   # empty (file exists)
+git grep -n -i 'lesson' origin/main -- migrations/                      # 0056 only
+git grep -n -E 'propose_lesson|lesson_review' origin/main -- crates/    # T10 store function + its test
+gh issue view 79 --repo nonagenticai/conveyor --json state,labels       # OPEN, status:blocked
+</code></pre>
+<p><code>cargo test -p conveyor-store --test retro</code> runs T10's proposal path; it asserts no T8 scenario. No <code>lessons</code> action is registered, so <code>cargo test -p conveyor-actions --test registry</code> cannot cover one. There is no T8 test to run and no T8 CI run to cite.</p>
+<h2>Links</h2>
+<ul>
+<li>Issue: #79 — OPEN, labels <code>unit</code>, <code>status:blocked</code>, <code>T8</code>; body records <code>Blocker: #77</code> (T5).</li>
+<li>Spec: <code>docs/SPEC_V2.md</code> §7.6, §10.3 (<code>lesson</code> row), §10.4 (memory family), §12 T8; decision D36.</li>
+<li>Migration and unit: <code>migrations/0056_cadence_tranche.sql</code>; commit <code>e452523f</code>; PR #368; issue #82 (T10).</li>
+<li>Descriptor and seed: <code>scripts/v2-slice-artefacts.json</code>; <code>seed/programme.json</code>.</li>
+<li>Related units: #82 (retro authoring, another writer of this table), #84 (promotion-rate metric), #77 (blocker).</li>
+</ul>
+<h2>Gap</h2>
+<ul>
+<li><strong>Missing capability.</strong> The T8 lifecycle is absent: refusal of a one-ref lesson, independence counted over roots, human review bound to an evidence hash, promotion to a knowledge source draft, durable rejection, self-review refusal. None of it is merged.</li>
+<li><strong>The one writer contradicts the gate as written.</strong> <code>propose_lesson_tx</code> sets <code>independent_count</code> to the number of evidence array elements; two refs to the same card would count as two independent refs — the exact case §7.6 refuses. The comment defers the rule to T8, which does not exist here.</li>
+<li><strong>The open unit.</strong> #79 is OPEN and blocked on #77. Its "current state (measured)" at baseline <code>5cf3d75</code>, 2026-11-13, says no <code>lesson</code> table exists; that statement has rotted — T10's #368 created the table afterwards. The baseline and the ABSENT rows need refreshing before a claim.</li>
+<li><strong>What would prove it.</strong> The issue's P1–P3 scenarios green at one PR head: <code>crates/store/tests/lesson.rs::the_database_refuses_a_lesson_with_one_independent_ref</code>, plus <code>crates/actions/tests/lessons.rs</code> for one-ref refusal, two independent refs promoting a source draft with no pin written, and the proposer/self-review refusals — with <code>lessons.*</code> present in <code>docs/design/data/actions.json</code> and a <code>lesson_review</code> table in a migration.</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Organisational memory · conveyor output · published 2026-11-20T07:33:41.908746784+00:00 · FR Test</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

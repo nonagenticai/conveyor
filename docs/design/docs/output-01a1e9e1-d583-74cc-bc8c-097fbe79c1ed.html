@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Stakeholder profiles — the six groups and their engagement · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>Stakeholder profiles</h1>
+<p><strong>Programme:</strong> conveyor buildout · <strong>Status:</strong> proposed for P0 acceptance (drafted 2026-11-17) ·
+<strong>Owner:</strong> the programme manager (interim); the BCM position is unstaffed · <strong>Artefact:</strong> SP-1, over
+the T1 <code>stakeholder_profile</code> rows.</p>
+<h2>Stakeholders</h2>
+<p>Six groups are profiled; the rows are <code>stakeholder_profile</code> records; this document is their proposed
+narrative, pending P0's acceptance. The programme's own organisation (the owner, the maintainer sessions, the reviewers) and
+its public (contributors, readers) are both in frame: the vision says the programme serves the
+organisation that builds it and the public that can see and challenge the design.</p>
+<table><thead><tr><th>Group</th><th>Concerns and sensitivities</th><th>Importance / influence / interest</th><th>Support (trend)</th><th>Engagement target</th><th>Benefits</th><th>Disbenefits</th></tr></thead><tbody>
+<tr><td>Sponsor / owner</td><td>the programme delivers the benefits it claims; the gates hold</td><td>high / high / high</td><td>champion (steady)</td><td>the definition-set acceptance and each tranche review; owns P0's close</td><td>auditable decisions; one model; predictable delivery</td><td>the discipline of the gates slows a shortcut</td></tr>
+<tr><td>Maintainer sessions (AI)</td><td>the code and its gates are correct; the work is evidenced</td><td>high / high / high</td><td>champion (steady)</td><td>build under the owner's authority; never self-approve; publish only as the admin decision the owner takes</td><td>self-development; less bespoke tooling</td><td>the human approval step</td></tr>
+<tr><td>Outside contributors</td><td>a clear design, a reviewable unit, a fair contribution path</td><td>medium / medium / medium</td><td>positive (unknown)</td><td>GitHub issues, Discussions and forks; the Contribute page lists the ready units</td><td>public collaboration</td><td>review load</td></tr>
+<tr><td>The tenant's jobs (the organisation)</td><td>positions are staffed and bound; the releases are current</td><td>medium / medium / medium</td><td>neutral (unknown)</td><td>the organisation seed and the job releases; the roles that own benefits and delivery</td><td>jobs, not code paths</td><td>the transition from code paths to positions</td></tr>
+<tr><td>Independent reviewers</td><td>evidence, not claims; a refusal is honest</td><td>high / medium / high</td><td>champion (steady)</td><td>review each unit before publish; return or kata an incomplete output</td><td>every decision is auditable; the public collaboration</td><td>the extra cycle</td></tr>
+<tr><td>The public reader</td><td>the programme is readable and the outputs are stable</td><td>low / low / medium</td><td>positive (unknown)</td><td>the public site and each output's discussion link; no account</td><td>the public can see and challenge the design</td><td>none identified</td></tr>
+</tbody></table>
+<h2>Concerns and sensitivities</h2>
+<ul>
+<li><strong>The sponsor</strong> carries the benefits and the acceptance; a number that was not measured is the
+sensitivity, not a missed target.</li>
+<li><strong>The maintainer sessions</strong> build and evidence; they do not approve their own work, and the
+publish decision remains the owner's.</li>
+<li><strong>Outside contributors</strong> need a design they can review and a path they can follow; the sensitivity
+is opacity, not disagreement.</li>
+<li><strong>The organisation's jobs</strong> need releases and bindings; a stale binding is refused by the system.</li>
+<li><strong>Reviewers</strong> need evidence; an overstated completion is the failure they exist to catch.</li>
+<li><strong>The public reader</strong> needs the programme to be readable and stable; a 404 on a published output
+is the defect that breaks the contract.</li>
+</ul>
+<h2>Influence and interest</h2>
+<p>The sponsor and the maintainer sessions have high influence and high interest; the reviewers have
+high importance with medium influence; the outside contributors and the organisation's jobs are the
+medium band; the public reader is low influence but a real interest. The exposure column in the row
+records how much each group is exposed to a delivery failure.</p>
+<h2>Support and engagement</h2>
+<p>Support is champion for the owner, the sessions and the reviewers; positive for contributors and
+readers; neutral for the organisation's jobs (the positions are seeded, not yet operating). The
+engagement target per group is the row's <code>engagement_target</code>; the trend is <code>unknown</code> where no cycle
+has run; where a group has been consistently engaged (the sponsor, the sessions, the reviewers) the
+row records <code>steady</code> as a dated judgement, not a measured trend.</p>
+<h2>Benefits and disbenefits</h2>
+<p>The benefits each group receives are the vision's outcomes (O1–O6) through the benefits map; the
+disbenefits are real costs (the gates' discipline, the review cycle, the transition from code paths
+to positions) and are named rather than denied.</p>
+<p><strong>Gap.</strong> The BCM position is unstaffed; the programme manager is the interim owner of these profiles
+and must hand them to the BCM when the position is staffed (skills assessment SA-1's S1 milestone).</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Programme definition — vision, blueprint, plan and project briefs · conveyor output · published 2026-11-20T07:33:41.908746784+00:00 · FR Test</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

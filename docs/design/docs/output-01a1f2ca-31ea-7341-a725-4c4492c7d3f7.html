@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>T10 — Closure review · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>T10 — Closure review</h1>
+<p>Project: T10 — SAFe cadence and MSP tranches · Track: v2 · Tranche: 4 · Plan: docs/SPEC_V2.md §12
+Measured at: main@f14b7d36, 2026-11-19 · Project row: closed</p>
+<h2>Outcome vs acceptance</h2>
+<p>The acceptance set is the <code>docs/SPEC_V2.md</code> §12 row T10, whose gate has five clauses. The project brief restates the first three verbatim as its acceptance; the SPEC row governs this review.</p>
+<table><thead><tr><th>Acceptance clause</th><th>Evidence</th><th>Verdict</th></tr></thead><tbody>
+<tr><td>PI planning materialises cards from the backlog by WSJF within WIP</td><td><code>crates/store/src/spine.rs:materialise_pi_tx</code> (slots = active lane <code>wip_limit</code> − live cards); <code>crates/store/tests/programme_cadence.rs::wsjf_is_computed_not_stored</code> (order <code>high, mid, low</code>; no <code>wsjf</code> column), <code>::materialisation_respects_wip_slots</code>, <code>::a_zero_job_size_is_refused</code>; <code>apps/server/tests/cadence_jobs.rs::pi_tick_is_idempotent</code></td><td>pass — the entry point is the worker tick (<code>apps/server/src/cadence.rs:tick</code>), not an action</td></tr>
+<tr><td>A deliverable without evidence cannot demo</td><td><code>crates/store/src/spine.rs:credit_demo_tx</code> refuses a non-<code>accepted</code> deliverable and an empty evidence array; <code>crates/store/tests/demo_gate.rs::evidence_less_deliverable_cannot_demo</code></td><td>pass — delivered as <code>programme_demo_credit</code>, not the approval primitive the design chose</td></tr>
+<tr><td>Retro produces lessons</td><td><code>crates/store/src/spine.rs:open_retro_tx</code>, <code>:record_retro_findings_tx</code>, <code>:close_retro_tx</code> (refuses a finding with no lesson); <code>crates/store/tests/retro.rs::every_finding_becomes_a_lesson</code>, <code>::retro_cannot_close_without_lessons</code></td><td>pass — T10 built its own <code>lesson</code> table, contrary to its design</td></tr>
+<tr><td>An end-of-tranche review with no baselines, benefit status or risk evidence is refused</td><td><code>crates/store/src/spine.rs:review_tranche_tx</code>; <code>crates/domain/src/spine.rs:tranche_review_has_evidence</code>; <code>crates/store/tests/tranche_review.rs::a_review_without_evidence_is_refused</code>, <code>::a_rebaseline_goes_through_change_control</code>, <code>::a_project_cannot_start_before_its_tranche_is_authorised</code></td><td>pass</td></tr>
+<tr><td>A transition that never measured its baseline cannot report the benefit realized</td><td><code>crates/store/src/spine.rs:benefit_realization_tx</code> returns <code>BenefitBaselineMissing</code>; <code>crates/store/tests/benefit_transition.rs::a_missing_baseline_cannot_claim_realization</code></td><td>partial — proven on the transition path, but <code>benefits.update(status='realized')</code> bypasses it</td></tr>
+</tbody></table>
+<p>Four clauses pass and one is partial. The brief's three-clause acceptance is contained in rows 1–3, all pass. The partial is real: <code>crates/actions/src/spine/mod.rs:benefits_update</code> permits <code>realized</code> in its status list and writes it through <code>BenefitPatch</code>, and no <code>realized</code> guard exists in <code>crates/store/src/spine.rs</code>, so a benefit profile can be marked realized with no measured transition — the exact bypass the project's inception analysis listed as risk 4.</p>
+<h2>Evidence</h2>
+<ul>
+<li>Merge: PR #368 at <code>e452523f8ce9f339022502984ccb4354fb506aed</code>, 2026-11-18; issue #82 CLOSED 2026-11-18T21:40:52Z. All paths below resolve at main@<code>f14b7d36</code>.</li>
+<li><code>migrations/0056_cadence_tranche.sql</code> — <code>lesson</code>, <code>programme_demo_credit</code> (unique per cadence and deliverable, evidence copied onto the credit), and <code>programme_tranche.authorised_at</code> / <code>authorisation_review_id</code>.</li>
+<li>Store: <code>crates/store/src/spine.rs</code> — <code>materialise_pi_tx</code>, <code>credit_demo_tx</code>, <code>propose_lesson_tx</code>, <code>open_retro_tx</code>, <code>record_retro_findings_tx</code>, <code>close_retro_tx</code>, <code>review_tranche_tx</code>, <code>project_tranche_state_tx</code>, <code>assert_project_tranche_authorised_tx</code>, <code>benefit_realization_tx</code>, <code>close_programme_tx</code>.</li>
+<li>Wiring: <code>crates/actions/src/programme.rs:assert_project_can_start</code> calls the tranche-authorisation read before the dependency and inception gates (refusal <code>409 tranche_not_authorised</code>); <code>apps/server/src/cadence.rs:tick</code> is invoked from <code>apps/server/src/worker.rs:286</code>.</li>
+<li>Tests: five store binaries — <code>crates/store/tests/programme_cadence.rs</code>, <code>demo_gate.rs</code>, <code>retro.rs</code>, <code>tranche_review.rs</code>, <code>benefit_transition.rs</code> — plus <code>apps/server/tests/cadence_jobs.rs</code>.</li>
+<li>CI at the merge sha: push <code>ci</code> run 44403960831, conclusion success (21m34s); CodeQL 44403957783, <code>board</code> 44403960776 and <code>delivery</code> 44403960627 success. The <code>issue-registry</code> run 44403960626 failed; it is a registry-refresh workflow, not the gate.</li>
+<li>This review did not run the tests locally; the pass verdicts rest on the merged test source and that CI record.</li>
+</ul>
+<h2>Open items</h2>
+<ol>
+<li><strong>Realized-status bypass</strong> — add a guard at <code>benefits.update</code> or route <code>realized</code> through the transition; until then clause 5 is policy only on one path. No code or action for it exists at this baseline.</li>
+<li><strong>Cadence execution actions absent</strong> — <code>cadences.plan|demo|retro|refine</code> and <code>benefits.strategy|realization_plan|report</code> are not in the action registry; execution is the tick. Decide whether the design is amended to the tick or the actions are built.</li>
+<li><strong>Refinement unbuilt</strong> — no stale-item read exists, so D-T10-6 has no implementation.</li>
+<li><strong><code>wbs_node.planned_cadence_id</code> unbuilt</strong> — no row records which cadence planned an item; a later PI period re-selects unplanned backlog.</li>
+<li><strong>Lesson ownership</strong> — T10 built the <code>lesson</code> table its analysis assigned to T8; reconcile with T8/T5 before a second lesson store appears.</li>
+<li><strong>Demo gate shape</strong> — <code>programme_demo_credit</code> replaces the designed <code>approval</code> row; either is a gate, but only one is the architecture of record.</li>
+<li><strong><code>crates/actions/tests/cadence_t10.rs</code></strong> — named by the design, absent at baseline.</li>
+</ol>
+<p>Ownership of items 1–7 is not established by anything in the merged tree; none carries an issue, branch or PR that this review observed. They are recorded as open, not as satisfied.</p>
+<h2>Decision</h2>
+<p>T10 is CLOSED. The close is the owner's act, already recorded: issue #82 closed 2026-11-18T21:40:52Z and PR #368 merged 2026-11-18T21:40:50Z at <code>e452523f</code>. This review neither repeats nor re-grants that approval; it records the per-clause verdicts and the evidence behind them. The close stands on four passing clauses and one partial: the cadence, demo, retro and tranche rules are implemented and tested, while realized-status remains reachable without a measured transition. The seven open items above are carried forward as open, so a later reader cannot mistake this closure for a claim that the design was delivered whole.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>SAFe cadence and MSP tranches · conveyor output · published 2026-11-20T07:33:41.908746784+00:00 · FR Test</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

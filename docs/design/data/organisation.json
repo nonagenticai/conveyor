@@ -1,0 +1,537 @@
+{
+  "bindings": [
+    {
+      "capability_agent_id": null,
+      "capability_id": null,
+      "executor_kind": "procedure",
+      "id": "01a1db6b-ee4e-7467-a069-a50d20d8c08e",
+      "job_id": "01a1db6b-4ef7-7e90-accc-c4d025595477",
+      "job_key": "backend_engineer",
+      "process_id": "01a1d3e8-6577-7ba8-9625-833d2316188e",
+      "release_hash": "6f0215460e1192083e78066a533c042ff25256de517bd275dfeb8a6dbb88a1a4",
+      "status": "retired",
+      "version": 2
+    }
+  ],
+  "departments": [
+    {
+      "id": "01a1db6b-4ef2-7d79-ad7f-135d66dfaa12",
+      "industry_id": "01a1db6b-4eef-7d6e-bc89-94cf5091304b",
+      "is_primary": true,
+      "name": "delivery",
+      "ordinal": 1
+    },
+    {
+      "id": "01a1db6b-4ef3-7da9-87a6-3e9599cfb591",
+      "industry_id": "01a1db6b-4eef-7d6e-bc89-94cf5091304b",
+      "is_primary": false,
+      "name": "verification",
+      "ordinal": 2
+    },
+    {
+      "id": "01a1db6b-4ef4-7958-a473-1c4b76ecd553",
+      "industry_id": "01a1db6b-4eef-7d6e-bc89-94cf5091304b",
+      "is_primary": false,
+      "name": "operations",
+      "ordinal": 3
+    },
+    {
+      "id": "01a1db6b-4ef5-75ab-9543-a576ee5dcc1e",
+      "industry_id": "01a1db6b-4eef-7d6e-bc89-94cf5091304b",
+      "is_primary": false,
+      "name": "project office",
+      "ordinal": 4
+    },
+    {
+      "id": "01a1db6b-4ef5-7f96-969a-4531d4bbab19",
+      "industry_id": "01a1db6b-4eef-7d6e-bc89-94cf5091304b",
+      "is_primary": false,
+      "name": "improvement",
+      "ordinal": 5
+    }
+  ],
+  "generated_at": "2026-11-20T07:33:41.908746784+00:00",
+  "industries": [
+    {
+      "id": "01a1db6b-4eef-7d6e-bc89-94cf5091304b",
+      "key": "software",
+      "name": "Software",
+      "status": "active"
+    }
+  ],
+  "jobs": [
+    {
+      "authority": "draft contracts and ADRs; no merge",
+      "binding": "toolkit strata@2 · ceiling read · credential strata_rag.tenant",
+      "capabilities": [
+        "architecture"
+      ],
+      "charter": "Turn intent into architecture contracts and traceable decisions.",
+      "department_ids": [
+        "01a1db6b-4ef2-7d79-ad7f-135d66dfaa12"
+      ],
+      "department_names": [
+        "delivery"
+      ],
+      "executor_kind": "internal_agent",
+      "family": "architecture",
+      "gates": "design · architecture contract · closure",
+      "grants": [
+        "models.create",
+        "trace_links.create"
+      ],
+      "id": "01a1db6b-4efe-73bf-9e8b-004de1b88c50",
+      "industry_id": "01a1db6b-4eef-7d6e-bc89-94cf5091304b",
+      "key": "architect",
+      "knowledge": "base → software → delivery → architecture",
+      "limits": "16 turns · 60k tokens · $4.00",
+      "memory": "work-package hot + one digest",
+      "model_ref": "router/high",
+      "name": "Architect",
+      "procedure_ref": "proc-arch",
+      "prompt_recipe": "architecture_role@3",
+      "release_hash": "bf760e1bf3147bf456145741822e6c647aa5411f137031fe350e8f9bab0d2139",
+      "status": "active"
+    },
+    {
+      "authority": "implement, test, propose PR",
+      "binding": "toolkit coding@4 · ceiling write · credential coding.tenant",
+      "capabilities": [
+        "delivery"
+      ],
+      "charter": "Implement bounded backend changes; prove them with tests; propose a reviewable patch.",
+      "department_ids": [
+        "01a1db6b-4ef2-7d79-ad7f-135d66dfaa12"
+      ],
+      "department_names": [
+        "delivery"
+      ],
+      "executor_kind": "internal_agent",
+      "family": "engineering",
+      "gates": "design (conditional) · merge · deploy",
+      "grants": [
+        "coding_jobs.create",
+        "coding_jobs.get",
+        "test_runs.create"
+      ],
+      "id": "01a1db6b-4ef7-7e90-accc-c4d025595477",
+      "industry_id": "01a1db6b-4eef-7d6e-bc89-94cf5091304b",
+      "key": "backend_engineer",
+      "knowledge": "base → software → delivery → backend",
+      "limits": "12 turns · 40k tokens · $2.50",
+      "memory": "work-package hot + one digest",
+      "model_ref": "router/medium",
+      "name": "Backend engineer",
+      "procedure_ref": "proc-implement",
+      "prompt_recipe": "implementation_role@4",
+      "release_hash": "6f0215460e1192083e78066a533c042ff25256de517bd275dfeb8a6dbb88a1a4",
+      "status": "active"
+    },
+    {
+      "department_ids": [
+        "01a1db6b-4ef2-7d79-ad7f-135d66dfaa12"
+      ],
+      "department_names": [
+        "delivery"
+      ],
+      "family": "engineering",
+      "id": "01a1db6b-4f0e-7ded-9a2c-42628510422a",
+      "industry_id": "01a1db6b-4eef-7d6e-bc89-94cf5091304b",
+      "key": "data_engineer",
+      "name": "Data engineer",
+      "release_hash": null,
+      "status": "draft"
+    },
+    {
+      "department_ids": [
+        "01a1db6b-4ef2-7d79-ad7f-135d66dfaa12"
+      ],
+      "department_names": [
+        "delivery"
+      ],
+      "family": "engineering",
+      "id": "01a1db6b-4f0d-7d9c-a925-a60e124a0657",
+      "industry_id": "01a1db6b-4eef-7d6e-bc89-94cf5091304b",
+      "key": "frontend_engineer",
+      "name": "Frontend engineer",
+      "release_hash": null,
+      "status": "draft"
+    },
+    {
+      "department_ids": [
+        "01a1db6b-4ef4-7958-a473-1c4b76ecd553"
+      ],
+      "department_names": [
+        "operations"
+      ],
+      "family": "operations",
+      "id": "01a1db6b-4f16-7551-9c4b-0850b18d2647",
+      "industry_id": "01a1db6b-4eef-7d6e-bc89-94cf5091304b",
+      "key": "incident_commander",
+      "name": "Incident commander",
+      "release_hash": null,
+      "status": "draft"
+    },
+    {
+      "authority": "triage + remedy within the closed set",
+      "binding": "toolkit coding@4 · ceiling read · credential coding.tenant",
+      "capabilities": [
+        "improvement"
+      ],
+      "charter": "Protect flow; one interruption becomes exactly one coach card; bounded remedy or escalation.",
+      "department_ids": [
+        "01a1db6b-4ef5-7f96-969a-4531d4bbab19"
+      ],
+      "department_names": [
+        "improvement"
+      ],
+      "executor_kind": "procedure",
+      "family": "improvement",
+      "gates": "escalation only",
+      "grants": [
+        "cards.create",
+        "cards.move",
+        "coach.triage",
+        "coach.remedy"
+      ],
+      "id": "01a1db6b-4f04-7c14-9fb0-89c1b1f802a6",
+      "industry_id": "01a1db6b-4eef-7d6e-bc89-94cf5091304b",
+      "key": "kanban_coach",
+      "knowledge": "base → software → improvement",
+      "limits": "closed sets · no LLM remedy",
+      "memory": "board hot + interruption digest",
+      "model_ref": "laya",
+      "name": "Kanban coach",
+      "procedure_ref": "proc-coach",
+      "prompt_recipe": "coach_triage@3",
+      "release_hash": "0fecb878303b4b57d3bab9eda641f19d8d701a8abe7aa46f601dd1ff67b45dea",
+      "status": "active"
+    },
+    {
+      "department_ids": [
+        "01a1db6b-4ef5-7f96-969a-4531d4bbab19"
+      ],
+      "department_names": [
+        "improvement"
+      ],
+      "family": "improvement",
+      "id": "01a1db6b-4f1a-703c-a4c6-64260c850671",
+      "industry_id": "01a1db6b-4eef-7d6e-bc89-94cf5091304b",
+      "key": "kata_facilitator",
+      "name": "Kata facilitator",
+      "release_hash": null,
+      "status": "draft"
+    },
+    {
+      "department_ids": [
+        "01a1db6b-4ef5-7f96-969a-4531d4bbab19"
+      ],
+      "department_names": [
+        "improvement"
+      ],
+      "family": "improvement",
+      "id": "01a1db6b-4f1b-7180-86f8-f991cb9b78d0",
+      "industry_id": "01a1db6b-4eef-7d6e-bc89-94cf5091304b",
+      "key": "measurement_engineer",
+      "name": "Measurement engineer",
+      "release_hash": null,
+      "status": "draft"
+    },
+    {
+      "department_ids": [
+        "01a1db6b-4ef3-7da9-87a6-3e9599cfb591"
+      ],
+      "department_names": [
+        "verification"
+      ],
+      "family": "verification",
+      "id": "01a1db6b-4f15-77f1-97d2-74fa066e7869",
+      "industry_id": "01a1db6b-4eef-7d6e-bc89-94cf5091304b",
+      "key": "performance_engineer",
+      "name": "Performance engineer",
+      "release_hash": null,
+      "status": "draft"
+    },
+    {
+      "department_ids": [
+        "01a1db6b-4ef2-7d79-ad7f-135d66dfaa12"
+      ],
+      "department_names": [
+        "delivery"
+      ],
+      "family": "engineering",
+      "id": "01a1db6b-4f0f-7b77-ab6f-5b49038bef37",
+      "industry_id": "01a1db6b-4eef-7d6e-bc89-94cf5091304b",
+      "key": "platform_engineer",
+      "name": "Platform engineer",
+      "release_hash": null,
+      "status": "draft"
+    },
+    {
+      "department_ids": [
+        "01a1db6b-4ef4-7958-a473-1c4b76ecd553"
+      ],
+      "department_names": [
+        "operations"
+      ],
+      "family": "operations",
+      "id": "01a1db6b-4f17-71cf-b84b-73a675ff91f2",
+      "industry_id": "01a1db6b-4eef-7d6e-bc89-94cf5091304b",
+      "key": "platform_operator",
+      "name": "Platform operator",
+      "release_hash": null,
+      "status": "draft"
+    },
+    {
+      "authority": "create/close project; never sole approver",
+      "binding": "toolkit billing@1 · ceiling read · credential billing.tenant",
+      "capabilities": [
+        "project_management"
+      ],
+      "charter": "Turn a request into a governed project; sequence work; route gates; close with evidence.",
+      "department_ids": [
+        "01a1db6b-4ef5-75ab-9543-a576ee5dcc1e"
+      ],
+      "department_names": [
+        "project office"
+      ],
+      "executor_kind": "procedure",
+      "family": "product",
+      "gates": "charter · baseline · change · closure",
+      "grants": [
+        "projects.create",
+        "wbs.write",
+        "approvals.request"
+      ],
+      "id": "01a1db6b-4f01-7876-8daa-e701c00b3ea8",
+      "industry_id": "01a1db6b-4eef-7d6e-bc89-94cf5091304b",
+      "key": "pm",
+      "knowledge": "base → software → project office",
+      "limits": "8 turns · 20k tokens · $1.00",
+      "memory": "portfolio digest + project hot",
+      "model_ref": "laya + router/small",
+      "name": "PM",
+      "procedure_ref": "proc-pm",
+      "prompt_recipe": "pm_charter@2",
+      "release_hash": "ee0444865658a843dfb9867d2f2e83a2f71ee187679dd6af21628cb518ebcd85",
+      "status": "active"
+    },
+    {
+      "department_ids": [
+        "01a1db6b-4ef5-75ab-9543-a576ee5dcc1e"
+      ],
+      "department_names": [
+        "project office"
+      ],
+      "family": "product",
+      "id": "01a1db6b-4f19-7072-af61-f501850b6cbf",
+      "industry_id": "01a1db6b-4eef-7d6e-bc89-94cf5091304b",
+      "key": "portfolio_analyst",
+      "name": "Portfolio analyst",
+      "release_hash": null,
+      "status": "draft"
+    },
+    {
+      "department_ids": [
+        "01a1db6b-4ef2-7d79-ad7f-135d66dfaa12"
+      ],
+      "department_names": [
+        "delivery"
+      ],
+      "family": "product",
+      "id": "01a1db6b-4f0b-7602-a195-6efa4f9cbce7",
+      "industry_id": "01a1db6b-4eef-7d6e-bc89-94cf5091304b",
+      "key": "product_owner",
+      "name": "Product owner",
+      "release_hash": null,
+      "status": "draft"
+    },
+    {
+      "department_ids": [
+        "01a1db6b-4ef5-75ab-9543-a576ee5dcc1e"
+      ],
+      "department_names": [
+        "project office"
+      ],
+      "family": "product",
+      "id": "01a1db6b-4f17-7e76-838d-590d71578ad1",
+      "industry_id": "01a1db6b-4eef-7d6e-bc89-94cf5091304b",
+      "key": "programme_manager",
+      "name": "Programme manager",
+      "release_hash": null,
+      "status": "draft"
+    },
+    {
+      "department_ids": [
+        "01a1db6b-4ef3-7da9-87a6-3e9599cfb591"
+      ],
+      "department_names": [
+        "verification"
+      ],
+      "family": "verification",
+      "id": "01a1db6b-4f13-7822-8c9a-09e67d5670e0",
+      "industry_id": "01a1db6b-4eef-7d6e-bc89-94cf5091304b",
+      "key": "qa_engineer",
+      "name": "QA engineer",
+      "release_hash": null,
+      "status": "draft"
+    },
+    {
+      "department_ids": [
+        "01a1db6b-4ef2-7d79-ad7f-135d66dfaa12"
+      ],
+      "department_names": [
+        "delivery"
+      ],
+      "family": "release",
+      "id": "01a1db6b-4f11-75a6-bec6-675c8fd11224",
+      "industry_id": "01a1db6b-4eef-7d6e-bc89-94cf5091304b",
+      "key": "release_manager",
+      "name": "Release manager",
+      "release_hash": null,
+      "status": "draft"
+    },
+    {
+      "department_ids": [
+        "01a1db6b-4ef2-7d79-ad7f-135d66dfaa12"
+      ],
+      "department_names": [
+        "delivery"
+      ],
+      "family": "verification",
+      "id": "01a1db6b-4f10-770d-be8c-c29b6de7587f",
+      "industry_id": "01a1db6b-4eef-7d6e-bc89-94cf5091304b",
+      "key": "reviewer",
+      "name": "Reviewer",
+      "release_hash": null,
+      "status": "draft"
+    },
+    {
+      "department_ids": [
+        "01a1db6b-4ef3-7da9-87a6-3e9599cfb591"
+      ],
+      "department_names": [
+        "verification"
+      ],
+      "family": "verification",
+      "id": "01a1db6b-4f14-77ac-b57f-de88b8df0a04",
+      "industry_id": "01a1db6b-4eef-7d6e-bc89-94cf5091304b",
+      "key": "security_reviewer",
+      "name": "Security reviewer",
+      "release_hash": null,
+      "status": "draft"
+    },
+    {
+      "authority": "read-first; write behind a gate",
+      "binding": "toolkit ops@5 · ceiling destructive · credential ops.namespace",
+      "capabilities": [
+        "operations"
+      ],
+      "charter": "Detect, triage, mitigate and learn from incidents in the conveyor and its dependencies.",
+      "department_ids": [
+        "01a1db6b-4ef4-7958-a473-1c4b76ecd553"
+      ],
+      "department_names": [
+        "operations"
+      ],
+      "executor_kind": "internal_agent",
+      "family": "operations",
+      "gates": "destructive action · postmortem",
+      "grants": [
+        "ops.k8s_read",
+        "ops.k8s_restart",
+        "ops.git_read"
+      ],
+      "id": "01a1db6b-4f07-7bbb-bc27-823f9fc63ce7",
+      "industry_id": "01a1db6b-4eef-7d6e-bc89-94cf5091304b",
+      "key": "sre",
+      "knowledge": "base → software → operations",
+      "limits": "10 turns · 30k tokens · $3.00",
+      "memory": "incident hot + postmortem digest",
+      "model_ref": "router/medium",
+      "name": "SRE / on-call",
+      "procedure_ref": "proc-incident",
+      "prompt_recipe": "incident_role@2",
+      "release_hash": "5839e993c08b27e3c482083c5b69ebfe83fdca0d6a53df19d38d36e64fb20011",
+      "status": "active"
+    },
+    {
+      "department_ids": [
+        "01a1db6b-4ef2-7d79-ad7f-135d66dfaa12"
+      ],
+      "department_names": [
+        "delivery"
+      ],
+      "family": "engineering",
+      "id": "01a1db6b-4f0c-7bd5-940f-3674a1ddf7fd",
+      "industry_id": "01a1db6b-4eef-7d6e-bc89-94cf5091304b",
+      "key": "tech_lead",
+      "name": "Tech lead",
+      "release_hash": null,
+      "status": "draft"
+    },
+    {
+      "department_ids": [
+        "01a1db6b-4ef2-7d79-ad7f-135d66dfaa12"
+      ],
+      "department_names": [
+        "delivery"
+      ],
+      "family": "knowledge",
+      "id": "01a1db6b-4f12-74a5-93cd-e4a7651a6b47",
+      "industry_id": "01a1db6b-4eef-7d6e-bc89-94cf5091304b",
+      "key": "technical_writer",
+      "name": "Technical writer",
+      "release_hash": null,
+      "status": "draft"
+    }
+  ],
+  "releases": [
+    {
+      "created_at": "2026-11-14T18:56:45.294787Z",
+      "id": "01a1db6b-4efc-7cfd-826a-667d2cc51dee",
+      "job_id": "01a1db6b-4ef7-7e90-accc-c4d025595477",
+      "job_key": "backend_engineer",
+      "release_hash": "6f0215460e1192083e78066a533c042ff25256de517bd275dfeb8a6dbb88a1a4",
+      "status": "published",
+      "version": 1
+    },
+    {
+      "created_at": "2026-11-14T18:56:45.294787Z",
+      "id": "01a1db6b-4f00-76ea-aced-d5263a65585d",
+      "job_id": "01a1db6b-4efe-73bf-9e8b-004de1b88c50",
+      "job_key": "architect",
+      "release_hash": "bf760e1bf3147bf456145741822e6c647aa5411f137031fe350e8f9bab0d2139",
+      "status": "published",
+      "version": 1
+    },
+    {
+      "created_at": "2026-11-14T18:56:45.294787Z",
+      "id": "01a1db6b-4f03-7ad4-975c-c4df7d8dd028",
+      "job_id": "01a1db6b-4f01-7876-8daa-e701c00b3ea8",
+      "job_key": "pm",
+      "release_hash": "ee0444865658a843dfb9867d2f2e83a2f71ee187679dd6af21628cb518ebcd85",
+      "status": "published",
+      "version": 1
+    },
+    {
+      "created_at": "2026-11-14T18:56:45.294787Z",
+      "id": "01a1db6b-4f06-7b71-81aa-523bde1cf7d7",
+      "job_id": "01a1db6b-4f04-7c14-9fb0-89c1b1f802a6",
+      "job_key": "kanban_coach",
+      "release_hash": "0fecb878303b4b57d3bab9eda641f19d8d701a8abe7aa46f601dd1ff67b45dea",
+      "status": "published",
+      "version": 1
+    },
+    {
+      "created_at": "2026-11-14T18:56:45.294787Z",
+      "id": "01a1db6b-4f0a-732b-ae52-481450df895e",
+      "job_id": "01a1db6b-4f07-7bbb-bc27-823f9fc63ce7",
+      "job_key": "sre",
+      "release_hash": "5839e993c08b27e3c482083c5b69ebfe83fdca0d6a53df19d38d36e64fb20011",
+      "status": "published",
+      "version": 1
+    }
+  ],
+  "schema": "design-snapshot/v1"
+}

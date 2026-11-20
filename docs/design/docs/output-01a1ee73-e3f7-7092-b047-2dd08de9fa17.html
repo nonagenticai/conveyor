@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>T0 Model and contracts — closure review · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>T0 — Closure review</h1>
+<pre><code>Project: T0 — Model and contracts · Track: v2 · Tranche: 0 · Plan: docs/SPEC_V2.md §12
+Unit: #349 (the unit that publishes this output)
+Measured at: main@856cb8e53756b40170353802d9d5c97fdc024ac4, 2026-11-18 · Project row: closed
+</code></pre>
+<h2>Outcome vs acceptance</h2>
+<p>T0's gate (<code>docs/SPEC_V2.md</code> §12; the live project row carries the same sentence in <code>meta.gate</code>) has three clauses. The slice also commits the ownership matrix, the organisation vocabulary, the decision-ladder types and the internal <code>Executor</code> contract with two live kinds.</p>
+<p><strong>Clause 1 — a job is created, a release is published, a binding pins its hash, and a run on a retired binding refuses <code>409 job_binding_stale</code>: PASS.</strong> <code>migrations/0040_organisation.sql</code> creates <code>job_catalogue</code>, <code>job_release</code> (SHA-256 <code>release_hash</code> over a frozen snapshot) and <code>job_binding</code> (<code>release_hash NOT NULL</code>); <code>run</code> gains <code>job_binding_id</code> and <code>release_hash</code>; the store refuses a retired or mismatched pin before the INSERT (<code>crates/store/src/run.rs</code>). Named tests: <code>crates/store/tests/organisation.rs::release_hash_is_deterministic_and_publish_is_idempotent</code> and <code>apps/server/tests/organisation_gate.rs::run_on_a_retired_binding_is_refused_409_before_the_insert</code>. The live sentence is recorded on #34: a binding was created, a first run succeeded, the binding was retired, and the next create answered <code>409 job_binding_stale</code> naming both hashes.</p>
+<p><strong>Clause 2 — no concept has two stores: PASS (review judgement).</strong> <code>docs/SPEC_V2.md</code> §10.1 assigns the industry/department/job/release/binding spine and the decision-ladder types to the conveyor. Migration 0040 extends the existing <code>department</code> table rather than forking it ("One department concept, not a fork"), with unique indexes for one primary and one ordinal per industry; <code>job_binding</code> joins conveyor-owned <code>job_catalogue</code>, <code>job_release</code>, <code>process</code> and <code>capability_agent</code> rows, not an imported manifest. Coverage reports 15/15 actions, 3/3 modules, 9/9 tables, no gap. Honest limit: no test can prove the absence of a second store; this is a design audit re-read here, not a passing test.</p>
+<p><strong>Clause 3 — a test-only third executor kind registers without editing the run path: PASS.</strong> <code>crates/domain/src/executor.rs</code> provides an open-slug <code>ExecutorKind</code>, one <code>Executor</code> trait and a registry with <code>procedure</code> and <code>internal_agent</code>; <code>job_binding.executor_kind</code> is TEXT with a shape CHECK and no value CHECK, so the registry is the authority. <code>crates/store/tests/organisation.rs::third_executor_kind_registers_without_editing_the_run_path</code> registers a third kind, creates a binding and a run, and shows the builtin registry refusing the same kind at binding creation.</p>
+<p>The decision-ladder types are present as five tables in the same migration (<code>decision</code>, <code>decision_option</code>, <code>decision_policy</code>, <code>decision_policy_refinement</code>, <code>laya_inference_config</code>) — types only, which is the slice boundary; T2 owns evaluation. PASS.</p>
+<h2>Evidence</h2>
+<ul>
+<li><strong>Merge:</strong> PR #65, squash commit <code>1f48e268</code> on <code>origin/main</code>, 2026-11-14; closes #34.</li>
+<li><strong>CI at the merge sha:</strong> run 43627890282 (<code>push</code>, <code>1f48e268</code>) concluded success. Its <code>checks</code> job runs fmt, clippy <code>-D warnings</code>, nextest plus doctests against PostgreSQL 18, and <code>cargo audit</code>, so the suite holding the named tests passed there. The PR-head run 43626325584 (<code>a5c6cf7</code>) is also green. The PR body records a local gate of 1441 tests across 249 binaries, 0 failures (recorded, not re-run by this review).</li>
+<li><strong>Merged artefacts at the merge sha:</strong> <code>migrations/0040_organisation.sql</code>, <code>crates/domain/src/executor.rs</code>, <code>crates/domain/src/organisation.rs</code>, <code>crates/store/src/organisation.rs</code>, <code>seed/organisation.json</code>.</li>
+<li><strong>Live proof:</strong> the post-merge comment on #34 records the migration, the idempotent seed (28 rows created, then 0), the retire → 409 sentence, the published snapshot and a LIVE design check of 184 assertions.</li>
+<li><strong>Published evidence:</strong> "Evidence — T0 Model and contracts", https://conveyor.nonagentic.ai/design/docs/output-01a1e688-678d-76fd-8ae7-6ca2712b64c2.html, measured at <code>main@cc88052</code> (2026-11-16); it records the inventory and states it does not re-run the acceptance suite.</li>
+<li><strong>Brief:</strong> https://conveyor.nonagentic.ai/design/docs/output-01a1e008-0d4f-7170-8a5e-0e89861340fe.html.</li>
+<li><strong>Coverage:</strong> <code>/design/data/coverage.json</code> row T0 — status <code>built</code>, zero open/claimed/blocked/ready units, gap null.</li>
+</ul>
+<h2>Open items</h2>
+<ul>
+<li><strong>Publication of this document.</strong> Owner: the #349 session. Next step: publish this closure-review and verify its page returns 200. It is the declared closure output, not a build gap.</li>
+<li><strong>Standing review obligation, not a task.</strong> Clause 2 has no executable invariant; a future change that gives an organisation or decision concept a second home must be caught in design review. Owner: programme architecture review; next step: cite §10.1 in that change's design record.</li>
+</ul>
+<h2>Decision</h2>
+<p><strong>Close — record the close.</strong> The live project row is <code>closed</code> (measured today, version 8). Reason: all three gate clauses were met on merged code with green CI at the merge sha and a recorded live proof; the slice's decision-ladder types and Executor contract exist at <code>origin/main</code>; coverage reports no gap and no open unit. T0 was closed before the closure gate (#302) existed — the gate merged 2026-11-18 as <code>18e06aca</code> (PR #336), and programme unit #349 records T0–T3 as the projects that predate it. This review is therefore the durable closure record the gate now expects; publishing it satisfies T0's declared <code>closure-review</code> output. No re-open is warranted.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Model and contracts · conveyor output · published 2026-11-20T07:33:41.908746784+00:00 · FR Test</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

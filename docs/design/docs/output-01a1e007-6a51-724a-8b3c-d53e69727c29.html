@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>S06b — Agent direct interface — the conveyor&#39;s own MCP surface · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>S06b — Agent direct interface — the conveyor's own MCP surface</h1>
+<p><strong>Track:</strong> v1 · <strong>Tranche:</strong> 6 · <strong>Measured status:</strong> built · <strong>Plan:</strong> <code>docs/plans/slices/S06b-agent-direct-interface.md</code>
+<strong>Dependencies:</strong> S04, S05, S06 · <strong>Issues:</strong> none</p>
+<h2>Outcome</h2>
+<p>The <code>agent</code> app operates the conveyor over the conveyor's <strong>own</strong> <code>/mcp</code> surface. At the end, one real agent task
+creates a project, reads its progress, answers an approval and closes the project — with the decision recorded as
+<code>decided_by_kind='agent'</code> — and no component called <code>nonagenticai_mcp_server</code> is in the path.</p>
+<h2>Boundary</h2>
+<p><strong>IN</strong> — the four gaps that stop the existing <code>/mcp</code> from being consumable by <code>agent</code>: the tool key, machine
+authentication, principal attribution, and an approval-request action. Also the agent-side registration contract
+(implemented in <code>agent</code>, gated here).</p>
+<p><strong>OUT</strong> — the <code>fr</code> toolkit in <code>nonagenticai_mcp_server</code> (retires with fr at S14); the agent's task/elicitation
+extension for <em>external</em> MCP servers (<strong>S06c</strong>; v1 polls until it lands); the conveyor's copilot surface (S10); every
+other fr caller (S13). No HMAC channel is built.</p>
+<h2>Reuse sources</h2>
+<table><thead><tr><th>path</th><th>read this</th><th>carry</th><th>do not carry</th></tr></thead><tbody>
+<tr><td><code>crates/actions/src/mcp.rs</code></td><td><code>tool_json</code>, the <code>_meta</code> block</td><td>the tool shape</td><td>—</td></tr>
+<tr><td><code>crates/auth/src/{authn,principal,licence}.rs</code></td><td><code>authenticate</code>, <code>Principal</code>, <code>Session</code>, the entitlement verdict</td><td>the fail-closed rule and the JWT-shape rule</td><td>the entitlement check's coupling to requests</td></tr>
+<tr><td><code>crates/store/src/approval.rs</code></td><td><code>insert_approval_tx</code> (nullable <code>run_id</code>), <code>open_gate_tx</code></td><td><code>insert_approval_tx</code></td><td><code>open_gate_tx</code> (requires a running run)</td></tr>
+<tr><td><code>crates/actions/src/mcp.rs</code>, <code>crates/api/src/actions.rs</code></td><td>the three `actor_kind:…</td><td></td><td></td></tr>
+</tbody></table>
+<h2>Inception units</h2>
+<ol>
+<li><code>analysis</code> — current state and reuse: inventory what already exists, the contract and licence constraints, the build-vs-reuse decision, and the risks.</li>
+<li><code>architecture</code> — the project's design: aggregates, tables, actions, modules, integrations, the decision record, and acceptance.</li>
+</ol>
+<p>Both are documents on this project with <code>meta.category</code> set to <code>analysis</code> / <code>architecture</code>; both published is the inception standard.</p>
+<h2>Dependencies</h2>
+<p>Blocked-by: S04, S05, S06.</p>
+<h2>Acceptance</h2>
+<pre><code class="language-bash">set -euo pipefail
+source ~/.cargo/env
+cargo test -p conveyor-auth
+cargo test -p conveyor-actions --test mcp_meta
+cargo test -p conveyor-api --test approval_dual
+cargo test -p conveyor-api --test mcp_agent
+cargo clippy --workspace --all-targets -- -D warnings
+# the served document matches its lock (regenerated in step 10)
+cargo run -q -p conveyor-server -- --print-openapi --check-lock
+# the agent task's evidence exists
+test -s docs/evidence/S06b-agent-task.md
+</code></pre>
+<p>Verify: the gate script above (its executable acceptance)</p>
+<h2>Capabilities</h2>
+<p><code>development</code>, <code>architecture</code></p>
+<h2>Gaps</h2>
+<ul>
+<li>None recorded beyond the inception units themselves.</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Agent direct interface — the conveyor&#39;s own MCP surface · conveyor output · published 2026-11-20T07:33:41.908746784+00:00</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

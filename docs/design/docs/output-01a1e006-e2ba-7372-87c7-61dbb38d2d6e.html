@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Business case · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>Business case</h1>
+<p><strong>Programme:</strong> conveyor buildout · <strong>Status:</strong> adopted by P0 · <strong>Date:</strong> 2026-11-15</p>
+<h2>Why now</h2>
+<ol>
+<li><strong>The machine works; the organisation does not exist yet.</strong> V1 is live at
+<code>conveyor.nonagentic.ai</code>: projects, boards, cards, runs, approvals, documents, procedures,
+capabilities, knowledge, memory, an inference ledger, evals, a benchmark harness and the
+compiled-prompt pipeline (<code>docs/SPEC_V2.md</code> §1.1). What it lacks is the organisation that
+staffs and governs the work — no industry, department, job, programme cadence, PM, coach, kata,
+development or operations position (<code>docs/SPEC_V2.md</code> §1.1). V2 is the difference between a work
+system and an operating organisation.</li>
+<li><strong>The estate has services that must be governed, not just kept running.</strong>
+<code>docs/plans/04-TOOL-ESTATE-INVENTORY.md</code> records the absorption state: scientific and lean4 are
+absorbed but not deployed; research and media are in flight; the coding fleet is still the
+Python deployment; the eighteen w2v stage directories are a <strong>deliverable vocabulary</strong>, not
+services. A tool platform with a probe, a version and a ledger is cheaper than an unowned fleet.</li>
+<li><strong>The public repository changes the economics of review.</strong> The code and this programme's
+definition set are public; a contributor can read the design, open an issue and propose a
+change without an account. The cost of an outside review drops to a GitHub session.</li>
+<li><strong>The development loop is the bottleneck.</strong> The measured audit in
+<code>docs/plans/development-process-speed.md</code> records a 102-minute run with 75 minutes before the
+heavy job starts, 27 minutes of job time and 18.9 minutes of tests. Improving that loop pays
+back on every one of the 48 projects.</li>
+</ol>
+<h2>Benefit map</h2>
+<table><thead><tr><th>Benefit</th><th>Mechanism</th><th>Measure</th></tr></thead><tbody>
+<tr><td>Auditable decisions</td><td>rule → laya → generation → human; every decision pins its policy and versions (<code>docs/SPEC_V2.md</code> §7)</td><td>a decision row for every choice; a gate that never refuses is flagged</td></tr>
+<tr><td>Less bespoke tooling</td><td>every cluster service is a versioned toolkit with a probe and a <code>tool_call</code> ledger (<code>docs/SPEC_V2.md</code> §11)</td><td>zero-use toolkits retired after a programme cycle (P10)</td></tr>
+<tr><td>Self-development</td><td>development projects on the conveyor and one dependency repo, under gates (<code>docs/SPEC_V2.md</code> §9)</td><td>T6's lane → PR → CI → merge → deploy → live verify, with rollback</td></tr>
+<tr><td>Public collaboration</td><td>public repo, public programme site, issue forms, DCO, design PRs against <code>programme/</code></td><td>an outside issue or PR that changes a published output</td></tr>
+<tr><td>One model</td><td>one Rust app, one database, one action registry (<code>docs/SPEC_V2.md</code> §10)</td><td>no concept with two stores (T0 gate)</td></tr>
+<tr><td>Predictable delivery</td><td>tranches are dependency levels; P0 gates T1–T17; the first three months are T0–T3 + T13 (<code>docs/SPEC_V2.md</code> §12)</td><td>the programme plan and the coverage instrument agree</td></tr>
+</tbody></table>
+<h2>Cost and risk posture</h2>
+<ul>
+<li><strong>Engineering cost is concentrated in T0–T3 and T13</strong> — the organisation and tool spines. Every
+other slice is a job that uses them (<code>docs/SPEC_V2.md</code> §12). The programme does not need all 48
+projects before it produces value; P0's definition set is the gate that prevents building the
+wrong 47.</li>
+<li><strong>The public repo is the exposure.</strong> No secrets, tokens, private hosts or customer data enter the
+repository or a published output; the public pack applies the snapshot's redaction and
+<code>scripts/ci/no-private-refs.sh</code> is the gate. Public input is GitHub only; there are no in-app
+public accounts.</li>
+<li><strong>CI is the recurring cost.</strong> GitHub-hosted runners are free for public repositories; the
+measured risk is queueing and supersession, not spend. The repo's CI budget is two runs per unit:
+the PR and its merge (<code>docs/plans/03-DELIVERY.md</code>); the local gate runs first.</li>
+<li><strong>The migration risk is drift.</strong> V1 stays live until S14's cutover; V2 does not re-open V1 slices.
+A V2 aggregate that no tenant uses does not ship (P10), and a retired binding refuses rather than
+silently serving a stale release.</li>
+</ul>
+<h2>Licensing and boundary</h2>
+<p>The licensing frame is per-tenant, opt-in and public-first: the repository and the programme site
+are public; a tenant's use of a V2 aggregate is a tenant decision, not a programme default. There is
+no per-app delegation header and no hidden dependency on the agent, fr or care-bus applications at
+runtime (<code>docs/SPEC_V2.md</code> §1.2, D33). The agent platform remains a user-interaction front end over
+MCP.</p>
+<h2>Decision</h2>
+<p>Approve P0's definition set and adopt the programme plan. The benefit is not a document: it is the
+operating loop in T12, measured by decision rows, tool calls, run evidence and the maturity levels
+in T11. The cost is the T0–T3 + T13 spine and the discipline of the public gates.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Programme definition — vision, blueprint, plan and project briefs · conveyor output · published 2026-11-20T07:33:41.908746784+00:00</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

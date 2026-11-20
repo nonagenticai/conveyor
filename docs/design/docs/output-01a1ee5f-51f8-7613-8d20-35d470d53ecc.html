@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>T15 Tool authoring and BYO — inception analysis · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>T15 — Inception analysis</h1>
+<p>Project: T15 — Tool authoring and BYO · Track: v2 · Tranche: 12 · Plan: docs/SPEC_V2.md §12
+Unit: #86 (this document is dependency-shaping work; blocked-by T13, T6 and P0)
+Measured at: main@61edfcf8, 2026-11-18 · Project row: active, meta.depends_on = ["T13", "T6", "P0"]</p>
+<h2>Current state</h2>
+<ul>
+<li><strong>absent — the tool-estate aggregates.</strong> SPEC_V2 §11.8 names <code>tool</code>, <code>toolkit</code>, <code>tool_binding</code> and <code>tool_call</code>; no migration creates them, and no <code>tools.*</code> action resolves in <code>docs/design/data/actions.json</code>. T13 (#76) owns them; T15 is blocked by T13 and T6.</li>
+<li><strong>built — the action-level effect ceiling.</strong> <code>crates/actions/src/spec.rs:Effect</code> defines read &lt; write &lt; spend &lt; destructive (four ranks; <code>rank()</code> orders them); <code>crates/actions/src/invoke.rs:binding_ceiling</code> reads a ceiling from binding meta and only narrows; <code>apps/server/tests/tool_effect.rs:effect_ceiling_is_never_raised</code> proves a <code>read</code> ceiling refuses a <code>write</code> action with <code>403 effect_ceiling</code>. It guards action bindings, not tool bindings.</li>
+<li><strong>built — tenant approval policy.</strong> <code>migrations/0050_approval_policies.sql:approval_policy</code> stores <code>approval required|waived</code> and <code>self_approval forbidden|allowed</code> per tenant and action name; an absent row is the safe default. <code>approvals.request|decide|list</code> and <code>approval_policies.get|list|set</code> resolve in <code>docs/design/data/actions.json</code>; <code>crates/domain/src/approval.rs:decided_by_kind</code> records who decided.</li>
+<li><strong>built — sealed credentials.</strong> <code>migrations/0013_documents.sql:secret</code> stores ciphertext, key id, scope and version; <code>secrets.create|get|list|rotate|delete</code> are registered, and no action reveals a value.</li>
+<li><strong>partial — OpenAPI ingestion.</strong> <code>crates/actions/src/ingest.rs:discover</code> parses a service's <code>openapi.json</code> into <code>DiscoveredAction</code> values; <code>ingest_production</code> and <code>apply</code> write them as <code>kind: external</code> rows in the action registry. This is action import, not toolkit import: it has no path to the tool estate.</li>
+<li><strong>built as server projection only — MCP.</strong> <code>crates/actions/src/mcp.rs</code> serves <code>rmcp</code>'s streamable HTTP at <code>/mcp</code>; <code>Cargo.toml</code> enables features <code>server</code> and <code>transport-streamable-http-server</code> only. There is no MCP client, discovery or remote binding.</li>
+<li><strong>claimed — seed toolkit bindings.</strong> <code>seed/organisation.json</code> names five bindings ("toolkit coding@4 · ceiling write · credential coding.tenant") but no table can hold one; these are design claims, not built paths.</li>
+<li><strong>absent/proposed — service scaffold and promotion.</strong> SPEC_V2 §11.6 path 2 names <code>template-rust-service</code>, which has no path in this repo; §11.5's promotion path is prose only. Both are planned under #86.</li>
+<li><strong>built, unrelated — name collision.</strong> <code>crates/actions/src/model/tools.rs</code> holds four architecture-model tools (<code>models.traceability</code>, <code>.gaps</code>, <code>.impact</code>, <code>.completeness</code>); it is not the tool estate and must not be reused.</li>
+</ul>
+<h2>Reuse sources</h2>
+<table><thead><tr><th>Source</th><th>Reuse candidate</th><th>Boundary</th><th>Analysis question</th></tr></thead><tbody>
+<tr><td><code>crates/actions/src/ingest.rs</code></td><td>OpenAPI parsing, <code>DiscoveredAction</code>, breaking-change diff</td><td>emits external actions, never toolkit rows</td><td>Which parser and diff does T15 reuse without duplicating the action namespace?</td></tr>
+<tr><td><code>crates/actions/src/mcp.rs</code> + <code>rmcp</code> 3.9.0</td><td>streamable-HTTP transport and sessions</td><td>server at <code>/mcp</code>; a remote binding is an outbound destination</td><td>Can the transport be reused as a client without exposing the conveyor's server?</td></tr>
+<tr><td><code>migrations/0050_approval_policies.sql</code></td><td>per-tenant, per-action approval policy</td><td>keys on a registered action name</td><td>Does <code>tools.publish</code> suffice as the key, or does BYO need a distinct one?</td></tr>
+<tr><td><code>migrations/0013_documents.sql:secret</code></td><td>sealed credential store</td><td>alias-only; no reveal path</td><td>Can a tool credential alias resolve inside the broker with no read action?</td></tr>
+<tr><td><code>migrations/0002_domain.sql:governed_asset</code></td><td>draft lifecycle parent</td><td><code>kind</code> CHECK admits only requirement, principle, adr</td><td>Is <code>tool_draft</code> an extension of this row or a new aggregate?</td></tr>
+<tr><td>wider estate — coding fleet gateway</td><td>OpenAPI 3.1 documents, effect-classed operations</td><td>a toolkit, not a second control plane</td><td>Which operations are import fixtures versus bound tools?</td></tr>
+<tr><td>wider estate — agent-platform MCP server</td><td>catalog shape, immutable versions, binding-scoped discovery, credential broker, write-verify</td><td>reference only; never a runtime dependency (D44/D59)</td><td>Which concepts are adopted, which refused?</td></tr>
+<tr><td>upstream — <code>openapiv3</code> 2.2.0, <code>rmcp</code> 3.9.0</td><td>parsers and transport</td><td>closed schema subset; the client feature must be enabled</td><td>Which versions and licences are acceptable in an Apache-2.0 repo?</td></tr>
+</tbody></table>
+<h2>Build vs reuse</h2>
+<p>Reuse the approval, secret, document and governed-asset rows; reuse the <code>ingest.rs</code> parser and its breaking-change rule rather than a second OpenAPI reader; reuse <code>rmcp</code> transport. Build the toolkit importer (draft <code>toolkit</code>/<code>tool</code> rows, not actions), the remote-MCP discovery adapter, tenant-binding resolution in the broker, and the promotion request. Constraints: the repository is Apache-2.0 (<code>LICENSE</code>); third-party licences are checked at adoption; no tenant code executes and no caller supplies a URL at call time (§11.5); the agent platform's MCP server is never a dependency (§11.7); archived kag components are never bound (R19).</p>
+<h2>Risks</h2>
+<ul>
+<li><strong>Ceiling gap between actions and tools.</strong> Until T13 and T15 land, a tool call has no ceiling; check: neither exists today.</li>
+<li><strong>OpenAPI 3.1 fidelity.</strong> <code>openapiv3</code> 2.2.0 may not parse 3.1 documents, while §11.5 requires 3.1; check: a 3.1 fixture (to create at <code>crates/actions/tests/openapi31.rs</code>).</li>
+<li><strong>Tool-as-action namespace leak.</strong> Extending <code>ingest.rs</code> to write toolkit rows would make a tool an action; check: review that toolkit import writes no <code>action_registry</code> row.</li>
+<li><strong>MCP discovery widening.</strong> A full remote tool list would escape the binding; check: a BYO test (to create at <code>apps/server/tests/byo_mcp.rs</code>).</li>
+<li><strong>Unconfigurable approval.</strong> <code>approval_policy</code> refuses an action name no registry action carries; check: <code>tools.publish</code> is absent from <code>actions.json</code> today.</li>
+<li><strong>Credential leakage into the ledger.</strong> Check: the <code>tool_call</code> schema has no credential field (to create with T13).</li>
+<li><strong>Seed claims read as built.</strong> Check: <code>git grep 'toolkit coding@4'</code> matches only <code>seed/organisation.json</code>.</li>
+</ul>
+<h2>Open questions</h2>
+<ol>
+<li>Is <code>tools.publish</code> the right approval-policy key for both OpenAPI and MCP publication, or does BYO-MCP need its own?</li>
+<li>Who is the "named approver" a destructive tool publication requires (§11.6) — tenant admin or platform security?</li>
+<li>Does a tool's effect ceiling distinguish <code>spend</code> as <code>Effect</code> does, or is tool spend a budget tag beside the effect rank?</li>
+<li>Does <code>openapiv3</code> accept 3.1, or is a second parser needed?</li>
+<li>Does MCP discovery write draft <code>tool</code> rows immediately, or a document pinned at publish?</li>
+</ol>
+<h2>Links</h2>
+<p>Brief: https://conveyor.nonagentic.ai/design/docs/output-01a1e008-4866-73b3-aff3-4b81913d1e23.html · Issue: https://github.com/nonagenticai/conveyor/issues/86 · SPEC_V2 §11.5, §11.6, §11.8, §12 T15, §10.4, §5.4, §8.1 · P0 reuse map: https://conveyor.nonagentic.ai/design/docs/output-01a1e006-fa29-756e-a710-90db4a232343.html</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Tool authoring and BYO · conveyor output · published 2026-11-20T07:33:41.908746784+00:00 · FR Test</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

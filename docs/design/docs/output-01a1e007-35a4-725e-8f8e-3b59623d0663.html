@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>S02 — Skeleton — workspace, tenancy, auth, jobs, SSE · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>S02 — Skeleton — workspace, tenancy, auth, jobs, SSE</h1>
+<p><strong>Track:</strong> v1 · <strong>Tranche:</strong> 1 · <strong>Measured status:</strong> built · <strong>Plan:</strong> <code>docs/plans/slices/S02-skeleton.md</code>
+<strong>Dependencies:</strong> S00 · <strong>Issues:</strong> #2</p>
+<h2>Outcome</h2>
+<p>A ten-member workspace (eight crates + two apps) and one binary (<code>serve | migrate | worker | admin</code>) over Postgres 18: eleven platform tables, forced RLS, OIDC/dev auth, a fail-closed licence gate, a fenced job runner, a replaying SSE stream.</p>
+<h2>Boundary</h2>
+<p><strong>IN</strong> — workspace, toolchain, <code>.dockerignore</code>, <code>compose.yaml</code>; <code>migrations/0001_platform.sql</code> (11 tables, RLS forced, roles, policies); <code>crates/store</code> pool/scope/migrator/outbox/jobs/audit/idempotency; <code>crates/auth</code> JWKS + dev principal + licence extractor; <code>crates/api</code> health, request id, problem+json, <code>/api/events</code>, <code>/metrics</code>; <code>apps/server</code> subcommands and <code>--print-openapi</code>.</p>
+<h2>Reuse sources</h2>
+<table><thead><tr><th>path</th><th>read this</th><th>carry (symbols)</th><th>do not carry</th></tr></thead><tbody>
+<tr><td><code>agent</code> <code>crates/agent-api/src/tenancy.rs</code></td><td>tenant-first tx scope</td><td><code>begin_scoped</code>, <code>set_tenant</code>, <code>lock_tenant_row</code>, <code>TenantCtx</code>, <code>JobCtx</code>; tenant row locked first</td><td><code>ACTIVE_TENANT_HEADER</code> — CONTRACT §9 forbids a client-supplied tenant</td></tr>
+<tr><td><code>agent</code> <code>crates/agent-api/migrations/0001_tenancy.sql</code></td><td>the policy, function and grants</td><td><code>app_current_tenant()</code>, <code>DEFAULT app_current_tenant()</code>, <code>tenant_isolation</code>, <code>NOBYPASSRLS</code>, <code>REVOKE ALL ON _sqlx_migrations</code></td><td>the <code>DO</code> block swallowing <code>insufficient_privilege</code> — passes with no r…</td></tr>
+</tbody></table>
+<h2>Inception units</h2>
+<ol>
+<li><code>analysis</code> — current state and reuse: inventory what already exists, the contract and licence constraints, the build-vs-reuse decision, and the risks.</li>
+<li><code>architecture</code> — the project's design: aggregates, tables, actions, modules, integrations, the decision record, and acceptance.</li>
+</ol>
+<p>Both are documents on this project with <code>meta.category</code> set to <code>analysis</code> / <code>architecture</code>; both published is the inception standard.</p>
+<h2>Dependencies</h2>
+<p>Blocked-by: S00.</p>
+<h2>Acceptance</h2>
+<pre><code class="language-bash">set -euo pipefail
+source ~/.cargo/env
+cd $HOME/Movies/conveyor
+cargo fmt --check
+cargo clippy --workspace --all-targets -- -D warnings
+cargo test --workspace
+cargo run -p conveyor-server -- --print-openapi | jq -e '.paths["/api/events"]'
+cargo run -p conveyor-server -- migrate
+docker compose up -d --build &amp;&amp; curl -sf localhost:8930/health/ready   # --build: a bare `up` tests the stale image
+</code></pre>
+<p>Verify: the gate script above (its executable acceptance)</p>
+<h2>Capabilities</h2>
+<p><code>architecture</code>, <code>development</code></p>
+<h2>Gaps</h2>
+<ul>
+<li>None recorded beyond the inception units themselves.</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Skeleton — workspace, tenancy, auth, jobs, SSE · conveyor output · published 2026-11-20T07:33:41.908746784+00:00</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

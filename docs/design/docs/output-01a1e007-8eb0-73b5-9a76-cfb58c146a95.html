@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>S08 — Governance, modelling, render and export · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>S08 — Governance, modelling, render and export</h1>
+<p><strong>Track:</strong> v1 · <strong>Tranche:</strong> 5 · <strong>Measured status:</strong> built · <strong>Plan:</strong> <code>docs/plans/slices/S08-governance-modelling.md</code>
+<strong>Dependencies:</strong> S03, S04, S07 · <strong>Issues:</strong> none</p>
+<h2>Outcome</h2>
+<p>RM's governance surface lands on S03's spine — portfolio registers and TOC trees as actions over existing tables; its architecture surface on one flattened model shape for ArchiMate and UML. R1 closes by <strong>scoping</strong>: a curated profile validated against live RM data, fr's render map and n8n operations.</p>
+<h2>Boundary</h2>
+<p><strong>IN</strong> — the 11 tables of <code>02-DATA-ARCHITECTURE §2.8/§2.9</code>; Part A actions over them plus TOC and programmes; Part B profile, validation, render, XMI and four read-only computations.</p>
+<p><strong>OUT</strong> — UI (<strong>S12</strong>); model search (<strong>S07</strong>; model arm only if S0 proves use); project CRUD (<strong>S05</strong>); principle-conflict verdicts (<strong>S07</strong>); <code>architecture_containers</code> (<strong>dropped</strong> — it feeds fr's queue selector, replaced by S06's card-type×list); RM's change-set/review/publication split (<strong>dropped</strong>, §8.1); graph layout and OCL/Profile/SysML (<strong>out of v1</strong>).</p>
+<h2>Reuse sources</h2>
+<table><thead><tr><th>path</th><th>read this</th><th>carry</th><th>do not carry</th></tr></thead><tbody>
+<tr><td><code>02-source-map/30-rm-planka-mcp-n8n.md</code> §1 (RM local HEAD <code>9ee72ab4e178</code>, 5 behind <code>origin/main 191086942ce5</code> on 2026-11-07; re-check moved paths)</td><td><code>architecture_*</code>, <code>modeling_*</code>, <code>uml_*</code>, <code>pm_*</code> routers</td><td>element/relationship/view concepts, <code>registry.json</code></td><td>five-table sprawl, containers, change sets</td></tr>
+<tr><td><code>requirements_management/src/data/archimate/3.2/registry.json</code></td><td>kind codes, labels, edge hints</td><td>labels/icons only</td><td>as validation authority</td></tr>
+<tr><td>fr <code>library</code> screens — `fr@6f7c509 frontend/src/routes/(project)/projects/[id]/lib…</td><td></td><td></td><td></td></tr>
+</tbody></table>
+<h2>Inception units</h2>
+<ol>
+<li><code>analysis</code> — current state and reuse: inventory what already exists, the contract and licence constraints, the build-vs-reuse decision, and the risks.</li>
+<li><code>architecture</code> — the project's design: aggregates, tables, actions, modules, integrations, the decision record, and acceptance.</li>
+</ol>
+<p>Both are documents on this project with <code>meta.category</code> set to <code>analysis</code> / <code>architecture</code>; both published is the inception standard.</p>
+<h2>Dependencies</h2>
+<p>Blocked-by: S03, S04, S07.</p>
+<h2>Acceptance</h2>
+<pre><code class="language-bash">set -euo pipefail
+source ~/.cargo/env          # CONTRACT §16 — cargo is not on PATH
+cargo test -p conveyor-api --test portfolio_roundtrip --test model_profile --test model_render
+cargo test -p conveyor-store --test s08_models --test s08_portfolio
+cargo test -p conveyor-render --test golden --test xmi_roundtrip
+cargo test -p conveyor-server --test prune
+# ⚠️ Corrected 2026-11-09: this block named three targets that do not exist — `toc_tree`, `validation_job`,
+# `architecture_tools`.
+
+Verify: the gate script above (its executable acceptance)
+
+## Capabilities
+
+`architecture`, `design`
+
+## Gaps
+
+- None recorded beyond the inception units themselves.
+</code></pre>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Governance, modelling, render and export · conveyor output · published 2026-11-20T07:33:41.908746784+00:00</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

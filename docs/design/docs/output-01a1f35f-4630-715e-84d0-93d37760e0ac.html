@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>T9 — Closure review · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>T9 — Closure review</h1>
+<p>Project: T9 — TOGAF ADM capability · Track: v2 · Tranche: 4 · Plan: docs/SPEC_V2.md §12 / docs/plans/T9-architecture-capability.md
+Unit: #387 (the unit that publishes this output)
+Measured at: main@36b9b60d, 2026-11-19 · Project row: closed</p>
+<h2>Outcome vs acceptance</h2>
+<p>The acceptance set is <code>docs/plans/T9-architecture-capability.md</code> §5, D1–D6. An independent compliance review — not the documents' author — recorded its verdicts on 2026-11-19 against the live statement of architecture work: approval <code>01a1f357-69eb-7716-811e-ce22ea93d496</code>, level compliant. The table restates those verdicts with the evidence at <code>36b9b60d</code>.</p>
+<table><thead><tr><th>Criterion</th><th>Evidence</th><th>Verdict</th></tr></thead><tbody>
+<tr><td>D1 — The artefact standard and repository</td><td><code>migrations/0054_architecture.sql</code> — <code>artifact_type</code>, <code>architecture_artifact</code>, <code>architecture_artifact_entry</code>, <code>architecture_artifact_link</code>; <code>crates/actions/src/architecture.rs</code> — <code>artifacts_*</code> and <code>repository_search</code>; <code>crates/api/tests/architecture_artifacts.rs::a_catalog_is_queryable_rows</code>, <code>::an_approved_artefact_is_immutable</code>, <code>::reuse_is_searchable_across_plateaus</code></td><td>pass</td></tr>
+<tr><td>D2 — The Preliminary capability</td><td><code>adm_profile</code>, <code>governance_body</code>, <code>architecture_maturity</code>, <code>architecture_skill_assessment</code>; <code>crates/api/tests/architecture_capability.rs::the_profile_names_the_mandatory_set</code>, <code>::a_maturity_assessment_needs_every_dimension</code>, <code>::a_skills_assessment_names_its_role</code>, <code>::maturity_list_returns_every_assessment_dimension</code>, <code>::skills_list_returns_one_entry_per_role</code>; live adoption rows read back 2026-11-19</td><td>pass — the service exposes only the write actions, so the maturity and skills rows are cited from the live read-back</td></tr>
+<tr><td>D3 — The architecture project and its phase gates</td><td><code>crates/api/tests/togaf_architecture_phases.rs::phases_a_to_f_pass_in_order</code>, <code>::a_draft_artefact_refuses_the_contract</code>, <code>::a_contract_change_reopens_the_gate</code></td><td>pass — tests only; no live phase advance has run</td></tr>
+<tr><td>D4 — Delivery compliance</td><td><code>crates/api/tests/togaf_delivery_design_gate.rs::a_delivery_project_without_a_contract_cannot_pass_design</code>, <code>::a_superseded_contract_refuses_design</code>, <code>::a_live_contract_opens_the_design_gate</code>; <code>crates/api/tests/architecture_compliance.rs::one_level_and_a_dated_waiver</code>; the live compliant review row</td><td>pass</td></tr>
+<tr><td>D5 — Change management</td><td><code>crates/api/tests/togaf_h_change.rs::a_scope_change_produces_a_change_register_row</code>, <code>::an_unrecorded_review_refuses_the_gate</code></td><td>pass — with the finding that the plan-named <code>a_systemic_finding_produces_a_kata_candidate</code> does not exist; the substance sits inside <code>a_scope_change_produces_a_change_register_row</code></td></tr>
+<tr><td>D6 — The console surface and the seed</td><td><code>apps/web/src/screens/architecture.rs</code> — four tabs, live invokes, phase-advance refusal — routed at <code>/architecture</code> in <code>apps/web/src/app.rs</code>; <code>docs/design/v2.js</code> Architecture destination; check-v2 248 checks</td><td>pass</td></tr>
+</tbody></table>
+<p>One correction to the review record. The reviewer wrote that the public snapshot already carried an <code>architecture</code> section. Measured after the review, <code>https://conveyor.nonagentic.ai/design/data/snapshot.js</code> returned <code>git_sha ba70b428</code> with no <code>architecture</code> section, and the three read actions were not registered live. PR #401 is merged at <code>36b9b60d</code>, but its image had not rolled at the time of writing. D6 is unaffected: its criterion is the app's Architecture screen, live since <code>c8204432</code>. The snapshot section is an additional surface, delivered by #401; the image roll and its live verification are pending.</p>
+<h2>Evidence</h2>
+<ul>
+<li>PR #350, merge <code>c8204432</code> (2026-11-18) — the capability, its 26 actions and the app's Architecture screen; issue #81 closed 2026-11-18.</li>
+<li>PR #401, merge <code>36b9b60d</code> (2026-11-19) — <code>architecture.maturity_list</code>, <code>architecture.skills_list</code>, <code>architecture.board_list</code>, the snapshot section and the pack destination; issue #385.</li>
+<li><code>migrations/0054_architecture.sql</code> — eleven tenant-scoped, FORCE-RLS tables; present at <code>main@36b9b60d</code>.</li>
+<li><code>crates/actions/src/architecture.rs</code> — 29 registered actions; <code>crates/store/src/architecture.rs</code> — the invariants and the write/read paths; <code>crates/store/src/snapshot.rs</code> — the public <code>architecture</code> section, filtered to programme-bound projects.</li>
+<li>Tests: the seventeen scenarios cited in the table, plus <code>crates/api/tests/architecture_capability.rs::board_list_returns_the_opened_body</code>; <code>crates/actions/tests/parity_http_mcp.rs</code> and <code>registry.rs</code> carry the new actions.</li>
+<li>Adoption: profile <code>conveyor-software-delivery</code> v3; PF-1 catalogue with 10 entries approved v2; derivation 7 edges and realization 10 edges linked; statement of architecture work live v2; maturity group mean 2.2/5; skills group six roles, 42 rows. Ten documents published under unit #387.</li>
+<li>CI: PR #401's required contexts succeeded; merge_group <code>ci</code> run 44501468428 succeeded, then merged.</li>
+<li>The project's published <code>evidence</code> document carries the same evidence; this review adds no proof beyond it.</li>
+</ul>
+<h2>Open items</h2>
+<p>Each disclosed gap is carried here, not treated as satisfied. No open issue in the queue names these specific gaps (<code>gh issue list --repo nonagenticai/conveyor --state all --search 'architecture OR T9'</code>, 2026-11-19); each owner claims before starting.</p>
+<ol>
+<li>PF-1 artefact document link — owner: project owner (decision); next step: decide the supersede plus fresh board approval, then set <code>document_id</code> to the published principles page.</li>
+<li>Type-create and E–H sets — owner: architecture capability follow-up; next step: an action that adds an artefact type, mandatory sets for phases E–H, and a non-empty Phase E requirement set.</li>
+<li>Board lifecycle — owner: architecture capability follow-up; next step: a transition action so an approved board leaves <code>draft</code> (#395 concerns board/contract coverage, not this transition).</li>
+<li>Duplicate assessment group <code>01a1f2ca-fdf6-7698-b685-e1e94dd454be</code> — owner: architecture capability follow-up; next step: add an assessment delete or supersede action, then remove the duplicate.</li>
+<li>Pack writes — owner: design-pack unit; next step: decide whether the pack must write; if so, a separate unit. The app screen remains the write surface.</li>
+<li>D5 selector correction — owner: plan and test owner; next step: implement <code>a_systemic_finding_produces_a_kata_candidate</code> or amend the plan to the existing selector, which covers the substance.</li>
+<li>Lifecycle event literals — owner: architecture capability follow-up; next step: find or add the emission sites for <code>architecture_artifact.changed</code>, <code>architecture_phase.closed</code>, <code>compliance_review.recorded</code> and <code>architecture_waiver.granted</code>, assert one in a test, or correct the plan's event claim.</li>
+<li>Live phase advance — owner: architecture project owner; next step: exercise one advance on a real architecture project and record the trace, closing D3's tests-only status.</li>
+<li>Image roll and live verification — owner: the release path for #401; next step: roll the image, then verify the snapshot contains the <code>architecture</code> section and the three read actions register live.</li>
+</ol>
+<h2>Decision</h2>
+<p>T9 is closed (status <code>closed</code>); its build unit #81 closed on 2026-11-18, and the project's closure is confirmed by this review at <code>36b9b60d</code>. It records the close and does not grant a new approval. All six acceptance criteria stand as pass on the compliance reviewer's verdicts, with three findings recorded rather than hidden: D3 has no live phase advance, D5's plan-named selector is absent while its substance is covered, and the reviewer's D6 snapshot claim did not hold — D6 itself is unaffected because its criterion is the app's Architecture screen, live since <code>c8204432</code>. The capability and the app console are delivered by #350; the read actions, pack destination and snapshot section are delivered by #401; the image roll and its live verification are pending. The gaps above are carried as open items, not treated as satisfied.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>TOGAF ADM capability · conveyor output · published 2026-11-20T07:33:41.908746784+00:00 · FR Test</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Governance and organisation · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>Governance and organisation</h1>
+<p><strong>Programme:</strong> conveyor buildout · <strong>Status:</strong> adopted by P0 · <strong>Date:</strong> 2026-11-15</p>
+<h2>1. Roles</h2>
+<table><thead><tr><th>Role</th><th>Who</th><th>Authority</th></tr></thead><tbody>
+<tr><td><strong>Owner</strong></td><td>George</td><td>Rulings, licensing, the merge of a lane's PR, credentials, anything irreversible on shared state</td></tr>
+<tr><td><strong>Maintainer</strong></td><td>The owner, and a maintainer team when it exists</td><td>Review, merge, release; never changes a gate it is judged by</td></tr>
+<tr><td><strong>Session (Claude)</strong></td><td>The working session</td><td>Diagnoses, implements, validates, opens one PR per unit; never merges the owner's PRs, never changes its own gates</td></tr>
+<tr><td><strong>Contributor</strong></td><td>Anyone, including the public</td><td>Opens an issue or a design PR; claims a ready unit with the four-check protocol; signs the DCO</td></tr>
+</tbody></table>
+<p>The conveyor's own organisation is the model it implements: industry → department → job, immutable
+releases and tenant-scoped bindings (<code>docs/SPEC_V2.md</code> §4). The roles above are the programme's
+operating positions until the conveyor's jobs can carry them.</p>
+<h2>2. Decision ladder</h2>
+<p>Every decision is one of: a rule, a laya choice, a generated draft, or a human decision. The rows
+are the same shape and pin the policy, refinement and configuration versions that produced them
+(<code>docs/SPEC_V2.md</code> §7). The programme adds three rules:</p>
+<ul>
+<li><strong>Owner rulings override the plan.</strong> Where this document conflicts with an owner ruling, the
+ruling wins, and the plan is corrected in the same PR.</li>
+<li><strong>A gate that cannot refuse is a defect.</strong> Every gate ships with a negative test; a never-refused
+gate is flagged, not celebrated (<code>docs/SPEC_V2.md</code> §14, R5).</li>
+<li><strong>A decision record is a document on the project</strong> when it is programme-level; an ADR under
+<code>docs/decisions/</code> when it changes the code's architecture. The two are linked, not duplicated.</li>
+</ul>
+<h2>3. Assurance</h2>
+<ul>
+<li><strong>Evidence over claims.</strong> DONE means the deliverable is observed landed: the test output, the
+live probe, the merged commit, the deployed revision (<code>docs/plans/03-DELIVERY.md</code>).</li>
+<li><strong>Independent validation.</strong> A builder does not validate its own unit; a fresh validator checks
+the artifact before a push, merge or handoff.</li>
+<li><strong>The measured programme.</strong> A project's status is computed from slice frontmatter, migrations,
+the action-registry dump and the pack (<code>scripts/build-coverage.py</code>); a hand-written status is not
+a status. The Validation page is the public rendering of that instrument.</li>
+<li><strong>The public gates.</strong> <code>no-private-refs</code>, the secret scan, DCO and the eight design-pack checks
+run on every PR; the local gate runs before the PR exists.</li>
+</ul>
+<h2>4. The unit protocol</h2>
+<ol>
+<li><strong>Claim.</strong> An issue with the unit label and a state label. The four checks: the issue is not
+blocked; no live branch or open PR covers it; the plan path resolves; the acceptance is
+executable. Push the branch <strong>when the work starts</strong>; an unpushed branch claims nothing.</li>
+<li><strong>Branch.</strong> One issue, one branch <code>issue/&lt;n&gt;-&lt;slug&gt;</code>, one PR (<code>Closes #&lt;n&gt;</code>). A slice is a
+commit on that branch, never its own PR.</li>
+<li><strong>Work.</strong> The local gate first: format, lint, tests, the pack checks, <code>build-docs --check</code>, the
+coverage check. A red gate stops the PR.</li>
+<li><strong>PR.</strong> Non-draft, when the unit is complete and the local gate is green. The PR body carries
+the measured evidence and <code>Closes #&lt;n&gt;</code>.</li>
+<li><strong>Merge.</strong> The owner merges on green. The merge is the second and last CI run for the unit; the
+deployment is verified against the merge revision, not against a hopeful status.</li>
+</ol>
+<p>The full contract is <code>docs/plans/03-DELIVERY.md</code>; the session entry contract is <code>CLAUDE.md</code>.</p>
+<h2>5. Public collaboration</h2>
+<ul>
+<li><strong>Input is GitHub only.</strong> Bug and feature forms carry the privacy checkbox; a contributor claims
+a ready unit in a fork, signs the DCO, and opens a PR; the public CI gate runs the same checks.</li>
+<li><strong>Design changes are pull requests against <code>programme/</code>.</strong> A maintainer applies an accepted change
+to the database; the next export supersedes the file. The DB is the store; the mirror is the
+public record.</li>
+<li><strong>No in-app public accounts.</strong> The public site is read-only; the signed-in console is the
+operator's. A public comment, account or moderation queue is out of frame.</li>
+</ul>
+<h2>6. Data and infrastructure invariants</h2>
+<ul>
+<li>One service, one database, one database user; a service never uses another's credentials.</li>
+<li>Secrets are per service; a rotation is a new value in the source of truth, never a live patch.</li>
+<li>Tenant isolation is enforced in the action layer and by row-level policy; a foreign key never
+enforces tenancy.</li>
+<li>The cluster is downstream of code: a broken workflow is fixed in the workflow or the archetype,
+never by widening the cluster to absorb it.</li>
+</ul>
+<h2>7. The andon cord</h2>
+<p>One stop stops every execution. Pulling it is a decision; releasing it is a decision with evidence.
+No session releases it on its own judgement, and the stop is recorded as an incident.</p>
+<h2>8. Amendment</h2>
+<p>This document is part of P0's definition set. An amendment is a new version of this document on P0,
+published, with the reason; a silent edit to a governance rule is a defect.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Programme definition — vision, blueprint, plan and project briefs · conveyor output · published 2026-11-20T07:33:41.908746784+00:00</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

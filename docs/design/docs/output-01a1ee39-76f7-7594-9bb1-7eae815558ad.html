@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>T14 Estate toolkits — inception analysis · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>T14 — Inception analysis</h1>
+<p>Project: T14 — Estate toolkits · Track: v2 · Tranche: 4 · Plan: docs/SPEC_V2.md §12
+Unit: #83 (this document is dependency-shaping work; blocked-by T13 and P0)
+Measured at: main@61edfcf8, 2026-11-18 · Project row: active, meta.depends_on = ["T13", "P0"]</p>
+<h2>Current state</h2>
+<p><strong>Tool platform — <code>absent</code>, in flight under T13 (#76).</strong> <code>docs/evidence/v2-coverage.md:actions:tools</code> records <code>tools.*</code>, <code>toolkits.*</code>, <code>tool_bindings.*</code> and <code>tool_calls.*</code> as absent; <code>docs/design/data/actions.json:actions</code> has none of them; no migration creates a tool table (latest 0051). Issue #76 is open and <code>status:claimed</code>, so the platform is under construction. Every T14 claim is blocked-by #76.</p>
+<p><strong>V1 external actions — <code>built</code>.</strong> <code>crates/actions/src/integrations/external.rs:coding_jobs_create</code>, <code>:coding_jobs_get</code>, <code>:artifacts_list</code>, <code>:billing_summary</code>, <code>:retrieval_query</code>. They are today's ad-hoc path; T13 migrates them, and T14 must not leave a second.</p>
+<p><strong>Ops actions — <code>built</code>.</strong> <code>crates/actions/src/ops/reads.rs:ops_pods</code>, <code>:ops_ci_status</code>; <code>crates/actions/src/ops/writes.rs:ops_scale</code>; host control <code>crates/actions/src/ops/host.rs:ops_host_status</code>. They reach backends from runs today; the broker path must replace that for jobs.</p>
+<p><strong>Binding ceiling — <code>built</code> for release bindings.</strong> <code>apps/server/tests/tool_effect.rs:effect_ceiling_is_never_raised</code> proves a ceiling lives on the binding and refuses before the backend.</p>
+<p><strong>Approval policy — <code>built</code>.</strong> <code>migrations/0050_approval_policies.sql:approval_policy</code> stores per-gate approvals; a policy lowers authority and can never grant a tool.</p>
+<p><strong>Absorbed code and captured contracts — <code>partial</code>.</strong> <code>apps/research/contract/webscraper/openapi.lock.json</code>, <code>apps/research/contract/media/openapi.lock.json</code>, <code>apps/media/contract/video_compiler_service/openapi.lock.json</code>, <code>apps/licenses/contract/openapi.lock.json</code>, <code>apps/scientific/contract/openapi.lock.json</code>, <code>apps/lean4-prover/contract/openapi.lock.json</code>. Per <code>docs/plans/04-TOOL-ESTATE-INVENTORY.md:§1</code>, two groups are absorbed but still serve the legacy image and research is in flight — a captured contract is not automatically the deployed backend's contract.</p>
+<p><strong>Seed claims — <code>claimed</code>.</strong> <code>seed/organisation.json:definition.binding</code> carries strings such as "toolkit coding@4 · ceiling write · credential coding.tenant"; no toolkit row exists behind them.</p>
+<p><strong>Draft entries — <code>planned</code>.</strong> §11.2 puts <code>evidence_review</code>, <code>discovery</code> :8807 and the planned AHTAPol services in the catalogue as <code>draft</code>, unbound until deployed and probed.</p>
+<p><strong>Zero-use report and outage unbinding — <code>absent</code>.</strong> §11.9 defines both; neither has a row, action or test today.</p>
+<h2>Reuse sources</h2>
+<table><thead><tr><th>Source</th><th>Analysis question</th></tr></thead><tbody>
+<tr><td><code>crates/actions/src/integrations/external.rs</code> (in repo)</td><td>Which operations become tools, and where does the adapter's missing path templating force a contract change?</td></tr>
+<tr><td><code>apps/*/contract/openapi.lock.json</code> (in repo)</td><td>Does each lock match the deployed backend, and can it seed an immutable pin?</td></tr>
+<tr><td><code>crates/actions/src/ops/</code> + <code>apps/host-agent</code> (in repo)</td><td>Can ops tools share one client and declaration without a second ledger?</td></tr>
+<tr><td><code>apps/server/tests/tool_effect.rs</code> (in repo)</td><td>Which ceiling semantics carry over unchanged?</td></tr>
+<tr><td>Coding fleet (estate capability, own repository)</td><td>Which operations are tools, at what ceiling?</td></tr>
+<tr><td>strata_rag / strata_ingest (estate capability)</td><td>Which retrieval is the probe, and what redaction applies?</td></tr>
+<tr><td>w2v orchestrator, stage fleet, video-compiler (estate capability)</td><td>Which operations survive the <code>apps/media</code> rewrite?</td></tr>
+<tr><td>scientific_processor, evidence_review, discovery (estate capability)</td><td>Which publish, which stay draft, and what proves callability?</td></tr>
+<tr><td><code>nonagenticai_mcp_server</code> (upstream, reference only)</td><td>Which catalogue concepts are borrowed, and which runtime refused?</td></tr>
+<tr><td>OpenAPI 3.1 + the workspace stack (upstream)</td><td>Does the import stay inside the existing schema subset?</td></tr>
+</tbody></table>
+<h2>Build vs reuse</h2>
+<ul>
+<li><strong>Tool platform — reuse T13.</strong> T14 writes catalogue rows, probes and bindings; a second resolver or ledger is out.</li>
+<li><strong>Contracts — reuse the captured locks.</strong> T14 imports documents, not service code; a lock is a specification, so no licence flows with it and Python or GPL code stays out.</li>
+<li><strong>V1 externals — reuse as the migration seed only.</strong> The coding fleet stays its own repository (ADR 0006); the conveyor calls its gateway contract and imports no code.</li>
+<li><strong>Ops — reuse the declarations and client.</strong> One implementation, two declared surfaces.</li>
+<li><strong>Refused:</strong> the <code>nonagenticai_mcp_server</code> runtime (D44), archived kag (R19), n8n and product applications (§11.2). The GPL R sidecar stays isolated behind its owning services; external data licences stay at the services that hold them (D42).</li>
+</ul>
+<h2>Risks</h2>
+<ol>
+<li><strong>Publishing the rewrite's contract against the legacy deployment</strong> — calls 404 or schemas diverge. Check: probe plus one live call per published toolkit.</li>
+<li><strong>Port-keyed toolkit identity</strong> — the two services on 8812 collide. Check: identity is the destination alias (§11.2).</li>
+<li><strong>A probe with a write or spend effect</strong> — a health check scales or bills. Check: the manifest test requires <code>effect = read</code>.</li>
+<li><strong>Auto-scaling inside the probe</strong> — the scientific scale-up hides an outage and bypasses approval. Check: a separate approved <code>ops.scale</code> call with its own ledger.</li>
+<li><strong>Draft entries made callable</strong> — a planned service fails at runtime instead of failing closed. Check: <code>tools.call</code> (to create, #76) returns 409 <code>tool_not_ready</code>.</li>
+<li><strong>Two catalogue truths</strong> — seed binding strings drift from toolkit rows. Check: a test refuses a release definition naming a toolkit outside <code>tool_binding</code> (to create, #76).</li>
+</ol>
+<h2>Open questions</h2>
+<ul>
+<li>Does T13 publish the coding toolkit from the live gateway contract or a captured lock, and which operations does T14 inherit unchanged?</li>
+<li>Which w2v and video-compiler operations are stable enough to pin before <code>apps/media</code> replaces their stages?</li>
+<li>Is strata one toolkit or two, given two service identities and credential aliases?</li>
+<li>What is a "programme cycle" for the zero-use window, and is the flag computed or stored?</li>
+</ul>
+<h2>Links</h2>
+<ul>
+<li>Project brief: https://conveyor.nonagentic.ai/design/docs/output-01a1e008-3fe4-7239-b39b-d29131a4792f.html</li>
+<li>Issue: https://github.com/nonagenticai/conveyor/issues/83 (blocked-by #76)</li>
+<li>Coverage row: <code>docs/evidence/v2-coverage.md</code> — <code>actions:tools</code></li>
+<li>Spec: §11.1–§11.10 (tool estate), §12 T14 (slice and gate), §8.1 (artefact standard), §10 (architecture and ownership), §3 (principles)</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Estate toolkits · conveyor output · published 2026-11-20T07:33:41.908746784+00:00 · FR Test</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

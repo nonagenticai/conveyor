@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>T8 Organisational memory — inception analysis · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>T8 — Inception analysis</h1>
+<p>Project: T8 — Organisational memory · Track: v2 · Tranche: 11 · Plan: docs/SPEC_V2.md §12
+Unit: #79 (this document is dependency-shaping work; blocked-by T5 and P0)
+Measured at: main@61edfcf8, 2026-11-18 · Project row: active, meta.depends_on = ["T5", "P0"]</p>
+<h2>Current state</h2>
+<p>State labels: <code>built | partial | planned | absent | proposed</code>. Citations resolve at <code>origin/main</code>.</p>
+<ul>
+<li><strong>built</strong> — <code>migrations/0020_capability.sql:work_package_memory</code> stores <code>fact|attempt|decision|blocker|digest</code> rows against a project, card, run and capability, with no evidence, review or promotion column.</li>
+<li><strong>built</strong> — <code>crates/actions/src/memory/remember.rs:memory_remember</code> writes one hot row in the caller's transaction; <code>crates/domain/src/memory.rs:validate_remember</code> refuses a blank body and the derived <code>digest</code> kind.</li>
+<li><strong>built</strong> — <code>crates/actions/src/memory/recall.rs:memory_recall</code> returns hot rows then a digest; an unreachable strata sets <code>degraded</code> and a warning.</li>
+<li><strong>built</strong> — <code>apps/server/src/memory_consolidate.rs:run</code> derives one digest per card; the <code>work-package: &lt;card_id&gt;</code> first line is the dedupe identity (<code>crates/domain/src/memory.rs:digest</code>).</li>
+<li><strong>built</strong> — <code>migrations/0020_capability.sql:capability_knowledge</code> pins <code>pack_key@pack_version</code>, <code>min_score</code> and <code>required</code>; its only write is <code>crates/actions/src/capability/capabilities.rs:capabilities_bind_knowledge</code> through <code>crates/store/src/capability.rs:bind_knowledge_tx</code>.</li>
+<li><strong>built</strong> — <code>crates/actions/src/knowledge/query.rs:knowledge_query</code> queries only the capability's pinned packs; no binding is an honest empty; a required pack with no leaves blocks run start (<code>409 capability_not_ready</code>, <code>crates/actions/src/capability/readiness.rs:capability_readiness_tx</code>).</li>
+<li><strong>built</strong> — <code>crates/actions/src/integrations/strata.rs:Strata</code> exposes <code>query</code>, <code>stores</code>, <code>create_root_store</code>, <code>pack_leaves</code>, <code>ingest_document</code> and <code>prune_source</code>; T8 needs no new transport.</li>
+<li><strong>built</strong> — <code>migrations/0002_domain.sql:trace_link</code> links typed <code>from_type/from_id</code> to <code>to_type/to_id</code> under a closed kind vocabulary — the shape for an evidence ref.</li>
+<li><strong>absent</strong> — the <code>lesson</code> aggregate: <code>git grep 'lesson' origin/main -- migrations/</code> returns nothing, and <code>work_package_memory</code> lacks evidence refs, review state and promotion ref.</li>
+<li><strong>absent</strong> — <code>lessons.propose|review|promote</code>: <code>docs/design/data/actions.json</code> has no <code>lessons.</code> name; the memory family is <code>memory.remember</code>, <code>memory.recall</code>, <code>knowledge.query</code> and <code>capabilities.bind_knowledge</code>.</li>
+<li><strong>absent</strong> — independent evidence and promotion: <code>trace_link.kind</code> has no <code>evidences</code> value, no production action ingests a lesson into strata, and the §7.5 <code>lesson</code> source row does not exist.</li>
+<li><strong>planned</strong> — §7.6's organisational row (D36) and §10.3's <code>lesson</code> row; <strong>proposed</strong> — <code>seed/programme.json:T8</code> carries the gate verbatim. This unit builds them; the gate is text, not a built refusal.</li>
+<li><strong>refused today</strong> — only the memory and readiness checks above refuse; no lesson action exists, so T8 has no failing path yet.</li>
+</ul>
+<h2>Reuse sources</h2>
+<table><thead><tr><th>Source</th><th>Analysis question</th></tr></thead><tbody>
+<tr><td>In repo — <code>work_package_memory</code></td><td>Is a lesson a new aggregate or a memory kind, and may hot rows serve as evidence?</td></tr>
+<tr><td>In repo — <code>trace_link</code></td><td>Can evidence refs reuse the edge table, not a second graph?</td></tr>
+<tr><td>In repo — capability pins and readiness</td><td>Does T8 ever write a pack pin, or only read the release path?</td></tr>
+<tr><td>In repo — card, run, eval and benchmark rows</td><td>Which records resolve a ref and its root today, and which cannot exist yet?</td></tr>
+<tr><td>Wider estate — <code>strata_rag</code> / <code>strata_ingest</code> capability</td><td>Does ingest create a source draft, and who owns draft-versus-published?</td></tr>
+<tr><td>Wider estate — capability pack release capability</td><td>Is a promoted source inert until a pack is published and pinned?</td></tr>
+<tr><td>Upstream — Postgres, sqlx, actions-derive</td><td>Can T8 be two tables and action specs, with no new runtime, port or store?</td></tr>
+</tbody></table>
+<h2>Build vs reuse</h2>
+<ul>
+<li><strong>Lesson aggregate: build.</strong> It carries a lifecycle no memory kind has; one would put review state on an append-only row.</li>
+<li><strong>Evidence refs: reuse <code>trace_link</code>.</strong> Extend its kind vocabulary with <code>evidences</code>; tenancy, uniqueness and indexes exist, and independence is computed at read time.</li>
+<li><strong>Review: build a typed <code>lesson_review</code>, not a generic approval.</strong> It records an evidence hash and is served by the Improve screen, not the approval inbox; the reviewer is a person, never the proposer (P4 by analogy).</li>
+<li><strong>Promotion: reuse the strata ingest contract.</strong> T8 builds the intent/commit record around the call and never publishes a pack or writes <code>capability_knowledge</code>.</li>
+<li><strong>Metric: do not build.</strong> Lesson promotion rate is T11's read model over T8 rows.</li>
+<li><strong>Constraints:</strong> public repo (no private host, credential or live id), workspace crates only, no new port (8930), strata via the existing client.</li>
+</ul>
+<h2>Risks</h2>
+<ul>
+<li>A lesson forked into a memory kind and a lesson row → <strong>check:</strong> <code>git grep -n 'lesson' origin/main -- migrations/</code> gains no memory-kind value.</li>
+<li>One run counted twice through its card and itself → <strong>check:</strong> an independence-root test where a card plus its only run is one ref.</li>
+<li>Evidence added after review rides a stale approval → <strong>check:</strong> a changed hash voids the review and returns the lesson to proposed.</li>
+<li>Retry double-ingests into strata → <strong>check:</strong> a stable <code>lesson: &lt;id&gt;</code> body and the reviewed hash; a second promote is 409.</li>
+<li>Incident refs before T7 → <strong>check:</strong> an unresolvable kind is refused (P8), marked absent in the matrix.</li>
+<li>Bad doctrine reaches a run through a pin → <strong>check:</strong> T8 has no publish or pin action; <code>bind_knowledge_tx</code> stays the only writer.</li>
+<li>Two principle catalogues collide: the published P0 set is P1–P10, SPEC_V2 §3 is P1–P11 → <strong>check:</strong> cite §3 only, never map ids.</li>
+</ul>
+<h2>Open questions</h2>
+<ol>
+<li>Is "source draft" a strata state, or only the conveyor's status until a pack release?</li>
+<li>Do incident and postmortem refs count at T8? Proposal: declare the kinds, refuse while unresolvable, populate with T7.</li>
+<li>May a tenant require more than two independent refs, as a P11 policy row with a floor of two?</li>
+<li>Who may review — any human, or an authority-matrix role (§6.7)?</li>
+<li>Does a project-scoped lesson promote into that project's pack or a tenant pack?</li>
+</ol>
+<h2>Links</h2>
+<ul>
+<li>Brief: https://conveyor.nonagentic.ai/design/docs/output-01a1e008-9a09-76c1-a454-3d69989cc86d.html</li>
+<li>Issue: #79</li>
+<li>Spec: <code>docs/SPEC_V2.md</code> §3, §7.6, §9.4, §10.3, §10.4, §12 T8; decision D36</li>
+<li>Inception standard: <code>docs/plans/P0-programme-definition.md</code> §5</li>
+<li>P0 published references: blueprint, business case, architecture principles, artefact standard and reuse map at the public design site</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Organisational memory · conveyor output · published 2026-11-20T07:33:41.908746784+00:00 · FR Test</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>T7 Operations — inception analysis · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>T7 — Inception analysis</h1>
+<p>Project: T7 — Operations · Track: v2 · Tranche: 5 · Plan: docs/SPEC_V2.md §12
+Unit: #78 (this document is dependency-shaping work; blocked-by T2, T4, T13 and P0)
+Measured at: main@61edfcf8, 2026-11-18 · Project row: active, meta.depends_on = ["T2", "T4", "T13", "P0"]</p>
+<h2>Current state</h2>
+<p><strong>Ops reads — <code>built</code>.</strong> <code>crates/actions/src/ops/reads.rs:ops_pods</code>, <code>:ops_deployments</code>, <code>:ops_events</code>, <code>:ops_logs</code>, <code>:ops_flux_status</code>, <code>:ops_ci_status</code> are six closed-input cluster reads using the worker's service-account token; <code>crates/actions/tests/ops_read.rs</code> is their test surface.</p>
+<p><strong>Ops writes — <code>built</code>.</strong> <code>crates/actions/src/ops/writes.rs:ops_restart</code>, <code>:ops_scale</code>, <code>:ops_rollback</code> declare <code>effect = destructive</code>, scope <code>ops:write</code>, an approval target, <code>dry_run</code> and read-back checks (<code>crates/actions/src/ops/mod.rs:WriteOut</code>, <code>:CheckOut</code>). <code>crates/actions/tests/ops_write.rs</code> covers them.</p>
+<p><strong>Destructive gate — <code>built</code>, with a configuration gap.</strong> <code>crates/actions/src/control/approvals.rs:enforce_destructive_gate</code> runs once at the invoke boundary (<code>crates/actions/src/invoke.rs:enforce_destructive_gate</code>), reading <code>migrations/0050_approval_policies.sql:approval_policy</code>; a missing row means <code>required</code>/<code>forbidden</code>. The policy is binary, while dual control needs <code>migrations/0002_domain.sql:required_decisions</code> (default 1), so §6.5's human dual control is not configurable per action today.</p>
+<p><strong>Host family — <code>built</code>.</strong> <code>crates/actions/src/ops/host.rs:ops_host_status</code>, <code>:ops_host_logs</code>, <code>:ops_host_restart_unit</code> and <code>migrations/0048_host_registry.sql:host_registry</code> already satisfy §10.4.1: destination from the registry, credential held by the per-host agent, fixed verbs. T7 inherits it.</p>
+<p><strong>Andon — <code>built</code>, unlinked.</strong> <code>crates/actions/src/control/andon.rs:ANDON_ENGAGED</code> and <code>:ANDON_RELEASED</code> (<code>andon.engage</code>, <code>andon.release</code>) stop new runs and keep the record; <code>apps/server/tests/andon.rs</code> is the test surface. Nothing ties it to an incident.</p>
+<p><strong>Incident — <code>absent</code>.</strong> No <code>incident</code> table exists in <code>migrations/</code> (latest <code>0051_tranche_review.sql</code>); <code>docs/design/data/actions.json:actions</code> has no <code>ops.incident</code>, <code>ops.triage</code>, <code>ops.mitigate</code>, <code>ops.resolve</code> or <code>ops.postmortem</code>; <code>docs/evidence/v2-coverage.md:destination:Operations</code> records a design page only.</p>
+<p><strong>Runbook — <code>partial</code>.</strong> The executable process aggregate is built (<code>migrations/0035_process_tree.sql:process</code>, <code>process_step</code>), and the SOP text is 0035's <code>procedure</code> (<code>migrations/0035_process_tree.sql:procedure</code>; <code>procedures.publish</code> resolves), but <code>seed/organisation.json:procedure_ref</code> binds the operations job to <code>proc-incident</code> and no such procedure is defined in <code>seed/processes/named.yaml</code>. The seven §9.2 runbooks are <code>absent</code>.</p>
+<p><strong>Postmortem — <code>partial</code>.</strong> <code>crates/domain/src/governance.rs:AssetKind::Postmortem</code> and the kind list at <code>migrations/0044_plan_spine.sql:postmortem</code> exist; no action composes one, and <code>governed_assets.*</code> is absent from <code>docs/design/data/actions.json:actions</code>.</p>
+<p><strong>Flag flip and detection — <code>absent</code> / <code>partial</code>.</strong> No action or table names a flag. <code>webhooks.*</code> and <code>schedules.*</code> exist, but nothing turns an alert, webhook or CI failure into an incident; the metrics reads of §6.5 have no action (<code>ops.logs</code> is built; §12 T14, #83, assigns the estate ops reads).</p>
+<h2>Reuse sources</h2>
+<table><thead><tr><th>Source</th><th>Analysis question</th></tr></thead><tbody>
+<tr><td><code>crates/actions/src/ops/</code> (in repo)</td><td>Which handlers does T7 call unchanged, and where does orchestration need a new one?</td></tr>
+<tr><td><code>crates/actions/src/control/approvals.rs</code> + <code>migrations/0050_approval_policies.sql</code> (in repo)</td><td>What must T7 add for dual control and dry-run evidence?</td></tr>
+<tr><td><code>crates/actions/src/control/andon.rs</code> (in repo)</td><td>Can the cord become incident-class without a second stop mechanism?</td></tr>
+<tr><td><code>migrations/0035_process_tree.sql:process</code> + <code>procedures.*</code> (in repo)</td><td>Is a runbook a published procedure with action steps?</td></tr>
+<tr><td><code>crates/domain/src/governance.rs</code> (in repo)</td><td>Is a postmortem a governed-asset kind, not a new aggregate?</td></tr>
+<tr><td>Kubernetes API (estate capability)</td><td>Which verbs are safe under a namespace-scoped account, and what does merge-patch buy over shell?</td></tr>
+<tr><td>Per-host agent (estate capability)</td><td>Which fixed verbs exist, and what proves the conveyor pod holds no host credential?</td></tr>
+<tr><td>Cluster observability (estate capability)</td><td>Are metric reads a T7 action or a T14 toolkit operation?</td></tr>
+<tr><td><code>nonagenticai_mcp_server</code> (upstream, reference only)</td><td>Which contract ideas (write-verify, idempotency) carry over, and why is its runtime refused?</td></tr>
+</tbody></table>
+<h2>Build vs reuse</h2>
+<ul>
+<li><strong>Reuse ops reads, writes and host.</strong> T7 composes them; a second Kubernetes client is refused (P1).</li>
+<li><strong>Reuse the approval gate and policy.</strong> Extend the policy with a decision count and dry-run evidence; no ops-specific approval table.</li>
+<li><strong>Reuse procedures as runbooks.</strong> Versioned and published; a <code>runbook</code> table would duplicate the aggregate.</li>
+<li><strong>Reuse <code>governed_asset</code> for postmortems.</strong> T7 adds the action and link, not a document store. Reuse andon; link it, never rebuild it.</li>
+<li><strong>Build <code>incident</code> and its actions.</strong> One satellite table behind a card because T11's MTTA/MTTR reads need typed columns; <code>ops.flag_flip</code> patches a declared ConfigMap key, because a flag service would be a second config store.</li>
+<li><strong>Refuse:</strong> cluster-admin, <code>kubectl</code> or shell from a job, a second alerting stack, a flag service, the mcp-server runtime (D44), archived kag (R19). The Kubernetes API is Apache-2.0, the workspace pins one dependency set, and no GPL component enters.</li>
+</ul>
+<h2>Risks</h2>
+<ol>
+<li><strong>The approved write can skip its dry run.</strong> <code>enforce_destructive_gate</code> records no dry-run ordering. Check: a test refuses a live write whose approval has no dry-run evidence.</li>
+<li><strong>Dual control is unconfigurable.</strong> "The tenant's configured approvals" is one decision today. Check: <code>required_decisions = 2</code> and one decision leaves the write refused.</li>
+<li><strong>Incident and card diverge.</strong> Two records is the P1 failure. Check: one writer per field, and no card path sets incident state.</li>
+<li><strong>Triage defaults instead of failing closed.</strong> Check: a missing severity set or runbook produces an explicit refusal (P8).</li>
+<li><strong>Detection is assumed.</strong> The gate scenario needs a stated entry (webhook, schedule, CI failure or person) or it proves only the middle. Check: the test names and uses it.</li>
+<li><strong>Flag flip widens the write surface.</strong> Check: only registry-declared keys; an undeclared key refuses before the API call. A host restart that bypasses the incident is checked by the audit and #283's open <code>UNGATED</code> entries.</li>
+</ol>
+<h2>Open questions</h2>
+<ul>
+<li>Does the namespace-scoped account carry <code>configmaps</code> patch, or must flag flip target a Deployment env var?</li>
+<li>Is severity computed by a T2 <code>decision_policy</code> or a laya-configured set, and which row owns the escalation threshold?</li>
+<li>Do metric reads belong to T7 or T14? §11.2 and §6.5 pull in different directions.</li>
+<li>Is the postmortem due window a T11 policy row or an approval expiry?</li>
+<li>Does the gate scenario run in a disposable namespace, or against a fake API in compose?</li>
+</ul>
+<h2>Links</h2>
+<ul>
+<li>Project brief: https://conveyor.nonagentic.ai/design/docs/output-01a1e008-8f7e-756f-bd44-fe52a0fbc56d.html</li>
+<li>Issue: https://github.com/nonagenticai/conveyor/issues/78</li>
+<li>Coverage row: <code>docs/evidence/v2-coverage.md</code> — <code>destination:Operations</code></li>
+<li>Spec: §12 T7 (slice and gate), §9.2 (operations), §5.4 (gates and dual control), §11.4 (effect classes), §10.4.1 (host boundary), §6.5 (operations charter), §3 (principles)</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Operations · conveyor output · published 2026-11-20T07:33:41.908746784+00:00 · FR Test</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

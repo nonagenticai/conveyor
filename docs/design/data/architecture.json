@@ -1,0 +1,1832 @@
+{
+  "artifacts": [
+    {
+      "artifact_kind": "principles_catalog",
+      "artifact_type_id": "01a1f2c1-1399-75fe-b9ec-33018daf4067",
+      "artifact_version": 1,
+      "change_initiative": "The conveyor programme's ADM capability adoption (T9)",
+      "contract_id": null,
+      "created_at": "2026-11-19T07:41:59.292686+00:00",
+      "document_id": null,
+      "entries": [
+        {
+          "artifact_id": "01a1f2c1-5717-75e7-9b3d-1d7707648c09",
+          "axis_a": "P1",
+          "axis_b": "One model, one store, one action registry",
+          "created_at": "2026-11-19T07:41:59.292686+00:00",
+          "id": "01a1f2c1-5751-7420-930c-dcd72dc2276c",
+          "position": 0,
+          "tenant_id": "01a1cf6d-23af-7e0e-8b07-89c8f06bafb4",
+          "updated_at": "2026-11-19T07:41:59.292686+00:00",
+          "value": {
+            "evidence": "crates/actions/src/lib.rs; migrations/*.sql; crates/actions/tests/registry.rs",
+            "implications": "A new capability is a table plus actions in this workspace, not a new service; no feature keeps a private file or cache as its record of truth.",
+            "rationale": "The estate's pain is distributed fragments of one model; one registry makes permission, audit and replay uniform, and its exact set is asserted by its own test.",
+            "statement": "A programme, its projects, their work, their decisions and their evidence are rows in one Postgres database written through one action registry; a concept has one table and one set of actions."
+          },
+          "version": 1
+        },
+        {
+          "artifact_id": "01a1f2c1-5717-75e7-9b3d-1d7707648c09",
+          "axis_a": "P2",
+          "axis_b": "Every mutation is an action; the database is not the API",
+          "created_at": "2026-11-19T07:41:59.292686+00:00",
+          "id": "01a1f2c1-576c-73ed-8332-198c63260760",
+          "position": 1,
+          "tenant_id": "01a1cf6d-23af-7e0e-8b07-89c8f06bafb4",
+          "updated_at": "2026-11-19T07:41:59.292686+00:00",
+          "value": {
+            "evidence": "crates/actions/src/invoke.rs; the registry test committed_action_dump_matches_the_registry",
+            "implications": "A new write is an action with a schema, a scope and a test; a read-only probe is BEGIN READ ONLY.",
+            "rationale": "RFC 9457 errors, If-Match/_version preconditions, revision history and audit hang off the action envelope; a SQL write bypasses every one of them.",
+            "statement": "A write goes through an action with its scope, tenant, precondition and event; no handler, UI or script writes rows by SQL."
+          },
+          "version": 1
+        },
+        {
+          "artifact_id": "01a1f2c1-5717-75e7-9b3d-1d7707648c09",
+          "axis_a": "P3",
+          "axis_b": "Tenant isolation is structural, not a filter",
+          "created_at": "2026-11-19T07:41:59.292686+00:00",
+          "id": "01a1f2c1-578a-70e4-8e5e-bb63496ab0a2",
+          "position": 2,
+          "tenant_id": "01a1cf6d-23af-7e0e-8b07-89c8f06bafb4",
+          "updated_at": "2026-11-19T07:41:59.292686+00:00",
+          "value": {
+            "evidence": "crates/store/src/scope.rs; crates/actions/tests/registry.rs a_foreign_tenant_parent_id_resolves_to_404_never_to_a_write",
+            "implications": "A new table ships with its policy in the same migration and a foreign-tenant 404 test; a session-level GUC through a pooler is forbidden.",
+            "rationale": "The store's begin_scoped is the only path that sets the tenant GUC; a filtered query is one forgotten predicate away from a leak.",
+            "statement": "Every tenant-owned table has RLS enabled and forced, and every query runs under the tenant's scope; a cross-tenant id resolves to 404."
+          },
+          "version": 1
+        },
+        {
+          "artifact_id": "01a1f2c1-5717-75e7-9b3d-1d7707648c09",
+          "axis_a": "P4",
+          "axis_b": "Publication is a decision, never a side effect",
+          "created_at": "2026-11-19T07:41:59.292686+00:00",
+          "id": "01a1f2c1-57a3-7b78-a893-b4e60e152eb2",
+          "position": 3,
+          "tenant_id": "01a1cf6d-23af-7e0e-8b07-89c8f06bafb4",
+          "updated_at": "2026-11-19T07:41:59.292686+00:00",
+          "value": {
+            "evidence": "crates/actions/src/documents/revisions.rs; crates/render/src/markdown.rs",
+            "implications": "A new public surface filters on the public bit and carries the tenant; preview uses the same renderer as the public page.",
+            "rationale": "The executor never approves its own work; documents.publish is the only action that moves the public bit, and the renderer neutralises raw HTML.",
+            "statement": "A row is public only when an admin's publish decision makes it public; an author's write never publishes and author markup is never executable on the public page."
+          },
+          "version": 1
+        },
+        {
+          "artifact_id": "01a1f2c1-5717-75e7-9b3d-1d7707648c09",
+          "axis_a": "P5",
+          "axis_b": "Every output is versioned, attributable and reversible",
+          "created_at": "2026-11-19T07:41:59.292686+00:00",
+          "id": "01a1f2c1-57be-704f-82dc-f3054308d789",
+          "position": 4,
+          "tenant_id": "01a1cf6d-23af-7e0e-8b07-89c8f06bafb4",
+          "updated_at": "2026-11-19T07:41:59.292686+00:00",
+          "value": {
+            "evidence": "migrations/0042_document_workflow.sql; crates/store/src/document.rs",
+            "implications": "A new aggregate that holds work products reuses the document model or carries the same provenance; deletion is a tombstone.",
+            "rationale": "The programme is judged on its intermediate work products; an output a reviewer cannot trace to author, version and evidence is not auditable.",
+            "statement": "A text output carries its author, a content hash and a revision history; every edit is versioned and a restore copies a version forward."
+          },
+          "version": 1
+        },
+        {
+          "artifact_id": "01a1f2c1-5717-75e7-9b3d-1d7707648c09",
+          "axis_a": "P6",
+          "axis_b": "Programme truth is computed, never hand-written",
+          "created_at": "2026-11-19T07:41:59.292686+00:00",
+          "id": "01a1f2c1-57d8-77a5-bce6-c149ce8a092f",
+          "position": 5,
+          "tenant_id": "01a1cf6d-23af-7e0e-8b07-89c8f06bafb4",
+          "updated_at": "2026-11-19T07:41:59.292686+00:00",
+          "value": {
+            "evidence": "scripts/build-coverage.py; scripts/build-programme-seed.py; scripts/check-output-standard.py",
+            "implications": "A new programme fact gets a generator and a --check gate; a document may explain the truth but may not be its only home.",
+            "rationale": "A hand-written status is the first thing to rot; the standard generates every project's expected set and the pack is built from the tree.",
+            "statement": "A project's status, units, dependencies and expected outputs come from measured sources and are regenerated by scripts; a checklist is derived from the standard."
+          },
+          "version": 1
+        },
+        {
+          "artifact_id": "01a1f2c1-5717-75e7-9b3d-1d7707648c09",
+          "axis_a": "P7",
+          "axis_b": "Gates refuse; a gate that never refuses is broken",
+          "created_at": "2026-11-19T07:41:59.292686+00:00",
+          "id": "01a1f2c1-57f2-7089-9aff-5fc62bc12526",
+          "position": 6,
+          "tenant_id": "01a1cf6d-23af-7e0e-8b07-89c8f06bafb4",
+          "updated_at": "2026-11-19T07:41:59.292686+00:00",
+          "value": {
+            "evidence": "crates/actions/tests/authoring_standard.rs; the 409 blocked_by gate in crates/actions/src/programme.rs",
+            "implications": "A gate names what is missing and offers the next step; a refusal is covered at the boundary the caller uses.",
+            "rationale": "The programme's publish and dependency gates exist because a publish without evidence happened; a refusal is the product, not an error path.",
+            "statement": "A quality gate is a refusal with an actionable reason, exercised by a test that proves the refusal; a gate that never refused in a full cycle is treated as broken."
+          },
+          "version": 1
+        },
+        {
+          "artifact_id": "01a1f2c1-5717-75e7-9b3d-1d7707648c09",
+          "axis_a": "P8",
+          "axis_b": "Typed dependencies, explicit gates",
+          "created_at": "2026-11-19T07:41:59.292686+00:00",
+          "id": "01a1f2c1-580b-7ba9-a663-d1ca48ad29d1",
+          "position": 7,
+          "tenant_id": "01a1cf6d-23af-7e0e-8b07-89c8f06bafb4",
+          "updated_at": "2026-11-19T07:41:59.292686+00:00",
+          "value": {
+            "evidence": "migrations/0044_plan_spine.sql; crates/actions/tests/plan_spine.rs",
+            "implications": "A project's inception names its dependencies and the contract it sits under; a deviation is a decision record.",
+            "rationale": "Untyped coupling hides the order the programme actually needs; the gate answers 409 blocked_by naming the open dependency.",
+            "statement": "A dependency between projects is typed and the programme gate enforces the blocking kind; a tranche review is a programme decision on evidence."
+          },
+          "version": 1
+        },
+        {
+          "artifact_id": "01a1f2c1-5717-75e7-9b3d-1d7707648c09",
+          "axis_a": "P9",
+          "axis_b": "Secrets never leave their boundary",
+          "created_at": "2026-11-19T07:41:59.292686+00:00",
+          "id": "01a1f2c1-5826-7257-8dde-4e24fdc3a467",
+          "position": 8,
+          "tenant_id": "01a1cf6d-23af-7e0e-8b07-89c8f06bafb4",
+          "updated_at": "2026-11-19T07:41:59.292686+00:00",
+          "value": {
+            "evidence": "crates/actions/src/documents/secrets.rs; scripts/ci/no-private-refs.sh",
+            "implications": "A credential is referenced, never printed; a public output and the snapshot are scanned before publication.",
+            "rationale": "The repository is public, so a leak is permanent; the secret aggregate stores only a sealed form.",
+            "statement": "A secret is write-only; no action returns its value, and no secret, token or private host enters the public repository or a published output."
+          },
+          "version": 1
+        },
+        {
+          "artifact_id": "01a1f2c1-5717-75e7-9b3d-1d7707648c09",
+          "axis_a": "P10",
+          "axis_b": "The estate is one deployable service per concept, absorbed not duplicated",
+          "created_at": "2026-11-19T07:41:59.292686+00:00",
+          "id": "01a1f2c1-583f-7f7f-b63f-245cfd18fa51",
+          "position": 9,
+          "tenant_id": "01a1cf6d-23af-7e0e-8b07-89c8f06bafb4",
+          "updated_at": "2026-11-19T07:41:59.292686+00:00",
+          "value": {
+            "evidence": "docs/decisions/0005-absorption-sequence-and-repo-scope.md; crates/actions/src/ops/",
+            "implications": "A new integration adds an action and a client in this workspace; a retired service's data is migrated, not forked.",
+            "rationale": "ADR 0005 fixes the absorption sequence; the public repository cannot carry a hidden dependency on a private host.",
+            "statement": "A service the organisation depends on is either this workspace's own code or an absorbed, contract-tested module behind an action; a second deployment of the same concept is retired."
+          },
+          "version": 1
+        }
+      ],
+      "id": "01a1f2c1-5717-75e7-9b3d-1d7707648c09",
+      "meta": {
+        "author": "programme architect (maintainer sessions)",
+        "related_initiative": "T9 capability adoption",
+        "review_date": "pending board decision",
+        "reviewer": "the Architecture Board",
+        "status": "draft for board approval",
+        "version": 1
+      },
+      "phase_code": "preliminary",
+      "plateau": "psa",
+      "project_id": null,
+      "purpose": "The principles every delivery project designs under, adopted by the Architecture Board.",
+      "scope": "The conveyor programme and every project in it; the estate services it absorbs.",
+      "stakeholders": {
+        "consumers": [
+          "every delivery project's inception"
+        ],
+        "owner": "programme architect",
+        "reviewer": "the Architecture Board"
+      },
+      "status": "approved",
+      "title": "Conveyor architecture principles — PF-1",
+      "updated_at": "2026-11-19T07:50:15.637744+00:00",
+      "version": 2
+    },
+    {
+      "artifact_kind": "diagram",
+      "artifact_type_id": "01a1f2c1-13b5-758c-8473-21d0f3e26c90",
+      "artifact_version": 1,
+      "change_initiative": "The conveyor programme's ADM capability adoption (T9)",
+      "contract_id": null,
+      "created_at": "2026-11-19T07:42:15.058225+00:00",
+      "document_id": null,
+      "entries": [
+        {
+          "artifact_id": "01a1f2c1-94ad-7a92-8aca-57202f48ece9",
+          "axis_a": "B5 One model",
+          "axis_b": "P1",
+          "created_at": "2026-11-19T07:42:15.058225+00:00",
+          "id": "01a1f2c1-94e4-771d-955e-5bd2a788b07e",
+          "position": 0,
+          "tenant_id": "01a1cf6d-23af-7e0e-8b07-89c8f06bafb4",
+          "updated_at": "2026-11-19T07:42:15.058225+00:00",
+          "value": {
+            "note": "A benefit recorded twice is a benefit nobody can trust; the principle makes the row the one record.",
+            "relation": "derivation"
+          },
+          "version": 1
+        },
+        {
+          "artifact_id": "01a1f2c1-94ad-7a92-8aca-57202f48ece9",
+          "axis_a": "B1 Auditable decisions",
+          "axis_b": "P4",
+          "created_at": "2026-11-19T07:42:15.058225+00:00",
+          "id": "01a1f2c1-94fe-7c73-999e-79213dfdead2",
+          "position": 1,
+          "tenant_id": "01a1cf6d-23af-7e0e-8b07-89c8f06bafb4",
+          "updated_at": "2026-11-19T07:42:15.058225+00:00",
+          "value": {
+            "note": "An auditable decision needs a publication act a reviewer can point at.",
+            "relation": "derivation"
+          },
+          "version": 1
+        },
+        {
+          "artifact_id": "01a1f2c1-94ad-7a92-8aca-57202f48ece9",
+          "axis_a": "B1 Auditable decisions",
+          "axis_b": "P5",
+          "created_at": "2026-11-19T07:42:15.058225+00:00",
+          "id": "01a1f2c1-9518-7c55-b0b9-1d86910104d1",
+          "position": 2,
+          "tenant_id": "01a1cf6d-23af-7e0e-8b07-89c8f06bafb4",
+          "updated_at": "2026-11-19T07:42:15.058225+00:00",
+          "value": {
+            "note": "An auditable decision needs author, version and revision history.",
+            "relation": "derivation"
+          },
+          "version": 1
+        },
+        {
+          "artifact_id": "01a1f2c1-94ad-7a92-8aca-57202f48ece9",
+          "axis_a": "B1 Auditable decisions",
+          "axis_b": "P7",
+          "created_at": "2026-11-19T07:42:15.058225+00:00",
+          "id": "01a1f2c1-9533-723a-a0b8-3f308779d644",
+          "position": 3,
+          "tenant_id": "01a1cf6d-23af-7e0e-8b07-89c8f06bafb4",
+          "updated_at": "2026-11-19T07:42:15.058225+00:00",
+          "value": {
+            "note": "An auditable decision needs gates that refuse and say why.",
+            "relation": "derivation"
+          },
+          "version": 1
+        },
+        {
+          "artifact_id": "01a1f2c1-94ad-7a92-8aca-57202f48ece9",
+          "axis_a": "B4 Public collaboration",
+          "axis_b": "P9",
+          "created_at": "2026-11-19T07:42:15.058225+00:00",
+          "id": "01a1f2c1-954d-7928-84fc-08b6564129e0",
+          "position": 4,
+          "tenant_id": "01a1cf6d-23af-7e0e-8b07-89c8f06bafb4",
+          "updated_at": "2026-11-19T07:42:15.058225+00:00",
+          "value": {
+            "note": "A public repository and a public design pack can carry no secret, token or private host.",
+            "relation": "derivation"
+          },
+          "version": 1
+        },
+        {
+          "artifact_id": "01a1f2c1-94ad-7a92-8aca-57202f48ece9",
+          "axis_a": "B6 Predictable delivery",
+          "axis_b": "P8",
+          "created_at": "2026-11-19T07:42:15.058225+00:00",
+          "id": "01a1f2c1-9567-75e8-833a-1629f6c9eb20",
+          "position": 5,
+          "tenant_id": "01a1cf6d-23af-7e0e-8b07-89c8f06bafb4",
+          "updated_at": "2026-11-19T07:42:15.058225+00:00",
+          "value": {
+            "note": "Predictable delivery comes from typed dependencies and explicit gates.",
+            "relation": "derivation"
+          },
+          "version": 1
+        },
+        {
+          "artifact_id": "01a1f2c1-94ad-7a92-8aca-57202f48ece9",
+          "axis_a": "B2 Less bespoke tooling",
+          "axis_b": "P10",
+          "created_at": "2026-11-19T07:42:15.058225+00:00",
+          "id": "01a1f2c1-9581-78a6-aec4-1fd08eadfbf2",
+          "position": 6,
+          "tenant_id": "01a1cf6d-23af-7e0e-8b07-89c8f06bafb4",
+          "updated_at": "2026-11-19T07:42:15.058225+00:00",
+          "value": {
+            "note": "Less bespoke tooling means absorbed modules behind actions, not a second deployment.",
+            "relation": "derivation"
+          },
+          "version": 1
+        }
+      ],
+      "id": "01a1f2c1-94ad-7a92-8aca-57202f48ece9",
+      "meta": {
+        "author": "programme architect (maintainer sessions)",
+        "building_block": "motivation",
+        "elements": "benefit → principle",
+        "review_date": "pending board decision",
+        "reviewer": "the Architecture Board",
+        "status": "draft for board approval",
+        "version": 1,
+        "viewpoint": "ArchiMate 3.1 / Motivation"
+      },
+      "phase_code": "preliminary",
+      "plateau": "psa",
+      "project_id": null,
+      "purpose": "Show which benefit each principle derives from, so a principle without a benefit and a benefit without a principle are both visible.",
+      "scope": "The ten principles of PF-1 against the benefits map's B1–B6.",
+      "stakeholders": {
+        "consumers": [
+          "the board",
+          "each delivery project's inception"
+        ],
+        "owner": "programme architect",
+        "reviewer": "the Architecture Board"
+      },
+      "status": "approved",
+      "title": "Principle derivation — benefits to principles",
+      "updated_at": "2026-11-19T07:50:17.618926+00:00",
+      "version": 2
+    },
+    {
+      "artifact_kind": "diagram",
+      "artifact_type_id": "01a1f2c1-13d0-723a-9330-27acb8dda30c",
+      "artifact_version": 1,
+      "change_initiative": "The conveyor programme's ADM capability adoption (T9)",
+      "contract_id": null,
+      "created_at": "2026-11-19T07:42:17.046444+00:00",
+      "document_id": null,
+      "entries": [
+        {
+          "artifact_id": "01a1f2c1-9c75-78a2-a2a4-647687dfbe10",
+          "axis_a": "P1",
+          "axis_b": "implementation",
+          "created_at": "2026-11-19T07:42:17.046444+00:00",
+          "id": "01a1f2c1-9cb3-7334-84d9-b806378c9d29",
+          "position": 0,
+          "tenant_id": "01a1cf6d-23af-7e0e-8b07-89c8f06bafb4",
+          "updated_at": "2026-11-19T07:42:17.046444+00:00",
+          "value": {
+            "evidence": "crates/actions/src/lib.rs — the one compiled registry; crates/actions/tests/registry.rs asserts its exact set",
+            "relation": "realization"
+          },
+          "version": 1
+        },
+        {
+          "artifact_id": "01a1f2c1-9c75-78a2-a2a4-647687dfbe10",
+          "axis_a": "P2",
+          "axis_b": "implementation",
+          "created_at": "2026-11-19T07:42:17.046444+00:00",
+          "id": "01a1f2c1-9ccd-78fa-bcc9-02f377fe201b",
+          "position": 1,
+          "tenant_id": "01a1cf6d-23af-7e0e-8b07-89c8f06bafb4",
+          "updated_at": "2026-11-19T07:42:17.046444+00:00",
+          "value": {
+            "evidence": "crates/actions/src/invoke.rs — dispatch, precondition, RFC 9457 errors",
+            "relation": "realization"
+          },
+          "version": 1
+        },
+        {
+          "artifact_id": "01a1f2c1-9c75-78a2-a2a4-647687dfbe10",
+          "axis_a": "P3",
+          "axis_b": "implementation",
+          "created_at": "2026-11-19T07:42:17.046444+00:00",
+          "id": "01a1f2c1-9ce7-7740-930b-5bfb15645ffb",
+          "position": 2,
+          "tenant_id": "01a1cf6d-23af-7e0e-8b07-89c8f06bafb4",
+          "updated_at": "2026-11-19T07:42:17.046444+00:00",
+          "value": {
+            "evidence": "crates/store/src/scope.rs and the tenant_isolation policies in every migration",
+            "relation": "realization"
+          },
+          "version": 1
+        },
+        {
+          "artifact_id": "01a1f2c1-9c75-78a2-a2a4-647687dfbe10",
+          "axis_a": "P4",
+          "axis_b": "implementation",
+          "created_at": "2026-11-19T07:42:17.046444+00:00",
+          "id": "01a1f2c1-9d0a-7317-97f1-a5674d5c2dc4",
+          "position": 3,
+          "tenant_id": "01a1cf6d-23af-7e0e-8b07-89c8f06bafb4",
+          "updated_at": "2026-11-19T07:42:17.046444+00:00",
+          "value": {
+            "evidence": "crates/actions/src/documents/revisions.rs (documents.publish) and crates/render/src/markdown.rs",
+            "relation": "realization"
+          },
+          "version": 1
+        },
+        {
+          "artifact_id": "01a1f2c1-9c75-78a2-a2a4-647687dfbe10",
+          "axis_a": "P5",
+          "axis_b": "implementation",
+          "created_at": "2026-11-19T07:42:17.046444+00:00",
+          "id": "01a1f2c1-9d24-74a0-80d1-347b8fd55361",
+          "position": 4,
+          "tenant_id": "01a1cf6d-23af-7e0e-8b07-89c8f06bafb4",
+          "updated_at": "2026-11-19T07:42:17.046444+00:00",
+          "value": {
+            "evidence": "migrations/0042_document_workflow.sql and crates/store/src/document.rs",
+            "relation": "realization"
+          },
+          "version": 1
+        },
+        {
+          "artifact_id": "01a1f2c1-9c75-78a2-a2a4-647687dfbe10",
+          "axis_a": "P6",
+          "axis_b": "implementation",
+          "created_at": "2026-11-19T07:42:17.046444+00:00",
+          "id": "01a1f2c1-9d3e-77bc-997a-d1e45b975a67",
+          "position": 5,
+          "tenant_id": "01a1cf6d-23af-7e0e-8b07-89c8f06bafb4",
+          "updated_at": "2026-11-19T07:42:17.046444+00:00",
+          "value": {
+            "evidence": "scripts/build-coverage.py, scripts/build-programme-seed.py, scripts/check-output-standard.py",
+            "relation": "realization"
+          },
+          "version": 1
+        },
+        {
+          "artifact_id": "01a1f2c1-9c75-78a2-a2a4-647687dfbe10",
+          "axis_a": "P7",
+          "axis_b": "implementation",
+          "created_at": "2026-11-19T07:42:17.046444+00:00",
+          "id": "01a1f2c1-9d58-7517-96f5-cfaec3546bfd",
+          "position": 6,
+          "tenant_id": "01a1cf6d-23af-7e0e-8b07-89c8f06bafb4",
+          "updated_at": "2026-11-19T07:42:17.046444+00:00",
+          "value": {
+            "evidence": "crates/actions/tests/authoring_standard.rs and the programme gates in crates/actions/src/programme.rs",
+            "relation": "realization"
+          },
+          "version": 1
+        },
+        {
+          "artifact_id": "01a1f2c1-9c75-78a2-a2a4-647687dfbe10",
+          "axis_a": "P8",
+          "axis_b": "implementation",
+          "created_at": "2026-11-19T07:42:17.046444+00:00",
+          "id": "01a1f2c1-9d72-7592-ba24-8e9d5d6b17dc",
+          "position": 7,
+          "tenant_id": "01a1cf6d-23af-7e0e-8b07-89c8f06bafb4",
+          "updated_at": "2026-11-19T07:42:17.046444+00:00",
+          "value": {
+            "evidence": "migrations/0044_plan_spine.sql and crates/actions/tests/plan_spine.rs",
+            "relation": "realization"
+          },
+          "version": 1
+        },
+        {
+          "artifact_id": "01a1f2c1-9c75-78a2-a2a4-647687dfbe10",
+          "axis_a": "P9",
+          "axis_b": "implementation",
+          "created_at": "2026-11-19T07:42:17.046444+00:00",
+          "id": "01a1f2c1-9d90-7c93-b99d-c083d9893579",
+          "position": 8,
+          "tenant_id": "01a1cf6d-23af-7e0e-8b07-89c8f06bafb4",
+          "updated_at": "2026-11-19T07:42:17.046444+00:00",
+          "value": {
+            "evidence": "crates/actions/src/documents/secrets.rs and scripts/ci/no-private-refs.sh",
+            "relation": "realization"
+          },
+          "version": 1
+        },
+        {
+          "artifact_id": "01a1f2c1-9c75-78a2-a2a4-647687dfbe10",
+          "axis_a": "P10",
+          "axis_b": "implementation",
+          "created_at": "2026-11-19T07:42:17.046444+00:00",
+          "id": "01a1f2c1-9dab-701a-a906-925c1195987d",
+          "position": 9,
+          "tenant_id": "01a1cf6d-23af-7e0e-8b07-89c8f06bafb4",
+          "updated_at": "2026-11-19T07:42:17.046444+00:00",
+          "value": {
+            "evidence": "docs/decisions/0005-absorption-sequence-and-repo-scope.md and the absorbed modules under crates/",
+            "relation": "realization"
+          },
+          "version": 1
+        }
+      ],
+      "id": "01a1f2c1-9c75-78a2-a2a4-647687dfbe10",
+      "meta": {
+        "author": "programme architect (maintainer sessions)",
+        "building_block": "implementation",
+        "elements": "principle → enforcing code or gate",
+        "review_date": "pending board decision",
+        "reviewer": "the Architecture Board",
+        "status": "draft for board approval",
+        "version": 1,
+        "viewpoint": "ArchiMate 3.1 / Implementation"
+      },
+      "phase_code": "preliminary",
+      "plateau": "psa",
+      "project_id": null,
+      "purpose": "Show, per principle, the code or gate that enforces it; a principle with no realization is a slogan.",
+      "scope": "The ten principles of PF-1 against the merged code at main@f14b7d36.",
+      "stakeholders": {
+        "consumers": [
+          "the board",
+          "every delivery project's inception"
+        ],
+        "owner": "programme architect",
+        "reviewer": "the Architecture Board"
+      },
+      "status": "approved",
+      "title": "Principle realization — principles to the code and gates that enforce them",
+      "updated_at": "2026-11-19T07:50:19.622442+00:00",
+      "version": 2
+    }
+  ],
+  "board": [
+    {
+      "charter": "The board governs the conveyor programme's architecture. It adopts the principles catalogue and the tailored ADM profile, approves architecture contracts, and accepts or rejects waivers. It cannot approve a gate it requested and cannot waive a deviation it owns. It meets at each tranche review and on a contract request. Quorum: the chair. Every decision is recorded with the evidence it was taken on.",
+      "commissioning_authority": "The programme owner (the sponsor and decision-maker; P0's governance row)",
+      "created_at": "2026-11-19T07:41:17.066513+00:00",
+      "decision_limits": {
+        "approves": [
+          "principles_catalog",
+          "adm_profile",
+          "architecture_contract",
+          "architecture_waiver"
+        ],
+        "cannot": [
+          "approve a gate it requested",
+          "waive a deviation it owns"
+        ],
+        "quorum": "the chair"
+      },
+      "id": "01a1f2c0-b22a-7e27-a6cc-1a8e48db327e",
+      "key": "conveyor-architecture-board",
+      "kind": "architecture_board",
+      "members": {
+        "chair": "programme owner",
+        "note": "positions, not persons; the programme architect position is held by the maintainer sessions under the owner's authority",
+        "positions": [
+          "programme architect",
+          "domain architect",
+          "delivery lead"
+        ]
+      },
+      "name": "Conveyor Architecture Board",
+      "status": "draft",
+      "updated_at": "2026-11-19T07:41:17.066513+00:00",
+      "version": 1
+    }
+  ],
+  "contracts": [
+    {
+      "approval_id": null,
+      "approved_at": "2026-11-19T07:50:28.603416+00:00",
+      "approved_by": "01a1cf1e-09dd-7580-99cc-de395f3e86cc",
+      "body": {
+        "acceptance_criteria": [
+          "D1 — the artefact standard and repository: a catalog's entries are rows, an approved artefact is immutable and a supersede writes version 2, and a reuse link is searchable across plateaus.",
+          "D2 — the Preliminary capability: the tailored profile names each phase's mandatory set by plateau, the board is a governance body row, and a maturity assessment carries all nine dimensions and a skills assessment all seven categories.",
+          "D3 — the architecture project and phase gates: an approved artefact set and a live contract advance a phase, a draft artefact refuses the advance naming the artefact, and a contract change re-opens the gate.",
+          "D4 — delivery compliance: a design gate without a live contract refuses, a superseded contract refuses naming its status, and one compliance level per review and a dated waiver without an owner are refused.",
+          "D5 — change management: a review's exactly-one outcome is a change row or a kata candidate, and a review with no verdict cannot close the phase.",
+          "D6 — the console surface: the Architecture destination renders its tabs from the live aggregates and each interaction records state."
+        ],
+        "assignment": "Deliver the TOGAF ADM capability as rows and actions in the one workspace: the artefact standard and repository, the Preliminary capability, the architecture project and its phase gates, delivery compliance, change management, and its console surface.",
+        "responsibilities": "The programme architect (the maintainer sessions under the owner's authority) delivers and evidences each deliverable; the Architecture Board reviews and approves; the programme owner accepts the capability.",
+        "scope": "The eleven tables of migration 0054 and the 26 architecture.* actions that expose them; the four ADM contract kinds; the seeded ten-type artefact standard; the Architecture Board; the maturity and skills baselines; and the Architecture capability screen (D6). The design is docs/plans/T9-architecture-capability.md."
+      },
+      "created_at": "2026-11-19T07:42:46.140382+00:00",
+      "id": "01a1f2c2-0e1a-787f-9011-46b424d1ec71",
+      "kind": "statement_of_architecture_work",
+      "phase_code": "a",
+      "project_id": "01a1d039-0d35-7bd1-945d-cea12c5dfd6d",
+      "status": "live",
+      "superseded_by_id": null,
+      "supersedes_id": null,
+      "title": "Statement of Architecture Work — the TOGAF ADM capability (T9)",
+      "updated_at": "2026-11-19T07:50:28.603416+00:00",
+      "version": 2
+    }
+  ],
+  "generated_at": "2026-11-20T07:33:41.908746784+00:00",
+  "links": [
+    {
+      "from_artifact_id": "01a1f2c1-94ad-7a92-8aca-57202f48ece9",
+      "id": "01a1f2c1-c6d3-7203-ae68-01e0b0ae4aa0",
+      "kind": "derivation",
+      "to_artifact_id": "01a1f2c1-5717-75e7-9b3d-1d7707648c09",
+      "version": 1
+    },
+    {
+      "from_artifact_id": "01a1f2c1-5717-75e7-9b3d-1d7707648c09",
+      "id": "01a1f2c1-cdba-731d-ac0f-934b07ff8d0a",
+      "kind": "realization",
+      "to_artifact_id": "01a1f2c1-9c75-78a2-a2a4-647687dfbe10",
+      "version": 1
+    }
+  ],
+  "maturity": [
+    {
+      "assessed_at": "2026-11-19T07:52:31.86611+00:00",
+      "assessment_id": "01a1f2ca-fdf6-7698-b685-e1e94dd454be",
+      "dimension": "architecture_communication",
+      "evidence": {
+        "baseline_date": "2026-11-19",
+        "dimensions": {
+          "architecture_communication": "The public design pack, the published output set and the required review of each document make the architecture readable; no stakeholder engagement cycle has run.",
+          "architecture_development": "The typed artefact repository exists and three Preliminary artefacts are rows with entries and links. No HLD or SD design exists for a delivery, so the discipline is exercised but not yet standard practice.",
+          "architecture_governance": "The board, the four contract kinds and the waiver rule are rows and actions; the first contract is requested and no delivery design gate has yet resolved against a live contract.",
+          "architecture_process": "The ADM phases, the four contract kinds and the phase-advance refusal exist as rows and actions (migrations/0054_architecture.sql; crates/actions/src/architecture.rs). One Preliminary capability is being accepted; no Phase A-H has yet run for a delivery.",
+          "business_linkage": "P0's benefits map names output -> capability -> outcome -> benefit -> objective; no benefit baseline has been measured, so no improvement can yet be demonstrated.",
+          "investment_strategy": "ADR 0005 fixes the absorption sequence and the business case carries the cost/risk posture; there is no formal investment appraisal or portfolio benefits tracking.",
+          "it_security": "Tenant isolation is structural (RLS on every tenant table), secrets are write-only, the repository is scanned on every PR and the public page neutralises author markup; there is no security architecture review cycle.",
+          "operating_unit_participation": "There is one operating unit (the programme itself); the organisation catalogue positions exist but no job release is bound to a running project.",
+          "senior_management": "The owner is the sponsor and decision-maker and chairs the Architecture Board, whose charter, commissioning authority and decision limits are now rows; one board decision records the capability adoption. There is no standing board cadence yet."
+        },
+        "method": "a review judgement against evidence a reviewer can open; each dimension's evidence is named below",
+        "previous": "P0 MA-1, dated 2026-11-17, mean 1.8/5",
+        "scope": "the conveyor programme's own architecture capability"
+      },
+      "id": "01a1f2ca-feb8-7723-ad0e-1e2fc660217c",
+      "score": 2,
+      "stage": "under development (baseline 2026-11-19)"
+    },
+    {
+      "assessed_at": "2026-11-19T07:52:31.86611+00:00",
+      "assessment_id": "01a1f2ca-fdf6-7698-b685-e1e94dd454be",
+      "dimension": "architecture_development",
+      "evidence": {
+        "baseline_date": "2026-11-19",
+        "dimensions": {
+          "architecture_communication": "The public design pack, the published output set and the required review of each document make the architecture readable; no stakeholder engagement cycle has run.",
+          "architecture_development": "The typed artefact repository exists and three Preliminary artefacts are rows with entries and links. No HLD or SD design exists for a delivery, so the discipline is exercised but not yet standard practice.",
+          "architecture_governance": "The board, the four contract kinds and the waiver rule are rows and actions; the first contract is requested and no delivery design gate has yet resolved against a live contract.",
+          "architecture_process": "The ADM phases, the four contract kinds and the phase-advance refusal exist as rows and actions (migrations/0054_architecture.sql; crates/actions/src/architecture.rs). One Preliminary capability is being accepted; no Phase A-H has yet run for a delivery.",
+          "business_linkage": "P0's benefits map names output -> capability -> outcome -> benefit -> objective; no benefit baseline has been measured, so no improvement can yet be demonstrated.",
+          "investment_strategy": "ADR 0005 fixes the absorption sequence and the business case carries the cost/risk posture; there is no formal investment appraisal or portfolio benefits tracking.",
+          "it_security": "Tenant isolation is structural (RLS on every tenant table), secrets are write-only, the repository is scanned on every PR and the public page neutralises author markup; there is no security architecture review cycle.",
+          "operating_unit_participation": "There is one operating unit (the programme itself); the organisation catalogue positions exist but no job release is bound to a running project.",
+          "senior_management": "The owner is the sponsor and decision-maker and chairs the Architecture Board, whose charter, commissioning authority and decision limits are now rows; one board decision records the capability adoption. There is no standing board cadence yet."
+        },
+        "method": "a review judgement against evidence a reviewer can open; each dimension's evidence is named below",
+        "previous": "P0 MA-1, dated 2026-11-17, mean 1.8/5",
+        "scope": "the conveyor programme's own architecture capability"
+      },
+      "id": "01a1f2ca-fe41-79f1-94e0-4810ce3490fa",
+      "score": 2,
+      "stage": "under development (baseline 2026-11-19)"
+    },
+    {
+      "assessed_at": "2026-11-19T07:52:31.86611+00:00",
+      "assessment_id": "01a1f2ca-fdf6-7698-b685-e1e94dd454be",
+      "dimension": "architecture_governance",
+      "evidence": {
+        "baseline_date": "2026-11-19",
+        "dimensions": {
+          "architecture_communication": "The public design pack, the published output set and the required review of each document make the architecture readable; no stakeholder engagement cycle has run.",
+          "architecture_development": "The typed artefact repository exists and three Preliminary artefacts are rows with entries and links. No HLD or SD design exists for a delivery, so the discipline is exercised but not yet standard practice.",
+          "architecture_governance": "The board, the four contract kinds and the waiver rule are rows and actions; the first contract is requested and no delivery design gate has yet resolved against a live contract.",
+          "architecture_process": "The ADM phases, the four contract kinds and the phase-advance refusal exist as rows and actions (migrations/0054_architecture.sql; crates/actions/src/architecture.rs). One Preliminary capability is being accepted; no Phase A-H has yet run for a delivery.",
+          "business_linkage": "P0's benefits map names output -> capability -> outcome -> benefit -> objective; no benefit baseline has been measured, so no improvement can yet be demonstrated.",
+          "investment_strategy": "ADR 0005 fixes the absorption sequence and the business case carries the cost/risk posture; there is no formal investment appraisal or portfolio benefits tracking.",
+          "it_security": "Tenant isolation is structural (RLS on every tenant table), secrets are write-only, the repository is scanned on every PR and the public page neutralises author markup; there is no security architecture review cycle.",
+          "operating_unit_participation": "There is one operating unit (the programme itself); the organisation catalogue positions exist but no job release is bound to a running project.",
+          "senior_management": "The owner is the sponsor and decision-maker and chairs the Architecture Board, whose charter, commissioning authority and decision limits are now rows; one board decision records the capability adoption. There is no standing board cadence yet."
+        },
+        "method": "a review judgement against evidence a reviewer can open; each dimension's evidence is named below",
+        "previous": "P0 MA-1, dated 2026-11-17, mean 1.8/5",
+        "scope": "the conveyor programme's own architecture capability"
+      },
+      "id": "01a1f2ca-fef3-768f-af6d-d3b39ca94cfe",
+      "score": 2,
+      "stage": "under development (baseline 2026-11-19)"
+    },
+    {
+      "assessed_at": "2026-11-19T07:52:31.86611+00:00",
+      "assessment_id": "01a1f2ca-fdf6-7698-b685-e1e94dd454be",
+      "dimension": "architecture_process",
+      "evidence": {
+        "baseline_date": "2026-11-19",
+        "dimensions": {
+          "architecture_communication": "The public design pack, the published output set and the required review of each document make the architecture readable; no stakeholder engagement cycle has run.",
+          "architecture_development": "The typed artefact repository exists and three Preliminary artefacts are rows with entries and links. No HLD or SD design exists for a delivery, so the discipline is exercised but not yet standard practice.",
+          "architecture_governance": "The board, the four contract kinds and the waiver rule are rows and actions; the first contract is requested and no delivery design gate has yet resolved against a live contract.",
+          "architecture_process": "The ADM phases, the four contract kinds and the phase-advance refusal exist as rows and actions (migrations/0054_architecture.sql; crates/actions/src/architecture.rs). One Preliminary capability is being accepted; no Phase A-H has yet run for a delivery.",
+          "business_linkage": "P0's benefits map names output -> capability -> outcome -> benefit -> objective; no benefit baseline has been measured, so no improvement can yet be demonstrated.",
+          "investment_strategy": "ADR 0005 fixes the absorption sequence and the business case carries the cost/risk posture; there is no formal investment appraisal or portfolio benefits tracking.",
+          "it_security": "Tenant isolation is structural (RLS on every tenant table), secrets are write-only, the repository is scanned on every PR and the public page neutralises author markup; there is no security architecture review cycle.",
+          "operating_unit_participation": "There is one operating unit (the programme itself); the organisation catalogue positions exist but no job release is bound to a running project.",
+          "senior_management": "The owner is the sponsor and decision-maker and chairs the Architecture Board, whose charter, commissioning authority and decision limits are now rows; one board decision records the capability adoption. There is no standing board cadence yet."
+        },
+        "method": "a review judgement against evidence a reviewer can open; each dimension's evidence is named below",
+        "previous": "P0 MA-1, dated 2026-11-17, mean 1.8/5",
+        "scope": "the conveyor programme's own architecture capability"
+      },
+      "id": "01a1f2ca-fe22-7090-880f-db955a45d9f6",
+      "score": 3,
+      "stage": "under development (baseline 2026-11-19)"
+    },
+    {
+      "assessed_at": "2026-11-19T07:52:31.86611+00:00",
+      "assessment_id": "01a1f2ca-fdf6-7698-b685-e1e94dd454be",
+      "dimension": "business_linkage",
+      "evidence": {
+        "baseline_date": "2026-11-19",
+        "dimensions": {
+          "architecture_communication": "The public design pack, the published output set and the required review of each document make the architecture readable; no stakeholder engagement cycle has run.",
+          "architecture_development": "The typed artefact repository exists and three Preliminary artefacts are rows with entries and links. No HLD or SD design exists for a delivery, so the discipline is exercised but not yet standard practice.",
+          "architecture_governance": "The board, the four contract kinds and the waiver rule are rows and actions; the first contract is requested and no delivery design gate has yet resolved against a live contract.",
+          "architecture_process": "The ADM phases, the four contract kinds and the phase-advance refusal exist as rows and actions (migrations/0054_architecture.sql; crates/actions/src/architecture.rs). One Preliminary capability is being accepted; no Phase A-H has yet run for a delivery.",
+          "business_linkage": "P0's benefits map names output -> capability -> outcome -> benefit -> objective; no benefit baseline has been measured, so no improvement can yet be demonstrated.",
+          "investment_strategy": "ADR 0005 fixes the absorption sequence and the business case carries the cost/risk posture; there is no formal investment appraisal or portfolio benefits tracking.",
+          "it_security": "Tenant isolation is structural (RLS on every tenant table), secrets are write-only, the repository is scanned on every PR and the public page neutralises author markup; there is no security architecture review cycle.",
+          "operating_unit_participation": "There is one operating unit (the programme itself); the organisation catalogue positions exist but no job release is bound to a running project.",
+          "senior_management": "The owner is the sponsor and decision-maker and chairs the Architecture Board, whose charter, commissioning authority and decision limits are now rows; one board decision records the capability adoption. There is no standing board cadence yet."
+        },
+        "method": "a review judgement against evidence a reviewer can open; each dimension's evidence is named below",
+        "previous": "P0 MA-1, dated 2026-11-17, mean 1.8/5",
+        "scope": "the conveyor programme's own architecture capability"
+      },
+      "id": "01a1f2ca-fe5f-7ea8-b9b5-f9b52d66c710",
+      "score": 2,
+      "stage": "under development (baseline 2026-11-19)"
+    },
+    {
+      "assessed_at": "2026-11-19T07:52:31.86611+00:00",
+      "assessment_id": "01a1f2ca-fdf6-7698-b685-e1e94dd454be",
+      "dimension": "investment_strategy",
+      "evidence": {
+        "baseline_date": "2026-11-19",
+        "dimensions": {
+          "architecture_communication": "The public design pack, the published output set and the required review of each document make the architecture readable; no stakeholder engagement cycle has run.",
+          "architecture_development": "The typed artefact repository exists and three Preliminary artefacts are rows with entries and links. No HLD or SD design exists for a delivery, so the discipline is exercised but not yet standard practice.",
+          "architecture_governance": "The board, the four contract kinds and the waiver rule are rows and actions; the first contract is requested and no delivery design gate has yet resolved against a live contract.",
+          "architecture_process": "The ADM phases, the four contract kinds and the phase-advance refusal exist as rows and actions (migrations/0054_architecture.sql; crates/actions/src/architecture.rs). One Preliminary capability is being accepted; no Phase A-H has yet run for a delivery.",
+          "business_linkage": "P0's benefits map names output -> capability -> outcome -> benefit -> objective; no benefit baseline has been measured, so no improvement can yet be demonstrated.",
+          "investment_strategy": "ADR 0005 fixes the absorption sequence and the business case carries the cost/risk posture; there is no formal investment appraisal or portfolio benefits tracking.",
+          "it_security": "Tenant isolation is structural (RLS on every tenant table), secrets are write-only, the repository is scanned on every PR and the public page neutralises author markup; there is no security architecture review cycle.",
+          "operating_unit_participation": "There is one operating unit (the programme itself); the organisation catalogue positions exist but no job release is bound to a running project.",
+          "senior_management": "The owner is the sponsor and decision-maker and chairs the Architecture Board, whose charter, commissioning authority and decision limits are now rows; one board decision records the capability adoption. There is no standing board cadence yet."
+        },
+        "method": "a review judgement against evidence a reviewer can open; each dimension's evidence is named below",
+        "previous": "P0 MA-1, dated 2026-11-17, mean 1.8/5",
+        "scope": "the conveyor programme's own architecture capability"
+      },
+      "id": "01a1f2ca-ff10-78d4-bbb4-02410d09768c",
+      "score": 2,
+      "stage": "under development (baseline 2026-11-19)"
+    },
+    {
+      "assessed_at": "2026-11-19T07:52:31.86611+00:00",
+      "assessment_id": "01a1f2ca-fdf6-7698-b685-e1e94dd454be",
+      "dimension": "it_security",
+      "evidence": {
+        "baseline_date": "2026-11-19",
+        "dimensions": {
+          "architecture_communication": "The public design pack, the published output set and the required review of each document make the architecture readable; no stakeholder engagement cycle has run.",
+          "architecture_development": "The typed artefact repository exists and three Preliminary artefacts are rows with entries and links. No HLD or SD design exists for a delivery, so the discipline is exercised but not yet standard practice.",
+          "architecture_governance": "The board, the four contract kinds and the waiver rule are rows and actions; the first contract is requested and no delivery design gate has yet resolved against a live contract.",
+          "architecture_process": "The ADM phases, the four contract kinds and the phase-advance refusal exist as rows and actions (migrations/0054_architecture.sql; crates/actions/src/architecture.rs). One Preliminary capability is being accepted; no Phase A-H has yet run for a delivery.",
+          "business_linkage": "P0's benefits map names output -> capability -> outcome -> benefit -> objective; no benefit baseline has been measured, so no improvement can yet be demonstrated.",
+          "investment_strategy": "ADR 0005 fixes the absorption sequence and the business case carries the cost/risk posture; there is no formal investment appraisal or portfolio benefits tracking.",
+          "it_security": "Tenant isolation is structural (RLS on every tenant table), secrets are write-only, the repository is scanned on every PR and the public page neutralises author markup; there is no security architecture review cycle.",
+          "operating_unit_participation": "There is one operating unit (the programme itself); the organisation catalogue positions exist but no job release is bound to a running project.",
+          "senior_management": "The owner is the sponsor and decision-maker and chairs the Architecture Board, whose charter, commissioning authority and decision limits are now rows; one board decision records the capability adoption. There is no standing board cadence yet."
+        },
+        "method": "a review judgement against evidence a reviewer can open; each dimension's evidence is named below",
+        "previous": "P0 MA-1, dated 2026-11-17, mean 1.8/5",
+        "scope": "the conveyor programme's own architecture capability"
+      },
+      "id": "01a1f2ca-fed5-7738-9430-950238053654",
+      "score": 3,
+      "stage": "under development (baseline 2026-11-19)"
+    },
+    {
+      "assessed_at": "2026-11-19T07:52:31.86611+00:00",
+      "assessment_id": "01a1f2ca-fdf6-7698-b685-e1e94dd454be",
+      "dimension": "operating_unit_participation",
+      "evidence": {
+        "baseline_date": "2026-11-19",
+        "dimensions": {
+          "architecture_communication": "The public design pack, the published output set and the required review of each document make the architecture readable; no stakeholder engagement cycle has run.",
+          "architecture_development": "The typed artefact repository exists and three Preliminary artefacts are rows with entries and links. No HLD or SD design exists for a delivery, so the discipline is exercised but not yet standard practice.",
+          "architecture_governance": "The board, the four contract kinds and the waiver rule are rows and actions; the first contract is requested and no delivery design gate has yet resolved against a live contract.",
+          "architecture_process": "The ADM phases, the four contract kinds and the phase-advance refusal exist as rows and actions (migrations/0054_architecture.sql; crates/actions/src/architecture.rs). One Preliminary capability is being accepted; no Phase A-H has yet run for a delivery.",
+          "business_linkage": "P0's benefits map names output -> capability -> outcome -> benefit -> objective; no benefit baseline has been measured, so no improvement can yet be demonstrated.",
+          "investment_strategy": "ADR 0005 fixes the absorption sequence and the business case carries the cost/risk posture; there is no formal investment appraisal or portfolio benefits tracking.",
+          "it_security": "Tenant isolation is structural (RLS on every tenant table), secrets are write-only, the repository is scanned on every PR and the public page neutralises author markup; there is no security architecture review cycle.",
+          "operating_unit_participation": "There is one operating unit (the programme itself); the organisation catalogue positions exist but no job release is bound to a running project.",
+          "senior_management": "The owner is the sponsor and decision-maker and chairs the Architecture Board, whose charter, commissioning authority and decision limits are now rows; one board decision records the capability adoption. There is no standing board cadence yet."
+        },
+        "method": "a review judgement against evidence a reviewer can open; each dimension's evidence is named below",
+        "previous": "P0 MA-1, dated 2026-11-17, mean 1.8/5",
+        "scope": "the conveyor programme's own architecture capability"
+      },
+      "id": "01a1f2ca-fe9b-7283-b896-fef2ce542722",
+      "score": 1,
+      "stage": "under development (baseline 2026-11-19)"
+    },
+    {
+      "assessed_at": "2026-11-19T07:52:31.86611+00:00",
+      "assessment_id": "01a1f2ca-fdf6-7698-b685-e1e94dd454be",
+      "dimension": "senior_management",
+      "evidence": {
+        "baseline_date": "2026-11-19",
+        "dimensions": {
+          "architecture_communication": "The public design pack, the published output set and the required review of each document make the architecture readable; no stakeholder engagement cycle has run.",
+          "architecture_development": "The typed artefact repository exists and three Preliminary artefacts are rows with entries and links. No HLD or SD design exists for a delivery, so the discipline is exercised but not yet standard practice.",
+          "architecture_governance": "The board, the four contract kinds and the waiver rule are rows and actions; the first contract is requested and no delivery design gate has yet resolved against a live contract.",
+          "architecture_process": "The ADM phases, the four contract kinds and the phase-advance refusal exist as rows and actions (migrations/0054_architecture.sql; crates/actions/src/architecture.rs). One Preliminary capability is being accepted; no Phase A-H has yet run for a delivery.",
+          "business_linkage": "P0's benefits map names output -> capability -> outcome -> benefit -> objective; no benefit baseline has been measured, so no improvement can yet be demonstrated.",
+          "investment_strategy": "ADR 0005 fixes the absorption sequence and the business case carries the cost/risk posture; there is no formal investment appraisal or portfolio benefits tracking.",
+          "it_security": "Tenant isolation is structural (RLS on every tenant table), secrets are write-only, the repository is scanned on every PR and the public page neutralises author markup; there is no security architecture review cycle.",
+          "operating_unit_participation": "There is one operating unit (the programme itself); the organisation catalogue positions exist but no job release is bound to a running project.",
+          "senior_management": "The owner is the sponsor and decision-maker and chairs the Architecture Board, whose charter, commissioning authority and decision limits are now rows; one board decision records the capability adoption. There is no standing board cadence yet."
+        },
+        "method": "a review judgement against evidence a reviewer can open; each dimension's evidence is named below",
+        "previous": "P0 MA-1, dated 2026-11-17, mean 1.8/5",
+        "scope": "the conveyor programme's own architecture capability"
+      },
+      "id": "01a1f2ca-fe7d-7451-a530-812385af7d99",
+      "score": 3,
+      "stage": "under development (baseline 2026-11-19)"
+    },
+    {
+      "assessed_at": "2026-11-19T07:42:58.586585+00:00",
+      "assessment_id": "01a1f2c2-3e8c-730f-906d-cd2baf65722a",
+      "dimension": "architecture_communication",
+      "evidence": {
+        "baseline_date": "2026-11-19",
+        "dimensions": {
+          "architecture_communication": "The public design pack, the published output set and the required review of each document make the architecture readable; no stakeholder engagement cycle has run.",
+          "architecture_development": "The typed artefact repository exists and three Preliminary artefacts are rows with entries and links. No HLD or SD design exists for a delivery, so the discipline is exercised but not yet standard practice.",
+          "architecture_governance": "The board, the four contract kinds and the waiver rule are rows and actions; the first contract is requested and no delivery design gate has yet resolved against a live contract.",
+          "architecture_process": "The ADM phases, the four contract kinds and the phase-advance refusal exist as rows and actions (migrations/0054_architecture.sql; crates/actions/src/architecture.rs). One Preliminary capability is being accepted; no Phase A-H has yet run for a delivery.",
+          "business_linkage": "P0's benefits map names output -> capability -> outcome -> benefit -> objective; no benefit baseline has been measured, so no improvement can yet be demonstrated.",
+          "investment_strategy": "ADR 0005 fixes the absorption sequence and the business case carries the cost/risk posture; there is no formal investment appraisal or portfolio benefits tracking.",
+          "it_security": "Tenant isolation is structural (RLS on every tenant table), secrets are write-only, the repository is scanned on every PR and the public page neutralises author markup; there is no security architecture review cycle.",
+          "operating_unit_participation": "There is one operating unit (the programme itself); the organisation catalogue positions exist but no job release is bound to a running project.",
+          "senior_management": "The owner is the sponsor and decision-maker and chairs the Architecture Board, whose charter, commissioning authority and decision limits are now rows; one board decision records the capability adoption. There is no standing board cadence yet."
+        },
+        "method": "a review judgement against evidence a reviewer can open; each dimension's evidence is named below",
+        "previous": "P0 MA-1, dated 2026-11-17, mean 1.8/5",
+        "scope": "the conveyor programme's own architecture capability"
+      },
+      "id": "01a1f2c2-3f45-7d69-bc5c-31fc5a9a777a",
+      "score": 2,
+      "stage": "under development (baseline 2026-11-19)"
+    },
+    {
+      "assessed_at": "2026-11-19T07:42:58.586585+00:00",
+      "assessment_id": "01a1f2c2-3e8c-730f-906d-cd2baf65722a",
+      "dimension": "architecture_development",
+      "evidence": {
+        "baseline_date": "2026-11-19",
+        "dimensions": {
+          "architecture_communication": "The public design pack, the published output set and the required review of each document make the architecture readable; no stakeholder engagement cycle has run.",
+          "architecture_development": "The typed artefact repository exists and three Preliminary artefacts are rows with entries and links. No HLD or SD design exists for a delivery, so the discipline is exercised but not yet standard practice.",
+          "architecture_governance": "The board, the four contract kinds and the waiver rule are rows and actions; the first contract is requested and no delivery design gate has yet resolved against a live contract.",
+          "architecture_process": "The ADM phases, the four contract kinds and the phase-advance refusal exist as rows and actions (migrations/0054_architecture.sql; crates/actions/src/architecture.rs). One Preliminary capability is being accepted; no Phase A-H has yet run for a delivery.",
+          "business_linkage": "P0's benefits map names output -> capability -> outcome -> benefit -> objective; no benefit baseline has been measured, so no improvement can yet be demonstrated.",
+          "investment_strategy": "ADR 0005 fixes the absorption sequence and the business case carries the cost/risk posture; there is no formal investment appraisal or portfolio benefits tracking.",
+          "it_security": "Tenant isolation is structural (RLS on every tenant table), secrets are write-only, the repository is scanned on every PR and the public page neutralises author markup; there is no security architecture review cycle.",
+          "operating_unit_participation": "There is one operating unit (the programme itself); the organisation catalogue positions exist but no job release is bound to a running project.",
+          "senior_management": "The owner is the sponsor and decision-maker and chairs the Architecture Board, whose charter, commissioning authority and decision limits are now rows; one board decision records the capability adoption. There is no standing board cadence yet."
+        },
+        "method": "a review judgement against evidence a reviewer can open; each dimension's evidence is named below",
+        "previous": "P0 MA-1, dated 2026-11-17, mean 1.8/5",
+        "scope": "the conveyor programme's own architecture capability"
+      },
+      "id": "01a1f2c2-3ed7-799c-8d07-7a854943665a",
+      "score": 2,
+      "stage": "under development (baseline 2026-11-19)"
+    },
+    {
+      "assessed_at": "2026-11-19T07:42:58.586585+00:00",
+      "assessment_id": "01a1f2c2-3e8c-730f-906d-cd2baf65722a",
+      "dimension": "architecture_governance",
+      "evidence": {
+        "baseline_date": "2026-11-19",
+        "dimensions": {
+          "architecture_communication": "The public design pack, the published output set and the required review of each document make the architecture readable; no stakeholder engagement cycle has run.",
+          "architecture_development": "The typed artefact repository exists and three Preliminary artefacts are rows with entries and links. No HLD or SD design exists for a delivery, so the discipline is exercised but not yet standard practice.",
+          "architecture_governance": "The board, the four contract kinds and the waiver rule are rows and actions; the first contract is requested and no delivery design gate has yet resolved against a live contract.",
+          "architecture_process": "The ADM phases, the four contract kinds and the phase-advance refusal exist as rows and actions (migrations/0054_architecture.sql; crates/actions/src/architecture.rs). One Preliminary capability is being accepted; no Phase A-H has yet run for a delivery.",
+          "business_linkage": "P0's benefits map names output -> capability -> outcome -> benefit -> objective; no benefit baseline has been measured, so no improvement can yet be demonstrated.",
+          "investment_strategy": "ADR 0005 fixes the absorption sequence and the business case carries the cost/risk posture; there is no formal investment appraisal or portfolio benefits tracking.",
+          "it_security": "Tenant isolation is structural (RLS on every tenant table), secrets are write-only, the repository is scanned on every PR and the public page neutralises author markup; there is no security architecture review cycle.",
+          "operating_unit_participation": "There is one operating unit (the programme itself); the organisation catalogue positions exist but no job release is bound to a running project.",
+          "senior_management": "The owner is the sponsor and decision-maker and chairs the Architecture Board, whose charter, commissioning authority and decision limits are now rows; one board decision records the capability adoption. There is no standing board cadence yet."
+        },
+        "method": "a review judgement against evidence a reviewer can open; each dimension's evidence is named below",
+        "previous": "P0 MA-1, dated 2026-11-17, mean 1.8/5",
+        "scope": "the conveyor programme's own architecture capability"
+      },
+      "id": "01a1f2c2-3f7b-7572-9642-2b9315270574",
+      "score": 2,
+      "stage": "under development (baseline 2026-11-19)"
+    },
+    {
+      "assessed_at": "2026-11-19T07:42:58.586585+00:00",
+      "assessment_id": "01a1f2c2-3e8c-730f-906d-cd2baf65722a",
+      "dimension": "architecture_process",
+      "evidence": {
+        "baseline_date": "2026-11-19",
+        "dimensions": {
+          "architecture_communication": "The public design pack, the published output set and the required review of each document make the architecture readable; no stakeholder engagement cycle has run.",
+          "architecture_development": "The typed artefact repository exists and three Preliminary artefacts are rows with entries and links. No HLD or SD design exists for a delivery, so the discipline is exercised but not yet standard practice.",
+          "architecture_governance": "The board, the four contract kinds and the waiver rule are rows and actions; the first contract is requested and no delivery design gate has yet resolved against a live contract.",
+          "architecture_process": "The ADM phases, the four contract kinds and the phase-advance refusal exist as rows and actions (migrations/0054_architecture.sql; crates/actions/src/architecture.rs). One Preliminary capability is being accepted; no Phase A-H has yet run for a delivery.",
+          "business_linkage": "P0's benefits map names output -> capability -> outcome -> benefit -> objective; no benefit baseline has been measured, so no improvement can yet be demonstrated.",
+          "investment_strategy": "ADR 0005 fixes the absorption sequence and the business case carries the cost/risk posture; there is no formal investment appraisal or portfolio benefits tracking.",
+          "it_security": "Tenant isolation is structural (RLS on every tenant table), secrets are write-only, the repository is scanned on every PR and the public page neutralises author markup; there is no security architecture review cycle.",
+          "operating_unit_participation": "There is one operating unit (the programme itself); the organisation catalogue positions exist but no job release is bound to a running project.",
+          "senior_management": "The owner is the sponsor and decision-maker and chairs the Architecture Board, whose charter, commissioning authority and decision limits are now rows; one board decision records the capability adoption. There is no standing board cadence yet."
+        },
+        "method": "a review judgement against evidence a reviewer can open; each dimension's evidence is named below",
+        "previous": "P0 MA-1, dated 2026-11-17, mean 1.8/5",
+        "scope": "the conveyor programme's own architecture capability"
+      },
+      "id": "01a1f2c2-3eb9-7508-a0f5-27a4b892e84c",
+      "score": 3,
+      "stage": "under development (baseline 2026-11-19)"
+    },
+    {
+      "assessed_at": "2026-11-19T07:42:58.586585+00:00",
+      "assessment_id": "01a1f2c2-3e8c-730f-906d-cd2baf65722a",
+      "dimension": "business_linkage",
+      "evidence": {
+        "baseline_date": "2026-11-19",
+        "dimensions": {
+          "architecture_communication": "The public design pack, the published output set and the required review of each document make the architecture readable; no stakeholder engagement cycle has run.",
+          "architecture_development": "The typed artefact repository exists and three Preliminary artefacts are rows with entries and links. No HLD or SD design exists for a delivery, so the discipline is exercised but not yet standard practice.",
+          "architecture_governance": "The board, the four contract kinds and the waiver rule are rows and actions; the first contract is requested and no delivery design gate has yet resolved against a live contract.",
+          "architecture_process": "The ADM phases, the four contract kinds and the phase-advance refusal exist as rows and actions (migrations/0054_architecture.sql; crates/actions/src/architecture.rs). One Preliminary capability is being accepted; no Phase A-H has yet run for a delivery.",
+          "business_linkage": "P0's benefits map names output -> capability -> outcome -> benefit -> objective; no benefit baseline has been measured, so no improvement can yet be demonstrated.",
+          "investment_strategy": "ADR 0005 fixes the absorption sequence and the business case carries the cost/risk posture; there is no formal investment appraisal or portfolio benefits tracking.",
+          "it_security": "Tenant isolation is structural (RLS on every tenant table), secrets are write-only, the repository is scanned on every PR and the public page neutralises author markup; there is no security architecture review cycle.",
+          "operating_unit_participation": "There is one operating unit (the programme itself); the organisation catalogue positions exist but no job release is bound to a running project.",
+          "senior_management": "The owner is the sponsor and decision-maker and chairs the Architecture Board, whose charter, commissioning authority and decision limits are now rows; one board decision records the capability adoption. There is no standing board cadence yet."
+        },
+        "method": "a review judgement against evidence a reviewer can open; each dimension's evidence is named below",
+        "previous": "P0 MA-1, dated 2026-11-17, mean 1.8/5",
+        "scope": "the conveyor programme's own architecture capability"
+      },
+      "id": "01a1f2c2-3ef3-72b0-8a13-54044b190c5c",
+      "score": 2,
+      "stage": "under development (baseline 2026-11-19)"
+    },
+    {
+      "assessed_at": "2026-11-19T07:42:58.586585+00:00",
+      "assessment_id": "01a1f2c2-3e8c-730f-906d-cd2baf65722a",
+      "dimension": "investment_strategy",
+      "evidence": {
+        "baseline_date": "2026-11-19",
+        "dimensions": {
+          "architecture_communication": "The public design pack, the published output set and the required review of each document make the architecture readable; no stakeholder engagement cycle has run.",
+          "architecture_development": "The typed artefact repository exists and three Preliminary artefacts are rows with entries and links. No HLD or SD design exists for a delivery, so the discipline is exercised but not yet standard practice.",
+          "architecture_governance": "The board, the four contract kinds and the waiver rule are rows and actions; the first contract is requested and no delivery design gate has yet resolved against a live contract.",
+          "architecture_process": "The ADM phases, the four contract kinds and the phase-advance refusal exist as rows and actions (migrations/0054_architecture.sql; crates/actions/src/architecture.rs). One Preliminary capability is being accepted; no Phase A-H has yet run for a delivery.",
+          "business_linkage": "P0's benefits map names output -> capability -> outcome -> benefit -> objective; no benefit baseline has been measured, so no improvement can yet be demonstrated.",
+          "investment_strategy": "ADR 0005 fixes the absorption sequence and the business case carries the cost/risk posture; there is no formal investment appraisal or portfolio benefits tracking.",
+          "it_security": "Tenant isolation is structural (RLS on every tenant table), secrets are write-only, the repository is scanned on every PR and the public page neutralises author markup; there is no security architecture review cycle.",
+          "operating_unit_participation": "There is one operating unit (the programme itself); the organisation catalogue positions exist but no job release is bound to a running project.",
+          "senior_management": "The owner is the sponsor and decision-maker and chairs the Architecture Board, whose charter, commissioning authority and decision limits are now rows; one board decision records the capability adoption. There is no standing board cadence yet."
+        },
+        "method": "a review judgement against evidence a reviewer can open; each dimension's evidence is named below",
+        "previous": "P0 MA-1, dated 2026-11-17, mean 1.8/5",
+        "scope": "the conveyor programme's own architecture capability"
+      },
+      "id": "01a1f2c2-3f95-7ecc-b673-1c7dca9b99b4",
+      "score": 2,
+      "stage": "under development (baseline 2026-11-19)"
+    },
+    {
+      "assessed_at": "2026-11-19T07:42:58.586585+00:00",
+      "assessment_id": "01a1f2c2-3e8c-730f-906d-cd2baf65722a",
+      "dimension": "it_security",
+      "evidence": {
+        "baseline_date": "2026-11-19",
+        "dimensions": {
+          "architecture_communication": "The public design pack, the published output set and the required review of each document make the architecture readable; no stakeholder engagement cycle has run.",
+          "architecture_development": "The typed artefact repository exists and three Preliminary artefacts are rows with entries and links. No HLD or SD design exists for a delivery, so the discipline is exercised but not yet standard practice.",
+          "architecture_governance": "The board, the four contract kinds and the waiver rule are rows and actions; the first contract is requested and no delivery design gate has yet resolved against a live contract.",
+          "architecture_process": "The ADM phases, the four contract kinds and the phase-advance refusal exist as rows and actions (migrations/0054_architecture.sql; crates/actions/src/architecture.rs). One Preliminary capability is being accepted; no Phase A-H has yet run for a delivery.",
+          "business_linkage": "P0's benefits map names output -> capability -> outcome -> benefit -> objective; no benefit baseline has been measured, so no improvement can yet be demonstrated.",
+          "investment_strategy": "ADR 0005 fixes the absorption sequence and the business case carries the cost/risk posture; there is no formal investment appraisal or portfolio benefits tracking.",
+          "it_security": "Tenant isolation is structural (RLS on every tenant table), secrets are write-only, the repository is scanned on every PR and the public page neutralises author markup; there is no security architecture review cycle.",
+          "operating_unit_participation": "There is one operating unit (the programme itself); the organisation catalogue positions exist but no job release is bound to a running project.",
+          "senior_management": "The owner is the sponsor and decision-maker and chairs the Architecture Board, whose charter, commissioning authority and decision limits are now rows; one board decision records the capability adoption. There is no standing board cadence yet."
+        },
+        "method": "a review judgement against evidence a reviewer can open; each dimension's evidence is named below",
+        "previous": "P0 MA-1, dated 2026-11-17, mean 1.8/5",
+        "scope": "the conveyor programme's own architecture capability"
+      },
+      "id": "01a1f2c2-3f60-7d95-8bdb-15e34b82c177",
+      "score": 3,
+      "stage": "under development (baseline 2026-11-19)"
+    },
+    {
+      "assessed_at": "2026-11-19T07:42:58.586585+00:00",
+      "assessment_id": "01a1f2c2-3e8c-730f-906d-cd2baf65722a",
+      "dimension": "operating_unit_participation",
+      "evidence": {
+        "baseline_date": "2026-11-19",
+        "dimensions": {
+          "architecture_communication": "The public design pack, the published output set and the required review of each document make the architecture readable; no stakeholder engagement cycle has run.",
+          "architecture_development": "The typed artefact repository exists and three Preliminary artefacts are rows with entries and links. No HLD or SD design exists for a delivery, so the discipline is exercised but not yet standard practice.",
+          "architecture_governance": "The board, the four contract kinds and the waiver rule are rows and actions; the first contract is requested and no delivery design gate has yet resolved against a live contract.",
+          "architecture_process": "The ADM phases, the four contract kinds and the phase-advance refusal exist as rows and actions (migrations/0054_architecture.sql; crates/actions/src/architecture.rs). One Preliminary capability is being accepted; no Phase A-H has yet run for a delivery.",
+          "business_linkage": "P0's benefits map names output -> capability -> outcome -> benefit -> objective; no benefit baseline has been measured, so no improvement can yet be demonstrated.",
+          "investment_strategy": "ADR 0005 fixes the absorption sequence and the business case carries the cost/risk posture; there is no formal investment appraisal or portfolio benefits tracking.",
+          "it_security": "Tenant isolation is structural (RLS on every tenant table), secrets are write-only, the repository is scanned on every PR and the public page neutralises author markup; there is no security architecture review cycle.",
+          "operating_unit_participation": "There is one operating unit (the programme itself); the organisation catalogue positions exist but no job release is bound to a running project.",
+          "senior_management": "The owner is the sponsor and decision-maker and chairs the Architecture Board, whose charter, commissioning authority and decision limits are now rows; one board decision records the capability adoption. There is no standing board cadence yet."
+        },
+        "method": "a review judgement against evidence a reviewer can open; each dimension's evidence is named below",
+        "previous": "P0 MA-1, dated 2026-11-17, mean 1.8/5",
+        "scope": "the conveyor programme's own architecture capability"
+      },
+      "id": "01a1f2c2-3f29-7bbe-9e67-e3e563766790",
+      "score": 1,
+      "stage": "under development (baseline 2026-11-19)"
+    },
+    {
+      "assessed_at": "2026-11-19T07:42:58.586585+00:00",
+      "assessment_id": "01a1f2c2-3e8c-730f-906d-cd2baf65722a",
+      "dimension": "senior_management",
+      "evidence": {
+        "baseline_date": "2026-11-19",
+        "dimensions": {
+          "architecture_communication": "The public design pack, the published output set and the required review of each document make the architecture readable; no stakeholder engagement cycle has run.",
+          "architecture_development": "The typed artefact repository exists and three Preliminary artefacts are rows with entries and links. No HLD or SD design exists for a delivery, so the discipline is exercised but not yet standard practice.",
+          "architecture_governance": "The board, the four contract kinds and the waiver rule are rows and actions; the first contract is requested and no delivery design gate has yet resolved against a live contract.",
+          "architecture_process": "The ADM phases, the four contract kinds and the phase-advance refusal exist as rows and actions (migrations/0054_architecture.sql; crates/actions/src/architecture.rs). One Preliminary capability is being accepted; no Phase A-H has yet run for a delivery.",
+          "business_linkage": "P0's benefits map names output -> capability -> outcome -> benefit -> objective; no benefit baseline has been measured, so no improvement can yet be demonstrated.",
+          "investment_strategy": "ADR 0005 fixes the absorption sequence and the business case carries the cost/risk posture; there is no formal investment appraisal or portfolio benefits tracking.",
+          "it_security": "Tenant isolation is structural (RLS on every tenant table), secrets are write-only, the repository is scanned on every PR and the public page neutralises author markup; there is no security architecture review cycle.",
+          "operating_unit_participation": "There is one operating unit (the programme itself); the organisation catalogue positions exist but no job release is bound to a running project.",
+          "senior_management": "The owner is the sponsor and decision-maker and chairs the Architecture Board, whose charter, commissioning authority and decision limits are now rows; one board decision records the capability adoption. There is no standing board cadence yet."
+        },
+        "method": "a review judgement against evidence a reviewer can open; each dimension's evidence is named below",
+        "previous": "P0 MA-1, dated 2026-11-17, mean 1.8/5",
+        "scope": "the conveyor programme's own architecture capability"
+      },
+      "id": "01a1f2c2-3f0e-793e-ad69-b7d235438652",
+      "score": 3,
+      "stage": "under development (baseline 2026-11-19)"
+    }
+  ],
+  "profiles": [
+    {
+      "adopted_at": "2026-11-19T07:50:26.220655+00:00",
+      "artifact_requirements": {
+        "a": {
+          "psa": [
+            "stakeholder_map",
+            "driver_goal_objective",
+            "requirements_catalog",
+            "solution_concept"
+          ]
+        },
+        "b": {
+          "hld": [
+            "business_capability_map"
+          ]
+        },
+        "c": {
+          "hld": [
+            "data_entity_catalog"
+          ]
+        },
+        "d": {
+          "hld": [
+            "technology_standards"
+          ]
+        },
+        "preliminary": {
+          "psa": [
+            "principles_catalog",
+            "principle_derivation",
+            "principle_realization"
+          ]
+        }
+      },
+      "board_decision_id": "01a1f2c8-e26f-79ce-a082-5526648a47c5",
+      "contract_kinds": {
+        "a": "statement_of_architecture_work",
+        "f": "delivery_contract",
+        "g": "statement_of_intent",
+        "h": "request_for_architecture"
+      },
+      "id": "01a1f2c1-14c1-74c5-a078-eef117c4f82c",
+      "key": "conveyor-software-delivery",
+      "name": "Conveyor software delivery — tailored ADM",
+      "phase_set": [
+        "preliminary",
+        "a",
+        "b",
+        "c",
+        "d",
+        "e",
+        "f",
+        "g",
+        "h"
+      ],
+      "status": "adopted",
+      "version": 3
+    }
+  ],
+  "schema": "design-snapshot/v1",
+  "skills": [
+    {
+      "assessed_at": "2026-11-19T07:43:16.745463+00:00",
+      "assessment_id": "9ce8e8d6-d665-47b6-bde7-4dcf33411686",
+      "category": "architecture",
+      "evidence": {
+        "baseline_date": "2026-11-19",
+        "note": "Unstaffed; the benefit profiles name the BCM as their owner while the position is unstaffed, recorded here as a governance gap.",
+        "previous": "P0 SA-1, dated 2026-11-17"
+      },
+      "id": "01a1f2c2-85e5-7291-a052-5cb57c645f04",
+      "job_key": "business-change-manager",
+      "proficiency": 0,
+      "role": "business change manager (position, unstaffed)"
+    },
+    {
+      "assessed_at": "2026-11-19T07:43:16.745463+00:00",
+      "assessment_id": "9ce8e8d6-d665-47b6-bde7-4dcf33411686",
+      "category": "business",
+      "evidence": {
+        "baseline_date": "2026-11-19",
+        "note": "Unstaffed; the benefit profiles name the BCM as their owner while the position is unstaffed, recorded here as a governance gap.",
+        "previous": "P0 SA-1, dated 2026-11-17"
+      },
+      "id": "01a1f2c2-85ca-7765-81c6-1d77a2021d22",
+      "job_key": "business-change-manager",
+      "proficiency": 0,
+      "role": "business change manager (position, unstaffed)"
+    },
+    {
+      "assessed_at": "2026-11-19T07:43:16.745463+00:00",
+      "assessment_id": "9ce8e8d6-d665-47b6-bde7-4dcf33411686",
+      "category": "general",
+      "evidence": {
+        "baseline_date": "2026-11-19",
+        "note": "Unstaffed; the benefit profiles name the BCM as their owner while the position is unstaffed, recorded here as a governance gap.",
+        "previous": "P0 SA-1, dated 2026-11-17"
+      },
+      "id": "01a1f2c2-85a9-76d4-b20c-bb3150d0714e",
+      "job_key": "business-change-manager",
+      "proficiency": 0,
+      "role": "business change manager (position, unstaffed)"
+    },
+    {
+      "assessed_at": "2026-11-19T07:43:16.745463+00:00",
+      "assessment_id": "9ce8e8d6-d665-47b6-bde7-4dcf33411686",
+      "category": "it_knowledge",
+      "evidence": {
+        "baseline_date": "2026-11-19",
+        "note": "Unstaffed; the benefit profiles name the BCM as their owner while the position is unstaffed, recorded here as a governance gap.",
+        "previous": "P0 SA-1, dated 2026-11-17"
+      },
+      "id": "01a1f2c2-8619-7ccb-bf9c-4d0bea2819d6",
+      "job_key": "business-change-manager",
+      "proficiency": 0,
+      "role": "business change manager (position, unstaffed)"
+    },
+    {
+      "assessed_at": "2026-11-19T07:43:16.745463+00:00",
+      "assessment_id": "9ce8e8d6-d665-47b6-bde7-4dcf33411686",
+      "category": "legal",
+      "evidence": {
+        "baseline_date": "2026-11-19",
+        "note": "Unstaffed; the benefit profiles name the BCM as their owner while the position is unstaffed, recorded here as a governance gap.",
+        "previous": "P0 SA-1, dated 2026-11-17"
+      },
+      "id": "01a1f2c2-8651-740b-88f6-5c9d1e013bcf",
+      "job_key": "business-change-manager",
+      "proficiency": 0,
+      "role": "business change manager (position, unstaffed)"
+    },
+    {
+      "assessed_at": "2026-11-19T07:43:16.745463+00:00",
+      "assessment_id": "9ce8e8d6-d665-47b6-bde7-4dcf33411686",
+      "category": "programme_management",
+      "evidence": {
+        "baseline_date": "2026-11-19",
+        "note": "Unstaffed; the benefit profiles name the BCM as their owner while the position is unstaffed, recorded here as a governance gap.",
+        "previous": "P0 SA-1, dated 2026-11-17"
+      },
+      "id": "01a1f2c2-85ff-7289-8b7b-5008431a8d45",
+      "job_key": "business-change-manager",
+      "proficiency": 0,
+      "role": "business change manager (position, unstaffed)"
+    },
+    {
+      "assessed_at": "2026-11-19T07:43:16.745463+00:00",
+      "assessment_id": "9ce8e8d6-d665-47b6-bde7-4dcf33411686",
+      "category": "technical",
+      "evidence": {
+        "baseline_date": "2026-11-19",
+        "note": "Unstaffed; the benefit profiles name the BCM as their owner while the position is unstaffed, recorded here as a governance gap.",
+        "previous": "P0 SA-1, dated 2026-11-17"
+      },
+      "id": "01a1f2c2-8635-7358-b9d0-d13dcf605bdd",
+      "job_key": "business-change-manager",
+      "proficiency": 0,
+      "role": "business change manager (position, unstaffed)"
+    },
+    {
+      "assessed_at": "2026-11-19T07:43:14.704091+00:00",
+      "assessment_id": "9ce8e8d6-d665-47b6-bde7-4dcf33411686",
+      "category": "architecture",
+      "evidence": {
+        "baseline_date": "2026-11-19",
+        "note": "The catalogue position exists and no holder is bound; recorded as none, which is a gap.",
+        "previous": "P0 SA-1, dated 2026-11-17"
+      },
+      "id": "01a1f2c2-7dea-7481-941a-a8d0519f4711",
+      "job_key": "programme-manager",
+      "proficiency": 0,
+      "role": "programme manager (position, unstaffed)"
+    },
+    {
+      "assessed_at": "2026-11-19T07:43:14.704091+00:00",
+      "assessment_id": "9ce8e8d6-d665-47b6-bde7-4dcf33411686",
+      "category": "business",
+      "evidence": {
+        "baseline_date": "2026-11-19",
+        "note": "The catalogue position exists and no holder is bound; recorded as none, which is a gap.",
+        "previous": "P0 SA-1, dated 2026-11-17"
+      },
+      "id": "01a1f2c2-7dcf-7479-a905-1f50231f378f",
+      "job_key": "programme-manager",
+      "proficiency": 0,
+      "role": "programme manager (position, unstaffed)"
+    },
+    {
+      "assessed_at": "2026-11-19T07:43:14.704091+00:00",
+      "assessment_id": "9ce8e8d6-d665-47b6-bde7-4dcf33411686",
+      "category": "general",
+      "evidence": {
+        "baseline_date": "2026-11-19",
+        "note": "The catalogue position exists and no holder is bound; recorded as none, which is a gap.",
+        "previous": "P0 SA-1, dated 2026-11-17"
+      },
+      "id": "01a1f2c2-7db3-7287-a987-da4a71f077a5",
+      "job_key": "programme-manager",
+      "proficiency": 0,
+      "role": "programme manager (position, unstaffed)"
+    },
+    {
+      "assessed_at": "2026-11-19T07:43:14.704091+00:00",
+      "assessment_id": "9ce8e8d6-d665-47b6-bde7-4dcf33411686",
+      "category": "it_knowledge",
+      "evidence": {
+        "baseline_date": "2026-11-19",
+        "note": "The catalogue position exists and no holder is bound; recorded as none, which is a gap.",
+        "previous": "P0 SA-1, dated 2026-11-17"
+      },
+      "id": "01a1f2c2-7e1f-7019-b982-8dbe7f2e04c1",
+      "job_key": "programme-manager",
+      "proficiency": 0,
+      "role": "programme manager (position, unstaffed)"
+    },
+    {
+      "assessed_at": "2026-11-19T07:43:14.704091+00:00",
+      "assessment_id": "9ce8e8d6-d665-47b6-bde7-4dcf33411686",
+      "category": "legal",
+      "evidence": {
+        "baseline_date": "2026-11-19",
+        "note": "The catalogue position exists and no holder is bound; recorded as none, which is a gap.",
+        "previous": "P0 SA-1, dated 2026-11-17"
+      },
+      "id": "01a1f2c2-7e54-7e23-9bd0-c483d22fb0d5",
+      "job_key": "programme-manager",
+      "proficiency": 0,
+      "role": "programme manager (position, unstaffed)"
+    },
+    {
+      "assessed_at": "2026-11-19T07:43:14.704091+00:00",
+      "assessment_id": "9ce8e8d6-d665-47b6-bde7-4dcf33411686",
+      "category": "programme_management",
+      "evidence": {
+        "baseline_date": "2026-11-19",
+        "note": "The catalogue position exists and no holder is bound; recorded as none, which is a gap.",
+        "previous": "P0 SA-1, dated 2026-11-17"
+      },
+      "id": "01a1f2c2-7e04-7595-8b34-d31578861df4",
+      "job_key": "programme-manager",
+      "proficiency": 0,
+      "role": "programme manager (position, unstaffed)"
+    },
+    {
+      "assessed_at": "2026-11-19T07:43:14.704091+00:00",
+      "assessment_id": "9ce8e8d6-d665-47b6-bde7-4dcf33411686",
+      "category": "technical",
+      "evidence": {
+        "baseline_date": "2026-11-19",
+        "note": "The catalogue position exists and no holder is bound; recorded as none, which is a gap.",
+        "previous": "P0 SA-1, dated 2026-11-17"
+      },
+      "id": "01a1f2c2-7e39-7aed-8894-07dd621f60a0",
+      "job_key": "programme-manager",
+      "proficiency": 0,
+      "role": "programme manager (position, unstaffed)"
+    },
+    {
+      "assessed_at": "2026-11-19T07:43:12.714452+00:00",
+      "assessment_id": "9ce8e8d6-d665-47b6-bde7-4dcf33411686",
+      "category": "architecture",
+      "evidence": {
+        "baseline_date": "2026-11-19",
+        "note": "The contribution protocol and the public design pack; the contributor's own PR is the evidence of technical skill.",
+        "previous": "P0 SA-1, dated 2026-11-17"
+      },
+      "id": "01a1f2c2-761c-7f18-944c-e6aeff387988",
+      "job_key": "outside-contributor",
+      "proficiency": 1,
+      "role": "outside contributor"
+    },
+    {
+      "assessed_at": "2026-11-19T07:43:12.714452+00:00",
+      "assessment_id": "9ce8e8d6-d665-47b6-bde7-4dcf33411686",
+      "category": "business",
+      "evidence": {
+        "baseline_date": "2026-11-19",
+        "note": "The contribution protocol and the public design pack; the contributor's own PR is the evidence of technical skill.",
+        "previous": "P0 SA-1, dated 2026-11-17"
+      },
+      "id": "01a1f2c2-7603-7464-a4e6-df8c78cfe881",
+      "job_key": "outside-contributor",
+      "proficiency": 1,
+      "role": "outside contributor"
+    },
+    {
+      "assessed_at": "2026-11-19T07:43:12.714452+00:00",
+      "assessment_id": "9ce8e8d6-d665-47b6-bde7-4dcf33411686",
+      "category": "general",
+      "evidence": {
+        "baseline_date": "2026-11-19",
+        "note": "The contribution protocol and the public design pack; the contributor's own PR is the evidence of technical skill.",
+        "previous": "P0 SA-1, dated 2026-11-17"
+      },
+      "id": "01a1f2c2-75e8-76b0-bff7-2ce76d0605d7",
+      "job_key": "outside-contributor",
+      "proficiency": 1,
+      "role": "outside contributor"
+    },
+    {
+      "assessed_at": "2026-11-19T07:43:12.714452+00:00",
+      "assessment_id": "9ce8e8d6-d665-47b6-bde7-4dcf33411686",
+      "category": "it_knowledge",
+      "evidence": {
+        "baseline_date": "2026-11-19",
+        "note": "The contribution protocol and the public design pack; the contributor's own PR is the evidence of technical skill.",
+        "previous": "P0 SA-1, dated 2026-11-17"
+      },
+      "id": "01a1f2c2-7651-76f7-b356-0f5e06742d72",
+      "job_key": "outside-contributor",
+      "proficiency": 3,
+      "role": "outside contributor"
+    },
+    {
+      "assessed_at": "2026-11-19T07:43:12.714452+00:00",
+      "assessment_id": "9ce8e8d6-d665-47b6-bde7-4dcf33411686",
+      "category": "legal",
+      "evidence": {
+        "baseline_date": "2026-11-19",
+        "note": "The contribution protocol and the public design pack; the contributor's own PR is the evidence of technical skill.",
+        "previous": "P0 SA-1, dated 2026-11-17"
+      },
+      "id": "01a1f2c2-7685-7307-99cb-955cdb215788",
+      "job_key": "outside-contributor",
+      "proficiency": 1,
+      "role": "outside contributor"
+    },
+    {
+      "assessed_at": "2026-11-19T07:43:12.714452+00:00",
+      "assessment_id": "9ce8e8d6-d665-47b6-bde7-4dcf33411686",
+      "category": "programme_management",
+      "evidence": {
+        "baseline_date": "2026-11-19",
+        "note": "The contribution protocol and the public design pack; the contributor's own PR is the evidence of technical skill.",
+        "previous": "P0 SA-1, dated 2026-11-17"
+      },
+      "id": "01a1f2c2-7636-7ef9-91f0-4bdd948f1163",
+      "job_key": "outside-contributor",
+      "proficiency": 0,
+      "role": "outside contributor"
+    },
+    {
+      "assessed_at": "2026-11-19T07:43:12.714452+00:00",
+      "assessment_id": "9ce8e8d6-d665-47b6-bde7-4dcf33411686",
+      "category": "technical",
+      "evidence": {
+        "baseline_date": "2026-11-19",
+        "note": "The contribution protocol and the public design pack; the contributor's own PR is the evidence of technical skill.",
+        "previous": "P0 SA-1, dated 2026-11-17"
+      },
+      "id": "01a1f2c2-766b-743a-9cd0-8e50bf8ad102",
+      "job_key": "outside-contributor",
+      "proficiency": 3,
+      "role": "outside contributor"
+    },
+    {
+      "assessed_at": "2026-11-19T07:43:10.717769+00:00",
+      "assessment_id": "9ce8e8d6-d665-47b6-bde7-4dcf33411686",
+      "category": "architecture",
+      "evidence": {
+        "baseline_date": "2026-11-19",
+        "note": "The merged code and its tests, the evidence documents and the design pack; no legal authority.",
+        "previous": "P0 SA-1, dated 2026-11-17"
+      },
+      "id": "01a1f2c2-6e50-753d-ad05-a36e695aaa7d",
+      "job_key": "maintainer-session",
+      "proficiency": 3,
+      "role": "maintainer sessions (AI)"
+    },
+    {
+      "assessed_at": "2026-11-19T07:43:10.717769+00:00",
+      "assessment_id": "9ce8e8d6-d665-47b6-bde7-4dcf33411686",
+      "category": "business",
+      "evidence": {
+        "baseline_date": "2026-11-19",
+        "note": "The merged code and its tests, the evidence documents and the design pack; no legal authority.",
+        "previous": "P0 SA-1, dated 2026-11-17"
+      },
+      "id": "01a1f2c2-6e36-7821-9a8a-1ac0b5824aeb",
+      "job_key": "maintainer-session",
+      "proficiency": 1,
+      "role": "maintainer sessions (AI)"
+    },
+    {
+      "assessed_at": "2026-11-19T07:43:10.717769+00:00",
+      "assessment_id": "9ce8e8d6-d665-47b6-bde7-4dcf33411686",
+      "category": "general",
+      "evidence": {
+        "baseline_date": "2026-11-19",
+        "note": "The merged code and its tests, the evidence documents and the design pack; no legal authority.",
+        "previous": "P0 SA-1, dated 2026-11-17"
+      },
+      "id": "01a1f2c2-6e1c-7399-b598-27bb42f69726",
+      "job_key": "maintainer-session",
+      "proficiency": 3,
+      "role": "maintainer sessions (AI)"
+    },
+    {
+      "assessed_at": "2026-11-19T07:43:10.717769+00:00",
+      "assessment_id": "9ce8e8d6-d665-47b6-bde7-4dcf33411686",
+      "category": "it_knowledge",
+      "evidence": {
+        "baseline_date": "2026-11-19",
+        "note": "The merged code and its tests, the evidence documents and the design pack; no legal authority.",
+        "previous": "P0 SA-1, dated 2026-11-17"
+      },
+      "id": "01a1f2c2-6e85-7eb0-b6df-79390267c601",
+      "job_key": "maintainer-session",
+      "proficiency": 5,
+      "role": "maintainer sessions (AI)"
+    },
+    {
+      "assessed_at": "2026-11-19T07:43:10.717769+00:00",
+      "assessment_id": "9ce8e8d6-d665-47b6-bde7-4dcf33411686",
+      "category": "legal",
+      "evidence": {
+        "baseline_date": "2026-11-19",
+        "note": "The merged code and its tests, the evidence documents and the design pack; no legal authority.",
+        "previous": "P0 SA-1, dated 2026-11-17"
+      },
+      "id": "01a1f2c2-6ebe-71a4-ae73-607b8c119e2d",
+      "job_key": "maintainer-session",
+      "proficiency": 0,
+      "role": "maintainer sessions (AI)"
+    },
+    {
+      "assessed_at": "2026-11-19T07:43:10.717769+00:00",
+      "assessment_id": "9ce8e8d6-d665-47b6-bde7-4dcf33411686",
+      "category": "programme_management",
+      "evidence": {
+        "baseline_date": "2026-11-19",
+        "note": "The merged code and its tests, the evidence documents and the design pack; no legal authority.",
+        "previous": "P0 SA-1, dated 2026-11-17"
+      },
+      "id": "01a1f2c2-6e6a-7fcd-89e4-f4fe130a5d05",
+      "job_key": "maintainer-session",
+      "proficiency": 1,
+      "role": "maintainer sessions (AI)"
+    },
+    {
+      "assessed_at": "2026-11-19T07:43:10.717769+00:00",
+      "assessment_id": "9ce8e8d6-d665-47b6-bde7-4dcf33411686",
+      "category": "technical",
+      "evidence": {
+        "baseline_date": "2026-11-19",
+        "note": "The merged code and its tests, the evidence documents and the design pack; no legal authority.",
+        "previous": "P0 SA-1, dated 2026-11-17"
+      },
+      "id": "01a1f2c2-6ea0-71ee-8a8b-3f9f8f8fdfe8",
+      "job_key": "maintainer-session",
+      "proficiency": 5,
+      "role": "maintainer sessions (AI)"
+    },
+    {
+      "assessed_at": "2026-11-19T07:43:08.823813+00:00",
+      "assessment_id": "9ce8e8d6-d665-47b6-bde7-4dcf33411686",
+      "category": "architecture",
+      "evidence": {
+        "baseline_date": "2026-11-19",
+        "note": "The registry, migrations, document aggregate, published output set, design-pack gates and CI; the sessions do not approve their own work.",
+        "previous": "P0 SA-1, dated 2026-11-17"
+      },
+      "id": "01a1f2c2-66e9-7ff3-b968-eb4da676222a",
+      "job_key": "programme-architect",
+      "proficiency": 5,
+      "role": "programme architect (maintainer sessions under the owner's authority)"
+    },
+    {
+      "assessed_at": "2026-11-19T07:43:08.823813+00:00",
+      "assessment_id": "9ce8e8d6-d665-47b6-bde7-4dcf33411686",
+      "category": "business",
+      "evidence": {
+        "baseline_date": "2026-11-19",
+        "note": "The registry, migrations, document aggregate, published output set, design-pack gates and CI; the sessions do not approve their own work.",
+        "previous": "P0 SA-1, dated 2026-11-17"
+      },
+      "id": "01a1f2c2-66ce-77fd-8758-ee627c78456f",
+      "job_key": "programme-architect",
+      "proficiency": 2,
+      "role": "programme architect (maintainer sessions under the owner's authority)"
+    },
+    {
+      "assessed_at": "2026-11-19T07:43:08.823813+00:00",
+      "assessment_id": "9ce8e8d6-d665-47b6-bde7-4dcf33411686",
+      "category": "general",
+      "evidence": {
+        "baseline_date": "2026-11-19",
+        "note": "The registry, migrations, document aggregate, published output set, design-pack gates and CI; the sessions do not approve their own work.",
+        "previous": "P0 SA-1, dated 2026-11-17"
+      },
+      "id": "01a1f2c2-66b1-7ef6-80b8-d4da9361c265",
+      "job_key": "programme-architect",
+      "proficiency": 3,
+      "role": "programme architect (maintainer sessions under the owner's authority)"
+    },
+    {
+      "assessed_at": "2026-11-19T07:43:08.823813+00:00",
+      "assessment_id": "9ce8e8d6-d665-47b6-bde7-4dcf33411686",
+      "category": "it_knowledge",
+      "evidence": {
+        "baseline_date": "2026-11-19",
+        "note": "The registry, migrations, document aggregate, published output set, design-pack gates and CI; the sessions do not approve their own work.",
+        "previous": "P0 SA-1, dated 2026-11-17"
+      },
+      "id": "01a1f2c2-671f-7ebd-8c4c-17d1238220e6",
+      "job_key": "programme-architect",
+      "proficiency": 4,
+      "role": "programme architect (maintainer sessions under the owner's authority)"
+    },
+    {
+      "assessed_at": "2026-11-19T07:43:08.823813+00:00",
+      "assessment_id": "9ce8e8d6-d665-47b6-bde7-4dcf33411686",
+      "category": "legal",
+      "evidence": {
+        "baseline_date": "2026-11-19",
+        "note": "The registry, migrations, document aggregate, published output set, design-pack gates and CI; the sessions do not approve their own work.",
+        "previous": "P0 SA-1, dated 2026-11-17"
+      },
+      "id": "01a1f2c2-6754-79af-9fab-db5813dd3da2",
+      "job_key": "programme-architect",
+      "proficiency": 1,
+      "role": "programme architect (maintainer sessions under the owner's authority)"
+    },
+    {
+      "assessed_at": "2026-11-19T07:43:08.823813+00:00",
+      "assessment_id": "9ce8e8d6-d665-47b6-bde7-4dcf33411686",
+      "category": "programme_management",
+      "evidence": {
+        "baseline_date": "2026-11-19",
+        "note": "The registry, migrations, document aggregate, published output set, design-pack gates and CI; the sessions do not approve their own work.",
+        "previous": "P0 SA-1, dated 2026-11-17"
+      },
+      "id": "01a1f2c2-6705-75d1-a0d5-9ee045acc1cf",
+      "job_key": "programme-architect",
+      "proficiency": 2,
+      "role": "programme architect (maintainer sessions under the owner's authority)"
+    },
+    {
+      "assessed_at": "2026-11-19T07:43:08.823813+00:00",
+      "assessment_id": "9ce8e8d6-d665-47b6-bde7-4dcf33411686",
+      "category": "technical",
+      "evidence": {
+        "baseline_date": "2026-11-19",
+        "note": "The registry, migrations, document aggregate, published output set, design-pack gates and CI; the sessions do not approve their own work.",
+        "previous": "P0 SA-1, dated 2026-11-17"
+      },
+      "id": "01a1f2c2-673a-7589-b7d7-7e199b44c35e",
+      "job_key": "programme-architect",
+      "proficiency": 5,
+      "role": "programme architect (maintainer sessions under the owner's authority)"
+    },
+    {
+      "assessed_at": "2026-11-19T07:43:06.629746+00:00",
+      "assessment_id": "9ce8e8d6-d665-47b6-bde7-4dcf33411686",
+      "category": "architecture",
+      "evidence": {
+        "baseline_date": "2026-11-19",
+        "note": "The ADRs, the owner rulings and the public programme record; the business case and licensing frame; legal awareness with advice, not authority.",
+        "previous": "P0 SA-1, dated 2026-11-17"
+      },
+      "id": "01a1f2c2-5e5b-784d-8ed0-f360d83c2163",
+      "job_key": "sponsor",
+      "proficiency": 3,
+      "role": "sponsor / owner"
+    },
+    {
+      "assessed_at": "2026-11-19T07:43:06.629746+00:00",
+      "assessment_id": "9ce8e8d6-d665-47b6-bde7-4dcf33411686",
+      "category": "business",
+      "evidence": {
+        "baseline_date": "2026-11-19",
+        "note": "The ADRs, the owner rulings and the public programme record; the business case and licensing frame; legal awareness with advice, not authority.",
+        "previous": "P0 SA-1, dated 2026-11-17"
+      },
+      "id": "01a1f2c2-5e41-7554-b2f0-1dd0e2628e40",
+      "job_key": "sponsor",
+      "proficiency": 5,
+      "role": "sponsor / owner"
+    },
+    {
+      "assessed_at": "2026-11-19T07:43:06.629746+00:00",
+      "assessment_id": "9ce8e8d6-d665-47b6-bde7-4dcf33411686",
+      "category": "general",
+      "evidence": {
+        "baseline_date": "2026-11-19",
+        "note": "The ADRs, the owner rulings and the public programme record; the business case and licensing frame; legal awareness with advice, not authority.",
+        "previous": "P0 SA-1, dated 2026-11-17"
+      },
+      "id": "01a1f2c2-5e24-782e-a2d5-5fcc9d6c8149",
+      "job_key": "sponsor",
+      "proficiency": 5,
+      "role": "sponsor / owner"
+    },
+    {
+      "assessed_at": "2026-11-19T07:43:06.629746+00:00",
+      "assessment_id": "9ce8e8d6-d665-47b6-bde7-4dcf33411686",
+      "category": "it_knowledge",
+      "evidence": {
+        "baseline_date": "2026-11-19",
+        "note": "The ADRs, the owner rulings and the public programme record; the business case and licensing frame; legal awareness with advice, not authority.",
+        "previous": "P0 SA-1, dated 2026-11-17"
+      },
+      "id": "01a1f2c2-5e90-74eb-85a1-6d7f62c048a1",
+      "job_key": "sponsor",
+      "proficiency": 3,
+      "role": "sponsor / owner"
+    },
+    {
+      "assessed_at": "2026-11-19T07:43:06.629746+00:00",
+      "assessment_id": "9ce8e8d6-d665-47b6-bde7-4dcf33411686",
+      "category": "legal",
+      "evidence": {
+        "baseline_date": "2026-11-19",
+        "note": "The ADRs, the owner rulings and the public programme record; the business case and licensing frame; legal awareness with advice, not authority.",
+        "previous": "P0 SA-1, dated 2026-11-17"
+      },
+      "id": "01a1f2c2-5ec5-7b58-8906-55a9898673b4",
+      "job_key": "sponsor",
+      "proficiency": 1,
+      "role": "sponsor / owner"
+    },
+    {
+      "assessed_at": "2026-11-19T07:43:06.629746+00:00",
+      "assessment_id": "9ce8e8d6-d665-47b6-bde7-4dcf33411686",
+      "category": "programme_management",
+      "evidence": {
+        "baseline_date": "2026-11-19",
+        "note": "The ADRs, the owner rulings and the public programme record; the business case and licensing frame; legal awareness with advice, not authority.",
+        "previous": "P0 SA-1, dated 2026-11-17"
+      },
+      "id": "01a1f2c2-5e75-78dc-849e-735a45ff242b",
+      "job_key": "sponsor",
+      "proficiency": 3,
+      "role": "sponsor / owner"
+    },
+    {
+      "assessed_at": "2026-11-19T07:43:06.629746+00:00",
+      "assessment_id": "9ce8e8d6-d665-47b6-bde7-4dcf33411686",
+      "category": "technical",
+      "evidence": {
+        "baseline_date": "2026-11-19",
+        "note": "The ADRs, the owner rulings and the public programme record; the business case and licensing frame; legal awareness with advice, not authority.",
+        "previous": "P0 SA-1, dated 2026-11-17"
+      },
+      "id": "01a1f2c2-5eaa-7c55-a846-8dc8fa518299",
+      "job_key": "sponsor",
+      "proficiency": 1,
+      "role": "sponsor / owner"
+    }
+  ],
+  "standard": [
+    {
+      "artifact_kind": "matrix",
+      "id": "01a1f2c1-13ea-7764-afc8-4f6322e0ad3e",
+      "key": "stakeholder_map",
+      "mandatory": true,
+      "name": "Stakeholder Map",
+      "phase_code": "a",
+      "plateau": "psa",
+      "position": 3
+    },
+    {
+      "artifact_kind": "catalog",
+      "id": "01a1f2c1-1406-747c-a7e8-b30353a58eaf",
+      "key": "driver_goal_objective",
+      "mandatory": true,
+      "name": "Driver/Goal/Objective Catalog",
+      "phase_code": "a",
+      "plateau": "psa",
+      "position": 4
+    },
+    {
+      "artifact_kind": "catalog",
+      "id": "01a1f2c1-1421-7aa2-9f15-39948d9a84ab",
+      "key": "requirements_catalog",
+      "mandatory": true,
+      "name": "Requirements Catalog",
+      "phase_code": "a",
+      "plateau": "psa",
+      "position": 5
+    },
+    {
+      "artifact_kind": "diagram",
+      "id": "01a1f2c1-143c-73a5-8820-83771e8602ca",
+      "key": "solution_concept",
+      "mandatory": true,
+      "name": "Solution Concept Diagram",
+      "phase_code": "a",
+      "plateau": "psa",
+      "position": 6
+    },
+    {
+      "artifact_kind": "diagram",
+      "id": "01a1f2c1-1456-7505-bb5b-5b8656aa8a1b",
+      "key": "business_capability_map",
+      "mandatory": true,
+      "name": "Business Capability Map",
+      "phase_code": "b",
+      "plateau": "hld",
+      "position": 7
+    },
+    {
+      "artifact_kind": "catalog",
+      "id": "01a1f2c1-1470-71d6-a5a8-2e7d0d615178",
+      "key": "data_entity_catalog",
+      "mandatory": true,
+      "name": "Data Entity/Data Component Catalog",
+      "phase_code": "c",
+      "plateau": "hld",
+      "position": 8
+    },
+    {
+      "artifact_kind": "catalog",
+      "id": "01a1f2c1-148a-7b2a-8f3e-77e7d910fcc2",
+      "key": "technology_standards",
+      "mandatory": true,
+      "name": "Technology Standards Catalog",
+      "phase_code": "d",
+      "plateau": "hld",
+      "position": 9
+    },
+    {
+      "artifact_kind": "principles_catalog",
+      "id": "01a1f2c1-1399-75fe-b9ec-33018daf4067",
+      "key": "principles_catalog",
+      "mandatory": true,
+      "name": "Principles Catalog",
+      "phase_code": "preliminary",
+      "plateau": "psa",
+      "position": 0
+    },
+    {
+      "artifact_kind": "diagram",
+      "id": "01a1f2c1-13b5-758c-8473-21d0f3e26c90",
+      "key": "principle_derivation",
+      "mandatory": true,
+      "name": "Principle Derivation Diagram",
+      "phase_code": "preliminary",
+      "plateau": "psa",
+      "position": 1
+    },
+    {
+      "artifact_kind": "diagram",
+      "id": "01a1f2c1-13d0-723a-9330-27acb8dda30c",
+      "key": "principle_realization",
+      "mandatory": true,
+      "name": "Principle Realization Diagram",
+      "phase_code": "preliminary",
+      "plateau": "psa",
+      "position": 2
+    }
+  ]
+}

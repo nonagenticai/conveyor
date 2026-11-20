@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>T15 Tool authoring and BYO — architecture design · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>T15 — Architecture design</h1>
+<p>Project: T15 — Tool authoring and BYO · Track: v2 · Tranche: 12 · Plan: docs/SPEC_V2.md §12
+Unit: #86 (this document is dependency-shaping work; blocked-by T13, T6 and P0)
+Measured at: main@61edfcf8, 2026-11-18 · Project row: active, meta.depends_on = ["T13", "T6", "P0"]</p>
+<h2>Context and boundary</h2>
+<p>T15 adds the tool estate's authoring front door: OpenAPI draft import, service-scaffold registration, remote-MCP binding, tenant binding and promotion. T13 (#76) owns the four tool aggregates, the broker and <code>tools.call</code>; T14 imports the estate; T6 supplies service registration. T15 owns the draft lifecycle, both BYO adapters, tenant resolution and promotion.</p>
+<p>Out of scope: tenant code execution, a second MCP server, caller-supplied URLs, re-opening V1 slices. One binary, one Postgres, no new port (8930); new tables, columns and actions only (§10.6).</p>
+<h2>Aggregates, tables and actions</h2>
+<table><thead><tr><th>Table</th><th>State</th><th>Invariant</th><th>Source</th></tr></thead><tbody>
+<tr><td><code>tool</code></td><td>to create (T13 #76)</td><td>one operation version: closed schemas, effect, idempotency, timeout, redaction, destination</td><td>§11.8</td></tr>
+<tr><td><code>toolkit</code></td><td>to create (T13)</td><td>immutable <code>key@version</code>; auth adapter, licence app, destination</td><td>§11.8</td></tr>
+<tr><td><code>toolkit.kind</code> (<code>native|openapi|mcp</code>), <code>scope</code>, <code>source_asset_id</code>, <code>source_hash</code></td><td>to create (T15)</td><td>provenance pinned; a source change is a new version</td><td>§11.5, D2</td></tr>
+<tr><td><code>tool_binding</code></td><td>to create (T13)</td><td>tenant-scoped; pinned versions; ceiling; credential alias</td><td>§11.8</td></tr>
+<tr><td><code>tool_binding.scope</code> (<code>job|tenant</code>), nullable <code>job_binding_id</code></td><td>to create (T15)</td><td>a tenant binding never widens a job binding</td><td>§12, D4</td></tr>
+<tr><td><code>tool_call</code></td><td>to create (T13)</td><td>one row per call; no credential</td><td>§11.8</td></tr>
+<tr><td><code>approval_policy</code></td><td>exists (<code>migrations/0050_approval_policies.sql:approval_policy</code>)</td><td>absent row = required + self-approval forbidden</td><td>§5.4</td></tr>
+<tr><td><code>approval</code>, <code>approval_decision</code></td><td>exists (<code>migrations/0002_domain.sql:196,231</code>)</td><td>requester cannot decide its own gate</td><td>§5.4</td></tr>
+<tr><td><code>governed_asset</code></td><td>exists (<code>migrations/0002_domain.sql:governed_asset</code>); kind CHECK to extend with <code>tool_draft</code></td><td>a draft is not a published toolkit</td><td>§11.6, D2</td></tr>
+<tr><td><code>secret</code></td><td>exists (<code>migrations/0013_documents.sql:secret</code>)</td><td>alias-only; no reveal</td><td>§11.8</td></tr>
+</tbody></table>
+<p>Invariants: import writes no action row; publication creates an immutable version; an absent policy row requires a human; tenant toolkits stay scoped and promotion is no admin toggle; a binding ceiling is the minimum of job, tenant and operation effect, and no field raises it; remote MCP exposes only the bound subset and every call is one <code>tool_call</code>; publish refuses wildcard egress, free-form input, or a write without idempotency.</p>
+<table><thead><tr><th>Action</th><th>State</th><th>Purpose</th><th>Trace</th></tr></thead><tbody>
+<tr><td><code>approvals.request|decide|list</code></td><td>exists (<code>docs/design/data/actions.json</code>)</td><td>gates</td><td>§5.4</td></tr>
+<tr><td><code>approval_policies.get|list|set</code></td><td>exists</td><td>publication gate config</td><td>§5.4</td></tr>
+<tr><td><code>secrets.create|get|list|rotate|delete</code></td><td>exists</td><td>credential alias sealing</td><td>§11.8</td></tr>
+<tr><td><code>tools.probe</code>, <code>tools.call</code></td><td>to create (T13)</td><td>health; only call path</td><td>§11.3, §11.9</td></tr>
+<tr><td><code>toolkits.import_openapi</code></td><td>to create</td><td>document → draft toolkit, closed schemas, effect default <code>read</code></td><td>§10.4, §11.5(1)</td></tr>
+<tr><td><code>toolkits.import_mcp</code></td><td>to create</td><td>remote endpoint → draft operations, bound subset</td><td>§11.5(2), D3</td></tr>
+<tr><td><code>tool_authoring.draft|validate|test|review</code></td><td>to create</td><td>schema/effect/egress/credential checks, replay, security review</td><td>§10.4, §11.6</td></tr>
+<tr><td><code>tools.publish|retire</code></td><td>to create</td><td>immutable publication behind the gate; retirement</td><td>§10.4</td></tr>
+<tr><td><code>tool_bindings.create|update|retire</code></td><td>to create</td><td>job or tenant binding, ceiling, credential alias</td><td>§10.4, D4</td></tr>
+<tr><td><code>toolkits.promote</code></td><td>to create</td><td>opens a kata/development request</td><td>§11.5, D5</td></tr>
+</tbody></table>
+<p>Events (to create): <code>toolkit.imported</code>, <code>toolkit.published</code>, <code>tool_binding.created</code>; T13 adds <code>tool.called</code> (§11.3.7).</p>
+<h2>Decisions</h2>
+<p>D1. Publication approval reuses <code>approval_policy</code>, keyed <code>tools.publish</code> (alternative: a toolkit policy table); consequence: human default, self-approval forbidden, per-action waiver.</p>
+<p>D2. Drafts are <code>governed_asset(kind='tool_draft')</code> (alternative: <code>toolkit_draft</code>); consequence: one record per fact; publish writes toolkit and tools atomically.</p>
+<p>D3. <code>toolkits.import_mcp</code> persists only bound operations, pinned as <code>source_hash</code> (alternative: proxy the full list); consequence: unbound tools invisible, drift is a new import plus kata.</p>
+<p>D4. A tenant binding is <code>scope='tenant'</code>, <code>job_binding_id NULL</code>; the broker resolves job then tenant, lower ceiling wins (alternative: per-job clones); consequence: one grant, one-row revocation.</p>
+<p>D5. Promotion is <code>toolkits.promote</code> → kata/development (alternative: admin copy); consequence: platform version reviewed and versioned; tenant version stays scoped.</p>
+<p>D6a. "Tenant-configurable" is a policy-table extension, not a new store: <code>approval_policy</code> carries only <code>approval</code> and <code>self_approval</code> today (<code>migrations/0050_approval_policies.sql:approval_policy</code>), so approver kind, count and expiry are new columns on that table (to create at #86). Alternative: a second policy table — refused (P1).</p>
+<p>D7. Promotion opens a kata/development request; the platform-catalogue promotion itself is out of scope per #86 and is never a toggle. Consequence: no authoring path stamps a platform version.</p>
+<p>D8. OpenAPI 3.1 coverage is a risk, not an assumption: the pinned parser (<code>openapiv3</code> 2.2.0) may not parse every 3.1 document. Consequence: the import refuses an unsupported construct with a typed error, the fixture <code>crates/actions/tests/openapi31.rs</code> (to create at #86) proves parse-or-refuse on a 3.1 sample, and a 3.0 document is the fallback.</p>
+<p>D6. Side-effect class reuses the built four-rank <code>Effect</code> (<code>read &lt; write &lt; spend &lt; destructive</code>, <code>crates/actions/src/spec.rs:Effect</code>); a tool's spend ceiling is therefore the same rank as an action's. Alternative: a three-rank scale with spend as a budget tag — rejected because it would change a built enum and lose the ordering that stops a write ceiling permitting spend. Consequence: <code>apps/server/tests/tool_effect.rs:the_effect_scale_is_read_write_destructive</code> is the action-side proof and is not cited as tool-side proof; the tool-side proof is to create under #86.</p>
+<h2>Acceptance</h2>
+<p>The gate (§12) reads verbatim: “a tool generated from a spec is published and called by a job; publication approval defaults to a human and is tenant-configurable; a BYO MCP server is bound, narrowed and audited; a tenant cannot exceed its effect ceiling”.</p>
+<ol>
+<li><strong>A tool generated from a spec is published and called by a job.</strong> A stored OpenAPI 3.1 document; <code>toolkits.import_openapi</code> drafts; <code>tool_authoring.validate</code> accepts two reads and one idempotent write; <code>tool_authoring.test</code> passes a replay; a human <code>approvals.decide</code> publishes <code>toolkit@1</code>; a bound job calls a read through <code>tools.call</code>, recording one <code>tool_call</code>.
+<code>Verify:</code> <code>crates/actions/tests/tool_authoring.rs::a_tool_generated_from_a_spec_is_published_and_called</code> (to create at #86).</li>
+<li><strong>Publication approval defaults to a human and is tenant-configurable.</strong> With no <code>approval_policy</code> row for <code>tools.publish</code>, publication needs <code>approvals.request</code> and a human <code>approvals.decide</code>; the author cannot decide. A tenant row waiving <code>tools.publish</code> publishes and audits.
+<code>Verify:</code> <code>crates/actions/tests/tool_authoring.rs::publication_waits_for_a_human_by_default</code> and <code>::a_tenant_policy_changes_the_publication_gate_without_a_code_change</code> (to create at #86); mechanism: <code>migrations/0050_approval_policies.sql:approval_policy</code>, <code>crates/actions/src/control/policies.rs:self_approval</code>, <code>crates/actions/src/control/approvals.rs:decided_by_kind</code>.</li>
+<li><strong>A BYO MCP server is bound, narrowed and audited.</strong> A remote endpoint exposing five tools; <code>toolkits.import_mcp</code> binds two and <code>tools.publish</code> publishes; discovery exposes two; an unbound call is refused before the network; each allowed call writes one <code>tool_call</code>, alias only, no secret.
+<code>Verify:</code> <code>crates/actions/tests/byo_tools.rs::only_the_bound_subset_is_callable_and_each_call_is_audited</code> and <code>::a_call_time_url_is_refused_and_a_byo_toolkit_is_tenant_scoped</code> (to create at #86).</li>
+<li><strong>A tenant cannot exceed its effect ceiling.</strong> A <code>tool_binding</code> with ceiling <code>read</code> and a tool classified <code>write</code>: the call is refused <code>403 tool_effect_forbidden</code> before the destination; an input field naming a higher ceiling changes nothing.
+<code>Verify:</code> <code>crates/actions/tests/tool_authoring.rs::the_publishing_job_cannot_widen_its_own_effect_ceiling</code> (to create at #86), mirroring <code>apps/server/tests/tool_effect.rs:effect_ceiling_is_never_raised</code>; the ceiling reader is <code>crates/actions/src/invoke.rs:binding_ceiling</code>.</li>
+<li><strong>Refusals on publication.</strong> An unbounded draft is refused, and a draft with no declared class defaults to <code>read</code>. <code>Verify:</code> <code>crates/actions/tests/tool_authoring.rs::publication_refuses_an_unbounded_draft_and_defaults_the_class_to_read</code> (to create at #86).</li>
+<li><strong>A destructive tool needs a named approver.</strong> <code>Verify:</code> <code>crates/actions/tests/tool_authoring.rs::a_destructive_tool_needs_a_named_approver</code> (to create at #86).</li>
+<li><strong>Promotion is not a toggle.</strong> <code>Verify:</code> <code>crates/actions/tests/tool_authoring.rs::promotion_is_not_an_admin_toggle</code> (to create at #86) — promotion opens a request; no authoring action stamps a platform version.</li>
+<li><strong>A 3.1 document parses or is refused.</strong> <code>Verify:</code> <code>crates/actions/tests/openapi31.rs</code> (to create at #86) — a known-3.1 sample either imports with closed schemas or refuses with a typed error naming the unsupported construct; never a silent partial import.</li>
+</ol>
+<h2>Architecture artefacts</h2>
+<h3>PSA set at inception</h3>
+<p>Principles applied: P1 one record per fact; import writes no action row. P2 import produces a draft, never a decision. P3 draft/review/publish are actions with evidence. P4 publisher ≠ approver. P5 replay and probe precede publication. P8 unresolved binding, probe or policy refuses <code>409 tool_not_ready</code>. P10 no speculative aggregate; columns only on T13's rows. P11 approval and ceiling are tenant rows.</p>
+<p>Requirements: R-T15-1 OpenAPI draft import, closed schemas, effect default <code>read</code> (§11.5(1), §11.6(1)). R2 service-scaffold registration (§11.6(2)). R3 remote MCP binding-scoped discovery (§11.5(2)). R4 tenant binding narrowed by job/tenant/operation (§11.1, §11.4). R5 human-default, tenant-configurable publication (§5.4, §12). R6 promotion via kata/development (§11.5). R7 one <code>tool_call</code>, no credential, drift opens a kata (§11.3, §11.9).</p>
+<p>Stakeholder × concern matrix (Publication·Credential·Ceiling·Audit·Version·Tenancy; A/O/C/I):</p>
+<table><thead><tr><th>Stakeholder</th><th>Cell</th></tr></thead><tbody>
+<tr><td>Tenant-admin</td><td>A/O·I·C·I·I·O</td></tr>
+<tr><td>Job-author</td><td>C·I·C·I·C·I</td></tr>
+<tr><td>Platform-security</td><td>A·C·C·C·C·I</td></tr>
+<tr><td>Development-job</td><td>I·I·I·I·C·I</td></tr>
+<tr><td>Operations</td><td>I·C·A·C·C·I</td></tr>
+<tr><td>Architecture-Board</td><td>C·I·I·I·A·I</td></tr>
+</tbody></table>
+<p>Driver/Goal/Objective: driver — tenant tools without a platform release, under platform control. Goal — self-service authoring under platform governance. O1 import a spec into a draft in one action. O2 bind a remote MCP subset with no credential exposure. O3 human-default, tenant-configurable publication approval.</p>
+<p>Solution concept (edges): E1 source document → draft <code>governed_asset</code> (derivation); E2 draft → validation/replay (dependency); E3 review → <code>approvals.request|decide</code> (dependency); E4 approval → <code>toolkit@version</code> + tools (realization); E5 version → <code>tool_binding</code> (dependency); E6 binding → <code>tools.call</code> → <code>tool_call</code> (realization); E7 tenant toolkit → <code>toolkits.promote</code> → kata/development (dependency); E8 <code>approval_policy</code> → gate (reuse); E9 <code>secret</code> → alias resolution (reuse).</p>
+<h3>Typed catalogue</h3>
+<p>TA-1 — T15 tool authoring capability catalogue. Type: catalog (one axis: capability) · Phase A · Plateau: PSA · Status: draft · Version: 1 · Author and date: T15 inception lane, 2026-11-18 · Reviewer and review date: this review, recorded on #347, 2026-11-18 · Owner: T15 project (#86) · Related project: T15 (#86), tranche 12 · Purpose, stakeholders, scope: one importable authoring capability per source kind under one approval gate, for tenant admins, job authors and platform security; covering OpenAPI, service registration, MCP, binding, promotion · Published document: this design, on acceptance to #86 · Links: derivation ← SPEC_V2 §11.5–§11.6; dependency → T13 (#76); reuse ← <code>approval_policy</code>, <code>secret</code>, <code>governed_asset</code>.</p>
+<table><thead><tr><th>UID</th><th>Item</th><th>Description of use or structure</th><th>State</th><th>Unit</th></tr></thead><tbody>
+<tr><td>TA-1.1</td><td>OpenAPI draft import</td><td><code>toolkits.import_openapi</code> parses a document into draft tools, closed schemas, effect default <code>read</code></td><td>to create</td><td>#86, needs T13</td></tr>
+<tr><td>TA-1.2</td><td>Service-scaffold registration</td><td>a workspace service registers its OpenAPI; the scaffold is T6's path</td><td>to create</td><td>#86, T6</td></tr>
+<tr><td>TA-1.3</td><td>Remote MCP binding</td><td><code>toolkits.import_mcp</code> discovers a streamable-HTTP endpoint, bound subset only</td><td>to create</td><td>#86</td></tr>
+<tr><td>TA-1.4</td><td>Tenant binding and narrowing</td><td><code>tool_bindings.create</code> with scope <code>job|tenant</code>; minimum of job, tenant, operation ceiling</td><td>to create</td><td>#86, T13</td></tr>
+<tr><td>TA-1.5</td><td>Publication approval</td><td><code>tools.publish</code> behind <code>approval_policy</code>; human default, tenant-configurable</td><td>to create</td><td>#86</td></tr>
+<tr><td>TA-1.6</td><td>Promotion path</td><td><code>toolkits.promote</code> opens a kata/development request</td><td>to create</td><td>#86, T5/T6</td></tr>
+</tbody></table>
+<h2>Migration and rollout</h2>
+<p>Sequence: T13 (#76) → T6 → T15. The T15 migration (to create, next after T13's) extends the <code>governed_asset.kind</code> CHECK with <code>tool_draft</code>, adds <code>toolkit.kind</code>, <code>scope</code>, <code>source_asset_id</code>, <code>source_hash</code>, and adds <code>tool_binding.scope</code> with nullable <code>job_binding_id</code>; forced RLS ships with it (P3). No policy seed: an absent <code>approval_policy</code> row is the safe default.</p>
+<p>Rollout: register actions and regenerate the served-spec lock; publish one OpenAPI fixture; exercise service registration through a T6 job; enable BYO by policy row. Rollback: retire bindings then versions; drafts become <code>archived</code>/<code>superseded</code>; forward-only.</p>
+<h2>Links</h2>
+<p>Brief: https://conveyor.nonagentic.ai/design/docs/output-01a1e008-4866-73b3-aff3-4b81913d1e23.html · Issue: https://github.com/nonagenticai/conveyor/issues/86 · SPEC_V2 §11.5, §11.6, §11.8, §12 T15, §10.4, §5.4, §8.1 · Artefact standard: https://conveyor.nonagentic.ai/design/docs/output-01a1e9d1-2720-776c-9741-a5deb322086e.html</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Tool authoring and BYO · conveyor output · published 2026-11-20T07:33:41.908746784+00:00 · FR Test</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

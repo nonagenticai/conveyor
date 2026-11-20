@@ -55,16 +55,7 @@ window.installV2 = function (api, enterprise) {
   // is the offline DESIGN study. Present, the rows the platform actually owns replace the
   // fixtures they cover, and the pages with no live source keep the DESIGN ribbon.
   const S = window.CONVEYOR_SNAPSHOT;
-  // The surface checks render the design fixtures, not the working tree's published payload: on
-  // a publish branch `data/snapshot.js` is the live pack and would hide every fixture the checks
-  // assert. The checks set this flag before any page script runs; a visitor never does (#468).
-  const qaNoSnapshot = window.CONVEYOR_QA_NO_SNAPSHOT === true;
-  if (qaNoSnapshot) {
-    // The generated outputs index is a publish branch's live payload too; the public empty-shape
-    // assertions need the placeholder, exactly as for the snapshot.
-    window.CONVEYOR_OUTPUTS = null;
-  }
-  const live = !qaNoSnapshot && S && S.schema === "design-snapshot/v1" ? S : null;
+  const live = S && S.schema === "design-snapshot/v1" ? S : null;
   // The V2 product-design study is not part of the public programme site. It stays available
   // to signed-in operators, and to a reviewer who asks for it explicitly with `?design=1`
   // (the mode `check-v2.cjs` exercises). Without either, a design destination is a sign-in gate.
