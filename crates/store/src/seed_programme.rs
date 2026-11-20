@@ -10,7 +10,7 @@
 //!
 //! `project.meta` is merged, not replaced: a later PM job may write keys the seed does not own,
 //! and a seed run must not erase them. The seed owns the keys it names (`plan`, `track`,
-//! `issues`, `depends_on`, `plan_status`, `status_source`) and leaves every other key alone.
+//! `issues`, `depends_on`, `plan_status`, `status_source`, `adm_phase`, `plateau`) and leaves every other key alone.
 //!
 //! **Every non-archived project also gets a board.** A project is addressed through its board —
 //! the console's workspace, its cards, the start card `projects.create` files — and no action
@@ -34,6 +34,11 @@ use crate::tenants;
 
 /// The checked-in programme document.
 pub const PROGRAMME_EXPORT: &str = include_str!("../../../seed/programme.json");
+
+/// The buildout's own MSP definition: the six benefit profiles, their map, the fourteen tranches
+/// and every project's ADM phase/plateau (`scripts/check-programme-definition.py` validates it).
+pub const PROGRAMME_DEFINITION_EXPORT: &str =
+    include_str!("../../../seed/programme-definition.json");
 
 /// The document's top level.
 #[derive(Debug, Deserialize)]
@@ -73,6 +78,73 @@ pub struct ProjectSeed {
     pub meta: Value,
 }
 
+/// The definition document's top level.
+#[derive(Debug, Deserialize)]
+pub struct DefinitionExport {
+    /// The document format; only `1` is accepted.
+    pub version: u32,
+    /// The programme the definition belongs to (the seed resolves it by name).
+    #[serde(default)]
+    pub programme: Option<ProgrammeSeed>,
+    /// The benefits, each with the six field groups' definition values.
+    pub benefits: Vec<BenefitDefinition>,
+    /// The benefits-map edges.
+    pub links: Vec<LinkDefinition>,
+    /// The tranches, numbered contiguously from 0.
+    pub tranches: Vec<TrancheDefinition>,
+    /// Each project's ADM phase and plateau (merged into the generated project meta).
+    #[serde(default)]
+    pub projects: std::collections::BTreeMap<String, ProjectDefinition>,
+}
+
+/// One benefit profile's definition.
+#[derive(Debug, Deserialize)]
+pub struct BenefitDefinition {
+    pub reference: String,
+    pub description: String,
+    pub category: String,
+    pub target: String,
+    pub baseline: String,
+    pub measurement_method: String,
+    pub owner_role: String,
+    #[serde(default)]
+    pub project_key: Option<String>,
+}
+
+/// One benefits-map edge; `benefit` is the profile's reference.
+#[derive(Debug, Deserialize)]
+pub struct LinkDefinition {
+    pub output_ref: String,
+    pub capability_ref: String,
+    pub operational_outcome: String,
+    pub benefit: String,
+    pub strategic_objective: String,
+    #[serde(default = "default_link_kind")]
+    pub kind: String,
+}
+
+fn default_link_kind() -> String {
+    "benefit".to_owned()
+}
+
+/// One tranche's definition.
+#[derive(Debug, Deserialize)]
+pub struct TrancheDefinition {
+    pub number: i32,
+    pub state: String,
+    pub entry: String,
+    pub exit: String,
+    #[serde(default)]
+    pub review_at: Option<chrono::DateTime<chrono::Utc>>,
+}
+
+/// One project's ADM placement.
+#[derive(Debug, Deserialize)]
+pub struct ProjectDefinition {
+    pub adm_phase: String,
+    pub plateau: String,
+}
+
 /// What one seed run did in one tenant.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub struct ProgrammeCounts {
@@ -88,6 +160,12 @@ pub struct ProgrammeCounts {
     /// `created: 0, boards_created: 0` on an unchanged programme, while the run that first makes
     /// a board-less project workable reports it here.
     pub boards_created: i64,
+    /// Benefit profiles inserted by the definition (a second run reports 0).
+    pub benefits: i64,
+    /// Benefits-map edges inserted by the definition.
+    pub links: i64,
+    /// Tranches inserted by the definition.
+    pub tranches: i64,
 }
 
 /// Parse the embedded document. A malformed document is a build-time error, never a data error.
@@ -112,6 +190,7 @@ pub async fn seed_programme(
     tenant_slug: Option<&str>,
 ) -> Result<Vec<(String, ProgrammeCounts)>, SeedError> {
     let export = programme_export()?;
+    let definition = definition_export()?;
     let targets = targets(pool, tenant_slug).await?;
     let mut results = Vec::with_capacity(targets.len());
     for (tenant_id, slug) in targets {
@@ -139,10 +218,127 @@ pub async fn seed_programme(
                     .await?;
             }
         }
+        seed_definition(&mut tx, tenant_id, programme_id, &definition, &mut counts).await?;
         tx.commit().await?;
         results.push((slug, counts));
     }
     Ok(results)
+}
+
+/// Parse the embedded definition. A malformed document is a programming error, never data.
+pub fn definition_export() -> Result<DefinitionExport, SeedError> {
+    let export: DefinitionExport = serde_json::from_str(PROGRAMME_DEFINITION_EXPORT)
+        .map_err(|error| SeedError::ProgrammeDocument(error.to_string()))?;
+    if export.version != 1 {
+        return Err(SeedError::ProgrammeDocument(format!(
+            "unsupported definition version {}",
+            export.version
+        )));
+    }
+    Ok(export)
+}
+
+/// Seed the buildout's own MSP rows. Each insert is guarded by its natural key, so a second run
+/// inserts nothing and an edited or published row is never overwritten.
+async fn seed_definition(
+    conn: &mut PgConnection,
+    tenant_id: Uuid,
+    programme_id: Uuid,
+    definition: &DefinitionExport,
+    counts: &mut ProgrammeCounts,
+) -> Result<(), SeedError> {
+    for benefit in &definition.benefits {
+        let project_id: Option<Uuid> = match &benefit.project_key {
+            Some(key) => {
+                sqlx::query_scalar("SELECT id FROM project WHERE tenant_id = $1 AND key = $2")
+                    .bind(tenant_id)
+                    .bind(key)
+                    .fetch_optional(&mut *conn)
+                    .await?
+            }
+            None => None,
+        };
+        let inserted = sqlx::query(
+            "INSERT INTO benefit_profile
+                (tenant_id, programme_id, project_id, reference, description, category,
+                 target, baseline, measurement_method, operational_area, status)
+             SELECT $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, 'draft'
+              WHERE NOT EXISTS (
+                  SELECT 1 FROM benefit_profile
+                   WHERE tenant_id = $1 AND programme_id = $2 AND reference = $4)",
+        )
+        .bind(tenant_id)
+        .bind(programme_id)
+        .bind(project_id)
+        .bind(&benefit.reference)
+        .bind(&benefit.description)
+        .bind(&benefit.category)
+        .bind(Value::String(benefit.target.clone()))
+        .bind(Value::String(benefit.baseline.clone()))
+        .bind(&benefit.measurement_method)
+        .bind(&benefit.owner_role)
+        .execute(&mut *conn)
+        .await?
+        .rows_affected();
+        counts.benefits += inserted as i64;
+    }
+    for link in &definition.links {
+        let benefit_id: Option<Uuid> = sqlx::query_scalar::<_, Uuid>(
+            "SELECT id FROM benefit_profile
+              WHERE tenant_id = $1 AND programme_id = $2 AND reference = $3",
+        )
+        .bind(tenant_id)
+        .bind(programme_id)
+        .bind(&link.benefit)
+        .fetch_optional(&mut *conn)
+        .await?;
+        let benefit_id =
+            benefit_id.ok_or_else(|| SeedError::Missing("benefit profile", "definition link"))?;
+        let inserted = sqlx::query(
+            "INSERT INTO benefit_link
+                (tenant_id, programme_id, output_ref, capability_ref, operational_outcome,
+                 benefit_id, strategic_objective, kind)
+             SELECT $1, $2, $3, $4, $5, $6, $7, $8
+              WHERE NOT EXISTS (
+                  SELECT 1 FROM benefit_link
+                   WHERE tenant_id = $1 AND programme_id = $2
+                     AND output_ref = $3 AND benefit_id = $6)",
+        )
+        .bind(tenant_id)
+        .bind(programme_id)
+        .bind(&link.output_ref)
+        .bind(&link.capability_ref)
+        .bind(&link.operational_outcome)
+        .bind(benefit_id)
+        .bind(&link.strategic_objective)
+        .bind(&link.kind)
+        .execute(&mut *conn)
+        .await?
+        .rows_affected();
+        counts.links += inserted as i64;
+    }
+    for tranche in &definition.tranches {
+        let inserted = sqlx::query(
+            "INSERT INTO programme_tranche
+                (tenant_id, programme_id, number, state, entry_criteria, exit_criteria, review_at)
+             SELECT $1, $2, $3, $4, $5, $6, $7
+              WHERE NOT EXISTS (
+                  SELECT 1 FROM programme_tranche
+                   WHERE tenant_id = $1 AND programme_id = $2 AND number = $3)",
+        )
+        .bind(tenant_id)
+        .bind(programme_id)
+        .bind(tranche.number)
+        .bind(&tranche.state)
+        .bind(Value::String(tranche.entry.clone()))
+        .bind(Value::String(tranche.exit.clone()))
+        .bind(tranche.review_at)
+        .execute(&mut *conn)
+        .await?
+        .rows_affected();
+        counts.tranches += inserted as i64;
+    }
+    Ok(())
 }
 
 /// The same target resolution `seed_catalogue` uses: one explicit slug, or every active tenant.

@@ -9,8 +9,10 @@ const base = new URL(baseURL);
 const token = process.env.DEV_AUTH_TOKEN;
 const devLogin = token?.startsWith("dev:") ? token.slice(4) : token;
 // S12 §6 step 0: a deployed target with no dev token is the real-OIDC mode. The setup project
-// logs in once through Keycloak, writes the access token the API helpers use, and keeps the
-// SSO cookies so every later context re-authenticates silently.
+// logs in once through Keycloak and writes the access token; #391's `e2e/fixture.ts` injects it
+// into every `/api/**` request (the app holds its token in memory only, ADR 0001). The SSO
+// cookies live in the state file, which only the app project reads — the setup must not be asked
+// for the file it exists to write.
 const oidc = Boolean(process.env.BASE_URL) && !process.env.DEV_AUTH_TOKEN;
 const OIDC_STATE = "test-results/oidc-state.json";
 
@@ -46,9 +48,7 @@ export default defineConfig({
           ],
           origins: [],
         }
-      : oidc
-        ? OIDC_STATE
-        : undefined,
+      : undefined,
   },
   projects: oidc
     ? [
