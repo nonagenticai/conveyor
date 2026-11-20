@@ -97,21 +97,21 @@ crates/actions/src/integrations/{object_store,external,breaker,ingest}.rs   # mo
 <tbody>
 <tr>
 <td><code>artifacts</code></td>
-<td>yes</td>
+<td><del>yes</del> <strong>superseded #450</strong></td>
 <td>artifact objects</td>
-<td>external <code>artifacts.list</code> from its <code>openapi.json</code> (<code>artifact_service</code>; routes <code>/api/artifacts</code>, <code>/projects/{project_id}/artifacts</code>); display only</td>
+<td>now internal <code>artifacts.list</code> over the document catalogue (§11.3/§11.10); the Python <code>artifact_service</code> is not a conveyor dependency</td>
 </tr>
 <tr>
 <td><code>worker_management</code></td>
-<td>yes</td>
+<td><del>yes</del> <strong>superseded #450</strong></td>
 <td>workers/providers/graphs</td>
-<td>external <code>workers.list</code>/<code>providers.list</code>/<code>graphs.list</code> (bare <code>/workers</code>, <code>/providers</code>, <code>/graphs</code>); <strong>read-only</strong></td>
+<td>now internal <code>workers.list</code>/<code>providers.list</code> over the durable queue and host registry (§11.2); the worker-graph read is retired</td>
 </tr>
 <tr>
 <td><code>billing_service</code></td>
-<td>yes</td>
+<td><del>yes</del> <strong>superseded #450</strong></td>
 <td>cost/budget summaries</td>
-<td>external <code>billing.summary</code> — <code>GET /api/billing/overview</code>; display only</td>
+<td>now internal <code>billing.summary</code> over <code>inference_call</code>/<code>tool_call</code> (#46); the Python service stays the platform's charging system (D52)</td>
 </tr>
 <tr>
 <td><code>inference-router</code></td>

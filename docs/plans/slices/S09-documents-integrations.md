@@ -5,7 +5,7 @@ status: planned
 depends_on: [S03, S04]
 spec_sections: ["§2", "§3 D12/D14", "§5.2", "§5.5", "§8 S9"]
 adds_tables: [document, repository, project_repository, secret]
-adds_actions: ['documents.create', 'documents.get', 'documents.list', 'documents.download', 'documents.update', 'documents.delete', 'documents.ingest', 'documents.report', 'repositories.create', 'repositories.get', 'repositories.list', 'repositories.delete', 'repositories.link', 'repositories.unlink', 'secrets.create', 'secrets.rotate', 'secrets.get', 'secrets.list', 'secrets.delete', 'workers.list', 'providers.list', 'graphs.list', 'artifacts.list', 'billing.summary', 'coding_jobs.create', 'coding_jobs.get', 'retrieval.query']
+adds_actions: ['documents.create', 'documents.get', 'documents.list', 'documents.download', 'documents.update', 'documents.delete', 'documents.ingest', 'documents.report', 'repositories.create', 'repositories.get', 'repositories.list', 'repositories.delete', 'repositories.link', 'repositories.unlink', 'secrets.create', 'secrets.rotate', 'secrets.get', 'secrets.list', 'secrets.delete', 'workers.list', 'providers.list', 'artifacts.list', 'billing.summary', 'coding_jobs.create', 'coding_jobs.get', 'retrieval.query']
 adds_events: ['document.created', 'document.updated', 'document.deleted', 'document.ingested', 'repository.created', 'repository.linked', 'secret.created', 'secret.rotated', 'secret.deleted']
 adds_modules: [integrations]
 parity_ids: PENDING-S0
@@ -55,9 +55,9 @@ crates/actions/src/integrations/{object_store,external,breaker,ingest}.rs   # mo
 ### 5.1 The line — nine externals
 | service | external | action gap it leaves | how the conveyor calls it |
 |---|---|---|---|
-| `artifacts` | yes | artifact objects | external `artifacts.list` from its `openapi.json` (`artifact_service`; routes `/api/artifacts`, `/projects/{project_id}/artifacts`); display only |
-| `worker_management` | yes | workers/providers/graphs | external `workers.list`/`providers.list`/`graphs.list` (bare `/workers`, `/providers`, `/graphs`); **read-only** |
-| `billing_service` | yes | cost/budget summaries | external `billing.summary` — `GET /api/billing/overview`; display only |
+| `artifacts` | ~~yes~~ **superseded #450** | artifact objects | now internal `artifacts.list` over the document catalogue (§11.3/§11.10); the Python `artifact_service` is not a conveyor dependency |
+| `worker_management` | ~~yes~~ **superseded #450** | workers/providers/graphs | now internal `workers.list`/`providers.list` over the durable queue and host registry (§11.2); the worker-graph read is retired |
+| `billing_service` | ~~yes~~ **superseded #450** | cost/budget summaries | now internal `billing.summary` over `inference_call`/`tool_call` (#46); the Python service stays the platform's charging system (D52) |
 | `inference-router` | yes | model routing, generation | external invoke; no local model inventory |
 | `licenses` | yes | issuance, validation | `GET /licenses/active?tenant_id=&app_key=conveyor` → `app_licence` |
 | `coding-*` | yes | analysis, edit, dispatch | external action per operation; ref in `run.external_ref` |

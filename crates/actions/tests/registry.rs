@@ -102,7 +102,7 @@ use serde_json::{Value, json};
 /// **T16 (#85) adds five internal**: `procedures.ingest_sop|ingest_process|ingest_rdf`,
 /// `procedures.validate` and `procedures.review_source` — the SOP/process-document intake and its
 /// source review (no `pko.*` action exists: owner decision 2026-11-19, #413).
-const EXPECTED: [&str; 485] = [
+const EXPECTED: [&str; 490] = [
     "actions.describe",
     "actions.list",
     "analyse.site",
@@ -304,7 +304,6 @@ const EXPECTED: [&str; 485] = [
     "fixtures.fail",
     "fixtures.slow",
     "fixtures.timeout",
-    "graphs.list",
     "industries.create",
     "industries.get",
     "industries.list",
@@ -408,15 +407,21 @@ const EXPECTED: [&str; 485] = [
     "ops.ci_status",
     "ops.deployments",
     "ops.events",
+    "ops.flag_flip",
     "ops.flux_status",
+    "ops.incident",
     "ops.host_logs",
     "ops.host_restart_unit",
     "ops.host_status",
     "ops.logs",
+    "ops.mitigate",
     "ops.pods",
+    "ops.postmortem",
+    "ops.resolve",
     "ops.restart",
     "ops.rollback",
     "ops.scale",
+    "ops.triage",
     "pm.charter",
     "pm.close",
     "pm.get",
@@ -664,7 +669,11 @@ fn the_registry_is_exactly_the_declared_set() {
     // `architecture.board_list`, all internal reads: 451 -> 454; external stays 18.
     // T11 (#84) adds eight `metrics.*` actions, all internal: 454 -> 462; external stays 18.
     // T16 (#85) adds five `procedures.*` actions, all internal: 462 -> 467; external stays 18.
-    assert_eq!((internal, external), (467, 18));
+    // #450 moves the four V1 displays onto conveyor state (`artifacts.list` over the document
+    // store, `billing.summary` over the ledger, `workers.list`/`providers.list` over the queue
+    // and host registry) and retires `graphs.list` with the service it described: internal
+    // 473 -> 477, external 18 -> 13. Every remaining external destination is a Rust service.
+    assert_eq!((internal, external), (477, 13));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),

@@ -23,6 +23,11 @@ const shot = (name) =>
     const page = await browser.newPage({
       viewport: { width: 1440, height: 1060 },
     });
+    // #468: on a publish branch the pack carries the live snapshot; the workbench fixtures are
+    // the design study's, so the page runs in the no-snapshot shape.
+    await page.addInitScript(() => {
+      window.CONVEYOR_QA_NO_SNAPSHOT = true;
+    });
     const errors = [],
       failed = [],
       external = [];

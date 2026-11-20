@@ -42,8 +42,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/SPEC_V2.html",
       "source": "docs/SPEC_V2.md",
       "section": "Spec",
-      "sha256": "191f2c99f63415c06985efdf67042106afbff29956658f8dfc8c66b40bbf5ce5",
-      "bytes": 170240,
+      "sha256": "e7b6a666c2b3a57294cf9517404d4e26fbd6745febeafe0a243c3a597233a663",
+      "bytes": 170681,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/SPEC_V2.md"
     },
     {
@@ -735,8 +735,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/slices/S09-documents-integrations.html",
       "source": "docs/plans/slices/S09-documents-integrations.md",
       "section": "Plans",
-      "sha256": "3b6678c555c2538cdc5aa9934bad9b4cd7828970a34ccda9cae22118c5339427",
-      "bytes": 22878,
+      "sha256": "f22757af3303bfeb36eb2aac979b8cacc9d74533c8ad3d49fa5bcca61cde083a",
+      "bytes": 23001,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S09-documents-integrations.md"
     },
     {

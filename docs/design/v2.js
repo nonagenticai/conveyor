@@ -55,7 +55,16 @@ window.installV2 = function (api, enterprise) {
   // is the offline DESIGN study. Present, the rows the platform actually owns replace the
   // fixtures they cover, and the pages with no live source keep the DESIGN ribbon.
   const S = window.CONVEYOR_SNAPSHOT;
-  const live = S && S.schema === "design-snapshot/v1" ? S : null;
+  // The surface checks render the design fixtures, not the working tree's published payload: on
+  // a publish branch `data/snapshot.js` is the live pack and would hide every fixture the checks
+  // assert. The checks set this flag before any page script runs; a visitor never does (#468).
+  const qaNoSnapshot = window.CONVEYOR_QA_NO_SNAPSHOT === true;
+  if (qaNoSnapshot) {
+    // The generated outputs index is a publish branch's live payload too; the public empty-shape
+    // assertions need the placeholder, exactly as for the snapshot.
+    window.CONVEYOR_OUTPUTS = null;
+  }
+  const live = !qaNoSnapshot && S && S.schema === "design-snapshot/v1" ? S : null;
   // The V2 product-design study is not part of the public programme site. It stays available
   // to signed-in operators, and to a reviewer who asks for it explicitly with `?design=1`
   // (the mode `check-v2.cjs` exercises). Without either, a design destination is a sign-in gate.
@@ -1965,6 +1974,11 @@ window.installV2 = function (api, enterprise) {
           closure,
           published: expected.filter(isPublished).length,
           closurePublished: closure.filter(isPublished).length,
+          // #386: the at-closure set is owed only once the project is closed. An active project's
+          // missing at-closure output is not debt; a closed project's is (the closure gate in
+          // crates/actions/src/programme.rs is the action-side mirror of this rule).
+          closureMissing:
+            project.status === "closed" ? closure.filter((category) => !isPublished(category)) : [],
           next: expected.find((category) => !isPublished(category)) || "",
         };
       })
@@ -1973,18 +1987,29 @@ window.installV2 = function (api, enterprise) {
           (left.meta.tranche ?? 99) - (right.meta.tranche ?? 99) ||
           String(left.project.key).localeCompare(String(right.project.key)),
       );
-    const body = rows.map(({ project, meta, expected, closure, published, closurePublished, next }) => {
-      const measured = ((coverageOf(project.key) || {}).status) || meta.measured_status || "—";
-      return `<tr><td><strong>${E(project.key)}</strong> <small>${E(project.name)}</small></td><td>${E(meta.tranche ?? "—")}</td><td>${E(measured)}</td><td>${B(`${published}/${expected.length}`, expected.length && published === expected.length ? "green" : "amber")}</td><td>${closure.length ? E(`${closurePublished}/${closure.length}`) : "—"}</td><td>${next ? `<span class="mono">${E(next)}</span>` : "—"}</td></tr>`;
-    });
+    const body = rows.map(
+      ({ project, meta, expected, closure, published, closurePublished, closureMissing, next }) => {
+        const measured = ((coverageOf(project.key) || {}).status) || meta.measured_status || "—";
+        // #386: a closed project's missing at-closure category is named in the row and tones the
+        // cell bad. An active project keeps the plain count — its closure set is not owed yet.
+        const closureCell = closure.length
+          ? `${B(`${closurePublished}/${closure.length}`, closureMissing.length ? "bad" : closurePublished === closure.length ? "green" : "amber")}${closureMissing.length ? `<small> missing: ${E(closureMissing.join(", "))}</small>` : ""}`
+          : "—";
+        return `<tr><td><strong>${E(project.key)}</strong> <small>${E(project.name)}</small></td><td>${E(meta.tranche ?? "—")}</td><td>${E(measured)}</td><td>${B(`${published}/${expected.length}`, expected.length && published === expected.length ? "green" : "amber")}</td><td>${closureCell}</td><td>${next ? `<span class="mono">${E(next)}</span>` : "—"}</td></tr>`;
+      },
+    );
     const due = rows.filter((row) => row.next.length > 0).length;
+    const closureOwed = rows.reduce((total, row) => total + row.closureMissing.length, 0);
+    const queueBadge = closureOwed
+      ? `${due} outputs due · ${closureOwed} closure ${closureOwed === 1 ? "output" : "outputs"} owed`
+      : `${due} outputs due`;
     return panel(
       "Programme queue",
       `${table(
         ["Project", "Tranche", "Measured", "Outputs", "Closure", "Next output"],
         body.length ? body : [`<tr><td colspan="6">No projects.</td></tr>`],
-      )}${note("Published outputs against the due-now set; `closure` counts the at-closure set. Ordered by tranche, then project key. The next output is the first due-now category with no published document.")}`,
-      B(`${due} outputs due`, due ? "amber" : "green"),
+      )}${note("Published outputs against the due-now set; `closure` counts the at-closure set. A closed project's unpublished at-closure output is debt; an active project's is not owed yet. Ordered by tranche, then project key. The next output is the first due-now category with no published document.")}`,
+      B(queueBadge, due || closureOwed ? "amber" : "green"),
     );
   }
 

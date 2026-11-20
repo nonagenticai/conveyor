@@ -727,6 +727,39 @@ pub async fn update_card_tx(
     }
 }
 
+/// Replace a card's `meta` document, guarded by its version. `None` means absent or stale.
+///
+/// The caller computes the merged document: `meta` is a free-form object whose keys belong to
+/// the card type (an incident's severity and timestamps, a coach card's interruption link), so
+/// the store never interprets it. The version guard is the same one `cards.update` uses, which
+/// keeps a concurrent write from being silently overwritten — the loser sees `None` and answers
+/// a stale precondition.
+pub async fn set_card_meta_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    id: Uuid,
+    meta: &Value,
+    expected_version: Version,
+) -> Result<Option<CardRecord>, sqlx::Error> {
+    let expected = i64::try_from(expected_version.get()).unwrap_or(i64::MAX);
+    let updated: Option<Uuid> = sqlx::query_scalar(
+        "UPDATE card
+            SET meta = $3, version = version + 1, updated_at = now()
+          WHERE tenant_id = $1 AND id = $2 AND version = $4
+          RETURNING id",
+    )
+    .bind(tenant.as_uuid())
+    .bind(id)
+    .bind(meta)
+    .bind(expected)
+    .fetch_optional(&mut *conn)
+    .await?;
+    match updated {
+        None => Ok(None),
+        Some(_) => get_card_record_tx(conn, tenant, id).await,
+    }
+}
+
 /// Bump a card's `version` without touching any other column.
 ///
 /// A card's representation includes its labels (`CardView`), so labelling or unlabelling a

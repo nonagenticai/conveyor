@@ -1,195 +1,195 @@
 {
   "actions_invoked": [
     {
-      "line": 1332,
+      "line": 1341,
       "name": "approvals.decide"
     },
     {
-      "line": 6035,
+      "line": 6060,
       "name": "approvals.decide"
     },
     {
-      "line": 5822,
+      "line": 5847,
       "name": "approvals.list"
     },
     {
-      "line": 5823,
+      "line": 5848,
       "name": "approvals.list"
     },
     {
-      "line": 5995,
+      "line": 6020,
       "name": "approvals.request"
     },
     {
-      "line": 1232,
+      "line": 1241,
       "name": "architecture.artifacts_entries"
     },
     {
-      "line": 1233,
+      "line": 1242,
       "name": "architecture.artifacts_links"
     },
     {
-      "line": 206,
+      "line": 215,
       "name": "card_types.list"
     },
     {
-      "line": 395,
+      "line": 404,
       "name": "cards.claim"
     },
     {
-      "line": 379,
+      "line": 388,
       "name": "cards.comment"
     },
     {
-      "line": 327,
+      "line": 336,
       "name": "cards.create"
     },
     {
-      "line": 356,
+      "line": 365,
       "name": "cards.move"
     },
     {
-      "line": 410,
+      "line": 419,
       "name": "cards.release"
     },
     {
-      "line": 2515,
+      "line": 2540,
       "name": "documents.compose"
     },
     {
-      "line": 3002,
+      "line": 3027,
       "name": "documents.compose"
     },
     {
-      "line": 2797,
+      "line": 2822,
       "name": "documents.create"
     },
     {
-      "line": 2868,
+      "line": 2893,
       "name": "documents.delete"
     },
     {
-      "line": 2814,
+      "line": 2839,
       "name": "documents.download"
     },
     {
-      "line": 2847,
+      "line": 2872,
       "name": "documents.download"
     },
     {
-      "line": 2537,
+      "line": 2562,
       "name": "documents.get"
     },
     {
-      "line": 2832,
+      "line": 2857,
       "name": "documents.get"
     },
     {
-      "line": 1091,
+      "line": 1100,
       "name": "documents.list"
     },
     {
-      "line": 1114,
+      "line": 1123,
       "name": "documents.list"
     },
     {
-      "line": 1141,
+      "line": 1150,
       "name": "documents.list"
     },
     {
-      "line": 2765,
+      "line": 2790,
       "name": "documents.list"
     },
     {
-      "line": 2899,
+      "line": 2924,
       "name": "documents.preview"
     },
     {
-      "line": 2945,
+      "line": 2970,
       "name": "documents.return"
     },
     {
-      "line": 2686,
+      "line": 2711,
       "name": "documents.revision_get"
     },
     {
-      "line": 2647,
+      "line": 2672,
       "name": "documents.revision_list"
     },
     {
-      "line": 5903,
+      "line": 5928,
       "name": "procedures.ingest_process"
     },
     {
-      "line": 5895,
+      "line": 5920,
       "name": "procedures.ingest_rdf"
     },
     {
-      "line": 5911,
+      "line": 5936,
       "name": "procedures.ingest_sop"
     },
     {
-      "line": 5779,
+      "line": 5804,
       "name": "procedures.list"
     },
     {
-      "line": 6108,
+      "line": 6133,
       "name": "procedures.publish"
     },
     {
-      "line": 5956,
+      "line": 5981,
       "name": "procedures.review_source"
     },
     {
-      "line": 5938,
+      "line": 5963,
       "name": "procedures.validate"
     },
     {
-      "line": 1355,
+      "line": 1364,
       "name": "process_runs.start"
     },
     {
-      "line": 5802,
+      "line": 5827,
       "name": "processes.get"
     },
     {
-      "line": 5782,
+      "line": 5807,
       "name": "processes.list"
     },
     {
-      "line": 6110,
+      "line": 6135,
       "name": "processes.publish"
     },
     {
-      "line": 197,
+      "line": 206,
       "name": "programmes.list"
     },
     {
-      "line": 672,
+      "line": 681,
       "name": "programmes.list"
     },
     {
-      "line": 2446,
+      "line": 2471,
       "name": "projects.close"
     },
     {
-      "line": 2329,
+      "line": 2354,
       "name": "projects.create"
     },
     {
-      "line": 2337,
+      "line": 2362,
       "name": "projects.update"
     },
     {
-      "line": 1305,
+      "line": 1314,
       "name": "runs.cancel"
     },
     {
-      "line": 1283,
+      "line": 1292,
       "name": "runs.get"
     },
     {
-      "line": 1260,
+      "line": 1269,
       "name": "runs.list"
     }
   ],
@@ -353,7 +353,6 @@
           223,
           224,
           225,
-          386,
           393,
           394,
           395,
@@ -362,10 +361,10 @@
           433,
           434,
           435,
-          450
+          462
         ],
-        "open": 17,
-        "ready": 8,
+        "open": 16,
+        "ready": 7,
         "unknown": 0
       }
     },
@@ -930,8 +929,8 @@
       "key": "S09",
       "measured": {
         "actions": [
-          27,
-          27
+          26,
+          26
         ],
         "modules": [
           1,
@@ -1100,10 +1099,11 @@
           390,
           391,
           392,
-          400
+          400,
+          459
         ],
-        "open": 7,
-        "ready": 5,
+        "open": 6,
+        "ready": 4,
         "unknown": 0
       }
     },
@@ -1709,10 +1709,11 @@
         "blocked": 0,
         "claimed": 0,
         "numbers": [
-          84
+          84,
+          458
         ],
-        "open": 0,
-        "ready": 0,
+        "open": 1,
+        "ready": 1,
         "unknown": 0
       }
     },
@@ -1721,8 +1722,7 @@
         "T15",
         "T17",
         "T5",
-        "T6",
-        "T7"
+        "T6"
       ],
       "evidence": [
         "docs/SPEC_V2.md"
@@ -1924,13 +1924,13 @@
       "tranche": 4,
       "units": {
         "blocked": 0,
-        "claimed": 0,
+        "claimed": 1,
         "numbers": [
           85,
           448
         ],
         "open": 1,
-        "ready": 1,
+        "ready": 0,
         "unknown": 0
       }
     },
@@ -1967,13 +1967,13 @@
       "track": "v2",
       "tranche": 5,
       "units": {
-        "blocked": 1,
+        "blocked": 0,
         "claimed": 0,
         "numbers": [
           87
         ],
         "open": 1,
-        "ready": 0,
+        "ready": 1,
         "unknown": 0
       }
     },
@@ -2192,18 +2192,18 @@
     {
       "blocked_by": [],
       "evidence": [
-        "docs/SPEC_V2.md"
+        "crates/ops"
       ],
-      "gap": "no incident, runbook or postmortem rows and no operations tool call set",
+      "gap": null,
       "key": "T7",
       "measured": {
         "actions": [
-          0,
-          0
+          15,
+          15
         ],
         "modules": [
-          0,
-          0
+          1,
+          1
         ],
         "tables": [
           0,
@@ -2218,12 +2218,12 @@
         "T17"
       ],
       "plan": "docs/SPEC_V2.md#12",
-      "status": "proposed",
+      "status": "built",
       "track": "v2",
       "tranche": 5,
       "units": {
-        "blocked": 0,
-        "claimed": 1,
+        "blocked": 1,
+        "claimed": 0,
         "numbers": [
           78,
           170,
@@ -2567,16 +2567,16 @@
       "by_status": {
         "absent": 0,
         "archived": 1,
-        "built": 38,
+        "built": 39,
         "partial": 2,
         "planned": 0,
-        "proposed": 6,
+        "proposed": 5,
         "standing": 1
       },
       "total": 48,
       "uncovered": [],
-      "with_open_units": 21,
-      "without_open_units": 27
+      "with_open_units": 22,
+      "without_open_units": 26
     },
     "screens": {
       "actions_invoked": 39,
