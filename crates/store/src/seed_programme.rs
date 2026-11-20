@@ -196,33 +196,60 @@ pub async fn seed_programme(
     for (tenant_id, slug) in targets {
         let tenant = TenantId::from_uuid(tenant_id)?;
         let mut tx = begin_scoped(pool, tenant).await?;
-        let mut counts = ProgrammeCounts::default();
-        // Resolved once per tenant, not once per project: the lanes are the same for every board,
-        // and a tenant without the template gets one warning, not 48.
-        let lanes = board_lanes(&mut tx, tenant).await?;
-        if lanes.is_none() {
-            tracing::warn!(
-                tenant = %slug,
-                template = DEFAULT_TEMPLATE_CODE,
-                "programme seed: no active board template for this tenant; the projects keep \
-                 their rows and are left without a board"
-            );
-        }
-        let programme_id =
-            upsert_programme(&mut tx, tenant_id, &export.programme, &mut counts).await?;
-        for project in &export.projects {
-            let project_id =
-                upsert_project(&mut tx, tenant_id, programme_id, project, &mut counts).await?;
-            if let Some(kinds) = lanes.as_deref() {
-                ensure_project_board(&mut tx, tenant, project_id, project, kinds, &mut counts)
-                    .await?;
-            }
-        }
-        seed_definition(&mut tx, tenant_id, programme_id, &definition, &mut counts).await?;
+        let counts = seed_export_tx(&mut tx, tenant, &export, &definition, &slug).await?;
         tx.commit().await?;
         results.push((slug, counts));
     }
     Ok(results)
+}
+
+/// Apply the embedded programme document inside the caller's tenant-scoped transaction.
+///
+/// The action path has no pool — `programmes.refresh` runs on a connection the API layer already
+/// scoped — so the per-tenant body is separated from target resolution. The caller owns the
+/// transaction: a failure rolls the whole tenant back and a commit publishes it atomically.
+pub async fn seed_programme_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+) -> Result<ProgrammeCounts, SeedError> {
+    let export = programme_export()?;
+    let definition = definition_export()?;
+    let label = tenant.as_uuid().to_string();
+    seed_export_tx(conn, tenant, &export, &definition, &label).await
+}
+
+async fn seed_export_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    export: &ProgrammeExport,
+    definition: &DefinitionExport,
+    label: &str,
+) -> Result<ProgrammeCounts, SeedError> {
+    let tenant_id = tenant.as_uuid();
+    let mut counts = ProgrammeCounts::default();
+    // Resolved once per tenant, not once per project: the lanes are the same for every board,
+    // and a tenant without the template gets one warning, not 48.
+    let lanes = board_lanes(&mut *conn, tenant).await?;
+    if lanes.is_none() {
+        tracing::warn!(
+            tenant = %label,
+            template = DEFAULT_TEMPLATE_CODE,
+            "programme seed: no active board template for this tenant; the projects keep \
+             their rows and are left without a board"
+        );
+    }
+    let programme_id =
+        upsert_programme(&mut *conn, tenant_id, &export.programme, &mut counts).await?;
+    for project in &export.projects {
+        let project_id =
+            upsert_project(&mut *conn, tenant_id, programme_id, project, &mut counts).await?;
+        if let Some(kinds) = lanes.as_deref() {
+            ensure_project_board(&mut *conn, tenant, project_id, project, kinds, &mut counts)
+                .await?;
+        }
+    }
+    seed_definition(&mut *conn, tenant_id, programme_id, definition, &mut counts).await?;
+    Ok(counts)
 }
 
 /// Parse the embedded definition. A malformed document is a programming error, never data.
