@@ -41,7 +41,6 @@ sha=<head>
 - [ ] Tests named per part exist and ran; none skipped
 - [ ] The issue's Definition-of-done checklist is satisfied
 - [ ] No second PR exists for this issue
-- [ ] The WIP cap is respected (≤2 open `issue/*` PRs, including this one)
 
 ## Resume
 - Branch: `issue/<n>-<slug>`

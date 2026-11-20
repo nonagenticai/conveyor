@@ -3,6 +3,8 @@ target/
 
 # Node / Playwright artefacts of the Leptos web harness (apps/web). Measured: 19 MB.
 node_modules/
+# a worktree may symlink the shared install; ignore it as a file too
+node_modules
 test-results/
 playwright-report/
 
