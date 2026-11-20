@@ -5,19 +5,19 @@
       "name": "approvals.decide"
     },
     {
-      "line": 6090,
+      "line": 6103,
       "name": "approvals.decide"
     },
     {
-      "line": 5877,
+      "line": 5890,
       "name": "approvals.list"
     },
     {
-      "line": 5878,
+      "line": 5891,
       "name": "approvals.list"
     },
     {
-      "line": 6050,
+      "line": 6063,
       "name": "approvals.request"
     },
     {
@@ -53,35 +53,35 @@
       "name": "cards.release"
     },
     {
-      "line": 2565,
+      "line": 2578,
       "name": "documents.compose"
     },
     {
-      "line": 3052,
+      "line": 3065,
       "name": "documents.compose"
     },
     {
-      "line": 2847,
+      "line": 2860,
       "name": "documents.create"
     },
     {
-      "line": 2918,
+      "line": 2931,
       "name": "documents.delete"
     },
     {
-      "line": 2864,
+      "line": 2877,
       "name": "documents.download"
     },
     {
-      "line": 2897,
+      "line": 2910,
       "name": "documents.download"
     },
     {
-      "line": 2587,
+      "line": 2600,
       "name": "documents.get"
     },
     {
-      "line": 2882,
+      "line": 2895,
       "name": "documents.get"
     },
     {
@@ -97,51 +97,51 @@
       "name": "documents.list"
     },
     {
-      "line": 2815,
+      "line": 2828,
       "name": "documents.list"
     },
     {
-      "line": 2949,
+      "line": 2962,
       "name": "documents.preview"
     },
     {
-      "line": 2995,
+      "line": 3008,
       "name": "documents.return"
     },
     {
-      "line": 2736,
+      "line": 2749,
       "name": "documents.revision_get"
     },
     {
-      "line": 2697,
+      "line": 2710,
       "name": "documents.revision_list"
     },
     {
-      "line": 5958,
+      "line": 5971,
       "name": "procedures.ingest_process"
     },
     {
-      "line": 5950,
+      "line": 5963,
       "name": "procedures.ingest_rdf"
     },
     {
-      "line": 5966,
+      "line": 5979,
       "name": "procedures.ingest_sop"
     },
     {
-      "line": 5834,
+      "line": 5847,
       "name": "procedures.list"
     },
     {
-      "line": 6163,
+      "line": 6176,
       "name": "procedures.publish"
     },
     {
-      "line": 6011,
+      "line": 6024,
       "name": "procedures.review_source"
     },
     {
-      "line": 5993,
+      "line": 6006,
       "name": "procedures.validate"
     },
     {
@@ -149,15 +149,15 @@
       "name": "process_runs.start"
     },
     {
-      "line": 5857,
+      "line": 5870,
       "name": "processes.get"
     },
     {
-      "line": 5837,
+      "line": 5850,
       "name": "processes.list"
     },
     {
-      "line": 6165,
+      "line": 6178,
       "name": "processes.publish"
     },
     {
@@ -173,15 +173,15 @@
       "name": "programmes.refresh"
     },
     {
-      "line": 2496,
+      "line": 2509,
       "name": "projects.close"
     },
     {
-      "line": 2379,
+      "line": 2392,
       "name": "projects.create"
     },
     {
-      "line": 2387,
+      "line": 2400,
       "name": "projects.update"
     },
     {

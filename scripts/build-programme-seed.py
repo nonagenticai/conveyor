@@ -32,6 +32,9 @@ import subprocess
 import sys
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import programme_state  # noqa: E402  (sibling module, resolved at run time)
+
 ROOT = Path(__file__).resolve().parents[1]
 PROGRAMME_NAME = "conveyor buildout"
 PROGRAMME_KEY = "conveyor-buildout"
@@ -393,27 +396,13 @@ def coverage_statuses() -> dict[str, dict]:
 
 
 def derive_status(project: dict, issues: list[dict], coverage: dict[str, dict]) -> str:
-    """Prefer the measured status over plan prose; the GitHub issue state still decides active.
+    """The programme's one status rule — delegated to `scripts/programme_state.py`.
 
-    A built/archived/standing project with no open unit is closed (or archived); any project
-    with an open unit is active; a measured-unbuilt project with no unit stays draft. Without a
-    coverage row the old plan-frontmatter rule applies, so the generator still works alone.
+    GitHub issue state outranks the measured coverage; the coverage answers "does the mock UI
+    cover this project", not "is the work delivered". The rule used to live here and ranked the
+    measurement first, so T11 stayed `draft` after #84 closed.
     """
-    if project["key"] == "PLATFORM":
-        return "active"  # a standing project: it is never "done"
-    measured = coverage.get(project["key"], {}).get("status", "")
-    if measured == "archived" or project.get("plan_status") == "superseded":
-        return "archived"
-    open_issues = [issue for issue in issues if issue["state"] == "OPEN"]
-    if measured in ("built", "standing"):
-        return "active" if open_issues else "closed"
-    if open_issues:
-        return "active"
-    if measured in ("partial", "planned", "absent", "proposed"):
-        return "draft"
-    if project.get("plan_status", "").startswith("built") or project.get("plan_status") == "active":
-        return "closed"
-    return "draft"
+    return programme_state.derive_status(project, issues, coverage)
 
 
 def build(issues: list[dict]) -> dict:
@@ -489,7 +478,7 @@ def build(issues: list[dict]) -> dict:
                     "issues": numbers,
                     "depends_on": project["depends_on"],
                     "plan_status": project.get("plan_status", ""),
-                    "status_source": "measured coverage + open GitHub issues + plan frontmatter",
+                    "status_source": programme_state.STATUS_SOURCE,
                     "measured_status": measured.get("status", ""),
                     "tranche": measured.get("tranche", 0),
                     "expected_outputs": list(cls["now"]),

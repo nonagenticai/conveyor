@@ -1447,6 +1447,12 @@ window.installV2 = function (api, enterprise) {
     const repo = current.repo_url
       ? `<a class="e-project-link" href="${E(current.repo_url)}" target="_blank" rel="noopener">repository ↗</a>`
       : "—";
+    // #433: the programme is downloadable. `download` keeps the reader on the page; the two files
+    // are the same rows this panel renders, so a screenshot can be checked against a file.
+    const downloads =
+      '<a class="e-project-link" href="data/programme.json" download>programme.json ↓</a> · ' +
+      '<a class="e-project-link" href="data/programme.csv" download>programme.csv ↓</a>';
+    const packStatus = (current.meta || {}).measured_status || "";
     const head = panel(
       `${E(current.key)} · ${E(current.name)}`,
       `${select}${
@@ -1463,9 +1469,16 @@ window.installV2 = function (api, enterprise) {
                 : "amber",
           ),
         ],
+        [
+          "Pack coverage",
+          packStatus
+            ? B(packStatus, packStatus === "built" || packStatus === "standing" ? "green" : "amber")
+            : `<span class="muted">—</span>`,
+        ],
         ["Repository", repo],
         ["Plan", plan ? `<a class="e-project-link" href="${E(plan)}">${E((current.meta || {}).plan)} ↗</a>` : `<span class="muted">—</span>`],
         ["Linked issues", `${projectIssues(current).length}`],
+        ["Download", downloads],
       ])}${
         signed
           ? `<div class="console-actions">${C.can("projects.update") ? button("Edit project", "project-edit", `data-id="${E(current.id)}"`, "small", "edit") : ""}${C.can("projects.close") ? button("Close project", "project-close", `data-id="${E(current.id)}"`, "small", "archive") : ""}</div>`
