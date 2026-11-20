@@ -1,11 +1,32 @@
 {
   "issues": [
     {
+      "number": 508,
+      "title": "programme: the write path refuses status, meta and self-approval bypasses",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/508",
+      "updatedAt": "2026-11-20T19:02:04Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        },
+        {
+          "name": "programme",
+          "color": "5319E7"
+        }
+      ]
+    },
+    {
       "number": 503,
       "title": "programme: the seed records tranche 1 as authorised after the continue review",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/503",
-      "updatedAt": "2026-11-20T17:31:38Z",
+      "updatedAt": "2026-11-20T18:22:09Z",
       "labels": [
         {
           "name": "unit",
@@ -24,9 +45,9 @@
     {
       "number": 502,
       "title": "benefits: a realized status needs a measured transition",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/502",
-      "updatedAt": "2026-11-20T17:31:35Z",
+      "updatedAt": "2026-11-20T18:20:43Z",
       "labels": [
         {
           "name": "unit",
@@ -45,9 +66,9 @@
     {
       "number": 501,
       "title": "programme: the conformance standard, snapshot exposure and the retro gap register",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/501",
-      "updatedAt": "2026-11-20T17:25:31Z",
+      "updatedAt": "2026-11-20T18:30:14Z",
       "labels": [
         {
           "name": "unit",
@@ -324,9 +345,9 @@
     {
       "number": 448,
       "title": "T16 \u2014 the Procedures destination live over the intake and its gates",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/448",
-      "updatedAt": "2026-11-20T08:25:58Z",
+      "updatedAt": "2026-11-20T19:17:57Z",
       "labels": [
         {
           "name": "unit",
@@ -394,7 +415,7 @@
       "title": "publish: the programme's delivery record \u2014 programme.json, CSV and one tracked issue",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/433",
-      "updatedAt": "2026-11-20T17:36:42Z",
+      "updatedAt": "2026-11-20T17:36:55Z",
       "labels": [
         {
           "name": "unit",
@@ -4040,9 +4061,9 @@
     {
       "number": 28,
       "title": "S12: hillclimb and inference-usage screens with their specs",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/28",
-      "updatedAt": "2026-11-20T17:31:18Z",
+      "updatedAt": "2026-11-20T18:50:31Z",
       "labels": [
         {
           "name": "unit",
@@ -4061,9 +4082,9 @@
     {
       "number": 27,
       "title": "S12: eval report and sign-off screens with their specs",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/27",
-      "updatedAt": "2026-11-20T17:31:16Z",
+      "updatedAt": "2026-11-20T18:50:29Z",
       "labels": [
         {
           "name": "unit",
@@ -4437,9 +4458,9 @@
     {
       "number": 7,
       "title": "S13 \u2014 the stage editor and the retirement-gate cleanup (W4/W5 done)",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/7",
-      "updatedAt": "2026-11-20T17:31:14Z",
+      "updatedAt": "2026-11-20T18:50:28Z",
       "labels": [
         {
           "name": "unit",
@@ -4458,9 +4479,9 @@
     {
       "number": 6,
       "title": "S12 \u2014 finish the UI: remaining screens and measurement",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/6",
-      "updatedAt": "2026-11-20T17:31:13Z",
+      "updatedAt": "2026-11-20T18:50:26Z",
       "labels": [
         {
           "name": "unit",
