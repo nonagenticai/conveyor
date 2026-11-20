@@ -284,7 +284,8 @@ jobs:
           python3 scripts/programme_state.py --check
           python3 scripts/audit-programme-conformance.py --self-test
           python3 scripts/audit-programme-conformance.py --check-standard
-          python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --report --out "$RUNNER_TEMP/conformance"          python3 scripts/check-output-standard.py --self-test
+          python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --report --out "$RUNNER_TEMP/conformance"
+          python3 scripts/check-output-standard.py --self-test
           python3 scripts/check-output-standard.py
           python3 scripts/ci/board.py --self-test
           node docs/design/scripts/check-coverage.cjs --self-test
