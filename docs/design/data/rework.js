@@ -8471,6 +8471,267 @@ window.CONVEYOR_REWORK = {
       "title": "Live Metering screen shows no cost, tool spend or budget utilisation"
     },
     {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-p111-1:T13",
+      "apply_to": "PLATFORM",
+      "artefact": "§11.1",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "A registered action creates, narrows and retires a tenant-scoped tool_binding against a published toolkit version with an effect ceiling and a credential alias; a test creates one, runs tools.call through the broker and asserts one tool_call row; a draft or retired toolkit is refused at binding creation.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "line": 102,
+              "path": "migrations/0055_tool_platform.sql",
+              "quote": "CREATE TABLE tool_binding (",
+              "source": "code"
+            },
+            {
+              "line": 179,
+              "path": "crates/store/src/tool.rs",
+              "quote": "            AND (b.run_id = $2 OR (b.job_binding_id IS NOT NULL AND b.job_binding_id = $3))",
+              "source": "code"
+            },
+            {
+              "line": 1298,
+              "path": "docs/SPEC_V2.md",
+              "quote": "hash); the binding pins the toolkit versions and the credential alias. Both are conveyor rows; the release never",
+              "source": "code"
+            }
+          ],
+          "rule": "v1-p111-1",
+          "source": "audit"
+        }
+      ],
+      "key": "v1-p111-1:T13",
+      "owner_project": "T13",
+      "rule": "v1-p111-1",
+      "scope": "T13",
+      "severity": "P1",
+      "spec": "§11.1",
+      "standard": "SPEC",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "§11.1 makes the tool binding one of the two conveyor rows that authorise tool use; no action or store function inserts a tool_binding, so resolution finds none in a real tenant and every call is refused.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "line": 102,
+                  "path": "migrations/0055_tool_platform.sql",
+                  "quote": "CREATE TABLE tool_binding (",
+                  "source": "code"
+                },
+                {
+                  "line": 179,
+                  "path": "crates/store/src/tool.rs",
+                  "quote": "            AND (b.run_id = $2 OR (b.job_binding_id IS NOT NULL AND b.job_binding_id = $3))",
+                  "source": "code"
+                },
+                {
+                  "line": 1298,
+                  "path": "docs/SPEC_V2.md",
+                  "quote": "hash); the binding pins the toolkit versions and the credential alias. Both are conveyor rows; the release never",
+                  "source": "code"
+                }
+              ],
+              "rule": "v1-p111-1",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P1",
+          "subject": "T13"
+        }
+      ],
+      "title": "The tool binding has no writer, so a production tool call cannot resolve"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-p111-2:T13",
+      "apply_to": "PLATFORM",
+      "artefact": "§11.1",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "A release-scoped grant row (op, variant, max_side_effect, enabled) is written inside the release hash and read at tools.call; an operation absent from the grant is refused 403 and a max_side_effect below the tool's effect is refused; tests cover both.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "line": 1294,
+              "path": "docs/SPEC_V2.md",
+              "quote": "| **Tool grant** | the release's operation allowlist (`op`, `variant`, `max_side_effect`, `enabled`) and per-call tool gate | the conveyor binding (tool existence + credential) |",
+              "source": "code"
+            },
+            {
+              "line": 1420,
+              "path": "docs/SPEC_V2.md",
+              "quote": "choose, and every choice is recorded; the broker never widens the grant.",
+              "source": "code"
+            },
+            {
+              "line": 174,
+              "path": "crates/store/src/tool.rs",
+              "quote": "           FROM tool_binding b",
+              "source": "code"
+            }
+          ],
+          "rule": "v1-p111-2",
+          "source": "audit"
+        }
+      ],
+      "key": "v1-p111-2:T13",
+      "owner_project": "T13",
+      "rule": "v1-p111-2",
+      "scope": "T13",
+      "severity": "P1",
+      "spec": "§11.1",
+      "standard": "SPEC",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "§11.1 names a second authorising row, the release's operation allowlist with op, variant, max_side_effect and enabled, and §11.4 says it bounds what an internal_agent may choose; no table, struct or action carries max_side_effect and resolution joins only tool_binding.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "line": 1294,
+                  "path": "docs/SPEC_V2.md",
+                  "quote": "| **Tool grant** | the release's operation allowlist (`op`, `variant`, `max_side_effect`, `enabled`) and per-call tool gate | the conveyor binding (tool existence + credential) |",
+                  "source": "code"
+                },
+                {
+                  "line": 1420,
+                  "path": "docs/SPEC_V2.md",
+                  "quote": "choose, and every choice is recorded; the broker never widens the grant.",
+                  "source": "code"
+                },
+                {
+                  "line": 174,
+                  "path": "crates/store/src/tool.rs",
+                  "quote": "           FROM tool_binding b",
+                  "source": "code"
+                }
+              ],
+              "rule": "v1-p111-2",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P1",
+          "subject": "T13"
+        }
+      ],
+      "title": "The release's tool grant does not exist, so an internal agent is bounded only by the binding"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-p111-3:T13",
+      "apply_to": "PLATFORM",
+      "artefact": "§11.1",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "A toolkit manifest or tool version can declare result fields to redact; publish persists them on tool.redact; a test publishes a tool that redacts a token field, calls it and asserts the value is redacted.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "line": 523,
+              "path": "crates/store/src/tool.rs",
+              "quote": "        \"INSERT INTO tool (tenant_id, toolkit_id, key, input_schema, effect, timeout_secs,",
+              "source": "code"
+            },
+            {
+              "line": 73,
+              "path": "migrations/0055_tool_platform.sql",
+              "quote": "    redact         jsonb NOT NULL DEFAULT '[]'::jsonb,",
+              "source": "code"
+            },
+            {
+              "line": 1394,
+              "path": "docs/SPEC_V2.md",
+              "quote": "   `ok | precondition_failed | check_failed | pending | backend_error`; declared fields are redacted and the response",
+              "source": "code"
+            }
+          ],
+          "rule": "v1-p111-3",
+          "source": "audit"
+        }
+      ],
+      "key": "v1-p111-3:T13",
+      "owner_project": "T13",
+      "rule": "v1-p111-3",
+      "scope": "T13",
+      "severity": "P1",
+      "spec": "§11.1",
+      "standard": "SPEC",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "§11.1 lists redaction as part of a tool and §11.3 applies the declared fields to the response; ToolManifest carries only key and action and the insert never names the column, so every published tool keeps the empty default and redaction is a no-op.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "line": 523,
+                  "path": "crates/store/src/tool.rs",
+                  "quote": "        \"INSERT INTO tool (tenant_id, toolkit_id, key, input_schema, effect, timeout_secs,",
+                  "source": "code"
+                },
+                {
+                  "line": 73,
+                  "path": "migrations/0055_tool_platform.sql",
+                  "quote": "    redact         jsonb NOT NULL DEFAULT '[]'::jsonb,",
+                  "source": "code"
+                },
+                {
+                  "line": 1394,
+                  "path": "docs/SPEC_V2.md",
+                  "quote": "   `ok | precondition_failed | check_failed | pending | backend_error`; declared fields are redacted and the response",
+                  "source": "code"
+                }
+              ],
+              "rule": "v1-p111-3",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P1",
+          "subject": "T13"
+        }
+      ],
+      "title": "Redaction is unreachable: no tool can declare a field to redact"
+    },
+    {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-p1110-1:T13",
       "apply_to": "PLATFORM",
       "artefact": "§11.10",
@@ -8556,6 +8817,93 @@ window.CONVEYOR_REWORK = {
         }
       ],
       "title": "Job object storage has no live path: JobStorage is test-only"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-p112-1:PLATFORM",
+      "apply_to": "PLATFORM",
+      "artefact": "§11.2",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "The retrieval manifest publishes strata_rag as published, or a test asserts a live-only status is refused for a planned service; a bound run's retrieval call reaches the destination and ledgers one tool_call, and tools.probe reports it live.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "line": 8,
+              "path": "seed/toolkits/retrieval.json",
+              "quote": "  \"status\": \"draft\",",
+              "source": "code"
+            },
+            {
+              "line": 1306,
+              "path": "docs/SPEC_V2.md",
+              "quote": "| `strata_rag` | pinned-leaf retrieval (`knowledge.query`), routed RAG | live | every job |",
+              "source": "code"
+            },
+            {
+              "line": 181,
+              "path": "crates/store/src/tool.rs",
+              "quote": "            AND k.status = 'published'",
+              "source": "code"
+            }
+          ],
+          "rule": "v1-p112-1",
+          "source": "audit"
+        }
+      ],
+      "key": "v1-p112-1:PLATFORM",
+      "owner_project": "PLATFORM",
+      "rule": "v1-p112-1",
+      "scope": "PLATFORM",
+      "severity": "P1",
+      "spec": "§11.2",
+      "standard": "SPEC",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "§11.2 lists strata_rag as live and used by every job; its seed manifest carries status draft and resolution requires a published toolkit, so the live retrieval estate has no callable tool.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "line": 8,
+                  "path": "seed/toolkits/retrieval.json",
+                  "quote": "  \"status\": \"draft\",",
+                  "source": "code"
+                },
+                {
+                  "line": 1306,
+                  "path": "docs/SPEC_V2.md",
+                  "quote": "| `strata_rag` | pinned-leaf retrieval (`knowledge.query`), routed RAG | live | every job |",
+                  "source": "code"
+                },
+                {
+                  "line": 181,
+                  "path": "crates/store/src/tool.rs",
+                  "quote": "            AND k.status = 'published'",
+                  "source": "code"
+                }
+              ],
+              "rule": "v1-p112-1",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P1",
+          "subject": "PLATFORM"
+        }
+      ],
+      "title": "The live strata_rag toolkit is seeded as draft and can never be called"
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-p116-1:T13",
@@ -29096,12 +29444,12 @@ window.CONVEYOR_REWORK = {
       "suppressed": 0
     },
     "SPEC": {
-      "findings": 81,
+      "findings": 85,
       "gaps": 38,
       "p0": 0,
       "p1": 5,
       "p2": 33,
-      "packages": 102,
+      "packages": 106,
       "rules": 8,
       "rules_clean": 2,
       "rules_with_gaps": 6,
@@ -29124,25 +29472,25 @@ window.CONVEYOR_REWORK = {
   "summary": {
     "by_severity": {
       "P0": 27,
-      "P1": 144,
+      "P1": 148,
       "P2": 153
     },
     "by_standard": {
       "MSP": 66,
       "PMP": 49,
       "SAFe": 16,
-      "SPEC": 102,
+      "SPEC": 106,
       "TOGAF": 91
     },
     "by_status": {
-      "open": 321,
+      "open": 325,
       "suppressed": 3
     },
     "duplicates": 0,
-    "open": 321,
-    "packages": 324,
+    "open": 325,
+    "packages": 328,
     "resolved": 11,
-    "subjects": 422,
+    "subjects": 426,
     "suppressed": 3
   }
 };

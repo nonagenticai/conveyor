@@ -3597,6 +3597,122 @@
             "failure_scenario": "A retention or deny policy written for tenant/id/* governs run objects but not documents; a prefix audit or a tenant-scoped bucket policy sees documents outside the documented namespace, so tenant separation depends on the application rather than the key scheme.",
             "acceptance": "One key scheme: key_for returns tenant/<tenant_id>/<document>/<hash>, matching the storage adapter and §11.10; a test asserts both adapters share the tenant prefix and that a key lacking it is refused.",
             "owner_project": "T13"
+        },
+        {
+            "id": "v1-p111-1",
+            "area": "§11.1",
+            "standard": "SPEC",
+            "spec": "§11.1",
+            "severity": "P1",
+            "title": "The tool binding has no writer, so a production tool call cannot resolve",
+            "problem": "§11.1 makes the tool binding one of the two conveyor rows that authorise tool use; no action or store function inserts a tool_binding, so resolution finds none in a real tenant and every call is refused.",
+            "evidence": [
+                {
+                    "path": "migrations/0055_tool_platform.sql",
+                    "line": 102,
+                    "quote": "CREATE TABLE tool_binding ("
+                },
+                {
+                    "path": "crates/store/src/tool.rs",
+                    "line": 179,
+                    "quote": "            AND (b.run_id = $2 OR (b.job_binding_id IS NOT NULL AND b.job_binding_id = $3))"
+                },
+                {
+                    "path": "docs/SPEC_V2.md",
+                    "line": 1298,
+                    "quote": "hash); the binding pins the toolkit versions and the credential alias. Both are conveyor rows; the release never"
+                }
+            ],
+            "failure_scenario": "A tenant admin wants a development job to call the coding toolkit. There is no request to make: job_bindings.create writes a job_binding, not a tool_binding, and the tool actions are publish, probe, usage and call. Every tools.call resolves no binding and answers 409 tool_not_ready; tools.probe can only disable or restore bindings that do not exist.",
+            "acceptance": "A registered action creates, narrows and retires a tenant-scoped tool_binding against a published toolkit version with an effect ceiling and a credential alias; a test creates one, runs tools.call through the broker and asserts one tool_call row; a draft or retired toolkit is refused at binding creation.",
+            "owner_project": "T13"
+        },
+        {
+            "id": "v1-p111-2",
+            "area": "§11.1",
+            "standard": "SPEC",
+            "spec": "§11.1",
+            "severity": "P1",
+            "title": "The release's tool grant does not exist, so an internal agent is bounded only by the binding",
+            "problem": "§11.1 names a second authorising row, the release's operation allowlist with op, variant, max_side_effect and enabled, and §11.4 says it bounds what an internal_agent may choose; no table, struct or action carries max_side_effect and resolution joins only tool_binding.",
+            "evidence": [
+                {
+                    "path": "docs/SPEC_V2.md",
+                    "line": 1294,
+                    "quote": "| **Tool grant** | the release's operation allowlist (`op`, `variant`, `max_side_effect`, `enabled`) and per-call tool gate | the conveyor binding (tool existence + credential) |"
+                },
+                {
+                    "path": "docs/SPEC_V2.md",
+                    "line": 1420,
+                    "quote": "choose, and every choice is recorded; the broker never widens the grant."
+                },
+                {
+                    "path": "crates/store/src/tool.rs",
+                    "line": 174,
+                    "quote": "           FROM tool_binding b"
+                }
+            ],
+            "failure_scenario": "A release grants only the read operation; its internal_agent run is bound to the whole toolkit at ceiling write, so the agent also calls the create operation. Nothing compares the choice with the release allowlist and no row on the run records a grant.",
+            "acceptance": "A release-scoped grant row (op, variant, max_side_effect, enabled) is written inside the release hash and read at tools.call; an operation absent from the grant is refused 403 and a max_side_effect below the tool's effect is refused; tests cover both.",
+            "owner_project": "T13"
+        },
+        {
+            "id": "v1-p111-3",
+            "area": "§11.1",
+            "standard": "SPEC",
+            "spec": "§11.1",
+            "severity": "P1",
+            "title": "Redaction is unreachable: no tool can declare a field to redact",
+            "problem": "§11.1 lists redaction as part of a tool and §11.3 applies the declared fields to the response; ToolManifest carries only key and action and the insert never names the column, so every published tool keeps the empty default and redaction is a no-op.",
+            "evidence": [
+                {
+                    "path": "crates/store/src/tool.rs",
+                    "line": 523,
+                    "quote": "        \"INSERT INTO tool (tenant_id, toolkit_id, key, input_schema, effect, timeout_secs,"
+                },
+                {
+                    "path": "migrations/0055_tool_platform.sql",
+                    "line": 73,
+                    "quote": "    redact         jsonb NOT NULL DEFAULT '[]'::jsonb,"
+                },
+                {
+                    "path": "docs/SPEC_V2.md",
+                    "line": 1394,
+                    "quote": "   `ok | precondition_failed | check_failed | pending | backend_error`; declared fields are redacted and the response"
+                }
+            ],
+            "failure_scenario": "A binding to an ingestion backend returns a document containing an API token or personal data. The tool cannot declare anything to redact, the column is empty, and the full body reaches the caller and the compiled prompt.",
+            "acceptance": "A toolkit manifest or tool version can declare result fields to redact; publish persists them on tool.redact; a test publishes a tool that redacts a token field, calls it and asserts the value is redacted.",
+            "owner_project": "T13"
+        },
+        {
+            "id": "v1-p112-1",
+            "area": "§11.2",
+            "standard": "SPEC",
+            "spec": "§11.2",
+            "severity": "P1",
+            "title": "The live strata_rag toolkit is seeded as draft and can never be called",
+            "problem": "§11.2 lists strata_rag as live and used by every job; its seed manifest carries status draft and resolution requires a published toolkit, so the live retrieval estate has no callable tool.",
+            "evidence": [
+                {
+                    "path": "seed/toolkits/retrieval.json",
+                    "line": 8,
+                    "quote": "  \"status\": \"draft\","
+                },
+                {
+                    "path": "docs/SPEC_V2.md",
+                    "line": 1306,
+                    "quote": "| `strata_rag` | pinned-leaf retrieval (`knowledge.query`), routed RAG | live | every job |"
+                },
+                {
+                    "path": "crates/store/src/tool.rs",
+                    "line": 181,
+                    "quote": "            AND k.status = 'published'"
+                }
+            ],
+            "failure_scenario": "A procedure step explicitly searches through the retrieval toolkit. The toolkit is draft, so the broker answers 409 tool_not_ready before any network call; the live, every-job retrieval estate has no callable tool and tools.probe never reports it, because an unpublished toolkit is not probed.",
+            "acceptance": "The retrieval manifest publishes strata_rag as published, or a test asserts a live-only status is refused for a planned service; a bound run's retrieval call reaches the destination and ledgers one tool_call, and tools.probe reports it live.",
+            "owner_project": "PLATFORM"
         }
     ]
 }
