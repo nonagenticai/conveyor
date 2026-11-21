@@ -1,6 +1,27 @@
 {
   "issues": [
     {
+      "number": 546,
+      "title": "design: publish the artefact record and the rework register in the committed pack, and deepen the audit",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/546",
+      "updatedAt": "2026-11-21T22:07:11Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        },
+        {
+          "name": "programme",
+          "color": "5319E7"
+        }
+      ]
+    },
+    {
       "number": 545,
       "title": "ops: publish the standards record and materialise the register after the live tranche closes",
       "state": "OPEN",
@@ -629,7 +650,7 @@
       "title": "conveyor-buildout \u2014 the SPEC_V2 programme",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/435",
-      "updatedAt": "2026-11-21T19:35:35Z",
+      "updatedAt": "2026-11-21T21:10:50Z",
       "labels": [
         {
           "name": "programme",
