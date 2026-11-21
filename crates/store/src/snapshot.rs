@@ -355,8 +355,32 @@ pub async fn snapshot_tx(
     )
     .await?;
 
+    // The metering totals. Money is never a stored ledger column (SPEC_V2 D52): `inference_call`
+    // stores tokens and the cost is derived at read time from `commercial_price`, with the exact
+    // formula `metrics.usage` and `inference_usage.report` use — a token-priced model by prompt
+    // and completion tokens, a unit-priced model by `usage_units`. A call the price join cannot
+    // price contributes NULL (zero to the sum) and is counted in `unpriced_calls`, mirroring
+    // `metrics.usage`, so "no price" never renders as "free". `tool_cost_usd` is the
+    // `tool_call` ledger's own recorded cost. Money is rounded to 6 decimals and stays a JSON
+    // number in the snapshot (the per-project/per-card rows keep the report's decimal string).
     let inference_totals: Value = sqlx::query_scalar(
-        "SELECT jsonb_build_object(
+        "WITH priced AS (
+             SELECT ic.*,
+                    CASE
+                        WHEN p.model IS NULL THEN NULL
+                        WHEN p.unit = 'token' THEN
+                            (ic.prompt_tokens::numeric * p.input_usd_per_1m
+                             + ic.completion_tokens::numeric * p.output_usd_per_1m) / 1000000
+                        WHEN ic.usage_units IS NOT NULL THEN ic.usage_units * p.unit_usd
+                        ELSE NULL
+                    END AS row_cost
+               FROM inference_call ic
+               LEFT JOIN commercial_price p
+                      ON p.model = coalesce(ic.served_model, ic.model)
+                     AND ((p.unit = 'token' AND ic.usage_unit IS NULL) OR p.unit = ic.usage_unit)
+              WHERE ic.tenant_id = $1
+         )
+         SELECT jsonb_build_object(
              'calls', count(*),
              'prompt_tokens', COALESCE(sum(prompt_tokens), 0),
              'completion_tokens', COALESCE(sum(completion_tokens), 0),
@@ -365,8 +389,14 @@ pub async fn snapshot_tx(
              'cache_write_calls', COALESCE(sum((cache_status = 'write')::int), 0),
              'cache_miss_calls', COALESCE(sum((cache_status = 'miss')::int), 0),
              'unknown_cache_calls', COALESCE(sum((cache_status = 'unknown')::int), 0),
-             'non_ok_calls', COALESCE(sum((outcome <> 'ok')::int), 0)
-         ) FROM inference_call WHERE tenant_id = $1",
+             'non_ok_calls', COALESCE(sum((outcome <> 'ok')::int), 0),
+             'cost_usd', COALESCE(round(sum(row_cost), 6), 0),
+             'unpriced_calls', count(*) - count(row_cost),
+             'tool_cost_usd', (
+                 SELECT COALESCE(round(sum(cost), 6), 0)
+                   FROM tool_call WHERE tenant_id = $1
+             )
+         ) FROM priced",
     )
     .bind(tenant_id)
     .fetch_one(&mut *conn)

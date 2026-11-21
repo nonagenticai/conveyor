@@ -272,10 +272,82 @@ async fn the_snapshot_attributes_tokens_and_cost_by_project_and_card() {
         &call("local-llm", hidden.run, 9_000, 9_000),
     )
     .await;
+    // A priced tool call on the public run, and one the destination did not meter: the totals
+    // sum the ledger's own recorded cost, so a NULL cost contributes nothing.
+    let toolkit: Uuid = sqlx::query_scalar(
+        "INSERT INTO toolkit (tenant_id, key, toolkit_version, title, service, owner, status)
+         VALUES ($1, 'echo', 1, 'Echo toolkit', 'echo', 'platform', 'published') RETURNING id",
+    )
+    .bind(tenant.as_uuid())
+    .fetch_one(&mut *tx)
+    .await
+    .expect("insert the toolkit");
+    let tool: Uuid = sqlx::query_scalar(
+        "INSERT INTO tool (tenant_id, toolkit_id, key, input_schema, effect, timeout_secs,
+                           handler_action, status)
+         VALUES ($1, $2, 'ping', '{}'::jsonb, 'read', 30, 'echo.ping', 'published')
+         RETURNING id",
+    )
+    .bind(tenant.as_uuid())
+    .bind(toolkit)
+    .fetch_one(&mut *tx)
+    .await
+    .expect("insert the tool");
+    let input_hash = "0".repeat(64);
+    for cost in [Some(Decimal::new(500, 6)), None] {
+        store::tool::insert_call(
+            &mut tx,
+            tenant,
+            &store::tool::NewToolCall {
+                run_id: Some(public.run),
+                run_step_id: None,
+                card_id: None,
+                tool_id: tool,
+                tool_key: "echo.ping",
+                toolkit_key: "echo",
+                toolkit_version: 1,
+                input_hash: &input_hash,
+                status: "ok",
+                http_status: Some(200),
+                latency_ms: 5,
+                request_bytes: None,
+                response_bytes: None,
+                cost,
+                error_class: None,
+                error_message: None,
+            },
+        )
+        .await
+        .expect("insert the tool call");
+    }
     tx.commit().await.expect("commit the calls");
 
     let data = snapshot(&db, tenant).await;
     let measure = &data.measure["inference"];
+
+    // The tenant-wide totals carry money: the cost derived at read time (D52), the tool ledger's
+    // recorded spend, and the count of calls the price join cannot price.
+    let totals = &measure["totals"];
+    assert_eq!(totals["calls"], 3, "all three calls, the draft's included");
+    assert_eq!(
+        totals["unpriced_calls"], 1,
+        "the unpriced model is counted in the totals"
+    );
+    let total_cost = totals["cost_usd"]
+        .as_f64()
+        .expect("cost_usd is a JSON number, not a string");
+    // 0.00028 (1k prompt + 500 completion) + 0.00378 (the draft project's 9k/9k call).
+    assert!(
+        (total_cost - 0.004_06).abs() < 1e-9,
+        "derived cost over every row: {total_cost}"
+    );
+    let tool_cost = totals["tool_cost_usd"]
+        .as_f64()
+        .expect("tool_cost_usd is a JSON number, not a string");
+    assert!(
+        (tool_cost - 0.000_5).abs() < 1e-9,
+        "the tool ledger's recorded cost: {tool_cost}"
+    );
 
     let by_project = measure["by_project"].as_array().expect("by_project");
     assert_eq!(
