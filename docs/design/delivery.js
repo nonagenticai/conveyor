@@ -1691,6 +1691,96 @@ window.CONVEYOR_DELIVERY = (function () {
     </div>`;
   }
 
+  // The generated standards record. Every MSP/TOGAF/SAFe/PMP artefact is a row with a status and
+  // a published page; an absent or partial artefact names the package that must close. The rail
+  // never invents an artefact: no record means "not published", not an empty set of green chips.
+  function standardsSummary(standards) {
+    const artefacts = list(standards && standards.artefacts);
+    if (!artefacts.length) {
+      return `<div class="delivery-rail std-rail"><span class="rail-label">Standards artefacts</span><div class="rail-chips"><span class="rail-chip">the standards record is not published</span></div></div>`;
+    }
+    const by = (standards && standards.by_standard) || {};
+    const chips = Object.keys(by)
+      .sort()
+      .map((standard) => {
+        const row = by[standard];
+        return `<span class="rail-chip std-chip"><b>${esc(standard)}</b> ${row.evidenced}/${row.artefacts} evidenced · ${row.partial} partial · ${row.absent} absent</span>`;
+      })
+      .join("");
+    return `<div class="delivery-rail std-rail"><span class="rail-label">Standards artefacts · <a href="docs/standards/index.html">index</a></span><div class="rail-chips">${chips}</div></div>`;
+  }
+
+  function artefactRail(standards, options = {}) {
+    const artefacts = list(standards && standards.artefacts);
+    if (!artefacts.length) {
+      return `<div class="delivery-rail std-rail"><span class="rail-label">Standards artefacts</span><div class="rail-chips"><span class="rail-chip">the standards record is not published</span></div></div>`;
+    }
+    const rows = artefacts
+      .filter((artefact) => {
+        const subject = artefact.subject || {};
+        if (options.cardId && subject.id === options.cardId) return true;
+        if (options.projectKey && subject.project_key === options.projectKey) return true;
+        if (
+          options.programmeId &&
+          subject.programme_id === options.programmeId &&
+          ["programme", "capability", "tranche", "benefit"].includes(artefact.subject_kind)
+        ) {
+          return true;
+        }
+        return false;
+      })
+      .sort((left, right) => {
+        const rank = { absent: 0, partial: 1, evidenced: 2 };
+        return (
+          (rank[left.status] ?? 3) - (rank[right.status] ?? 3) ||
+          String(left.standard).localeCompare(String(right.standard)) ||
+          String(left.category).localeCompare(String(right.category))
+        );
+      });
+    if (!rows.length) {
+      return `<div class="delivery-rail std-rail"><span class="rail-label">Standards artefacts</span><div class="rail-chips"><span class="rail-chip">no standards artefact applies to this subject</span></div></div>`;
+    }
+    const groups = new Map();
+    rows.forEach((artefact) => {
+      const bucket = groups.get(artefact.standard) || [];
+      bucket.push(artefact);
+      groups.set(artefact.standard, bucket);
+    });
+    const body = [...groups.keys()]
+      .sort()
+      .map((standard) => {
+        const items = groups
+          .get(standard)
+          .map(
+            (artefact) =>
+              `<li><a class="std-link ${esc(artefact.status)}" href="docs/standards/${esc(
+                artefact.id,
+              )}.html">${esc(artefact.category)} · ${esc((artefact.subject || {}).title || "—")}</a><span class="std-state">${esc(
+                artefact.status,
+              )}</span>${
+                artefact.status === "evidenced"
+                  ? ""
+                  : `<code class="std-package">${esc(artefact.package_key || "no package")}</code>`
+              }</li>`,
+          )
+          .join("");
+        return `<div class="std-group"><span class="std-standard">${esc(standard)}</span><ul class="std-links">${items}</ul></div>`;
+      })
+      .join("");
+    const counts = rows.reduce(
+      (acc, artefact) => {
+        acc[artefact.status] = (acc[artefact.status] || 0) + 1;
+        return acc;
+      },
+      {},
+    );
+    return `<div class="delivery-rail std-rail"><span class="rail-label">Standards artefacts · ${
+      rows.length
+    } · ${counts.evidenced || 0} evidenced · ${counts.partial || 0} partial · ${
+      counts.absent || 0
+    } absent</span><div class="std-groups">${body}</div></div>`;
+  }
+
   return {
     activityIndex,
     portfolioRows,
@@ -1705,6 +1795,8 @@ window.CONVEYOR_DELIVERY = (function () {
     cadenceRail,
     reworkRail,
     scorecard,
+    standardsSummary,
+    artefactRail,
     governanceLine,
     projectGovernance,
     executionPanel,

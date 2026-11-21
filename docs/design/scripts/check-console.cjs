@@ -621,6 +621,79 @@ function freshState() {
 }
 
 // A small real-shaped snapshot for the public-pack shape: two projects, three issues, one board.
+// #528: the generated standards record beside the snapshot. One programme artefact (partial), one
+// phase artefact (absent, with a published package) and one card artefact (evidenced), so the four
+// levels have a row each and the absent/partial states are exercised rather than assumed.
+const STANDARDS = {
+  schema: "design-standards/v1",
+  generated_at: "2026-11-20T12:00:00Z",
+  git_sha: "0".repeat(40),
+  summary: { artefacts: 3, mandatory: 3, evidenced: 1, partial: 1, absent: 1, findings: 2 },
+  by_standard: {
+    MSP: { artefacts: 1, evidenced: 0, partial: 1, absent: 0 },
+    TOGAF: { artefacts: 1, evidenced: 0, partial: 0, absent: 1 },
+    Delivery: { artefacts: 1, evidenced: 1, partial: 0, absent: 0 },
+  },
+  artefacts: [
+    {
+      id: "std-msp-vision-delivery",
+      standard: "MSP",
+      level: "programme",
+      subject_kind: "programme",
+      category: "vision",
+      status: "partial",
+      mandatory: true,
+      package_key: "std-msp-vision-delivery:programme",
+      package_published: true,
+      subject: {
+        id: "11111111-1111-7111-8111-111111111111",
+        key: "11111111-1111-7111-8111-111111111111",
+        title: "Delivery programme",
+        programme_id: "11111111-1111-7111-8111-111111111111",
+      },
+      document: { path: "docs/standards/std-msp-vision-delivery.html", sha256: "0".repeat(64) },
+    },
+    {
+      id: "std-togaf-phase-a-dlv",
+      standard: "TOGAF",
+      level: "project",
+      subject_kind: "phase",
+      category: "phase-a",
+      status: "absent",
+      mandatory: true,
+      package_key: "std-togaf-phase-a-dlv:DLV",
+      package_published: true,
+      subject: {
+        id: "22222222-2222-7222-8222-222222222222:a",
+        key: "DLV/a",
+        title: "DLV — A",
+        programme_id: "11111111-1111-7111-8111-111111111111",
+        project_key: "DLV",
+      },
+      document: { path: "docs/standards/std-togaf-phase-a-dlv.html", sha256: "0".repeat(64) },
+    },
+    {
+      id: "std-delivery-evidence-card",
+      standard: "Delivery",
+      level: "work_package",
+      subject_kind: "card",
+      category: "evidence",
+      status: "evidenced",
+      mandatory: true,
+      package_key: "",
+      package_published: true,
+      subject: {
+        id: "66666666-6666-7666-8666-666666666666",
+        key: "66666666-6666-7666-8666-666666666666",
+        title: "Evidence card",
+        programme_id: "11111111-1111-7111-8111-111111111111",
+        project_key: "DLV",
+      },
+      document: { path: "docs/standards/std-delivery-evidence-card.html", sha256: "0".repeat(64) },
+    },
+  ],
+};
+
 const SNAPSHOT = {
   schema: "design-snapshot/v1",
   generated_at: "2026-11-20T12:00:00Z",
@@ -1683,7 +1756,7 @@ function runDetail(state, id) {
   };
 }
 
-function startServer({ config, state, snapshot, outputs }) {
+function startServer({ config, state, snapshot, outputs, standards }) {
   const server = http.createServer((req, res) => {
     const url = new URL(req.url, "http://127.0.0.1");
     const pathname = decodeURIComponent(url.pathname);
@@ -3112,6 +3185,16 @@ function startServer({ config, state, snapshot, outputs }) {
     }
     // #386's fixture serves its own published-output index; the committed docs/outputs.js is a
     // placeholder (null), so the public queue would otherwise have no docs to count.
+    if (pathname === "/data/standards.js") {
+      res.writeHead(200, { "Content-Type": MIME[".js"] });
+      return res.end(
+        standards
+          ? "window.CONVEYOR_STANDARDS = " + JSON.stringify(standards) + ";"
+          : "window.CONVEYOR_STANDARDS = null;",
+      );
+    }
+    // #386's fixture serves its own published-output index; the committed docs/outputs.js is a
+    // placeholder (null), so the public queue would otherwise have no docs to count.
     if (pathname === "/docs/outputs.js" && outputs) {
       res.writeHead(200, { "Content-Type": MIME[".js"] });
       return res.end("window.CONVEYOR_OUTPUTS = " + JSON.stringify(outputs) + ";");
@@ -3159,6 +3242,7 @@ function readBody(req, done) {
     config: null,
     state: snapshotState,
     snapshot: SNAPSHOT,
+    standards: STANDARDS,
   });
   // #386: three projects that isolate the closure-debt rule. C1 is closed and owes one
   // at-closure category; C2 is closed and complete; A1 is active and owes nothing yet.
@@ -3402,6 +3486,12 @@ function readBody(req, done) {
       assert.match(scorecardText, /MSP/, "the scorecard scores MSP");
       assert.match(scorecardText, /TOGAF/, "the scorecard scores TOGAF");
       assert.match(scorecardText, /2 open · 1 findings/, "an open-package count renders");
+      // #528: the generated standards record at L1 — per-standard evidenced/partial/absent counts.
+      const standardsSummary = await page.locator("#main .std-rail").first().innerText();
+      assert.match(standardsSummary, /MSP 0\/1 evidenced/, "L1 counts the MSP artefacts");
+      assert.match(standardsSummary, /TOGAF 0\/1 evidenced/, "L1 counts the TOGAF artefacts");
+      assert.match(standardsSummary, /1 partial/, "L1 names the partial artefact");
+      assert.match(standardsSummary, /1 absent/, "L1 names the absent artefact");
       // L2: the programme drill — only its projects, grouped by MSP tranche.
       await page.goto(
         `http://127.0.0.1:${snapshotServer.port}/studio.html#portfolio/11111111-1111-7111-8111-111111111111`,
@@ -3457,6 +3547,11 @@ function readBody(req, done) {
       assert.match(programmeTimeline, /next b/, "the next required phase is named");
       assert.match(programmeTimeline, /realised/, "a realised benefit renders");
       assert.match(programmeTimeline, /unbaselined/, "an unbaselined benefit says so");
+      // #528: L2's generated standards rail — the programme artefact, its status and its package.
+      const programmeStandards = await page.locator("#main .std-rail").first().innerText();
+      assert.match(programmeStandards, /vision · Delivery programme/, "L2 carries the programme artefact");
+      assert.match(programmeStandards, /partial/i, "the artefact's status renders");
+      assert.match(programmeStandards, /std-msp-vision-delivery:programme/, "the package that must close renders");
       assert.ok(
         (await page.locator('#main a[href="#portfolio"]').count()) >= 1,
         "L2 links back to the portfolio",
@@ -3502,6 +3597,10 @@ function readBody(req, done) {
       );
       const planLane = await page.locator("#main .kanban-col.kanban-plan").innerText();
       assert.match(planLane, /Deliver the pack/, "the Plan lane carries the WBS work package");
+      // #528: L3's generated standards rail — the project's phase artefact and its package.
+      const projectStandards = await page.locator("#main .std-rail").first().innerText();
+      assert.match(projectStandards, /phase-a · DLV — A/, "L3 carries the project's phase artefact");
+      assert.match(projectStandards, /std-togaf-phase-a-dlv:DLV/, "the absent phase names its package");
       // L4: the work package's execution and its own kanban, including the done child.
       await page.goto(
         `http://127.0.0.1:${snapshotServer.port}/studio.html#projects/22222222-2222-7222-8222-222222222222/wp/66666666-6666-7666-8666-666666666666`,
@@ -3518,6 +3617,10 @@ function readBody(req, done) {
       assert.match(packageText, /READY: the card is scoped/, "the Definition of Done is shown");
       assert.match(packageText, /1 run/, "the card's run is shown");
       assert.match(packageText, /Child three/, "an archived child renders");
+      // #528: L4's generated standards rail — the card's evidence artefact and its status.
+      const cardStandards = await page.locator("#main .std-rail").first().innerText();
+      assert.match(cardStandards, /evidence · Evidence card/, "L4 carries the card's evidence artefact");
+      assert.match(cardStandards, /evidenced/i, "the card artefact's status renders");
       assert.equal(
         (packageText.match(/Child three/g) || []).length,
         1,
