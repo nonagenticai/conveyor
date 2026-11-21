@@ -11,8 +11,9 @@ mod support;
 
 use conveyor_domain::{TenantId, Version};
 use conveyor_store::begin_scoped;
-use conveyor_store::card::{claim_card_tx, get_card_tx, release_card_tx};
+use conveyor_store::card::{claim_card_tx, get_card_tx, release_card_tx, renew_card_tx};
 use tokio::task::JoinSet;
+use uuid::Uuid;
 
 #[tokio::test]
 async fn thirty_two_racers_get_exactly_one_grant_and_the_fence_is_monotonic() {
@@ -131,4 +132,118 @@ async fn thirty_two_racers_get_exactly_one_grant_and_the_fence_is_monotonic() {
         granted.version.get()
     );
     assert_eq!(granted.claim_fence, 5, "the fence survives the release");
+}
+
+/// Exclusivity when every racer is a *distinct* `app_user`: the same-assignee arm can grant
+/// none of them, and once one wins the live lease must refuse every other user even at the
+/// card's current version.
+///
+/// Thirty-two users race one card at its current version. Exactly one is granted; the losers
+/// are `Ok(None)`, the store's refusal (a live lease is the action layer's `409`, a stale
+/// version its `412`). The winner then re-claims through the same-assignee arm with the
+/// version its grant returned and renews with the fence, and a different user presenting that
+/// *current* version is refused — the version predicate cannot explain that refusal, only the
+/// live lease can.
+#[tokio::test]
+async fn thirty_two_users_race_one_card_and_exactly_one_wins() {
+    let db = support::TestDb::fresh().await;
+    let seed = support::seed_tenant(&db.super_pool, "claim-users").await;
+    let tenant = TenantId::from_uuid(seed.tenant).expect("non-nil");
+
+    // ── 32 distinct app_users; the fixture's own two users stay out of the race ───────────
+    let mut users = Vec::with_capacity(32);
+    for racer in 0..32 {
+        let user: Uuid =
+            sqlx::query_scalar("INSERT INTO app_user (display_name) VALUES ($1) RETURNING id")
+                .bind(format!("racer-{racer}"))
+                .fetch_one(&db.super_pool)
+                .await
+                .expect("seed a racing app_user");
+        users.push(user);
+    }
+
+    // ── 32 concurrent claims, one per distinct user, all from the card's version 1 ───────
+    let mut racers = JoinSet::new();
+    for user in users.iter().copied() {
+        let pool = db.runtime.clone();
+        let card = seed.card;
+        racers.spawn(async move {
+            let mut tx = begin_scoped(&pool, tenant).await.expect("scope the claim");
+            let granted = claim_card_tx(&mut tx, tenant, card, user, 900, Version::INITIAL)
+                .await
+                .expect("the claim statement runs");
+            tx.commit().await.expect("commit the claim");
+            (user, granted)
+        });
+    }
+    let mut winners = Vec::new();
+    let mut refusals = 0usize;
+    while let Some(joined) = racers.join_next().await {
+        let (user, granted) = joined.expect("a racer must not panic");
+        match granted {
+            Some(granted) => winners.push((user, granted)),
+            None => refusals += 1,
+        }
+    }
+    println!(
+        "32 distinct users produced {} grant(s) and {refusals} refusal(s)",
+        winners.len()
+    );
+    assert_eq!(
+        winners.len(),
+        1,
+        "exactly one of 32 distinct users may claim the card"
+    );
+    assert_eq!(
+        refusals, 31,
+        "the other 31 distinct users are refused with `Ok(None)`"
+    );
+    let (winner, granted) = winners[0];
+    assert_eq!(granted.claim_fence, 1, "the first claim is fence 1");
+    assert_eq!(granted.version.get(), 2, "one version bump per grant");
+
+    // ── the holder renews through the same-assignee arm with its granted version ────────
+    let mut tx = begin_scoped(&db.runtime, tenant)
+        .await
+        .expect("scope the renewal");
+    let renewed = claim_card_tx(&mut tx, tenant, seed.card, winner, 900, granted.version)
+        .await
+        .expect("the renewal statement runs")
+        .expect("the holder renews with the version its grant returned");
+    tx.commit().await.expect("commit the renewal");
+    assert_eq!(renewed.claim_fence, 2, "a renewal continues the fence");
+    assert_eq!(renewed.version.get(), 3, "a renewal bumps the version");
+
+    // ── the fence itself is a renew credential: the same claim held longer ──────────────
+    let mut tx = begin_scoped(&db.runtime, tenant)
+        .await
+        .expect("scope the fence renewal");
+    let extended = renew_card_tx(&mut tx, tenant, seed.card, renewed.claim_fence, 900)
+        .await
+        .expect("the fence-renew statement runs")
+        .expect("the holder renews with the fence its grant returned");
+    tx.commit().await.expect("commit the fence renewal");
+    assert_eq!(
+        extended.claim_fence, renewed.claim_fence,
+        "a renew is the same claim held longer"
+    );
+    assert_eq!(extended.version.get(), 4, "a renew still bumps the version");
+
+    // ── a different user at that current version loses to the live lease alone ──────────
+    let stranger = users
+        .iter()
+        .copied()
+        .find(|user| *user != winner)
+        .expect("a non-holder among the racers");
+    let mut tx = begin_scoped(&db.runtime, tenant)
+        .await
+        .expect("scope the stranger's claim");
+    let refused = claim_card_tx(&mut tx, tenant, seed.card, stranger, 900, extended.version)
+        .await
+        .expect("the stranger's claim statement runs");
+    tx.rollback().await.expect("roll back the refused claim");
+    assert_eq!(
+        refused, None,
+        "a distinct user cannot claim a card under a live lease, even at its current version"
+    );
 }
