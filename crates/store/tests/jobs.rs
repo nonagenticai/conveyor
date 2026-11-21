@@ -666,17 +666,33 @@ async fn two_uncommitted_batches_pick_disjoint_rows() {
 }
 
 /// `max = 0` claims nothing — and reaps nothing — on either shape.
+///
+/// The exhausted row is the reap witness: it is `running` with an expired lease and no attempt
+/// left, so a zero batch that ran `reap_exhausted` before its zero check would leave it `dead`.
 #[tokio::test]
 async fn a_zero_batch_claims_nothing() {
     let db = common::TestDb::fresh().await;
     let tenant = a_tenant(&db).await;
     let pool = &db.runtime;
 
-    let id = jobs::enqueue(
+    // Enqueued first, so the single claim below takes it (run_after, then id, orders the queue).
+    let exhausted = jobs::enqueue(
         pool,
         tenant,
         "event.prune",
-        "zero",
+        "zero-exhausted",
+        serde_json::json!({}),
+        None,
+        1,
+    )
+    .await
+    .expect("enqueue")
+    .expect("row");
+    let due = jobs::enqueue(
+        pool,
+        tenant,
+        "event.prune",
+        "zero-due",
         serde_json::json!({}),
         None,
         5,
@@ -684,6 +700,15 @@ async fn a_zero_batch_claims_nothing() {
     .await
     .expect("enqueue")
     .expect("row");
+    let claimed = jobs::claim(pool, tenant, 60)
+        .await
+        .expect("claim")
+        .expect("the first row is due");
+    assert_eq!(
+        claimed.id, exhausted,
+        "the first enqueued row is claimed first"
+    );
+    expire_lease(&db, exhausted).await;
 
     assert!(
         jobs::claim_batch(pool, tenant, 60, None, 0)
@@ -700,10 +725,23 @@ async fn a_zero_batch_claims_nothing() {
             .expect("a zero batch on an open transaction")
             .is_empty()
     );
+    // Read INSIDE the transaction: a stray reap would be visible here, where the rollback
+    // below would hide it.
+    let status: String = sqlx::query_scalar("SELECT status FROM job WHERE id = $1")
+        .bind(exhausted)
+        .fetch_one(&mut *tx)
+        .await
+        .expect("read the row in the transaction");
+    assert_eq!(status, "running", "a zero batch reaps nothing");
     tx.rollback().await.expect("rollback");
 
-    let (status, ..) = row(&db.super_pool, id).await;
-    assert_eq!(status, "pending", "the row was never claimed");
+    let (status, ..) = row(&db.super_pool, exhausted).await;
+    assert_eq!(
+        status, "running",
+        "the exhausted lease was never reaped by a zero batch"
+    );
+    let (status, ..) = row(&db.super_pool, due).await;
+    assert_eq!(status, "pending", "the due row was never claimed");
 }
 
 /// The batch's single reap dead-letters an exhausted expired row instead of handing it out.

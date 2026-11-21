@@ -3218,3 +3218,195 @@ mod claim_batch_tests {
         assert_eq!(semaphore.available_permits(), MAX_IN_FLIGHT_JOBS);
     }
 }
+
+// The tick-level proof for #536. The unit tests above prove the budget arithmetic; only a real
+// tick proves the store call, the permit hand-off and the spawned task are wired together. The
+// module borrows the integration harness by `#[path]` — the same harness, from the same file,
+// that `crates/store/tests/jobs.rs` includes — so there is still one copy of it.
+#[cfg(test)]
+#[path = "../tests/common/mod.rs"]
+mod tick_test_db;
+
+#[cfg(test)]
+mod tick_claim_tests {
+    use super::tick_test_db as common;
+    use super::*;
+
+    /// A tenant `active_ids` will hand to the tick (`status` defaults to `active`).
+    async fn a_tenant(db: &common::TestDb) -> TenantId {
+        let id: Uuid = sqlx::query_scalar(
+            "INSERT INTO tenant (slug, name) VALUES ('tick-claims', 'Tick claims') RETURNING id",
+        )
+        .fetch_one(&db.super_pool)
+        .await
+        .expect("seed a tenant");
+        TenantId::from_uuid(id).expect("non-nil")
+    }
+
+    async fn enqueue(db: &common::TestDb, tenant: TenantId, key: &str) {
+        store::jobs::enqueue(
+            &db.runtime,
+            tenant,
+            "event.prune",
+            key,
+            serde_json::json!({}),
+            None,
+            5,
+        )
+        .await
+        .expect("enqueue")
+        .expect("a first enqueue creates the row");
+    }
+
+    /// A real worker on the test database. `connect` opens the runtime pool from the config,
+    /// exactly as production does; no licence client is configured, and no `licence.sync` job
+    /// is enqueued here.
+    async fn worker_for(db: &common::TestDb) -> Arc<Worker> {
+        let config = Config::from_lookup(|key| match key {
+            "APP_ENV" => Some("test".to_owned()),
+            "DATABASE_URL" | "DATABASE_LISTEN_URL" | "DATABASE_MIGRATE_URL" => {
+                Some(db.runtime_url.clone())
+            }
+            "JOB_LEASE_SECS" => Some("2".to_owned()),
+            _ => None,
+        })
+        .expect("a test configuration");
+        Arc::new(Worker::connect(config).await.expect("connect the worker"))
+    }
+
+    async fn statuses(db: &common::TestDb, tenant: TenantId) -> Vec<String> {
+        sqlx::query_scalar("SELECT status FROM job WHERE tenant_id = $1 ORDER BY dedupe_key")
+            .bind(tenant.as_uuid())
+            .fetch_all(&db.super_pool)
+            .await
+            .expect("read the job statuses")
+    }
+
+    async fn status_count(db: &common::TestDb, tenant: TenantId, status: &str) -> usize {
+        statuses(db, tenant)
+            .await
+            .iter()
+            .filter(|row| *row == status)
+            .count()
+    }
+
+    /// P2.1: one tick claims exactly the free permits — never the tenant batch beyond them —
+    /// and runs each claimed job in its own task.
+    #[tokio::test(flavor = "multi_thread")]
+    async fn one_tick_claims_exactly_the_free_permit_budget() {
+        let db = common::TestDb::fresh().await;
+        let tenant = a_tenant(&db).await;
+        for key in ["tick-1", "tick-2", "tick-3", "tick-4", "tick-5"] {
+            enqueue(&db, tenant, key).await;
+        }
+        let worker = worker_for(&db).await;
+
+        // Leave exactly three slots free: the claim must be sized three, not BATCH_PER_TENANT.
+        let mut held = Vec::new();
+        for _ in 0..(MAX_IN_FLIGHT_JOBS - 3) {
+            held.push(
+                Arc::clone(&worker.in_flight)
+                    .acquire_owned()
+                    .await
+                    .expect("hold a permit"),
+            );
+        }
+
+        worker.tick().await.expect("the tick");
+        assert_eq!(
+            status_count(&db, tenant, "pending").await,
+            2,
+            "the tick fills exactly the free permits; got {:?}",
+            statuses(&db, tenant).await,
+        );
+
+        // One task per claimed job: the three reach `succeeded` in this process.
+        for _ in 0..400 {
+            if status_count(&db, tenant, "succeeded").await == 3 {
+                break;
+            }
+            tokio::time::sleep(Duration::from_millis(25)).await;
+        }
+        assert_eq!(
+            status_count(&db, tenant, "succeeded").await,
+            3,
+            "each claimed job ran in its own task and finished; got {:?}",
+            statuses(&db, tenant).await,
+        );
+
+        // And every permit — the three the tasks held and the five held here — comes back.
+        drop(held);
+        for _ in 0..400 {
+            if worker.in_flight.available_permits() == MAX_IN_FLIGHT_JOBS {
+                break;
+            }
+            tokio::time::sleep(Duration::from_millis(10)).await;
+        }
+        assert_eq!(
+            worker.in_flight.available_permits(),
+            MAX_IN_FLIGHT_JOBS,
+            "the budget returns to the semaphore"
+        );
+    }
+
+    /// P2.2: with no free permit the tick issues no claim at all.
+    #[tokio::test(flavor = "multi_thread")]
+    async fn a_tick_with_no_free_permit_claims_nothing() {
+        let db = common::TestDb::fresh().await;
+        let tenant = a_tenant(&db).await;
+        enqueue(&db, tenant, "no-budget-1").await;
+        enqueue(&db, tenant, "no-budget-2").await;
+        let worker = worker_for(&db).await;
+
+        let mut held = Vec::new();
+        for _ in 0..MAX_IN_FLIGHT_JOBS {
+            held.push(
+                Arc::clone(&worker.in_flight)
+                    .acquire_owned()
+                    .await
+                    .expect("hold a permit"),
+            );
+        }
+
+        worker.tick().await.expect("the tick");
+        assert_eq!(
+            status_count(&db, tenant, "pending").await,
+            2,
+            "no permit, no claim; got {:?}",
+            statuses(&db, tenant).await,
+        );
+        assert_eq!(
+            worker.in_flight.available_permits(),
+            0,
+            "the tick took nothing"
+        );
+        drop(held);
+        assert_eq!(worker.in_flight.available_permits(), MAX_IN_FLIGHT_JOBS);
+    }
+
+    /// P2.3: a claim error releases the whole budget and the tick carries on to the next tenant.
+    #[tokio::test(flavor = "multi_thread")]
+    async fn a_claim_error_releases_the_budget_and_the_tick_survives() {
+        let db = common::TestDb::fresh().await;
+        let tenant = a_tenant(&db).await;
+        enqueue(&db, tenant, "claim-error").await;
+        let worker = worker_for(&db).await;
+
+        // Break the claim in the database: the reap and the claim statement now fail. The
+        // tick logs the error and must still return Ok with its budget released.
+        sqlx::query("DROP TABLE job CASCADE")
+            .execute(&db.super_pool)
+            .await
+            .expect("drop the job table");
+
+        worker
+            .tick()
+            .await
+            .expect("a claim error is logged, not propagated");
+        assert_eq!(
+            worker.in_flight.available_permits(),
+            MAX_IN_FLIGHT_JOBS,
+            "the whole budget came back"
+        );
+    }
+}
