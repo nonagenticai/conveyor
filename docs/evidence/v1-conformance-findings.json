@@ -1,8 +1,8 @@
 {
   "schema": "conveyor-v1-findings/v1",
-  "audited_sha": "6663d9f9672d002a654a60a3467679e698890a1d",
+  "audited_sha": "d6a97982cc54aa6fd423355f85fd42a866c4847e",
   "audited_at": "2026-11-21",
-  "method": "Fresh auditors read SPEC_V2 section by section against the tree; every evidence quote is the raw line at the cited path and is re-verified by scripts/verify-findings.py before admission.",
+  "method": "Fresh auditors read SPEC_V2 section by section against the tree in four waves; every evidence quote is the raw line at the cited path and is re-verified by scripts/verify-findings.py before admission.",
   "findings": [
     {
       "id": "v1-p5-1",
@@ -17,6 +17,51 @@
           "path": "crates/actions/src/pm/mod.rs",
           "line": 605,
           "quote": "    pub require_evidence: bool,"
+        },
+        {
+          "path": "crates/actions/src/control/views.rs",
+          "line": 353,
+          "quote": "    pub require_evidence: bool,"
+        },
+        {
+          "path": "crates/actions/src/control/approvals.rs",
+          "line": 388,
+          "quote": "        input.require_evidence,"
+        },
+        {
+          "path": "crates/actions/src/control/approvals.rs",
+          "line": 391,
+          "quote": "    if !evidence.is_empty() {"
+        },
+        {
+          "path": "crates/actions/src/pm/mod.rs",
+          "line": 56,
+          "quote": "    if require && evidence.is_empty() {"
+        },
+        {
+          "path": "crates/actions/src/pm/mod.rs",
+          "line": 59,
+          "quote": "            \"gate_evidence_missing\","
+        },
+        {
+          "path": "crates/store/src/metrics.rs",
+          "line": 147,
+          "quote": "                      count(*) FILTER (WHERE status = 'rejected')::bigint AS rejected,"
+        },
+        {
+          "path": "crates/store/src/metrics.rs",
+          "line": 152,
+          "quote": "                              AND jsonb_array_length(meta -> 'evidence') > 0)))::bigint AS with_evidence,"
+        },
+        {
+          "path": "crates/actions/src/metrics/mod.rs",
+          "line": 298,
+          "quote": "        \"approvals.evidence_completeness\".to_owned(),"
+        },
+        {
+          "path": "crates/actions/src/metrics/mod.rs",
+          "line": 364,
+          "quote": "    pub with_evidence: i64,"
         }
       ],
       "failure_scenario": "pm.route_gate 'deploy' with evidence [] and require_evidence omitted opens an approvable gate; work ships with no artefact or run judged.",
@@ -28,10 +73,35 @@
       "area": "§5.3",
       "standard": "SPEC",
       "spec": "§5.3",
-      "severity": "P1",
+      "severity": "P0",
       "title": "WBS nodes accepted on a checkbox",
       "problem": "wbs.update validates status only against the enum, then writes acceptance/evidence verbatim; an empty evidence array is legal.",
       "evidence": [
+        {
+          "path": "crates/actions/src/spine/mod.rs",
+          "line": 1166,
+          "quote": "        && !matches!(status, \"open\" | \"accepted\" | \"cancelled\")"
+        },
+        {
+          "path": "crates/actions/src/spine/mod.rs",
+          "line": 1166,
+          "quote": "        && !matches!(status, \"open\" | \"accepted\" | \"cancelled\")"
+        },
+        {
+          "path": "crates/actions/src/spine/mod.rs",
+          "line": 1177,
+          "quote": "        status: input.status,"
+        },
+        {
+          "path": "crates/store/src/spine.rs",
+          "line": 301,
+          "quote": "            status = coalesce($6, status), acceptance = coalesce($7, acceptance),"
+        },
+        {
+          "path": "migrations/0044_plan_spine.sql",
+          "line": 26,
+          "quote": "-- divides by it; zero is a refusal, never a division. `acceptance` is by artefact/run, not a"
+        },
         {
           "path": "crates/actions/src/spine/mod.rs",
           "line": 1166,
@@ -74,6 +144,16 @@
           "path": "crates/store/src/spine.rs",
           "line": 301,
           "quote": "            status = coalesce($6, status), acceptance = coalesce($7, acceptance),"
+        },
+        {
+          "path": "crates/actions/src/pm/mod.rs",
+          "line": 560,
+          "quote": "        store::spine::take_baseline_tx(&mut *tx, ctx.tenant, project_id, &kind, ctx.actor_id, None)"
+        },
+        {
+          "path": "crates/actions/src/spine/mod.rs",
+          "line": 1345,
+          "quote": "                \"change_request_required\","
         }
       ],
       "failure_scenario": "After the scope baseline is approved, WBS titles/body/inputs are edited; no change row exists and runs execute against unpinned scope.",
@@ -141,6 +221,21 @@
           "path": "apps/inference-router/src/billing.rs",
           "line": 55,
           "quote": "    /// `no_active_budget` — must allow; refusing on them turns a billing blip into an outage."
+        },
+        {
+          "path": "migrations/0040_organisation.sql",
+          "line": 162,
+          "quote": "CREATE TABLE job_binding ("
+        },
+        {
+          "path": "crates/actions/src/metrics/mod.rs",
+          "line": 848,
+          "quote": "/// The cost/budget overview, derived from the conveyor's own ledger."
+        },
+        {
+          "path": "crates/store/src/inference.rs",
+          "line": 263,
+          "quote": "/// Cost is derived from the ledger and `commercial_price` at read time (SPEC_V2 D52) and is"
         }
       ],
       "failure_scenario": "An unbudgeted run calls upstream indefinitely; no 429 is ever produced and spend is discovered after the fact.",
@@ -363,6 +458,11 @@
           "path": "migrations/0054_architecture.sql",
           "line": 59,
           "quote": "    board_decision_id     uuid,"
+        },
+        {
+          "path": "crates/store/src/architecture.rs",
+          "line": 1051,
+          "quote": "          WHERE adm_profile.status <> 'retired'"
         }
       ],
       "failure_scenario": "After adoption, an actor tailors the same profile to remove phase A artefacts and contract kinds, weakening every subsequent gate without any board decision; a draft profile is adopted citing a random uuid.",
@@ -392,6 +492,21 @@
           "path": "migrations/0054_architecture.sql",
           "line": 82,
           "quote": "    charter                 text NOT NULL DEFAULT '',"
+        },
+        {
+          "path": "docs/design/data/architecture.json",
+          "line": 574,
+          "quote": "      \"status\": \"draft\","
+        },
+        {
+          "path": "docs/design/data/architecture.json",
+          "line": 563,
+          "quote": "      \"kind\": \"architecture_board\","
+        },
+        {
+          "path": "docs/design/data/programme.json",
+          "line": 6204,
+          "quote": "        \"gate\": \"an architecture project passes Preliminary and A–F with each phase's mandatory artefacts approved and its contract live; a phase missing a mandatory artefact is refused; a delivery project without a live contract is refused at design; a compliance review records one level and a waiver names its owner and review date; an H review produces exactly one change or kata\","
         }
       ],
       "failure_scenario": "A draft, never-approved governance_body issues an approved architecture_board decision for a delivery contract; contracts_approve accepts it and the contract goes live under a board with empty charter and no members.",
@@ -455,6 +570,11 @@
           "path": "migrations/0054_architecture.sql",
           "line": 270,
           "quote": "    CONSTRAINT architecture_compliance_review_one UNIQUE (tenant_id, project_id, contract_id)"
+        },
+        {
+          "path": "crates/store/src/architecture.rs",
+          "line": 1806,
+          "quote": "                 WHERE tenant_id = $1 AND project_id = $2 AND outcome IS NOT NULL"
         }
       ],
       "failure_scenario": "Two contracts each record a change outcome, or a G review carries an outcome; phase h advances with two typed outcomes, so the change/kata decision is ambiguous.",
@@ -484,6 +604,31 @@
           "path": "crates/domain/src/spine.rs",
           "line": 311,
           "quote": "                .is_some_and(|value| !value.is_null() && value != &Value::Array(Vec::new()))"
+        },
+        {
+          "path": "docs/design/data/msp.json",
+          "line": 402,
+          "quote": "      \"decision\": \"continue\","
+        },
+        {
+          "path": "docs/design/data/msp.json",
+          "line": 429,
+          "quote": "      \"reviewed_at\": \"2026-11-18T07:17:50.738714+00:00\","
+        },
+        {
+          "path": "docs/design/data/msp.json",
+          "line": 459,
+          "quote": "      \"state\": \"planned\","
+        },
+        {
+          "path": "docs/design/data/programme.json",
+          "line": 5558,
+          "quote": "      \"status\": \"closed\","
+        },
+        {
+          "path": "docs/design/data/programme.json",
+          "line": 5559,
+          "quote": "      \"updated_at\": \"2026-11-17T13:49:07.723637+00:00\","
         }
       ],
       "failure_scenario": "A fresh tenant seeds tranche 1 as authorised with no programme_tranche_review; every tranche-1 project passes assert_project_tranche_authorised_tx and starts. A reviewer can submit evidence {\"baselines\":\"none\",\"benefit_status\":\"none\",\"risk_register\":\"none\"} and the continue/pause/stop gate records it.",
@@ -513,6 +658,16 @@
           "path": "seed/programme-definition.json",
           "line": 13,
           "quote": "      \"baseline\": \"not measured - no instrument exists (recorded as a kata on the kata project)\","
+        },
+        {
+          "path": "crates/store/src/spine.rs",
+          "line": 2001,
+          "quote": "            .is_some_and(|t| t.baseline_measured_at.is_some() && t.post_measured_at.is_some());"
+        },
+        {
+          "path": "crates/store/src/spine.rs",
+          "line": 2489,
+          "quote": "    if post.is_some() && baseline.is_none() {"
         }
       ],
       "failure_scenario": "benefits.transition_upsert accepts baseline_measured_at and post_measured_at with evidence [], then benefits.update sets status realized. No post-transition measurement exists, yet the benefit claims improvement.",
@@ -595,6 +750,56 @@
           "path": "crates/store/src/spine.rs",
           "line": 3363,
           "quote": "    if owner.as_deref().is_none_or(|value| value.trim().is_empty()) {"
+        },
+        {
+          "path": "crates/actions/src/portfolio/programmes.rs",
+          "line": 162,
+          "quote": "        status: trimmed(input.status),"
+        },
+        {
+          "path": "crates/store/src/spine.rs",
+          "line": 3333,
+          "quote": "pub async fn close_programme_tx("
+        },
+        {
+          "path": "crates/store/src/spine.rs",
+          "line": 3360,
+          "quote": "    let Some(owner) = plans.first() else {"
+        },
+        {
+          "path": "crates/store/src/spine.rs",
+          "line": 3349,
+          "quote": "        \"SELECT a.meta->>'post_closure_owner'"
+        },
+        {
+          "path": "crates/store/src/spine.rs",
+          "line": 3353,
+          "quote": "            AND a.kind = 'benefits_realization_plan'"
+        },
+        {
+          "path": "docs/design/data/programme.json",
+          "line": 5581,
+          "quote": "        \"gate\": \"PI planning materialises cards from the backlog by WSJF within WIP; a deliverable without evidence cannot demo; retro produces lessons; an end-of-tranche review with no baselines, benefit status or risk evidence is refused; a transition that never measured its baseline cannot report the benefit realized\","
+        },
+        {
+          "path": "docs/design/data/programme.json",
+          "line": 5597,
+          "quote": "      \"status\": \"closed\","
+        },
+        {
+          "path": "seed/programme-definition.json",
+          "line": 13,
+          "quote": "      \"baseline\": \"not measured - no instrument exists (recorded as a kata on the kata project)\","
+        },
+        {
+          "path": "docs/design/data/msp.json",
+          "line": 99,
+          "quote": "      \"status\": \"draft\","
+        },
+        {
+          "path": "docs/design/data/msp.json",
+          "line": 459,
+          "quote": "      \"state\": \"planned\","
         }
       ],
       "failure_scenario": "A project with no outputs closes with neither approval nor closure record; the programme closes on a draft plan whose only post-closure content is the owner string.",
@@ -633,6 +838,21 @@
           "path": "crates/actions/src/coach.rs",
           "line": 738,
           "quote": "    store::coach::mark_remedied_tx(&mut *tx, ctx.tenant, interruption.id)"
+        },
+        {
+          "path": "crates/actions/src/coach.rs",
+          "line": 722,
+          "quote": "    let remedy = store::coach::insert_remedy_tx("
+        },
+        {
+          "path": "crates/actions/src/coach.rs",
+          "line": 738,
+          "quote": "    store::coach::mark_remedied_tx(&mut *tx, ctx.tenant, interruption.id)"
+        },
+        {
+          "path": "crates/actions/src/coach.rs",
+          "line": 743,
+          "quote": "    if remedy_class == \"ask\" {"
         }
       ],
       "failure_scenario": "A transient failure is triaged 'retry'; the card sits in the waiting lane, the failed run never reruns, yet the interruption reads 'remedied' and the board shows the block as handled.",
@@ -657,6 +877,31 @@
           "path": "crates/actions/src/coach.rs",
           "line": 780,
           "quote": "                process_key: Some(\"kata.open\".to_owned()),"
+        },
+        {
+          "path": "docs/SPEC_V2.md",
+          "line": 1024,
+          "quote": "`development` type and a stricter gate set:"
+        },
+        {
+          "path": "docs/SPEC_V2.md",
+          "line": 1208,
+          "quote": "| development | `dev.open\\|implement\\|verify\\|merge\\|release\\|rollback` (composes coding/git/CI actions) |"
+        },
+        {
+          "path": "crates/actions/src/lib.rs",
+          "line": 20,
+          "quote": "pub mod agent_surface;"
+        },
+        {
+          "path": "crates/actions/src/lib.rs",
+          "line": 107,
+          "quote": "pub mod youtube;"
+        },
+        {
+          "path": "crates/actions/src/registry.rs",
+          "line": 184,
+          "quote": "        let mut actions: Vec<ActionSpec> = inventory::iter::<ActionRegistration>()"
         }
       ],
       "failure_scenario": "A postmortem or systemic triage marks the finding 'systemic'; a kata run appears, nothing else. The candidate change is never built, measured on held-out data, or gated for adoption, so production never changes.",
@@ -700,6 +945,16 @@
           "path": "crates/actions/src/board/pull.rs",
           "line": 358,
           "quote": "        coach_skipped: live.is_some() || coach_refusal.is_some(),"
+        },
+        {
+          "path": "crates/actions/src/coach.rs",
+          "line": 366,
+          "quote": "    if prior >= crate::board::pull::COACH_CHAIN_MAX {"
+        },
+        {
+          "path": "crates/actions/src/coach.rs",
+          "line": 370,
+          "quote": "            \"the card has already had three interruptions; a fourth would only repeat them\","
         }
       ],
       "failure_scenario": "A card fails four times with four distinct defects; the fourth failure is logged and commented but never triaged, so a real interruption has no card and no owner.",
@@ -719,6 +974,21 @@
           "path": "crates/actions/src/board/pull.rs",
           "line": 423,
           "quote": "            \"coach.interrupt\","
+        },
+        {
+          "path": "crates/actions/src/board/pull.rs",
+          "line": 417,
+          "quote": "    // (c) The coach, through the one admission path (T4). `coach.interrupt` creates the coach"
+        },
+        {
+          "path": "crates/actions/src/board/pull.rs",
+          "line": 423,
+          "quote": "            \"coach.interrupt\","
+        },
+        {
+          "path": "docs/SPEC_V2.md",
+          "line": 1078,
+          "quote": "alert / failed run / eval delta / prompt finding / coach escalation"
         }
       ],
       "failure_scenario": "A board exceeds its WIP limit or a lease goes stale for days; no interruption, triage or remedy exists, and the Measure views show the block only after a downstream failure.",
@@ -795,6 +1065,16 @@
           "path": "migrations/0002_domain.sql",
           "line": 18,
           "quote": "CREATE TABLE programme ("
+        },
+        {
+          "path": "crates/actions/src/portfolio/programmes.rs",
+          "line": 87,
+          "quote": "            name: name.to_owned(),"
+        },
+        {
+          "path": "crates/actions/src/portfolio/programmes.rs",
+          "line": 89,
+          "quote": "            owner_user_id: input.owner_user_id,"
         }
       ],
       "failure_scenario": "Every project re-declares cadence/ART config; nothing inherits or locks it, so programmes drift.",
@@ -863,13 +1143,13 @@
       "area": "§10.5",
       "standard": "SPEC",
       "spec": "§10.5",
-      "severity": "P0",
-      "title": "Portfolio has no WSJF backlog, cadence, capacity or per-project metering",
-      "problem": "The console Portfolio renders only Timeline, In flight, Dependencies and Programme. The WSJF backlog, PI/demo/retro cadence, capacity and per-project metering named by §10.5 are absent; README admits those fixtures stay the study.",
+      "severity": "P1",
+      "title": "Portfolio does not compose the WSJF backlog, cadence, capacity or per-project metering",
+      "problem": "The console Portfolio renders only Timeline, In flight, Dependencies and Programme. The WSJF ranking exists on Plan (v2.js:4641), the cadence kinds at v2.js:979 and a Metering screen at v2.js:7483, so the missing piece is Portfolio composition; the §10.5 panels are not composed into Portfolio and README admits the remaining fixtures stay the study.",
       "evidence": [
         {
           "path": "docs/design/v2.js",
-          "line": 4827,
+          "line": 4840,
           "quote": "      [\"Timeline\", \"In flight\", \"Dependencies\", \"Programme\"],"
         }
       ],
@@ -888,7 +1168,7 @@
       "evidence": [
         {
           "path": "docs/design/v2.js",
-          "line": 5906,
+          "line": 5919,
           "quote": "      ? [\"Boards\", \"WBS\", \"Baseline vs forecast\", \"Registers\", \"Cadence\"]"
         }
       ],
@@ -907,7 +1187,7 @@
       "evidence": [
         {
           "path": "docs/design/v2.js",
-          "line": 5079,
+          "line": 5092,
           "quote": "      `${route(\"Programme definition\", \"programme\", \"\", \"shield\")}${route(\"System architecture\", \"architecture\", \"\", \"model\")}`,"
         },
         {
@@ -931,7 +1211,7 @@
       "evidence": [
         {
           "path": "docs/design/v2.js",
-          "line": 1343,
+          "line": 1356,
           "quote": "  const MSP_TABS = [\"Definition\", \"Benefits map & profiles\", \"Tranches & reviews\", \"Benefits realization\", \"Stakeholders\"];"
         }
       ],
@@ -950,7 +1230,7 @@
       "evidence": [
         {
           "path": "docs/design/v2.js",
-          "line": 7466,
+          "line": 7479,
           "quote": "  // Live: the platform publishes `measure.inference` (calls, tokens and cache hits by caller and"
         }
       ],
@@ -969,7 +1249,7 @@
       "evidence": [
         {
           "path": "docs/design/v2.js",
-          "line": 5010,
+          "line": 5023,
           "quote": "              : panel(\"Stakeholders\", note(\"The design study carries no stakeholder fixture. The live page reads stakeholder profiles from the programme store; the public snapshot carries the published profiles.\"));"
         }
       ],
@@ -1042,7 +1322,7 @@
       "evidence": [
         {
           "path": "docs/design/scripts/publish-data.sh",
-          "line": 90,
+          "line": 108,
           "quote": "cp \"$tmp/conformance/conformance-gap-register.json\" \"$tmp/data/conformance.json\""
         },
         {
@@ -1066,7 +1346,7 @@
       "evidence": [
         {
           "path": "docs/design/scripts/publish-data.sh",
-          "line": 42,
+          "line": 131,
           "quote": "python3 \"$pack/scripts/build-docs.py\""
         },
         {
@@ -1076,7 +1356,7 @@
         },
         {
           "path": "docs/design/scripts/publish-data.sh",
-          "line": 94,
+          "line": 136,
           "quote": "rsync -a \"$tmp/data/\" \"$data/\""
         }
       ],
@@ -1236,6 +1516,1364 @@
       "acceptance": "Cap or paginate lanes and the archived column with a 'show N more' control; add a fixture with more than 50 cards in one lane.",
       "owner_project": "PLATFORM",
       "resolved_by": "this PR (Part 6): every kanban lane and the archived column cap at 25 tiles with a visible remainder"
+    },
+    {
+      "id": "v1-w1a-2",
+      "area": "§4",
+      "standard": "SPEC",
+      "spec": "§4.1",
+      "severity": "P0",
+      "title": "Release compile ignores the knowledge layers and can never refuse release_not_ready or department_conflict",
+      "problem": "SPEC_V2 §4.1 requires the release to compile base → industry → department archetype → each department in declared order → job, with required kinds that can only be tightened downward, sibling-value conflicts raised as department_conflict, and unresolvable required knowledge refused with 409 release_not_ready naming the kind and department. compile_release_tx builds the whole immutable snapshot from the catalogue row and its placement only (job_key/title/family/industry/departments/anatomy); there is no layer store, no required-kind resolution and no code path that emits release_not_ready or department_conflict (neither string occurs anywhere under crates/). job_releases.publish therefore hashes and stores an unresolved draft as a release.",
+      "evidence": [
+        {
+          "path": "crates/store/src/organisation.rs",
+          "line": 575,
+          "quote": "        \"family\": job.family,"
+        },
+        {
+          "path": "crates/store/src/organisation.rs",
+          "line": 578,
+          "quote": "        \"anatomy\": job.definition,"
+        }
+      ],
+      "failure_scenario": "Create a job whose departments declare a required kind (e.g. charter) that the job definition never sets. job_releases.publish returns 200 with a release hash and a snapshot that contains no resolved charter; job_bindings.create pins that release active and a run proceeds. Required knowledge is missing and the mandated 409 release_not_ready never fires. Two sibling departments with conflicting values likewise produce a clean release instead of 422 department_conflict.",
+      "acceptance": "Publishing over a department whose required kind has no resolvable value returns 409 release_not_ready with the kind and department named; two sibling departments declaring one kind at different values return 422 department_conflict; the release snapshot records the resolved layer values and their sources, and a successful publish is reproducible byte-for-byte.",
+      "owner_project": "T0"
+    },
+    {
+      "id": "v1-w1a-3",
+      "area": "§5.1-5.3",
+      "standard": "SPEC",
+      "spec": "§5.3.2",
+      "severity": "P1",
+      "title": "Change requests are approved by a plain registers.update, bypassing the person's decision",
+      "problem": "SPEC_V2 §5.3.2 requires a scope/schedule/cost change to be a change request with an impact analysis and a person's decision. registers.update forwards a caller-supplied status straight into update_register_tx, which writes status unconditionally. There is no approval row, no approver identity recorded, and no impact review on that path, while take_baseline_guarded accepts the literal string status='approved' as proof the change was decided.",
+      "evidence": [
+        {
+          "path": "crates/actions/src/spine/mod.rs",
+          "line": 1533,
+          "quote": "        input.status.as_deref(),"
+        },
+        {
+          "path": "crates/store/src/spine.rs",
+          "line": 779,
+          "quote": "            status = coalesce($4, status), title = coalesce($5, title),"
+        }
+      ],
+      "failure_scenario": "1) registers.create kind='change' with baseline_ref and meta.impact (satisfies the DB CHECK). 2) registers.update {\"id\": <change>, \"status\": \"approved\"} succeeds with no approver recorded and no decision. 3) baselines.take with that change_id passes take_baseline_guarded's status=='approved' check and freezes a new baseline. The scope changes with no person's decision and no gate.",
+      "acceptance": "Only a gated approval action can move a change row to approved; registers.update refuses a caller-supplied status of approved (422/409 change_requires_approval). take_baseline_guarded requires an approval row with a decider distinct from the requester, not a status string, and a negative test proves the direct update is refused.",
+      "owner_project": "T1"
+    },
+    {
+      "id": "v1-w1a-4",
+      "area": "§4",
+      "standard": "SPEC",
+      "spec": "§4.1",
+      "severity": "P1",
+      "title": "Jobs can never leave draft, and a never-curated draft publishes as an immutable release",
+      "problem": "SPEC_V2 §4.1 requires a live job and refuses a live design with 409 job_not_live; §4.3 says a person curates the draft catalogue into published jobs. job_catalogue.create hard-writes status='draft', JobUpdateIn has no status field and no activation action exists, so 'active' is unreachable through the API. job_release_publish_tx refuses only a retired job, so any unactivated draft is compiled and stored as a pinned release. The string job_not_live is never produced anywhere under crates/.",
+      "evidence": [
+        {
+          "path": "crates/actions/src/organisation.rs",
+          "line": 606,
+          "quote": "            status: \"draft\".to_owned(),"
+        },
+        {
+          "path": "crates/store/src/organisation.rs",
+          "line": 592,
+          "quote": "    if job.status == \"retired\" {"
+        }
+      ],
+      "failure_scenario": "Call job_catalogue.create (the only creation path, always draft), then job_releases.publish on the returned id: it returns 200 with a release hash. job_bindings.create pins that release and runs execute against a position no person ever curated or activated. No call can ever return 409 job_not_live, because no action changes status to active and no publish path checks for liveness.",
+      "acceptance": "An activation/curation action moves draft→active with a version and gate; job_releases.publish on a draft or retired job returns 409 job_not_live; publish on an active job succeeds; a test proves draft publication is refused.",
+      "owner_project": "T0"
+    },
+    {
+      "id": "v1-w1a-5",
+      "area": "§4",
+      "standard": "SPEC",
+      "spec": "§4.4",
+      "severity": "P1",
+      "title": "Runs may be created with no job binding and no release pin",
+      "problem": "SPEC_V2 §4.4 requires a card to name a binding and a run to record the binding and the resolved release it actually used, with a retired binding or wrong release refused before any model call. run.job_binding_id and run.release_hash are nullable (0040), and insert_run_tx only refuses a release_hash supplied without a binding; a request with no binding inserts NULL for both. All of the §4.4 checks are skipped when there is no binding.",
+      "evidence": [
+        {
+          "path": "migrations/0040_organisation.sql",
+          "line": 207,
+          "quote": "    ADD COLUMN job_binding_id uuid,"
+        },
+        {
+          "path": "crates/store/src/run.rs",
+          "line": 385,
+          "quote": "        None if input.release_hash.is_some() => return Err(RunStoreError::ReleaseWithoutBinding),"
+        }
+      ],
+      "failure_scenario": "Call runs.create with only {\"project_id\": <project>} (no job_binding_id, no release_hash). The run is inserted queued with job_binding_id=NULL and release_hash=NULL and executes; there is no binding to be stale, no release to be ready, and no job pin in the record, so the job_binding_stale, job_not_live and release_not_ready refusals cannot apply.",
+      "acceptance": "A run that executes conveyor job work requires job_binding_id; an insert with no binding on the job path is refused before the INSERT (409/422 binding_required). Runs that are not job runs are explicitly typed and excluded from the job executor path. A test asserts no job run row can exist with NULL job_binding_id.",
+      "owner_project": "T0"
+    },
+    {
+      "id": "v1-w1b-3",
+      "area": "§6.3",
+      "standard": "SPEC",
+      "spec": "§6.3",
+      "severity": "P1",
+      "title": "Kata opens as a document-only run in the target tenant, with no instrument, threshold or adoption gate",
+      "problem": "The systemic path starts a `kata.open` process run on the interrupted card with inputs `{interruption_id}` only, inside the coach's tenant. No kata record names an instrument or a success threshold (spec: a kata that cannot name both 'is not opened'), no pre-registered prediction is required, no adoption gate is opened, and the kata tenant required by D45 is never resolved. The improvement loop therefore inherits the target tenant's autonomy, approvals and budgets.",
+      "evidence": [
+        {
+          "path": "crates/actions/src/coach.rs",
+          "line": 778,
+          "quote": "                card_id: interruption.interrupted_card_id,"
+        },
+        {
+          "path": "crates/actions/src/coach.rs",
+          "line": 780,
+          "quote": "                process_key: Some(\"kata.open\".to_owned()),"
+        },
+        {
+          "path": "crates/actions/src/coach.rs",
+          "line": 781,
+          "quote": "                inputs: json!({ \"interruption_id\": interruption.id }),"
+        }
+      ],
+      "failure_scenario": "A systemic `conveyor_defect` opens a kata that is an ordinary document-composing agent run bound to the target project's card and tenant. It can compose and comment but cannot measure, cannot open its mandatory adoption approval, and any write it is later granted runs under the target tenant's autonomy. Every systemic signal yields a document, never a measured, adopted change.",
+      "acceptance": "`coach.remedy` refuses to open a systemic kata unless an instrument id and numeric success threshold are supplied; the run is created under tenant `kata` with the kata tenant's policy; adoption requires a resolved human approval whose approver is not the kata's own actor; tests assert each refusal.",
+      "owner_project": "T5"
+    },
+    {
+      "id": "v1-w1b-4",
+      "area": "§6.5",
+      "standard": "SPEC",
+      "spec": "§6.5",
+      "severity": "P1",
+      "title": "Destructive ops writes do not enforce dual control or a prior dry-run",
+      "problem": "The approval guard whose own doc says 'destructive = approval + dry-run + dual control' checks only that the named approval is approved, was opened for the same action and carries the same target. It never checks `required_decisions >= 2` and never checks that a dry run ran. Approval creation defaults `required_decisions` to 1, so a single approver authorises restart, scale, rollback and flag flip. SPEC §6.5 requires each gated write to require the tenant's configured approvals (default: human dual control) and a dry-run.",
+      "evidence": [
+        {
+          "path": "crates/actions/src/control/approvals.rs",
+          "line": 426,
+          "quote": "/// SPEC_V2 §11.4: `destructive` = approval + dry-run + dual control. The approval row is the"
+        },
+        {
+          "path": "crates/actions/src/control/approvals.rs",
+          "line": 461,
+          "quote": "    if record.approval.status != ApprovalStatus::Approved {"
+        },
+        {
+          "path": "crates/actions/src/control/approvals.rs",
+          "line": 318,
+          "quote": "    let required_decisions = input.required_decisions.unwrap_or(1);"
+        },
+        {
+          "path": "crates/actions/src/ops/writes.rs",
+          "line": 183,
+          "quote": "    if input.dry_run {"
+        }
+      ],
+      "failure_scenario": "One user creates an approval for `ops.rollback` with the default one decision, approves it alone, then invokes `ops.rollback` with that `approval_id`. The rollback runs; no second human and no dry run was ever involved. The §6.5 default of human dual control plus a dry-run is bypassed for every destructive ops action.",
+      "acceptance": "The invoke gate rejects an `ops.*` destructive call unless the approval has `required_decisions >= 2` with two distinct approvers and a recorded dry-run for the same action and target precedes the real call; tests cover a single-decision approval and a no-dry-run call being refused.",
+      "owner_project": "T7"
+    },
+    {
+      "id": "v1-w1b-5",
+      "area": "§6.7",
+      "standard": "SPEC",
+      "spec": "§6.7",
+      "severity": "P1",
+      "title": "The authority and gate matrix is hard-coded code plus caller input, not tenant data",
+      "problem": "The PM role is a hard-coded `job_key` branch; `job_binding`'s 'authority' is free-form `meta`; `tenant_role_scope` maps RBAC roles (admin/member/viewer) to scopes, not meta-job authority. Gate required decisions and kind are caller inputs (`unwrap_or(1)`) rather than tenant policy rows. The PM/coach/kata/delivery/ops matrix therefore cannot be configured, and the actor opening a gate sets how many humans resolve it.",
+      "evidence": [
+        {
+          "path": "crates/actions/src/pm/mod.rs",
+          "line": 160,
+          "quote": "    if !job.job_key.eq_ignore_ascii_case(PM_JOB_KEY)"
+        },
+        {
+          "path": "crates/actions/src/pm/mod.rs",
+          "line": 643,
+          "quote": "    let required = input.required_decisions.unwrap_or(1);"
+        },
+        {
+          "path": "crates/store/src/organisation.rs",
+          "line": 173,
+          "quote": "    /// `department_scope`, authority, limits override."
+        }
+      ],
+      "failure_scenario": "A tenant wants phase gates to need two humans and the coach to be unable to do anything but move cards. Neither is expressible: no authority row exists, and every `pm.route_gate` call supplies `required_decisions` (1 by default) and an arbitrary kind, so the PM's design and closure gates open as single-approval; any binding holding the static action scopes can call `coach.remedy` or `projects.baseline` regardless of its meta-role.",
+      "acceptance": "Role authority resolves from tenant rows (meta-role x action, narrowed by the binding); a delivery binding calling `coach.remedy` or `projects.baseline` is refused unless the tenant granted it; `required_decisions` and approver kind come from a tenant gate-policy row and `pm.route_gate` cannot lower them; tests cover a tenant override and the unconfigured default.",
+      "owner_project": "PLATFORM"
+    },
+    {
+      "id": "v1-w1c-2",
+      "area": "§7.1/§7.4",
+      "standard": "SPEC",
+      "spec": "§7.1/§7.4",
+      "severity": "P0",
+      "title": "The L3 human gate on a generated draft is forgeable by any service principal, and any accepted non-rule decision on the card qualifies",
+      "problem": "§7.1 makes L3 a human approval (approval + approval_decision) for every irreversible action, and §7.4 says a generated draft becomes applicable only through an action with a gate. ladder.record accepts rung='human' from any caller holding governance:write (the action is kind=internal) and copies ctx.actor_kind with no check that the actor is a person; record_decision_tx only checks that the cited approval row exists in the tenant, never that its approval_decision is accepted or that it covers this draft. ladder.apply_draft then admits any accepted non-rule decision that names the same card, regardless of the question it answered or the artefact it was about, so a routine accepted laya classification also unlocks a generated patch.",
+      "evidence": [
+        {
+          "path": "crates/actions/src/ladder/mod.rs",
+          "line": 1015,
+          "quote": "            actor_kind: ctx.actor_kind.clone(),"
+        },
+        {
+          "path": "crates/store/src/ladder.rs",
+          "line": 809,
+          "quote": "    ensure_optional_parent_tx(&mut *conn, tenant, Parent::Approval, new.approval_id)"
+        },
+        {
+          "path": "crates/actions/src/ladder/mod.rs",
+          "line": 1126,
+          "quote": "    if matches!(rung, Rung::Rule) || decision.outcome.as_deref() != Some(\"accepted\") {"
+        }
+      ],
+      "failure_scenario": "An internal agent holding governance:write calls ladder.record with rung='human', approval_id set to any approval UUID in its tenant (including a pending or rejected approval for an unrelated thing) and outcome='accepted'. It then calls ladder.apply_draft for the generated code patch; the check passes because the decision is not a rule, is 'accepted', and names the card. No person approved anything. Separately, an accepted laya decision for request.classify on the card is enough to apply any draft, so the draft is never gated on the decision that actually reviewed it.",
+      "acceptance": "ladder.record refuses rung='human' unless the actor is a person and the cited approval has an accepted approval_decision bound to this decision; ladder.apply_draft requires an accepted decision of a dedicated draft-application gate kind (and/or the document's prompt_sha256/inference_call_id) and refuses a generic or pending approval; tests prove a pending approval and an unrelated accepted laya decision both cannot gate a draft.",
+      "owner_project": "T2"
+    },
+    {
+      "id": "v1-w1c-3",
+      "area": "§7.2/§7.3",
+      "standard": "SPEC",
+      "spec": "§7.2/§7.3",
+      "severity": "P1",
+      "title": "L1 laya is never invoked: ladder.evaluate stamps rung=laya on caller-supplied answer, confidence and latency",
+      "problem": "§7.2 defines the laya contract (POST /v1/systemone over row-authored questions) and §7.3 makes laya mandatory for the listed decisions. The repository contains no ladder laya client: the only laya HTTP path is process/step.rs's judge. ladder.evaluate instead takes the answer, confidence, probabilities and latency from the request body and writes rung='laya' with whatever configuration versions happen to be resolved. The 'calibrated choice' is therefore an unverifiable assertion; nothing distinguishes a real laya answer from a number an agent invented.",
+      "evidence": [
+        {
+          "path": "crates/actions/src/ladder/mod.rs",
+          "line": 775,
+          "quote": "    let confidence = input.confidence.ok_or_else(|| {"
+        },
+        {
+          "path": "crates/actions/src/ladder/mod.rs",
+          "line": 827,
+          "quote": "            rung: Rung::Laya,"
+        },
+        {
+          "path": "crates/actions/src/ladder/mod.rs",
+          "line": 845,
+          "quote": "            latency_ms: input.latency_ms,"
+        }
+      ],
+      "failure_scenario": "An internal agent misroutes a request and posts ladder.evaluate {kind:'request.classify', answer:'bug', confidence:0.99, latency_ms:12}. The ledger records a laya decision with full policy/refinement/laya-config pins and empty probabilities, indistinguishable from a genuine calibrated response. Because nothing compares the row to a systemone response, a fabricated confidence can clear any threshold, and the 'L1 before L2' ordering the chapter depends on is not evidence-backed.",
+      "acceptance": "The L1 path performs the laya request itself (or records a verified laya call id) and derives answer, confidence, probabilities and measured latency from the response; a laya-rung decision without that provenance is refused; a test posts a confidence directly and proves it cannot produce rung='laya'.",
+      "owner_project": "T2"
+    },
+    {
+      "id": "v1-w1c-4",
+      "area": "§7.2",
+      "standard": "SPEC",
+      "spec": "§7.2",
+      "severity": "P1",
+      "title": "Options are inline request text, not authored/versioned rows, and the answer is never checked against them",
+      "problem": "§7.2 requires options to be authored and versioned rows (decision_option) and never free text from a prompt, so a choice is provably one of a finite set. In the ladder surfaces, options arrive in the same request body as the answer, the option-set version is fabricated as 1 whenever any options are supplied, and record_decision_tx inserts the options after the decision without comparing new.answer to any option key. A laya decision can therefore carry an answer outside its own recorded option set, or a one-element option set that merely echoes the answer.",
+      "evidence": [
+        {
+          "path": "crates/actions/src/ladder/mod.rs",
+          "line": 816,
+          "quote": "        .or_else(|| (!options.is_empty()).then_some(1));"
+        },
+        {
+          "path": "crates/store/src/ladder.rs",
+          "line": 851,
+          "quote": "            \"INSERT INTO decision_option (tenant_id, decision_id, key, label, payload)"
+        }
+      ],
+      "failure_scenario": "A prompt or agent sends options [{key:'yes'},{key:'no'}] with answer 'yes, because the ticket says so'. The row stores option_set_version=1 and two option rows, and the answer is accepted as a valid laya choice even though it is not a key in the set. Conversely it can send only the option it picked, so the ledger can never prove the decision was constrained to a finite authored set; a prompt can inject or shrink the option space per call.",
+      "acceptance": "option sets are authored/versioned rows resolved by policy+question, the evaluate action references the set (and a real version), and the answer must equal one of that set's keys or the action returns 422; tests cover an answer outside the set and a caller trying to pass its own option list.",
+      "owner_project": "T2"
+    },
+    {
+      "id": "v1-w1c-5",
+      "area": "§7.2",
+      "standard": "SPEC",
+      "spec": "§7.2",
+      "severity": "P2",
+      "title": "fail_policy and the Unavailable outcome are stored but never applied; a laya outage cannot become gate_unavailable",
+      "problem": "§7.2 requires Unavailable to be gate_unavailable, following fail_policy, and never silently a pass. The domain's unavailable() maps closed|open to refused|action, but nothing calls it: ladder.evaluate requires a confidence, computes only the threshold outcome, and the sole caller of effective.fail_policy() is validate_vocabulary(). The fail_policy column is validated for spelling and then dead at the evaluation boundary, so a closed safety policy and an open routing policy behave identically when laya is unreachable.",
+      "evidence": [
+        {
+          "path": "crates/domain/src/ladder.rs",
+          "line": 262,
+          "quote": "pub fn unavailable(fail_policy: FailPolicy, action: FailAction) -> Outcome {"
+        },
+        {
+          "path": "crates/actions/src/ladder/mod.rs",
+          "line": 785,
+          "quote": "    let outcome = evaluate(confidence, threshold, action)"
+        },
+        {
+          "path": "crates/store/src/ladder.rs",
+          "line": 572,
+          "quote": "    pub fn fail_policy(&self) -> Result<FailPolicy, LadderStoreError> {"
+        }
+      ],
+      "failure_scenario": "Laya times out during a closed safety-gate pre-check. The caller has no confidence to post, so ladder.evaluate returns 422 confidence_missing and no decision row exists; there is no gate_unavailable, no refused outcome and no escalation record. An operator auditing the run cannot tell whether the gate passed, was skipped, or was never evaluated, and downstream policy can treat the missing row as 'not blocking'.",
+      "acceptance": "A gate_unavailable path exists on the ladder that records the outage and applies fail_policy (closed => refused, open => the policy action), with a test for an unreachable laya on both a closed and an open policy; open with annotate must record the note, closed must record the refusal.",
+      "owner_project": "T2"
+    },
+    {
+      "id": "v1-w1c-6",
+      "area": "§7.5/§7.6",
+      "standard": "SPEC",
+      "spec": "§7.5",
+      "severity": "P2",
+      "title": "Knowledge-family metrics are explicitly unavailable because the lesson and pack-hit ledgers are absent",
+      "problem": "§7.5's Knowledge family requires pack hit rate, citation rate, readiness blocks and lesson promotion rate computed from decision, inference_call and lesson rows, and §7.6 requires lesson promotion with >=2 independent evidence references and a person's review. The metrics source row is lesson, which the schema does not have: metrics.flow hard-codes knowledge.lesson_promotion_rate and knowledge.pack_hit_rate into the unavailable list, stating the lesson ledger (T8) is not in the schema and no knowledge-retrieval ledger exists. There is no lesson action module either (knowledge/ has only mod.rs and query.rs).",
+      "evidence": [
+        {
+          "path": "crates/actions/src/metrics/mod.rs",
+          "line": 663,
+          "quote": "                metric: \"knowledge.lesson_promotion_rate\".to_owned(),"
+        },
+        {
+          "path": "crates/actions/src/metrics/mod.rs",
+          "line": 664,
+          "quote": "                reason: \"the lesson ledger (T8) is not in the schema\".to_owned(),"
+        },
+        {
+          "path": "crates/actions/src/metrics/mod.rs",
+          "line": 668,
+          "quote": "                reason: \"no knowledge-retrieval ledger exists; inference_call records the prompt, not the pack hit\".to_owned(),"
+        }
+      ],
+      "failure_scenario": "The Measure panel and the Knowledge family of the metrics API can never report a pack hit rate or a lesson promotion rate, so a tenant cannot tell whether retrieval is helping or whether lessons are being adopted. Because there is no lesson row, the >=2-independent-evidence promotion rule has no enforcement point: a single bad run cannot be promoted through a governed action because there is no action, and when one is added there is no ledger contract for it to check.",
+      "acceptance": "The lesson ledger (proposed/reviewed/promoted/rejected with evidence references) and a pack-hit source exist; metrics.flow reports real pack_hit_rate and lesson_promotion_rate; promotion refuses fewer than two distinct card/run/incident evidence references or a missing review; tests cover both refusals.",
+      "owner_project": "T11"
+    },
+    {
+      "id": "v1-w2a-2",
+      "area": "§8.1",
+      "standard": "TOGAF",
+      "spec": "§8.1",
+      "severity": "P1",
+      "title": "A phase missing from the profile advances with zero mandatory artefacts",
+      "problem": "The gate reads only `profile.artifact_requirements`. When the requested phase has no entry (or an entry that is neither an array nor an object), the set list is empty and `satisfied` is initialised true, so the phase closes with no artefact at all; the `artifact_type.mandatory` column that carries the standard's own mandatory set is seeded and returned but never read by the gate. §8.1 says the mandatory set \"comes from the standard, filtered by the tenant's adm_profile\" — filtered, not replaced.",
+      "evidence": [
+        {
+          "path": "crates/store/src/architecture.rs",
+          "line": 1706,
+          "quote": "    let sets: Vec<Vec<String>> = match profile.artifact_requirements.get(requested) {"
+        },
+        {
+          "path": "crates/store/src/architecture.rs",
+          "line": 1725,
+          "quote": "        _ => Vec::new(),"
+        },
+        {
+          "path": "crates/store/src/architecture.rs",
+          "line": 1728,
+          "quote": "    let mut satisfied = sets.is_empty();"
+        }
+      ],
+      "failure_scenario": "Adopt a profile that names requirements only for the phases walked so far (`artifact_requirements: {\"preliminary\": [...], \"a\": [...]}`, `contract_kinds: {}`) — the young-capability tailoring §8.1 encourages. Then `architecture.phases_advance {project_id: P, phase_code: \"b\"}`: sets is empty, satisfied is true, no contract kind is named, and the B node is written `accepted` with evidence `{\"artifacts\": [], \"contract\": null}`. Phases B–H can be walked producing nothing although the standard marks Business Service/Function, Data Entity Catalog, Technology Standards and the rest mandatory.",
+      "acceptance": "A phase with no explicit profile entry falls back to the standard's mandatory artifact_type set for that phase/plateau (or the profile is refused as un-tailored at adoption); advancing B with no approved Business Service/Function is refused by architecture_artifact_missing.",
+      "owner_project": "T9"
+    },
+    {
+      "id": "v1-w2a-3",
+      "area": "§8.1",
+      "standard": "TOGAF",
+      "spec": "§8.1",
+      "severity": "P1",
+      "title": "Profile adoption accepts any UUID as its board decision",
+      "problem": "`adopt_profile_tx` writes the caller's `adopt_with_decision_id` into board_decision_id with no existence, gate, status or subject check, and `migrations/0054_architecture.sql` gives the column no foreign key to `approval` (contrast architecture_contract_approval_fk). The same codebase validates exactly this for contracts in `architecture.contracts_approve` (gate = architecture_board, status = approved, subject = this contract). §8.1's Preliminary gate is \"the board adopts the profile\"; here the gate is a client-supplied string.",
+      "evidence": [
+        {
+          "path": "migrations/0054_architecture.sql",
+          "line": 59,
+          "quote": "    board_decision_id     uuid,"
+        },
+        {
+          "path": "crates/store/src/architecture.rs",
+          "line": 1079,
+          "quote": "            SET status = 'adopted', adopted_at = now(), board_decision_id = $4,"
+        }
+      ],
+      "failure_scenario": "Call `architecture.profile_tailor {key: \"default\", name: \"Default\", phase_set: [...], artifact_requirements: {...}, contract_kinds: {...}, adopt_with_decision_id: \"<any random uuid>\"}`. The profile returns 200 with status 'adopted' and no approval row exists anywhere in the tenant. The recorded capability baseline now claims board adoption, and every later phase gate runs against a profile whose adoption decision cannot be produced.",
+      "acceptance": "Adoption refuses unless the id names an approval row with gate='architecture_board', status='approved', subject_kind='adm_profile' and subject_id = this profile id; the migration carries the FK and a NOT NULL board_decision_id for status='adopted'.",
+      "owner_project": "T9"
+    },
+    {
+      "id": "v1-w2a-4",
+      "area": "§8.1",
+      "standard": "TOGAF",
+      "spec": "§8.1",
+      "severity": "P1",
+      "title": "contracts_request retires another project's live contract via supersedes_id",
+      "problem": "`request_contract_tx` retires the row named by `supersedes_id` with an UPDATE scoped by tenant only — never by project, kind or phase — and then writes `superseded_by_id` on it unconditionally. Any contract id of the tenant is accepted, so a request for one project can retire the governing contract of another.",
+      "evidence": [
+        {
+          "path": "crates/store/src/architecture.rs",
+          "line": 1400,
+          "quote": "              WHERE tenant_id = $1 AND id = $2 AND status IN ('draft', 'live')\","
+        }
+      ],
+      "failure_scenario": "Project P2 holds its live delivery_contract C2. A caller issues `architecture.contracts_request {project_id: P1, kind: \"statement_of_architecture_work\", phase_code: \"a\", title: \"SAW\", supersedes_id: C2}`. C2 flips to status='superseded' and its superseded_by_id now points at P1's SAW. P2's close gate then answers closure_contract_missing and `architecture.phases_advance` on G answers architecture_contract_not_live — two gates broken by a write to a different project.",
+      "acceptance": "A superseded contract must belong to the same project (and kind/phase) as the new one, else 409; a failed check writes neither the retirement nor the new row.",
+      "owner_project": "T9"
+    },
+    {
+      "id": "v1-w2a-6",
+      "area": "§8.1",
+      "standard": "TOGAF",
+      "spec": "§8.1",
+      "severity": "P2",
+      "title": "phase_progress reports a phase evidenced by draft artefacts and superseded contracts",
+      "problem": "`phase_progress` builds `artifact_phases` from every architecture_artifact row the snapshot carries without testing `status`, and picks one contract per (project, phase) by recency without testing `status`; \"evidenced\" is then computed from those sets. The console therefore reports progress under a rule that contradicts `advance_phase_tx`, which only accepts an `approved` artefact and a `live` contract.",
+      "evidence": [
+        {
+          "path": "crates/store/src/snapshot.rs",
+          "line": 1406,
+          "quote": "            artifact_phases.insert((project.to_owned(), phase.to_owned()));"
+        },
+        {
+          "path": "crates/store/src/snapshot.rs",
+          "line": 1475,
+          "quote": "                artifact_phases.contains(&phase_key) || contract.is_some() || compliance.is_some();"
+        }
+      ],
+      "failure_scenario": "Create one artefact with `phase_code: \"c\"` and leave it in `draft` (or supersede an approved one), then read the snapshot: the project's phase_progress marks C `state: \"evidenced\"` and `next_required` moves to D, while `architecture.phases_advance {phase_code: \"c\"}` returns 409 architecture_artifact_missing. The Architecture destination and the gate disagree about the same phase.",
+      "acceptance": "phase_progress counts only status='approved' artefacts and status='live' contracts (matching advance_phase_tx), so a phase reported `evidenced` is one the gate would also close.",
+      "owner_project": "T9"
+    },
+    {
+      "id": "v1-w2b-2",
+      "area": "§8.3",
+      "standard": "MSP",
+      "spec": "§8.3",
+      "severity": "P0",
+      "title": "Project start passes when the programme has no tranche row",
+      "problem": "assert_project_tranche_authorised_tx treats 'no tranche row found' as authorised. project_tranche_state_tx defaults a missing meta.tranche to 1 and returns None when no programme_tranche row has that number; the caller maps None to Ok(()). That None case is meant for standalone projects (programme_id NULL), but it is identical for a programme-bound project whose programme has no tranche rows at all, so the 'no project starts before the first tranche is authorised' rule is not enforced for a fresh programme.",
+      "evidence": [
+        {
+          "path": "crates/store/src/spine.rs",
+          "line": 3192,
+          "quote": "        None => Ok(()),"
+        },
+        {
+          "path": "crates/store/src/spine.rs",
+          "line": 1375,
+          "quote": "        .unwrap_or(1);"
+        }
+      ],
+      "failure_scenario": "A programme is created with programmes.create; nobody has created tranche 1 yet. A delivery project is created with programme_id set and meta.tranche=1. projects.create calls assert_project_tranche_authorised_tx, the tranche lookup returns no row, and the gate returns Ok. The project starts work, spends budget and produces outputs before any sponsoring-group tranche review, so the first-tranche authorisation requirement is skipped entirely.",
+      "acceptance": "For a project whose programme_id is set, a missing tranche row returns 409 tranche_not_authorised (only programme_id NULL may pass); an integration test creates a programme with zero tranches and asserts project start is refused.",
+      "owner_project": "T10"
+    },
+    {
+      "id": "v1-w2b-3",
+      "area": "§8.3",
+      "standard": "MSP",
+      "spec": "§8.3",
+      "severity": "P1",
+      "title": "A benefit is accepted with no capability and no operational area",
+      "problem": "The spec's rule 'Every benefit names the capability it depends on and the operational area that must change' is not enforced. benefits.create defaults capabilities to an empty array and operational_area to the empty string, and the store validation (benefit_profile_missing over BenefitProfileFields) covers only baseline, target, measurement_method and benefit_owner_job_id. Neither capabilities nor operational_area is part of the validated field set on insert or update.",
+      "evidence": [
+        {
+          "path": "crates/actions/src/spine/mod.rs",
+          "line": 2119,
+          "quote": "            capabilities: input.capabilities.unwrap_or_else(|| serde_json::json!([])),"
+        },
+        {
+          "path": "crates/actions/src/spine/mod.rs",
+          "line": 2124,
+          "quote": "            operational_area: input.operational_area.unwrap_or_default(),"
+        },
+        {
+          "path": "crates/store/src/spine.rs",
+          "line": 2025,
+          "quote": "    let fields = BenefitProfileFields {"
+        }
+      ],
+      "failure_scenario": "The BCM registers 'faster onboarding' with a baseline, target, method and owner but leaves capabilities and operational_area empty. benefits.create succeeds (only the four measurement fields are checked). The benefit enters the map with no capability dependency and no operational area to change, and can later be marked realized without any programme capability having been delivered or any part of operations having changed — the exact 'wish' the spec says must be refused.",
+      "acceptance": "benefits.create and benefits.update refuse 400 benefit_profile_incomplete unless capabilities is a non-empty array and operational_area is non-blank after trim, in addition to the four measurement fields.",
+      "owner_project": "T10"
+    },
+    {
+      "id": "v1-w2b-5",
+      "area": "§8.3",
+      "standard": "MSP",
+      "spec": "§8.3",
+      "severity": "P1",
+      "title": "Benefits-map output_ref is free text, so dependency slips miss benefits",
+      "problem": "benefit_link.output_ref is a plain text column with no foreign key, and benefits.link copies the caller's string unchanged. The store's own contract for record_dependency_slip_tx says the at-risk benefits come from edges where benefit_link.output_ref names a wbs_node id, but no action validates that the string is an existing wbs_node of the programme. The map is therefore accepted with edges that can never participate in a dependency slip.",
+      "evidence": [
+        {
+          "path": "migrations/0044_plan_spine.sql",
+          "line": 318,
+          "quote": "    output_ref          text NOT NULL,"
+        },
+        {
+          "path": "crates/actions/src/spine/mod.rs",
+          "line": 2219,
+          "quote": "            output_ref: input.output_ref,"
+        },
+        {
+          "path": "crates/store/src/spine.rs",
+          "line": 3205,
+          "quote": "/// The benefits come from the map's edges — `benefit_link.output_ref` names a `wbs_node` id —"
+        }
+      ],
+      "failure_scenario": "The BCM links the benefit to output_ref '3.2.1 Onboarding walkthrough' (a WBS label) instead of the wbs_node UUID. benefits.link accepts it and the map is accepted. When that output's dependency slips, record_dependency_slip_tx matches benefit_link.output_ref against wbs_node ids, finds nothing, and reports zero benefits at risk; the benefit-at-risk metric and the sponsor's escalation both under-report by exactly the benefits the map intended to protect.",
+      "acceptance": "benefits.link resolves output_ref to an existing wbs_node id in the same programme (refusing a non-uuid or a node from another programme), or the dependency-slip path returns an error when an edge names no node instead of silently returning an empty list.",
+      "owner_project": "T10"
+    },
+    {
+      "id": "v1-w2c-2",
+      "area": "§8.2",
+      "standard": "SAFe",
+      "spec": "§8.2",
+      "severity": "P1",
+      "title": "Demo and retro cadence rows enforce nothing: no evidence, no credit, no lessons",
+      "problem": "'demo' and 'retro' are accepted enum values and nothing else. No action requires each completed deliverable to exhibit its evidence at a system demo, no acceptance path withholds credit for a deliverable that was never demoed, and no retro action produces lessons or kata candidates. The spec's 'no demo, no credit' and inspect-and-adapt records have no implementation.",
+      "evidence": [
+        {
+          "path": "crates/actions/src/spine/mod.rs",
+          "line": 2648,
+          "quote": "    /// `pi | sprint | demo | retro | refinement`."
+        }
+      ],
+      "failure_scenario": "A PI closes without a system demo. Every deliverable stays accepted because acceptance is a status PATCH (see v2-w2c-4); the retro row exists with empty meta and produces no lesson or kata candidate. The improvement loop the spec says is measured has no rows to measure.",
+      "acceptance": "A demo cadence refuses to credit/accept a completed deliverable without a typed evidence reference exhibited at that demo, and a retro action writes lessons plus kata candidates linked to the retro cadence row; tests cover the refused credit and the written lessons.",
+      "owner_project": "T10"
+    },
+    {
+      "id": "v1-w2c-3",
+      "area": "§8.4",
+      "standard": "PMP",
+      "spec": "§8.4",
+      "severity": "P0",
+      "title": "Baseline change guard trusts a self-declared 'approved' status on a register row",
+      "problem": "`take_baseline_guarded` advances a baseline when the named change row has `status == \"approved\"`, but `registers.create` and `registers.update` write any status string straight to the row with no validation and no approval gate. Any `portfolio:write` caller can create a change already marked approved, or PATCH an open one, and then re-baseline. The store already has `change_is_approved_tx`, which correctly reads the approval gate, but the baseline guard does not use it.",
+      "evidence": [
+        {
+          "path": "crates/actions/src/spine/mod.rs",
+          "line": 1533,
+          "quote": "        input.status.as_deref(),"
+        },
+        {
+          "path": "crates/actions/src/spine/mod.rs",
+          "line": 1357,
+          "quote": "        if change.kind != \"change\""
+        },
+        {
+          "path": "crates/store/src/spine.rs",
+          "line": 1923,
+          "quote": "/// gate is approved. The approval is the second principal's decision, not the row's status."
+        }
+      ],
+      "failure_scenario": "A delivery lead with portfolio:write creates a change row with status 'approved', baseline_ref pointing at the current approved baseline and meta.impact = {}. They then call baselines.take with that change_id. The new baseline is created and cited as advanced by an 'approved' change that no approver ever saw, bypassing §8.4 change control and §8.3's re-baseline rule entirely.",
+      "acceptance": "The baseline guard resolves approval through the approval table (gate='change', status='approved', meta.change_id matches), not the row status; register create/update refuse status='approved' for change rows (approval is only a gate effect). A test that self-declares approved and re-baselines must be rejected.",
+      "owner_project": "T3"
+    },
+    {
+      "id": "v1-w2c-5",
+      "area": "§8.5",
+      "standard": "TOGAF",
+      "spec": "§8.5",
+      "severity": "P1",
+      "title": "The trace chain stops at card/project: no run, step, artefact or evidence end",
+      "problem": "The trace-edge whitelist is governed_asset | card | project. The spec chain continues WBS deliverable → card → run → step → artefact/evidence → acceptance → closure; none of run, step, artefact or evidence is an addressable end, and there is no view action joining them. Gate evidence edges also fire only for evidence items whose kind is governed_asset, so typed run/artefact evidence never leaves an edge at all.",
+      "evidence": [
+        {
+          "path": "crates/store/src/trace_link.rs",
+          "line": 24,
+          "quote": "pub const END_TYPES: [&str; 3] = [\"governed_asset\", \"card\", \"project\"];"
+        },
+        {
+          "path": "crates/actions/src/governance/views.rs",
+          "line": 237,
+          "quote": "    /// `governed_asset | card`."
+        }
+      ],
+      "failure_scenario": "An auditor asks the governance screen which requirement a given run proves and where its evidence is. trace_links.list can only return requirement→card or requirement→project edges; the run, its steps and its artefacts are unreachable from the requirement, and evidence arrays naming a run are silently skipped by the gate effect. The one question §8.5 says the screen answers cannot be answered.",
+      "acceptance": "Trace ends include run, step, artefact and evidence (tenant-resolved), and a bounded governance view action returns requirement → cards → runs → steps/artefacts/evidence for a requirement or run; tests build the chain and read it back.",
+      "owner_project": "S07"
+    },
+    {
+      "id": "v1-w2c-6",
+      "area": "§8.5",
+      "standard": "TOGAF",
+      "spec": "§8.5",
+      "severity": "P1",
+      "title": "Trace links are optional and not required at creation for architecture-governed work",
+      "problem": "`trace_links.create` is a standalone opt-in action. Work-package/card creation (`wbs.create` and the board path) never checks for a trace link to an approved requirement or architecture asset. The spec requires the link at creation time for architecture-governed work; here it can be added later or never.",
+      "evidence": [
+        {
+          "path": "crates/actions/src/governance/trace.rs",
+          "line": 112,
+          "quote": "    name = \"trace_links.create\","
+        },
+        {
+          "path": "crates/actions/src/spine/mod.rs",
+          "line": 1048,
+          "quote": "    name = \"wbs.create\","
+        }
+      ],
+      "failure_scenario": "A team starts architecture-governed work (project meta marks it governed), creates the work package and card, and runs it with no requirement/architecture edge. The work is ungoverned and no run can be attributed to an approved requirement; nothing refuses the creation and no report flags the orphan.",
+      "acceptance": "Creation of a work package/card for an architecture-governed project refuses with 409 unless it carries a trace link to an approved requirement or architecture asset, writing the edge in the same transaction; a test asserts the orphan is refused and the linked creation succeeds.",
+      "owner_project": "S07"
+    },
+    {
+      "id": "v1-w3a-1",
+      "area": "§9.2",
+      "standard": "SPEC",
+      "spec": "§9.2",
+      "severity": "P0",
+      "title": "The andon cord can be released by a machine: andon.release never checks that the actor is a person",
+      "problem": "SPEC §9.2 says the andon cord is released by a person only. andon_release goes straight from the handler context to store::andon::release_tx; it never consults ctx.actor_kind, even though the same crate already uses actor_kind to decide whether an actor is a user (incidents.rs:750). The action is kind=\"internal\", and the invoke boundary's Authority::Internal lane permits any actor_kind that holds the scope (invoke.rs:776), so a scheduled ops job or a coding agent holding andon:write can release a cord a human pulled. The release event records only actor_id, with no principal kind a reader could use to tell a person from a machine.",
+      "evidence": [
+        {
+          "path": "crates/actions/src/control/andon.rs",
+          "line": 87,
+          "quote": "async fn andon_release("
+        },
+        {
+          "path": "crates/actions/src/control/andon.rs",
+          "line": 92,
+          "quote": "    let Some(state) = store::andon::release_tx(&mut *tx, ctx.tenant)"
+        },
+        {
+          "path": "crates/actions/src/ops/incidents.rs",
+          "line": 750,
+          "quote": "            owner_user_id: (ctx.actor_kind == \"user\").then_some(ctx.actor_id),"
+        }
+      ],
+      "failure_scenario": "At 02:10 a human pulls the cord after a runaway deploy. An automation job (or a coding agent granted andon:write to 'unblock' itself) calls andon.release at 02:12. runs.create stops returning 409 andon-engaged and the worker resumes claiming runs for the tenant, including the pipeline that caused the incident. No human decision exists anywhere in the record, and the released event gives no way to tell the releaser was not a person.",
+      "acceptance": "andon.release returns 403 unless ctx.actor_kind == \"user\"; a test asserts a machine principal holding andon:write is refused while a user succeeds, and the andon.released event carries the principal kind.",
+      "owner_project": "T7"
+    },
+    {
+      "id": "v1-w3a-5",
+      "area": "§9.2",
+      "standard": "SPEC",
+      "spec": "§9.2",
+      "severity": "P1",
+      "title": "An incident that needed no write can never be postmortemed or resolved, starving the improvement loop",
+      "problem": "ops.postmortem refuses unless mitigated_at is recorded, and ops.resolve refuses unless both mitigated_at and a postmortem are present. An incident that self-heals, is fixed by a person outside conveyor, or is opened from an alert that then cleared has no mitigation write to run; it therefore can never produce a postmortem, a kata candidate, or a resolution, though §9.2 defines a person-opened incident and a postmortem whose systemic finding should become a kata.",
+      "evidence": [
+        {
+          "path": "crates/actions/src/ops/incidents.rs",
+          "line": 708,
+          "quote": "    if meta.get(META_MITIGATED_AT).is_none() {"
+        },
+        {
+          "path": "crates/actions/src/ops/incidents.rs",
+          "line": 712,
+          "quote": "            \"a postmortem follows a mitigation; none has been recorded\","
+        },
+        {
+          "path": "crates/actions/src/ops/incidents.rs",
+          "line": 845,
+          "quote": "    if meta.get(META_MITIGATED_AT).is_none() {"
+        },
+        {
+          "path": "crates/actions/src/ops/incidents.rs",
+          "line": 852,
+          "quote": "    if meta.get(META_POSTMORTEM).is_none() {"
+        }
+      ],
+      "failure_scenario": "A certificate-expiry alert fires. An operator renews the certificate with their own tooling; conveyor's only write verbs (restart, scale, rollback, flag_flip) are not the fix and running one would be a false record. The incident stays open forever: no postmortem can be written, so the systemic finding (no automated rotation) never becomes a kata, and the card contaminates every open-incidents view and every severity metric.",
+      "acceptance": "An incident may record mitigation as 'no action required' with a reason (no cluster write, no mitigated write recorded) and may then be postmortemed and resolved; a test asserts a zero-write incident reaches resolved with a postmortem and, when systemic, exactly one kata candidate.",
+      "owner_project": "T7"
+    },
+    {
+      "id": "v1-w3b-2",
+      "area": "§10.5",
+      "standard": "SPEC",
+      "spec": "§10.5",
+      "severity": "P1",
+      "title": "The live web shell still exposes only V1's nine destinations; six V2 destinations have no route",
+      "problem": "apps/web/src/app.rs calls itself the nine-destination shell and its route table plus Sidebar (app.rs:267-322) contain no route or nav entry for Organisation, Authoring, Portfolio, Programme, Plan or Operations; Procedures/Improve exist only as Build sub-screens and an Evals sub-screen. Any deep link to a documented V2 destination falls through to the literal 'No such page.' fallback (app.rs:138). The §10.5 screens therefore cannot be reached in the live product at all.",
+      "evidence": [
+        {
+          "path": "docs/SPEC_V2.md",
+          "line": 1243,
+          "quote": "V1's nine destinations stand (Today, Board, Runs, Build, Design, Measure, Evals, Govern, Channels). V2 adds:"
+        },
+        {
+          "path": "apps/web/src/app.rs",
+          "line": 1,
+          "quote": "//! The application root: one boot, then the nine-destination shell."
+        },
+        {
+          "path": "apps/web/src/app.rs",
+          "line": 138,
+          "quote": "                        <Routes fallback=|| view! { <p class=\"muted\">\"No such page.\"</p> }>"
+        },
+        {
+          "path": "apps/web/src/app.rs",
+          "line": 267,
+          "quote": "        <nav class=\"rail\" aria-label=\"Destinations\">"
+        }
+      ],
+      "failure_scenario": "The owner or a tenant admin opens /organisation, /portfolio, /programme or /operations (or clicks the destination in a design pack) and the SPA renders 'No such page.'; job catalogue/release administration, tranche reviews, benefits, WBS/baselines and incident/postmortem work have no human surface, so those workflows are API-only in practice.",
+      "acceptance": "Each §10.5 destination has a live route and Sidebar entry (Organisation, Procedures, Authoring, Portfolio, Programme, Plan, Improve, Operations), each landing on a real screen; or an owner-approved scope cut records the deferral in SPEC_V2 §10.5.",
+      "owner_project": "PLATFORM"
+    },
+    {
+      "id": "v1-w3b-3",
+      "area": "§10.4",
+      "standard": "SPEC",
+      "spec": "§10.4",
+      "severity": "P1",
+      "title": "The declared authoring.* action family does not exist",
+      "problem": "SPEC §10.4 declares authoring.intake|draft|review|publish and authoring.assets. The actions crate declares no authoring module (the module inventory spans lib.rs:20-107), and the compile-time registry is exactly the inventory submissions (registry.rs:184); enumeration of all ~493 declared names contains no authoring.* action, and served-spec.lock.json contains none. documents.* is the V1 document lifecycle and does not provide an asset draft catalogue or intake queue.",
+      "evidence": [
+        {
+          "path": "docs/SPEC_V2.md",
+          "line": 1202,
+          "quote": "| authoring | `authoring.intake\\|draft\\|review\\|publish`, `authoring.assets` |"
+        },
+        {
+          "path": "crates/actions/src/lib.rs",
+          "line": 20,
+          "quote": "pub mod agent_surface;"
+        },
+        {
+          "path": "crates/actions/src/lib.rs",
+          "line": 107,
+          "quote": "pub mod youtube;"
+        },
+        {
+          "path": "crates/actions/src/registry.rs",
+          "line": 184,
+          "quote": "        let mut actions: Vec<ActionSpec> = inventory::iter::<ActionRegistration>()"
+        }
+      ],
+      "failure_scenario": "An agent front end or UI calls authoring.intake to submit a document to the authoring queue, or authoring.publish to release a drafted asset: the registry returns no such action (404/unknown action), so the Authoring destination's intake, draft catalogue, review/publish and dependency-status flows have no HTTP or MCP surface and can only be faked through ad-hoc documents.* calls.",
+      "acceptance": "authoring.intake|draft|review|publish and authoring.assets are registered ActionSpecs with handlers, appear in served-spec.lock.json and the MCP manifest, and a registry test asserts the five names; or SPEC_V2 §10.4 is amended by owner decision naming the replacement family.",
+      "owner_project": "PLATFORM"
+    },
+    {
+      "id": "v1-w3b-5",
+      "area": "§10.4",
+      "standard": "SPEC",
+      "spec": "§10.4",
+      "severity": "P2",
+      "title": "The kata.* family is not an action family; kata exists only as an unregistered process key",
+      "problem": "SPEC §10.4 declares kata.open|observe|analyse|propose|measure|adopt|propagate|close. No kata.* ActionSpec is registered. The implementation uses the string as a process-catalogue key: coach.escalate starts a process run with process_key 'kata.open' (coach.rs:780) and ops.incident names the same const (incidents.rs:64). There is no action to list a kata, read its Six Gests state, measure or adopt it, so the Improve destination's kata queue has no action surface.",
+      "evidence": [
+        {
+          "path": "docs/SPEC_V2.md",
+          "line": 1207,
+          "quote": "| kata | `kata.open\\|observe\\|analyse\\|propose\\|measure\\|adopt\\|propagate\\|close` |"
+        },
+        {
+          "path": "crates/actions/src/ops/incidents.rs",
+          "line": 64,
+          "quote": "pub const KATA_PROCESS: &str = \"kata.open\";"
+        },
+        {
+          "path": "crates/actions/src/coach.rs",
+          "line": 780,
+          "quote": "                process_key: Some(\"kata.open\".to_owned()),"
+        }
+      ],
+      "failure_scenario": "coach.escalate opens a kata process run, but no kata.observe/measure/adopt action exists: an MCP client or the Improve screen cannot query the kata queue, record an observation/measurement or adopt the improvement, and the only way to advance it is the generic process_runs.start with a process key that must already be seeded. The systemic-improvement loop is not a discoverable API.",
+      "acceptance": "Either the eight kata verbs are registered as ActionSpecs (list/read state included) or SPEC §10.4 replaces the family with the process-key design and documents how observe/measure/adopt are expressed; a registry or process-catalogue test covers the chosen contract.",
+      "owner_project": "PLATFORM"
+    },
+    {
+      "id": "v1-w3b-6",
+      "area": "§10.4",
+      "standard": "SPEC",
+      "spec": "§10.4",
+      "severity": "P2",
+      "title": "Four of the six declared analyse.* actions are missing",
+      "problem": "SPEC §10.4 and §10.4.1 declare analyse.site, analyse.app, analyse.video, analyse.brand, analyse.content and analyse.report as the evidence producers for gates. Only analyse.site (analysis/actions.rs:16) and analyse.video (analysis/video.rs:16) are registered; there is no analyse.app, analyse.brand, analyse.content or analyse.report in the registry, so four of the six measured subjects named by §10.4.1 cannot be analysed through the action surface.",
+      "evidence": [
+        {
+          "path": "docs/SPEC_V2.md",
+          "line": 1210,
+          "quote": "| analysis | `analyse.site`, `analyse.app`, `analyse.video`, `analyse.brand`, `analyse.content`, `analyse.report` |"
+        },
+        {
+          "path": "crates/actions/src/analysis/actions.rs",
+          "line": 16,
+          "quote": "const ACTION: &str = \"analyse.site\";"
+        },
+        {
+          "path": "crates/actions/src/analysis/video.rs",
+          "line": 16,
+          "quote": "    name = \"analyse.video\","
+        }
+      ],
+      "failure_scenario": "A production or QC procedure carries a gate that names analyse.brand or analyse.content (the §10.4.1 example: scoring the subject of the project, not the system). The action does not exist, so the gate cannot produce its evidence row and the step fails at resolution; brand/content/application/report QC is impossible without out-of-band work, while §10.4.1 forbids building it inside metrics/evals.",
+      "acceptance": "analyse.app, analyse.brand, analyse.content and analyse.report are registered with schemas and handlers (or explicitly scoped out in SPEC §10.4 by owner decision), and a registry test asserts the final six-verb set.",
+      "owner_project": "PLATFORM"
+    },
+    {
+      "id": "v1-w4a-1",
+      "area": "§11.3",
+      "standard": "SPEC",
+      "spec": "§11.3",
+      "severity": "P0",
+      "title": "No spend budget gate: 429 tool_budget_exceeded is unimplemented and tool_call.cost is never written",
+      "problem": "§11.3 step 2 requires the broker to check the spend budget and fail with `429 tool_budget_exceeded`; §11.4's spend row requires 'budget check + ledger'; §11.8/§11.9 require cost per call. The broker performs only the effect-ceiling comparison (no budget read, no 429 branch anywhere in crates/), and writes the ledger row with `cost: None` unconditionally, so the column exists but is never populated and per-job 'tool-budget usage' cannot be computed.",
+      "evidence": [
+        {
+          "path": "docs/SPEC_V2.md",
+          "line": 1386,
+          "quote": "   (`429 tool_budget_exceeded`)."
+        },
+        {
+          "path": "docs/SPEC_V2.md",
+          "line": 1413,
+          "quote": "| **spend** | LLM generation, w2v render, TTS, paid data source | budget check + ledger |"
+        },
+        {
+          "path": "crates/actions/src/broker.rs",
+          "line": 355,
+          "quote": "        cost: None,"
+        }
+      ],
+      "failure_scenario": "A run whose binding permits `spend` calls `image_gen.generate` in a loop (image_gen is a first-wave toolkit). No budget counter is consulted before any of the calls; the destination produces paid renders on every iteration; every ledger row carries cost NULL, so the tenant's spend cannot be attributed and the gate that should have stopped at the first over-budget call never fires.",
+      "acceptance": "A spend-class tool call when the job's budget is exhausted returns `429 tool_budget_exceeded` before any network call; a successful spend call writes a non-null `cost` on its single `tool_call` row; a test drives `tools.call` for a spend tool under a zero budget and asserts the destination was never reached.",
+      "owner_project": "T13"
+    },
+    {
+      "id": "v1-w4a-2",
+      "area": "§11.3",
+      "standard": "SPEC",
+      "spec": "§11.3",
+      "severity": "P0",
+      "title": "Write-verify is unenforced: no checks[]/verdict at call time and no publication gate for a write tool without verification",
+      "problem": "§11.3 states the two rules are 'not negotiable in the conveyor's registry': a write tool returns read-back `checks[]` and a `verdict`, and a write with no verification path cannot be published. The `tool` table has no verification declaration, `toolkits.publish` copies effect and schema from the action spec and inserts unconditionally, and the broker classifies the outcome from the HTTP status alone — it never inspects a `verdict` or `checks[]`. A write tool can therefore be published and called with no verification, and a 200 whose effect did not happen is ledgered `ok`.",
+      "evidence": [
+        {
+          "path": "docs/SPEC_V2.md",
+          "line": 1402,
+          "quote": "**Writes verify themselves.** A write tool returns read-back `checks[]` and a `verdict`; a write with no verification"
+        },
+        {
+          "path": "crates/actions/src/toolkits/publish.rs",
+          "line": 191,
+          "quote": "                effect: spec.effect.as_str(),"
+        },
+        {
+          "path": "crates/actions/src/broker.rs",
+          "line": 315,
+          "quote": "                _ => \"backend_error\","
+        }
+      ],
+      "failure_scenario": "A `write` tool (for example `coding.jobs.create`) is published with no checks declaration. The destination answers 200 after a partial write — the branch was created but the commit was not. The broker ledgers `ok`, the run proceeds on the belief that the write verified itself, and the unverified write is indistinguishable in the ledger from a verified one.",
+      "acceptance": "`toolkits.publish` refuses a `write`/`destructive` tool whose action declares no verification path, naming the tool; a call whose result carries a failing `verdict` or `checks[]` is ledgered `check_failed` and returned to the caller distinctly from `ok`; a test publishes a write tool with no verification and asserts no `tool` row is created.",
+      "owner_project": "T13"
+    },
+    {
+      "id": "v1-w4a-3",
+      "area": "§11.3",
+      "standard": "SPEC",
+      "spec": "§11.3",
+      "severity": "P1",
+      "title": "idempotency='required' is data the broker never reads; the caller's key is a blind passthrough",
+      "problem": "The tool version declares `idempotency` (`required | optional | forbidden`), but resolve does not select it, the broker requires no key for a `required` write, and `tools.call` is itself declared `idempotent: false` so the engine does not replay. The only use of the key is copying whatever the caller supplied into the target request. §11.3's 'Writes take an `idempotency_key`' and §11.6's refusal to publish a write effect without an idempotency declaration are unenforced at call time.",
+      "evidence": [
+        {
+          "path": "docs/SPEC_V2.md",
+          "line": 1403,
+          "quote": "path cannot be published. Writes take an `idempotency_key`. These two rules are borrowed from the proven"
+        },
+        {
+          "path": "migrations/0055_tool_platform.sql",
+          "line": 70,
+          "quote": "    idempotency    text NOT NULL DEFAULT 'optional'"
+        },
+        {
+          "path": "crates/actions/src/broker.rs",
+          "line": 250,
+          "quote": "        idempotency_key: request.idempotency_key.clone(),"
+        },
+        {
+          "path": "crates/actions/src/tools.rs",
+          "line": 67,
+          "quote": "        idempotent: false,"
+        }
+      ],
+      "failure_scenario": "An executor retries a write step after a transport timeout and sends no Idempotency-Key. Nothing at the broker refuses the call for a tool whose `idempotency='required'`; both attempts reach the destination and two branches (or two PRs, two uploads) exist for one step.",
+      "acceptance": "A call to a tool whose `idempotency='required'` with no key returns `422 tool_input_invalid` before any network call; `tool.idempotency` is resolved into the broker and a caller-supplied key is forwarded unchanged; a test asserts the missing-key refusal and that no destination call was made.",
+      "owner_project": "T13"
+    },
+    {
+      "id": "v1-w4a-4",
+      "area": "§11.3",
+      "standard": "SPEC",
+      "spec": "§11.3",
+      "severity": "P1",
+      "title": "credential_alias is resolved but never injected; every binding calls with the target's process credential",
+      "problem": "Resolve selects `b.credential_alias` into `ResolvedTool`, but no code reads that field. The broker dispatches the target action as `Authority::Internal` with no sealed-secret lookup, so the credential actually used is whatever the target's process configuration carries — identical for every tenant and every binding. §11.3 step 4 ('The broker injects it') and §11.1's 'narrowed by ... credential alias' have no implementation; the alias column is an authoritative-looking setting with no effect.",
+      "evidence": [
+        {
+          "path": "crates/store/src/tool.rs",
+          "line": 71,
+          "quote": "    pub credential_alias: Option<String>,"
+        },
+        {
+          "path": "docs/SPEC_V2.md",
+          "line": 1389,
+          "quote": "4. **Resolve the credential** from the sealed secret store by alias. The broker injects it; the prompt never carries it"
+        },
+        {
+          "path": "crates/actions/src/broker.rs",
+          "line": 258,
+          "quote": "        authority: Authority::Internal,"
+        }
+      ],
+      "failure_scenario": "Two tenant bindings pin the same toolkit with different credential aliases. Both calls are dispatched internally under the single configured service token, so tenant B's calls execute with tenant A's rights; revoking or rotating B's alias changes nothing at the destination, and a binding that declares no credential still succeeds on the target's ambient credential.",
+      "acceptance": "A call resolves the binding's `credential_alias` through the sealed secret store and the destination receives that credential; a binding with no alias against a toolkit whose auth adapter is not `none` fails closed before the call; a test binding two aliases to one toolkit asserts the two destination credentials differ.",
+      "owner_project": "T13"
+    },
+    {
+      "id": "v1-w4a-5",
+      "area": "§11.3",
+      "standard": "SPEC",
+      "spec": "§11.3",
+      "severity": "P1",
+      "title": "Long operations are unbounded in the required way: tool timeout_secs ignored, no pending status and no resume_token",
+      "problem": "The tool version carries `timeout_secs`, but the broker never applies it; the only deadline is the static 300 s `timeout_ms` on `tools.call`. On expiry the broker maps every non-2xx/412/422 outcome to `backend_error` — there is no `pending` branch, no `resume_token` is minted anywhere in crates/, and there is no status tool to continue from one. §11.3's 'on timeout the tool returns `pending` with a `resume_token`' and 'a timeout never fails silently' are unimplemented.",
+      "evidence": [
+        {
+          "path": "docs/SPEC_V2.md",
+          "line": 1399,
+          "quote": "**Long operations are bounded.** Every poll has a fixed budget; on timeout the tool returns `pending` with a"
+        },
+        {
+          "path": "migrations/0055_tool_platform.sql",
+          "line": 72,
+          "quote": "    timeout_secs   int NOT NULL DEFAULT 30 CHECK (timeout_secs BETWEEN 1 AND 300),"
+        },
+        {
+          "path": "crates/actions/src/tools.rs",
+          "line": 70,
+          "quote": "        timeout_ms: 300_000,"
+        },
+        {
+          "path": "crates/actions/src/broker.rs",
+          "line": 315,
+          "quote": "                _ => \"backend_error\","
+        }
+      ],
+      "failure_scenario": "A video-compiler render exceeds the 300 s action deadline. The broker ledgers `backend_error` and returns a failure, while the durable compile job keeps running at the destination. The run has no `pending` result and no `resume_token`, so it cannot poll or continue — a slow-but-succeeding operation is recorded as a backend failure and the work is orphaned.",
+      "acceptance": "A call whose destination exceeds the tool's `timeout_secs` returns `{status:\"pending\", resume_token}` and ledgers status `pending`, not `backend_error`; the matching status tool accepts the token and continues; a test with a slow destination asserts the pending envelope and a follow-up call that completes.",
+      "owner_project": "T13"
+    },
+    {
+      "id": "v1-w4a-6",
+      "area": "§11.5",
+      "standard": "SPEC",
+      "spec": "§11.5",
+      "severity": "P1",
+      "title": "No BYO surface: the publishable catalogue is a compile-time seed and no OpenAPI import or MCP discovery action exists",
+      "problem": "§11.5 permits a tenant two kinds of tool: an OpenAPI 3.1 toolkit imported as a draft with tenant-admin approval and a contract test, and a remote MCP server with binding-scoped discovery. The only publish path is `toolkits.publish`, whose input is `EmptyIn` and whose source is the compile-time `RAW` list of `seed/toolkits/*.json`; `ToolkitManifest` carries no document, schema or URL, and the registered tool actions are only `tools.call`, `tools.usage`, `tools.probe` and `toolkits.publish`. There is no import action, no tenant allowlist and no discovery, so a tenant's own licensed service cannot enter the estate at all.",
+      "evidence": [
+        {
+          "path": "docs/SPEC_V2.md",
+          "line": 1424,
+          "quote": "A tenant may bring two kinds of tool and only two:"
+        },
+        {
+          "path": "crates/actions/src/toolkits/manifest.rs",
+          "line": 23,
+          "quote": "const RAW: &[(&str, &str)] = &["
+        },
+        {
+          "path": "crates/actions/src/toolkits/manifest.rs",
+          "line": 9,
+          "quote": "//! the broker dispatches. It never carries an input schema: the schema is copied from the live"
+        }
+      ],
+      "failure_scenario": "A tenant licensed for its own internal OpenAPI service asks for it as a tool. There is no request an admin can make: publishing reads only the embedded seed files, the toolkit manifest cannot express the tenant's document or base URL, and no tenant allowlist exists to review the destination. The tenant's jobs cannot call their own service, and §11.3 step 5's BYO allowlist has nothing to attach to.",
+      "acceptance": "A tenant-admin action imports an OpenAPI 3.1 document into a draft toolkit (per-operation closed schemas, default `read` effect, destination base URL, credential alias) that cannot be bound until a contract test and approval pass; an MCP endpoint registers and exposes only the bound subset; no path accepts uploaded code. A test creates a tenant toolkit from a document and binds it to a run.",
+      "owner_project": "T13"
+    },
+    {
+      "id": "v1-w4b-3",
+      "area": "§14/R6",
+      "standard": "SPEC",
+      "spec": "§9.3, D34, P11",
+      "severity": "P1",
+      "title": "Earned auto-merge is replaced by an unconditional policy waiver",
+      "problem": "§9.3/D34 require auto-merge to be an approval_policy row with `approver_kind='auto'` and typed conditions — consecutive green runs, revert count, path scope, independent reviewer, expiry — all tenant configuration, and the policy change itself a gated change. The implemented policy has exactly two fields, `approval` (required|waived) and `self_approval`, and `waives()` returns true for any action whose row says `waived`. There are no conditions, no expiry, no revert or reviewer inputs, no version dimension, and `approval_policies.set` is an ordinary `write` action, so the policy is not itself gated. A single holder of `approvals:write` can permanently switch a destructive gate off.",
+      "evidence": [
+        {
+          "path": "crates/store/src/approval_policy.rs",
+          "line": 46,
+          "quote": "    /// This tenant has opted out for this action; the call runs without one."
+        },
+        {
+          "path": "crates/store/src/approval_policy.rs",
+          "line": 47,
+          "quote": "    Waived,"
+        },
+        {
+          "path": "crates/store/src/approval_policy.rs",
+          "line": 115,
+          "quote": "    pub approval: ApprovalRequirement,"
+        },
+        {
+          "path": "crates/store/src/approval_policy.rs",
+          "line": 217,
+          "quote": "        Ok(Some(policy)) => Ok(policy.approval == ApprovalRequirement::Waived),"
+        },
+        {
+          "path": "crates/actions/src/control/policies.rs",
+          "line": 109,
+          "quote": "    effect = \"write\","
+        }
+      ],
+      "failure_scenario": "A tenant sets `waived` for ops.rollback (or any destructive action). From then on every rollback runs without an approval, with no condition, expiry or revocation trigger, and the change that enabled it was itself ungated. R6's 'auto-merge earned and revocable' becomes a permanent off switch that no green-run or revert-count evidence can turn back on.",
+      "acceptance": "Autonomy is a versioned policy row carrying approver kind and typed conditions plus expiry; it defaults off, is revoked automatically when a condition fails, and a change to it requires an approval decision rather than a plain write.",
+      "owner_project": "T11"
+    },
+    {
+      "id": "v1-w4b-4",
+      "area": "§14/R5",
+      "standard": "SPEC",
+      "spec": "§5.4, P4",
+      "severity": "P1",
+      "title": "self_approval='allowed' lets a requester decide their own gate",
+      "problem": "P4 and §5.4 state flatly that the executor/assignee/requester cannot approve the gate that judges their work. The policy model adds a second opt-out, `self_approval` (forbidden|allowed), and the decision writer consults `allows_self_approval` for the gate's action. Setting `allowed` therefore makes the requester a valid approver for their own gate, so dual control and P4 are tenant-waivable configuration rather than invariants.",
+      "evidence": [
+        {
+          "path": "crates/store/src/approval_policy.rs",
+          "line": 81,
+          "quote": "    Allowed,"
+        },
+        {
+          "path": "crates/store/src/approval_policy.rs",
+          "line": 117,
+          "quote": "    pub self_approval: SelfApproval,"
+        },
+        {
+          "path": "crates/store/src/approval.rs",
+          "line": 850,
+          "quote": "            match approval_policy::allows_self_approval(&mut *conn, tenant, &row.gate).await {"
+        }
+      ],
+      "failure_scenario": "The only holder of `approvals:write` sets self_approval=allowed for ops.scale, then requests a scale gate and approves it themselves. The audit records one human decision by the requester and the gate resolves; no second person ever saw the action, and nothing flags the self-approval as an exception.",
+      "acceptance": "Self-approval is unconditional: the decision writer refuses a decision whose approver is the gate's requester/executor, with no policy row able to relax it. Any historical exception is an explicit, audited override rather than a stored permission.",
+      "owner_project": "T11"
+    },
+    {
+      "id": "v1-w4b-5",
+      "area": "§14/R5",
+      "standard": "SPEC",
+      "spec": "§5.4, §7.5",
+      "severity": "P2",
+      "title": "never_refused counts only reject decisions and ignores every other refusal",
+      "problem": "§5.4 defines the governance audit over gates that have 'never refused anything in a full programme cycle'. The implementation computes never_refused as decided approvals with zero rejected approvals, where `rejected` counts only approval rows whose status became rejected. Refusals that happen before or outside a decision — 422 gate_evidence_missing at request time, 403 approval_wrong_target/approval_not_approved at the invoke boundary, expired gates — create or change no rejected approval row and are invisible. The window also defaults to a rolling 90 days, not a programme cycle.",
+      "evidence": [
+        {
+          "path": "crates/actions/src/metrics/mod.rs",
+          "line": 439,
+          "quote": "        let never = gate.decided > 0 && gate.rejected == 0;"
+        },
+        {
+          "path": "crates/actions/src/metrics/mod.rs",
+          "line": 28,
+          "quote": "const DEFAULT_WINDOW_DAYS: i64 = 90;"
+        },
+        {
+          "path": "crates/store/src/metrics.rs",
+          "line": 147,
+          "quote": "                      count(*) FILTER (WHERE status = 'rejected')::bigint AS rejected,"
+        },
+        {
+          "path": "crates/actions/src/pm/mod.rs",
+          "line": 59,
+          "quote": "            \"gate_evidence_missing\","
+        }
+      ],
+      "failure_scenario": "A gate refuses every evidence-less submission at request time (no approval row is written) and approves the few evidenced ones. Its governance row shows decided>0 and rejected=0, so it is reported as never refused, while a gate that genuinely never refused but had one rejection 91 days ago is reported healthy. The audit flags the wrong gates and misses the real rubber stamp.",
+      "acceptance": "Every refusal path (evidence 422, target/action 403, expiry) increments the gate's refusal count; the window is the programme cycle (or a configured equivalent), and the audit opens a finding/event rather than only populating a read-model field.",
+      "owner_project": "T11"
+    },
+    {
+      "id": "v1-w4b-6",
+      "area": "§14/R1",
+      "standard": "SPEC",
+      "spec": "P10, §7.5, T11",
+      "severity": "P2",
+      "title": "metric_reconciliation is a write-only aggregate with a dead verdict helper",
+      "problem": "P10 forbids an aggregate with no named procedure and no metric reading it. `metric_reconciliation` rows are written by metrics.reconcile (both the matched/difference path and the unavailable path), but no action, metric or read model ever reads them; the only helper that consumes the verdict is parked behind `#[allow(dead_code)]` with a comment saying it waits for a later action. The billing comparison therefore exists only as the response of the call that recorded it, not as a governance figure.",
+      "evidence": [
+        {
+          "path": "crates/actions/src/metrics/mod.rs",
+          "line": 508,
+          "quote": "// Keep the reconciliation enum referenced until the P2 action lands on this branch; the state"
+        },
+        {
+          "path": "crates/actions/src/metrics/mod.rs",
+          "line": 510,
+          "quote": "#[allow(dead_code)]"
+        },
+        {
+          "path": "crates/actions/src/metrics/mod.rs",
+          "line": 511,
+          "quote": "fn reconciliation_verdict("
+        },
+        {
+          "path": "crates/actions/src/metrics/mod.rs",
+          "line": 1013,
+          "quote": "    store::metrics::record_reconciliation_tx("
+        }
+      ],
+      "failure_scenario": "A monthly reconciliation records a growing conveyor-vs-billing delta and opens an incident card each time. No report, dashboard or metric ever queries the reconciliation table, so the trend across periods is invisible; if the incident cards are closed, the delta history is buried in rows nothing reads. If the service is later removed, the table and writer remain as pure dead weight.",
+      "acceptance": "A declared read action/metric returns reconciliation history (latest state per period, delta trend, incident links), or the table, writer and dead helper are deleted until a consumer exists.",
+      "owner_project": "T11"
+    },
+    {
+      "id": "v1-w3c-2",
+      "area": "§12",
+      "standard": "SPEC",
+      "spec": "§12",
+      "severity": "P1",
+      "title": "T14 closed on source-code evidence although its gate demands live probe and live-call receipts",
+      "problem": "T14's gate requires, for each published toolkit, a probe and one live call, a scale-up/scale-back of scientific_processor, a zero-use report and an outage-unbind test. The project register closes T14 with a required 'closure-review' output, but coverage cites only the source directory crates/actions/src/toolkits — no probe result, call ledger, scale receipt or closure review is cited. A code path cannot prove a live estate call.",
+      "evidence": [
+        {
+          "path": "docs/design/data/coverage.json",
+          "line": 1807,
+          "quote": "      \"evidence\": ["
+        },
+        {
+          "path": "docs/design/data/coverage.json",
+          "line": 1808,
+          "quote": "        \"crates/actions/src/toolkits\""
+        },
+        {
+          "path": "docs/design/data/coverage.json",
+          "line": 1811,
+          "quote": "      \"key\": \"T14\","
+        },
+        {
+          "path": "docs/design/data/coverage.json",
+          "line": 1837,
+          "quote": "      \"status\": \"built\","
+        }
+      ],
+      "failure_scenario": "A toolkit is published and bound from unit code alone; its backend is unreachable or its schema drifted. Jobs bind an unprobed tool, calls fail mid-run, and the zero-use/outage behaviour was never exercised. The estate coverage claim is false until a live call is recorded.",
+      "acceptance": "T14 reopens unless the closure evidence carries: one live probe + live call receipt per published toolkit; the scientific_processor scale-up/scale-back log; a zero-use report; and a recorded outage-unbind test. Every receipt is addressable from the public output index.",
+      "owner_project": "T14"
+    },
+    {
+      "id": "v1-w3c-4",
+      "area": "§12",
+      "standard": "SPEC",
+      "spec": "§12",
+      "severity": "P1",
+      "title": "T8 marked built with zero actions and zero modules; its only evidence is the cadence/tranche migration",
+      "problem": "The organisational-memory gate is behavioural: a lesson with one evidence ref must be refused, and two independent refs plus review must promote a source draft. Coverage records T8 with 0 actions, 0 modules and 1 table, and cites migrations/0056_cadence_tranche.sql — the same migration cited for T10's cadence/tranche tables, not a memory action surface. The refusal/promotion behaviour cannot exist with no action.",
+      "evidence": [
+        {
+          "path": "docs/design/data/coverage.json",
+          "line": 2243,
+          "quote": "      \"evidence\": ["
+        },
+        {
+          "path": "docs/design/data/coverage.json",
+          "line": 2244,
+          "quote": "        \"migrations/0056_cadence_tranche.sql\""
+        },
+        {
+          "path": "docs/design/data/coverage.json",
+          "line": 2247,
+          "quote": "      \"key\": \"T8\","
+        },
+        {
+          "path": "docs/design/data/coverage.json",
+          "line": 2268,
+          "quote": "      \"status\": \"built\","
+        },
+        {
+          "path": "docs/design/data/coverage.json",
+          "line": 2249,
+          "quote": "        \"actions\": ["
+        },
+        {
+          "path": "docs/design/data/coverage.json",
+          "line": 2250,
+          "quote": "          0,"
+        }
+      ],
+      "failure_scenario": "A lesson with one evidence ref is accepted or promoted because no refusal path exists; a bad run can become doctrine. T5's kata work and T12's 'lesson' step then rest on a slice that is schema-only.",
+      "acceptance": "T8 reopens until lesson/evidence actions exist and tests show: one-ref lesson refused; two independent refs + review promotes; a bad run stays out of doctrine. Evidence cites the action module and tests, not the cadence migration.",
+      "owner_project": "T8"
+    },
+    {
+      "id": "v1-w3c-6",
+      "area": "§12",
+      "standard": "SPEC",
+      "spec": "§12",
+      "severity": "P2",
+      "title": "T3 closed with the specification itself as its only evidence",
+      "problem": "T3's gate requires a PM request run end to end, a refusal of self-approval and a change request for a baseline change. Coverage cites docs/SPEC_V2.md — the requirement document, which is also T3's plan link — as the sole evidence, and the project register closes T3. There is no cited run record, refusal test or change request.",
+      "evidence": [
+        {
+          "path": "docs/design/data/coverage.json",
+          "line": 2025,
+          "quote": "      \"evidence\": ["
+        },
+        {
+          "path": "docs/design/data/coverage.json",
+          "line": 2026,
+          "quote": "        \"docs/SPEC_V2.md\""
+        },
+        {
+          "path": "docs/design/data/coverage.json",
+          "line": 2029,
+          "quote": "      \"key\": \"T3\","
+        },
+        {
+          "path": "docs/design/data/coverage.json",
+          "line": 2050,
+          "quote": "      \"status\": \"built\","
+        }
+      ],
+      "failure_scenario": "Downstream slices T4, T7 and T10 treat the PM job as working when no end-to-end PM run or self-approval refusal was ever recorded; the organisation loop (T12) then starts on an unexercised spine.",
+      "acceptance": "T3 cites a PM run record, a self-approval refusal test and a baseline-change-request test; its closure review exists in the output index.",
+      "owner_project": "T3"
+    },
+    {
+      "id": "v1-w4c-1",
+      "area": "generator",
+      "standard": "SPEC",
+      "spec": "§8.1",
+      "severity": "P1",
+      "title": "Partial mandatory artefacts are suppressed by COVERED_BY, contradicting the declared absent-only contract",
+      "problem": "coverage_key() is consulted for every non-evidenced mandatory artefact, including partial ones. The file's own contract says a partial artefact must NOT be covered because a published document missing a required heading is a section-level finding the data-gap rules cannot see. Because the lookup ignores status, a partial phase/project artefact is attributed to the generic gap package, no finding is emitted, and no package ever names the missing heading.",
+      "evidence": [
+        {
+          "path": "scripts/generate-standards.py",
+          "line": 739,
+          "quote": "        covered = coverage_key(artefact[\"category\"], artefact, covered_keys)"
+        },
+        {
+          "path": "scripts/generate-standards.py",
+          "line": 711,
+          "quote": "    rule = COVERED_BY.get(category) or ABSENT_ONLY_COVERED.get(category)"
+        },
+        {
+          "path": "scripts/generate-standards.py",
+          "line": 58,
+          "quote": "# but the package is the gap rule's: one defect, one package. A partial artefact is NOT covered,"
+        }
+      ],
+      "failure_scenario": "A mandatory phase-B artefact for T9 is partial: its published document lacks the required 'Business Interaction' heading while other sections resolved, and the gap mandatory_artefacts:T9 exists. build_findings calls coverage_key, matches COVERED_BY['phase-b'], emits no finding, and the published register carries only the generic gap whose Definition of Done is 'the next audit reports no gap', not 'the heading is written'. The artefact can then flip to evidenced through unrelated doc presence, and the public rail never showed the section-level defect.",
+      "acceptance": "coverage_key returns \"\" unless artefact[\"status\"] == \"absent\" (absent-only for both maps), and a self-test case proves: partial phase artefact + matching gap => exactly one section-level finding and no suppression.",
+      "owner_project": "PLATFORM",
+      "resolved_by": "fixed in #530 before merge"
+    },
+    {
+      "id": "v1-w4c-2",
+      "area": "generator",
+      "standard": "SPEC",
+      "spec": "§8.1",
+      "severity": "P1",
+      "title": "A published document with no rendered page satisfies every required section",
+      "problem": "document_headings() returns None when output-<id>.html is absent, and resolve_documents counts a None-heading document as matched for ANY heading. The section then carries count > 0, reads evidenced, and heading_found is True, so no partial/absent status and no finding is produced even though no page exists to contain the heading. The section-level honesty check is silently disabled by a missing artefact.",
+      "evidence": [
+        {
+          "path": "scripts/generate-standards.py",
+          "line": 443,
+          "quote": "        if headings[str(doc.get(\"id\"))] is None or heading_key in headings[str(doc.get(\"id\"))]"
+        },
+        {
+          "path": "scripts/generate-standards.py",
+          "line": 452,
+          "quote": "    return source, bool(matched) or not docs"
+        }
+      ],
+      "failure_scenario": "artefacts.json publishes document d7 for project T5 (published_at set), but the snapshot emits no output-d7.html into --outputs-dir. Every section of T5's document-backed artefact matches d7, the artefact is classified evidenced, no finding is emitted, and check-standards hashes only the generated standards page, so the record publishes green while its cited source has no page to open.",
+      "acceptance": "A None heading set means unverifiable, not matched: count only documents whose headings were actually read, and a self-test with a published doc row whose page is absent expects partial or absent plus a finding.",
+      "owner_project": "PLATFORM",
+      "resolved_by": "fixed in #530 before merge"
+    },
+    {
+      "id": "v1-w4c-3",
+      "area": "generator",
+      "standard": "SPEC",
+      "spec": "§8.1",
+      "severity": "P1",
+      "title": "The architecture capability computed source emits a phantom profile row when no profile exists",
+      "problem": "computed_rows('architecture_capability') indexes the profile list with `or [{}]`, so the returned rows always contain at least {kind: 'profile'} even when the snapshot has no adm_profile. Any required section whose source is this computed name reports count 1 and reads evidenced, asserting a capability the row set does not support.",
+      "evidence": [
+        {
+          "path": "scripts/generate-standards.py",
+          "line": 385,
+          "quote": "        profile = (architecture.get(\"profiles\") or [{}])[0]"
+        },
+        {
+          "path": "scripts/generate-standards.py",
+          "line": 387,
+          "quote": "            {\"kind\": \"profile\", **profile},"
+        },
+        {
+          "path": "seed/output-standard.json",
+          "line": 877,
+          "quote": "            \"name\": \"architecture_capability\""
+        }
+      ],
+      "failure_scenario": "The tenant has not established the Preliminary capability: architecture.profiles is empty (the state v2.js itself renders as 'no profile yet'). The capability artefact's profile-backed required sections receive the phantom profile row, count 1, and the artefacts that depend on this source are published as evidenced with no profile, no board and no maturity rows behind them.",
+      "acceptance": "Return [] when profiles is empty (drop the `or [{}]` fallback) and add a self-test asserting the capability artefact is absent on a profile-less fixture.",
+      "owner_project": "PLATFORM",
+      "resolved_by": "fixed in #530 before merge"
+    },
+    {
+      "id": "v1-w4c-4",
+      "area": "gate",
+      "standard": "SPEC",
+      "spec": "§8",
+      "severity": "P2",
+      "title": "check-standards recomputes status from self-reported section statuses and never verifies sources or the live register",
+      "problem": "The gate derives an artefact's expected status from section.status strings rather than from section source counts, and accepts package_published as an authoritative boolean without reading the published rework register. A record can therefore claim evidenced sections with zero-count sources and a package that no card exists for, and still pass.",
+      "evidence": [
+        {
+          "path": "docs/design/scripts/check-standards.cjs",
+          "line": 54,
+          "quote": "    const evidenced = sections.filter((section) => section.status === \"evidenced\").length;"
+        },
+        {
+          "path": "docs/design/scripts/check-standards.cjs",
+          "line": 74,
+          "quote": "      if (artefact.package_published !== true) {"
+        }
+      ],
+      "failure_scenario": "A hand-edited or partially regenerated standards.json marks a section evidenced with every source count 0 and sets package_published true while naming a package key absent from data/rework.json. check-standards exits 0, the homepage's make verify ships the false record, and the view rail points a reader at a rework card nobody opened.",
+      "acceptance": "Recompute each section's status from its sources (evidenced only when some source count > 0) and resolve package_key against the packages array in data/rework.json; add self-test cases for both forgeries.",
+      "owner_project": "PLATFORM",
+      "resolved_by": "fixed in #530 before merge"
+    },
+    {
+      "id": "v1-w4c-5",
+      "area": "publish",
+      "standard": "SPEC",
+      "spec": "§8",
+      "severity": "P2",
+      "title": "publish-data.sh writes into the published pack before the conformance gate",
+      "problem": "Step 0 runs build-docs.py against $pack/docs before the snapshot, the audit and the strict gate. A failed publish therefore still leaves the pack's rendered pages rewritten, directly contradicting the script's stated contract that a failed audit leaves the published data and output pages untouched.",
+      "evidence": [
+        {
+          "path": "docs/design/scripts/publish-data.sh",
+          "line": 42,
+          "quote": "python3 \"$pack/scripts/build-docs.py\""
+        },
+        {
+          "path": "docs/design/scripts/publish-data.sh",
+          "line": 35,
+          "quote": "# A failed audit therefore leaves the published data and output pages untouched."
+        }
+      ],
+      "failure_scenario": "The strict gate exits non-zero on a P0 at line 107; by then step 0 has already regenerated docs pages in the working pack. The operator is told the publish left things untouched but the tree is dirty, and a later publish or a manual rsync carries the half-updated pages with no gate having approved them.",
+      "acceptance": "Build rendered pages into $tmp/docs and copy them in at step 4 with the rest of the pack (or restore the pack on any exit), plus a test that a forced strict failure leaves the pack byte-identical.",
+      "owner_project": "PLATFORM",
+      "resolved_by": "fixed in #530 before merge"
     }
   ]
 }

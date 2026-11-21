@@ -38,9 +38,19 @@ REGISTER_STANDARDS = ("MSP", "TOGAF", "SAFe", "PMP", "SPEC")
 REGISTER_SCOPES = ("project", "tranche", "programme")
 REGISTER_MAX_SUBJECTS = 20
 REGISTER_SUPPRESSED = ("waiver", "unprovable")
-REGISTER_ACCEPTANCE = (
-    "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --report"
-)
+def register_acceptance(key: str) -> str:
+    """The command that proves one package is closed, not a whole-programme report.
+
+    Rebuilding the register from the ledgers is the check: a finding marked `resolved_by` and a
+    gap that no longer exists in the snapshot both drop the package, and `--rework-check` exits
+    1 while the key is still open.
+    """
+    return (
+        "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data "
+        "--findings docs/evidence/v1-conformance-findings.json "
+        "--findings docs/evidence/standards-findings.json "
+        f"--rework-check {key}"
+    )
 PLACEHOLDER = re.compile(
     r"(not measured|no instrument|unknown|tbd|to be determined|n/?a|placeholder|none)",
     re.IGNORECASE,
@@ -1614,7 +1624,7 @@ def build_register(
                     "owner_project": owner,
                     "apply_to": apply_to,
                     "depends_on": [],
-                    "acceptance_command": REGISTER_ACCEPTANCE,
+                    "acceptance_command": register_acceptance(key),
                     "baseline": None
                     if group["finding"]
                     else {
@@ -2276,8 +2286,12 @@ def main() -> None:
     parser.add_argument(
         "--findings",
         type=Path,
+        action="append",
         default=None,
-        help="the checked-in v1 conformance findings ledger to merge into the rework register",
+        help=(
+            "a findings ledger to merge into the rework register; repeatable, so the checked-in "
+            "v1 ledger and the generated artefact findings are merged together"
+        ),
     )
     parser.add_argument(
         "--rework-out",
@@ -2285,11 +2299,22 @@ def main() -> None:
         default=None,
         help="write the rework register (one package per gap) to this path",
     )
+    parser.add_argument(
+        "--rework-check",
+        metavar="KEY",
+        default=None,
+        help=(
+            "rebuild the register and exit 1 while this package key is still open; this is the "
+            "per-package acceptance command the register publishes"
+        ),
+    )
     parser.add_argument("--check-standard", action="store_true")
     parser.add_argument("--self-test", action="store_true")
     args = parser.parse_args()
-    if args.findings and not args.rework_out:
-        parser.error("--findings is only meaningful with --rework-out")
+    if args.findings and not (args.rework_out or args.rework_check):
+        parser.error("--findings is only meaningful with --rework-out or --rework-check")
+    if args.rework_check and not args.findings:
+        parser.error("--rework-check needs the findings ledgers via --findings")
 
     if args.self_test:
         self_test()
@@ -2305,14 +2330,20 @@ def main() -> None:
     )
     gaps = Audit(dataset, standard).run()
 
-    if args.rework_out:
+    register = None
+    if args.rework_out or args.rework_check:
         baseline_doc = (
             read_json(args.baseline) if args.baseline.exists() else {"version": 1, "entries": []}
         )
-        findings_doc = read_json(args.findings) if args.findings else {"findings": []}
+        merged_findings: list[Any] = []
+        for path in args.findings or []:
+            ledger = read_json(path)
+            merged_findings.extend(ledger.get("findings", []))
+        findings_doc = {"findings": merged_findings}
         register = build_register(
             gaps, baseline_doc, findings_doc, standard, dataset, str(args.snapshot)
         )
+    if args.rework_out and register is not None:
         args.rework_out.parent.mkdir(parents=True, exist_ok=True)
         # sort_keys + the package sort make a re-run byte-identical, so the published register
         # can be diffed like any other generated artefact.
@@ -2324,6 +2355,16 @@ def main() -> None:
             f"({register['summary']['open']} open, {register['summary']['suppressed']} suppressed, "
             f"{register['summary']['duplicates']} duplicates folded)"
         )
+    if args.rework_check:
+        open_keys = {str(package.get("key")) for package in register.get("packages") or []}
+        if args.rework_check in open_keys:
+            print(
+                f"audit-programme-conformance: {args.rework_check} is still open",
+                file=sys.stderr,
+            )
+            sys.exit(1)
+        print(f"audit-programme-conformance: {args.rework_check} is cleared")
+        return
 
     if args.report or args.write_baseline or args.strict:
         args.out.mkdir(parents=True, exist_ok=True)

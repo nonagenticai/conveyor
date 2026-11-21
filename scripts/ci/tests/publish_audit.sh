@@ -21,6 +21,7 @@ cp "$repo/docs/design/scripts/publish-data.sh" "$tmp/docs/design/scripts/publish
 printf '# no-op: the publish test does not rebuild the pack\n' > "$tmp/docs/design/scripts/build-docs.py"
 printf '#!/usr/bin/env bash\nprintf %%s "{\\"issues\\": []}" > "$1"\n' > "$tmp/scripts/fetch-issues.sh"
 cp "$repo/scripts/audit-programme-conformance.py" "$tmp/scripts/audit-programme-conformance.py"
+cp "$repo/scripts/generate-standards.py" "$tmp/scripts/generate-standards.py"
 cp "$repo/governance/conformance.json" "$tmp/governance/conformance.json"
 cp "$repo/seed/programme.json" "$tmp/seed/programme.json"
 cp "$repo/seed/programme-definition.json" "$tmp/seed/programme-definition.json"
@@ -28,8 +29,8 @@ cp "$repo/seed/output-standard.json" "$tmp/seed/output-standard.json"
 chmod +x "$tmp/scripts/fetch-issues.sh" "$tmp/docs/design/scripts/build-docs.py"
 
 cat > "$tmp/fixture/programme.json" <<'JSON'
-{"programme": [], "projects": [
-  {"id": "p1", "key": "T1", "status": "closed", "created_at": "2026-11-20T00:00:00Z",
+{"programme": [{"id": "pg1", "name": "fixture programme", "status": "active"}], "projects": [
+  {"id": "p1", "key": "T1", "programme_id": "pg1", "status": "closed", "created_at": "2026-11-20T00:00:00Z",
    "meta": {"track": "v2", "tranche": 1, "expected_outputs": [], "closure_outputs": [],
             "measured_status": "built", "adm_phase": "g", "plateau": "delivery"}}
 ]}
@@ -57,6 +58,20 @@ window.CONVEYOR_OUTPUTS = {"schema": "design-outputs/v1", "generated_at": "2026-
 JSON
 cat > "$tmp/docs/evidence/conformance-baseline.json" <<'JSON'
 {"version": 1, "entries": []}
+JSON
+# The checked-in v1 ledger is an INPUT to the register, not a side note. The finding below is
+# distinctive; the published register must carry it, or publish-data.sh dropped the ledger.
+cat > "$tmp/docs/evidence/v1-conformance-findings.json" <<'JSON'
+{"schema": "conveyor-v1-findings/v1", "audited_sha": "0000000000000000000000000000000000000000",
+ "audited_at": "2026-11-20", "method": "publish audit fixture",
+ "findings": [{"id": "fixture-p1", "area": "§5.4", "standard": "SPEC", "spec": "§5.4",
+  "severity": "P1", "title": "publish fixture finding",
+  "problem": "the fixture proves the checked-in ledger reaches the published register",
+  "evidence": [{"path": "scripts/ci/tests/publish_audit.sh", "line": 1,
+                "quote": "#!/usr/bin/env bash"}],
+  "failure_scenario": "publish-data.sh runs the audit without --findings and the register omits every audited finding",
+  "acceptance": "the published register carries this package",
+  "owner_project": "PLATFORM"}]}
 JSON
 
 cat > "$tmp/bin/conveyor" <<'SH'
@@ -102,6 +117,10 @@ if [ -e "$tmp/docs/design/data/rework.json" ]; then
   echo "FAIL: strict publish wrote the rework register before the audit passed" >&2
   exit 1
 fi
+if [ -e "$tmp/docs/design/data/standards.json" ]; then
+  echo "FAIL: strict publish wrote the standards record before the audit passed" >&2
+  exit 1
+fi
 grep -q 'FAIL new P0' "$tmp/strict.log" || {
   echo "FAIL: the strict failure did not name the new P0" >&2
   cat "$tmp/strict.log" >&2
@@ -124,9 +143,28 @@ test -f "$tmp/docs/design/data/rework.json" || {
   cat "$tmp/report.log" >&2
   exit 1
 }
+test -f "$tmp/docs/design/data/standards.json" || {
+  echo "FAIL: report-only publish did not carry the standards record" >&2
+  cat "$tmp/report.log" >&2
+  exit 1
+}
+test -f "$tmp/docs/design/docs/standards/index.html" || {
+  echo "FAIL: report-only publish did not carry the standards index" >&2
+  cat "$tmp/report.log" >&2
+  exit 1
+}
 python3 -c 'import json,sys; d=json.load(open(sys.argv[1])); assert d["schema"]=="conveyor-rework/v1", d.get("schema")' \
   "$tmp/docs/design/data/rework.json" || {
   echo "FAIL: the published rework register is not conveyor-rework/v1" >&2
+  exit 1
+}
+python3 - "$tmp/docs/design/data/rework.json" <<'PY' || {
+import json, sys
+register = json.load(open(sys.argv[1]))
+titles = [package.get("title") for package in register.get("packages", [])]
+assert "publish fixture finding" in titles, titles
+PY
+  echo "FAIL: the published register dropped the checked-in v1 findings ledger" >&2
   exit 1
 }
 echo "publish_audit: OK"

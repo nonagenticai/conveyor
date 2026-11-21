@@ -596,6 +596,8 @@ window.installV2 = function (api, enterprise) {
             architecture: live.architecture || {},
             // The audit's rework register rides in the snapshot beside the rows it judges.
             rework: live.rework || null,
+            // The generated MSP/TOGAF/SAFe/PMP record is its own published file.
+            standards: window.CONVEYOR_STANDARDS || null,
             generated_at: live.generated_at || null,
           }
         : null;
@@ -657,6 +659,7 @@ window.installV2 = function (api, enterprise) {
       // Signed in, the register is still the published audit's: it is generated at publish time,
       // so its own `generated_at` is labelled by the scorecard rather than presented as "now".
       rework: live && live.rework ? live.rework : null,
+      standards: window.CONVEYOR_STANDARDS || null,
       generated_at: null,
     };
   }
@@ -759,12 +762,16 @@ window.installV2 = function (api, enterprise) {
           data.msp ? data.msp.tranche_reconciliation : null,
         )}${D.phaseStrip(data.architecture ? data.architecture.phase_progress : null, view.projects)}${D.cadenceRail(
           view.artefacts,
-        )}${D.reworkRail(data.rework, view.projects)}${D.governanceLine(
+        )}${D.reworkRail(data.rework, view.projects)}${D.artefactRail(data.standards, {
+          programmeId: view.programme ? view.programme.id : "",
+        })}${D.governanceLine(
           view.artefacts,
           data.architecture,
         )}`
       : "";
-    const body = `${head}${boardsNote}${summary}${scorecard}${D.gantt(linked, {
+    const body = `${head}${boardsNote}${summary}${scorecard}${D.standardsSummary(
+      data.standards,
+    )}${D.gantt(linked, {
       label: view ? "Project · MSP tranche" : "Programme / initiative",
       emptyNote: view
         ? "This programme has no project in the published snapshot."
@@ -807,7 +814,10 @@ window.installV2 = function (api, enterprise) {
       ).length;
       return panel(
         `${project.key} · Work package`,
-        `${D.packageBoard(model, data.work)}${note(
+        `${D.packageBoard(model, data.work)}${D.artefactRail(data.standards, {
+          cardId: model.parent ? model.parent.id : cardId,
+          projectKey: project.key,
+        })}${note(
           "A work package is the card: its execution (runs, gate, Definition of Done, spend) is shown above its own board. The board below holds its child cards across their board's lanes; archived children stay visible as done. A card with no children is still a work package — its execution is the whole answer.",
         )}`,
         model.parent
@@ -824,7 +834,10 @@ window.installV2 = function (api, enterprise) {
     const packages = model.roots.filter((card) => (model.children.get(card.id) || []).length > 0);
     return panel(
       `${project.key} · Board`,
-      `${D.projectGovernance(project, data.msp, data.architecture, data.work)}${D.kanban(model)}${note(
+      `${D.projectGovernance(project, data.msp, data.architecture, data.work)}${D.artefactRail(
+        data.standards,
+        { projectKey: project.key },
+      )}${D.kanban(model)}${note(
         "A card with children is a work package; open any card for its own board and its execution (runs, gate, Definition of Done, spend). Tokens and cost are the card's own ledger; the work-package tile adds its children.",
       )}`,
       model.boards.length

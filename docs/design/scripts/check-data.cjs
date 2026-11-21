@@ -111,6 +111,96 @@ for (const file of manifest.files || []) {
   }
 }
 
+// The standards record is generated after the snapshot (pass 2) and is not part of the snapshot
+// manifest. It carries its own content hash, one published page per artefact, and a package key
+// for every mandatory artefact that is not evidenced.
+const standardsPath = path.join(dataDir, "standards.json");
+if (fs.existsSync(standardsPath)) {
+  const stable = (value) => {
+    if (Array.isArray(value)) return `[${value.map(stable).join(",")}]`;
+    if (value && typeof value === "object") {
+      return `{${Object.keys(value)
+        .sort()
+        .map((key) => `${JSON.stringify(key)}:${stable(value[key])}`)
+        .join(",")}}`;
+    }
+    return JSON.stringify(value);
+  };
+  let standards;
+  try {
+    standards = JSON.parse(fs.readFileSync(standardsPath, "utf8"));
+    ok("standards.json parses");
+  } catch (error) {
+    bad(`standards.json does not parse: ${error.message}`);
+  }
+  if (standards) {
+    if (standards.schema !== "design-standards/v1") {
+      bad(`standards.schema is ${JSON.stringify(standards.schema)}, expected "design-standards/v1"`);
+    }
+    const artefacts = Array.isArray(standards.artefacts) ? standards.artefacts : [];
+    const body = { ...standards };
+    delete body.payload_sha256;
+    const digest = crypto.createHash("sha256").update(stable(body)).digest("hex");
+    if (digest !== standards.payload_sha256) {
+      bad(`standards.json payload hash ${digest} != ${standards.payload_sha256}`);
+    } else {
+      ok(`standards.json carries ${artefacts.length} artefacts and a matching payload hash`);
+    }
+    const counts = { evidenced: 0, partial: 0, absent: 0 };
+    const ids = new Set();
+    for (const artefact of artefacts) {
+      if (ids.has(artefact.id)) bad(`standards artefact id is repeated: ${artefact.id}`);
+      ids.add(artefact.id);
+      if (!(artefact.status in counts)) {
+        bad(`${artefact.id} has status ${JSON.stringify(artefact.status)}`);
+        continue;
+      }
+      counts[artefact.status] += 1;
+      if (artefact.mandatory && artefact.status !== "evidenced" && !artefact.package_key) {
+        bad(`${artefact.id} is ${artefact.status} but names no package`);
+      }
+      const page = artefact.document && artefact.document.path;
+      if (!page) {
+        bad(`${artefact.id} has no document path`);
+        continue;
+      }
+      const target = path.join(root, page);
+      if (!fs.existsSync(target)) {
+        bad(`${artefact.id} page ${page} is absent`);
+        continue;
+      }
+      const sha = crypto.createHash("sha256").update(fs.readFileSync(target)).digest("hex");
+      if (sha !== artefact.document.sha256) bad(`${artefact.id} page hash does not match`);
+    }
+    for (const status of Object.keys(counts)) {
+      if ((standards.summary || {})[status] !== counts[status]) {
+        bad(`standards summary ${status} ${(standards.summary || {})[status]} != ${counts[status]}`);
+      }
+    }
+    if (!fs.existsSync(path.join(root, "docs", "standards", "index.html"))) {
+      bad("the standards index page is absent");
+    }
+    const standardsJs = path.join(dataDir, "standards.js");
+    if (!fs.existsSync(standardsJs)) {
+      bad("standards.js is absent while standards.json is published");
+    } else {
+      const text = fs.readFileSync(standardsJs, "utf8");
+      const match = /^window\.CONVEYOR_STANDARDS = ([\s\S]*);\s*$/.exec(text);
+      let payload = null;
+      try {
+        payload = match ? JSON.parse(match[1]) : null;
+      } catch (error) {
+        payload = null;
+      }
+      if (!payload || stable(payload) !== stable(standards)) {
+        bad("standards.js is not the standards.json assignment");
+      } else {
+        ok("standards.js carries the standards record");
+      }
+    }
+  }
+}
+
 const snapshotJs = path.join(dataDir, "snapshot.js");
 if (!fs.existsSync(snapshotJs)) {
   bad("snapshot.js is absent");
@@ -284,6 +374,19 @@ if (fs.existsSync(studioPath)) {
     bad("studio.html must load data/snapshot.js before v2.js");
   } else {
     ok("studio.html loads data/snapshot.js before v2.js");
+  }
+  // The standards record is a public data file too; the view's rail reads it without a fetch.
+  const standardsAt = html.indexOf('src="data/standards.js"');
+  const standardAt = html.indexOf('src="data/output-standard.js"');
+  const deliveryAt = html.indexOf('src="delivery.js"');
+  if (standardsAt === -1) {
+    bad("studio.html does not load data/standards.js");
+  } else if (standardAt === -1 || standardsAt < standardAt) {
+    bad("studio.html must load data/standards.js after data/output-standard.js");
+  } else if (deliveryAt !== -1 && standardsAt > deliveryAt) {
+    bad("studio.html must load data/standards.js before delivery.js");
+  } else {
+    ok("studio.html loads data/standards.js before delivery.js");
   }
 }
 

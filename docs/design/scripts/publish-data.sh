@@ -37,10 +37,6 @@ tmp="$(mktemp -d)"
 trap 'rm -rf "$tmp"' EXIT
 mkdir -p "$tmp/data" "$tmp/docs" "$tmp/conformance"
 
-# 0. Markdown -> standalone HTML. The pack is published verbatim, so the pages must exist
-#    here; check-docs.cjs gates the committed output without needing pandoc.
-python3 "$pack/scripts/build-docs.py"
-
 # 1. The issue registry is the only GitHub-derived input the snapshot needs. The programme seed
 #    is an IMAGE INPUT (`include_str!`), so it changes only in a repository PR and never during a
 #    publish. The plan seed is retired: execution state (boards, cards, runs) is never seeded, so
@@ -59,11 +55,33 @@ if [ -n "${GENERATED_AT:-}" ]; then
 fi
 "$conveyor" "${snapshot_args[@]}"
 
-# 3. The conformance audit runs on the draft BEFORE anything is published. It writes the rework
-#    register the pack must carry, so the published register is the one computed from this
-#    snapshot. A failed audit leaves the published data and output pages untouched.
+# 3. The conformance gap register runs on the draft BEFORE anything is published. It is the
+#    authorisation ledger the artefact generator dedupes against: a gap owns its package, so the
+#    same defect never becomes a second card.
 audit_args=(--snapshot "$tmp/data" --out "$tmp/conformance")
+python3 "$root/scripts/audit-programme-conformance.py" "${audit_args[@]}" --report
+test -f "$tmp/conformance/conformance-gap-register.json" || {
+  echo "publish-data: the audit produced no gap register" >&2
+  exit 1
+}
+
+# 3a. Pass 1 of the standards generator: every mandatory MSP/TOGAF/SAFe/PMP artefact is resolved
+#     against the draft snapshot, its documents and the gap register; only an unresolved section
+#     becomes a finding. This file is an INPUT to the register below.
+python3 "$root/scripts/generate-standards.py" \
+  --snapshot "$tmp/data" --outputs-dir "$tmp/docs" \
+  --gaps "$tmp/conformance/conformance-gap-register.json" \
+  --findings-out "$tmp/conformance/standards-findings.json" >/dev/null
+test -f "$tmp/conformance/standards-findings.json" || {
+  echo "publish-data: the standards generator produced no findings" >&2
+  exit 1
+}
+
+# 3b. The register merges the live gaps, the checked-in v1 findings ledger and the artefact
+#     findings. A failed audit leaves the published data and output pages untouched.
 python3 "$root/scripts/audit-programme-conformance.py" "${audit_args[@]}" \
+  --findings "$root/docs/evidence/v1-conformance-findings.json" \
+  --findings "$tmp/conformance/standards-findings.json" \
   --report --rework-out "$tmp/conformance/rework.json"
 test -f "$tmp/conformance/rework.json" || {
   echo "publish-data: the audit produced no rework register" >&2
@@ -90,7 +108,31 @@ fi
 cp "$tmp/conformance/conformance-gap-register.json" "$tmp/data/conformance.json"
 cp "$tmp/conformance/conformance-gap-register.md" "$tmp/data/conformance.md"
 
-# 4. Only now does the fresh pack replace the published one.
+# 3d. Pass 2 of the standards generator writes the published artefact record and one page per
+#     artefact. It runs only after the strict gate, so the register it names is the one the gate
+#     saw and a failed publish never writes a standards page.
+python3 "$root/scripts/generate-standards.py" \
+  --snapshot "$tmp/data" --outputs-dir "$tmp/docs" \
+  --gaps "$tmp/conformance/conformance-gap-register.json" \
+  --register "$tmp/data/rework.json" \
+  --data-out "$tmp/data" --html-out "$tmp/docs/standards" \
+  --findings-out "$root/docs/evidence/standards-findings.json" >/dev/null
+test -f "$tmp/data/standards.json" || {
+  echo "publish-data: the standards generator produced no record" >&2
+  exit 1
+}
+test -f "$tmp/docs/standards/index.html" || {
+  echo "publish-data: the standards generator produced no index" >&2
+  exit 1
+}
+
+# 3e. Markdown -> standalone HTML. This writes the pack's document pages, so it runs only after
+#     the gate: a failed publish leaves both the data and the documents untouched.
+python3 "$pack/scripts/build-docs.py"
+
+# 4. Only now does the fresh pack replace the published one. The standards directory is replaced
+#    wholesale: a page for an artefact that no longer exists must not survive the publish.
+rsync -a --delete "$tmp/docs/standards/" "$pack/docs/standards/"
 rsync -a "$tmp/data/" "$data/"
 rsync -a "$tmp/docs/" "$pack/docs/"
 

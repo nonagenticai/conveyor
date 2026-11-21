@@ -107,10 +107,24 @@ artefact that needs a decision nobody made is published as absent, never invente
 scorecard and the L2 rails read those sections plus the `rework` register, whose denominators
 come from `governance/conformance.json`, not from the view.
 
-**The rework loop.** `scripts/audit-programme-conformance.py --rework-out` turns the gap register
-and the checked-in v1 audit (`docs/evidence/v1-conformance-findings.json`) into
+**The MSP, TOGAF, SAFe and PMP artefacts are generated documents.** `seed/output-standard.json`
+v3 names, for every artefact, its standard, level, subject kind (programme, project, tranche,
+benefit, capability, phase or card), mandatory flag, SPEC clause and the source each required
+section derives from. `scripts/generate-standards.py` resolves every applicable artefact against
+the snapshot, its published documents and the gap register, then publishes `data/standards.json`,
+one page per artefact under `docs/standards/` and an index. A section with a named row or document
+renders that record and its provenance; a section without one is *absent*, with the fixed line
+naming the record that would satisfy it. The four levels link to the artefacts they own, and an
+absent or partial artefact names the rework package that must close. The generator never calls a
+model: the artefact record is derived, not drafted.
+
+**The rework loop.** `scripts/audit-programme-conformance.py --rework-out` turns the gap register,
+the checked-in v1 audit (`docs/evidence/v1-conformance-findings.json`) and the artefact findings
+(`docs/evidence/standards-findings.json`) into
 `data/rework.json`: one package per remediation unit, carrying its standard, SPEC clause,
-artefact, severity, evidence and Definition of Done. The publish carries it into `snapshot.js`
+artefact, severity, evidence and Definition of Done. A data gap and an artefact that describe the
+same missing record are one package, never two: the generator suppresses the artefact finding when
+the gap register already owns the defect. The publish carries the register into `snapshot.js`
 (`conveyor snapshot --conformance`); `scripts/materialise-rework.py` turns an open package into a
 card with `meta.rework_key` on the owning project's board. Materialisation is a separate,
 explicit, dry-run-first command with its own writable URL — the publish transaction stays
@@ -127,8 +141,11 @@ output is **next**. The **Programme queue** on Portfolio is the programme-level 
 project's published vs expected outputs, its closure count and its next output, ordered by tranche.
 The public project page shows published counts only; the public queue never counts a private draft.
 
-**The authoring standard** (`seed/output-standard.json` version 2) carries a `templates` map: one
-entry per category with its required headings, optional headings and a Markdown skeleton. The
+**The authoring standard** (`seed/output-standard.json` version 3) carries a `templates` map: one
+entry per category with its required headings, optional headings, a Markdown skeleton and the
+standards metadata the generator reads. The category list is the shared vocabulary: the output
+classes' due-now/closure sets use it, and the standards catalogue marks the artefact categories it
+generates as `on_demand` so a new artefact category never widens a project's output checklist. The
 console seeds the skeleton on compose and shows a live **completeness** panel; **Preview** renders a
 saved draft with the same `conveyor_render::markdown` the public page uses. The server blocks the
 transition to public — through `documents.publish` or a `documents.compose`/`documents.update` that
@@ -252,6 +269,12 @@ for the public tenant. The committed `data/outputs.js` placeholder is only the c
 fallback; the live route shadows it. `conveyor snapshot --outputs-dir` writes the same bytes for
 an offline pack, and a parity test holds the two to one renderer. A body is rendered with raw HTML
 neutralised, so the public page has no executable markup from an author.
+
+**Standards artefacts** are the third generated document source: `scripts/generate-standards.py
+--html-out docs/standards` writes one page per MSP/TOGAF/SAFe/PMP artefact plus an index, each
+carrying its status, resolved sources, gate state and the package that must close. The publish
+runs them in pass 2, after the strict conformance gate, so a failed publish never writes a
+standards page; `check-standards.cjs` and `check-data.cjs` gate the published record.
 
 ## Feedback
 

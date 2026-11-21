@@ -31,6 +31,11 @@ SEED_PATH = ROOT / "seed" / "programme.json"
 CONSOLE_PATH = ROOT / "docs" / "design" / "data" / "output-standard.js"
 FACTS = {"key", "track", "status", "measured_status"}
 ON_DEMAND = "decision"
+DEFAULT_ON_DEMAND = [ON_DEMAND]
+STANDARDS = {"MSP", "TOGAF", "SAFe", "PMP", "SPEC", "Delivery"}
+LEVELS = {"portfolio", "programme", "project", "work_package"}
+SUBJECT_KINDS = {"programme", "project", "tranche", "benefit", "capability", "phase", "card"}
+SOURCE_KINDS = {"rows", "documents", "computed", "register"}
 FENCE = re.compile(r"^\s*(```+|~~~+)")
 ATX = re.compile(r"^(#{1,6})\s+(.*?)\s*#*\s*$")
 
@@ -104,8 +109,8 @@ def resolve(std: dict, project: dict) -> dict | None:
 
 def validate(std: dict, seed: dict, console: dict) -> list[str]:
     errors: list[str] = []
-    if std.get("version") != 2:
-        errors.append(f"standard version is {std.get('version')!r}, expected 2")
+    if std.get("version") != 3:
+        errors.append(f"standard version is {std.get('version')!r}, expected 3")
 
     categories = std.get("categories")
     if not isinstance(categories, list) or not categories:
@@ -116,6 +121,16 @@ def validate(std: dict, seed: dict, console: dict) -> list[str]:
     for category in categories:
         if not isinstance(category, str) or not category:
             errors.append(f"invalid category {category!r}")
+
+    on_demand = std.get("on_demand", DEFAULT_ON_DEMAND)
+    if not isinstance(on_demand, list) or not on_demand:
+        errors.append("on_demand must be a non-empty list")
+        on_demand = list(DEFAULT_ON_DEMAND)
+    if len(on_demand) != len(set(on_demand)):
+        errors.append("on_demand contains a duplicate")
+    for category in on_demand:
+        if category not in categories:
+            errors.append(f"on_demand names unknown category {category!r}")
 
     aliases = std.get("aliases")
     if not isinstance(aliases, dict):
@@ -155,8 +170,8 @@ def validate(std: dict, seed: dict, console: dict) -> list[str]:
             for category in values:
                 if category not in categories:
                     errors.append(f"class {name!r} {field} has unknown category {category!r}")
-                if category == ON_DEMAND:
-                    errors.append(f"class {name!r} {field} requires {ON_DEMAND!r}, which is on demand only")
+                if category in on_demand:
+                    errors.append(f"class {name!r} {field} requires {category!r}, which is on demand only")
         now = cls.get("now") or []
         closure = cls.get("closure") or []
         if set(now) & set(closure):
@@ -206,6 +221,61 @@ def validate(std: dict, seed: dict, console: dict) -> list[str]:
         if "://" in skeleton or "www." in skeleton.lower():
             errors.append(f"template {category!r} skeleton carries a URL")
 
+        # The standards metadata is what the artefact generator reads. A template without it is
+        # an output category, not a standards artefact; every v3 template must name its place.
+        if template.get("standard") not in STANDARDS:
+            errors.append(f"template {category!r} has no valid standard")
+        if template.get("level") not in LEVELS:
+            errors.append(f"template {category!r} has no valid level")
+        if template.get("subject_kind") not in SUBJECT_KINDS:
+            errors.append(f"template {category!r} has no valid subject_kind")
+        if not isinstance(template.get("mandatory"), bool):
+            errors.append(f"template {category!r} has no boolean mandatory flag")
+        spec = template.get("spec")
+        if not isinstance(spec, str) or not spec.strip():
+            errors.append(f"template {category!r} has no spec clause")
+        document_category = template.get("document_category")
+        if document_category is not None and document_category not in categories:
+            errors.append(
+                f"template {category!r} names unknown document category {document_category!r}"
+            )
+        sources = template.get("sources", {})
+        if not isinstance(sources, dict):
+            errors.append(f"template {category!r} sources must be an object")
+            sources = {}
+        heading_keys = {heading_key(h) for h in required if isinstance(h, str)}
+        heading_keys |= {heading_key(h) for h in optional if isinstance(h, str)}
+        for heading, source_list in sources.items():
+            if not isinstance(heading, str) or heading_key(heading) not in heading_keys:
+                errors.append(f"template {category!r} sources a heading it does not declare: {heading!r}")
+                continue
+            if not isinstance(source_list, list) or not source_list:
+                errors.append(f"template {category!r} section {heading!r} has no sources")
+                continue
+            for source in source_list:
+                if not isinstance(source, dict) or source.get("kind") not in SOURCE_KINDS:
+                    errors.append(
+                        f"template {category!r} section {heading!r} has an invalid source"
+                    )
+                    continue
+                if source["kind"] in {"rows", "documents"}:
+                    if not isinstance(source.get("file"), str) or not source["file"]:
+                        errors.append(
+                            f"template {category!r} section {heading!r} source has no file"
+                        )
+                    if not isinstance(source.get("pointer"), str) or not source["pointer"].startswith("/"):
+                        errors.append(
+                            f"template {category!r} section {heading!r} source has no JSON pointer"
+                        )
+                    if "match" in source and not isinstance(source["match"], dict):
+                        errors.append(
+                            f"template {category!r} section {heading!r} match must be an object"
+                        )
+                if source["kind"] == "computed" and not isinstance(source.get("name"), str):
+                    errors.append(
+                        f"template {category!r} section {heading!r} computed source has no name"
+                    )
+
     if not isinstance(seed.get("projects"), list) or not seed["projects"]:
         errors.append("seed has no projects")
         projects = []
@@ -240,7 +310,7 @@ def validate(std: dict, seed: dict, console: dict) -> list[str]:
     for cls in classes:
         required.update(cls.get("now") or [])
         required.update(cls.get("closure") or [])
-    orphans = set(categories) - required - {ON_DEMAND}
+    orphans = set(categories) - required - set(on_demand)
     if orphans:
         errors.append(f"categories covered by no class and not on demand: {sorted(orphans)}")
 
@@ -289,6 +359,35 @@ def self_test(std: dict, seed: dict, console: dict) -> int:
     bad = copy.deepcopy(std)
     bad["templates"]["vision"]["skeleton"] += "\nSee https://example.com for the method.\n"
     cases.append(("a URL in the skeleton", bad, seed, console))
+
+    bad = copy.deepcopy(std)
+    bad["version"] = 2
+    cases.append(("the retired standard version", bad, seed, console))
+
+    bad = copy.deepcopy(std)
+    bad["on_demand"].append("not-a-category")
+    cases.append(("an on-demand category that does not exist", bad, seed, console))
+
+    bad = copy.deepcopy(std)
+    bad["classes"][1]["now"].append(bad["on_demand"][-1])
+    cases.append(("a class that requires an on-demand category", bad, seed, console))
+
+    bad = copy.deepcopy(std)
+    bad["templates"]["vision"].pop("standard", None)
+    cases.append(("a template without a standard", bad, seed, console))
+
+    bad = copy.deepcopy(std)
+    bad["templates"]["vision"]["sources"] = {"Not a required heading": [{"kind": "computed", "name": "x"}]}
+    cases.append(("a source on an undeclared heading", bad, seed, console))
+
+    bad = copy.deepcopy(std)
+    first_heading = bad["templates"]["vision"]["required"][0]
+    bad["templates"]["vision"]["sources"] = {first_heading: [{"kind": "not-a-kind"}]}
+    cases.append(("an invalid source kind", bad, seed, console))
+
+    bad = copy.deepcopy(std)
+    bad["templates"]["benefit-profile"].pop("subject_kind", None)
+    cases.append(("a template without a subject kind", bad, seed, console))
 
     failures = 0
     for label, case_std, case_seed, case_console in cases:

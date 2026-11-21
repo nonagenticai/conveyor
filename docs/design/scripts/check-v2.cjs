@@ -276,6 +276,12 @@ const shot = (name) => path.join(process.env.CONVEYOR_QA_OUTPUT || os.tmpdir(), 
       (await page.locator("#main .delivery-scorecard").count()) === 0,
       "no standards scorecard renders without a snapshot",
     );
+    // The generated standards record is published beside the snapshot; without the snapshot the
+    // view has no subject to attach it to and says nothing, rather than listing artefacts.
+    check(
+      (await page.locator("#main .std-rail").count()) === 0,
+      "no standards artefact rail renders without a snapshot",
+    );
     await nav("projects");
     check(
       (await content()).includes("No published snapshot is loaded"),
