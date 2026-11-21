@@ -657,9 +657,10 @@ window.installV2 = function (api, enterprise) {
         skills: cs.adm.skills.items,
         phase_progress: live && live.architecture ? live.architecture.phase_progress : null,
       },
-      // Signed in, the register is still the published audit's: it is generated at publish time,
-      // so its own `generated_at` is labelled by the scorecard rather than presented as "now".
-      rework: live && live.rework ? live.rework : null,
+      // Signed in, the register is still the published audit's: a live snapshot embeds it, and a
+      // pack published from the committed snapshot carries it as CONVEYOR_REWORK. The scorecard
+      // labels its own `generated_at` rather than presenting it as "now".
+      rework: (live && live.rework) || window.CONVEYOR_REWORK || null,
       standards: window.CONVEYOR_STANDARDS || null,
       generated_at: null,
     };

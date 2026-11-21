@@ -289,19 +289,37 @@ if (fs.existsSync(reworkJsPath)) {
       bad(`data/rework.js schema is ${JSON.stringify(register.schema)}, expected "conveyor-rework/v1"`);
     }
     if (!Array.isArray(register.packages)) bad("data/rework.js carries no packages array");
-    if (fs.existsSync(reworkPath)) {
-      // Compare content, not key order: the live publish writes rework.json through the Rust
-      // snapshot and the generator writes rework.js with sorted keys.
-      const canonical = (value) => {
-        if (Array.isArray(value)) return `[${value.map(canonical).join(",")}]`;
-        if (value && typeof value === "object") {
-          return `{${Object.keys(value)
-            .sort()
-            .map((key) => `${JSON.stringify(key)}:${canonical(value[key])}`)
-            .join(",")}}`;
+    // Compare content, not key order: the live publish writes rework.json through the Rust
+    // snapshot and the generator writes rework.js and the evidence ledger with sorted keys.
+    const canonical = (value) => {
+      if (Array.isArray(value)) return `[${value.map(canonical).join(",")}]`;
+      if (value && typeof value === "object") {
+        return `{${Object.keys(value)
+          .sort()
+          .map((key) => `${JSON.stringify(key)}:${canonical(value[key])}`)
+          .join(",")}}`;
+      }
+      return JSON.stringify(value);
+    };
+    // The canonical register for this snapshot is the evidence ledger. A global that only has to
+    // carry a schema and an array would let an emptied register pass while every unresolved
+    // artefact still names a package that no longer exists.
+    const evidenceRegister = path.resolve(__dirname, "..", "..", "evidence", "rework-register.json");
+    if (fs.existsSync(evidenceRegister)) {
+      try {
+        const canonicalRegister = JSON.parse(fs.readFileSync(evidenceRegister, "utf8"));
+        if (canonical(register) !== canonical(canonicalRegister)) {
+          bad("data/rework.js differs from docs/evidence/rework-register.json");
+        } else {
+          ok("data/rework.js matches the canonical register ledger");
         }
-        return JSON.stringify(value);
-      };
+      } catch (error) {
+        bad(`docs/evidence/rework-register.json does not parse: ${error.message}`);
+      }
+    } else if (!fs.existsSync(reworkPath)) {
+      bad("data/rework.js is published with no canonical register at docs/evidence/rework-register.json");
+    }
+    if (fs.existsSync(reworkPath)) {
       try {
         const published = JSON.parse(fs.readFileSync(reworkPath, "utf8"));
         if (canonical(published) !== canonical(register)) {

@@ -105,11 +105,13 @@ if [ "$mode" = "--check" ]; then
   exit 0
 fi
 
-# 5. Install only after every step passed. The standards directory is replaced wholesale: a page
-#    for an artefact that no longer exists must not survive the publish.
+# 5. Install only after every step passed. The record, the register and the ledgers go first and
+#    the page tree last: a failure while copying the small files leaves the old pages beside the
+#    old record (a stale pack the gate refuses), never new pages beside an old register. The
+#    standards directory is replaced wholesale: a page for a retired artefact must not survive.
 mkdir -p "$pack/data" "$pack/docs/standards" "$(dirname "$register_ledger")"
-rsync -a --delete "$tmp/standards/" "$pack/docs/standards/"
 cp "$tmp/data/standards.json" "$tmp/data/standards.js" "$tmp/data/rework.js" "$pack/data/"
 cp "$tmp/rework.json" "$register_ledger"
 cp "$tmp/standards-findings.json" "$findings_ledger"
+rsync -a --delete "$tmp/standards/" "$pack/docs/standards/"
 echo "publish-standards: record, pages and register published from $snapshot"

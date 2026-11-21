@@ -649,7 +649,12 @@ def build_instances(
                     continue
                 identifier = f"std-{slug(str(template['standard']))}-{slug(category)}-{slug(subject['key'])}"
                 if identifier in seen:
-                    continue
+                    # Two subjects whose keys slug to the same id would otherwise drop one
+                    # artefact silently — and every gate would rebuild the same omission.
+                    raise GenerationError(
+                        f"two subjects share the artefact id {identifier!r}; "
+                        "their keys collide after slugging"
+                    )
                 seen.add(identifier)
                 required = list(template.get("required") or [])
                 sections = [
@@ -1151,22 +1156,34 @@ def check(
         else:
             # The record's own claim is that every artefact has a page whose bytes hash to it.
             # A deleted or edited page is a stale record even when the payload is unchanged.
+            # `document.path` is relative to the pack root, which is the snapshot's parent — not
+            # the outputs directory (an --outputs-dir anywhere else would hash files outside the
+            # pack). Containment is asserted so a record cannot point the check outside it.
+            pack_root = snapshot_dir.parent.resolve()
             for artefact in committed.get("artefacts") or []:
                 artefact_id = str(artefact.get("id") or "?")
                 page_doc = artefact.get("document") or {}
-                page = outputs_dir.parent / str(page_doc.get("path") or "")
                 if not page_doc.get("path"):
                     problems.append(f"{artefact_id}: the record names no page")
-                elif not page.is_file():
-                    problems.append(f"{page} is missing; regenerate the record")
-                elif sha256_text(page.read_text(encoding="utf-8")) != page_doc.get("sha256"):
-                    problems.append(f"{page} does not match its recorded hash")
+                    continue
+                page = (pack_root / str(page_doc["path"])).resolve()
+                try:
+                    page.relative_to(pack_root)
+                except ValueError:
+                    problems.append(f"{artefact_id}: page {page_doc['path']} escapes the pack")
+                else:
+                    if not page.is_file():
+                        problems.append(f"{page} is missing; regenerate the record")
+                    elif sha256_text(page.read_text(encoding="utf-8")) != page_doc.get("sha256"):
+                        problems.append(f"{page} does not match its recorded hash")
         script_path = snapshot_dir / "standards.js"
         if script_path.is_file():
             if script_path.read_text(encoding="utf-8") != js_assignment(
                 "CONVEYOR_STANDARDS", committed
             ):
                 problems.append(f"{script_path} is stale; regenerate it")
+        else:
+            problems.append(f"{script_path} is missing; generate it")
     else:
         problems.append(f"{record_path} is missing; generate the record")
     for problem in problems:

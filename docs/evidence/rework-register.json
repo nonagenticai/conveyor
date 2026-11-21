@@ -8160,7 +8160,7 @@
         {
           "evidence": [
             {
-              "line": 4841,
+              "line": 4842,
               "path": "docs/design/v2.js",
               "quote": "      [\"Timeline\", \"In flight\", \"Dependencies\", \"Programme\"],",
               "source": "code"
@@ -8187,7 +8187,7 @@
             {
               "evidence": [
                 {
-                  "line": 4841,
+                  "line": 4842,
                   "path": "docs/design/v2.js",
                   "quote": "      [\"Timeline\", \"In flight\", \"Dependencies\", \"Programme\"],",
                   "source": "code"
@@ -8223,7 +8223,7 @@
         {
           "evidence": [
             {
-              "line": 5920,
+              "line": 5921,
               "path": "docs/design/v2.js",
               "quote": "      ? [\"Boards\", \"WBS\", \"Baseline vs forecast\", \"Registers\", \"Cadence\"]",
               "source": "code"
@@ -8250,7 +8250,7 @@
             {
               "evidence": [
                 {
-                  "line": 5920,
+                  "line": 5921,
                   "path": "docs/design/v2.js",
                   "quote": "      ? [\"Boards\", \"WBS\", \"Baseline vs forecast\", \"Registers\", \"Cadence\"]",
                   "source": "code"
@@ -8286,7 +8286,7 @@
         {
           "evidence": [
             {
-              "line": 5093,
+              "line": 5094,
               "path": "docs/design/v2.js",
               "quote": "      `${route(\"Programme definition\", \"programme\", \"\", \"shield\")}${route(\"System architecture\", \"architecture\", \"\", \"model\")}`,",
               "source": "code"
@@ -8319,7 +8319,7 @@
             {
               "evidence": [
                 {
-                  "line": 5093,
+                  "line": 5094,
                   "path": "docs/design/v2.js",
                   "quote": "      `${route(\"Programme definition\", \"programme\", \"\", \"shield\")}${route(\"System architecture\", \"architecture\", \"\", \"model\")}`,",
                   "source": "code"
@@ -8361,7 +8361,7 @@
         {
           "evidence": [
             {
-              "line": 1357,
+              "line": 1358,
               "path": "docs/design/v2.js",
               "quote": "  const MSP_TABS = [\"Definition\", \"Benefits map & profiles\", \"Tranches & reviews\", \"Benefits realization\", \"Stakeholders\"];",
               "source": "code"
@@ -8388,7 +8388,7 @@
             {
               "evidence": [
                 {
-                  "line": 1357,
+                  "line": 1358,
                   "path": "docs/design/v2.js",
                   "quote": "  const MSP_TABS = [\"Definition\", \"Benefits map & profiles\", \"Tranches & reviews\", \"Benefits realization\", \"Stakeholders\"];",
                   "source": "code"
@@ -8424,7 +8424,7 @@
         {
           "evidence": [
             {
-              "line": 7480,
+              "line": 7481,
               "path": "docs/design/v2.js",
               "quote": "  // Live: the platform publishes `measure.inference` (calls, tokens and cache hits by caller and",
               "source": "code"
@@ -8451,7 +8451,7 @@
             {
               "evidence": [
                 {
-                  "line": 7480,
+                  "line": 7481,
                   "path": "docs/design/v2.js",
                   "quote": "  // Live: the platform publishes `measure.inference` (calls, tokens and cache hits by caller and",
                   "source": "code"
@@ -9903,7 +9903,7 @@
       "subject_count": 1,
       "subjects": [
         {
-          "detail": "\u00a76.1 says the PM never changes an approved baseline without a change request, but plan_project calls the store's take_baseline_tx with change_id None, bypassing the guarded baselines.take action; a second call also duplicates the WBS.",
+          "detail": "\u00a76.1 says the PM never changes an approved baseline without a change request, but plan_project calls the store's take_baseline_tx with change_id None, bypassing the guarded baselines.take action; a second call also duplicates the WBS. This is the baseline path: v1-p5-4 is the WBS row mutation path and they share one missing guard.",
           "disposition": "rework",
           "evidence": [
             {
@@ -10518,15 +10518,15 @@
         {
           "evidence": [
             {
-              "line": 4019,
-              "path": "seed/catalogue.json",
-              "quote": "      \"code\": \"py2rust\",",
+              "line": 1024,
+              "path": "docs/SPEC_V2.md",
+              "quote": "`development` type and a stricter gate set:",
               "source": "code"
             },
             {
-              "line": 121,
-              "path": "crates/actions/src/board/projects.rs",
-              "quote": "                \"no active project_type catalogue row has this code in this tenant\",",
+              "line": 184,
+              "path": "crates/actions/src/registry.rs",
+              "quote": "        let mut actions: Vec<ActionSpec> = inventory::iter::<ActionRegistration>()",
               "source": "code"
             }
           ],
@@ -10545,21 +10545,21 @@
       "subject_count": 1,
       "subjects": [
         {
-          "detail": "\u00a79.1 defines charter, lane branch, implement, verify, review, merge gate, deploy with live verification and close as gated steps; no dev.* action is registered, so the cycle cannot be expressed even by a person.",
+          "detail": "\u00a79.1 defines charter, lane branch, implement, verify, review, merge gate, deploy with live verification and close as gated steps; the action registry enumerates every registered action and none is a dev.* action, so the cycle has no execution surface. v1-p6-2 records the missing trigger in the improvement loop; this records the missing pipeline itself.",
           "disposition": "rework",
           "evidence": [
             {
               "evidence": [
                 {
-                  "line": 4019,
-                  "path": "seed/catalogue.json",
-                  "quote": "      \"code\": \"py2rust\",",
+                  "line": 1024,
+                  "path": "docs/SPEC_V2.md",
+                  "quote": "`development` type and a stricter gate set:",
                   "source": "code"
                 },
                 {
-                  "line": 121,
-                  "path": "crates/actions/src/board/projects.rs",
-                  "quote": "                \"no active project_type catalogue row has this code in this tenant\",",
+                  "line": 184,
+                  "path": "crates/actions/src/registry.rs",
+                  "quote": "        let mut actions: Vec<ActionSpec> = inventory::iter::<ActionRegistration>()",
                   "source": "code"
                 }
               ],
@@ -20660,7 +20660,7 @@
         {
           "evidence": [
             {
-              "line": 5024,
+              "line": 5025,
               "path": "docs/design/v2.js",
               "quote": "              : panel(\"Stakeholders\", note(\"The design study carries no stakeholder fixture. The live page reads stakeholder profiles from the programme store; the public snapshot carries the published profiles.\"));",
               "source": "code"
@@ -20687,7 +20687,7 @@
             {
               "evidence": [
                 {
-                  "line": 5024,
+                  "line": 5025,
                   "path": "docs/design/v2.js",
                   "quote": "              : panel(\"Stakeholders\", note(\"The design study carries no stakeholder fixture. The live page reads stakeholder profiles from the programme store; the public snapshot carries the published profiles.\"));",
                   "source": "code"

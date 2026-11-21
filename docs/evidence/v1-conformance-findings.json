@@ -1149,7 +1149,7 @@
             "evidence": [
                 {
                     "path": "docs/design/v2.js",
-                    "line": 4841,
+                    "line": 4842,
                     "quote": "      [\"Timeline\", \"In flight\", \"Dependencies\", \"Programme\"],"
                 }
             ],
@@ -1168,7 +1168,7 @@
             "evidence": [
                 {
                     "path": "docs/design/v2.js",
-                    "line": 5920,
+                    "line": 5921,
                     "quote": "      ? [\"Boards\", \"WBS\", \"Baseline vs forecast\", \"Registers\", \"Cadence\"]"
                 }
             ],
@@ -1187,7 +1187,7 @@
             "evidence": [
                 {
                     "path": "docs/design/v2.js",
-                    "line": 5093,
+                    "line": 5094,
                     "quote": "      `${route(\"Programme definition\", \"programme\", \"\", \"shield\")}${route(\"System architecture\", \"architecture\", \"\", \"model\")}`,"
                 },
                 {
@@ -1211,7 +1211,7 @@
             "evidence": [
                 {
                     "path": "docs/design/v2.js",
-                    "line": 1357,
+                    "line": 1358,
                     "quote": "  const MSP_TABS = [\"Definition\", \"Benefits map & profiles\", \"Tranches & reviews\", \"Benefits realization\", \"Stakeholders\"];"
                 }
             ],
@@ -1230,7 +1230,7 @@
             "evidence": [
                 {
                     "path": "docs/design/v2.js",
-                    "line": 7480,
+                    "line": 7481,
                     "quote": "  // Live: the platform publishes `measure.inference` (calls, tokens and cache hits by caller and"
                 }
             ],
@@ -1249,7 +1249,7 @@
             "evidence": [
                 {
                     "path": "docs/design/v2.js",
-                    "line": 5024,
+                    "line": 5025,
                     "quote": "              : panel(\"Stakeholders\", note(\"The design study carries no stakeholder fixture. The live page reads stakeholder profiles from the programme store; the public snapshot carries the published profiles.\"));"
                 }
             ],
@@ -3122,17 +3122,17 @@
             "spec": "§9.1",
             "severity": "P1",
             "title": "No dev.* action family exists for the nine-step development gate set",
-            "problem": "§9.1 defines charter, lane branch, implement, verify, review, merge gate, deploy with live verification and close as gated steps; no dev.* action is registered, so the cycle cannot be expressed even by a person.",
+            "problem": "§9.1 defines charter, lane branch, implement, verify, review, merge gate, deploy with live verification and close as gated steps; the action registry enumerates every registered action and none is a dev.* action, so the cycle has no execution surface. v1-p6-2 records the missing trigger in the improvement loop; this records the missing pipeline itself.",
             "evidence": [
                 {
-                    "path": "seed/catalogue.json",
-                    "line": 4019,
-                    "quote": "      \"code\": \"py2rust\","
+                    "path": "docs/SPEC_V2.md",
+                    "line": 1024,
+                    "quote": "`development` type and a stricter gate set:"
                 },
                 {
-                    "path": "crates/actions/src/board/projects.rs",
-                    "line": 121,
-                    "quote": "                \"no active project_type catalogue row has this code in this tenant\","
+                    "path": "crates/actions/src/registry.rs",
+                    "line": 184,
+                    "quote": "        let mut actions: Vec<ActionSpec> = inventory::iter::<ActionRegistration>()"
                 }
             ],
             "failure_scenario": "T6's lane, PR, CI, review, merge, deploy and live verify is attempted on conveyor itself; there is no action to open the lane, record verification, request the review or record the deploy, so the only record is prose and no gate can refuse a red merge.",
@@ -3233,7 +3233,7 @@
             "spec": "§6.1",
             "severity": "P1",
             "title": "pm.plan replaces an approved baseline without a change request",
-            "problem": "§6.1 says the PM never changes an approved baseline without a change request, but plan_project calls the store's take_baseline_tx with change_id None, bypassing the guarded baselines.take action; a second call also duplicates the WBS.",
+            "problem": "§6.1 says the PM never changes an approved baseline without a change request, but plan_project calls the store's take_baseline_tx with change_id None, bypassing the guarded baselines.take action; a second call also duplicates the WBS. This is the baseline path: v1-p5-4 is the WBS row mutation path and they share one missing guard.",
             "evidence": [
                 {
                     "path": "crates/actions/src/pm/mod.rs",
