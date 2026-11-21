@@ -22,7 +22,7 @@ use serde_json::{Value, json};
 use sqlx::PgConnection;
 use uuid::Uuid;
 
-use crate::control::{etag_of, invalid, require_precondition_with, store_error};
+use crate::control::{approval_error, etag_of, invalid, require_precondition_with, store_error};
 use crate::invoke::{ActionError, HandlerCtx};
 use crate::spec::HandlerOutput;
 use crate::views::Page;
@@ -1114,7 +1114,7 @@ async fn architecture_contracts_approve(
     if let Some(approval_id) = input.approval_id {
         let board = store::approval::get_approval_tx(&mut *tx, ctx.tenant, approval_id)
             .await
-            .map_err(|error| store_error(error, ctx.action))?
+            .map_err(|error| approval_error(error, ctx.action))?
             .ok_or_else(|| ActionError::resource_not_found("board decision"))?;
         if board.approval.gate != "architecture_board"
             || board.approval.status != conveyor_domain::ApprovalStatus::Approved
