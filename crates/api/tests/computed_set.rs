@@ -655,7 +655,7 @@ async fn the_coach_chain_stops_at_the_cap() {
 
     // Three interruptions with three DIFFERENT signatures: a repeat signature escalates instead
     // of opening a second interruption, so the cap needs three distinct faults.
-    for index in 0..conveyor_actions::board::pull::COACH_CHAIN_MAX {
+    for index in 0..conveyor_actions::board::pull::COACH_INTERRUPTION_MAX {
         let key = format!("coach.cap.{index}");
         let sop = Uuid::parse_str(&support::publish_sop(&running, &key).await).expect("SOP");
         published_process(&pg, seeded.tenant, &key, "Cap probe", None, sop).await;
@@ -693,7 +693,7 @@ async fn the_coach_chain_stops_at_the_cap() {
     .expect("the interruption count");
     assert_eq!(
         interruptions,
-        conveyor_actions::board::pull::COACH_CHAIN_MAX,
+        conveyor_actions::board::pull::COACH_INTERRUPTION_MAX,
         "the cap holds"
     );
 }

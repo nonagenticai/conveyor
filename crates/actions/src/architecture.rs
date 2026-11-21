@@ -9,6 +9,7 @@
 use std::collections::HashMap;
 
 use chrono::{DateTime, Utc};
+use conveyor_domain::architecture as vocab;
 use conveyor_store as store;
 use conveyor_store::architecture::{
     ArchitectureRule, ArchitectureStoreError, ArtifactLinkRecord, ArtifactRecord,
@@ -72,6 +73,30 @@ fn arch_error(error: ArchitectureStoreError, action: &str) -> ActionError {
                 }
                 ArchitectureRule::NoProfile => {
                     ActionError::new(409, "architecture_profile_missing", detail)
+                }
+                ArchitectureRule::ProfileInvalid(_) => {
+                    ActionError::new(409, "architecture_profile_invalid", detail)
+                }
+                ArchitectureRule::ProfileNotAdopted => {
+                    ActionError::new(409, "architecture_profile_not_adopted", detail)
+                }
+                ArchitectureRule::BoardDecisionRequired => {
+                    ActionError::new(409, "architecture_profile_decision_required", detail)
+                }
+                ArchitectureRule::ReviewMissing => {
+                    ActionError::new(409, "architecture_review_missing", detail)
+                }
+                ArchitectureRule::ReviewNonConformant(_) => {
+                    ActionError::new(409, "architecture_review_non_conformant", detail)
+                }
+                ArchitectureRule::KataCandidateRequired => {
+                    ActionError::new(409, "architecture_kata_candidate_required", detail)
+                }
+                ArchitectureRule::KataCandidateNotFound(_) => {
+                    ActionError::new(409, "architecture_kata_candidate_not_found", detail)
+                }
+                ArchitectureRule::KataDeferralNotApproved(_) => {
+                    ActionError::new(409, "architecture_kata_deferral_not_approved", detail)
                 }
             }
         }
@@ -837,6 +862,211 @@ pub struct ProfileTailorIn {
     pub adopt_with_decision_id: Option<Uuid>,
 }
 
+/// Validate one profile_tailor payload against the tenant's seeded standard.
+///
+/// A tailored profile may add requirements, never subtract the standard's mandatory artefacts,
+/// and it may only name phases it declares in `phase_set`. Refusing here is what stops an
+/// adopted profile from starting every phase gate satisfied.
+fn validate_profile_tailor(
+    standard: &[ArtifactTypeRecord],
+    input: &ProfileTailorIn,
+) -> Result<(), ActionError> {
+    let phases = profile_phase_set(input)?;
+    let mut named: HashMap<String, Vec<String>> = HashMap::new();
+    match &input.artifact_requirements {
+        Value::Null => {}
+        Value::Object(requirements) => {
+            for (phase, value) in requirements {
+                if !phases.contains(phase) {
+                    return Err(invalid(
+                        "artifact_requirements",
+                        "invalid_value",
+                        format!("phase {phase:?} is not in this profile's phase_set"),
+                    ));
+                }
+                let keys = named.entry(phase.clone()).or_default();
+                match value {
+                    Value::Array(items) => {
+                        collect_profile_keys(items, phase, keys, standard)?;
+                    }
+                    Value::Object(plateaus) if !plateaus.is_empty() => {
+                        for (plateau, items) in plateaus {
+                            if !vocab::is_plateau(plateau) {
+                                return Err(invalid(
+                                    "artifact_requirements",
+                                    "invalid_value",
+                                    format!(
+                                        "phase {phase:?}'s plateau {plateau:?} is not one of \
+                                         psa, hld or sd"
+                                    ),
+                                ));
+                            }
+                            let Value::Array(items) = items else {
+                                return Err(invalid(
+                                    "artifact_requirements",
+                                    "invalid_value",
+                                    format!(
+                                        "phase {phase:?}'s plateau {plateau} must be an array \
+                                         of artifact_type keys"
+                                    ),
+                                ));
+                            };
+                            collect_profile_keys(items, phase, keys, standard)?;
+                        }
+                    }
+                    _ => {
+                        return Err(invalid(
+                            "artifact_requirements",
+                            "invalid_value",
+                            format!(
+                                "phase {phase:?}'s requirements must be an array or a plateau map"
+                            ),
+                        ));
+                    }
+                }
+                if keys.is_empty() {
+                    return Err(invalid(
+                        "artifact_requirements",
+                        "invalid_value",
+                        format!("phase {phase:?} names no artefact requirements"),
+                    ));
+                }
+            }
+        }
+        _ => {
+            return Err(invalid(
+                "artifact_requirements",
+                "invalid_value",
+                "artifact_requirements must be an object keyed by phase",
+            ));
+        }
+    }
+    // Every mandatory row of a phase the profile claims to cover must still be named. A phase
+    // dropped from phase_set is a tailoring decision; a mandatory artefact silently dropped from
+    // a phase that stays in the set is a weakened gate.
+    for row in standard
+        .iter()
+        .filter(|row| row.mandatory && phases.contains(&row.phase_code))
+    {
+        let retained = named
+            .get(&row.phase_code)
+            .is_some_and(|keys| keys.iter().any(|key| key == &row.key));
+        if !retained {
+            return Err(invalid(
+                "artifact_requirements",
+                "invalid_value",
+                format!(
+                    "the mandatory artifact_type {:?} for phase {:?} is missing from the profile",
+                    row.key, row.phase_code
+                ),
+            ));
+        }
+    }
+    match &input.contract_kinds {
+        Value::Null => {}
+        Value::Object(kinds) => {
+            for (phase, kind) in kinds {
+                if !phases.contains(phase) {
+                    return Err(invalid(
+                        "contract_kinds",
+                        "invalid_value",
+                        format!("phase {phase:?} is not in this profile's phase_set"),
+                    ));
+                }
+                let Some(kind) = kind.as_str() else {
+                    return Err(invalid(
+                        "contract_kinds",
+                        "invalid_value",
+                        format!("phase {phase:?}'s contract kind must be a string"),
+                    ));
+                };
+                if kind != "none" && !vocab::is_contract_kind(kind) {
+                    return Err(invalid(
+                        "contract_kinds",
+                        "invalid_value",
+                        format!("{kind:?} is not one of the four contract kinds or none"),
+                    ));
+                }
+            }
+        }
+        _ => {
+            return Err(invalid(
+                "contract_kinds",
+                "invalid_value",
+                "contract_kinds must be an object keyed by phase",
+            ));
+        }
+    }
+    Ok(())
+}
+
+fn profile_phase_set(input: &ProfileTailorIn) -> Result<Vec<String>, ActionError> {
+    let Value::Array(items) = &input.phase_set else {
+        return Err(invalid(
+            "phase_set",
+            "invalid_value",
+            "phase_set must be a non-empty array of ADM phase codes",
+        ));
+    };
+    if items.is_empty() {
+        return Err(invalid(
+            "phase_set",
+            "invalid_value",
+            "phase_set must name at least one ADM phase",
+        ));
+    }
+    let mut phases: Vec<String> = Vec::with_capacity(items.len());
+    for item in items {
+        let phase = item
+            .as_str()
+            .filter(|phase| vocab::is_phase(phase))
+            .ok_or_else(|| {
+                invalid(
+                    "phase_set",
+                    "invalid_value",
+                    format!("{item} is not an ADM phase code"),
+                )
+            })?;
+        if phases.iter().any(|declared| declared.as_str() == phase) {
+            return Err(invalid(
+                "phase_set",
+                "invalid_value",
+                format!("phase {phase:?} is repeated"),
+            ));
+        }
+        phases.push(phase.to_owned());
+    }
+    Ok(phases)
+}
+
+fn collect_profile_keys(
+    items: &[Value],
+    phase: &str,
+    keys: &mut Vec<String>,
+    standard: &[ArtifactTypeRecord],
+) -> Result<(), ActionError> {
+    for item in items {
+        let Some(key) = item.as_str().filter(|key| !key.trim().is_empty()) else {
+            return Err(invalid(
+                "artifact_requirements",
+                "invalid_value",
+                format!("phase {phase:?}'s requirements must be artifact_type keys"),
+            ));
+        };
+        if !standard.iter().any(|row| row.key == key) {
+            return Err(invalid(
+                "artifact_requirements",
+                "invalid_value",
+                format!("{key:?} is not an artifact_type of this tenant's standard"),
+            ));
+        }
+        if !keys.iter().any(|seen| seen.as_str() == key) {
+            keys.push(key.to_owned());
+        }
+    }
+    Ok(())
+}
+
 #[crate::action(
     name = "architecture.profile_tailor",
     version = 1,
@@ -856,12 +1086,27 @@ async fn architecture_profile_tailor(
     store::architecture::seed_standard_tx(&mut *tx, ctx.tenant)
         .await
         .map_err(|error| arch_error(error, ctx.action))?;
+    let standard = store::architecture::list_standard_tx(&mut *tx, ctx.tenant)
+        .await
+        .map_err(|error| arch_error(error, ctx.action))?;
+    validate_profile_tailor(&standard, &input)?;
+    // The two maps are NOT NULL columns; an omitted map is an empty tailoring, not a null write.
+    let requirements = if input.artifact_requirements.is_null() {
+        json!({})
+    } else {
+        input.artifact_requirements
+    };
+    let kinds = if input.contract_kinds.is_null() {
+        json!({})
+    } else {
+        input.contract_kinds
+    };
     let new = NewProfile {
         key: input.key,
         name: input.name,
         phase_set: input.phase_set,
-        artifact_requirements: input.artifact_requirements,
-        contract_kinds: input.contract_kinds,
+        artifact_requirements: requirements,
+        contract_kinds: kinds,
     };
     let mut record = store::architecture::upsert_profile_tx(&mut *tx, ctx.tenant, &new)
         .await

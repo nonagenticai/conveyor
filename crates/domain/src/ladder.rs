@@ -344,7 +344,8 @@ pub fn is_input_hash(value: &str) -> bool {
 ///
 /// `GeneratedDraft` has no `From`/`Into` impl and no method that yields a card transition; a
 /// generation result can only be stored (a `governed_asset`, a `document` or a code patch) and
-/// applied by an action whose own gate is L1/L3 (§7.4). The `compile_fail` doctest below is
+/// applied by an action whose gate is an accepted L3 human decision of the `draft.apply` gate
+/// (§7.4). The `compile_fail` doctest below is
 /// the type-level proof, and `apply_card_transition_tx` takes no such type.
 ///
 /// ```compile_fail

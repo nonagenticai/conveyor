@@ -37,13 +37,15 @@ async fn approved(
 async fn phases_a_to_f_pass_in_order() {
     let f = arch::fixture().await;
     arch::tailor(
-        &f.running,
+        &f,
         json!({
             "preliminary": { "psa": ["principles_catalog"] },
             "a": { "psa": ["stakeholder_map"] },
             "b": { "hld": ["business_capability_map"] },
             "c": { "hld": ["data_entity_catalog"] },
             "d": { "hld": ["technology_standards"] },
+            "e": { "sd": ["solution_concept"] },
+            "f": { "sd": ["business_capability_map"] },
         }),
         json!({
             "a": "statement_of_architecture_work",
@@ -69,11 +71,59 @@ async fn phases_a_to_f_pass_in_order() {
         "principles_catalog",
     )
     .await;
+    // The profile added the one type it tailored; the standard's other mandatory rows still
+    // join the set, so one approval does not satisfy the gate.
+    let (status, out) = arch::advance(&f.running, &project, "preliminary").await;
+    assert_eq!(
+        status, 409,
+        "the mandatory principle diagrams are not approved yet: {out}"
+    );
+    assert_eq!(out["type"], "architecture_artifact_missing", "{out}");
+    assert!(
+        out["detail"]
+            .as_str()
+            .unwrap_or_default()
+            .contains("principle_derivation"),
+        "artifact_type.mandatory was not read: {out}"
+    );
+    approved(
+        &f,
+        &project,
+        "principle_derivation",
+        "preliminary",
+        "psa",
+        "diagram",
+    )
+    .await;
+    approved(
+        &f,
+        &project,
+        "principle_realization",
+        "preliminary",
+        "psa",
+        "diagram",
+    )
+    .await;
     let (status, out) = arch::advance(&f.running, &project, "preliminary").await;
     assert_eq!(status, 200, "Preliminary: {out}");
     assert_eq!(out["next_phase"], "a", "{out}");
 
     approved(&f, &project, "stakeholder_map", "a", "psa", "matrix").await;
+    let (status, out) = arch::advance(&f.running, &project, "a").await;
+    assert_eq!(
+        status, 409,
+        "phase A's mandatory set is not approved yet: {out}"
+    );
+    assert!(
+        out["detail"]
+            .as_str()
+            .unwrap_or_default()
+            .contains("driver_goal_objective"),
+        "artifact_type.mandatory was not read: {out}"
+    );
+    approved(&f, &project, "driver_goal_objective", "a", "psa", "catalog").await;
+    approved(&f, &project, "requirements_catalog", "a", "psa", "catalog").await;
+    approved(&f, &project, "solution_concept", "a", "psa", "diagram").await;
     arch::live_contract(&f, &project, "statement_of_architecture_work", "a").await;
     let (status, out) = arch::advance(&f.running, &project, "a").await;
     assert_eq!(status, 200, "A: {out}");
@@ -103,10 +153,22 @@ async fn phases_a_to_f_pass_in_order() {
     assert_eq!(status, 200, "D: {out}");
     assert_eq!(out["next_phase"], "e", "{out}");
 
+    // E and F borrow a seeded type: a tailored requirement may name any standard type, and an
+    // absent set is refused rather than treated as satisfied.
+    approved(&f, &project, "solution_concept", "e", "sd", "diagram").await;
     let (status, out) = arch::advance(&f.running, &project, "e").await;
     assert_eq!(status, 200, "E: {out}");
     assert_eq!(out["next_phase"], "f", "{out}");
 
+    approved(
+        &f,
+        &project,
+        "business_capability_map",
+        "f",
+        "sd",
+        "diagram",
+    )
+    .await;
     arch::live_contract(&f, &project, "delivery_contract", "f").await;
     let (status, out) = arch::advance(&f.running, &project, "f").await;
     assert_eq!(status, 200, "F: {out}");
@@ -117,12 +179,19 @@ async fn phases_a_to_f_pass_in_order() {
 async fn a_draft_artefact_refuses_the_contract() {
     let f = arch::fixture().await;
     arch::tailor(
-        &f.running,
+        &f,
         json!({ "a": { "psa": ["stakeholder_map"] } }),
         json!({ "a": "statement_of_architecture_work" }),
     )
     .await;
     let project = arch::project(&f.running, "architecture").await;
+    for (key, kind) in [
+        ("principles_catalog", "principles_catalog"),
+        ("principle_derivation", "diagram"),
+        ("principle_realization", "diagram"),
+    ] {
+        approved(&f, &project, key, "preliminary", "psa", kind).await;
+    }
     let (status, _) = arch::advance(&f.running, &project, "preliminary").await;
     assert_eq!(status, 200);
 
@@ -172,25 +241,29 @@ async fn a_draft_artefact_refuses_the_contract() {
 async fn a_contract_change_reopens_the_gate() {
     let f = arch::fixture().await;
     arch::tailor(
-        &f.running,
+        &f,
         json!({ "a": { "psa": ["stakeholder_map"] } }),
         json!({ "a": "statement_of_architecture_work" }),
     )
     .await;
     let project = arch::project(&f.running, "architecture").await;
+    for (key, kind) in [
+        ("principles_catalog", "principles_catalog"),
+        ("principle_derivation", "diagram"),
+        ("principle_realization", "diagram"),
+    ] {
+        approved(&f, &project, key, "preliminary", "psa", kind).await;
+    }
     let (status, _) = arch::advance(&f.running, &project, "preliminary").await;
     assert_eq!(status, 200);
-    let artifact_type_id = arch::type_id(&f.running, "stakeholder_map").await;
-    let artifact = arch::artifact(
-        &f.running,
-        "a",
-        "psa",
-        "matrix",
-        "Stakeholder map",
-        json!({ "project_id": project, "artifact_type_id": artifact_type_id }),
-    )
-    .await;
-    arch::approve_artifact(&f.running, &arch::id_of(&artifact)).await;
+    for (key, kind) in [
+        ("stakeholder_map", "matrix"),
+        ("driver_goal_objective", "catalog"),
+        ("requirements_catalog", "catalog"),
+        ("solution_concept", "diagram"),
+    ] {
+        approved(&f, &project, key, "a", "psa", kind).await;
+    }
     let contract = arch::live_contract(&f, &project, "statement_of_architecture_work", "a").await;
 
     let retired = arch::ok(

@@ -3319,21 +3319,46 @@ pub async fn close_retro_tx(
 /// Refuse a project start when the programme's tranche has not been authorised.
 ///
 /// The rule is the domain's (`PlanError::TrancheNotAuthorised`); the action maps it to
-/// `409 tranche_not_authorised`. A project outside a programme, or in a programme with no
-/// tranche rows, is unchanged.
+/// `409 tranche_not_authorised`.
+///
+/// [`project_tranche_state_tx`] answers `None` for two different facts, and only one of them is
+/// allowed: a project outside a programme keeps its legacy allowance, while a project inside a
+/// programme that HAS a tranche plan but no row for the project's tranche is sitting in an
+/// undeclared tranche and is refused. A programme that has declared no tranche plan at all (the
+/// pre-tranche programmes) also keeps the legacy allowance — the rule binds the first tranche to
+/// a plan that exists, it does not invent one.
 pub async fn assert_project_tranche_authorised_tx(
     conn: &mut PgConnection,
     tenant: TenantId,
     project_id: Uuid,
 ) -> Result<(), PlanStoreError> {
     match project_tranche_state_tx(&mut *conn, tenant, project_id).await? {
-        None => Ok(()),
         Some((_number, state))
             if matches!(state.as_str(), "authorised" | "in_review" | "closed") =>
         {
             Ok(())
         }
         Some((_number, _state)) => Err(PlanStoreError::Illegal(PlanError::TrancheNotAuthorised)),
+        None => {
+            let planned: bool = sqlx::query_scalar(
+                "SELECT EXISTS (
+                    SELECT 1 FROM project p
+                      JOIN programme_tranche t
+                        ON t.tenant_id = p.tenant_id AND t.programme_id = p.programme_id
+                     WHERE p.tenant_id = $1 AND p.id = $2
+                )",
+            )
+            .bind(tenant.as_uuid())
+            .bind(project_id)
+            .fetch_one(&mut *conn)
+            .await?;
+            if planned {
+                // The programme has a tranche plan; the project's tranche number is not in it.
+                Err(PlanStoreError::Illegal(PlanError::TrancheNotAuthorised))
+            } else {
+                Ok(())
+            }
+        }
     }
 }
 

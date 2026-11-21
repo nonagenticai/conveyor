@@ -656,3 +656,58 @@ async fn cadences_and_stakeholder_profiles_are_rows() {
     assert_eq!(status, 200, "{updated}");
     assert_eq!(output(&updated)["support_level"], "high");
 }
+
+/// v1-p5-2 — acceptance is evidence, not a checkbox.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn accepting_a_wbs_node_without_evidence_is_refused() {
+    let (_pg, running, _seeded) = fixture().await;
+    let project = create_project(&running, "Evidence gate").await;
+    let node = create_wbs(&running, &project, "Unproven deliverable").await;
+
+    let (_, headers, _) = running
+        .invoke_full(
+            "wbs.get",
+            "dev:alice",
+            json!({"id": node}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    let etag = headers
+        .get("etag")
+        .cloned()
+        .expect("the node carries an ETag");
+
+    let (status, body) = running
+        .invoke(
+            "wbs.update",
+            "dev:alice",
+            json!({"id": node, "status": "accepted", "evidence": []}),
+            Some(etag.as_str()),
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 422, "{body}");
+    assert_eq!(body["type"], "action-invalid-input", "{body}");
+    assert_eq!(body["errors"][0]["field"], "evidence", "{body}");
+    assert_eq!(body["errors"][0]["code"], "required", "{body}");
+
+    let (status, body) = running
+        .invoke(
+            "wbs.update",
+            "dev:alice",
+            json!({
+                "id": node,
+                "status": "accepted",
+                "evidence": [{"manifest": "acceptance/programme/T1.toml", "result": "pass"}]
+            }),
+            Some(etag.as_str()),
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{body}");
+    assert_eq!(output(&body)["status"], "accepted", "{body}");
+}

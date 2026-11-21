@@ -860,7 +860,9 @@ async fn the_live_view_and_the_cli_write_the_same_bytes() {
             tenant: "snap-live".to_owned(),
             out: dir.clone(),
             outputs_dir: Some(dir.join("docs")),
-            generated_at: Some(view.generated_at.clone()),
+            // v1-pack-2: no clock override. The CLI derives `generated_at` from the snapshot data,
+            // the same function `site_view` uses, so both write the same bytes.
+            generated_at: None,
             issues: issues_path,
             conformance: Some(rework_path),
             feedback_url: feedback.to_owned(),
@@ -871,6 +873,11 @@ async fn the_live_view_and_the_cli_write_the_same_bytes() {
     .await
     .expect("the CLI snapshot");
 
+    assert_eq!(
+        std::fs::read(dir.join("programme.json")).expect("programme.json"),
+        view.programme_json.as_bytes(),
+        "the live download is the CLI's programme.json"
+    );
     assert_eq!(
         std::fs::read(dir.join("snapshot.js")).expect("snapshot.js"),
         view.snapshot_js.as_bytes(),

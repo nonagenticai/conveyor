@@ -79,6 +79,23 @@ async fn fixture() -> Fixture {
     )
     .await
     .expect("approve the governing contract");
+    // T9 (#81): the design gate reads Phase G, which is the live contract AND its compliance
+    // review. These tests are about the gate's evidence, so the review is fixture state.
+    conveyor_store::architecture::record_review_tx(
+        &mut tx,
+        seeded.tenant,
+        &conveyor_store::architecture::NewReview {
+            project_id: project,
+            contract_id: contract.id,
+            level: "compliant".to_owned(),
+            findings: json!([]),
+            evidence: json!({ "ref": "fixture design review" }),
+            outcome: None,
+            reviewed_by: seeded.user_id,
+        },
+    )
+    .await
+    .expect("record the Phase-G compliance review");
     tx.commit().await.expect("commit the contract");
     let binding = seed_pm_job(&pg, seeded.tenant_id).await;
     let running = support::Running::start(&pg).await;
@@ -189,12 +206,10 @@ async fn approve_asset(running: &support::Running, id: Uuid) {
 }
 
 /// `pm.route_gate` as the PM (alice). The requester is the caller, so alice cannot decide it.
-async fn route_gate(
-    fixture: &Fixture,
-    gate: &str,
-    evidence: Value,
-    require_evidence: bool,
-) -> (u16, Value) {
+///
+/// SPEC_V2 §5.4: a gate with no evidence is refused; the only override is a recorded
+/// `evidence_waiver` reason, which none of these scenarios uses.
+async fn route_gate(fixture: &Fixture, gate: &str, evidence: Value) -> (u16, Value) {
     fixture
         .running
         .invoke(
@@ -206,7 +221,6 @@ async fn route_gate(
                 "gate": gate,
                 "kind": "gate",
                 "evidence": evidence,
-                "require_evidence": require_evidence,
             }),
             None,
             None,
@@ -255,7 +269,6 @@ async fn a_live_contract_resolves_the_gate() {
         &fixture,
         "design",
         json!([{ "kind": "governed_asset", "id": asset }]),
-        false,
     )
     .await;
     assert_eq!(status, 201, "a live approved asset opens the gate: {body}");
@@ -336,7 +349,6 @@ async fn a_draft_contract_refuses_the_gate() {
         &fixture,
         "design",
         json!([{ "kind": "governed_asset", "id": draft }]),
-        false,
     )
     .await;
     assert_eq!(status, 422, "a draft asset must be refused: {body}");
@@ -371,7 +383,6 @@ async fn a_draft_contract_refuses_the_gate() {
         &fixture,
         "design",
         json!([{ "kind": "governed_asset", "id": old }]),
-        false,
     )
     .await;
     assert_eq!(status, 422, "a superseded asset must be refused: {body}");
@@ -393,12 +404,12 @@ async fn a_draft_contract_refuses_the_gate() {
     fixture.running.shutdown().await;
 }
 
-/// P4.3 — a gate that requires evidence and carries none is refused before any row is written.
+/// P4.3 — a gate with no evidence and no recorded waiver is refused before any row is written.
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn a_gate_without_evidence_is_refused() {
     let fixture = fixture().await;
 
-    let (status, body) = route_gate(&fixture, "design", json!([]), true).await;
+    let (status, body) = route_gate(&fixture, "design", json!([])).await;
     assert_eq!(status, 422, "an evidence-less gate must be refused: {body}");
     assert_eq!(body["type"], "gate_evidence_missing", "{body}");
 

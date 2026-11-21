@@ -226,6 +226,27 @@ def parse_severities(raw: str) -> set[str]:
     return values
 
 
+def clear_failure(receipt: dict[str, Any], key: str) -> None:
+    """A later success retires an earlier failure for the same package."""
+    receipt["failures"] = [
+        failure
+        for failure in receipt.get("failures", [])
+        if not (isinstance(failure, dict) and failure.get("key") == key)
+    ]
+
+
+def prune_failures(receipt: dict[str, Any]) -> bool:
+    """An applied package cannot still be failed; return True when the receipt changed."""
+    applied = set(receipt.get("applied", {}))
+    before = len(receipt.get("failures", []))
+    receipt["failures"] = [
+        failure
+        for failure in receipt.get("failures", [])
+        if not (isinstance(failure, dict) and failure.get("key") in applied)
+    ]
+    return len(receipt["failures"]) != before
+
+
 def select(
     register: dict[str, Any],
     snapshot: Snapshot,
@@ -400,6 +421,7 @@ def apply(
                     "at": datetime.now(timezone.utc).replace(microsecond=0).isoformat(),
                     "source": "existing-card",
                 }
+                clear_failure(receipt, key)
                 stamp(receipt)
                 write_json(receipt_path, receipt)
                 counts["existing"] += 1
@@ -414,12 +436,14 @@ def apply(
                 "severity": package["severity"],
                 "at": datetime.now(timezone.utc).replace(microsecond=0).isoformat(),
             }
+            clear_failure(receipt, key)
             stamp(receipt)
             write_json(receipt_path, receipt)
             counts["created"] += 1
             print(f"create {key} -> {card_id} ({package['severity']}, {package['apply_to']})")
         except (ActionError, KeyError) as error:
             counts["failed"] += 1
+            clear_failure(receipt, key)
             receipt["failures"].append({"key": key, "error": str(error)})
             stamp(receipt)
             write_json(receipt_path, receipt)
@@ -619,6 +643,20 @@ def self_test() -> None:
         ]
         if suppressed:
             raise SystemExit("self-test: a suppressed package entered the plan")
+        receipt = {
+            "failures": [
+                {"key": "a", "error": "x"},
+                {"key": "b", "error": "y"},
+            ]
+        }
+        clear_failure(receipt, "a")
+        if [row["key"] for row in receipt["failures"]] != ["b"]:
+            raise SystemExit("self-test: a later success did not clear the earlier failure")
+        stale = {"applied": {"a": {}}, "failures": [{"key": "a"}, {"key": "b"}]}
+        if not prune_failures(stale):
+            raise SystemExit("self-test: an applied package kept its stale failure")
+        if [row["key"] for row in stale["failures"]] != ["b"]:
+            raise SystemExit("self-test: the prune removed the wrong failure")
     print("materialise-rework: self-test OK")
 
 
@@ -652,6 +690,8 @@ def main(argv: list[str]) -> int:
         return 2
     snapshot = Snapshot(args.data)
     receipt = load_receipt(args.receipt, args.tenant)
+    if prune_failures(receipt) and args.apply:
+        write_json(args.receipt, receipt)
     items = select(
         register,
         snapshot,
