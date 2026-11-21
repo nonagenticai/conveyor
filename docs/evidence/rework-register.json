@@ -9680,6 +9680,180 @@
       "title": "Five of the seven project types have no catalogue row"
     },
     {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-p54-1:T1",
+      "apply_to": "PLATFORM",
+      "artefact": "\u00a75.4",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Moving a card into a done list with unmet card_type.definition acceptance refuses 422 with a named error; an approval carrying an override reason permits it and the coach surfaces that reason; tests prove the refusal, the override and the unmet-evidence case.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "line": 102,
+              "path": "migrations/0002_domain.sql",
+              "quote": "    definition jsonb NOT NULL DEFAULT '{}'::jsonb,",
+              "source": "code"
+            },
+            {
+              "line": 401,
+              "path": "crates/actions/src/board/cards.rs",
+              "quote": "        matrix::ensure_move(&current.card, from.list.kind, to.list.kind, &rules)?;",
+              "source": "code"
+            },
+            {
+              "line": 210,
+              "path": "crates/domain/src/catalogue.rs",
+              "quote": "    matrix: BTreeMap<ListKind, Vec<ListKind>>,",
+              "source": "code"
+            }
+          ],
+          "rule": "v1-p54-1",
+          "source": "audit"
+        }
+      ],
+      "key": "v1-p54-1:T1",
+      "owner_project": "T1",
+      "rule": "v1-p54-1",
+      "scope": "T1",
+      "severity": "P1",
+      "spec": "\u00a75.4",
+      "standard": "SPEC",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "\u00a75.4 puts the Definition of Done on card_type.definition and requires the domain layer to check it before a card enters a done list, with an approval override whose reason the coach reads; the column exists but no code reads it and cards.move consults only the project-type matrix.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "line": 102,
+                  "path": "migrations/0002_domain.sql",
+                  "quote": "    definition jsonb NOT NULL DEFAULT '{}'::jsonb,",
+                  "source": "code"
+                },
+                {
+                  "line": 401,
+                  "path": "crates/actions/src/board/cards.rs",
+                  "quote": "        matrix::ensure_move(&current.card, from.list.kind, to.list.kind, &rules)?;",
+                  "source": "code"
+                },
+                {
+                  "line": 210,
+                  "path": "crates/domain/src/catalogue.rs",
+                  "quote": "    matrix: BTreeMap<ListKind, Vec<ListKind>>,",
+                  "source": "code"
+                }
+              ],
+              "rule": "v1-p54-1",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P1",
+          "subject": "T1"
+        }
+      ],
+      "title": "A card's Definition of Done is never checked when it enters the done lane"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-p54-2:T11",
+      "apply_to": "T11",
+      "artefact": "\u00a75.4",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "A non-human decision on any gate not declared non-governance in a tenant gate-policy row is refused 403 human_only_gate; the policy row carries the approver kind; tests cover the default refusal and the tenant-declared job or agent approval.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "line": 873,
+              "path": "crates/store/src/approval.rs",
+              "quote": "    if eval_gate.is_some() {",
+              "source": "code"
+            },
+            {
+              "line": 874,
+              "path": "crates/store/src/approval.rs",
+              "quote": "        if decision.decided_by_kind != DeciderKind::Human {",
+              "source": "code"
+            },
+            {
+              "line": 117,
+              "path": "crates/store/src/approval_policy.rs",
+              "quote": "    pub self_approval: SelfApproval,",
+              "source": "code"
+            }
+          ],
+          "rule": "v1-p54-2",
+          "source": "audit"
+        }
+      ],
+      "key": "v1-p54-2:T11",
+      "owner_project": "T11",
+      "rule": "v1-p54-2",
+      "scope": "T11",
+      "severity": "P1",
+      "spec": "\u00a75.4",
+      "standard": "SPEC",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "\u00a75.4 makes an approver human by default and lets a tenant authorise a job or agent only for a gate it explicitly declares non-governance; the one decision writer requires a human decision only when an eval gate is set, so every other gate accepts an agent or service decision.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "line": 873,
+                  "path": "crates/store/src/approval.rs",
+                  "quote": "    if eval_gate.is_some() {",
+                  "source": "code"
+                },
+                {
+                  "line": 874,
+                  "path": "crates/store/src/approval.rs",
+                  "quote": "        if decision.decided_by_kind != DeciderKind::Human {",
+                  "source": "code"
+                },
+                {
+                  "line": 117,
+                  "path": "crates/store/src/approval_policy.rs",
+                  "quote": "    pub self_approval: SelfApproval,",
+                  "source": "code"
+                }
+              ],
+              "rule": "v1-p54-2",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P1",
+          "subject": "T11"
+        }
+      ],
+      "title": "The human-approver default is enforced only for eval gates"
+    },
+    {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-p61-1:T3",
       "apply_to": "PLATFORM",
       "artefact": "\u00a76.1",
@@ -29444,12 +29618,12 @@
       "suppressed": 0
     },
     "SPEC": {
-      "findings": 85,
+      "findings": 87,
       "gaps": 38,
       "p0": 0,
       "p1": 5,
       "p2": 33,
-      "packages": 106,
+      "packages": 108,
       "rules": 8,
       "rules_clean": 2,
       "rules_with_gaps": 6,
@@ -29472,25 +29646,25 @@
   "summary": {
     "by_severity": {
       "P0": 27,
-      "P1": 148,
+      "P1": 150,
       "P2": 153
     },
     "by_standard": {
       "MSP": 66,
       "PMP": 49,
       "SAFe": 16,
-      "SPEC": 106,
+      "SPEC": 108,
       "TOGAF": 91
     },
     "by_status": {
-      "open": 325,
+      "open": 327,
       "suppressed": 3
     },
     "duplicates": 0,
-    "open": 325,
-    "packages": 328,
+    "open": 327,
+    "packages": 330,
     "resolved": 11,
-    "subjects": 426,
+    "subjects": 428,
     "suppressed": 3
   }
 }

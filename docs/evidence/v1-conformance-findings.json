@@ -3713,6 +3713,64 @@
             "failure_scenario": "A procedure step explicitly searches through the retrieval toolkit. The toolkit is draft, so the broker answers 409 tool_not_ready before any network call; the live, every-job retrieval estate has no callable tool and tools.probe never reports it, because an unpublished toolkit is not probed.",
             "acceptance": "The retrieval manifest publishes strata_rag as published, or a test asserts a live-only status is refused for a planned service; a bound run's retrieval call reaches the destination and ledgers one tool_call, and tools.probe reports it live.",
             "owner_project": "PLATFORM"
+        },
+        {
+            "id": "v1-p54-1",
+            "area": "§5.4",
+            "standard": "SPEC",
+            "spec": "§5.4",
+            "severity": "P1",
+            "title": "A card's Definition of Done is never checked when it enters the done lane",
+            "problem": "§5.4 puts the Definition of Done on card_type.definition and requires the domain layer to check it before a card enters a done list, with an approval override whose reason the coach reads; the column exists but no code reads it and cards.move consults only the project-type matrix.",
+            "evidence": [
+                {
+                    "path": "migrations/0002_domain.sql",
+                    "line": 102,
+                    "quote": "    definition jsonb NOT NULL DEFAULT '{}'::jsonb,"
+                },
+                {
+                    "path": "crates/actions/src/board/cards.rs",
+                    "line": 401,
+                    "quote": "        matrix::ensure_move(&current.card, from.list.kind, to.list.kind, &rules)?;"
+                },
+                {
+                    "path": "crates/domain/src/catalogue.rs",
+                    "line": 210,
+                    "quote": "    matrix: BTreeMap<ListKind, Vec<ListKind>>,"
+                }
+            ],
+            "failure_scenario": "A delivery card whose card_type.definition declares required outputs is moved active to done by cards.move; ensure_move approves the transition from the matrix alone, no acceptance artefact is required, no override row is written, and the coach never sees a reason. The project then closes over work that never met its own definition.",
+            "acceptance": "Moving a card into a done list with unmet card_type.definition acceptance refuses 422 with a named error; an approval carrying an override reason permits it and the coach surfaces that reason; tests prove the refusal, the override and the unmet-evidence case.",
+            "owner_project": "T1"
+        },
+        {
+            "id": "v1-p54-2",
+            "area": "§5.4",
+            "standard": "SPEC",
+            "spec": "§5.4",
+            "severity": "P1",
+            "title": "The human-approver default is enforced only for eval gates",
+            "problem": "§5.4 makes an approver human by default and lets a tenant authorise a job or agent only for a gate it explicitly declares non-governance; the one decision writer requires a human decision only when an eval gate is set, so every other gate accepts an agent or service decision.",
+            "evidence": [
+                {
+                    "path": "crates/store/src/approval.rs",
+                    "line": 873,
+                    "quote": "    if eval_gate.is_some() {"
+                },
+                {
+                    "path": "crates/store/src/approval.rs",
+                    "line": 874,
+                    "quote": "        if decision.decided_by_kind != DeciderKind::Human {"
+                },
+                {
+                    "path": "crates/store/src/approval_policy.rs",
+                    "line": 117,
+                    "quote": "    pub self_approval: SelfApproval,"
+                }
+            ],
+            "failure_scenario": "A service principal holding approvals:write answers a PM charter or baseline gate through an internal invoke. record_decision_tx writes a service decider and resolves the gate because it is not an eval gate; with two required decisions, two machine principals complete dual control and no human is involved, although the tenant never declared the gate non-governance.",
+            "acceptance": "A non-human decision on any gate not declared non-governance in a tenant gate-policy row is refused 403 human_only_gate; the policy row carries the approver kind; tests cover the default refusal and the tenant-declared job or agent approval.",
+            "owner_project": "T11"
         }
     ]
 }

@@ -13,7 +13,10 @@
  *   - every source in every section is a recognised kind and a resolving pointer;
  *   - a document-backed artefact has a page whose hash matches.
  *
- * Run: node docs/design/scripts/check-standards.cjs [--self-test]
+ * Run: node docs/design/scripts/check-standards.cjs --data docs/design/data --documents docs/design
+ *      node docs/design/scripts/check-standards.cjs --self-test
+ *
+ * Exit 1 when the record is absent: the pack must publish it.
  */
 "use strict";
 
