@@ -201,6 +201,21 @@ impl Fixture {
             .await
     }
 
+    /// [`Fixture::call`] with an `Idempotency-Key` header: the call-level key §11.3 names, which
+    /// the route folds into `InvokeRequest.idempotency_key` (the middle of the three options).
+    async fn call_with_key(&self, tool_name: &str, input: Value, key: &str) -> (u16, Value) {
+        self.running
+            .invoke(
+                "tools.call",
+                "dev:alice",
+                json!({"run_id": self.run_id, "tool": tool_name, "input": input}),
+                None,
+                Some(key),
+                None,
+            )
+            .await
+    }
+
     /// Declare the tool's verification path (§11.3). The fixture writes the tool row directly, so
     /// the declaration is test input exactly like the effect and the schema.
     async fn set_verify(&self, verify: Value) {
@@ -217,6 +232,24 @@ impl Fixture {
         .await
         .expect("set the tool's verification path");
         tx.commit().await.expect("commit the verification path");
+    }
+
+    /// Declare the tool version's idempotency policy (§11.3). The fixture writes the tool row
+    /// directly, so the policy is test input exactly like the effect and the schema.
+    async fn set_idempotency(&self, value: &str) {
+        let mut tx = begin_scoped(&self.pg.owner, self.tenant)
+            .await
+            .expect("a scoped write");
+        sqlx::query(
+            "UPDATE tool SET idempotency = $2 WHERE tenant_id = $1
+              AND toolkit_id IN (SELECT id FROM toolkit WHERE tenant_id = $1)",
+        )
+        .bind(self.tenant.as_uuid())
+        .bind(value)
+        .execute(&mut *tx)
+        .await
+        .expect("set the tool's idempotency policy");
+        tx.commit().await.expect("commit the idempotency policy");
     }
 
     async fn ledger(&self) -> Vec<tool::ToolCallRow> {
@@ -778,6 +811,88 @@ async fn a_verified_write_is_ok() {
     assert_eq!(rows.len(), 1, "exactly one ledger row: {rows:?}");
     assert_eq!(rows[0].status, "ok");
     assert_eq!(fixture.stub.hits(), 1);
+
+    fixture.running.shutdown().await;
+}
+
+// ── v1-w4a-3 — the tool version's idempotency policy (SPEC_V2 §11.3) ────────────────────
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_required_key_is_refused_without_one() {
+    let _serial = SERIAL.lock().await;
+    let fixture = Fixture::new(
+        "coding",
+        "jobs.create",
+        "coding_jobs.create",
+        "write",
+        "write",
+        coding_schema(),
+    )
+    .await;
+    fixture.set_idempotency("required").await;
+
+    let (status, body) = fixture
+        .call(
+            "coding.jobs.create",
+            json!({"kind": "test", "input": {"files": []}}),
+        )
+        .await;
+
+    assert_eq!(status, 422, "a required key is not optional: {body}");
+    assert_eq!(body["type"], "tool_input_invalid", "{body}");
+    let errors = body["errors"].as_array().expect("field errors");
+    assert!(
+        errors
+            .iter()
+            .any(|error| error["field"] == "idempotency_key"),
+        "the refusal names the header: {body}"
+    );
+    assert_eq!(
+        fixture.stub.hits(),
+        0,
+        "a missing key must make zero destination calls"
+    );
+
+    fixture.running.shutdown().await;
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_required_key_is_forwarded_and_replays() {
+    let _serial = SERIAL.lock().await;
+    let fixture = Fixture::new(
+        "coding",
+        "jobs.create",
+        "coding_jobs.create",
+        "write",
+        "write",
+        coding_schema(),
+    )
+    .await;
+    fixture.set_idempotency("required").await;
+    let input = json!({"kind": "test", "input": {"files": []}});
+
+    let (status, body) = fixture
+        .call_with_key("coding.jobs.create", input.clone(), "k-1")
+        .await;
+    assert_eq!(status, 200, "a keyed call is admitted: {body}");
+    assert_eq!(
+        fixture.stub.hits(),
+        1,
+        "the first call reaches the destination"
+    );
+
+    let (status, body) = fixture
+        .call_with_key("coding.jobs.create", input, "k-1")
+        .await;
+    assert_eq!(
+        status, 200,
+        "the same key replays the stored response: {body}"
+    );
+    assert_eq!(
+        fixture.stub.hits(),
+        1,
+        "a replay must not make a second destination call"
+    );
 
     fixture.running.shutdown().await;
 }
