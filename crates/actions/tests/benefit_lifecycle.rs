@@ -115,6 +115,8 @@ async fn create_benefit(
                 "target": {"value": 8},
                 "measurement_method": "card and run timestamps, weekly",
                 "benefit_owner_job_id": owner,
+                "capabilities": ["delivery"],
+                "operational_area": "delivery",
                 "status": status,
             }),
             None,
@@ -540,6 +542,36 @@ async fn a_realized_status_needs_a_complete_transition() {
     .execute(&pg.super_pool)
     .await
     .expect("post-transition measurement");
+    // v1-p83-2: two timestamps are an assertion, not proof. The transition must also carry its
+    // evidence before the status can advance.
+    let (status, body) = running
+        .invoke(
+            "benefits.update",
+            TOKEN,
+            json!({"id": benefit, "status": "realized"}),
+            Some("\"1\""),
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(
+        status, 422,
+        "timestamps without evidence cannot claim realization: {body}"
+    );
+    assert_eq!(
+        body["errors"][0]["code"], "benefit_baseline_missing",
+        "{body}"
+    );
+
+    sqlx::query(
+        "UPDATE benefit_transition
+            SET evidence = '[{\"kind\":\"measurement\",\"ref\":\"m-1\"}]'::jsonb
+          WHERE benefit_id = $1::uuid",
+    )
+    .bind(&benefit)
+    .execute(&pg.super_pool)
+    .await
+    .expect("transition evidence");
     let (status, body) = running
         .invoke(
             "benefits.update",
@@ -573,6 +605,8 @@ async fn a_created_benefit_cannot_start_realized() {
                 "target": {"value": 8},
                 "measurement_method": "card and run timestamps, weekly",
                 "benefit_owner_job_id": owner,
+                "capabilities": ["delivery"],
+                "operational_area": "delivery",
                 "status": "realized",
             }),
             None,
@@ -590,4 +624,78 @@ async fn a_created_benefit_cannot_start_realized() {
         listed.is_empty(),
         "a profile must not exist after the refusal: {listed:?}"
     );
+}
+
+/// §8.3 — a profile with a complete measurement but no capabilities and no operational area is
+/// refused as incomplete, and the refusal names both gaps.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_benefit_without_capabilities_or_an_area_is_refused() {
+    let (pg, running, seeded) = fixture().await;
+    let programme = create_programme(&running, "Incomplete programme").await;
+    let owner = owner_job(&pg, &seeded).await;
+    let (status, body) = running
+        .invoke(
+            "benefits.create",
+            TOKEN,
+            json!({
+                "programme_id": programme,
+                "reference": "BEN-01",
+                "description": "BEN-01 benefit",
+                "baseline": {"value": 14},
+                "target": {"value": 8},
+                "measurement_method": "card and run timestamps, weekly",
+                "benefit_owner_job_id": owner,
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 422, "{body}");
+    assert_eq!(
+        body["errors"][0]["code"], "benefit_profile_incomplete",
+        "{body}"
+    );
+    let detail = text(&body["errors"][0], "detail");
+    assert!(detail.contains("capabilities"), "{body}");
+    assert!(detail.contains("operational_area"), "{body}");
+    let listed = list_benefits(&running, &programme, true).await;
+    assert!(
+        listed.is_empty(),
+        "a refused profile left a row: {listed:?}"
+    );
+}
+
+/// §8.3 — a placeholder baseline ("not measured") is not a measurement: creation refuses it and
+/// the refusal names the baseline.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_placeholder_baseline_is_refused() {
+    let (pg, running, seeded) = fixture().await;
+    let programme = create_programme(&running, "Placeholder programme").await;
+    let owner = owner_job(&pg, &seeded).await;
+    let (status, body) = running
+        .invoke(
+            "benefits.create",
+            TOKEN,
+            json!({
+                "programme_id": programme,
+                "reference": "BEN-01",
+                "description": "BEN-01 benefit",
+                "baseline": "not measured",
+                "target": {"value": 8},
+                "measurement_method": "card and run timestamps, weekly",
+                "benefit_owner_job_id": owner,
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 422, "{body}");
+    assert_eq!(
+        body["errors"][0]["code"], "benefit_profile_incomplete",
+        "{body}"
+    );
+    let detail = text(&body["errors"][0], "detail");
+    assert!(detail.contains("baseline"), "{body}");
 }

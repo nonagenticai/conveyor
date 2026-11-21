@@ -6713,6 +6713,8 @@ fn spine_samples() -> Vec<Sample> {
                 json!({
                     "programme_id": ctx.pop("benefits.create"),
                     "reference": "BEN-PARITY",
+                    "capabilities": ["delivery"],
+                    "operational_area": "delivery",
                 })
             });
             expecting(sample, 422)

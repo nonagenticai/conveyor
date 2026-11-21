@@ -421,7 +421,12 @@ async fn a_benefit_without_baseline_target_method_or_owner_is_refused() {
         .invoke(
             "benefits.create",
             "dev:alice",
-            json!({"programme_id": programme, "reference": "BEN-01"}),
+            json!({
+                "programme_id": programme,
+                "reference": "BEN-01",
+                "capabilities": ["delivery"],
+                "operational_area": "delivery"
+            }),
             None,
             None,
             None,
@@ -471,7 +476,9 @@ async fn a_benefit_map_edge_names_its_five_levels() {
                 "baseline": {"value": 14, "measured_at": "2026-11-01"},
                 "target": {"value": 8},
                 "measurement_method": "card and run timestamps, weekly",
-                "benefit_owner_job_id": job
+                "benefit_owner_job_id": job,
+                "capabilities": ["delivery"],
+                "operational_area": "delivery"
             }),
             None,
             None,

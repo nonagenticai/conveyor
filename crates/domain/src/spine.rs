@@ -8,9 +8,9 @@
 //!
 //! * **WSJF is computed on read** from four typed, non-negative integers and `job_size > 0`.
 //!   There is no score column; a stored score would become a stale opinion (D-T1-4).
-//! * **A benefit profile without its baseline, target, measurement method and owner is a
-//!   wish.** [`benefit_profile_missing`] returns the exact fields that are absent, so the
-//!   refusal can name them (D-T1-9).
+//! * **A benefit profile without a measured baseline and target, a measurement method, an owner,
+//!   its capabilities and its operational area is a wish.** [`benefit_profile_missing`] returns
+//!   the exact fields that are absent, so the refusal can name them (D-T1-9).
 
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -239,13 +239,27 @@ pub fn validate_change(
     Ok(())
 }
 
+/// A measurement is a real reading, not a placeholder: a number or a non-empty structured
+/// document, never null/blank/an empty container and never the literal "not measured".
+fn is_measurement(value: &Value) -> bool {
+    match value {
+        Value::Null => false,
+        Value::String(text) => {
+            !text.trim().is_empty() && !text.eq_ignore_ascii_case("not measured")
+        }
+        Value::Array(items) => !items.is_empty(),
+        Value::Object(map) => !map.is_empty(),
+        _ => true,
+    }
+}
+
 /// The mandatory fields a benefit profile must carry, in the §8.3 order.
 pub fn benefit_profile_missing(profile: &BenefitProfileFields) -> Vec<&'static str> {
     let mut missing = Vec::new();
-    if profile.baseline.is_none() {
+    if !profile.baseline.as_ref().is_some_and(is_measurement) {
         missing.push("baseline");
     }
-    if profile.target.is_none() {
+    if !profile.target.as_ref().is_some_and(is_measurement) {
         missing.push("target");
     }
     if profile.measurement_method.trim().is_empty() {
@@ -253,6 +267,16 @@ pub fn benefit_profile_missing(profile: &BenefitProfileFields) -> Vec<&'static s
     }
     if profile.benefit_owner_job_id.is_none() {
         missing.push("benefit_owner");
+    }
+    if !profile
+        .capabilities
+        .as_array()
+        .is_some_and(|items| !items.is_empty())
+    {
+        missing.push("capabilities");
+    }
+    if profile.operational_area.trim().is_empty() {
+        missing.push("operational_area");
     }
     missing
 }
@@ -268,6 +292,10 @@ pub struct BenefitProfileFields {
     pub measurement_method: String,
     /// The BCM job that owns the benefit.
     pub benefit_owner_job_id: Option<Uuid>,
+    /// The capabilities the benefit depends on (§8.3); an empty array is a gap.
+    pub capabilities: Value,
+    /// The operational area that must change (§8.3); blank is a gap.
+    pub operational_area: String,
 }
 
 /// The five levels a benefits-map edge must name (§8.3).

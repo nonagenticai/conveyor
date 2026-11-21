@@ -1718,6 +1718,8 @@ impl NewBenefitProfile {
             target: self.target.clone(),
             measurement_method: self.measurement_method.clone(),
             benefit_owner_job_id: self.benefit_owner_job_id,
+            capabilities: self.capabilities.clone(),
+            operational_area: self.operational_area.clone(),
         }
     }
 }
@@ -2001,11 +2003,19 @@ pub async fn update_benefit_tx(
     }
     if patch.status.as_deref() == Some("realized") {
         // §8.3: a benefit whose baseline was never measured cannot claim an improvement. The
-        // realization record is the only proof that both readings exist; consult it here so the
-        // status cannot advance past it.
+        // realization record is the proof: both readings and the evidence behind them. Timestamps
+        // alone are an assertion, so the status cannot advance past an empty evidence field.
         let measured = get_transition_tx(&mut *conn, tenant, id)
             .await?
-            .is_some_and(|t| t.baseline_measured_at.is_some() && t.post_measured_at.is_some());
+            .is_some_and(|t| {
+                t.baseline_measured_at.is_some()
+                    && t.post_measured_at.is_some()
+                    && match &t.evidence {
+                        Value::Array(items) => !items.is_empty(),
+                        Value::Object(map) => !map.is_empty(),
+                        _ => false,
+                    }
+            });
         if !measured {
             return Err(PlanStoreError::Illegal(PlanError::BenefitBaselineMissing));
         }
@@ -2037,6 +2047,14 @@ pub async fn update_benefit_tx(
             .clone()
             .unwrap_or_else(|| current.measurement_method.clone()),
         benefit_owner_job_id: patch.benefit_owner_job_id.or(current.benefit_owner_job_id),
+        capabilities: patch
+            .capabilities
+            .clone()
+            .unwrap_or_else(|| current.capabilities.clone()),
+        operational_area: patch
+            .operational_area
+            .clone()
+            .unwrap_or_else(|| current.operational_area.clone()),
     };
     let missing = benefit_profile_missing(&fields);
     if !missing.is_empty() {

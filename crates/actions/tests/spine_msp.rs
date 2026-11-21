@@ -98,7 +98,9 @@ async fn create_benefit(
                 "baseline": {"value": 14},
                 "target": {"value": 8},
                 "measurement_method": "weekly timestamps",
-                "benefit_owner_job_id": job
+                "benefit_owner_job_id": job,
+                "capabilities": ["delivery"],
+                "operational_area": "delivery"
             }),
             None,
             None,
@@ -575,7 +577,9 @@ async fn msp_deletes_and_refusals() {
                 "baseline": {"value": 1},
                 "target": {"value": 2},
                 "measurement_method": "weekly",
-                "benefit_owner_job_id": job
+                "benefit_owner_job_id": job,
+                "capabilities": ["delivery"],
+                "operational_area": "delivery"
             }),
             None,
             None,
