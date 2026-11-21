@@ -7970,6 +7970,180 @@
       "title": "Reconcile the seed with the live rows"
     },
     {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-p101-1:T2",
+      "apply_to": "PLATFORM",
+      "artefact": "\u00a710.1",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every laya, checker and eval verdict writes one decision row with rung, answer, versions, input hash and latency, linked to the run step in the same transaction; a test asserts the decision count equals the judged steps and that ladder.list returns the step gate.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "line": 1444,
+              "path": "crates/actions/src/process/step.rs",
+              "quote": "        \"decision\": if verdict.accepted { \"accept\" } else { \"reject\" },",
+              "source": "code"
+            },
+            {
+              "line": 1491,
+              "path": "crates/actions/src/process/step.rs",
+              "quote": "        store::process_judge::set_verdict_tx(&mut tx, tenant, row.id, verdict)",
+              "source": "code"
+            },
+            {
+              "line": 1456,
+              "path": "crates/store/src/process.rs",
+              "quote": "            SET judge = $3, updated_at = now()",
+              "source": "code"
+            }
+          ],
+          "rule": "v1-p101-1",
+          "source": "audit"
+        }
+      ],
+      "key": "v1-p101-1:T2",
+      "owner_project": "T2",
+      "rule": "v1-p101-1",
+      "scope": "T2",
+      "severity": "P1",
+      "spec": "\u00a710.1",
+      "standard": "SPEC",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "\u00a710.1 requires one record per fact; the step judge's accept or reject is persisted only as JSON on run_step.judge, with no decision row, so the per-step choice lives in a store the model does not declare.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "line": 1444,
+                  "path": "crates/actions/src/process/step.rs",
+                  "quote": "        \"decision\": if verdict.accepted { \"accept\" } else { \"reject\" },",
+                  "source": "code"
+                },
+                {
+                  "line": 1491,
+                  "path": "crates/actions/src/process/step.rs",
+                  "quote": "        store::process_judge::set_verdict_tx(&mut tx, tenant, row.id, verdict)",
+                  "source": "code"
+                },
+                {
+                  "line": 1456,
+                  "path": "crates/store/src/process.rs",
+                  "quote": "            SET judge = $3, updated_at = now()",
+                  "source": "code"
+                }
+              ],
+              "rule": "v1-p101-1",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P1",
+          "subject": "T2"
+        }
+      ],
+      "title": "A per-step judge verdict is a second decision store"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-p102-3:T13",
+      "apply_to": "PLATFORM",
+      "artefact": "\u00a710.2",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "One key scheme: key_for returns tenant/<tenant_id>/<document>/<hash>, matching the storage adapter and \u00a711.10; a test asserts both adapters share the tenant prefix and that a key lacking it is refused.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "line": 195,
+              "path": "crates/actions/src/integrations/objects.rs",
+              "quote": "    format!(\"t/{tenant}/{document}/{prefix}\")",
+              "source": "code"
+            },
+            {
+              "line": 27,
+              "path": "crates/actions/src/storage.rs",
+              "quote": "pub const TENANT_PREFIX: &str = \"tenant\";",
+              "source": "code"
+            },
+            {
+              "line": 1504,
+              "path": "docs/SPEC_V2.md",
+              "quote": "enforced by key prefix and bucket policy: a mandatory tenant prefix (`tenant/<tenant_id>/`), project/run prefixes",
+              "source": "code"
+            }
+          ],
+          "rule": "v1-p102-3",
+          "source": "audit"
+        }
+      ],
+      "key": "v1-p102-3:T13",
+      "owner_project": "T13",
+      "rule": "v1-p102-3",
+      "scope": "T13",
+      "severity": "P1",
+      "spec": "\u00a710.2",
+      "standard": "SPEC",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "\u00a711.10 mandates the tenant/tenant_id/ prefix for tenant separation; document bytes are written under t/tenant/ while the job-object adapter writes under tenant/, so one bucket carries two tenant conventions and the policy covers only one.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "line": 195,
+                  "path": "crates/actions/src/integrations/objects.rs",
+                  "quote": "    format!(\"t/{tenant}/{document}/{prefix}\")",
+                  "source": "code"
+                },
+                {
+                  "line": 27,
+                  "path": "crates/actions/src/storage.rs",
+                  "quote": "pub const TENANT_PREFIX: &str = \"tenant\";",
+                  "source": "code"
+                },
+                {
+                  "line": 1504,
+                  "path": "docs/SPEC_V2.md",
+                  "quote": "enforced by key prefix and bucket policy: a mandatory tenant prefix (`tenant/<tenant_id>/`), project/run prefixes",
+                  "source": "code"
+                }
+              ],
+              "rule": "v1-p102-3",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P1",
+          "subject": "T13"
+        }
+      ],
+      "title": "Documents escape the mandated tenant prefix on the shared bucket"
+    },
+    {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-p105-1:PLATFORM",
       "apply_to": "PLATFORM",
       "artefact": "\u00a710.5",
@@ -8295,6 +8469,255 @@
         }
       ],
       "title": "Live Metering screen shows no cost, tool spend or budget utilisation"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-p1110-1:T13",
+      "apply_to": "PLATFORM",
+      "artefact": "\u00a711.10",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "A storage action or broker tool exposes get and put through JobStorage with the tenant prefix, SSE, hash and cap enforced at the call path; a test stores and retrieves a job's object through the action and refuses a cross-tenant key and an oversize object.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "line": 82,
+              "path": "crates/actions/src/storage.rs",
+              "quote": "pub struct JobStorage {",
+              "source": "code"
+            },
+            {
+              "line": 79,
+              "path": "crates/actions/tests/s3_wire.rs",
+              "quote": "    let storage = JobStorage::from_env().expect(",
+              "source": "code"
+            },
+            {
+              "line": 1502,
+              "path": "docs/SPEC_V2.md",
+              "quote": "The conveyor does not depend on `artifact_service` :8556 or `storage-api` :8391 for its own bytes. One storage adapter",
+              "source": "code"
+            }
+          ],
+          "rule": "v1-p1110-1",
+          "source": "audit"
+        }
+      ],
+      "key": "v1-p1110-1:T13",
+      "owner_project": "T13",
+      "rule": "v1-p1110-1",
+      "scope": "T13",
+      "severity": "P1",
+      "spec": "\u00a711.10",
+      "standard": "SPEC",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "\u00a711.10 requires one storage adapter that writes and reads MinIO directly with a tenant prefix, encryption, a content hash and a size cap; JobStorage implements that contract but no registered action, broker tool or toolkit calls it, so a run cannot persist bytes.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "line": 82,
+                  "path": "crates/actions/src/storage.rs",
+                  "quote": "pub struct JobStorage {",
+                  "source": "code"
+                },
+                {
+                  "line": 79,
+                  "path": "crates/actions/tests/s3_wire.rs",
+                  "quote": "    let storage = JobStorage::from_env().expect(",
+                  "source": "code"
+                },
+                {
+                  "line": 1502,
+                  "path": "docs/SPEC_V2.md",
+                  "quote": "The conveyor does not depend on `artifact_service` :8556 or `storage-api` :8391 for its own bytes. One storage adapter",
+                  "source": "code"
+                }
+              ],
+              "rule": "v1-p1110-1",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P1",
+          "subject": "T13"
+        }
+      ],
+      "title": "Job object storage has no live path: JobStorage is test-only"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-p116-1:T13",
+      "apply_to": "PLATFORM",
+      "artefact": "\u00a711.6",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "A missing operation creates a tool-request card naming the operation, the step and the procedure; publishing a tool version rebinds the step; a test ingests such a procedure, asserts the card exists and that the procedure is retryable once the tool is published.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "line": 1445,
+              "path": "docs/SPEC_V2.md",
+              "quote": "3. **Missing operation \u2192 tool request.** A procedure step that needs an operation with no tool opens a tool-request",
+              "source": "code"
+            },
+            {
+              "line": 1114,
+              "path": "crates/actions/src/procedure/ingest.rs",
+              "quote": "                \"sop.cannot_grant_tool\",",
+              "source": "code"
+            }
+          ],
+          "rule": "v1-p116-1",
+          "source": "audit"
+        }
+      ],
+      "key": "v1-p116-1:T13",
+      "owner_project": "T13",
+      "rule": "v1-p116-1",
+      "scope": "T13",
+      "severity": "P1",
+      "spec": "\u00a711.6",
+      "standard": "SPEC",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "\u00a711.6 makes a missing operation a governed path: the procedure step opens a tool-request card, a development job implements and publishes it, and the step is rebound; intake instead refuses the whole source with 422 sop.cannot_grant_tool, and no tool-request action or card type exists.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "line": 1445,
+                  "path": "docs/SPEC_V2.md",
+                  "quote": "3. **Missing operation \u2192 tool request.** A procedure step that needs an operation with no tool opens a tool-request",
+                  "source": "code"
+                },
+                {
+                  "line": 1114,
+                  "path": "crates/actions/src/procedure/ingest.rs",
+                  "quote": "                \"sop.cannot_grant_tool\",",
+                  "source": "code"
+                }
+              ],
+              "rule": "v1-p116-1",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P1",
+          "subject": "T13"
+        }
+      ],
+      "title": "A missing operation dead-ends instead of opening a tool request"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-p119-1:T13",
+      "apply_to": "PLATFORM",
+      "artefact": "\u00a711.9",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "tools.retire unbinds and retires a zero-use tool with an owner decision, and a schema-drift signature opens a kata; a test drives a zero-use window to retirement and a 422 drift to a kata row.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "line": 53,
+              "path": "crates/actions/src/toolkits/usage.rs",
+              "quote": "    /// True when the tool had no call in the window \u2014 the retirement flag.",
+              "source": "code"
+            },
+            {
+              "line": 1497,
+              "path": "docs/SPEC_V2.md",
+              "quote": "in-flight runs finish. A tool with zero calls over one programme cycle is flagged and retired (P10). A schema-drift",
+              "source": "code"
+            },
+            {
+              "line": 314,
+              "path": "crates/actions/src/broker.rs",
+              "quote": "                422 => \"check_failed\",",
+              "source": "code"
+            }
+          ],
+          "rule": "v1-p119-1",
+          "source": "audit"
+        }
+      ],
+      "key": "v1-p119-1:T13",
+      "owner_project": "T13",
+      "rule": "v1-p119-1",
+      "scope": "T13",
+      "severity": "P1",
+      "spec": "\u00a711.9",
+      "standard": "SPEC",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "\u00a711.9 requires a zero-call tool to be retired over a cycle and a schema-drift signature to open a kata; tools.usage computes zero_use and nothing consumes it, there is no tools.retire action, and a backend 422 is ledgered as check_failed.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "line": 53,
+                  "path": "crates/actions/src/toolkits/usage.rs",
+                  "quote": "    /// True when the tool had no call in the window \u2014 the retirement flag.",
+                  "source": "code"
+                },
+                {
+                  "line": 1497,
+                  "path": "docs/SPEC_V2.md",
+                  "quote": "in-flight runs finish. A tool with zero calls over one programme cycle is flagged and retired (P10). A schema-drift",
+                  "source": "code"
+                },
+                {
+                  "line": 314,
+                  "path": "crates/actions/src/broker.rs",
+                  "quote": "                422 => \"check_failed\",",
+                  "source": "code"
+                }
+              ],
+              "rule": "v1-p119-1",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P1",
+          "subject": "T13"
+        }
+      ],
+      "title": "Zero-use tools are flagged but never retired, and a schema drift opens no kata"
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-p42-1:T0",
@@ -8909,6 +9332,180 @@
       "title": "Five of the seven project types have no catalogue row"
     },
     {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-p61-1:T3",
+      "apply_to": "PLATFORM",
+      "artefact": "\u00a76.1",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "plan_project refuses with 409 change_request_required when an approved baseline of that kind exists unless an approved change naming it is supplied, and refuses the duplicate WBS; a test re-calls pm.plan and projects.baseline after approval and asserts the refusal, and both paths share one guard.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "line": 560,
+              "path": "crates/actions/src/pm/mod.rs",
+              "quote": "        store::spine::take_baseline_tx(&mut *tx, ctx.tenant, project_id, &kind, ctx.actor_id, None)",
+              "source": "code"
+            },
+            {
+              "line": 1347,
+              "path": "crates/actions/src/spine/mod.rs",
+              "quote": "                    \"project {project_id} already holds an approved {kind} baseline ({}); a new \\",
+              "source": "code"
+            },
+            {
+              "line": 536,
+              "path": "docs/SPEC_V2.md",
+              "quote": "| **Never** | approve its own gates; change an approved baseline without a change request; do the work of a delivery job |",
+              "source": "code"
+            }
+          ],
+          "rule": "v1-p61-1",
+          "source": "audit"
+        }
+      ],
+      "key": "v1-p61-1:T3",
+      "owner_project": "T3",
+      "rule": "v1-p61-1",
+      "scope": "T3",
+      "severity": "P1",
+      "spec": "\u00a76.1",
+      "standard": "SPEC",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "\u00a76.1 says the PM never changes an approved baseline without a change request, but plan_project calls the store's take_baseline_tx with change_id None, bypassing the guarded baselines.take action; a second call also duplicates the WBS.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "line": 560,
+                  "path": "crates/actions/src/pm/mod.rs",
+                  "quote": "        store::spine::take_baseline_tx(&mut *tx, ctx.tenant, project_id, &kind, ctx.actor_id, None)",
+                  "source": "code"
+                },
+                {
+                  "line": 1347,
+                  "path": "crates/actions/src/spine/mod.rs",
+                  "quote": "                    \"project {project_id} already holds an approved {kind} baseline ({}); a new \\",
+                  "source": "code"
+                },
+                {
+                  "line": 536,
+                  "path": "docs/SPEC_V2.md",
+                  "quote": "| **Never** | approve its own gates; change an approved baseline without a change request; do the work of a delivery job |",
+                  "source": "code"
+                }
+              ],
+              "rule": "v1-p61-1",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P1",
+          "subject": "T3"
+        }
+      ],
+      "title": "pm.plan replaces an approved baseline without a change request"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-p66-1:T0",
+      "apply_to": "PLATFORM",
+      "artefact": "\u00a76.6",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "A handoff action (cards.assign, or a binding on create) requires an active job_binding_id plus artefact ids and acceptance criteria, writes card.job_binding_id, emits an event and is exposed on CardOut; moving a delivery card into a work lane without a binding is refused 422; a test proves the binding reaches the run.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "line": 2,
+              "path": "crates/actions/src/board/cards.rs",
+              "quote": "//! `cards.create` \u00b7 `.get` \u00b7 `.update` \u00b7 `.move` \u00b7 `.archive` \u00b7 `.unarchive` \u00b7 `.duplicate`",
+              "source": "code"
+            },
+            {
+              "line": 203,
+              "path": "migrations/0040_organisation.sql",
+              "quote": "    ADD COLUMN job_binding_id uuid,",
+              "source": "code"
+            },
+            {
+              "line": 614,
+              "path": "docs/SPEC_V2.md",
+              "quote": "2. **A handoff is an action** (`cards.assign` / `cards.move` + `comment`/`artifact.attach`) producing an `event`.",
+              "source": "code"
+            }
+          ],
+          "rule": "v1-p66-1",
+          "source": "audit"
+        }
+      ],
+      "key": "v1-p66-1:T0",
+      "owner_project": "T0",
+      "rule": "v1-p66-1",
+      "scope": "T0",
+      "severity": "P1",
+      "spec": "\u00a76.6",
+      "standard": "SPEC",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "\u00a76.6 requires a handoff card to name its job binding, inputs and acceptance and to be produced by cards.assign or cards.move with a comment; card.job_binding_id exists in the schema but no code writes or reads it and cards.assign does not exist.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "line": 2,
+                  "path": "crates/actions/src/board/cards.rs",
+                  "quote": "//! `cards.create` \u00b7 `.get` \u00b7 `.update` \u00b7 `.move` \u00b7 `.archive` \u00b7 `.unarchive` \u00b7 `.duplicate`",
+                  "source": "code"
+                },
+                {
+                  "line": 203,
+                  "path": "migrations/0040_organisation.sql",
+                  "quote": "    ADD COLUMN job_binding_id uuid,",
+                  "source": "code"
+                },
+                {
+                  "line": 614,
+                  "path": "docs/SPEC_V2.md",
+                  "quote": "2. **A handoff is an action** (`cards.assign` / `cards.move` + `comment`/`artifact.attach`) producing an `event`.",
+                  "source": "code"
+                }
+              ],
+              "rule": "v1-p66-1",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P1",
+          "subject": "T0"
+        }
+      ],
+      "title": "A handoff is not expressible: no cards.assign and no binding on a card"
+    },
+    {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-p75-2:T11",
       "apply_to": "T11",
       "artefact": "\u00a77.5",
@@ -9207,6 +9804,180 @@
         }
       ],
       "title": "Reconciliation compares conveyor to itself; billing_service is never read"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-p76-1:PLATFORM",
+      "apply_to": "PLATFORM",
+      "artefact": "\u00a77.6",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every run-start seam either resolves capability_id, including workflow and generic runs, or runs the same readiness check; a test starts a workflow run against a required unpublished pack and asserts the refusal with zero run rows and zero model calls.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "line": 203,
+              "path": "crates/actions/src/workflow/runs.rs",
+              "quote": "        capability_id: None,",
+              "source": "code"
+            },
+            {
+              "line": 184,
+              "path": "crates/actions/src/process/runs.rs",
+              "quote": "    let readiness = crate::capability::readiness::capability_readiness_tx(",
+              "source": "code"
+            },
+            {
+              "line": 161,
+              "path": "crates/store/src/prompt.rs",
+              "quote": "    if let Some(capability_id) = capability_id {",
+              "source": "code"
+            }
+          ],
+          "rule": "v1-p76-1",
+          "source": "audit"
+        }
+      ],
+      "key": "v1-p76-1:PLATFORM",
+      "owner_project": "PLATFORM",
+      "rule": "v1-p76-1",
+      "scope": "PLATFORM",
+      "severity": "P1",
+      "spec": "\u00a77.6",
+      "standard": "SPEC",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The only readiness call is in process_runs.start; workflow_runs.start and runs.create insert runs with capability_id None, so \u00a77.6's required-pack block never runs there and the compile receives no capability or knowledge facts.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "line": 203,
+                  "path": "crates/actions/src/workflow/runs.rs",
+                  "quote": "        capability_id: None,",
+                  "source": "code"
+                },
+                {
+                  "line": 184,
+                  "path": "crates/actions/src/process/runs.rs",
+                  "quote": "    let readiness = crate::capability::readiness::capability_readiness_tx(",
+                  "source": "code"
+                },
+                {
+                  "line": 161,
+                  "path": "crates/store/src/prompt.rs",
+                  "quote": "    if let Some(capability_id) = capability_id {",
+                  "source": "code"
+                }
+              ],
+              "rule": "v1-p76-1",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P1",
+          "subject": "PLATFORM"
+        }
+      ],
+      "title": "Workflow and generic runs bypass the required-knowledge readiness guard"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-p77-1:PLATFORM",
+      "apply_to": "PLATFORM",
+      "artefact": "\u00a77.7",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Creating or activating an internal_agent without a resolvable prompt_ref is refused, readiness blocks it and agent.run cannot call a model without compiled text; a test proves a NULL prompt_ref yields zero calls and every internal_agent call carries a 64-hex prompt hash.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "line": 463,
+              "path": "crates/actions/src/workflow/agent.rs",
+              "quote": "    if let Some(reference) = record.prompt_ref.as_deref() {",
+              "source": "code"
+            },
+            {
+              "line": 184,
+              "path": "crates/actions/src/capability/readiness.rs",
+              "quote": "    if let Some(reference) = agent.prompt_ref.as_deref()",
+              "source": "code"
+            },
+            {
+              "line": 192,
+              "path": "crates/domain/src/capability.rs",
+              "quote": "    /// A built-in `<name>@<version>`, or `None` to use the action's default.",
+              "source": "code"
+            }
+          ],
+          "rule": "v1-p77-1",
+          "source": "audit"
+        }
+      ],
+      "key": "v1-p77-1:PLATFORM",
+      "owner_project": "PLATFORM",
+      "rule": "v1-p77-1",
+      "scope": "PLATFORM",
+      "severity": "P1",
+      "spec": "\u00a77.7",
+      "standard": "SPEC",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "\u00a77.7 requires every prompt to be compiled at run time from the run's sources with a recorded hash; agent.run compiles only when prompt_ref is Some, readiness skips the check when it is None, and the domain claims a default that does not exist.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "line": 463,
+                  "path": "crates/actions/src/workflow/agent.rs",
+                  "quote": "    if let Some(reference) = record.prompt_ref.as_deref() {",
+                  "source": "code"
+                },
+                {
+                  "line": 184,
+                  "path": "crates/actions/src/capability/readiness.rs",
+                  "quote": "    if let Some(reference) = agent.prompt_ref.as_deref()",
+                  "source": "code"
+                },
+                {
+                  "line": 192,
+                  "path": "crates/domain/src/capability.rs",
+                  "quote": "    /// A built-in `<name>@<version>`, or `None` to use the action's default.",
+                  "source": "code"
+                }
+              ],
+              "rule": "v1-p77-1",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P1",
+          "subject": "PLATFORM"
+        }
+      ],
+      "title": "A run can call a model with no compiled prompt and a NULL prompt hash"
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-p91-1:T6",
@@ -19177,6 +19948,180 @@
       "title": "Reconcile the project's status source"
     },
     {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-p102-1:T2",
+      "apply_to": "PLATFORM",
+      "artefact": "\u00a710.2",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "laya dispatch uses min(config timeout, 3000 ms) with a 1500 ms default; a stalled fake laya test asserts abandonment within 3 seconds and records the unavailable outcome under the decision policy.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "line": 273,
+              "path": "crates/actions/src/process/judge.rs",
+              "quote": "        timeout_ms: 30_000,",
+              "source": "code"
+            },
+            {
+              "line": 955,
+              "path": "crates/actions/src/invoke.rs",
+              "quote": "    match tokio::time::timeout(Duration::from_millis(u64::from(spec.timeout_ms)), work).await {",
+              "source": "code"
+            },
+            {
+              "line": 1129,
+              "path": "docs/SPEC_V2.md",
+              "quote": "| conveyor \u2192 laya | `POST /v1/systemone`, 1500 ms default / 3 s hard budget; fail policy per decision policy |",
+              "source": "code"
+            }
+          ],
+          "rule": "v1-p102-1",
+          "source": "audit"
+        }
+      ],
+      "key": "v1-p102-1:T2",
+      "owner_project": "T2",
+      "rule": "v1-p102-1",
+      "scope": "T2",
+      "severity": "P2",
+      "spec": "\u00a710.2",
+      "standard": "SPEC",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "\u00a710.2 fixes the conveyor-to-laya seam at a 1500 ms default with a 3 s hard budget; the only laya action declares a 30 s timeout and the invoker enforces that value, so no 1500 or 3000 ms constant exists.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "line": 273,
+                  "path": "crates/actions/src/process/judge.rs",
+                  "quote": "        timeout_ms: 30_000,",
+                  "source": "code"
+                },
+                {
+                  "line": 955,
+                  "path": "crates/actions/src/invoke.rs",
+                  "quote": "    match tokio::time::timeout(Duration::from_millis(u64::from(spec.timeout_ms)), work).await {",
+                  "source": "code"
+                },
+                {
+                  "line": 1129,
+                  "path": "docs/SPEC_V2.md",
+                  "quote": "| conveyor \u2192 laya | `POST /v1/systemone`, 1500 ms default / 3 s hard budget; fail policy per decision policy |",
+                  "source": "code"
+                }
+              ],
+              "rule": "v1-p102-1",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "T2"
+        }
+      ],
+      "title": "laya's 3 second hard budget is enforced as 30 seconds"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-p102-2:T7",
+      "apply_to": "T7",
+      "artefact": "\u00a710.2",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Kubernetes verbs are toolkit operations bound per tenant and dispatched through the broker with one tool_call row each and the namespace taken from the binding; a test asserts the ledger row and the refusal of an out-of-binding namespace.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "line": 44,
+              "path": "crates/actions/src/ops/reads.rs",
+              "quote": "    let client = client()?;",
+              "source": "code"
+            },
+            {
+              "line": 24,
+              "path": "crates/actions/src/ops/mod.rs",
+              "quote": "//! **The credential is the worker's.** `conveyor-worker` is the only pod template that",
+              "source": "code"
+            },
+            {
+              "line": 1133,
+              "path": "docs/SPEC_V2.md",
+              "quote": "| conveyor \u2192 k8s | the ops toolkit through the broker: namespace-scoped service account; read/write verbs declared as tools with effect classes (\u00a711.4) |",
+              "source": "code"
+            }
+          ],
+          "rule": "v1-p102-2",
+          "source": "audit"
+        }
+      ],
+      "key": "v1-p102-2:T7",
+      "owner_project": "T7",
+      "rule": "v1-p102-2",
+      "scope": "T7",
+      "severity": "P2",
+      "spec": "\u00a710.2",
+      "standard": "SPEC",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "\u00a710.2 sends conveyor-to-k8s traffic through the ops toolkit and the broker with declared effect classes; ops actions build a client from the worker's service-account token and call the API inside the action, and no ops toolkit manifest exists.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "line": 44,
+                  "path": "crates/actions/src/ops/reads.rs",
+                  "quote": "    let client = client()?;",
+                  "source": "code"
+                },
+                {
+                  "line": 24,
+                  "path": "crates/actions/src/ops/mod.rs",
+                  "quote": "//! **The credential is the worker's.** `conveyor-worker` is the only pod template that",
+                  "source": "code"
+                },
+                {
+                  "line": 1133,
+                  "path": "docs/SPEC_V2.md",
+                  "quote": "| conveyor \u2192 k8s | the ops toolkit through the broker: namespace-scoped service account; read/write verbs declared as tools with effect classes (\u00a711.4) |",
+                  "source": "code"
+                }
+              ],
+              "rule": "v1-p102-2",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "T7"
+        }
+      ],
+      "title": "Kubernetes is reached directly from ops actions, not through the broker"
+    },
+    {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-p105-6:PLATFORM",
       "apply_to": "PLATFORM",
       "artefact": "\u00a710.5",
@@ -19666,6 +20611,93 @@
       "title": "The authoring pipeline is an inline converter call, not a procedure job"
     },
     {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-p61-2:T3",
+      "apply_to": "PLATFORM",
+      "artefact": "\u00a76.1",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "A pm.status action writes or returns a report with the PM's status narrative scoped to the project, WBS and gates, backed by a status-report asset kind or a documented non-asset contract; a test asserts the report cites the live baseline and gate set.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "line": 533,
+              "path": "docs/SPEC_V2.md",
+              "quote": "| **Outputs** | project + charter, WBS, baseline, cards with job bindings, gate decisions, status report, closure record |",
+              "source": "code"
+            },
+            {
+              "line": 822,
+              "path": "crates/actions/src/pm/mod.rs",
+              "quote": "/// `pm.get` \u2014 the PM's view: project, charter, WBS, baselines and gates.",
+              "source": "code"
+            },
+            {
+              "line": 59,
+              "path": "crates/domain/src/governance.rs",
+              "quote": "    pub const ALL: [AssetKind; 15] = [",
+              "source": "code"
+            }
+          ],
+          "rule": "v1-p61-2",
+          "source": "audit"
+        }
+      ],
+      "key": "v1-p61-2:T3",
+      "owner_project": "T3",
+      "rule": "v1-p61-2",
+      "scope": "T3",
+      "severity": "P2",
+      "spec": "\u00a76.1",
+      "standard": "SPEC",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "\u00a76.1 lists a status report and an LLM status narrative as PM outputs; no action, asset kind or console surface produces one, and pm.get is a raw read of the project, charter, WBS, baselines and gates.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "line": 533,
+                  "path": "docs/SPEC_V2.md",
+                  "quote": "| **Outputs** | project + charter, WBS, baseline, cards with job bindings, gate decisions, status report, closure record |",
+                  "source": "code"
+                },
+                {
+                  "line": 822,
+                  "path": "crates/actions/src/pm/mod.rs",
+                  "quote": "/// `pm.get` \u2014 the PM's view: project, charter, WBS, baselines and gates.",
+                  "source": "code"
+                },
+                {
+                  "line": 59,
+                  "path": "crates/domain/src/governance.rs",
+                  "quote": "    pub const ALL: [AssetKind; 15] = [",
+                  "source": "code"
+                }
+              ],
+              "rule": "v1-p61-2",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "T3"
+        }
+      ],
+      "title": "The PM's status report output has no producer"
+    },
+    {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-p75-6:T11",
       "apply_to": "T11",
       "artefact": "\u00a77.5",
@@ -19739,6 +20771,180 @@
         }
       ],
       "title": "Unpriced calls become zero in the billing/reconciliation figure"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-p76-2:PLATFORM",
+      "apply_to": "PLATFORM",
+      "artefact": "\u00a77.6",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "The hot query or recall excludes kind digest; a test consolidates a card and asserts the hot list carries no digest row or body and that the digest is read only from the cold store.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "line": 346,
+              "path": "crates/store/src/memory.rs",
+              "quote": "         VALUES ($1, $2, $3, 'digest', 'system', $4, now(), $5)",
+              "source": "code"
+            },
+            {
+              "line": 229,
+              "path": "crates/store/src/memory.rs",
+              "quote": "          WHERE tenant_id = $1 AND card_id = $2",
+              "source": "code"
+            },
+            {
+              "line": 20,
+              "path": "crates/actions/src/memory/mod.rs",
+              "quote": "/// One memory row as an action returns it. Never carries a digest body: that is read from strata.",
+              "source": "code"
+            }
+          ],
+          "rule": "v1-p76-2",
+          "source": "audit"
+        }
+      ],
+      "key": "v1-p76-2:PLATFORM",
+      "owner_project": "PLATFORM",
+      "rule": "v1-p76-2",
+      "scope": "PLATFORM",
+      "severity": "P2",
+      "spec": "\u00a77.6",
+      "standard": "SPEC",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "\u00a77.6 separates hot rows from the cold digest; consolidation writes the digest into work_package_memory as kind digest and the hot query has no kind filter, so recall returns a derived digest body as a hot row.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "line": 346,
+                  "path": "crates/store/src/memory.rs",
+                  "quote": "         VALUES ($1, $2, $3, 'digest', 'system', $4, now(), $5)",
+                  "source": "code"
+                },
+                {
+                  "line": 229,
+                  "path": "crates/store/src/memory.rs",
+                  "quote": "          WHERE tenant_id = $1 AND card_id = $2",
+                  "source": "code"
+                },
+                {
+                  "line": 20,
+                  "path": "crates/actions/src/memory/mod.rs",
+                  "quote": "/// One memory row as an action returns it. Never carries a digest body: that is read from strata.",
+                  "source": "code"
+                }
+              ],
+              "rule": "v1-p76-2",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "PLATFORM"
+        }
+      ],
+      "title": "memory.recall serves the consolidated digest inside the hot rows"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-p77-2:PLATFORM",
+      "apply_to": "PLATFORM",
+      "artefact": "\u00a77.7",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "An action can set and version prompt.budget_chars and prompt_section.budget_chars; with a tight ceiling the compile refuses with the measured size over the limit and makes no model call; a test sets a ceiling and asserts the refusal.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "line": 1272,
+              "path": "crates/store/src/seed.rs",
+              "quote": "            \"INSERT INTO prompt (tenant_id, key, version, status, title)",
+              "source": "code"
+            },
+            {
+              "line": 1289,
+              "path": "crates/store/src/seed.rs",
+              "quote": "                     (tenant_id, prompt_id, position, source_kind, required, template)",
+              "source": "code"
+            },
+            {
+              "line": 9,
+              "path": "migrations/0031_s21_prompt_budget.sql",
+              "quote": "--      what every seeded recipe stays \u2014 the mechanism is opt-in until a recipe names a ceiling.",
+              "source": "code"
+            }
+          ],
+          "rule": "v1-p77-2",
+          "source": "audit"
+        }
+      ],
+      "key": "v1-p77-2:PLATFORM",
+      "owner_project": "PLATFORM",
+      "rule": "v1-p77-2",
+      "scope": "PLATFORM",
+      "severity": "P2",
+      "spec": "\u00a77.7",
+      "standard": "SPEC",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "\u00a77.7 requires compiled prompts with character budgets and a measured refusal over budget; both seed inserts omit budget_chars and no action writes the column, so every recipe stays unbounded.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "line": 1272,
+                  "path": "crates/store/src/seed.rs",
+                  "quote": "            \"INSERT INTO prompt (tenant_id, key, version, status, title)",
+                  "source": "code"
+                },
+                {
+                  "line": 1289,
+                  "path": "crates/store/src/seed.rs",
+                  "quote": "                     (tenant_id, prompt_id, position, source_kind, required, template)",
+                  "source": "code"
+                },
+                {
+                  "line": 9,
+                  "path": "migrations/0031_s21_prompt_budget.sql",
+                  "quote": "--      what every seeded recipe stays \u2014 the mechanism is opt-in until a recipe names a ceiling.",
+                  "source": "code"
+                }
+              ],
+              "rule": "v1-p77-2",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "PLATFORM"
+        }
+      ],
+      "title": "Prompt character budgets cannot be written, so the over-budget refusal is unreachable"
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-pack-2:PLATFORM",
@@ -27890,12 +29096,12 @@
       "suppressed": 0
     },
     "SPEC": {
-      "findings": 67,
+      "findings": 81,
       "gaps": 38,
       "p0": 0,
       "p1": 5,
       "p2": 33,
-      "packages": 88,
+      "packages": 102,
       "rules": 8,
       "rules_clean": 2,
       "rules_with_gaps": 6,
@@ -27918,25 +29124,25 @@
   "summary": {
     "by_severity": {
       "P0": 27,
-      "P1": 135,
-      "P2": 148
+      "P1": 144,
+      "P2": 153
     },
     "by_standard": {
       "MSP": 66,
       "PMP": 49,
       "SAFe": 16,
-      "SPEC": 88,
+      "SPEC": 102,
       "TOGAF": 91
     },
     "by_status": {
-      "open": 307,
+      "open": 321,
       "suppressed": 3
     },
     "duplicates": 0,
-    "open": 307,
-    "packages": 310,
+    "open": 321,
+    "packages": 324,
     "resolved": 11,
-    "subjects": 408,
+    "subjects": 422,
     "suppressed": 3
   }
 }
