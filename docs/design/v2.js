@@ -630,15 +630,28 @@ window.installV2 = function (api, enterprise) {
             cadences: cs.msp.cadences,
             wbs_nodes: cs.msp.wbs,
             tranche_reviews: cs.msp.reviews,
+            register_items: cs.msp.registers,
+            project_baselines: cs.msp.baselines,
           }
         : {},
-      architecture: {},
+      // Signed in, the ADM capability is the console's own reads (`consoleLoadAdm`); it is
+      // loaded by the delivery page rather than invented here. Until it lands the rails say
+      // what is true at that moment — no profile yet — and the load re-renders.
+      architecture: {
+        profiles: cs.adm.profile.data ? [cs.adm.profile.data] : [],
+        standard: cs.adm.standard.items,
+        contracts: cs.adm.contracts.items,
+        board: cs.adm.boards.items,
+        maturity: cs.adm.maturity.items,
+        skills: cs.adm.skills.items,
+      },
       generated_at: null,
     };
   }
 
   function deliveryTimeline() {
     const D = deliveryPack();
+    if (consoleOn()) consoleLoadAdm();
     const data = deliveryData();
     if (!D || !data) {
       return panel(
@@ -690,6 +703,22 @@ window.installV2 = function (api, enterprise) {
             projects.length - projectFlight
           }</b> completed</span>`
     }<span>${E(spend)}</span></div>`;
+    // Signed in, the console loads a project's board on demand; a project whose board has not
+    // loaded has no observed event to draw yet. Say so, and offer the one action that loads them.
+    const pendingBoards = consoleOn()
+      ? consoleProjects().filter((project) => !cs.byProject[project.id]).length
+      : 0;
+    const boardsNote = pendingBoards
+      ? `<div class="delivery-crumb"><span class="muted">${pendingBoards} project${
+          pendingBoards === 1 ? "'s board is" : "s' boards are"
+        } not loaded yet, so their activity is not drawn.</span>${button(
+          "Load boards",
+          "programme-load-boards",
+          "",
+          "small",
+          "board",
+        )}</div>`
+      : "";
     const head = view
       ? `<div class="delivery-crumb"><a class="gantt-name" href="#portfolio">← Portfolio</a><span class="muted">${E(
           view.programme ? view.programme.name : "Programme",
@@ -697,7 +726,7 @@ window.installV2 = function (api, enterprise) {
           view.artefacts,
         )}${D.benefitRail(view.artefacts)}${D.governanceLine(view.artefacts, data.architecture)}`
       : "";
-    const body = `${head}${summary}${D.gantt(linked, {
+    const body = `${head}${boardsNote}${summary}${D.gantt(linked, {
       label: view ? "Project · MSP tranche" : "Programme / initiative",
       emptyNote: view
         ? "This programme has no project in the published snapshot."
@@ -716,6 +745,7 @@ window.installV2 = function (api, enterprise) {
 
   function deliveryBoard(project) {
     const D = deliveryPack();
+    if (consoleOn()) consoleLoadAdm();
     const data = deliveryData();
     if (!D || !data) {
       return panel(

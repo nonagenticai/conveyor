@@ -955,6 +955,19 @@ const SNAPSHOT = {
         list_changed_at: "2026-11-16T00:00:00Z",
         archived_at: null,
       },
+      // #528: an archived child that is still in an active lane. It must render once, in the
+      // Archived column — never also in its old lane (and the tile must count it as done).
+      {
+        id: "77777777-7777-7777-8777-777777777773",
+        board_id: "44444444-4444-7444-8444-444444444444",
+        list_id: "55555555-5555-7555-8555-555555555551",
+        card_type_id: "ct-delivery",
+        name: "Child three",
+        parent_card_id: "66666666-6666-7666-8666-666666666666",
+        created_at: "2026-11-12T00:00:00Z",
+        list_changed_at: "2026-11-13T00:00:00Z",
+        archived_at: "2026-11-18T00:00:00Z",
+      },
       {
         id: "88888888-8888-7888-8888-888888888888",
         board_id: "44444444-4444-7444-8444-444444444444",
@@ -3187,7 +3200,7 @@ function readBody(req, done) {
       await page.waitForTimeout(300);
       const boardText = await page.locator("#main").innerText();
       assert.match(boardText, /Work package Alpha/, "the work-package tile renders");
-      assert.match(boardText, /WORK PACKAGE · 2/, "the tile carries its child count");
+      assert.match(boardText, /WORK PACKAGE · 3/, "the tile carries its child count");
       assert.match(boardText, /Loose card/, "a card with no children renders as a card");
       assert.match(boardText, /Archived card/, "an archived card stays visible");
       assert.match(boardText, /delivery_contract/, "the TOGAF contract is on the project record");
@@ -3213,12 +3226,28 @@ function readBody(req, done) {
       const packageText = await page.locator("#main").innerText();
       assert.match(packageText, /Child one/, "the work package's first child renders");
       assert.match(packageText, /Child two/, "the work package's second child renders");
-      assert.match(packageText, /1\/2 cards done/, "the work package shows its progress");
+      assert.match(packageText, /2\/3 cards done/, "the work package shows its progress");
       assert.match(packageText, /execution/i, "the work package shows its execution");
       assert.match(packageText, /delivery\.review/, "the card's gate is shown");
       assert.match(packageText, /2 decisions/, "the gate's required decisions are shown");
       assert.match(packageText, /READY: the card is scoped/, "the Definition of Done is shown");
       assert.match(packageText, /1 run/, "the card's run is shown");
+      assert.match(packageText, /Child three/, "an archived child renders");
+      assert.equal(
+        (packageText.match(/Child three/g) || []).length,
+        1,
+        "an archived child renders once (Archived column, not also its old lane)",
+      );
+      assert.equal(
+        await page.locator('#main .kanban-col[data-lane="active"] .kanban-card').count(),
+        1,
+        "the archived child is not repeated in its previous lane",
+      );
+      assert.equal(
+        await page.locator('#main .kanban-col[data-lane="archived"] .kanban-card').count(),
+        1,
+        "the archived child has its own column",
+      );
       assert.ok(
         (await page.locator('#main a[href="#projects/22222222-2222-7222-8222-222222222222"]').count()) >= 1,
         "the work package links back to the project board",

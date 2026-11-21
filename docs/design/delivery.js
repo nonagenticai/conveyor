@@ -680,8 +680,9 @@ window.CONVEYOR_DELIVERY = (function () {
     const archived = all.filter((card) => card.archived_at);
     const openIds = new Set(open.map((card) => card.id));
     const children = new Map();
-    open.forEach((card) => {
-      // A child whose parent is archived or absent is a loose card, not an orphan tile.
+    // Children include archived ones: a work package's progress counts the child that is done.
+    // A child whose parent is archived or absent is a loose card, not an orphan tile.
+    all.forEach((card) => {
       if (!card.parent_card_id || !openIds.has(card.parent_card_id)) return;
       if (!children.has(card.parent_card_id)) children.set(card.parent_card_id, []);
       children.get(card.parent_card_id).push(card);
@@ -872,16 +873,16 @@ window.CONVEYOR_DELIVERY = (function () {
       return `<div class="kanban-wrap">${head}${execution}<div class="kanban-empty muted">No child cards. This work package's execution is above; a child card would appear in its lane here.</div></div>`;
     }
     const lanes = model.lanes.filter((lane) => lane.kind !== "archive");
+    const live = model.children.filter((card) => !card.archived_at);
     const columns = lanes.map((lane) => {
-      const cards = model.children.filter((card) => card.list_id === lane.id).sort(byPosition);
+      const cards = live.filter((card) => card.list_id === lane.id).sort(byPosition);
       return `<section class="kanban-col" data-lane="${esc(lane.kind)}">
         <header><span>${esc(lane.name)}</span><b>${cards.length}</b></header>
         <div class="kanban-cards">${cards.map((card) => packageTile(card, model)).join("")}</div>
       </section>`;
     });
-    const orphan = model.children.filter(
-      (card) => !lanes.some((lane) => lane.id === card.list_id),
-    );
+    // An archived child renders once, in the Archived column — never also in its old lane.
+    const orphan = live.filter((card) => !lanes.some((lane) => lane.id === card.list_id));
     const archived = model.children.filter((card) => card.archived_at);
     if (orphan.length) {
       columns.push(`<section class="kanban-col" data-lane="unknown"><header><span>No lane</span><b>${orphan.length}</b></header><div class="kanban-cards">${orphan
