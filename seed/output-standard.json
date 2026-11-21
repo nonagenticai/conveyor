@@ -32,7 +32,11 @@
     "compliance-review",
     "waiver",
     "maturity-assessment",
-    "skills-assessment"
+    "skills-assessment",
+    "pi-plan",
+    "pi-objectives",
+    "system-demo",
+    "inspect-adapt"
   ],
   "aliases": {
     "brief": "project-brief",
@@ -76,7 +80,11 @@
         "adm-profile",
         "artifact-standard",
         "maturity-assessment",
-        "skills-assessment"
+        "skills-assessment",
+        "pi-plan",
+        "pi-objectives",
+        "system-demo",
+        "inspect-adapt"
       ],
       "closure": []
     },
@@ -542,6 +550,57 @@
       ],
       "optional": [],
       "skeleton": "# Architecture skills assessment\n\nThe seven-category skills baseline per role, with proficiency and development milestones.\n\n## Categories\n\nGeneral; business skills and methods; architecture skills; programme and project management; general IT knowledge; technical IT skills; legal environment.\n\n## Proficiency by role\n\nEach role's proficiency per category, with the evidence.\n\n## Baseline\n\nThe dated baseline and its scope.\n\n## Development milestones\n\nThe development plan and the milestones a review can measure.\n"
+    },
+    "pi-plan": {
+      "required": [
+        "Objectives",
+        "Plan",
+        "WSJF order",
+        "Capacity and WIP",
+        "Evidence"
+      ],
+      "optional": [
+        "Dependencies",
+        "Links"
+      ],
+      "skeleton": "# PI plan\n\nThe plan for one programme increment: the deliverables selected from the backlog, ordered by WSJF, within the WIP limit.\n\n## Objectives\n\nThe PI objectives this plan is judged against, with their planned business value.\n\n## Plan\n\nThe deliverables materialised for this increment, one per WBS node, with their project and acceptance.\n\n## WSJF order\n\nThe four typed inputs per candidate — business value, time criticality, risk reduction and job size — in the order the plan takes them. The score is computed, never stored.\n\n## Capacity and WIP\n\nThe capacity the plan is bounded by and the WIP limit it respects.\n\n## Evidence\n\nThe backlog rows, the cadence row and the approval that made this the plan.\n\n## Dependencies\n\nThe cross-project dependencies the order is constrained by.\n\n## Links\n\nThe cadence, the objectives and the tranche this plan belongs to.\n"
+    },
+    "pi-objectives": {
+      "required": [
+        "Objectives",
+        "Business value",
+        "Measurement",
+        "Evidence"
+      ],
+      "optional": [
+        "Risks",
+        "Links"
+      ],
+      "skeleton": "# PI objectives\n\nThe objectives for one programme increment, planned before delivery and assessed at its close.\n\n## Objectives\n\nEach objective, in outcome form: what is true after the increment that is not true now.\n\n## Business value\n\nThe planned business value per objective, typed as an integer; the actual value is recorded at the close.\n\n## Measurement\n\nHow each objective is judged: the acceptance manifest, the evidence and the check that decides it.\n\n## Evidence\n\nThe verification runs and the records that support the assessment.\n\n## Risks\n\nThe objectives at risk and what would move them.\n\n## Links\n\nThe PI plan, the tranche review and the project records.\n"
+    },
+    "system-demo": {
+      "required": [
+        "Demonstrated",
+        "Evidence",
+        "Credits",
+        "Findings"
+      ],
+      "optional": [
+        "Links"
+      ],
+      "skeleton": "# System demo\n\nThe demo record for one programme increment: every completed deliverable exhibits its evidence. No demo, no credit.\n\n## Demonstrated\n\nEach completed deliverable presented, with its project and the outcome it evidences.\n\n## Evidence\n\nThe evidence each deliverable exhibited: the acceptance manifest run, the published output and the record.\n\n## Credits\n\nThe demo credits recorded per accepted deliverable, copied from the deliverable's evidence.\n\n## Findings\n\nWhat the demo exposed: defects, gaps and follow-ups, with owners.\n\n## Links\n\nThe cadence row, the deliverables and the tranche review.\n"
+    },
+    "inspect-adapt": {
+      "required": [
+        "What went well",
+        "What did not",
+        "Lessons",
+        "Actions"
+      ],
+      "optional": [
+        "Links"
+      ],
+      "skeleton": "# Inspect and adapt\n\nThe retro record for one programme increment: what the evidence showed, the lessons it produced and the actions it set.\n\n## What went well\n\nThe practices and decisions the evidence supports keeping.\n\n## What did not\n\nThe failures, delays and bypasses the evidence exposed, named plainly.\n\n## Lessons\n\nOne lesson per finding, as the organisational-memory record; a retro with no lessons is refused.\n\n## Actions\n\nThe actions, owners and dates that follow from the lessons.\n\n## Links\n\nThe retro cadence, the lessons and the tranche review.\n"
     }
   }
 }

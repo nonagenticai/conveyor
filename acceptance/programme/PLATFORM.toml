@@ -32,3 +32,21 @@ gates={g.get("gate"):g.get("status") for g in o.get("gates",[])}
 assert gates.get("charter")=="approved", gates
 '
 '''
+
+[[check]]
+id = "PLATFORM-pi-cadence"
+check = "pi_cadence"
+severity = "P0"
+description = "the project's PI has a cadence row and a backlog-refinement row"
+
+[[check]]
+id = "PLATFORM-wsjf"
+check = "wsjf"
+severity = "P0"
+description = "every WBS deliverable of the project carries the four typed WSJF inputs"
+
+[[check]]
+id = "PLATFORM-demo-credits"
+check = "demo_credits"
+severity = "P0"
+description = "every accepted deliverable has a demo credit carrying its evidence"

@@ -233,6 +233,16 @@ class Dataset:
         plateau = entry.get("plateau") or meta.get("plateau")
         return (str(phase).lower() if phase else None, plateau)
 
+    def projection(self, name: str) -> list[dict[str, Any]] | None:
+        """One snapshot projection. An absent projection returns None, never a crash."""
+        for source in (self.msp, self.programme):
+            if name in source:
+                value = source.get(name)
+                if isinstance(value, list):
+                    return [row for row in value if isinstance(row, dict)]
+                return []
+        return None
+
 
 class Audit:
     def __init__(self, data: Dataset, standard: dict[str, Any]) -> None:
@@ -271,6 +281,7 @@ class Audit:
         self.tranche_authorisation()
         self.project_tranche()
         self.closure()
+        self.safe()
         self.declared_outputs()
         self.benefits()
         self.programme_baselines()
@@ -647,6 +658,265 @@ class Audit:
                     kind,
                     f"the programme has no {kind} baseline",
                 )
+
+    # ── SAFe §8.2 ────────────────────────────────────────────────────────────────────
+
+    def safe(self) -> None:
+        """The SAFe planning, demonstration and learning controls on the tranche record."""
+        authorising = set(
+            self.standard.get("programme", {}).get("tranche_states_authorising_delivery", [])
+        )
+        cadences = self.data.projection("cadences")
+        carrying = self.carrying_tranches()
+
+        for tranche in carrying:
+            subject = self.tranche_subject(tranche)
+            if not self.cadence_for(cadences, tranche, "pi"):
+                self.add(
+                    "pi_cadence_missing",
+                    "P1",
+                    subject,
+                    "the tranche carries projects but has no PI cadence for its period",
+                )
+            if not self.cadence_for(cadences, tranche, "refinement"):
+                self.add(
+                    "backlog_refinement_missing",
+                    "P1",
+                    subject,
+                    "the tranche has no refinement cadence for its period",
+                )
+
+        for tranche in carrying:
+            if tranche.get("state") not in authorising:
+                continue
+            subject = self.tranche_subject(tranche) + " PI"
+            if not self.pi_output("pi-plan", tranche):
+                self.add(
+                    "pi_plan_missing",
+                    "P0",
+                    subject,
+                    "the PI carried by an authorised tranche has no published pi-plan output",
+                )
+            if not self.pi_output("pi-objectives", tranche):
+                self.add(
+                    "pi_objectives_missing",
+                    "P1",
+                    subject,
+                    "the PI carried by an authorised tranche has no published pi-objectives output",
+                )
+
+        self.demo_credits(authorising)
+        self.retro_lessons(cadences)
+        self.wsjf_inputs()
+
+    def pi_output(self, category: str, tranche: dict[str, Any]) -> bool:
+        """The PI artefact must name this tranche, not merely exist somewhere."""
+        programme_key = self.standard.get("programme", {}).get("project_key", "P0")
+        needle = self.tranche_subject(tranche).replace(" ", "-").lower()
+        rows = self.data.outputs.get("outputs", []) if isinstance(self.data.outputs, dict) else []
+        for row in rows:
+            if not isinstance(row, dict):
+                continue
+            if row.get("category") != category or row.get("project_key") != programme_key:
+                continue
+            label = f"{row.get('title') or ''} {row.get('unit') or ''}".lower()
+            if needle in label:
+                return True
+        return False
+
+    def carrying_tranches(self) -> list[dict[str, Any]]:
+        declared = set()
+        for project in self.data.projects:
+            try:
+                declared.add(int((project.get("meta") or {}).get("tranche")))
+            except (TypeError, ValueError):
+                continue
+        carrying = []
+        for tranche in self.data.tranches:
+            try:
+                number = int(tranche.get("number"))
+            except (TypeError, ValueError):
+                continue
+            if number in declared:
+                carrying.append(tranche)
+        return carrying
+
+    @staticmethod
+    def tranche_subject(tranche: dict[str, Any]) -> str:
+        return f"tranche {tranche.get('number')}"
+
+    @staticmethod
+    def cadence_kind(cadence: dict[str, Any]) -> str:
+        return str(cadence.get("kind") or "").lower()
+
+    @staticmethod
+    def tranche_periods(tranche: dict[str, Any]) -> set[str]:
+        """The tranche projection has no period column today; accept one, plus its number."""
+        values: set[str] = set()
+        meta = tranche.get("meta") if isinstance(tranche.get("meta"), dict) else {}
+        for source in (tranche, meta):
+            for field in ("period", "pi", "pi_number"):
+                value = source.get(field)
+                if value not in (None, ""):
+                    values.add(str(value))
+        if tranche.get("number") is not None:
+            values.add(str(tranche.get("number")))
+        return values
+
+    def cadence_covers(self, cadence: dict[str, Any], tranche: dict[str, Any]) -> bool:
+        """The cadence projection carries a period and optional meta, not a tranche column."""
+        meta = cadence.get("meta") if isinstance(cadence.get("meta"), dict) else {}
+        identifiers = {str(tranche.get("id")), str(tranche.get("number"))}
+        periods = self.tranche_periods(tranche)
+        for source in (cadence, meta):
+            for field in ("tranche_id", "tranche_number", "tranche"):
+                value = source.get(field)
+                if value not in (None, "") and str(value) in identifiers:
+                    return True
+            for field in ("period", "pi", "pi_number"):
+                value = source.get(field)
+                if value not in (None, "") and str(value) in periods:
+                    return True
+        return False
+
+    def cadence_for(
+        self,
+        cadences: list[dict[str, Any]] | None,
+        tranche: dict[str, Any],
+        kind: str,
+    ) -> bool:
+        if not cadences:
+            return False
+        return any(
+            self.cadence_kind(row) == kind and self.cadence_covers(row, tranche)
+            for row in cadences
+        )
+
+    def demo_credits(self, authorising: set[str]) -> None:
+        nodes = self.data.projection("wbs_nodes")
+        if nodes is None:
+            self.unprovable(
+                "demo_credit_missing",
+                "msp.wbs_nodes",
+                "the snapshot does not carry the WBS projection",
+            )
+            return
+        credits = self.data.projection("demo_credits")
+        if credits is None:
+            self.unprovable(
+                "demo_credit_missing",
+                "msp.demo_credits",
+                "the snapshot does not carry the demo-credit projection",
+            )
+            return
+        for node in nodes:
+            if node.get("kind") != "deliverable" or node.get("status") != "accepted":
+                continue
+            tranche = self.node_tranche(node)
+            if tranche is None or tranche.get("state") not in authorising:
+                continue
+            subject = self.wbs_subject(node)
+            linked = [row for row in credits if row.get("deliverable_id") == node.get("id")]
+            if not linked:
+                self.add(
+                    "demo_credit_missing",
+                    "P1",
+                    subject,
+                    "an accepted deliverable in an authorised tranche has no demo credit",
+                )
+            for credit in linked:
+                if not non_empty(credit.get("evidence")):
+                    self.add(
+                        "demo_credit_missing",
+                        "P1",
+                        str(credit.get("id") or f"{subject}:credit"),
+                        "the demo credit carries empty evidence",
+                    )
+
+    def retro_lessons(self, cadences: list[dict[str, Any]] | None) -> None:
+        lessons = self.data.projection("lessons")
+        for tranche in self.data.tranches:
+            if tranche.get("state") != "closed":
+                continue
+            subject = self.tranche_subject(tranche)
+            retro = [
+                row
+                for row in (cadences or [])
+                if self.cadence_kind(row) == "retro" and self.cadence_covers(row, tranche)
+            ]
+            if not retro:
+                self.add(
+                    "retro_lesson_missing",
+                    "P1",
+                    subject,
+                    "the closed tranche has no retro cadence for its period",
+                )
+                continue
+            retro_ids = {str(row.get("id")) for row in retro if row.get("id") is not None}
+            taught = any(
+                str(row.get("cadence_id")) in retro_ids and non_empty(row.get("statement"))
+                for row in (lessons or [])
+            )
+            if not taught:
+                self.add(
+                    "retro_lesson_missing",
+                    "P1",
+                    subject,
+                    "the tranche's retro produced no lesson",
+                )
+
+    def wsjf_inputs(self) -> None:
+        nodes = self.data.projection("wbs_nodes")
+        if nodes is None:
+            self.unprovable(
+                "wsjf_inputs_missing",
+                "msp.wbs_nodes",
+                "the snapshot does not carry the WBS projection",
+            )
+            return
+        for node in nodes:
+            if node.get("kind") != "deliverable":
+                continue
+            problems = []
+            size = self.as_number(node.get("job_size"))
+            if size is None or size < 1:
+                problems.append("job_size is missing or below 1")
+            values = [
+                self.as_number(node.get(field))
+                for field in ("business_value", "time_criticality", "risk_reduction")
+            ]
+            if all(value is None or value <= 0 for value in values):
+                problems.append("business_value, time_criticality and risk_reduction are all zero")
+            if problems:
+                self.add(
+                    "wsjf_inputs_missing",
+                    "P1",
+                    self.wbs_subject(node),
+                    "; ".join(problems),
+                )
+
+    def node_tranche(self, node: dict[str, Any]) -> dict[str, Any] | None:
+        project = self.data.by_id.get(node.get("project_id"))
+        if project is None:
+            return None
+        try:
+            number = int((project.get("meta") or {}).get("tranche"))
+        except (TypeError, ValueError):
+            return None
+        return self.data.tranche_by_number.get(number)
+
+    @staticmethod
+    def wbs_subject(node: dict[str, Any]) -> str:
+        return str(node.get("id") or node.get("title") or "?")
+
+    @staticmethod
+    def as_number(value: Any) -> float | None:
+        if value is None or isinstance(value, bool):
+            return None
+        try:
+            return float(value)
+        except (TypeError, ValueError):
+            return None
 
     # ── TOGAF ────────────────────────────────────────────────────────────────────────
 
@@ -1143,6 +1413,13 @@ def standard_checks(standard: dict[str, Any], seed_dir: Path) -> None:
         "snapshot_schema_stale",
         "programme_outputs",
         "tranche_plan",
+        "pi_cadence_missing",
+        "pi_plan_missing",
+        "pi_objectives_missing",
+        "demo_credit_missing",
+        "retro_lesson_missing",
+        "wsjf_inputs_missing",
+        "backlog_refinement_missing",
         "tranche_review_without_authorisation",
         "project_in_unauthorised_tranche",
         "closed_without_closure_review",
@@ -1188,14 +1465,106 @@ def standard_checks(standard: dict[str, Any], seed_dir: Path) -> None:
     p0 = next(
         (cls for cls in output_standard.get("classes", []) if cls.get("name") == "p0"), None
     )
-    if p0 is None or len(p0.get("now", [])) != 21:
-        fail("seed/output-standard.json must define the p0 class with 21 categories")
+    # The standard can grow (the SAFe outputs were added after the original 21). Pin the floor
+    # and the categories the SAFe rules read, not an exact count that blocks every addition.
+    now = p0.get("now", []) if p0 else []
+    if p0 is None or len(now) < 21:
+        fail("seed/output-standard.json must define the p0 class with at least 21 categories")
+    for category in ("pi-plan", "pi-objectives"):
+        if category not in now:
+            fail(f"the p0 class must carry the SAFe output {category!r}")
     seed = read_json(ROOT / sources["programme_seed"])
     definition = read_json(ROOT / sources["programme_definition"])
     seed_keys = {row.get("key") for row in seed.get("projects", [])}
     definition_keys = set(definition.get("projects", {}))
     if seed_keys != definition_keys:
         fail("seed/programme.json and seed/programme-definition.json disagree on project keys")
+
+
+DEFAULT_COVERAGE = ROOT / "governance" / "standards-coverage.json"
+
+
+def verifier_check_names() -> set[str]:
+    """The checks the project verifier actually registers, read from its registry."""
+    source = (ROOT / "scripts" / "verify-project.py").read_text(encoding="utf-8")
+    if "CHECKS: dict[" not in source:
+        fail("scripts/verify-project.py has no CHECKS registry to read")
+    block = source.split("CHECKS: dict[", 1)[1].split("}", 1)[0]
+    names = set(re.findall(r'"([a-z_]+)":', block))
+    if not names:
+        fail("scripts/verify-project.py registers no checks")
+    return names
+
+
+def coverage_failures(
+    standard: dict[str, Any],
+    coverage: dict[str, Any],
+    categories: set[str],
+    verifier_checks: set[str],
+) -> list[str]:
+    """Why the standards coverage matrix is not a complete map, or an empty list."""
+    problems: list[str] = []
+    if coverage.get("version") != 1:
+        problems.append("coverage version must be 1")
+    standards = coverage.get("standards")
+    if not isinstance(standards, list) or not standards:
+        return problems + ["coverage.standards must be a non-empty list"]
+    rules = standard.get("rules") or {}
+    used: set[str] = set()
+    seen: set[str] = set()
+    for entry in standards:
+        standard_id = entry.get("id")
+        if not standard_id:
+            problems.append("a standard has no id")
+        if not entry.get("source"):
+            problems.append(f"standard {standard_id!r} names no source")
+        clauses = entry.get("clauses") or []
+        if not clauses:
+            problems.append(f"standard {standard_id!r} has no clauses")
+        for clause in clauses:
+            clause_id = clause.get("id")
+            if not clause_id:
+                problems.append(f"standard {standard_id!r} has a clause with no id")
+                continue
+            if clause_id in seen:
+                problems.append(f"duplicate clause id {clause_id!r}")
+            seen.add(clause_id)
+            mapped = clause.get("rules") or []
+            if not mapped:
+                problems.append(f"clause {clause_id!r} maps to no rule")
+            for rule in mapped:
+                if rule not in rules:
+                    problems.append(f"clause {clause_id!r} names unknown rule {rule!r}")
+                used.add(rule)
+            for category in clause.get("outputs") or []:
+                if category not in categories:
+                    problems.append(
+                        f"clause {clause_id!r} names unknown output category {category!r}"
+                    )
+            for check in clause.get("verifier") or []:
+                if check not in verifier_checks:
+                    problems.append(
+                        f"clause {clause_id!r} names unknown verifier check {check!r}"
+                    )
+    orphans = sorted(set(rules) - used)
+    if orphans:
+        problems.append("rules enforced by no clause: " + ", ".join(orphans))
+    return problems
+
+
+def coverage_checks(standard: dict[str, Any], seed_dir: Path) -> None:
+    if not DEFAULT_COVERAGE.exists():
+        fail(f"the standards coverage matrix is missing: {DEFAULT_COVERAGE}")
+    coverage = read_json(DEFAULT_COVERAGE)
+    output_standard = read_json(ROOT / standard["sources"]["output_standard"])
+    problems = coverage_failures(
+        standard,
+        coverage,
+        set(output_standard.get("categories", [])),
+        verifier_check_names(),
+    )
+    if problems:
+        fail("standards coverage: " + "; ".join(problems))
 
 
 # ── Self-test ────────────────────────────────────────────────────────────────────────
@@ -1205,6 +1574,35 @@ def self_test() -> None:
     standard = read_json(DEFAULT_STANDARD)
     standard_checks(standard, ROOT / "seed")
     output_standard = read_json(ROOT / standard["sources"]["output_standard"])
+    coverage = read_json(DEFAULT_COVERAGE)
+    categories = set(output_standard.get("categories", []))
+    verifier_checks = verifier_check_names()
+    if coverage_failures(standard, coverage, categories, verifier_checks):
+        fail(
+            "the shipped standards coverage matrix does not pass its own check: "
+            + "; ".join(coverage_failures(standard, coverage, categories, verifier_checks))
+        )
+    broken = json.loads(json.dumps(coverage))
+    broken["standards"][0]["clauses"][0]["rules"] = ["no_such_rule"]
+    if not coverage_failures(standard, broken, categories, verifier_checks):
+        fail("the coverage check accepted an unknown rule")
+    broken = json.loads(json.dumps(coverage))
+    broken["standards"][0]["clauses"][0]["rules"] = []
+    if not coverage_failures(standard, broken, categories, verifier_checks):
+        fail("the coverage check accepted a clause with no rule")
+    broken = json.loads(json.dumps(coverage))
+    broken["standards"][0]["clauses"][0]["outputs"] = ["no-such-category"]
+    if not coverage_failures(standard, broken, categories, verifier_checks):
+        fail("the coverage check accepted an unknown output category")
+    broken = json.loads(json.dumps(coverage))
+    broken["standards"][0]["clauses"][0]["verifier"] = ["no_such_check"]
+    if not coverage_failures(standard, broken, categories, verifier_checks):
+        fail("the coverage check accepted an unknown verifier check")
+    broken = json.loads(json.dumps(coverage))
+    broken["standards"][0]["clauses"][0]["rules"] = ["programme_outputs"]
+    orphans = coverage_failures(standard, broken, categories, verifier_checks)
+    if not any("enforced by no clause" in problem for problem in orphans):
+        fail("the coverage check accepted a rule that no clause enforces")
 
     def base() -> Dataset:
         profile = {
@@ -1258,6 +1656,14 @@ def self_test() -> None:
             ]
             + [
                 {"project_key": "P0", "category": "closure-review"},
+                {"project_key": "P0", "category": "pi-plan",
+                 "title": "PI plan — tranche 0", "unit": "tranche-0"},
+                {"project_key": "P0", "category": "pi-plan",
+                 "title": "PI plan — tranche 1", "unit": "tranche-1"},
+                {"project_key": "P0", "category": "pi-objectives",
+                 "title": "PI objectives — tranche 0", "unit": "tranche-0"},
+                {"project_key": "P0", "category": "pi-objectives",
+                 "title": "PI objectives — tranche 1", "unit": "tranche-1"},
                 {"project_key": "T1", "category": "project-brief"},
                 {"project_key": "T1", "category": "evidence"},
             ]
@@ -1283,6 +1689,33 @@ def self_test() -> None:
             "benefit_transitions": [],
             "programme_baselines": [
                 {"kind": "management"}, {"kind": "governance"}, {"kind": "boundary"}
+            ],
+            "cadences": [
+                {"id": "cad-pi-0", "kind": "pi", "period": "0", "state": "closed",
+                 "meta": {"tranche_id": "tr0"}},
+                {"id": "cad-pi-1", "kind": "pi", "period": "1", "state": "authorised",
+                 "meta": {}},
+                {"id": "cad-demo-1", "kind": "demo", "period": "1", "state": "closed",
+                 "meta": {"tranche_id": "tr1"}},
+                {"id": "cad-retro-0", "kind": "retro", "period": "0", "state": "closed",
+                 "meta": {"tranche_number": 0}},
+                {"id": "cad-refine-0", "kind": "refinement", "period": "0",
+                 "state": "closed", "meta": {"tranche_id": "tr0"}},
+                {"id": "cad-refine-1", "kind": "refinement", "period": "1",
+                 "state": "authorised", "meta": {"tranche_id": "tr1"}},
+            ],
+            "wbs_nodes": [
+                {"id": "w1", "project_id": "t1", "kind": "deliverable", "status": "accepted",
+                 "title": "walking skeleton", "business_value": 8, "time_criticality": 5,
+                 "risk_reduction": 3, "job_size": 3},
+            ],
+            "demo_credits": [
+                {"id": "dc1", "cadence_id": "cad-demo-1", "deliverable_id": "w1",
+                 "evidence": ["recording-1"]},
+            ],
+            "lessons": [
+                {"id": "l1", "cadence_id": "cad-retro-0", "finding_key": "L-1",
+                 "statement": "plan the PI before authorising it"},
             ],
         }
         architecture = {
@@ -1540,6 +1973,94 @@ def self_test() -> None:
     expect_absent(noop, "closure_outputs_undeclared")
     expect_absent(noop, "closed_without_closure_review")
 
+    # SAFe §8.2: PI cadence, plan, objectives, demo credit, retro lesson, WSJF, refinement.
+    def drop_cadence(kind: str):
+        def mutate(data: Dataset) -> None:
+            data.msp["cadences"] = [
+                row for row in data.msp["cadences"] if row.get("kind") != kind
+            ]
+
+        return mutate
+
+    expect(drop_cadence("pi"), "pi_cadence_missing", "P1")
+    expect_absent(noop, "pi_cadence_missing")
+
+    def drop_pi_plan(data: Dataset) -> None:
+        data.outputs["outputs"] = [
+            row
+            for row in data.outputs["outputs"]
+            if not (
+                row.get("category") == "pi-plan"
+                and "tranche-1"
+                in f"{row.get('title') or ''} {row.get('unit') or ''}".lower()
+            )
+        ]
+
+    expect(drop_pi_plan, "pi_plan_missing", "P0")
+    expect_absent(noop, "pi_plan_missing")
+
+    def drop_pi_objectives(data: Dataset) -> None:
+        data.outputs["outputs"] = [
+            row
+            for row in data.outputs["outputs"]
+            if not (
+                row.get("category") == "pi-objectives"
+                and "tranche-1"
+                in f"{row.get('title') or ''} {row.get('unit') or ''}".lower()
+            )
+        ]
+
+    expect(drop_pi_objectives, "pi_objectives_missing", "P1")
+    expect_absent(noop, "pi_objectives_missing")
+
+    def drop_demo_credit(data: Dataset) -> None:
+        data.msp["demo_credits"] = []
+
+    expect(drop_demo_credit, "demo_credit_missing", "P1")
+    expect_absent(noop, "demo_credit_missing")
+
+    def empty_credit_evidence(data: Dataset) -> None:
+        data.msp["demo_credits"][0]["evidence"] = []
+
+    expect(empty_credit_evidence, "demo_credit_missing", "P1")
+
+    expect(drop_cadence("retro"), "retro_lesson_missing", "P1")
+
+    def drop_lessons(data: Dataset) -> None:
+        data.msp["lessons"] = []
+
+    expect(drop_lessons, "retro_lesson_missing", "P1")
+    expect_absent(noop, "retro_lesson_missing")
+
+    def undersized(data: Dataset) -> None:
+        data.msp["wbs_nodes"][0]["job_size"] = 0
+
+    expect(undersized, "wsjf_inputs_missing", "P1")
+
+    def zeroed_wsjf(data: Dataset) -> None:
+        for field in ("business_value", "time_criticality", "risk_reduction"):
+            data.msp["wbs_nodes"][0][field] = 0
+
+    expect(zeroed_wsjf, "wsjf_inputs_missing", "P1")
+    expect_absent(noop, "wsjf_inputs_missing")
+
+    expect(drop_cadence("refinement"), "backlog_refinement_missing", "P1")
+    expect_absent(noop, "backlog_refinement_missing")
+
+    def drop_safe_projections(data: Dataset) -> None:
+        for name in ("cadences", "wbs_nodes", "demo_credits", "lessons"):
+            data.msp.pop(name, None)
+
+    # A snapshot that predates a projection is a gap, never a crash.
+    for rule in (
+        "pi_cadence_missing",
+        "demo_credit_missing",
+        "retro_lesson_missing",
+        "wsjf_inputs_missing",
+        "backlog_refinement_missing",
+    ):
+        expect(drop_safe_projections, rule)
+
     # Strict mode: the ledger is a ratchet with one disposition vocabulary.
     sample = base()
     drop_artefact(sample, "type-solution")
@@ -1641,6 +2162,7 @@ def main() -> None:
         return
     standard = read_json(args.standard)
     standard_checks(standard, args.seed_dir)
+    coverage_checks(standard, args.seed_dir)
     if args.check_standard:
         print("audit-programme-conformance: standard OK")
         return

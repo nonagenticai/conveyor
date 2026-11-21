@@ -1504,7 +1504,11 @@
           "adm-profile",
           "artifact-standard",
           "maturity-assessment",
-          "skills-assessment"
+          "skills-assessment",
+          "pi-plan",
+          "pi-objectives",
+          "system-demo",
+          "inspect-adapt"
         ],
         "closure_outputs": [],
         "adm_phase": "Preliminary",

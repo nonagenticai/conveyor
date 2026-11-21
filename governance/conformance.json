@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "standard": "SPEC_V2 §8.1 (tailored TOGAF ADM) and §8.3 (MSP as rows and gates)",
+  "standard": "SPEC_V2 §8.1 (tailored TOGAF ADM), §8.2 (SAFe) and §8.3 (MSP as rows and gates)",
   "sources": {
     "output_standard": "seed/output-standard.json",
     "programme_seed": "seed/programme.json",
@@ -22,6 +22,13 @@
     "snapshot_schema_stale": "P2",
     "programme_outputs": "P1",
     "tranche_plan": "P2",
+    "pi_cadence_missing": "P1",
+    "pi_plan_missing": "P0",
+    "pi_objectives_missing": "P1",
+    "demo_credit_missing": "P1",
+    "retro_lesson_missing": "P1",
+    "wsjf_inputs_missing": "P1",
+    "backlog_refinement_missing": "P1",
     "tranche_review_without_authorisation": "P0",
     "project_in_unauthorised_tranche": "P0",
     "closed_without_closure_review": "P0",

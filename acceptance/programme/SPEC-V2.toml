@@ -61,3 +61,21 @@ id = "SPEC-V2-waivers"
 check = "waivers"
 severity = "P0"
 description = "no active waiver is expired or owned by its reviewer"
+
+[[check]]
+id = "SPEC-V2-pi-cadence"
+check = "pi_cadence"
+severity = "P0"
+description = "the project's PI has a cadence row and a backlog-refinement row"
+
+[[check]]
+id = "SPEC-V2-wsjf"
+check = "wsjf"
+severity = "P0"
+description = "every WBS deliverable of the project carries the four typed WSJF inputs"
+
+[[check]]
+id = "SPEC-V2-demo-credits"
+check = "demo_credits"
+severity = "P0"
+description = "every accepted deliverable has a demo credit carrying its evidence"

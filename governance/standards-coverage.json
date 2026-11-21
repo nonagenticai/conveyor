@@ -1,0 +1,386 @@
+{
+  "version": 1,
+  "description": "Every mandatory clause of the three adopted standards, mapped to the conformance rule(s) that enforce it, the output category that evidences it, the live row that carries it and the verifier check that re-tests it. The auditor's coverage self-test refuses an unmapped clause, a rule used by no clause, and a category that does not exist in seed/output-standard.json.",
+  "standards": [
+    {
+      "id": "togaf-adm",
+      "name": "TOGAF ADM — tailored profile conveyor-software-delivery",
+      "source": "docs/SPEC_V2.md §8.1",
+      "clauses": [
+        {
+          "id": "togaf.preliminary.principles",
+          "title": "Architecture principles, tailored ADM profile and governance adopted",
+          "rules": ["profile_adopted"],
+          "outputs": ["architecture-principles", "adm-profile"],
+          "row": "architecture_profile, artifact_type",
+          "verifier": ["project"]
+        },
+        {
+          "id": "togaf.preliminary.artefact-standard",
+          "title": "The artefact standard and repository exist (catalog, matrix, diagram)",
+          "rules": ["mandatory_artefacts"],
+          "outputs": ["artifact-standard", "architecture-artifact"],
+          "row": "artifact_type, architecture_artifact",
+          "verifier": ["project"]
+        },
+        {
+          "id": "togaf.preliminary.board",
+          "title": "The Architecture Board is approved with a charter and decision limits",
+          "rules": ["board_not_approved"],
+          "outputs": ["governance"],
+          "row": "governance_body",
+          "verifier": ["project"]
+        },
+        {
+          "id": "togaf.preliminary.maturity",
+          "title": "Maturity is a dated assessment, never an assertion",
+          "rules": ["programme_outputs"],
+          "outputs": ["maturity-assessment"],
+          "row": "architecture_maturity",
+          "verifier": ["project"]
+        },
+        {
+          "id": "togaf.preliminary.skills",
+          "title": "Skills is a dated assessment, never an assertion",
+          "rules": ["programme_outputs"],
+          "outputs": ["skills-assessment"],
+          "row": "architecture_skills",
+          "verifier": ["project"]
+        },
+        {
+          "id": "togaf.phase-a.soaw",
+          "title": "Phase A closes on a Statement of Architecture Work",
+          "rules": ["contract_missing", "contract_unapproved"],
+          "outputs": ["statement-of-architecture-work"],
+          "row": "architecture_contract",
+          "verifier": ["contract"]
+        },
+        {
+          "id": "togaf.phase-a.artefacts",
+          "title": "A: stakeholder map, driver/goal/objective, requirements catalog, solution concept",
+          "rules": ["mandatory_artefacts"],
+          "outputs": ["architecture-artifact"],
+          "row": "architecture_artifact",
+          "verifier": ["project"]
+        },
+        {
+          "id": "togaf.phase-b.capability",
+          "title": "B: business capability map",
+          "rules": ["mandatory_artefacts", "capability_artefacts"],
+          "outputs": ["architecture-artifact"],
+          "row": "architecture_artifact",
+          "verifier": ["project"]
+        },
+        {
+          "id": "togaf.phase-c.data",
+          "title": "C: data entity catalog",
+          "rules": ["mandatory_artefacts"],
+          "outputs": ["architecture-artifact"],
+          "row": "architecture_artifact",
+          "verifier": ["project"]
+        },
+        {
+          "id": "togaf.phase-d.technology",
+          "title": "D: technology standards",
+          "rules": ["mandatory_artefacts"],
+          "outputs": ["architecture-artifact"],
+          "row": "architecture_artifact",
+          "verifier": ["project"]
+        },
+        {
+          "id": "togaf.phase-f.contract",
+          "title": "The delivery contract is board-approved and requester ≠ approver",
+          "rules": ["contract_missing", "contract_unapproved", "requester_is_approver"],
+          "outputs": [],
+          "row": "architecture_contract, approval",
+          "verifier": ["contract"]
+        },
+        {
+          "id": "togaf.phase-g.review",
+          "title": "Phase G records one typed compliance level against the contract",
+          "rules": ["compliance_review_missing"],
+          "outputs": ["compliance-review"],
+          "row": "architecture_compliance_review",
+          "verifier": ["review"]
+        },
+        {
+          "id": "togaf.waiver",
+          "title": "A deviation is waived with owner, reason, risk and reassessment date",
+          "rules": ["waiver_invalid"],
+          "outputs": ["waiver"],
+          "row": "architecture_waiver",
+          "verifier": ["waivers"]
+        },
+        {
+          "id": "togaf.derivation",
+          "title": "Artefacts answer derivation, realization and reuse",
+          "rules": ["derivation_missing"],
+          "outputs": [],
+          "row": "architecture_artifact_link",
+          "verifier": ["project"]
+        },
+        {
+          "id": "togaf.plateau.psa",
+          "title": "The Project Start Architecture plateau is the delivery project's minimum",
+          "rules": ["capability_artefacts", "mandatory_artefacts"],
+          "outputs": ["architecture-artifact"],
+          "row": "architecture_artifact",
+          "verifier": ["project"]
+        }
+      ]
+    },
+    {
+      "id": "safe-cadence",
+      "name": "SAFe — the programme cadence",
+      "source": "docs/SPEC_V2.md §8.2",
+      "clauses": [
+        {
+          "id": "safe.portfolio",
+          "title": "The portfolio is the computed view of every project and programme in flight",
+          "rules": ["tranche_plan", "programme_outputs"],
+          "outputs": ["programme-plan"],
+          "row": "programme, project",
+          "verifier": ["project"]
+        },
+        {
+          "id": "safe.art",
+          "title": "The programme is the ART: shared config, dependency graph, cadence and backlog",
+          "rules": ["tranche_plan", "pi_cadence_missing"],
+          "outputs": ["programme-plan"],
+          "row": "programme, project_dependency, programme_cadence",
+          "verifier": ["project"]
+        },
+        {
+          "id": "safe.pi.cadence",
+          "title": "Every PI (= tranche) has a cadence row before its plan",
+          "rules": ["pi_cadence_missing"],
+          "outputs": [],
+          "row": "programme_cadence",
+          "verifier": ["pi_cadence"]
+        },
+        {
+          "id": "safe.pi.plan",
+          "title": "PI planning materialises the plan from the backlog by WSJF within the WIP limit",
+          "rules": ["pi_plan_missing", "wsjf_inputs_missing"],
+          "outputs": ["pi-plan"],
+          "row": "wbs_node",
+          "verifier": ["pi_plan", "wsjf"]
+        },
+        {
+          "id": "safe.pi.objectives",
+          "title": "PI objectives carry planned business value and are assessed at the close",
+          "rules": ["pi_objectives_missing"],
+          "outputs": ["pi-objectives"],
+          "row": "programme_cadence, wbs_node",
+          "verifier": ["pi_objectives"]
+        },
+        {
+          "id": "safe.demo",
+          "title": "System demo: every completed deliverable exhibits evidence; no demo, no credit",
+          "rules": ["demo_credit_missing"],
+          "outputs": ["system-demo"],
+          "row": "programme_demo_credit, wbs_node",
+          "verifier": ["demo_credits"]
+        },
+        {
+          "id": "safe.inspect-adapt",
+          "title": "Inspect and adapt: the retro produces lessons",
+          "rules": ["retro_lesson_missing"],
+          "outputs": ["inspect-adapt"],
+          "row": "programme_cadence, lesson",
+          "verifier": ["lessons"]
+        },
+        {
+          "id": "safe.refinement",
+          "title": "Backlog refinement re-scores WSJF and flags stale items",
+          "rules": ["backlog_refinement_missing"],
+          "outputs": [],
+          "row": "programme_cadence",
+          "verifier": ["pi_cadence"]
+        },
+        {
+          "id": "safe.lean-governance",
+          "title": "Gates sit at value boundaries (phase and increment), not per card",
+          "rules": ["tranche_review_without_authorisation", "project_in_unauthorised_tranche"],
+          "outputs": ["tranche-review"],
+          "row": "programme_tranche",
+          "verifier": ["project"]
+        },
+        {
+          "id": "safe.wsjf",
+          "title": "WSJF is arithmetic over four typed integers; the score is never stored",
+          "rules": ["wsjf_inputs_missing"],
+          "outputs": ["pi-plan"],
+          "row": "wbs_node",
+          "verifier": ["wsjf"]
+        }
+      ]
+    },
+    {
+      "id": "msp-programme",
+      "name": "MSP — programme definition and benefits realization",
+      "source": "docs/SPEC_V2.md §8.3",
+      "clauses": [
+        {
+          "id": "msp.mandate",
+          "title": "The mandate is authorised by the sponsoring group",
+          "rules": ["programme_outputs"],
+          "outputs": ["vision", "governance"],
+          "row": "document, output",
+          "verifier": ["project"]
+        },
+        {
+          "id": "msp.brief",
+          "title": "The programme brief is approved and authorises definition",
+          "rules": ["programme_outputs"],
+          "outputs": ["vision", "programme-plan"],
+          "row": "document, output",
+          "verifier": ["project"]
+        },
+        {
+          "id": "msp.blueprint",
+          "title": "The blueprint carries current, intermediate and target states",
+          "rules": ["programme_outputs"],
+          "outputs": ["blueprint"],
+          "row": "document, output",
+          "verifier": ["project"]
+        },
+        {
+          "id": "msp.business-case",
+          "title": "The business case includes the do-nothing option and the investment appraisal",
+          "rules": ["programme_outputs"],
+          "outputs": ["business-case"],
+          "row": "document, output",
+          "verifier": ["project"]
+        },
+        {
+          "id": "msp.benefit-profile",
+          "title": "A benefit profile carries its six field groups: baseline, target, method, owner",
+          "rules": ["benefit_profile_incomplete"],
+          "outputs": ["benefit-profile"],
+          "row": "benefit_profile",
+          "verifier": ["benefit_baseline"]
+        },
+        {
+          "id": "msp.benefits-map",
+          "title": "The benefits map runs output → capability → outcome → benefit → objective",
+          "rules": ["programme_outputs", "benefit_profile_incomplete"],
+          "outputs": ["benefits-map"],
+          "row": "benefit_link",
+          "verifier": ["benefit_baseline"]
+        },
+        {
+          "id": "msp.projects-dossier",
+          "title": "The projects dossier names each project's outputs, dependencies and risks",
+          "rules": ["programme_outputs"],
+          "outputs": ["projects-dossier"],
+          "row": "project",
+          "verifier": ["project"]
+        },
+        {
+          "id": "msp.plan-tranches",
+          "title": "The programme plan is carried by tranches and their reviews",
+          "rules": ["tranche_plan", "tranche_review_without_authorisation", "project_in_unauthorised_tranche"],
+          "outputs": ["tranche-plan", "tranche-review"],
+          "row": "programme_tranche, programme_tranche_review",
+          "verifier": ["project"]
+        },
+        {
+          "id": "msp.refined-vision",
+          "title": "The refined vision is approved by the programme board",
+          "rules": ["programme_outputs"],
+          "outputs": ["vision"],
+          "row": "document, output",
+          "verifier": ["project"]
+        },
+        {
+          "id": "msp.baselines",
+          "title": "Management, governance and boundary baselines are taken before a tranche is managed",
+          "rules": ["programme_baselines"],
+          "outputs": ["programme-plan"],
+          "row": "programme_baseline",
+          "verifier": ["project"]
+        },
+        {
+          "id": "msp.benefits-strategy",
+          "title": "The benefits management strategy is published",
+          "rules": ["programme_outputs"],
+          "outputs": ["benefits-strategy"],
+          "row": "document, output",
+          "verifier": ["project"]
+        },
+        {
+          "id": "msp.realization-plan",
+          "title": "The benefits realization plan names post-closure measurement",
+          "rules": ["programme_outputs"],
+          "outputs": ["realization-plan"],
+          "row": "document, output",
+          "verifier": ["project"]
+        },
+        {
+          "id": "msp.stakeholders",
+          "title": "Stakeholder profiles and the engagement plan are accepted",
+          "rules": ["programme_outputs"],
+          "outputs": ["stakeholder-profiles"],
+          "row": "stakeholder_profile",
+          "verifier": ["project"]
+        },
+        {
+          "id": "msp.strategies",
+          "title": "Information, risk, issue, monitoring, communications, quality and resource plans",
+          "rules": ["programme_outputs"],
+          "outputs": ["governance"],
+          "row": "document, register_item",
+          "verifier": ["project"]
+        },
+        {
+          "id": "msp.transition",
+          "title": "A benefit's baseline is measured before the transition and its realization after",
+          "rules": ["realized_without_transition", "transition_order", "benefit_baseline_placeholder"],
+          "outputs": ["benefit-profile"],
+          "row": "benefit_transition",
+          "verifier": ["benefit_baseline"]
+        },
+        {
+          "id": "msp.closure",
+          "title": "A project closes on a review with its declared outputs published",
+          "rules": ["closed_without_closure_review", "closure_outputs_undeclared", "unpublished_declared_output"],
+          "outputs": ["closure-review", "evidence"],
+          "row": "project, approval, document",
+          "verifier": ["project", "closure_outputs", "closure_gate"]
+        }
+      ]
+    },
+    {
+      "id": "programme-integrity",
+      "name": "Cross-standard record integrity (controls that belong to no single standard)",
+      "source": "governance/conformance.json",
+      "clauses": [
+        {
+          "id": "integrity.snapshot",
+          "title": "The snapshot is fresh and its schema matches; a stale schema is a gap",
+          "rules": ["snapshot_schema_stale"],
+          "outputs": [],
+          "row": "manifest.json",
+          "verifier": []
+        },
+        {
+          "id": "integrity.seed-live",
+          "title": "The seed and the live rows agree; drift is a recorded gap, not a silent difference",
+          "rules": ["seed_live_drift"],
+          "outputs": [],
+          "row": "seed/programme.json",
+          "verifier": []
+        },
+        {
+          "id": "integrity.status-source",
+          "title": "A project's status source is recorded, never inferred",
+          "rules": ["status_source_drift"],
+          "outputs": [],
+          "row": "project.meta.status_source",
+          "verifier": []
+        }
+      ]
+    }
+  ]
+}

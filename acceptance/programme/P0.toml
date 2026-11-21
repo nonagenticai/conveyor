@@ -74,3 +74,39 @@ reason = "the six benefit instruments and their baselines are U6's measurement u
 owner = "programme owner"
 issue = "U6"
 expires = "2027-02-18"
+
+[[check]]
+id = "P0-pi-cadence"
+check = "pi_cadence"
+severity = "P0"
+description = "the project's PI has a cadence row and a backlog-refinement row"
+
+[[check]]
+id = "P0-wsjf"
+check = "wsjf"
+severity = "P0"
+description = "every WBS deliverable of the project carries the four typed WSJF inputs"
+
+[[check]]
+id = "P0-demo-credits"
+check = "demo_credits"
+severity = "P0"
+description = "every accepted deliverable has a demo credit carrying its evidence"
+
+[[check]]
+id = "P0-lessons"
+check = "lessons"
+severity = "P0"
+description = "the PI's retro produced its lessons"
+
+[[check]]
+id = "P0-pi-plan"
+check = "pi_plan"
+severity = "P0"
+description = "the PI plan is a published programme output"
+
+[[check]]
+id = "P0-pi-objectives"
+check = "pi_objectives"
+severity = "P0"
+description = "the PI objectives are a published programme output"
