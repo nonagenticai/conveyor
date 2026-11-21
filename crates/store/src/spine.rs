@@ -1180,15 +1180,8 @@ pub async fn review_tranche_tx(
         .fetch_optional(&mut *conn)
         .await?
         .ok_or(PlanStoreError::NotFound { what: "tranche" })?;
-    // The first tranche starts `planned`: its review is what closes it and authorises the next
-    // one, so `planned` is reviewable. A terminal row is not — reviewing it is a second
-    // decision over a tranche that is no longer open, and the one-review check below covers the
-    // paused/stopped rows a review itself produced.
-    if matches!(reviewed.state.as_str(), "closed" | "retired") {
-        return Err(PlanStoreError::Illegal(PlanError::TrancheNotReviewable {
-            state: reviewed.state.clone(),
-        }));
-    }
+    // A tranche close has one review. The check runs before the state guard so a second review
+    // of a row the first review closed reports "already reviewed", not "not reviewable".
     let already: bool = sqlx::query_scalar(
         "SELECT EXISTS (
             SELECT 1 FROM programme_tranche_review WHERE tenant_id = $1 AND tranche_id = $2
@@ -1200,6 +1193,14 @@ pub async fn review_tranche_tx(
     .await?;
     if already {
         return Err(PlanStoreError::Illegal(PlanError::TrancheAlreadyReviewed));
+    }
+    // The first tranche starts `planned`: its review is what closes it and authorises the next
+    // one, so `planned` is reviewable. A terminal row with no review is not — reviewing it is a
+    // second decision over a tranche that is no longer open.
+    if matches!(reviewed.state.as_str(), "closed" | "retired") {
+        return Err(PlanStoreError::Illegal(PlanError::TrancheNotReviewable {
+            state: reviewed.state.clone(),
+        }));
     }
     // A `continue` authorises the next tranche in the same write: the review's outcome is what
     // authorises it, and the start gate reads the state (and the review that set it), never a
