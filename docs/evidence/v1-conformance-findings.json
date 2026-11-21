@@ -199,17 +199,17 @@
       "spec": "§7.5",
       "severity": "P1",
       "title": "Tool spend is a stored column and is absent from every usage roll-up",
-      "problem": "tool_call.cost is stored (violating read-time derivation), and the usage aggregate reads only inference_call, so tool spend never reaches tenant/job/run totals.",
+      "problem": "Tool spend is stored on tool_call and now appears in metrics.usage (tool_calls + tool_cost_usd) and billing.summary, so the 'absent from every roll-up' claim is no longer true. Two halves remain: inference_usage.report is inference-only and carries no tool spend, and both figures sum the stored cost instead of re-deriving it from the ledger at read time (D52).",
       "evidence": [
         {
-          "path": "migrations/0055_tool_platform.sql",
-          "line": 163,
-          "quote": "    cost           numeric(18, 6) CHECK (cost >= 0),"
+          "path": "crates/store/src/metrics.rs",
+          "line": 483,
+          "quote": "               FROM tool_call tc"
         },
         {
           "path": "crates/store/src/inference.rs",
           "line": 329,
-          "quote": "               FROM inference_call ic"
+          "quote": "                        ELSE NULL"
         }
       ],
       "failure_scenario": "Tenant and job spend exclude tool costs, so reported spend and budget utilisation understate actual consumption.",
@@ -223,22 +223,17 @@
       "spec": "§7.5",
       "severity": "P1",
       "title": "Roll-ups stop at tenant/project/card",
-      "problem": "Roll-ups stop at tenant/project/card: the public UsageGroup set has six dimensions (day, model, caller kind, cache status, prompt sha, project) and no department, programme, job, run or step; the card bucket is a private addition.",
+      "problem": "metrics.usage now covers the full eight-level metering set (tenant through call), but inference_usage.report still offers only its six inference dimensions (model, caller, prompt and the run/project/card buckets), so a department, programme, job or step question cannot be asked of the inference report.",
       "evidence": [
         {
-          "path": "crates/store/src/inference.rs",
-          "line": 286,
-          "quote": "        UsageGroup::Project => \"coalesce(c.project_id::text, '')\","
+          "path": "crates/store/src/metrics.rs",
+          "line": 346,
+          "quote": "/// The closed metering level set."
         },
         {
-          "path": "crates/store/src/snapshot.rs",
-          "line": 919,
-          "quote": "                \"by_project\": usage_by_project,"
-        },
-        {
-          "path": "crates/store/src/snapshot.rs",
-          "line": 920,
-          "quote": "                \"by_card\": usage_by_card"
+          "path": "crates/actions/src/inference/usage.rs",
+          "line": 37,
+          "quote": "    let group = UsageGroup::parse(&input.group_by).ok_or_else(|| {"
         }
       ],
       "failure_scenario": "The UI cannot show department, programme, job or run-level spend; those panels render empty.",
@@ -267,7 +262,12 @@
       ],
       "failure_scenario": "Unattributed calls are silently charged to a project/department, and department breakdowns cannot be produced.",
       "acceptance": "The report returns an explicit other/unattributed bucket; a caller_kind='other' call is excluded from project totals and counted separately.",
-      "owner_project": "T11"
+      "owner_project": "T11",
+      "resolved_by": {
+        "commit": "e1fbd15bfc547c99848adc32966c82552baf7dea",
+        "test": "crates/store/tests/inference_.rs",
+        "evidence": "cargo test -p conveyor-store --test inference_ --test metrics_: 5 + 1 passed. An inference_call with caller_kind='other' and a run id appears under 'unattributed' in both the inference usage aggregate and metrics.usage; the project bucket no longer absorbs it."
+      }
     },
     {
       "id": "v1-p75-5",
@@ -309,7 +309,7 @@
         },
         {
           "path": "crates/store/src/inference.rs",
-          "line": 265,
+          "line": 266,
           "quote": "/// `unpriced_calls` — \"no price\" must not render as \"free\"."
         }
       ],
@@ -1167,8 +1167,13 @@
       "spec": "§10.3",
       "severity": "P1",
       "title": "Manifest covers only snapshot files; conformance, issues and output pages publish unhashed",
-      "problem": "publish-data.sh adds conformance.json/md and issues.json to tmp/data after snapshot wrote manifest.json; write_outputs pages never enter files[]. check-data tests listed files only and never rejects unlisted extras, so unhashed files publish and pass.",
+      "problem": "The manifest now hashes issues.json, the output pages and outputs.js, but not the files written after the snapshot: conformance.json/.md, standards.json/standards.js and the standards/build-docs pages. manifest.json is written inside the snapshot before those, and check-data.cjs only hashes listed files, so an unlisted file passes silently.",
       "evidence": [
+        {
+          "path": "crates/pack/src/snapshot.rs",
+          "line": 357,
+          "quote": "    std::fs::write(args.out.join(\"manifest.json\"), &manifest_bytes)?;"
+        },
         {
           "path": "docs/design/scripts/publish-data.sh",
           "line": 108,
@@ -1191,18 +1196,8 @@
       "spec": "§10.3",
       "severity": "P1",
       "title": "Publish mutates the shipped pack before the audit and never deletes stale data",
-      "problem": "build-docs.py writes directly into the shipped PACK/docs before the strict audit, contradicting the temp-only contract. The docs/design/data rsync lacks --delete, so files omitted by a later snapshot remain published.",
+      "problem": "The shipped pack is now written only after the strict gate, so the 'mutates before audit' half is fixed. What remains: that gate audits a tree still missing conformance.json and the standards record, and the data rsync has no --delete, so a data file whose source vanished survives the publish (the standards tree is replaced wholesale; data is not).",
       "evidence": [
-        {
-          "path": "docs/design/scripts/publish-data.sh",
-          "line": 131,
-          "quote": "python3 \"$pack/scripts/build-docs.py\""
-        },
-        {
-          "path": "docs/design/scripts/build-docs.py",
-          "line": 41,
-          "quote": "OUT = PACK / \"docs\""
-        },
         {
           "path": "docs/design/scripts/publish-data.sh",
           "line": 136,
@@ -3444,7 +3439,12 @@
       ],
       "failure_scenario": "An empty tenant renders blank, or a 500 renders raw, and the suite stays green because no assertion distinguishes the three states.",
       "acceptance": "Each screen spec gains distinct empty, error and happy assertions, or the gate bullet is amended with the reason.",
-      "owner_project": "S12"
+      "owner_project": "S12",
+      "resolved_by": {
+        "commit": "8f1e57706a3c1efea6092a3f7b7edebb0facc594",
+        "test": "apps/web/e2e/run-queue.spec.ts",
+        "evidence": "Playwright against the built bundle on 127.0.0.1:8931 with the seeded API: all five three-state tests passed (run-queue happy/empty/error, admin empty/error) in 5.6s. The run-queue error spec injects a 503 after the dead `expired` filter was removed."
+      }
     },
     {
       "id": "v1-s13-1",
