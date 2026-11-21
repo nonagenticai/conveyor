@@ -72,6 +72,7 @@ class Runner:
         tranche_label: str = "tranche 0",
         acts_path: Path | None = None,
         today: str | None = None,
+        keep_active: bool = False,
     ) -> None:
         self.project = project
         self.content = content
@@ -82,6 +83,7 @@ class Runner:
         self.tranche_label = tranche_label
         self.acts_path = acts_path or evidence
         self.today = today or datetime.now(timezone.utc).strftime("%Y-%m-%d")
+        self.keep_active = keep_active
         self.transcript = evidence.parent / "transcript.jsonl"
         self.snapshot = ""
         self.board = ""
@@ -103,6 +105,10 @@ class Runner:
             return str(self.acts_path.relative_to(ROOT))
         except ValueError:
             return str(self.acts_path)
+
+    def closes_project(self) -> bool:
+        """A project with an open issue is reworked but never closed (#526's demotion policy)."""
+        return not self.keep_active
 
     # ── transport ───────────────────────────────────────────────────────────────────
 
@@ -282,7 +288,9 @@ class Runner:
         # 3. declare the closure outputs the project publishes
         row = self.project_row()
         meta = dict(row.get("meta") or {})
-        if set(meta.get("closure_outputs") or []) != {"closure-review"}:
+        if not self.closes_project():
+            print("  closure outputs: not applicable (the project stays active)")
+        elif set(meta.get("closure_outputs") or []) != {"closure-review"}:
             self.invoke(
                 "projects.programme_meta",
                 {"id": self.project_id, "meta": {"closure_outputs": ["closure-review"]}},
@@ -429,7 +437,9 @@ class Runner:
 
         # 8. publish the retrospective closure review output
         outputs = self._published_outputs()
-        if not any(
+        if not self.closes_project():
+            print("  closure-review output: not applicable (the project stays active)")
+        elif not any(
             row.get("category") == "closure-review"
             and row.get("project_id") == self.project_id
             and "retrospective" in (row.get("title") or "")
@@ -564,7 +574,9 @@ class Runner:
 
         # 11. closure request -> decision -> the destructive close gate -> close
         row = self.project_row()
-        if row["status"] != "closed":
+        if not self.closes_project():
+            print("  closure: not applicable (the project stays active)")
+        elif row["status"] != "closed":
             approvals = self._read(
                 "approvals.list", {"project_id": self.project_id}
             ).get("items", [])
@@ -693,6 +705,10 @@ def self_test() -> None:
         raise SystemExit(f"self-test: acts_ref {second.acts_ref()!r} names the wrong tranche")
     if second.today != "2026-11-22":
         raise SystemExit("self-test: the date is not the one passed")
+    if not second.closes_project():
+        raise SystemExit("self-test: a project without --keep-active must close")
+    if runner(keep_active=True).closes_project():
+        raise SystemExit("self-test: --keep-active did not stop the closure")
     print("rework-project: self-test ok")
 
 
@@ -716,6 +732,11 @@ def main() -> None:
         "--acts",
         type=Path,
         help="the batch acts page (default docs/evidence/rework/<KEY>/acts.md)",
+    )
+    parser.add_argument(
+        "--keep-active",
+        action="store_true",
+        help="rework but do not close: a project with an open issue is never closed (#526)",
     )
     args = parser.parse_args()
     if args.self_test:
@@ -741,6 +762,7 @@ def main() -> None:
         demo_cadence=args.demo_cadence,
         tranche_label=args.tranche_label,
         acts_path=args.acts,
+        keep_active=args.keep_active,
     ).run()
 
 

@@ -472,11 +472,17 @@ def run_record(args, transport):
     else:
         print_result("write", action, write_result)
     created_id = None
+    created_match: list[str] = []
     if read_id_field:
         created_id = write_result.get(read_id_field)
         if not isinstance(created_id, str) or not created_id:
             fail(f"the write returned no {read_id_field!r}; cannot read it back")
-        read_input = {"id": created_id}
+        if args.read_input is None:
+            read_input = {"id": created_id}
+        else:
+            # The read action's schema is its own (a list read takes the parent id, not the
+            # child's); the created id is proved by matching it in the rows returned.
+            created_match = [f"id={created_id}"]
     if snapshot_source:
         if not created_id:
             fail(f"{action}: a snapshot read-back needs the created id (--read-id-from-output)")
@@ -504,9 +510,9 @@ def run_record(args, transport):
             print_result("read-back", read_action, row)
         return 0
     read_result = execute(transport, read_action, read_input, actor_id=actor_id)
-    if args.read_match:
+    if args.read_match or created_match:
         pairs = []
-        for item in args.read_match:
+        for item in list(args.read_match or []) + created_match:
             if "=" not in item:
                 fail(f"--read-match needs FIELD=VALUE, got {item!r}", 2)
             field, expected = item.split("=", 1)
@@ -814,6 +820,37 @@ def self_test():
             [] if "unverified" in (completed.stdout + completed.stderr).lower()
             else ["failure does not say the claim is unverified"]
         ),
+    )
+
+    list_env = dict(fake_env)
+    list_env["PROGRAMME_RECORD_LIST"] = "1"
+
+    def verify_list_readback(completed):
+        problems = []
+        reads = [
+            call for call in calls()
+            if call["argv"][call["argv"].index("--name") + 1] == "cadences.list"
+        ]
+        if not reads:
+            problems.append("the list read-back never ran")
+        elif reads[0]["input"] != {"programme_id": "p1"}:
+            problems.append(f"the read input was {reads[0]['input']!r}")
+        return problems
+
+    run_case(
+        "a list read-back keeps its own input and matches the created id",
+        [
+            "--action", "cadences.create",
+            "--input", '{"programme_id":"p1","kind":"pi","period":"tranche-1"}',
+            "--read-action", "cadences.list",
+            "--read-input", '{"programme_id":"p1"}',
+            "--read-id-from-output", "id",
+            "--evidence", evidence,
+            "--quiet",
+        ],
+        list_env,
+        True,
+        verify_list_readback,
     )
 
     def verify_local_bin(completed):
