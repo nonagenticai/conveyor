@@ -559,6 +559,18 @@ def load_manifest(path: Path) -> dict[str, Any]:
         fail(f"{path} is not TOML: {error}")
 
 
+def snapshot_label(path: Path, manifest: dict[str, Any]) -> str:
+    """Where the evidence says the snapshot was: repo-relative, or a retained one named by SHA.
+
+    A snapshot built outside the repository (the live batch keeps its retained directory under
+    the operator's home) must not leak an absolute path into a committed or published artefact.
+    """
+    try:
+        return str(path.resolve().relative_to(ROOT))
+    except ValueError:
+        return f"retained-snapshot/{manifest.get('git_sha') or 'unknown'}"
+
+
 def run_project(
     key: str,
     snapshot_dir: Path,
@@ -654,7 +666,7 @@ def run_project(
         "gate": declared.get("gate"),
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "snapshot": {
-            "path": str(snapshot_dir),
+            "path": snapshot_label(snapshot_dir, snapshot.manifest),
             "git_sha": snapshot.manifest.get("git_sha"),
             "generated_at": snapshot.manifest.get("generated_at"),
         },

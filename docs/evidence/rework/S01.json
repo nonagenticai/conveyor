@@ -131,7 +131,7 @@
   ],
   "failures": [],
   "gate": "The decision record states what is observable and marks the rest not recoverable; the project re-closes through the one gate.",
-  "generated_at": "2026-11-21T18:19:10.278379+00:00",
+  "generated_at": "2026-11-21T18:25:29.186686+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/S01.toml",
   "name": "UI spike \u2014 Leptos CSR vs Leptos SSR",

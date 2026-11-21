@@ -163,7 +163,7 @@
   ],
   "failures": [],
   "gate": "The definition set is published; the charter and scope baseline are approved; the closure review and close gate are recorded.",
-  "generated_at": "2026-11-21T18:19:02.532819+00:00",
+  "generated_at": "2026-11-21T18:25:21.147981+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/P0.toml",
   "name": "Programme definition \u2014 vision, blueprint, plan and project briefs",
