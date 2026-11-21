@@ -97,7 +97,7 @@
       "evidence": [
         {
           "path": "crates/actions/src/spine/mod.rs",
-          "line": 1186,
+          "line": 1241,
           "quote": "        && !matches!(status, \"open\" | \"accepted\" | \"cancelled\")"
         },
         {
@@ -107,7 +107,7 @@
         },
         {
           "path": "crates/actions/src/spine/mod.rs",
-          "line": 1380,
+          "line": 1435,
           "quote": "                \"change_request_required\","
         }
       ],
@@ -150,7 +150,7 @@
       "evidence": [
         {
           "path": "crates/store/src/spine.rs",
-          "line": 1031,
+          "line": 1038,
           "quote": "    let sql = \"SELECT id, key, name, status, programme_id, version FROM project"
         }
       ],
@@ -185,7 +185,12 @@
       ],
       "failure_scenario": "An unbudgeted run calls upstream indefinitely; no 429 is ever produced and spend is discovered after the fact.",
       "acceptance": "A binding without a budget refuses run start (409/422 naming the missing budget); with a declared budget call N+1 returns 429 budget_exceeded before dispatch and the provider-call counter is unchanged.",
-      "owner_project": "T11"
+      "owner_project": "T11",
+      "resolved_by": {
+        "commit": "8f1e57706a3c1efea6092a3f7b7edebb0facc594",
+        "test": "crates/actions/tests/tool_budget.rs",
+        "evidence": "cargo test -p conveyor-actions --test tool_budget: 14 passed (2026-11-21). The router defaults to Enforce; an unbudgeted capturing call is 429 tool_budget_exceeded before dispatch; an internal-agent binding with no ceiling refuses runs.create 422 budget_missing; a priced call records its derived cost on tool_call."
+      }
     },
     {
       "id": "v1-p75-2",
@@ -542,7 +547,7 @@
         },
         {
           "path": "crates/store/src/spine.rs",
-          "line": 3337,
+          "line": 3502,
           "quote": "            if matches!(state.as_str(), \"authorised\" | \"in_review\" | \"closed\") =>"
         }
       ],
@@ -566,7 +571,7 @@
         },
         {
           "path": "crates/store/src/spine.rs",
-          "line": 2001,
+          "line": 2008,
           "quote": "            .is_some_and(|t| t.baseline_measured_at.is_some() && t.post_measured_at.is_some());"
         },
         {
@@ -576,12 +581,12 @@
         },
         {
           "path": "crates/store/src/spine.rs",
-          "line": 2001,
+          "line": 2008,
           "quote": "            .is_some_and(|t| t.baseline_measured_at.is_some() && t.post_measured_at.is_some());"
         },
         {
           "path": "crates/store/src/spine.rs",
-          "line": 2489,
+          "line": 2496,
           "quote": "    if post.is_some() && baseline.is_none() {"
         }
       ],
@@ -634,7 +639,7 @@
         },
         {
           "path": "crates/store/src/spine.rs",
-          "line": 1461,
+          "line": 1468,
           "quote": "            \"SELECT EXISTS (SELECT 1 FROM programme_baseline WHERE tenant_id = $1 AND id = $2)\","
         }
       ],
@@ -658,12 +663,12 @@
         },
         {
           "path": "crates/store/src/spine.rs",
-          "line": 3496,
+          "line": 3661,
           "quote": "pub async fn close_programme_tx("
         },
         {
           "path": "crates/store/src/spine.rs",
-          "line": 3530,
+          "line": 3695,
           "quote": "        \"UPDATE programme SET status = 'closed', version = version + 1, updated_at = now()"
         }
       ],
@@ -871,7 +876,12 @@
       ],
       "failure_scenario": "An unattended tick commits an unapproved plan, with unvalidated WSJF inputs, as materialised work.",
       "acceptance": "Materialisation stops at awaiting_approval; a named human approval is required before cards count as planned and the tick cannot bypass it.",
-      "owner_project": "T10"
+      "owner_project": "T10",
+      "resolved_by": {
+        "commit": "8f1e57706a3c1efea6092a3f7b7edebb0facc594",
+        "test": "crates/actions/tests/pi_plan_approval.rs",
+        "evidence": "cargo test -p conveyor-actions --test pi_plan_approval: 8 passed. A pending or rejected plan materialises nothing; an approved plan materialises exactly once inside the WIP slots; a service principal's decision cannot approve a plan."
+      }
     },
     {
       "id": "v1-p82-2",
@@ -884,12 +894,12 @@
       "evidence": [
         {
           "path": "crates/actions/src/spine/mod.rs",
-          "line": 3006,
+          "line": 3061,
           "quote": "            state: input.state,"
         },
         {
           "path": "crates/store/src/spine.rs",
-          "line": 2663,
+          "line": 2670,
           "quote": "            state = coalesce($5, state),"
         },
         {
@@ -942,7 +952,7 @@
       "evidence": [
         {
           "path": "apps/server/src/cadence.rs",
-          "line": 52,
+          "line": 92,
           "quote": "              WHERE tenant_id = $1 AND kind IN ('demo', 'retro') AND state = 'planned'"
         }
       ],
@@ -961,7 +971,7 @@
       "evidence": [
         {
           "path": "crates/store/src/spine.rs",
-          "line": 2820,
+          "line": 2985,
           "quote": "          WHERE tenant_id = $1 AND project_id = $2 AND kind = 'deliverable'"
         }
       ],
@@ -1468,7 +1478,12 @@
       ],
       "failure_scenario": "Create a job whose departments declare a required kind (e.g. charter) that the job definition never sets. job_releases.publish returns 200 with a release hash and a snapshot that contains no resolved charter; job_bindings.create pins that release active and a run proceeds. Required knowledge is missing and the mandated 409 release_not_ready never fires. Two sibling departments with conflicting values likewise produce a clean release instead of 422 department_conflict.",
       "acceptance": "Publishing over a department whose required kind has no resolvable value returns 409 release_not_ready with the kind and department named; two sibling departments declaring one kind at different values return 422 department_conflict; the release snapshot records the resolved layer values and their sources, and a successful publish is reproducible byte-for-byte.",
-      "owner_project": "T0"
+      "owner_project": "T0",
+      "resolved_by": {
+        "commit": "8f1e57706a3c1efea6092a3f7b7edebb0facc594",
+        "test": "crates/actions/tests/release_layers.rs",
+        "evidence": "cargo test -p conveyor-actions --test release_layers: green in the 8f1e5770 wave. A release missing a knowledge layer refuses release_not_ready and conflicting department layers refuse department_conflict."
+      }
     },
     {
       "id": "v1-w1a-3",
@@ -1481,12 +1496,12 @@
       "evidence": [
         {
           "path": "crates/actions/src/spine/mod.rs",
-          "line": 1588,
+          "line": 1643,
           "quote": "        input.status.as_deref(),"
         },
         {
           "path": "crates/store/src/spine.rs",
-          "line": 779,
+          "line": 786,
           "quote": "            status = coalesce($4, status), title = coalesce($5, title),"
         }
       ],
@@ -1505,12 +1520,12 @@
       "evidence": [
         {
           "path": "crates/actions/src/organisation.rs",
-          "line": 606,
+          "line": 645,
           "quote": "            status: \"draft\".to_owned(),"
         },
         {
           "path": "crates/store/src/organisation.rs",
-          "line": 592,
+          "line": 955,
           "quote": "    if job.status == \"retired\" {"
         }
       ],
@@ -1626,7 +1641,7 @@
         },
         {
           "path": "crates/store/src/organisation.rs",
-          "line": 173,
+          "line": 213,
           "quote": "    /// `department_scope`, authority, limits override."
         }
       ],
@@ -1935,12 +1950,12 @@
       "evidence": [
         {
           "path": "crates/actions/src/spine/mod.rs",
-          "line": 2174,
+          "line": 2229,
           "quote": "            capabilities: input.capabilities.unwrap_or_else(|| serde_json::json!([])),"
         },
         {
           "path": "crates/actions/src/spine/mod.rs",
-          "line": 2179,
+          "line": 2234,
           "quote": "            operational_area: input.operational_area.unwrap_or_default(),"
         },
         {
@@ -1974,7 +1989,7 @@
         },
         {
           "path": "crates/actions/src/spine/mod.rs",
-          "line": 2274,
+          "line": 2329,
           "quote": "            output_ref: input.output_ref,"
         }
       ],
@@ -1993,7 +2008,7 @@
       "evidence": [
         {
           "path": "crates/actions/src/spine/mod.rs",
-          "line": 3006,
+          "line": 3061,
           "quote": "            state: input.state,"
         },
         {
@@ -2003,7 +2018,7 @@
         },
         {
           "path": "crates/store/src/spine.rs",
-          "line": 3302,
+          "line": 3467,
           "quote": "                PlanError::RetroFindingWithoutLesson(key),"
         }
       ],
@@ -2085,7 +2100,7 @@
         },
         {
           "path": "crates/actions/src/spine/mod.rs",
-          "line": 1068,
+          "line": 1123,
           "quote": "    name = \"wbs.create\","
         }
       ],
@@ -2304,7 +2319,12 @@
       ],
       "failure_scenario": "A run whose binding permits `spend` calls `image_gen.generate` in a loop (image_gen is a first-wave toolkit). No budget counter is consulted before any of the calls; the destination produces paid renders on every iteration; every ledger row carries cost NULL, so the tenant's spend cannot be attributed and the gate that should have stopped at the first over-budget call never fires.",
       "acceptance": "A spend-class tool call when the job's budget is exhausted returns `429 tool_budget_exceeded` before any network call; a successful spend call writes a non-null `cost` on its single `tool_call` row; a test drives `tools.call` for a spend tool under a zero budget and asserts the destination was never reached.",
-      "owner_project": "T13"
+      "owner_project": "T13",
+      "resolved_by": {
+        "commit": "8f1e57706a3c1efea6092a3f7b7edebb0facc594",
+        "test": "crates/actions/tests/tool_budget.rs",
+        "evidence": "cargo test -p conveyor-actions --test tool_budget: 14 passed. A spend tool under a zero or exhausted budget is 429 tool_budget_exceeded with the stub's hit counter unchanged, and a successful spend call's single tool_call row carries the derived non-null cost."
+      }
     },
     {
       "id": "v1-w4a-2",
@@ -2322,7 +2342,7 @@
         },
         {
           "path": "crates/actions/src/broker.rs",
-          "line": 315,
+          "line": 391,
           "quote": "                _ => \"backend_error\","
         },
         {
@@ -2356,7 +2376,7 @@
         },
         {
           "path": "crates/actions/src/broker.rs",
-          "line": 250,
+          "line": 326,
           "quote": "        idempotency_key: request.idempotency_key.clone(),"
         },
         {
@@ -2390,7 +2410,7 @@
         },
         {
           "path": "crates/actions/src/broker.rs",
-          "line": 258,
+          "line": 334,
           "quote": "        authority: Authority::Internal,"
         }
       ],
@@ -2424,7 +2444,7 @@
         },
         {
           "path": "crates/actions/src/broker.rs",
-          "line": 315,
+          "line": 391,
           "quote": "                _ => \"backend_error\","
         }
       ],
@@ -3094,22 +3114,22 @@
       "spec": "§5.4",
       "severity": "P0",
       "title": "S06 gate names five absent test targets",
-      "problem": "The S06 acceptance command names run_retry, approval_expire, andon, delivery_retry and telegram_reply test targets under crates/api/tests; none exists at this head. A missing test target makes the gate hard-error, so the slice's own acceptance can never pass and properties c/d/e lack their named proofs.",
+      "problem": "The S06 acceptance command named five test targets that do not exist (telegram_reply and four others under crates/api/tests), so the gate hard-errored before any property could run. The gate is now split by package and names only shipped targets: conveyor-api's golden_path, claim_race, approval_dual, notifications, sse_control and channel_inbound, and conveyor-server's run_retry, approval_expire, andon and delivery_retry. The remaining requirement is the green run of those targets; no run is recorded in this ledger.",
       "evidence": [
         {
           "path": "docs/plans/slices/S06-control-plane.md",
-          "line": 176,
-          "quote": "cargo test -p conveyor-api --test golden_path --test claim_race --test run_retry \\"
+          "line": 165,
+          "quote": "8. `card.claim` waiter + `card.lease_sweep` + the lease events. `cargo test -p conveyor-api --test claim_race`"
         },
         {
           "path": "docs/plans/slices/S06-control-plane.md",
-          "line": 177,
-          "quote": "  --test approval_dual --test approval_expire --test andon --test delivery_retry \\"
+          "line": 166,
+          "quote": "9. Runs: 5 actions, `run.execute`, `run.reap`; one-live-run invariant. `cargo test -p conveyor-server --test run_retry`"
         },
         {
           "path": "docs/plans/slices/S06-control-plane.md",
-          "line": 178,
-          "quote": "  --test telegram_reply --test notifications --test sse_control"
+          "line": 170,
+          "quote": "13. Andon: 2 actions, poller pause, gauge + timeout. `cargo test -p conveyor-server --test andon`"
         }
       ],
       "failure_scenario": "The S06 gate is permanently red; retry, andon, delivery and approval-expiry regressions ship unseen.",
@@ -3152,22 +3172,12 @@
       "spec": "§5.4",
       "severity": "P0",
       "title": "S06c gate's task_capable assertion can never pass",
-      "problem": "The gate greps for the literal task_capable: true in projects.rs, but the derive writes task = true; no such literal exists, so grep -c returns 0 and test ... -eq 1 fails even though projects.execute is task-capable.",
+      "problem": "The S06c gate grepped for the literal `task_capable: true` in projects.rs, but the derive writes `task = true`, so grep -c returned 0 and the assertion could never pass. The gate now runs the compiled-registry assertion `conveyor-actions --test mcp_tasks_contract only_projects_execute_is_task_capable`. The named test exists; its green run is the remaining proof and is not yet recorded here.",
       "evidence": [
         {
           "path": "docs/plans/slices/S06c-mcp-tasks.md",
-          "line": 169,
-          "quote": "test \"$(grep -c 'task_capable: true' crates/actions/src/board/projects.rs)\" -eq 1"
-        },
-        {
-          "path": "crates/actions/src/board/projects.rs",
-          "line": 1270,
-          "quote": "    task = true"
-        },
-        {
-          "path": "crates/actions/src/mcp.rs",
-          "line": 267,
-          "quote": "        if spec.task_capable && (200..300).contains(&status) {"
+          "line": 173,
+          "quote": "cargo test -p conveyor-actions --test mcp_tasks_contract only_projects_execute_is_task_capable"
         }
       ],
       "failure_scenario": "The S06c gate is red despite working tasks, or a dead literal is added to satisfy the grep.",
@@ -3322,7 +3332,12 @@
       ],
       "failure_scenario": "A low-scope caller probes tool names; 403 distinguishes existing from absent tools, contradicting the slice's contract, and no test fails.",
       "acceptance": "Either amend S10 to the S04-D6 rule (correct-the-claim) and add a test calling an omitted real tool, or implement action-not-found; state which governs.",
-      "owner_project": "S10"
+      "owner_project": "S10",
+      "resolved_by": {
+        "commit": "8f1e57706a3c1efea6092a3f7b7edebb0facc594",
+        "test": "crates/api/tests/copilot_surface.rs",
+        "evidence": "cargo test -p conveyor-api --test copilot_surface: 4 passed. An action outside the surface is absent from tools/list and refused 403 action-forbidden over HTTP and MCP; S10 property e now records the shipped rule instead of action-not-found."
+      }
     },
     {
       "id": "v1-s10-2",
@@ -3365,27 +3380,22 @@
       "spec": "§5.4",
       "severity": "P0",
       "title": "S11's gate calls procedure_runs.start, which does not exist at HEAD",
-      "problem": "The gate still uses the pre-amendment names: it builds a stepped procedure with procedures.create and starts it via procedure_runs.start. The registry exposes process_runs.start; procedure_runs.start survives only in a comment.",
+      "problem": "The S11 gate used the pre-amendment names: procedures.create plus procedure_runs.start, which does not exist at this head. The script now publishes through processes.create and starts through process_runs.start, and says so where the old name appeared. The remaining requirement is a green run of the script against a live server; no run is recorded here.",
       "evidence": [
         {
           "path": "docs/plans/slices/S11-procedures.md",
-          "line": 142,
-          "quote": "ID=$(P procedures.create \"{\\\"input\\\":{\\\"key\\\":\\\"dev-phase\\\",\\\"title\\\":\\\"Dev phase\\\",\\\"card_type_code\\\":\\\"$CT\\\",\\\"steps\\\":["
+          "line": 145,
+          "quote": "# `procedure_runs.start` never existed at this head — the run entry point is `process_runs.start`."
         },
         {
           "path": "docs/plans/slices/S11-procedures.md",
-          "line": 154,
-          "quote": "RUN=$(P procedure_runs.start \"{\\\"input\\\":{\\\"card_id\\\":\\\"$CARD\\\",\\\"procedure_key\\\":\\\"dev-phase\\\",\\\"inputs\\\":{\\\"ticket\\\":\\\"T-1\\\",\\\"done_list\\\":\\\"$DONE\\\"}}}\" | jq -r .id)"
+          "line": 152,
+          "quote": "ID=$(P processes.create \"{\\\"input\\\":{\\\"key\\\":\\\"dev-phase\\\",\\\"title\\\":\\\"Dev phase\\\",\\\"card_type_code\\\":\\\"$CT\\\",\\\"steps\\\":["
         },
         {
-          "path": "crates/actions/src/process/runs.rs",
-          "line": 245,
-          "quote": "    name = \"process_runs.start\","
-        },
-        {
-          "path": "crates/actions/src/workflow/runs.rs",
-          "line": 3,
-          "quote": "//! Starting mirrors S11's `procedure_runs.start`: the run row, its first trace row and the job"
+          "path": "docs/plans/slices/S11-procedures.md",
+          "line": 164,
+          "quote": "RUN=$(P process_runs.start \"{\\\"input\\\":{\\\"card_id\\\":\\\"$CARD\\\",\\\"process_key\\\":\\\"dev-phase\\\",\\\"inputs\\\":{\\\"ticket\\\":\\\"T-1\\\",\\\"done_list\\\":\\\"$DONE\\\"}}}\" | jq -r .id)"
         }
       ],
       "failure_scenario": "Running the slice's own gate returns action-not-found at the start call, so its nine-row acceptance can never be green at HEAD.",
@@ -3399,27 +3409,27 @@
       "spec": "§5.4",
       "severity": "P0",
       "title": "Specs do not assert empty, error and happy states; run-queue's disjunction proves neither",
-      "problem": "The gate says every spec asserts three states and a happy-path-only spec fails review. run-queue has one test whose core assertion accepts empty or non-empty; admin asserts only that .problem is absent, never an error state.",
+      "problem": "The S12 three-state rule was unmet: run-queue had one test whose core assertion accepted empty or non-empty, and admin asserted only that `.problem` was absent. Each screen now has distinct happy, empty and error tests; run-queue's error path injects a 503 on runs.list (the invalid `expired` filter was removed rather than tested), and admin's injects a 503 on audit.list. The tests have not yet been run under Playwright in this ledger.",
       "evidence": [
         {
-          "path": "docs/plans/slices/S12-ui-buildout.md",
-          "line": 123,
-          "quote": "- Every spec asserts empty state, error state and happy path — a spec that only asserts the happy path fails review."
+          "path": "apps/web/e2e/run-queue.spec.ts",
+          "line": 15,
+          "quote": "test(\"the queue shows a run this test created, filtered by its state\", async ({ page, request }) => {"
         },
         {
           "path": "apps/web/e2e/run-queue.spec.ts",
-          "line": 3,
-          "quote": "test(\"the run queue filters by state\", async ({ page }) => {"
+          "line": 40,
+          "quote": "test(\"a tenant with no runs says so instead of rendering a blank queue\", async ({ page }) => {"
         },
         {
           "path": "apps/web/e2e/run-queue.spec.ts",
-          "line": 16,
-          "quote": "      .or(page.locator(\".pill\", { hasText: /failed/i }).first()),"
+          "line": 51,
+          "quote": "test(\"a failed queue read is the screen's error panel\", async ({ page }) => {"
         },
         {
           "path": "apps/web/e2e/admin.spec.ts",
-          "line": 61,
-          "quote": "  await expect(page.locator(\".problem\")).toHaveCount(0);"
+          "line": 83,
+          "quote": "test(\"a tab whose action fails renders the screen's error panel\", async ({ page }) => {"
         }
       ],
       "failure_scenario": "An empty tenant renders blank, or a 500 renders raw, and the suite stays green because no assertion distinguishes the three states.",
@@ -3462,17 +3472,17 @@
       "spec": "§5",
       "severity": "P0",
       "title": "S14 cutover gate's evidence tree does not exist",
-      "problem": "The plan says the cutover evidence is delivered in-tree, and its gate iterates docs/cutover/evidence/R1..R6 before any health, andon, decommission or parity check. At c7d92d74 docs/cutover/ is absent entirely, so the gate exits 1 at R1 and precondition P4 is unmet.",
+      "problem": "The cutover evidence tree does not exist: docs/cutover/ is absent at HEAD, so R0-R7, the freeze log and the rollback runbook are requirements, not receipts. The plan now self-records the absence and the S14 gate fails first naming the gap instead of pretending the tree is delivered. The acceptance (receipts in-tree, gate exits 0) remains unmet.",
       "evidence": [
         {
           "path": "docs/plans/slices/S14-cutover.md",
-          "line": 87,
-          "quote": "Also delivered: `docs/cutover/freeze-log.md`, `docs/cutover/rollback.md`, `docs/cutover/evidence/R0..R7-*`"
+          "line": 35,
+          "quote": "| P4 | Old system frozen (D8) | **NOT PROVEN in-tree (v1-s14-1):** `docs/cutover/` is absent at HEAD, so `docs/cutover/freeze-log.md` does not exist. The freeze is recorded only in this plan and in gitops-production #5333; until the log is committed this precondition is unmet and the §7 gate stays red. |"
         },
         {
           "path": "docs/plans/slices/S14-cutover.md",
-          "line": 216,
-          "quote": "for f in R1-live-n8n.md R2-replay.md R3-inapp-engine.md R4-rollback.md R5-parity-final.txt R6-agent-task.md; do test -s \"docs/cutover/evidence/$f\" || { echo \"missing evidence: $f\" >&2; exit 1; }; done"
+          "line": 89,
+          "quote": "`docs/cutover/fixtures/` (recorded payloads). ⚠️ `docs/cutover/` is **absent at HEAD**"
         }
       ],
       "failure_scenario": "The S14 gate aborts on R1-live-n8n.md, so the health, andon, decommission and parity checks never run.",
@@ -3486,17 +3496,22 @@
       "spec": "§7",
       "severity": "P0",
       "title": "S15 memory and knowledge gate targets are missing",
-      "problem": "Both gate commands select integration targets that exist nowhere; the only knowledge_query/memory_recall code is in src modules. The test target is named but absent, so the compiler refuses the run and properties (a)/(d) are never proved.",
+      "problem": "The S15 gate named conveyor-api test targets (knowledge_query, memory_recall) that exist nowhere. It now names shipped targets: conveyor-actions registry and parity_http_mcp, strata_live (ignored, real strata) and conveyor-store --test memory, with the vacuous filters removed. What remains unproven is a real pack/layer knowledge hit and run-transactional memory; the live path is still an ignored test, so the acceptance's second clause is unmet.",
       "evidence": [
         {
           "path": "docs/plans/slices/S15-capability-knowledge-memory.md",
-          "line": 144,
-          "quote": "cargo test -p conveyor-api --test knowledge_query"
+          "line": 114,
+          "quote": "   `cargo test -p conveyor-actions --test strata_live -- --ignored` (real strata) plus"
         },
         {
           "path": "docs/plans/slices/S15-capability-knowledge-memory.md",
-          "line": 146,
-          "quote": "cargo test -p conveyor-api --test memory_recall"
+          "line": 119,
+          "quote": "   `--test parity_http_mcp` (HTTP + MCP); the `conveyor-api --test knowledge_query` target named here"
+        },
+        {
+          "path": "docs/plans/slices/S15-capability-knowledge-memory.md",
+          "line": 123,
+          "quote": "   The shipped proof is `cargo test -p conveyor-store --test memory` and"
         }
       ],
       "failure_scenario": "The gate stops at the first missing target; capability, memory, readiness and clippy checks never execute.",
@@ -3510,27 +3525,17 @@
       "spec": "§7",
       "severity": "P0",
       "title": "S16 inference-capture and audit gates are vacuous",
-      "problem": "Three gate filters select nothing that exists: the --exact name is a_real_call_records_the_router_usage but the test is a_real_external_call_records_the_router_usage_field_for_field; the gate names procedures_write but the registry test is processes_write; and the inference_usage and inference_constraints targets are absent. A filter matching zero tests exits 0, so the only real-call capture proof never executes.",
+      "problem": "The S16 gate's --exact filters selected nothing that exists (a_real_call_records_the_router_usage vs the shipped name, procedures_write vs processes_write) and a zero-match libtest run exits 0. The filters now name the shipped tests and the gate has a zero-match guard that makes a stale name red. The live-router rehearsal target the plan promised is still absent, so the acceptance's last clause is unmet.",
       "evidence": [
         {
           "path": "docs/plans/slices/S16-inference-audit.md",
+          "line": 111,
+          "quote": "   sending `X-Correlation-Id`. `rbuild -- test -p conveyor-actions inference_capture`."
+        },
+        {
+          "path": "docs/plans/slices/S16-inference-audit.md",
           "line": 145,
-          "quote": "rbuild -- test -p conveyor-actions --test inference_capture -- --exact a_real_call_records_the_router_usage"
-        },
-        {
-          "path": "crates/actions/tests/inference_capture.rs",
-          "line": 19,
-          "quote": "async fn a_real_external_call_records_the_router_usage_field_for_field() {"
-        },
-        {
-          "path": "docs/plans/slices/S16-inference-audit.md",
-          "line": 147,
-          "quote": "rbuild -- test -p conveyor-domain --test inference_usage"
-        },
-        {
-          "path": "docs/plans/slices/S16-inference-audit.md",
-          "line": 153,
-          "quote": "rbuild -- test -p conveyor-actions --test registry -- --exact no_prompt_action_holds_procedures_write"
+          "quote": "  n=$(rbuild -- test \"$@\" -- --list --exact \"$name\" | grep -c ': test$' || true)"
         }
       ],
       "failure_scenario": "A capture seam that drops router usage yields a green S16 gate because zero capture tests matched.",
@@ -3544,17 +3549,12 @@
       "spec": "§10",
       "severity": "P1",
       "title": "S17's admitted live sandbox proof has no test artifact",
-      "problem": "The plan represents its only NOT PROVEN item as apps/server/tests/sandbox_live.rs with an #[ignore] test and a documented follow-up command. That file is absent at c7d92d74, so the documented command exits target-not-found and no runnable proof is queued.",
+      "problem": "The plan represented its only NOT PROVEN item as apps/server/tests/sandbox_live.rs with an ignored test; the file is absent, so the documented command exits target-not-found. The plan now says exactly that and no longer claims a proof artifact exists. The acceptance (the file exists with the named ignored test and its result is recorded) remains unmet.",
       "evidence": [
         {
           "path": "docs/plans/slices/S17-benchmark-harness.md",
-          "line": 82,
-          "quote": "`apps/server/tests/benchmark_jobs.rs`, `apps/server/tests/sandbox_live.rs` (`#[ignore]`, needs the cluster). Plus"
-        },
-        {
-          "path": "docs/plans/slices/S17-benchmark-harness.md",
-          "line": 187,
-          "quote": "`rbuild -- test -p conveyor-server --test sandbox_live -- --ignored`, run once when the node exists."
+          "line": 194,
+          "quote": "`rbuild -- test -p conveyor-server --test sandbox_live -- --ignored` exits target-not-found. The"
         }
       ],
       "failure_scenario": "An operator runs the documented ignored command; cargo exits target-not-found, indistinguishable from an unproven sandbox.",
@@ -3568,21 +3568,21 @@
       "spec": "§7",
       "severity": "P0",
       "title": "S18 gate cites targets in the wrong package",
-      "problem": "benchmark_arm lives in crates/api/tests (package conveyor-api), but the gate asks conveyor-server for it; benchmark_improvement is apps/server/src/benchmark_improvement.rs, a module with no #[test] or [[test]] target. Both commands fail before any arm or improvement assertion runs.",
+      "problem": "The S18 gate asked conveyor-server for benchmark_arm (it lives in conveyor-api) and named benchmark_improvement, which has no test target. The gate now names conveyor-api --test benchmark_arm and carries a named-gap guard for benchmark_improvement: the file's absence is stated and the gate fails loudly rather than passing on zero tests. The second command still selects no real target, so the acceptance is unmet.",
       "evidence": [
         {
           "path": "docs/plans/slices/S18-kata-improvement.md",
-          "line": 111,
-          "quote": "cargo test -p conveyor-server --test benchmark_arm"
-        },
-        {
-          "path": "crates/api/tests/benchmark_arm.rs",
-          "line": 146,
-          "quote": "async fn the_conveyor_arm_refuses_what_it_cannot_measure() {"
+          "line": 113,
+          "quote": "cargo test -p conveyor-api --test benchmark_arm"
         },
         {
           "path": "docs/plans/slices/S18-kata-improvement.md",
-          "line": 115,
+          "line": 120,
+          "quote": "test -s apps/server/tests/benchmark_improvement.rs || {"
+        },
+        {
+          "path": "docs/plans/slices/S18-kata-improvement.md",
+          "line": 124,
           "quote": "cargo test -p conveyor-server --test benchmark_improvement"
         }
       ],
@@ -3612,7 +3612,12 @@
       ],
       "failure_scenario": "A sign-off or answer-key action granted agent reachability still yields a green S19 gate.",
       "acceptance": "The filter names machine_reachable exactly; a deliberately reachable eval action turns it red.",
-      "owner_project": "S19"
+      "owner_project": "S19",
+      "resolved_by": {
+        "commit": "8f1e57706a3c1efea6092a3f7b7edebb0facc594",
+        "test": "crates/actions/tests/registry.rs",
+        "evidence": "cargo test -p conveyor-actions --test registry: 12 passed, including no_eval_signoff_or_answer_key_action_is_machine_reachable. The S19 gate now names that exact filter and its zero-match guard makes a stale name red."
+      }
     },
     {
       "id": "v1-s05-1",
@@ -3664,7 +3669,7 @@
         },
         {
           "path": "docs/design/data/actions.json",
-          "line": 240,
+          "line": 241,
           "quote": "    \"lessons.list\","
         }
       ],
@@ -3694,7 +3699,7 @@
         },
         {
           "path": "docs/design/data/actions.json",
-          "line": 465,
+          "line": 466,
           "quote": "    \"tools.call\","
         }
       ],
@@ -3759,7 +3764,7 @@
         },
         {
           "path": "docs/design/data/actions.json",
-          "line": 465,
+          "line": 466,
           "quote": "    \"tools.call\","
         }
       ],
@@ -3794,7 +3799,7 @@
         },
         {
           "path": "docs/design/data/actions.json",
-          "line": 341,
+          "line": 342,
           "quote": "    \"procedures.ingest_sop\","
         }
       ],
@@ -3802,6 +3807,49 @@
       "acceptance": "Re-base on 0055, delete the false precondition, and keep only the procedures.draft/PDDL/PKO gaps.",
       "owner_project": "T17",
       "disposition": "correct-the-claim"
+    },
+    {
+      "id": "v1-u5a-budget-1",
+      "area": "§4.2",
+      "standard": "SPEC",
+      "spec": "§4.2",
+      "severity": "P1",
+      "title": "The seeded job anatomy's limits are a display string, so no seeded binding declares a machine budget",
+      "problem": "SPEC_V2 §4.2 makes the release anatomy the job's default max-iterations, timeout, token and cost budget, but every seeded definition carries `limits` as prose ('12 turns · 40k tokens · $2.50'). The store's budget resolver accepts only `limits.cost_budget_usd` as a non-negative JSON number, so a binding compiled from the seed has no enforceable ceiling and, under the #526 fail-closed gate, cannot start an internal-agent run.",
+      "evidence": [
+        {
+          "path": "seed/organisation.json",
+          "line": 50,
+          "quote": "        \"limits\": \"12 turns · 40k tokens · $2.50\","
+        }
+      ],
+      "failure_scenario": "A tenant is seeded, a person binds the backend_engineer job to a process, and runs.create is called: the binding resolves, but the run-start budget gate refuses 422 budget_missing although the published anatomy displays a $2.50 ceiling. The displayed limit is not the enforced one.",
+      "acceptance": "The seeded definitions carry a structured `limits` object with a numeric `cost_budget_usd` (the display string preserved as `limits.display`), the release compile copies it into the anatomy verbatim, a seeded binding satisfies the run-start budget gate, and existing live rows are migrated forward or reseeded with a recorded migration.",
+      "owner_project": "T0"
+    },
+    {
+      "id": "v1-u5a-expired-filter-1",
+      "area": "§12",
+      "standard": "SPEC",
+      "spec": "§12",
+      "severity": "P2",
+      "title": "The run queue offered an `expired` filter the API always refuses",
+      "problem": "The run-queue screen listed 'Expired' as a status filter, but RunStatus has no expired state (approvals expire, runs do not), so selecting it made runs.list answer 422 and replaced the queue with an error panel. The S12 audit found it while correcting the slice's three-state spec.",
+      "evidence": [
+        {
+          "path": "apps/web/src/screens/runs.rs",
+          "line": 25,
+          "quote": "    (\"expired\", \"Expired\"),"
+        }
+      ],
+      "failure_scenario": "A person opens /runs and selects 'Expired': every call is 422 action-invalid-input naming the real statuses, so the screen shows an error panel for a filter the UI itself offered.",
+      "acceptance": "The filter list is exactly the states the API accepts; the queue's error-state e2e asserts a transport failure rather than a self-inflicted 422.",
+      "owner_project": "PLATFORM",
+      "resolved_by": {
+        "commit": "8f1e57706a3c1efea6092a3f7b7edebb0facc594",
+        "test": "apps/web/e2e/run-queue.spec.ts",
+        "evidence": "The option is removed (FILTERS is 7 entries); the error spec injects a 503 on runs.list and asserts the screen's error panel. Playwright run is the remaining gate."
+      }
     }
   ]
 }
