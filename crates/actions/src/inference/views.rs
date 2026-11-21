@@ -92,7 +92,8 @@ pub struct InferenceUsageReportIn {
     pub since: DateTime<Utc>,
     /// Exclusive upper bound on the call time.
     pub until: DateTime<Utc>,
-    /// `day | model | caller_kind | cache_status | prompt_sha | project`.
+    /// `day | model | caller_kind | cache_status | prompt_sha | project | department |
+    /// programme | job | run | step`.
     pub group_by: String,
 }
 
