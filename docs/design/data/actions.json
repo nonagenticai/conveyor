@@ -71,6 +71,7 @@
     "billing.summary",
     "boards.get",
     "boards.set_member",
+    "cadences.approve_plan",
     "cadences.create",
     "cadences.credit_demo",
     "cadences.credit_list",

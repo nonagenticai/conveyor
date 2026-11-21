@@ -79,7 +79,10 @@ artifact writer), `crates/domain/src/benchmark/{mod,arm,grade,parsers,mcnemar,sp
 `crates/actions/src/benchmark/{mod,runs,cases}.rs`,
 `apps/server/src/sandbox.rs`, `apps/server/src/worker.rs` (the driver + reaper). Tests:
 `crates/actions/tests/benchmark_parity.rs` (+ its frozen fixtures), `crates/api/tests/benchmark_rls.rs`,
-`apps/server/tests/benchmark_jobs.rs`, `apps/server/tests/sandbox_live.rs` (`#[ignore]`, needs the cluster). Plus
+`apps/server/tests/benchmark_jobs.rs` (the shipped sandbox proof: manifest/isolation contract,
+fail-closed config, and the driver against a stubbed API). **No live sandbox test exists at this
+baseline:** `apps/server/tests/sandbox_live.rs` is absent and no `#[ignore]` sandbox test exists in
+the workspace — the live proof is a named gap (§7), not a target. Plus
 `spec.rs` (two scopes), `crates/actions-derive/src/lib.rs` (the wire table), `served-spec.lock.json`, and the S12
 screen declaration.
 
@@ -124,7 +127,9 @@ Screens declared for S12: **#13 Benchmarks** (`benchmark_runs.*`, `benchmark_cas
 9. `actions::benchmark` — the eight handlers; scopes at the five code sites; registry `EXPECTED` and the api-lib
    count; a `parity_http_mcp` sample for each action.
 10. `apps/server/src/sandbox.rs` — `kube` client, ConfigMap + Job, pod log, delete; deterministic names; fail-closed
-    config. Unit-test the manifest builder; one `#[ignore]` live proof against the cluster.
+    config. The manifest builder, isolation contract and fail-closed config are proved in
+    `apps/server/tests/benchmark_jobs.rs`; the live cluster proof does not exist (named gap, §7) — do not
+    cite a `sandbox_live` target.
 11. Worker: `benchmark.run.poll` (start ≤ concurrency, poll, grade, finalise, re-enqueue per tick with
     `max_attempts=1`) and `benchmark.reap` in `DEFAULT_SCHEDULES` + `prune.rs`'s exact list.
 12. `--write-lock`; schema/action/op counts in the index; `cargo test --workspace`; clippy; `/tmp/s17-gate.sh`.
@@ -183,8 +188,13 @@ rbuild -- test -p conveyor-server --test benchmark_jobs
 printf '\nGATE_GREEN\n'
 ```
 
-A live sandbox proof is **not** in this block: it needs the grading node (§10). It is one `#[ignore]` test,
-`rbuild -- test -p conveyor-server --test sandbox_live -- --ignored`, run once when the node exists.
+A live sandbox proof is **not in this block and has no test artifact**. It needs the grading node
+(§10). ⚠️ **NAMED GAP (v1-s17-1, 2026-11-21):** `apps/server/tests/sandbox_live.rs` is absent and no
+`#[ignore]` sandbox test exists anywhere in the workspace, so the documented command
+`rbuild -- test -p conveyor-server --test sandbox_live -- --ignored` exits target-not-found. The
+shipped proof is `apps/server/tests/benchmark_jobs.rs` (manifest, isolation contract, fail-closed
+config, stubbed driver). The live cluster proof stays **NOT PROVEN** until that ignored test and the
+grading node exist; no runnable command is claimed here.
 
 ## 8. Traps
 

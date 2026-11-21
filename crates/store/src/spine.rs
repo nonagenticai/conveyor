@@ -11,15 +11,16 @@
 //! There is no portfolio row (D-T1-7).
 
 use chrono::{DateTime, Utc};
-use conveyor_domain::TenantId;
 use conveyor_domain::spine::{
     BenefitMapFields, BenefitProfileFields, PlanError, WsjfInputs, benefit_map_missing,
     benefit_profile_missing, tranche_review_has_evidence, validate_change,
 };
+use conveyor_domain::{Approval, TenantId};
 use serde_json::Value;
 use sqlx::{AssertSqlSafe, PgConnection};
 use uuid::Uuid;
 
+use crate::approval::{ApprovalStoreError, NewApproval, get_approval_tx, insert_approval_tx};
 use crate::parent::{Parent, ParentError, ensure_optional_parent_tx, ensure_parent_tx};
 
 /// The plan spine's failures.
@@ -59,6 +60,12 @@ pub enum PlanStoreError {
         /// Why the removal is refused.
         why: &'static str,
     },
+    /// A PI plan has no decision a person made, so nothing may materialise.
+    #[error("pi_plan_not_approved")]
+    PiPlanNotApproved,
+    /// The approval surface refused the plan's gate or its decision.
+    #[error(transparent)]
+    Approval(#[from] ApprovalStoreError),
     /// The database refused the statement.
     #[error(transparent)]
     Database(#[from] sqlx::Error),
@@ -2715,6 +2722,152 @@ pub async fn delete_cadence_tx(
     Ok(())
 }
 
+// ── PI plan approval ────────────────────────────────────────────────────────────────────
+
+/// The gate a PI plan's sign-off is recorded under.
+///
+/// A plan gate has no run, card or project to hang on, so `approval.run_id` is NULL and
+/// `uq_appr_pending` cannot see a second pending row. The gate's identity is
+/// `meta.target` — the cadence id — which is what every read below matches on.
+pub const PI_PLAN_APPROVAL_GATE: &str = "cadences.approve_plan";
+
+/// The `approval.kind` a PI plan's gate carries.
+pub const PI_PLAN_APPROVAL_KIND: &str = "plan";
+
+/// The cadence state while its plan waits for a person's decision.
+pub const CADENCE_AWAITING_APPROVAL: &str = "awaiting_approval";
+
+/// The cadence state after a person rejected its plan.
+pub const CADENCE_REJECTED: &str = "rejected";
+
+/// The pending PI-plan gate for `cadence_id`, if one is open.
+pub async fn pending_pi_plan_approval_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    cadence_id: Uuid,
+) -> Result<Option<Uuid>, PlanStoreError> {
+    Ok(sqlx::query_scalar(
+        "SELECT id FROM approval
+          WHERE tenant_id = $1 AND gate = $2 AND status = 'pending'
+            AND meta->>'target' = $3
+          ORDER BY created_at DESC, id DESC
+          LIMIT 1",
+    )
+    .bind(tenant.as_uuid())
+    .bind(PI_PLAN_APPROVAL_GATE)
+    .bind(cadence_id.to_string())
+    .fetch_optional(&mut *conn)
+    .await?)
+}
+
+/// The approved PI-plan gate whose approving decision a person made, if one exists.
+///
+/// `decided_by_kind = 'human'` is the rule, not a display detail: a service or an agent can
+/// decide a gate through the generic approvals surface, and that decision must not turn an
+/// unapproved plan into cards. [`materialise_pi_tx`] refuses without this row.
+pub async fn pi_plan_human_approval_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    cadence_id: Uuid,
+) -> Result<Option<Uuid>, PlanStoreError> {
+    Ok(sqlx::query_scalar(
+        "SELECT a.id
+           FROM approval a
+          WHERE a.tenant_id = $1 AND a.gate = $2 AND a.status = 'approved'
+            AND a.meta->>'target' = $3
+            AND EXISTS (
+                SELECT 1 FROM approval_decision d
+                 WHERE d.tenant_id = a.tenant_id AND d.approval_id = a.id
+                   AND d.decision = 'approve' AND d.decided_by_kind = 'human')
+          ORDER BY a.created_at, a.id
+          LIMIT 1",
+    )
+    .bind(tenant.as_uuid())
+    .bind(PI_PLAN_APPROVAL_GATE)
+    .bind(cadence_id.to_string())
+    .fetch_optional(&mut *conn)
+    .await?)
+}
+
+/// Open — or return — the pending gate for a PI plan.
+///
+/// The cadence row is locked first, so two requesters serialise and the second sees the first's
+/// pending row. The insert names the cadence id in `meta.target`; that string, not a parent
+/// column, is the gate's identity. A cadence already materialised has nothing left to approve.
+pub async fn open_pi_plan_approval_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    cadence_id: Uuid,
+    requested_by: Option<Uuid>,
+) -> Result<Approval, PlanStoreError> {
+    let row: Option<(String, String, String, Uuid)> = sqlx::query_as(
+        "SELECT kind, state, period, programme_id
+           FROM programme_cadence
+          WHERE tenant_id = $1 AND id = $2
+          FOR UPDATE",
+    )
+    .bind(tenant.as_uuid())
+    .bind(cadence_id)
+    .fetch_optional(&mut *conn)
+    .await?;
+    let (kind, state, period, programme_id) = row.ok_or(PlanStoreError::NotFound {
+        what: "cadence row",
+    })?;
+    if kind != "pi" {
+        return Err(PlanStoreError::Illegal(PlanError::CadenceWrongKind {
+            expected: "pi",
+            actual: kind,
+        }));
+    }
+    if state == "materialised" {
+        return Err(PlanStoreError::Conflict {
+            what: "cadence row",
+            why: "the plan is already materialised and cannot be approved again",
+        });
+    }
+    if let Some(existing) = pending_pi_plan_approval_tx(&mut *conn, tenant, cadence_id).await? {
+        return get_approval_tx(&mut *conn, tenant, existing)
+            .await?
+            .map(|record| record.approval)
+            .ok_or(PlanStoreError::NotFound { what: "approval" });
+    }
+    let mut input = NewApproval::new(PI_PLAN_APPROVAL_GATE, PI_PLAN_APPROVAL_KIND);
+    input.requested_by = requested_by;
+    input.meta = serde_json::json!({
+        "target": cadence_id.to_string(),
+        "cadence_id": cadence_id.to_string(),
+        "programme_id": programme_id.to_string(),
+        "period": period,
+        "description": "Approve this PI plan before its backlog becomes cards",
+    });
+    insert_approval_tx(conn, tenant, &input)
+        .await
+        .map_err(PlanStoreError::from)
+}
+
+/// Record the state a PI plan's approval leaves the cadence in.
+///
+/// `awaiting_approval` means "nothing may be drafted until a person approves"; `rejected` is
+/// the person's refusal. A materialised cadence is never moved — its cards are the record.
+pub async fn set_pi_cadence_approval_state_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    cadence_id: Uuid,
+    state: &str,
+) -> Result<(), PlanStoreError> {
+    sqlx::query(
+        "UPDATE programme_cadence
+            SET state = $3, version = version + 1, updated_at = now()
+          WHERE tenant_id = $1 AND id = $2 AND kind = 'pi' AND state <> 'materialised'",
+    )
+    .bind(tenant.as_uuid())
+    .bind(cadence_id)
+    .bind(state)
+    .execute(&mut *conn)
+    .await?;
+    Ok(())
+}
+
 /// What a PI materialisation wrote.
 #[derive(Clone, Debug, Default)]
 pub struct PiMaterialisation {
@@ -2726,13 +2879,19 @@ pub struct PiMaterialisation {
 
 /// Materialise a `kind='pi'` cadence: draft the next cadence's cards from the standing backlog.
 ///
+/// **A plan is a person's decision.** Nothing is drafted until an `approval` for this cadence
+/// carries a human `approve` (`cadences.approve_plan` is the writer): an unapproved plan is
+/// [`PlanStoreError::PiPlanNotApproved`], never a silent draft, so the unattended worker tick
+/// cannot commit a plan nobody signed off. The tick reports the refusal and leaves the cadence
+/// `awaiting_approval`.
+///
 /// The backlog is a `wbs_node(kind='deliverable', status='open')` row with no card yet. The
 /// score is `(business_value + time_criticality + risk_reduction) / job_size`, computed in the
 /// ordering and never stored (D-T1-4). The drafts land in the board named by
 /// `meta.board_id`'s intake lane, bounded by the active lane's `wip_limit` minus the cards live
 /// there; the cadence then moves `planned → materialised` in the same transaction, so a second
 /// tick creates nothing. A tick with no free slot writes nothing and leaves the cadence
-/// `planned`, so a later tick still drafts.
+/// un-materialised, so a later tick still drafts.
 pub async fn materialise_pi_tx(
     conn: &mut PgConnection,
     tenant: TenantId,
@@ -2749,8 +2908,14 @@ pub async fn materialise_pi_tx(
             actual: cadence.kind.clone(),
         }));
     }
-    if cadence.state != "planned" {
+    if cadence.state == "materialised" {
         return Ok(PiMaterialisation::default());
+    }
+    if pi_plan_human_approval_tx(&mut *conn, tenant, cadence_id)
+        .await?
+        .is_none()
+    {
+        return Err(PlanStoreError::PiPlanNotApproved);
     }
     let board_id: Uuid = cadence
         .meta

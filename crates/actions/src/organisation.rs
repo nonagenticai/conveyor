@@ -25,6 +25,7 @@ use uuid::Uuid;
 
 use crate::control::{invalid, store_error};
 use crate::invoke::{ActionError, HandlerCtx};
+use crate::spec::FieldError;
 use crate::views::EmptyIn;
 
 // ── views ────────────────────────────────────────────────────────────────────────────────
@@ -384,6 +385,44 @@ fn organisation_error(error: OrganisationStoreError, action: &str) -> ActionErro
             "invalid_placement",
             "the placement must be ordered 1..=n with exactly one primary",
         ),
+        // SPEC_V2 §4.1: the compile refuses an unresolved draft instead of hashing it.
+        OrganisationStoreError::ReleaseNotReady { kind, department } => ActionError::new(
+            409,
+            "release_not_ready",
+            format!(
+                "the required kind {kind:?} has no resolvable value for department {department:?}"
+            ),
+        )
+        .with_errors(vec![FieldError {
+            field: "kind".to_owned(),
+            code: "required".to_owned(),
+            detail: format!(
+                "kind {kind:?} is required by {department:?} and no layer sets a value"
+            ),
+        }]),
+        OrganisationStoreError::DepartmentConflict {
+            kind,
+            left_department,
+            left_value,
+            right_department,
+            right_value,
+        } => ActionError::new(
+            422,
+            "department_conflict",
+            format!(
+                "kind {kind:?} is {left_value} in department {left_department:?} and \
+                 {right_value} in department {right_department:?}; a job-layer value must \
+                 resolve it"
+            ),
+        )
+        .with_errors(vec![FieldError {
+            field: "kind".to_owned(),
+            code: "department_conflict".to_owned(),
+            detail: format!(
+                "departments {left_department:?} and {right_department:?} set {kind:?} to \
+                 different values"
+            ),
+        }]),
         OrganisationStoreError::ReleaseJobMismatch => invalid(
             "release_id",
             "release_job_mismatch",

@@ -2499,6 +2499,11 @@ async fn prepare(sample: &Sample, pg: &support::Pg, ctx: &Ctx) {
             let g = seed_parity_programme(pg, ctx).await;
             ctx.push("cadences.list", g);
         }
+        "cadences.approve_plan" => {
+            let g = seed_parity_programme(pg, ctx).await;
+            let c = seed_parity_cadence(pg, ctx, g).await;
+            ctx.push("cadences.approve_plan", c);
+        }
         // ── #526: the demo credit and the retro/lesson memory ────────────────────────────
         // A credit needs a demo cadence and an ACCEPTED deliverable with its evidence; the
         // cadence and deliverable are fresh per round, so the sample's own call is the insert.
@@ -6790,6 +6795,16 @@ fn spine_samples() -> Vec<Sample> {
             let mut sample = plain("cadences.list", json!({}), None);
             sample.prepare = true;
             sample.input = Box::new(|ctx: &Ctx| json!({"programme_id": ctx.pop("cadences.list")}));
+            expecting(sample, 200)
+        },
+        {
+            // The plan gate's opening call: a pending approval on a fresh PI cadence. A decision
+            // is a person's second act and is covered by `pi_plan_approval`; parity needs the
+            // surface both transports share, not a second decision path.
+            let mut sample = plain("cadences.approve_plan", json!({}), None);
+            sample.prepare = true;
+            sample.input =
+                Box::new(|ctx: &Ctx| json!({"cadence_id": ctx.pop("cadences.approve_plan")}));
             expecting(sample, 200)
         },
         // ── #526: the demo credit and the retro/lesson memory ────────────────────────────

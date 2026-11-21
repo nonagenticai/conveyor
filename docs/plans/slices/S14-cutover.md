@@ -32,7 +32,7 @@ task, and fr / requirements_management / Planka decommissioned — each dumped f
 | P1 | S13 closed | **Historical (executed 2026-11-18):** S13's close deactivated every flow it replaces, so the count was 0 before this slice; the n8n database was dumped at T+14 and deleted with its namespace (measured 2026-11-19: `select datname from pg_database where datname='n8n'` → no row). `parity/n8n-dispositions.tsv` (S13's deliverable) has 348 rows |
 | P2 | S06b closed | `docs/evidence/S06b-agent-task.md` exists with a `run_id`, a project id and one decided approval, plus the imported tool keys (`projects.create`, not `tool.*`) |
 | P3 | the contract and its native map | `python3 scripts/check-parity.py --require-native` green: the signed `parity/parity.yaml` is the capability input and `parity/native.tsv` is the acceptance gate — every `used` id carries an `action:` / `test:` / `replacement:` / `dropped:` disposition. The legacy `probe:` acceptances are reachability evidence, not the gate |
-| P4 | Old system frozen (D8) | `docs/cutover/freeze-log.md` exists, its freeze date is set, and every fr/RM/`kanban` commit merged since has a disposition (`absorbed` / `not-applicable` / `dropped`) |
+| P4 | Old system frozen (D8) | **NOT PROVEN in-tree (v1-s14-1):** `docs/cutover/` is absent at HEAD, so `docs/cutover/freeze-log.md` does not exist. The freeze is recorded only in this plan and in gitops-production #5333; until the log is committed this precondition is unmet and the §7 gate stays red. |
 | P5 | 8930 free | local: `lsof -nP -iTCP:8930 -sTCP:LISTEN` → empty (measured free 2026-11-07). In-cluster: `kubectl get svc -A -o json \| jq -r '.items[].spec.ports[]?.port' \| grep -x 8930` → empty |
 | P6 | Disk | `df -h /srv/backups` on master ≥ 3× the three dumps; doubt ⇒ STOP, never prune |
 
@@ -84,11 +84,21 @@ removal (flows retired at S13; decommissioned after its T+14 dump, see §9.9); `
 | andon | `POST /api/actions/andon.engage/invocations` and `…/andon.release/invocations` (S06's two actions — there is no separate `/api/andon` route) + an `andon_state` row the engine reads |
 | port | **8930** (never 8000) |
 
-Also delivered: `docs/cutover/freeze-log.md`, `docs/cutover/rollback.md`, `docs/cutover/evidence/R0..R7-*`
-(`.md`, except the parity record `R5-parity-final.txt`),
-`docs/cutover/fixtures/` (recorded payloads).
+Declared, **not committed**: `docs/cutover/freeze-log.md`, `docs/cutover/rollback.md`,
+`docs/cutover/evidence/R0..R7-*` (`.md`, except the parity record `R5-parity-final.txt`),
+`docs/cutover/fixtures/` (recorded payloads). ⚠️ `docs/cutover/` is **absent at HEAD**
+(v1-s14-1): none of these receipts is in-tree, and §7 names the gap instead of treating them as
+delivered. The S14 acceptance evidence that *does* exist in-tree is the native harness
+(`acceptance/native.toml`, `scripts/acceptance.py`, `.github/workflows/acceptance.yml` — #8,
+PR #483) and the native map (`parity/native.tsv`, `scripts/check-parity.py`).
 
 ## 6. Build order
+
+⚠️ **Evidence status (v1-s14-1, 2026-11-21).** The `R1`–`R7` receipts named in the steps below were
+never committed: `docs/cutover/` is absent at HEAD, so every `R*` filename below is a **requirement,
+not a receipt**. The live acceptance evidence that exists is the native harness shipped by #8
+(PR #483); its run result is recorded only in that PR's body, and P6's
+`docs/evidence/RELEASE-<sha>.md` is also absent. Do not cite a step's receipt name as proof.
 
 1. **Name decision (day 1).** `GH_SHIM=off gh api repos/nonagenticai/conveyor` → `archived=true`; rename:
    `GH_SHIM=off gh repo rename conveyor-archive -R nonagenticai/conveyor --yes`. George authorises (deleting forfeits
@@ -171,6 +181,34 @@ cd $HOME/Movies/conveyor
 #   export E2E_USER=<the Keycloak test user>     E2E_PASS=<its password>   (S12's suite logs in with real OIDC
 #                                                                          here: dev-auth is refused in production)
 
+# 0. The R0–R7 cutover receipts. `docs/cutover/` was never committed (v1-s14-1): freeze-log.md,
+#    rollback.md and the R1/R2/R4/R6 receipts are NOT PROVEN in-tree. Name the gap and stay red —
+#    never invent a receipt or silently skip the check. This runs first: the item-1 probe
+#    redirect writes into docs/cutover/, which would otherwise fail with a bare ENOENT.
+if [ ! -d docs/cutover/evidence ]; then
+  echo "NAMED GAP (S14): docs/cutover/ is absent — R0–R7 receipts, freeze-log.md and rollback.md are NOT PROVEN; in-tree evidence is acceptance/native.toml + scripts/acceptance.py (#8/PR #483), and P6's release receipt is absent" >&2
+  exit 1
+fi
+for f in R1-live-n8n.md R2-replay.md R3-inapp-engine.md R4-rollback.md R5-parity-final.txt R6-agent-task.md; do test -s "docs/cutover/evidence/$f" || { echo "missing evidence: $f" >&2; exit 1; }; done
+test -s docs/cutover/evidence/R6-agent-task.md   # one real `agent` task end to end: projects.create →
+                                                 # pending-approval → approved through `mcp_server` →
+                                                 # approval.closed → run `succeeded`; project id on
+                                                 # `external_ref`; one activity row
+test -s docs/cutover/evidence/R4-rollback.md     # rollback executed once, timed, ≤ 15 min
+
+# 0b. The acceptance evidence that EXISTS in-tree is the native harness, not a cutover tree.
+#    `acceptance/native.toml` + `scripts/acceptance.py` shipped with #8 (PR #483); the live run
+#    (`--sha 81c2c2c5 --skip-commands`: 6 contexts + 6 probes PASS) is recorded only in PR #483's
+#    body, not in docs/evidence/.
+test -s acceptance/native.toml
+python3 scripts/acceptance.py --self-test                     # hermetic: 8/8 refusals, exit 0
+python3 scripts/acceptance.py --sha "$(git rev-parse HEAD)" --base-url "$BASE"   # live: contexts + probes + commands
+#    P6's release receipt is the in-tree record that the live run happened; it is absent at HEAD.
+test -n "$(ls docs/evidence/RELEASE-*.md 2>/dev/null)" || {
+  echo "NAMED GAP (S14 P6): docs/evidence/RELEASE-<sha>.md is absent — no in-tree release receipt" >&2
+  exit 1
+}
+
 # 1. Native acceptance (R5). The gate is `parity/native.tsv`: every used id resolves to an
 #    `action:`, `test:`, `replacement:` or `dropped:` disposition, and the check refuses a
 #    missing or unknown row. The signed contract stays the capability input; the legacy
@@ -211,14 +249,6 @@ test -z "$(kubectl get ns fr requirements kanban --ignore-not-found -o name)"   
 ! grep -rq 'fr.nonagentic.ai' "$C/clusters/strato/services/cloudflared-apps/configmap.yaml" \
       "$C/clusters/strato/istio/app-hosts/"
 test "$(curl -s -o /dev/null -w '%{http_code}' https://fr.nonagentic.ai/health)" != 200   # from OUTSIDE the cluster
-
-# 6. Manual evidence that must be on disk before this gate is green.
-for f in R1-live-n8n.md R2-replay.md R3-inapp-engine.md R4-rollback.md R5-parity-final.txt R6-agent-task.md; do test -s "docs/cutover/evidence/$f" || { echo "missing evidence: $f" >&2; exit 1; }; done
-test -s docs/cutover/evidence/R6-agent-task.md   # one real `agent` task end to end: projects.create →
-                                                 # pending-approval → approved through `mcp_server` →
-                                                 # approval.closed → run `succeeded`; project id on
-                                                 # `external_ref`; one activity row
-test -s docs/cutover/evidence/R4-rollback.md     # rollback executed once, timed, ≤ 15 min
 ```
 
 Loki is a **24 h sample**: it can never prove completeness. Only object absence does.

@@ -409,7 +409,7 @@ mod tests {
         let registry = conveyor_actions::registry();
         assert_eq!(
             registry.len(),
-            503,
+            511,
             "the live registry: S04–S11 + S16 (216) + S17's 8 benchmark actions (224) + S13's 6 \
              workflows actions (230) + S19 Part B's 7 eval actions (237) + S13's 3 workflow_runs \
              (240) + S15's 3 knowledge/memory actions (243) + S15 step 5's 7 capability actions \
@@ -437,7 +437,9 @@ mod tests {
              tranches.authorise) (497) + #511's five \
              rework-path actions (programmes.baseline|baseline_approve|baselines_list, \
              projects.charter, projects.reopen) (502) + #524's closure-request action \
-             (projects.close_request) (503). \
+             (projects.close_request) (503) + #526's reviews_get (504), its four SAFe demo and \
+             lesson actions (508), its two retro actions (510) and its cadences.approve_plan \
+             (511). \
              The count is asserted here because this crate serves the registry; a lane that adds \
              an action bumps it."
         );

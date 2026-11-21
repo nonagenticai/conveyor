@@ -72,7 +72,7 @@ crates/actions/tests/copilot_coverage.rs
 |---|---|
 | `PROJECT_AGENT_ACTIONS` | `agent_surface(principal)` = registry actions where `scopes ⊆ principal.scopes` ∧ `kind ∈ {internal, external}` ∧ `tenancy` satisfiable |
 | `PROJECT_AGENT_CORE` / `SEARCHABLE` | `AgentHints.tier`, a defaulted `ActionSpec` field declared with the action |
-| `PROJECT_BINDING` / `SurfaceRefusal` | the projection **omits**; `/mcp` answers `action-not-found`, never `403` (S04-D6) |
+| `PROJECT_BINDING` / `SurfaceRefusal` | the projection **omits** the action from both surfaces; calling a known-but-omitted name is `403 action-forbidden` (S04-D6 — the omission is the guarantee, not indistinguishability), and a name outside the registry is `-32602` |
 | `rbac.ts` | the S04 `Scope` check — no copilot authorization module |
 | `coverage-check.ts` | `crates/actions/tests/copilot_coverage.rs`: every mutating UI operation resolves to an action name or the declared transport exemption. |
 
@@ -153,7 +153,7 @@ cargo clippy --workspace --all-targets -- -D warnings
 | b | approval gates execution | approve as an authorized member → exactly one `action_invocation`, card moved, turn `outcome='completed'` with `tool_calls[0].invocation_id` |
 | c | approving twice | second `approvals.decide` is a no-op/`409`; invocation count 1; key replay returns the first body |
 | d | replay | disconnect after the user turn, reconnect with `Last-Event-ID`: the turn arrives once, no duplicate `seq` or invocation |
-| e | scope-absent tool | low-scope principal's `/api/copilot/actions` **and** `/mcp` `tools/list` both omit it; calling it is `action-not-found`, not `403` |
+| e | scope-absent tool | low-scope principal's `/api/copilot/actions` **and** `/mcp` `tools/list` both omit it; calling the omitted action is `403 action-forbidden` on the HTTP invocation route and an `isError` tool result with the same problem on `/mcp` (S04-D6); a name outside the registry is `-32602` |
 | f | inference outage | breaker open ⇒ `503` problem+json, turn `failed`, zero `action_invocation`, no `cards.move` |
 | g | coverage | every mutating UI operation maps to an action or the declared exemption; an injected unmapped operation fails by name |
 

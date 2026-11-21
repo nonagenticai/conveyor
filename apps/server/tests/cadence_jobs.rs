@@ -109,11 +109,44 @@ async fn fixture(db: &common::TestDb) -> Fixture {
     .fetch_one(&db.super_pool)
     .await
     .expect("insert the cadence");
-    Fixture {
+    let fixture = Fixture {
         tenant,
         cadence,
         project,
-    }
+    };
+    // The tick drafts nothing until a person approves the PI plan.
+    approve_plan(db, &fixture).await;
+    fixture
+}
+
+/// The approved human PI-plan gate the tick now requires.
+async fn approve_plan(db: &common::TestDb, f: &Fixture) {
+    let mut tx = conveyor_store::scope::begin_scoped(&db.super_pool, f.tenant)
+        .await
+        .expect("scope the plan gate");
+    let mut new = conveyor_store::approval::NewApproval::new(
+        conveyor_store::spine::PI_PLAN_APPROVAL_GATE,
+        "plan",
+    );
+    new.meta = json!({ "target": f.cadence.to_string() });
+    let approval = conveyor_store::approval::insert_approval_tx(&mut tx, f.tenant, &new)
+        .await
+        .expect("insert the plan gate");
+    let approver: Uuid =
+        sqlx::query_scalar("INSERT INTO app_user (display_name) VALUES ('Approver') RETURNING id")
+            .fetch_one(&mut *tx)
+            .await
+            .expect("insert the approver");
+    conveyor_store::approval::record_decision_tx(
+        &mut tx,
+        f.tenant,
+        approval.id,
+        &conveyor_domain::Decision::approve(approver),
+        false,
+    )
+    .await
+    .expect("approve the plan");
+    tx.commit().await.expect("commit the plan gate");
 }
 
 #[tokio::test]
