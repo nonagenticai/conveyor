@@ -2639,22 +2639,22 @@
             "evidence": [
                 {
                     "path": "docs/design/data/coverage.json",
-                    "line": 1807,
+                    "line": 1808,
                     "quote": "      \"evidence\": ["
                 },
                 {
                     "path": "docs/design/data/coverage.json",
-                    "line": 1808,
+                    "line": 1809,
                     "quote": "        \"crates/actions/src/toolkits\""
                 },
                 {
                     "path": "docs/design/data/coverage.json",
-                    "line": 1811,
+                    "line": 1812,
                     "quote": "      \"key\": \"T14\","
                 },
                 {
                     "path": "docs/design/data/coverage.json",
-                    "line": 1837,
+                    "line": 1838,
                     "quote": "      \"status\": \"built\","
                 }
             ],
@@ -2673,32 +2673,32 @@
             "evidence": [
                 {
                     "path": "docs/design/data/coverage.json",
-                    "line": 2243,
+                    "line": 2244,
                     "quote": "      \"evidence\": ["
                 },
                 {
                     "path": "docs/design/data/coverage.json",
-                    "line": 2244,
+                    "line": 2245,
                     "quote": "        \"migrations/0056_cadence_tranche.sql\""
                 },
                 {
                     "path": "docs/design/data/coverage.json",
-                    "line": 2247,
+                    "line": 2248,
                     "quote": "      \"key\": \"T8\","
                 },
                 {
                     "path": "docs/design/data/coverage.json",
-                    "line": 2268,
+                    "line": 2269,
                     "quote": "      \"status\": \"built\","
                 },
                 {
                     "path": "docs/design/data/coverage.json",
-                    "line": 2249,
+                    "line": 2250,
                     "quote": "        \"actions\": ["
                 },
                 {
                     "path": "docs/design/data/coverage.json",
-                    "line": 2250,
+                    "line": 2251,
                     "quote": "          0,"
                 }
             ],
@@ -2717,22 +2717,22 @@
             "evidence": [
                 {
                     "path": "docs/design/data/coverage.json",
-                    "line": 2025,
+                    "line": 2026,
                     "quote": "      \"evidence\": ["
                 },
                 {
                     "path": "docs/design/data/coverage.json",
-                    "line": 2026,
+                    "line": 2027,
                     "quote": "        \"docs/SPEC_V2.md\""
                 },
                 {
                     "path": "docs/design/data/coverage.json",
-                    "line": 2029,
+                    "line": 2030,
                     "quote": "      \"key\": \"T3\","
                 },
                 {
                     "path": "docs/design/data/coverage.json",
-                    "line": 2050,
+                    "line": 2051,
                     "quote": "      \"status\": \"built\","
                 }
             ],

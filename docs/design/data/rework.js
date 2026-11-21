@@ -11961,25 +11961,25 @@ window.CONVEYOR_REWORK = {
         {
           "evidence": [
             {
-              "line": 1807,
+              "line": 1808,
               "path": "docs/design/data/coverage.json",
               "quote": "      \"evidence\": [",
               "source": "code"
             },
             {
-              "line": 1808,
+              "line": 1809,
               "path": "docs/design/data/coverage.json",
               "quote": "        \"crates/actions/src/toolkits\"",
               "source": "code"
             },
             {
-              "line": 1811,
+              "line": 1812,
               "path": "docs/design/data/coverage.json",
               "quote": "      \"key\": \"T14\",",
               "source": "code"
             },
             {
-              "line": 1837,
+              "line": 1838,
               "path": "docs/design/data/coverage.json",
               "quote": "      \"status\": \"built\",",
               "source": "code"
@@ -12006,25 +12006,25 @@ window.CONVEYOR_REWORK = {
             {
               "evidence": [
                 {
-                  "line": 1807,
+                  "line": 1808,
                   "path": "docs/design/data/coverage.json",
                   "quote": "      \"evidence\": [",
                   "source": "code"
                 },
                 {
-                  "line": 1808,
+                  "line": 1809,
                   "path": "docs/design/data/coverage.json",
                   "quote": "        \"crates/actions/src/toolkits\"",
                   "source": "code"
                 },
                 {
-                  "line": 1811,
+                  "line": 1812,
                   "path": "docs/design/data/coverage.json",
                   "quote": "      \"key\": \"T14\",",
                   "source": "code"
                 },
                 {
-                  "line": 1837,
+                  "line": 1838,
                   "path": "docs/design/data/coverage.json",
                   "quote": "      \"status\": \"built\",",
                   "source": "code"
@@ -12060,37 +12060,37 @@ window.CONVEYOR_REWORK = {
         {
           "evidence": [
             {
-              "line": 2243,
+              "line": 2244,
               "path": "docs/design/data/coverage.json",
               "quote": "      \"evidence\": [",
               "source": "code"
             },
             {
-              "line": 2244,
+              "line": 2245,
               "path": "docs/design/data/coverage.json",
               "quote": "        \"migrations/0056_cadence_tranche.sql\"",
               "source": "code"
             },
             {
-              "line": 2247,
+              "line": 2248,
               "path": "docs/design/data/coverage.json",
               "quote": "      \"key\": \"T8\",",
               "source": "code"
             },
             {
-              "line": 2268,
+              "line": 2269,
               "path": "docs/design/data/coverage.json",
               "quote": "      \"status\": \"built\",",
               "source": "code"
             },
             {
-              "line": 2249,
+              "line": 2250,
               "path": "docs/design/data/coverage.json",
               "quote": "        \"actions\": [",
               "source": "code"
             },
             {
-              "line": 2250,
+              "line": 2251,
               "path": "docs/design/data/coverage.json",
               "quote": "          0,",
               "source": "code"
@@ -12117,37 +12117,37 @@ window.CONVEYOR_REWORK = {
             {
               "evidence": [
                 {
-                  "line": 2243,
+                  "line": 2244,
                   "path": "docs/design/data/coverage.json",
                   "quote": "      \"evidence\": [",
                   "source": "code"
                 },
                 {
-                  "line": 2244,
+                  "line": 2245,
                   "path": "docs/design/data/coverage.json",
                   "quote": "        \"migrations/0056_cadence_tranche.sql\"",
                   "source": "code"
                 },
                 {
-                  "line": 2247,
+                  "line": 2248,
                   "path": "docs/design/data/coverage.json",
                   "quote": "      \"key\": \"T8\",",
                   "source": "code"
                 },
                 {
-                  "line": 2268,
+                  "line": 2269,
                   "path": "docs/design/data/coverage.json",
                   "quote": "      \"status\": \"built\",",
                   "source": "code"
                 },
                 {
-                  "line": 2249,
+                  "line": 2250,
                   "path": "docs/design/data/coverage.json",
                   "quote": "        \"actions\": [",
                   "source": "code"
                 },
                 {
-                  "line": 2250,
+                  "line": 2251,
                   "path": "docs/design/data/coverage.json",
                   "quote": "          0,",
                   "source": "code"
@@ -22082,25 +22082,25 @@ window.CONVEYOR_REWORK = {
         {
           "evidence": [
             {
-              "line": 2025,
+              "line": 2026,
               "path": "docs/design/data/coverage.json",
               "quote": "      \"evidence\": [",
               "source": "code"
             },
             {
-              "line": 2026,
+              "line": 2027,
               "path": "docs/design/data/coverage.json",
               "quote": "        \"docs/SPEC_V2.md\"",
               "source": "code"
             },
             {
-              "line": 2029,
+              "line": 2030,
               "path": "docs/design/data/coverage.json",
               "quote": "      \"key\": \"T3\",",
               "source": "code"
             },
             {
-              "line": 2050,
+              "line": 2051,
               "path": "docs/design/data/coverage.json",
               "quote": "      \"status\": \"built\",",
               "source": "code"
@@ -22127,25 +22127,25 @@ window.CONVEYOR_REWORK = {
             {
               "evidence": [
                 {
-                  "line": 2025,
+                  "line": 2026,
                   "path": "docs/design/data/coverage.json",
                   "quote": "      \"evidence\": [",
                   "source": "code"
                 },
                 {
-                  "line": 2026,
+                  "line": 2027,
                   "path": "docs/design/data/coverage.json",
                   "quote": "        \"docs/SPEC_V2.md\"",
                   "source": "code"
                 },
                 {
-                  "line": 2029,
+                  "line": 2030,
                   "path": "docs/design/data/coverage.json",
                   "quote": "      \"key\": \"T3\",",
                   "source": "code"
                 },
                 {
-                  "line": 2050,
+                  "line": 2051,
                   "path": "docs/design/data/coverage.json",
                   "quote": "      \"status\": \"built\",",
                   "source": "code"
