@@ -14,7 +14,10 @@ use crate::models::RunOut;
 use crate::sse;
 use crate::state::AppCtx;
 
-const FILTERS: [(&str, &str); 8] = [
+/// The six `RunStatus` values, plus "all". A filter the API would refuse is never offered:
+/// `RunStatus` has no `expired` (approvals expire; runs do not), and the old "Expired" entry
+/// here made every selection a 422.
+const FILTERS: [(&str, &str); 7] = [
     ("all", "All"),
     ("queued", "Queued"),
     ("running", "Running"),
@@ -22,7 +25,6 @@ const FILTERS: [(&str, &str); 8] = [
     ("succeeded", "Succeeded"),
     ("failed", "Failed"),
     ("cancelled", "Cancelled"),
-    ("expired", "Expired"),
 ];
 
 #[component]

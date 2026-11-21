@@ -160,7 +160,12 @@ async fn an_agent_node_runs_the_capped_loop_and_traces_every_call() {
         .invoke(
             "workflow_runs.start",
             "dev:alice",
-            json!({"workflow_id": workflow_id, "project_id": project_id}),
+            // The model-calling run must declare its spend ceiling (#526 / D45).
+            json!({
+                "workflow_id": workflow_id,
+                "project_id": project_id,
+                "inputs": {"limits": {"cost_budget_usd": 5.0}}
+            }),
             None,
             None,
             Some("rid-agent"),

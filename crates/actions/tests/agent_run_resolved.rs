@@ -206,7 +206,9 @@ async fn the_run_declares_its_executor_and_the_step_resolves_the_config() {
             json!({
                 "workflow_id": workflow_id,
                 "project_id": project_id,
-                "capability_agent_id": agent_id
+                "capability_agent_id": agent_id,
+                // The model-calling run must declare its spend ceiling (#526 / D45).
+                "inputs": {"limits": {"cost_budget_usd": 5.0}}
             }),
             None,
             None,
@@ -332,7 +334,12 @@ async fn start_workflow_run(
     workflow_id: &str,
     agent: Option<Uuid>,
 ) -> String {
-    let mut input = json!({"workflow_id": workflow_id, "project_id": project_id});
+    // The model-calling run must declare its spend ceiling (#526 / D45).
+    let mut input = json!({
+        "workflow_id": workflow_id,
+        "project_id": project_id,
+        "inputs": {"limits": {"cost_budget_usd": 5.0}}
+    });
     if let Some(agent) = agent {
         input["capability_agent_id"] = json!(agent);
     }

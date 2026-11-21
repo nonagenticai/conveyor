@@ -237,6 +237,14 @@ therefore ordinary `#[test]`s. `cargo` refuses on this machine — every line is
 set -euo pipefail
 cd $HOME/Movies/conveyor
 
+# libtest exits 0 on a filter that selects zero tests (v1-s19-1): list the exact name before running it.
+one_test() { # <test name> <rbuild test args...>
+  local name="$1"; shift
+  local n
+  n=$(rbuild -- test "$@" -- --list --exact "$name" | grep -c ': test$' || true)
+  test "$n" -eq 1 || { echo "zero-match filter: $name (matched $n)" >&2; exit 1; }
+}
+
 # 1. ten tables RLS-forced, migration 0026 in the LEDGER (not the migrate log line, which says nothing)
 rbuild -- test -p conveyor-store --test eval_schema -- --exact ten_tables_rls_forced_and_0026_applied
 
@@ -250,7 +258,8 @@ rbuild -- test -p conveyor-actions --test eval_signoff_gate
 rbuild -- test -p conveyor-domain --test eval_isolation -- --exact subject_input_carries_no_expected_bytes
 
 # 5. the held-out wall is access, not a prompt
-rbuild -- test -p conveyor-api --test eval_heldout -- --exact an_agent_principal_cannot_read_a_test_trace
+one_test an_agent_reads_the_instrument_but_never_the_held_out_half -p conveyor-api --test eval_heldout
+rbuild -- test -p conveyor-api --test eval_heldout -- --exact an_agent_reads_the_instrument_but_never_the_held_out_half
 
 # 6. a failed attempt cannot occupy the (case,rep) slot
 rbuild -- test -p conveyor-store --test eval_slot
@@ -264,8 +273,9 @@ rbuild -- test -p conveyor-server --test eval_controls
 # 9. the variant grammar, the grade-object shape, and the label length are database invariants
 rbuild -- test -p conveyor-store --test eval_constraints
 
-# 10. no answer-key or sign-off action is agent-reachable
-rbuild -- test -p conveyor-actions --test registry -- --exact no_eval_signoff_or_answer_key_action_is_agent_reachable
+# 10. no answer-key or sign-off action is machine-reachable (the shipped test name is `_machine_reachable`)
+one_test no_eval_signoff_or_answer_key_action_is_machine_reachable -p conveyor-actions --test registry
+rbuild -- test -p conveyor-actions --test registry -- --exact no_eval_signoff_or_answer_key_action_is_machine_reachable
 
 # 11. the served surface and the lock agree (the repo's own checker, not a hand-rolled count)
 rbuild -- run -q -p conveyor-server -- --print-openapi --check-lock

@@ -181,6 +181,18 @@ async fn runs_create(
         .await
         .map_err(|error| store_error(error, action))?;
 
+    // #526 / D45: `runs.create` carries no run inputs, so an internal-agent binding must itself
+    // declare the ceiling; a budgetless one is refused here rather than at its first model call.
+    if let Some(binding_id) = input.job_binding_id {
+        crate::invoke::ensure_binding_budget(
+            &mut *tx,
+            ctx.tenant,
+            binding_id,
+            &serde_json::Value::Null,
+        )
+        .await?;
+    }
+
     let run = store::run::insert_run_tx(
         &mut *tx,
         ctx.tenant,

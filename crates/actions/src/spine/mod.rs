@@ -18,6 +18,7 @@
 
 use chrono::{DateTime, Utc};
 use conveyor_domain::spine::{PlanError, WsjfInputs, wsjf};
+use conveyor_domain::{ApprovalError, DeciderKind, Decision, DecisionKind};
 use conveyor_store as store;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
@@ -183,6 +184,13 @@ fn spine_error(error: PlanStoreError, action: &str) -> ActionError {
             "retro_finding_without_lesson",
             format!("the retro finding {key:?} has no lesson; propose one before closing"),
         ),
+        PlanStoreError::PiPlanNotApproved => ActionError::new(
+            409,
+            "pi_plan_not_approved",
+            "the PI plan has no approved human decision: a person must approve it with \
+             cadences.approve_plan before any card is drafted",
+        ),
+        PlanStoreError::Approval(error) => plan_approval_error(error, action),
         PlanStoreError::Illegal(other) => invalid("input", "plan_refused", other.to_string()),
         PlanStoreError::Conflict { what, why } => ActionError::new(
             409,
@@ -194,6 +202,53 @@ fn spine_error(error: PlanStoreError, action: &str) -> ActionError {
             ActionError::internal()
         }
         PlanStoreError::Database(error) => store_error(error, action),
+    }
+}
+
+/// A gate or decision refusal on the PI-plan approval path.
+fn plan_approval_error(error: store::ApprovalStoreError, action: &str) -> ActionError {
+    match error {
+        store::ApprovalStoreError::NotFound => ActionError::resource_not_found("such approval"),
+        store::ApprovalStoreError::Conflict => ActionError::new(
+            409,
+            "conflict",
+            format!("{action:?}: a pending approval already gates this plan"),
+        ),
+        store::ApprovalStoreError::AlreadyDecided => ActionError::new(
+            409,
+            "conflict",
+            format!("{action:?}: this approver already decided the gate"),
+        ),
+        store::ApprovalStoreError::Illegal(ApprovalError::RequesterCannotDecide) => {
+            ActionError::new(
+                409,
+                "requester_cannot_decide",
+                format!("{action:?}: the person who opened the plan's gate cannot decide it"),
+            )
+        }
+        store::ApprovalStoreError::Illegal(error) => {
+            ActionError::new(409, "conflict", error.to_string())
+        }
+        store::ApprovalStoreError::Vocabulary { what, value } => {
+            tracing::error!(what, value = %value, "a stored approval value is outside the domain");
+            ActionError::internal()
+        }
+        store::ApprovalStoreError::Parent(error) => parent_error(error, action),
+        store::ApprovalStoreError::Run(error) => {
+            tracing::error!(%error, action, "decide a PI plan gate");
+            ActionError::internal()
+        }
+        store::ApprovalStoreError::HumanOnlyGate => ActionError::new(
+            403,
+            "human_only",
+            format!("{action:?}: a PI plan is approved by a person"),
+        ),
+        store::ApprovalStoreError::EvalScopeRequired => ActionError::new(
+            403,
+            "eval_scope_required",
+            format!("{action:?}: an eval sign-off needs evals:approve"),
+        ),
+        store::ApprovalStoreError::Database(error) => store_error(error, action),
     }
 }
 
@@ -3011,6 +3066,222 @@ async fn cadences_update(
     .map_err(|error| spine_error(error, ctx.action))?;
     emit_spine_event(&mut *tx, &ctx, "programme_cadence", record.id, "updated").await?;
     Ok(HandlerOutput::ok(cadence_out(&record)).with_etag(etag_of(record.version)))
+}
+
+/// `cadences.approve_plan` — the gate that stands between a PI plan and its cards.
+///
+/// `decision` absent opens (or returns) the plan's pending `approval`; `approve`/`reject`
+/// records a **person's** decision on it. Nothing materialises until the gate carries a human
+/// approve, so the unattended cadence tick cannot commit an unapproved plan.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct CadenceApprovePlanIn {
+    /// The PI cadence whose materialisation is gated.
+    pub cadence_id: Uuid,
+    /// `approve` or `reject`. Absent opens the gate and leaves it pending.
+    pub decision: Option<String>,
+    /// The note the deciding person records on the gate.
+    pub note: Option<String>,
+}
+
+/// A PI plan's gate as `cadences.approve_plan` returns it.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct CadencePlanApprovalOut {
+    /// The cadence the gate belongs to.
+    pub cadence_id: String,
+    /// The approval row.
+    pub approval_id: String,
+    /// `pending | approved | rejected`.
+    pub status: String,
+    /// The decision this call recorded; absent when the call only opened the gate.
+    pub decision: Option<String>,
+    /// The cadence state after the call (`awaiting_approval` or `rejected`).
+    pub state: String,
+    /// The approval's If-Match version.
+    pub version: i64,
+}
+
+fn plan_approval_out(
+    cadence_id: Uuid,
+    approval: &conveyor_domain::Approval,
+    decision: Option<&str>,
+    state: &str,
+) -> CadencePlanApprovalOut {
+    CadencePlanApprovalOut {
+        cadence_id: cadence_id.to_string(),
+        approval_id: approval.id.to_string(),
+        status: approval.status.as_str().to_owned(),
+        decision: decision.map(str::to_owned),
+        state: state.to_owned(),
+        version: i64::try_from(approval.version.get()).unwrap_or(i64::MAX),
+    }
+}
+
+/// Open, approve or reject a PI plan's gate.
+#[crate::action(
+    name = "cadences.approve_plan",
+    version = 1,
+    kind = "internal",
+    scopes = ["portfolio:write"],
+    idempotent = false,
+    timeout_ms = 30000,
+    effect = "write",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn cadences_approve_plan(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: CadenceApprovePlanIn,
+) -> Result<HandlerOutput<CadencePlanApprovalOut>, ActionError> {
+    let current = store::spine::get_cadence_tx(&mut *tx, ctx.tenant, input.cadence_id)
+        .await
+        .map_err(|error| spine_error(error, ctx.action))?
+        .ok_or_else(|| ActionError::resource_not_found("such cadence row"))?;
+    if current.kind != "pi" {
+        return Err(invalid(
+            "cadence_id",
+            "cadence_wrong_kind",
+            format!(
+                "the cadence is {}; a plan approval needs a pi cadence",
+                current.kind
+            ),
+        ));
+    }
+    if current.state == "materialised" {
+        return Err(ActionError::new(
+            409,
+            "plan_already_materialised",
+            "the plan's cards are already drafted; approval is closed",
+        ));
+    }
+    let requested = match input.decision.as_deref().map(str::trim) {
+        None | Some("") => None,
+        Some("approve") => Some(DecisionKind::Approve),
+        Some("reject") => Some(DecisionKind::Reject),
+        Some(other) => {
+            return Err(invalid(
+                "decision",
+                "invalid_value",
+                format!("{other:?} is not approve or reject"),
+            ));
+        }
+    };
+    let Some(kind) = requested else {
+        // Opening the gate is a request, never an approval. The cadence is marked waiting so
+        // the console and the worker read one state; an existing pending gate is reused, so a
+        // retry stacks no second gate.
+        if store::spine::pi_plan_human_approval_tx(&mut *tx, ctx.tenant, input.cadence_id)
+            .await
+            .map_err(|error| spine_error(error, ctx.action))?
+            .is_some()
+        {
+            return Err(ActionError::new(
+                409,
+                "plan_already_approved",
+                "a person already approved this plan; there is nothing left to request",
+            ));
+        }
+        let approval = store::spine::open_pi_plan_approval_tx(
+            &mut *tx,
+            ctx.tenant,
+            input.cadence_id,
+            Some(ctx.actor_id),
+        )
+        .await
+        .map_err(|error| spine_error(error, ctx.action))?;
+        store::spine::set_pi_cadence_approval_state_tx(
+            &mut *tx,
+            ctx.tenant,
+            input.cadence_id,
+            store::spine::CADENCE_AWAITING_APPROVAL,
+        )
+        .await
+        .map_err(|error| spine_error(error, ctx.action))?;
+        emit_spine_event(
+            &mut *tx,
+            &ctx,
+            "programme_cadence",
+            input.cadence_id,
+            "updated",
+        )
+        .await?;
+        return Ok(HandlerOutput::ok(plan_approval_out(
+            input.cadence_id,
+            &approval,
+            None,
+            store::spine::CADENCE_AWAITING_APPROVAL,
+        )));
+    };
+    // A decision is a person's act. The store's human-decision check is the backstop; the
+    // refusal belongs here so a machine caller learns why nothing happened.
+    if ctx.actor_kind != "user" || ctx.channel.is_some() {
+        return Err(ActionError::new(
+            403,
+            "human_only",
+            "a PI plan is approved by a person; a machine identity cannot decide it",
+        ));
+    }
+    let existing = match kind {
+        DecisionKind::Approve => {
+            store::spine::pi_plan_human_approval_tx(&mut *tx, ctx.tenant, input.cadence_id)
+                .await
+                .map_err(|error| spine_error(error, ctx.action))?
+        }
+        DecisionKind::Reject => None,
+    };
+    if let Some(existing) = existing {
+        let record = store::approval::get_approval_tx(&mut *tx, ctx.tenant, existing)
+            .await
+            .map_err(|error| plan_approval_error(error, ctx.action))?
+            .ok_or_else(ActionError::internal)?;
+        return Ok(HandlerOutput::ok(plan_approval_out(
+            input.cadence_id,
+            &record.approval,
+            Some("approve"),
+            &current.state,
+        )));
+    }
+    let approval =
+        store::spine::open_pi_plan_approval_tx(&mut *tx, ctx.tenant, input.cadence_id, None)
+            .await
+            .map_err(|error| spine_error(error, ctx.action))?;
+    let decision = Decision {
+        approver_id: ctx.actor_id,
+        kind,
+        note: input.note.unwrap_or_default(),
+        decided_by_kind: DeciderKind::Human,
+        via: Some(serde_json::json!({ "channel": "web" })),
+        item_decisions: None,
+    };
+    let decided =
+        store::approval::record_decision_tx(&mut *tx, ctx.tenant, approval.id, &decision, false)
+            .await
+            .map_err(|error| plan_approval_error(error, ctx.action))?;
+    let state = match kind {
+        DecisionKind::Approve => store::spine::CADENCE_AWAITING_APPROVAL,
+        DecisionKind::Reject => store::spine::CADENCE_REJECTED,
+    };
+    store::spine::set_pi_cadence_approval_state_tx(&mut *tx, ctx.tenant, input.cadence_id, state)
+        .await
+        .map_err(|error| spine_error(error, ctx.action))?;
+    emit_spine_event(
+        &mut *tx,
+        &ctx,
+        "programme_cadence",
+        input.cadence_id,
+        "updated",
+    )
+    .await?;
+    let recorded = match kind {
+        DecisionKind::Approve => "approve",
+        DecisionKind::Reject => "reject",
+    };
+    Ok(HandlerOutput::ok(plan_approval_out(
+        input.cadence_id,
+        &decided,
+        Some(recorded),
+        state,
+    )))
 }
 
 /// `cadences.delete`'s approval target: what the gate authorises, computed from the input alone.

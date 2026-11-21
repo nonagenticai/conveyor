@@ -103,21 +103,29 @@ migrations/0020_capability.sql
 1. `0020`: five tables, four columns, `catalogue_entry(kind='capability')` migrated into `capability` then deleted.
    `cargo run -q -p conveyor-server -- migrate` twice.
 2. Seed the 17 capabilities and their relations from `seed/capability.json`; remove the capability rows from
-   `seed/catalogue.json` and make `crates/store/src/seed.rs` import both. `cargo test -p conveyor-store capability_seed`.
+   `seed/catalogue.json` and make `crates/store/src/seed.rs` import both. `cargo test -p conveyor-store
+   --test s07_seed` and `--test capability` (the `capability_seed` filter named here matches nothing).
 3. Domain: status transitions, relation cycle refusal, allowed-action validation. `cargo test -p conveyor-domain capability`.
 4. Store: CRUD + the binding query (`capability → packs`, `card_type → capability`). `cargo test -p conveyor-store capability`.
 5. Actions: `capabilities.*`, `capability_agents.*`, `capabilities.bind_knowledge` (+ `knowledge.bound`).
    `cargo test -p conveyor-actions capability`.
 6. `strata` client: `POST /api/query`, `POST /api/stores/{id}/documents`, `DELETE /api/sources/{sid}/documents`.
-   Timeouts and a breaker as in S09; no retry on 4xx. `cargo test -p conveyor-api knowledge_client`.
+   Timeouts and a breaker as in S09; no retry on 4xx. The shipped proof is the ignored
+   `cargo test -p conveyor-actions --test strata_live -- --ignored` (real strata) plus
+   `cargo test -p conveyor-actions --test parity_http_mcp`; the `conveyor-api knowledge_client` filter
+   named here matches nothing.
 7. `knowledge.query`: resolve pack → leaf ids (cache), filter `metadata.capability`, return hits unchanged.
-   `cargo test -p conveyor-api --test knowledge_query`.
+   The shipped proof is `cargo test -p conveyor-actions --test registry` (registered) and
+   `--test parity_http_mcp` (HTTP + MCP); the `conveyor-api --test knowledge_query` target named here
+   never existed (see §7).
 8. `memory.remember` + `memory.recorded`; hot read. `cargo test -p conveyor-actions memory`.
 9. `memory.recall`: hot + semantic (`source_ids = ["conveyor:work:<card>"]`), hot wins.
-   `cargo test -p conveyor-api --test memory_recall`.
+   The shipped proof is `cargo test -p conveyor-store --test memory` and
+   `cargo test -p conveyor-actions --test parity_http_mcp`; the `conveyor-api --test memory_recall`
+   target named here never existed (see §7).
 10. `memory.consolidate`: build the digest with the `work-package: <card_id>` header, ingest with a new
     `source_run`, prune `except_run`, set `consolidated_at`. Idempotent on replay.
-    `cargo test -p conveyor-store memory_consolidate`.
+    `cargo test -p conveyor-server --test memory_consolidate`.
 11. Wire `run.capability_id`/`capability_agent_id` at run creation; scope the run's actions from
     `allowed_actions`; carry `{capability_agent_id, prompt_ref, model_ref}` into the `agent.run` step input
     contract (S13 registers the action and owns the loop). `cargo test -p conveyor-actions run_capability`.
@@ -139,17 +147,44 @@ docker compose --profile strata up -d --wait
 cargo run -q -p conveyor-server -- migrate
 cargo test -p conveyor-domain capability
 cargo test -p conveyor-store capability
-cargo test -p conveyor-store memory_consolidate
+cargo test -p conveyor-store --test memory                    # hot rows: newest first, supersede, digest
+cargo test -p conveyor-server --test memory_consolidate       # the job: digest, stamps, prune, replay no-op
 cargo test -p conveyor-actions capability memory
-cargo test -p conveyor-api --test knowledge_query
+# `knowledge.query` / `memory.recall` ship in `conveyor-actions`, never in `conveyor-api` (v1-s15-1).
+# A libtest filter that selects zero tests exits 0, so each target is counted before it runs.
+some_tests() { # <minimum> <cargo test args...>
+  local min="$1"; shift
+  local n
+  n=$(cargo test "$@" -- --list | grep -c ': test$' || true)
+  test "$n" -ge "$min" || { echo "too few tests: $n < $min for: $*" >&2; exit 1; }
+}
+some_tests 1 -p conveyor-actions --test registry              # both actions registered
+some_tests 1 -p conveyor-actions --test parity_http_mcp       # both executed over HTTP and MCP
+some_tests 1 -p conveyor-actions --test strata_live           # the shipped ignored live proof exists
+some_tests 1 -p conveyor-api --test capability_readiness
+cargo test -p conveyor-actions --test registry
+cargo test -p conveyor-actions --test parity_http_mcp
+cargo test -p conveyor-actions --test strata_live -- --ignored   # real strata: ingest, query hits, prune
 cargo test -p conveyor-api --test capability_readiness
-cargo test -p conveyor-api --test memory_recall
 cargo clippy --workspace --all-targets -- -D warnings
 # the removed vocabulary has one home
 test -z "$(grep -rn "kind = 'capability'" crates/ migrations/ | grep -v capability.rs)"
 # no embedding code in the conveyor
 test -z "$(grep -rn "pgvector\|hnsw\|embedding" crates/ migrations/ | grep -v '^Binary')"
 ```
+
+⚠️ **Gate correction and named gaps (v1-s15-1, 2026-11-21).** The gate named two `conveyor-api`
+targets that never existed (`--test knowledge_query`, `--test memory_recall`) and a
+`conveyor-store memory_consolidate` filter that matches nothing; the shipped proof is
+`conveyor-actions --test {registry,parity_http_mcp}` plus the ignored `strata_live`, with
+`conveyor-store --test memory` and `conveyor-server --test memory_consolidate` behind them.
+Still **NOT PROVEN by any shipped test**: property (a)'s pack-bound hit carrying `pack` and
+`layer` (`strata_live` proves the raw strata client query; `parity_http_mcp` runs `knowledge.query`
+against an unbound capability, so its hits are deterministically empty), and property (d)'s
+run-transactional `memory.remember` (`conveyor-store --test memory` proves hot-row visibility and
+ordering; no test asserts the write shares the run's transaction).
+`apps/server/tests/memory_consolidate.rs`'s header also cites a `knowledge_live` target that does
+not exist — the shipped ignored live proof is `crates/actions/tests/strata_live.rs`.
 
 | # | property | proof |
 |---|---|---|

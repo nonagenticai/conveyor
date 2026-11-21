@@ -244,7 +244,11 @@ mod tests {
                 (60, "procedure ingestion".to_owned()),
                 // #508: the contract's requester, recorded at request time and never rewritten
                 // (0061_contract_requester.sql, SPEC_V2 §8.1 — the approver must differ).
-                (61, "contract requester".to_owned())
+                (61, "contract requester".to_owned()),
+                // v1-w1a-2 (#526): the release's layered kind store — base → industry →
+                // department archetype → department → job — and `department.archetype`
+                // (0062_release_layers.sql, SPEC_V2 §4.1).
+                (62, "release layers".to_owned())
             ],
             "the embedded migration set is {embedded:?}; a wrong sqlx::migrate! path or a \
              file outside the set changes it"
