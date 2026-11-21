@@ -1224,6 +1224,84 @@ window.installV2 = function (api, enterprise) {
       B(`${list(source.documents).length} documents`),
     )}`;
   }
+  /* The programme's projects as one dossier table, read from the rows this destination already
+     loads: signed in the console's `/api/projects` read (`cs.projects`), published the snapshot's
+     `live.programme.projects`. Nothing is fetched here, no fixture is drawn on a store path, and
+     a column with no source says so instead of guessing. */
+  function mspDossier(source) {
+    const signed = consoleOn();
+    const rows = signed ? consoleProjects() : snapshotProjects();
+    const M = (live || {}).msp || {};
+    const mspState = signed ? msp() : null;
+    // `baselines.list` and `documents.list` are read for the definition-set project only.
+    const scopedProjectId = mspState ? mspState.projectId : null;
+    const trancheByNumber = new Map();
+    list(source.tranches).forEach((t) => {
+      const number = Number(t.number);
+      if (Number.isFinite(number)) trancheByNumber.set(number, t);
+    });
+    const baselines = list(source.baselines);
+    const baselinesLoaded = signed
+      ? !!(mspState && mspState.loaded)
+      : Array.isArray(M.project_baselines);
+    const documents = list(source.documents);
+    const documentsLoaded = signed
+      ? !!(mspState && mspState.loaded)
+      : Array.isArray(((live || {}).artefacts || {}).documents);
+    const statusToneOf = (status) =>
+      status === "active" ? "green" : status === "closed" || status === "archived" ? "" : "amber";
+    const trancheCell = (project) => {
+      const number = (project.meta || {}).tranche;
+      if (number == null || String(number).trim() === "") {
+        return `<span class="muted">not in this read</span>`;
+      }
+      // The tranche rows carry no project id; the number on the project's own row is the join.
+      const row = trancheByNumber.get(Number(number));
+      return `T${E(number)}${row ? ` · ${B(row.state || "planned", row.state === "closed" ? "green" : "amber")}` : ""}`;
+    };
+    const baselineCell = (project) => {
+      if (!baselinesLoaded) return `<span class="muted">not in this read</span>`;
+      if (signed && project.id !== scopedProjectId) {
+        // The console's baseline read is one project's, so another project's absence here is
+        // not evidence that it holds no baseline.
+        return `<span class="muted">not in this read</span>`;
+      }
+      const matches = baselines.filter((b) => b.project_id === project.id);
+      return matches.length
+        ? matches.map((b) => `<code>${E(b.kind || "—")}</code>`).join(" ")
+        : `<span class="muted">none recorded</span>`;
+    };
+    const evidenceCell = (project) => {
+      const issues = projectIssues(project).length;
+      const scoped = !signed || project.id === scopedProjectId;
+      const docs =
+        documentsLoaded && scoped
+          ? documents.filter((d) => d.project_id === project.id)
+          : null;
+      const evidence = docs ? docs.filter((d) => d.category === "evidence").length : 0;
+      const documentsText = docs
+        ? `${docs.length} document${docs.length === 1 ? "" : "s"}${evidence ? ` · ${evidence} evidence` : ""}`
+        : "documents not in this read";
+      return `<small>${E(documentsText)} · ${issues} linked issue${issues === 1 ? "" : "s"}</small>`;
+    };
+    const provenance = signed
+      ? "signed in · cs.projects, the console's own /api/projects read"
+      : live
+        ? "published snapshot · live.programme.projects"
+        : "no project store or snapshot is loaded on this pack";
+    return `${mspError()}${panel(
+      "Projects dossier",
+      `${table(
+        ["Project", "Status", "Tranche", "Baseline", "Evidence / output"],
+        rows.length
+          ? rows.map((project) => `<tr><td><strong>${E(project.key || "—")}</strong><small>${E(project.name || "")}</small></td><td>${B(project.status || "—", statusToneOf(project.status))}</td><td>${trancheCell(project)}</td><td>${baselineCell(project)}</td><td>${evidenceCell(project)}</td></tr>`)
+          : [`<tr><td colspan="5">No project rows in this store/snapshot.</td></tr>`],
+      )}${note(
+        `Source: <span class="mono">${E(provenance)}</span>. The tranche is the project row's own <span class="mono">meta.tranche</span>, matched by number to the programme's tranche rows; those rows carry no project id, so a project without one reads "not in this read". Baselines match <span class="mono">project_id</span> in the rows this destination already loads; signed in the MSP read is scoped to the definition-set project, so another project's baseline reads "not in this read", not "none". Documents are counted per project from the loaded document rows; linked issues are the project's own <span class="mono">meta.issues</span>. Nothing is fetched here and no fixture is rendered.`,
+      )}`,
+      B(`${rows.length} project${rows.length === 1 ? "" : "s"}`, rows.length ? "green" : ""),
+    )}`;
+  }
   function mspBenefits(source) {
     const rows = list(source.benefits);
     const chosen = rows.find((b) => b.id === v.mspBenefit) || rows[0] || {};
@@ -1353,7 +1431,7 @@ window.installV2 = function (api, enterprise) {
         : note("Select a stakeholder, or create the first one."),
     )}</div></div>`;
   }
-  const MSP_TABS = ["Definition", "Benefits map & profiles", "Tranches & reviews", "Benefits realization", "Stakeholders"];
+  const MSP_TABS = ["Definition", "Dossier", "Benefits map & profiles", "Tranches & reviews", "Benefits realization", "Stakeholders"];
   function mspDefinitionBody(tab) {
     const source = mspSource();
     if (consoleOn() && !msp().loaded && !msp().error) {
@@ -1362,13 +1440,15 @@ window.installV2 = function (api, enterprise) {
     return (
       tab === "Definition"
         ? mspDefinition(source)
-        : tab === "Benefits map & profiles"
-          ? mspBenefits(source)
-          : tab === "Tranches & reviews"
-            ? mspTranches(source)
-            : tab === "Benefits realization"
-              ? mspRealization(source)
-              : mspStakeholders(source)
+        : tab === "Dossier"
+          ? mspDossier(source)
+          : tab === "Benefits map & profiles"
+            ? mspBenefits(source)
+            : tab === "Tranches & reviews"
+              ? mspTranches(source)
+              : tab === "Benefits realization"
+                ? mspRealization(source)
+                : mspStakeholders(source)
     );
   }
   function programmeDefinitionLive() {
@@ -5218,7 +5298,9 @@ window.installV2 = function (api, enterprise) {
             ? tranches
             : tab === "Benefits realization"
               ? realization
-              : stakeholdersPanel;
+              : tab === "Dossier"
+                ? mspDossier(mspSource())
+                : stakeholdersPanel;
 
     return `<div class="page enterprise">${heading(
       "Programme definition",
