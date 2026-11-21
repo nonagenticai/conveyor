@@ -33,8 +33,6 @@ pub struct Fixture {
     pub binding: Uuid,
     /// The published P0 standing-delegation decision the U4 acts cite.
     pub delegation: String,
-    /// The Architecture Board row the contract approvals decide through.
-    pub board: Uuid,
     /// A third principal: the accepting owner, distinct from the requester and the reviewer.
     pub owner: Uuid,
 }
@@ -51,7 +49,6 @@ pub async fn fixture() -> Fixture {
     let binding = seed_pm_job(&pg, seeded.tenant_id).await;
     let running = support::Running::start(&pg).await;
     let owner = seed_owner(&pg, seeded.tenant_id).await;
-    let board = seed_arch_board(&pg, seeded.tenant_id).await;
     let delegation = seed_delegation(&running).await;
     Fixture {
         pg,
@@ -59,7 +56,6 @@ pub async fn fixture() -> Fixture {
         seeded,
         binding,
         delegation,
-        board,
         owner,
     }
 }
@@ -87,21 +83,6 @@ async fn seed_owner(pg: &support::Pg, tenant_id: Uuid) -> Uuid {
     .await
     .expect("insert the owner membership");
     user
-}
-
-/// The Architecture Board row; a unique key per fixture so a test that opens its own board does
-/// not collide with this one.
-async fn seed_arch_board(pg: &support::Pg, tenant_id: Uuid) -> Uuid {
-    sqlx::query_scalar(
-        "INSERT INTO governance_body (tenant_id, kind, key, name)
-         VALUES ($1, 'architecture_board', $2, 'Conveyor Architecture Board')
-         RETURNING id",
-    )
-    .bind(tenant_id)
-    .bind(format!("board-{}", Uuid::now_v7().simple()))
-    .fetch_one(&pg.super_pool)
-    .await
-    .expect("insert the board")
 }
 
 /// Publish the standing-delegation decision under P0 through the real document actions.
@@ -390,15 +371,37 @@ pub async fn request_contract(
 }
 
 pub async fn approve_contract(f: &Fixture, id: &str) -> Value {
-    // U4: the board decision about this contract, citing the standing delegation. The board
-    // acts as the admin; the requester is the admin; the approver is the second principal.
+    // U4: the board decision about this contract, citing the standing delegation. The board is
+    // opened per approval with a unique key, so the fixture does not put a second row in the
+    // board-list assertions.
+    let (status, opened) = f
+        .running
+        .invoke(
+            "architecture.board_open",
+            TOKEN,
+            json!({
+                "kind": "architecture_board",
+                "key": format!("contract-board-{}", Uuid::now_v7().simple()),
+                "name": "Contract board",
+                "charter": "Approve the delivery contract",
+                "commissioning_authority": "P0 programme board",
+                "decision_limits": {},
+                "members": [],
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "architecture.board_open: {opened}");
+    let body_id = id_of(output(&opened));
     let (status, board) = f
         .running
         .invoke(
             "architecture.board_decide",
             TOKEN,
             json!({
-                "body_id": f.board,
+                "body_id": body_id,
                 "decision": "approved",
                 "evidence": {"delegation_ref": f.delegation},
                 "subject_kind": "contract",
