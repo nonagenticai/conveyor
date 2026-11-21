@@ -1,0 +1,105 @@
+[project]
+key = "S13"
+name = "Process engine, judge, map and care-bus — the process is the executor, the DAG retained as the tool-sequence engine, the 348 flows re-authored"
+gate = "Green when the process limb passes with the gate parked and resumed and the coach child proving the run tree; the judge proves accept, reject-rerun, the two-reject BLOCK and the outage wait; the bus proves duplicate idempotency, re-delivery after `FLUSHALL` and the DLQ; the default catalogue is exactly 280; the dispositions have no `delta:` row; and with Redis stopped the Postgres-only limb still passes."
+
+[[check]]
+id = "S13-project"
+check = "project"
+severity = "P0"
+description = "S13 is closed"
+
+[[check]]
+id = "S13-baseline"
+check = "project_baseline"
+require_approved = true
+severity = "P0"
+description = "the scope baseline is approved; the close gate reads the approved row"
+
+[[check]]
+id = "S13-charter"
+kind = "command"
+severity = "P0"
+description = "the charter asset exists and the charter gate is approved"
+command = '''python3 scripts/programme-record.py --check --action pm.get --input '{"project_id":"01a1d039-0d2e-7ed4-9cda-a7fce9fffa8e"}' | python3 -c '
+import json,sys
+s=sys.stdin.read()
+d=json.loads(s[s.find("{"):])
+o=d.get("output",d)
+assert o.get("charter_asset_id"), "no charter asset"
+gates={g.get("gate"):g.get("status") for g in o.get("gates",[])}
+assert gates.get("charter")=="approved", gates
+'
+'''
+
+[[check]]
+id = "S13-closure-outputs"
+check = "closure_outputs"
+severity = "P0"
+description = "the declared closure outputs are declared and published"
+
+[[check]]
+id = "S13-contract"
+check = "contract"
+severity = "P0"
+description = "a live board-approved delivery contract exists"
+
+[[check]]
+id = "S13-review"
+check = "review"
+severity = "P0"
+description = "the Phase-G review cites a published standing delegation"
+
+[[check]]
+id = "S13-closure-gate"
+check = "closure_gate"
+severity = "P0"
+description = "the closure gate was decided by an approver other than its requester"
+
+[[check]]
+id = "S13-waivers"
+check = "waivers"
+severity = "P0"
+description = "no active waiver is expired or owned by its reviewer"
+
+[[check]]
+id = "S13-pi-cadence"
+check = "pi_cadence"
+severity = "P0"
+description = "the project's PI has a cadence row and a backlog-refinement row"
+
+[[check]]
+id = "S13-pi-plan"
+check = "pi_plan"
+severity = "P0"
+description = "the project tranche's PI plan is published"
+
+[[check]]
+id = "S13-pi-objectives"
+check = "pi_objectives"
+severity = "P0"
+description = "the project tranche's PI objectives are published"
+
+[[check]]
+id = "S13-lessons"
+check = "lessons"
+severity = "P1"
+description = "the tranche retro produced at least one lesson"
+
+[[check]]
+id = "S13-wsjf"
+check = "wsjf"
+severity = "P0"
+description = "every WBS deliverable of the project carries the four typed WSJF inputs"
+
+[[check]]
+id = "S13-demo-credits"
+check = "demo_credits"
+severity = "P0"
+description = "every accepted deliverable has a demo credit carrying its evidence"
+
+[[check]]
+id = "S13-product"
+check = "product_findings"
+severity = "P0"
+description = "no open P0 product finding remains for the project"
