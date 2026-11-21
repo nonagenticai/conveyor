@@ -24,9 +24,9 @@
     {
       "number": 527,
       "title": "programme: the five proposed V2 inception sets \u2014 author, correct the live record, record the gate",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/527",
-      "updatedAt": "2026-11-21T10:09:07Z",
+      "updatedAt": "2026-11-21T11:37:14Z",
       "labels": [
         {
           "name": "unit",
@@ -47,15 +47,15 @@
       "title": "programme: the tranche-0 rework batch \u2014 verifier, manifests and seven retrospective project records (U5a)",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/526",
-      "updatedAt": "2026-11-21T09:11:29Z",
+      "updatedAt": "2026-11-21T11:27:51Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:blocked",
-          "color": "D93F0B"
+          "name": "status:claimed",
+          "color": "FBCA04"
         },
         {
           "name": "programme",
@@ -68,7 +68,7 @@
       "title": "programme: the strict gates \u2014 one close path, tranche review, dual control and strict publish",
       "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/524",
-      "updatedAt": "2026-11-21T10:19:31Z",
+      "updatedAt": "2026-11-21T10:47:53Z",
       "labels": [
         {
           "name": "unit",
@@ -553,7 +553,7 @@
       "title": "conveyor-buildout \u2014 the SPEC_V2 programme",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/435",
-      "updatedAt": "2026-11-21T02:07:14Z",
+      "updatedAt": "2026-11-21T10:45:16Z",
       "labels": [
         {
           "name": "programme",
