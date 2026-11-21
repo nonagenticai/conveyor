@@ -303,7 +303,7 @@ pub async fn snapshot_tx(
              SELECT id, project_id, card_id, kind, title, category, unit, publishable,
                     updated_at, created_at
                FROM document
-              WHERE tenant_id = $1 AND publishable AND status = 'active'
+              WHERE tenant_id = $1 AND published_at IS NOT NULL AND status = 'active'
          ) t",
         tenant_id,
     )
