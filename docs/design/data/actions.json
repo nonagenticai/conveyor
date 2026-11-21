@@ -422,6 +422,8 @@
     "requirements.transition",
     "requirements.update",
     "retrieval.query",
+    "retros.close",
+    "retros.record_findings",
     "roles.policy_get",
     "roles.policy_reset",
     "roles.policy_set",

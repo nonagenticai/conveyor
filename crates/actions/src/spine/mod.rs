@@ -178,6 +178,11 @@ fn spine_error(error: PlanStoreError, action: &str) -> ActionError {
         PlanStoreError::Illegal(PlanError::TrancheRetired) => {
             ActionError::new(409, "tranche_retired", "the tranche is retired")
         }
+        PlanStoreError::Illegal(PlanError::RetroFindingWithoutLesson(key)) => invalid(
+            "cadence_id",
+            "retro_finding_without_lesson",
+            format!("the retro finding {key:?} has no lesson; propose one before closing"),
+        ),
         PlanStoreError::Illegal(other) => invalid("input", "plan_refused", other.to_string()),
         PlanStoreError::Conflict { what, why } => ActionError::new(
             409,
@@ -3136,6 +3141,133 @@ async fn cadences_credit_list(
         items: records.iter().map(demo_credit_out).collect(),
         next_cursor: None,
     })
+}
+
+/// The findings the coach gathered on a retro.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct RetroFindingsIn {
+    /// The retro cadence.
+    pub cadence_id: Uuid,
+    /// The findings: one object per finding, each carrying its `key`.
+    pub findings: Value,
+}
+
+/// Close a retro.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct RetroCloseIn {
+    /// The retro cadence.
+    pub cadence_id: Uuid,
+}
+
+/// Record a retro's findings on its coach card.
+///
+/// The retro was openable only by the worker's tick and closeable only by a store call: the
+/// inspect-and-adapt step had no API. The findings live on the retro card, and closing checks
+/// one lesson per finding key, so a retro cannot be closed over an empty lesson set.
+#[crate::action(
+    name = "retros.record_findings",
+    version = 1,
+    kind = "internal",
+    scopes = ["portfolio:write"],
+    idempotent = false,
+    timeout_ms = 30000,
+    effect = "write",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn retros_record_findings(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: RetroFindingsIn,
+) -> Result<HandlerOutput<CadenceOut>, ActionError> {
+    let cadence = store::spine::get_cadence_tx(&mut *tx, ctx.tenant, input.cadence_id)
+        .await
+        .map_err(|error| spine_error(error, ctx.action))?
+        .ok_or_else(|| ActionError::resource_not_found("such cadence row"))?;
+    if cadence.kind != "retro" {
+        return Err(invalid(
+            "cadence_id",
+            "cadence_wrong_kind",
+            "the findings need a retro cadence",
+        ));
+    }
+    // Recording findings opens the retro's one coach card first: the row is the retro's own
+    // record, and a caller with a cadence but no tick yet should not have to know about the card.
+    store::spine::open_retro_tx(&mut *tx, ctx.tenant, input.cadence_id)
+        .await
+        .map_err(|error| spine_error(error, ctx.action))?;
+    store::spine::record_retro_findings_tx(&mut *tx, ctx.tenant, input.cadence_id, &input.findings)
+        .await
+        .map_err(|error| spine_error(error, ctx.action))?;
+    emit_spine_event(
+        &mut *tx,
+        &ctx,
+        "programme_cadence",
+        input.cadence_id,
+        "findings_recorded",
+    )
+    .await?;
+    let record = store::spine::get_cadence_tx(&mut *tx, ctx.tenant, input.cadence_id)
+        .await
+        .map_err(|error| spine_error(error, ctx.action))?
+        .ok_or_else(ActionError::internal)?;
+    Ok(HandlerOutput::ok(cadence_out(&record)).with_etag(etag_of(record.version)))
+}
+
+/// Close a retro once every recorded finding has its lesson.
+#[crate::action(
+    name = "retros.close",
+    version = 1,
+    kind = "internal",
+    scopes = ["portfolio:write"],
+    idempotent = false,
+    timeout_ms = 30000,
+    effect = "write",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn retros_close(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: RetroCloseIn,
+) -> Result<HandlerOutput<CadenceOut>, ActionError> {
+    let cadence = store::spine::get_cadence_tx(&mut *tx, ctx.tenant, input.cadence_id)
+        .await
+        .map_err(|error| spine_error(error, ctx.action))?
+        .ok_or_else(|| ActionError::resource_not_found("such cadence row"))?;
+    if cadence.kind != "retro" {
+        return Err(invalid(
+            "cadence_id",
+            "cadence_wrong_kind",
+            "a retro close needs a retro cadence",
+        ));
+    }
+    store::spine::close_retro_tx(&mut *tx, ctx.tenant, input.cadence_id)
+        .await
+        .map_err(|error| spine_error(error, ctx.action))?;
+    let patch = store::spine::CadencePatch {
+        period: None,
+        state: Some("closed".to_owned()),
+        meta: None,
+    };
+    let record = store::spine::update_cadence_tx(
+        &mut *tx,
+        ctx.tenant,
+        input.cadence_id,
+        cadence.version,
+        &patch,
+    )
+    .await
+    .map_err(|error| spine_error(error, ctx.action))?;
+    emit_spine_event(
+        &mut *tx,
+        &ctx,
+        "programme_cadence",
+        input.cadence_id,
+        "closed",
+    )
+    .await?;
+    Ok(HandlerOutput::ok(cadence_out(&record)).with_etag(etag_of(record.version)))
 }
 
 /// A lesson as `lessons.*` returns it.

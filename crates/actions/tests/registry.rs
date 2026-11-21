@@ -118,7 +118,9 @@ use serde_json::{Value, json};
 /// that opens the closure gate. 503 → **504**.
 /// **#526 (5a) adds 4 internal**: `cadences.credit_demo|credit_list` and `lessons.propose|list`
 /// — the SAFe demo credits and the retro lessons. 504 → **508**.
-const EXPECTED: [&str; 508] = [
+/// **#526 (P) adds 2 internal**: `retros.record_findings|close` — inspect-and-adapt had store
+/// functions but no API, so a retro could be opened by the worker and never driven. 508 → **510**.
+const EXPECTED: [&str; 510] = [
     "actions.describe",
     "actions.list",
     "analyse.site",
@@ -544,6 +546,8 @@ const EXPECTED: [&str; 508] = [
     "requirements.transition",
     "requirements.update",
     "retrieval.query",
+    "retros.close",
+    "retros.record_findings",
     "roles.policy_get",
     "roles.policy_reset",
     "roles.policy_set",
@@ -721,7 +725,9 @@ fn the_registry_is_exactly_the_declared_set() {
     // 490 -> 491; external stays 13.
     // #526 (5a) adds four internal actions (`cadences.credit_demo|credit_list`,
     // `lessons.propose|list`): 491 -> 495; external stays 13.
-    assert_eq!((internal, external), (495, 13));
+    // #526 (P) adds two internal actions (`retros.record_findings|close`), the inspect-and-adapt
+    // API that had only store functions: 495 -> 497; external stays 13.
+    assert_eq!((internal, external), (497, 13));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),
