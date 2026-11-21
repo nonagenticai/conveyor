@@ -547,7 +547,7 @@
         },
         {
           "path": "crates/store/src/spine.rs",
-          "line": 3502,
+          "line": 3520,
           "quote": "            if matches!(state.as_str(), \"authorised\" | \"in_review\" | \"closed\") =>"
         }
       ],
@@ -562,32 +562,12 @@
       "spec": "§8.3",
       "severity": "P1",
       "title": "Benefit measurement is presence-only and realized needs only two timestamps",
-      "problem": "Completeness checks baseline/target for non-null only, so {} or the literal \"not measured\" passes; the seeded B1-B6 baselines are exactly that text. realized is allowed when the transition has baseline_measured_at and post_measured_at, with no post measurement value or evidence required.",
+      "problem": "Completeness now rejects empty/whitespace/placeholder baselines and targets and a realized status now needs non-empty transition evidence in addition to both timestamps. What remains missing is the measurement VALUES: benefit_transition stores timestamps plus a free-form readiness document, so a realized claim still has no typed baseline/post value to compare. The seeded B1-B6 baselines bypass the store with raw SQL (see v1-p83-3).",
       "evidence": [
         {
-          "path": "crates/domain/src/spine.rs",
-          "line": 245,
-          "quote": "    if profile.baseline.is_none() {"
-        },
-        {
           "path": "crates/store/src/spine.rs",
-          "line": 2008,
-          "quote": "            .is_some_and(|t| t.baseline_measured_at.is_some() && t.post_measured_at.is_some());"
-        },
-        {
-          "path": "seed/programme-definition.json",
-          "line": 13,
-          "quote": "      \"baseline\": \"not measured - no instrument exists (recorded as a kata on the kata project)\","
-        },
-        {
-          "path": "crates/store/src/spine.rs",
-          "line": 2008,
-          "quote": "            .is_some_and(|t| t.baseline_measured_at.is_some() && t.post_measured_at.is_some());"
-        },
-        {
-          "path": "crates/store/src/spine.rs",
-          "line": 2496,
-          "quote": "    if post.is_some() && baseline.is_none() {"
+          "line": 2426,
+          "quote": "/// The editable fields of a realization record. `None` leaves the stored value in place."
         }
       ],
       "failure_scenario": "benefits.transition_upsert accepts baseline_measured_at and post_measured_at with evidence [], then benefits.update sets status realized. No post-transition measurement exists, yet the benefit claims improvement.",
@@ -663,12 +643,12 @@
         },
         {
           "path": "crates/store/src/spine.rs",
-          "line": 3661,
+          "line": 3679,
           "quote": "pub async fn close_programme_tx("
         },
         {
           "path": "crates/store/src/spine.rs",
-          "line": 3695,
+          "line": 3713,
           "quote": "        \"UPDATE programme SET status = 'closed', version = version + 1, updated_at = now()"
         }
       ],
@@ -899,7 +879,7 @@
         },
         {
           "path": "crates/store/src/spine.rs",
-          "line": 2670,
+          "line": 2688,
           "quote": "            state = coalesce($5, state),"
         },
         {
@@ -971,7 +951,7 @@
       "evidence": [
         {
           "path": "crates/store/src/spine.rs",
-          "line": 2985,
+          "line": 3003,
           "quote": "          WHERE tenant_id = $1 AND project_id = $2 AND kind = 'deliverable'"
         }
       ],
@@ -1966,7 +1946,12 @@
       ],
       "failure_scenario": "The BCM registers 'faster onboarding' with a baseline, target, method and owner but leaves capabilities and operational_area empty. benefits.create succeeds (only the four measurement fields are checked). The benefit enters the map with no capability dependency and no operational area to change, and can later be marked realized without any programme capability having been delivered or any part of operations having changed — the exact 'wish' the spec says must be refused.",
       "acceptance": "benefits.create and benefits.update refuse 400 benefit_profile_incomplete unless capabilities is a non-empty array and operational_area is non-blank after trim, in addition to the four measurement fields.",
-      "owner_project": "T10"
+      "owner_project": "T10",
+      "resolved_by": {
+        "commit": "5cc321144ff68470aa24ab9bf05b65bf0b9124b5",
+        "test": "crates/actions/tests/benefit_lifecycle.rs",
+        "evidence": "cargo test -p conveyor-actions --test benefit_lifecycle: 13 passed, including a_benefit_without_capabilities_or_an_area_is_refused and a_placeholder_baseline_is_refused (422 benefit_profile_incomplete naming both gaps). spine_msp 10, plan_spine 14 and the parity sample are green with the two fields present."
+      }
     },
     {
       "id": "v1-w2b-5",
@@ -2018,7 +2003,7 @@
         },
         {
           "path": "crates/store/src/spine.rs",
-          "line": 3467,
+          "line": 3485,
           "quote": "                PlanError::RetroFindingWithoutLesson(key),"
         }
       ],
@@ -3550,17 +3535,17 @@
       "spec": "§7",
       "severity": "P0",
       "title": "S16 inference-capture and audit gates are vacuous",
-      "problem": "The S16 gate's --exact filters selected nothing that exists (a_real_call_records_the_router_usage vs the shipped name, procedures_write vs processes_write) and a zero-match libtest run exits 0. The filters now name the shipped tests and the gate has a zero-match guard that makes a stale name red. The live-router rehearsal target the plan promised is still absent, so the acceptance's last clause is unmet.",
+      "problem": "The S16 gate's --exact filters now match shipped tests and a zero-match run is red, and the live rehearsal target exists: crates/actions/tests/inference_live.rs (ignored) calls the deployed router and asserts one inference_call row with a served model. The run needs the router's caller licence token (CONVEYOR_LIVE_ROUTER_TOKEN), which is not in any checked-in file; the public endpoint is reachable and licence-enforced. Until that token is supplied the live half is a named gap, not a pass.",
       "evidence": [
         {
-          "path": "docs/plans/slices/S16-inference-audit.md",
-          "line": 111,
-          "quote": "   sending `X-Correlation-Id`. `rbuild -- test -p conveyor-actions inference_capture`."
+          "path": "crates/actions/tests/inference_live.rs",
+          "line": 1,
+          "quote": "//! One real call through the estate inference router writes exactly one `inference_call` row"
         },
         {
           "path": "docs/plans/slices/S16-inference-audit.md",
-          "line": 146,
-          "quote": "  n=$(rbuild -- test \"$@\" -- --list --exact \"$name\" | grep -c ': test$' || true)"
+          "line": 166,
+          "quote": "rbuild -- test -p conveyor-actions --test inference_live -- --ignored --nocapture"
         }
       ],
       "failure_scenario": "A capture seam that drops router usage yields a green S16 gate because zero capture tests matched.",
