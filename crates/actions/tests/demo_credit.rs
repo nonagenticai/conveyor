@@ -172,7 +172,6 @@ async fn a_credit_needs_an_accepted_deliverable() {
     let (deliverable, version) = create_deliverable(&running, &project).await;
     let (status, body) = update_deliverable(
         &running,
-        &deliverable,
         version,
         json!({"id": deliverable, "evidence": ["doc:increment"]}),
     )
@@ -193,7 +192,6 @@ async fn a_credit_needs_evidence() {
     let (deliverable, version) = create_deliverable(&running, &project).await;
     let (status, body) = update_deliverable(
         &running,
-        &deliverable,
         version,
         json!({"id": deliverable, "status": "accepted"}),
     )
