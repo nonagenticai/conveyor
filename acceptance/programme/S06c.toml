@@ -1,0 +1,105 @@
+[project]
+key = "S06c"
+name = "MCP tasks — a long-running project asks for input"
+gate = "At the end, an MCP client that declares `io.modelcontextprotocol/tasks` calls `projects.execute`, receives `resultType:\"task\"`, polls `tasks/get` through a project that waits on an approval, answers it with `tasks/update`, and reads a terminal result — with no Python service in the path and no new table."
+
+[[check]]
+id = "S06c-project"
+check = "project"
+severity = "P0"
+description = "S06c is closed"
+
+[[check]]
+id = "S06c-baseline"
+check = "project_baseline"
+require_approved = true
+severity = "P0"
+description = "the scope baseline is approved; the close gate reads the approved row"
+
+[[check]]
+id = "S06c-charter"
+kind = "command"
+severity = "P0"
+description = "the charter asset exists and the charter gate is approved"
+command = '''python3 scripts/programme-record.py --check --action pm.get --input '{"project_id":"01a1d039-0d2b-7542-9574-e961ffd1b597"}' | python3 -c '
+import json,sys
+s=sys.stdin.read()
+d=json.loads(s[s.find("{"):])
+o=d.get("output",d)
+assert o.get("charter_asset_id"), "no charter asset"
+gates={g.get("gate"):g.get("status") for g in o.get("gates",[])}
+assert gates.get("charter")=="approved", gates
+'
+'''
+
+[[check]]
+id = "S06c-closure-outputs"
+check = "closure_outputs"
+severity = "P0"
+description = "the declared closure outputs are declared and published"
+
+[[check]]
+id = "S06c-contract"
+check = "contract"
+severity = "P0"
+description = "a live board-approved delivery contract exists"
+
+[[check]]
+id = "S06c-review"
+check = "review"
+severity = "P0"
+description = "the Phase-G review cites a published standing delegation"
+
+[[check]]
+id = "S06c-closure-gate"
+check = "closure_gate"
+severity = "P0"
+description = "the closure gate was decided by an approver other than its requester"
+
+[[check]]
+id = "S06c-waivers"
+check = "waivers"
+severity = "P0"
+description = "no active waiver is expired or owned by its reviewer"
+
+[[check]]
+id = "S06c-pi-cadence"
+check = "pi_cadence"
+severity = "P0"
+description = "the project's PI has a cadence row and a backlog-refinement row"
+
+[[check]]
+id = "S06c-pi-plan"
+check = "pi_plan"
+severity = "P0"
+description = "the project tranche's PI plan is published"
+
+[[check]]
+id = "S06c-pi-objectives"
+check = "pi_objectives"
+severity = "P0"
+description = "the project tranche's PI objectives are published"
+
+[[check]]
+id = "S06c-wsjf"
+check = "wsjf"
+severity = "P0"
+description = "every WBS deliverable of the project carries the four typed WSJF inputs"
+
+[[check]]
+id = "S06c-demo-credits"
+check = "demo_credits"
+severity = "P0"
+description = "every accepted deliverable has a demo credit carrying its evidence"
+
+[[check]]
+id = "S06c-lessons"
+check = "lessons"
+severity = "P1"
+description = "the tranche retro produced at least one lesson"
+
+[[check]]
+id = "S06c-product"
+check = "product_findings"
+severity = "P0"
+description = "no open P0 product finding remains for the project"
