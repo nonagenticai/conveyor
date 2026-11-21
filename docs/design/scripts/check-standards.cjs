@@ -19,8 +19,17 @@ const crypto = require("node:crypto");
 const fs = require("node:fs");
 const path = require("node:path");
 
-const root = path.resolve(__dirname, "..");
-const dataPath = path.join(root, "data", "standards.json");
+// The default is the published pack. The CI gate builds the record in a temp root instead, so
+// `--data` names that record's directory and `--documents` the root its `docs/standards/` pages
+// hang from; without them this validates exactly what the publish would serve.
+const argv = process.argv.slice(2);
+function option(name) {
+  const index = argv.indexOf(name);
+  return index >= 0 && index + 1 < argv.length ? argv[index + 1] : null;
+}
+const root = option("--documents") ? path.resolve(option("--documents")) : path.resolve(__dirname, "..");
+const dataDir = option("--data") ? path.resolve(option("--data")) : path.join(root, "data");
+const dataPath = path.join(dataDir, "standards.json");
 const STATUSES = new Set(["evidenced", "partial", "absent"]);
 const STANDARDS = new Set(["MSP", "TOGAF", "SAFe", "PMP", "SPEC"]);
 const LEVELS = new Set(["portfolio", "programme", "project", "work_package"]);
@@ -179,6 +188,10 @@ function selfTest() {
 function main() {
   if (process.argv.includes("--self-test")) return selfTest();
   if (!fs.existsSync(dataPath)) {
+    if (argv.includes("--data")) {
+      console.log(`check-standards: no standards record at ${dataPath}; the gate built nothing to verify`);
+      return 1;
+    }
     console.log("check-standards: no standards record published yet (nothing to verify)");
     return 0;
   }
@@ -190,7 +203,7 @@ function main() {
     return 1;
   }
   let registerKeys = null;
-  const reworkPath = path.join(root, "data", "rework.json");
+  const reworkPath = path.join(dataDir, "rework.json");
   if (fs.existsSync(reworkPath)) {
     try {
       const register = JSON.parse(fs.readFileSync(reworkPath, "utf8"));
