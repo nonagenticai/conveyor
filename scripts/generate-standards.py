@@ -297,7 +297,14 @@ def documents_for(
     documents = (snapshot.get("artefacts") or {}).get("documents") or []
     selected: list[dict[str, Any]] = []
     for doc in documents:
-        if doc.get("category") != category or not doc.get("publishable", True):
+        if doc.get("category") != category:
+            continue
+        # #537 made publication a timestamp. Read it when present; fall back to the old flag for
+        # a snapshot produced before that change so a rebase never drops every document.
+        if "published_at" in doc:
+            if not doc.get("published_at"):
+                continue
+        elif not doc.get("publishable", True):
             continue
         project_id = str(doc.get("project_id") or "")
         if scope == "subject":
