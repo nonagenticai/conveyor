@@ -995,7 +995,12 @@
       ],
       "failure_scenario": "An operator opens Portfolio and cannot rank work by WSJF, see PI planning/demo/retro dates, capacity, or spend per project; prioritisation and budget review happen outside the console.",
       "acceptance": "Portfolio exposes backlog+WSJF, cadence (PI/demo/retro), capacity and per-project metering panels fed by their real actions/rows, with fixtures only behind ?design=1.",
-      "owner_project": "PLATFORM"
+      "owner_project": "PLATFORM",
+      "resolved_by": {
+        "commit": "6b4ccc2ddd88ea80c00148ee496717990fe52c70",
+        "test": "docs/design/scripts/check-v2.cjs",
+        "evidence": "The Portfolio destination now composes a WSJF backlog panel (ranked WBS rows), a cadence panel, a real capacity panel (WIP limits vs live cards) and a per-project metering panel from run rows, on both the console and public paths, with honest empty states and no fixture money. check-v2 281 checks; check-console: 0 unhandled page errors."
+      }
     },
     {
       "id": "v1-p105-2",
