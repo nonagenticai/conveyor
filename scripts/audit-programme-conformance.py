@@ -1413,11 +1413,15 @@ def render_markdown(
     for gap in gaps:
         counts[gap["severity"]] = counts.get(gap["severity"], 0) + 1
     manifest = dataset.manifest
+    # The published page must not carry the operator's home directory: name the retained snapshot
+    # by its last two path components (`issue-526-2a1ff31d/data`), which identifies it without a
+    # machine-specific absolute path.
+    snapshot_label = "/".join(Path(snapshot).parts[-2:])
     lines = [
         "# MSP/TOGAF conformance gap register",
         "",
         f"Snapshot: `{manifest.get('git_sha', 'unknown')}` generated `{manifest.get('generated_at', 'unknown')}` "
-        f"from `{snapshot}`.",
+        f"from `{snapshot_label}`.",
         "",
         "| Severity | Count |",
         "|---|---:|",
