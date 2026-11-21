@@ -262,10 +262,15 @@ const shot = (name) => path.join(process.env.CONVEYOR_QA_OUTPUT || os.tmpdir(), 
       (await content()).includes("No published snapshot is loaded"),
       "the public portfolio is honest without a snapshot",
     );
-    // #528: a timeline is never drawn from a fixture — no snapshot, no `.gantt`.
+    // #528: a timeline is never drawn from a fixture — no snapshot, no `.gantt`, and no MSP/TOGAF
+    // artefact rail either (the rails read the snapshot's rows, never the study fixtures).
     check(
       (await page.locator("#main .gantt").count()) === 0,
       "the portfolio timeline does not render without a snapshot",
+    );
+    check(
+      (await page.locator("#main .delivery-rail").count()) === 0,
+      "no tranche or benefit rail renders without a snapshot",
     );
     await nav("projects");
     check(

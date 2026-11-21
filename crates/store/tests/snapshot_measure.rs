@@ -215,6 +215,30 @@ async fn the_snapshot_attributes_tokens_and_cost_by_project_and_card() {
         .execute(&db.super_pool)
         .await
         .expect("mark the hidden project draft");
+    // A standalone active project with a board and no card: the boundary publishes it (it has
+    // work attached), but it has no observed event, so it must not appear in `project_activity`.
+    // The page draws no bar for it rather than inventing one from `project.created_at`.
+    let silent = {
+        let mut tx = store::begin_scoped(&db.owner, tenant)
+            .await
+            .expect("scoped tx");
+        let project = store::project::insert_project_tx(
+            &mut tx,
+            tenant,
+            &store::project::NewProject::new("SILENT", "Project SILENT"),
+        )
+        .await
+        .expect("insert the silent project");
+        store::board::insert_board_tx(
+            &mut tx,
+            tenant,
+            &store::board::NewBoard::new(project.id, "Silent board"),
+        )
+        .await
+        .expect("insert the silent board");
+        tx.commit().await.expect("commit the silent fixture");
+        project.id
+    };
 
     // One priced call (local-llm has a commercial price from migration 0045) and one call on a
     // model with no price row, both on the public card's run.
@@ -306,6 +330,22 @@ async fn the_snapshot_attributes_tokens_and_cost_by_project_and_card() {
             .iter()
             .any(|row| row["project_id"] == serde_json::json!(hidden.project.to_string())),
         "the draft project's window is not public"
+    );
+    // The silent project is public (active, with a board) but has no event: no window, so the
+    // page has no bar to draw and must say "no dated activity".
+    assert!(
+        data.programme["projects"]
+            .as_array()
+            .expect("projects")
+            .iter()
+            .any(|row| row["id"] == serde_json::json!(silent.to_string())),
+        "an active standalone project with a board is published"
+    );
+    assert!(
+        !activity
+            .iter()
+            .any(|row| row["project_id"] == serde_json::json!(silent.to_string())),
+        "a project with no observed event has no activity window"
     );
 
     // The kanban groups by parent_card_id; the snapshot carries it.

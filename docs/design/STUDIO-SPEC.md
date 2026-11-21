@@ -190,27 +190,36 @@ and projects), `work` (boards, lists, cards, runs and `project_activity`) and `m
 
 | Level | Route | Renderer | Data |
 |---|---|---|---|
-| L1 portfolio | `#portfolio` | Gantt | one row per programme (rolled up from its projects) plus one per standalone initiative |
-| L2 programme | `#portfolio/<programmeId>` | Gantt | that programme's projects |
-| L3 project | `#projects/<projectId>` | Kanban | the board's lanes as columns; a card with children is a work-package tile |
-| L4 work package | `#projects/<projectId>/wp/<cardId>` | Kanban | the parent card's children across their board's lanes |
+| L1 portfolio | `#portfolio` | Gantt | one row per in-flight programme (rolled up from its projects, completed counted) plus one per standalone initiative |
+| L2 programme | `#portfolio/<programmeId>` | Gantt + MSP/TOGAF rails | that programme's projects grouped by `meta.tranche`; tranche rail, benefit rail, cadence/capability line |
+| L3 project | `#projects/<projectId>` | Kanban + project record | all the project's boards' lanes as columns, archived cards in their own column; the TOGAF contract/compliance and PMP WBS/register/baseline rows |
+| L4 work package | `#projects/<projectId>/wp/<cardId>` | Execution + kanban | the card's runs/steps, gate, Definition of Done and spend, then its children across their lanes; a childless card is valid |
 
 - **A bar is actuals, not a promise.** It starts at the first observed card or run activity
   (`work.project_activity.started_at`) and ends at completion, or at the snapshot's
   `generated_at` while the work is in flight. A planned window is drawn as a dashed track only
   when `project.meta.plan_start` and `meta.plan_end` are both present; a row with no event says
-  **no dated activity** rather than inventing a bar.
+  **no dated activity** rather than inventing a bar. A project row's `created_at` is never a bar.
+- **The standards artefacts are the snapshot's rows.** L2 draws the MSP tranches
+  (`msp.tranches`, with their `tranche_reviews`), the benefit profiles (`msp.benefit_profiles`
+  and their transitions — measured means a baseline, realised means a post-transition
+  measurement) and the SAFe cadence / TOGAF profile-and-board line. L3 draws the project's
+  `architecture_contract` and `architecture_compliance_review`, and any `wbs_node`,
+  `project_register_item` or `project_baseline` rows. An absent set is named, never invented.
 - **Spend is the ledger's own number.** Tokens are stored; cost is derived from
-  `commercial_price` and arrives as a decimal string. A model with no price contributes zero and
-  is counted in `unpriced_calls`; the row shows `*` and the count, never a fabricated `$0`.
+  `commercial_price` and arrives as a decimal string. A call with no price contributes zero and
+  is counted in `unpriced_calls`; a row whose calls are all unpriced shows `—*`, never `$0`.
   `measure.inference.totals` remains tenant-wide; `by_project`/`by_card` are filtered to the
   published boundary, so the difference is the boundary, not a missing call.
 - **The public boundary is the portfolio.** A programme-bound project is public; a standalone
   project is public only when it is `active`/`paused` **and** carries a board or a card. A draft
-  or bare session fixture is not published.
-- **A work package is a card with children** (`card.parent_card_id`). The project board shows
-  work-package tiles and loose cards; the work package's own board shows the children, archived
-  ones included as done. A child whose parent is archived or absent renders as a loose card.
+  or bare session fixture is not published. Closed and archived work is history: a closed
+  programme is not an L1 row, and a closed project is a completed bar at L2 and archived cards at
+  L3.
+- **A work package is the card** (SPEC_V2 §5.1). Its execution is its runs, gate, Definition of
+  Done and spend; `card.parent_card_id` gives it child cards, which render as its own board with
+  archived children visible as done. A childless card is the ordinary case and still opens L4. A
+  child whose parent is archived or absent renders as a loose card.
 
 ## Roles — meta-jobs as ordinary jobs
 

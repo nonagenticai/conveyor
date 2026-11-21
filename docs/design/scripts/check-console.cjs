@@ -689,6 +689,7 @@ const SNAPSHOT = {
           plan: "",
           issues: [],
           depends_on: [],
+          tranche: 4,
           plan_start: "2026-11-12",
           plan_end: "2026-11-24",
         },
@@ -702,6 +703,28 @@ const SNAPSHOT = {
         created_at: "2026-11-15T00:00:00Z",
         updated_at: "2026-11-16T00:00:00Z",
         meta: { track: "v1", plan: "", issues: [], depends_on: [] },
+      },
+      // #528: an in-programme project with spend but no observed event, and a closed project, so
+      // the "no dated activity" and "completed" states are both exercised.
+      {
+        id: "99999999-9999-7999-8999-999999999999",
+        key: "QUIET",
+        name: "Quiet project",
+        programme_id: "11111111-1111-7111-8111-111111111111",
+        status: "active",
+        created_at: "2026-11-10T00:00:00Z",
+        updated_at: "2026-11-11T00:00:00Z",
+        meta: { track: "v1", plan: "", issues: [], depends_on: [], tranche: 2 },
+      },
+      {
+        id: "aaaaaaaa-aaaa-7aaa-8aaa-aaaaaaaaaaaa",
+        key: "DONE",
+        name: "Closed project",
+        programme_id: "11111111-1111-7111-8111-111111111111",
+        status: "closed",
+        created_at: "2026-11-01T00:00:00Z",
+        updated_at: "2026-11-12T00:00:00Z",
+        meta: { track: "v1", plan: "", issues: [], depends_on: [], tranche: 1 },
       },
     ],
     issue_registry: {
@@ -731,14 +754,33 @@ const SNAPSHOT = {
     },
   },
   msp: {
+    // #528: the MSP artefacts are programme-scoped in the live snapshot; the fixture carries the
+    // UUID programme so the L2 rail is exercised against the same route id the page validates.
+    // One benefit has a measured baseline (its transition), one honestly has none.
     benefit_profiles: [
       {
         id: "ben-p0",
         reference: "BEN-P0",
+        programme_id: "11111111-1111-7111-8111-111111111111",
         description: "A published benefit",
         category: "delivery",
         observable_outcome: "faster delivery",
+        target: "half the cycle time",
+        baseline: "measured 2026-10-01",
+        measurement_method: "cycle time from the run ledger",
         status: "tracking",
+        version: 1,
+      },
+      {
+        id: "ben-p1",
+        reference: "BEN-P1",
+        programme_id: "11111111-1111-7111-8111-111111111111",
+        description: "An unmeasured benefit",
+        category: "delivery",
+        target: "every artifact has a QA version",
+        baseline: "not measured - no instrument exists",
+        measurement_method: "the artefact ledger",
+        status: "draft",
         version: 1,
       },
     ],
@@ -746,6 +788,7 @@ const SNAPSHOT = {
       {
         id: "bl-p0",
         benefit_id: "ben-p0",
+        programme_id: "11111111-1111-7111-8111-111111111111",
         output_ref: "P0 brief",
         capability_ref: "programme management",
         operational_outcome: "the definition set is published",
@@ -758,6 +801,7 @@ const SNAPSHOT = {
       {
         id: "bt-p0",
         benefit_id: "ben-p0",
+        programme_id: "11111111-1111-7111-8111-111111111111",
         baseline_measured_at: "2026-10-01T00:00:00Z",
         readiness: "ready",
         version: 1,
@@ -766,6 +810,7 @@ const SNAPSHOT = {
     stakeholder_profiles: [
       {
         id: "sp-p0",
+        programme_id: "11111111-1111-7111-8111-111111111111",
         name: "Published sponsor",
         importance: "high",
         influence: "high",
@@ -776,10 +821,29 @@ const SNAPSHOT = {
     tranches: [
       {
         id: "tr-p0",
-        number: 1,
-        state: "reviewed",
-        review_at: "2026-12-01",
+        programme_id: "11111111-1111-7111-8111-111111111111",
+        number: 0,
+        state: "closed",
+        review_at: "2026-11-17",
         baseline_ref: "BL-P0",
+        version: 1,
+      },
+      {
+        id: "tr-p1",
+        programme_id: "11111111-1111-7111-8111-111111111111",
+        number: 1,
+        state: "planned",
+        review_at: null,
+        baseline_ref: null,
+        version: 1,
+      },
+      {
+        id: "tr-p2",
+        programme_id: "11111111-1111-7111-8111-111111111111",
+        number: 2,
+        state: "planned",
+        review_at: null,
+        baseline_ref: null,
         version: 1,
       },
     ],
@@ -787,9 +851,13 @@ const SNAPSHOT = {
       {
         id: "rv-p0",
         tranche_id: "tr-p0",
-        tranche_number: 1,
+        tranche_number: 0,
         decision: "continue",
-        evidence: { baselines: "frozen" },
+        evidence: {
+          baselines: "frozen",
+          document_url: "https://conveyor.nonagentic.ai/design/docs/output-t0.html",
+        },
+        reviewed_at: "2026-11-17T00:00:00Z",
         created_at: "2026-11-01T00:00:00Z",
       },
     ],
@@ -898,8 +966,29 @@ const SNAPSHOT = {
         list_changed_at: "2026-11-17T00:00:00Z",
         archived_at: null,
       },
+      // #528: an archived root card — a closed project's completed work stays visible.
+      {
+        id: "bbbbbbbb-bbbb-7bbb-8bbb-bbbbbbbbbbbb",
+        board_id: "44444444-4444-7444-8444-444444444444",
+        list_id: "55555555-5555-7555-8555-555555555551",
+        card_type_id: "ct-delivery",
+        name: "Archived card",
+        parent_card_id: null,
+        created_at: "2026-11-09T00:00:00Z",
+        list_changed_at: "2026-11-10T00:00:00Z",
+        archived_at: "2026-11-11T00:00:00Z",
+      },
     ],
-    card_types: [{ id: "ct-delivery", code: "delivery_task", label: "Delivery task" }],
+    card_types: [
+      {
+        id: "ct-delivery",
+        code: "delivery_task",
+        label: "Delivery task",
+        definition: {
+          acceptance: ["READY: the card is scoped", "DONE: the evidence is attached"],
+        },
+      },
+    ],
     project_activity: [
       {
         project_id: "22222222-2222-7222-8222-222222222222",
@@ -911,8 +1000,56 @@ const SNAPSHOT = {
         started_at: "2026-11-15T00:00:00Z",
         last_activity_at: "2026-11-16T00:00:00Z",
       },
+      {
+        project_id: "aaaaaaaa-aaaa-7aaa-8aaa-aaaaaaaaaaaa",
+        started_at: "2026-11-01T00:00:00Z",
+        last_activity_at: "2026-11-12T00:00:00Z",
+      },
+      // No window for the QUIET project: the page must say "no dated activity", never invent one.
     ],
-    runs: [],
+    runs: [
+      {
+        id: "run-dlv-1",
+        project_id: "22222222-2222-7222-8222-222222222222",
+        card_id: "66666666-6666-7666-8666-666666666666",
+        status: "succeeded",
+        created_at: "2026-11-19T00:00:00Z",
+        started_at: "2026-11-19T00:01:00Z",
+        finished_at: "2026-11-19T00:05:00Z",
+      },
+      {
+        id: "run-dlv-2",
+        project_id: "22222222-2222-7222-8222-222222222222",
+        card_id: "77777777-7777-7777-8777-777777777771",
+        status: "failed",
+        created_at: "2026-11-20T00:00:00Z",
+        started_at: "2026-11-20T00:01:00Z",
+        finished_at: "2026-11-20T00:02:00Z",
+      },
+    ],
+    run_steps: [
+      { id: "rs-dlv-1", run_id: "run-dlv-1", status: "succeeded", created_at: "2026-11-19T00:01:00Z" },
+      { id: "rs-dlv-2", run_id: "run-dlv-1", status: "succeeded", created_at: "2026-11-19T00:02:00Z" },
+      { id: "rs-dlv-3", run_id: "run-dlv-2", status: "failed", created_at: "2026-11-20T00:01:00Z" },
+    ],
+    approvals: [
+      {
+        id: "ap-dlv-1",
+        card_id: "66666666-6666-7666-8666-666666666666",
+        project_id: "22222222-2222-7222-8222-222222222222",
+        gate: "delivery.review",
+        kind: "gate",
+        status: "approved",
+        required_decisions: 2,
+        requested_by: "u-1",
+        expires_at: null,
+        run_id: null,
+        created_at: "2026-11-20T00:00:00Z",
+        updated_at: "2026-11-20T00:00:00Z",
+        version: 1,
+      },
+    ],
+    approval_decisions: [],
   },
   // T16: the published procedure shape the signed-out page renders.
   config: {
@@ -1087,7 +1224,37 @@ const SNAPSHOT = {
         superseded_by_id: null,
         version: 1,
       },
+      // #528: the delivery project's own TOGAF rows, so L3 shows the contract and the Phase G
+      // compliance level rather than "no architecture contract".
+      {
+        id: "con-dlv-1",
+        project_id: "22222222-2222-7222-8222-222222222222",
+        kind: "delivery_contract",
+        phase_code: "F",
+        title: "Delivery contract",
+        body: {},
+        status: "live",
+        approval_id: null,
+        approved_by: "u-1",
+        approved_at: "2026-11-13T00:00:00Z",
+        supersedes_id: null,
+        superseded_by_id: null,
+        version: 1,
+      },
     ],
+    compliance_reviews: [
+      {
+        id: "cr-dlv-1",
+        project_id: "22222222-2222-7222-8222-222222222222",
+        contract_id: "con-dlv-1",
+        level: "compliant",
+        outcome: "design reviewed",
+        reviewed_at: "2026-11-18T00:00:00Z",
+        reviewed_by: "u-1",
+        version: 1,
+      },
+    ],
+    waivers: [],
     board: [
       {
         id: "board-pub-1",
@@ -1178,6 +1345,17 @@ const SNAPSHOT = {
           cost_usd: "0.035000",
           priced_calls: 1,
           unpriced_calls: 0,
+        },
+        // Unpriced only: the row must render "—*", never "$0.00".
+        {
+          project_id: "99999999-9999-7999-8999-999999999999",
+          calls: 1,
+          prompt_tokens: 40_000,
+          completion_tokens: 2_000,
+          total_tokens: 42_000,
+          cost_usd: "0.000000",
+          priced_calls: 0,
+          unpriced_calls: 1,
         },
       ],
       by_card: [
@@ -2938,18 +3116,28 @@ function readBody(req, done) {
       assert.match(timeline, /Delivery timeline · portfolio/, "L1 renders the portfolio timeline");
       assert.match(timeline, /Delivery programme/, "a programme row renders at L1");
       assert.match(timeline, /Standalone initiative/, "a standalone initiative renders at L1");
-      assert.match(timeline, /1\.5M tok/, "the project's token total renders");
+      assert.match(timeline, /1\.5M tok/, "the programme's token total renders");
       assert.match(timeline, /\$0\.42\*/, "the derived cost renders, marked unpriced");
-      assert.match(timeline, /1 unpriced call/, "an unpriced call is counted, never priced as free");
+      assert.match(timeline, /unpriced/, "an unpriced call is marked, never priced as free");
+      // MSP at portfolio level: the programme row carries its tranche and benefit state.
+      assert.match(timeline, /T0 closed · T1–2 planned/, "the programme row carries its tranches");
+      assert.match(timeline, /1\/2 benefits measured/, "the programme row carries its benefits");
+      assert.match(timeline, /1 completed/, "completed work is counted at L1");
       assert.ok(
-        (await page.locator("#main .gantt .gantt-row").count()) >= 2,
+        (await page.locator("#main .gantt .gantt-row").count()) >= 3,
         "L1 has a row per programme and standalone initiative",
       );
       assert.ok(
         (await page.locator("#main .gantt-actual").count()) >= 2,
         "the actual bars are drawn",
       );
-      // L2: the programme drill — only its projects, with a way back.
+      // An in-flight programme's bar reaches the snapshot clock; the 0.8 % sliver is the regression.
+      const barWidth = await page
+        .locator('#main .gantt-row[data-state="in_progress"] .gantt-actual')
+        .first()
+        .evaluate((el) => parseFloat(el.style.width));
+      assert.ok(barWidth > 20, `an in-flight programme bar spans its window (${barWidth}%)`);
+      // L2: the programme drill — only its projects, grouped by MSP tranche.
       await page.goto(
         `http://127.0.0.1:${snapshotServer.port}/studio.html#portfolio/11111111-1111-7111-8111-111111111111`,
       );
@@ -2974,10 +3162,24 @@ function readBody(req, done) {
         "L2's timeline shows only this programme's projects",
       );
       assert.ok(
+        (await page.locator("#main .gantt-group").count()) >= 3,
+        "L2 groups the projects by their MSP tranche",
+      );
+      assert.match(programmeTimeline, /tranche 1/i, "the tranche header renders");
+      assert.match(programmeTimeline, /MSP tranches/i, "the tranche rail renders");
+      assert.match(programmeTimeline, /BEN-P0/, "the measured benefit renders");
+      assert.match(programmeTimeline, /BEN-P1/, "the unmeasured benefit renders");
+      assert.match(programmeTimeline, /unmeasured/, "an unmeasured baseline says so");
+      assert.match(programmeTimeline, /no dated activity/, "a project with no event has no bar");
+      assert.match(programmeTimeline, /—\*/, "an unpriced-only spend renders —, never $0.00");
+      assert.match(programmeTimeline, /Closed project/, "a completed project stays visible at L2");
+      assert.match(programmeTimeline, /MSP benefits/i, "the benefit rail renders");
+      assert.ok(
         (await page.locator('#main a[href="#portfolio"]').count()) >= 1,
         "L2 links back to the portfolio",
       );
-      // L3: the project kanban — the work package and the loose card.
+      // L3: the project kanban — the work package, the loose card and the archived card, with the
+      // project's TOGAF/PMP record above it.
       await page.goto(
         `http://127.0.0.1:${snapshotServer.port}/studio.html#projects/22222222-2222-7222-8222-222222222222`,
       );
@@ -2987,11 +3189,22 @@ function readBody(req, done) {
       assert.match(boardText, /Work package Alpha/, "the work-package tile renders");
       assert.match(boardText, /WORK PACKAGE · 2/, "the tile carries its child count");
       assert.match(boardText, /Loose card/, "a card with no children renders as a card");
+      assert.match(boardText, /Archived card/, "an archived card stays visible");
+      assert.match(boardText, /delivery_contract/, "the TOGAF contract is on the project record");
+      assert.match(boardText, /compliant/, "the compliance level is on the project record");
       assert.ok(
         (await page.locator("#main .kanban .kanban-col").count()) >= 2,
         "the board's lanes are columns",
       );
-      // L4: the work package's own kanban, including the archived/done child.
+      assert.ok(
+        (await page.locator("#main .kanban-col.kanban-archived .kanban-card").count()) >= 1,
+        "archived work has its own column",
+      );
+      assert.ok(
+        (await page.locator('#main .kanban-card a.kanban-open[href*="/wp/"]').count()) >= 3,
+        "every card opens its own work-package view",
+      );
+      // L4: the work package's execution and its own kanban, including the done child.
       await page.goto(
         `http://127.0.0.1:${snapshotServer.port}/studio.html#projects/22222222-2222-7222-8222-222222222222/wp/66666666-6666-7666-8666-666666666666`,
       );
@@ -3001,10 +3214,33 @@ function readBody(req, done) {
       assert.match(packageText, /Child one/, "the work package's first child renders");
       assert.match(packageText, /Child two/, "the work package's second child renders");
       assert.match(packageText, /1\/2 cards done/, "the work package shows its progress");
+      assert.match(packageText, /execution/i, "the work package shows its execution");
+      assert.match(packageText, /delivery\.review/, "the card's gate is shown");
+      assert.match(packageText, /2 decisions/, "the gate's required decisions are shown");
+      assert.match(packageText, /READY: the card is scoped/, "the Definition of Done is shown");
+      assert.match(packageText, /1 run/, "the card's run is shown");
       assert.ok(
         (await page.locator('#main a[href="#projects/22222222-2222-7222-8222-222222222222"]').count()) >= 1,
         "the work package links back to the project board",
       );
+      // L4 for a childless card: the execution is the answer, not an empty board.
+      await page.goto(
+        `http://127.0.0.1:${snapshotServer.port}/studio.html#projects/22222222-2222-7222-8222-222222222222/wp/88888888-8888-7888-8888-888888888888`,
+      );
+      await page.waitForSelector(".page");
+      await page.waitForTimeout(300);
+      const childlessText = await page.locator("#main").innerText();
+      assert.match(childlessText, /No child cards/, "a childless work package says so");
+      assert.match(childlessText, /No run is recorded/, "its empty execution is honest");
+      assert.match(childlessText, /definition of done/i, "it still carries its Definition of Done");
+      // A phone gets the same view, scrolled inside its own box: the page itself never overflows.
+      await page.setViewportSize({ width: 390, height: 844 });
+      await page.waitForTimeout(150);
+      const overflow = await page.evaluate(
+        () => document.documentElement.scrollWidth - window.innerWidth,
+      );
+      assert.ok(overflow <= 1, `the page has no horizontal overflow at 390px (${overflow})`);
+      await page.setViewportSize({ width: 1440, height: 1000 });
       // A project with no board says so; it never renders empty columns.
       await page.goto(
         `http://127.0.0.1:${snapshotServer.port}/studio.html#projects/33333333-3333-7333-8333-333333333333`,
