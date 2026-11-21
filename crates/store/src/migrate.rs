@@ -248,7 +248,10 @@ mod tests {
                 // v1-w1a-2 (#526): the release's layered kind store — base → industry →
                 // department archetype → department → job — and `department.archetype`
                 // (0062_release_layers.sql, SPEC_V2 §4.1).
-                (62, "release layers".to_owned())
+                (62, "release layers".to_owned()),
+                // v1-w4a-2 (#526): the write tool's declared verification path on the version
+                // it was published with (0063_tool_verify.sql, SPEC_V2 §11.3).
+                (63, "tool verify".to_owned())
             ],
             "the embedded migration set is {embedded:?}; a wrong sqlx::migrate! path or a \
              file outside the set changes it"

@@ -65,6 +65,8 @@ pub struct ResolvedTool {
     pub redact: Value,
     /// The declared external action that dispatches the destination call.
     pub handler_action: String,
+    /// The write verification declaration (§11.3); `{}` on a non-writing tool.
+    pub verify: Value,
     /// The binding's ceiling — it narrows the tool's effect and never raises it.
     pub effect_ceiling: String,
     /// The sealed credential alias the broker resolves (never shown to a job).
@@ -120,7 +122,7 @@ pub async fn step_belongs_to_run(
 
 const RESOLVED_COLUMNS: &str = "t.id AS tool_id, k.id AS toolkit_id, k.key AS toolkit_key, \
      k.toolkit_version, t.key AS tool_key, t.input_schema, t.effect, t.timeout_secs, \
-     t.redact, t.handler_action, b.effect_ceiling, b.credential_alias";
+     t.redact, t.handler_action, t.verify, b.effect_ceiling, b.credential_alias";
 
 #[derive(sqlx::FromRow)]
 struct ResolvedRow {
@@ -134,6 +136,7 @@ struct ResolvedRow {
     timeout_secs: i32,
     redact: Value,
     handler_action: String,
+    verify: Value,
     effect_ceiling: String,
     credential_alias: Option<String>,
 }
@@ -151,6 +154,7 @@ impl From<ResolvedRow> for ResolvedTool {
             timeout_secs: row.timeout_secs,
             redact: row.redact,
             handler_action: row.handler_action,
+            verify: row.verify,
             effect_ceiling: row.effect_ceiling,
             credential_alias: row.credential_alias,
         }
@@ -422,6 +426,8 @@ pub struct NewTool<'a> {
     pub handler_action: &'a str,
     /// The closed input schema copied from the action.
     pub input_schema: &'a Value,
+    /// The write verification declaration (§11.3); `{}` on a non-writing tool.
+    pub verify: &'a Value,
     /// The effect class copied from the action.
     pub effect: &'a str,
     /// 1..=300.
@@ -521,8 +527,8 @@ pub async fn insert_tool(
 ) -> Result<Uuid, ToolStoreError> {
     let (id,): (Uuid,) = sqlx::query_as(
         "INSERT INTO tool (tenant_id, toolkit_id, key, input_schema, effect, timeout_secs,
-                           handler_action, status)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, 'published')
+                           handler_action, verify, status)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'published')
          RETURNING id",
     )
     .bind(tenant.as_uuid())
@@ -532,6 +538,7 @@ pub async fn insert_tool(
     .bind(tool.effect)
     .bind(tool.timeout_secs)
     .bind(tool.handler_action)
+    .bind(tool.verify)
     .fetch_one(conn)
     .await?;
     Ok(id)

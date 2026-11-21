@@ -136,7 +136,8 @@ capture time (owner 2026-11-09, answering §10 Q2), so the audit is started by t
 
 ```bash
 set -euo pipefail
-# CONTRACT §16: Rust runs on the build host through rbuild; the dev box's cargo refuses inside a Cargo project.
+# CONTRACT §16 (amended 2026-11-20): rbuild is retired. Read every `rbuild -- test` below as the
+# same command run by the GitHub-hosted preflight; locally it is cargo-guard.py for feedback only.
 # libtest exits 0 when a filter selects zero tests (v1-s16-1), so every exact name below is LISTED before
 # it is run: a zero-match filter is a red gate, not a green one. The target names are the shipped ones.
 one_test() { # <test name> <rbuild test args...>

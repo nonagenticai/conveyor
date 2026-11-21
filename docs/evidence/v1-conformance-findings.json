@@ -2337,7 +2337,7 @@
       "evidence": [
         {
           "path": "crates/actions/src/toolkits/publish.rs",
-          "line": 191,
+          "line": 198,
           "quote": "                effect: spec.effect.as_str(),"
         },
         {
@@ -2400,7 +2400,7 @@
       "evidence": [
         {
           "path": "crates/store/src/tool.rs",
-          "line": 71,
+          "line": 73,
           "quote": "    pub credential_alias: Option<String>,"
         },
         {
@@ -3534,7 +3534,7 @@
         },
         {
           "path": "docs/plans/slices/S16-inference-audit.md",
-          "line": 145,
+          "line": 146,
           "quote": "  n=$(rbuild -- test \"$@\" -- --list --exact \"$name\" | grep -c ': test$' || true)"
         }
       ],
@@ -3553,7 +3553,7 @@
       "evidence": [
         {
           "path": "docs/plans/slices/S17-benchmark-harness.md",
-          "line": 194,
+          "line": 195,
           "quote": "`rbuild -- test -p conveyor-server --test sandbox_live -- --ignored` exits target-not-found. The"
         }
       ],
@@ -3850,6 +3850,25 @@
         "test": "apps/web/e2e/run-queue.spec.ts",
         "evidence": "The option is removed (FILTERS is 7 entries); the error spec injects a 503 on runs.list and asserts the screen's error panel. Playwright run is the remaining gate."
       }
+    },
+    {
+      "id": "v1-u5a-rbuild-1",
+      "area": "§12",
+      "standard": "SPEC",
+      "spec": "§12",
+      "severity": "P1",
+      "title": "The slice gates still invoke `rbuild`, retired by the owner on 2026-11-20",
+      "problem": "The owner's 2026-11-20 ruling retired rbuild, the m1 build host and all local Rust compilation: the compile/lint verdict now comes from GitHub-hosted preflight, and cargo-guard.py on m4 is for interactive work only. The S16 and S17 gate blocks still show `rbuild -- test` (the note above them now says to read them as preflight), and 119 plan lines across the set still name the retired runner. A gate command that names a tool no host installs can never pass as written.",
+      "evidence": [
+        {
+          "path": "docs/plans/slices/S17-benchmark-harness.md",
+          "line": 154,
+          "quote": "rbuild -- test -p conveyor-actions --test benchmark_parity -- --nocapture"
+        }
+      ],
+      "failure_scenario": "A session copies the S17 gate verbatim, runs `rbuild -- test ...`, and gets command-not-found. It either reports a red gate that is an artifact of the retired runner, or it drops the test step and reports green on the checks that happened to be local.",
+      "acceptance": "Every current gate document names a runnable route (preflight for the verdict, cargo-guard for interactive feedback); every historical build-order line that keeps `rbuild` is labelled historical, and the CONTRACT §16 retirement note is the rule of record.",
+      "owner_project": "PLATFORM"
     }
   ]
 }

@@ -141,7 +141,8 @@ set -euo pipefail
 cd $HOME/Movies/conveyor
 step() { printf '\n=== %s ===\n' "$1"; }
 
-# Rust runs on the build host (CONTRACT §16): `~/.local/bin/cargo` refuses inside a Cargo project on the dev box.
+# CONTRACT §16 (amended 2026-11-20): rbuild is retired. Read every `rbuild -- test` below as the
+# same command run by the GitHub-hosted preflight; locally it is cargo-guard.py for feedback only.
 step "fmt + clippy"
 rbuild -- fmt --all -- --check
 rbuild -- clippy --workspace --all-targets -- -D warnings

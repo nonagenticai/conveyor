@@ -37,6 +37,8 @@ struct Stub {
 #[derive(Clone)]
 struct StubState {
     hits: Arc<AtomicUsize>,
+    /// The answer every request gets; `None` is the path echo the refusal tests rely on.
+    reply: Option<Value>,
 }
 
 async fn answer(
@@ -44,15 +46,33 @@ async fn answer(
     uri: axum::http::Uri,
 ) -> axum::Json<Value> {
     state.hits.fetch_add(1, Ordering::SeqCst);
-    axum::Json(json!({"stub": true, "path": uri.path()}))
+    axum::Json(
+        state
+            .reply
+            .clone()
+            .unwrap_or_else(|| json!({"stub": true, "path": uri.path()})),
+    )
 }
 
 impl Stub {
     async fn start() -> Stub {
+        Stub::start_with_reply(None).await
+    }
+
+    /// A stub that answers every request with the same document: the destination's half of a
+    /// write-verification test, where the answer itself is what the broker judges.
+    async fn start_with(reply: Value) -> Stub {
+        Stub::start_with_reply(Some(reply)).await
+    }
+
+    async fn start_with_reply(reply: Option<Value>) -> Stub {
         let hits = Arc::new(AtomicUsize::new(0));
         let app = axum::Router::new()
             .fallback(axum::routing::any(answer))
-            .with_state(StubState { hits: hits.clone() });
+            .with_state(StubState {
+                hits: hits.clone(),
+                reply,
+            });
         let listener = tokio::net::TcpListener::bind("127.0.0.1:0")
             .await
             .expect("bind the destination stub");
@@ -89,9 +109,58 @@ impl Fixture {
         ceiling: &str,
         input_schema: Value,
     ) -> Fixture {
+        Fixture::build(
+            toolkit_key,
+            tool_key,
+            handler_action,
+            effect,
+            ceiling,
+            input_schema,
+            None,
+        )
+        .await
+    }
+
+    /// [`Fixture::new`] with the destination's answer pinned: a write-verification test needs the
+    /// answer to be its own input, because the broker judges the document it got back.
+    #[allow(clippy::too_many_arguments)]
+    async fn new_with_reply(
+        toolkit_key: &str,
+        tool_key: &str,
+        handler_action: &str,
+        effect: &str,
+        ceiling: &str,
+        input_schema: Value,
+        reply: Value,
+    ) -> Fixture {
+        Fixture::build(
+            toolkit_key,
+            tool_key,
+            handler_action,
+            effect,
+            ceiling,
+            input_schema,
+            Some(reply),
+        )
+        .await
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    async fn build(
+        toolkit_key: &str,
+        tool_key: &str,
+        handler_action: &str,
+        effect: &str,
+        ceiling: &str,
+        input_schema: Value,
+        reply: Option<Value>,
+    ) -> Fixture {
         let pg = support::Pg::fresh().await;
         let seeded = support::seed(&pg, "dev-a", "alice", "Alice").await;
-        let stub = Stub::start().await;
+        let stub = match reply {
+            Some(reply) => Stub::start_with(reply).await,
+            None => Stub::start().await,
+        };
         // Both services the broker tests reach: `fixtures.*` and the coding action (SPEC §12 T13's
         // "a development job calls coding through the broker").
         support::set_env(support::STUB_ENV, &stub.base);
@@ -130,6 +199,24 @@ impl Fixture {
                 None,
             )
             .await
+    }
+
+    /// Declare the tool's verification path (§11.3). The fixture writes the tool row directly, so
+    /// the declaration is test input exactly like the effect and the schema.
+    async fn set_verify(&self, verify: Value) {
+        let mut tx = begin_scoped(&self.pg.owner, self.tenant)
+            .await
+            .expect("a scoped write");
+        sqlx::query(
+            "UPDATE tool SET verify = $2 WHERE tenant_id = $1
+              AND toolkit_id IN (SELECT id FROM toolkit WHERE tenant_id = $1)",
+        )
+        .bind(self.tenant.as_uuid())
+        .bind(&verify)
+        .execute(&mut *tx)
+        .await
+        .expect("set the tool's verification path");
+        tx.commit().await.expect("commit the verification path");
     }
 
     async fn ledger(&self) -> Vec<tool::ToolCallRow> {
@@ -578,6 +665,121 @@ async fn a_job_round_trips_a_tenant_prefixed_object() {
     // The adapter builds every key itself; a caller cannot escape the prefix with a name.
     let escaped = storage.key(seeded.tenant_id, None, None, "../another-tenant/secret");
     assert!(escaped.is_err(), "a traversal name is refused");
+}
+
+// ── v1-w4a-2 — write verification (SPEC_V2 §11.3) ───────────────────────────────────────
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_write_whose_verdict_fails_is_check_failed_and_not_ok() {
+    let _serial = SERIAL.lock().await;
+    let fixture = Fixture::new_with_reply(
+        "coding",
+        "jobs.create",
+        "coding_jobs.create",
+        "write",
+        "write",
+        coding_schema(),
+        json!({"verdict": "failed", "checks": [{"name": "branch", "ok": false}]}),
+    )
+    .await;
+    fixture
+        .set_verify(json!({"verdict": "verdict", "checks": "checks"}))
+        .await;
+
+    let (status, body) = fixture
+        .call(
+            "coding.jobs.create",
+            json!({"kind": "test", "input": {"files": []}}),
+        )
+        .await;
+
+    assert_eq!(status, 422, "a failing verdict is not ok: {body}");
+    assert_eq!(body["type"], "write_not_verified", "{body}");
+    let rows = fixture.ledger().await;
+    assert_eq!(rows.len(), 1, "exactly one ledger row: {rows:?}");
+    assert_eq!(rows[0].status, "check_failed");
+    assert_eq!(
+        fixture.stub.hits(),
+        1,
+        "the call reached the destination, then was judged"
+    );
+
+    fixture.running.shutdown().await;
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_write_with_no_verdict_is_check_failed() {
+    let _serial = SERIAL.lock().await;
+    // The default stub echoes its path, which carries no declared verdict: the destination
+    // answered 200, and that is precisely the answer the declaration refuses to trust.
+    let fixture = Fixture::new(
+        "coding",
+        "jobs.create",
+        "coding_jobs.create",
+        "write",
+        "write",
+        coding_schema(),
+    )
+    .await;
+    fixture
+        .set_verify(json!({"verdict": "verdict", "checks": "checks"}))
+        .await;
+
+    let (status, body) = fixture
+        .call(
+            "coding.jobs.create",
+            json!({"kind": "test", "input": {"files": []}}),
+        )
+        .await;
+
+    assert_eq!(
+        status, 422,
+        "a declared verdict the answer does not carry is not ok: {body}"
+    );
+    assert_eq!(body["type"], "write_not_verified", "{body}");
+    let rows = fixture.ledger().await;
+    assert_eq!(rows.len(), 1, "exactly one ledger row: {rows:?}");
+    assert_eq!(rows[0].status, "check_failed");
+    assert_eq!(
+        fixture.stub.hits(),
+        1,
+        "the destination was called before judging"
+    );
+
+    fixture.running.shutdown().await;
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_verified_write_is_ok() {
+    let _serial = SERIAL.lock().await;
+    let fixture = Fixture::new_with_reply(
+        "coding",
+        "jobs.create",
+        "coding_jobs.create",
+        "write",
+        "write",
+        coding_schema(),
+        json!({"verdict": "ok", "checks": [{"name": "branch", "ok": true}]}),
+    )
+    .await;
+    fixture
+        .set_verify(json!({"verdict": "verdict", "checks": "checks"}))
+        .await;
+
+    let (status, body) = fixture
+        .call(
+            "coding.jobs.create",
+            json!({"kind": "test", "input": {"files": []}}),
+        )
+        .await;
+
+    assert_eq!(status, 200, "a passing verdict and checks are ok: {body}");
+    let rows = fixture.ledger().await;
+    assert_eq!(rows.len(), 1, "exactly one ledger row: {rows:?}");
+    assert_eq!(rows[0].status, "ok");
+    assert_eq!(fixture.stub.hits(), 1);
+
+    fixture.running.shutdown().await;
 }
 
 // ── P5.2 ────────────────────────────────────────────────────────────────────────────────

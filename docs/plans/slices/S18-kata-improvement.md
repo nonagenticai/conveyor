@@ -113,14 +113,8 @@ cd $HOME/Movies/conveyor
 cargo test -p conveyor-api --test benchmark_arm
 # two versions of one subject compare with an exact McNemar delta
 cargo test -p conveyor-api --test benchmark_trend
-# NAMED GAP (S18, v1-s18-1): no `benchmark_improvement` test target exists. The job body
-# `apps/server/src/benchmark_improvement.rs` has no test target and no #[cfg(test)];
-# `benchmark_arm` proves only that a baseline enqueues `benchmark.improvement.run`. Name the gap
-# and stay red rather than run a target-not-found command that proves nothing.
-test -s apps/server/tests/benchmark_improvement.rs || {
-  echo "NAMED GAP (S18): improvement-job body unproven — apps/server/tests/benchmark_improvement.rs absent" >&2
-  exit 1
-}
+# v1-s18-1 closed: the improvement body has its own target — the permanent refusal of an empty
+# payload, the no-op on an already judged candidate, and the scheduled next look for a live one.
 cargo test -p conveyor-server --test benchmark_improvement
 # the workspace is still green and the lock still matches
 cargo run -q -p conveyor-server -- --print-openapi --check-lock >/dev/null
