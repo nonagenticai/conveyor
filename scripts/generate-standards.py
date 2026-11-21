@@ -852,10 +852,10 @@ def render_page(artefact: dict[str, Any], generated_at: str, git_sha: str) -> st
     <meta name="generator" content="conveyor generate-standards.py" />
     <meta name="description" content="{escape(artefact['standard'])} artefact generated from the published record." />
     <title>{escape(artefact['title'])} · conveyor standards</title>
-    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="../assets/plex-sans.css" />
-    <link rel="stylesheet" href="../assets/plex-mono.css" />
-    <link rel="stylesheet" href="../docs.css" />
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
     <style>
       .std-meta {{ display:grid; grid-template-columns:repeat(auto-fit,minmax(11rem,1fr)); gap:.5rem 1.5rem; margin:1rem 0 2rem; }}
       .std-meta div {{ border-top:1px solid var(--line, #d8d8d8); padding-top:.35rem; }}
@@ -870,11 +870,11 @@ def render_page(artefact: dict[str, Any], generated_at: str, git_sha: str) -> st
   </head>
   <body>
     <header class="doc-topbar">
-      <a class="doc-brand" href="../studio.html"><span class="doc-mark">C</span> conveyor</a>
+      <a class="doc-brand" href="../../studio.html"><span class="doc-mark">C</span> conveyor</a>
       <span class="doc-sep">/</span>
       <a href="index.html">Standards</a>
       <span class="doc-grow"></span>
-      <a class="doc-source" href="../data/standards.json">data</a>
+      <a class="doc-source" href="../../data/standards.json">data</a>
     </header>
     <main class="doc-body">
       <h1>{escape(artefact['title'])}</h1>
@@ -914,10 +914,10 @@ def render_index(instances: list[dict[str, Any]], generated_at: str, git_sha: st
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta name="generator" content="conveyor generate-standards.py" />
     <title>Standards artefact index · conveyor</title>
-    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="../assets/plex-sans.css" />
-    <link rel="stylesheet" href="../assets/plex-mono.css" />
-    <link rel="stylesheet" href="../docs.css" />
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
     <style>
       .std-state {{ font-size:.75rem; text-transform:uppercase; letter-spacing:.06em; opacity:.7; }}
       .std-index {{ list-style:none; padding:0; }}
@@ -926,11 +926,11 @@ def render_index(instances: list[dict[str, Any]], generated_at: str, git_sha: st
   </head>
   <body>
     <header class="doc-topbar">
-      <a class="doc-brand" href="../studio.html"><span class="doc-mark">C</span> conveyor</a>
+      <a class="doc-brand" href="../../studio.html"><span class="doc-mark">C</span> conveyor</a>
       <span class="doc-sep">/</span>
-      <a href="../studio.html">Studio</a>
+      <a href="../../studio.html">Studio</a>
       <span class="doc-grow"></span>
-      <a class="doc-source" href="../data/standards.json">data</a>
+      <a class="doc-source" href="../../data/standards.json">data</a>
     </header>
     <main class="doc-body">
       <h1>Standards artefact index</h1>
