@@ -146,22 +146,22 @@ PT=${PAIR%%|*}; CT=${PAIR#*|}
 # Two current publish rules shape this block: every step names a PUBLISHED SOP, and `kind` is
 # explicit because a step carrying `gate_kind` infers `gate` when `kind` is absent (a gate step
 # may not name an action). The gated COMPUTED step parks for approval, then runs once.
-SOP=$(P procedures.create "{\"input\":{\"key\":\"dev-phase-sop\",\"title\":\"Dev phase SOP\",\"acceptance_criteria\":[\"the card reached done\"],\"inspection\":{\"kind\":\"checker\",\"rule\":\"always\"}}}" | jq -r .id)
+SOP=$(P procedures.create "{\"input\":{\"key\":\"dev-phase-sop\",\"title\":\"Dev phase SOP\",\"acceptance_criteria\":[\"the card reached done\"],\"inspection\":{\"kind\":\"checker\",\"rule\":\"always\"}}}" | jq -r .output.id)
 [ -n "$SOP" ] || { echo "procedures.create returned no id" >&2; exit 1; }
 P procedures.publish "{\"input\":{\"procedure_id\":\"$SOP\"}}"
 ID=$(P processes.create "{\"input\":{\"key\":\"dev-phase\",\"title\":\"Dev phase\",\"card_type_code\":\"$CT\",\"steps\":[
  {\"kind\":\"computed\",\"procedure_id\":\"$SOP\",\"action\":\"cards.claim\",\"input_template\":{\"card_id\":\"{{card.id}}\",\"_version\":\"{{card.version}}\"}},
  {\"kind\":\"computed\",\"procedure_id\":\"$SOP\",\"action\":\"cards.comment\",\"input_template\":{\"id\":\"{{card.id}}\",\"body\":\"run {{run.inputs.ticket}}\"},\"gate_kind\":\"human_approval\"},
- {\"kind\":\"computed\",\"procedure_id\":\"$SOP\",\"action\":\"cards.move\",\"input_template\":{\"id\":\"{{card.id}}\",\"list_id\":\"{{run.inputs.done_list}}\",\"_version\":\"{{card.version}}\"}}]}}" | jq -r .id)
-PRJ=$(P projects.create "{\"input\":{\"title\":\"s11 gate\",\"project_type_code\":\"$PT\"}}" | jq -r .id)
+ {\"kind\":\"computed\",\"procedure_id\":\"$SOP\",\"action\":\"cards.move\",\"input_template\":{\"id\":\"{{card.id}}\",\"list_id\":\"{{run.inputs.done_list}}\",\"_version\":\"{{card.version}}\"}}]}}" | jq -r .output.id)
+PRJ=$(P projects.create "{\"input\":{\"title\":\"s11 gate\",\"project_type_code\":\"$PT\"}}" | jq -r .output.id)
 [ -n "$PRJ" ] || { echo "projects.create returned no id" >&2; exit 1; }
 BOARD=$(Q "select id from board where project_id='$PRJ' order by position, id limit 1")
 ACTIVE=$(Q "select id from list where board_id='$BOARD' and kind='active'")
 DONE=$(Q "select id from list where board_id='$BOARD' and kind='done'")
 [ -n "$BOARD" ] && [ -n "$ACTIVE" ] && [ -n "$DONE" ] || { echo "the project has no board or no active/done list" >&2; exit 1; }
-CARD=$(P cards.create "{\"input\":{\"board_id\":\"$BOARD\",\"list_id\":\"$ACTIVE\",\"name\":\"S11 gate card\",\"card_type_code\":\"$CT\"}}" | jq -r .id)
+CARD=$(P cards.create "{\"input\":{\"board_id\":\"$BOARD\",\"list_id\":\"$ACTIVE\",\"name\":\"S11 gate card\",\"card_type_code\":\"$CT\"}}" | jq -r .output.id)
 P processes.publish "{\"input\":{\"process_id\":\"$ID\"}}"
-RUN=$(P process_runs.start "{\"input\":{\"card_id\":\"$CARD\",\"process_key\":\"dev-phase\",\"inputs\":{\"ticket\":\"T-1\",\"done_list\":\"$DONE\"}}}" | jq -r .id)
+RUN=$(P process_runs.start "{\"input\":{\"card_id\":\"$CARD\",\"process_key\":\"dev-phase\",\"inputs\":{\"ticket\":\"T-1\",\"done_list\":\"$DONE\"}}}" | jq -r .output.id)
 for i in $(seq 1 30); do [ "$(Q "select status from run where id='$RUN'")" = waiting_approval ] && break; sleep 1; done   # the worker advances asynchronously
 test "$(Q "select status from run where id='$RUN'")" = waiting_approval          # waiting_approval
 APPROVAL=$(Q "select id from approval where run_id='$RUN' and status='pending'")
