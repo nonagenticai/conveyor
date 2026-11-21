@@ -6,9 +6,9 @@
 //! action layer's vocabulary; a refusal the domain owns is raised as [`PlanStoreError::Illegal`]
 //! and mapped once, by the action.
 //!
-//! The one read model is [`in_flight_tx`]: it selects projects by the tenant's configured
-//! in-flight set (`tenant.settings -> 'portfolio' -> 'in_flight'`, default `active,paused`).
-//! There is no portfolio row (D-T1-7).
+//! The one read model is [`in_flight_tx`]: it selects projects **and** programmes by the
+//! tenant's configured in-flight set (`tenant.settings -> 'portfolio' -> 'in_flight'`, default
+//! `active,paused`). There is no portfolio row (D-T1-7).
 
 use chrono::{DateTime, Utc};
 use conveyor_domain::spine::{
@@ -1004,6 +1004,28 @@ pub struct InFlightRecord {
     pub version: i64,
 }
 
+/// One in-flight programme. A programme with no projects is still in flight.
+#[derive(Clone, Debug, sqlx::FromRow)]
+pub struct InFlightProgrammeRecord {
+    /// The programme id.
+    pub id: Uuid,
+    /// The name.
+    pub name: String,
+    /// The status.
+    pub status: String,
+    /// The If-Match version.
+    pub version: i64,
+}
+
+/// The computed portfolio: every project and programme in the tenant's in-flight set.
+#[derive(Clone, Debug, Default)]
+pub struct InFlight {
+    /// The in-flight projects.
+    pub projects: Vec<InFlightRecord>,
+    /// The in-flight programmes.
+    pub programmes: Vec<InFlightProgrammeRecord>,
+}
+
 /// The tenant's in-flight set: `tenant.settings -> 'portfolio' -> 'in_flight'`, default
 /// `["active", "paused"]` (D-T1-7). A malformed or empty value falls back to the default.
 pub async fn in_flight_set_tx(
@@ -1029,20 +1051,34 @@ pub async fn in_flight_set_tx(
     Ok(set)
 }
 
-/// List the projects in the tenant's in-flight set.
+/// List the portfolio in flight: the projects and the programmes whose status is in the
+/// tenant's configured in-flight set. Membership is derived for both kinds (SPEC_V2 §5.1), so
+/// an in-flight programme appears on its own status even with zero projects. Read only.
 pub async fn in_flight_tx(
     conn: &mut PgConnection,
     tenant: TenantId,
-) -> Result<Vec<InFlightRecord>, PlanStoreError> {
+) -> Result<InFlight, PlanStoreError> {
     let set = in_flight_set_tx(&mut *conn, tenant).await?;
-    let sql = "SELECT id, key, name, status, programme_id, version FROM project
+    let projects_sql = "SELECT id, key, name, status, programme_id, version FROM project
                 WHERE tenant_id = $1 AND status = ANY($2)
                 ORDER BY updated_at DESC, id DESC";
-    Ok(sqlx::query_as(AssertSqlSafe(sql))
+    let projects: Vec<InFlightRecord> = sqlx::query_as(AssertSqlSafe(projects_sql))
         .bind(tenant.as_uuid())
         .bind(&set)
         .fetch_all(&mut *conn)
-        .await?)
+        .await?;
+    let programmes_sql = "SELECT id, name, status, version FROM programme
+                WHERE tenant_id = $1 AND status = ANY($2)
+                ORDER BY updated_at DESC, id DESC";
+    let programmes: Vec<InFlightProgrammeRecord> = sqlx::query_as(AssertSqlSafe(programmes_sql))
+        .bind(tenant.as_uuid())
+        .bind(&set)
+        .fetch_all(&mut *conn)
+        .await?;
+    Ok(InFlight {
+        projects,
+        programmes,
+    })
 }
 
 // ── programme_tranche ───────────────────────────────────────────────────────────────────
@@ -1951,6 +1987,49 @@ pub async fn change_is_approved_tx(
     .bind(tenant.as_uuid())
     .bind(change_id)
     .bind(project_id)
+    .fetch_one(&mut *conn)
+    .await
+}
+
+/// True when `change_id` is the change request that authorises an edit under `baseline_id`.
+///
+/// A change names the baseline it changes in the register's own `baseline_ref` column (the FK
+/// `project_register_item_baseline_fk`; every `kind='change'` row carries one — `validate_change`
+/// refuses a change without it). The change must belong to the same project as the baseline, its
+/// `meta.impact` block must be present (the `validate_change` rule: present and not JSON null),
+/// and its `change` gate must be approved — the row's own `status` is never an approval
+/// (`change_is_approved_tx`'s rule).
+///
+/// The reciprocal `meta.baseline_id` that `link_change_to_baseline_tx` writes names the baseline
+/// the change *produced*, so it is not the authorisation for edits under the new baseline; an
+/// edit after a re-baseline cites a change whose `baseline_ref` is that new baseline.
+pub async fn approved_change_for_baseline_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    change_id: Uuid,
+    baseline_id: Uuid,
+) -> Result<bool, sqlx::Error> {
+    sqlx::query_scalar(
+        "SELECT EXISTS (
+            SELECT 1 FROM project_register_item r
+              JOIN project_baseline b
+                ON b.tenant_id = r.tenant_id
+               AND b.id = r.baseline_ref
+               AND b.project_id = r.project_id
+              JOIN approval a
+                ON a.tenant_id = r.tenant_id
+               AND a.gate = 'change'
+               AND a.status = 'approved'
+               AND a.meta->>'change_id' = r.id::text
+             WHERE r.tenant_id = $1 AND r.id = $2 AND r.kind = 'change'
+               AND b.id = $3
+               AND r.meta->'impact' IS NOT NULL
+               AND r.meta->'impact' <> 'null'::jsonb
+        )",
+    )
+    .bind(tenant.as_uuid())
+    .bind(change_id)
+    .bind(baseline_id)
     .fetch_one(&mut *conn)
     .await
 }
