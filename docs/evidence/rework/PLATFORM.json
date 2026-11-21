@@ -67,16 +67,16 @@
   ],
   "failures": [],
   "gate": "The standing platform row carries an approved charter and a baseline; it does not close.",
-  "generated_at": "2026-11-21T18:25:23.617984+00:00",
+  "generated_at": "2026-11-21T18:50:52.553206+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/PLATFORM.toml",
   "name": "CI, runners and platform",
   "project": "PLATFORM",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-21T18:17:55.718331+00:00",
-    "git_sha": "d7293f96082dbf2f99f53bb8fd765834dddf6858",
-    "path": "retained-snapshot/d7293f96082dbf2f99f53bb8fd765834dddf6858"
+    "generated_at": "2026-11-21T18:50:29.096406+00:00",
+    "git_sha": "ede4ceb594b4c43298cc657fbb943e5450783ceb",
+    "path": "retained-snapshot/ede4ceb594b4c43298cc657fbb943e5450783ceb"
   },
   "verdict": "green",
   "warnings": []

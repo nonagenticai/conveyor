@@ -1,0 +1,95 @@
+[project]
+key = "S02"
+name = "Skeleton — workspace, tenancy, auth, jobs, SSE"
+gate = "The A–D artefacts and the delivery contract exist, the project brief and evidence are published, and the project stays ACTIVE because issue #2 is open."
+
+[[check]]
+id = "S02-project"
+check = "project"
+status = "active"
+severity = "P0"
+description = "S02 is active — its open issue #2 forbids a closure"
+
+[[check]]
+id = "S02-baseline"
+check = "project_baseline"
+require_approved = true
+severity = "P0"
+description = "the scope baseline is approved; the close gate reads the approved row"
+
+[[check]]
+id = "S02-charter"
+kind = "command"
+severity = "P0"
+description = "the charter asset exists and the charter gate is approved"
+command = '''python3 scripts/programme-record.py --check --action pm.get --input '{"project_id":"01a1d039-0d27-7b45-abb5-bf851a4c3d4a"}' | python3 -c '
+import json,sys
+s=sys.stdin.read()
+d=json.loads(s[s.find("{"):])
+o=d.get("output",d)
+assert o.get("charter_asset_id"), "no charter asset"
+gates={g.get("gate"):g.get("status") for g in o.get("gates",[])}
+assert gates.get("charter")=="approved", gates
+'
+'''
+
+[[check]]
+id = "S02-closure-outputs"
+check = "closure_outputs"
+allow_empty = true
+severity = "P1"
+description = "an active project declares no closure outputs"
+
+[[check]]
+id = "S02-contract"
+check = "contract"
+severity = "P0"
+description = "a live board-approved delivery contract exists"
+
+[[check]]
+id = "S02-review"
+check = "review"
+severity = "P0"
+description = "the Phase-G review cites a published standing delegation"
+
+[[check]]
+id = "S02-waivers"
+check = "waivers"
+severity = "P0"
+description = "no active waiver is expired or owned by its reviewer"
+
+[[check]]
+id = "S02-pi-cadence"
+check = "pi_cadence"
+severity = "P0"
+description = "the project's PI has a cadence row and a backlog-refinement row"
+
+[[check]]
+id = "S02-pi-plan"
+check = "pi_plan"
+severity = "P0"
+description = "the tranche-1 PI plan is published"
+
+[[check]]
+id = "S02-pi-objectives"
+check = "pi_objectives"
+severity = "P0"
+description = "the tranche-1 PI objectives are published"
+
+[[check]]
+id = "S02-wsjf"
+check = "wsjf"
+severity = "P0"
+description = "every WBS deliverable of the project carries the four typed WSJF inputs"
+
+[[check]]
+id = "S02-demo-credits"
+check = "demo_credits"
+severity = "P0"
+description = "every accepted deliverable has a demo credit carrying its evidence"
+
+[[check]]
+id = "S02-lessons"
+check = "lessons"
+severity = "P1"
+description = "the tranche-1 retro produced at least one lesson"
