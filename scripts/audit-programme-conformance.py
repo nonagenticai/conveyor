@@ -2276,8 +2276,12 @@ def main() -> None:
     parser.add_argument(
         "--findings",
         type=Path,
+        action="append",
         default=None,
-        help="the checked-in v1 conformance findings ledger to merge into the rework register",
+        help=(
+            "a findings ledger to merge into the rework register; repeatable, so the checked-in "
+            "v1 ledger and the generated artefact findings are merged together"
+        ),
     )
     parser.add_argument(
         "--rework-out",
@@ -2309,7 +2313,11 @@ def main() -> None:
         baseline_doc = (
             read_json(args.baseline) if args.baseline.exists() else {"version": 1, "entries": []}
         )
-        findings_doc = read_json(args.findings) if args.findings else {"findings": []}
+        merged_findings: list[Any] = []
+        for path in args.findings or []:
+            ledger = read_json(path)
+            merged_findings.extend(ledger.get("findings", []))
+        findings_doc = {"findings": merged_findings}
         register = build_register(
             gaps, baseline_doc, findings_doc, standard, dataset, str(args.snapshot)
         )
