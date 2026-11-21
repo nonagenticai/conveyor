@@ -208,7 +208,7 @@ async fn a_rule_a_laya_and_a_human_decision_share_one_audit_shape() {
             "dev:alice",
             json!({
                 "project_id": project_id,
-                "gate": "gate.precheck",
+                "gate": "capability_ready",
                 "kind": "decision",
                 "description": "Confirm the gate"
             }),
