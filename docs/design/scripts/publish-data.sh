@@ -130,10 +130,18 @@ test -f "$tmp/docs/standards/index.html" || {
 #     the gate: a failed publish leaves both the data and the documents untouched.
 python3 "$pack/scripts/build-docs.py"
 
+# 3f. The snapshot wrote its manifest before every generator above, so their files (the
+#     conformance register, the standards record, the documents) are not hashed in it. Finalise
+#     the finished pack: rehash the directory as it now stands and rewrite manifest.json.
+#     Nothing is regenerated, and no database is read.
+"$conveyor" snapshot --manifest-only --out "$tmp/data"
+
 # 4. Only now does the fresh pack replace the published one. The standards directory is replaced
 #    wholesale: a page for an artefact that no longer exists must not survive the publish.
 rsync -a --delete "$tmp/docs/standards/" "$pack/docs/standards/"
-rsync -a "$tmp/data/" "$data/"
+# The data directory is replaced wholesale too: a file a later generator stopped writing must
+# not survive as an unlisted (therefore unhashed) file beside the manifest.
+rsync -a --delete "$tmp/data/" "$data/"
 rsync -a "$tmp/docs/" "$pack/docs/"
 
 # 5. Mirror the pack (including data/ and docs/) and let the homepage's own gate decide.

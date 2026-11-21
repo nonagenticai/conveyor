@@ -6,6 +6,7 @@
  * When a snapshot IS present, the check is the gate on it:
  *   - manifest.json parses and names every file with a sha256;
  *   - every listed file exists and its bytes hash to the manifest value;
+ *   - every file under data/ is named by the manifest (an unlisted file cannot pass);
  *   - snapshot.js is a valid `window.CONVEYOR_SNAPSHOT = {…};` assignment;
  *   - secrets.json contains metadata only (no value/ciphertext/key id);
  *   - no file carries an email or a credential-shaped string;
@@ -111,9 +112,32 @@ for (const file of manifest.files || []) {
   }
 }
 
-// The standards record is generated after the snapshot (pass 2) and is not part of the snapshot
-// manifest. It carries its own content hash, one published page per artefact, and a package key
-// for every mandatory artefact that is not evidenced.
+// v1-pack-4: a file the manifest does not name is covered by no hash check, so a generator that
+// writes after the snapshot would publish it unverified. The data directory must be exactly the
+// manifest plus the files it lists; `manifest.json` is the listing itself.
+const listedPaths = new Set((manifest.files || []).map((file) => file.path));
+const unlisted = [];
+const walkData = (dir, prefix) => {
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const relative = prefix ? `${prefix}/${entry.name}` : entry.name;
+    if (entry.isDirectory()) {
+      walkData(path.join(dir, entry.name), relative);
+    } else if (relative !== "manifest.json" && !listedPaths.has(relative)) {
+      unlisted.push(relative);
+    }
+  }
+};
+walkData(dataDir, "");
+for (const file of unlisted) {
+  bad(`${file} is published under data/ but not listed in manifest.json`);
+}
+if (unlisted.length === 0) {
+  ok("every file under data/ is listed in manifest.json");
+}
+
+// The standards record is generated after the snapshot (pass 2). It carries its own content
+// hash, one published page per artefact, and a package key for every mandatory artefact that is
+// not evidenced.
 const standardsPath = path.join(dataDir, "standards.json");
 if (fs.existsSync(standardsPath)) {
   const stable = (value) => {
