@@ -178,6 +178,14 @@ pub enum PlanError {
         /// The kind the row carries.
         actual: String,
     },
+    /// A cadence state move the state machine does not allow.
+    #[error("the cadence is {from}; it cannot move to {to}")]
+    CadenceIllegalTransition {
+        /// The state the row carries.
+        from: String,
+        /// The state the caller asked for.
+        to: String,
+    },
     /// A cadence names no target board in its metadata.
     #[error("the cadence names no target board in meta.board_id")]
     CadenceBoardMissing,

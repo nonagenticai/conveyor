@@ -251,7 +251,10 @@ mod tests {
                 (62, "release layers".to_owned()),
                 // v1-w4a-2 (#526): the write tool's declared verification path on the version
                 // it was published with (0063_tool_verify.sql, SPEC_V2 §11.3).
-                (63, "tool verify".to_owned())
+                (63, "tool verify".to_owned()),
+                // v1-p82-2 (#526): `programme_cadence.state` becomes a closed set
+                // (0064_cadence_state.sql, SPEC_V2 §8.2).
+                (64, "cadence state".to_owned())
             ],
             "the embedded migration set is {embedded:?}; a wrong sqlx::migrate! path or a \
              file outside the set changes it"

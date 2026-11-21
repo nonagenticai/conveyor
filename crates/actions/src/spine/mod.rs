@@ -84,6 +84,13 @@ fn spine_error(error: PlanStoreError, action: &str) -> ActionError {
             "cadence_wrong_kind",
             format!("the cadence is {actual}; a credit needs a {expected} cadence"),
         ),
+        PlanStoreError::Illegal(PlanError::CadenceIllegalTransition { from, to }) => {
+            ActionError::new(
+                409,
+                "cadence_illegal_transition",
+                format!("the cadence is {from}; it cannot move to {to}"),
+            )
+        }
         PlanStoreError::Illegal(PlanError::DemoDeliverableNotComplete) => invalid(
             "deliverable_id",
             "deliverable_not_accepted",
