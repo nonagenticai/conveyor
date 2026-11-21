@@ -377,7 +377,7 @@
       "resolved_by": {
         "commit": "92e6b223e2b6de6a005e8e8ec1e984abbbc3071b",
         "test": "crates/actions/tests/togaf_phase_g.rs::the_design_gate_requires_the_phase_g_review",
-        "evidence": "also togaf_close_gate::a_programme_track_project_is_not_exempt_from_phase_g"
+        "evidence": "also crates/actions/tests/togaf_close_gate.rs::a_programme_track_project_is_not_exempt_from_phase_g"
       }
     },
     {
@@ -1292,18 +1292,18 @@
       "evidence": [
         {
           "path": "docs/design/delivery.js",
-          "line": 286,
-          "quote": "      list((work || {}).project_activity).map((row) => [row.project_id, row]),"
+          "line": 117,
+          "quote": "  function observedWindows(work) {"
+        },
+        {
+          "path": "docs/design/delivery.js",
+          "line": 772,
+          "quote": "    const derived = observedWindows(work);"
         }
       ],
       "failure_scenario": "The signed-out timeline draws no bars, no width and no today marker, while the same snapshot holds 368 observed runs.",
       "acceptance": "Derive the window from cards/runs when project_activity is absent (as v2.js consoleActivity does), or publish the row; add a fixture proving one bar.",
-      "owner_project": "PLATFORM",
-      "resolved_by": {
-        "commit": "a7a86a1f75e656b40bdbc060949e21de984be332",
-        "test": "docs/design/scripts/check-console.cjs",
-        "evidence": "observedWindows fallback; check-console.cjs runs in ci-public line 305 and is green at c7d92d74"
-      }
+      "owner_project": "PLATFORM"
     },
     {
       "id": "v1-view-2",
@@ -1316,18 +1316,23 @@
       "evidence": [
         {
           "path": "docs/design/delivery.js",
-          "line": 289,
-          "quote": "    const usage = new Map(list(inference.by_project).map((row) => [row.project_id, row]));"
+          "line": 98,
+          "quote": "  function tenantSpend(measure) {"
+        },
+        {
+          "path": "docs/design/delivery.js",
+          "line": 1247,
+          "quote": "      unattributed: tenantSpend(measure),"
+        },
+        {
+          "path": "docs/design/delivery.js",
+          "line": 1480,
+          "quote": "      unattributed: tenantSpend(measure),"
         }
       ],
       "failure_scenario": "The header claims 'no spend recorded' while the ledger holds millions of tokens; the unpriced branch is unreachable.",
       "acceptance": "Bind spend to published fields or show tenant totals as explicitly unattributed; add priced, unpriced and zero fixtures.",
-      "owner_project": "PLATFORM",
-      "resolved_by": {
-        "commit": "d4cb74ae568a3e84eb83ca74097510fd8294e816",
-        "test": "docs/design/scripts/check-console.cjs",
-        "evidence": "tenantSpend reports the tenant total as unattributed when by_project/by_card are absent; check-console green at c7d92d74"
-      }
+      "owner_project": "PLATFORM"
     },
     {
       "id": "v1-view-3",
@@ -1340,18 +1345,23 @@
       "evidence": [
         {
           "path": "docs/design/delivery.js",
-          "line": 394,
-          "quote": "    const standalone = [...index.values()].filter((p) => !p.programmeId);"
+          "line": 893,
+          "quote": "    // A standalone project is public only when it is active/paused AND carries a board or a card"
+        },
+        {
+          "path": "docs/design/delivery.js",
+          "line": 895,
+          "quote": "    const standalone = [...index.values()].filter("
+        },
+        {
+          "path": "docs/design/delivery.js",
+          "line": 901,
+          "quote": "    return { programmes, standalone };"
         }
       ],
       "failure_scenario": "A closed standalone project remains a completed portfolio row permanently, contradicting portfolio membership.",
       "acceptance": "Apply the active/paused plus board-or-card predicate; a fixture proves a closed standalone project is absent.",
-      "owner_project": "PLATFORM",
-      "resolved_by": {
-        "commit": "d4cb74ae568a3e84eb83ca74097510fd8294e816",
-        "test": "docs/design/scripts/check-console.cjs",
-        "evidence": "standalone rows require active/paused and a board or a card; check-console green at c7d92d74"
-      }
+      "owner_project": "PLATFORM"
     },
     {
       "id": "v1-view-4",
@@ -1364,18 +1374,18 @@
       "evidence": [
         {
           "path": "docs/design/delivery.js",
-          "line": 220,
-          "quote": "      .slice(0, 8)"
+          "line": 344,
+          "quote": "  // are read. Every profile renders — nothing is silently truncated."
+        },
+        {
+          "path": "docs/design/delivery.js",
+          "line": 345,
+          "quote": "  function benefitRail(artefacts) {"
         }
       ],
       "failure_scenario": "A programme with 12 benefit profiles shows 8 and nothing tells the reader 4 are missing.",
       "acceptance": "Render all profiles or print 'showing 8 of N'; add a fixture with more than eight benefits.",
-      "owner_project": "PLATFORM",
-      "resolved_by": {
-        "commit": "d4cb74ae568a3e84eb83ca74097510fd8294e816",
-        "test": "docs/design/scripts/check-console.cjs",
-        "evidence": "the benefit rail renders every profile; check-console green at c7d92d74"
-      }
+      "owner_project": "PLATFORM"
     },
     {
       "id": "v1-view-5",
@@ -1388,18 +1398,23 @@
       "evidence": [
         {
           "path": "docs/design/delivery.js",
-          "line": 735,
-          "quote": "          <div class=\"kanban-cards\">${cards.map((card) => tile(card, model)).join(\"\")}</div>"
+          "line": 167,
+          "quote": "  const TILE_CAP = 25;"
+        },
+        {
+          "path": "docs/design/delivery.js",
+          "line": 170,
+          "quote": "    const shown = all.slice(0, TILE_CAP);"
+        },
+        {
+          "path": "docs/design/delivery.js",
+          "line": 173,
+          "quote": "      rest > 0 ? `<div class=\"kanban-more\">${rest} more</div>` : \"\""
         }
       ],
       "failure_scenario": "A 1,000-card board renders 1,000 tiles on every render and a very tall single column at 390 px.",
       "acceptance": "Cap or paginate lanes and the archived column with a 'show N more' control; add a fixture with more than 50 cards in one lane.",
-      "owner_project": "PLATFORM",
-      "resolved_by": {
-        "commit": "d4cb74ae568a3e84eb83ca74097510fd8294e816",
-        "test": "docs/design/scripts/check-console.cjs",
-        "evidence": "every kanban lane and the archived column cap at 25 tiles; check-console green at c7d92d74"
-      }
+      "owner_project": "PLATFORM"
     },
     {
       "id": "v1-w1a-2",
@@ -1625,7 +1640,7 @@
       "resolved_by": {
         "commit": "92e6b223e2b6de6a005e8e8ec1e984abbbc3071b",
         "test": "crates/actions/tests/ladder_human_gate.rs::a_service_principal_cannot_record_a_human_decision",
-        "evidence": "also only_a_human_draft_apply_decision_can_gate_a_draft; decision_ladder 7 passed"
+        "evidence": "also only_a_human_draft_apply_decision_can_gate_a_draft; crates/actions/tests/decision_ladder.rs 7 passed"
       }
     },
     {
