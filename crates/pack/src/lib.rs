@@ -2,7 +2,7 @@
 //! The public design pack: one data model, three consumers.
 //!
 //! - [`snapshot`] turns one tenant's rows into the deterministic snapshot files the CLI writes.
-//! - [`outputs`] renders the publishable platform outputs — one page each plus the `outputs.js`
+//! - [`outputs`] renders the published platform outputs — one page each plus the `outputs.js`
 //!   index.
 //! - [`live`] builds both in memory, in one read-only transaction, for the unauthenticated
 //!   `/design` routes. The API crate calls it; `apps/server` only holds the CLI glue.

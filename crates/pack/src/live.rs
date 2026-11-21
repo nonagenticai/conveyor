@@ -2,7 +2,7 @@
 //! The live public view: the snapshot and the published outputs, built in memory.
 //!
 //! The unauthenticated `/design` routes call [`site_view`]. It reads **everything in one
-//! read-only transaction** — the snapshot data, the publishable documents and the projects —
+//! read-only transaction** — the snapshot data, the published documents and the projects —
 //! so the two projections cannot disagree about a row that changed between two reads.
 //!
 //! **Deterministic.** `generated_at` is the newest published document's `updated_at`, never the
@@ -11,7 +11,7 @@
 //!
 //! **Redacted and safe.** Titles and bodies pass the snapshot's `redact` safety net before they
 //! are rendered. The Markdown renderer (in [`crate::outputs`]) neutralises raw HTML and refuses
-//! non-http(s)/mailto URLs. Only `publishable AND status='active'` rows with a body are visible —
+//! non-http(s)/mailto URLs. Only `published_at IS NOT NULL AND status='active'` rows with a body are visible —
 //! the same filter the CLI writer uses.
 
 use std::collections::HashMap;

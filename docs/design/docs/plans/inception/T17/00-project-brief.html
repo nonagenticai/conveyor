@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>T17 — Tenant asset authoring · conveyor documents</title>
+    <link rel="icon" href="../../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/plans/inception/T17/00-project-brief.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="t17--tenant-asset-authoring">T17 — Tenant asset authoring</h1>
+<ul>
+<li><strong>Status:</strong> published</li>
+<li><strong>Version:</strong> 1.0</li>
+<li><strong>Author / date:</strong> conveyor programme session / 2026-11-21</li>
+<li><strong>Reviewer / review date:</strong> #347 independent review / 2026-11-18; owner publication / 2026-11-21</li>
+<li><strong>Related project:</strong> T17 — Tenant asset authoring · issue #87 · live document <code>01a1e008-58e9-772a-87a3-ad2e9a1e8354</code></li>
+<li><strong>Rationale:</strong> state the inception basis for T17: a tenant's brief and documents become a reviewed catalogue of departments, jobs, procedures and policies, and no asset publishes itself or widens a tool grant.</li>
+<li><strong>Published document:</strong> <code>01a1e008-58e9-772a-87a3-ad2e9a1e8354</code> — published 2026-11-21</li>
+<li><strong>Contract:</strong> pending</li>
+<li><strong>ADM phase / plateau:</strong> A / PSA for the artefact (project row: G / capability)</li>
+<li><strong>Entries:</strong> outcome, boundary, reuse sources, inception units, dependencies, acceptance, capabilities, plan, risks, links.</li>
+<li><strong>Derivation / realization / reuse / dependency:</strong> derived from SPEC_V2 §5.7 and §10.4–§10.5, §12 T17, and P0 §4; realized by #87; reuse sources below; depends on T16, T3 and P0.</li>
+<li><strong>Links:</strong> issue #87; <code>docs/SPEC_V2.md</code> §12; <code>01-inception-analysis.md</code>; <code>02-architecture-design.md</code>; <code>seed/programme.json</code>.</li>
+</ul>
+<h2 id="outcome">Outcome</h2>
+<p>A tenant supplies a brief and documents, and a reviewed catalogue of departments, jobs, procedures and policies is published; no asset can publish itself or widen a tool grant.</p>
+<h2 id="boundary">Boundary</h2>
+<p>In scope: the authoring lifecycle — intake a brief and documents, draft organisation/department/job/procedure/policy assets with their sources, review each, and publish through the target's own publish action — with the draft store, the review record and the templates.</p>
+<p>Out of scope: writing the target tables (departments, jobs, procedures, policies publish themselves); a second converter for SOP/RDF/BPMN (T16 owns it); tools and bindings (T13 owns them; T17 may request, never grant); a fork of <code>governed_asset</code>; a new template table is in scope only as <code>asset_template</code>.</p>
+<h2 id="reuse-sources">Reuse sources</h2>
+<ul>
+<li><code>crates/{domain,store,actions,api}</code> — the existing table/action surfaces an asset extends; the analysis names which must not be duplicated.</li>
+<li><code>migrations/0040_organisation.sql</code> — is the fact already a row?</li>
+<li><code>migrations/0050_approval_policies.sql</code> + <code>crates/actions/src/control/approvals.rs</code> — the per-action review gate.</li>
+<li><code>migrations/0002_domain.sql:governed_asset</code> + the document model — which row owns a draft, which the published asset.</li>
+<li><code>crates/actions-derive</code> — action, job, or UI-only read.</li>
+<li><code>seed/organisation.json</code> — a seed may never update a published row.</li>
+<li>Estate capability, by role: knowledge ingest/retrieval — which result is evidence, and how it is redacted.</li>
+<li>Upstream: the workspace crates — no new dependency without a workspace decision.</li>
+</ul>
+<h2 id="inception-units">Inception units</h2>
+<ol type="1">
+<li><code>inception-analysis</code> — <code>01-inception-analysis.md</code>; live <code>01a1ee42-312b-770c-bdae-36a1b077d2e6</code> (published 2026-11-21).</li>
+<li><code>architecture-design</code> — <code>02-architecture-design.md</code>; live <code>01a1ee42-3aca-7179-867c-000d986a865e</code> (published 2026-11-21).</li>
+</ol>
+<p>Both are published (owner publication, 2026-11-21); the inception gate is met. #87 is claimed by its delivery session; this brief does not change that issue's status.</p>
+<h2 id="dependencies">Dependencies</h2>
+<p>Typed, from <code>seed/programme.json</code>: blocked-by T16, T3 and P0; related #87 (delivery, claimed). T16 owns ingestion and the SOP human gate; T3 owns the decision ladder. The delivery unit is claimed, not authorised by this brief.</p>
+<h2 id="acceptance">Acceptance</h2>
+<p>The project gate: a tenant supplies a short brief plus documents, and a reviewed catalogue of departments, jobs, procedures and policies is published; no asset can publish itself or widen a tool grant.</p>
+<p>Verify: #87's scenarios (<code>crates/actions/tests/authoring.rs</code>, <code>asset_review.rs</code>, <code>apps/web/e2e/authoring.spec.ts</code>, to create there); at inception, the published analysis+design pair, not yet satisfied.</p>
+<h2 id="capabilities">Capabilities</h2>
+<p><code>meta_procedure</code>, <code>design</code> — the authoring surfaces; no other capability may publish an authored asset.</p>
+<h2 id="plan">Plan</h2>
+<p><code>docs/SPEC_V2.md</code> §5.7, §10.4–§10.5 and §12 row T17. Delivery unit #87; no separate <code>S##</code> slice file. Target tranche <strong>5 — not authorised</strong>.</p>
+<h2 id="risks">Risks</h2>
+<ul>
+<li>Two stores: draft and published row diverge → one-owning-table contract test per kind.</li>
+<li>Self-publication → <code>self_approval</code> default forbidden (migration 0050); refusal test at <code>crates/actions/tests/asset_review.rs</code> (to create).</li>
+<li>Tool-grant widening → a policy draft waives its own gate; refusal test at <code>asset_review.rs</code> (to create).</li>
+<li>Unordered publication → job references an unpublished department; <code>depends_on</code> refusal test at <code>authoring.rs::a_draft_that_references_an_unpublished_asset_is_refused</code> (to create).</li>
+<li>T16 or T13 slip → the gate is unmeetable; check <code>git grep pko_release</code> and <code>CREATE TABLE tool_binding</code> on main.</li>
+<li>Orphan assets inflate the catalogue → zero-use report.</li>
+<li>Public leak → P9 scan before publication.</li>
+</ul>
+<h2 id="links">Links</h2>
+<ul>
+<li>Issue #87 (delivery; claimed).</li>
+<li><code>docs/SPEC_V2.md</code> §5.7, §10.4–§10.5, §12 T17.</li>
+<li><code>seed/programme.json</code> row T17.</li>
+<li><code>01-inception-analysis.md</code>, <code>02-architecture-design.md</code>.</li>
+</ul>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/plans/inception/T17/00-project-brief.md</code> at build time.</span>
+      <a href="../../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

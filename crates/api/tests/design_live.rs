@@ -201,20 +201,35 @@ async fn compose(
     token: &str,
     title: &str,
     body: &str,
-    publishable: bool,
+    publish: bool,
 ) -> String {
     let (status, document) = running
         .invoke(
             "documents.compose",
             token,
-            json!({"title": title, "body": body, "publishable": publishable}),
+            json!({"title": title, "body": body}),
             None,
             None,
             None,
         )
         .await;
     assert_eq!(status, 201, "{document}");
-    document["output"]["id"].as_str().expect("id").to_owned()
+    let id = document["output"]["id"].as_str().expect("id").to_owned();
+    if publish {
+        // `publishable` alone is not publication: the public window reads `published_at`.
+        let (status, published) = running
+            .invoke(
+                "documents.publish",
+                token,
+                json!({"id": id, "publish": true}),
+                Some("\"1\""),
+                None,
+                None,
+            )
+            .await;
+        assert_eq!(status, 200, "{published}");
+    }
+    id
 }
 
 #[tokio::test(flavor = "multi_thread")]

@@ -1,7 +1,8 @@
 //! The publish workflow and the document history (0042).
 //!
-//! `publishable` is the one public bit. `documents.publish` is the only action that changes it, and
-//! only an admin (or the synthetic machine tenant-admin the operator CLI runs as) may call it.
+//! `published_at` is the public bit, set together with `publishable` by `documents.publish` — the
+//! only action that changes either — and only an admin (or the synthetic machine tenant-admin the
+//! operator CLI runs as) may call it.
 //! `documents.request_publish` is the author's signal; it is a flag, not a state machine.
 //!
 //! History reuses the workspace's one `revision` table and one writer. A revision is the complete
