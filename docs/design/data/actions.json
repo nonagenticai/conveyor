@@ -473,6 +473,7 @@
     "tranches.create",
     "tranches.delete",
     "tranches.list",
+    "tranches.resume",
     "tranches.retire",
     "tranches.review",
     "tranches.review_list",

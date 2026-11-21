@@ -9,12 +9,19 @@
 //! * `v1-w2b-2` — a programme-bound project whose programme HAS a tranche plan but no row for
 //!   the project's tranche cannot start; a programme with no tranche plan keeps its legacy
 //!   allowance (`projects.execute`).
+//! * `v1-tr2-1` — a `pause` review froze every project in the tranche with no way back; a
+//!   human-approved `tranche.resume` gate naming the tranche moves it to `in_review`
+//!   (`tranches.resume`), a compliant project can then close, and the resumed tranche records
+//!   the second, dated review that authorises its successor.
 //!
 //! The harness is `support::Pg::fresh()` plus a direct `InvokeRequest` as a real seeded actor
 //! (`seeded.user_id`), the same shape `ops_write.rs` uses.
+//!
+//! `rbuild -- test -p conveyor-actions --test spine_gates`.
 
 mod support;
 
+use conveyor_actions::spine::TRANCHE_RESUME_GATE;
 use conveyor_actions::{Authority, InvokeRequest, invoke, registry};
 use conveyor_auth::Role;
 use serde_json::{Value, json};
@@ -482,4 +489,795 @@ async fn a_programme_without_a_tranche_plan_keeps_its_legacy_allowance() {
     .expect("a programme with no tranche plan keeps the legacy allowance");
 
     assert_eq!(outcome.status, 200, "{}", outcome.body);
+}
+
+// ── v1-tr2-1 — a paused tranche has a resume path ─────────────────────────────────────────
+
+const TOKEN: &str = "dev:alice";
+const REVIEWER: &str = "dev:reviewer";
+
+fn output(body: &Value) -> &Value {
+    body.get("output").unwrap_or(body)
+}
+
+fn text(value: &Value, field: &str) -> String {
+    value[field]
+        .as_str()
+        .unwrap_or_else(|| panic!("{field} is not a string in {value}"))
+        .to_owned()
+}
+
+/// The review/delegation fixture: a seeded tenant and the real HTTP app, because the pause is
+/// produced by the real `tranches.review` action (its gate and its P0 delegation are real rows).
+async fn running_fixture() -> (support::Pg, support::Running, support::Seeded) {
+    let pg = support::Pg::fresh().await;
+    let seeded = support::seed(&pg, "dev-a", "alice", "Alice").await;
+    conveyor_store::seed::catalogue(&pg.owner)
+        .await
+        .expect("the catalogue seed");
+    let running = support::Running::start(&pg).await;
+    (pg, running, seeded)
+}
+
+/// A programme and one tranche, created by raw SQL: these tests are about the state transition,
+/// not `tranches.create`'s validation.
+async fn programme_and_tranche(pg: &support::Pg, tenant_id: Uuid, state: &str) -> (Uuid, Uuid) {
+    let programme: Uuid =
+        sqlx::query_scalar("INSERT INTO programme (tenant_id, name) VALUES ($1, 'P') RETURNING id")
+            .bind(tenant_id)
+            .fetch_one(&pg.super_pool)
+            .await
+            .expect("insert the programme");
+    let tranche: Uuid = sqlx::query_scalar(
+        "INSERT INTO programme_tranche (tenant_id, programme_id, number, state)
+         VALUES ($1, $2, 0, $3) RETURNING id",
+    )
+    .bind(tenant_id)
+    .bind(programme)
+    .bind(state)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("insert the tranche");
+    (programme, tranche)
+}
+
+/// Submit a tranche review through the real `tranches.review` action: a review gate decided by
+/// the distinct reviewer, the published delegation, and the evidence §8.3 requires. Raw SQL for
+/// this transition would hide the defect's own setup.
+async fn try_review_tranche(
+    pg: &support::Pg,
+    running: &support::Running,
+    seeded: &support::Seeded,
+    tranche: Uuid,
+    decision: &str,
+    delegation: &str,
+) -> Result<conveyor_actions::InvokeOutcome, conveyor_actions::ActionError> {
+    let input = json!({
+        "id": tranche,
+        "decision": decision,
+        "delegation_ref": delegation,
+        "evidence": {
+            "baselines": ["B0"],
+            "benefit_status": {"BEN-1": "tracking"},
+            "risk_register": ["risk-1"]
+        }
+    });
+    let gate = support::review_gate(running, TOKEN, &input).await;
+    let mut review = request(seeded.user_id, "tranches.review", input);
+    review.approval_id = Some(gate);
+    invoke(&pg.runtime, registry(), seeded.tenant, review).await
+}
+
+/// Record a tranche review and assert it landed.
+async fn review_tranche(
+    pg: &support::Pg,
+    running: &support::Running,
+    seeded: &support::Seeded,
+    tranche: Uuid,
+    decision: &str,
+    delegation: &str,
+) {
+    let outcome = try_review_tranche(pg, running, seeded, tranche, decision, delegation)
+        .await
+        .expect("the tranche review");
+    assert_eq!(outcome.status, 200, "{}", outcome.body);
+}
+
+/// Record the tranche's `pause` through the real action and assert it landed.
+async fn pause_tranche(
+    pg: &support::Pg,
+    running: &support::Running,
+    seeded: &support::Seeded,
+    tranche: Uuid,
+    delegation: &str,
+) {
+    review_tranche(pg, running, seeded, tranche, "pause", delegation).await;
+    assert_eq!(
+        tranche_state(pg, seeded.tenant_id, tranche).await,
+        "paused",
+        "the pause review pauses the tranche"
+    );
+}
+
+/// An approval row in the given state, with one decision row when asked. The gates under test
+/// are fixtures, not the transition: the resume's gate identity is what the action reads.
+async fn gate_approval(
+    pg: &support::Pg,
+    tenant_id: Uuid,
+    gate: &str,
+    status: &str,
+    target: &str,
+    decision: Option<(&str, &str)>,
+) -> Uuid {
+    let id: Uuid = sqlx::query_scalar(
+        "INSERT INTO approval (tenant_id, gate, kind, status, meta)
+         VALUES ($1, $2, 'gate', $3, jsonb_build_object('target', $4::text))
+         RETURNING id",
+    )
+    .bind(tenant_id)
+    .bind(gate)
+    .bind(status)
+    .bind(target.to_owned())
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("insert the approval");
+    if let Some((decision, kind)) = decision {
+        sqlx::query(
+            "INSERT INTO approval_decision
+                 (tenant_id, approval_id, approver_id, decision, decided_by_kind)
+             VALUES ($1, $2, $3, $4, $5)",
+        )
+        .bind(tenant_id)
+        .bind(id)
+        .bind(support::reviewer_id(pg).await)
+        .bind(decision)
+        .bind(kind)
+        .execute(&pg.super_pool)
+        .await
+        .expect("insert the approval decision");
+    }
+    id
+}
+
+fn resume_request(actor: Uuid, tranche: Uuid, approval: Uuid, note: Option<&str>) -> InvokeRequest {
+    request(
+        actor,
+        "tranches.resume",
+        json!({"tranche_id": tranche, "approval_id": approval, "note": note}),
+    )
+}
+
+async fn refused_resume(
+    pg: &support::Pg,
+    seeded: &support::Seeded,
+    tranche: Uuid,
+    approval: Uuid,
+) -> conveyor_actions::ActionError {
+    invoke(
+        &pg.runtime,
+        registry(),
+        seeded.tenant,
+        resume_request(seeded.user_id, tranche, approval, None),
+    )
+    .await
+    .expect_err("a resume without its approved gate must be refused")
+}
+
+fn assert_approval_missing(error: &conveyor_actions::ActionError) {
+    assert_eq!(error.status, 422, "{}", error.detail);
+    assert_eq!(error.errors.len(), 1, "{:?}", error.errors);
+    assert_eq!(error.errors[0].field, "approval_id", "{:?}", error.errors);
+    assert_eq!(
+        error.errors[0].code, "approval_missing",
+        "{:?}",
+        error.errors
+    );
+}
+
+async fn tranche_state(pg: &support::Pg, tenant_id: Uuid, tranche: Uuid) -> String {
+    sqlx::query_scalar("SELECT state FROM programme_tranche WHERE tenant_id = $1 AND id = $2")
+        .bind(tenant_id)
+        .bind(tranche)
+        .fetch_one(&pg.super_pool)
+        .await
+        .expect("read the tranche state")
+}
+
+/// v1-tr2-1 — `tranches.review` maps `pause` to `paused`, and a paused tranche froze every
+/// project in it: no action could move it back. Only an approved `tranche.resume` gate naming
+/// this tranche, carrying a human `approve` decision, resumes it.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_paused_tranche_resumes_only_with_its_approved_gate() {
+    let (pg, running, seeded) = running_fixture().await;
+    let (_programme, tranche) = programme_and_tranche(&pg, seeded.tenant_id, "planned").await;
+    let delegation = support::delegation_ref(&running, TOKEN).await;
+    pause_tranche(&pg, &running, &seeded, tranche, &delegation).await;
+
+    let target = tranche.to_string();
+    // A cited approval that does not exist.
+    let unknown = refused_resume(&pg, &seeded, tranche, Uuid::now_v7()).await;
+    assert_approval_missing(&unknown);
+    // An approved gate opened for another action.
+    let wrong_gate = gate_approval(
+        &pg,
+        seeded.tenant_id,
+        "tranches.review",
+        "approved",
+        &target,
+        Some(("approve", "human")),
+    )
+    .await;
+    assert_approval_missing(&refused_resume(&pg, &seeded, tranche, wrong_gate).await);
+    // The right gate, still pending.
+    let pending = gate_approval(
+        &pg,
+        seeded.tenant_id,
+        TRANCHE_RESUME_GATE,
+        "pending",
+        &target,
+        Some(("approve", "human")),
+    )
+    .await;
+    assert_approval_missing(&refused_resume(&pg, &seeded, tranche, pending).await);
+    // An approved `tranche.resume` gate that names a different object.
+    let wrong_target = gate_approval(
+        &pg,
+        seeded.tenant_id,
+        TRANCHE_RESUME_GATE,
+        "approved",
+        &Uuid::now_v7().to_string(),
+        Some(("approve", "human")),
+    )
+    .await;
+    assert_approval_missing(&refused_resume(&pg, &seeded, tranche, wrong_target).await);
+    // An approved gate only a machine decided is not a human authorisation.
+    let machine_only = gate_approval(
+        &pg,
+        seeded.tenant_id,
+        TRANCHE_RESUME_GATE,
+        "approved",
+        &target,
+        Some(("approve", "agent")),
+    )
+    .await;
+    assert_approval_missing(&refused_resume(&pg, &seeded, tranche, machine_only).await);
+    assert_eq!(
+        tranche_state(&pg, seeded.tenant_id, tranche).await,
+        "paused",
+        "a refused resume moved the tranche"
+    );
+
+    // The approved `tranche.resume` gate naming this tranche resumes it.
+    let gate = gate_approval(
+        &pg,
+        seeded.tenant_id,
+        TRANCHE_RESUME_GATE,
+        "approved",
+        &target,
+        Some(("approve", "human")),
+    )
+    .await;
+    let outcome = invoke(
+        &pg.runtime,
+        registry(),
+        seeded.tenant,
+        resume_request(seeded.user_id, tranche, gate, Some("the audit fix landed")),
+    )
+    .await
+    .expect("an approved tranche.resume gate resumes the tranche");
+    assert_eq!(outcome.status, 200, "{}", outcome.body);
+    assert_eq!(
+        output(&outcome.body)["state"],
+        "in_review",
+        "the resume moves a paused tranche back to in_review: {}",
+        outcome.body
+    );
+
+    // The resume is recorded on the gate that authorised it.
+    let meta: Value =
+        sqlx::query_scalar("SELECT meta FROM approval WHERE tenant_id = $1 AND id = $2")
+            .bind(seeded.tenant_id)
+            .bind(gate)
+            .fetch_one(&pg.super_pool)
+            .await
+            .expect("read the resume gate");
+    assert_eq!(
+        meta["resume"]["resume_approval_id"],
+        json!(gate.to_string()),
+        "{meta}"
+    );
+    assert_eq!(meta["resume"]["tranche_id"], json!(target), "{meta}");
+    assert_eq!(
+        meta["resume"]["note"],
+        json!("the audit fix landed"),
+        "{meta}"
+    );
+    assert!(meta["resume"]["resumed_at"].is_string(), "{meta}");
+
+    // A resumed tranche is no longer paused: a second resume is refused and changes nothing.
+    let error = refused_resume(&pg, &seeded, tranche, gate).await;
+    assert_eq!(error.status, 409, "{}", error.detail);
+    assert_eq!(error.code, "tranche_not_paused", "{}", error.detail);
+    assert_eq!(
+        tranche_state(&pg, seeded.tenant_id, tranche).await,
+        "in_review"
+    );
+}
+
+/// v1-tr2-1's second half: a resume that only lets projects close is still a dead end — the
+/// tranche's one review was the pause, and the programme could never authorise its successor.
+/// After the approved resume, the resumed tranche records the second, dated review, and that
+/// `continue` review authorises the next tranche.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_resumed_tranche_reviews_again_and_authorises_its_successor() {
+    let (pg, running, seeded) = running_fixture().await;
+    let delegation = support::delegation_ref(&running, TOKEN).await;
+    // Tranche 1 is the open tranche; tranche 2 is the successor a `continue` authorises.
+    let programme: Uuid = sqlx::query_scalar(
+        "INSERT INTO programme (tenant_id, name) VALUES ($1, 'Resume programme') RETURNING id",
+    )
+    .bind(seeded.tenant_id)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("insert the programme");
+    let tranche1: Uuid = sqlx::query_scalar(
+        "INSERT INTO programme_tranche (tenant_id, programme_id, number, state)
+         VALUES ($1, $2, 1, 'authorised') RETURNING id",
+    )
+    .bind(seeded.tenant_id)
+    .bind(programme)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("insert tranche 1");
+    let tranche2: Uuid = sqlx::query_scalar(
+        "INSERT INTO programme_tranche (tenant_id, programme_id, number, state)
+         VALUES ($1, $2, 2, 'planned') RETURNING id",
+    )
+    .bind(seeded.tenant_id)
+    .bind(programme)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("insert tranche 2");
+
+    pause_tranche(&pg, &running, &seeded, tranche1, &delegation).await;
+    // The pause is still the row's one review: only the RESUME reopens it, so a second review
+    // before the resume is refused and writes nothing.
+    let refused =
+        try_review_tranche(&pg, &running, &seeded, tranche1, "continue", &delegation).await;
+    let refused = refused.expect_err("a paused tranche's pause is its one review");
+    assert_eq!(refused.status, 409, "{}", refused.detail);
+    assert_eq!(
+        refused.code, "tranche_already_reviewed",
+        "{}",
+        refused.detail
+    );
+
+    let gate = gate_approval(
+        &pg,
+        seeded.tenant_id,
+        TRANCHE_RESUME_GATE,
+        "approved",
+        &tranche1.to_string(),
+        Some(("approve", "human")),
+    )
+    .await;
+    let outcome = invoke(
+        &pg.runtime,
+        registry(),
+        seeded.tenant,
+        resume_request(
+            seeded.user_id,
+            tranche1,
+            gate,
+            Some("the exit criteria were met"),
+        ),
+    )
+    .await
+    .expect("resume the tranche");
+    assert_eq!(outcome.status, 200, "{}", outcome.body);
+
+    // The second, dated review — the programme's forward path — is recordable on the resumed
+    // tranche, and its `continue` authorises tranche 2 in the same write.
+    review_tranche(&pg, &running, &seeded, tranche1, "continue", &delegation).await;
+    let (state1, reviews1): (String, i64) = sqlx::query_as(
+        "SELECT state, (SELECT count(*) FROM programme_tranche_review
+                         WHERE tenant_id = $1 AND tranche_id = $2)
+           FROM programme_tranche WHERE tenant_id = $1 AND id = $2",
+    )
+    .bind(seeded.tenant_id)
+    .bind(tranche1)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("read tranche 1");
+    assert_eq!(state1, "closed", "the continue review closes the tranche");
+    assert_eq!(
+        reviews1, 2,
+        "the pause and the resumed continue are both on record"
+    );
+    let (state2, authorisation): (String, Option<Uuid>) = sqlx::query_as(
+        "SELECT state, authorisation_review_id FROM programme_tranche
+          WHERE tenant_id = $1 AND id = $2",
+    )
+    .bind(seeded.tenant_id)
+    .bind(tranche2)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("read tranche 2");
+    assert_eq!(
+        state2, "authorised",
+        "the continue review authorises tranche 2"
+    );
+    let latest: Uuid = sqlx::query_scalar(
+        "SELECT id FROM programme_tranche_review
+          WHERE tenant_id = $1 AND tranche_id = $2 AND decision = 'continue'",
+    )
+    .bind(seeded.tenant_id)
+    .bind(tranche1)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("the resumed continue review");
+    assert_eq!(
+        authorisation,
+        Some(latest),
+        "tranche 2 is authorised by the resumed review, never by the pause"
+    );
+}
+
+// ── the project-close fixture (copied from `programme_close.rs`, which proves it conformant) ──
+
+async fn programme_project(
+    pg: &support::Pg,
+    running: &support::Running,
+    seeded: &support::Seeded,
+) -> String {
+    let programme: Uuid = sqlx::query_scalar(
+        "INSERT INTO programme (tenant_id, name) VALUES ($1, 'Close programme') RETURNING id",
+    )
+    .bind(seeded.tenant_id)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("insert the programme");
+    sqlx::query(
+        // Number 1 is the project's default tranche when it names none, so the start gate reads
+        // this row; a number-0 plan would make the project sit in an undeclared tranche.
+        "INSERT INTO programme_tranche (tenant_id, programme_id, number, state)
+         VALUES ($1, $2, 1, 'authorised')",
+    )
+    .bind(seeded.tenant_id)
+    .bind(programme)
+    .execute(&pg.super_pool)
+    .await
+    .expect("insert the authorised tranche");
+    let (status, created) = running
+        .invoke(
+            "projects.create",
+            TOKEN,
+            json!({
+                "title": "Programme close",
+                "key": format!("PC-{}", Uuid::now_v7().simple()),
+                "programme_id": programme,
+                "project_type_code": "delivery",
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "{created}");
+    let id = text(output(&created), "id");
+    let version = output(&created)["version"].as_i64().expect("a version");
+    let (status, body) = running
+        .invoke(
+            "projects.programme_meta",
+            TOKEN,
+            json!({
+                "id": id,
+                "meta": {
+                    "track": "v2",
+                    "tranche": 1,
+                    "expected_outputs": [],
+                    "closure_outputs": [],
+                },
+            }),
+            Some(&format!("\"{version}\"")),
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{body}");
+    let (status, body) = running
+        .invoke(
+            "projects.activate",
+            TOKEN,
+            json!({"id": id}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{body}");
+    id
+}
+
+async fn approve(running: &support::Running, approval_id: &str) {
+    let (status, body) = running
+        .invoke(
+            "approvals.decide",
+            REVIEWER,
+            json!({"approval_id": approval_id, "decision": "approve"}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{body}");
+}
+
+async fn charter(running: &support::Running, project: &str) {
+    let (status, body) = running
+        .invoke(
+            "projects.charter",
+            TOKEN,
+            json!({"project_id": project, "charter": "The project's mandate and scope."}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "{body}");
+    approve(running, &text(output(&body), "approval_id")).await;
+}
+
+async fn baseline(running: &support::Running, project: &str) {
+    let (status, body) = running
+        .invoke(
+            "projects.baseline",
+            TOKEN,
+            json!({
+                "project_id": project,
+                "baseline_kind": "scope",
+                "wbs": [{
+                    "kind": "work_package",
+                    "title": "Deliver the project",
+                    "business_value": 1,
+                    "time_criticality": 1,
+                    "risk_reduction": 1,
+                    "job_size": 1,
+                }],
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "{body}");
+    approve(running, &text(output(&body), "approval_id")).await;
+}
+
+async fn board(pg: &support::Pg, tenant: Uuid) -> Uuid {
+    sqlx::query_scalar(
+        "INSERT INTO governance_body (tenant_id, kind, key, name)
+         VALUES ($1, 'architecture_board', 'board', 'Conveyor Architecture Board')
+         RETURNING id",
+    )
+    .bind(tenant)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("insert the board")
+}
+
+async fn contract(
+    pg: &support::Pg,
+    running: &support::Running,
+    seeded: &support::Seeded,
+    project: &str,
+    delegation: &str,
+) -> String {
+    let (status, body) = running
+        .invoke(
+            "architecture.contracts_request",
+            TOKEN,
+            json!({
+                "project_id": project,
+                "kind": "delivery_contract",
+                "phase_code": "f",
+                "title": "Delivery contract",
+                "body": {"compliance": "the acceptance manifest at the published SHA"},
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "{body}");
+    let contract_id = text(output(&body), "id");
+    let version = output(&body)["version"]
+        .as_i64()
+        .expect("a contract version");
+
+    let board = board(pg, seeded.tenant_id).await;
+    let (status, body) = running
+        .invoke(
+            "architecture.board_decide",
+            TOKEN,
+            json!({
+                "body_id": board,
+                "decision": "approved",
+                "evidence": {"delegation_ref": delegation},
+                "subject_kind": "contract",
+                "subject_id": contract_id,
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "{body}");
+    let approval_id = text(output(&body), "approval_id");
+
+    let (status, body) = running
+        .invoke(
+            "architecture.contracts_approve",
+            REVIEWER,
+            json!({
+                "id": contract_id,
+                "approval_id": approval_id,
+                "delegation_ref": delegation,
+            }),
+            Some(&format!("\"{version}\"")),
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{body}");
+    contract_id
+}
+
+async fn review(
+    running: &support::Running,
+    project: &str,
+    contract: &str,
+    delegation: &str,
+) -> String {
+    let (status, body) = running
+        .invoke(
+            "architecture.reviews_record",
+            REVIEWER,
+            json!({
+                "project_id": project,
+                "contract_id": contract,
+                "level": "compliant",
+                "delegation_ref": delegation,
+                "findings": [],
+                "evidence": {
+                    "manifest": "acceptance/programme/T.toml",
+                    "delegation_ref": delegation,
+                },
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "{body}");
+    text(output(&body), "id")
+}
+
+async fn close_request(running: &support::Running, project: &str, delegation: &str) -> String {
+    let (status, body) = running
+        .invoke(
+            "projects.close_request",
+            TOKEN,
+            json!({
+                "id": project,
+                "closure": "The project delivered its scope; the closure evidence is published.",
+                "delegation_ref": delegation,
+                "evidence": {"manifest": "acceptance/programme/T.toml"},
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "{body}");
+    text(output(&body), "approval_id")
+}
+
+async fn close(
+    pg: &support::Pg,
+    running: &support::Running,
+    seeded: &support::Seeded,
+    project: &str,
+) -> (u16, Value) {
+    running
+        .invoke_gated(
+            pg,
+            seeded.tenant,
+            "projects.close",
+            TOKEN,
+            json!({"id": project}),
+            None,
+        )
+        .await
+}
+
+async fn project_status(running: &support::Running, project: &str) -> String {
+    let (status, body) = running
+        .invoke(
+            "projects.get",
+            TOKEN,
+            json!({"id": project}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{body}");
+    text(&output(&body)["project"], "status")
+}
+
+/// v1-tr2-1 — the defect: a paused tranche froze its projects and `projects.close` refused them
+/// `closure_tranche_not_authorised` forever. After the gate-approved resume the same close
+/// passes; `projects.close`'s accepted states are unchanged.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_compliant_project_closes_in_a_resumed_tranche() {
+    let (pg, running, seeded) = running_fixture().await;
+    let delegation = support::delegation_ref(&running, TOKEN).await;
+    let project = programme_project(&pg, &running, &seeded).await;
+    let tranche: Uuid =
+        sqlx::query_scalar("SELECT id FROM programme_tranche WHERE tenant_id = $1 AND number = 1")
+            .bind(seeded.tenant_id)
+            .fetch_one(&pg.super_pool)
+            .await
+            .expect("the programme's tranche");
+    // A pause, taken through the real review action.
+    pause_tranche(&pg, &running, &seeded, tranche, &delegation).await;
+
+    charter(&running, &project).await;
+    baseline(&running, &project).await;
+    let contract_id = contract(&pg, &running, &seeded, &project, &delegation).await;
+    let _review = review(&running, &project, &contract_id, &delegation).await;
+    let gate = close_request(&running, &project, &delegation).await;
+    approve(&running, &gate).await;
+
+    // The freeze the finding names: every close record is in place, and the paused tranche
+    // still refuses the close.
+    let (status, body) = close(&pg, &running, &seeded, &project).await;
+    assert_eq!(status, 409, "{body}");
+    assert_eq!(body["type"], "closure_tranche_not_authorised", "{body}");
+
+    // Resume under its approved gate, then the same close passes.
+    let resume_gate = gate_approval(
+        &pg,
+        seeded.tenant_id,
+        TRANCHE_RESUME_GATE,
+        "approved",
+        &tranche.to_string(),
+        Some(("approve", "human")),
+    )
+    .await;
+    let outcome = invoke(
+        &pg.runtime,
+        registry(),
+        seeded.tenant,
+        resume_request(seeded.user_id, tranche, resume_gate, None),
+    )
+    .await
+    .expect("resume the tranche");
+    assert_eq!(outcome.status, 200, "{}", outcome.body);
+    assert_eq!(
+        output(&outcome.body)["state"],
+        "in_review",
+        "{}",
+        outcome.body
+    );
+
+    let (status, body) = close(&pg, &running, &seeded, &project).await;
+    assert_eq!(status, 200, "{body}");
+    assert_eq!(
+        output(&body)["project"]["status"],
+        "closed",
+        "the compliant close closes after the resume: {body}"
+    );
+    assert_eq!(project_status(&running, &project).await, "closed");
 }

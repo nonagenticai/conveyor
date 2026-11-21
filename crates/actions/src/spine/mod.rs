@@ -194,6 +194,21 @@ fn spine_error(error: PlanStoreError, action: &str) -> ActionError {
         PlanStoreError::Illegal(PlanError::TrancheRetired) => {
             ActionError::new(409, "tranche_retired", "the tranche is retired")
         }
+        PlanStoreError::Illegal(PlanError::TrancheNotPaused { state }) => ActionError::new(
+            409,
+            "tranche_not_paused",
+            format!("the tranche is {state}; only a paused tranche can be resumed"),
+        ),
+        PlanStoreError::Illegal(PlanError::TrancheResumeApprovalMissing { approval_id }) => {
+            invalid(
+                "approval_id",
+                "approval_missing",
+                format!(
+                    "approval {approval_id} is not an approved tranche.resume gate naming this \
+                 tranche"
+                ),
+            )
+        }
         PlanStoreError::Illegal(PlanError::RetroFindingWithoutLesson(key)) => invalid(
             "cadence_id",
             "retro_finding_without_lesson",
@@ -2114,6 +2129,50 @@ async fn tranches_review(
     .await
     .map_err(|error| spine_error(error, ctx.action))?;
     emit_spine_event(&mut *tx, &ctx, "programme_tranche", record.id, "reviewed").await?;
+    Ok(HandlerOutput::ok(tranche_out(&record)).with_etag(etag_of(record.version)))
+}
+
+/// The gate a paused tranche's resume is authorised under.
+pub const TRANCHE_RESUME_GATE: &str = "tranche.resume";
+
+/// `tranches.resume` — move a paused tranche back to `in_review` under its approved gate.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct TrancheResumeIn {
+    /// The paused tranche.
+    pub tranche_id: Uuid,
+    /// The approved `tranche.resume` gate naming this tranche.
+    pub approval_id: Uuid,
+    /// Why the tranche resumes; recorded with the resume.
+    #[serde(default)]
+    pub note: Option<String>,
+}
+
+#[crate::action(
+    name = "tranches.resume",
+    version = 1,
+    kind = "internal",
+    scopes = ["portfolio:write"],
+    idempotent = false,
+    timeout_ms = 30000,
+    effect = "write",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn tranches_resume(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: TrancheResumeIn,
+) -> Result<HandlerOutput<TrancheOut>, ActionError> {
+    let record = store::spine::resume_tranche_tx(
+        &mut *tx,
+        ctx.tenant,
+        input.tranche_id,
+        input.approval_id,
+        input.note.as_deref(),
+    )
+    .await
+    .map_err(|error| spine_error(error, ctx.action))?;
+    emit_spine_event(&mut *tx, &ctx, "programme_tranche", record.id, "resumed").await?;
     Ok(HandlerOutput::ok(tranche_out(&record)).with_etag(etag_of(record.version)))
 }
 
