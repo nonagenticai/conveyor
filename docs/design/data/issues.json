@@ -26,7 +26,7 @@
       "title": "worker: claim a batch in one transaction and reap once",
       "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/536",
-      "updatedAt": "2026-11-21T18:38:35Z",
+      "updatedAt": "2026-11-21T18:39:21Z",
       "labels": [
         {
           "name": "unit",
@@ -41,9 +41,9 @@
     {
       "number": 528,
       "title": "design: the delivery view \u2014 portfolio and programme Gantt, project and work-package kanban",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/528",
-      "updatedAt": "2026-11-21T18:20:26Z",
+      "updatedAt": "2026-11-21T19:15:21Z",
       "labels": [
         {
           "name": "unit",
@@ -591,7 +591,7 @@
       "title": "conveyor-buildout \u2014 the SPEC_V2 programme",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/435",
-      "updatedAt": "2026-11-21T13:29:37Z",
+      "updatedAt": "2026-11-21T19:03:36Z",
       "labels": [
         {
           "name": "programme",
