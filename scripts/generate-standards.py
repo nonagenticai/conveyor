@@ -40,7 +40,6 @@ from typing import Any, Iterable
 ROOT = Path(__file__).resolve().parents[1]
 STANDARD_PATH = ROOT / "seed" / "output-standard.json"
 FINDINGS_PATH = ROOT / "docs" / "evidence" / "standards-findings.json"
-DATA_PATH = ROOT / "docs" / "design" / "data" / "standards.json"
 SCHEMA = "design-standards/v1"
 FINDINGS_SCHEMA = "conveyor-v1-findings/v1"
 PACKAGE_SCHEMA = "conveyor-rework/v1"
