@@ -402,8 +402,8 @@
       "path": "docs/evidence/conformance-gap-register.html",
       "source": "docs/evidence/conformance-gap-register.md",
       "section": "Evidence",
-      "sha256": "3149412b1401213852cdc582fb5a1f4eb1b7fcf62f9469ad103b950710e7792a",
-      "bytes": 22447,
+      "sha256": "0109c7d73ecac9110ec01b0d8258985ba26630e1b0d58b81da259fdb2080b2e5",
+      "bytes": 27503,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/conformance-gap-register.md"
     },
     {
@@ -486,6 +486,132 @@
       "sha256": "077ef6e3f3ba3fad737cc65bb288092663d58dc22e7d70192af9b5f21638afed",
       "bytes": 4420,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/produce-capture-2026-11-16.md"
+    },
+    {
+      "title": "DESIGN-PUBLISH — retrospective rework note (2026-11-21)",
+      "path": "docs/evidence/rework/DESIGN-PUBLISH.html",
+      "source": "docs/evidence/rework/DESIGN-PUBLISH.md",
+      "section": "Evidence",
+      "sha256": "2a9b17b3ca28bc518dde5f77d2b3cc8bbbcc03a7c2f4eb20188e3c990e15bc6f",
+      "bytes": 1073,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/DESIGN-PUBLISH.md"
+    },
+    {
+      "title": "DESIGN-PUBLISH — retrospective rework acts (2026-11-21)",
+      "path": "docs/evidence/rework/DESIGN-PUBLISH/acts.html",
+      "source": "docs/evidence/rework/DESIGN-PUBLISH/acts.md",
+      "section": "Evidence",
+      "sha256": "3901f1fc89b48ac444cb17656498001ac435dad98e2fedea6c3a350f1100789c",
+      "bytes": 210,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/DESIGN-PUBLISH/acts.md"
+    },
+    {
+      "title": "P0 — retrospective rework note (2026-11-21)",
+      "path": "docs/evidence/rework/P0.html",
+      "source": "docs/evidence/rework/P0.md",
+      "section": "Evidence",
+      "sha256": "476617563b448a2e336ca05b8b5b538c822b5728b59a593d954905ebde9d12f1",
+      "bytes": 1109,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/P0.md"
+    },
+    {
+      "title": "PLATFORM — retrospective rework note (2026-11-21)",
+      "path": "docs/evidence/rework/PLATFORM.html",
+      "source": "docs/evidence/rework/PLATFORM.md",
+      "section": "Evidence",
+      "sha256": "47950a2528083fd6740fd8bfd5708abbeb955196872b9f30e5ba4d317738cacc",
+      "bytes": 823,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/PLATFORM.md"
+    },
+    {
+      "title": "PLATFORM — the standing row's retrospective record (2026-11-21)",
+      "path": "docs/evidence/rework/PLATFORM/acts.html",
+      "source": "docs/evidence/rework/PLATFORM/acts.md",
+      "section": "Evidence",
+      "sha256": "28267762f6593a3b0c20aa110119a8962afa96f772b4ea934239742aab044fb8",
+      "bytes": 490,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/PLATFORM/acts.md"
+    },
+    {
+      "title": "S00 — retrospective rework note (2026-11-21)",
+      "path": "docs/evidence/rework/S00.html",
+      "source": "docs/evidence/rework/S00.md",
+      "section": "Evidence",
+      "sha256": "b2e42b232ae47a156c94a9f9f5ed40a4e8e18c0766b1175e3693236386dd85fd",
+      "bytes": 997,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/S00.md"
+    },
+    {
+      "title": "S00 — retrospective rework acts (2026-11-21)",
+      "path": "docs/evidence/rework/S00/acts.html",
+      "source": "docs/evidence/rework/S00/acts.md",
+      "section": "Evidence",
+      "sha256": "e4ae08cf7d42f5282ceaf52d2e4a0bdd8d815de1a2188129cd2076905c52cbc3",
+      "bytes": 199,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/S00/acts.md"
+    },
+    {
+      "title": "S01 — retrospective rework note (2026-11-21)",
+      "path": "docs/evidence/rework/S01.html",
+      "source": "docs/evidence/rework/S01.md",
+      "section": "Evidence",
+      "sha256": "5a838cba86e1850befbeb4b913b326f4a9ea061c2c6d6dfa82f5d46cc8529755",
+      "bytes": 1138,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/S01.md"
+    },
+    {
+      "title": "S01 — retrospective rework acts (2026-11-21)",
+      "path": "docs/evidence/rework/S01/acts.html",
+      "source": "docs/evidence/rework/S01/acts.md",
+      "section": "Evidence",
+      "sha256": "8200bd9968fc0dc72efde91e0a4e29c830076d9d22a0bdb93152ab7a17b09720",
+      "bytes": 199,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/S01/acts.md"
+    },
+    {
+      "title": "SPEC-V2 — retrospective rework note (2026-11-21)",
+      "path": "docs/evidence/rework/SPEC-V2.html",
+      "source": "docs/evidence/rework/SPEC-V2.md",
+      "section": "Evidence",
+      "sha256": "481aaadae294b845de126a4b9ed2a80c7391795ed589b3ad9e7c00aa85704a0b",
+      "bytes": 1059,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/SPEC-V2.md"
+    },
+    {
+      "title": "SPEC-V2 — retrospective rework acts (2026-11-21)",
+      "path": "docs/evidence/rework/SPEC-V2/acts.html",
+      "source": "docs/evidence/rework/SPEC-V2/acts.md",
+      "section": "Evidence",
+      "sha256": "bc63295d14d532022accf9bb60db5e9d293386414eecda2cc5a4dff2cd71293c",
+      "bytes": 203,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/SPEC-V2/acts.md"
+    },
+    {
+      "title": "T0 — retrospective rework note (2026-11-21)",
+      "path": "docs/evidence/rework/T0.html",
+      "source": "docs/evidence/rework/T0.md",
+      "section": "Evidence",
+      "sha256": "e74e602354ff0c787034201a7daeaa3b00d2f71049ed03a6d95f609d923864c4",
+      "bytes": 1140,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/T0.md"
+    },
+    {
+      "title": "T0 — retrospective rework acts (2026-11-21)",
+      "path": "docs/evidence/rework/T0/acts.html",
+      "source": "docs/evidence/rework/T0/acts.md",
+      "section": "Evidence",
+      "sha256": "806b7de781b9c8eed32518898d0654b03dcfbf3ac2b62ac7a03901639a51f29c",
+      "bytes": 198,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/T0/acts.md"
+    },
+    {
+      "title": "Tranche 0 / PI 0 — the SAFe cadence record (retrospective, 2026-11-21)",
+      "path": "docs/evidence/rework/tranche-0/acts.html",
+      "source": "docs/evidence/rework/tranche-0/acts.md",
+      "section": "Evidence",
+      "sha256": "060a93ce3c03261ced4870799608e65b5e3d6c4d3ab2d3a65c5346e24badf234",
+      "bytes": 826,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/tranche-0/acts.md"
     },
     {
       "title": "V1 → SPECV2 coverage",
