@@ -3588,6 +3588,195 @@
       "failure_scenario": "A sign-off or answer-key action granted agent reachability still yields a green S19 gate.",
       "acceptance": "The filter names machine_reachable exactly; a deliberately reachable eval action turns it red.",
       "owner_project": "S19"
+    },
+    {
+      "id": "v1-s05-1",
+      "area": "S05 board",
+      "standard": "SPEC",
+      "spec": "§8 S5",
+      "severity": "P1",
+      "title": "S05 property (c)'s five-page ≤500 ms proof does not exist",
+      "problem": "The gate's 1k-card load proof has two thresholds: first-page p95 ≤ 120 ms and 1,000 cards in five pages ≤ 500 ms. The only load artifact, tests/load/board.js, issues one limit=200 first-page request per iteration and asserts only p95 ≤ 120 ms and zero failures; neither the script nor the gate walks five cursor pages or measures 500 ms.",
+      "evidence": [
+        {
+          "path": "docs/plans/slices/S05-board.md",
+          "line": 171,
+          "quote": "| c | 1k load | `GET /api/boards/{id}/cards?limit=200` p95 **≤ 120 ms** at 20 rps; 1,000 cards in 5 pages **≤ 500 ms**, no sort in Rust |"
+        },
+        {
+          "path": "tests/load/board.js",
+          "line": 27,
+          "quote": "    http_req_duration: ['p(95)<=120'],"
+        },
+        {
+          "path": "tests/load/board.js",
+          "line": 38,
+          "quote": "  const response = http.get(`${BASE_URL}/api/boards/${BOARD_ID}/cards?limit=200`, {"
+        }
+      ],
+      "failure_scenario": "A cursor regression rescans or sorts the 1,000-card board per page: first-page p95 stays under 120 ms so the gate stays green, while paging all five pages exceeds 500 ms.",
+      "acceptance": "board.js walks five cursor pages on the 1,000-card board and asserts total ≤500 ms, failing when a page query sorts or rescans in Rust; the gate runs that scenario.",
+      "owner_project": "S05"
+    },
+    {
+      "id": "v1-t5-1",
+      "area": "T5 inception",
+      "standard": "SPEC",
+      "spec": "§12 T5",
+      "severity": "P1",
+      "title": "T5's lessons absence is false",
+      "problem": "The published inception analysis says no lesson table and no lessons.* action exist. Both exist at this head: migration 0056 creates the lesson table and actions.json serves lessons.list. The only true part is that the promotion mechanism is absent.",
+      "evidence": [
+        {
+          "path": "docs/plans/inception/T5/01-inception-analysis.md",
+          "line": 34,
+          "quote": "- **absent** — no `lesson` table and no `lessons.*` action; §7.6 promotion has no mechanism."
+        },
+        {
+          "path": "migrations/0056_cadence_tranche.sql",
+          "line": 10,
+          "quote": "CREATE TABLE lesson ("
+        },
+        {
+          "path": "docs/design/data/actions.json",
+          "line": 240,
+          "quote": "    \"lessons.list\","
+        }
+      ],
+      "failure_scenario": "Propagation is planned against an existing surface, inviting duplicate lesson work or a missed existing writer.",
+      "acceptance": "Rewrite the row from the tree; keep only the promotion mechanism absent.",
+      "owner_project": "T5",
+      "disposition": "correct-the-claim"
+    },
+    {
+      "id": "v1-t6-1",
+      "area": "T6 inception",
+      "standard": "SPEC",
+      "spec": "§12 T6",
+      "severity": "P1",
+      "title": "T6's tool/broker absence is false",
+      "problem": "The published inception analysis says T13's broker is absent (no tool table, no tools.* action) and uses that as the block. Both exist at this head: migration 0055 creates the tool platform tables and actions.json serves tools.call.",
+      "evidence": [
+        {
+          "path": "docs/plans/inception/T6/01-inception-analysis.md",
+          "line": 32,
+          "quote": "**Coding — `partial`.** V1's ad-hoc path is `crates/actions/src/integrations/external.rs:coding_jobs_create`; T13's broker is `absent` (no tool table, no `tools.*` action), so T6 is blocked. The pod substrate exists (`migrations/0041_runner.sql:runner_run`, `apps/server/src/runner_dispatch.rs:POLL_AFTER_SECS`) but runs capabilities, not CI."
+        },
+        {
+          "path": "migrations/0055_tool_platform.sql",
+          "line": 102,
+          "quote": "CREATE TABLE tool_binding ("
+        },
+        {
+          "path": "docs/design/data/actions.json",
+          "line": 465,
+          "quote": "    \"tools.call\","
+        }
+      ],
+      "failure_scenario": "T6 is sequenced as blocked on storage that exists, risking duplicate broker work and a wrong dependency statement.",
+      "acceptance": "Restate T13's actual remaining scope and re-justify the block.",
+      "owner_project": "T6",
+      "disposition": "correct-the-claim"
+    },
+    {
+      "id": "v1-t12-1",
+      "area": "T12 inception",
+      "standard": "SPEC",
+      "spec": "§12 T12",
+      "severity": "P1",
+      "title": "T12's absent rows and inventory citations are false",
+      "problem": "The published inception analysis records lessons and the architecture capability as absent and cites actions.json lines that do not hold. Both tables exist at this head (0056:lesson, 0054:architecture_artifact), and the cited action lines moved.",
+      "evidence": [
+        {
+          "path": "docs/plans/inception/T12/01-inception-analysis.md",
+          "line": 44,
+          "quote": "- Lessons (T8, #79): `name = \"lessons\\.` → 0 and `CREATE TABLE lesson` → 0."
+        },
+        {
+          "path": "migrations/0056_cadence_tranche.sql",
+          "line": 10,
+          "quote": "CREATE TABLE lesson ("
+        },
+        {
+          "path": "docs/plans/inception/T12/01-inception-analysis.md",
+          "line": 46,
+          "quote": "- Architecture capability (T9, #81): `CREATE TABLE architecture_artifact` → 0."
+        },
+        {
+          "path": "migrations/0054_architecture.sql",
+          "line": 144,
+          "quote": "CREATE TABLE architecture_artifact ("
+        }
+      ],
+      "failure_scenario": "The acceptance map classifies built stages as absent, so scenarios and seams are designed against nonexistent gaps.",
+      "acceptance": "Relabel every stage from the tree and re-cite actions.json.",
+      "owner_project": "T12",
+      "disposition": "correct-the-claim"
+    },
+    {
+      "id": "v1-t15-1",
+      "area": "T15 inception",
+      "standard": "SPEC",
+      "spec": "§12 T15",
+      "severity": "P1",
+      "title": "T15's tool-estate absence is false",
+      "problem": "The published inception analysis says no migration creates tool/toolkit/tool_binding/tool_call and no tools.* action resolves. Migration 0055 creates the tool platform and actions.json serves tools.call at this head; the block on T13 is overstated.",
+      "evidence": [
+        {
+          "path": "docs/plans/inception/T15/01-inception-analysis.md",
+          "line": 22,
+          "quote": "- **absent — the tool-estate aggregates.** SPEC_V2 §11.8 names `tool`, `toolkit`, `tool_binding` and `tool_call`; no migration creates them, and no `tools.*` action resolves in `docs/design/data/actions.json`. T13 (#76) owns them; T15 is blocked by T13 and T6."
+        },
+        {
+          "path": "migrations/0055_tool_platform.sql",
+          "line": 102,
+          "quote": "CREATE TABLE tool_binding ("
+        },
+        {
+          "path": "docs/design/data/actions.json",
+          "line": 465,
+          "quote": "    \"tools.call\","
+        }
+      ],
+      "failure_scenario": "T15 plans aggregates and migrations 0055 already provides, risking conflicting or duplicate tool tables.",
+      "acceptance": "Re-base on 0055 and correct the governed_asset kind set.",
+      "owner_project": "T15",
+      "disposition": "correct-the-claim"
+    },
+    {
+      "id": "v1-t17-1",
+      "area": "T17 inception",
+      "standard": "SPEC",
+      "spec": "§12 T17",
+      "severity": "P1",
+      "title": "T17's tool and ingest absences are false",
+      "problem": "The published inception analysis says there is no tool table and no procedures.ingest_sop, and its design adds a grep precondition that now returns 0055:102. Both surfaces exist at this head; the T16/T13 blockers are overstated.",
+      "evidence": [
+        {
+          "path": "docs/plans/inception/T17/01-inception-analysis.md",
+          "line": 63,
+          "quote": "`tool`/`toolkit`/`tool_binding`/`tool_call` table, so a tool request has no target and no ceiling to"
+        },
+        {
+          "path": "migrations/0055_tool_platform.sql",
+          "line": 102,
+          "quote": "CREATE TABLE tool_binding ("
+        },
+        {
+          "path": "docs/plans/inception/T17/01-inception-analysis.md",
+          "line": 61,
+          "quote": "`pko_release`/`pko_entity`/`pko_relation` in `migrations/` and no `procedures.ingest_sop|draft`"
+        },
+        {
+          "path": "docs/design/data/actions.json",
+          "line": 341,
+          "quote": "    \"procedures.ingest_sop\","
+        }
+      ],
+      "failure_scenario": "Scenario 3's precondition cannot hold, and the T16/T13 blockers overstate what is missing.",
+      "acceptance": "Re-base on 0055, delete the false precondition, and keep only the procedures.draft/PDDL/PKO gaps.",
+      "owner_project": "T17",
+      "disposition": "correct-the-claim"
     }
   ]
 }
