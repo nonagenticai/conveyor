@@ -546,6 +546,45 @@ window.installV2 = function (api, enterprise) {
   };
   const deliveryPack = () => window.CONVEYOR_DELIVERY || null;
 
+  // Signed in, the console assembles the same shape from its own reads. It has no snapshot, so
+  // each project's activity window is computed from the cards and runs it has actually loaded —
+  // the same rule the snapshot's `project_activity` uses (first and last observed event), never
+  // from the project row's `created_at`. The metering roll-up is not loaded on this page, so spend
+  // is honestly absent rather than zero.
+  function consoleActivity(projects, boards, cards, runs) {
+    const boardProject = new Map(boards.map((row) => [row.id, row.project_id]));
+    const events = new Map();
+    const add = (projectId, value) => {
+      const at = Date.parse(value || "");
+      if (!projectId || !Number.isFinite(at)) return;
+      const entry = events.get(projectId) || { start: at, end: at };
+      entry.start = Math.min(entry.start, at);
+      entry.end = Math.max(entry.end, at);
+      events.set(projectId, entry);
+    };
+    cards.forEach((card) => {
+      const projectId = boardProject.get(card.board_id);
+      add(projectId, card.created_at);
+      add(projectId, card.list_changed_at);
+      add(projectId, card.archived_at);
+    });
+    runs.forEach((run) => {
+      add(run.project_id, run.created_at);
+      add(run.project_id, run.started_at);
+      add(run.project_id, run.finished_at);
+    });
+    return list(projects)
+      .filter((project) => events.has(project.id))
+      .map((project) => {
+        const entry = events.get(project.id);
+        return {
+          project_id: project.id,
+          started_at: new Date(entry.start).toISOString(),
+          last_activity_at: new Date(entry.end).toISOString(),
+        };
+      });
+  }
+
   function deliveryData() {
     if (!consoleOn()) {
       return live
@@ -553,6 +592,8 @@ window.installV2 = function (api, enterprise) {
             programme: live.programme || {},
             work: live.work || {},
             measure: live.measure || {},
+            msp: live.msp || {},
+            architecture: live.architecture || {},
             generated_at: live.generated_at || null,
           }
         : null;
@@ -567,10 +608,31 @@ window.installV2 = function (api, enterprise) {
       cards.push(...list(entry.cards));
     });
     const programmes = cs.msp && cs.msp.programme ? [cs.msp.programme] : [];
+    const projects = consoleProjects();
+    const runs = list(cs.runs);
     return {
-      programme: { programme: programmes, projects: consoleProjects() },
-      work: { boards, lists, cards, runs: list(cs.runs) },
+      programme: { programme: programmes, projects },
+      work: {
+        boards,
+        lists,
+        cards,
+        runs,
+        project_activity: consoleActivity(projects, boards, cards, runs),
+      },
       measure: {},
+      msp: cs.msp
+        ? {
+            tranches: cs.msp.tranches,
+            benefit_profiles: cs.msp.benefits,
+            benefit_links: cs.msp.links,
+            benefit_transitions: cs.msp.transitions,
+            stakeholder_profiles: cs.msp.stakeholders,
+            cadences: cs.msp.cadences,
+            wbs_nodes: cs.msp.wbs,
+            tranche_reviews: cs.msp.reviews,
+          }
+        : {},
+      architecture: {},
       generated_at: null,
     };
   }
@@ -595,49 +657,60 @@ window.installV2 = function (api, enterprise) {
       Number.isFinite(clock) ? clock : Date.now(),
     );
     const selected = routeUuid(1);
-    const candidate = selected ? D.programmeRows(data.programme, index, selected) : null;
+    const candidate = selected ? D.programmeRows(data.programme, index, selected, data.msp) : null;
     // An id that names no programme falls back to the portfolio rather than an empty drill.
     const view = candidate && candidate.programme ? candidate : null;
-    const l1 = view ? null : D.portfolioRows(data.programme, index);
-    const rows = view ? view.projects : [...l1.programmes, ...l1.standalone];
-    const linked = rows.map((row) => ({
-      ...row,
-      href: row.kind === "programme" ? `#portfolio/${row.id}` : `#projects/${row.id}`,
-    }));
-    const spendRows = linked.filter((row) => Number.isFinite(row.tokens));
-    const inFlight = linked.filter((row) => row.state !== "completed").length;
-    const totalTokens = spendRows.reduce((sum, row) => sum + row.tokens, 0);
-    const totalUsd = spendRows.reduce((sum, row) => sum + (Number(row.usd) || 0), 0);
-    const totalUnpriced = linked.reduce((sum, row) => sum + Number(row.unpriced || 0), 0);
-    const spend = spendRows.length
-      ? `${D.tokens(totalTokens)} tokens · ${D.usd(totalUsd)}${
-          totalUnpriced
-            ? ` <small class="muted">(${totalUnpriced} unpriced call${totalUnpriced === 1 ? "" : "s"})</small>`
-            : ""
-        }`
+    const l1 = view ? null : D.portfolioRows(data.programme, index, Number.isFinite(clock) ? clock : Date.now(), data.msp);
+    const rows = view
+      ? D.trancheRows(view.projects, view.artefacts)
+      : [...l1.programmes, ...l1.standalone];
+    const linked = rows.map((row) =>
+      row.group
+        ? row
+        : {
+            ...row,
+            href: row.kind === "programme" ? `#portfolio/${row.id}` : `#projects/${row.id}`,
+          },
+    );
+    const totals = D.summary(linked);
+    const projects = [...index.values()];
+    const projectFlight = projects.filter((row) => row.state !== "completed").length;
+    const spend = totals.hasSpend
+      ? D.spendText(totals.tokens, totals.usd, totals.priced, totals.unpriced)
       : "no spend recorded";
-    const summary = `<div class="delivery-summary"><span><b>${linked.length}</b> ${
-      view ? "projects" : "rows"
-    }</span><span><b>${inFlight}</b> in flight</span><span><b>${
-      linked.length - inFlight
-    }</b> completed</span><span>${spend}</span></div>`;
+    // At L1 the portfolio's own rows are the programmes; the project counts behind them are what
+    // makes completed work legible at portfolio level (SPEC_V2 §5.1 keeps closed rows out of the
+    // in-flight portfolio; their bars live inside the programme at L2).
+    const summary = `<div class="delivery-summary">${
+      view
+        ? `<span><b>${totals.count}</b> ${totals.count === 1 ? "project" : "projects"}</span><span><b>${totals.inFlight}</b> in flight</span><span><b>${totals.completed}</b> completed</span>`
+        : `<span><b>${totals.count}</b> ${totals.count === 1 ? "row" : "rows"}</span><span><b>${
+            projects.length
+          }</b> ${projects.length === 1 ? "project" : "projects"}</span><span><b>${projectFlight}</b> in flight</span><span><b>${
+            projects.length - projectFlight
+          }</b> completed</span>`
+    }<span>${E(spend)}</span></div>`;
     const head = view
       ? `<div class="delivery-crumb"><a class="gantt-name" href="#portfolio">← Portfolio</a><span class="muted">${E(
           view.programme ? view.programme.name : "Programme",
-        )}</span></div>`
+        )}</span><a class="gantt-name" href="#programme">Programme definition →</a></div>${D.trancheRail(
+          view.artefacts,
+        )}${D.benefitRail(view.artefacts)}${D.governanceLine(view.artefacts, data.architecture)}`
       : "";
     const body = `${head}${summary}${D.gantt(linked, {
-      label: view ? "Project" : "Programme / initiative",
+      label: view ? "Project · MSP tranche" : "Programme / initiative",
       emptyNote: view
         ? "This programme has no project in the published snapshot."
-        : "No programme or standalone initiative is published yet.",
+        : "No in-flight programme or standalone initiative is published yet. Closed and archived work is history; a programme's own history is shown inside it.",
     })}${note(
-      "A bar runs from the first observed card or run activity to completion — or to the snapshot time while the work is in flight. A programme row rolls its projects up. Spend is the ledger's tokens and its derived cost; “unpriced” counts calls on a model with no commercial price.",
+      "A bar runs from the first observed card or run activity to completion — or to the snapshot time while the work is in flight. A project with no observed event says so rather than inventing a bar. A programme rolls its projects up and carries its MSP tranche and benefit state; at programme level the projects are grouped by tranche. Spend is the ledger's tokens and its derived cost; an unpriced model is counted and marked, never priced as free.",
     )}`;
     return panel(
       view ? "Delivery timeline · programme" : "Delivery timeline · portfolio",
       body,
-      view ? "" : `<span class="console-live">${rows.length} rows</span>`,
+      view
+        ? `<span class="console-live">${totals.count} ${totals.count === 1 ? "project" : "projects"}</span>`
+        : `<span class="console-live">${totals.count} ${totals.count === 1 ? "row" : "rows"}</span>`,
     );
   }
 
@@ -666,22 +739,29 @@ window.installV2 = function (api, enterprise) {
       ).length;
       return panel(
         `${project.key} · Work package`,
-        `${D.packageBoard(model)}${note(
-          "Children are the work package's own cards, shown across their board's lanes. Archived children stay visible as done.",
+        `${D.packageBoard(model, data.work)}${note(
+          "A work package is the card: its execution (runs, gate, Definition of Done, spend) is shown above its own board. The board below holds its child cards across their board's lanes; archived children stay visible as done. A card with no children is still a work package — its execution is the whole answer.",
         )}`,
-        B(`${done}/${model.children.length} done`, done === model.children.length && model.children.length ? "green" : ""),
+        model.parent
+          ? B(
+              model.children.length
+                ? `${done}/${model.children.length} children done`
+                : "no child cards",
+              model.children.length && done === model.children.length ? "green" : "",
+            )
+          : "",
       );
     }
     const model = D.boardModel(data.work, project.id, data.measure);
     const packages = model.roots.filter((card) => (model.children.get(card.id) || []).length > 0);
     return panel(
       `${project.key} · Board`,
-      `${D.kanban(model)}${note(
-        "A card with children is a work package; open it for the cards inside. Tokens and cost are the card's own ledger (the work package adds its children).",
+      `${D.projectGovernance(project, data.msp, data.architecture, data.work)}${D.kanban(model)}${note(
+        "A card with children is a work package; open any card for its own board and its execution (runs, gate, Definition of Done, spend). Tokens and cost are the card's own ledger; the work-package tile adds its children.",
       )}`,
-      model.board
+      model.boards.length
         ? B(
-            `${model.roots.length} cards · ${packages.length} packages`,
+            `${model.roots.length} cards · ${packages.length} packages · ${model.archived.length} archived`,
             model.roots.length ? "green" : "",
           )
         : "",
@@ -4539,11 +4619,14 @@ window.installV2 = function (api, enterprise) {
     // No programme row is a real answer for a tenant: render the absence. Naming a fixture
     // programme here is how the page would keep looking live after the row was gone.
     const programme = cs.programme || null;
-    // The operator console opens on the queue it acts from; the timeline is one tab away. The
-    // public page renders the same timeline above the queue, so the visual is not console-only.
+    // The operator console opens on the in-flight queue it acts from; a programme drill
+    // (`#portfolio/<id>`) is a timeline route and opens there directly. The public page renders
+    // the timeline above its queue, so the visual is not console-only.
     const tab = ["Timeline", "In flight", "Dependencies", "Programme"].includes(v.tab.portfolio)
       ? v.tab.portfolio
-      : "In flight";
+      : routeUuid(1)
+        ? "Timeline"
+        : "In flight";
     const statusTone = (status) =>
       status === "active"
         ? "green"

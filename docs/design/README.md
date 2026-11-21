@@ -78,19 +78,25 @@ requests** panel lists every draft whose author asked for publication
 `documents.publish` action as the register's, and there is no separate approve/deny action.
 
 **The delivery view** renders the work model at four levels from the same published snapshot.
-**Portfolio** draws a Gantt of every programme — rolled up from its projects — plus every
-standalone change initiative; a programme row opens the programme's own Gantt at
-`#portfolio/<programmeId>`. **Projects** draws the selected project's board as a kanban at
-`#projects/<projectId>`: the board's lanes are columns, a card with children is a work-package
-tile, and opening it (`#projects/<projectId>/wp/<cardId>`) shows the cards inside the work package
-across their lanes, archived children included as done. A bar is **actuals** — first observed card
-or run activity to completion, or to the snapshot time while in flight — and a planned window is a
-dashed track only when `project.meta.plan_start`/`meta.plan_end` are present; a row with no event
-says *no dated activity* rather than inventing one. Spend comes from `measure.inference`
-(`by_project`, `by_card`): tokens are stored, cost is derived from the pinned commercial price, and
-a model with no price is counted as *unpriced* — never shown as `$0`. The public boundary is the
-tenant portfolio: a programme-bound project is public; a standalone project is public only when it
-is `active`/`paused` and carries a board or a card.
+**Portfolio** draws a Gantt of every in-flight programme — rolled up from its projects, counting
+the completed ones — plus every standalone change initiative; a programme row opens the
+programme's own Gantt at `#portfolio/<programmeId>`. **Programme** groups its projects by their
+MSP tranche (`project.meta.tranche`) under the tranche rail, the benefit rail (measured vs
+unmeasured baseline, never "realised" without a transition) and the SAFe cadence / TOGAF
+capability line. **Projects** draws the selected project's board as a kanban at
+`#projects/<projectId>`, with the project's own record above it — TOGAF contract and compliance
+review, PMP WBS/register/baseline counts when present, and the declared artefacts. A card with
+children is a work-package tile, and opening any card (`#projects/<projectId>/wp/<cardId>`) shows
+its execution — runs and steps, gate, Definition of Done, spend — followed by its child cards
+across their lanes, archived children included as done. A childless card is still a work package:
+its execution is the whole answer and the page says there are no child cards. A bar is
+**actuals** — first observed card or run activity to completion, or to the snapshot time while in
+flight — and a planned window is a dashed track only when `project.meta.plan_start`/`meta.plan_end`
+are present; a row with no event says *no dated activity* rather than inventing one. Spend comes
+from `measure.inference` (`by_project`, `by_card`): tokens are stored, cost is derived from the
+pinned commercial price, and a row with no priced call renders `—*` with its unpriced count —
+never `$0`. The public boundary is the tenant portfolio: a programme-bound project is public; a
+standalone project is public only when it is `active`/`paused` and carries a board or a card.
 
 **The output standard** is data: `seed/output-standard.json` owns the vocabulary and the
 per-project-class due-now and at-closure sets. `scripts/build-programme-seed.py` writes
