@@ -7814,10 +7814,11 @@ window.installV2 = function (api, enterprise) {
   }
 
   /* ------------------------------------------------------------------ Metering */
-  // Live: the platform publishes `measure.inference` (calls, tokens and cache hits by caller and
-  // by model) and a `note` that fixes the cost rule. The screen renders those rows and nothing
-  // else; the design study's fixture roll-ups appear only where no snapshot is loaded, and a
-  // snapshot without the section says so rather than borrowing a fixture number (#458).
+  // Live: the platform publishes `measure.inference` (calls, tokens, derived cost, tool spend and
+  // cache hits by caller and by model) and a `note` that fixes the cost rule. The screen renders
+  // those rows and nothing else; the design study's fixture roll-ups appear only where no
+  // snapshot is loaded, and a snapshot without the section says so rather than borrowing a
+  // fixture number (#458).
   function metering() {
     if (live) return meteringLive();
     const tab = v.tab.metering || "Roll-ups";
@@ -7860,7 +7861,7 @@ window.installV2 = function (api, enterprise) {
     const num = (value) => Number(value || 0).toLocaleString("en-US");
     const stat = (label, value, sub) =>
       `<div class="metric"><div class="label"><i class="dot green"></i>${E(label)}</div><div class="metric-number">${E(value)}</div><small>${E(sub)}</small></div>`;
-    const head = `${heading("Metering", "The platform's own inference aggregates, read from the published snapshot: calls, tokens and cache hits by caller and by model.", `${route("Portfolio", "portfolio", "", "layers")}${route("Usage", "usage", "", "chart")}`, "MEASURE & IMPROVE")}${ribbon("Live measurement: <span class=\"mono\">measure.inference</span> from the published snapshot. Cost is a read-time derivation, never a stored figure.", true)}`;
+    const head = `${heading("Metering", "The platform's own inference aggregates, read from the published snapshot: calls, tokens, derived cost, tool spend and cache hits by caller and by model.", `${route("Portfolio", "portfolio", "", "layers")}${route("Usage", "usage", "", "chart")}`, "MEASURE & IMPROVE")}${ribbon("Live measurement: <span class=\"mono\">measure.inference</span> from the published snapshot. Cost is a read-time derivation, never a stored figure.", true)}`;
     const ruled = measure.note ? note(E(measure.note)) : "";
     if (!inference) {
       return `<div class="page enterprise">${head}${panel(
@@ -7869,6 +7870,14 @@ window.installV2 = function (api, enterprise) {
       )}${ruled}</div>`;
     }
     const totals = inference.totals || {};
+    // Money is a read-time derivation (D52), published as a rounded JSON number. Small spend is
+    // shown to four decimals so a real $0.00028 is not rendered as "$0.00"; an absent figure is
+    // "—", never a claimed zero.
+    const usd = (value) => {
+      const n = Number(value);
+      if (!Number.isFinite(n)) return "—";
+      return "$" + n.toFixed(n > 0 && n < 0.01 ? 4 : 2);
+    };
     const tiles = `<div class="metrics">${[
       stat("Calls", num(totals.calls), `${num(totals.non_ok_calls)} not ok`),
       stat(
@@ -7876,12 +7885,20 @@ window.installV2 = function (api, enterprise) {
         num(totals.total_tokens),
         `${num(totals.prompt_tokens)} prompt · ${num(totals.completion_tokens)} completion`,
       ),
+      stat("Cost", usd(totals.cost_usd), "derived at read time (D52)"),
+      stat("Tool spend", usd(totals.tool_cost_usd), "tool_call ledger"),
       stat(
         "Cache hits",
         num(totals.cache_hit_calls),
         `${num(totals.cache_miss_calls)} misses · ${num(totals.cache_write_calls)} writes · ${num(totals.unknown_cache_calls)} unknown`,
       ),
+      stat("Unpriced calls", num(totals.unpriced_calls), "no price row — counted, never free"),
     ].join("")}</div>`;
+    // The derivation is stated, not implied. A budget percentage needs a declared ceiling; the
+    // snapshot publishes no budget, so none is invented.
+    const derivation = note(
+      "Cost is derived at read time from <span class='mono'>inference_call</span> × <span class='mono'>commercial_price</span> — priced by token or by usage unit (D52) — and is never a stored column; tool spend is the <span class='mono'>tool_call</span> ledger's recorded cost. A call the price join cannot price is counted as unpriced, never rendered as free. Budget utilisation needs a declared ceiling: the snapshot publishes no budget, so no percentage is shown.",
+    );
     const callerRows = list(inference.by_caller).map(
       (row) =>
         `<tr><td>${E(row.caller_kind || "unknown")}</td><td>${num(row.calls)}</td><td>${num(row.total_tokens)}</td></tr>`,
@@ -7890,7 +7907,7 @@ window.installV2 = function (api, enterprise) {
       (row) =>
         `<tr><td>${E(row.model || "unknown")}</td><td>${num(row.calls)}</td><td>${num(row.prompt_tokens)}</td><td>${num(row.completion_tokens)}</td><td>${num(row.total_tokens)}</td><td>${num(row.cache_hits)}</td></tr>`,
     );
-    return `<div class="page enterprise">${head}${tiles}${panel(
+    return `<div class="page enterprise">${head}${tiles}${derivation}${panel(
       "By caller",
       callerRows.length
         ? table(["Caller", "Calls", "Tokens"], callerRows)
