@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>T6 — Development project · conveyor documents</title>
+    <link rel="icon" href="../../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/plans/inception/T6/00-project-brief.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="t6--development-project">T6 — Development project</h1>
+<ul>
+<li><strong>Status:</strong> draft</li>
+<li><strong>Version:</strong> 0.1</li>
+<li><strong>Author / date:</strong> conveyor programme session / 2026-11-21</li>
+<li><strong>Reviewer / review date:</strong> pending / pending</li>
+<li><strong>Related project:</strong> T6 — Development project · issue #80 · live document <code>01a1e008-8640-73e4-a90a-6bf8c250a0af</code></li>
+<li><strong>Rationale:</strong> state the inception basis for T6: a real feature lands on the conveyor and one dependency repo through the lane, PR, CI, review, merge, deploy and live-verify path, without the project changing its own gates.</li>
+<li><strong>Published document:</strong> <code>01a1e008-8640-73e4-a90a-6bf8c250a0af</code> — <code>published_at</code> null (draft; not published)</li>
+<li><strong>Contract:</strong> pending</li>
+<li><strong>ADM phase / plateau:</strong> A / PSA for the artefact (project row: G / capability)</li>
+<li><strong>Entries:</strong> outcome, boundary, reuse sources, inception units, dependencies, acceptance, capabilities, plan, risks, links.</li>
+<li><strong>Derivation / realization / reuse / dependency:</strong> derived from SPEC_V2 §6.4, §9.1 and §12 T6, and P0 §4; realized by #80; reuse sources below; depends on T5, T13 and P0.</li>
+<li><strong>Links:</strong> issue #80; <code>docs/SPEC_V2.md</code> §12; <code>01-inception-analysis.md</code>; <code>02-architecture-design.md</code>; <code>seed/programme.json</code>.</li>
+</ul>
+<h2 id="outcome">Outcome</h2>
+<p>The conveyor develops a real feature on itself and one dependency repo: lane, PR, CI, review, merge, deploy and live verify, with rollback tested.</p>
+<h2 id="boundary">Boundary</h2>
+<p>In scope: the development-project lifecycle — a lane branch and PR, the local gate, CI, an independent human review, the merge, the deploy read-back and a tested rollback — implemented with the existing GitHub client, PM and document surfaces.</p>
+<p>Out of scope: the V1 built slices (not re-opened); a second GitHub client or token path; the coding fleet's execution (T13 owns it); cluster writes (Flux and a human own the deploy); the CI workflow itself (reused unchanged).</p>
+<h2 id="reuse-sources">Reuse sources</h2>
+<ul>
+<li><code>crates/actions/src/integrations/github.rs</code> — the one token boundary and HTTP stack; extend its verbs, never add a second client.</li>
+<li><code>apps/server/src/publish.rs</code> — the PR-only, sealed-secret, one-branch, one-PR, never-merge discipline.</li>
+<li><code>migrations/0013_documents.sql</code> + <code>migrations/0040_organisation.sql</code> — the per-repository credential and the release binding.</li>
+<li><code>crates/actions/src/pm/mod.rs</code> — the PM actions that gate a development project, including the independent-approver rule.</li>
+<li><code>.github/workflows/ci-public.yml</code> — the repo-specific gate; the estate archetype owns the shared part.</li>
+<li>Estate capability, by role: the coding fleet — lane, commit and PR operations, at its effect ceiling.</li>
+<li>Upstream: the GitHub REST API and its merge queue — required checks and merge semantics.</li>
+</ul>
+<h2 id="inception-units">Inception units</h2>
+<ol type="1">
+<li><code>inception-analysis</code> — <code>01-inception-analysis.md</code>; live <code>01a1ee4e-ac03-76aa-8f54-81018d8bcd57</code> (draft, unpublished).</li>
+<li><code>architecture-design</code> — <code>02-architecture-design.md</code>; live <code>01a1ee4e-b842-70a4-81ee-aacce62c31a9</code> (draft, unpublished).</li>
+</ol>
+<p>Both are drafts; publication is the owner's acceptance act and the inception gate stays unmet until then.</p>
+<h2 id="dependencies">Dependencies</h2>
+<p>Typed, from <code>seed/programme.json</code>: blocked-by T5, T13 and P0; related #80 (delivery). T13's broker must exist before a coding job is bound; T5's kata lifecycle is the measurement path. The delivery unit is <code>status:blocked</code> because tranche 11 is not authorised.</p>
+<h2 id="acceptance">Acceptance</h2>
+<p>The project gate: a real feature lands through lane → PR → CI → review → merge → deploy → live verify; the project cannot change its own gates; rollback tested.</p>
+<p>Verify: exercised by #80's own scenarios (<code>crates/actions/tests/development_project.rs</code>, to create there); at inception the acceptance is the published analysis+design pair, not yet satisfied.</p>
+<h2 id="capabilities">Capabilities</h2>
+<p><code>development</code> — owns the delivery path; no other capability may fork the merge gate.</p>
+<h2 id="plan">Plan</h2>
+<p><code>docs/SPEC_V2.md</code> §6.4, §9.1 and §12 row T6. Delivery unit #80; no separate <code>S##</code> slice file. Target tranche <strong>11 — not authorised</strong>.</p>
+<h2 id="risks">Risks</h2>
+<ul>
+<li>A PR weakens its own gate → check: the merge refuses a protected-path change without a gate-change approval.</li>
+<li>Green CI is read as approval → check: merge refuses without an independent human approval naming the run evidence.</li>
+<li>The token leaks → check: secret scan and private-ref scan on the PR, plus the redaction test.</li>
+<li>A second coding path forms before T13 → check: the served-set lock test in <code>crates/actions/tests/registry.rs</code>.</li>
+<li>Deploy or rollback is asserted, not evidenced → check: closure refuses a release with an empty live check or an untested rollback.</li>
+<li>A skipped private-repo run counts as green → check: the gate requires a run URL on a public repository.</li>
+</ul>
+<h2 id="links">Links</h2>
+<ul>
+<li>Issue #80 (delivery; blocked).</li>
+<li><code>docs/SPEC_V2.md</code> §6.4, §9.1, §12 T6.</li>
+<li><code>seed/programme.json</code> row T6.</li>
+<li><code>01-inception-analysis.md</code>, <code>02-architecture-design.md</code>.</li>
+</ul>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/plans/inception/T6/00-project-brief.md</code> at build time.</span>
+      <a href="../../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>
