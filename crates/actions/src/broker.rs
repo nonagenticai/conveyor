@@ -305,6 +305,21 @@ pub(crate) async fn invoke_broker(
         check_spend_budget(&mut tx, ctx.tenant, &run).await?;
     }
 
+    // SPEC_V2 §11.3: a tool whose version declares `required` may not be called without a
+    // key. The refusal names the header before any destination is reached; `forbidden` is the
+    // absence of the same contract for a tool that must not be replayed.
+    if tool.idempotency == "required"
+        && request
+            .idempotency_key
+            .as_deref()
+            .is_none_or(|key| key.trim().is_empty())
+    {
+        return Err(invalid_tool_input(
+            format!("{} requires an Idempotency-Key", call.tool),
+            vec![field("idempotency_key", "required")],
+        ));
+    }
+
     let errors = validate_input(&tool.input_schema, &call.input);
     if !errors.is_empty() {
         return Err(invalid_tool_input(

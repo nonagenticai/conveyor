@@ -59,6 +59,8 @@ pub struct ResolvedTool {
     pub input_schema: Value,
     /// The effect class stored as data on the tool version.
     pub effect: String,
+    /// The tool version's idempotency policy (§11.3): required | optional | forbidden.
+    pub idempotency: String,
     /// The tool's own timeout, in seconds.
     pub timeout_secs: i32,
     /// The result fields the broker redacts.
@@ -121,8 +123,8 @@ pub async fn step_belongs_to_run(
 }
 
 const RESOLVED_COLUMNS: &str = "t.id AS tool_id, k.id AS toolkit_id, k.key AS toolkit_key, \
-     k.toolkit_version, t.key AS tool_key, t.input_schema, t.effect, t.timeout_secs, \
-     t.redact, t.handler_action, t.verify, b.effect_ceiling, b.credential_alias";
+     k.toolkit_version, t.key AS tool_key, t.input_schema, t.effect, t.idempotency, \
+     t.timeout_secs, t.redact, t.handler_action, t.verify, b.effect_ceiling, b.credential_alias";
 
 #[derive(sqlx::FromRow)]
 struct ResolvedRow {
@@ -133,6 +135,7 @@ struct ResolvedRow {
     tool_key: String,
     input_schema: Value,
     effect: String,
+    idempotency: String,
     timeout_secs: i32,
     redact: Value,
     handler_action: String,
@@ -151,6 +154,7 @@ impl From<ResolvedRow> for ResolvedTool {
             tool_key: row.tool_key,
             input_schema: row.input_schema,
             effect: row.effect,
+            idempotency: row.idempotency,
             timeout_secs: row.timeout_secs,
             redact: row.redact,
             handler_action: row.handler_action,
