@@ -386,22 +386,21 @@ above exactly.
 - Names are defined once: a table, action or event appears in exactly one slice's `adds_*` front-matter.
   Later slices reference, never redefine.
 
-## 16. Toolchain and local environment (measured 2026-11-07; **build host changed 2026-11-09**)
+## 16. Toolchain and local environment (measured 2026-11-07; **build host 2026-11-09; retired 2026-11-20**)
 
-- ⛔ **Rust builds and tests run on the build host the build host, never on this machine (2026-11-09).** `~/.local/bin/cargo`
-  and `~/.local/bin/rustc` are **shims that refuse inside any Cargo project** — the refusal is deliberate (the
-  workspace's `target/` reached 84 GiB on a 228 GiB volume). Do not work around it, and do not add a
-  machine-level `~/.cargo/config.toml`: cargo gives `config.toml` precedence over the repo's `Cargo.toml`.
-  Use **`rbuild -- <cargo args>`** (e.g. `rbuild -- test --locked`), **`rbuild --gate`** for the LANE gate
-  (`fmt --all -- --check && clippy && test --locked`), and `--detach` + `--status` / `--logs` for long runs.
-  A one-off may override with `ALLOW_LOCAL_RUST=1`. Full detail: memory `remote-rust-builds-on-the build host.md`.
-- ⛔ **Therefore every gate block in this set is wrong as written, and a slice that copies one blindly runs
-  nothing.** Two mechanical translations: (a) a line that invokes `cargo` becomes `rbuild -- <args>`, and the
-  opening `source ~/.cargo/env` is removed (the shim is what must be reached, not bypassed); (b) `rbuild` never
-  runs on this machine, so **it cannot satisfy a local `psql` assertion in the same script**. A gate may still
-  probe the local compose database, but then it must say how that database was migrated — the binary's `migrate`
-  is itself a cargo command and therefore a build-host action. ⚠️ The clean form is to assert in **Rust**
-  (a `#[test]` that queries) rather than in `psql`, so the assertion travels to the host with the tests.
+- ⛔ **The build host and `rbuild` were retired on 2026-11-20 (owner ruling).** No Rust compile runs on local
+  hardware — not on m1, mini1 or this machine. The **compile/lint verdict comes from the repository's
+  GitHub-hosted `preflight.yml`** (`gh workflow run preflight.yml --ref <branch>`, then the PR's CI is the final
+  gate), which is free, parallel and queue-free. Local gates stay sub-second and non-compiling: the git hooks run
+  `cargo fmt --all -- --check`, `cargo metadata --locked --format-version 1` and actionlint on changed workflows.
+  On m4 only, `~/.claude/scripts/cargo-guard.py` remains the sanctioned route for **interactive** work (a local
+  binary, a debugger, a bisect) — never as a gate. A bare compiling `cargo` command is denied by
+  `block-local-cargo.py` on every host. The rbuild mechanics formerly described here (the m1 host cluster, the
+  per-repo `mkdir` lock, `ALLOW_LOCAL_RUST`) are historical and no longer apply.
+- ⛔ **A gate block that invokes `cargo test` is run by CI, not by hand on a laptop.** Locally the same command is
+  `~/.claude/scripts/cargo-guard.py test ...` for interactive feedback only; the authoritative run is
+  `preflight.yml`. An assertion that needs the database must be a Rust `#[test]` (the harness provisions its own
+  Postgres 18), never a `psql` probe in the gate script.
 - **Toolchains:** the host runs **rustup 1.99.0**, the exact pin in `rust-toolchain.toml`; `rbuild` invokes the
   rustup path by absolute path and refuses on a version mismatch. Homebrew's rust (1.99.1) ignores
   `rust-toolchain.toml` and must never be what compiles this tree. `wasm32-unknown-unknown`, `trunk` and
