@@ -283,8 +283,9 @@ fn not_modified_with(headers: &HeaderMap, etag: &str, cache: &'static str) -> Op
 /// Serve one published attachment's bytes.
 ///
 /// The row is read in the public tenant and must be an active attachment whose parent is active
-/// and publishable. The bytes are re-hashed and compared with the row's hash — a mismatch is
-/// corruption, never a file. Only PNG and JPEG are `inline`; PDF, SVG, JSON, CSV and text are
+/// and published (`published_at IS NOT NULL`). The bytes are re-hashed and compared with the
+/// row's hash — a mismatch is corruption, never a file. Only PNG and JPEG are `inline`; PDF, SVG,
+/// JSON, CSV and text are
 /// downloads, with `nosniff` and a sandbox CSP on every response.
 async fn answer_attachment(
     state: &AppState,

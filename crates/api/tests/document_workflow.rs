@@ -25,6 +25,18 @@ fn etag(value: &Value) -> String {
     )
 }
 
+/// The ids the public output window currently serves, read through the store's own reader.
+async fn published_output_ids(pg: &support::Pg, tenant: TenantId) -> Vec<String> {
+    let mut tx = conveyor_store::begin_scoped(&pg.owner, tenant)
+        .await
+        .expect("scoped tx");
+    let rows = conveyor_store::document::list_published_outputs_tx(&mut *tx, tenant)
+        .await
+        .expect("published outputs");
+    tx.rollback().await.expect("rollback");
+    rows.into_iter().map(|row| row.id.to_string()).collect()
+}
+
 /// Add a `member` principal to an existing tenant.
 async fn add_member(pg: &support::Pg, tenant: TenantId, login: &str, name: &str) {
     let subject = format!("dev:{login}");
@@ -542,6 +554,10 @@ async fn update_publish_and_unpublish_move_published_at() {
         .as_str()
         .expect("published_at")
         .to_owned();
+    assert!(
+        published_output_ids(&pg, seeded.tenant).await.contains(&id),
+        "the public output window serves the published row"
+    );
     let v2 = etag(output(&published));
 
     // An edit that does not touch publication keeps the publication instant and the row public.
@@ -561,6 +577,10 @@ async fn update_publish_and_unpublish_move_published_at() {
         output(&edited)["published_at"].as_str(),
         Some(first.as_str())
     );
+    assert!(
+        published_output_ids(&pg, seeded.tenant).await.contains(&id),
+        "an edit that does not touch publication keeps the row public"
+    );
     let v3 = etag(output(&edited));
 
     // The other direction clears the window.
@@ -577,6 +597,10 @@ async fn update_publish_and_unpublish_move_published_at() {
     assert_eq!(status, 200, "{unpublished}");
     assert_eq!(output(&unpublished)["publishable"], false);
     assert_eq!(output(&unpublished)["published_at"], Value::Null);
+    assert!(
+        !published_output_ids(&pg, seeded.tenant).await.contains(&id),
+        "the public output window drops the unpublished row"
+    );
 
     // The audit stream crosses the boundary with the state, exactly as documents.publish does.
     let published_events: i64 = sqlx::query_scalar(

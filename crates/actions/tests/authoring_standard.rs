@@ -291,6 +291,23 @@ async fn a_publishable_but_unpublished_row_is_checked_on_transition() {
         "a refused publish never makes the row public"
     );
 
+    // The update path crosses the same boundary and must run the same gate.
+    let (status, refused) = running
+        .invoke(
+            "documents.update",
+            "dev:alice",
+            json!({"id": id, "publishable": true}),
+            Some(&version),
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 409, "{refused}");
+    assert!(
+        refused.to_string().contains("output_incomplete"),
+        "{refused}"
+    );
+
     // A complete row in the same legacy state publishes and is stamped.
     let (status, created) = compose(
         &running,
