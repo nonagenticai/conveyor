@@ -77,6 +77,60 @@ requests** panel lists every draft whose author asked for publication
 (`documents.list {publish_requested: true}`) and publishes it in place; publication is the same
 `documents.publish` action as the register's, and there is no separate approve/deny action.
 
+**The delivery view** renders the work model at four levels from the same published snapshot.
+**Portfolio** draws a Gantt of every in-flight programme — rolled up from its projects, counting
+the completed ones — plus every standalone change initiative; a programme row opens the
+programme's own Gantt at `#portfolio/<programmeId>`. **Programme** groups its projects by their
+MSP tranche (`project.meta.tranche`) under the tranche rail, the benefit rail (measured vs
+unmeasured baseline, never "realised" without a transition) and the SAFe cadence / TOGAF
+capability line. **Projects** draws the selected project's board as a kanban at
+`#projects/<projectId>`, with the project's own record above it — TOGAF contract and compliance
+review, PMP WBS/register/baseline counts when present, and the declared artefacts. A card with
+children is a work-package tile, and opening any card (`#projects/<projectId>/wp/<cardId>`) shows
+its execution — runs and steps, gate, Definition of Done, spend — followed by its child cards
+across their lanes, archived children included as done. A childless card is still a work package:
+its execution is the whole answer and the page says there are no child cards. A bar is
+**actuals** — first observed card or run activity to completion, or to the snapshot time while in
+flight — and a planned window is a dashed track only when `project.meta.plan_start`/`meta.plan_end`
+are present; a row with no event says *no dated activity* rather than inventing one. Spend comes
+from `measure.inference` (`by_project`, `by_card`): tokens are stored, cost is derived from the
+pinned commercial price, and a row with no priced call renders `—*` with its unpriced count —
+never `$0`. The public boundary is the tenant portfolio: a programme-bound project is public; a
+standalone project is public only when it is `active`/`paused` and carries a board or a card.
+
+**The standards record is generated, not asserted.** The snapshot computes
+`msp.benefit_realisation` (baseline → transition → post measurement), `msp.dependencies` (the
+declared graph, typed only where the declaration is typed), `msp.tranche_reconciliation`
+(declared state vs the authorising review and the projects actually delivering) and
+`architecture.phase_progress` (A–H per project with its contract and compliance review). An
+artefact that needs a decision nobody made is published as absent, never invented. The L1
+scorecard and the L2 rails read those sections plus the `rework` register, whose denominators
+come from `governance/conformance.json`, not from the view.
+
+**The MSP, TOGAF, SAFe and PMP artefacts are generated documents.** `seed/output-standard.json`
+v3 names, for every artefact, its standard, level, subject kind (programme, project, tranche,
+benefit, capability, phase or card), mandatory flag, SPEC clause and the source each required
+section derives from. `scripts/generate-standards.py` resolves every applicable artefact against
+the snapshot, its published documents and the gap register, then publishes `data/standards.json`,
+one page per artefact under `docs/standards/` and an index. A section with a named row or document
+renders that record and its provenance; a section without one is *absent*, with the fixed line
+naming the record that would satisfy it. The four levels link to the artefacts they own, and an
+absent or partial artefact names the rework package that must close. The generator never calls a
+model: the artefact record is derived, not drafted.
+
+**The rework loop.** `scripts/audit-programme-conformance.py --rework-out` turns the gap register,
+the checked-in v1 audit (`docs/evidence/v1-conformance-findings.json`) and the artefact findings
+(`docs/evidence/standards-findings.json`) into
+`data/rework.json`: one package per remediation unit, carrying its standard, SPEC clause,
+artefact, severity, evidence and Definition of Done. A data gap and an artefact that describe the
+same missing record are one package, never two: the generator suppresses the artefact finding when
+the gap register already owns the defect. The publish carries the register into `snapshot.js`
+(`conveyor snapshot --conformance`); `scripts/materialise-rework.py` turns an open package into a
+card with `meta.rework_key` on the owning project's board. Materialisation is a separate,
+explicit, dry-run-first command with its own writable URL — the publish transaction stays
+read-only. A card already applied is never duplicated; a package no longer in the register is
+reported cleared, never auto-archived.
+
 **The output standard** is data: `seed/output-standard.json` owns the vocabulary and the
 per-project-class due-now and at-closure sets. `scripts/build-programme-seed.py` writes
 `meta.expected_outputs` / `meta.closure_outputs` into the seed and `data/output-standard.js` for
@@ -87,8 +141,11 @@ output is **next**. The **Programme queue** on Portfolio is the programme-level 
 project's published vs expected outputs, its closure count and its next output, ordered by tranche.
 The public project page shows published counts only; the public queue never counts a private draft.
 
-**The authoring standard** (`seed/output-standard.json` version 2) carries a `templates` map: one
-entry per category with its required headings, optional headings and a Markdown skeleton. The
+**The authoring standard** (`seed/output-standard.json` version 3) carries a `templates` map: one
+entry per category with its required headings, optional headings, a Markdown skeleton and the
+standards metadata the generator reads. The category list is the shared vocabulary: the output
+classes' due-now/closure sets use it, and the standards catalogue marks the artefact categories it
+generates as `on_demand` so a new artefact category never widens a project's output checklist. The
 console seeds the skeleton on compose and shows a live **completeness** panel; **Preview** renders a
 saved draft with the same `conveyor_render::markdown` the public page uses. The server blocks the
 transition to public — through `documents.publish` or a `documents.compose`/`documents.update` that
@@ -212,6 +269,12 @@ for the public tenant. The committed `data/outputs.js` placeholder is only the c
 fallback; the live route shadows it. `conveyor snapshot --outputs-dir` writes the same bytes for
 an offline pack, and a parity test holds the two to one renderer. A body is rendered with raw HTML
 neutralised, so the public page has no executable markup from an author.
+
+**Standards artefacts** are the third generated document source: `scripts/generate-standards.py
+--html-out docs/standards` writes one page per MSP/TOGAF/SAFe/PMP artefact plus an index, each
+carrying its status, resolved sources, gate state and the package that must close. The publish
+runs them in pass 2, after the strict conformance gate, so a failed publish never writes a
+standards page; `check-standards.cjs` and `check-data.cjs` gate the published record.
 
 ## Feedback
 

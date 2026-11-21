@@ -1,31 +1,31 @@
 {
   "actions_invoked": [
     {
-      "line": 1366,
+      "line": 1695,
       "name": "approvals.decide"
     },
     {
-      "line": 6125,
+      "line": 6470,
       "name": "approvals.decide"
     },
     {
-      "line": 5912,
+      "line": 6257,
       "name": "approvals.list"
     },
     {
-      "line": 5913,
+      "line": 6258,
       "name": "approvals.list"
     },
     {
-      "line": 6085,
+      "line": 6430,
       "name": "approvals.request"
     },
     {
-      "line": 1266,
+      "line": 1595,
       "name": "architecture.artifacts_entries"
     },
     {
-      "line": 1267,
+      "line": 1596,
       "name": "architecture.artifacts_links"
     },
     {
@@ -53,111 +53,111 @@
       "name": "cards.release"
     },
     {
-      "line": 2600,
+      "line": 2932,
       "name": "documents.compose"
     },
     {
-      "line": 3087,
+      "line": 3419,
       "name": "documents.compose"
     },
     {
-      "line": 2882,
+      "line": 3214,
       "name": "documents.create"
     },
     {
-      "line": 2953,
+      "line": 3285,
       "name": "documents.delete"
     },
     {
-      "line": 2899,
+      "line": 3231,
       "name": "documents.download"
     },
     {
-      "line": 2932,
+      "line": 3264,
       "name": "documents.download"
     },
     {
-      "line": 2622,
+      "line": 2954,
       "name": "documents.get"
     },
     {
-      "line": 2917,
+      "line": 3249,
       "name": "documents.get"
     },
     {
-      "line": 1125,
+      "line": 1454,
       "name": "documents.list"
     },
     {
-      "line": 1148,
+      "line": 1477,
       "name": "documents.list"
     },
     {
-      "line": 1175,
+      "line": 1504,
       "name": "documents.list"
     },
     {
-      "line": 2850,
+      "line": 3182,
       "name": "documents.list"
     },
     {
-      "line": 2984,
+      "line": 3316,
       "name": "documents.preview"
     },
     {
-      "line": 3030,
+      "line": 3362,
       "name": "documents.return"
     },
     {
-      "line": 2771,
+      "line": 3103,
       "name": "documents.revision_get"
     },
     {
-      "line": 2732,
+      "line": 3064,
       "name": "documents.revision_list"
     },
     {
-      "line": 5993,
+      "line": 6338,
       "name": "procedures.ingest_process"
     },
     {
-      "line": 5985,
+      "line": 6330,
       "name": "procedures.ingest_rdf"
     },
     {
-      "line": 6001,
+      "line": 6346,
       "name": "procedures.ingest_sop"
     },
     {
-      "line": 5869,
+      "line": 6214,
       "name": "procedures.list"
     },
     {
-      "line": 6198,
+      "line": 6543,
       "name": "procedures.publish"
     },
     {
-      "line": 6046,
+      "line": 6391,
       "name": "procedures.review_source"
     },
     {
-      "line": 6028,
+      "line": 6373,
       "name": "procedures.validate"
     },
     {
-      "line": 1389,
+      "line": 1718,
       "name": "process_runs.start"
     },
     {
-      "line": 5892,
+      "line": 6237,
       "name": "processes.get"
     },
     {
-      "line": 5872,
+      "line": 6217,
       "name": "processes.list"
     },
     {
-      "line": 6200,
+      "line": 6545,
       "name": "processes.publish"
     },
     {
@@ -165,31 +165,31 @@
       "name": "programmes.list"
     },
     {
-      "line": 682,
+      "line": 1011,
       "name": "programmes.list"
     },
     {
-      "line": 750,
+      "line": 1079,
       "name": "programmes.refresh"
     },
     {
-      "line": 2531,
+      "line": 2863,
       "name": "projects.close"
     },
     {
-      "line": 2392,
+      "line": 2724,
       "name": "projects.create"
     },
     {
-      "line": 1339,
+      "line": 1668,
       "name": "runs.cancel"
     },
     {
-      "line": 1317,
+      "line": 1646,
       "name": "runs.get"
     },
     {
-      "line": 1294,
+      "line": 1623,
       "name": "runs.list"
     }
   ],
@@ -334,7 +334,7 @@
       "tranche": 0,
       "units": {
         "blocked": 1,
-        "claimed": 3,
+        "claimed": 2,
         "numbers": [
           17,
           22,
@@ -358,10 +358,9 @@
           426,
           435,
           476,
-          526,
-          528
+          526
         ],
-        "open": 14,
+        "open": 13,
         "ready": 5,
         "unknown": 0
       }

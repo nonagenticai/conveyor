@@ -262,10 +262,38 @@ const shot = (name) => path.join(process.env.CONVEYOR_QA_OUTPUT || os.tmpdir(), 
       (await content()).includes("No published snapshot is loaded"),
       "the public portfolio is honest without a snapshot",
     );
+    // #528: a timeline is never drawn from a fixture — no snapshot, no `.gantt`, and no MSP/TOGAF
+    // artefact rail either (the rails read the snapshot's rows, never the study fixtures).
+    check(
+      (await page.locator("#main .gantt").count()) === 0,
+      "the portfolio timeline does not render without a snapshot",
+    );
+    check(
+      (await page.locator("#main .delivery-rail").count()) === 0,
+      "no tranche or benefit rail renders without a snapshot",
+    );
+    check(
+      (await page.locator("#main .delivery-scorecard").count()) === 0,
+      "no standards scorecard renders without a snapshot",
+    );
+    // The generated standards record is published beside the snapshot; without the snapshot the
+    // view has no subject to attach it to and says nothing, rather than listing artefacts.
+    check(
+      (await page.locator("#main .std-rail").count()) === 0,
+      "no standards artefact rail renders without a snapshot",
+    );
     await nav("projects");
     check(
       (await content()).includes("No published snapshot is loaded"),
       "the public projects page is honest without a snapshot",
+    );
+    check(
+      (await page.locator("#main .kanban").count()) === 0,
+      "the project board does not render without a snapshot",
+    );
+    check(
+      (await page.locator("#main .kanban-rework").count()) === 0,
+      "the rework lane does not render without a snapshot",
     );
     await nav("plan");
     check(
