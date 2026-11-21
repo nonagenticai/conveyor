@@ -148,29 +148,16 @@
       "allowed": false,
       "check": "product_findings",
       "description": "no open P0 product finding remains for the project",
-      "detail": "1 open P0 package(s): v1-p75-1:T11",
+      "detail": "no open P0 package for this project",
       "id": "T11-product",
       "kind": "snapshot",
-      "result": "fail",
-      "severity": "P0"
-    },
-    {
-      "allowed": false,
-      "check": null,
-      "description": "a closed project must not carry a red acceptance manifest",
-      "detail": "the project is closed while its manifest is red",
-      "id": "closed-on-red",
-      "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     }
   ],
-  "failures": [
-    "T11-product (P0): 1 open P0 package(s): v1-p75-1:T11",
-    "closed-on-red (P0): the project is closed on a red manifest"
-  ],
+  "failures": [],
   "gate": "The A\u2013D artefacts, the delivery contract, the closure review and the declared outputs exist; the project re-closes through the one gate.",
-  "generated_at": "2026-11-21T20:57:13.033777+00:00",
+  "generated_at": "2026-11-21T22:39:37.556175+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T11.toml",
   "name": "Metrics, metering and maturity",
@@ -181,6 +168,6 @@
     "git_sha": "2a1ff31df668b8fc456dcac2640f29f44cafcf16",
     "path": "retained-snapshot/2a1ff31df668b8fc456dcac2640f29f44cafcf16"
   },
-  "verdict": "red",
+  "verdict": "green",
   "warnings": []
 }
