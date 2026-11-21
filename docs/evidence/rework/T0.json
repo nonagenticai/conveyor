@@ -117,7 +117,7 @@
   ],
   "failures": [],
   "gate": "The A\u2013D set is approved; the project re-closes through the one gate.",
-  "generated_at": "2026-11-21T18:19:15.437977+00:00",
+  "generated_at": "2026-11-21T18:25:34.407619+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T0.toml",
   "name": "Model and contracts",

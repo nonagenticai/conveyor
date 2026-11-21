@@ -117,7 +117,7 @@
   ],
   "failures": [],
   "gate": "The closure review exists and every declared closure output is published; the project re-closes through the one gate.",
-  "generated_at": "2026-11-21T18:19:12.847297+00:00",
+  "generated_at": "2026-11-21T18:25:31.803003+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/SPEC-V2.toml",
   "name": "SPEC V2 \u2014 the organisational operating model",

@@ -4,7 +4,7 @@
   "accepted_at": "2026-11-21T18:20:00Z",
   "accepted_by": "conveyor-e2e",
   "approver": "conveyor-approver",
-  "acceptance_ref": "01a1ff54-eb5c-7581-91c6-4e1ea2cde8c7",
+  "acceptance_ref": "01a1ff5b-6fbb-7515-aa01-ece3e2d93a0f",
   "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
   "snapshot": {
     "git_sha": "d7293f96082dbf2f99f53bb8fd765834dddf6858",
@@ -1779,5 +1779,6 @@
       "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     }
   ],
-  "correction_ref": "01a1ff58-b79a-70dc-a429-20345ad49214"
+  "correction_ref": "01a1ff58-b79a-70dc-a429-20345ad49214",
+  "superseded_acceptance_ref": "01a1ff54-eb5c-7581-91c6-4e1ea2cde8c7"
 }
