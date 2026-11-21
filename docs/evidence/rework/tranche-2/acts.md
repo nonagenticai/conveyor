@@ -99,3 +99,9 @@ decided by `conveyor-approver` on the requester's gate; the tranche is `paused`,
 | PI plan | `documents.compose` + `documents.publish` | `01a20051-62d5-76b5-9c22-a298c4c31c46` |
 | PI objectives | `documents.compose` + `documents.publish` | `01a20052-1d3e-71e4-9490-f531e1592cc0` |
 | tranche review | `tranches.review` (approval `01a2006b-6ffb-7a76-95ad-73cbae124869`) | `01a2006c-8f71-733d-a562-103c144882ce` |
+| tranche review (corrected) | `documents.update` + `documents.publish` | `01a2006a-8db7-764e-9b21-fee33e71e815` v2, republished 2026-11-21T23:25:57Z |
+
+The review document was corrected at v2 after the lane head moved: `v1-t2-3` (fcb96fa9) and
+`v1-t2-6` (1167127d) are resolved with their tests, and `v1-s12-1` (8f1e5770) is resolved locally
+with its Playwright run pending the PR's web CI. The pause decision is unchanged: it rests on the red
+manifests and the refused closures, neither of which those resolutions touch.
