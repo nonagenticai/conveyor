@@ -549,8 +549,16 @@ async fn the_rework_register_rides_the_conformance_flag() {
         "a snapshot without --conformance writes no rework.json"
     );
     let plain_js = std::fs::read_to_string(dir.join("snapshot.js")).expect("snapshot.js");
+    // Structural, not a substring: the test tenant's own slug is "rework".
+    let plain_document: Value = serde_json::from_str(
+        plain_js
+            .strip_prefix("window.CONVEYOR_SNAPSHOT = ")
+            .and_then(|rest| rest.strip_suffix(";\n"))
+            .expect("the wrapper's shape"),
+    )
+    .expect("snapshot json");
     assert!(
-        !plain_js.contains("\"rework\""),
+        plain_document.get("rework").is_none(),
         "a snapshot without --conformance carries no rework key"
     );
     let plain_manifest: Value = serde_json::from_str(
