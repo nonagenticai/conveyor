@@ -15,7 +15,9 @@
 
 use std::collections::HashSet;
 
+use chrono::{DateTime, Utc};
 use conveyor_domain::TenantId;
+use conveyor_domain::inference::UsageGroup;
 use serde_json::{Value, json};
 use sqlx::PgConnection;
 
@@ -28,7 +30,8 @@ pub struct SnapshotData {
     pub organisation: Value,
     /// `config.json` data: catalogue, capabilities, agents, procedures, prompts, schedules.
     pub config: Value,
-    /// `work.json` data: boards, lists, cards, runs, approvals, comments, people.
+    /// `work.json` data: boards, lists, cards, runs, approvals, comments, people, and each
+    /// project's observed activity window.
     pub work: Value,
     /// `msp.json` data: the programme-definition records — benefit profiles, the benefits map,
     /// realization, stakeholder profiles, tranches and their reviews, baselines, cadence, WBS,
@@ -44,7 +47,8 @@ pub struct SnapshotData {
     /// timestamps and the runbook/postmortem links. Never the triage narrative or the evidence:
     /// those are the operator's text, not the programme's public record.
     pub ops: Value,
-    /// `measure.json` data: inference aggregates (no prompt or response bodies exist).
+    /// `measure.json` data: inference aggregates (no prompt or response bodies exist), including
+    /// the per-project and per-card spend the delivery view reads.
     pub measure: Value,
     /// Secret **metadata** — never a value, never a key id.
     pub secrets: Value,
@@ -72,7 +76,9 @@ pub async fn snapshot_tx(
              SELECT p.id, p.key, p.name, p.description, p.status, p.programme_id,
                     p.project_type_code, p.phase_code, p.repo_url, p.meta, p.version,
                     p.created_at, p.updated_at,
-                    (SELECT count(*) FROM board b WHERE b.project_id = p.id) AS board_count
+                    (SELECT count(*) FROM board b WHERE b.project_id = p.id) AS board_count,
+                    (SELECT count(*) FROM board b JOIN card c ON c.board_id = b.id
+                      WHERE b.project_id = p.id) AS card_count
                FROM project p WHERE p.tenant_id = $1
          ) t",
         tenant_id,
@@ -144,6 +150,41 @@ pub async fn snapshot_tx(
                     input_hash, output_hash, duration_ms, procedure_version, started_at,
                     finished_at, created_at, updated_at
                FROM run_step WHERE tenant_id = $1
+         ) t",
+        tenant_id,
+    )
+    .await?;
+    // Each project's observed activity window — the actuals a Gantt bar is drawn from. Built from
+    // events (cards and runs) rather than from `project.created_at`, so a bar starts when work
+    // started, not when the row was inserted. A project with no event is absent here; the page
+    // then shows its row without a bar rather than inventing one.
+    let mut project_activity = rows(
+        &mut *conn,
+        "SELECT COALESCE(jsonb_agg(to_jsonb(t) ORDER BY t.project_id), '[]'::jsonb) FROM (
+             SELECT project_id, min(ts) AS started_at, max(ts) AS last_activity_at
+               FROM (
+                    SELECT b.project_id, c.created_at AS ts
+                      FROM board b JOIN card c ON c.board_id = b.id AND c.tenant_id = b.tenant_id
+                     WHERE b.tenant_id = $1
+                    UNION ALL
+                    SELECT b.project_id, c.list_changed_at
+                      FROM board b JOIN card c ON c.board_id = b.id AND c.tenant_id = b.tenant_id
+                     WHERE b.tenant_id = $1
+                    UNION ALL
+                    SELECT b.project_id, c.archived_at
+                      FROM board b JOIN card c ON c.board_id = b.id AND c.tenant_id = b.tenant_id
+                     WHERE b.tenant_id = $1 AND c.archived_at IS NOT NULL
+                    UNION ALL
+                    SELECT r.project_id, r.created_at FROM run r WHERE r.tenant_id = $1
+                    UNION ALL
+                    SELECT r.project_id, r.started_at
+                      FROM run r WHERE r.tenant_id = $1 AND r.started_at IS NOT NULL
+                    UNION ALL
+                    SELECT r.project_id, r.finished_at
+                      FROM run r WHERE r.tenant_id = $1 AND r.finished_at IS NOT NULL
+               ) events
+              WHERE project_id IS NOT NULL
+              GROUP BY project_id
          ) t",
         tenant_id,
     )
@@ -640,15 +681,26 @@ pub async fn snapshot_tx(
         tenant_id,
     )
     .await?;
-    // ⛔ The public pack is the PROGRAMME's view (SPEC_V2 §5; the console already filters its
-    // project list the same way — `docs/design/v2.js:4193`). A project outside a programme is a
-    // session fixture — a proof, a scratch reproduction — never programme work, and its boards,
-    // runs, comments and approvals are not the programme's story. Filtered here, at the one
-    // snapshot every public surface reads, so a future fixture cannot become a distractor just
-    // by being created. The authenticated API (`GET /api/projects`) is unaffected: an operator
-    // still sees every row.
-    let bound_projects = ids_where(&projects, "programme_id", |field| !field.is_null());
+    // ⛔ The public pack is the TENANT'S PORTFOLIO (SPEC_V2 §5.1; owner brief 2026-11-21). Every
+    // programme-bound project is public. A standalone project is public only when it is a real
+    // change initiative: status `active`/`paused` AND it carries a board or a card. A standalone
+    // draft, or a bare row with neither, is a session fixture — a proof, a scratch reproduction —
+    // never portfolio work, and its boards, runs, comments and approvals are not the programme's
+    // story. Filtered here, at the one snapshot every public surface reads, so a future fixture
+    // cannot become a public row just by being created. The authenticated API
+    // (`GET /api/projects`) is unaffected: an operator still sees every row.
+    let bound_projects = ids_where_row(&projects, |row| {
+        let programme_bound = row.get("programme_id").is_some_and(|id| !id.is_null());
+        let status = row
+            .get("status")
+            .and_then(Value::as_str)
+            .unwrap_or_default();
+        let in_flight = matches!(status, "active" | "paused");
+        let has_work = |key: &str| row.get(key).and_then(Value::as_i64).unwrap_or(0) > 0;
+        programme_bound || (in_flight && (has_work("board_count") || has_work("card_count")))
+    });
     retain_ids(&mut projects, "id", &bound_projects);
+    retain_ids(&mut project_activity, "project_id", &bound_projects);
     retain_ids(&mut boards, "project_id", &bound_projects);
     let bound_boards = ids_where(&boards, "id", |_| true);
     retain_ids(&mut lists, "board_id", &bound_boards);
@@ -705,6 +757,51 @@ pub async fn snapshot_tx(
     let bound_reviews = ids_where(&architecture_reviews, "id", |_| true);
     retain_ids(&mut architecture_waivers, "review_id", &bound_reviews);
 
+    // Per-project and per-card spend for the delivery view. The metering aggregate is the one
+    // priced read (tokens stored, money derived); it is built AFTER the boundary so a filtered
+    // project's calls cannot reach a public file. `cost_usd` stays a decimal string, exactly as
+    // the usage report renders it — an unpriced model contributes zero and is counted in
+    // `unpriced_calls`, never shown as free.
+    let since = DateTime::<Utc>::UNIX_EPOCH;
+    let until = Utc::now();
+    let usage_entry = |row: conveyor_domain::inference::UsageRow| {
+        json!({
+            "calls": row.calls,
+            "prompt_tokens": row.prompt_tokens,
+            "completion_tokens": row.completion_tokens,
+            "total_tokens": row.prompt_tokens + row.completion_tokens,
+            "cost_usd": row.cost_usd,
+            "priced_calls": row.priced_calls,
+            "unpriced_calls": row.unpriced_calls,
+        })
+    };
+    let usage_by_project: Vec<Value> =
+        crate::inference::usage_rows_tx(&mut *conn, tenant, UsageGroup::Project, since, until)
+            .await
+            .map_err(inference_error)?
+            .into_iter()
+            .filter(|row| bound_projects.contains(&row.bucket))
+            .map(|row| {
+                let project_id = row.bucket.clone();
+                let mut value = usage_entry(row);
+                value["project_id"] = Value::String(project_id);
+                value
+            })
+            .collect();
+    let usage_by_card: Vec<Value> =
+        crate::inference::usage_by_card_tx(&mut *conn, tenant, since, until)
+            .await
+            .map_err(inference_error)?
+            .into_iter()
+            .filter(|row| bound_cards.contains(&row.bucket))
+            .map(|row| {
+                let card_id = row.bucket.clone();
+                let mut value = usage_entry(row);
+                value["card_id"] = Value::String(card_id);
+                value
+            })
+            .collect();
+
     Ok(SnapshotData {
         programme: json!({"programme": programme, "projects": projects}),
         // T0: the organisation spine (§4) — industries, the placed departments, the job
@@ -729,6 +826,7 @@ pub async fn snapshot_tx(
             "card_types": card_types,
             "runs": runs,
             "run_steps": run_steps,
+            "project_activity": project_activity,
             "approvals": approvals,
             "approval_decisions": approval_decisions,
             "comments": comments,
@@ -768,13 +866,24 @@ pub async fn snapshot_tx(
             "inference": {
                 "totals": inference_totals,
                 "by_model": inference_by_model,
-                "by_caller": inference_by_caller
+                "by_caller": inference_by_caller,
+                "by_project": usage_by_project,
+                "by_card": usage_by_card
             },
             "note": "tokens are stored; cost is derived by the app from the pinned price version \
-                     and is not stored in the ledger"
+                     and is not stored in the ledger. `totals`, `by_model` and `by_caller` are \
+                     tenant-wide; `by_project` and `by_card` cover only the rows this snapshot \
+                     publishes, so the differences are the boundary, not a missing call"
         }),
         secrets: json!({"secrets": secrets}),
     })
+}
+
+/// The inference store's only error is a database refusal; the snapshot's error type is the same.
+fn inference_error(error: crate::inference::InferenceStoreError) -> sqlx::Error {
+    match error {
+        crate::inference::InferenceStoreError::Database(inner) => inner,
+    }
 }
 
 /// The `id`s of the rows whose `key` field satisfies `keep`.
@@ -788,6 +897,20 @@ fn ids_where(value: &Value, key: &str, keep: impl Fn(&Value) -> bool) -> HashSet
         .map(|rows| {
             rows.iter()
                 .filter(|row| row.get(key).is_some_and(&keep))
+                .filter_map(|row| row.get("id").and_then(Value::as_str).map(str::to_owned))
+                .collect()
+        })
+        .unwrap_or_default()
+}
+
+/// The `id`s of the rows that satisfy a whole-row predicate — for a boundary that reads more than
+/// one field (`programme_id`, `status`, `board_count`, `card_count`).
+fn ids_where_row(value: &Value, keep: impl Fn(&Value) -> bool) -> HashSet<String> {
+    value
+        .as_array()
+        .map(|rows| {
+            rows.iter()
+                .filter(|row| keep(row))
                 .filter_map(|row| row.get("id").and_then(Value::as_str).map(str::to_owned))
                 .collect()
         })

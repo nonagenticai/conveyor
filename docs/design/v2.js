@@ -520,6 +520,174 @@ window.installV2 = function (api, enterprise) {
     );
   const snapshotProjects = () => orderedProjects(list(((live || {}).programme || {}).projects));
 
+  /* ------------------------------------------------------------ delivery view */
+  // The four levels read one published source: `programme` (programmes + projects), `work`
+  // (boards/lists/cards/runs/project_activity) and `measure` (per-project/per-card spend). Signed
+  // in, the same shape is assembled from the console's own reads; a project whose board has not
+  // loaded yet simply has no bar. A route id is user input, so it is validated as a UUID and used
+  // only as a lookup key — never as a function name.
+  const DELIVERY_UUID =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  const routeSegments = () =>
+    String(location.hash || "")
+      .replace(/^#/, "")
+      .split("/")
+      .filter(Boolean)
+      .map((part) => {
+        try {
+          return decodeURIComponent(part);
+        } catch {
+          return part;
+        }
+      });
+  const routeUuid = (index) => {
+    const part = routeSegments()[index];
+    return part && DELIVERY_UUID.test(part) ? part : null;
+  };
+  const deliveryPack = () => window.CONVEYOR_DELIVERY || null;
+
+  function deliveryData() {
+    if (!consoleOn()) {
+      return live
+        ? {
+            programme: live.programme || {},
+            work: live.work || {},
+            measure: live.measure || {},
+            generated_at: live.generated_at || null,
+          }
+        : null;
+    }
+    const boards = [];
+    const lists = [];
+    const cards = [];
+    Object.values(cs.byProject || {}).forEach((entry) => {
+      if (!entry || entry.error) return;
+      if (entry.board) boards.push(entry.board);
+      lists.push(...list(entry.lists));
+      cards.push(...list(entry.cards));
+    });
+    const programmes = cs.msp && cs.msp.programme ? [cs.msp.programme] : [];
+    return {
+      programme: { programme: programmes, projects: consoleProjects() },
+      work: { boards, lists, cards, runs: list(cs.runs) },
+      measure: {},
+      generated_at: null,
+    };
+  }
+
+  function deliveryTimeline() {
+    const D = deliveryPack();
+    const data = deliveryData();
+    if (!D || !data) {
+      return panel(
+        "Delivery timeline",
+        note(
+          "No published snapshot is loaded. The timeline reads the programme's own rows; sign in at the app origin to operate the live programme.",
+          "bad",
+        ),
+      );
+    }
+    const clock = Date.parse(data.generated_at || "");
+    const index = D.activityIndex(
+      data.programme,
+      data.work,
+      data.measure,
+      Number.isFinite(clock) ? clock : Date.now(),
+    );
+    const selected = routeUuid(1);
+    const candidate = selected ? D.programmeRows(data.programme, index, selected) : null;
+    // An id that names no programme falls back to the portfolio rather than an empty drill.
+    const view = candidate && candidate.programme ? candidate : null;
+    const l1 = view ? null : D.portfolioRows(data.programme, index);
+    const rows = view ? view.projects : [...l1.programmes, ...l1.standalone];
+    const linked = rows.map((row) => ({
+      ...row,
+      href: row.kind === "programme" ? `#portfolio/${row.id}` : `#projects/${row.id}`,
+    }));
+    const spendRows = linked.filter((row) => Number.isFinite(row.tokens));
+    const inFlight = linked.filter((row) => row.state !== "completed").length;
+    const totalTokens = spendRows.reduce((sum, row) => sum + row.tokens, 0);
+    const totalUsd = spendRows.reduce((sum, row) => sum + (Number(row.usd) || 0), 0);
+    const totalUnpriced = linked.reduce((sum, row) => sum + Number(row.unpriced || 0), 0);
+    const spend = spendRows.length
+      ? `${D.tokens(totalTokens)} tokens · ${D.usd(totalUsd)}${
+          totalUnpriced
+            ? ` <small class="muted">(${totalUnpriced} unpriced call${totalUnpriced === 1 ? "" : "s"})</small>`
+            : ""
+        }`
+      : "no spend recorded";
+    const summary = `<div class="delivery-summary"><span><b>${linked.length}</b> ${
+      view ? "projects" : "rows"
+    }</span><span><b>${inFlight}</b> in flight</span><span><b>${
+      linked.length - inFlight
+    }</b> completed</span><span>${spend}</span></div>`;
+    const head = view
+      ? `<div class="delivery-crumb"><a class="gantt-name" href="#portfolio">← Portfolio</a><span class="muted">${E(
+          view.programme ? view.programme.name : "Programme",
+        )}</span></div>`
+      : "";
+    const body = `${head}${summary}${D.gantt(linked, {
+      label: view ? "Project" : "Programme / initiative",
+      emptyNote: view
+        ? "This programme has no project in the published snapshot."
+        : "No programme or standalone initiative is published yet.",
+    })}${note(
+      "A bar runs from the first observed card or run activity to completion — or to the snapshot time while the work is in flight. A programme row rolls its projects up. Spend is the ledger's tokens and its derived cost; “unpriced” counts calls on a model with no commercial price.",
+    )}`;
+    return panel(
+      view ? "Delivery timeline · programme" : "Delivery timeline · portfolio",
+      body,
+      view ? "" : `<span class="console-live">${rows.length} rows</span>`,
+    );
+  }
+
+  function deliveryBoard(project) {
+    const D = deliveryPack();
+    const data = deliveryData();
+    if (!D || !data) {
+      return panel(
+        "Board",
+        note(
+          "No published snapshot is loaded. The board reads the programme's own cards; sign in at the app origin to operate it.",
+          "bad",
+        ),
+      );
+    }
+    if (consoleOn() && !cs.byProject[project.id]) {
+      return panel("Board", note("Loading this project's board…"));
+    }
+    const cardId = routeUuid(3);
+    const projectId = routeUuid(1);
+    const isPackage = cardId && projectId === project.id && routeSegments()[2] === "wp";
+    if (isPackage) {
+      const model = D.packageModel(data.work, project.id, cardId, data.measure);
+      const done = model.children.filter(
+        (card) => card.archived_at || ["done", "archive"].includes(model.laneKinds.get(card.list_id)),
+      ).length;
+      return panel(
+        `${project.key} · Work package`,
+        `${D.packageBoard(model)}${note(
+          "Children are the work package's own cards, shown across their board's lanes. Archived children stay visible as done.",
+        )}`,
+        B(`${done}/${model.children.length} done`, done === model.children.length && model.children.length ? "green" : ""),
+      );
+    }
+    const model = D.boardModel(data.work, project.id, data.measure);
+    const packages = model.roots.filter((card) => (model.children.get(card.id) || []).length > 0);
+    return panel(
+      `${project.key} · Board`,
+      `${D.kanban(model)}${note(
+        "A card with children is a work package; open it for the cards inside. Tokens and cost are the card's own ledger (the work package adds its children).",
+      )}`,
+      model.board
+        ? B(
+            `${model.roots.length} cards · ${packages.length} packages`,
+            model.roots.length ? "green" : "",
+          )
+        : "",
+    );
+  }
+
   /* ------------------------------------------------------- MSP programme store */
   // One source, fail closed (#305 Part C): signed in the programme definition, plan spine,
   // dependencies and in-flight rows come from the actions; signed out they come from the
@@ -1427,7 +1595,10 @@ window.installV2 = function (api, enterprise) {
           : note("No published snapshot is loaded. Sign in to operate the live programme."),
       )}</div>`;
     }
+    // A deep link (`#projects/<id>` or `#projects/<id>/wp/<cardId>`) wins over the in-page picker;
+    // an id that is not in this tenant falls back rather than rendering an empty page.
     const current =
+      rows.find((row) => row.id === routeUuid(1)) ||
       rows.find((row) => row.id === v.projectPage) ||
       rows.find((row) => /^S/.test(String(row.key))) ||
       rows[0];
@@ -1435,14 +1606,14 @@ window.installV2 = function (api, enterprise) {
       consoleLoadProject(current.id);
       consoleLoadOutputs(current.id);
     }
-    const select = signed
-      ? `<label class="e-select">Project <select data-v2-input="project-page">${rows
-          .map(
-            (row) =>
-              `<option value="${E(row.id)}" ${row.id === current.id ? "selected" : ""}>${E(row.key)} · ${E(row.name)}</option>`,
-          )
-          .join("")}</select></label>`
-      : "";
+    // Signed out, the picker selects a project from the published snapshot; the move handler is
+    // the same one the console uses, and its loaders already no-op without a session.
+    const select = `<label class="e-select">Project <select data-v2-input="project-page">${rows
+      .map(
+        (row) =>
+          `<option value="${E(row.id)}" ${row.id === current.id ? "selected" : ""}>${E(row.key)} · ${E(row.name)}</option>`,
+      )
+      .join("")}</select></label>`;
     const plan = planHref((current.meta || {}).plan);
     const repo = current.repo_url
       ? `<a class="e-project-link" href="${E(current.repo_url)}" target="_blank" rel="noopener">repository ↗</a>`
@@ -1866,7 +2037,7 @@ window.installV2 = function (api, enterprise) {
           }</td></tr>`,
       )
       .join("");
-    return `${publicExpectedOutputPanel(current)}${panel(
+    return `${deliveryBoard(current)}${publicExpectedOutputPanel(current)}${panel(
       "All projects",
       `${table(["Project", "Status", "Track", "Plan"], [body])}${note(
         "This is the published snapshot, read-only. Sign in at the app origin to edit a project, compose outputs or publish.",
@@ -2214,7 +2385,7 @@ window.installV2 = function (api, enterprise) {
     const failure = cs.lastError
       ? note(`<strong>Last refusal</strong> · ${E(consoleError(cs.lastError))}`, "bad")
       : "";
-    return `${failure}${coveragePanel(project)}${board}${cardPanel}${issuePanel}${expectedOutputPanel(project)}${projectOutputs(project)}${projectFeedback(project)}`;
+    return `${failure}${deliveryBoard(project)}${coveragePanel(project)}${board}${cardPanel}${issuePanel}${expectedOutputPanel(project)}${projectOutputs(project)}${projectFeedback(project)}`;
   }
 
   function projectOutputs(project) {
@@ -4368,7 +4539,11 @@ window.installV2 = function (api, enterprise) {
     // No programme row is a real answer for a tenant: render the absence. Naming a fixture
     // programme here is how the page would keep looking live after the row was gone.
     const programme = cs.programme || null;
-    const tab = v.tab.portfolio || "In flight";
+    // The operator console opens on the queue it acts from; the timeline is one tab away. The
+    // public page renders the same timeline above the queue, so the visual is not console-only.
+    const tab = ["Timeline", "In flight", "Dependencies", "Programme"].includes(v.tab.portfolio)
+      ? v.tab.portfolio
+      : "In flight";
     const statusTone = (status) =>
       status === "active"
         ? "green"
@@ -4454,7 +4629,9 @@ window.installV2 = function (api, enterprise) {
     const programmeRow = msp().programme || programme || {};
     const inFlightRows = list(msp().inFlight);
     const content =
-      tab === "Dependencies"
+      tab === "Timeline"
+        ? deliveryTimeline()
+        : tab === "Dependencies"
         ? panel(
             "Project dependencies",
             `${deps.length
@@ -4495,7 +4672,11 @@ window.installV2 = function (api, enterprise) {
     )}${consoleRibbon(
       "Projects, units, boards and dependency edges read from the platform's own rows.",
       true,
-    )}${summary}${tabs(["In flight", "Dependencies", "Programme"], tab, "portfolio")}${content}</div>`;
+    )}${summary}${tabs(
+      ["Timeline", "In flight", "Dependencies", "Programme"],
+      tab,
+      "portfolio",
+    )}${content}</div>`;
   }
 
   function portfolio() {
@@ -4526,7 +4707,7 @@ window.installV2 = function (api, enterprise) {
     )}${consoleRibbon(
       `The published programme snapshot${programme.name ? ` · ${E(programme.name)}` : ""}: ${rows.length} projects and their dependency edges.`,
       rows.length > 0,
-    )}${programmeQueue(rows, list((window.CONVEYOR_OUTPUTS || {}).outputs))}${panel(
+    )}${deliveryTimeline()}${programmeQueue(rows, list((window.CONVEYOR_OUTPUTS || {}).outputs))}${panel(
       "Projects",
       `<p class="muted">Every row is a programme project in the published snapshot, with the GitHub units linked on it.</p>${table(
         ["Project", "Tranche", "Status", "Measured", "Units"],

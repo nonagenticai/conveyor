@@ -10,11 +10,13 @@
 //! docs/design/data/programme.json     the buildout programme, its projects and issue links
 //! docs/design/data/organisation.json  industry → department → job → release → binding
 //! docs/design/data/config.json        catalogue, capabilities, agents, procedures, prompts
-//! docs/design/data/work.json          boards, lists, cards, runs, approvals, comments, people
+//! docs/design/data/work.json          boards, lists, cards, runs, approvals, comments, people,
+//!                                     and each project's observed activity window
 //! docs/design/data/msp.json           benefits, realization, stakeholders, tranches, baselines,
 //!                                     cadence, WBS, registers and typed dependencies
 //! docs/design/data/artefacts.json     governed assets and document metadata
-//! docs/design/data/measure.json       inference aggregates (tokens, cache classes)
+//! docs/design/data/measure.json       inference aggregates (tokens, cache classes) and the
+//!                                     per-project/per-card spend the delivery view reads
 //! docs/design/data/secrets.json       secret METADATA only — never a value
 //! docs/design/data/evidence.json      the evidence/plan documents and their hashes
 //! docs/design/data/feedback.json      the external feedback issues
