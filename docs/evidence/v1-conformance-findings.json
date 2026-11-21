@@ -208,7 +208,7 @@
         },
         {
           "path": "crates/store/src/inference.rs",
-          "line": 329,
+          "line": 340,
           "quote": "                        ELSE NULL"
         }
       ],
@@ -238,7 +238,12 @@
       ],
       "failure_scenario": "The UI cannot show department, programme, job or run-level spend; those panels render empty.",
       "acceptance": "The report returns each required level from the ledgers; a test rolls one call up to the job_binding primary department and its programme.",
-      "owner_project": "T11"
+      "owner_project": "T11",
+      "resolved_by": {
+        "commit": "1e0a27922441fcbb66cbd715712169e33defc3bb",
+        "test": "crates/store/tests/inference_.rs",
+        "evidence": "inference_ 6/6: UsageGroup now carries department, programme, job, run and step (11 dimensions); usage_rows_tx joins run->binding->primary department, run->project->programme, the binding, the run and the step with unattributed fallbacks, and the_extended_dimensions_group_by_programme_job_and_run proves the rows."
+      }
     },
     {
       "id": "v1-p75-4",
@@ -309,7 +314,7 @@
         },
         {
           "path": "crates/store/src/inference.rs",
-          "line": 266,
+          "line": 269,
           "quote": "/// `unpriced_calls` — \"no price\" must not render as \"free\"."
         }
       ],
@@ -1072,7 +1077,12 @@
       ],
       "failure_scenario": "A programme manager cannot see the consolidated project dossier (which projects, their state and evidence) inside the programme; it exists only as scattered tranche rows.",
       "acceptance": "A Dossier tab lists the programme's projects with tranche, state, baseline and evidence read from the programme/project store.",
-      "owner_project": "PLATFORM"
+      "owner_project": "PLATFORM",
+      "resolved_by": {
+        "commit": "4d68301aa5bb95d0028852ad5c884bbe7e33d9ea",
+        "test": "docs/design/scripts/check-v2.cjs",
+        "evidence": "The programme definition gains a Dossier tab over real project rows: status, tranche joined from meta.tranche, project-filtered baseline (or 'not in this read'), and real document/evidence counts; the public path reads live.programme.projects. check-v2 281 checks; check-console 0 unhandled page errors."
+      }
     },
     {
       "id": "v1-p105-5",
@@ -1085,7 +1095,7 @@
       "evidence": [
         {
           "path": "docs/design/v2.js",
-          "line": 7735,
+          "line": 7817,
           "quote": "  // Live: the platform publishes `measure.inference` (calls, tokens and cache hits by caller and"
         }
       ],
@@ -1689,17 +1699,17 @@
       "evidence": [
         {
           "path": "crates/actions/src/ladder/mod.rs",
-          "line": 784,
+          "line": 831,
           "quote": "    let confidence = input.confidence.ok_or_else(|| {"
         },
         {
           "path": "crates/actions/src/ladder/mod.rs",
-          "line": 836,
+          "line": 883,
           "quote": "            rung: Rung::Laya,"
         },
         {
           "path": "crates/actions/src/ladder/mod.rs",
-          "line": 854,
+          "line": 901,
           "quote": "            latency_ms: input.latency_ms,"
         }
       ],
@@ -1718,12 +1728,12 @@
       "evidence": [
         {
           "path": "crates/actions/src/ladder/mod.rs",
-          "line": 740,
+          "line": 787,
           "quote": "    pub options: Option<Vec<OptionIn>>,"
         },
         {
           "path": "crates/actions/src/ladder/mod.rs",
-          "line": 825,
+          "line": 872,
           "quote": "        .or_else(|| (!options.is_empty()).then_some(1));"
         },
         {
@@ -1752,7 +1762,7 @@
         },
         {
           "path": "crates/actions/src/ladder/mod.rs",
-          "line": 794,
+          "line": 841,
           "quote": "    let outcome = evaluate(confidence, threshold, action)"
         },
         {
@@ -3985,7 +3995,12 @@
       ],
       "failure_scenario": "A service principal holding governance:write calls refinements.publish with threshold_override=0.0. The next ladder.evaluate on a 0.01-confidence answer is accepted, and no approval row or human decision exists to explain the threshold change; the decision rows pin refinement_version=2 as if the change had been governed.",
       "acceptance": "refinements.publish routes through the tenant's approval policy (a human gate) before the new version is visible to evaluation; a test proves publishing without the configured approval is refused and no evaluation uses the unapproved refinement.",
-      "owner_project": "T2"
+      "owner_project": "T2",
+      "resolved_by": {
+        "commit": "fcb96fa93b33a0a7689418163d4c2613cc1917e8",
+        "test": "crates/actions/tests/decision_ladder.rs",
+        "evidence": "decision_ladder 10/10, ladder_human_gate 10/10, parity 7/7: refinements.publish requires a human-approved approval with gate refinement.publish targeting that policy; missing, wrong-gate and other-policy approvals are 422 approval_missing before any row; the lock is regenerated and --check-lock is green."
+      }
     },
     {
       "id": "v1-t2-5",
