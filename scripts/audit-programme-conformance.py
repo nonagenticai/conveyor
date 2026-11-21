@@ -1106,6 +1106,9 @@ class Audit:
             artifact_type = self.data.artifact_types.get(artefact.get("artifact_type_id"))
             if artifact_type and artifact_type.get("key"):
                 approved.add(artifact_type["key"])
+            elif (artefact.get("meta") or {}).get("artifact_key"):
+                # A row created without the type binding names its standard key in its meta.
+                approved.add(artefact["meta"]["artifact_key"])
             elif artefact.get("artifact_kind"):
                 approved.add(artefact["artifact_kind"])
         for key in sorted(preliminary - approved):
@@ -1146,6 +1149,9 @@ class Audit:
                 artifact_type = self.data.artifact_types.get(artefact.get("artifact_type_id"))
                 if artifact_type and artifact_type.get("key"):
                     actual.add(artifact_type["key"])
+                elif (artefact.get("meta") or {}).get("artifact_key"):
+                    # A row created without the type binding names its standard key in its meta.
+                    actual.add(artefact["meta"]["artifact_key"])
                 elif artefact.get("artifact_kind"):
                     actual.add(artefact["artifact_kind"])
             missing = sorted(required - actual)
