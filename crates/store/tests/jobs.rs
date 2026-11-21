@@ -599,26 +599,30 @@ async fn claim_batch_honours_kind_and_run_after() {
     }
 }
 
-/// Two batches held open at once never hand out the same row.
+/// Two batches held open at once never hand out the same row — and the second still takes what
+/// the first skipped.
 #[tokio::test]
 async fn two_uncommitted_batches_pick_disjoint_rows() {
     let db = common::TestDb::fresh().await;
     let tenant = a_tenant(&db).await;
     let pool = &db.runtime;
 
-    for key in ["disjoint-1", "disjoint-2"] {
-        jobs::enqueue(
-            pool,
-            tenant,
-            "event.prune",
-            key,
-            serde_json::json!({}),
-            None,
-            5,
-        )
-        .await
-        .expect("enqueue")
-        .expect("row");
+    let mut ids = Vec::new();
+    for key in ["disjoint-1", "disjoint-2", "disjoint-3"] {
+        ids.push(
+            jobs::enqueue(
+                pool,
+                tenant,
+                "event.prune",
+                key,
+                serde_json::json!({}),
+                None,
+                5,
+            )
+            .await
+            .expect("enqueue")
+            .expect("row"),
+        );
     }
 
     let mut first = conveyor_store::begin_scoped(pool, tenant)
@@ -627,22 +631,79 @@ async fn two_uncommitted_batches_pick_disjoint_rows() {
     let mut second = conveyor_store::begin_scoped(pool, tenant)
         .await
         .expect("second scope");
+    // A `FOR UPDATE` without `SKIP LOCKED` would block on the first batch's row locks until its
+    // transaction ended — which this test never does. Bound the wait so that regression is a 2 s
+    // error here instead of a hung suite.
+    sqlx::query("SET LOCAL lock_timeout = '2000ms'")
+        .execute(&mut *second)
+        .await
+        .expect("bound the second claim's lock wait");
 
-    let a = jobs::claim_batch_tx(&mut first, 60, None, 10)
+    let a = jobs::claim_batch_tx(&mut first, 60, None, 2)
         .await
         .expect("first batch");
-    assert_eq!(a.len(), 2);
+    assert_eq!(a.len(), 2, "the first batch takes exactly its two rows");
     let b = jobs::claim_batch_tx(&mut second, 60, None, 10)
         .await
         .expect("second batch");
-    assert!(
-        b.is_empty(),
-        "SKIP LOCKED leaves the first batch's rows alone, not {} more",
-        b.len()
+    assert_eq!(
+        b.len(),
+        1,
+        "the second batch takes the row the first skipped, and only that one"
     );
+    assert!(
+        a.iter().all(|job| b.iter().all(|other| other.id != job.id)),
+        "the two batches never hand out the same row"
+    );
+    let claimed: Vec<Uuid> = a.iter().chain(b.iter()).map(|job| job.id).collect();
+    assert_eq!(claimed.len(), 3, "every row is claimed exactly once");
+    for id in ids {
+        assert!(claimed.contains(&id), "row {id} was never claimed");
+    }
 
     first.rollback().await.expect("rollback");
     second.rollback().await.expect("rollback");
+}
+
+/// `max = 0` claims nothing — and reaps nothing — on either shape.
+#[tokio::test]
+async fn a_zero_batch_claims_nothing() {
+    let db = common::TestDb::fresh().await;
+    let tenant = a_tenant(&db).await;
+    let pool = &db.runtime;
+
+    let id = jobs::enqueue(
+        pool,
+        tenant,
+        "event.prune",
+        "zero",
+        serde_json::json!({}),
+        None,
+        5,
+    )
+    .await
+    .expect("enqueue")
+    .expect("row");
+
+    assert!(
+        jobs::claim_batch(pool, tenant, 60, None, 0)
+            .await
+            .expect("a zero batch")
+            .is_empty()
+    );
+    let mut tx = conveyor_store::begin_scoped(pool, tenant)
+        .await
+        .expect("scope");
+    assert!(
+        jobs::claim_batch_tx(&mut tx, 60, None, 0)
+            .await
+            .expect("a zero batch on an open transaction")
+            .is_empty()
+    );
+    tx.rollback().await.expect("rollback");
+
+    let (status, ..) = row(&db.super_pool, id).await;
+    assert_eq!(status, "pending", "the row was never claimed");
 }
 
 /// The batch's single reap dead-letters an exhausted expired row instead of handing it out.
@@ -677,8 +738,9 @@ async fn the_batch_reap_dead_letters_an_exhausted_row() {
         .await
         .expect("batch claim");
     assert!(
-        batch.iter().all(|job| job.id != id),
-        "an exhausted row is reaped, never handed out"
+        batch.is_empty(),
+        "the only due row was reaped, so the batch is empty; got {} rows",
+        batch.len()
     );
     let (status, attempts, ..) = row(&db.super_pool, id).await;
     assert_eq!(status, "dead");

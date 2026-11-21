@@ -4,7 +4,7 @@
 //! 1. materialises due `schedule` rows into jobs (under the advisory lock, so two replicas
 //!    create one job — see `conveyor_store::schedule`);
 //! 2. iterates `active` tenants (the `tenant` table is the only unscoped one) and claims up
-//!    to [`BATCH_PER_TENANT`] jobs per tenant, each claim in that tenant's scope;
+//!    to [`BATCH_PER_TENANT`] jobs per tenant in one claim inside that tenant's scope;
 //! 3. runs the handler and finishes with the lease token it claimed.
 //!
 //! A handler failure never kills the loop: a retryable failure goes back to `pending` with
@@ -326,19 +326,10 @@ impl Worker {
             let permits = take_claim_budget(&self.in_flight, BATCH_PER_TENANT);
             if !permits.is_empty() {
                 let max = permits.len();
-                let claimed = if engaged {
-                    store::jobs::claim_batch(
-                        &self.pool,
-                        tenant,
-                        lease_secs,
-                        Some(&ANDON_ALLOWED_KINDS),
-                        max,
-                    )
-                    .await
-                } else {
-                    store::claim_batch(&self.pool, tenant, lease_secs, None, max).await
-                };
-                match claimed {
+                // The cord, when pulled, narrows the claim to the kinds that must keep running;
+                // the filter is part of the same statement, never a post-claim check.
+                let kinds = engaged.then_some(ANDON_ALLOWED_KINDS.as_slice());
+                match store::claim_batch(&self.pool, tenant, lease_secs, kinds, max).await {
                     Ok(jobs) => {
                         // A claim may return fewer jobs than the budget; `zip` releases the
                         // permits the queue did not need.

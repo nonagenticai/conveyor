@@ -17,8 +17,9 @@
 //! a retry requested at the last attempt also lands `dead`.
 //!
 //! Every public database function takes a [`TenantId`] and opens its own [`begin_scoped`]
-//! transaction, except [`claim_batch_tx`], which runs on a caller-scoped connection so two
-//! claims can be held open at once; the internal `reap_exhausted` runs on the caller's
+//! transaction, except [`claim_batch_tx`], which runs on a caller-scoped connection and shares
+//! the caller's transaction; a `max = 0` claim returns before opening anything. The internal
+//! `reap_exhausted` runs on the caller's
 //! already-scoped connection, and `truncate` touches no database. The worker iterates tenants
 //! (the `tenant` table has no RLS) instead of using a `BYPASSRLS` role that S2-D3 deliberately
 //! does not create.
@@ -169,18 +170,25 @@ pub async fn claim_batch(
 
 /// The claim body, on an already-scoped connection.
 ///
-/// Split from [`claim_batch`] so a caller that must hold the transaction — two uncommitted
-/// claims proving `SKIP LOCKED` — runs the same statement without the commit. `conn` must
-/// already carry the tenant scope. The reap runs first, in this transaction, for the reason
-/// on [`reap_exhausted`].
+/// Split from [`claim_batch`] so a caller that shares its transaction — a handler's `_tx`
+/// write, or a test holding two claims open to prove `SKIP LOCKED` — runs the same statement
+/// without the commit. `conn` must already carry the tenant scope. The reap runs first, in
+/// this transaction, for the reason on [`reap_exhausted`]. `max = 0` claims nothing and does
+/// not reap, exactly as [`claim_batch`] does.
 pub async fn claim_batch_tx(
     conn: &mut PgConnection,
     lease_secs: i64,
     kinds: Option<&[&str]>,
     max: usize,
 ) -> Result<Vec<Job>, sqlx::Error> {
+    if max == 0 {
+        return Ok(Vec::new());
+    }
     let lease_secs = lease_secs.max(1);
-    let max = max.max(1);
+    // `LIMIT` is an i64. An absurd `usize` must not wrap negative and turn the claim into a
+    // database error; the batch is bounded by the caller's permits, and this only guards the
+    // public API.
+    let max = i64::try_from(max).unwrap_or(i64::MAX);
     let kinds: Option<Vec<String>> = kinds.map(|kinds| {
         kinds
             .iter()
@@ -217,7 +225,7 @@ pub async fn claim_batch_tx(
     sqlx::query_as(sqlx::AssertSqlSafe(sql))
         .bind(lease_secs as f64)
         .bind(&kinds)
-        .bind(max as i64)
+        .bind(max)
         .fetch_all(&mut *conn)
         .await
 }
