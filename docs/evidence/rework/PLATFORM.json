@@ -68,18 +68,16 @@
       "allowed": false,
       "check": "product_findings",
       "description": "no open P0 product finding remains for the project",
-      "detail": "2 open P0 package(s): v1-p5-1:PLATFORM, v1-pack-6:PLATFORM",
+      "detail": "no open P0 package for this project",
       "id": "PLATFORM-product",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     }
   ],
-  "failures": [
-    "PLATFORM-product (P0): 2 open P0 package(s): v1-p5-1:PLATFORM, v1-pack-6:PLATFORM"
-  ],
+  "failures": [],
   "gate": "The standing platform row carries an approved charter and a baseline; it does not close.",
-  "generated_at": "2026-11-21T20:56:53.892259+00:00",
+  "generated_at": "2026-11-21T22:39:17.758070+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/PLATFORM.toml",
   "name": "CI, runners and platform",
@@ -90,6 +88,6 @@
     "git_sha": "2a1ff31df668b8fc456dcac2640f29f44cafcf16",
     "path": "retained-snapshot/2a1ff31df668b8fc456dcac2640f29f44cafcf16"
   },
-  "verdict": "red",
+  "verdict": "green",
   "warnings": []
 }

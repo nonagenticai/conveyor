@@ -147,7 +147,7 @@
   ],
   "failures": [],
   "gate": "The A\u2013D artefacts and the delivery contract exist, the brief and the evidence are published, the P2 long-job proof is landed, and the project closes through the one gate.",
-  "generated_at": "2026-11-21T20:57:01.750190+00:00",
+  "generated_at": "2026-11-21T22:39:26.525340+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/S02.toml",
   "name": "Skeleton \u2014 workspace, tenancy, auth, jobs, SSE",

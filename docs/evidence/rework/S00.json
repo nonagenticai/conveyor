@@ -127,7 +127,7 @@
   ],
   "failures": [],
   "gate": "The A\u2013D artefacts, the closure review and the declared outputs exist; the project re-closes through the one gate.",
-  "generated_at": "2026-11-21T20:56:56.606540+00:00",
+  "generated_at": "2026-11-21T22:39:20.817360+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/S00.toml",
   "name": "Usage inventory \u2192 parity/parity.yaml",

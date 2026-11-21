@@ -118,29 +118,16 @@
       "allowed": false,
       "check": "product_findings",
       "description": "no open P0 product finding remains for the project",
-      "detail": "1 open P0 package(s): v1-w1a-2:T0",
+      "detail": "no open P0 package for this project",
       "id": "T0-product",
       "kind": "snapshot",
-      "result": "fail",
-      "severity": "P0"
-    },
-    {
-      "allowed": false,
-      "check": null,
-      "description": "a closed project must not carry a red acceptance manifest",
-      "detail": "the project is closed while its manifest is red",
-      "id": "closed-on-red",
-      "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     }
   ],
-  "failures": [
-    "T0-product (P0): 1 open P0 package(s): v1-w1a-2:T0",
-    "closed-on-red (P0): the project is closed on a red manifest"
-  ],
+  "failures": [],
   "gate": "The A\u2013D set is approved; the project re-closes through the one gate.",
-  "generated_at": "2026-11-21T20:57:07.168114+00:00",
+  "generated_at": "2026-11-21T22:39:32.116641+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T0.toml",
   "name": "Model and contracts",
@@ -151,6 +138,6 @@
     "git_sha": "2a1ff31df668b8fc456dcac2640f29f44cafcf16",
     "path": "retained-snapshot/2a1ff31df668b8fc456dcac2640f29f44cafcf16"
   },
-  "verdict": "red",
+  "verdict": "green",
   "warnings": []
 }
