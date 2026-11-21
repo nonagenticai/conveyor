@@ -506,7 +506,7 @@ async fn a_category_alias_is_canonicalised_and_an_unknown_one_is_refused() {
 #[tokio::test(flavor = "multi_thread")]
 async fn update_publish_and_unpublish_move_published_at() {
     let pg = support::Pg::fresh().await;
-    support::seed(&pg, "workflow-update", "alice", "Alice").await;
+    let seeded = support::seed(&pg, "workflow-update", "alice", "Alice").await;
     let running = support::Running::start(&pg).await;
 
     let (status, created) = running
@@ -577,6 +577,28 @@ async fn update_publish_and_unpublish_move_published_at() {
     assert_eq!(status, 200, "{unpublished}");
     assert_eq!(output(&unpublished)["publishable"], false);
     assert_eq!(output(&unpublished)["published_at"], Value::Null);
+
+    // The audit stream crosses the boundary with the state, exactly as documents.publish does.
+    let published_events: i64 = sqlx::query_scalar(
+        "SELECT count(*) FROM event
+          WHERE tenant_id = $1 AND topic = 'document:' || $2 AND type = 'document.published'",
+    )
+    .bind(seeded.tenant_id)
+    .bind(&id)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("count the publication events");
+    let unpublished_events: i64 = sqlx::query_scalar(
+        "SELECT count(*) FROM event
+          WHERE tenant_id = $1 AND topic = 'document:' || $2 AND type = 'document.unpublished'",
+    )
+    .bind(seeded.tenant_id)
+    .bind(&id)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("count the unpublish events");
+    assert_eq!(published_events, 1, "one update publish event");
+    assert_eq!(unpublished_events, 1, "one update unpublish event");
 }
 
 /// #537: a restore on a published row is an unpublish; it must clear `published_at`, not just
@@ -584,7 +606,7 @@ async fn update_publish_and_unpublish_move_published_at() {
 #[tokio::test(flavor = "multi_thread")]
 async fn restoring_a_published_row_unpublishes_it() {
     let pg = support::Pg::fresh().await;
-    support::seed(&pg, "workflow-restore", "alice", "Alice").await;
+    let seeded = support::seed(&pg, "workflow-restore", "alice", "Alice").await;
     let running = support::Running::start(&pg).await;
 
     let (status, created) = running
@@ -651,5 +673,19 @@ async fn restoring_a_published_row_unpublishes_it() {
         output(&restored)["published_at"],
         Value::Null,
         "a restored row leaves the public window"
+    );
+
+    let unpublished_events: i64 = sqlx::query_scalar(
+        "SELECT count(*) FROM event
+          WHERE tenant_id = $1 AND topic = 'document:' || $2 AND type = 'document.unpublished'",
+    )
+    .bind(seeded.tenant_id)
+    .bind(&id)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("count the unpublish events");
+    assert_eq!(
+        unpublished_events, 1,
+        "the restore that leaves the public window emits document.unpublished"
     );
 }

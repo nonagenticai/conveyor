@@ -21,9 +21,9 @@ use std::collections::HashMap;
 use uuid::Uuid;
 
 use super::{
-    ALLOWED_CONTENT_TYPES, DOCUMENT_CREATED, DOCUMENT_DELETED, DOCUMENT_PURGE_KIND,
-    DOCUMENT_UPDATED, MAX_OUTPUT_BYTES, MAX_UPLOAD_BYTES, document_error, emit_document_event,
-    invalid,
+    ALLOWED_CONTENT_TYPES, DOCUMENT_CREATED, DOCUMENT_DELETED, DOCUMENT_PUBLISHED,
+    DOCUMENT_PURGE_KIND, DOCUMENT_UNPUBLISHED, DOCUMENT_UPDATED, MAX_OUTPUT_BYTES,
+    MAX_UPLOAD_BYTES, document_error, emit_document_event, invalid,
 };
 use crate::integrations::objects::{Objects, key_for};
 use crate::invoke::{ActionError, HandlerCtx};
@@ -675,6 +675,18 @@ async fn documents_compose(
         json!({"id": created.id, "version": created.version.get(), "text": true}),
     )
     .await?;
+    // A compose straight to public is also a publication; the audit stream must say so, exactly
+    // as `documents.publish` does.
+    if input.publishable == Some(true) {
+        emit_document_event(
+            &mut *tx,
+            &ctx,
+            DOCUMENT_PUBLISHED,
+            created.id,
+            json!({"id": created.id, "published_at": created.published_at}),
+        )
+        .await?;
+    }
     let etag = etag(created.version.get());
     Ok(
         HandlerOutput::created(document_out_with_names(&mut *tx, created, action).await?)
@@ -1134,6 +1146,22 @@ async fn documents_update(
         json!({"id": updated.id, "changed": changed}),
     )
     .await?;
+    // An update can cross the public boundary; the same audit event as `documents.publish` is
+    // written so the state and the event stream cannot disagree.
+    if current.published_at.is_some() != updated.published_at.is_some() {
+        emit_document_event(
+            &mut *tx,
+            &ctx,
+            if updated.published_at.is_some() {
+                DOCUMENT_PUBLISHED
+            } else {
+                DOCUMENT_UNPUBLISHED
+            },
+            updated.id,
+            json!({"id": updated.id, "published_at": updated.published_at}),
+        )
+        .await?;
+    }
     let etag = etag(updated.version.get());
     Ok(
         HandlerOutput::ok(document_out_with_names(&mut *tx, updated, action).await?)

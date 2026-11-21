@@ -190,7 +190,7 @@ async fn a_complete_output_publishes_and_unpublish_never_blocks() {
 /// The CLI's bulk path composes straight to public; it must meet the same gate.
 #[tokio::test(flavor = "multi_thread")]
 async fn an_output_composed_straight_to_public_is_checked() {
-    let (_pg, running, _seeded) = fixture().await;
+    let (pg, running, seeded) = fixture().await;
     let (status, refused) = compose(
         &running,
         "dev:alice",
@@ -224,6 +224,20 @@ async fn an_output_composed_straight_to_public_is_checked() {
     assert!(
         output(&created)["published_at"].is_string(),
         "a compose straight to public stamps published_at: {created}"
+    );
+    let id = output(&created)["id"].as_str().expect("id");
+    let events: i64 = sqlx::query_scalar(
+        "SELECT count(*) FROM event
+          WHERE tenant_id = $1 AND topic = 'document:' || $2 AND type = 'document.published'",
+    )
+    .bind(seeded.tenant_id)
+    .bind(id)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("count the publication events");
+    assert_eq!(
+        events, 1,
+        "a compose straight to public emits document.published"
     );
 }
 

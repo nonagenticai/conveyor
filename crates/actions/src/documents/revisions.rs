@@ -600,6 +600,17 @@ async fn documents_revisions_restore(
         json!({"id": updated.id, "restored": seq, "version": updated.version.get()}),
     )
     .await?;
+    // Restoring a public row unpublishes it; the state change gets its own audit event.
+    if current.published_at.is_some() && updated.published_at.is_none() {
+        emit_document_event(
+            &mut *tx,
+            &ctx,
+            DOCUMENT_UNPUBLISHED,
+            updated.id,
+            json!({"id": updated.id, "published_at": updated.published_at}),
+        )
+        .await?;
+    }
     let etag = etag(updated.version.get());
     Ok(
         HandlerOutput::ok(document_out_with_names(&mut *tx, updated, action).await?)
