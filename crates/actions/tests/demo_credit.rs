@@ -104,7 +104,6 @@ async fn create_deliverable(running: &support::Running, project: &str) -> (Strin
 
 async fn update_deliverable(
     running: &support::Running,
-    deliverable: &str,
     version: i64,
     input: Value,
 ) -> (u16, Value) {
@@ -117,7 +116,6 @@ async fn update_deliverable(
 async fn accept(running: &support::Running, deliverable: &str, version: i64, evidence: Value) {
     let (status, body) = update_deliverable(
         running,
-        deliverable,
         version,
         json!({"id": deliverable, "status": "accepted", "evidence": evidence}),
     )
