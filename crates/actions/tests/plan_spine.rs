@@ -542,15 +542,12 @@ async fn a_tranche_review_without_evidence_is_refused() {
     assert_eq!(status, 201, "{tranche}");
     let id = id_of(output(&tranche), "id");
 
+    let delegation = support::delegation_ref(&running, "dev:alice").await;
+    let input =
+        json!({"id": id, "decision": "continue", "delegation_ref": delegation, "evidence": {}});
+    let gate = support::review_gate(&running, "dev:alice", &input).await;
     let (status, refused) = running
-        .invoke(
-            "tranches.review",
-            "dev:alice",
-            json!({"id": id, "decision": "continue", "evidence": {}}),
-            None,
-            None,
-            None,
-        )
+        .invoke_approved("tranches.review", "dev:alice", input, None, gate)
         .await;
     assert_eq!(status, 422, "{refused}");
     assert!(
@@ -558,23 +555,32 @@ async fn a_tranche_review_without_evidence_is_refused() {
         "{refused}"
     );
 
-    let (status, reviewed) = running
+    // U4: a `continue` authorises the next tranche, so the plan needs one to authorise.
+    let (status, next) = running
         .invoke(
-            "tranches.review",
+            "tranches.create",
             "dev:alice",
-            json!({
-                "id": id,
-                "decision": "continue",
-                "evidence": {
-                    "baselines": ["B0"],
-                    "benefit_status": {"BEN-01": "tracking"},
-                    "risk_register": ["risk-1"]
-                }
-            }),
+            json!({"programme_id": programme, "number": 1}),
             None,
             None,
             None,
         )
+        .await;
+    assert_eq!(status, 201, "{next}");
+
+    let input = json!({
+        "id": id,
+        "decision": "continue",
+        "delegation_ref": delegation,
+        "evidence": {
+            "baselines": ["B0"],
+            "benefit_status": {"BEN-01": "tracking"},
+            "risk_register": ["risk-1"]
+        }
+    });
+    let gate = support::review_gate(&running, "dev:alice", &input).await;
+    let (status, reviewed) = running
+        .invoke_approved("tranches.review", "dev:alice", input, None, gate)
         .await;
     assert_eq!(status, 200, "{reviewed}");
     assert_eq!(output(&reviewed)["state"], "closed");

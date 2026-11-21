@@ -31,7 +31,13 @@ pub struct Fixture {
     pub seeded: support::Seeded,
     /// The active PM job binding `pm.route_gate` requires.
     pub binding: Uuid,
+    /// The published P0 standing-delegation decision the U4 acts cite.
+    pub delegation: String,
+    /// A third principal: the accepting owner, distinct from the requester and the reviewer.
+    pub owner: Uuid,
 }
+
+pub const OWNER: &str = "dev:owner";
 
 pub async fn fixture() -> Fixture {
     let pg = support::Pg::fresh().await;
@@ -42,12 +48,91 @@ pub async fn fixture() -> Fixture {
     conveyor_actions::board::matrix::clear_cache();
     let binding = seed_pm_job(&pg, seeded.tenant_id).await;
     let running = support::Running::start(&pg).await;
+    let owner = seed_owner(&pg, seeded.tenant_id).await;
+    let delegation = seed_delegation(&running).await;
     Fixture {
         pg,
         running,
         seeded,
         binding,
+        delegation,
+        owner,
     }
+}
+
+/// A third human in the tenant: the accepting owner of a waived finding, distinct from the
+/// contract's requester and the compliance reviewer.
+async fn seed_owner(pg: &support::Pg, tenant_id: Uuid) -> Uuid {
+    let user: Uuid = sqlx::query_scalar(
+        "INSERT INTO app_user (oidc_subject, email, display_name)
+         VALUES ('dev:owner', 'owner@dev.invalid', 'Owner')
+         ON CONFLICT (oidc_subject) WHERE oidc_subject IS NOT NULL
+         DO UPDATE SET display_name = excluded.display_name
+         RETURNING id",
+    )
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("insert the owner");
+    sqlx::query(
+        "INSERT INTO membership (tenant_id, user_id, role) VALUES ($1, $2, 'admin')
+         ON CONFLICT (tenant_id, user_id) DO NOTHING",
+    )
+    .bind(tenant_id)
+    .bind(user)
+    .execute(&pg.super_pool)
+    .await
+    .expect("insert the owner membership");
+    user
+}
+
+/// Publish the standing-delegation decision under P0 through the real document actions.
+async fn seed_delegation(running: &support::Running) -> String {
+    let (status, created) = running
+        .invoke(
+            "projects.create",
+            TOKEN,
+            json!({"title": "Programme definition", "key": "P0"}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "create P0: {created}");
+    let p0 = id_of(output(&created));
+    let body = "# Decision record\n\n## Context\n\nThe programme's standing delegation.\n\n## Decision\n\nThe session acts for the programme under this delegation.\n\n## Consequences\n\nEvery delegated act cites this decision.\n\n## Evidence\n\nThe acts read back through the record harness.\n";
+    let (status, composed) = running
+        .invoke(
+            "documents.compose",
+            TOKEN,
+            json!({
+                "title": "Standing delegation",
+                "project_id": p0,
+                "body": body,
+                "category": "decision",
+                "publishable": true,
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "compose the delegation: {composed}");
+    let document = id_of(output(&composed));
+    let version = output(&composed)["version"]
+        .as_i64()
+        .expect("a document version");
+    let (status, published) = running
+        .invoke(
+            "documents.publish",
+            TOKEN,
+            json!({"id": document, "publish": true}),
+            Some(&format!("\"{version}\"")),
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "publish the delegation: {published}");
+    document
 }
 
 /// The PM job rows exactly as `pm_gate_evidence.rs` seeds them: an active `pm` position, its
@@ -121,6 +206,20 @@ pub async fn call(
     (status, output(&body).clone())
 }
 
+/// [`call`] as another principal (the reviewer or the accepting owner).
+pub async fn call_as(
+    running: &support::Running,
+    token: &str,
+    action: &str,
+    input: Value,
+    if_match: Option<&str>,
+) -> (u16, Value) {
+    let (status, body) = running
+        .invoke(action, token, input, if_match, None, None)
+        .await;
+    (status, output(&body).clone())
+}
+
 pub async fn ok(
     running: &support::Running,
     action: &str,
@@ -140,6 +239,19 @@ pub async fn created(
 ) -> Value {
     let (status, out) = call(running, action, input, if_match).await;
     assert_eq!(status, 201, "{action}: {out}");
+    out
+}
+
+/// [`created`] as another principal (the reviewer or the accepting owner).
+pub async fn created_as(
+    running: &support::Running,
+    token: &str,
+    action: &str,
+    input: Value,
+    if_match: Option<&str>,
+) -> Value {
+    let (status, out) = call_as(running, token, action, input, if_match).await;
+    assert_eq!(status, 201, "{action} as {token}: {out}");
     out
 }
 
@@ -258,13 +370,63 @@ pub async fn request_contract(
     .await
 }
 
-pub async fn approve_contract(running: &support::Running, id: &str) -> Value {
-    // The requester is the admin; the approver must be the second principal (#508).
-    let (status, body) = running
+pub async fn approve_contract(f: &Fixture, id: &str) -> Value {
+    // U4: the board decision about this contract, citing the standing delegation. The board is
+    // opened per approval with a unique key, so the fixture does not put a second row in the
+    // board-list assertions.
+    let (status, opened) = f
+        .running
+        .invoke(
+            "architecture.board_open",
+            TOKEN,
+            json!({
+                "kind": "architecture_board",
+                "key": format!("contract-board-{}", Uuid::now_v7().simple()),
+                "name": "Contract board",
+                "charter": "Approve the delivery contract",
+                "commissioning_authority": "P0 programme board",
+                "decision_limits": {},
+                "members": [],
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "architecture.board_open: {opened}");
+    let body_id = id_of(output(&opened));
+    let (status, board) = f
+        .running
+        .invoke(
+            "architecture.board_decide",
+            TOKEN,
+            json!({
+                "body_id": body_id,
+                "decision": "approved",
+                "evidence": {"delegation_ref": f.delegation},
+                "subject_kind": "contract",
+                "subject_id": id,
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "architecture.board_decide: {board}");
+    let approval_id = output(&board)["approval_id"]
+        .as_str()
+        .expect("the board approval id")
+        .to_owned();
+    let (status, body) = f
+        .running
         .invoke(
             "architecture.contracts_approve",
             support::REVIEWER,
-            json!({ "id": id }),
+            json!({
+                "id": id,
+                "approval_id": approval_id,
+                "delegation_ref": f.delegation,
+            }),
             Some("\"1\""),
             None,
             None,
@@ -279,15 +441,10 @@ pub async fn approve_contract(running: &support::Running, id: &str) -> Value {
 }
 
 /// Request and approve one contract; returns its id (now live).
-pub async fn live_contract(
-    running: &support::Running,
-    project: &str,
-    kind: &str,
-    phase: &str,
-) -> String {
-    let out = request_contract(running, project, kind, phase).await;
+pub async fn live_contract(f: &Fixture, project: &str, kind: &str, phase: &str) -> String {
+    let out = request_contract(&f.running, project, kind, phase).await;
     let id = id_of(&out);
-    approve_contract(running, &id).await;
+    approve_contract(f, &id).await;
     id
 }
 

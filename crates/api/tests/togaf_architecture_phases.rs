@@ -74,7 +74,7 @@ async fn phases_a_to_f_pass_in_order() {
     assert_eq!(out["next_phase"], "a", "{out}");
 
     approved(&f, &project, "stakeholder_map", "a", "psa", "matrix").await;
-    arch::live_contract(&f.running, &project, "statement_of_architecture_work", "a").await;
+    arch::live_contract(&f, &project, "statement_of_architecture_work", "a").await;
     let (status, out) = arch::advance(&f.running, &project, "a").await;
     assert_eq!(status, 200, "A: {out}");
     assert_eq!(out["closed_phase"], "a", "{out}");
@@ -107,7 +107,7 @@ async fn phases_a_to_f_pass_in_order() {
     assert_eq!(status, 200, "E: {out}");
     assert_eq!(out["next_phase"], "f", "{out}");
 
-    arch::live_contract(&f.running, &project, "delivery_contract", "f").await;
+    arch::live_contract(&f, &project, "delivery_contract", "f").await;
     let (status, out) = arch::advance(&f.running, &project, "f").await;
     assert_eq!(status, 200, "F: {out}");
     assert_eq!(out["next_phase"], "g", "{out}");
@@ -137,8 +137,7 @@ async fn a_draft_artefact_refuses_the_contract() {
         json!({ "project_id": project, "artifact_type_id": artifact_type_id }),
     )
     .await;
-    let contract =
-        arch::live_contract(&f.running, &project, "statement_of_architecture_work", "a").await;
+    let contract = arch::live_contract(&f, &project, "statement_of_architecture_work", "a").await;
 
     let (status, refused) = arch::advance(&f.running, &project, "a").await;
     assert_eq!(status, 409, "{refused}");
@@ -192,8 +191,7 @@ async fn a_contract_change_reopens_the_gate() {
     )
     .await;
     arch::approve_artifact(&f.running, &arch::id_of(&artifact)).await;
-    let contract =
-        arch::live_contract(&f.running, &project, "statement_of_architecture_work", "a").await;
+    let contract = arch::live_contract(&f, &project, "statement_of_architecture_work", "a").await;
 
     let retired = arch::ok(
         &f.running,
@@ -241,7 +239,7 @@ async fn a_contract_change_reopens_the_gate() {
     )
     .await;
     assert_eq!(old["superseded_by_id"], replacement_id, "{old}");
-    arch::approve_contract(&f.running, &replacement_id).await;
+    arch::approve_contract(&f, &replacement_id).await;
 
     let (status, out) = arch::advance(&f.running, &project, "a").await;
     assert_eq!(status, 200, "the replacement contract is live: {out}");

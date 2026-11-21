@@ -25,15 +25,17 @@ async fn a_scope_change_produces_a_change_register_row() {
     let change =
         arch::register_change(&f.pg, f.seeded.tenant_id, project_uuid, f.seeded.user_id).await;
 
-    let review = arch::created(
+    let review = arch::created_as(
         &f.running,
+        support::REVIEWER,
         "architecture.reviews_record",
         json!({
             "project_id": project,
             "contract_id": contract_id,
             "level": "non_conformant",
+            "delegation_ref": f.delegation,
             "findings": [{ "finding": "the current architecture no longer meets its purpose" }],
-            "evidence": [{ "ref": "change register" }],
+            "evidence": {"ref": "change register", "delegation_ref": f.delegation},
             "outcome": { "kind": "change", "change_id": change },
         }),
         None,
@@ -46,13 +48,15 @@ async fn a_scope_change_produces_a_change_register_row() {
     let before = arch::change_rows(&f.pg, f.seeded.tenant_id).await;
     let kata_contract =
         arch::request_contract(&f.running, &project, "statement_of_intent", "h").await;
-    let kata = arch::created(
+    let kata = arch::created_as(
         &f.running,
+        support::REVIEWER,
         "architecture.reviews_record",
         json!({
             "project_id": project,
             "contract_id": arch::id_of(&kata_contract),
             "level": "non_conformant",
+            "delegation_ref": f.delegation,
             "findings": [{ "finding": "systemic: the review ritual itself failed" }],
             "outcome": { "kind": "kata", "candidate": "review-ritual" },
         }),
@@ -86,13 +90,15 @@ async fn an_unrecorded_review_refuses_the_gate() {
 
     let contract =
         arch::request_contract(&f.running, &project, "request_for_architecture", "h").await;
-    arch::created(
+    arch::created_as(
         &f.running,
+        support::REVIEWER,
         "architecture.reviews_record",
         json!({
             "project_id": project,
             "contract_id": arch::id_of(&contract),
             "level": "compliant",
+            "delegation_ref": f.delegation,
             "outcome": { "kind": "kata", "candidate": "phase-h-review" },
         }),
         None,

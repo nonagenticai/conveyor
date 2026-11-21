@@ -113,6 +113,26 @@ fn spine_error(error: PlanStoreError, action: &str) -> ActionError {
             "tranche_review_not_continue",
             "only a continue review authorises the next tranche",
         ),
+        PlanStoreError::Illegal(PlanError::TrancheNotReviewable { state }) => ActionError::new(
+            409,
+            "tranche_not_reviewable",
+            format!("the tranche is {state}; a closed or retired tranche cannot be reviewed"),
+        ),
+        PlanStoreError::Illegal(PlanError::TrancheAlreadyReviewed) => ActionError::new(
+            409,
+            "tranche_already_reviewed",
+            "the tranche close already has its one review",
+        ),
+        PlanStoreError::Illegal(PlanError::NextTrancheMissing) => ActionError::new(
+            409,
+            "next_tranche_missing",
+            "a continue review needs the next tranche in the plan",
+        ),
+        PlanStoreError::Illegal(PlanError::NextTrancheNotPlanned { state }) => ActionError::new(
+            409,
+            "next_tranche_not_planned",
+            format!("the next tranche is {state}; only a planned tranche can be authorised"),
+        ),
         PlanStoreError::Illegal(PlanError::BenefitBaselineMissing) => invalid(
             "baseline",
             "benefit_baseline_missing",
@@ -628,6 +648,13 @@ pub struct TrancheReviewIn {
     pub decision: String,
     /// The evidence: baselines, benefit status and the risk register.
     pub evidence: Value,
+    /// The published P0 standing-delegation decision output the reviewer acts under.
+    pub delegation_ref: Uuid,
+}
+
+/// `tranches.review`'s approval target: what the gate authorises, computed from the input alone.
+fn target_tranches_review(input: &TrancheReviewIn) -> Result<String, String> {
+    Ok(format!("tranche/{}/review", input.id))
 }
 
 /// `tranches.update`; `If-Match` is required.
@@ -1801,20 +1828,64 @@ async fn tranches_create(
     timeout_ms = 30000,
     effect = "write",
     confirm = "none",
-    tenancy = "tenant"
+    tenancy = "tenant",
+    approval_target = "target_tranches_review"
 )]
 async fn tranches_review(
     tx: &mut PgConnection,
     ctx: HandlerCtx,
     input: TrancheReviewIn,
 ) -> Result<HandlerOutput<TrancheOut>, ActionError> {
+    // The MSP decision is dual-controlled: the executor requests the gate, a distinct delegate
+    // decides it, and this action records the delegate's decision. The approval target is the
+    // exact tranche review the gate authorises.
+    let target = target_tranches_review(&input)
+        .map_err(|detail| invalid("input", "invalid_value", &detail))?;
+    let approval_id = crate::control::approvals::require_approval_tx(
+        &mut *tx,
+        &ctx,
+        "tranches.review",
+        &target,
+        ctx.approval_id,
+    )
+    .await?;
+    crate::programme::assert_delegation_ref(&mut *tx, ctx.tenant, input.delegation_ref).await?;
+    let reviewer = store::approval::deciding_approver_tx(&mut *tx, ctx.tenant, approval_id)
+        .await
+        .map_err(|error| store_error(error, ctx.action))?
+        .ok_or_else(|| {
+            ActionError::new(
+                409,
+                "tranche_review_not_approved",
+                "the tranche review gate has no approving decision",
+            )
+        })?;
+    let evidence = match input.evidence {
+        Value::Object(mut map) => {
+            map.insert(
+                "delegation_ref".to_owned(),
+                Value::String(input.delegation_ref.to_string()),
+            );
+            Value::Object(map)
+        }
+        Value::Null => serde_json::json!({
+            "delegation_ref": input.delegation_ref.to_string(),
+        }),
+        _ => {
+            return Err(invalid(
+                "evidence",
+                "evidence_object_required",
+                "the review evidence must be a JSON object",
+            ));
+        }
+    };
     let record = store::spine::review_tranche_tx(
         &mut *tx,
         ctx.tenant,
         input.id,
         input.decision.trim(),
-        &input.evidence,
-        ctx.actor_id,
+        &evidence,
+        reviewer,
     )
     .await
     .map_err(|error| spine_error(error, ctx.action))?;

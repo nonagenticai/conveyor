@@ -110,24 +110,25 @@ async fn create_tranche(running: &support::Running, programme: &str, number: i64
     text(output(&body), "id")
 }
 
-async fn review_tranche(running: &support::Running, tranche: &str, decision: &str) -> (u16, Value) {
+async fn review_tranche(
+    running: &support::Running,
+    tranche: &str,
+    decision: &str,
+    delegation: &str,
+) -> (u16, Value) {
+    let input = json!({
+        "id": tranche,
+        "decision": decision,
+        "delegation_ref": delegation,
+        "evidence": {
+            "baselines": ["B0"],
+            "benefit_status": {"B1": "tracking"},
+            "risk_register": ["risk-1"]
+        }
+    });
+    let gate = support::review_gate(running, TOKEN, &input).await;
     running
-        .invoke(
-            "tranches.review",
-            TOKEN,
-            json!({
-                "id": tranche,
-                "decision": decision,
-                "evidence": {
-                    "baselines": ["B0"],
-                    "benefit_status": {"B1": "tracking"},
-                    "risk_register": ["risk-1"]
-                }
-            }),
-            None,
-            None,
-            None,
-        )
+        .invoke_approved("tranches.review", TOKEN, input, None, gate)
         .await
 }
 
@@ -316,7 +317,8 @@ async fn activate_requires_authorised_tranche() {
 
     // A continue review authorises the next tranche in the same write; then activation passes.
     let t0 = create_tranche(&running, &programme, 0).await;
-    let (status, _body) = review_tranche(&running, &t0, "continue").await;
+    let delegation = support::delegation_ref(&running, TOKEN).await;
+    let (status, _body) = review_tranche(&running, &t0, "continue", &delegation).await;
     assert_eq!(status, 200);
     assert_eq!(
         tranche_state(&running, &programme, 1).await["state"],
@@ -461,12 +463,13 @@ async fn contract_cannot_self_approve() {
     let (_pg, running, _seeded) = fixture().await;
     let project = create_project(&running, "Self approval", None).await;
     let contract = request_contract(&running, &project).await;
+    let delegation = support::delegation_ref(&running, TOKEN).await;
     let version = contract["version"].as_i64().expect("version").to_string();
     let (status, body) = running
         .invoke(
             "architecture.contracts_approve",
             TOKEN,
-            json!({"id": contract["id"]}),
+            json!({"id": contract["id"], "delegation_ref": delegation}),
             Some(&version),
             None,
             None,
@@ -481,6 +484,7 @@ async fn legacy_contract_requester_flagged() {
     let (pg, running, seeded) = fixture().await;
     let project = create_project(&running, "Legacy contract", None).await;
     let contract = request_contract(&running, &project).await;
+    let delegation = support::delegation_ref(&running, TOKEN).await;
     let id = Uuid::parse_str(&text(&contract, "id")).expect("contract id");
     sqlx::query(
         "UPDATE architecture_contract SET requested_by = NULL WHERE tenant_id = $1 AND id = $2",
@@ -497,14 +501,14 @@ async fn legacy_contract_requester_flagged() {
         .invoke(
             "architecture.contracts_approve",
             REVIEWER,
-            json!({"id": contract["id"]}),
+            json!({"id": contract["id"], "delegation_ref": delegation}),
             Some(&version),
             None,
             None,
         )
         .await;
     assert_eq!(status, 409, "{body}");
-    assert_eq!(error_code(&body), "requester_unknown", "{body}");
+    assert_eq!(error_code(&body), "board_approval_required", "{body}");
 
     // The board decision is the independent authority; the row still reads its flag.
     let board = create_board(&pg, seeded.tenant_id).await;
@@ -515,7 +519,7 @@ async fn legacy_contract_requester_flagged() {
             json!({
                 "body_id": board,
                 "decision": "approved",
-                "evidence": {"legacy": "no recorded requester"},
+                "evidence": {"legacy": "no recorded requester", "delegation_ref": delegation},
                 "subject_kind": "contract",
                 "subject_id": contract["id"]
             }),
@@ -531,7 +535,11 @@ async fn legacy_contract_requester_flagged() {
         .invoke(
             "architecture.contracts_approve",
             REVIEWER,
-            json!({"id": contract["id"], "approval_id": approval_id}),
+            json!({
+                "id": contract["id"],
+                "approval_id": approval_id,
+                "delegation_ref": delegation
+            }),
             Some(&version),
             None,
             None,
@@ -546,15 +554,26 @@ async fn legacy_contract_requester_flagged() {
 
 #[tokio::test]
 async fn tranche_authorise_links_review() {
-    let (_pg, running, _seeded) = fixture().await;
+    let (pg, running, _seeded) = fixture().await;
     let programme = create_programme(&running, "Repair programme").await;
     let t0 = create_tranche(&running, &programme, 0).await;
-    // The review is recorded before the next tranche exists, exactly as the historical review
-    // predates the row its authorisation would have moved.
-    let (status, _body) = review_tranche(&running, &t0, "continue").await;
+    let t1 = create_tranche(&running, &programme, 1).await;
+    // The real review authorises tranche 1 in the same write. The repair path exists for the
+    // historical review whose authorisation never landed, so the fixture withdraws it after the
+    // fact: the review row stays, the next tranche reads planned, and the repair re-links it.
+    let delegation = support::delegation_ref(&running, TOKEN).await;
+    let (status, _body) = review_tranche(&running, &t0, "continue", &delegation).await;
     assert_eq!(status, 200);
     let review = latest_review(&running, &programme).await;
-    create_tranche(&running, &programme, 1).await;
+    sqlx::query(
+        "UPDATE programme_tranche
+            SET state = 'planned', authorised_at = NULL, authorisation_review_id = NULL
+          WHERE id = $1::uuid",
+    )
+    .bind(&t1)
+    .execute(&pg.super_pool)
+    .await
+    .expect("withdraw the authorisation");
     assert_eq!(
         tranche_state(&running, &programme, 1).await["state"],
         "planned"
@@ -583,7 +602,8 @@ async fn tranche_authorise_refuses_non_continue_and_unknown() {
     let (_pg, running, _seeded) = fixture().await;
     let programme = create_programme(&running, "Refusal programme").await;
     let t0 = create_tranche(&running, &programme, 0).await;
-    let (status, _body) = review_tranche(&running, &t0, "pause").await;
+    let delegation = support::delegation_ref(&running, TOKEN).await;
+    let (status, _body) = review_tranche(&running, &t0, "pause", &delegation).await;
     assert_eq!(status, 200);
     let review = latest_review(&running, &programme).await;
     create_tranche(&running, &programme, 1).await;
@@ -623,10 +643,11 @@ async fn tranche_authorise_is_idempotent() {
     let (_pg, running, _seeded) = fixture().await;
     let programme = create_programme(&running, "Idempotent programme").await;
     let t0 = create_tranche(&running, &programme, 0).await;
-    let (status, _body) = review_tranche(&running, &t0, "continue").await;
+    let _t1 = create_tranche(&running, &programme, 1).await;
+    let delegation = support::delegation_ref(&running, TOKEN).await;
+    let (status, _body) = review_tranche(&running, &t0, "continue", &delegation).await;
     assert_eq!(status, 200);
     let review = latest_review(&running, &programme).await;
-    create_tranche(&running, &programme, 1).await;
 
     let (status, first) = running
         .invoke(
@@ -758,6 +779,7 @@ async fn contract_approval_links_the_board_decision() {
     let project = create_project(&running, "Board-approved contract", None).await;
     let contract = request_contract(&running, &project).await;
     let contract_id = text(&contract, "id");
+    let delegation = support::delegation_ref(&running, TOKEN).await;
 
     let (status, body) = running
         .invoke(
@@ -766,7 +788,7 @@ async fn contract_approval_links_the_board_decision() {
             json!({
                 "body_id": board,
                 "decision": "approved",
-                "evidence": {"contract": contract_id},
+                "evidence": {"contract": contract_id, "delegation_ref": delegation},
                 "subject_kind": "contract",
                 "subject_id": contract_id
             }),
@@ -783,7 +805,11 @@ async fn contract_approval_links_the_board_decision() {
         .invoke(
             "architecture.contracts_approve",
             REVIEWER,
-            json!({"id": contract_id, "approval_id": approval_id}),
+            json!({
+                "id": contract_id,
+                "approval_id": approval_id,
+                "delegation_ref": delegation
+            }),
             Some(&version),
             None,
             None,

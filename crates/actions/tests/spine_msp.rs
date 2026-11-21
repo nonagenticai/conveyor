@@ -359,6 +359,8 @@ async fn tranche_review_persists_decision_and_evidence() {
     let (_pg, running, _seeded) = fixture().await;
     let programme = create_programme(&running, "Review programme").await;
     let (tranche, etag) = create_tranche(&running, &programme, 0).await;
+    // U4: a `continue` authorises the next tranche, so the plan needs one to authorise.
+    let _next = create_tranche(&running, &programme, 1).await;
 
     let (status, updated) = running
         .invoke(
@@ -381,23 +383,20 @@ async fn tranche_review_persists_decision_and_evidence() {
         "mandate approved",
         "{updated}"
     );
+    let delegation = support::delegation_ref(&running, "dev:alice").await;
+    let input = json!({
+        "id": tranche,
+        "decision": "continue",
+        "delegation_ref": delegation,
+        "evidence": {
+            "baselines": ["B0"],
+            "benefit_status": {"BEN-T": "tracking"},
+            "risk_register": ["risk-1"]
+        }
+    });
+    let gate = support::review_gate(&running, "dev:alice", &input).await;
     let (status, reviewed) = running
-        .invoke(
-            "tranches.review",
-            "dev:alice",
-            json!({
-                "id": tranche,
-                "decision": "continue",
-                "evidence": {
-                    "baselines": ["B0"],
-                    "benefit_status": {"BEN-T": "tracking"},
-                    "risk_register": ["risk-1"]
-                }
-            }),
-            None,
-            None,
-            None,
-        )
+        .invoke_approved("tranches.review", "dev:alice", input, None, gate)
         .await;
     assert_eq!(status, 200, "{reviewed}");
     assert_eq!(output(&reviewed)["state"], "closed");

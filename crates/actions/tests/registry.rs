@@ -112,7 +112,7 @@ use serde_json::{Value, json};
 /// **#511 (rework path) adds 2 internal**: `projects.charter` (charter an EXISTING project) and
 /// `projects.reopen` (the closed → active transition the retrospective's `rework` verdict
 /// authorises). 500 → **502**.
-const EXPECTED: [&str; 502] = [
+const EXPECTED: [&str; 503] = [
     "actions.describe",
     "actions.list",
     "analyse.site",
@@ -494,6 +494,7 @@ const EXPECTED: [&str; 502] = [
     "projects.baseline",
     "projects.charter",
     "projects.close",
+    "projects.close_request",
     "projects.create",
     "projects.execute",
     "projects.get",
@@ -703,7 +704,9 @@ fn the_registry_is_exactly_the_declared_set() {
     // 484 -> 487; external stays 13.
     // #511's rework path adds two internal actions (`projects.charter|reopen`): 487 -> 489;
     // external stays 13.
-    assert_eq!((internal, external), (489, 13));
+    // #524 (U4) adds one internal action (`projects.close_request`, the programme's closure
+    // request that opens the closure gate): 489 -> 490; external stays 13.
+    assert_eq!((internal, external), (490, 13));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),

@@ -2002,6 +2002,83 @@ pub async fn waive_tx(
         .map_err(ArchitectureStoreError::Database)
 }
 
+/// The project's live delivery contract, if it has one.
+///
+/// The close gate reads this row, not the project's prose: a delivery project closes only
+/// against a contract the board approved, and the contract's `approved_by` is the independent
+/// authority the close cites.
+pub async fn live_delivery_contract_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    project_id: Uuid,
+) -> Result<Option<ContractRecord>, ArchitectureStoreError> {
+    let sql = format!(
+        "SELECT {CONTRACT_COLUMNS} FROM architecture_contract
+          WHERE tenant_id = $1 AND project_id = $2 AND kind = 'delivery_contract'
+            AND status = 'live'
+          ORDER BY approved_at DESC NULLS LAST, id DESC LIMIT 1"
+    );
+    Ok(sqlx::query_as(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(project_id)
+        .fetch_optional(&mut *conn)
+        .await?)
+}
+
+/// The one compliance review a delivery contract carries (the Phase-G judgement).
+pub async fn review_for_contract_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    contract_id: Uuid,
+) -> Result<Option<ReviewRecord>, ArchitectureStoreError> {
+    let sql = format!(
+        "SELECT {REVIEW_COLUMNS} FROM architecture_compliance_review
+          WHERE tenant_id = $1 AND contract_id = $2 LIMIT 1"
+    );
+    Ok(sqlx::query_as(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(contract_id)
+        .fetch_optional(&mut *conn)
+        .await?)
+}
+
+/// Read one compliance review by id; the waiver path needs its contract, reviewer and evidence.
+pub async fn get_review_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    id: Uuid,
+) -> Result<Option<ReviewRecord>, ArchitectureStoreError> {
+    let sql = format!(
+        "SELECT {REVIEW_COLUMNS} FROM architecture_compliance_review
+          WHERE tenant_id = $1 AND id = $2"
+    );
+    Ok(sqlx::query_as(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(id)
+        .fetch_optional(&mut *conn)
+        .await?)
+}
+
+/// An active, unexpired waiver on a review. A waiver is the only way a non-conformant
+/// compliance level may still close; its reassessment date is the forcing function.
+pub async fn active_waiver_for_review_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    review_id: Uuid,
+) -> Result<Option<WaiverRecord>, ArchitectureStoreError> {
+    let sql = format!(
+        "SELECT {WAIVER_COLUMNS} FROM architecture_waiver
+          WHERE tenant_id = $1 AND review_id = $2 AND status = 'active'
+            AND reassessment_at > now()
+          ORDER BY reassessment_at DESC LIMIT 1"
+    );
+    Ok(sqlx::query_as(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(review_id)
+        .fetch_optional(&mut *conn)
+        .await?)
+}
+
 fn require_scores(
     what: &'static str,
     expected: &[&str],

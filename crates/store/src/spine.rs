@@ -1167,9 +1167,68 @@ pub async fn review_tranche_tx(
             });
         }
     };
-    let reviewed = get_tranche_tx(&mut *conn, tenant, id)
+    // Lock the reviewed tranche: two concurrent reviews of the same close must not both pass
+    // the one-review check. The lock is held until the transaction commits, so the second
+    // reviewer waits, sees the first review and is refused.
+    let sql = format!(
+        "SELECT {TRANCHE_COLUMNS} FROM programme_tranche
+          WHERE tenant_id = $1 AND id = $2 FOR UPDATE"
+    );
+    let reviewed: TrancheRecord = sqlx::query_as(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(id)
+        .fetch_optional(&mut *conn)
         .await?
         .ok_or(PlanStoreError::NotFound { what: "tranche" })?;
+    // A tranche close has one review. The check runs before the state guard so a second review
+    // of a row the first review closed reports "already reviewed", not "not reviewable".
+    let already: bool = sqlx::query_scalar(
+        "SELECT EXISTS (
+            SELECT 1 FROM programme_tranche_review WHERE tenant_id = $1 AND tranche_id = $2
+        )",
+    )
+    .bind(tenant.as_uuid())
+    .bind(id)
+    .fetch_one(&mut *conn)
+    .await?;
+    if already {
+        return Err(PlanStoreError::Illegal(PlanError::TrancheAlreadyReviewed));
+    }
+    // The first tranche starts `planned`: its review is what closes it and authorises the next
+    // one, so `planned` is reviewable. A terminal row with no review is not — reviewing it is a
+    // second decision over a tranche that is no longer open.
+    if matches!(reviewed.state.as_str(), "closed" | "retired") {
+        return Err(PlanStoreError::Illegal(PlanError::TrancheNotReviewable {
+            state: reviewed.state.clone(),
+        }));
+    }
+    // A `continue` authorises the next tranche in the same write: the review's outcome is what
+    // authorises it, and the start gate reads the state (and the review that set it), never a
+    // second document. The next row is locked and checked BEFORE the review is inserted, so a
+    // `continue` with nothing to authorise leaves no review row behind.
+    let next = if decision == "continue" {
+        let sql = format!(
+            "SELECT {TRANCHE_COLUMNS} FROM programme_tranche
+              WHERE tenant_id = $1 AND programme_id = $2 AND number = $3 FOR UPDATE"
+        );
+        let row: Option<TrancheRecord> = sqlx::query_as(AssertSqlSafe(sql))
+            .bind(tenant.as_uuid())
+            .bind(reviewed.programme_id)
+            .bind(reviewed.number + 1)
+            .fetch_optional(&mut *conn)
+            .await?;
+        match row {
+            None => return Err(PlanStoreError::Illegal(PlanError::NextTrancheMissing)),
+            Some(row) if row.state != "planned" => {
+                return Err(PlanStoreError::Illegal(PlanError::NextTrancheNotPlanned {
+                    state: row.state,
+                }));
+            }
+            Some(row) => Some(row),
+        }
+    } else {
+        None
+    };
     ensure_parent_tx(&mut *conn, tenant, Parent::AppUser, reviewed_by)
         .await
         .map_err(PlanStoreError::Parent)?;
@@ -1186,22 +1245,23 @@ pub async fn review_tranche_tx(
         .bind(reviewed_by)
         .fetch_one(&mut *conn)
         .await?;
-    // A `continue` authorises the next tranche in the same write: the review's outcome is what
-    // authorises it, and the start gate reads the state (and the review that set it), never a
-    // second document.
-    if decision == "continue" {
-        sqlx::query(
+    if let Some(next) = next {
+        let updated = sqlx::query(
             "UPDATE programme_tranche
                 SET state = 'authorised', authorised_at = now(),
-                    authorisation_review_id = $4, version = version + 1, updated_at = now()
-              WHERE tenant_id = $1 AND programme_id = $2 AND number = $3 AND state = 'planned'",
+                    authorisation_review_id = $3, version = version + 1, updated_at = now()
+              WHERE tenant_id = $1 AND id = $2 AND state = 'planned'",
         )
         .bind(tenant.as_uuid())
-        .bind(reviewed.programme_id)
-        .bind(reviewed.number + 1)
+        .bind(next.id)
         .bind(review.id)
         .execute(&mut *conn)
         .await?;
+        if updated.rows_affected() != 1 {
+            return Err(PlanStoreError::Illegal(PlanError::NextTrancheNotPlanned {
+                state: "changed".to_owned(),
+            }));
+        }
     }
     let sql = format!(
         "UPDATE programme_tranche SET state = $3, version = version + 1, updated_at = now()

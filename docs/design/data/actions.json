@@ -378,6 +378,7 @@
     "projects.baseline",
     "projects.charter",
     "projects.close",
+    "projects.close_request",
     "projects.create",
     "projects.execute",
     "projects.get",

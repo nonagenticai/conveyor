@@ -961,6 +961,27 @@ pub async fn decision_by_tx(
     .await
 }
 
+/// The approver whose decision resolved the gate, if it was approved.
+///
+/// A gate under a quorum has several approving decisions; the review records the first one
+/// (the decision that met the quorum) as the reviewer. The row is immutable, so this is a fact,
+/// never a projection that can drift from the write.
+pub async fn deciding_approver_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    approval_id: Uuid,
+) -> Result<Option<Uuid>, sqlx::Error> {
+    sqlx::query_scalar(
+        "SELECT approver_id FROM approval_decision
+          WHERE tenant_id = $1 AND approval_id = $2 AND decision = 'approve'
+          ORDER BY created_at ASC, approver_id ASC LIMIT 1",
+    )
+    .bind(tenant.as_uuid())
+    .bind(approval_id)
+    .fetch_optional(&mut *conn)
+    .await
+}
+
 /// Resolve every pending gate whose `expires_at` has passed. Returns the number resolved.
 ///
 /// The sweep is a job (`approval.expire`), not a timer (data-arch §3.3). A gate without an

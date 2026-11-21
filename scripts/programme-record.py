@@ -66,6 +66,7 @@ READBACK_MAP = {
     "registers.create": "registers.get",
     "registers.update": "registers.get",
     "pm.close": "pm.get",
+    "projects.close_request": "projects.get",
     "projects.reopen": "projects.get",
     "projects.charter": "pm.get",
 }

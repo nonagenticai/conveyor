@@ -111,6 +111,24 @@ pub enum PlanError {
     /// Only a `continue` decision authorises the next tranche.
     #[error("only a continue review authorises the next tranche")]
     TrancheReviewNotContinue,
+    /// A closed or retired tranche cannot be reviewed.
+    #[error("the tranche is {state}; a closed or retired tranche cannot be reviewed")]
+    TrancheNotReviewable {
+        /// The state the row carries.
+        state: String,
+    },
+    /// A tranche close already has its one review.
+    #[error("the tranche close already has a review")]
+    TrancheAlreadyReviewed,
+    /// A `continue` review needs the next tranche in the plan.
+    #[error("the tranche plan has no next tranche to authorise")]
+    NextTrancheMissing,
+    /// The next tranche is not `planned`, so a `continue` cannot authorise it.
+    #[error("the next tranche is {state}; only a planned tranche can be authorised")]
+    NextTrancheNotPlanned {
+        /// The state the next row carries.
+        state: String,
+    },
     /// A dependency edge closed a cycle.
     #[error("the dependency {from} -> {to} would close a cycle")]
     DependencyCycle {

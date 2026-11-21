@@ -22,7 +22,7 @@ use serde_json::{Value, json};
 use sqlx::PgConnection;
 use uuid::Uuid;
 
-use crate::control::{etag_of, invalid, require_precondition_with, store_error};
+use crate::control::{approval_error, etag_of, invalid, require_precondition_with, store_error};
 use crate::invoke::{ActionError, HandlerCtx};
 use crate::spec::HandlerOutput;
 use crate::views::Page;
@@ -1056,10 +1056,12 @@ async fn architecture_contracts_list(
 pub struct ContractApproveIn {
     /// The contract.
     pub id: Uuid,
-    /// The board decision that approves it. Optional here; the rework requires it for every
-    /// delivery contract so the approval is provable.
+    /// The board decision that approves it. Required for a delivery contract; a legacy
+    /// non-delivery row may omit it.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub approval_id: Option<Uuid>,
+    /// The published P0 standing-delegation decision output the board acted under.
+    pub delegation_ref: Uuid,
 }
 
 #[crate::action(
@@ -1095,13 +1097,61 @@ async fn architecture_contracts_approve(
         ));
     }
     // A legacy row has no requester to exclude. It is approved only against a board decision,
-    // which is the independent authority the missing requester cannot provide.
-    if current.requested_by.is_none() && input.approval_id.is_none() {
+    // which is the independent authority the missing requester cannot provide. A delivery
+    // contract always needs that decision, and the decision must be about this contract and
+    // cite the same standing delegation.
+    crate::programme::assert_delegation_ref(&mut *tx, ctx.tenant, input.delegation_ref).await?;
+    if (current.requested_by.is_none() || current.kind == "delivery_contract")
+        && input.approval_id.is_none()
+    {
         return Err(ActionError::new(
             409,
-            "requester_unknown",
-            "a contract with no recorded requester is approved only against a board decision",
+            "board_approval_required",
+            "a delivery contract (or a contract with no recorded requester) is approved only \
+             against a board decision",
         ));
+    }
+    if let Some(approval_id) = input.approval_id {
+        let board = store::approval::get_approval_tx(&mut *tx, ctx.tenant, approval_id)
+            .await
+            .map_err(|error| approval_error(error, ctx.action))?
+            .ok_or_else(|| ActionError::resource_not_found("board decision"))?;
+        if board.approval.gate != "architecture_board"
+            || board.approval.status != conveyor_domain::ApprovalStatus::Approved
+        {
+            return Err(ActionError::new(
+                409,
+                "board_approval_invalid",
+                "the approval is not an approved architecture board decision",
+            ));
+        }
+        let subject_id = board
+            .meta
+            .get("subject_id")
+            .and_then(Value::as_str)
+            .and_then(|raw| raw.parse::<Uuid>().ok());
+        if board.meta.get("subject_kind").and_then(Value::as_str) != Some("contract")
+            || subject_id != Some(input.id)
+        {
+            return Err(ActionError::new(
+                409,
+                "board_approval_wrong_subject",
+                "the board decision is not about this contract",
+            ));
+        }
+        let board_ref = board
+            .meta
+            .get("evidence")
+            .and_then(|evidence| evidence.get("delegation_ref"))
+            .and_then(Value::as_str)
+            .and_then(|raw| raw.parse::<Uuid>().ok());
+        if board_ref != Some(input.delegation_ref) {
+            return Err(ActionError::new(
+                409,
+                "delegation_ref_mismatch",
+                "the board decision cites a different standing delegation",
+            ));
+        }
     }
     let expected =
         require_precondition_with(&ctx, ctx.action, json!({ "version": current.version }))?;
@@ -1231,6 +1281,8 @@ pub struct ReviewRecordIn {
     /// Phase H's one typed outcome: `{"kind":"change","change_id":…}` or `{"kind":"kata",…}`.
     #[serde(default)]
     pub outcome: Option<Value>,
+    /// The published P0 standing-delegation decision output the reviewer acts under.
+    pub delegation_ref: Uuid,
 }
 
 /// A review as returned.
@@ -1289,12 +1341,44 @@ async fn architecture_reviews_record(
     ctx: HandlerCtx,
     input: ReviewRecordIn,
 ) -> Result<HandlerOutput<ReviewOut>, ActionError> {
+    crate::programme::assert_delegation_ref(&mut *tx, ctx.tenant, input.delegation_ref).await?;
+    let contract = store::architecture::get_contract_tx(&mut *tx, ctx.tenant, input.contract_id)
+        .await
+        .map_err(|error| arch_error(error, ctx.action))?
+        .ok_or_else(|| ActionError::resource_not_found("architecture contract"))?;
+    if contract
+        .requested_by
+        .is_some_and(|requester| requester == ctx.actor_id)
+    {
+        return Err(ActionError::new(
+            409,
+            "requester_is_reviewer",
+            "a compliance review is recorded by an actor other than the contract's requester",
+        ));
+    }
+    let evidence = match input.evidence {
+        Value::Object(mut map) => {
+            map.insert(
+                "delegation_ref".to_owned(),
+                Value::String(input.delegation_ref.to_string()),
+            );
+            Value::Object(map)
+        }
+        Value::Null => json!({ "delegation_ref": input.delegation_ref.to_string() }),
+        _ => {
+            return Err(invalid(
+                "evidence",
+                "evidence_object_required",
+                "the review evidence must be a JSON object",
+            ));
+        }
+    };
     let new = NewReview {
         project_id: input.project_id,
         contract_id: input.contract_id,
         level: input.level,
         findings: input.findings,
-        evidence: input.evidence,
+        evidence,
         outcome: input.outcome,
         reviewed_by: ctx.actor_id,
     };
@@ -1378,6 +1462,44 @@ async fn architecture_reviews_waive(
     ctx: HandlerCtx,
     input: WaiverIn,
 ) -> Result<HandlerOutput<WaiverOut>, ActionError> {
+    let review = store::architecture::get_review_tx(&mut *tx, ctx.tenant, input.review_id)
+        .await
+        .map_err(|error| arch_error(error, ctx.action))?
+        .ok_or_else(|| ActionError::resource_not_found("compliance review"))?;
+    let contract = store::architecture::get_contract_tx(&mut *tx, ctx.tenant, review.contract_id)
+        .await
+        .map_err(|error| arch_error(error, ctx.action))?
+        .ok_or_else(|| ActionError::resource_not_found("architecture contract"))?;
+    if contract
+        .requested_by
+        .is_some_and(|requester| requester == ctx.actor_id)
+    {
+        return Err(ActionError::new(
+            409,
+            "requester_is_waiver_owner",
+            "the contract's requester cannot waive its compliance review",
+        ));
+    }
+    if review.reviewed_by == ctx.actor_id || input.owner_user_id == Some(review.reviewed_by) {
+        return Err(ActionError::new(
+            409,
+            "reviewer_is_waiver_owner",
+            "the reviewer cannot waive their own finding; the accepting owner must be a different actor",
+        ));
+    }
+    let delegation_ref = review
+        .evidence
+        .get("delegation_ref")
+        .and_then(Value::as_str)
+        .and_then(|raw| raw.parse::<Uuid>().ok())
+        .ok_or_else(|| {
+            ActionError::new(
+                409,
+                "delegation_ref_missing",
+                "the review does not cite the standing delegation the waiver acts under",
+            )
+        })?;
+    crate::programme::assert_delegation_ref(&mut *tx, ctx.tenant, delegation_ref).await?;
     let new = NewWaiver {
         review_id: input.review_id,
         owner_user_id: input.owner_user_id,
