@@ -3143,22 +3143,22 @@
       "spec": "§5.4",
       "severity": "P0",
       "title": "S06b gate proofs are admitted NOT PROVEN/PARTIAL",
-      "problem": "The evidence file states the agent app was not run, the importer was not executed, and the end-to-end run_id is null; property g requires one real agent task carrying a run id and property b requires the importer to run.",
+      "problem": "The evidence file states the agent app was not run, the importer was not executed, and the end-to-end run_id is null; property g requires one real agent task carrying a run id and property b requires the importer to run. The old Open note that the allowlist has only runs.list is stale — the conveyor's MCP_DEFAULT_ACTIONS now carries cards.create and runs.create — but the agent app on this box has no prebuilt binary and its checkout carries no conveyor MCP-client registration, so neither property is executable today.",
       "evidence": [
         {
-          "path": "docs/evidence/S06b-agent-task.md",
-          "line": 7,
-          "quote": "contract over the real `/mcp` HTTP surface with a licence principal. It does **not** run the `agent` app — its plan"
+          "path": "crates/actions/src/channel/mod.rs",
+          "line": 47,
+          "quote": "    \"cards.create\","
+        },
+        {
+          "path": "crates/actions/src/channel/mod.rs",
+          "line": 79,
+          "quote": "    \"runs.create\","
         },
         {
           "path": "docs/evidence/S06b-agent-task.md",
           "line": 62,
           "quote": "| b | import: the agent's `mcp-import` yields `projects.create`, not `tool.*` | **NOT PROVEN** | the agent's importer is not executed here. (a) proves the conveyor-side precondition: the operation key is an `object.verb`, never absent. Live import remains S14 §7. |"
-        },
-        {
-          "path": "docs/evidence/S06b-agent-task.md",
-          "line": 67,
-          "quote": "| g | end to end: create, progress, decide, close; evidence contains run id, project id, one decision | **PARTIAL** | create → `projects.get` + `events.list` → request → decide → `projects.close` → `projects.get` shows `closed`, all over `/mcp` as a licence principal. **`run_id` is `null`**: no run-creating action is on the agent allowlist (`AGENT_TOOLS` has only `runs.list`; `runs.create` needs a card; `cards.create` is outside the allowlist). See \"Open\". |"
         }
       ],
       "failure_scenario": "S06b is recorded built while its agent-facing contract is untested; the gap is deferred indefinitely to S14.",
@@ -3506,22 +3506,17 @@
       "spec": "§7",
       "severity": "P0",
       "title": "S15 memory and knowledge gate targets are missing",
-      "problem": "The S15 gate named conveyor-api test targets (knowledge_query, memory_recall) that exist nowhere. It now names shipped targets: conveyor-actions registry and parity_http_mcp, strata_live (ignored, real strata) and conveyor-store --test memory, with the vacuous filters removed. What remains unproven is a real pack/layer knowledge hit and run-transactional memory; the live path is still an ignored test, so the acceptance's second clause is unmet.",
+      "problem": "The S15 gate named conveyor-api targets that exist nowhere and are now corrected to shipped ones. Two live gaps remain: the real pack/layer knowledge hit and run-transactional memory. The ignored strata_live test now reads CONVEYOR_STRATA_RAG_URL (default http://strata-rag:8092) and compiles, but no strata_rag is deployed: mini3 has no image/credentials, and mini1 and mini2 (the owner-corrected hosts) have no docker, container, process or :8092 listener. The live half is a deployment blocker, not a test one.",
       "evidence": [
+        {
+          "path": "crates/actions/tests/strata_live.rs",
+          "line": 18,
+          "quote": "const URL: &str = \"http://strata-rag:8092\";"
+        },
         {
           "path": "docs/plans/slices/S15-capability-knowledge-memory.md",
           "line": 114,
           "quote": "   `cargo test -p conveyor-actions --test strata_live -- --ignored` (real strata) plus"
-        },
-        {
-          "path": "docs/plans/slices/S15-capability-knowledge-memory.md",
-          "line": 119,
-          "quote": "   `--test parity_http_mcp` (HTTP + MCP); the `conveyor-api --test knowledge_query` target named here"
-        },
-        {
-          "path": "docs/plans/slices/S15-capability-knowledge-memory.md",
-          "line": 123,
-          "quote": "   The shipped proof is `cargo test -p conveyor-store --test memory` and"
         }
       ],
       "failure_scenario": "The gate stops at the first missing target; capability, memory, readiness and clippy checks never execute.",
