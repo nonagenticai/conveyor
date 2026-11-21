@@ -253,6 +253,7 @@ async fn review(running: &support::Running, project: &str, contract: &str, deleg
                 "project_id": project,
                 "contract_id": contract,
                 "level": "compliant",
+                "delegation_ref": delegation,
                 "findings": [],
                 "evidence": {
                     "manifest": "acceptance/programme/T.toml",
@@ -532,6 +533,11 @@ async fn close_request_refuses_a_decision_from_another_project() {
         .await;
     assert_eq!(status, 201, "{created}");
     let other = text(output(&created), "id");
+    let decision_body = conveyor_domain::output_standard::template("decision")
+        .map(|template| template.skeleton)
+        .unwrap_or_else(|| {
+            "# Decision record\n\n## Context\n\nA context.\n\n## Decision\n\nA decision.\n\n## Consequences\n\nThe consequences.\n\n## Evidence\n\nThe evidence.\n".to_owned()
+        });
     let (status, body) = running
         .invoke(
             "documents.compose",
@@ -539,7 +545,7 @@ async fn close_request_refuses_a_decision_from_another_project() {
             json!({
                 "title": "Another decision",
                 "project_id": other,
-                "body": "A decision under another project.",
+                "body": decision_body,
                 "category": "decision",
                 "publishable": true,
             }),
