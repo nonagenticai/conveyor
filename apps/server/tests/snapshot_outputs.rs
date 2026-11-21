@@ -116,7 +116,9 @@ async fn only_published_outputs_are_public_and_rendered_safely() {
     let documents = artefacts["documents"].as_array().expect("documents");
     assert_eq!(documents.len(), 1, "only the published output is public");
     assert!(
-        !artefacts.contains("Publishable but never published"),
+        documents
+            .iter()
+            .all(|document| document["title"] != "Publishable but never published"),
         "publishable alone is not publication"
     );
     assert_eq!(documents[0]["title"], "Published note");
