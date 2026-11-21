@@ -1271,7 +1271,7 @@ fn tranche_reconciliation(tranches: &Value, reviews: &Value, projects: &Value) -
         };
         let replace = latest_review
             .get(tranche_id)
-            .is_none_or(|current| row_is_later(review, *current, "reviewed_at"));
+            .is_none_or(|current| row_is_later(review, current, "reviewed_at"));
         if replace {
             latest_review.insert(tranche_id, review);
         }
@@ -1417,7 +1417,7 @@ fn phase_progress(
         let key = (project.to_owned(), phase.to_owned());
         let replace = contract_by_phase
             .get(&key)
-            .is_none_or(|current| row_is_later(contract, *current, "created_at"));
+            .is_none_or(|current| row_is_later(contract, current, "created_at"));
         if replace {
             contract_by_phase.insert(key, contract);
         }
@@ -1429,7 +1429,7 @@ fn phase_progress(
         };
         let replace = review_by_contract
             .get(contract_id)
-            .is_none_or(|current| row_is_later(review, *current, "reviewed_at"));
+            .is_none_or(|current| row_is_later(review, current, "reviewed_at"));
         if replace {
             review_by_contract.insert(contract_id, review);
         }
