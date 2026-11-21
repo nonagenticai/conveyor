@@ -98,3 +98,9 @@ id = "T1-lessons"
 check = "lessons"
 severity = "P1"
 description = "the tranche-1 retro produced at least one lesson"
+
+[[check]]
+id = "T1-product"
+check = "product_findings"
+severity = "P0"
+description = "no open P0 product finding remains for the project"
