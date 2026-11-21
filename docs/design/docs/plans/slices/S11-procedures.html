@@ -38,7 +38,7 @@
 <h2 id="3-scope">3. Scope</h2>
 <p><strong>IN</strong> — the 3 tables of <code>02-DATA-ARCHITECTURE §2.12</code>; two <code>run</code> columns; 9 actions; publish validation; one resolver; job kind <code>procedure.step</code>; the seed.</p>
 <p><strong>OUT</strong> — matrix legality (<code>S03</code>), approval transport (<code>S06</code>, <code>S06a</code>), sub-procedures/engine/editor (<code>S13</code>), screens (<code>S12</code>), PDL (never).</p>
-<p><strong>UI surface declared for S12</strong> (declaration only): <code>procedures</code> — <code>procedures.*</code>, <code>procedure_runs.start/cancel</code>, read models <code>procedure</code> + <code>procedure_step</code> + <code>run_step</code>; SSE <code>run:{id}</code>.</p>
+<p><strong>UI surface declared for S12</strong> (declaration only): <code>processes</code> — <code>processes.*</code>, <code>procedures.*</code> (the SOP), <code>process_runs.start/cancel</code>, read models <code>process</code> + <code>process_step</code> + <code>procedure</code> (SOP) + <code>run_step</code>; SSE <code>run:{id}</code>.</p>
 <h2 id="4-source-material">4. Source material</h2>
 <table>
 <thead>
@@ -95,34 +95,38 @@
 </thead>
 <tbody>
 <tr>
-<td><code>procedures.create</code></td>
-<td><code>{key,title,description?,card_type_code?,steps?}</code> → <code>ProcedureOut</code>; new key = v1, existing forks <code>max(version)+1</code>, second draft = 409 <code>procedure.draft_exists</code></td>
+<td><code>processes.create</code></td>
+<td><code>{key,title,description?,card_type_code?,steps?}</code> → <code>ProcessOut</code>; new key = v1, existing forks <code>max(version)+1</code>, second draft = 409 <code>process.draft_exists</code></td>
 </tr>
 <tr>
-<td><code>procedures.update</code></td>
-<td><code>{procedure_id,title?,description?,steps?}</code> → <code>ProcedureOut</code>; draft only, <code>steps</code> replaces the list, <code>If-Match</code></td>
+<td><code>processes.update</code></td>
+<td><code>{process_id,title?,description?,steps?}</code> → <code>ProcessOut</code>; draft only, <code>steps</code> replaces the list, <code>If-Match</code></td>
 </tr>
 <tr>
-<td><code>procedures.publish</code></td>
-<td><code>{procedure_id}</code> → <code>{version,revision_id,content_hash}</code>; re-publish returns the same</td>
+<td><code>processes.publish</code></td>
+<td><code>{process_id,acknowledge_findings?}</code> → <code>{version,revision_id,content_hash}</code>; re-publish returns the same</td>
 </tr>
 <tr>
-<td><code>procedures.retire</code></td>
-<td><code>{procedure_id}</code> → <code>ProcedureOut</code>; live runs unaffected</td>
+<td><code>processes.retire</code></td>
+<td><code>{process_id}</code> → <code>ProcessOut</code>; live runs unaffected</td>
 </tr>
 <tr>
-<td><code>procedures.get</code> / <code>.list</code></td>
-<td><code>{procedure_id?/key?,version?}</code> / <code>{status?,card_type_code?,cursor?,limit?}</code> → <code>ProcedureOut</code> / page</td>
+<td><code>processes.get</code> / <code>.list</code></td>
+<td><code>{process_id?/key?,version?}</code> / <code>{status?,card_type_code?,cursor?,limit?}</code> → <code>ProcessOut</code> / page</td>
 </tr>
 <tr>
-<td><code>procedure_runs.start</code></td>
-<td><code>{card_id,procedure_id?/procedure_key?,inputs?}</code> → <code>RunOut</code>; <code>Idempotency-Key</code>, one live <strong>root</strong> run per card; a child may start under a live parent (<code>parent_run_id</code>/<code>step_id</code>, 2026-11-09)</td>
+<td><code>procedures.*</code></td>
+<td>the <strong>SOP</strong>, not the sequence: <code>{key,title,description?,definition_of_ready?,definition_of_done?,acceptance_criteria?,inspection?,outputs?}</code> and its <code>.update/.publish/.retire/.get/.list</code> siblings → <code>ProcedureOut</code>; a step names the published SOP it is judged against</td>
+</tr>
+<tr>
+<td><code>process_runs.start</code></td>
+<td><code>{card_id,process_id?/process_key?,inputs?}</code> → <code>RunOut</code>; <code>Idempotency-Key</code>, one live <strong>root</strong> run per card; a child may start under a live parent (<code>parent_run_id</code>/<code>step_id</code>, 2026-11-09)</td>
 </tr>
 </tbody>
 </table>
-<p><code>StepIn = {action, input_template, gate_kind?, on_error?, max_attempts?}</code>, <code>on_error ∈ fail|continue|retry</code> (default <code>fail</code>). <code>procedure_runs.start</code> composes S06's <code>runs.create</code> + <code>runs.start</code>; <strong>cancel is S06's <code>runs.cancel</code></strong> (extended to skip the run's queued <code>run_step</code> rows and announce each) — no second run state machine and no second cancel surface. <code>procedure_runs.complete_step</code> is <strong>dropped</strong> (step 9, 2026-11-09): the executor is the only writer of a run step, and an external "mark this complete" would let a caller set a step result without executing it; no consumer existed. HTTP is the registry route; no screens (S12). Files: <code>crates/domain/src/{procedure,template}.rs</code>, <code>crates/store/src/{procedure,run_step}.rs</code>, <code>crates/actions/src/procedure/</code>, <code>crates/api/src/procedures.rs</code>, <code>crates/api/tests/procedure_*.rs</code>. <strong>Events:</strong> <code>procedure.published</code>/<code>procedure.retired</code> from publish/retire (<code>{id,key,version}</code>), <code>run_step.changed</code> on every <code>run_step</code> transition (<code>{run_id,position,attempt,status}</code>).</p>
+<p><code>StepIn = {action, input_template, gate_kind?, on_result?, max_attempts?}</code>, <code>on_result ∈ fail|continue|retry</code> (default <code>fail</code>). ⚠️ The stored/API field is <strong><code>on_result</code></strong>; this plan's earlier drafts called it <code>on_error</code>, and the contract-change sections below keep that historical name. <code>process_runs.start</code> composes S06's <code>runs.create</code> + <code>runs.start</code>; <strong>cancel is S06's <code>runs.cancel</code></strong> (extended to skip the run's queued <code>run_step</code> rows and announce each) — no second run state machine and no second cancel surface. <code>process_runs.complete_step</code> is <strong>dropped</strong> (step 9, 2026-11-09): the executor is the only writer of a run step, and an external "mark this complete" would let a caller set a step result without executing it; no consumer existed. HTTP is the registry route; no screens (S12). Files: <code>crates/domain/src/{procedure,template}.rs</code>, <code>crates/store/src/{procedure,run_step}.rs</code>, <code>crates/actions/src/procedure/</code>, <code>crates/api/src/procedures.rs</code>, <code>crates/api/tests/procedure_*.rs</code>. <strong>Events:</strong> <code>procedure.published</code>/<code>procedure.retired</code> from publish/retire (<code>{id,key,version}</code>), <code>run_step.changed</code> on every <code>run_step</code> transition (<code>{run_id,position,attempt,status}</code>).</p>
 <h3 id="53-model-and-publish">5.3 Model and publish</h3>
-<p>A procedure is a version family: rows share <code>(tenant_id, key)</code>, each with <code>version</code> and <code>status ∈ draft|published|retired</code>. Publish validates in one transaction: action in the live manifest; <code>gate_kind</code> in <code>catalogue_entry(kind='gate')</code>; template roots/paths legal and <code>steps.&lt;n&gt; &lt; position</code>; <code>retry</code> only on idempotent actions; no <code>procedure_runs.*</code> step. It writes the frozen <code>revision</code> (<code>entity_type='procedure'</code>, <code>seq=version</code>, <code>content</code> = the steps, <code>content_hash=sha256(canonical JSON)</code>), flips the key's previous published row to <code>retired</code> and this one to <code>published</code>, emits <code>procedure.published</code>. <code>procedure_step</code> is immutable after publish; an edit copies it into v+1.</p>
+<p>A procedure is a version family: rows share <code>(tenant_id, key)</code>, each with <code>version</code> and <code>status ∈ draft|published|retired</code>. Publish validates in one transaction: action in the live manifest; <code>gate_kind</code> in <code>catalogue_entry(kind='gate')</code>; template roots/paths legal and <code>steps.&lt;n&gt; &lt; position</code>; <code>retry</code> only on idempotent actions; no <code>process_runs.*</code> step. It writes the frozen <code>revision</code> (<code>entity_type='procedure'</code>, <code>seq=version</code>, <code>content</code> = the steps, <code>content_hash=sha256(canonical JSON)</code>), flips the key's previous published row to <code>retired</code> and this one to <code>published</code>, emits <code>procedure.published</code>. <code>procedure_step</code> is immutable after publish; an edit copies it into v+1.</p>
 <h3 id="54-input-template">5.4 Input template</h3>
 <table>
 <thead>
@@ -201,10 +205,10 @@
 <li><code>domain::template::resolve</code> + a case table (object, interpolation, escape, missing path, forward ref, unknown root); <code>cargo test -p conveyor-domain template</code>.</li>
 <li><code>store::{procedure,run_step}</code>: create/fork, copy-forward, materialise, claim, record, append attempt; <code>cargo test -p conveyor-store procedure_crud run_step</code>.</li>
 <li>Six <code>procedures.*</code> actions + problem+json codes; <code>cargo test -p conveyor-actions procedures</code>.</li>
-<li>Publish: manifest lookup, gate lookup, revision freeze, old→retired in one tx; <code>cargo test -p conveyor-actions --test procedure publish</code>.</li>
-<li>Start: card/type checks, run insert, materialisation, job enqueue; <code>cargo test -p conveyor-actions --test procedure_start</code>.</li>
-<li>Step executor + <code>procedure.step</code> job: claim → resolve → invoke → record; <code>cargo test -p conveyor-actions --test procedure_step</code>.</li>
-<li>Gate, retry, continue, cancel (built 2026-11-09). <strong>Gate representation:</strong> the gated step stays <code>queued</code>; <code>gate_kind</code> opens an S06 <code>approval</code> (<code>kind='procedure'</code>, <code>gate=gate_kind</code>, <code>meta={position,attempt,procedure_step_id}</code>, quorum from <code>catalogue_entry(kind='gate').meta.dual_control</code>, <code>expires_at</code> from its <code>meta</code> when present) and the run parks <code>running → waiting_approval</code>. <code>approved</code> enqueues the same <code>(position,attempt)</code> as its own job (the <code>:gate</code> dedupe suffix keeps it from collapsing onto a still-running park job); <code>rejected|expired</code> applies <code>on_error</code> through the ordinary record-and-chain. <strong>Cancel</strong> is <code>runs.cancel</code> (voids the pending gate, skips the queued steps). Tests live in <code>crates/actions/tests/procedure_step.rs</code> (gate/retry/continue) and <code>procedure_cancel.rs</code>; a worker-level expiry path is in <code>apps/server/src/worker.rs::approval_expire</code>.</li>
+<li>Publish: manifest lookup, gate lookup, revision freeze, old→retired in one tx; <code>cargo test -p conveyor-actions --test procedures publish</code>.</li>
+<li>Start: card/type checks, run insert, materialisation, job enqueue; <code>cargo test -p conveyor-actions --test process_start</code>.</li>
+<li>Step executor + <code>procedure.step</code> job: claim → resolve → invoke → record; <code>cargo test -p conveyor-actions --test process_step</code>.</li>
+<li>Gate, retry, continue, cancel (built 2026-11-09). <strong>Gate representation:</strong> the gated step stays <code>queued</code>; <code>gate_kind</code> opens an S06 <code>approval</code> (<code>kind='procedure'</code>, <code>gate=gate_kind</code>, <code>meta={position,attempt,procedure_step_id}</code>, quorum from <code>catalogue_entry(kind='gate').meta.dual_control</code>, <code>expires_at</code> from its <code>meta</code> when present) and the run parks <code>running → waiting_approval</code>. <code>approved</code> enqueues the same <code>(position,attempt)</code> as its own job (the <code>:gate</code> dedupe suffix keeps it from collapsing onto a still-running park job); <code>rejected|expired</code> applies <code>on_error</code> through the ordinary record-and-chain. <strong>Cancel</strong> is <code>runs.cancel</code> (voids the pending gate, skips the queued steps). Tests live in <code>crates/actions/tests/process_step.rs</code> (gate/retry/continue) and <code>process_cancel.rs</code>; a worker-level expiry path is in <code>apps/server/src/worker.rs::approval_expire</code>.</li>
 <li>MCP projection + spec lock: <code>cargo run -p conveyor-server -- --print-openapi --check-lock</code>.</li>
 <li>Seed: <code>cargo run -p conveyor-server -- migrate --seed</code>; then, <strong>tenant-scoped</strong> (the table is RLS+FORCE, so an unscoped count is always 0): <code>psql "$DATABASE_URL" -qAtc "BEGIN; SET LOCAL app.current_tenant='&lt;dev-a uuid&gt;'; select count(*) from procedure where status='published'; COMMIT;"</code>. <strong>The procedure seed itself is deferred (George 2026-11-09)</strong>: the count is 0 by decision, and the derivation path is in §5.6.</li>
 <li>Gate rehearsal (§7); <code>cargo clippy --workspace --all-targets -- -D warnings &amp;&amp; cargo fmt --check</code>.</li>
@@ -217,28 +221,37 @@ CONVEYOR_DEV_AUTH=1 cargo run -p conveyor-server -- worker &amp;
 CONVEYOR_DEV_AUTH=1 cargo run -p conveyor-server -- serve &amp;
 trap &#39;kill $(jobs -p) 2&gt;/dev/null || true&#39; EXIT
 API=localhost:8930/api/actions; P(){ curl -fsS -X POST &quot;$API/$1/invocations&quot; -H &#39;content-type: application/json&#39; -H &quot;authorization: Bearer dev:alice&quot; -d &quot;$2&quot;; }
+PR(){ curl -fsS -X POST &quot;$API/$1/invocations&quot; -H &#39;content-type: application/json&#39; -H &quot;authorization: Bearer dev:reviewer&quot; -d &quot;$2&quot;; }   # the second dev-a admin the requester exclusion needs
 TENANT=$(psql &quot;$DATABASE_URL&quot; -tAc &quot;select id from tenant where slug=&#39;dev-a&#39;&quot;)          # `tenant` is the one table with no RLS
 Q(){ psql &quot;$DATABASE_URL&quot; -qAtc &quot;BEGIN; SET LOCAL app.current_tenant=&#39;$TENANT&#39;; $1; COMMIT;&quot;; }   # SET LOCAL inside one transaction, never a session-level SET
 PAIR=$(Q &quot;select e.code || &#39;|&#39; || ct.code from catalogue_entry e join card_type ct on e.meta-&gt;&#39;matrix&#39; ? ct.code and e.meta-&gt;&#39;matrix&#39;-&gt;ct.code-&gt;&#39;active&#39; ? &#39;done&#39; where e.kind=&#39;project_type&#39; and e.is_active and ct.is_active order by e.code, ct.code limit 1&quot;)
 PT=${PAIR%%|*}; CT=${PAIR#*|}
 [ -n &quot;$PT&quot; ] &amp;&amp; [ &quot;$PT&quot; != &quot;$PAIR&quot; ] || { echo &quot;seed has no project_type whose matrix allows active→done (S07 §5.4)&quot; &gt;&amp;2; exit 1; }
-ID=$(P procedures.create &quot;{\&quot;input\&quot;:{\&quot;key\&quot;:\&quot;dev-phase\&quot;,\&quot;title\&quot;:\&quot;Dev phase\&quot;,\&quot;card_type_code\&quot;:\&quot;$CT\&quot;,\&quot;steps\&quot;:[
- {\&quot;action\&quot;:\&quot;cards.claim\&quot;,\&quot;input_template\&quot;:{\&quot;card_id\&quot;:\&quot;{{card.id}}\&quot;,\&quot;_version\&quot;:\&quot;{{card.version}}\&quot;}},
- {\&quot;action\&quot;:\&quot;cards.comment\&quot;,\&quot;input_template\&quot;:{\&quot;id\&quot;:\&quot;{{card.id}}\&quot;,\&quot;body\&quot;:\&quot;run {{run.inputs.ticket}}\&quot;},\&quot;gate_kind\&quot;:\&quot;human_approval\&quot;},
- {\&quot;action\&quot;:\&quot;cards.move\&quot;,\&quot;input_template\&quot;:{\&quot;id\&quot;:\&quot;{{card.id}}\&quot;,\&quot;list_id\&quot;:\&quot;{{run.inputs.done_list}}\&quot;,\&quot;_version\&quot;:\&quot;{{card.version}}\&quot;}}]}}&quot; | jq -r .id)
-PRJ=$(P projects.create &quot;{\&quot;input\&quot;:{\&quot;title\&quot;:\&quot;s11 gate\&quot;,\&quot;project_type_code\&quot;:\&quot;$PT\&quot;}}&quot; | jq -r .id)
+# v1-s11-1: the sequence is a PROCESS (`processes.*`); `procedures.*` is the SOP. The old
+# `procedure_runs.start` never existed at this head — the run entry point is `process_runs.start`.
+# Two current publish rules shape this block: every step names a PUBLISHED SOP, and `kind` is
+# explicit because a step carrying `gate_kind` infers `gate` when `kind` is absent (a gate step
+# may not name an action). The gated COMPUTED step parks for approval, then runs once.
+SOP=$(P procedures.create &quot;{\&quot;input\&quot;:{\&quot;key\&quot;:\&quot;dev-phase-sop\&quot;,\&quot;title\&quot;:\&quot;Dev phase SOP\&quot;,\&quot;acceptance_criteria\&quot;:[\&quot;the card reached done\&quot;],\&quot;inspection\&quot;:{\&quot;kind\&quot;:\&quot;checker\&quot;,\&quot;rule\&quot;:\&quot;always\&quot;}}}&quot; | jq -r .output.id)
+[ -n &quot;$SOP&quot; ] || { echo &quot;procedures.create returned no id&quot; &gt;&amp;2; exit 1; }
+P procedures.publish &quot;{\&quot;input\&quot;:{\&quot;procedure_id\&quot;:\&quot;$SOP\&quot;}}&quot;
+ID=$(P processes.create &quot;{\&quot;input\&quot;:{\&quot;key\&quot;:\&quot;dev-phase\&quot;,\&quot;title\&quot;:\&quot;Dev phase\&quot;,\&quot;card_type_code\&quot;:\&quot;$CT\&quot;,\&quot;steps\&quot;:[
+ {\&quot;kind\&quot;:\&quot;computed\&quot;,\&quot;procedure_id\&quot;:\&quot;$SOP\&quot;,\&quot;action\&quot;:\&quot;cards.claim\&quot;,\&quot;input_template\&quot;:{\&quot;card_id\&quot;:\&quot;{{card.id}}\&quot;,\&quot;_version\&quot;:\&quot;{{card.version}}\&quot;}},
+ {\&quot;kind\&quot;:\&quot;computed\&quot;,\&quot;procedure_id\&quot;:\&quot;$SOP\&quot;,\&quot;action\&quot;:\&quot;cards.comment\&quot;,\&quot;input_template\&quot;:{\&quot;id\&quot;:\&quot;{{card.id}}\&quot;,\&quot;body\&quot;:\&quot;run {{run.inputs.ticket}}\&quot;},\&quot;gate_kind\&quot;:\&quot;human_approval\&quot;},
+ {\&quot;kind\&quot;:\&quot;computed\&quot;,\&quot;procedure_id\&quot;:\&quot;$SOP\&quot;,\&quot;action\&quot;:\&quot;cards.move\&quot;,\&quot;input_template\&quot;:{\&quot;id\&quot;:\&quot;{{card.id}}\&quot;,\&quot;list_id\&quot;:\&quot;{{run.inputs.done_list}}\&quot;,\&quot;_version\&quot;:\&quot;{{card.version}}\&quot;}}]}}&quot; | jq -r .output.id)
+PRJ=$(P projects.create &quot;{\&quot;input\&quot;:{\&quot;title\&quot;:\&quot;s11 gate\&quot;,\&quot;project_type_code\&quot;:\&quot;$PT\&quot;}}&quot; | jq -r .output.id)
 [ -n &quot;$PRJ&quot; ] || { echo &quot;projects.create returned no id&quot; &gt;&amp;2; exit 1; }
 BOARD=$(Q &quot;select id from board where project_id=&#39;$PRJ&#39; order by position, id limit 1&quot;)
 ACTIVE=$(Q &quot;select id from list where board_id=&#39;$BOARD&#39; and kind=&#39;active&#39;&quot;)
 DONE=$(Q &quot;select id from list where board_id=&#39;$BOARD&#39; and kind=&#39;done&#39;&quot;)
 [ -n &quot;$BOARD&quot; ] &amp;&amp; [ -n &quot;$ACTIVE&quot; ] &amp;&amp; [ -n &quot;$DONE&quot; ] || { echo &quot;the project has no board or no active/done list&quot; &gt;&amp;2; exit 1; }
-CARD=$(P cards.create &quot;{\&quot;input\&quot;:{\&quot;board_id\&quot;:\&quot;$BOARD\&quot;,\&quot;list_id\&quot;:\&quot;$ACTIVE\&quot;,\&quot;name\&quot;:\&quot;S11 gate card\&quot;,\&quot;card_type_code\&quot;:\&quot;$CT\&quot;}}&quot; | jq -r .id)
-P procedures.publish &quot;{\&quot;input\&quot;:{\&quot;procedure_id\&quot;:\&quot;$ID\&quot;}}&quot;
-RUN=$(P procedure_runs.start &quot;{\&quot;input\&quot;:{\&quot;card_id\&quot;:\&quot;$CARD\&quot;,\&quot;procedure_key\&quot;:\&quot;dev-phase\&quot;,\&quot;inputs\&quot;:{\&quot;ticket\&quot;:\&quot;T-1\&quot;,\&quot;done_list\&quot;:\&quot;$DONE\&quot;}}}&quot; | jq -r .id)
+CARD=$(P cards.create &quot;{\&quot;input\&quot;:{\&quot;board_id\&quot;:\&quot;$BOARD\&quot;,\&quot;list_id\&quot;:\&quot;$ACTIVE\&quot;,\&quot;name\&quot;:\&quot;S11 gate card\&quot;,\&quot;card_type_code\&quot;:\&quot;$CT\&quot;}}&quot; | jq -r .output.id)
+P processes.publish &quot;{\&quot;input\&quot;:{\&quot;process_id\&quot;:\&quot;$ID\&quot;}}&quot;
+RUN=$(P process_runs.start &quot;{\&quot;input\&quot;:{\&quot;card_id\&quot;:\&quot;$CARD\&quot;,\&quot;process_key\&quot;:\&quot;dev-phase\&quot;,\&quot;inputs\&quot;:{\&quot;ticket\&quot;:\&quot;T-1\&quot;,\&quot;done_list\&quot;:\&quot;$DONE\&quot;}}}&quot; | jq -r .output.id)
 for i in $(seq 1 30); do [ &quot;$(Q &quot;select status from run where id=&#39;$RUN&#39;&quot;)&quot; = waiting_approval ] &amp;&amp; break; sleep 1; done   # the worker advances asynchronously
 test &quot;$(Q &quot;select status from run where id=&#39;$RUN&#39;&quot;)&quot; = waiting_approval          # waiting_approval
 APPROVAL=$(Q &quot;select id from approval where run_id=&#39;$RUN&#39; and status=&#39;pending&#39;&quot;)
-P approvals.decide &quot;{\&quot;input\&quot;:{\&quot;approval_id\&quot;:\&quot;$APPROVAL\&quot;,\&quot;decision\&quot;:\&quot;approve\&quot;}}&quot;
+PR approvals.decide &quot;{\&quot;input\&quot;:{\&quot;approval_id\&quot;:\&quot;$APPROVAL\&quot;,\&quot;decision\&quot;:\&quot;approve\&quot;}}&quot;   # the requester (alice) may not decide her own gate
 for i in $(seq 1 30); do [ &quot;$(Q &quot;select count(*) from run_step where run_id=&#39;$RUN&#39;&quot;)&quot; = 3 ] &amp;&amp; break; sleep 1; done
 test &quot;$(Q &quot;select count(*) from run_step where run_id=&#39;$RUN&#39;&quot;)&quot; = 3        # 3 rows
 for i in $(seq 1 30); do [ &quot;$(Q &quot;select status from run where id=&#39;$RUN&#39;&quot;)&quot; = succeeded ] &amp;&amp; break; sleep 1; done   # the approved gate resumes the last step
@@ -254,11 +267,11 @@ test &quot;$(Q &quot;select count(*) from run_step where run_id=&#39;$RUN&#39; a
 <ul>
 <li><strong>PDL creeping back.</strong> No condition/effect/assertion field. Input legality is the action's JSON Schema; state legality is the matrix; "what next" is step order.</li>
 <li><strong>A template language with no escaping.</strong> <code>\{{</code> is the only escape; unknown roots and bad indices refuse. No filters, <code>||</code> or truthiness.</li>
-<li><strong>A step that invokes itself.</strong> Publish refuses any step naming <code>procedure_runs.*</code> and any <code>steps.&lt;n&gt;</code> at or after its position. Sub-procedures (S13) need <code>run.parent_run_id</code> and a depth cap first.</li>
+<li><strong>A step that invokes itself.</strong> Publish refuses any step naming <code>process_runs.*</code> and any <code>steps.&lt;n&gt;</code> at or after its position. Sub-procedures (S13) need <code>run.parent_run_id</code> and a depth cap first.</li>
 <li><strong><code>run_step</code> outside the step's transaction.</strong> Result, <code>action_invocation</code>, <code>audit_event</code> and event share one tx; the remote call cannot, so its <code>Idempotency-Key</code> derives from <code>(run_id, position, attempt)</code> and a crash retries into the same key. ⚠️ <strong>As built (step 8), the internal composed call cannot share the record's tx</strong>: <code>invoke</code> owns its own transaction (validation, idempotency claim, bookkeeping, handler, commit), so <code>action_invocation</code>/<code>audit_event</code> commit there and <code>run_step</code> + <code>run_step.changed</code> + the chain commit in a second transaction. The property is preserved by the replay rule instead: the resolved input is persisted at CLAIM, a crash re-invokes under the same Idempotency-Key, and the record is idempotent on <code>(run_id, position, attempt)</code>. Sharing one tx would require an <code>invoke_in_tx</code> engine entry point — deliberately not added here.</li>
 <li><strong>Publishing without freezing.</strong> Status flip, <code>revision</code> and retired-previous are one tx; <code>procedure_step</code> is immutable after publish. Never re-read the procedure at step time.</li>
 <li><strong>A gate on a non-idempotent step.</strong> A gate parks before execution so the step runs once per attempt, but <code>on_error='retry'</code> on a non-idempotent action is refused at publish — the retry has no second approval.</li>
-<li>⚠️ <strong>Executor scoping (D22, CONTRACT §17) — S11 seams it, S15 fills it.</strong> As built (2026-11-09): migration <strong><code>0021_s11_run_capability</code></strong> adds the two forward-reference <code>run</code> columns (<code>capability_id</code>, <code>capability_agent_id</code>; no FK — S15's <code>0020</code> adds the targets and constraints), and <code>procedure_runs.start</code> calls one <code>resolve_start_context</code> + <code>ensure_start_ready</code> pair before anything is written. Today the resolver returns <code>StartContext::Unresolved</code> (no capability schema exists), so the readiness arm does not apply — it is not skipped; the enum makes that explicit. S15 fills the <code>Resolved</code> body (readiness, <code>409 capability_not_ready</code> with <code>blocking[]</code>, <code>allowed_actions</code> passed into the invocation) and must not add a second start path.</li>
+<li>⚠️ <strong>Executor scoping (D22, CONTRACT §17) — S11 seams it, S15 fills it.</strong> As built (2026-11-09): migration <strong><code>0021_s11_run_capability</code></strong> adds the two forward-reference <code>run</code> columns (<code>capability_id</code>, <code>capability_agent_id</code>; no FK — S15's <code>0020</code> adds the targets and constraints), and <code>process_runs.start</code> calls one <code>resolve_start_context</code> + <code>ensure_start_ready</code> pair before anything is written. Today the resolver returns <code>StartContext::Unresolved</code> (no capability schema exists), so the readiness arm does not apply — it is not skipped; the enum makes that explicit. S15 fills the <code>Resolved</code> body (readiness, <code>409 capability_not_ready</code> with <code>blocking[]</code>, <code>allowed_actions</code> passed into the invocation) and must not add a second start path.</li>
 <li><strong>Who may author.</strong> <code>procedures:write</code> is held by owner/admin/member (super-admin, tenant-admin, tenant-member) and by the <strong><code>kata_executor</code></strong> role — now a real fifth role (George 2026-11-09, CCR 5): a synthetic tenant-admin held only by a MACHINE principal (<code>app_user.kind</code> = <code>agent</code> | <code>service</code>; <code>members.set_role</code> refuses a human). It holds every tenant scope an <code>admin</code> does, because its job is to create and update the system's shared assets (procedures today; workflows S13, knowledge S15) and run project work. The step executor runs as <code>actor_kind='service'</code>, <code>Role::KataExecutor</code>. A viewer may read but not author. The publish-time invoke check (step 8) remains the control that stops a member from conferring an action they lack.</li>
 </ul>
 <h2 id="9-decisions-closed-here">9. Decisions closed here</h2>

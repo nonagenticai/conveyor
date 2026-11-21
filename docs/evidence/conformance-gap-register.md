@@ -1,6 +1,6 @@
 # MSP/TOGAF conformance gap register
 
-Snapshot: `2a1ff31df668b8fc456dcac2640f29f44cafcf16` generated `2026-11-21T20:52:01.734068+00:00` from `/Users/georgedekker/Movies/nonagenticai/conveyor-snapshots/issue-526-2a1ff31d/data`.
+Snapshot: `2a1ff31df668b8fc456dcac2640f29f44cafcf16` generated `2026-11-21T20:52:01.734068+00:00` from `issue-526-2a1ff31d/data`.
 
 | Severity | Count |
 |---|---:|
