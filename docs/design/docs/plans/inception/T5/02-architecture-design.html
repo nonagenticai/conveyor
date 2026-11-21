@@ -1,0 +1,343 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>T5 — Architecture design · conveyor documents</title>
+    <link rel="icon" href="../../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/plans/inception/T5/02-architecture-design.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="t5--architecture-design">T5 — Architecture design</h1>
+<p>Project: T5 — Kata · Track: v2 · Tranche: 10 · Plan: docs/SPEC_V2.md §12 Unit: #77 (this document is dependency-shaping work; blocked-by T2, S16–S20 and P0) Baseline: main@70d31773, 2026-11-21 (content reviewed at main@61edfcf8, 2026-11-18; citations re-verified at this baseline) · Project row: active, meta.depends_on = ["T2", "S16", "S17", "S18", "S19", "S20", "P0"]</p>
+<ul>
+<li><strong>Status:</strong> published</li>
+<li><strong>Version:</strong> 1.0</li>
+<li><strong>Author / date:</strong> conveyor programme session / 2026-11-21</li>
+<li><strong>Reviewer / review date:</strong> #347 independent review / 2026-11-18; owner publication / 2026-11-21</li>
+<li><strong>Related project:</strong> T5 — Kata · issue #77 · live document <code>01a1ee4c-04d8-757b-ad3d-1807a55e0ae1</code></li>
+<li><strong>Rationale:</strong> Define the to-be architecture for Kata: aggregates, tables and actions, decisions, acceptance and the artefact set.</li>
+<li><strong>Published document:</strong> <code>01a1ee4c-04d8-757b-ad3d-1807a55e0ae1</code> — published 2026-11-21</li>
+<li><strong>Contract:</strong> pending</li>
+<li><strong>ADM phase / plateau:</strong> A / PSA for the artefact (project row: G / capability)</li>
+<li><strong>Entries:</strong> context and boundary; aggregate/table/action rows; decisions; acceptance scenarios; PSA set; typed artefacts; rollout.</li>
+<li><strong>Derivation / realization / reuse / dependency:</strong> derived from SPEC_V2 §6.3, §9.3–§9.4, §12 T5 and P0 §5; realized by #77; reuse sources cited below; project dependencies T2, S16–S20, P0.</li>
+<li><strong>Links:</strong> issue #77; SPEC_V2 §12; the sibling inception document; <code>seed/programme.json</code>.</li>
+</ul>
+<h2 id="context-and-boundary">Context and boundary</h2>
+<p>T5 is the system-improvement job of §6.3: observe, state the problem with data, choose a candidate, standardise, sustain, propagate. It owns the kata project, the candidate, the measurement contract, the adoption gate, propagation and revert. It is one link of §9.4's single loop, not a parallel loop.</p>
+<p>In scope: the <code>kata</code> job binding, a kata project type, the kata rows, the <code>kata.*</code> actions and events. Out: the instruments (S16–S20), lesson promotion (organisational memory), the development project (T6), the andon cord (S06) and the tool platform (T13). Under D45 the kata is its own tenant; that tenant, its approvals, budget and autonomy policy are absent today (no <code>kata</code> tenant row — the analysis records it), and this design proposes them, never inheriting the target tenant's write scope.</p>
+<h2 id="aggregates-tables-and-actions">Aggregates, tables and actions</h2>
+<p>Existing names resolve in <code>migrations/</code> and <code>docs/design/data/actions.json</code>; proposed names are marked <code>(to create)</code> and trace to §12 T5 or a decision below.</p>
+<table>
+<thead>
+<tr>
+<th>Aggregate</th>
+<th>Table</th>
+<th>Invariants</th>
+<th>Actions</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Kata</td>
+<td><code>project</code> (existing) + <code>kata</code> (to create)</td>
+<td>one kata row per kata project; at most one open kata per <code>(tenant_id, signature)</code>; instrument and prediction fixed at open</td>
+<td><code>kata.open</code>, <code>kata.observe</code>, <code>kata.close</code> (to create)</td>
+</tr>
+<tr>
+<td>Candidate</td>
+<td><code>kata_candidate</code> (to create)</td>
+<td>ordinal monotonic per kata; <code>target_ref</code> records tenant, kind, id and <code>base_version</code>; a measured candidate is immutable</td>
+<td><code>kata.analyse</code>, <code>kata.propose</code> (to create)</td>
+</tr>
+<tr>
+<td>Measurement</td>
+<td><code>kata_measurement</code> (to create)</td>
+<td>instrument version, split and noise band pinned; baseline and candidate from the same instrument version</td>
+<td><code>kata.measure</code> (to create)</td>
+</tr>
+<tr>
+<td>Adoption</td>
+<td><code>approval</code> (existing)</td>
+<td>one approval row; <code>approval_decision.decided_by_kind='human'</code> (every non-human decision refuses); approver is not the kata executor or assignee; <code>improvement_verdict</code> stays the built `keep</td>
+<td>revert</td>
+</tr>
+<tr>
+<td>Propagation</td>
+<td><code>kata_propagation</code> (to create)</td>
+<td>one row per target; each target carries its own approval; no target inherits the kata tenant's autonomy</td>
+<td><code>kata.propagate</code> (to create)</td>
+</tr>
+<tr>
+<td>Revert</td>
+<td><code>kata</code> outcome + <code>event</code> (existing)</td>
+<td>the recorded <code>base_version</code> is restored; the reason is recorded; cord release is never a kata action</td>
+<td><code>kata.close</code> (to create)</td>
+</tr>
+</tbody>
+</table>
+<p>A partial unique index on the open states enforces the signature rule; RLS is enabled in the same migration.</p>
+<p>Reused actions: <code>projects.create</code>, <code>projects.close</code>, <code>cards.create</code>, <code>runs.create</code>, <code>approvals.request</code>, <code>approvals.decide</code>, <code>eval_runs.start</code>, <code>eval_signoffs.request</code>, <code>eval_signoffs.decide</code>, <code>benchmark_runs.start</code>, <code>benchmark_runs.get</code>, <code>benchmark_runs.compare</code>, <code>andon.engage</code>, <code>andon.release</code>, <code>procedures.publish</code>, <code>job_releases.publish</code>. Proposed: the §10.4 family <code>kata.open</code>, <code>kata.observe</code>, <code>kata.analyse</code>, <code>kata.propose</code>, <code>kata.measure</code>, <code>kata.adopt</code>, <code>kata.propagate</code>, <code>kata.close</code> (to create). Events <code>kata.opened</code>, <code>kata.candidate_proposed</code>, <code>kata.measured</code>, <code>kata.adopted</code>, <code>kata.reverted</code>, <code>kata.propagated</code>, <code>kata.closed</code> (to create) travel on the existing outbox. The seeded process key <code>kata.open</code> (built) and the proposed action <code>kata.open</code> are different registries; the existing catalogue tests assert only the process key (<code>apps/server/tests/catalogue_install.rs</code>), and a test that both resolve is to create at #77.</p>
+<h2 id="decisions">Decisions</h2>
+<p><strong>D-T5-1 — Kata is a project type, not a workflow engine.</strong> A <code>project</code> with <code>project_type_code='kata_v2'</code>, cards, runs and approvals. Alternative: a dedicated kata service. Consequence: no second runtime; it inherits T1's project types.</p>
+<p><strong>D-T5-2 — The measurement is an existing instrument.</strong> <code>kata.measure</code> calls <code>eval_runs.start</code> or <code>benchmark_runs.start</code> and records the run id. Alternative: a kata-local harness. Consequence: frozen versions and sign-offs apply; a suite that cannot express the change blocks the kata.</p>
+<p><strong>D-T5-3 — Held out means the instrument's locked split.</strong> Adoption requires <code>split='test'</code> on a version whose <code>split_sha256</code> is locked and unchanged since prediction. Alternative: a separate holdout store. Consequence: the kata never calls <code>evals.draw_split</code>; a re-drawn split voids the measurement.</p>
+<p><strong>D-T5-4 — Adoption is a human approval.</strong> <code>kata.adopt</code> opens an <code>approval</code> and may not decide it; the decision refuses a non-user principal, reusing the <code>signoff_requires_human</code> pattern. Alternative: auto-adopt on a metric win. Consequence: adoption waits for a person.</p>
+<p><strong>D-T5-5 — Revert is an explicit outcome.</strong> <code>kata.close{outcome:'reverted'}</code> re-publishes <code>base_version</code> through the target's own action and writes <code>kata.reverted</code>. Alternative: record the verdict and leave the change live. Consequence: the target's gate runs on the restore.</p>
+<p><strong>D-T5-6 — The kata tenant references a target, never writes across tenants.</strong> A pinned <code>(target_tenant_id, kind, id, base_version)</code>; every target write is the target tenant's publish action under its own gate. Alternative: a cross-tenant service account. Consequence: the read grant is a tenant-configurable policy row.</p>
+<p><strong>D-T5-7 — One open kata per signature.</strong> A partial unique index plus a <code>kata.open</code> refusal (<code>409 kata_signature_open</code>); <code>kata_wip</code> stays a WIP limit. Alternative: rely on the WIP limit. Consequence: duplicate katas are structurally impossible.</p>
+<p><strong>D-T5-8 — The published seed row is not edited.</strong> A new code <code>kata_v2</code> (to create) is seeded and V1 <code>kata</code> retired for new projects. Alternative: edit <code>seed/catalogue.json:kata</code> in place. Consequence: the seed gate stays green.</p>
+<h2 id="acceptance">Acceptance</h2>
+<p>Gate, verbatim from §12 T5: "a procedure change is measured on a held-out instrument; a regression is reverted; self-approval refused; an unmeasurable kata is not opened".</p>
+<ol type="1">
+<li><strong>Held-out measurement.</strong> Given a kata changing a procedure version, when <code>kata.measure</code> runs, then <code>kata_measurement</code> records the pinned instrument version and <code>split='test'</code>; <code>kata.adopt</code> refuses a <code>train</code> or <code>none</code> split with <code>422 kata_measurement_not_held_out</code>. Verify: <code>crates/actions/tests/kata_measure.rs::a_procedure_change_is_measured_on_the_held_out_split</code> (to create at #77).</li>
+<li><strong>Regression reverted.</strong> Given <code>improvement_verdict='revert'</code>, when the kata closes with <code>outcome='reverted'</code>, then <code>base_version</code> is published again and <code>kata.reverted</code> is written; a close without a restore refuses <code>422 kata_revert_missing</code>. Verify: (to create at crates/actions/tests/kata_revert.rs).</li>
+<li><strong>Self-approval refused.</strong> Given an adoption approval, when the kata's executor or a machine principal calls <code>approvals.decide</code>, then the decision refuses <code>403 kata_self_approval</code>. Verify: <code>crates/actions/tests/kata_adopt.rs::the_kata_cannot_approve_its_own_adoption</code> (to create at #77); pattern at <code>crates/actions/tests/eval_signoff_gate.rs</code>.</li>
+<li><strong>Unmeasurable kata not opened.</strong> Given an open request with no instrument id, version, split or prediction, when <code>kata.open</code> runs, then it refuses <code>422 kata_unmeasurable</code> and writes no kata row. Verify: <code>crates/actions/tests/kata_open.rs::a_kata_without_an_instrument_is_not_opened</code> (to create at #77).</li>
+<li><strong>Prediction before measurement.</strong> Given a kata, when <code>kata.measure</code> runs before a prediction row exists, then it refuses <code>422 kata_prediction_missing</code>. Verify: <code>crates/actions/tests/kata_gets.rs::the_prediction_is_recorded_before_the_measurement</code> (to create at #77).</li>
+</ol>
+<h2 id="architecture-artefacts">Architecture artefacts</h2>
+<p>Common metadata: owner the <code>kata</code> job owner; reviewer this review, recorded on #347; review date 2026-11-18; version 1; project T5 — Kata; published document this architecture design, to be published under #77; links derive from SPEC_V2 §6.3/§12 T5. Purpose/stakeholders/scope: how the kata loop is measured, adopted and reverted, for the kata job, coach, PM, adopting human and target job owner.</p>
+<p><strong>PSA-1 — Principles applied (catalogue).</strong> P3 no work without card/evidence — every kata is a project card and every gate carries run and instrument ids; P4 executor never approves its own work — adoption excludes the kata's principal; P5 measurement before adoption — prediction and held-out measurement are mandatory; P6 meta-jobs are ordinary jobs — the same project, card, run and approval primitives; P10 no speculative aggregates — four tables, each read by an action; P11 tenant configuration over code — adoption policy, read grant and WIP limit are rows.</p>
+<p><strong>PSA-2 — Requirements (catalogue).</strong> R1 six Gets with an evidence set (§6.3); R2 pre-registered prediction before the candidate (§6.3); R3 held-out measurement (§12 T5); R4 revert on regression (§12 T5, §9.3); R5 adoption by a person, never self-approval (§9.3); R6 no kata without an instrument and threshold (§6.3); R7 propagation per target (§6.3); R8 lessons need two independent evidence refs at promotion (§7.6, owned by organisational memory).</p>
+<p><strong>PSA-3 — Stakeholder map (matrix).</strong> Axes stakeholder × concern; each cell is accountable (A), consulted (C), informed (I) or deliberately empty.</p>
+<table>
+<thead>
+<tr>
+<th>Stakeholder \ Concern</th>
+<th>Evidence set</th>
+<th>Adoption</th>
+<th>Priority and WIP</th>
+<th>Publish</th>
+<th>Propagation</th>
+<th>Measurement</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Kata facilitator</td>
+<td>A</td>
+<td>C</td>
+<td>I</td>
+<td>I</td>
+<td>I</td>
+<td>A</td>
+</tr>
+<tr>
+<td>Coach</td>
+<td>C (raises the candidate)</td>
+<td>C</td>
+<td>A</td>
+<td>—</td>
+<td>C</td>
+<td>I</td>
+</tr>
+<tr>
+<td>PM</td>
+<td>I</td>
+<td>C</td>
+<td>A</td>
+<td>—</td>
+<td>I</td>
+<td>C</td>
+</tr>
+<tr>
+<td>Human approver</td>
+<td>C</td>
+<td>A</td>
+<td>—</td>
+<td>I</td>
+<td>C</td>
+<td>C</td>
+</tr>
+<tr>
+<td>Target job owner</td>
+<td>I</td>
+<td>C</td>
+<td>I</td>
+<td>A</td>
+<td>A</td>
+<td>C</td>
+</tr>
+<tr>
+<td>Operations</td>
+<td>C (postmortem origin)</td>
+<td>I</td>
+<td>I</td>
+<td>—</td>
+<td>I</td>
+<td>C</td>
+</tr>
+<tr>
+<td>Architecture Board</td>
+<td>I</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>A (job-family change)</td>
+<td>I</td>
+</tr>
+</tbody>
+</table>
+<p><strong>PSA-4 — Driver/Goal/Objective catalog.</strong> D1 improvements are asserted, not proven. G1 every adopted change wins on a held-out instrument. G2 every regression returns to its base version. G3 every improvement can reach another job. O1 one open kata per signature. O2 adoption refuses a non-held-out measurement. O3 revert restores a recorded version. O4 propagation is a per-target approval.</p>
+<p><strong>PSA-5 — Solution concept (catalogue of edges).</strong> Viewpoint: the adopting human asking what proves a kata change.</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>From</th>
+<th>To</th>
+<th>The gate on the edge</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>source card or finding</td>
+<td>kata project</td>
+<td><code>kata.open</code> refuses without an instrument id, version and pre-registered prediction</td>
+</tr>
+<tr>
+<td>2</td>
+<td>kata project</td>
+<td>observation and problem statement</td>
+<td>the six-Gets evidence set</td>
+</tr>
+<tr>
+<td>3</td>
+<td>problem statement</td>
+<td>candidate</td>
+<td>the prediction is recorded first</td>
+</tr>
+<tr>
+<td>4</td>
+<td>candidate</td>
+<td>measurement</td>
+<td>pinned instrument version, <code>split='test'</code></td>
+</tr>
+<tr>
+<td>5</td>
+<td>measurement</td>
+<td>adoption approval</td>
+<td>a human decides; the kata cannot</td>
+</tr>
+<tr>
+<td>6</td>
+<td>adoption approval</td>
+<td>production version</td>
+<td>the target's own publish action and gate</td>
+</tr>
+<tr>
+<td>7</td>
+<td>measurement (regression)</td>
+<td>base version</td>
+<td>revert restores the recorded version</td>
+</tr>
+<tr>
+<td>8</td>
+<td>production version</td>
+<td>propagation rows</td>
+<td>per-target approval</td>
+</tr>
+</tbody>
+</table>
+<p><strong>TS-1 — Kata action catalogue (catalogue).</strong> Metadata: type catalogue · phase/plateau A / PSA · status draft · version 1 · owner the <code>kata</code> job owner · reviewer this review, recorded on #347 · review date 2026-11-18 · project T5 — Kata · purpose the action surface and each gate it carries · stakeholders the kata job, coach, PM, adopting human and target job owner · scope §10.4's kata family plus the read actions this design adds · published document this architecture design, to be published under #77 · links §10.4, §6.3.</p>
+<table>
+<thead>
+<tr>
+<th>Action</th>
+<th>Kind</th>
+<th>Refusal it carries</th>
+<th>Event</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>kata.open</code></td>
+<td>write</td>
+<td><code>422 kata_unmeasurable</code> without instrument and prediction; <code>409 kata_signature_open</code> for a second open kata on one signature</td>
+<td><code>kata.opened</code></td>
+</tr>
+<tr>
+<td><code>kata.observe</code></td>
+<td>write</td>
+<td>refuses an observation with no evidence ref</td>
+<td><code>kata.observed</code></td>
+</tr>
+<tr>
+<td><code>kata.analyse</code></td>
+<td>write</td>
+<td>refuses a problem statement without measurement data</td>
+<td><code>kata.analysed</code></td>
+</tr>
+<tr>
+<td><code>kata.propose</code></td>
+<td>write</td>
+<td>refuses a candidate with no pre-registered prediction (<code>422 kata_prediction_missing</code>)</td>
+<td><code>kata.candidate_proposed</code></td>
+</tr>
+<tr>
+<td><code>kata.measure</code></td>
+<td>write</td>
+<td>refuses a non-held-out split (<code>422 kata_measurement_not_held_out</code>)</td>
+<td><code>kata.measured</code></td>
+</tr>
+<tr>
+<td><code>kata.adopt</code></td>
+<td>write</td>
+<td>refuses a non-human decision (<code>403 kata_self_approval</code>)</td>
+<td><code>kata.adopted</code></td>
+</tr>
+<tr>
+<td><code>kata.propagate</code></td>
+<td>write</td>
+<td>refuses a target without its own approval</td>
+<td><code>kata.propagated</code></td>
+</tr>
+<tr>
+<td><code>kata.close</code></td>
+<td>write</td>
+<td>refuses <code>outcome='reverted'</code> without a restore (<code>422 kata_revert_missing</code>)</td>
+<td><code>kata.closed</code>, <code>kata.reverted</code></td>
+</tr>
+<tr>
+<td><code>kata.get</code>, <code>kata.list</code></td>
+<td>read</td>
+<td>n/a</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<h2 id="migration-and-rollout">Migration and rollout</h2>
+<p>One forward-only migration, <code>0052_t5_kata.sql</code> (to create): four tables with RLS, the signature index; no backfill, no edit to an existing table. Seed changes add <code>kata_v2</code> (to create), the kata actions and a capability description as a new seed release, never an edit to the published <code>kata</code> row. Rollout follows T2 and S16–S20: register actions, seed the type, open one kata on a low-risk procedure, prove measurement and revert locally, then enable the coach's escalation. The feature is dark until a kata project exists. The adoption gate defaults to human dual control through <code>approval_policy</code>; the failed-kata cord stays on <code>andon</code>.</p>
+<h2 id="links">Links</h2>
+<ul>
+<li>Brief: <a href="https://conveyor.nonagentic.ai/design/docs/output-01a1e008-7d05-75d4-ae9d-4e2d485271b4.html">https://conveyor.nonagentic.ai/design/docs/output-01a1e008-7d05-75d4-ae9d-4e2d485271b4.html</a></li>
+<li>Issue: #77</li>
+<li>Spec: <code>docs/SPEC_V2.md</code> §6.3, §7.6, §8.1, §9.3, §9.4, §10.4, §12 T5; decisions D31, D45</li>
+<li>Inception standard: <code>docs/plans/P0-programme-definition.md</code> §5</li>
+<li>P0 published references: architecture principles, artefact standard, reuse map and blueprint at the public design site</li>
+</ul>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/plans/inception/T5/02-architecture-design.md</code> at build time.</span>
+      <a href="../../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

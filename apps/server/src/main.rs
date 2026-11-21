@@ -91,7 +91,7 @@ enum Command {
         /// The output directory.
         #[arg(long, default_value = "docs/design/data")]
         out: PathBuf,
-        /// Also render every publishable platform output into this directory
+        /// Also render every published platform output into this directory
         /// (`docs/design/docs`). Absent means the data snapshot only.
         #[arg(long)]
         outputs_dir: Option<PathBuf>,

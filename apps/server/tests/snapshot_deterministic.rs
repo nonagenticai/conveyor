@@ -133,9 +133,9 @@ async fn snapshot_is_byte_identical_and_redacts_secrets_and_pii() {
     // The definition-set metadata (#333): the public page shows a published document's category,
     // unit and published state; a draft's existence must stay invisible.
     sqlx::query(
-        "INSERT INTO document (tenant_id, project_id, kind, title, body, publishable, category, unit, status)
+        "INSERT INTO document (tenant_id, project_id, kind, title, body, publishable, published_at, category, unit, status)
          VALUES ($1, $2, 'document', 'Snapshot definition artefact', 'a published body', true,
-                 'vision', 'P0', 'active')",
+                 now(), 'vision', 'P0', 'active')",
     )
     .bind(tenant)
     .bind(project)
@@ -555,6 +555,12 @@ async fn the_live_view_and_the_cli_write_the_same_bytes() {
     )
     .await
     .expect("compose the live output");
+    // `publishable` alone is not publication: the snapshot and the outputs index read `published_at`.
+    sqlx::query("UPDATE document SET published_at = now() WHERE id = $1")
+        .bind(document_id)
+        .execute(&mut *tx)
+        .await
+        .expect("publish the live output");
     tx.commit().await.expect("commit");
 
     let dir = std::env::temp_dir().join(format!("conveyor-live-parity-{}", Uuid::now_v7()));

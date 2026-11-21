@@ -7,7 +7,7 @@
 //! the operator's preview calls. `outputs.js` is the
 //! index (`window.CONVEYOR_OUTPUTS = {…}`), and `docs/design/docs.js` only lists it.
 //!
-//! **The filter is the publication decision.** Only `publishable AND status='active'` rows with a
+//! **The filter is the publication decision.** Only `published_at IS NOT NULL AND status='active'` rows with a
 //! body are rendered. A row that exists but was never published is absent from both the page set
 //! and the index — there is no "all documents" fallback.
 //!

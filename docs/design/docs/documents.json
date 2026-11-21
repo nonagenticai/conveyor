@@ -632,6 +632,150 @@
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/handoffs/S12-connectors.md"
     },
     {
+      "title": "Inception record — the five proposed V2 projects",
+      "path": "docs/plans/inception/README.html",
+      "source": "docs/plans/inception/README.md",
+      "section": "Plans",
+      "sha256": "ae117fb25d2a4df7d0a1fc0da5936a233a00c2f8c21dd171ce4748cc919ebf9a",
+      "bytes": 4151,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/inception/README.md"
+    },
+    {
+      "title": "T12 — One organisation loop",
+      "path": "docs/plans/inception/T12/00-project-brief.html",
+      "source": "docs/plans/inception/T12/00-project-brief.md",
+      "section": "Plans",
+      "sha256": "d2e7f63c6b77c7e11157a31ab9bb654d1611eb8efb3b2e0e516aaa2171e7acd5",
+      "bytes": 5379,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/inception/T12/00-project-brief.md"
+    },
+    {
+      "title": "T12 — Inception analysis",
+      "path": "docs/plans/inception/T12/01-inception-analysis.html",
+      "source": "docs/plans/inception/T12/01-inception-analysis.md",
+      "section": "Plans",
+      "sha256": "e8ca1399d3dc1a8429ec88e4b99a20468b0a5bf929d7ecb0f336afa14081cb57",
+      "bytes": 9065,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/inception/T12/01-inception-analysis.md"
+    },
+    {
+      "title": "T12 — Architecture design",
+      "path": "docs/plans/inception/T12/02-architecture-design.html",
+      "source": "docs/plans/inception/T12/02-architecture-design.md",
+      "section": "Plans",
+      "sha256": "e7b08206631ad38be00550d13c76cf8b692c8ced237e3766108986ebdb9a6695",
+      "bytes": 12615,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/inception/T12/02-architecture-design.md"
+    },
+    {
+      "title": "T15 — Tool authoring and BYO",
+      "path": "docs/plans/inception/T15/00-project-brief.html",
+      "source": "docs/plans/inception/T15/00-project-brief.md",
+      "section": "Plans",
+      "sha256": "fe3917e9d6f1381fc31dc42e6ace96225672470e02831b8ffe2608f03ad75309",
+      "bytes": 5140,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/inception/T15/00-project-brief.md"
+    },
+    {
+      "title": "T15 — Inception analysis",
+      "path": "docs/plans/inception/T15/01-inception-analysis.html",
+      "source": "docs/plans/inception/T15/01-inception-analysis.md",
+      "section": "Plans",
+      "sha256": "c17ca9fc0b22060b1077d7a6e7e0d803ff0e9c07e141c21888be21f9b7bed730",
+      "bytes": 8364,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/inception/T15/01-inception-analysis.md"
+    },
+    {
+      "title": "T15 — Architecture design",
+      "path": "docs/plans/inception/T15/02-architecture-design.html",
+      "source": "docs/plans/inception/T15/02-architecture-design.md",
+      "section": "Plans",
+      "sha256": "1e69b1f3ad2c252310ee8690556ca792ced61ddc1065cd6786db1b1691b571cd",
+      "bytes": 15480,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/inception/T15/02-architecture-design.md"
+    },
+    {
+      "title": "T17 — Tenant asset authoring",
+      "path": "docs/plans/inception/T17/00-project-brief.html",
+      "source": "docs/plans/inception/T17/00-project-brief.md",
+      "section": "Plans",
+      "sha256": "d93c168904196ed3533ebfb90b991ec5e45485e9468a867e3ff560a142c040aa",
+      "bytes": 5131,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/inception/T17/00-project-brief.md"
+    },
+    {
+      "title": "T17 — Inception analysis",
+      "path": "docs/plans/inception/T17/01-inception-analysis.html",
+      "source": "docs/plans/inception/T17/01-inception-analysis.md",
+      "section": "Plans",
+      "sha256": "ab364e21781bad8ae1c0ef89fd113d0229469ef64fac21acce9825e94c99a5aa",
+      "bytes": 8179,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/inception/T17/01-inception-analysis.md"
+    },
+    {
+      "title": "T17 — Architecture design",
+      "path": "docs/plans/inception/T17/02-architecture-design.html",
+      "source": "docs/plans/inception/T17/02-architecture-design.md",
+      "section": "Plans",
+      "sha256": "0f2df7beb5c520a5f7d65fb4a9369aae9445b1ba7f5c25d61f68dd0d898bd358",
+      "bytes": 12450,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/inception/T17/02-architecture-design.md"
+    },
+    {
+      "title": "T5 — Kata",
+      "path": "docs/plans/inception/T5/00-project-brief.html",
+      "source": "docs/plans/inception/T5/00-project-brief.md",
+      "section": "Plans",
+      "sha256": "c2d519527e772922fa6f66e729ce2cfa8d69fd305f84ea4e78593838a6a46a50",
+      "bytes": 5495,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/inception/T5/00-project-brief.md"
+    },
+    {
+      "title": "T5 — Inception analysis",
+      "path": "docs/plans/inception/T5/01-inception-analysis.html",
+      "source": "docs/plans/inception/T5/01-inception-analysis.md",
+      "section": "Plans",
+      "sha256": "41aa3ab11c0019d422f3331d0cc7ae934b96def70b1f0e842aab0616bf814ec9",
+      "bytes": 8283,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/inception/T5/01-inception-analysis.md"
+    },
+    {
+      "title": "T5 — Architecture design",
+      "path": "docs/plans/inception/T5/02-architecture-design.html",
+      "source": "docs/plans/inception/T5/02-architecture-design.md",
+      "section": "Plans",
+      "sha256": "1f73aaac2c15375299d27bdf36ea23e9b975dc56b9afdd3934d78cfd425dcf5b",
+      "bytes": 14985,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/inception/T5/02-architecture-design.md"
+    },
+    {
+      "title": "T6 — Development project",
+      "path": "docs/plans/inception/T6/00-project-brief.html",
+      "source": "docs/plans/inception/T6/00-project-brief.md",
+      "section": "Plans",
+      "sha256": "1f9e65d281e540e9e6867213053dbb63f9d405a8f5e4977ea016da955d36e23f",
+      "bytes": 4820,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/inception/T6/00-project-brief.md"
+    },
+    {
+      "title": "T6 — Inception analysis",
+      "path": "docs/plans/inception/T6/01-inception-analysis.html",
+      "source": "docs/plans/inception/T6/01-inception-analysis.md",
+      "section": "Plans",
+      "sha256": "590d7054a62c3a6d84272eaa80b552225590f3792144f7edbfcdbfcad2eb53a6",
+      "bytes": 8299,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/inception/T6/01-inception-analysis.md"
+    },
+    {
+      "title": "T6 — Architecture design",
+      "path": "docs/plans/inception/T6/02-architecture-design.html",
+      "source": "docs/plans/inception/T6/02-architecture-design.md",
+      "section": "Plans",
+      "sha256": "3f2deb4ca854b810454e95b7242962d19e87eb91fceb1486931cbcda3bcbbbf1",
+      "bytes": 12860,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/inception/T6/02-architecture-design.md"
+    },
+    {
       "title": "S00 — Usage inventory → parity/parity.yaml",
       "path": "docs/plans/slices/S00-usage-inventory.html",
       "source": "docs/plans/slices/S00-usage-inventory.md",
