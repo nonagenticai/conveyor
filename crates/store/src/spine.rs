@@ -2968,6 +2968,78 @@ pub async fn credit_demo_tx(
     }
 }
 
+/// A demo credit row.
+#[derive(Clone, Debug, sqlx::FromRow)]
+pub struct DemoCreditRecord {
+    /// The row id.
+    pub id: Uuid,
+    /// The demo cadence the credit was recorded at.
+    pub cadence_id: Uuid,
+    /// The accepted deliverable the credit names.
+    pub deliverable_id: Uuid,
+    /// The deliverable's evidence, copied when the credit was recorded.
+    pub evidence: Value,
+    /// When the credit was recorded.
+    pub credited_at: DateTime<Utc>,
+    /// The If-Match version.
+    pub version: i64,
+}
+
+const DEMO_CREDIT_COLUMNS: &str = "id, cadence_id, deliverable_id, evidence, credited_at, version";
+
+/// Read one demo credit.
+pub async fn get_demo_credit_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    id: Uuid,
+) -> Result<Option<DemoCreditRecord>, PlanStoreError> {
+    let sql = format!(
+        "SELECT {DEMO_CREDIT_COLUMNS} FROM programme_demo_credit
+          WHERE tenant_id = $1 AND id = $2"
+    );
+    Ok(sqlx::query_as(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(id)
+        .fetch_optional(&mut *conn)
+        .await?)
+}
+
+/// Read the credit for one (cadence, deliverable), if it was recorded.
+pub async fn find_demo_credit_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    cadence_id: Uuid,
+    deliverable_id: Uuid,
+) -> Result<Option<DemoCreditRecord>, PlanStoreError> {
+    let sql = format!(
+        "SELECT {DEMO_CREDIT_COLUMNS} FROM programme_demo_credit
+          WHERE tenant_id = $1 AND cadence_id = $2 AND deliverable_id = $3"
+    );
+    Ok(sqlx::query_as(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(cadence_id)
+        .bind(deliverable_id)
+        .fetch_optional(&mut *conn)
+        .await?)
+}
+
+/// List a demo cadence's credits.
+pub async fn list_demo_credits_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    cadence_id: Uuid,
+) -> Result<Vec<DemoCreditRecord>, PlanStoreError> {
+    let sql = format!(
+        "SELECT {DEMO_CREDIT_COLUMNS} FROM programme_demo_credit
+          WHERE tenant_id = $1 AND cadence_id = $2 ORDER BY credited_at, id"
+    );
+    Ok(sqlx::query_as(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(cadence_id)
+        .fetch_all(&mut *conn)
+        .await?)
+}
+
 /// Propose a lesson for one retro finding; the table is the organisational-memory record.
 ///
 /// The evidence refs are stored as given (T8 owns the independent-ref rule); the cadence is the
@@ -3012,6 +3084,72 @@ pub async fn propose_lesson_tx(
     .fetch_one(&mut *conn)
     .await
     .map_err(PlanStoreError::Database)
+}
+
+/// A lesson row.
+#[derive(Clone, Debug, sqlx::FromRow)]
+pub struct LessonRecord {
+    /// The row id.
+    pub id: Uuid,
+    /// The programme whose memory holds the lesson.
+    pub programme_id: Uuid,
+    /// The retro cadence the finding came from, when known.
+    pub cadence_id: Option<Uuid>,
+    /// The finding's key within the retro.
+    pub finding_key: String,
+    /// The lesson itself.
+    pub statement: String,
+    /// The evidence refs behind the lesson.
+    pub evidence: Value,
+    /// How many of the refs are independent.
+    pub independent_count: i32,
+    /// `proposed | reviewed | promoted | rejected`.
+    pub state: String,
+    /// Where the lesson came from.
+    pub source: String,
+    /// Free-form metadata.
+    pub meta: Value,
+    /// The If-Match version.
+    pub version: i64,
+    /// Creation time.
+    pub created_at: DateTime<Utc>,
+    /// Last write.
+    pub updated_at: DateTime<Utc>,
+}
+
+const LESSON_COLUMNS: &str = "id, programme_id, cadence_id, finding_key, statement, evidence, \
+                              independent_count, state, source, meta, version, created_at, \
+                              updated_at";
+
+/// Read one lesson.
+pub async fn get_lesson_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    id: Uuid,
+) -> Result<Option<LessonRecord>, PlanStoreError> {
+    let sql = format!("SELECT {LESSON_COLUMNS} FROM lesson WHERE tenant_id = $1 AND id = $2");
+    Ok(sqlx::query_as(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(id)
+        .fetch_optional(&mut *conn)
+        .await?)
+}
+
+/// List a programme's lessons.
+pub async fn list_lessons_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    programme_id: Uuid,
+) -> Result<Vec<LessonRecord>, PlanStoreError> {
+    let sql = format!(
+        "SELECT {LESSON_COLUMNS} FROM lesson
+          WHERE tenant_id = $1 AND programme_id = $2 ORDER BY created_at, id"
+    );
+    Ok(sqlx::query_as(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(programme_id)
+        .fetch_all(&mut *conn)
+        .await?)
 }
 
 /// Open the retro cadence's one card (in the board named by `meta.board_id`), or return it.

@@ -451,6 +451,28 @@ pub async fn snapshot_tx(
         tenant_id,
     )
     .await?;
+    // The cadence record's two satellites: the demo credits a cadence issued and the lessons its
+    // retros raised. They travel beside `cadences` in `msp`; a credit names its cadence and a
+    // lesson names its programme, so neither needs a programme column of its own.
+    let demo_credits = rows(
+        &mut *conn,
+        "SELECT COALESCE(jsonb_agg(to_jsonb(t) ORDER BY t.cadence_id, t.deliverable_id, t.id), '[]'::jsonb) FROM (
+             SELECT id, cadence_id, deliverable_id, evidence, credited_at, version
+               FROM programme_demo_credit WHERE tenant_id = $1
+         ) t",
+        tenant_id,
+    )
+    .await?;
+    let lessons = rows(
+        &mut *conn,
+        "SELECT COALESCE(jsonb_agg(to_jsonb(t) ORDER BY t.programme_id, t.cadence_id, t.finding_key, t.id), '[]'::jsonb) FROM (
+             SELECT id, programme_id, cadence_id, finding_key, statement, evidence,
+                    independent_count, state, source, version, created_at, updated_at
+               FROM lesson WHERE tenant_id = $1
+         ) t",
+        tenant_id,
+    )
+    .await?;
     let wbs_nodes = rows(
         &mut *conn,
         "SELECT COALESCE(jsonb_agg(to_jsonb(t) ORDER BY t.project_id, t.parent_id, t.position, t.id), '[]'::jsonb) FROM (
@@ -545,8 +567,8 @@ pub async fn snapshot_tx(
         &mut *conn,
         "SELECT COALESCE(jsonb_agg(to_jsonb(t) ORDER BY t.phase_code, t.kind, t.created_at, t.id), '[]'::jsonb) FROM (
              SELECT id, project_id, kind, phase_code, title, body, status, approval_id,
-                    approved_by, approved_at, supersedes_id, superseded_by_id, version,
-                    created_at, updated_at
+                    approved_by, requested_by, approved_at, supersedes_id, superseded_by_id,
+                    version, created_at, updated_at
                FROM architecture_contract WHERE tenant_id = $1
          ) t",
         tenant_id,
@@ -555,9 +577,9 @@ pub async fn snapshot_tx(
     let mut architecture_reviews = rows(
         &mut *conn,
         "SELECT COALESCE(jsonb_agg(to_jsonb(t) ORDER BY t.reviewed_at DESC, t.project_id, t.id), '[]'::jsonb) FROM (
-             SELECT r.id, r.project_id, r.contract_id, r.level, r.outcome, r.reviewed_by,
-                    u.display_name AS reviewed_by_name, r.reviewed_at, r.version,
-                    r.created_at, r.updated_at
+             SELECT r.id, r.project_id, r.contract_id, r.level, r.findings, r.evidence,
+                    r.outcome, r.reviewed_by, u.display_name AS reviewed_by_name,
+                    r.reviewed_at, r.version, r.created_at, r.updated_at
                FROM architecture_compliance_review r
                LEFT JOIN app_user u ON u.id = r.reviewed_by
               WHERE r.tenant_id = $1
@@ -743,6 +765,8 @@ pub async fn snapshot_tx(
             "tranche_reviews": tranche_reviews,
             "programme_baselines": programme_baselines,
             "cadences": cadences,
+            "demo_credits": demo_credits,
+            "lessons": lessons,
             "wbs_nodes": wbs_nodes,
             "project_baselines": project_baselines,
             "register_items": register_items,

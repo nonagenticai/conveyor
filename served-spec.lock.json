@@ -1,7 +1,7 @@
 {
   "version": 1,
   "operations": {
-    "GET /api/actions": "2e0a615985355eee09a4fdd610b3a9b3c0907786cff633a1a1a0ec937f305003",
+    "GET /api/actions": "6e0c3ae3ae12f024ceeb80079f433fc578269acf5a93d8e5edd7a2aac64c8cc7",
     "GET /api/boards/{id}": "e1a5ad504ea61c9f6f4c9940f6bce0a13a06587c4545d9d52616852f0e67fa5b",
     "GET /api/boards/{id}/cards": "be3ca9f8fea011aa8b097206310d24ba4641698d2a8d239c5b2df6c48b784502",
     "GET /api/boards/{id}/webhooks": "5b77b802ff044156108b56072acb99bed0e2f9dfb5f2dc667b000af191cffd1b",
@@ -95,6 +95,8 @@
     "POST /api/actions/boards.get/invocations": "1e036af70e8a186779f49b6c44d3357e228d00f7623d0f8e5d63b198beb6d54c",
     "POST /api/actions/boards.set_member/invocations": "07ecc461ab9909db7058e2e3779d8450191b4844363a08d720d124fb7c525b35",
     "POST /api/actions/cadences.create/invocations": "9d54d8d41edbdd2c7ff366596d79f97a89a3d88eb80f561a671c8a54f7b52ef1",
+    "POST /api/actions/cadences.credit_demo/invocations": "132fafc6465dc08c1eb93e5dd10ff4afe59bb734523a548f82dfdec9fd24cd4d",
+    "POST /api/actions/cadences.credit_list/invocations": "9de7aeaac3142a7cddda06825c97f43a0f1628016b3ad82af226cf5661ec8b7b",
     "POST /api/actions/cadences.delete/invocations": "cd267983407e552d63768b1cae964264bf89dbdd930a072ca0309d121d881af5",
     "POST /api/actions/cadences.list/invocations": "0f4418eb757448407b8b5c8aae150da422809f506871429a9e758ca0d5f15502",
     "POST /api/actions/cadences.update/invocations": "fcb93a13f6799474f7311b4849fb3e9679cce0e1c5ef3351644404d9567acad6",
@@ -258,6 +260,8 @@
     "POST /api/actions/laya.judge/invocations": "3e9c8e3be7de4bbf4b647c095f02ef06b614580f2c3af548bc02b8af8e3b49d5",
     "POST /api/actions/laya_configs.create/invocations": "2bc0ca22f9d0ca7c042178143d67ad8d4c8fca03bc2e5e3aba3eb3b9512edc73",
     "POST /api/actions/laya_configs.list/invocations": "166217a68586a1f498d3d96d286a795fc365cfc64dfcbe37231e8e1f010aebba",
+    "POST /api/actions/lessons.list/invocations": "a2a007513584f2fad031b1012c286b9a41907376b180986b3601384912b6cafc",
+    "POST /api/actions/lessons.propose/invocations": "e13febe47e6ca4410c53babb2ff3962bd12a23bb367c22ae052395b2ad04f7d7",
     "POST /api/actions/licences.get/invocations": "a43e3c3412fc792cd7c8bdb97c91b0301dca5e0ee16c9b249d324451e978e608",
     "POST /api/actions/lists.create/invocations": "758f93be13149fa2a5e6505b3c1d9422291abdba031ad8001700d89ea2ba01b1",
     "POST /api/actions/lists.move/invocations": "57c8ebb5c11757760c9cdcb5a645f37371cfe98d541b4dead8edf80b06fa36ec",
