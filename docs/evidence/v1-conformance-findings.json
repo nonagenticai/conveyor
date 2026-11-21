@@ -78,7 +78,7 @@
       "evidence": [
         {
           "path": "crates/domain/src/spine.rs",
-          "line": 252,
+          "line": 264,
           "quote": "    let has_impact = impact.is_some_and(|value| !value.is_null());"
         }
       ],
@@ -562,7 +562,7 @@
         },
         {
           "path": "crates/store/src/spine.rs",
-          "line": 3718,
+          "line": 3817,
           "quote": "            if matches!(state.as_str(), \"authorised\" | \"in_review\" | \"closed\") =>"
         }
       ],
@@ -581,7 +581,7 @@
       "evidence": [
         {
           "path": "crates/store/src/spine.rs",
-          "line": 2536,
+          "line": 2635,
           "quote": "/// The editable fields of a realization record. `None` leaves the stored value in place."
         }
       ],
@@ -634,7 +634,7 @@
         },
         {
           "path": "crates/store/src/spine.rs",
-          "line": 1504,
+          "line": 1512,
           "quote": "            \"SELECT EXISTS (SELECT 1 FROM programme_baseline WHERE tenant_id = $1 AND id = $2)\","
         }
       ],
@@ -658,12 +658,12 @@
         },
         {
           "path": "crates/store/src/spine.rs",
-          "line": 3907,
+          "line": 4006,
           "quote": "pub async fn close_programme_tx("
         },
         {
           "path": "crates/store/src/spine.rs",
-          "line": 3941,
+          "line": 4040,
           "quote": "        \"UPDATE programme SET status = 'closed', version = version + 1, updated_at = now()"
         }
       ],
@@ -971,7 +971,7 @@
       "evidence": [
         {
           "path": "crates/store/src/spine.rs",
-          "line": 3201,
+          "line": 3300,
           "quote": "          WHERE tenant_id = $1 AND project_id = $2 AND kind = 'deliverable'"
         }
       ],
@@ -1531,7 +1531,7 @@
       "evidence": [
         {
           "path": "crates/actions/src/spine/mod.rs",
-          "line": 1746,
+          "line": 1761,
           "quote": "        input.status.as_deref(),"
         },
         {
@@ -2053,7 +2053,7 @@
       "evidence": [
         {
           "path": "crates/actions/src/spine/mod.rs",
-          "line": 3175,
+          "line": 3234,
           "quote": "            state: input.state,"
         },
         {
@@ -2063,7 +2063,7 @@
         },
         {
           "path": "crates/store/src/spine.rs",
-          "line": 3683,
+          "line": 3782,
           "quote": "                PlanError::RetroFindingWithoutLesson(key),"
         }
       ],
@@ -2145,7 +2145,7 @@
         },
         {
           "path": "crates/actions/src/spine/mod.rs",
-          "line": 1223,
+          "line": 1238,
           "quote": "    name = \"wbs.create\","
         }
       ],
@@ -4181,7 +4181,12 @@
       "failure_scenario": "A tranche review that honestly records `pause` — the MSP answer when the exit criteria are not met — permanently prevents the very projects that could still meet them from closing. The programme has no way to resume short of deleting or retiring the tranche, so an honest pause converts a recoverable slip into a dead end.",
       "acceptance": "Add a resume path (`tranches.resume` with an approving decision, or allow `tranches.review` to record a second dated review) and let a project close while its tranche is paused, with the closure recorded as in-flight work; a test proves a paused tranche can be resumed and that a compliant project can close in it.",
       "owner_project": "T1",
-      "found_by": "use, during the tranche-2 rework (2026-11-21)"
+      "found_by": "use, during the tranche-2 rework (2026-11-21)",
+      "resolved_by": {
+        "commit": "aad18225013aadc08e6e759a8c1ac82ddd6ba509",
+        "test": "crates/actions/tests/spine_gates.rs",
+        "evidence": "spine_gates 14/14. `a_paused_tranche_resumes_only_with_its_approved_gate` refuses an unknown approval, a wrong gate, a pending gate, a wrong target and a machine-only decision (422 approval_missing each, the tranche left paused), then resumes under an approved HUMAN `tranche.resume` gate naming the tranche (200, state in_review), records the resume on the gate and refuses a second resume 409 tranche_not_paused. `a_compliant_project_closes_in_a_resumed_tranche` shows the freeze the finding names (every close record in place, still 409 closure_tranche_not_authorised) and the same close passing after the resume. `a_resumed_tranche_reviews_again_and_authorises_its_successor` proves the paused tranche still has its one review before the resume (409 tranche_already_reviewed) and that the resumed tranche records the second, dated review, whose `continue` closes it and authorises the next tranche."
+      }
     }
   ]
 }
