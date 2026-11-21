@@ -32,6 +32,9 @@
 //! **Manifest.** `manifest.json` hashes every published file: the data files above, the output
 //! pages and `outputs.js` when `--outputs-dir` is set, and the issue registry the run read.
 //!
+//! **Finalise.** `--manifest-only` rehashes a pack directory that later generators have already
+//! added to and rewrites its `manifest.json`; it reads no database and regenerates nothing.
+//!
 //! **Redaction.** The store queries select explicit columns (see `conveyor_store::snapshot`):
 //! no secret value, no encryption key id, no email, no OIDC subject, no session or licence
 //! token. A redaction test generates a snapshot over a tenant seeded with a known secret and a
@@ -83,6 +86,9 @@ pub struct SnapshotArgs {
     /// The commit the published pack describes. Absent means `git rev-parse HEAD` in the
     /// working directory; a pod has no checkout, so a publish passes it explicitly.
     pub git_sha: Option<String>,
+    /// Rehash an already-written pack directory and rewrite its `manifest.json`; nothing else
+    /// is regenerated and no database is read.
+    pub manifest_only: bool,
 }
 
 /// One written file.
@@ -144,10 +150,21 @@ pub enum SnapshotError {
         /// Why it was refused.
         detail: String,
     },
+    /// `--manifest-only` names a directory with no readable, snapshot-shaped `manifest.json`.
+    #[error("manifest-only {path}: {detail}")]
+    ManifestOnly {
+        /// The `manifest.json` path that was read.
+        path: String,
+        /// Why it was refused.
+        detail: String,
+    },
 }
 
 /// Read one tenant and write every snapshot file.
 pub async fn run(args: SnapshotArgs) -> Result<SnapshotReport, SnapshotError> {
+    if args.manifest_only {
+        return manifest_only(&args);
+    }
     let database_url = args
         .database_url
         .clone()
@@ -165,6 +182,9 @@ pub async fn run_with_pool(
     pool: &sqlx::PgPool,
     args: SnapshotArgs,
 ) -> Result<SnapshotReport, SnapshotError> {
+    if args.manifest_only {
+        return manifest_only(&args);
+    }
     let tenant = store::tenants::id_by_slug(pool, &args.tenant)
         .await?
         .ok_or_else(|| SnapshotError::UnknownTenant(args.tenant.clone()))?;
@@ -365,6 +385,153 @@ pub async fn run_with_pool(
         manifest_sha256,
         outputs,
     })
+}
+
+/// `--manifest-only` (v1-pack-3): rehash every file already in the pack directory and rewrite
+/// `manifest.json` from those bytes.
+///
+/// The snapshot writes its manifest before the publish's later generators (conformance,
+/// standards, documents), so those files would publish unhashed. This pass runs after the last
+/// generator: it keeps the old manifest's header, takes each file's `records` from the old
+/// manifest when it listed that path (never inventing one), and hashes the bytes on disk now.
+fn manifest_only(args: &SnapshotArgs) -> Result<SnapshotReport, SnapshotError> {
+    let out = &args.out;
+    let manifest_path = out.join("manifest.json");
+    let path_label = manifest_path.display().to_string();
+
+    let read =
+        std::fs::read_to_string(&manifest_path).map_err(|error| SnapshotError::ManifestOnly {
+            path: path_label.clone(),
+            detail: if error.kind() == std::io::ErrorKind::NotFound {
+                "no manifest.json; run a normal snapshot first".to_owned()
+            } else {
+                error.to_string()
+            },
+        })?;
+    let old: Value = serde_json::from_str(&read).map_err(|error| SnapshotError::ManifestOnly {
+        path: path_label.clone(),
+        detail: format!("does not parse: {error}"),
+    })?;
+    if old.get("schema").and_then(Value::as_str) != Some(SCHEMA) {
+        return Err(SnapshotError::ManifestOnly {
+            path: path_label.clone(),
+            detail: format!(
+                "schema is {}, expected {SCHEMA:?}",
+                old.get("schema")
+                    .map_or_else(|| "absent".to_owned(), |schema| schema.to_string())
+            ),
+        });
+    }
+    let old_files =
+        old.get("files")
+            .and_then(Value::as_array)
+            .ok_or_else(|| SnapshotError::ManifestOnly {
+                path: path_label.clone(),
+                detail: "carries no files array".to_owned(),
+            })?;
+
+    let mut old_records = std::collections::HashMap::new();
+    for file in old_files {
+        if let (Some(path), Some(records)) = (
+            file.get("path").and_then(Value::as_str),
+            file.get("records").and_then(Value::as_u64),
+        ) {
+            old_records.insert(path.to_owned(), records as usize);
+        }
+    }
+
+    let mut paths = Vec::new();
+    collect_files(out, out, &mut paths)?;
+    paths.sort();
+
+    let mut files = Vec::with_capacity(paths.len() + old_files.len());
+    let mut walked = std::collections::HashSet::new();
+    for path in paths {
+        let bytes = std::fs::read(out.join(&path))?;
+        walked.insert(path.clone());
+        files.push(SnapshotFile {
+            path: path.clone(),
+            sha256: sha256_hex(&bytes),
+            bytes: bytes.len(),
+            records: old_records.get(&path).copied().unwrap_or(0),
+        });
+    }
+
+    // The snapshot's platform pages live outside the data directory (`../docs/…`). They are
+    // published pack files too, so keep an old entry whose file still exists; an entry whose
+    // file is gone is dropped, because the manifest must name only files that are there.
+    for file in old_files {
+        let Some(path) = file.get("path").and_then(Value::as_str) else {
+            continue;
+        };
+        if walked.contains(path) || path == "manifest.json" {
+            continue;
+        }
+        if !out.join(path).is_file() {
+            continue;
+        }
+        let bytes = std::fs::read(out.join(path))?;
+        files.push(SnapshotFile {
+            path: path.to_owned(),
+            sha256: sha256_hex(&bytes),
+            bytes: bytes.len(),
+            records: old_records.get(path).copied().unwrap_or(0),
+        });
+    }
+    files.sort_by(|a, b| a.path.cmp(&b.path));
+
+    let header = |key: &str| old.get(key).cloned().unwrap_or(Value::Null);
+    let manifest = json!({
+        "schema": SCHEMA,
+        "generated_at": header("generated_at"),
+        "tenant": header("tenant"),
+        "git_sha": header("git_sha"),
+        "migration": header("migration"),
+        "feedback_url": header("feedback_url"),
+        "redaction": header("redaction"),
+        "files": &files,
+    });
+    let manifest_bytes = to_pretty_bytes(&manifest)?;
+    std::fs::write(&manifest_path, &manifest_bytes)?;
+    let manifest_sha256 = sha256_hex(&manifest_bytes);
+
+    Ok(SnapshotReport {
+        tenant: old
+            .get("tenant")
+            .and_then(Value::as_str)
+            .unwrap_or_default()
+            .to_owned(),
+        out: out.clone(),
+        files,
+        generated_at: old
+            .get("generated_at")
+            .and_then(Value::as_str)
+            .unwrap_or_default()
+            .to_owned(),
+        manifest_sha256,
+        outputs: 0,
+    })
+}
+
+/// Every file under `dir`, as a forward-slash path relative to `root`, excluding the root
+/// `manifest.json` (the file this pass rewrites).
+fn collect_files(root: &Path, dir: &Path, out: &mut Vec<String>) -> Result<(), std::io::Error> {
+    for entry in std::fs::read_dir(dir)? {
+        let path = entry?.path();
+        if path.is_dir() {
+            collect_files(root, &path, out)?;
+            continue;
+        }
+        let relative = path
+            .strip_prefix(root)
+            .unwrap_or(&path)
+            .to_string_lossy()
+            .replace('\\', "/");
+        if relative != "manifest.json" {
+            out.push(relative);
+        }
+    }
+    Ok(())
 }
 
 /// One snapshot section as the standalone JSON file the CLI writes.
@@ -803,5 +970,86 @@ mod tests {
             ),
             "pages/output-1.html"
         );
+    }
+
+    /// v1-pack-3/v1-pack-4: the finalise pass rehashes the finished pack, keeps the record
+    /// count the old manifest gave a file, gives a file the old manifest never saw `0`, and
+    /// never lists `manifest.json` itself.
+    #[test]
+    fn manifest_only_rehashes_the_finished_pack() -> Result<(), SnapshotError> {
+        let dir =
+            std::env::temp_dir().join(format!("conveyor-pack-manifest-{}", uuid::Uuid::now_v7()));
+        std::fs::create_dir_all(&dir)?;
+        let old_manifest = json!({
+            "schema": SCHEMA,
+            "generated_at": "2026-11-12T00:00:00Z",
+            "tenant": "snap",
+            "git_sha": "0123456789abcdef0123456789abcdef01234567",
+            "migration": {"version": 42, "description": "the snapshot migration"},
+            "feedback_url": DEFAULT_FEEDBACK_URL,
+            "redaction": "no secret values, no encryption key ids, no emails",
+            "files": [
+                {"path": "notes.txt", "sha256": "stale", "bytes": 1, "records": 5}
+            ],
+        });
+        std::fs::write(
+            dir.join("manifest.json"),
+            serde_json::to_vec_pretty(&old_manifest)?,
+        )?;
+        let notes = b"a note\n";
+        std::fs::write(dir.join("notes.txt"), notes)?;
+        let added = b"[1,2,3]\n";
+        std::fs::write(dir.join("added.json"), added)?;
+
+        let report = manifest_only(&SnapshotArgs {
+            tenant: "snap".to_owned(),
+            out: dir.clone(),
+            outputs_dir: None,
+            generated_at: None,
+            issues: dir.join("issues.json"),
+            conformance: None,
+            feedback_url: DEFAULT_FEEDBACK_URL.to_owned(),
+            database_url: None,
+            git_sha: None,
+            manifest_only: true,
+        })?;
+
+        let paths: Vec<&str> = report.files.iter().map(|file| file.path.as_str()).collect();
+        assert_eq!(paths, ["added.json", "notes.txt"]);
+        assert!(
+            !paths.contains(&"manifest.json"),
+            "the manifest never lists itself"
+        );
+        let added_file = &report.files[0];
+        assert_eq!(added_file.sha256, sha256_hex(added));
+        assert_eq!(added_file.bytes, added.len());
+        assert_eq!(
+            added_file.records, 0,
+            "a file the old manifest never listed has no record count"
+        );
+        let notes_file = &report.files[1];
+        assert_eq!(notes_file.sha256, sha256_hex(notes));
+        assert_eq!(
+            notes_file.records, 5,
+            "the old manifest's record count survives"
+        );
+
+        let written: Value =
+            serde_json::from_str(&std::fs::read_to_string(dir.join("manifest.json"))?)?;
+        assert_eq!(written["schema"], SCHEMA);
+        assert_eq!(written["tenant"], "snap");
+        assert_eq!(written["generated_at"], "2026-11-12T00:00:00Z");
+        assert_eq!(
+            written["migration"],
+            json!({"version": 42, "description": "the snapshot migration"})
+        );
+        assert_eq!(written["files"].as_array().map(Vec::len), Some(2));
+        assert_eq!(
+            report.manifest_sha256,
+            sha256_hex(&std::fs::read(dir.join("manifest.json"))?)
+        );
+
+        std::fs::remove_dir_all(&dir)?;
+        Ok(())
     }
 }
