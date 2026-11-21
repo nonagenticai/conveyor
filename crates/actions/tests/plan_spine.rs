@@ -66,6 +66,79 @@ async fn create_programme(running: &support::Running, name: &str) -> String {
     id_of(output(&body), "id")
 }
 
+/// A project inside a programme: only such a project's WBS nodes are the programme's outputs.
+async fn create_programme_project(
+    running: &support::Running,
+    programme: &str,
+    title: &str,
+) -> String {
+    let (status, body) = running
+        .invoke(
+            "projects.create",
+            "dev:alice",
+            json!({
+                "title": title,
+                "project_type_code": "delivery",
+                "programme_id": programme
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "{body}");
+    id_of(output(&body), "id")
+}
+
+/// A complete profile the benefits map can link to (baseline, target, method and owner are all
+/// mandatory, so the inline fixture would be forty lines in every test).
+async fn create_measured_benefit(
+    pg: &support::Pg,
+    running: &support::Running,
+    seeded: &support::Seeded,
+    programme: &str,
+    reference: &str,
+) -> String {
+    let industry: uuid::Uuid = sqlx::query_scalar(
+        "INSERT INTO industry (tenant_id, key, name) VALUES ($1, 'software', 'Software')
+         RETURNING id",
+    )
+    .bind(seeded.tenant_id)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("industry");
+    let job: uuid::Uuid = sqlx::query_scalar(
+        "INSERT INTO job_catalogue (tenant_id, job_key, industry_id, title)
+         VALUES ($1, 'bcm', $2, 'Benefit owner') RETURNING id",
+    )
+    .bind(seeded.tenant_id)
+    .bind(industry)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("job");
+    let (status, profile) = running
+        .invoke(
+            "benefits.create",
+            "dev:alice",
+            json!({
+                "programme_id": programme,
+                "reference": reference,
+                "baseline": {"value": 14, "measured_at": "2026-11-01"},
+                "target": {"value": 8},
+                "measurement_method": "card and run timestamps, weekly",
+                "benefit_owner_job_id": job,
+                "capabilities": ["delivery"],
+                "operational_area": "delivery"
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "{profile}");
+    id_of(output(&profile), "id")
+}
+
 async fn create_wbs(running: &support::Running, project: &str, title: &str) -> String {
     let (status, body) = running
         .invoke(
@@ -449,44 +522,9 @@ async fn a_benefit_without_baseline_target_method_or_owner_is_refused() {
 async fn a_benefit_map_edge_names_its_five_levels() {
     let (pg, running, seeded) = fixture().await;
     let programme = create_programme(&running, "Map programme").await;
-    let industry: uuid::Uuid = sqlx::query_scalar(
-        "INSERT INTO industry (tenant_id, key, name) VALUES ($1, 'software', 'Software')
-         RETURNING id",
-    )
-    .bind(seeded.tenant_id)
-    .fetch_one(&pg.super_pool)
-    .await
-    .expect("industry");
-    let job: uuid::Uuid = sqlx::query_scalar(
-        "INSERT INTO job_catalogue (tenant_id, job_key, industry_id, title)
-         VALUES ($1, 'bcm', $2, 'Benefit owner') RETURNING id",
-    )
-    .bind(seeded.tenant_id)
-    .bind(industry)
-    .fetch_one(&pg.super_pool)
-    .await
-    .expect("job");
-    let (status, profile) = running
-        .invoke(
-            "benefits.create",
-            "dev:alice",
-            json!({
-                "programme_id": programme,
-                "reference": "BEN-01",
-                "baseline": {"value": 14, "measured_at": "2026-11-01"},
-                "target": {"value": 8},
-                "measurement_method": "card and run timestamps, weekly",
-                "benefit_owner_job_id": job,
-                "capabilities": ["delivery"],
-                "operational_area": "delivery"
-            }),
-            None,
-            None,
-            None,
-        )
-        .await;
-    assert_eq!(status, 201, "{profile}");
-    let benefit = id_of(output(&profile), "id");
+    let project = create_programme_project(&running, &programme, "Map project").await;
+    let node = create_wbs(&running, &project, "T1 plan spine").await;
+    let benefit = create_measured_benefit(&pg, &running, &seeded, &programme, "BEN-01").await;
 
     let (status, refused) = running
         .invoke(
@@ -495,7 +533,7 @@ async fn a_benefit_map_edge_names_its_five_levels() {
             json!({
                 "programme_id": programme,
                 "benefit_id": benefit,
-                "output_ref": "T1 plan spine",
+                "output_ref": node,
                 "capability_ref": "WBS and baseline",
                 "operational_outcome": "the plan is managed"
             }),
@@ -517,7 +555,7 @@ async fn a_benefit_map_edge_names_its_five_levels() {
             json!({
                 "programme_id": programme,
                 "benefit_id": benefit,
-                "output_ref": "T1 plan spine",
+                "output_ref": node,
                 "capability_ref": "WBS and baseline",
                 "operational_outcome": "the plan is managed",
                 "strategic_objective": "faster IT delivery"
@@ -529,6 +567,142 @@ async fn a_benefit_map_edge_names_its_five_levels() {
         .await;
     assert_eq!(status, 201, "{linked}");
     assert_eq!(output(&linked)["benefit_id"], benefit);
+    assert_eq!(output(&linked)["output_ref"], node);
+}
+
+/// v1-w2b-5 — an output is a `wbs_node` id; a label is refused and leaves no edge.
+#[tokio::test(flavor = "multi_thread")]
+async fn a_benefit_link_refuses_a_non_uuid_output_ref() {
+    let (pg, running, seeded) = fixture().await;
+    let programme = create_programme(&running, "Label output programme").await;
+    create_programme_project(&running, &programme, "Label output project").await;
+    let benefit = create_measured_benefit(&pg, &running, &seeded, &programme, "BEN-01").await;
+
+    let (status, refused) = running
+        .invoke(
+            "benefits.link",
+            "dev:alice",
+            json!({
+                "programme_id": programme,
+                "benefit_id": benefit,
+                "output_ref": "T1 plan spine",
+                "capability_ref": "WBS and baseline",
+                "operational_outcome": "the plan is managed",
+                "strategic_objective": "faster IT delivery"
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 422, "{refused}");
+    assert_eq!(refused["type"], "action-invalid-input", "{refused}");
+    assert_eq!(refused["errors"][0]["field"], "output_ref", "{refused}");
+    assert_eq!(
+        refused["errors"][0]["code"], "benefit_output_unresolved",
+        "{refused}"
+    );
+    let rows: i64 = sqlx::query_scalar("SELECT count(*) FROM benefit_link")
+        .fetch_one(&pg.super_pool)
+        .await
+        .expect("count edges");
+    assert_eq!(rows, 0, "a refused edge left a row");
+}
+
+/// v1-w2b-5 — a real node of another programme is still not this map's output.
+#[tokio::test(flavor = "multi_thread")]
+async fn a_benefit_link_refuses_a_node_from_another_programme() {
+    let (pg, running, seeded) = fixture().await;
+    let home = create_programme(&running, "Home programme").await;
+    let other = create_programme(&running, "Other programme").await;
+    let other_project = create_programme_project(&running, &other, "Other project").await;
+    let foreign = create_wbs(&running, &other_project, "Another programme's output").await;
+    let benefit = create_measured_benefit(&pg, &running, &seeded, &home, "BEN-01").await;
+
+    let (status, refused) = running
+        .invoke(
+            "benefits.link",
+            "dev:alice",
+            json!({
+                "programme_id": home,
+                "benefit_id": benefit,
+                "output_ref": foreign,
+                "capability_ref": "WBS and baseline",
+                "operational_outcome": "the plan is managed",
+                "strategic_objective": "faster IT delivery"
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 422, "{refused}");
+    assert_eq!(refused["errors"][0]["field"], "output_ref", "{refused}");
+    assert_eq!(
+        refused["errors"][0]["code"], "benefit_output_unresolved",
+        "{refused}"
+    );
+
+    // The node is real and in this tenant: the refusal is the programme, not existence.
+    let (status, node) = running
+        .invoke(
+            "wbs.get",
+            "dev:alice",
+            json!({"id": foreign}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{node}");
+}
+
+/// v1-w2b-5 — a node of this programme is accepted and stored as its id.
+#[tokio::test(flavor = "multi_thread")]
+async fn a_benefit_link_accepts_a_node_in_its_programme() {
+    let (pg, running, seeded) = fixture().await;
+    let programme = create_programme(&running, "Node output programme").await;
+    let project = create_programme_project(&running, &programme, "Node output project").await;
+    let node = create_wbs(&running, &project, "The measured output").await;
+    let benefit = create_measured_benefit(&pg, &running, &seeded, &programme, "BEN-01").await;
+
+    let (status, linked) = running
+        .invoke(
+            "benefits.link",
+            "dev:alice",
+            json!({
+                "programme_id": programme,
+                "benefit_id": benefit,
+                "output_ref": node,
+                "capability_ref": "WBS and baseline",
+                "operational_outcome": "the plan is managed",
+                "strategic_objective": "faster IT delivery"
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "{linked}");
+    assert_eq!(output(&linked)["output_ref"], node);
+
+    let (status, listed) = running
+        .invoke(
+            "benefits.link_list",
+            "dev:alice",
+            json!({"programme_id": programme}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{listed}");
+    assert_eq!(
+        output(&listed)["items"].as_array().map(Vec::len),
+        Some(1),
+        "{listed}"
+    );
+    assert_eq!(output(&listed)["items"][0]["output_ref"], node);
 }
 
 /// P5.3 — a tranche review without evidence is refused; with evidence it records the decision.

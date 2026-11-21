@@ -2297,6 +2297,37 @@ pub async fn insert_benefit_link_tx(
             what: "benefit profile",
         });
     }
+    // The output is a WBS node, not a label: `record_dependency_slip_tx` matches `output_ref`
+    // to `wbs_node.id`, so an edge naming anything else is a row that can never participate.
+    // The profile check above pins the profile's programme to `new.programme_id`, so resolving
+    // the node to this programme is resolving it to the profile's programme. The id is stored
+    // canonically (lowercase, hyphenated) so the slip's text join is exact.
+    let output_node = Uuid::parse_str(new.output_ref.trim()).map_err(|_| {
+        PlanStoreError::Illegal(PlanError::BenefitOutputUnresolved {
+            output_ref: new.output_ref.clone(),
+        })
+    })?;
+    let output_owned: bool = sqlx::query_scalar(
+        "SELECT EXISTS (
+            SELECT 1
+              FROM wbs_node w
+              JOIN project p ON p.tenant_id = w.tenant_id AND p.id = w.project_id
+             WHERE w.tenant_id = $1 AND w.id = $2 AND p.programme_id = $3
+        )",
+    )
+    .bind(tenant.as_uuid())
+    .bind(output_node)
+    .bind(new.programme_id)
+    .fetch_one(&mut *conn)
+    .await?;
+    if !output_owned {
+        return Err(PlanStoreError::Illegal(
+            PlanError::BenefitOutputUnresolved {
+                output_ref: new.output_ref.clone(),
+            },
+        ));
+    }
+    let output_ref = output_node.to_string();
     let sql = "INSERT INTO benefit_link
                  (tenant_id, programme_id, output_ref, capability_ref, operational_outcome,
                   benefit_id, strategic_objective, kind)
@@ -2306,7 +2337,7 @@ pub async fn insert_benefit_link_tx(
     let row: BenefitLinkRecord = sqlx::query_as(AssertSqlSafe(sql))
         .bind(tenant.as_uuid())
         .bind(new.programme_id)
-        .bind(&new.output_ref)
+        .bind(&output_ref)
         .bind(&new.capability_ref)
         .bind(&new.operational_outcome)
         .bind(new.benefit_id)
@@ -3573,6 +3604,36 @@ pub async fn record_dependency_slip_tx(
     let (_from, to_project) = row.ok_or(PlanStoreError::NotFound {
         what: "project dependency",
     })?;
+    // An edge that names no node cannot be attributed to a project, so it might have been this
+    // slip's output: report it rather than silently under-reporting the benefits at risk. The
+    // scope is the slipped project's programme, where the map lives.
+    let programme: Option<Uuid> =
+        sqlx::query_scalar("SELECT programme_id FROM project WHERE tenant_id = $1 AND id = $2")
+            .bind(tenant.as_uuid())
+            .bind(to_project)
+            .fetch_one(&mut *conn)
+            .await?;
+    if let Some(programme) = programme {
+        let unresolved: Option<String> = sqlx::query_scalar(
+            "SELECT l.output_ref
+               FROM benefit_link l
+              WHERE l.tenant_id = $1 AND l.programme_id = $2
+                AND NOT EXISTS (
+                    SELECT 1 FROM wbs_node w
+                     WHERE w.tenant_id = l.tenant_id AND w.id::text = l.output_ref)
+              ORDER BY l.output_ref
+              LIMIT 1",
+        )
+        .bind(tenant.as_uuid())
+        .bind(programme)
+        .fetch_optional(&mut *conn)
+        .await?;
+        if let Some(output_ref) = unresolved {
+            return Err(PlanStoreError::Illegal(
+                PlanError::BenefitOutputUnresolved { output_ref },
+            ));
+        }
+    }
     let benefits: Vec<Uuid> = sqlx::query_scalar(
         "SELECT DISTINCT l.benefit_id
            FROM benefit_link l
