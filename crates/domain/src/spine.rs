@@ -105,6 +105,15 @@ pub enum PlanError {
         /// The absent level names.
         missing: Vec<&'static str>,
     },
+    /// A benefits-map edge's `output_ref` names no WBS node of the edge's programme.
+    ///
+    /// The dependency-slip read matches `benefit_link.output_ref` to `wbs_node.id`; an edge
+    /// whose output is a label can never participate, so it is refused at write time.
+    #[error("output_ref {output_ref:?} names no wbs_node of this programme")]
+    BenefitOutputUnresolved {
+        /// The caller's unchecked string.
+        output_ref: String,
+    },
     /// A tranche review with no baselines, benefit status or risk evidence is refused.
     #[error("a tranche review needs baselines, benefit status and the risk register as evidence")]
     TrancheReviewEvidenceMissing,

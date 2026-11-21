@@ -149,6 +149,43 @@ async fn approved_draft_gate(
     approval.id
 }
 
+/// An approved `refinement.publish` gate naming `policy_id` (§7.2).
+///
+/// Requested through the real action as `dev:alice`, whose request carries the policy id in
+/// `meta.target` (a parentless gate is legitimate exactly then), and decided by the distinct
+/// reviewer: the requester cannot decide the gate that judges their own change.
+async fn approved_refinement_gate(running: &support::Running, policy_id: &str) -> String {
+    let (status, approval) = running
+        .invoke(
+            "approvals.request",
+            "dev:alice",
+            json!({
+                "gate": "refinement.publish",
+                "kind": "decision",
+                "description": "Change the refinement policy",
+                "target": policy_id
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{approval}");
+    let approval_id = id_of(output(&approval), "id");
+    let (status, decided) = running
+        .invoke(
+            "approvals.decide",
+            support::REVIEWER,
+            json!({"approval_id": approval_id, "decision": "approve"}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{decided}");
+    approval_id
+}
+
 /// P1.1 — a rule, a laya and a human decision share one audit shape.
 #[tokio::test(flavor = "multi_thread")]
 async fn a_rule_a_laya_and_a_human_decision_share_one_audit_shape() {
@@ -208,7 +245,7 @@ async fn a_rule_a_laya_and_a_human_decision_share_one_audit_shape() {
             "dev:alice",
             json!({
                 "project_id": project_id,
-                "gate": "gate.precheck",
+                "gate": "capability_ready",
                 "kind": "decision",
                 "description": "Confirm the gate"
             }),
@@ -347,12 +384,18 @@ async fn a_refinement_changes_a_threshold_without_a_code_change() {
     assert_eq!(output(&refused)["outcome"], "refused", "{refused}");
     assert_eq!(output(&refused)["policy_version"], 1, "{refused}");
 
-    // The tenant publishes a 0.5 refinement — configuration, not a build.
+    // The tenant publishes a 0.5 refinement — configuration, not a build, but a gated policy
+    // change (§7.2): it cites the approved refinement.publish gate naming this policy.
+    let approval_id = approved_refinement_gate(&running, &policy_id).await;
     let (status, published) = running
         .invoke(
             "refinements.publish",
             "dev:alice",
-            json!({"policy_id": policy_id, "threshold_override": 0.5}),
+            json!({
+                "policy_id": policy_id,
+                "threshold_override": 0.5,
+                "approval_id": approval_id
+            }),
             None,
             None,
             None,
@@ -374,6 +417,190 @@ async fn a_refinement_changes_a_threshold_without_a_code_change() {
     );
 }
 
+/// §7.2 — changing a refinement is a gated policy change: a principal holding
+/// `governance:write` cannot publish an override alone, and the refusal writes no row.
+#[tokio::test(flavor = "multi_thread")]
+async fn a_refinement_cannot_publish_without_its_gate() {
+    let (_pg, running, _seeded) = fixture().await;
+    let (policy_id, _etag) = create_policy(
+        &running,
+        "gate.precheck",
+        Some("capability_ready"),
+        0.8,
+        "closed",
+        "block",
+    )
+    .await;
+
+    let (status, refused) = running
+        .invoke(
+            "refinements.publish",
+            "dev:alice",
+            json!({"policy_id": policy_id, "threshold_override": 0.5}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 422, "{refused}");
+    assert_eq!(
+        output(&refused)["errors"][0]["field"],
+        "approval_id",
+        "{refused}"
+    );
+    assert_eq!(
+        output(&refused)["errors"][0]["code"],
+        "approval_missing",
+        "{refused}"
+    );
+
+    // The refusal runs before the write: the policy has no refinement row and no version.
+    let (status, list) = running
+        .invoke(
+            "refinements.list",
+            "dev:alice",
+            json!({"policy_id": policy_id}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{list}");
+    assert_eq!(
+        output(&list)["items"].as_array().expect("items").len(),
+        0,
+        "a refused publish wrote a refinement row: {list}"
+    );
+}
+
+/// §7.2 — the gate names the policy it changes: an approved gate for another policy cannot
+/// authorise this one.
+#[tokio::test(flavor = "multi_thread")]
+async fn a_refinement_gate_for_another_policy_cannot_authorise_this_one() {
+    let (_pg, running, _seeded) = fixture().await;
+    let (policy_id, _etag) = create_policy(
+        &running,
+        "gate.precheck",
+        Some("capability_ready"),
+        0.8,
+        "closed",
+        "block",
+    )
+    .await;
+    let (other_policy_id, _other_etag) = create_policy(
+        &running,
+        "gate.precheck.other",
+        Some("capability_ready"),
+        0.8,
+        "closed",
+        "block",
+    )
+    .await;
+
+    // A real approved human gate — but its target is the other policy.
+    let other_gate = approved_refinement_gate(&running, &other_policy_id).await;
+    let (status, refused) = running
+        .invoke(
+            "refinements.publish",
+            "dev:alice",
+            json!({
+                "policy_id": policy_id,
+                "threshold_override": 0.5,
+                "approval_id": other_gate
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 422, "{refused}");
+    assert_eq!(
+        output(&refused)["errors"][0]["field"],
+        "approval_id",
+        "{refused}"
+    );
+    assert_eq!(
+        output(&refused)["errors"][0]["code"],
+        "approval_missing",
+        "{refused}"
+    );
+
+    let (status, list) = running
+        .invoke(
+            "refinements.list",
+            "dev:alice",
+            json!({"policy_id": policy_id}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{list}");
+    assert_eq!(
+        output(&list)["items"].as_array().expect("items").len(),
+        0,
+        "a gate for another policy authorised a refinement: {list}"
+    );
+}
+
+/// §7.2 — an approved human gate naming this policy publishes, and each gated publish advances
+/// the refinement's version.
+#[tokio::test(flavor = "multi_thread")]
+async fn a_human_approved_refinement_gate_publishes() {
+    let (_pg, running, _seeded) = fixture().await;
+    let (policy_id, _etag) = create_policy(
+        &running,
+        "gate.precheck",
+        Some("capability_ready"),
+        0.8,
+        "closed",
+        "block",
+    )
+    .await;
+
+    let first_gate = approved_refinement_gate(&running, &policy_id).await;
+    let (status, published) = running
+        .invoke(
+            "refinements.publish",
+            "dev:alice",
+            json!({
+                "policy_id": policy_id,
+                "threshold_override": 0.5,
+                "approval_id": first_gate
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{published}");
+    assert_eq!(output(&published)["version"], 1, "{published}");
+
+    // A second gated change republishes the same refinement at version 2.
+    let second_gate = approved_refinement_gate(&running, &policy_id).await;
+    let (status, republished) = running
+        .invoke(
+            "refinements.publish",
+            "dev:alice",
+            json!({
+                "policy_id": policy_id,
+                "threshold_override": 0.4,
+                "approval_id": second_gate
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{republished}");
+    assert_eq!(output(&republished)["version"], 2, "{republished}");
+    assert_eq!(
+        output(&republished)["id"],
+        published["output"]["id"],
+        "a republish must advance the one refinement, not add a second: {republished}"
+    );
+}
+
 /// P3.1 — every decision pins the versions it read; a later change does not rewrite the row.
 #[tokio::test(flavor = "multi_thread")]
 async fn every_decision_pins_the_refinement_and_laya_config_versions() {
@@ -387,16 +614,22 @@ async fn every_decision_pins_the_refinement_and_laya_config_versions() {
         "block",
     )
     .await;
-    running
+    let approval_id = approved_refinement_gate(&running, &policy_id).await;
+    let (status, published) = running
         .invoke(
             "refinements.publish",
             "dev:alice",
-            json!({"policy_id": policy_id, "threshold_override": 0.6}),
+            json!({
+                "policy_id": policy_id,
+                "threshold_override": 0.6,
+                "approval_id": approval_id
+            }),
             None,
             None,
             None,
         )
         .await;
+    assert_eq!(status, 200, "{published}");
 
     // A laya decision with no laya config to pin is refused: the pin is mandatory, not a default.
     let (status, unpinned) = evaluate(&running, 0.9).await;
