@@ -78,7 +78,7 @@
       "evidence": [
         {
           "path": "crates/domain/src/spine.rs",
-          "line": 244,
+          "line": 252,
           "quote": "    let has_impact = impact.is_some_and(|value| !value.is_null());"
         }
       ],
@@ -562,7 +562,7 @@
         },
         {
           "path": "crates/store/src/spine.rs",
-          "line": 3630,
+          "line": 3718,
           "quote": "            if matches!(state.as_str(), \"authorised\" | \"in_review\" | \"closed\") =>"
         }
       ],
@@ -658,12 +658,12 @@
         },
         {
           "path": "crates/store/src/spine.rs",
-          "line": 3819,
+          "line": 3907,
           "quote": "pub async fn close_programme_tx("
         },
         {
           "path": "crates/store/src/spine.rs",
-          "line": 3853,
+          "line": 3941,
           "quote": "        \"UPDATE programme SET status = 'closed', version = version + 1, updated_at = now()"
         }
       ],
@@ -793,7 +793,7 @@
         },
         {
           "path": "crates/actions/src/board/pull.rs",
-          "line": 358,
+          "line": 359,
           "quote": "        coach_skipped: live.is_some() || coach_refusal.is_some(),"
         }
       ],
@@ -812,17 +812,17 @@
       "evidence": [
         {
           "path": "crates/actions/src/board/pull.rs",
-          "line": 423,
+          "line": 424,
           "quote": "            \"coach.interrupt\","
         },
         {
           "path": "crates/actions/src/board/pull.rs",
-          "line": 417,
+          "line": 418,
           "quote": "    // (c) The coach, through the one admission path (T4). `coach.interrupt` creates the coach"
         },
         {
           "path": "crates/actions/src/board/pull.rs",
-          "line": 423,
+          "line": 424,
           "quote": "            \"coach.interrupt\","
         },
         {
@@ -905,7 +905,12 @@
       ],
       "failure_scenario": "A caller moves planned directly to closed, or persists an arbitrary string, destroying cadence history.",
       "acceptance": "The five states are CHECKed and disallowed transitions are refused with 409 and covered by tests.",
-      "owner_project": "T10"
+      "owner_project": "T10",
+      "resolved_by": {
+        "commit": "d7b7338346b672b3ea0013ee02e1aaf3f69be68c",
+        "test": "crates/store/tests/programme_cadence.rs",
+        "evidence": "programme_cadence 5/5: migration 0064 CHECKs the state to the six values the code writes; cadence_move is consulted by the edit path, the approval gate and the materialiser, and an illegal jump is 409 cadence_illegal_transition. The CHECK was verified against a throwaway postgres:18."
+      }
     },
     {
       "id": "v1-p82-3",
@@ -966,7 +971,7 @@
       "evidence": [
         {
           "path": "crates/store/src/spine.rs",
-          "line": 3113,
+          "line": 3201,
           "quote": "          WHERE tenant_id = $1 AND project_id = $2 AND kind = 'deliverable'"
         }
       ],
@@ -1111,7 +1116,12 @@
       ],
       "failure_scenario": "A tenant on the published pack sees call counts only and cannot check spend, tool spend or budget headroom, nor drill to a tool call.",
       "acceptance": "Live Metering renders tokens, derived cost, tool spend and budget utilisation and drills from tenant to run/step/tool call from the ledger rows.",
-      "owner_project": "PLATFORM"
+      "owner_project": "PLATFORM",
+      "resolved_by": {
+        "commit": "59df4b78ba5bfa2a9bdcec5d5f7473bc006058ef",
+        "test": "crates/store/tests/snapshot_measure.rs",
+        "evidence": "The snapshot measure totals now carry cost_usd (D52 read-time price), tool_cost_usd and unpriced_calls; the Metering screen renders Cost / Tool spend / Unpriced calls. snapshot_measure 6/6 asserts one priced and one unpriced tool call at exact figures; check-v2 281 checks."
+      }
     },
     {
       "id": "v1-p105-6",
@@ -1521,7 +1531,7 @@
       "evidence": [
         {
           "path": "crates/actions/src/spine/mod.rs",
-          "line": 1739,
+          "line": 1746,
           "quote": "        input.status.as_deref(),"
         },
         {
@@ -1912,17 +1922,17 @@
       "evidence": [
         {
           "path": "crates/store/src/snapshot.rs",
-          "line": 1430,
+          "line": 1460,
           "quote": "            artifact_phases.insert((project.to_owned(), phase.to_owned()));"
         },
         {
           "path": "crates/store/src/snapshot.rs",
-          "line": 1444,
+          "line": 1474,
           "quote": "            .is_none_or(|current| row_is_later(contract, current, \"created_at\"));"
         },
         {
           "path": "crates/store/src/snapshot.rs",
-          "line": 1499,
+          "line": 1529,
           "quote": "                artifact_phases.contains(&phase_key) || contract.is_some() || compliance.is_some();"
         }
       ],
@@ -2043,7 +2053,7 @@
       "evidence": [
         {
           "path": "crates/actions/src/spine/mod.rs",
-          "line": 3168,
+          "line": 3175,
           "quote": "            state: input.state,"
         },
         {
@@ -2053,7 +2063,7 @@
         },
         {
           "path": "crates/store/src/spine.rs",
-          "line": 3595,
+          "line": 3683,
           "quote": "                PlanError::RetroFindingWithoutLesson(key),"
         }
       ],
@@ -2135,7 +2145,7 @@
         },
         {
           "path": "crates/actions/src/spine/mod.rs",
-          "line": 1216,
+          "line": 1223,
           "quote": "    name = \"wbs.create\","
         }
       ],
@@ -2461,7 +2471,12 @@
       ],
       "failure_scenario": "Two tenant bindings pin the same toolkit with different credential aliases. Both calls are dispatched internally under the single configured service token, so tenant B's calls execute with tenant A's rights; revoking or rotating B's alias changes nothing at the destination, and a binding that declares no credential still succeeds on the target's ambient credential.",
       "acceptance": "A call resolves the binding's `credential_alias` through the sealed secret store and the destination receives that credential; a binding with no alias against a toolkit whose auth adapter is not `none` fails closed before the call; a test binding two aliases to one toolkit asserts the two destination credentials differ.",
-      "owner_project": "T13"
+      "owner_project": "T13",
+      "resolved_by": {
+        "commit": "8b0f9655dbe3b33fd926049ad63786eb5e057062",
+        "test": "crates/actions/tests/tool_platform.rs",
+        "evidence": "tool_platform 17/17: the destination sees the binding's sealed credential (the stub echoes the binding token, not the default); a credential-required toolkit with no binding alias is 409 tool_not_ready with zero destination calls. 57 InvokeRequest constructions carry the field; tool_budget 14/14 and all actions/api/server test binaries compile."
+      }
     },
     {
       "id": "v1-w4a-5",
@@ -2489,7 +2504,7 @@
         },
         {
           "path": "crates/actions/src/broker.rs",
-          "line": 490,
+          "line": 507,
           "quote": "                _ => \"backend_error\","
         }
       ],
@@ -4033,7 +4048,7 @@
       "evidence": [
         {
           "path": "crates/actions/src/invoke.rs",
-          "line": 763,
+          "line": 770,
           "quote": "    ActionError::new(429, \"tool_budget_exceeded\", detail)"
         },
         {
