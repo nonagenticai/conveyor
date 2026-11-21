@@ -1,22 +1,22 @@
 {
   "counts": {
     "P0": 22,
-    "P1": 54,
-    "P2": 60,
+    "P1": 131,
+    "P2": 12,
     "P3": 0
   },
   "gaps": [
     {
-      "detail": "project is closed but its class-required closure review is not published",
-      "disposition": "remediate",
+      "detail": "project is closed but its closure review is not published",
+      "disposition": "rework",
       "evidence": null,
       "rule": "closed_without_closure_review",
       "severity": "P0",
       "subject": "DESIGN-PUBLISH"
     },
     {
-      "detail": "project is closed but its class-required closure review is not published",
-      "disposition": "remediate",
+      "detail": "project is closed but its closure review is not published",
+      "disposition": "rework",
       "evidence": null,
       "rule": "closed_without_closure_review",
       "severity": "P0",
@@ -24,7 +24,7 @@
     },
     {
       "detail": "project is closed in tranche 2 whose state is 'planned'",
-      "disposition": "remediate",
+      "disposition": "rework",
       "evidence": null,
       "rule": "project_in_unauthorised_tranche",
       "severity": "P0",
@@ -32,7 +32,7 @@
     },
     {
       "detail": "project is closed in tranche 4 whose state is 'planned'",
-      "disposition": "remediate",
+      "disposition": "rework",
       "evidence": null,
       "rule": "project_in_unauthorised_tranche",
       "severity": "P0",
@@ -40,7 +40,7 @@
     },
     {
       "detail": "project is closed in tranche 6 whose state is 'planned'",
-      "disposition": "remediate",
+      "disposition": "rework",
       "evidence": null,
       "rule": "project_in_unauthorised_tranche",
       "severity": "P0",
@@ -48,7 +48,7 @@
     },
     {
       "detail": "project is closed in tranche 7 whose state is 'planned'",
-      "disposition": "remediate",
+      "disposition": "rework",
       "evidence": null,
       "rule": "project_in_unauthorised_tranche",
       "severity": "P0",
@@ -56,7 +56,7 @@
     },
     {
       "detail": "project is closed in tranche 8 whose state is 'planned'",
-      "disposition": "remediate",
+      "disposition": "rework",
       "evidence": null,
       "rule": "project_in_unauthorised_tranche",
       "severity": "P0",
@@ -64,7 +64,7 @@
     },
     {
       "detail": "project is closed in tranche 4 whose state is 'planned'",
-      "disposition": "remediate",
+      "disposition": "rework",
       "evidence": null,
       "rule": "project_in_unauthorised_tranche",
       "severity": "P0",
@@ -72,7 +72,7 @@
     },
     {
       "detail": "project is closed in tranche 5 whose state is 'planned'",
-      "disposition": "remediate",
+      "disposition": "rework",
       "evidence": null,
       "rule": "project_in_unauthorised_tranche",
       "severity": "P0",
@@ -80,7 +80,7 @@
     },
     {
       "detail": "project is closed in tranche 4 whose state is 'planned'",
-      "disposition": "remediate",
+      "disposition": "rework",
       "evidence": null,
       "rule": "project_in_unauthorised_tranche",
       "severity": "P0",
@@ -88,7 +88,7 @@
     },
     {
       "detail": "project is closed in tranche 6 whose state is 'planned'",
-      "disposition": "remediate",
+      "disposition": "rework",
       "evidence": null,
       "rule": "project_in_unauthorised_tranche",
       "severity": "P0",
@@ -96,7 +96,7 @@
     },
     {
       "detail": "project is closed in tranche 6 whose state is 'planned'",
-      "disposition": "remediate",
+      "disposition": "rework",
       "evidence": null,
       "rule": "project_in_unauthorised_tranche",
       "severity": "P0",
@@ -104,7 +104,7 @@
     },
     {
       "detail": "project is closed in tranche 7 whose state is 'planned'",
-      "disposition": "remediate",
+      "disposition": "rework",
       "evidence": null,
       "rule": "project_in_unauthorised_tranche",
       "severity": "P0",
@@ -112,7 +112,7 @@
     },
     {
       "detail": "project is closed in tranche 1 whose state is 'planned'",
-      "disposition": "remediate",
+      "disposition": "rework",
       "evidence": null,
       "rule": "project_in_unauthorised_tranche",
       "severity": "P0",
@@ -120,7 +120,7 @@
     },
     {
       "detail": "project is closed in tranche 4 whose state is 'planned'",
-      "disposition": "remediate",
+      "disposition": "rework",
       "evidence": null,
       "rule": "project_in_unauthorised_tranche",
       "severity": "P0",
@@ -128,7 +128,7 @@
     },
     {
       "detail": "project is closed in tranche 3 whose state is 'planned'",
-      "disposition": "remediate",
+      "disposition": "rework",
       "evidence": null,
       "rule": "project_in_unauthorised_tranche",
       "severity": "P0",
@@ -136,7 +136,7 @@
     },
     {
       "detail": "project is closed in tranche 4 whose state is 'planned'",
-      "disposition": "remediate",
+      "disposition": "rework",
       "evidence": null,
       "rule": "project_in_unauthorised_tranche",
       "severity": "P0",
@@ -144,7 +144,7 @@
     },
     {
       "detail": "project is closed in tranche 2 whose state is 'planned'",
-      "disposition": "remediate",
+      "disposition": "rework",
       "evidence": null,
       "rule": "project_in_unauthorised_tranche",
       "severity": "P0",
@@ -152,7 +152,7 @@
     },
     {
       "detail": "project is closed in tranche 3 whose state is 'planned'",
-      "disposition": "remediate",
+      "disposition": "rework",
       "evidence": null,
       "rule": "project_in_unauthorised_tranche",
       "severity": "P0",
@@ -160,7 +160,7 @@
     },
     {
       "detail": "project is closed in tranche 4 whose state is 'planned'",
-      "disposition": "remediate",
+      "disposition": "rework",
       "evidence": null,
       "rule": "project_in_unauthorised_tranche",
       "severity": "P0",
@@ -168,7 +168,7 @@
     },
     {
       "detail": "project is closed in tranche 4 whose state is 'planned'",
-      "disposition": "remediate",
+      "disposition": "rework",
       "evidence": null,
       "rule": "project_in_unauthorised_tranche",
       "severity": "P0",
@@ -176,7 +176,7 @@
     },
     {
       "detail": "continue did not authorise tranche 1: state is 'planned'",
-      "disposition": "remediate",
+      "disposition": "rework",
       "evidence": null,
       "rule": "tranche_review_without_authorisation",
       "severity": "P0",
@@ -184,7 +184,7 @@
     },
     {
       "detail": "baseline is a placeholder: 'not measured - no instrument exists (recorded as a kata on the kata project)'",
-      "disposition": "remediate",
+      "disposition": "rework",
       "evidence": null,
       "rule": "benefit_baseline_placeholder",
       "severity": "P1",
@@ -192,7 +192,7 @@
     },
     {
       "detail": "baseline is a placeholder: 'not measured - no instrument exists (recorded as a kata on the kata project)'",
-      "disposition": "remediate",
+      "disposition": "rework",
       "evidence": null,
       "rule": "benefit_baseline_placeholder",
       "severity": "P1",
@@ -200,7 +200,7 @@
     },
     {
       "detail": "baseline is a placeholder: 'not measured - no instrument exists (recorded as a kata on the kata project)'",
-      "disposition": "remediate",
+      "disposition": "rework",
       "evidence": null,
       "rule": "benefit_baseline_placeholder",
       "severity": "P1",
@@ -208,7 +208,7 @@
     },
     {
       "detail": "baseline is a placeholder: 'not measured - no instrument exists (recorded as a kata on the kata project)'",
-      "disposition": "remediate",
+      "disposition": "rework",
       "evidence": null,
       "rule": "benefit_baseline_placeholder",
       "severity": "P1",
@@ -216,7 +216,7 @@
     },
     {
       "detail": "baseline is a placeholder: 'not measured - no instrument exists (recorded as a kata on the kata project)'",
-      "disposition": "remediate",
+      "disposition": "rework",
       "evidence": null,
       "rule": "benefit_baseline_placeholder",
       "severity": "P1",
@@ -224,7 +224,7 @@
     },
     {
       "detail": "baseline is a placeholder: 'not measured - no instrument exists (recorded as a kata on the kata project)'",
-      "disposition": "remediate",
+      "disposition": "rework",
       "evidence": null,
       "rule": "benefit_baseline_placeholder",
       "severity": "P1",
@@ -232,7 +232,7 @@
     },
     {
       "detail": "missing operational_area",
-      "disposition": "remediate",
+      "disposition": "rework",
       "evidence": null,
       "rule": "benefit_profile_incomplete",
       "severity": "P1",
@@ -240,15 +240,247 @@
     },
     {
       "detail": "the architecture board is not active",
-      "disposition": "remediate",
+      "disposition": "rework",
       "evidence": null,
       "rule": "board_not_approved",
       "severity": "P1",
       "subject": "board"
     },
     {
+      "detail": "project is closed but its closure review is not published",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "closed_without_closure_review",
+      "severity": "P1",
+      "subject": "S00"
+    },
+    {
+      "detail": "project is closed but its closure review is not published",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "closed_without_closure_review",
+      "severity": "P1",
+      "subject": "S01"
+    },
+    {
+      "detail": "project is closed but its closure review is not published",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "closed_without_closure_review",
+      "severity": "P1",
+      "subject": "S03"
+    },
+    {
+      "detail": "project is closed but its closure review is not published",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "closed_without_closure_review",
+      "severity": "P1",
+      "subject": "S05"
+    },
+    {
+      "detail": "project is closed but its closure review is not published",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "closed_without_closure_review",
+      "severity": "P1",
+      "subject": "S06b"
+    },
+    {
+      "detail": "project is closed but its closure review is not published",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "closed_without_closure_review",
+      "severity": "P1",
+      "subject": "S06c"
+    },
+    {
+      "detail": "project is closed but its closure review is not published",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "closed_without_closure_review",
+      "severity": "P1",
+      "subject": "S06d"
+    },
+    {
+      "detail": "project is closed but its closure review is not published",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "closed_without_closure_review",
+      "severity": "P1",
+      "subject": "S07"
+    },
+    {
+      "detail": "project is closed but its closure review is not published",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "closed_without_closure_review",
+      "severity": "P1",
+      "subject": "S08"
+    },
+    {
+      "detail": "project is closed but its closure review is not published",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "closed_without_closure_review",
+      "severity": "P1",
+      "subject": "S09"
+    },
+    {
+      "detail": "project is closed but its closure review is not published",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "closed_without_closure_review",
+      "severity": "P1",
+      "subject": "S10"
+    },
+    {
+      "detail": "project is closed but its closure review is not published",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "closed_without_closure_review",
+      "severity": "P1",
+      "subject": "S11"
+    },
+    {
+      "detail": "project is closed but its closure review is not published",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "closed_without_closure_review",
+      "severity": "P1",
+      "subject": "S16"
+    },
+    {
+      "detail": "project is closed but its closure review is not published",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "closed_without_closure_review",
+      "severity": "P1",
+      "subject": "SPEC-V2"
+    },
+    {
+      "detail": "project is closed but declares no closure_outputs",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "closure_outputs_undeclared",
+      "severity": "P1",
+      "subject": "P0"
+    },
+    {
+      "detail": "project is closed but declares no closure_outputs",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "closure_outputs_undeclared",
+      "severity": "P1",
+      "subject": "S00"
+    },
+    {
+      "detail": "project is closed but declares no closure_outputs",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "closure_outputs_undeclared",
+      "severity": "P1",
+      "subject": "S01"
+    },
+    {
+      "detail": "project is closed but declares no closure_outputs",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "closure_outputs_undeclared",
+      "severity": "P1",
+      "subject": "S03"
+    },
+    {
+      "detail": "project is closed but declares no closure_outputs",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "closure_outputs_undeclared",
+      "severity": "P1",
+      "subject": "S05"
+    },
+    {
+      "detail": "project is closed but declares no closure_outputs",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "closure_outputs_undeclared",
+      "severity": "P1",
+      "subject": "S06b"
+    },
+    {
+      "detail": "project is closed but declares no closure_outputs",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "closure_outputs_undeclared",
+      "severity": "P1",
+      "subject": "S06c"
+    },
+    {
+      "detail": "project is closed but declares no closure_outputs",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "closure_outputs_undeclared",
+      "severity": "P1",
+      "subject": "S06d"
+    },
+    {
+      "detail": "project is closed but declares no closure_outputs",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "closure_outputs_undeclared",
+      "severity": "P1",
+      "subject": "S07"
+    },
+    {
+      "detail": "project is closed but declares no closure_outputs",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "closure_outputs_undeclared",
+      "severity": "P1",
+      "subject": "S08"
+    },
+    {
+      "detail": "project is closed but declares no closure_outputs",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "closure_outputs_undeclared",
+      "severity": "P1",
+      "subject": "S09"
+    },
+    {
+      "detail": "project is closed but declares no closure_outputs",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "closure_outputs_undeclared",
+      "severity": "P1",
+      "subject": "S10"
+    },
+    {
+      "detail": "project is closed but declares no closure_outputs",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "closure_outputs_undeclared",
+      "severity": "P1",
+      "subject": "S11"
+    },
+    {
+      "detail": "project is closed but declares no closure_outputs",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "closure_outputs_undeclared",
+      "severity": "P1",
+      "subject": "S16"
+    },
+    {
+      "detail": "project is closed but declares no closure_outputs",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "closure_outputs_undeclared",
+      "severity": "P1",
+      "subject": "SPEC-V2"
+    },
+    {
       "detail": "delivery project has no live architecture contract",
-      "disposition": "remediate",
+      "disposition": "rework",
       "evidence": null,
       "rule": "contract_missing",
       "severity": "P1",
@@ -256,7 +488,7 @@
     },
     {
       "detail": "delivery project has no live architecture contract",
-      "disposition": "remediate",
+      "disposition": "rework",
       "evidence": null,
       "rule": "contract_missing",
       "severity": "P1",
@@ -264,7 +496,7 @@
     },
     {
       "detail": "delivery project has no live architecture contract",
-      "disposition": "remediate",
+      "disposition": "rework",
       "evidence": null,
       "rule": "contract_missing",
       "severity": "P1",
@@ -272,7 +504,7 @@
     },
     {
       "detail": "delivery project has no live architecture contract",
-      "disposition": "remediate",
+      "disposition": "rework",
       "evidence": null,
       "rule": "contract_missing",
       "severity": "P1",
@@ -280,7 +512,7 @@
     },
     {
       "detail": "delivery project has no live architecture contract",
-      "disposition": "remediate",
+      "disposition": "rework",
       "evidence": null,
       "rule": "contract_missing",
       "severity": "P1",
@@ -288,7 +520,7 @@
     },
     {
       "detail": "delivery project has no live architecture contract",
-      "disposition": "remediate",
+      "disposition": "rework",
       "evidence": null,
       "rule": "contract_missing",
       "severity": "P1",
@@ -296,7 +528,7 @@
     },
     {
       "detail": "delivery project has no live architecture contract",
-      "disposition": "remediate",
+      "disposition": "rework",
       "evidence": null,
       "rule": "contract_missing",
       "severity": "P1",
@@ -304,7 +536,7 @@
     },
     {
       "detail": "delivery project has no live architecture contract",
-      "disposition": "remediate",
+      "disposition": "rework",
       "evidence": null,
       "rule": "contract_missing",
       "severity": "P1",
@@ -312,7 +544,7 @@
     },
     {
       "detail": "delivery project has no live architecture contract",
-      "disposition": "remediate",
+      "disposition": "rework",
       "evidence": null,
       "rule": "contract_missing",
       "severity": "P1",
@@ -320,7 +552,7 @@
     },
     {
       "detail": "delivery project has no live architecture contract",
-      "disposition": "remediate",
+      "disposition": "rework",
       "evidence": null,
       "rule": "contract_missing",
       "severity": "P1",
@@ -328,7 +560,7 @@
     },
     {
       "detail": "delivery project has no live architecture contract",
-      "disposition": "remediate",
+      "disposition": "rework",
       "evidence": null,
       "rule": "contract_missing",
       "severity": "P1",
@@ -336,7 +568,7 @@
     },
     {
       "detail": "delivery project has no live architecture contract",
-      "disposition": "remediate",
+      "disposition": "rework",
       "evidence": null,
       "rule": "contract_missing",
       "severity": "P1",
@@ -344,7 +576,7 @@
     },
     {
       "detail": "delivery project has no live architecture contract",
-      "disposition": "remediate",
+      "disposition": "rework",
       "evidence": null,
       "rule": "contract_missing",
       "severity": "P1",
@@ -352,7 +584,7 @@
     },
     {
       "detail": "delivery project has no live architecture contract",
-      "disposition": "remediate",
+      "disposition": "rework",
       "evidence": null,
       "rule": "contract_missing",
       "severity": "P1",
@@ -360,7 +592,7 @@
     },
     {
       "detail": "delivery project has no live architecture contract",
-      "disposition": "remediate",
+      "disposition": "rework",
       "evidence": null,
       "rule": "contract_missing",
       "severity": "P1",
@@ -368,15 +600,367 @@
     },
     {
       "detail": "delivery project has no live architecture contract",
-      "disposition": "remediate",
+      "disposition": "rework",
       "evidence": null,
       "rule": "contract_missing",
       "severity": "P1",
       "subject": "T8"
     },
     {
+      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "mandatory_artefacts",
+      "severity": "P1",
+      "subject": "S00"
+    },
+    {
+      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "mandatory_artefacts",
+      "severity": "P1",
+      "subject": "S01"
+    },
+    {
+      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "mandatory_artefacts",
+      "severity": "P1",
+      "subject": "S02"
+    },
+    {
+      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "mandatory_artefacts",
+      "severity": "P1",
+      "subject": "S03"
+    },
+    {
+      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "mandatory_artefacts",
+      "severity": "P1",
+      "subject": "S04"
+    },
+    {
+      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "mandatory_artefacts",
+      "severity": "P1",
+      "subject": "S05"
+    },
+    {
+      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "mandatory_artefacts",
+      "severity": "P1",
+      "subject": "S06"
+    },
+    {
+      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "mandatory_artefacts",
+      "severity": "P1",
+      "subject": "S06a"
+    },
+    {
+      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "mandatory_artefacts",
+      "severity": "P1",
+      "subject": "S06b"
+    },
+    {
+      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "mandatory_artefacts",
+      "severity": "P1",
+      "subject": "S06c"
+    },
+    {
+      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "mandatory_artefacts",
+      "severity": "P1",
+      "subject": "S06d"
+    },
+    {
+      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "mandatory_artefacts",
+      "severity": "P1",
+      "subject": "S07"
+    },
+    {
+      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "mandatory_artefacts",
+      "severity": "P1",
+      "subject": "S08"
+    },
+    {
+      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "mandatory_artefacts",
+      "severity": "P1",
+      "subject": "S09"
+    },
+    {
+      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "mandatory_artefacts",
+      "severity": "P1",
+      "subject": "S10"
+    },
+    {
+      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "mandatory_artefacts",
+      "severity": "P1",
+      "subject": "S11"
+    },
+    {
+      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "mandatory_artefacts",
+      "severity": "P1",
+      "subject": "S12"
+    },
+    {
+      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "mandatory_artefacts",
+      "severity": "P1",
+      "subject": "S13"
+    },
+    {
+      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "mandatory_artefacts",
+      "severity": "P1",
+      "subject": "S14"
+    },
+    {
+      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "mandatory_artefacts",
+      "severity": "P1",
+      "subject": "S15"
+    },
+    {
+      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "mandatory_artefacts",
+      "severity": "P1",
+      "subject": "S16"
+    },
+    {
+      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "mandatory_artefacts",
+      "severity": "P1",
+      "subject": "S17"
+    },
+    {
+      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "mandatory_artefacts",
+      "severity": "P1",
+      "subject": "S18"
+    },
+    {
+      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "mandatory_artefacts",
+      "severity": "P1",
+      "subject": "S19"
+    },
+    {
+      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "mandatory_artefacts",
+      "severity": "P1",
+      "subject": "S20"
+    },
+    {
+      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "mandatory_artefacts",
+      "severity": "P1",
+      "subject": "S21"
+    },
+    {
+      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "mandatory_artefacts",
+      "severity": "P1",
+      "subject": "T0"
+    },
+    {
+      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "mandatory_artefacts",
+      "severity": "P1",
+      "subject": "T1"
+    },
+    {
+      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "mandatory_artefacts",
+      "severity": "P1",
+      "subject": "T10"
+    },
+    {
+      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "mandatory_artefacts",
+      "severity": "P1",
+      "subject": "T11"
+    },
+    {
+      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "mandatory_artefacts",
+      "severity": "P1",
+      "subject": "T12"
+    },
+    {
+      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "mandatory_artefacts",
+      "severity": "P1",
+      "subject": "T13"
+    },
+    {
+      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "mandatory_artefacts",
+      "severity": "P1",
+      "subject": "T14"
+    },
+    {
+      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "mandatory_artefacts",
+      "severity": "P1",
+      "subject": "T15"
+    },
+    {
+      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "mandatory_artefacts",
+      "severity": "P1",
+      "subject": "T16"
+    },
+    {
+      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "mandatory_artefacts",
+      "severity": "P1",
+      "subject": "T17"
+    },
+    {
+      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "mandatory_artefacts",
+      "severity": "P1",
+      "subject": "T2"
+    },
+    {
+      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "mandatory_artefacts",
+      "severity": "P1",
+      "subject": "T3"
+    },
+    {
+      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "mandatory_artefacts",
+      "severity": "P1",
+      "subject": "T4"
+    },
+    {
+      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "mandatory_artefacts",
+      "severity": "P1",
+      "subject": "T5"
+    },
+    {
+      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "mandatory_artefacts",
+      "severity": "P1",
+      "subject": "T6"
+    },
+    {
+      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "mandatory_artefacts",
+      "severity": "P1",
+      "subject": "T7"
+    },
+    {
+      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "mandatory_artefacts",
+      "severity": "P1",
+      "subject": "T8"
+    },
+    {
+      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "mandatory_artefacts",
+      "severity": "P1",
+      "subject": "T9"
+    },
+    {
       "detail": "the programme has no boundary baseline",
-      "disposition": "remediate",
+      "disposition": "rework",
       "evidence": null,
       "rule": "programme_baselines",
       "severity": "P1",
@@ -384,7 +968,7 @@
     },
     {
       "detail": "the programme has no governance baseline",
-      "disposition": "remediate",
+      "disposition": "rework",
       "evidence": null,
       "rule": "programme_baselines",
       "severity": "P1",
@@ -392,7 +976,7 @@
     },
     {
       "detail": "the programme has no management baseline",
-      "disposition": "remediate",
+      "disposition": "rework",
       "evidence": null,
       "rule": "programme_baselines",
       "severity": "P1",
@@ -400,7 +984,7 @@
     },
     {
       "detail": "project is active in tranche 1 whose state is 'planned'",
-      "disposition": "remediate",
+      "disposition": "rework",
       "evidence": null,
       "rule": "project_in_unauthorised_tranche",
       "severity": "P1",
@@ -408,7 +992,7 @@
     },
     {
       "detail": "project is active in tranche 3 whose state is 'planned'",
-      "disposition": "remediate",
+      "disposition": "rework",
       "evidence": null,
       "rule": "project_in_unauthorised_tranche",
       "severity": "P1",
@@ -416,7 +1000,7 @@
     },
     {
       "detail": "project is active in tranche 5 whose state is 'planned'",
-      "disposition": "remediate",
+      "disposition": "rework",
       "evidence": null,
       "rule": "project_in_unauthorised_tranche",
       "severity": "P1",
@@ -424,7 +1008,7 @@
     },
     {
       "detail": "project is active in tranche 10 whose state is 'planned'",
-      "disposition": "remediate",
+      "disposition": "rework",
       "evidence": null,
       "rule": "project_in_unauthorised_tranche",
       "severity": "P1",
@@ -432,7 +1016,7 @@
     },
     {
       "detail": "project is active in tranche 8 whose state is 'planned'",
-      "disposition": "remediate",
+      "disposition": "rework",
       "evidence": null,
       "rule": "project_in_unauthorised_tranche",
       "severity": "P1",
@@ -440,7 +1024,7 @@
     },
     {
       "detail": "project is active in tranche 11 whose state is 'planned'",
-      "disposition": "remediate",
+      "disposition": "rework",
       "evidence": null,
       "rule": "project_in_unauthorised_tranche",
       "severity": "P1",
@@ -448,7 +1032,7 @@
     },
     {
       "detail": "project is active in tranche 7 whose state is 'planned'",
-      "disposition": "remediate",
+      "disposition": "rework",
       "evidence": null,
       "rule": "project_in_unauthorised_tranche",
       "severity": "P1",
@@ -456,7 +1040,7 @@
     },
     {
       "detail": "project is active in tranche 5 whose state is 'planned'",
-      "disposition": "remediate",
+      "disposition": "rework",
       "evidence": null,
       "rule": "project_in_unauthorised_tranche",
       "severity": "P1",
@@ -464,7 +1048,7 @@
     },
     {
       "detail": "project is active in tranche 9 whose state is 'planned'",
-      "disposition": "remediate",
+      "disposition": "rework",
       "evidence": null,
       "rule": "project_in_unauthorised_tranche",
       "severity": "P1",
@@ -472,7 +1056,7 @@
     },
     {
       "detail": "project is active in tranche 8 whose state is 'planned'",
-      "disposition": "remediate",
+      "disposition": "rework",
       "evidence": null,
       "rule": "project_in_unauthorised_tranche",
       "severity": "P1",
@@ -480,7 +1064,7 @@
     },
     {
       "detail": "project is active in tranche 9 whose state is 'planned'",
-      "disposition": "remediate",
+      "disposition": "rework",
       "evidence": null,
       "rule": "project_in_unauthorised_tranche",
       "severity": "P1",
@@ -488,7 +1072,7 @@
     },
     {
       "detail": "project is active in tranche 9 whose state is 'planned'",
-      "disposition": "remediate",
+      "disposition": "rework",
       "evidence": null,
       "rule": "project_in_unauthorised_tranche",
       "severity": "P1",
@@ -496,7 +1080,7 @@
     },
     {
       "detail": "project is active in tranche 1 whose state is 'planned'",
-      "disposition": "remediate",
+      "disposition": "rework",
       "evidence": null,
       "rule": "project_in_unauthorised_tranche",
       "severity": "P1",
@@ -504,7 +1088,7 @@
     },
     {
       "detail": "project is active in tranche 13 whose state is 'planned'",
-      "disposition": "remediate",
+      "disposition": "rework",
       "evidence": null,
       "rule": "project_in_unauthorised_tranche",
       "severity": "P1",
@@ -512,7 +1096,7 @@
     },
     {
       "detail": "project is active in tranche 12 whose state is 'planned'",
-      "disposition": "remediate",
+      "disposition": "rework",
       "evidence": null,
       "rule": "project_in_unauthorised_tranche",
       "severity": "P1",
@@ -520,7 +1104,7 @@
     },
     {
       "detail": "project is active in tranche 4 whose state is 'planned'",
-      "disposition": "remediate",
+      "disposition": "rework",
       "evidence": null,
       "rule": "project_in_unauthorised_tranche",
       "severity": "P1",
@@ -528,7 +1112,7 @@
     },
     {
       "detail": "project is active in tranche 5 whose state is 'planned'",
-      "disposition": "remediate",
+      "disposition": "rework",
       "evidence": null,
       "rule": "project_in_unauthorised_tranche",
       "severity": "P1",
@@ -536,7 +1120,7 @@
     },
     {
       "detail": "project is active in tranche 10 whose state is 'planned'",
-      "disposition": "remediate",
+      "disposition": "rework",
       "evidence": null,
       "rule": "project_in_unauthorised_tranche",
       "severity": "P1",
@@ -544,7 +1128,7 @@
     },
     {
       "detail": "project is active in tranche 11 whose state is 'planned'",
-      "disposition": "remediate",
+      "disposition": "rework",
       "evidence": null,
       "rule": "project_in_unauthorised_tranche",
       "severity": "P1",
@@ -552,7 +1136,7 @@
     },
     {
       "detail": "project is active in tranche 5 whose state is 'planned'",
-      "disposition": "remediate",
+      "disposition": "rework",
       "evidence": null,
       "rule": "project_in_unauthorised_tranche",
       "severity": "P1",
@@ -560,7 +1144,7 @@
     },
     {
       "detail": "project is active in tranche 11 whose state is 'planned'",
-      "disposition": "remediate",
+      "disposition": "rework",
       "evidence": null,
       "rule": "project_in_unauthorised_tranche",
       "severity": "P1",
@@ -568,7 +1152,39 @@
     },
     {
       "detail": "seed status 'closed' != live status 'active'",
-      "disposition": "remediate",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "seed_live_drift",
+      "severity": "P1",
+      "subject": "S12"
+    },
+    {
+      "detail": "seed status 'closed' != live status 'active'",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "seed_live_drift",
+      "severity": "P1",
+      "subject": "S13"
+    },
+    {
+      "detail": "seed status 'closed' != live status 'active'",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "seed_live_drift",
+      "severity": "P1",
+      "subject": "T11"
+    },
+    {
+      "detail": "seed status 'closed' != live status 'active'",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "seed_live_drift",
+      "severity": "P1",
+      "subject": "T16"
+    },
+    {
+      "detail": "seed status 'closed' != live status 'active'",
+      "disposition": "rework",
       "evidence": null,
       "rule": "seed_live_drift",
       "severity": "P1",
@@ -576,7 +1192,7 @@
     },
     {
       "detail": "declared outputs are not published: closure-review",
-      "disposition": "remediate",
+      "disposition": "rework",
       "evidence": null,
       "rule": "unpublished_declared_output",
       "severity": "P1",
@@ -584,7 +1200,7 @@
     },
     {
       "detail": "declared outputs are not published: evidence",
-      "disposition": "remediate",
+      "disposition": "rework",
       "evidence": null,
       "rule": "unpublished_declared_output",
       "severity": "P1",
@@ -592,7 +1208,7 @@
     },
     {
       "detail": "declared outputs are not published: closure-review, evidence",
-      "disposition": "remediate",
+      "disposition": "rework",
       "evidence": null,
       "rule": "unpublished_declared_output",
       "severity": "P1",
@@ -600,7 +1216,7 @@
     },
     {
       "detail": "declared outputs are not published: evidence",
-      "disposition": "remediate",
+      "disposition": "rework",
       "evidence": null,
       "rule": "unpublished_declared_output",
       "severity": "P1",
@@ -608,7 +1224,7 @@
     },
     {
       "detail": "declared outputs are not published: evidence",
-      "disposition": "remediate",
+      "disposition": "rework",
       "evidence": null,
       "rule": "unpublished_declared_output",
       "severity": "P1",
@@ -623,392 +1239,8 @@
       "subject": "#435"
     },
     {
-      "detail": "missing approved artefacts: principle_derivation, principle_realization, principles_catalog",
-      "disposition": "remediate",
-      "evidence": null,
-      "rule": "mandatory_artefacts",
-      "severity": "P2",
-      "subject": "DESIGN-PUBLISH"
-    },
-    {
-      "detail": "missing approved artefacts: principle_derivation, principle_realization, principles_catalog",
-      "disposition": "remediate",
-      "evidence": null,
-      "rule": "mandatory_artefacts",
-      "severity": "P2",
-      "subject": "P0"
-    },
-    {
-      "detail": "missing approved artefacts: principle_derivation, principle_realization, principles_catalog",
-      "disposition": "remediate",
-      "evidence": null,
-      "rule": "mandatory_artefacts",
-      "severity": "P2",
-      "subject": "PLATFORM"
-    },
-    {
-      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, principle_derivation, principle_realization, principles_catalog, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
-      "disposition": "remediate",
-      "evidence": null,
-      "rule": "mandatory_artefacts",
-      "severity": "P2",
-      "subject": "S00"
-    },
-    {
-      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, principle_derivation, principle_realization, principles_catalog, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
-      "disposition": "remediate",
-      "evidence": null,
-      "rule": "mandatory_artefacts",
-      "severity": "P2",
-      "subject": "S01"
-    },
-    {
-      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, principle_derivation, principle_realization, principles_catalog, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
-      "disposition": "remediate",
-      "evidence": null,
-      "rule": "mandatory_artefacts",
-      "severity": "P2",
-      "subject": "S02"
-    },
-    {
-      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, principle_derivation, principle_realization, principles_catalog, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
-      "disposition": "remediate",
-      "evidence": null,
-      "rule": "mandatory_artefacts",
-      "severity": "P2",
-      "subject": "S03"
-    },
-    {
-      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, principle_derivation, principle_realization, principles_catalog, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
-      "disposition": "remediate",
-      "evidence": null,
-      "rule": "mandatory_artefacts",
-      "severity": "P2",
-      "subject": "S04"
-    },
-    {
-      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, principle_derivation, principle_realization, principles_catalog, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
-      "disposition": "remediate",
-      "evidence": null,
-      "rule": "mandatory_artefacts",
-      "severity": "P2",
-      "subject": "S05"
-    },
-    {
-      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, principle_derivation, principle_realization, principles_catalog, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
-      "disposition": "remediate",
-      "evidence": null,
-      "rule": "mandatory_artefacts",
-      "severity": "P2",
-      "subject": "S06"
-    },
-    {
-      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, principle_derivation, principle_realization, principles_catalog, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
-      "disposition": "remediate",
-      "evidence": null,
-      "rule": "mandatory_artefacts",
-      "severity": "P2",
-      "subject": "S06a"
-    },
-    {
-      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, principle_derivation, principle_realization, principles_catalog, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
-      "disposition": "remediate",
-      "evidence": null,
-      "rule": "mandatory_artefacts",
-      "severity": "P2",
-      "subject": "S06b"
-    },
-    {
-      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, principle_derivation, principle_realization, principles_catalog, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
-      "disposition": "remediate",
-      "evidence": null,
-      "rule": "mandatory_artefacts",
-      "severity": "P2",
-      "subject": "S06c"
-    },
-    {
-      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, principle_derivation, principle_realization, principles_catalog, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
-      "disposition": "remediate",
-      "evidence": null,
-      "rule": "mandatory_artefacts",
-      "severity": "P2",
-      "subject": "S06d"
-    },
-    {
-      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, principle_derivation, principle_realization, principles_catalog, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
-      "disposition": "remediate",
-      "evidence": null,
-      "rule": "mandatory_artefacts",
-      "severity": "P2",
-      "subject": "S07"
-    },
-    {
-      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, principle_derivation, principle_realization, principles_catalog, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
-      "disposition": "remediate",
-      "evidence": null,
-      "rule": "mandatory_artefacts",
-      "severity": "P2",
-      "subject": "S08"
-    },
-    {
-      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, principle_derivation, principle_realization, principles_catalog, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
-      "disposition": "remediate",
-      "evidence": null,
-      "rule": "mandatory_artefacts",
-      "severity": "P2",
-      "subject": "S09"
-    },
-    {
-      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, principle_derivation, principle_realization, principles_catalog, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
-      "disposition": "remediate",
-      "evidence": null,
-      "rule": "mandatory_artefacts",
-      "severity": "P2",
-      "subject": "S10"
-    },
-    {
-      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, principle_derivation, principle_realization, principles_catalog, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
-      "disposition": "remediate",
-      "evidence": null,
-      "rule": "mandatory_artefacts",
-      "severity": "P2",
-      "subject": "S11"
-    },
-    {
-      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, principle_derivation, principle_realization, principles_catalog, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
-      "disposition": "remediate",
-      "evidence": null,
-      "rule": "mandatory_artefacts",
-      "severity": "P2",
-      "subject": "S12"
-    },
-    {
-      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, principle_derivation, principle_realization, principles_catalog, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
-      "disposition": "remediate",
-      "evidence": null,
-      "rule": "mandatory_artefacts",
-      "severity": "P2",
-      "subject": "S13"
-    },
-    {
-      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, principle_derivation, principle_realization, principles_catalog, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
-      "disposition": "remediate",
-      "evidence": null,
-      "rule": "mandatory_artefacts",
-      "severity": "P2",
-      "subject": "S14"
-    },
-    {
-      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, principle_derivation, principle_realization, principles_catalog, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
-      "disposition": "remediate",
-      "evidence": null,
-      "rule": "mandatory_artefacts",
-      "severity": "P2",
-      "subject": "S15"
-    },
-    {
-      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, principle_derivation, principle_realization, principles_catalog, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
-      "disposition": "remediate",
-      "evidence": null,
-      "rule": "mandatory_artefacts",
-      "severity": "P2",
-      "subject": "S16"
-    },
-    {
-      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, principle_derivation, principle_realization, principles_catalog, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
-      "disposition": "remediate",
-      "evidence": null,
-      "rule": "mandatory_artefacts",
-      "severity": "P2",
-      "subject": "S17"
-    },
-    {
-      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, principle_derivation, principle_realization, principles_catalog, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
-      "disposition": "remediate",
-      "evidence": null,
-      "rule": "mandatory_artefacts",
-      "severity": "P2",
-      "subject": "S18"
-    },
-    {
-      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, principle_derivation, principle_realization, principles_catalog, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
-      "disposition": "remediate",
-      "evidence": null,
-      "rule": "mandatory_artefacts",
-      "severity": "P2",
-      "subject": "S19"
-    },
-    {
-      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, principle_derivation, principle_realization, principles_catalog, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
-      "disposition": "remediate",
-      "evidence": null,
-      "rule": "mandatory_artefacts",
-      "severity": "P2",
-      "subject": "S20"
-    },
-    {
-      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, principle_derivation, principle_realization, principles_catalog, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
-      "disposition": "remediate",
-      "evidence": null,
-      "rule": "mandatory_artefacts",
-      "severity": "P2",
-      "subject": "S21"
-    },
-    {
-      "detail": "missing approved artefacts: principle_derivation, principle_realization, principles_catalog",
-      "disposition": "remediate",
-      "evidence": null,
-      "rule": "mandatory_artefacts",
-      "severity": "P2",
-      "subject": "SPEC-V2"
-    },
-    {
-      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, principle_derivation, principle_realization, principles_catalog, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
-      "disposition": "remediate",
-      "evidence": null,
-      "rule": "mandatory_artefacts",
-      "severity": "P2",
-      "subject": "T0"
-    },
-    {
-      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, principle_derivation, principle_realization, principles_catalog, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
-      "disposition": "remediate",
-      "evidence": null,
-      "rule": "mandatory_artefacts",
-      "severity": "P2",
-      "subject": "T1"
-    },
-    {
-      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, principle_derivation, principle_realization, principles_catalog, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
-      "disposition": "remediate",
-      "evidence": null,
-      "rule": "mandatory_artefacts",
-      "severity": "P2",
-      "subject": "T10"
-    },
-    {
-      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, principle_derivation, principle_realization, principles_catalog, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
-      "disposition": "remediate",
-      "evidence": null,
-      "rule": "mandatory_artefacts",
-      "severity": "P2",
-      "subject": "T11"
-    },
-    {
-      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, principle_derivation, principle_realization, principles_catalog, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
-      "disposition": "remediate",
-      "evidence": null,
-      "rule": "mandatory_artefacts",
-      "severity": "P2",
-      "subject": "T12"
-    },
-    {
-      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, principle_derivation, principle_realization, principles_catalog, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
-      "disposition": "remediate",
-      "evidence": null,
-      "rule": "mandatory_artefacts",
-      "severity": "P2",
-      "subject": "T13"
-    },
-    {
-      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, principle_derivation, principle_realization, principles_catalog, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
-      "disposition": "remediate",
-      "evidence": null,
-      "rule": "mandatory_artefacts",
-      "severity": "P2",
-      "subject": "T14"
-    },
-    {
-      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, principle_derivation, principle_realization, principles_catalog, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
-      "disposition": "remediate",
-      "evidence": null,
-      "rule": "mandatory_artefacts",
-      "severity": "P2",
-      "subject": "T15"
-    },
-    {
-      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, principle_derivation, principle_realization, principles_catalog, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
-      "disposition": "remediate",
-      "evidence": null,
-      "rule": "mandatory_artefacts",
-      "severity": "P2",
-      "subject": "T16"
-    },
-    {
-      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, principle_derivation, principle_realization, principles_catalog, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
-      "disposition": "remediate",
-      "evidence": null,
-      "rule": "mandatory_artefacts",
-      "severity": "P2",
-      "subject": "T17"
-    },
-    {
-      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, principle_derivation, principle_realization, principles_catalog, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
-      "disposition": "remediate",
-      "evidence": null,
-      "rule": "mandatory_artefacts",
-      "severity": "P2",
-      "subject": "T2"
-    },
-    {
-      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, principle_derivation, principle_realization, principles_catalog, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
-      "disposition": "remediate",
-      "evidence": null,
-      "rule": "mandatory_artefacts",
-      "severity": "P2",
-      "subject": "T3"
-    },
-    {
-      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, principle_derivation, principle_realization, principles_catalog, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
-      "disposition": "remediate",
-      "evidence": null,
-      "rule": "mandatory_artefacts",
-      "severity": "P2",
-      "subject": "T4"
-    },
-    {
-      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, principle_derivation, principle_realization, principles_catalog, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
-      "disposition": "remediate",
-      "evidence": null,
-      "rule": "mandatory_artefacts",
-      "severity": "P2",
-      "subject": "T5"
-    },
-    {
-      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, principle_derivation, principle_realization, principles_catalog, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
-      "disposition": "remediate",
-      "evidence": null,
-      "rule": "mandatory_artefacts",
-      "severity": "P2",
-      "subject": "T6"
-    },
-    {
-      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, principle_derivation, principle_realization, principles_catalog, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
-      "disposition": "remediate",
-      "evidence": null,
-      "rule": "mandatory_artefacts",
-      "severity": "P2",
-      "subject": "T7"
-    },
-    {
-      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, principle_derivation, principle_realization, principles_catalog, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
-      "disposition": "remediate",
-      "evidence": null,
-      "rule": "mandatory_artefacts",
-      "severity": "P2",
-      "subject": "T8"
-    },
-    {
-      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, principle_derivation, principle_realization, principles_catalog, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
-      "disposition": "remediate",
-      "evidence": null,
-      "rule": "mandatory_artefacts",
-      "severity": "P2",
-      "subject": "T9"
-    },
-    {
       "detail": "project is archived in tranche 6 whose state is 'planned'",
-      "disposition": "remediate",
+      "disposition": "rework",
       "evidence": null,
       "rule": "project_in_unauthorised_tranche",
       "severity": "P2",
@@ -1056,7 +1288,7 @@
     },
     {
       "detail": "coverage says 'proposed', the register says 'active'",
-      "disposition": "remediate",
+      "disposition": "rework",
       "evidence": null,
       "rule": "status_source_drift",
       "severity": "P2",
@@ -1064,7 +1296,7 @@
     },
     {
       "detail": "coverage says 'proposed', the register says 'active'",
-      "disposition": "remediate",
+      "disposition": "rework",
       "evidence": null,
       "rule": "status_source_drift",
       "severity": "P2",
@@ -1072,7 +1304,7 @@
     },
     {
       "detail": "coverage says 'proposed', the register says 'active'",
-      "disposition": "remediate",
+      "disposition": "rework",
       "evidence": null,
       "rule": "status_source_drift",
       "severity": "P2",
@@ -1080,7 +1312,7 @@
     },
     {
       "detail": "coverage says 'proposed', the register says 'active'",
-      "disposition": "remediate",
+      "disposition": "rework",
       "evidence": null,
       "rule": "status_source_drift",
       "severity": "P2",
@@ -1088,7 +1320,7 @@
     },
     {
       "detail": "coverage says 'proposed', the register says 'active'",
-      "disposition": "remediate",
+      "disposition": "rework",
       "evidence": null,
       "rule": "status_source_drift",
       "severity": "P2",

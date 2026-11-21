@@ -33,6 +33,7 @@
 
 use chrono::{DateTime, Utc};
 use conveyor_domain::{TenantId, Version};
+use serde_json::Value;
 use sqlx::PgConnection;
 use uuid::Uuid;
 
@@ -62,6 +63,12 @@ pub enum PortfolioStoreError {
     /// The page cursor is not one this module issued.
     #[error("the page cursor is malformed")]
     BadCursor,
+    /// The kind is not one of the programme baseline trio.
+    #[error("a programme baseline kind is management, governance or boundary")]
+    UnknownBaselineKind,
+    /// The baseline already carries an approver.
+    #[error("the baseline is already approved")]
+    AlreadyApproved,
     /// A referenced parent does not exist in this tenant.
     #[error(transparent)]
     Parent(#[from] ParentError),
@@ -336,6 +343,224 @@ pub async fn list_programmes_tx(
         .await?;
     let (rows, next) = page_split(rows, limit, |row| (row.updated_at, row.id));
     Ok((rows.into_iter().map(Into::into).collect(), next))
+}
+
+// ── programme_baseline (the MSP management/governance/boundary trio) ─────────────────────
+
+/// The three kinds a programme baseline records.
+pub const PROGRAMME_BASELINE_KINDS: [&str; 3] = ["management", "governance", "boundary"];
+
+/// Whether `kind` names one of the trio.
+pub fn is_programme_baseline_kind(kind: &str) -> bool {
+    PROGRAMME_BASELINE_KINDS.contains(&kind)
+}
+
+/// A programme baseline as the `programmes.baseline*` actions return it.
+#[derive(Clone, Debug, PartialEq)]
+pub struct ProgrammeBaselineRecord {
+    /// The row id.
+    pub id: Uuid,
+    /// The programme the baseline belongs to.
+    pub programme_id: Uuid,
+    /// `management | governance | boundary`.
+    pub kind: String,
+    /// The frozen snapshot: the programme, its tranches and its projects.
+    pub snapshot: Value,
+    /// When it was taken.
+    pub taken_at: DateTime<Utc>,
+    /// Who took it.
+    pub taken_by: Uuid,
+    /// Who approved it, if anyone. A distinct approver is the action layer's rule.
+    pub approved_by: Option<Uuid>,
+    /// The optimistic-concurrency version (`ETag`).
+    pub version: Version,
+    /// When the row was created.
+    pub created_at: DateTime<Utc>,
+}
+
+#[derive(Debug, sqlx::FromRow)]
+struct ProgrammeBaselineRow {
+    id: Uuid,
+    programme_id: Uuid,
+    kind: String,
+    snapshot: Value,
+    taken_at: DateTime<Utc>,
+    taken_by: Uuid,
+    approved_by: Option<Uuid>,
+    version: i64,
+    created_at: DateTime<Utc>,
+}
+
+impl From<ProgrammeBaselineRow> for ProgrammeBaselineRecord {
+    fn from(row: ProgrammeBaselineRow) -> Self {
+        Self {
+            id: row.id,
+            programme_id: row.programme_id,
+            kind: row.kind,
+            snapshot: row.snapshot,
+            taken_at: row.taken_at,
+            taken_by: row.taken_by,
+            approved_by: row.approved_by,
+            version: version_of(row.version),
+            created_at: row.created_at,
+        }
+    }
+}
+
+const PROGRAMME_BASELINE_COLUMNS: &str = "id, programme_id, kind, snapshot, taken_at, taken_by, \
+                                          approved_by, version, created_at";
+
+/// Freeze the programme, its tranches and its projects as one baseline.
+///
+/// Everything the snapshot holds is read INSIDE the caller's transaction, so the rows that
+/// commit with the baseline are the rows the snapshot describes. A later edit never rewrites
+/// it — that is why a test can change a project and read the same snapshot back.
+pub async fn take_programme_baseline_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    programme_id: Uuid,
+    kind: &str,
+    taken_by: Uuid,
+) -> Result<ProgrammeBaselineRecord, PortfolioStoreError> {
+    if !is_programme_baseline_kind(kind) {
+        return Err(PortfolioStoreError::UnknownBaselineKind);
+    }
+    let programme = get_programme_tx(&mut *conn, tenant, programme_id)
+        .await?
+        .ok_or(PortfolioStoreError::NotFound)?;
+    // The single-column FKs bypass RLS, so the taker is resolved in the caller's tenant
+    // before the insert (CONTRACT §2) rather than left to the FK.
+    ensure_parent_tx(&mut *conn, tenant, Parent::AppUser, taken_by).await?;
+    let tranches: Value = sqlx::query_scalar(
+        "SELECT COALESCE(jsonb_agg(to_jsonb(t) ORDER BY t.number), '[]'::jsonb) FROM (
+             SELECT id, programme_id, number, state, entry_criteria, exit_criteria, baseline_ref,
+                    review_at, authorised_at, authorisation_review_id, version, created_at,
+                    updated_at
+               FROM programme_tranche
+              WHERE tenant_id = $1 AND programme_id = $2
+         ) t",
+    )
+    .bind(tenant.as_uuid())
+    .bind(programme_id)
+    .fetch_one(&mut *conn)
+    .await?;
+    let projects: Value = sqlx::query_scalar(
+        "SELECT COALESCE(jsonb_agg(to_jsonb(t) ORDER BY t.key), '[]'::jsonb) FROM (
+             SELECT id, key, name, description, status, programme_id, project_type_code,
+                    phase_code, owner_user_id, repo_url, meta, version, created_at, updated_at
+               FROM project
+              WHERE tenant_id = $1 AND programme_id = $2
+         ) t",
+    )
+    .bind(tenant.as_uuid())
+    .bind(programme_id)
+    .fetch_one(&mut *conn)
+    .await?;
+    let snapshot = serde_json::json!({
+        "programme": {
+            "id": programme.id,
+            "name": programme.name,
+            "status": programme.status,
+            "owner_user_id": programme.owner_user_id,
+            "version": version_i64(programme.version),
+            "created_at": programme.created_at,
+            "updated_at": programme.updated_at,
+        },
+        "tranches": tranches,
+        "projects": projects,
+    });
+    let sql = format!(
+        "INSERT INTO programme_baseline (tenant_id, programme_id, kind, snapshot, taken_by)
+         VALUES ($1, $2, $3, $4, $5)
+         RETURNING {PROGRAMME_BASELINE_COLUMNS}"
+    );
+    let row: ProgrammeBaselineRow = sqlx::query_as(sqlx::AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(programme_id)
+        .bind(kind)
+        .bind(&snapshot)
+        .bind(taken_by)
+        .fetch_one(&mut *conn)
+        .await?;
+    Ok(row.into())
+}
+
+/// Read one baseline inside the caller's tenant; another tenant's id is `None`.
+pub async fn get_programme_baseline_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    id: Uuid,
+) -> Result<Option<ProgrammeBaselineRecord>, PortfolioStoreError> {
+    let sql = format!(
+        "SELECT {PROGRAMME_BASELINE_COLUMNS} FROM programme_baseline
+          WHERE tenant_id = $1 AND id = $2"
+    );
+    let row: Option<ProgrammeBaselineRow> = sqlx::query_as(sqlx::AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(id)
+        .fetch_optional(&mut *conn)
+        .await?;
+    Ok(row.map(Into::into))
+}
+
+/// A programme's baselines, newest `taken_at` first.
+pub async fn list_programme_baselines_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    programme_id: Uuid,
+) -> Result<Vec<ProgrammeBaselineRecord>, PortfolioStoreError> {
+    let sql = format!(
+        "SELECT {PROGRAMME_BASELINE_COLUMNS} FROM programme_baseline
+          WHERE tenant_id = $1 AND programme_id = $2
+          ORDER BY taken_at DESC, id DESC"
+    );
+    let rows: Vec<ProgrammeBaselineRow> = sqlx::query_as(sqlx::AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(programme_id)
+        .fetch_all(&mut *conn)
+        .await?;
+    Ok(rows.into_iter().map(Into::into).collect())
+}
+
+/// Mark a baseline approved by `approver`.
+///
+/// The row is locked first so two approvals cannot both read "unapproved": absent is
+/// [`PortfolioStoreError::NotFound`], an already-approved row is
+/// [`PortfolioStoreError::AlreadyApproved`], and only then does the write bump the version.
+pub async fn approve_programme_baseline_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    id: Uuid,
+    approver: Uuid,
+) -> Result<ProgrammeBaselineRecord, PortfolioStoreError> {
+    ensure_parent_tx(&mut *conn, tenant, Parent::AppUser, approver).await?;
+    let sql = format!(
+        "SELECT {PROGRAMME_BASELINE_COLUMNS} FROM programme_baseline
+          WHERE tenant_id = $1 AND id = $2 FOR UPDATE"
+    );
+    let row: Option<ProgrammeBaselineRow> = sqlx::query_as(sqlx::AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(id)
+        .fetch_optional(&mut *conn)
+        .await?;
+    let current: ProgrammeBaselineRecord = row.ok_or(PortfolioStoreError::NotFound)?.into();
+    if current.approved_by.is_some() {
+        return Err(PortfolioStoreError::AlreadyApproved);
+    }
+    let sql = format!(
+        "UPDATE programme_baseline
+            SET approved_by = $3, version = version + 1, updated_at = now()
+          WHERE tenant_id = $1 AND id = $2
+         RETURNING {PROGRAMME_BASELINE_COLUMNS}"
+    );
+    let row: Option<ProgrammeBaselineRow> = sqlx::query_as(sqlx::AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(id)
+        .bind(approver)
+        .fetch_optional(&mut *conn)
+        .await?;
+    let record: ProgrammeBaselineRecord = row.ok_or(PortfolioStoreError::NotFound)?.into();
+    Ok(record)
 }
 
 // ── project_stakeholder ─────────────────────────────────────────────────────────────────
@@ -624,4 +849,8 @@ macro_rules! has_version {
     };
 }
 
-has_version!(ProgrammeRecord, ProjectStakeholderRecord,);
+has_version!(
+    ProgrammeRecord,
+    ProgrammeBaselineRecord,
+    ProjectStakeholderRecord,
+);

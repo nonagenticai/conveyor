@@ -2,9 +2,12 @@
 //!
 //! `conveyor admin action invoke` — and the admin commands built on it — call the **same**
 //! engine as `POST /api/actions/<name>/invocations`: no second dispatcher and no raw SQL
-//! mutation. The actor is the tenant's own first active member (the `board-export` importer's
-//! rule), `actor_kind = "service"`, and the synthetic machine role. Validation, preconditions,
-//! events and audit rows are therefore the ones a real caller gets.
+//! mutation. The actor is **selectable**: `--actor-id` names an active member (a governance act
+//! must be performed by a DISTINCT approver — the live tenant has `conveyor-approver` for
+//! exactly that), and without it the caller acts as the tenant's first active admin/member (the
+//! `board-export` importer's rule). A named actor is validated against `membership`, never
+//! trusted. `actor_kind = "service"` and the synthetic machine role stay the same either way, so
+//! validation, preconditions, events and audit rows are the ones a real caller gets.
 
 use conveyor_actions::invoke::{Authority, InvokeRequest, UsageContext, invoke};
 use conveyor_actions::{ActionKind, registry};
@@ -24,15 +27,39 @@ pub struct ActionCaller<'a> {
 }
 
 impl<'a> ActionCaller<'a> {
-    /// Resolve the tenant's actor once. A tenant with no active member has no operator.
+    /// Resolve the tenant's default actor once. A tenant with no active member has no operator.
+    ///
+    /// Delegates to [`new_as`] with no actor named, so the identity rules live in one place.
     pub async fn new(
         pool: &'a PgPool,
         tenant: TenantId,
         app_key: &'a str,
     ) -> Result<Self, CallError> {
-        let actor = store::identity::tenant_actor(pool, tenant)
-            .await?
-            .ok_or(CallError::NoActor)?;
+        Self::new_as(pool, tenant, app_key, None).await
+    }
+
+    /// Resolve the actor the caller NAMES (`--actor-id`), or the tenant's default one.
+    ///
+    /// A named actor is validated: it must be an active member of THIS tenant, otherwise
+    /// [`CallError::NotMember`]. That is what lets a governance act be performed by a distinct
+    /// approver instead of the tenant's first member, without inventing an identity.
+    pub async fn new_as(
+        pool: &'a PgPool,
+        tenant: TenantId,
+        app_key: &'a str,
+        actor_id: Option<Uuid>,
+    ) -> Result<Self, CallError> {
+        let actor = match actor_id {
+            Some(id) => {
+                if !store::identity::tenant_member(pool, tenant, id).await? {
+                    return Err(CallError::NotMember(id));
+                }
+                id
+            }
+            None => store::identity::tenant_actor(pool, tenant)
+                .await?
+                .ok_or(CallError::NoActor)?,
+        };
         Ok(Self {
             pool,
             tenant,
@@ -124,6 +151,9 @@ pub enum CallError {
     /// No membership exists to attribute the action to.
     #[error("the tenant has no active member to act as")]
     NoActor,
+    /// The actor the caller named is not an active member of this tenant.
+    #[error("user {0} is not an active member of this tenant")]
+    NotMember(Uuid),
     /// The action name is not in the registry.
     #[error("no action {0:?}")]
     NotFound(String),

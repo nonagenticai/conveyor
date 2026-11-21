@@ -486,6 +486,42 @@ pub async fn transition_project_status_tx(
     Ok(row.map(Into::into))
 }
 
+/// Reopen a closed project — the retrospective rework's one backward transition.
+///
+/// Status-guarded exactly like [`close_project_tx`]: `None` means the project is absent or not
+/// `closed`. The reason and the decision reference are recorded under `meta.reopen_reason` and
+/// `meta.reopen_decision_ref`; the action that calls this refuses a project whose
+/// `meta.viability` is not `rework`, so the transition cannot be used to un-close a project that
+/// merely changed its mind.
+pub async fn reopen_project_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    id: Uuid,
+    reason: &str,
+    decision_ref: &str,
+) -> Result<Option<Project>, sqlx::Error> {
+    let row: Option<ProjectRow> = sqlx::query_as(
+        "UPDATE project
+            SET status = 'active',
+                meta = meta || jsonb_build_object(
+                    'reopen_reason', $3::text,
+                    'reopen_decision_ref', $4::text
+                ),
+                version = version + 1,
+                updated_at = now()
+          WHERE tenant_id = $1 AND id = $2 AND status = 'closed'
+          RETURNING id, key, name, description, status, programme_id, project_type_code,
+                    phase_code, owner_user_id, repo_url, meta, version",
+    )
+    .bind(tenant.as_uuid())
+    .bind(id)
+    .bind(reason)
+    .bind(decision_ref)
+    .fetch_optional(&mut *conn)
+    .await?;
+    Ok(row.map(Into::into))
+}
+
 /// A project-page cursor: `base64url("<key>|<uuid>")`, unpadded (CONTRACT §5).
 ///
 /// The pair is the sort key of the last row of the previous page: `key` is unique per

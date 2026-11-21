@@ -370,7 +370,7 @@
         "actions: cadences.* found (cadences.create, cadences.delete, cadences.list…)",
         "actions: governed_assets.* absent",
         "actions: programme_config.* absent",
-        "actions: programmes.* found (programmes.create, programmes.get, programmes.list…)",
+        "actions: programmes.* found (programmes.baseline, programmes.baseline_approve, programmes.baselines_list…)",
         "actions: project_dependencies.* found (project_dependencies.create, project_dependencies.delete, project_dependencies.list)",
         "actions: registers.* found (registers.create, registers.delete, registers.get…)",
         "actions: tranches.* found (tranches.authorise, tranches.create, tranches.delete…)",

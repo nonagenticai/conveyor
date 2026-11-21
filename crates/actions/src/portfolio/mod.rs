@@ -139,6 +139,16 @@ pub fn portfolio_error(error: PortfolioStoreError, action: &str) -> ActionError 
             "invalid_value",
             "not a cursor this service issued",
         ),
+        PortfolioStoreError::UnknownBaselineKind => invalid(
+            "kind",
+            "unknown_kind",
+            "kind must be management, governance or boundary",
+        ),
+        PortfolioStoreError::AlreadyApproved => ActionError::new(
+            409,
+            "already_approved",
+            "the baseline already carries an approver",
+        ),
         PortfolioStoreError::Parent(error) => parent_error(error, action),
         PortfolioStoreError::Database(error) => store_error(error, action),
     }

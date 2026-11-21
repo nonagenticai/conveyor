@@ -10,8 +10,10 @@
 
 use conveyor_store as store;
 use conveyor_store::portfolio::{
-    NewProgrammeRow, PortfolioPage, ProgrammePatch, ProgrammeRecord, get_programme_tx,
-    list_programmes_tx, update_programme_tx,
+    NewProgrammeRow, PortfolioPage, ProgrammeBaselineRecord, ProgrammePatch, ProgrammeRecord,
+    approve_programme_baseline_tx, get_programme_baseline_tx, get_programme_tx,
+    list_programme_baselines_tx, list_programmes_tx, take_programme_baseline_tx,
+    update_programme_tx,
 };
 use serde_json::Value;
 use sqlx::PgConnection;
@@ -20,7 +22,8 @@ use crate::invoke::{ActionError, HandlerCtx};
 use crate::spec::HandlerOutput;
 
 use super::{
-    IdIn, Page, ProgrammeCreateIn, ProgrammeListIn, ProgrammeOut, ProgrammeRefreshIn,
+    IdIn, Page, ProgrammeBaselineApproveIn, ProgrammeBaselineListIn, ProgrammeBaselineOut,
+    ProgrammeBaselineTakeIn, ProgrammeCreateIn, ProgrammeListIn, ProgrammeOut, ProgrammeRefreshIn,
     ProgrammeRefreshOut, ProgrammeUpdateIn, emit_portfolio_event, etag_of, invalid,
     portfolio_error, require_precondition_with, trimmed, version_i64,
 };
@@ -222,6 +225,141 @@ async fn programmes_list(
     Ok(Page {
         items: rows.iter().map(programme_out).collect(),
         next_cursor,
+    })
+}
+
+/// One programme baseline as every `programmes.baseline*` action returns it.
+fn baseline_out(record: &ProgrammeBaselineRecord) -> ProgrammeBaselineOut {
+    ProgrammeBaselineOut {
+        id: record.id.to_string(),
+        programme_id: record.programme_id.to_string(),
+        kind: record.kind.clone(),
+        snapshot: record.snapshot.clone(),
+        taken_at: record.taken_at,
+        taken_by: record.taken_by.to_string(),
+        approved_by: record.approved_by.map(|id| id.to_string()),
+        version: version_i64(record.version),
+        created_at: record.created_at,
+    }
+}
+
+/// Freeze the programme's management, governance or boundary baseline.
+#[crate::action(
+    name = "programmes.baseline",
+    version = 1,
+    kind = "internal",
+    scopes = ["portfolio:write"],
+    idempotent = false,
+    timeout_ms = 30000,
+    effect = "write",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn programmes_baseline(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: ProgrammeBaselineTakeIn,
+) -> Result<HandlerOutput<ProgrammeBaselineOut>, ActionError> {
+    let action = ctx.action;
+    let record = take_programme_baseline_tx(
+        &mut *tx,
+        ctx.tenant,
+        input.programme_id,
+        input.kind.trim(),
+        ctx.actor_id,
+    )
+    .await
+    .map_err(|error| portfolio_error(error, action))?;
+    emit_portfolio_event(
+        &mut *tx,
+        &ctx,
+        "programme_baseline",
+        "programme",
+        record.id,
+        "created",
+    )
+    .await?;
+
+    Ok(HandlerOutput::created(baseline_out(&record))
+        .with_etag(etag_of(version_i64(record.version))))
+}
+
+/// Approve a baseline; the approver must be distinct from the taker.
+#[crate::action(
+    name = "programmes.baseline_approve",
+    version = 1,
+    kind = "internal",
+    scopes = ["portfolio:write"],
+    idempotent = false,
+    timeout_ms = 30000,
+    effect = "write",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn programmes_baseline_approve(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: ProgrammeBaselineApproveIn,
+) -> Result<HandlerOutput<ProgrammeBaselineOut>, ActionError> {
+    let action = ctx.action;
+    let current = get_programme_baseline_tx(&mut *tx, ctx.tenant, input.baseline_id)
+        .await
+        .map_err(|error| portfolio_error(error, action))?
+        .ok_or_else(|| ActionError::resource_not_found("such programme baseline"))?;
+    if current.taken_by == ctx.actor_id {
+        return Err(ActionError::new(
+            409,
+            "self_approval",
+            "the baseline's taker cannot approve it: a distinct approver is required",
+        ));
+    }
+    if current.approved_by.is_some() {
+        return Err(ActionError::new(
+            409,
+            "already_approved",
+            "the baseline already carries an approver",
+        ));
+    }
+    let record =
+        approve_programme_baseline_tx(&mut *tx, ctx.tenant, input.baseline_id, ctx.actor_id)
+            .await
+            .map_err(|error| portfolio_error(error, action))?;
+    emit_portfolio_event(
+        &mut *tx,
+        &ctx,
+        "programme_baseline",
+        "programme",
+        record.id,
+        "updated",
+    )
+    .await?;
+
+    Ok(HandlerOutput::ok(baseline_out(&record)).with_etag(etag_of(version_i64(record.version))))
+}
+
+/// One programme's baselines, newest first.
+#[crate::action(
+    name = "programmes.baselines_list",
+    version = 1,
+    kind = "internal",
+    scopes = ["portfolio:read"],
+    idempotent = true,
+    timeout_ms = 30000,
+    effect = "read",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn programmes_baselines_list(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: ProgrammeBaselineListIn,
+) -> Result<Page<ProgrammeBaselineOut>, ActionError> {
+    let records = list_programme_baselines_tx(&mut *tx, ctx.tenant, input.programme_id)
+        .await
+        .map_err(|error| portfolio_error(error, ctx.action))?;
+    Ok(Page {
+        items: records.iter().map(baseline_out).collect(),
+        next_cursor: None,
     })
 }
 

@@ -134,6 +134,34 @@ pub async fn tenant_actor(pool: &PgPool, tenant: TenantId) -> Result<Option<Uuid
     Ok(id)
 }
 
+/// Whether `user_id` is an **active** member of `tenant`.
+///
+/// The operator CLI's `--actor-id` names the user a governance act is performed BY; the id is
+/// validated here rather than trusted, so a typo, another tenant's user or a deactivated one is
+/// refused before any action runs. `app_user.status` is part of the check: an inactive person is
+/// not an actor.
+pub async fn tenant_member(
+    pool: &PgPool,
+    tenant: TenantId,
+    user_id: Uuid,
+) -> Result<bool, sqlx::Error> {
+    let mut tx = begin_scoped(pool, tenant).await?;
+    let member: bool = sqlx::query_scalar(
+        "SELECT EXISTS (
+             SELECT 1
+               FROM membership m
+               JOIN app_user u ON u.id = m.user_id
+              WHERE m.tenant_id = $1 AND m.user_id = $2 AND u.status = 'active'
+         )",
+    )
+    .bind(tenant.as_uuid())
+    .bind(user_id)
+    .fetch_one(&mut *tx)
+    .await?;
+    tx.commit().await?;
+    Ok(member)
+}
+
 /// The active `app_user` whose email is `email`, with its memberships.
 ///
 /// This is the email-keyed half of login (owner ruling 2026-11-09): a Keycloak account may be

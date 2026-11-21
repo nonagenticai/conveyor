@@ -202,9 +202,6 @@ class Dataset:
             ),
             None,
         )
-        self.adopted_at = parse_time(
-            standard.get("legacy", {}).get("capability_adopted_at")
-        )
 
     def class_for(self, project: dict[str, Any]) -> dict[str, Any] | None:
         facts = {
@@ -236,11 +233,6 @@ class Dataset:
         plateau = entry.get("plateau") or meta.get("plateau")
         return (str(phase).lower() if phase else None, plateau)
 
-    def created_before_adoption(self, key: str) -> bool:
-        project = self.by_key.get(key, {})
-        created = parse_time(project.get("created_at"))
-        return bool(created and self.adopted_at and created < self.adopted_at)
-
 
 class Audit:
     def __init__(self, data: Dataset, standard: dict[str, Any]) -> None:
@@ -255,7 +247,7 @@ class Audit:
         subject: str,
         detail: str,
         *,
-        disposition: str = "remediate",
+        disposition: str = "rework",
         evidence: Any = None,
     ) -> None:
         self.gaps.append(
@@ -286,6 +278,7 @@ class Audit:
         self.contracts()
         self.compliance()
         self.waivers()
+        self.capability_artefacts()
         self.artefacts()
         self.drift()
         self.derivation()
@@ -470,27 +463,31 @@ class Audit:
         closure_category = (
             self.standard.get("programme", {}).get("closure_review_category", "closure-review")
         )
+        programme_key = self.standard.get("programme", {}).get("project_key", "P0")
         for project in self.data.projects:
             if project.get("status") != "closed":
                 continue
             key = project.get("key", "?")
-            cls = self.data.class_for(project) or {}
-            required = closure_category in (cls.get("closure") or [])
+            meta = project.get("meta") or {}
+            if not (meta.get("closure_outputs") or []):
+                self.add(
+                    "closure_outputs_undeclared",
+                    "P1",
+                    key,
+                    "project is closed but declares no closure_outputs",
+                )
             declared = self.data.declared(key)
             published = self.data.published.get(key, set())
-            if closure_category not in declared and not required:
-                continue
             if closure_category in published:
                 continue
-            if key == self.standard.get("programme", {}).get("project_key", "P0"):
-                if "tranche-review" in published:
-                    continue
+            if key == programme_key and "tranche-review" in published:
+                continue
             severity = "P0" if closure_category in declared else "P1"
             self.add(
                 "closed_without_closure_review",
                 severity,
                 key,
-                "project is closed but its class-required closure review is not published",
+                "project is closed but its closure review is not published",
             )
 
     def declared_outputs(self) -> None:
@@ -820,12 +817,45 @@ class Audit:
                         "active waiver is past its reassessment date",
                     )
 
+    def capability_artefacts(self) -> None:
+        """The Preliminary phase is a capability obligation, checked once, owned by no project."""
+        preliminary = {
+            row.get("key")
+            for row in self.data.architecture.get("standard", [])
+            if isinstance(row, dict)
+            and row.get("phase_code") == "preliminary"
+            and row.get("mandatory", True)
+            and row.get("key")
+        }
+        if not preliminary:
+            return
+        approved: set[str] = set()
+        for artefact in self.data.artefacts:
+            if artefact.get("status") != "approved":
+                continue
+            artifact_type = self.data.artifact_types.get(artefact.get("artifact_type_id"))
+            if artifact_type and artifact_type.get("key"):
+                approved.add(artifact_type["key"])
+            elif artefact.get("artifact_kind"):
+                approved.add(artefact["artifact_kind"])
+        for key in sorted(preliminary - approved):
+            self.add(
+                "capability_artefacts",
+                "P1",
+                key,
+                "the Preliminary architecture capability has no approved artefact of this type",
+            )
+
     def artefacts(self) -> None:
         profile = self.data.profile or {}
         requirements = profile.get("artifact_requirements") or {}
-        phases = ["preliminary", "a", "b", "c", "d", "e", "f", "g", "h"]
+        # A project's own mandatory set starts at phase A; Preliminary is the capability check
+        # above (§8.1). There is no pre-adoption discount: every live project is held to its set.
+        phases = ["a", "b", "c", "d", "e", "f", "g", "h"]
         for project in self.data.projects:
             key = project.get("key", "?")
+            if (project.get("meta") or {}).get("viability") in {"fold", "close-by-decision"}:
+                continue
             phase, _plateau = self.data.phase(key)
             if phase not in phases:
                 continue
@@ -851,10 +881,9 @@ class Audit:
             missing = sorted(required - actual)
             if not missing:
                 continue
-            severity = "P2" if self.data.created_before_adoption(key) else "P1"
             self.add(
                 "mandatory_artefacts",
-                severity,
+                "P1",
                 key,
                 "missing approved artefacts: " + ", ".join(missing),
             )
@@ -1020,6 +1049,20 @@ def gap_key(gap: dict[str, Any]) -> tuple[str, str]:
     return (str(gap["rule"]), str(gap["subject"]))
 
 
+DISPOSITIONS = ("rework", "fold", "waiver", "correct-the-claim", "unprovable")
+
+
+def baseline_disposition(gap: dict[str, Any]) -> str:
+    """The ledger's one disposition vocabulary; the auditor's own unprovable verdict wins."""
+    if gap.get("disposition") == "unprovable":
+        return "unprovable"
+    if gap["rule"] == "derivation_missing":
+        return "correct-the-claim"
+    if str(gap["subject"]).split(":")[0] == "S06a":
+        return "fold"
+    return "rework"
+
+
 def baseline_entries(gaps: list[dict[str, Any]], standard: dict[str, Any]) -> dict[str, Any]:
     expires = "2027-02-18"
     entries = [
@@ -1027,6 +1070,7 @@ def baseline_entries(gaps: list[dict[str, Any]], standard: dict[str, Any]) -> di
             "rule": gap["rule"],
             "subject": gap["subject"],
             "severity": gap["severity"],
+            "disposition": baseline_disposition(gap),
             "owner": "programme owner",
             "expires": expires,
             "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
@@ -1047,12 +1091,25 @@ def check_strict(
 ) -> list[str]:
     failures: list[str] = []
     current = {gap_key(gap): gap for gap in gaps}
-    recorded = {
-        (str(entry.get("rule")), str(entry.get("subject"))): entry
-        for entry in baseline.get("entries", [])
-        if isinstance(entry, dict)
-    }
+    recorded: dict[tuple[str, str], dict[str, Any]] = {}
     today = datetime.now(timezone.utc).date()
+    for entry in baseline.get("entries", []):
+        if not isinstance(entry, dict):
+            continue
+        key = (str(entry.get("rule")), str(entry.get("subject")))
+        recorded[key] = entry
+        name = f"{entry.get('rule')} {entry.get('subject')}"
+        if entry.get("disposition") not in DISPOSITIONS:
+            failures.append(
+                f"baseline entry has no valid disposition: {name} ({entry.get('disposition')!r})"
+            )
+        expires = entry.get("expires")
+        try:
+            expired = datetime.fromisoformat(expires).date() < today
+        except (TypeError, ValueError):
+            expired = True
+        if expired:
+            failures.append(f"baseline expired: {name} (expires {expires!r})")
     for key, gap in current.items():
         if gap["severity"] not in fail_on:
             continue
@@ -1066,15 +1123,11 @@ def check_strict(
             failures.append(
                 f"worsened to {gap['severity']}: {gap['rule']} {gap['subject']} — {gap['detail']}"
             )
-        expires = entry.get("expires")
-        if isinstance(expires, str):
-            try:
-                if datetime.fromisoformat(expires).date() < today:
-                    failures.append(
-                        f"baseline expired: {gap['rule']} {gap['subject']} (expired {expires})"
-                    )
-            except ValueError:
-                pass
+    for key, entry in recorded.items():
+        if key not in current:
+            failures.append(
+                f"ledger grew: {entry.get('rule')} {entry.get('subject')} has no live gap"
+            )
     return failures
 
 
@@ -1106,7 +1159,10 @@ def standard_checks(standard: dict[str, Any], seed_dir: Path) -> None:
         "requester_is_approver",
         "compliance_review_missing",
         "waiver_invalid",
+        "capability_artefacts",
         "mandatory_artefacts",
+        "closed_without_closure_review",
+        "closure_outputs_undeclared",
         "seed_live_drift",
         "derivation_missing",
         "status_source_drift",
@@ -1176,7 +1232,7 @@ def self_test() -> None:
                     "adm_phase": "preliminary",
                     "plateau": "psa",
                     "expected_outputs": p0["now"],
-                    "closure_outputs": [],
+                    "closure_outputs": ["closure-review"],
                     "measured_status": "built",
                 },
             },
@@ -1201,6 +1257,7 @@ def self_test() -> None:
                 {"project_key": "P0", "category": category} for category in p0["now"]
             ]
             + [
+                {"project_key": "P0", "category": "closure-review"},
                 {"project_key": "T1", "category": "project-brief"},
                 {"project_key": "T1", "category": "evidence"},
             ]
@@ -1317,12 +1374,36 @@ def self_test() -> None:
     if base_gaps:
         fail(f"the self-test base is not conformant: {base_gaps}")
 
-    def expect(mutate, rule: str) -> None:
+    def expect(mutate, rule: str, severity: str | None = None) -> None:
         data = base()
         mutate(data)
-        found = {gap["rule"] for gap in audit(data)}
-        if rule not in found:
-            fail(f"mutating for {rule} produced {sorted(found)}")
+        found = audit(data)
+        matches = [gap for gap in found if gap["rule"] == rule]
+        if not matches:
+            fail(f"mutating for {rule} produced {sorted({gap['rule'] for gap in found})}")
+        if severity and not any(gap["severity"] == severity for gap in matches):
+            fail(f"{rule} fired at {[gap['severity'] for gap in matches]}, expected {severity}")
+
+    def expect_absent(mutate, rule: str) -> None:
+        data = base()
+        mutate(data)
+        if any(gap["rule"] == rule for gap in audit(data)):
+            fail(f"{rule} fired where it must not")
+
+    def expect_clean(mutate) -> None:
+        data = base()
+        mutate(data)
+        found = audit(data)
+        if found:
+            fail(f"a conformant fixture produced {found}")
+
+    def noop(data: Dataset) -> None:
+        pass
+
+    def drop_artefact(data: Dataset, artifact_type_id: str) -> None:
+        data.artefacts[:] = [
+            row for row in data.artefacts if row.get("artifact_type_id") != artifact_type_id
+        ]
 
     def drop_authorisation(data: Dataset) -> None:
         data.tranche_by_number[1]["state"] = "planned"
@@ -1414,6 +1495,107 @@ def self_test() -> None:
 
     expect(invalid_waiver, "waiver_invalid")
 
+    # capability_artefacts: the Preliminary set is checked once, at capability level.
+    expect(lambda data: drop_artefact(data, "type-principles"), "capability_artefacts", "P1")
+
+    def unowned_principles(data: Dataset) -> None:
+        data.artefacts[:] = [row for row in data.artefacts if row.get("id") != "a1"]
+
+    # Pass: a Preliminary-phase project need not own the capability artefacts; an unowned
+    # approved artefact of the type satisfies the capability set.
+    expect_clean(unowned_principles)
+
+    # mandatory_artefacts: the per-project set starts at A, at P1 with no pre-adoption discount.
+    def missing_solution(data: Dataset) -> None:
+        drop_artefact(data, "type-solution")
+
+    expect(missing_solution, "mandatory_artefacts", "P1")
+
+    def pre_adoption_missing(data: Dataset) -> None:
+        data.by_key["T1"]["created_at"] = "2020-01-01T00:00:00+00:00"
+        drop_artefact(data, "type-solution")
+
+    expect(pre_adoption_missing, "mandatory_artefacts", "P1")
+
+    def folded_missing(data: Dataset) -> None:
+        data.by_key["T1"]["meta"]["viability"] = "fold"
+        drop_artefact(data, "type-solution")
+
+    expect_absent(folded_missing, "mandatory_artefacts")
+
+    def close_by_decision_missing(data: Dataset) -> None:
+        data.by_key["T1"]["meta"]["viability"] = "close-by-decision"
+        drop_artefact(data, "type-solution")
+
+    expect_absent(close_by_decision_missing, "mandatory_artefacts")
+
+    # closure_outputs_undeclared, and the vacuous skip removed from the review rule.
+    def empty_closure(data: Dataset) -> None:
+        data.by_key["T1"]["status"] = "closed"
+        data.by_key["T1"]["meta"]["closure_outputs"] = []
+        data.published["T1"].discard("closure-review")
+
+    expect(empty_closure, "closure_outputs_undeclared", "P1")
+    expect(empty_closure, "closed_without_closure_review", "P1")
+    expect_absent(noop, "closure_outputs_undeclared")
+    expect_absent(noop, "closed_without_closure_review")
+
+    # Strict mode: the ledger is a ratchet with one disposition vocabulary.
+    sample = base()
+    drop_artefact(sample, "type-solution")
+    sample_gaps = audit(sample)
+    ledger = baseline_entries(sample_gaps, standard)
+    if check_strict(sample_gaps, ledger, {"P0", "P1"}):
+        fail("strict rejects its own generated ledger")
+    if [entry["disposition"] for entry in ledger["entries"]] != ["rework"]:
+        fail(f"the base ledger carries {ledger['entries']}")
+
+    def strict_failures(entries: list[dict[str, Any]]) -> str:
+        found = check_strict(sample_gaps, {"version": 1, "entries": entries}, {"P0", "P1"})
+        if not found:
+            fail(f"strict accepted {entries}")
+        return " | ".join(found)
+
+    missing_disposition = [dict(entry) for entry in ledger["entries"]]
+    del missing_disposition[0]["disposition"]
+    if "no valid disposition" not in strict_failures(missing_disposition):
+        fail("strict did not name the entry without a disposition")
+
+    expired = [dict(entry) for entry in ledger["entries"]]
+    expired[0]["expires"] = "2020-01-01"
+    if "baseline expired" not in strict_failures(expired):
+        fail("strict did not refuse the expired entry")
+
+    if "new P1" not in strict_failures([]):
+        fail("strict did not refuse a new fingerprint")
+
+    grown = [dict(entry) for entry in ledger["entries"]] + [
+        {
+            "rule": "mandatory_artefacts",
+            "subject": "Z9",
+            "severity": "P1",
+            "disposition": "rework",
+            "owner": "programme owner",
+            "expires": "2027-02-18",
+            "reason": "added without a live gap",
+        }
+    ]
+    if "ledger grew: mandatory_artefacts Z9" not in strict_failures(grown):
+        fail("strict did not refuse ledger growth")
+
+    if baseline_disposition(
+        {"rule": "mandatory_artefacts", "subject": "S06a", "severity": "P1"}
+    ) != "fold":
+        fail("S06a is not folded in the ledger")
+    if baseline_disposition(
+        {"rule": "derivation_missing", "subject": "#435", "severity": "P1"}
+    ) != "correct-the-claim":
+        fail("derivation_missing is not a correct-the-claim")
+    if baseline_disposition(
+        {"rule": "waiver_invalid", "subject": "w", "severity": "P1", "disposition": "unprovable"}
+    ) != "unprovable":
+        fail("an unprovable gap is not marked unprovable")
+
     # The run is deterministic: same inputs, same bytes.
     first = json.dumps([gap for gap in audit(base())], sort_keys=True)
     second = json.dumps([gap for gap in audit(base())], sort_keys=True)
@@ -1482,6 +1664,13 @@ def main() -> None:
         (args.out / "conformance-gap-register.md").write_text(
             render_markdown(gaps, dataset, args.snapshot), encoding="utf-8"
         )
+        if args.report:
+            # The canonical regeneration writes the ledger beside its register, so the accepted
+            # set and the evidence are always produced by the same audit of the same snapshot.
+            (args.out / "conformance-baseline.json").write_text(
+                json.dumps(baseline_entries(gaps, standard), indent=2, sort_keys=False) + "\n",
+                encoding="utf-8",
+            )
 
     if args.write_baseline:
         args.write_baseline.parent.mkdir(parents=True, exist_ok=True)
