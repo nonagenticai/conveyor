@@ -330,13 +330,17 @@ async fn usage_cost_is_derived_at_read_time_and_projects_are_visible() {
         ..Usage::default()
     };
 
+    // The two run-bound calls carry a real caller kind: a `caller_kind = 'other'` call is
+    // deliberately never charged to its run's project (see the unattributed test below).
     let mut tx = begin_scoped(&db.runtime, tenant).await.expect("scope");
     let mut first = call("local-llm", None, Some(big));
+    first.caller_kind = "agent_run";
     first.run_id = Some(projects[0].1);
     inference::insert_call_tx(&mut tx, tenant, &first)
         .await
         .expect("insert priced big");
     let mut second = call("local-llm", None, Some(small));
+    second.caller_kind = "agent_run";
     second.run_id = Some(projects[1].1);
     inference::insert_call_tx(&mut tx, tenant, &second)
         .await
@@ -398,8 +402,86 @@ async fn usage_cost_is_derived_at_read_time_and_projects_are_visible() {
     assert_eq!(two.cost_usd, Decimal::new(1, 6));
     let unattributed = by_project
         .iter()
-        .find(|row| row.bucket.is_empty())
-        .expect("a call with no run is its own visible bucket");
+        .find(|row| row.bucket == "unattributed")
+        .expect("a synthetic call with no run is the explicit unattributed bucket");
     assert_eq!((unattributed.calls, unattributed.unpriced_calls), (1, 1));
+    tx.commit().await.expect("commit");
+}
+
+#[tokio::test]
+async fn an_other_caller_is_unattributed_even_with_a_run() {
+    let db = support::TestDb::fresh().await;
+    let tenant = tenant(&db, "s16-other-unattributed").await;
+
+    // Two projects with a run each: the synthetic caller's run points at a real project, and a
+    // real caller's run gives the report a project bucket to keep separate from it.
+    let mut projects = Vec::new();
+    for key in ["synthetic", "attributed"] {
+        let project: Uuid = sqlx::query_scalar(
+            "INSERT INTO project (tenant_id, key, name) VALUES ($1, $2, $2) RETURNING id",
+        )
+        .bind(tenant.as_uuid())
+        .bind(key)
+        .fetch_one(&db.super_pool)
+        .await
+        .expect("seed project");
+        let run: Uuid = sqlx::query_scalar(
+            "INSERT INTO run (tenant_id, project_id, status) VALUES ($1, $2, 'queued') RETURNING id",
+        )
+        .bind(tenant.as_uuid())
+        .bind(project)
+        .fetch_one(&db.super_pool)
+        .await
+        .expect("seed run");
+        projects.push((project, run));
+    }
+
+    let usage = Usage {
+        prompt_tokens: 10,
+        total_tokens: 10,
+        ..Usage::default()
+    };
+    let mut tx = begin_scoped(&db.runtime, tenant).await.expect("scope");
+    let mut synthetic = call("local-llm", None, Some(usage));
+    synthetic.run_id = Some(projects[0].1);
+    inference::insert_call_tx(&mut tx, tenant, &synthetic)
+        .await
+        .expect("insert synthetic call");
+    let mut attributed = call("local-llm", None, Some(usage));
+    attributed.caller_kind = "agent_run";
+    attributed.run_id = Some(projects[1].1);
+    inference::insert_call_tx(&mut tx, tenant, &attributed)
+        .await
+        .expect("insert attributed call");
+    tx.commit().await.expect("commit");
+
+    let now = Utc::now();
+    let mut tx = begin_scoped(&db.runtime, tenant).await.expect("scope");
+    let rows = inference::usage_rows_tx(
+        &mut tx,
+        tenant,
+        UsageGroup::Project,
+        now - Duration::hours(1),
+        now + Duration::hours(1),
+    )
+    .await
+    .expect("project report");
+
+    let unattributed = rows
+        .iter()
+        .find(|row| row.bucket == "unattributed")
+        .expect("the synthetic caller has its own explicit bucket");
+    assert_eq!(unattributed.calls, 1);
+    let attributed_project = projects[1].0.to_string();
+    let attributed_row = rows
+        .iter()
+        .find(|row| row.bucket == attributed_project)
+        .expect("the real caller's project bucket");
+    assert_eq!(attributed_row.calls, 1);
+    assert!(
+        rows.iter()
+            .all(|row| row.bucket != projects[0].0.to_string()),
+        "the synthetic caller's run must not charge its project: {rows:?}"
+    );
     tx.commit().await.expect("commit");
 }
