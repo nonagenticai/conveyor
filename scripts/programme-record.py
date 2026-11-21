@@ -100,7 +100,7 @@ READBACK_MAP = {
 READBACK_ID_FROM_OUTPUT = {
     "documents.create": "id",
     "registers.create": "id",
-    "projects.baseline": "id",
+    "projects.baseline": "baseline_id",
     "architecture.contracts_request": "id",
     "architecture.artifacts_create": "id",
     "architecture.reviews_record": "id",
@@ -392,7 +392,7 @@ if name and os.environ.get("PROGRAMME_RECORD_EMPTY") == name:
 elif name == "documents.compose":
     print(json.dumps({"id": "doc-1", "title": "composed"}))
 else:
-    print(json.dumps({"ok": True, "id": "row-1", "action": name, "input": payload}))
+    print(json.dumps({"ok": True, "id": "row-1", "baseline_id": "row-1", "action": name, "input": payload}))
 """
 
 
