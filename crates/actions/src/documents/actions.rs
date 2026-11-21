@@ -63,7 +63,9 @@ pub struct DocumentCreateIn {
     /// The output-standard slot (`project-brief`, `evidence`, …).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub category: Option<String>,
-    /// The programme unit (a project key or an issue number).
+    /// The programme unit (a project key, an issue number, or a planning period such as
+    /// `tranche-0` for a PI artefact; the conformance audit and the verifier read the period
+    /// from here).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub unit: Option<String>,
     /// Free metadata merged into the row's `meta` beside `content_type`/`size_bytes`.
@@ -517,7 +519,9 @@ pub struct DocumentComposeIn {
     /// The output-standard slot (`project-brief`, `evidence`, …).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub category: Option<String>,
-    /// The programme unit (a project key or an issue number).
+    /// The programme unit (a project key, an issue number, or a planning period such as
+    /// `tranche-0` for a PI artefact; the conformance audit and the verifier read the period
+    /// from here).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub unit: Option<String>,
     /// Whether the public snapshot may carry this output. Default false; only an admin may set it.
