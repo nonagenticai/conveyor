@@ -570,7 +570,7 @@ async fn tranche_authorise_links_review() {
             SET state = 'planned', authorised_at = NULL, authorisation_review_id = NULL
           WHERE id = $1::uuid",
     )
-    .bind(&t1.0)
+    .bind(&t1)
     .execute(&pg.super_pool)
     .await
     .expect("withdraw the authorisation");
