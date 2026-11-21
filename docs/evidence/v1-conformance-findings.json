@@ -3395,7 +3395,7 @@
       "spec": "§5.4",
       "severity": "P0",
       "title": "S11's gate calls procedure_runs.start, which does not exist at HEAD",
-      "problem": "The S11 gate used the pre-amendment names: procedures.create plus procedure_runs.start, which does not exist at this head. The script now publishes through processes.create and starts through process_runs.start, and says so where the old name appeared. The remaining requirement is a green run of the script against a live server; no run is recorded here.",
+      "problem": "The S11 gate called `procedure_runs.start`, which does not exist at this head, and it read `.id` from each action's answer although every answer is the InvocationResponse envelope `{output, request_id, duration_ms}` — so the procedure id was null and the gate died 422 at publish. The script now publishes through `processes.create` + `process_runs.start` and reads `.output.id` at all five parse sites.",
       "evidence": [
         {
           "path": "docs/plans/slices/S11-procedures.md",
@@ -3415,7 +3415,12 @@
       ],
       "failure_scenario": "Running the slice's own gate returns action-not-found at the start call, so its nine-row acceptance can never be green at HEAD.",
       "acceptance": "Rewrite the gate to processes.create/process_runs.start (or ship a compatibility action) and demonstrate it green.",
-      "owner_project": "S11"
+      "owner_project": "S11",
+      "resolved_by": {
+        "commit": "dba92cdf3c5b7b64333f8f45ed39201980fff6d7",
+        "test": "docs/plans/slices/S11-procedures.md",
+        "evidence": "The extracted gate ran green end to end (exit 0) against a throwaway Postgres 18 and a local `conveyor serve` + `worker` at 127.0.0.1:8935: procedures.create/publish, processes.create/publish, projects.create, cards.create, process_runs.start, waiting_approval, dev:reviewer approvals.decide, three succeeded run_step rows, run succeeded."
+      }
     },
     {
       "id": "v1-s12-1",
