@@ -763,7 +763,9 @@ def build_findings(
             })
         findings.append({
             "id": artefact["id"],
-            "area": artefact["spec"],
+            # The audit puts `area` on the package as its artefact; for an artefact finding the
+            # category is the useful name, while `spec` still carries the clause.
+            "area": artefact["category"],
             "standard": artefact["standard"],
             "spec": artefact["spec"],
             "severity": severity,

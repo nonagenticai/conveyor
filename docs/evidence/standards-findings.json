@@ -4,7 +4,7 @@
   "findings": [
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
-      "area": "§8.3",
+      "area": "benefit-transition",
       "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
       "category": "benefit-transition",
       "evidence": [
@@ -97,7 +97,7 @@
     },
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
-      "area": "§8.3",
+      "area": "benefit-transition",
       "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
       "category": "benefit-transition",
       "evidence": [
@@ -190,7 +190,7 @@
     },
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
-      "area": "§8.3",
+      "area": "benefit-transition",
       "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
       "category": "benefit-transition",
       "evidence": [
@@ -283,7 +283,7 @@
     },
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
-      "area": "§8.3",
+      "area": "benefit-transition",
       "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
       "category": "benefit-transition",
       "evidence": [
@@ -376,7 +376,7 @@
     },
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
-      "area": "§8.3",
+      "area": "benefit-transition",
       "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
       "category": "benefit-transition",
       "evidence": [
@@ -469,7 +469,7 @@
     },
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
-      "area": "§8.3",
+      "area": "benefit-transition",
       "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
       "category": "benefit-transition",
       "evidence": [
@@ -562,7 +562,7 @@
     },
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
-      "area": "§8.3",
+      "area": "blueprint",
       "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
       "category": "blueprint",
       "evidence": [
@@ -642,7 +642,7 @@
     },
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
-      "area": "§8.3",
+      "area": "governance",
       "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
       "category": "governance",
       "evidence": [
@@ -722,7 +722,7 @@
     },
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
-      "area": "§8.3",
+      "area": "programme-plan",
       "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
       "category": "programme-plan",
       "evidence": [
@@ -802,7 +802,7 @@
     },
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
-      "area": "§8.3",
+      "area": "programme-strategies",
       "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
       "category": "programme-strategies",
       "evidence": [
@@ -921,7 +921,7 @@
     },
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
-      "area": "§8.3",
+      "area": "refined-vision",
       "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
       "category": "refined-vision",
       "evidence": [
@@ -975,7 +975,7 @@
     },
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
-      "area": "§8.1",
+      "area": "delivery-contract",
       "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
       "category": "delivery-contract",
       "evidence": [
@@ -1042,7 +1042,7 @@
     },
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
-      "area": "§8.3",
+      "area": "business-case",
       "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
       "category": "business-case",
       "evidence": [
@@ -1083,7 +1083,7 @@
     },
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
-      "area": "§8.3",
+      "area": "programme-brief",
       "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
       "category": "programme-brief",
       "evidence": [
@@ -1176,7 +1176,7 @@
     },
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
-      "area": "§8.3",
+      "area": "projects-dossier",
       "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
       "category": "projects-dossier",
       "evidence": [
@@ -1217,7 +1217,7 @@
     },
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
-      "area": "§8.4",
+      "area": "project-brief",
       "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
       "category": "project-brief",
       "evidence": [
@@ -1258,7 +1258,7 @@
     },
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
-      "area": "§8.4",
+      "area": "project-brief",
       "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
       "category": "project-brief",
       "evidence": [
@@ -1312,7 +1312,7 @@
     },
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
-      "area": "§8.4",
+      "area": "project-brief",
       "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
       "category": "project-brief",
       "evidence": [
@@ -1353,7 +1353,7 @@
     },
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
-      "area": "§8.4",
+      "area": "project-brief",
       "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
       "category": "project-brief",
       "evidence": [
@@ -1394,7 +1394,7 @@
     },
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
-      "area": "§8.4",
+      "area": "project-brief",
       "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
       "category": "project-brief",
       "evidence": [
@@ -1448,7 +1448,7 @@
     },
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
-      "area": "§8.4",
+      "area": "project-brief",
       "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
       "category": "project-brief",
       "evidence": [
@@ -1502,7 +1502,7 @@
     },
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
-      "area": "§8.4",
+      "area": "project-brief",
       "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
       "category": "project-brief",
       "evidence": [
@@ -1556,7 +1556,7 @@
     },
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
-      "area": "§8.4",
+      "area": "project-brief",
       "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
       "category": "project-brief",
       "evidence": [
@@ -1597,7 +1597,7 @@
     },
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
-      "area": "§8.4",
+      "area": "project-brief",
       "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
       "category": "project-brief",
       "evidence": [
@@ -1651,7 +1651,7 @@
     },
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
-      "area": "§8.4",
+      "area": "project-brief",
       "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
       "category": "project-brief",
       "evidence": [
@@ -1692,7 +1692,7 @@
     },
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
-      "area": "§8.4",
+      "area": "project-brief",
       "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
       "category": "project-brief",
       "evidence": [
@@ -1746,7 +1746,7 @@
     },
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
-      "area": "§8.4",
+      "area": "project-brief",
       "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
       "category": "project-brief",
       "evidence": [
@@ -1826,7 +1826,7 @@
     },
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
-      "area": "§8.4",
+      "area": "project-brief",
       "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
       "category": "project-brief",
       "evidence": [
@@ -1880,7 +1880,7 @@
     },
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
-      "area": "§8.4",
+      "area": "project-brief",
       "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
       "category": "project-brief",
       "evidence": [
@@ -1934,7 +1934,7 @@
     },
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
-      "area": "§8.4",
+      "area": "project-brief",
       "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
       "category": "project-brief",
       "evidence": [
@@ -1988,7 +1988,7 @@
     },
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
-      "area": "§8.4",
+      "area": "project-brief",
       "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
       "category": "project-brief",
       "evidence": [
@@ -2029,7 +2029,7 @@
     },
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
-      "area": "§8.4",
+      "area": "project-brief",
       "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
       "category": "project-brief",
       "evidence": [
@@ -2083,7 +2083,7 @@
     },
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
-      "area": "§8.4",
+      "area": "project-brief",
       "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
       "category": "project-brief",
       "evidence": [
@@ -2137,7 +2137,7 @@
     },
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
-      "area": "§8.4",
+      "area": "project-brief",
       "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
       "category": "project-brief",
       "evidence": [
@@ -2191,7 +2191,7 @@
     },
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
-      "area": "§8.4",
+      "area": "project-brief",
       "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
       "category": "project-brief",
       "evidence": [
@@ -2245,7 +2245,7 @@
     },
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
-      "area": "§8.4",
+      "area": "project-brief",
       "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
       "category": "project-brief",
       "evidence": [
@@ -2299,7 +2299,7 @@
     },
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
-      "area": "§8.4",
+      "area": "project-brief",
       "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
       "category": "project-brief",
       "evidence": [
@@ -2353,7 +2353,7 @@
     },
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
-      "area": "§8.4",
+      "area": "project-brief",
       "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
       "category": "project-brief",
       "evidence": [
@@ -2407,7 +2407,7 @@
     },
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
-      "area": "§8.4",
+      "area": "project-brief",
       "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
       "category": "project-brief",
       "evidence": [
@@ -2461,7 +2461,7 @@
     },
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
-      "area": "§8.4",
+      "area": "project-brief",
       "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
       "category": "project-brief",
       "evidence": [
@@ -2502,7 +2502,7 @@
     },
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
-      "area": "§8.4",
+      "area": "project-brief",
       "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
       "category": "project-brief",
       "evidence": [
@@ -2543,7 +2543,7 @@
     },
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
-      "area": "§8.4",
+      "area": "project-brief",
       "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
       "category": "project-brief",
       "evidence": [
@@ -2584,7 +2584,7 @@
     },
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
-      "area": "§8.4",
+      "area": "project-brief",
       "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
       "category": "project-brief",
       "evidence": [
@@ -2625,7 +2625,7 @@
     },
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
-      "area": "§8.4",
+      "area": "project-brief",
       "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
       "category": "project-brief",
       "evidence": [
@@ -2666,7 +2666,7 @@
     },
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
-      "area": "§8.4",
+      "area": "project-brief",
       "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
       "category": "project-brief",
       "evidence": [
@@ -2707,7 +2707,7 @@
     },
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
-      "area": "§8.4",
+      "area": "project-brief",
       "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
       "category": "project-brief",
       "evidence": [
@@ -2748,7 +2748,7 @@
     },
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
-      "area": "§8.4",
+      "area": "project-brief",
       "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
       "category": "project-brief",
       "evidence": [
@@ -2789,7 +2789,7 @@
     },
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
-      "area": "§8.4",
+      "area": "project-brief",
       "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
       "category": "project-brief",
       "evidence": [
@@ -2830,7 +2830,7 @@
     },
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
-      "area": "§8.4",
+      "area": "project-brief",
       "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
       "category": "project-brief",
       "evidence": [
@@ -2871,7 +2871,7 @@
     },
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
-      "area": "§8.4",
+      "area": "project-brief",
       "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
       "category": "project-brief",
       "evidence": [
@@ -2912,7 +2912,7 @@
     },
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
-      "area": "§8.4",
+      "area": "project-brief",
       "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
       "category": "project-brief",
       "evidence": [
@@ -2953,7 +2953,7 @@
     },
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
-      "area": "§8.4",
+      "area": "project-brief",
       "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
       "category": "project-brief",
       "evidence": [
@@ -2994,7 +2994,7 @@
     },
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
-      "area": "§8.4",
+      "area": "project-brief",
       "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
       "category": "project-brief",
       "evidence": [
@@ -3035,7 +3035,7 @@
     },
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
-      "area": "§8.4",
+      "area": "project-brief",
       "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
       "category": "project-brief",
       "evidence": [
@@ -3076,7 +3076,7 @@
     },
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
-      "area": "§8.4",
+      "area": "project-brief",
       "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
       "category": "project-brief",
       "evidence": [
@@ -3117,7 +3117,7 @@
     },
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
-      "area": "§8.4",
+      "area": "project-brief",
       "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
       "category": "project-brief",
       "evidence": [
@@ -3158,7 +3158,7 @@
     },
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
-      "area": "§8.4",
+      "area": "project-brief",
       "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
       "category": "project-brief",
       "evidence": [
@@ -3199,7 +3199,7 @@
     },
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
-      "area": "§8.2",
+      "area": "safe-art",
       "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
       "category": "safe-art",
       "evidence": [
@@ -3240,7 +3240,7 @@
     },
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
-      "area": "§8.2",
+      "area": "safe-cadence",
       "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
       "category": "safe-cadence",
       "evidence": [
@@ -3307,7 +3307,7 @@
     },
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
-      "area": "§8.1",
+      "area": "architecture-artifact",
       "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
       "category": "architecture-artifact",
       "evidence": [
@@ -3374,7 +3374,7 @@
     },
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
-      "area": "§8.1",
+      "area": "architecture-artifact",
       "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
       "category": "architecture-artifact",
       "evidence": [
@@ -3441,7 +3441,7 @@
     },
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
-      "area": "§8.1",
+      "area": "architecture-artifact",
       "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
       "category": "architecture-artifact",
       "evidence": [
@@ -3508,7 +3508,7 @@
     },
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
-      "area": "§8.1",
+      "area": "architecture-artifact",
       "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
       "category": "architecture-artifact",
       "evidence": [
@@ -3575,7 +3575,7 @@
     },
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
-      "area": "§8.1",
+      "area": "requirements-catalog",
       "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
       "category": "requirements-catalog",
       "evidence": [
