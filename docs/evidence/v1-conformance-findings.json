@@ -460,7 +460,7 @@
           "quote": "    board_decision_id     uuid,"
         },
         {
-          "path": "/Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-528/crates/store/src/architecture.rs",
+          "path": "crates/store/src/architecture.rs",
           "line": 1051,
           "quote": "          WHERE adm_profile.status <> 'retired'"
         }
@@ -572,7 +572,7 @@
           "quote": "    CONSTRAINT architecture_compliance_review_one UNIQUE (tenant_id, project_id, contract_id)"
         },
         {
-          "path": "/Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-528/crates/store/src/architecture.rs",
+          "path": "crates/store/src/architecture.rs",
           "line": 1806,
           "quote": "                 WHERE tenant_id = $1 AND project_id = $2 AND outcome IS NOT NULL"
         }
@@ -1855,17 +1855,17 @@
       "problem": "The gate reads only `profile.artifact_requirements`. When the requested phase has no entry (or an entry that is neither an array nor an object), the set list is empty and `satisfied` is initialised true, so the phase closes with no artefact at all; the `artifact_type.mandatory` column that carries the standard's own mandatory set is seeded and returned but never read by the gate. §8.1 says the mandatory set \"comes from the standard, filtered by the tenant's adm_profile\" — filtered, not replaced.",
       "evidence": [
         {
-          "path": "/Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-528/crates/store/src/architecture.rs",
+          "path": "crates/store/src/architecture.rs",
           "line": 1706,
           "quote": "    let sets: Vec<Vec<String>> = match profile.artifact_requirements.get(requested) {"
         },
         {
-          "path": "/Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-528/crates/store/src/architecture.rs",
+          "path": "crates/store/src/architecture.rs",
           "line": 1725,
           "quote": "        _ => Vec::new(),"
         },
         {
-          "path": "/Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-528/crates/store/src/architecture.rs",
+          "path": "crates/store/src/architecture.rs",
           "line": 1728,
           "quote": "    let mut satisfied = sets.is_empty();"
         }
@@ -1884,12 +1884,12 @@
       "problem": "`adopt_profile_tx` writes the caller's `adopt_with_decision_id` into board_decision_id with no existence, gate, status or subject check, and `migrations/0054_architecture.sql` gives the column no foreign key to `approval` (contrast architecture_contract_approval_fk). The same codebase validates exactly this for contracts in `architecture.contracts_approve` (gate = architecture_board, status = approved, subject = this contract). §8.1's Preliminary gate is \"the board adopts the profile\"; here the gate is a client-supplied string.",
       "evidence": [
         {
-          "path": "/Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-528/migrations/0054_architecture.sql",
+          "path": "migrations/0054_architecture.sql",
           "line": 59,
           "quote": "    board_decision_id     uuid,"
         },
         {
-          "path": "/Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-528/crates/store/src/architecture.rs",
+          "path": "crates/store/src/architecture.rs",
           "line": 1079,
           "quote": "            SET status = 'adopted', adopted_at = now(), board_decision_id = $4,"
         }
@@ -1908,7 +1908,7 @@
       "problem": "`request_contract_tx` retires the row named by `supersedes_id` with an UPDATE scoped by tenant only — never by project, kind or phase — and then writes `superseded_by_id` on it unconditionally. Any contract id of the tenant is accepted, so a request for one project can retire the governing contract of another.",
       "evidence": [
         {
-          "path": "/Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-528/crates/store/src/architecture.rs",
+          "path": "crates/store/src/architecture.rs",
           "line": 1400,
           "quote": "              WHERE tenant_id = $1 AND id = $2 AND status IN ('draft', 'live')\","
         }
@@ -1927,12 +1927,12 @@
       "problem": "`phase_progress` builds `artifact_phases` from every architecture_artifact row the snapshot carries without testing `status`, and picks one contract per (project, phase) by recency without testing `status`; \"evidenced\" is then computed from those sets. The console therefore reports progress under a rule that contradicts `advance_phase_tx`, which only accepts an `approved` artefact and a `live` contract.",
       "evidence": [
         {
-          "path": "/Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-528/crates/store/src/snapshot.rs",
+          "path": "crates/store/src/snapshot.rs",
           "line": 1406,
           "quote": "            artifact_phases.insert((project.to_owned(), phase.to_owned()));"
         },
         {
-          "path": "/Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-528/crates/store/src/snapshot.rs",
+          "path": "crates/store/src/snapshot.rs",
           "line": 1475,
           "quote": "                artifact_phases.contains(&phase_key) || contract.is_some() || compliance.is_some();"
         }
