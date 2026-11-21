@@ -484,3 +484,246 @@ async fn a_nil_tenant_cannot_be_built_from_a_decoded_row_id() {
         Err(IdError::Nil)
     ));
 }
+
+/// Claim a batch: one call takes at most `max`, and the rest stay due for the next call.
+#[tokio::test]
+async fn claim_batch_returns_at_most_max_and_leaves_the_rest() {
+    let db = common::TestDb::fresh().await;
+    let tenant = a_tenant(&db).await;
+    let pool = &db.runtime;
+
+    let mut ids = Vec::new();
+    for key in ["batch-1", "batch-2", "batch-3"] {
+        let id = jobs::enqueue(
+            pool,
+            tenant,
+            "event.prune",
+            key,
+            serde_json::json!({}),
+            None,
+            5,
+        )
+        .await
+        .expect("enqueue")
+        .expect("a first enqueue creates the row");
+        ids.push(id);
+    }
+
+    let claimed = jobs::claim_batch(pool, tenant, 60, None, 2)
+        .await
+        .expect("claim a batch of two");
+    assert_eq!(claimed.len(), 2, "the batch is capped at max");
+    assert!(
+        claimed.iter().all(|job| job.status == "running"),
+        "every claimed row is running"
+    );
+    let tokens: std::collections::BTreeSet<Uuid> = claimed
+        .iter()
+        .map(|job| job.lease_token.expect("a claimed job carries a token"))
+        .collect();
+    assert_eq!(tokens.len(), 2, "each claimed job gets its own fence token");
+
+    let left: Vec<Uuid> = ids
+        .iter()
+        .copied()
+        .filter(|id| claimed.iter().all(|job| job.id != *id))
+        .collect();
+    assert_eq!(left.len(), 1, "one row of three is left for the next batch");
+    let (status, ..) = row(&db.super_pool, left[0]).await;
+    assert_eq!(status, "pending", "the third job waits for the next batch");
+
+    let next = jobs::claim_batch(pool, tenant, 60, None, 2)
+        .await
+        .expect("second batch");
+    assert_eq!(next.len(), 1, "the next batch takes the remaining row");
+    assert_eq!(next[0].id, left[0]);
+}
+
+/// A batch with a kind filter takes only due rows of those kinds.
+#[tokio::test]
+async fn claim_batch_honours_kind_and_run_after() {
+    let db = common::TestDb::fresh().await;
+    let tenant = a_tenant(&db).await;
+    let pool = &db.runtime;
+
+    let due = jobs::enqueue(
+        pool,
+        tenant,
+        "event.prune",
+        "due",
+        serde_json::json!({}),
+        None,
+        5,
+    )
+    .await
+    .expect("enqueue")
+    .expect("row");
+    let other = jobs::enqueue(
+        pool,
+        tenant,
+        "job.prune",
+        "other",
+        serde_json::json!({}),
+        None,
+        5,
+    )
+    .await
+    .expect("enqueue")
+    .expect("row");
+    let future = jobs::enqueue(
+        pool,
+        tenant,
+        "event.prune",
+        "future",
+        serde_json::json!({}),
+        Some(Utc::now() + ChronoDuration::seconds(60)),
+        5,
+    )
+    .await
+    .expect("enqueue")
+    .expect("row");
+
+    let claimed = jobs::claim_batch(pool, tenant, 60, Some(&["event.prune"]), 10)
+        .await
+        .expect("claim");
+    let ids: Vec<Uuid> = claimed.iter().map(|job| job.id).collect();
+    assert_eq!(
+        ids,
+        vec![due],
+        "only the due row of the named kind is claimable"
+    );
+
+    for id in [other, future] {
+        let (status, ..) = row(&db.super_pool, id).await;
+        assert_eq!(status, "pending", "an unclaimed row stays pending");
+    }
+}
+
+/// Two batches held open at once never hand out the same row.
+#[tokio::test]
+async fn two_uncommitted_batches_pick_disjoint_rows() {
+    let db = common::TestDb::fresh().await;
+    let tenant = a_tenant(&db).await;
+    let pool = &db.runtime;
+
+    for key in ["disjoint-1", "disjoint-2"] {
+        jobs::enqueue(
+            pool,
+            tenant,
+            "event.prune",
+            key,
+            serde_json::json!({}),
+            None,
+            5,
+        )
+        .await
+        .expect("enqueue")
+        .expect("row");
+    }
+
+    let mut first = conveyor_store::begin_scoped(pool, tenant)
+        .await
+        .expect("first scope");
+    let mut second = conveyor_store::begin_scoped(pool, tenant)
+        .await
+        .expect("second scope");
+
+    let a = jobs::claim_batch_tx(&mut first, 60, None, 10)
+        .await
+        .expect("first batch");
+    assert_eq!(a.len(), 2);
+    let b = jobs::claim_batch_tx(&mut second, 60, None, 10)
+        .await
+        .expect("second batch");
+    assert!(
+        b.is_empty(),
+        "SKIP LOCKED leaves the first batch's rows alone, not {} more",
+        b.len()
+    );
+
+    first.rollback().await.expect("rollback");
+    second.rollback().await.expect("rollback");
+}
+
+/// The batch's single reap dead-letters an exhausted expired row instead of handing it out.
+#[tokio::test]
+async fn the_batch_reap_dead_letters_an_exhausted_row() {
+    let db = common::TestDb::fresh().await;
+    let tenant = a_tenant(&db).await;
+    let pool = &db.runtime;
+
+    let id = jobs::enqueue(
+        pool,
+        tenant,
+        "event.prune",
+        "exhausted",
+        serde_json::json!({}),
+        None,
+        1,
+    )
+    .await
+    .expect("enqueue")
+    .expect("row");
+
+    let claimed = jobs::claim(pool, tenant, 60)
+        .await
+        .expect("claim")
+        .expect("the row is due");
+    assert_eq!(claimed.id, id);
+    assert_eq!(claimed.attempts, 1);
+
+    expire_lease(&db, id).await;
+    let batch = jobs::claim_batch(pool, tenant, 60, None, 10)
+        .await
+        .expect("batch claim");
+    assert!(
+        batch.iter().all(|job| job.id != id),
+        "an exhausted row is reaped, never handed out"
+    );
+    let (status, attempts, ..) = row(&db.super_pool, id).await;
+    assert_eq!(status, "dead");
+    assert_eq!(attempts, 1);
+}
+
+/// A deferred continuation is claimed again without counting a second attempt.
+#[tokio::test]
+async fn a_continuation_batch_does_not_count_a_second_attempt() {
+    let db = common::TestDb::fresh().await;
+    let tenant = a_tenant(&db).await;
+    let pool = &db.runtime;
+
+    let id = jobs::enqueue(
+        pool,
+        tenant,
+        "event.prune",
+        "continuation",
+        serde_json::json!({}),
+        None,
+        5,
+    )
+    .await
+    .expect("enqueue")
+    .expect("row");
+
+    let first = jobs::claim(pool, tenant, 60)
+        .await
+        .expect("claim")
+        .expect("the row is due");
+    let token = first.lease_token.expect("a claimed job carries a token");
+    assert!(
+        jobs::defer(pool, tenant, id, token, Duration::ZERO)
+            .await
+            .expect("defer"),
+        "the live holder can defer its own continuation"
+    );
+
+    let again = jobs::claim_batch(pool, tenant, 60, None, 1)
+        .await
+        .expect("claim the continuation");
+    assert_eq!(again.len(), 1);
+    assert_eq!(again[0].id, id);
+    assert_eq!(
+        again[0].attempts, 1,
+        "a continuation does not count a second attempt"
+    );
+}

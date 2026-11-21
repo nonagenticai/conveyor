@@ -320,35 +320,41 @@ impl Worker {
             // Read the cord before claiming, every tick: the state is a row, so a release
             // takes effect on the next pass without restarting any process.
             let engaged = andon_engaged(&self.pool, tenant).await;
-            for _ in 0..BATCH_PER_TENANT {
-                // No permit, no claim: a hung handler must cost one slot, never the loop.
-                let Ok(permit) = Arc::clone(&self.in_flight).try_acquire_owned() else {
-                    break;
-                };
+            // One claim per tenant-tick: the transaction, the tenant GUC and the expired-lease
+            // reap are paid once per batch instead of once per job. The batch is still capped by
+            // the free in-flight slots, and no permit means no claim.
+            let permits = take_claim_budget(&self.in_flight, BATCH_PER_TENANT);
+            if !permits.is_empty() {
+                let max = permits.len();
                 let claimed = if engaged {
-                    store::jobs::claim_with(
+                    store::jobs::claim_batch(
                         &self.pool,
                         tenant,
                         lease_secs,
                         Some(&ANDON_ALLOWED_KINDS),
+                        max,
                     )
                     .await
                 } else {
-                    store::claim(&self.pool, tenant, lease_secs).await
+                    store::claim_batch(&self.pool, tenant, lease_secs, None, max).await
                 };
-                let job = match claimed {
-                    Ok(Some(job)) => job,
-                    Ok(None) => break,
-                    Err(error) => {
-                        tracing::warn!(%error, tenant = %tenant, "claim failed");
-                        break;
+                match claimed {
+                    Ok(jobs) => {
+                        // A claim may return fewer jobs than the budget; `zip` releases the
+                        // permits the queue did not need.
+                        for (job, permit) in jobs.into_iter().zip(permits) {
+                            let this = Arc::clone(self);
+                            tokio::spawn(async move {
+                                this.run_job(&job).await;
+                                drop(permit);
+                            });
+                        }
                     }
-                };
-                let this = Arc::clone(self);
-                tokio::spawn(async move {
-                    this.run_job(&job).await;
-                    drop(permit);
-                });
+                    Err(error) => {
+                        // Dropping the permits returns the whole budget to the semaphore.
+                        tracing::warn!(%error, tenant = %tenant, "claim failed");
+                    }
+                }
             }
         }
         Ok(())
@@ -993,6 +999,27 @@ async fn dispatch(
 // (CONTRACT §7), and each is idempotent on `(kind, dedupe_key)` through the job queue: a
 // reclaimed job repeats the handler, so a handler that finds the work already done must
 // finish quietly rather than emit a second event.
+
+/// Fill one tenant-tick's claim budget from the in-flight semaphore.
+///
+/// The budget is `min(free permits, cap)`, where `cap` is the per-tenant batch. Every permit is
+/// held until its own spawned task drops it, so a claimed job can never wait for a slot; a
+/// claim error releases the whole budget by dropping the vector. Zero free permits yields an
+/// empty budget and therefore no claim.
+fn take_claim_budget(
+    semaphore: &Arc<tokio::sync::Semaphore>,
+    cap: usize,
+) -> Vec<tokio::sync::OwnedSemaphorePermit> {
+    let budget = semaphore.available_permits().min(cap);
+    let mut permits = Vec::with_capacity(budget);
+    for _ in 0..budget {
+        match Arc::clone(semaphore).try_acquire_owned() {
+            Ok(permit) => permits.push(permit),
+            Err(_) => break,
+        }
+    }
+    permits
+}
 
 /// True when the tenant's andon cord is pulled.
 ///
@@ -3157,5 +3184,46 @@ mod bus_consumer_tests {
             "{name}"
         );
         assert!(!name.starts_with('-'), "{name}");
+    }
+}
+
+#[cfg(test)]
+mod claim_batch_tests {
+    use super::*;
+
+    /// The budget is both caps at once: the free in-flight slots and the tenant batch.
+    #[test]
+    fn the_budget_is_capped_by_permits_and_the_tenant_batch() {
+        let semaphore = Arc::new(tokio::sync::Semaphore::new(MAX_IN_FLIGHT_JOBS));
+        assert_eq!(
+            take_claim_budget(&semaphore, BATCH_PER_TENANT).len(),
+            MAX_IN_FLIGHT_JOBS.min(BATCH_PER_TENANT),
+        );
+
+        let tight = Arc::new(tokio::sync::Semaphore::new(3));
+        assert_eq!(take_claim_budget(&tight, BATCH_PER_TENANT).len(), 3);
+
+        let batch = Arc::new(tokio::sync::Semaphore::new(MAX_IN_FLIGHT_JOBS));
+        assert_eq!(take_claim_budget(&batch, 5).len(), 5);
+    }
+
+    /// Zero free permits is an empty budget, which the tick treats as "no claim".
+    #[test]
+    fn no_free_permit_means_no_budget() {
+        let semaphore = Arc::new(tokio::sync::Semaphore::new(0));
+        assert!(take_claim_budget(&semaphore, BATCH_PER_TENANT).is_empty());
+    }
+
+    /// Dropping the budget — including on the claim-error arm — returns every permit.
+    #[test]
+    fn dropping_the_budget_returns_the_permits() {
+        let semaphore = Arc::new(tokio::sync::Semaphore::new(MAX_IN_FLIGHT_JOBS));
+        let permits = take_claim_budget(&semaphore, BATCH_PER_TENANT);
+        assert_eq!(
+            permits.len() + semaphore.available_permits(),
+            MAX_IN_FLIGHT_JOBS,
+        );
+        drop(permits);
+        assert_eq!(semaphore.available_permits(), MAX_IN_FLIGHT_JOBS);
     }
 }
