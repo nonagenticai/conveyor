@@ -104,13 +104,22 @@ READBACK_MAP = {
     "architecture.artifacts_create": "architecture.artifacts_get",
     "architecture.artifacts_approve": "architecture.artifacts_get",
     "architecture.reviews_record": "architecture.reviews_get",
+    "cadences.create": "cadences.list",
+    "cadences.update": "cadences.list",
+    "cadences.credit_demo": "cadences.credit_list",
+    "lessons.propose": "lessons.list",
+    "wbs.create": "wbs.get",
+    "wbs.update": "wbs.get",
+    "tranches.review": "tranches.review_list",
 }
 
 # A create whose read-back is the row it just made. The write output's field is the read
 # input's `id`; --read-input and an explicit --read-id-from-output both override this.
 READBACK_ID_FROM_OUTPUT = {
     "documents.create": "id",
+    "documents.compose": "id",
     "registers.create": "id",
+    "wbs.create": "id",
     "projects.baseline": "baseline_id",
     "architecture.contracts_request": "id",
     "architecture.artifacts_create": "id",
@@ -342,6 +351,27 @@ def has_row(value):
     return True
 
 
+def match_row(value, pairs):
+    """The one row in a list read-back that matches every FIELD=VALUE pair."""
+    rows = None
+    if isinstance(value, dict):
+        for key in ("items", "rows", "results"):
+            if isinstance(value.get(key), list):
+                rows = value[key]
+                break
+    elif isinstance(value, list):
+        rows = value
+    if rows is None:
+        return None, "the read-back is not a list; --read-match cannot apply"
+    for row in rows:
+        if isinstance(row, dict) and all(
+            str(row.get(field)) == expected for field, expected in pairs
+        ):
+            return row, None
+    rendered = ", ".join(f"{field}={expected}" for field, expected in pairs)
+    return None, f"no row matches {rendered}"
+
+
 def print_result(kind, action, value):
     print(f"== {kind}: {action} ==")
     print(json.dumps(value, indent=2))
@@ -461,6 +491,17 @@ def run_record(args, transport):
             print_result("read-back", read_action, row)
         return 0
     read_result = execute(transport, read_action, read_input, actor_id=actor_id)
+    if args.read_match:
+        pairs = []
+        for item in args.read_match:
+            if "=" not in item:
+                fail(f"--read-match needs FIELD=VALUE, got {item!r}", 2)
+            field, expected = item.split("=", 1)
+            pairs.append((field.strip(), expected))
+        row, error = match_row(read_result, pairs)
+        if error:
+            fail(f"read-back {read_action}: {error}; the {action} write is unverified")
+        read_result = row
     if not has_row(read_result):
         fail(f"read-back {read_action} returned no row; the {action} write is unverified")
     if not args.quiet:
@@ -490,6 +531,8 @@ if name and os.environ.get("PROGRAMME_RECORD_EMPTY") == name:
     print("null")
 elif name == "documents.compose":
     print(json.dumps({"id": "doc-1", "title": "composed"}))
+elif name and name.endswith(".list") and os.environ.get("PROGRAMME_RECORD_LIST"):
+    print(json.dumps({"items": [{"id": "row-1", "kind": "pi", "period": "tranche-0"}]}))
 else:
     print(json.dumps({"ok": True, "id": "row-1", "baseline_id": "row-1", "action": name, "input": payload}))
 """
@@ -689,7 +732,6 @@ def self_test():
             "--action", "documents.compose",
             "--input", '{"title":"t","body":"body"}',
             "--evidence", evidence,
-            "--read-id-from-output", "id",
         ],
         fake_env,
         True,
@@ -796,6 +838,35 @@ def self_test():
         verify_quiet,
     )
 
+    # A list read-back proves the created row when it matches the row's own fields.
+    list_env = dict(fake_env)
+    list_env["PROGRAMME_RECORD_LIST"] = "1"
+    cadence_argv = [
+        "--action", "cadences.create",
+        "--input", '{"programme_id":"p1","kind":"pi","period":"tranche-0"}',
+        "--evidence", evidence,
+    ]
+    run_case(
+        "read-match finds the created row",
+        cadence_argv + ["--read-match", "kind=pi", "--read-match", "period=tranche-0"],
+        list_env,
+        True,
+        lambda completed: (
+            [] if '"kind": "pi"' in completed.stdout
+            else ["the matched row was not printed"]
+        ),
+    )
+    run_case(
+        "read-match refuses a missing row",
+        cadence_argv + ["--read-match", "period=tranche-9"],
+        list_env,
+        False,
+        lambda completed: (
+            [] if "unverified" in (completed.stdout + completed.stderr).lower()
+            else ["failure does not say the claim is unverified"]
+        ),
+    )
+
     # The deployed engine serves no review read action yet; a review reads back from the
     # product's own snapshot of the live database when --snapshot is given.
     snapshot_dir = os.path.join(workdir, "snapshot")
@@ -859,6 +930,7 @@ def self_test():
         "architecture.artifacts_approve": "architecture.artifacts_get",
         "architecture.reviews_record": "architecture.reviews_get",
         "documents.create": "documents.get",
+        "documents.compose": "documents.get",
         "documents.update": "documents.get",
     }
     mapping_failures = []
@@ -883,10 +955,12 @@ def self_test():
         if calls_for_action != [write_action, read_action]:
             mapping_failures.append(f"{write_action}: calls were {calls_for_action!r}")
             continue
-        if write_action in READBACK_ID_FROM_OUTPUT and calls()[1]["input"] != {"id": "row-1"}:
-            mapping_failures.append(
-                f"{write_action}: read input was {calls()[1]['input']!r}"
-            )
+        if write_action in READBACK_ID_FROM_OUTPUT:
+            expected_id = "doc-1" if write_action == "documents.compose" else "row-1"
+            if calls()[1]["input"] != {"id": expected_id}:
+                mapping_failures.append(
+                    f"{write_action}: read input was {calls()[1]['input']!r}"
+                )
     if mapping_failures:
         failures.append("lifecycle mappings")
         print("FAIL lifecycle mappings")
@@ -897,9 +971,9 @@ def self_test():
 
     print()
     if failures:
-        print(f"SELF-TEST FAILED: {len(failures)} of 15 cases: {', '.join(failures)}")
+        print(f"SELF-TEST FAILED: {len(failures)} of 17 cases: {', '.join(failures)}")
         return 1
-    print("SELF-TEST OK: 15 cases passed")
+    print("SELF-TEST OK: 17 cases passed")
     return 0
 
 
@@ -912,6 +986,13 @@ def main(argv=None):
     parser.add_argument("--input", metavar="JSON|@FILE", help="action input")
     parser.add_argument("--read-action", metavar="NAME", help="read-back action")
     parser.add_argument("--read-input", metavar="JSON|@FILE", help="read-back input")
+    parser.add_argument(
+        "--read-match",
+        action="append",
+        default=[],
+        metavar="FIELD=VALUE",
+        help="require a row in a list read-back to match (repeatable)",
+    )
     parser.add_argument(
         "--snapshot",
         metavar="DIR",

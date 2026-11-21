@@ -464,6 +464,11 @@ def check_lessons(
 def _published_for_period(
     snapshot: Snapshot, category: str, period: str, programme_key: str
 ) -> bool:
+    """The PI artefact names its tranche in the title or unit (`tranche-N`).
+
+    `unit` is the output's programme unit (see `documents.compose`); the retrospective batch
+    writes the planning period there, and the title repeats it for a human reader.
+    """
     needle = period.lower()
     for row in snapshot.outputs:
         if row.get("category") != category or row.get("project_key") != programme_key:
