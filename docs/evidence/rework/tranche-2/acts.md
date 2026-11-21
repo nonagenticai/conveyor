@@ -105,3 +105,16 @@ The review document was corrected at v2 after the lane head moved: `v1-t2-3` (fc
 `v1-t2-6` (1167127d) are resolved with their tests, and `v1-s12-1` (8f1e5770) is resolved locally
 with its Playwright run pending the PR's web CI. The pause decision is unchanged: it rests on the red
 manifests and the refused closures, neither of which those resolutions touch.
+
+## The manifest verdicts are only as good as the snapshot
+
+The S03/T2 verdicts in `docs/evidence/rework/{S03,T2}.json` were taken by the branch verifier against
+a snapshot built by the DEPLOYED engine. That projection is older than the branch's: it omits
+`architecture_contract.requested_by`, omits `document.published_at`, and returned no demo-credit rows.
+Three of the reported failures (contract, review, demo credit) are therefore snapshot artefacts, not
+defects in the live record; the live contract, review and credit all satisfy their properties. The
+real gaps are S03's unrun closure and T2's `non_conformant` review level. The branch's snapshot does
+select the three fields but cannot be built against the live `0061` schema, so this tranche's
+acceptance evidence is reproducible only after the lane's migrations are applied.
+
+The tranche review document records both corrections and was republished to v3.
