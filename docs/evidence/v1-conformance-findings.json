@@ -3061,6 +3061,374 @@
       "failure_scenario": "A destructive action requests its gate with require_evidence=false and no evidence; the approval row opens and can be decided with nothing to read.",
       "acceptance": "A tenant policy or gate declares evidence mandatory; approvals.request refuses an empty evidence set unless an explicit waiver reason is recorded, and tests prove both the refusal and the waiver.",
       "owner_project": "PLATFORM"
+    },
+    {
+      "id": "v1-s06-1",
+      "area": "S06 control plane",
+      "standard": "SPEC",
+      "spec": "§5.4",
+      "severity": "P0",
+      "title": "S06 gate names five absent test targets",
+      "problem": "The S06 acceptance command names run_retry, approval_expire, andon, delivery_retry and telegram_reply test targets under crates/api/tests; none exists at this head. A missing test target makes the gate hard-error, so the slice's own acceptance can never pass and properties c/d/e lack their named proofs.",
+      "evidence": [
+        {
+          "path": "docs/plans/slices/S06-control-plane.md",
+          "line": 176,
+          "quote": "cargo test -p conveyor-api --test golden_path --test claim_race --test run_retry \\"
+        },
+        {
+          "path": "docs/plans/slices/S06-control-plane.md",
+          "line": 177,
+          "quote": "  --test approval_dual --test approval_expire --test andon --test delivery_retry \\"
+        },
+        {
+          "path": "docs/plans/slices/S06-control-plane.md",
+          "line": 178,
+          "quote": "  --test telegram_reply --test notifications --test sse_control"
+        }
+      ],
+      "failure_scenario": "The S06 gate is permanently red; retry, andon, delivery and approval-expiry regressions ship unseen.",
+      "acceptance": "Add the named targets (or point the gate at the real ones) and prove properties c-e green.",
+      "owner_project": "S06"
+    },
+    {
+      "id": "v1-s06-2",
+      "area": "S06b agent direct interface",
+      "standard": "SPEC",
+      "spec": "§5.4",
+      "severity": "P0",
+      "title": "S06b gate proofs are admitted NOT PROVEN/PARTIAL",
+      "problem": "The evidence file states the agent app was not run, the importer was not executed, and the end-to-end run_id is null; property g requires one real agent task carrying a run id and property b requires the importer to run.",
+      "evidence": [
+        {
+          "path": "docs/evidence/S06b-agent-task.md",
+          "line": 7,
+          "quote": "contract over the real `/mcp` HTTP surface with a licence principal. It does **not** run the `agent` app — its plan"
+        },
+        {
+          "path": "docs/evidence/S06b-agent-task.md",
+          "line": 62,
+          "quote": "| b | import: the agent's `mcp-import` yields `projects.create`, not `tool.*` | **NOT PROVEN** | the agent's importer is not executed here. (a) proves the conveyor-side precondition: the operation key is an `object.verb`, never absent. Live import remains S14 §7. |"
+        },
+        {
+          "path": "docs/evidence/S06b-agent-task.md",
+          "line": 67,
+          "quote": "| g | end to end: create, progress, decide, close; evidence contains run id, project id, one decision | **PARTIAL** | create → `projects.get` + `events.list` → request → decide → `projects.close` → `projects.get` shows `closed`, all over `/mcp` as a licence principal. **`run_id` is `null`**: no run-creating action is on the agent allowlist (`AGENT_TOOLS` has only `runs.list`; `runs.create` needs a card; `cards.create` is outside the allowlist). See \"Open\". |"
+        }
+      ],
+      "failure_scenario": "S06b is recorded built while its agent-facing contract is untested; the gap is deferred indefinitely to S14.",
+      "acceptance": "Run a real agent task end to end and record the run id, project id and one decision.",
+      "owner_project": "S06"
+    },
+    {
+      "id": "v1-s06-3",
+      "area": "S06c MCP tasks",
+      "standard": "SPEC",
+      "spec": "§5.4",
+      "severity": "P0",
+      "title": "S06c gate's task_capable assertion can never pass",
+      "problem": "The gate greps for the literal task_capable: true in projects.rs, but the derive writes task = true; no such literal exists, so grep -c returns 0 and test ... -eq 1 fails even though projects.execute is task-capable.",
+      "evidence": [
+        {
+          "path": "docs/plans/slices/S06c-mcp-tasks.md",
+          "line": 169,
+          "quote": "test \"$(grep -c 'task_capable: true' crates/actions/src/board/projects.rs)\" -eq 1"
+        },
+        {
+          "path": "crates/actions/src/board/projects.rs",
+          "line": 1270,
+          "quote": "    task = true"
+        },
+        {
+          "path": "crates/actions/src/mcp.rs",
+          "line": 267,
+          "quote": "        if spec.task_capable && (200..300).contains(&status) {"
+        }
+      ],
+      "failure_scenario": "The S06c gate is red despite working tasks, or a dead literal is added to satisfy the grep.",
+      "acceptance": "Replace the grep with a registry assertion (or match the real task = true derive) and prove the one-task-capable-action property.",
+      "owner_project": "S06"
+    },
+    {
+      "id": "v1-s06-4",
+      "area": "S06d connector standard",
+      "standard": "SPEC",
+      "spec": "§5.4",
+      "severity": "P1",
+      "title": "S06d workspace gate never re-run green after fixes",
+      "problem": "The plan records that the full workspace run found five failures and was not repeated after the fixes; only the affected binaries were re-run, while the gate is the full workspace test.",
+      "evidence": [
+        {
+          "path": "docs/plans/slices/S06d-connector-standard.md",
+          "line": 77,
+          "quote": "rbuild -- test --workspace --no-fail-fast --locked"
+        },
+        {
+          "path": "docs/plans/slices/S06d-connector-standard.md",
+          "line": 87,
+          "quote": "The full suite was not repeated end-to-end after the fixes (each affected binary was)."
+        },
+        {
+          "path": "docs/plans/slices/S06d-connector-standard.md",
+          "line": 4,
+          "quote": "status: built"
+        }
+      ],
+      "failure_scenario": "Workspace-wide breakage outside the affected binaries is unproven at the slice's close.",
+      "acceptance": "Re-run the workspace gate green at the built commit and record it.",
+      "owner_project": "S06"
+    },
+    {
+      "id": "v1-s07-1",
+      "area": "S07 requirements/search",
+      "standard": "SPEC",
+      "spec": "§10.1",
+      "severity": "P1",
+      "title": "S07 project_request.timeout is absent",
+      "problem": "The plan requires a project_request.timeout window (default 24h, S06 §5.3) and a project_request test target; no timeout job or schedule exists and the named test target is absent.",
+      "evidence": [
+        {
+          "path": "docs/plans/slices/S07-requirements-search.md",
+          "line": 168,
+          "quote": "15. `project_requests.*` + `project_request.timeout` (S06 §5.3) — `cargo test -p conveyor-api --test project_request`; clippy."
+        },
+        {
+          "path": "docs/plans/slices/S07-requirements-search.md",
+          "line": 231,
+          "quote": "4. **`project_request.timeout` window** (fr's timer was 300 s)? Default: 24 h, measured before S14."
+        },
+        {
+          "path": "crates/actions/src/governance/requests.rs",
+          "line": 242,
+          "quote": "    name = \"project_requests.create\","
+        }
+      ],
+      "failure_scenario": "Stale project requests never expire or promote; S06 §5.3's timer is replaced by nothing.",
+      "acceptance": "Implement the timeout job with its window and add the project_request test.",
+      "owner_project": "S07"
+    },
+    {
+      "id": "v1-s08-1",
+      "area": "S08 governance/modelling",
+      "standard": "SPEC",
+      "spec": "§5.4",
+      "severity": "P1",
+      "title": "S08 validation-findings proof has no assertion",
+      "problem": "Property g requires a dangling relationship to yield status='findings' naming its id and no run row in the mutation transaction; the named targets model_profile.rs and s08_models.rs contain no findings/dangling assertion.",
+      "evidence": [
+        {
+          "path": "docs/plans/slices/S08-governance-modelling.md",
+          "line": 334,
+          "quote": "| g | validation post-commit | dangling relationship → `status='findings'` naming its id; no run row inside the mutation tx |"
+        },
+        {
+          "path": "docs/plans/slices/S08-governance-modelling.md",
+          "line": 323,
+          "quote": "# validation job are `model_profile` (api) and `s08_models` (store); the portfolio aggregates are `s08_portfolio`."
+        },
+        {
+          "path": "crates/api/tests/model_profile.rs",
+          "line": 639,
+          "quote": "    assert_eq!(status, 422, \"an unknown version has no profile: {body}\");"
+        }
+      ],
+      "failure_scenario": "Validation could emit no findings, or run inside the mutation transaction, while the gate stays green.",
+      "acceptance": "Add the dangling-relationship test asserting the findings id and the post-commit timing.",
+      "owner_project": "S08"
+    },
+    {
+      "id": "v1-s09-1",
+      "area": "S09 documents/integrations",
+      "standard": "SPEC",
+      "spec": "§5.4",
+      "severity": "P1",
+      "title": "S09 egress gate scans one crate and permits ten named transports",
+      "problem": "Property f claims zero reqwest:: outside the executor, but the proof walks only crates/actions/src and allowlists transports besides invoke.rs; egress in crates/auth, crates/api and apps/server is never seen.",
+      "evidence": [
+        {
+          "path": "docs/plans/slices/S09-documents-integrations.md",
+          "line": 219,
+          "quote": "| f | externals — `GET /api/actions` shows `timeout_ms` on every external; zero `reqwest::` outside the executor |"
+        },
+        {
+          "path": "crates/api/tests/externals_declared.rs",
+          "line": 36,
+          "quote": "        .join(\"actions/src\");"
+        },
+        {
+          "path": "crates/auth/src/jwks.rs",
+          "line": 42,
+          "quote": "    client: reqwest::Client,"
+        }
+      ],
+      "failure_scenario": "A new direct HTTP call in an api, server or auth path bypasses timeout, breaker, idempotency and audit, and this gate still passes.",
+      "acceptance": "A workspace-wide scan with an exact allowlist (engine plus declared transports), or restate property f to its true scope; a planted offender outside the engine must fail.",
+      "owner_project": "S09"
+    },
+    {
+      "id": "v1-s10-1",
+      "area": "S10 copilot surface",
+      "standard": "SPEC",
+      "spec": "§5.4",
+      "severity": "P0",
+      "title": "S10 property e contradicts the shipped S04-D6 rule and the 403 path is untested",
+      "problem": "The plan says calling a scope-absent tool is action-not-found, never 403. The shipped rule is deliberately weaker for a human principal: the tool is absent from tools/list, and tools/call on a known name returns 403 action-forbidden. The test calls only an invented name (cards_teleport), so the known-but-out-of-scope 403 path is untested and the slice's property e cannot pass as written.",
+      "evidence": [
+        {
+          "path": "docs/plans/slices/S10-copilot-ag-ui.md",
+          "line": 156,
+          "quote": "| e | scope-absent tool | low-scope principal's `/api/copilot/actions` **and** `/mcp` `tools/list` both omit it; calling it is `action-not-found`, not `403` |"
+        },
+        {
+          "path": "crates/api/tests/copilot_surface.rs",
+          "line": 6,
+          "quote": "//! ⚠️ The slice's §5.2 table also says calling an absent tool answers `action-not-found`, never `403`."
+        },
+        {
+          "path": "crates/actions/src/mcp.rs",
+          "line": 196,
+          "quote": "            // `invoke` refuses it with the same `403 action-forbidden` HTTP returns. The"
+        },
+        {
+          "path": "crates/api/tests/copilot_surface.rs",
+          "line": 103,
+          "quote": "            json!({\"name\": \"cards_teleport\", \"arguments\": {}}),"
+        }
+      ],
+      "failure_scenario": "A low-scope caller probes tool names; 403 distinguishes existing from absent tools, contradicting the slice's contract, and no test fails.",
+      "acceptance": "Either amend S10 to the S04-D6 rule (correct-the-claim) and add a test calling an omitted real tool, or implement action-not-found; state which governs.",
+      "owner_project": "S10"
+    },
+    {
+      "id": "v1-s10-2",
+      "area": "S10 copilot surface",
+      "standard": "SPEC",
+      "spec": "§5.5",
+      "severity": "P1",
+      "title": "completions.create is 300 s and model:write, not the plan's 60 s and models:invoke",
+      "problem": "The plan declares a 60 s timeout and models:invoke; the shared chat_spec pins 300_000 ms and model:write and the test locks the deviation, so the accepted bound is unimplemented.",
+      "evidence": [
+        {
+          "path": "docs/plans/slices/S10-copilot-ag-ui.md",
+          "line": 113,
+          "quote": "The conveyor does not absorb `inference-router` (D14). `completions.create` is `kind: external` (`scopes: [models:invoke]`, 60 s timeout, per-action circuit breaker, tenant licence token). If it is down, times out, or the breaker is open, the turn ends `failed` with an RFC 9457 problem and **zero** tool invocations: the assistant never emits a fabricated tool call or a heuristic substitute. **S16 adds one declaration to this action** — `captures_usage = true` — and the engine then writes an `inference_call` row with `caller_kind='copilot'` and `conversation_turn_id` in the same transaction as the invocation's bookkeeping (CONTRACT §18). No handler parses `usage`, and nothing in the turn runner changes."
+        },
+        {
+          "path": "crates/actions/src/integrations/inference.rs",
+          "line": 121,
+          "quote": "        timeout_ms: 300_000,"
+        },
+        {
+          "path": "crates/actions/src/integrations/inference.rs",
+          "line": 172,
+          "quote": "        assert_eq!(spec.timeout_ms, 300_000);"
+        },
+        {
+          "path": "crates/actions/src/integrations/inference.rs",
+          "line": 173,
+          "quote": "        assert_eq!(spec.scope_names(), vec![\"model:write\"]);"
+        }
+      ],
+      "failure_scenario": "A hung router holds a worker five minutes instead of the accepted sixty seconds; outage tests stay green because they assert the deviating constant.",
+      "acceptance": "Implement 60 s/models:invoke or amend S10 with the rationale; the test asserts the agreed bound.",
+      "owner_project": "S10"
+    },
+    {
+      "id": "v1-s11-1",
+      "area": "S11 procedures",
+      "standard": "SPEC",
+      "spec": "§5.4",
+      "severity": "P0",
+      "title": "S11's gate calls procedure_runs.start, which does not exist at HEAD",
+      "problem": "The gate still uses the pre-amendment names: it builds a stepped procedure with procedures.create and starts it via procedure_runs.start. The registry exposes process_runs.start; procedure_runs.start survives only in a comment.",
+      "evidence": [
+        {
+          "path": "docs/plans/slices/S11-procedures.md",
+          "line": 142,
+          "quote": "ID=$(P procedures.create \"{\\\"input\\\":{\\\"key\\\":\\\"dev-phase\\\",\\\"title\\\":\\\"Dev phase\\\",\\\"card_type_code\\\":\\\"$CT\\\",\\\"steps\\\":["
+        },
+        {
+          "path": "docs/plans/slices/S11-procedures.md",
+          "line": 154,
+          "quote": "RUN=$(P procedure_runs.start \"{\\\"input\\\":{\\\"card_id\\\":\\\"$CARD\\\",\\\"procedure_key\\\":\\\"dev-phase\\\",\\\"inputs\\\":{\\\"ticket\\\":\\\"T-1\\\",\\\"done_list\\\":\\\"$DONE\\\"}}}\" | jq -r .id)"
+        },
+        {
+          "path": "crates/actions/src/process/runs.rs",
+          "line": 245,
+          "quote": "    name = \"process_runs.start\","
+        },
+        {
+          "path": "crates/actions/src/workflow/runs.rs",
+          "line": 3,
+          "quote": "//! Starting mirrors S11's `procedure_runs.start`: the run row, its first trace row and the job"
+        }
+      ],
+      "failure_scenario": "Running the slice's own gate returns action-not-found at the start call, so its nine-row acceptance can never be green at HEAD.",
+      "acceptance": "Rewrite the gate to processes.create/process_runs.start (or ship a compatibility action) and demonstrate it green.",
+      "owner_project": "S11"
+    },
+    {
+      "id": "v1-s12-1",
+      "area": "S12 UI buildout",
+      "standard": "SPEC",
+      "spec": "§5.4",
+      "severity": "P0",
+      "title": "Specs do not assert empty, error and happy states; run-queue's disjunction proves neither",
+      "problem": "The gate says every spec asserts three states and a happy-path-only spec fails review. run-queue has one test whose core assertion accepts empty or non-empty; admin asserts only that .problem is absent, never an error state.",
+      "evidence": [
+        {
+          "path": "docs/plans/slices/S12-ui-buildout.md",
+          "line": 123,
+          "quote": "- Every spec asserts empty state, error state and happy path — a spec that only asserts the happy path fails review."
+        },
+        {
+          "path": "apps/web/e2e/run-queue.spec.ts",
+          "line": 3,
+          "quote": "test(\"the run queue filters by state\", async ({ page }) => {"
+        },
+        {
+          "path": "apps/web/e2e/run-queue.spec.ts",
+          "line": 16,
+          "quote": "      .or(page.locator(\".pill\", { hasText: /failed/i }).first()),"
+        },
+        {
+          "path": "apps/web/e2e/admin.spec.ts",
+          "line": 61,
+          "quote": "  await expect(page.locator(\".problem\")).toHaveCount(0);"
+        }
+      ],
+      "failure_scenario": "An empty tenant renders blank, or a 500 renders raw, and the suite stays green because no assertion distinguishes the three states.",
+      "acceptance": "Each screen spec gains distinct empty, error and happy assertions, or the gate bullet is amended with the reason.",
+      "owner_project": "S12"
+    },
+    {
+      "id": "v1-s13-1",
+      "area": "S13 process engine",
+      "standard": "SPEC",
+      "spec": "§5.8",
+      "severity": "P1",
+      "title": "S13 is built while the reusable workflow catalogue is unshipped",
+      "problem": "The plan marks the slice built but records seed/processes/workflows as 'Not blocked, not shipped.' The call step's workflow limb works only for hand-created rows, so the retained tool-sequence executor has no catalogue path from a process.",
+      "evidence": [
+        {
+          "path": "docs/plans/slices/S13-n8n-engine.md",
+          "line": 4,
+          "quote": "status: built (2026-11-10; session 2 closed W4/W5/D29, the catalogue E2E and the BYO token path; session 3 closed the step contract, gate/call seed content, the run lifecycle, the judge record, map authoring, the bus replay proof and the install path; the DAG plan is superseded; the engine is retained — owner ruling 2026-11-09)"
+        },
+        {
+          "path": "docs/plans/slices/S13-n8n-engine.md",
+          "line": 283,
+          "quote": "13. `seed/processes/workflows/` — the reusable tool sequences. **Not blocked, not shipped.** The"
+        },
+        {
+          "path": "docs/plans/slices/S13-n8n-engine.md",
+          "line": 287,
+          "quote": "    re-authoring the old flows. The `call` step's workflow limb is proved by `call_step.rs`."
+        }
+      ],
+      "failure_scenario": "A tenant-authored process call names a workflow key; no catalogue row resolves, so the workflow-second limb is unusable outside tests.",
+      "acceptance": "Ship the workflows catalogue, or declare the workflow limb out of scope and stop claiming it as built.",
+      "owner_project": "S13"
     }
   ]
 }
