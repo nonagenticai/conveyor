@@ -246,6 +246,10 @@ def execute(transport, action, payload, approval_id=None, actor_id=None, if_matc
         action, approval_id=approval_id, actor_id=actor_id, if_match=if_match
     )
     stdin = json.dumps(payload, separators=(",", ":")) + "\n"
+    if isinstance(payload, dict) and "input" in payload:
+        # The admin CLI unwraps a top-level "input" as its envelope; an action whose own input
+        # carries that key (`approvals.request`) must be wrapped so the key survives.
+        stdin = json.dumps({"input": payload}, separators=(",", ":")) + "\n"
     env = None
     if transport.local_bin:
         # The binary logs to stdout; the harness requires stdout to be the action's JSON alone.
@@ -477,6 +481,15 @@ def run_record(args, transport):
         if not created_id:
             fail(f"{action}: a snapshot read-back needs the created id (--read-id-from-output)")
         filename, collection = snapshot_source
+        if args.snapshot_command:
+            refreshed = subprocess.run(
+                shlex.split(args.snapshot_command), capture_output=True, text=True
+            )
+            if refreshed.returncode != 0:
+                fail(
+                    f"{action}: --snapshot-command exited {refreshed.returncode}: "
+                    f"{refreshed.stderr.strip()[:400]}"
+                )
         row = load_snapshot_row(args.snapshot, filename, collection, created_id)
         if not has_row(row):
             fail(
@@ -838,6 +851,31 @@ def self_test():
         verify_quiet,
     )
 
+    def verify_wrapped(completed):
+        problems = []
+        if not calls():
+            problems.append("the transport was not called")
+        else:
+            inner = calls()[0]["input"].get("input", {})
+            if inner.get("gate") != "projects.close":
+                problems.append(f"the nested input was not preserved: {calls()[0]['input']!r}")
+        return problems
+
+    run_case(
+        "an input field is wrapped in the admin envelope",
+        [
+            "--action", "approvals.request",
+            "--input",
+            '{"gate":"projects.close","kind":"action","action":"projects.close","input":{"id":"p1"}}',
+            "--evidence", evidence,
+            "--read-action", "approvals.get",
+            "--read-id-from-output", "id",
+        ],
+        fake_env,
+        True,
+        verify_wrapped,
+    )
+
     # A list read-back proves the created row when it matches the row's own fields.
     list_env = dict(fake_env)
     list_env["PROGRAMME_RECORD_LIST"] = "1"
@@ -916,6 +954,33 @@ def self_test():
         ),
     )
 
+    # A write whose row cannot be read in the same transaction refreshes the snapshot first.
+    writer = os.path.join(workdir, "snapshot-writer.py")
+    with open(writer, "w", encoding="utf-8") as handle:
+        handle.write(
+            "import json, os, sys\n"
+            "d = sys.argv[1]\n"
+            "os.makedirs(d, exist_ok=True)\n"
+            "json.dump({'compliance_reviews': [{'id': 'row-1'}]}, "
+            "open(os.path.join(d, 'architecture.json'), 'w'))\n"
+            "json.dump({'generated_at': '2026-11-21T00:00:00Z'}, "
+            "open(os.path.join(d, 'programme.json'), 'w'))\n"
+        )
+    fresh_dir = os.path.join(workdir, "snapshot-fresh")
+    refreshed_argv = [
+        fresh_dir if part == snapshot_dir else part for part in review_argv
+    ] + ["--snapshot-command", shlex.join([sys.executable, "-I", writer, fresh_dir])]
+    run_case(
+        "snapshot-command refreshes the read-back",
+        refreshed_argv,
+        fake_env,
+        True,
+        lambda completed: (
+            [] if '"id": "row-1"' in completed.stdout
+            else ["the refreshed row was not printed"]
+        ),
+    )
+
     # The lifecycle's writes must each resolve a read-back; a create whose read input is the
     # row it made reads the id from the write output unless --read-input overrides it.
     lifecycle = {
@@ -971,9 +1036,9 @@ def self_test():
 
     print()
     if failures:
-        print(f"SELF-TEST FAILED: {len(failures)} of 17 cases: {', '.join(failures)}")
+        print(f"SELF-TEST FAILED: {len(failures)} of 19 cases: {', '.join(failures)}")
         return 1
-    print("SELF-TEST OK: 17 cases passed")
+    print("SELF-TEST OK: 19 cases passed")
     return 0
 
 
@@ -997,6 +1062,11 @@ def main(argv=None):
         "--snapshot",
         metavar="DIR",
         help="read the created row from this snapshot (built after the write)",
+    )
+    parser.add_argument(
+        "--snapshot-command",
+        metavar="CMD",
+        help="run this command after the write to refresh --snapshot before the read-back",
     )
     parser.add_argument("--evidence", metavar="PATH", help="required for a write")
     parser.add_argument("--approval-id", metavar="UUID", help="approved gate for the write")
