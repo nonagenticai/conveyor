@@ -104,6 +104,7 @@ pub async fn wip_pull(
     };
     for (card_id, version) in selected {
         let request = InvokeRequest {
+            credential_alias: None,
             action: "cards.move".to_owned(),
             input: json!({
                 "id": card_id,
@@ -484,6 +485,7 @@ fn service_request(
     idempotency_key: String,
 ) -> InvokeRequest {
     InvokeRequest {
+        credential_alias: None,
         action: action.to_owned(),
         input,
         precondition: None,

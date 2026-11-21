@@ -139,6 +139,7 @@ pub async fn run_case(
         registry(),
         tenant,
         InvokeRequest {
+            credential_alias: None,
             action: eval.entry_action.clone(),
             input: request.clone(),
             precondition: None,
@@ -916,6 +917,7 @@ async fn invoke_judge(
         registry(),
         tenant,
         InvokeRequest {
+            credential_alias: None,
             action: "completions.create".to_owned(),
             input: request,
             precondition: None,

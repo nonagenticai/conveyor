@@ -787,6 +787,7 @@ async fn invoke_and_record(
     }
 
     let request = InvokeRequest {
+        credential_alias: None,
         action: row.action.clone(),
         input: row.input.clone(),
         // The precondition is the input's reserved `_version` member; `invoke` strips it itself
@@ -1197,6 +1198,7 @@ async fn laya_verdict(
     threshold: Option<f64>,
 ) -> Result<JudgeCall, StepFailure> {
     let request = InvokeRequest {
+        credential_alias: None,
         action: "laya.judge".to_owned(),
         input: judge::request(None, output, acceptance_criteria, Some(&row.input)),
         precondition: None,

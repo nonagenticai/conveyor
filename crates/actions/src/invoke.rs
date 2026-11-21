@@ -179,6 +179,13 @@ pub struct InvokeRequest {
     /// Who made a model call and what it belongs to (S16). Captured only when the action
     /// declares `captures_usage`; every other action passes `None`.
     pub usage: Option<UsageContext>,
+    /// The binding's sealed credential alias, when a broker call supplied one (#526).
+    ///
+    /// The broker sets this from `tool_binding.credential_alias`; **no transport may** — an
+    /// HTTP or MCP caller cannot name a secret the tenant's grant did not bind. When present,
+    /// `invoke_external` opens THIS sealed tenant secret and sends it as the bearer instead
+    /// of the destination action's own compiled-in `auth` name.
+    pub credential_alias: Option<String>,
 }
 
 /// Who made a model call and what it belongs to (S16).
@@ -1333,9 +1340,13 @@ async fn invoke_external(
     let url = format!("{}{}", base.trim_end_matches('/'), path);
 
     // A per-tenant credential is opened under the caller's tenant, never compiled in and never
-    // read from the environment. A missing secret is a typed 503 (the caller treats an
-    // unreachable/unconfigured judge as an outage, never as a decision).
-    let bearer: Option<String> = match auth {
+    // read from the environment. The broker's binding alias wins over the action's own
+    // configured name: the alias is the credential the grant resolved, so the destination sees
+    // the binding's credential, not the tool's tenant-wide default. Without an alias, the
+    // spec's `auth` name is read exactly as before. A missing secret is a typed 503 (the caller
+    // treats an unreachable/unconfigured judge as an outage, never as a decision).
+    let secret_name = request.credential_alias.as_deref().or(auth);
+    let bearer: Option<String> = match secret_name {
         None => None,
         Some(name) => {
             let mut tx = store::begin_scoped(pool, ctx.tenant)
@@ -1347,7 +1358,12 @@ async fn invoke_external(
                 Ok(bytes) => bearer_from_secret(bytes),
                 Err(store::secret::SecretError::NotFound) => None,
                 Err(error) => {
-                    tracing::warn!(%error, action = spec.name, "open the action's secret");
+                    tracing::warn!(
+                        %error,
+                        action = spec.name,
+                        secret = name,
+                        "open the action's credential"
+                    );
                     None
                 }
             };

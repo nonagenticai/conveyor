@@ -22,6 +22,7 @@ use uuid::Uuid;
 /// authenticated principal; a test sets it explicitly to prove the handler's own check.
 fn request(action: &str, input: Value, actor_kind: &str, actor_id: Uuid) -> InvokeRequest {
     InvokeRequest {
+        credential_alias: None,
         action: action.to_owned(),
         input,
         precondition: None,

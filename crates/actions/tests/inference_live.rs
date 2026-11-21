@@ -61,6 +61,7 @@ async fn one_real_call_through_the_router_writes_one_ledger_row_with_a_served_mo
     tx.commit().await.expect("commit the sealed token");
 
     let request = InvokeRequest {
+        credential_alias: None,
         action: "completions.create".to_owned(),
         input: json!({
             "model": MODEL,

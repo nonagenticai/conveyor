@@ -28,7 +28,9 @@ static SERIAL: tokio::sync::Mutex<()> = tokio::sync::Mutex::const_new(());
 ///
 /// `support::Stub` counts only the routes its breaker test needs; the broker's instrument is
 /// "did ANY request reach the destination", so this stub counts every request it answers. It
-/// returns the path, which is how a test tells the services apart.
+/// returns the path, which is how a test tells the services apart, and echoes the caller's
+/// `Authorization` header, which is how a credential test tells WHICH sealed secret the engine
+/// opened.
 struct Stub {
     base: String,
     hits: Arc<AtomicUsize>,
@@ -37,21 +39,24 @@ struct Stub {
 #[derive(Clone)]
 struct StubState {
     hits: Arc<AtomicUsize>,
-    /// The answer every request gets; `None` is the path echo the refusal tests rely on.
+    /// The answer every request gets; `None` is the path-and-authorization echo the refusal
+    /// and credential tests rely on.
     reply: Option<Value>,
 }
 
 async fn answer(
     axum::extract::State(state): axum::extract::State<StubState>,
     uri: axum::http::Uri,
+    headers: axum::http::HeaderMap,
 ) -> axum::Json<Value> {
     state.hits.fetch_add(1, Ordering::SeqCst);
-    axum::Json(
-        state
-            .reply
-            .clone()
-            .unwrap_or_else(|| json!({"stub": true, "path": uri.path()})),
-    )
+    let authorization = headers
+        .get(axum::http::header::AUTHORIZATION)
+        .and_then(|value| value.to_str().ok())
+        .map(str::to_owned);
+    axum::Json(state.reply.clone().unwrap_or_else(
+        || json!({"stub": true, "path": uri.path(), "authorization": authorization}),
+    ))
 }
 
 impl Stub {
@@ -252,6 +257,60 @@ impl Fixture {
         tx.commit().await.expect("commit the idempotency policy");
     }
 
+    /// Declare the binding's sealed credential alias (§11.8). The fixture inserts the binding
+    /// with no alias — the state the credential-required refusal tests — so a test that wants a
+    /// credentialed destination names the tenant secret here.
+    async fn set_credential_alias(&self, alias: Option<&str>) {
+        let mut tx = begin_scoped(&self.pg.owner, self.tenant)
+            .await
+            .expect("a scoped write");
+        sqlx::query(
+            "UPDATE tool_binding SET credential_alias = $2, updated_at = now()
+              WHERE tenant_id = $1",
+        )
+        .bind(self.tenant.as_uuid())
+        .bind(alias)
+        .execute(&mut *tx)
+        .await
+        .expect("set the binding's credential alias");
+        tx.commit().await.expect("commit the credential alias");
+    }
+
+    /// Declare the toolkit's auth adapter (§11.8). The fixture seeds `none` — a destination that
+    /// needs no tenant credential; `bearer` marks one that a binding must credential.
+    async fn set_auth_adapter(&self, adapter: &str) {
+        let mut tx = begin_scoped(&self.pg.owner, self.tenant)
+            .await
+            .expect("a scoped write");
+        sqlx::query(
+            "UPDATE toolkit SET auth_adapter = $2, updated_at = now() WHERE tenant_id = $1",
+        )
+        .bind(self.tenant.as_uuid())
+        .bind(adapter)
+        .execute(&mut *tx)
+        .await
+        .expect("set the toolkit's auth adapter");
+        tx.commit().await.expect("commit the auth adapter");
+    }
+
+    /// Seal one tenant secret, exactly as a tenant's BYO credential is written. Two named
+    /// secrets let a test prove WHICH one the engine opened.
+    async fn seal_secret(&self, name: &str, value: &str) {
+        let mut tx = begin_scoped(&self.pg.runtime, self.tenant)
+            .await
+            .expect("a scoped secret write");
+        conveyor_store::secret::create_secret_tx(
+            &mut tx,
+            self.tenant,
+            name,
+            value.as_bytes(),
+            "tenant",
+        )
+        .await
+        .expect("seal the tenant secret");
+        tx.commit().await.expect("commit the sealed secret");
+    }
+
     async fn ledger(&self) -> Vec<tool::ToolCallRow> {
         let mut tx = begin_scoped(&self.pg.owner, self.tenant)
             .await
@@ -308,8 +367,9 @@ async fn seed_tool(
         .await
         .expect("a scoped write");
     let toolkit_id: Uuid = sqlx::query_scalar(
-        "INSERT INTO toolkit (tenant_id, key, toolkit_version, title, service, owner, status)
-         VALUES ($1, $2, 1, $3, $4, 'platform', 'published') RETURNING id",
+        "INSERT INTO toolkit (tenant_id, key, toolkit_version, title, service, auth_adapter,
+                              owner, status)
+         VALUES ($1, $2, 1, $3, $4, 'none', 'platform', 'published') RETURNING id",
     )
     .bind(tenant.as_uuid())
     .bind(toolkit_key)
@@ -892,6 +952,93 @@ async fn a_required_key_is_forwarded_and_replays() {
         fixture.stub.hits(),
         1,
         "a replay must not make a second destination call"
+    );
+
+    fixture.running.shutdown().await;
+}
+
+// ── v1-w4a-4 — the binding's sealed credential (SPEC_V2 §11.3) ──────────────────────────
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_call_uses_the_bindings_sealed_credential() {
+    let _serial = SERIAL.lock().await;
+    let fixture = Fixture::new(
+        "coding",
+        "jobs.create",
+        "coding_jobs.create",
+        "write",
+        "write",
+        coding_schema(),
+    )
+    .await;
+    fixture.set_credential_alias(Some("svc.binding")).await;
+    // Two sealed secrets: the binding names one, and the other is the tenant-wide value a
+    // broken resolution would send instead.
+    fixture.seal_secret("svc.default", "default-token").await;
+    fixture.seal_secret("svc.binding", "binding-token").await;
+
+    let (status, body) = fixture
+        .call(
+            "coding.jobs.create",
+            json!({"kind": "test", "input": {"files": []}}),
+        )
+        .await;
+
+    assert_eq!(status, 200, "a credentialed binding is admitted: {body}");
+    assert_eq!(
+        body["output"]["authorization"], "Bearer binding-token",
+        "the destination must receive the binding's sealed credential: {body}"
+    );
+    assert_ne!(
+        body["output"]["authorization"], "Bearer default-token",
+        "the tool's tenant-wide secret must not be sent instead: {body}"
+    );
+    assert_eq!(fixture.stub.hits(), 1, "exactly one destination call");
+
+    fixture.running.shutdown().await;
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_binding_without_a_credential_cannot_call_a_credentialed_toolkit() {
+    let _serial = SERIAL.lock().await;
+    let fixture = Fixture::new(
+        "coding",
+        "jobs.create",
+        "coding_jobs.create",
+        "write",
+        "write",
+        coding_schema(),
+    )
+    .await;
+    // The toolkit requires a credential; the binding (as seeded) carries no alias.
+    fixture.set_auth_adapter("bearer").await;
+    let before = fixture.stub.hits();
+
+    let (status, body) = fixture
+        .call(
+            "coding.jobs.create",
+            json!({"kind": "test", "input": {"files": []}}),
+        )
+        .await;
+
+    assert_eq!(
+        status, 409,
+        "a binding with no credential is not ready: {body}"
+    );
+    assert_eq!(body["type"], "tool_not_ready", "{body}");
+    let detail = body["detail"].as_str().unwrap_or_default();
+    assert!(
+        detail.contains("credential_alias"),
+        "the refusal names the missing binding field: {body}"
+    );
+    assert_eq!(
+        fixture.stub.hits(),
+        before,
+        "a refused binding must make zero destination calls"
+    );
+    assert!(
+        fixture.ledger().await.is_empty(),
+        "a refusal before dispatch writes no tool_call row"
     );
 
     fixture.running.shutdown().await;

@@ -77,6 +77,7 @@ async fn a_real_external_call_records_the_router_usage_field_for_field() {
     let run_id = Uuid::now_v7();
     let step_id = Uuid::now_v7();
     let request = InvokeRequest {
+        credential_alias: None,
         action: "completions.create".to_owned(),
         input: json!({
             "model": "alias-model",
@@ -189,6 +190,7 @@ async fn a_call_without_a_usage_context_writes_no_row() {
     // The same action, invoked without a usage context (an ordinary HTTP call): the engine
     // captures only what the caller named.
     let request = InvokeRequest {
+        credential_alias: None,
         action: "completions.create".to_owned(),
         input: json!({"messages": [{"role": "user", "content": "hello"}]}),
         precondition: None,
@@ -268,6 +270,7 @@ async fn a_capture_failure_keeps_the_call_and_never_retries_the_paid_request() {
         .expect("break only the ledger");
 
     let request = InvokeRequest {
+        credential_alias: None,
         action: "completions.create".to_owned(),
         input: json!({
             "model": "alias-model",

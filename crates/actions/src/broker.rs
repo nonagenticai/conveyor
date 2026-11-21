@@ -269,6 +269,20 @@ pub(crate) async fn invoke_broker(
             )
         })?;
 
+    // A destination whose toolkit declares an auth adapter other than `none` needs a tenant
+    // credential, and the binding is where that credential is named. A binding with no
+    // `credential_alias` cannot call it: the destination would otherwise receive the target
+    // action's own tenant-wide secret (or none at all), which is exactly the credential leak
+    // this refusal prevents. Typed `409` before any network call, like every other unready
+    // binding (§11.3 step 1).
+    if tool.credential_alias.is_none() && tool.auth_adapter != "none" {
+        return Err(not_ready(format!(
+            "{} requires a sealed credential (auth adapter {:?}) and this binding carries no \
+             credential_alias: set tool_binding.credential_alias to the tenant secret's name",
+            call.tool, tool.auth_adapter
+        )));
+    }
+
     let effect = Effect::parse(&tool.effect).ok_or_else(|| {
         tracing::error!(tool = %call.tool, effect = %tool.effect, "broker: unknown effect class");
         ActionError::new(
@@ -420,6 +434,9 @@ pub(crate) async fn invoke_broker(
         depth: request.depth + 1,
         app_key: ctx.app_key.clone(),
         usage,
+        // The binding's sealed credential alias — the one thing the target action must use
+        // instead of its own tenant-wide secret (§11.3).
+        credential_alias: tool.credential_alias.clone(),
     };
 
     let started = Instant::now();

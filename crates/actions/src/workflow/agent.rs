@@ -633,6 +633,7 @@ pub(crate) async fn drive(
                     registry(),
                     tenant,
                     InvokeRequest {
+                        credential_alias: None,
                         action: MODEL_ACTION.to_owned(),
                         input,
                         precondition: None,
@@ -685,6 +686,7 @@ pub(crate) async fn drive(
                         registry(),
                         tenant,
                         InvokeRequest {
+                            credential_alias: None,
                             action: call.name.clone(),
                             input: call.arguments.clone(),
                             precondition: None,

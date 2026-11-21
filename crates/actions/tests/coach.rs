@@ -1224,6 +1224,7 @@ async fn an_agent_principal_cannot_remedy_but_a_person_can() {
     // `coach.remedy` is not in that channel's compiled allowlist, so the existing boundary
     // refuses it — no second authorization path.
     let request = conveyor_actions::InvokeRequest {
+        credential_alias: None,
         action: "coach.remedy".to_owned(),
         input: json!({"interruption_id": interruption}),
         precondition: None,

@@ -121,6 +121,7 @@ impl Fixture {
     /// A direct invocation of one action (not through `tools.call`), attributed to the run.
     fn direct_request(&self, action: &str, input: Value) -> InvokeRequest {
         InvokeRequest {
+            credential_alias: None,
             action: action.to_owned(),
             input,
             precondition: None,
@@ -546,8 +547,9 @@ async fn seed_tool(
         .await
         .expect("scope the tool fixture");
     let toolkit_id: Uuid = sqlx::query_scalar(
-        "INSERT INTO toolkit (tenant_id, key, toolkit_version, title, service, owner, status)
-         VALUES ($1, $2, 1, $3, $4, 'platform', 'published') RETURNING id",
+        "INSERT INTO toolkit (tenant_id, key, toolkit_version, title, service, auth_adapter,
+                              owner, status)
+         VALUES ($1, $2, 1, $3, $4, 'none', 'platform', 'published') RETURNING id",
     )
     .bind(tenant.as_uuid())
     .bind(toolkit_key)

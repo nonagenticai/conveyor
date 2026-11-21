@@ -73,6 +73,9 @@ pub struct ResolvedTool {
     pub effect_ceiling: String,
     /// The sealed credential alias the broker resolves (never shown to a job).
     pub credential_alias: Option<String>,
+    /// The toolkit's auth adapter (`bearer | none | sealed-profile`). The broker refuses a
+    /// binding with no `credential_alias` against a toolkit whose adapter is not `none`.
+    pub auth_adapter: String,
 }
 
 /// Read the run a broker call is made for.
@@ -124,7 +127,8 @@ pub async fn step_belongs_to_run(
 
 const RESOLVED_COLUMNS: &str = "t.id AS tool_id, k.id AS toolkit_id, k.key AS toolkit_key, \
      k.toolkit_version, t.key AS tool_key, t.input_schema, t.effect, t.idempotency, \
-     t.timeout_secs, t.redact, t.handler_action, t.verify, b.effect_ceiling, b.credential_alias";
+     t.timeout_secs, t.redact, t.handler_action, t.verify, b.effect_ceiling, b.credential_alias, \
+     k.auth_adapter";
 
 #[derive(sqlx::FromRow)]
 struct ResolvedRow {
@@ -142,6 +146,7 @@ struct ResolvedRow {
     verify: Value,
     effect_ceiling: String,
     credential_alias: Option<String>,
+    auth_adapter: String,
 }
 
 impl From<ResolvedRow> for ResolvedTool {
@@ -161,6 +166,7 @@ impl From<ResolvedRow> for ResolvedTool {
             verify: row.verify,
             effect_ceiling: row.effect_ceiling,
             credential_alias: row.credential_alias,
+            auth_adapter: row.auth_adapter,
         }
     }
 }

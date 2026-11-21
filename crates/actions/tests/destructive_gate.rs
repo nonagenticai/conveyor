@@ -23,6 +23,7 @@ use conveyor_store as store;
 /// A request as an admin caller (the only role that holds `ops:write`).
 fn request(action: &str, input: Value, approval_id: Option<Uuid>) -> InvokeRequest {
     InvokeRequest {
+        credential_alias: None,
         action: action.to_owned(),
         input,
         precondition: None,
