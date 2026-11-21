@@ -66,17 +66,17 @@
     {
       "number": 511,
       "title": "programme: the standard corrected and the authority record repaired",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/511",
-      "updatedAt": "2026-11-20T19:26:40Z",
+      "updatedAt": "2026-11-21T00:38:26Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:blocked",
-          "color": "D93F0B"
+          "name": "status:claimed",
+          "color": "FBCA04"
         },
         {
           "name": "programme",
@@ -469,7 +469,7 @@
       "title": "conveyor-buildout \u2014 the SPEC_V2 programme",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/435",
-      "updatedAt": "2026-11-20T21:24:09Z",
+      "updatedAt": "2026-11-20T22:44:32Z",
       "labels": [
         {
           "name": "programme",
@@ -499,7 +499,7 @@
       "title": "publish: the programme's delivery record \u2014 programme.json, CSV and one tracked issue",
       "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/433",
-      "updatedAt": "2026-11-20T21:56:03Z",
+      "updatedAt": "2026-11-20T22:54:19Z",
       "labels": [
         {
           "name": "unit",
