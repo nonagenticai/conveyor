@@ -115,12 +115,15 @@ def check(content: dict, template_standard: dict, snapshot_ids: set[str],
         expect(not missing, f"{key} is missing required sections: {', '.join(missing)}")
 
     if closes:
-        expect(isinstance(content.get("closure"), str) and len(content["closure"]) > 100,
+        closure = content.get("closure")
+        closure_review = content.get("closure_review")
+        expect(isinstance(closure, str) and len(closure) > 100,
                "closure must be a markdown string of substance")
-        expect(isinstance(content.get("closure_review"), str) and len(content["closure_review"]) > 100,
+        expect(isinstance(closure_review, str) and len(closure_review) > 100,
                "closure_review must be a markdown string of substance")
         required = (templates.get("closure-review") or {}).get("required") or []
-        missing = [name for name in required if name not in headings(content["closure_review"])]
+        body = closure_review if isinstance(closure_review, str) else ""
+        missing = [name for name in required if name not in headings(body)]
         expect(not missing, f"closure_review is missing required sections: {', '.join(missing)}")
     else:
         expect("closure" not in content and "closure_review" not in content,
@@ -204,6 +207,16 @@ def self_test() -> None:
     del active["closure"], active["closure_review"]
     if check(active, standard, ids, wsjf, False):
         raise SystemExit("self-test: an active project without closure keys failed")
+
+    # Closes said true but the content was authored for an active project: this must be a
+    # reported refusal, not a KeyError from the closure-review heading check.
+    closing_without_keys = json.loads(json.dumps(active))
+    problems = check(closing_without_keys, standard, ids, wsjf, True)
+    for needle in ("closure must be", "closure_review must be"):
+        if not any(needle in problem for problem in problems):
+            raise SystemExit(
+                f"self-test: a closing content without {needle!r} did not refuse cleanly: {problems}"
+            )
     print("rework-content-check: self-test ok")
 
 

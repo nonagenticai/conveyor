@@ -3,8 +3,8 @@
     {
       "allowed": false,
       "check": "project",
-      "description": "S02 is active \u2014 its open issue #2 forbids a closure",
-      "detail": "project S02 is active",
+      "description": "S02 is closed on the P2 proof at the named SHA",
+      "detail": "project S02 is closed",
       "id": "S02-project",
       "kind": "snapshot",
       "result": "pass",
@@ -14,10 +14,10 @@
       "allowed": false,
       "check": "project_baseline",
       "description": "the scope baseline is approved; the close gate reads the approved row",
-      "detail": "no project baseline",
+      "detail": "1 project baseline(s); 1 approved",
       "id": "S02-baseline",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
@@ -25,43 +25,43 @@
       "check": null,
       "command": "python3 scripts/programme-record.py --check --action pm.get --input '{\"project_id\":\"01a1d039-0d27-7b45-abb5-bf851a4c3d4a\"}' | python3 -c '\nimport json,sys\ns=sys.stdin.read()\nd=json.loads(s[s.find(\"{\"):])\no=d.get(\"output\",d)\nassert o.get(\"charter_asset_id\"), \"no charter asset\"\ngates={g.get(\"gate\"):g.get(\"status\") for g in o.get(\"gates\",[])}\nassert gates.get(\"charter\")==\"approved\", gates\n'\n",
       "description": "the charter asset exists and the charter gate is approved",
-      "detail": "exit 1: Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset",
-      "exit": 1,
+      "detail": "exit 0",
+      "exit": 0,
       "id": "S02-charter",
       "kind": "command",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0",
-      "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset\n",
+      "stderr": "",
       "stdout": ""
     },
     {
       "allowed": false,
       "check": "closure_outputs",
-      "description": "an active project declares no closure outputs",
-      "detail": "no closure outputs declared (allowed for this row)",
+      "description": "the declared closure outputs are declared and published",
+      "detail": "1 closure outputs published",
       "id": "S02-closure-outputs",
       "kind": "snapshot",
       "result": "pass",
-      "severity": "P1"
+      "severity": "P0"
     },
     {
       "allowed": false,
       "check": "contract",
       "description": "a live board-approved delivery contract exists",
-      "detail": "no live board-approved delivery contract",
+      "detail": "contract 01a1ff84-4425-75d9-8772-08e09cf71069 approved by 01a1e8a7-8b23-76a9-9114-aafb95f7a545, requested by 01a1e607-17d9-77d3-98d3-a43a87c4633d",
       "id": "S02-contract",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
       "allowed": false,
       "check": "review",
       "description": "the Phase-G review cites a published standing delegation",
-      "detail": "no Phase-G compliance review for the project's contract",
+      "detail": "review 01a1ff87-19a4-783f-85c5-033d5f38cedf cites the published delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
       "id": "S02-review",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
@@ -108,54 +108,46 @@
       "allowed": false,
       "check": "wsjf",
       "description": "every WBS deliverable of the project carries the four typed WSJF inputs",
-      "detail": "no WBS deliverable carries the plan",
+      "detail": "1 WBS node(s) carry the four WSJF inputs",
       "id": "S02-wsjf",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
       "allowed": false,
       "check": "demo_credits",
       "description": "every accepted deliverable has a demo credit carrying its evidence",
-      "detail": "no accepted deliverable to demo",
+      "detail": "1 accepted deliverable(s), each with a demo credit",
       "id": "S02-demo-credits",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
       "allowed": false,
       "check": "lessons",
       "description": "the tranche-1 retro produced at least one lesson",
-      "detail": "the tranche-1 retro produced no lesson",
+      "detail": "5 lesson(s) from the tranche-1 retro",
       "id": "S02-lessons",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P1"
     }
   ],
-  "failures": [
-    "S02-baseline (P0): no project baseline",
-    "S02-charter (P0): exit 1: Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n    assert o.get(\"charter_asset_id\"), \"no charter asset\"\n           ~~~~~^^^^^^^^^^^^^^^^^^^^\nAssertionError: no charter asset",
-    "S02-contract (P0): no live board-approved delivery contract",
-    "S02-review (P0): no Phase-G compliance review for the project's contract",
-    "S02-wsjf (P0): no WBS deliverable carries the plan",
-    "S02-demo-credits (P0): no accepted deliverable to demo",
-    "S02-lessons (P1): the tranche-1 retro produced no lesson"
-  ],
-  "gate": "The A\u2013D artefacts and the delivery contract exist, the project brief and evidence are published, and the project stays ACTIVE because issue #2 is open.",
-  "generated_at": "2026-11-21T18:57:14.223372+00:00",
+  "failures": [],
+  "gate": "The A\u2013D artefacts and the delivery contract exist, the brief and the evidence are published, the P2 long-job proof is landed, and the project closes through the one gate.",
+  "generated_at": "2026-11-21T19:48:29.905356+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/S02.toml",
   "name": "Skeleton \u2014 workspace, tenancy, auth, jobs, SSE",
   "project": "S02",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-21T18:56:47.894285+00:00",
-    "git_sha": "ede4ceb594b4c43298cc657fbb943e5450783ceb",
-    "path": "retained-snapshot/ede4ceb594b4c43298cc657fbb943e5450783ceb"
+    "generated_at": "2026-11-21T19:48:06.428670+00:00",
+    "git_sha": "d367a4a992ca5338c82466e9d6ef308e62b01ba6",
+    "path": "retained-snapshot/d367a4a992ca5338c82466e9d6ef308e62b01ba6"
   },
-  "verdict": "red",
+  "verdict": "green",
   "warnings": []
 }

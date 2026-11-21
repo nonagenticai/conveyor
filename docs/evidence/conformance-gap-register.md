@@ -1,26 +1,23 @@
 # MSP/TOGAF conformance gap register
 
-Snapshot: `ede4ceb594b4c43298cc657fbb943e5450783ceb` generated `2026-11-21T18:50:29.096406+00:00` from `/tmp/snap-baseline/data`.
+Snapshot: `d367a4a992ca5338c82466e9d6ef308e62b01ba6` generated `2026-11-21T19:48:06.428670+00:00` from `/tmp/snap-u5b5/data`.
 
 | Severity | Count |
 |---|---:|
-| P0 | 30 |
-| P1 | 166 |
-| P2 | 2 |
+| P0 | 27 |
+| P1 | 155 |
+| P2 | 3 |
 | P3 | 0 |
 
 ## P0 and P1
 
 | Rule | Subject | Severity | Detail |
 |---|---|---|---|
-| `closed_without_closure_review` | `T1` | P0 | project is closed but its closure review is not published |
-| `closed_without_closure_review` | `T11` | P0 | project is closed but its closure review is not published |
 | `closed_without_closure_review` | `T14` | P0 | project is closed but its closure review is not published |
 | `closed_without_closure_review` | `T16` | P0 | project is closed but its closure review is not published |
 | `closed_without_closure_review` | `T2` | P0 | project is closed but its closure review is not published |
 | `closed_without_closure_review` | `T3` | P0 | project is closed but its closure review is not published |
 | `closed_without_closure_review` | `T7` | P0 | project is closed but its closure review is not published |
-| `pi_plan_missing` | `tranche 1 PI` | P0 | the PI carried by an authorised tranche has no published pi-plan output |
 | `project_in_unauthorised_tranche` | `S03` | P0 | project is closed in tranche 2 whose state is 'planned' |
 | `project_in_unauthorised_tranche` | `S05` | P0 | project is closed in tranche 4 whose state is 'planned' |
 | `project_in_unauthorised_tranche` | `S06b` | P0 | project is closed in tranche 6 whose state is 'planned' |
@@ -43,7 +40,6 @@ Snapshot: `ede4ceb594b4c43298cc657fbb943e5450783ceb` generated `2026-11-21T18:50
 | `project_in_unauthorised_tranche` | `T4` | P0 | project is closed in tranche 4 whose state is 'planned' |
 | `project_in_unauthorised_tranche` | `T7` | P0 | project is closed in tranche 5 whose state is 'planned' |
 | `project_in_unauthorised_tranche` | `T9` | P0 | project is closed in tranche 4 whose state is 'planned' |
-| `backlog_refinement_missing` | `tranche 1` | P1 | the tranche has no refinement cadence for its period |
 | `backlog_refinement_missing` | `tranche 10` | P1 | the tranche has no refinement cadence for its period |
 | `backlog_refinement_missing` | `tranche 11` | P1 | the tranche has no refinement cadence for its period |
 | `backlog_refinement_missing` | `tranche 12` | P1 | the tranche has no refinement cadence for its period |
@@ -89,9 +85,7 @@ Snapshot: `ede4ceb594b4c43298cc657fbb943e5450783ceb` generated `2026-11-21T18:50
 | `closure_outputs_undeclared` | `S12` | P1 | project is closed but declares no closure_outputs |
 | `closure_outputs_undeclared` | `S13` | P1 | project is closed but declares no closure_outputs |
 | `closure_outputs_undeclared` | `S16` | P1 | project is closed but declares no closure_outputs |
-| `contract_missing` | `T1` | P1 | delivery project has no live architecture contract |
 | `contract_missing` | `T10` | P1 | delivery project has no live architecture contract |
-| `contract_missing` | `T11` | P1 | delivery project has no live architecture contract |
 | `contract_missing` | `T12` | P1 | delivery project has no live architecture contract |
 | `contract_missing` | `T13` | P1 | delivery project has no live architecture contract |
 | `contract_missing` | `T14` | P1 | delivery project has no live architecture contract |
@@ -105,7 +99,6 @@ Snapshot: `ede4ceb594b4c43298cc657fbb943e5450783ceb` generated `2026-11-21T18:50
 | `contract_missing` | `T6` | P1 | delivery project has no live architecture contract |
 | `contract_missing` | `T7` | P1 | delivery project has no live architecture contract |
 | `contract_missing` | `T8` | P1 | delivery project has no live architecture contract |
-| `mandatory_artefacts` | `S02` | P1 | missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, requirements_catalog, solution_concept, stakeholder_map, technology_standards |
 | `mandatory_artefacts` | `S03` | P1 | missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, requirements_catalog, solution_concept, stakeholder_map, technology_standards |
 | `mandatory_artefacts` | `S04` | P1 | missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, requirements_catalog, solution_concept, stakeholder_map, technology_standards |
 | `mandatory_artefacts` | `S05` | P1 | missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, requirements_catalog, solution_concept, stakeholder_map, technology_standards |
@@ -128,9 +121,7 @@ Snapshot: `ede4ceb594b4c43298cc657fbb943e5450783ceb` generated `2026-11-21T18:50
 | `mandatory_artefacts` | `S19` | P1 | missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, requirements_catalog, solution_concept, stakeholder_map, technology_standards |
 | `mandatory_artefacts` | `S20` | P1 | missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, requirements_catalog, solution_concept, stakeholder_map, technology_standards |
 | `mandatory_artefacts` | `S21` | P1 | missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, requirements_catalog, solution_concept, stakeholder_map, technology_standards |
-| `mandatory_artefacts` | `T1` | P1 | missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, requirements_catalog, solution_concept, stakeholder_map, technology_standards |
 | `mandatory_artefacts` | `T10` | P1 | missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, requirements_catalog, solution_concept, stakeholder_map, technology_standards |
-| `mandatory_artefacts` | `T11` | P1 | missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, requirements_catalog, solution_concept, stakeholder_map, technology_standards |
 | `mandatory_artefacts` | `T12` | P1 | missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, requirements_catalog, solution_concept, stakeholder_map, technology_standards |
 | `mandatory_artefacts` | `T13` | P1 | missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, requirements_catalog, solution_concept, stakeholder_map, technology_standards |
 | `mandatory_artefacts` | `T14` | P1 | missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, requirements_catalog, solution_concept, stakeholder_map, technology_standards |
@@ -145,7 +136,6 @@ Snapshot: `ede4ceb594b4c43298cc657fbb943e5450783ceb` generated `2026-11-21T18:50
 | `mandatory_artefacts` | `T7` | P1 | missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, requirements_catalog, solution_concept, stakeholder_map, technology_standards |
 | `mandatory_artefacts` | `T8` | P1 | missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, requirements_catalog, solution_concept, stakeholder_map, technology_standards |
 | `mandatory_artefacts` | `T9` | P1 | missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, requirements_catalog, solution_concept, stakeholder_map, technology_standards |
-| `pi_cadence_missing` | `tranche 1` | P1 | the tranche carries projects but has no PI cadence for its period |
 | `pi_cadence_missing` | `tranche 10` | P1 | the tranche carries projects but has no PI cadence for its period |
 | `pi_cadence_missing` | `tranche 11` | P1 | the tranche carries projects but has no PI cadence for its period |
 | `pi_cadence_missing` | `tranche 12` | P1 | the tranche carries projects but has no PI cadence for its period |
@@ -158,7 +148,6 @@ Snapshot: `ede4ceb594b4c43298cc657fbb943e5450783ceb` generated `2026-11-21T18:50
 | `pi_cadence_missing` | `tranche 7` | P1 | the tranche carries projects but has no PI cadence for its period |
 | `pi_cadence_missing` | `tranche 8` | P1 | the tranche carries projects but has no PI cadence for its period |
 | `pi_cadence_missing` | `tranche 9` | P1 | the tranche carries projects but has no PI cadence for its period |
-| `pi_objectives_missing` | `tranche 1 PI` | P1 | the PI carried by an authorised tranche has no published pi-objectives output |
 | `project_in_unauthorised_tranche` | `S04` | P1 | project is active in tranche 3 whose state is 'planned' |
 | `project_in_unauthorised_tranche` | `S06` | P1 | project is active in tranche 5 whose state is 'planned' |
 | `project_in_unauthorised_tranche` | `S14` | P1 | project is active in tranche 11 whose state is 'planned' |
@@ -174,7 +163,6 @@ Snapshot: `ede4ceb594b4c43298cc657fbb943e5450783ceb` generated `2026-11-21T18:50
 | `project_in_unauthorised_tranche` | `T5` | P1 | project is active in tranche 10 whose state is 'planned' |
 | `project_in_unauthorised_tranche` | `T6` | P1 | project is active in tranche 11 whose state is 'planned' |
 | `project_in_unauthorised_tranche` | `T8` | P1 | project is active in tranche 11 whose state is 'planned' |
-| `unpublished_declared_output` | `S02` | P1 | declared outputs are not published: project-brief |
 | `unpublished_declared_output` | `S03` | P1 | declared outputs are not published: project-brief |
 | `unpublished_declared_output` | `S04` | P1 | declared outputs are not published: project-brief |
 | `unpublished_declared_output` | `S05` | P1 | declared outputs are not published: project-brief |
@@ -197,9 +185,7 @@ Snapshot: `ede4ceb594b4c43298cc657fbb943e5450783ceb` generated `2026-11-21T18:50
 | `unpublished_declared_output` | `S19` | P1 | declared outputs are not published: project-brief |
 | `unpublished_declared_output` | `S20` | P1 | declared outputs are not published: project-brief |
 | `unpublished_declared_output` | `S21` | P1 | declared outputs are not published: project-brief |
-| `unpublished_declared_output` | `T1` | P1 | declared outputs are not published: closure-review, evidence, project-brief |
 | `unpublished_declared_output` | `T10` | P1 | declared outputs are not published: project-brief |
-| `unpublished_declared_output` | `T11` | P1 | declared outputs are not published: closure-review, evidence, project-brief |
 | `unpublished_declared_output` | `T13` | P1 | declared outputs are not published: project-brief |
 | `unpublished_declared_output` | `T14` | P1 | declared outputs are not published: closure-review, evidence, project-brief |
 | `unpublished_declared_output` | `T16` | P1 | declared outputs are not published: closure-review, evidence, project-brief |
@@ -219,7 +205,7 @@ Snapshot: `ede4ceb594b4c43298cc657fbb943e5450783ceb` generated `2026-11-21T18:50
 | PLATFORM | active | 0 | 0 | 0 | 0 | 0 |
 | S00 | closed | 0 | 0 | 0 | 0 | 0 |
 | S01 | closed | 0 | 0 | 0 | 0 | 0 |
-| S02 | active | 1 | 0 | 2 | 0 | 0 |
+| S02 | closed | 1 | 0 | 0 | 1 | 0 |
 | S03 | closed | 2 | 1 | 4 | 0 | 0 |
 | S04 | active | 3 | 0 | 3 | 0 | 0 |
 | S05 | closed | 4 | 1 | 4 | 0 | 0 |
@@ -245,9 +231,9 @@ Snapshot: `ede4ceb594b4c43298cc657fbb943e5450783ceb` generated `2026-11-21T18:50
 | S21 | active | 9 | 0 | 3 | 0 | 0 |
 | SPEC-V2 | closed | 0 | 0 | 0 | 0 | 0 |
 | T0 | closed | 0 | 0 | 0 | 0 | 0 |
-| T1 | closed | 1 | 1 | 3 | 0 | 0 |
+| T1 | closed | 1 | 0 | 0 | 0 | 0 |
 | T10 | closed | 4 | 1 | 3 | 0 | 0 |
-| T11 | closed | 1 | 1 | 3 | 0 | 0 |
+| T11 | closed | 1 | 0 | 0 | 0 | 0 |
 | T12 | active | 13 | 0 | 3 | 0 | 0 |
 | T13 | closed | 3 | 1 | 3 | 0 | 0 |
 | T14 | closed | 4 | 2 | 3 | 0 | 0 |

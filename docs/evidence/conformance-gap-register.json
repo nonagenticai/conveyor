@@ -1,27 +1,11 @@
 {
   "counts": {
-    "P0": 30,
-    "P1": 166,
-    "P2": 2,
+    "P0": 27,
+    "P1": 155,
+    "P2": 3,
     "P3": 0
   },
   "gaps": [
-    {
-      "detail": "project is closed but its closure review is not published",
-      "disposition": "rework",
-      "evidence": null,
-      "rule": "closed_without_closure_review",
-      "severity": "P0",
-      "subject": "T1"
-    },
-    {
-      "detail": "project is closed but its closure review is not published",
-      "disposition": "rework",
-      "evidence": null,
-      "rule": "closed_without_closure_review",
-      "severity": "P0",
-      "subject": "T11"
-    },
     {
       "detail": "project is closed but its closure review is not published",
       "disposition": "rework",
@@ -61,14 +45,6 @@
       "rule": "closed_without_closure_review",
       "severity": "P0",
       "subject": "T7"
-    },
-    {
-      "detail": "the PI carried by an authorised tranche has no published pi-plan output",
-      "disposition": "rework",
-      "evidence": null,
-      "rule": "pi_plan_missing",
-      "severity": "P0",
-      "subject": "tranche 1 PI"
     },
     {
       "detail": "project is closed in tranche 2 whose state is 'planned'",
@@ -245,14 +221,6 @@
       "rule": "project_in_unauthorised_tranche",
       "severity": "P0",
       "subject": "T9"
-    },
-    {
-      "detail": "the tranche has no refinement cadence for its period",
-      "disposition": "rework",
-      "evidence": null,
-      "rule": "backlog_refinement_missing",
-      "severity": "P1",
-      "subject": "tranche 1"
     },
     {
       "detail": "the tranche has no refinement cadence for its period",
@@ -620,23 +588,7 @@
       "evidence": null,
       "rule": "contract_missing",
       "severity": "P1",
-      "subject": "T1"
-    },
-    {
-      "detail": "delivery project has no live architecture contract",
-      "disposition": "rework",
-      "evidence": null,
-      "rule": "contract_missing",
-      "severity": "P1",
       "subject": "T10"
-    },
-    {
-      "detail": "delivery project has no live architecture contract",
-      "disposition": "rework",
-      "evidence": null,
-      "rule": "contract_missing",
-      "severity": "P1",
-      "subject": "T11"
     },
     {
       "detail": "delivery project has no live architecture contract",
@@ -741,14 +693,6 @@
       "rule": "contract_missing",
       "severity": "P1",
       "subject": "T8"
-    },
-    {
-      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
-      "disposition": "rework",
-      "evidence": null,
-      "rule": "mandatory_artefacts",
-      "severity": "P1",
-      "subject": "S02"
     },
     {
       "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
@@ -932,23 +876,7 @@
       "evidence": null,
       "rule": "mandatory_artefacts",
       "severity": "P1",
-      "subject": "T1"
-    },
-    {
-      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
-      "disposition": "rework",
-      "evidence": null,
-      "rule": "mandatory_artefacts",
-      "severity": "P1",
       "subject": "T10"
-    },
-    {
-      "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
-      "disposition": "rework",
-      "evidence": null,
-      "rule": "mandatory_artefacts",
-      "severity": "P1",
-      "subject": "T11"
     },
     {
       "detail": "missing approved artefacts: business_capability_map, data_entity_catalog, driver_goal_objective, requirements_catalog, solution_concept, stakeholder_map, technology_standards",
@@ -1068,14 +996,6 @@
       "evidence": null,
       "rule": "pi_cadence_missing",
       "severity": "P1",
-      "subject": "tranche 1"
-    },
-    {
-      "detail": "the tranche carries projects but has no PI cadence for its period",
-      "disposition": "rework",
-      "evidence": null,
-      "rule": "pi_cadence_missing",
-      "severity": "P1",
       "subject": "tranche 10"
     },
     {
@@ -1165,14 +1085,6 @@
       "rule": "pi_cadence_missing",
       "severity": "P1",
       "subject": "tranche 9"
-    },
-    {
-      "detail": "the PI carried by an authorised tranche has no published pi-objectives output",
-      "disposition": "rework",
-      "evidence": null,
-      "rule": "pi_objectives_missing",
-      "severity": "P1",
-      "subject": "tranche 1 PI"
     },
     {
       "detail": "project is active in tranche 3 whose state is 'planned'",
@@ -1300,14 +1212,6 @@
       "evidence": null,
       "rule": "unpublished_declared_output",
       "severity": "P1",
-      "subject": "S02"
-    },
-    {
-      "detail": "declared outputs are not published: project-brief",
-      "disposition": "rework",
-      "evidence": null,
-      "rule": "unpublished_declared_output",
-      "severity": "P1",
       "subject": "S03"
     },
     {
@@ -1479,28 +1383,12 @@
       "subject": "S21"
     },
     {
-      "detail": "declared outputs are not published: closure-review, evidence, project-brief",
-      "disposition": "rework",
-      "evidence": null,
-      "rule": "unpublished_declared_output",
-      "severity": "P1",
-      "subject": "T1"
-    },
-    {
       "detail": "declared outputs are not published: project-brief",
       "disposition": "rework",
       "evidence": null,
       "rule": "unpublished_declared_output",
       "severity": "P1",
       "subject": "T10"
-    },
-    {
-      "detail": "declared outputs are not published: closure-review, evidence, project-brief",
-      "disposition": "rework",
-      "evidence": null,
-      "rule": "unpublished_declared_output",
-      "severity": "P1",
-      "subject": "T11"
     },
     {
       "detail": "declared outputs are not published: project-brief",
@@ -1589,11 +1477,19 @@
       "rule": "project_in_unauthorised_tranche",
       "severity": "P2",
       "subject": "S06a"
+    },
+    {
+      "detail": "seed status 'active' != live status 'closed'",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "seed_live_drift",
+      "severity": "P2",
+      "subject": "S02"
     }
   ],
   "snapshot": {
-    "generated_at": "2026-11-21T18:50:29.096406+00:00",
-    "git_sha": "ede4ceb594b4c43298cc657fbb943e5450783ceb",
+    "generated_at": "2026-11-21T19:48:06.428670+00:00",
+    "git_sha": "d367a4a992ca5338c82466e9d6ef308e62b01ba6",
     "path": "data",
     "tenant": "nonagentic"
   },

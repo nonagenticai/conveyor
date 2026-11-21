@@ -1,37 +1,20 @@
 {
-  "version": 4,
+  "version": 5,
   "standard": "governance/conformance.json",
-  "accepted_at": "2026-11-21T18:20:00Z",
+  "accepted_at": "2026-11-21T19:49:44+00:00",
   "accepted_by": "conveyor-e2e",
   "approver": "conveyor-approver",
-  "acceptance_ref": "01a1ff5b-6fbb-7515-aa01-ece3e2d93a0f",
+  "acceptance_ref": "01a1ffa8-2268-7333-b189-a665cf5652bb",
   "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
   "snapshot": {
-    "git_sha": "d7293f96082dbf2f99f53bb8fd765834dddf6858",
-    "generated_at": "2026-11-21T18:17:55.718331+00:00",
-    "manifest_sha256": "ba8129181a213aa76e642f9a83673c26ed82dabec3f8eeaa364fe825e18968c4",
-    "tenant": "nonagentic",
-    "outputs": 116
+    "git_sha": "d367a4a992ca5338c82466e9d6ef308e62b01ba6",
+    "generated_at": "2026-11-21T19:48:06.428670+00:00",
+    "manifest_sha256": "f135ff3789cfb930fef38bbdf7ac2a466705c8f5e3ffe34a940716898cef4334",
+    "outputs": 128,
+    "tenant": "nonagentic"
   },
+  "superseded_acceptance_ref": "01a1ff5b-6fbb-7515-aa01-ece3e2d93a0f",
   "entries": [
-    {
-      "rule": "closed_without_closure_review",
-      "subject": "T1",
-      "severity": "P0",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
-    },
-    {
-      "rule": "closed_without_closure_review",
-      "subject": "T11",
-      "severity": "P0",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
-    },
     {
       "rule": "closed_without_closure_review",
       "subject": "T14",
@@ -39,7 +22,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "closed_without_closure_review",
@@ -48,7 +31,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "closed_without_closure_review",
@@ -57,7 +40,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "closed_without_closure_review",
@@ -66,7 +49,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "closed_without_closure_review",
@@ -75,16 +58,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
-    },
-    {
-      "rule": "pi_plan_missing",
-      "subject": "tranche 1 PI",
-      "severity": "P0",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "project_in_unauthorised_tranche",
@@ -93,7 +67,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "project_in_unauthorised_tranche",
@@ -102,7 +76,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "project_in_unauthorised_tranche",
@@ -111,7 +85,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "project_in_unauthorised_tranche",
@@ -120,7 +94,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "project_in_unauthorised_tranche",
@@ -129,7 +103,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "project_in_unauthorised_tranche",
@@ -138,7 +112,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "project_in_unauthorised_tranche",
@@ -147,7 +121,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "project_in_unauthorised_tranche",
@@ -156,7 +130,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "project_in_unauthorised_tranche",
@@ -165,7 +139,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "project_in_unauthorised_tranche",
@@ -174,7 +148,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "project_in_unauthorised_tranche",
@@ -183,7 +157,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "project_in_unauthorised_tranche",
@@ -192,7 +166,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "project_in_unauthorised_tranche",
@@ -201,7 +175,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "project_in_unauthorised_tranche",
@@ -210,7 +184,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "project_in_unauthorised_tranche",
@@ -219,7 +193,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "project_in_unauthorised_tranche",
@@ -228,7 +202,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "project_in_unauthorised_tranche",
@@ -237,7 +211,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "project_in_unauthorised_tranche",
@@ -246,7 +220,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "project_in_unauthorised_tranche",
@@ -255,7 +229,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "project_in_unauthorised_tranche",
@@ -264,7 +238,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "project_in_unauthorised_tranche",
@@ -273,7 +247,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "project_in_unauthorised_tranche",
@@ -282,16 +256,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
-    },
-    {
-      "rule": "backlog_refinement_missing",
-      "subject": "tranche 1",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "backlog_refinement_missing",
@@ -300,7 +265,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "backlog_refinement_missing",
@@ -309,7 +274,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "backlog_refinement_missing",
@@ -318,7 +283,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "backlog_refinement_missing",
@@ -327,7 +292,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "backlog_refinement_missing",
@@ -336,7 +301,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "backlog_refinement_missing",
@@ -345,7 +310,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "backlog_refinement_missing",
@@ -354,7 +319,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "backlog_refinement_missing",
@@ -363,7 +328,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "backlog_refinement_missing",
@@ -372,7 +337,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "backlog_refinement_missing",
@@ -381,7 +346,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "backlog_refinement_missing",
@@ -390,7 +355,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "backlog_refinement_missing",
@@ -399,7 +364,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "benefit_baseline_placeholder",
@@ -408,7 +373,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "benefit_baseline_placeholder",
@@ -417,7 +382,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "benefit_baseline_placeholder",
@@ -426,7 +391,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "benefit_baseline_placeholder",
@@ -435,7 +400,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "benefit_baseline_placeholder",
@@ -444,7 +409,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "benefit_baseline_placeholder",
@@ -453,7 +418,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "benefit_profile_incomplete",
@@ -462,7 +427,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "closed_without_closure_review",
@@ -471,7 +436,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "closed_without_closure_review",
@@ -480,7 +445,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "closed_without_closure_review",
@@ -489,7 +454,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "closed_without_closure_review",
@@ -498,7 +463,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "closed_without_closure_review",
@@ -507,7 +472,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "closed_without_closure_review",
@@ -516,7 +481,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "closed_without_closure_review",
@@ -525,7 +490,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "closed_without_closure_review",
@@ -534,7 +499,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "closed_without_closure_review",
@@ -543,7 +508,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "closed_without_closure_review",
@@ -552,7 +517,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "closed_without_closure_review",
@@ -561,7 +526,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "closed_without_closure_review",
@@ -570,7 +535,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "closed_without_closure_review",
@@ -579,7 +544,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "closure_outputs_undeclared",
@@ -588,7 +553,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "closure_outputs_undeclared",
@@ -597,7 +562,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "closure_outputs_undeclared",
@@ -606,7 +571,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "closure_outputs_undeclared",
@@ -615,7 +580,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "closure_outputs_undeclared",
@@ -624,7 +589,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "closure_outputs_undeclared",
@@ -633,7 +598,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "closure_outputs_undeclared",
@@ -642,7 +607,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "closure_outputs_undeclared",
@@ -651,7 +616,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "closure_outputs_undeclared",
@@ -660,7 +625,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "closure_outputs_undeclared",
@@ -669,7 +634,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "closure_outputs_undeclared",
@@ -678,7 +643,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "closure_outputs_undeclared",
@@ -687,7 +652,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "closure_outputs_undeclared",
@@ -696,16 +661,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
-    },
-    {
-      "rule": "contract_missing",
-      "subject": "T1",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "contract_missing",
@@ -714,16 +670,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
-    },
-    {
-      "rule": "contract_missing",
-      "subject": "T11",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "contract_missing",
@@ -732,7 +679,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "contract_missing",
@@ -741,7 +688,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "contract_missing",
@@ -750,7 +697,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "contract_missing",
@@ -759,7 +706,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "contract_missing",
@@ -768,7 +715,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "contract_missing",
@@ -777,7 +724,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "contract_missing",
@@ -786,7 +733,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "contract_missing",
@@ -795,7 +742,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "contract_missing",
@@ -804,7 +751,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "contract_missing",
@@ -813,7 +760,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "contract_missing",
@@ -822,7 +769,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "contract_missing",
@@ -831,7 +778,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "contract_missing",
@@ -840,16 +787,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
-    },
-    {
-      "rule": "mandatory_artefacts",
-      "subject": "S02",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "mandatory_artefacts",
@@ -858,7 +796,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "mandatory_artefacts",
@@ -867,7 +805,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "mandatory_artefacts",
@@ -876,7 +814,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "mandatory_artefacts",
@@ -885,7 +823,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "mandatory_artefacts",
@@ -894,7 +832,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "mandatory_artefacts",
@@ -903,7 +841,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "mandatory_artefacts",
@@ -912,7 +850,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "mandatory_artefacts",
@@ -921,7 +859,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "mandatory_artefacts",
@@ -930,7 +868,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "mandatory_artefacts",
@@ -939,7 +877,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "mandatory_artefacts",
@@ -948,7 +886,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "mandatory_artefacts",
@@ -957,7 +895,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "mandatory_artefacts",
@@ -966,7 +904,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "mandatory_artefacts",
@@ -975,7 +913,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "mandatory_artefacts",
@@ -984,7 +922,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "mandatory_artefacts",
@@ -993,7 +931,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "mandatory_artefacts",
@@ -1002,7 +940,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "mandatory_artefacts",
@@ -1011,7 +949,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "mandatory_artefacts",
@@ -1020,7 +958,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "mandatory_artefacts",
@@ -1029,7 +967,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "mandatory_artefacts",
@@ -1038,7 +976,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "mandatory_artefacts",
@@ -1047,16 +985,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
-    },
-    {
-      "rule": "mandatory_artefacts",
-      "subject": "T1",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "mandatory_artefacts",
@@ -1065,16 +994,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
-    },
-    {
-      "rule": "mandatory_artefacts",
-      "subject": "T11",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "mandatory_artefacts",
@@ -1083,7 +1003,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "mandatory_artefacts",
@@ -1092,7 +1012,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "mandatory_artefacts",
@@ -1101,7 +1021,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "mandatory_artefacts",
@@ -1110,7 +1030,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "mandatory_artefacts",
@@ -1119,7 +1039,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "mandatory_artefacts",
@@ -1128,7 +1048,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "mandatory_artefacts",
@@ -1137,7 +1057,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "mandatory_artefacts",
@@ -1146,7 +1066,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "mandatory_artefacts",
@@ -1155,7 +1075,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "mandatory_artefacts",
@@ -1164,7 +1084,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "mandatory_artefacts",
@@ -1173,7 +1093,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "mandatory_artefacts",
@@ -1182,7 +1102,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "mandatory_artefacts",
@@ -1191,7 +1111,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "mandatory_artefacts",
@@ -1200,16 +1120,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
-    },
-    {
-      "rule": "pi_cadence_missing",
-      "subject": "tranche 1",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "pi_cadence_missing",
@@ -1218,7 +1129,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "pi_cadence_missing",
@@ -1227,7 +1138,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "pi_cadence_missing",
@@ -1236,7 +1147,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "pi_cadence_missing",
@@ -1245,7 +1156,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "pi_cadence_missing",
@@ -1254,7 +1165,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "pi_cadence_missing",
@@ -1263,7 +1174,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "pi_cadence_missing",
@@ -1272,7 +1183,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "pi_cadence_missing",
@@ -1281,7 +1192,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "pi_cadence_missing",
@@ -1290,7 +1201,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "pi_cadence_missing",
@@ -1299,7 +1210,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "pi_cadence_missing",
@@ -1308,7 +1219,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "pi_cadence_missing",
@@ -1317,16 +1228,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
-    },
-    {
-      "rule": "pi_objectives_missing",
-      "subject": "tranche 1 PI",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "project_in_unauthorised_tranche",
@@ -1335,7 +1237,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "project_in_unauthorised_tranche",
@@ -1344,7 +1246,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "project_in_unauthorised_tranche",
@@ -1353,7 +1255,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "project_in_unauthorised_tranche",
@@ -1362,7 +1264,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "project_in_unauthorised_tranche",
@@ -1371,7 +1273,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "project_in_unauthorised_tranche",
@@ -1380,7 +1282,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "project_in_unauthorised_tranche",
@@ -1389,7 +1291,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "project_in_unauthorised_tranche",
@@ -1398,7 +1300,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "project_in_unauthorised_tranche",
@@ -1407,7 +1309,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "project_in_unauthorised_tranche",
@@ -1416,7 +1318,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "project_in_unauthorised_tranche",
@@ -1425,7 +1327,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "project_in_unauthorised_tranche",
@@ -1434,7 +1336,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "project_in_unauthorised_tranche",
@@ -1443,7 +1345,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "project_in_unauthorised_tranche",
@@ -1452,7 +1354,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "project_in_unauthorised_tranche",
@@ -1461,16 +1363,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
-    },
-    {
-      "rule": "unpublished_declared_output",
-      "subject": "S02",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "unpublished_declared_output",
@@ -1479,7 +1372,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "unpublished_declared_output",
@@ -1488,7 +1381,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "unpublished_declared_output",
@@ -1497,7 +1390,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "unpublished_declared_output",
@@ -1506,7 +1399,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "unpublished_declared_output",
@@ -1515,7 +1408,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "unpublished_declared_output",
@@ -1524,7 +1417,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "unpublished_declared_output",
@@ -1533,7 +1426,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "unpublished_declared_output",
@@ -1542,7 +1435,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "unpublished_declared_output",
@@ -1551,7 +1444,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "unpublished_declared_output",
@@ -1560,7 +1453,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "unpublished_declared_output",
@@ -1569,7 +1462,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "unpublished_declared_output",
@@ -1578,7 +1471,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "unpublished_declared_output",
@@ -1587,7 +1480,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "unpublished_declared_output",
@@ -1596,7 +1489,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "unpublished_declared_output",
@@ -1605,7 +1498,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "unpublished_declared_output",
@@ -1614,7 +1507,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "unpublished_declared_output",
@@ -1623,7 +1516,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "unpublished_declared_output",
@@ -1632,7 +1525,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "unpublished_declared_output",
@@ -1641,7 +1534,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "unpublished_declared_output",
@@ -1650,7 +1543,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "unpublished_declared_output",
@@ -1659,7 +1552,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "unpublished_declared_output",
@@ -1668,16 +1561,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
-    },
-    {
-      "rule": "unpublished_declared_output",
-      "subject": "T1",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "unpublished_declared_output",
@@ -1686,16 +1570,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
-    },
-    {
-      "rule": "unpublished_declared_output",
-      "subject": "T11",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "unpublished_declared_output",
@@ -1704,7 +1579,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "unpublished_declared_output",
@@ -1713,7 +1588,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "unpublished_declared_output",
@@ -1722,7 +1597,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "unpublished_declared_output",
@@ -1731,7 +1606,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "unpublished_declared_output",
@@ -1740,7 +1615,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "unpublished_declared_output",
@@ -1749,7 +1624,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "unpublished_declared_output",
@@ -1758,7 +1633,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "unpublished_declared_output",
@@ -1767,7 +1642,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     },
     {
       "rule": "unpublished_declared_output",
@@ -1776,9 +1651,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
+      "reason": "accepted with baseline v5 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     }
-  ],
-  "correction_ref": "01a1ff58-b79a-70dc-a429-20345ad49214",
-  "superseded_acceptance_ref": "01a1ff54-eb5c-7581-91c6-4e1ea2cde8c7"
+  ]
 }

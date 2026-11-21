@@ -35,6 +35,19 @@ PROGRAMME = "01a1d039-0d24-7d16-ae52-4841e96ccfac"
 DELEGATION = "01a1ff1f-e4ba-72dc-9c1a-13049933cf14"
 TRANCHE_ZERO = "01a1e9e0-ced2-7769-b12f-f6fba0997914"
 DEMO_CADENCE = "01a1ff21-7354-7777-996b-4c8cb12f25e9"
+# The adopted profile's seven A–D artefacts, in the order the content file carries them
+# (`scripts/rework-content-check.py` refuses any other order). The key binds each row to the
+# standard's `artifact_type`, which is what makes the artefact resolvable by the conformance
+# audit; a row without the binding is invisible to it.
+ARTEFACT_KEYS = [
+    "stakeholder_map",
+    "driver_goal_objective",
+    "requirements_catalog",
+    "solution_concept",
+    "business_capability_map",
+    "data_entity_catalog",
+    "technology_standards",
+]
 BIN = os.environ.get("PROGRAMME_RECORD_BIN", "")
 E2E = os.environ.get("CONVEYOR_E2E", "01a1e607-17d9-77d3-98d3-a43a87c4633d")
 APPROVER = os.environ.get("CONVEYOR_APPROVER", "01a1e8a7-8b23-76a9-9114-aafb95f7a545")
@@ -337,17 +350,70 @@ class Runner:
         existing = self._read(
             "architecture.artifacts_list", {"project_id": self.project_id}
         ).get("items", [])
-        titles = {row.get("title") for row in existing}
-        for artefact in self.content["artifacts"]:
+        titles = {
+            row.get("title"): row
+            for row in existing
+            if row.get("status") not in ("superseded", "archived")
+        }
+        standard = {
+            row.get("key"): row.get("id")
+            for row in (self.snapshot_json("architecture.json").get("standard") or [])
+        }
+        required = len(ARTEFACT_KEYS)
+        if len(self.content["artifacts"]) != required:
+            fail(f"the content must carry the {required} A–D artefacts in the standard order")
+        for index, artefact in enumerate(self.content["artifacts"]):
+            key = ARTEFACT_KEYS[index]
             if artefact["title"] in titles:
-                print(f"  artefact: {artefact['title']} already present")
+                row = titles[artefact["title"]]
+                meta = dict(row.get("meta") or {})
+                if meta.get("artifact_key") != key:
+                    # An approved artefact is immutable; the repair is a new version. The
+                    # supersede writes a draft copy, the draft takes the standard key in its
+                    # meta (the row has no type binding), and the draft is approved.
+                    draft = self.invoke(
+                        "architecture.artifacts_supersede",
+                        {"id": row["id"]},
+                        read_action="architecture.artifacts_get",
+                        read_id_from_output="id",
+                        if_match=row.get("version", 1),
+                    )
+                    meta = dict(draft.get("meta") or {})
+                    meta.update(
+                        {
+                            "retrospective": True,
+                            "delegation_ref": self.delegation,
+                            "artifact_key": key,
+                        }
+                    )
+                    draft = self.invoke(
+                        "architecture.artifacts_update",
+                        {"id": draft["id"], "meta": meta},
+                        read_action="architecture.artifacts_get",
+                        read_input={"id": draft["id"]},
+                        if_match=draft.get("version", 1),
+                    )
+                    self.invoke(
+                        "architecture.artifacts_approve",
+                        {"id": draft["id"]},
+                        actor=APPROVER,
+                        if_match=draft.get("version", 1),
+                    )
+                    print(f"  artefact: {artefact['title']} re-versioned and bound to {key}")
+                else:
+                    print(f"  artefact: {artefact['title']} already present")
                 continue
             created = self.invoke(
                 "architecture.artifacts_create",
                 dict(
                     artefact,
                     project_id=self.project_id,
-                    meta={"retrospective": True, "delegation_ref": self.delegation},
+                    artifact_type_id=standard.get(key),
+                    meta={
+                        "retrospective": True,
+                        "delegation_ref": self.delegation,
+                        "artifact_key": key,
+                    },
                 ),
                 read_action="architecture.artifacts_get",
                 read_id_from_output="id",
@@ -468,38 +534,13 @@ class Runner:
 
         # 8b. the project's other expected outputs (the close gate requires every declared one)
         expected = (self.project_row().get("meta") or {}).get("expected_outputs") or []
-        outputs = self._published_outputs()
         for category in expected:
-            if any(
-                row.get("category") == category and row.get("project_id") == self.project_id
-                for row in outputs
-            ):
-                print(f"  {category} output: already published")
-                continue
             body = self.content.get(
                 "spec_output" if category == "spec" else f"{category.replace('-', '_')}_output"
             )
             if not body:
                 fail(f"{category}: no body in the content file")
-            doc = self.invoke(
-                "documents.compose",
-                {
-                    "title": f"{category.replace('-', ' ').title()} — {self.project} "
-                             f"(retrospective, {self.today})",
-                    "project_id": self.project_id,
-                    "body": body,
-                    "category": category,
-                    "publishable": True,
-                },
-                read_action="documents.get",
-                read_id_from_output="id",
-            )
-            self.invoke(
-                "documents.publish",
-                {"id": doc["id"], "publish": True},
-                read_input={"id": doc["id"]},
-                if_match=1,
-            )
+            self.ensure_output(category, body)
 
         # 9. the Phase-G compliance review, read back from a fresh snapshot
         if self.dry_run:
@@ -580,10 +621,31 @@ class Runner:
             approvals = self._read(
                 "approvals.list", {"project_id": self.project_id}
             ).get("items", [])
+            # A reopen voids the earlier closure decision: the close gate only counts a closure
+            # approval taken after `reopened_at` (`assert_project_can_close` reads `since`).
+            # Without this, a resumed run sees the first run's approval, skips the request and
+            # the close is refused `closure_gate_missing`.
+            since = (row.get("meta") or {}).get("reopened_at") or row.get("reopened_at")
+
+            def current(approval: dict, since: str | None) -> bool:
+                if not since:
+                    return True
+                at = approval.get("decided_at") or approval.get("created_at")
+                if not at:
+                    return False
+                try:
+                    return datetime.fromisoformat(
+                        str(at).replace("Z", "+00:00")
+                    ) >= datetime.fromisoformat(str(since).replace("Z", "+00:00"))
+                except ValueError:
+                    return True
+
             approved_closure = [
                 approval
                 for approval in approvals
-                if approval.get("gate") == "closure" and approval.get("status") == "approved"
+                if approval.get("gate") == "closure"
+                and approval.get("status") == "approved"
+                and current(approval, since)
             ]
             if approved_closure:
                 print("  closure gate: already approved")
@@ -626,6 +688,17 @@ class Runner:
             print(f"  closed {self.project}: {closed.get('id') or closed.get('project', {}).get('id')}")
 
         print(f"{self.project}: {self.acts} acts recorded")
+        if not self.dry_run:
+            total = (
+                sum(1 for _ in self.transcript.open(encoding="utf-8"))
+                if self.transcript.exists()
+                else self.acts
+            )
+            with Path(self.acts_path).open("a", encoding="utf-8") as page:
+                page.write(
+                    f"\n{self.project}: {total} acts in `transcript.jsonl`; "
+                    f"the last run recorded {self.acts}.\n"
+                )
 
     def _published_outputs(self) -> list[dict]:
         path = Path(self.snapshot).parent / "docs" / "outputs.js"
@@ -634,6 +707,67 @@ class Runner:
         text = path.read_text(encoding="utf-8")
         document = json.loads(text[text.find("{"): text.rfind("}") + 1])
         return document.get("outputs", [])
+
+    def ensure_output(self, category: str, body: str) -> None:
+        """Publish a declared output, or correct a published body that the rework changed.
+
+        A rework must not leave a stale public claim. A project-brief or evidence page written
+        for the pre-rework state stays public unless its body is corrected; skipping it because
+        a row exists would leave the record contradicting the closure. The product lets an admin
+        edit a published row, but unpublish -> update -> publish keeps publication a recorded
+        decision and re-runs the category's required-heading gate on the new body.
+        """
+        rows = [
+            row for row in self._published_outputs()
+            if row.get("category") == category and row.get("project_id") == self.project_id
+        ]
+        if not rows:
+            doc = self.invoke(
+                "documents.compose",
+                {
+                    "title": f"{category.replace('-', ' ').title()} — {self.project} "
+                             f"(retrospective, {self.today})",
+                    "project_id": self.project_id,
+                    "body": body,
+                    "category": category,
+                    "publishable": True,
+                },
+                read_action="documents.get",
+                read_id_from_output="id",
+            )
+            self.invoke(
+                "documents.publish",
+                {"id": doc["id"], "publish": True},
+                read_input={"id": doc["id"]},
+                if_match=doc.get("version", 1),
+            )
+            return
+        row = self._read("documents.get", {"id": rows[0]["id"]})
+        if (row.get("body") or "").strip() == body.strip():
+            print(f"  {category} output: current")
+            return
+        if row.get("published_at"):
+            row = self.invoke(
+                "documents.publish",
+                {"id": row["id"], "publish": False},
+                read_input={"id": row["id"]},
+                if_match=row.get("version", 1),
+            )
+        row = self.invoke(
+            "documents.update",
+            {"id": row["id"], "body": body},
+            read_action="documents.get",
+            read_input={"id": row["id"]},
+            if_match=row.get("version", 1),
+        )
+        if not row.get("published_at"):
+            self.invoke(
+                "documents.publish",
+                {"id": row["id"], "publish": True},
+                read_input={"id": row["id"]},
+                if_match=row.get("version", 1),
+            )
+        print(f"  {category} output: body corrected and republished")
 
     def decide(self, approval_id: str, note: str, close_gate: bool = False) -> dict:
         self.invoke(
