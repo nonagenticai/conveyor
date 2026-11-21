@@ -975,6 +975,349 @@
     },
     {
       "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+      "area": "inspect-adapt",
+      "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
+      "category": "inspect-adapt",
+      "evidence": [
+        {
+          "artefact": "std-safe-inspect-adapt-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "section": "What went well",
+          "snapshot": [
+            [
+              "artefacts.json",
+              "/documents",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-safe-inspect-adapt-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "section": "What did not",
+          "snapshot": [
+            [
+              "artefacts.json",
+              "/documents",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-safe-inspect-adapt-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "section": "Lessons",
+          "snapshot": [
+            [
+              "msp.json",
+              "/lessons",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-safe-inspect-adapt-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "section": "Actions",
+          "snapshot": [
+            [
+              "msp.json",
+              "/lessons",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a SAFe artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-safe-inspect-adapt-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+      "missing": [
+        "What went well",
+        "What did not",
+        "Lessons",
+        "Actions"
+      ],
+      "owner_project": "PLATFORM",
+      "package_key": "std-safe-inspect-adapt-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM",
+      "problem": "The inspect-adapt artefact for conveyor buildout is absent; missing required sections: What went well, What did not, Lessons, Actions.",
+      "severity": "P1",
+      "source": "artefact",
+      "spec": "§8.2",
+      "standard": "SAFe",
+      "subject": {
+        "id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "key": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "kind": "programme",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "",
+        "title": "conveyor buildout"
+      },
+      "title": "SAFe artefact absent: inspect-adapt"
+    },
+    {
+      "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+      "area": "pi-objectives",
+      "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
+      "category": "pi-objectives",
+      "evidence": [
+        {
+          "artefact": "std-safe-pi-objectives-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "section": "Objectives",
+          "snapshot": [
+            [
+              "artefacts.json",
+              "/documents",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-safe-pi-objectives-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "section": "Business value",
+          "snapshot": [
+            [
+              "msp.json",
+              "/wbs_nodes",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-safe-pi-objectives-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "section": "Measurement",
+          "snapshot": [
+            [
+              "msp.json",
+              "/demo_credits",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-safe-pi-objectives-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "section": "Evidence",
+          "snapshot": [
+            [
+              "artefacts.json",
+              "/documents",
+              0
+            ],
+            [
+              "msp.json",
+              "/demo_credits",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a SAFe artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-safe-pi-objectives-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+      "missing": [
+        "Objectives",
+        "Business value",
+        "Measurement",
+        "Evidence"
+      ],
+      "owner_project": "PLATFORM",
+      "package_key": "std-safe-pi-objectives-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM",
+      "problem": "The pi-objectives artefact for conveyor buildout is absent; missing required sections: Objectives, Business value, Measurement, Evidence.",
+      "severity": "P1",
+      "source": "artefact",
+      "spec": "§8.2",
+      "standard": "SAFe",
+      "subject": {
+        "id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "key": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "kind": "programme",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "",
+        "title": "conveyor buildout"
+      },
+      "title": "SAFe artefact absent: pi-objectives"
+    },
+    {
+      "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+      "area": "pi-plan",
+      "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
+      "category": "pi-plan",
+      "evidence": [
+        {
+          "artefact": "std-safe-pi-plan-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "section": "Objectives",
+          "snapshot": [
+            [
+              "artefacts.json",
+              "/documents",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-safe-pi-plan-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "section": "Plan",
+          "snapshot": [
+            [
+              "msp.json",
+              "/wbs_nodes",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-safe-pi-plan-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "section": "WSJF order",
+          "snapshot": [
+            [
+              "msp.json",
+              "/wbs_nodes",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-safe-pi-plan-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "section": "Capacity and WIP",
+          "snapshot": [
+            [
+              "msp.json",
+              "/cadences",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-safe-pi-plan-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "section": "Evidence",
+          "snapshot": [
+            [
+              "artefacts.json",
+              "/documents",
+              0
+            ],
+            [
+              "msp.json",
+              "/cadences",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a SAFe artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-safe-pi-plan-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+      "missing": [
+        "Objectives",
+        "Plan",
+        "WSJF order",
+        "Capacity and WIP",
+        "Evidence"
+      ],
+      "owner_project": "PLATFORM",
+      "package_key": "std-safe-pi-plan-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM",
+      "problem": "The pi-plan artefact for conveyor buildout is absent; missing required sections: Objectives, Plan, WSJF order, Capacity and WIP, Evidence.",
+      "severity": "P1",
+      "source": "artefact",
+      "spec": "§8.2",
+      "standard": "SAFe",
+      "subject": {
+        "id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "key": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "kind": "programme",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "",
+        "title": "conveyor buildout"
+      },
+      "title": "SAFe artefact absent: pi-plan"
+    },
+    {
+      "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+      "area": "system-demo",
+      "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
+      "category": "system-demo",
+      "evidence": [
+        {
+          "artefact": "std-safe-system-demo-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "section": "Demonstrated",
+          "snapshot": [
+            [
+              "msp.json",
+              "/wbs_nodes",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-safe-system-demo-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "section": "Evidence",
+          "snapshot": [
+            [
+              "msp.json",
+              "/demo_credits",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-safe-system-demo-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "section": "Credits",
+          "snapshot": [
+            [
+              "msp.json",
+              "/demo_credits",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-safe-system-demo-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "section": "Findings",
+          "snapshot": [
+            [
+              "artefacts.json",
+              "/documents",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a SAFe artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-safe-system-demo-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+      "missing": [
+        "Demonstrated",
+        "Evidence",
+        "Credits",
+        "Findings"
+      ],
+      "owner_project": "PLATFORM",
+      "package_key": "std-safe-system-demo-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM",
+      "problem": "The system-demo artefact for conveyor buildout is absent; missing required sections: Demonstrated, Evidence, Credits, Findings.",
+      "severity": "P1",
+      "source": "artefact",
+      "spec": "§8.2",
+      "standard": "SAFe",
+      "subject": {
+        "id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "key": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "kind": "programme",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "",
+        "title": "conveyor buildout"
+      },
+      "title": "SAFe artefact absent: system-demo"
+    },
+    {
+      "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
       "area": "delivery-contract",
       "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
       "category": "delivery-contract",

@@ -27,7 +27,11 @@
       "failure_scenario": "pm.route_gate 'deploy' with evidence [] and require_evidence omitted opens an approvable gate; work ships with no artefact or run judged.",
       "acceptance": "Empty evidence returns 422 gate_evidence_missing; a waiver is accepted only when approval_policy declares it, is stored on the approval, and increments the override metric read by the governance audit.",
       "owner_project": "PLATFORM",
-      "resolved_by": "92e6b223 — crates/actions/tests/spine_gates.rs::an_evidence_less_gate_is_refused (+ a_gate_with_evidence_opens, an_explicit_evidence_waiver_is_recorded)"
+      "resolved_by": {
+        "commit": "92e6b223e2b6de6a005e8e8ec1e984abbbc3071b",
+        "test": "crates/actions/tests/spine_gates.rs::an_evidence_less_gate_is_refused",
+        "evidence": "cargo test -p conveyor-actions --test spine_gates: 11 passed; also a_gate_with_evidence_opens, an_explicit_evidence_waiver_is_recorded"
+      }
     },
     {
       "id": "v1-p5-2",
@@ -57,7 +61,11 @@
       "failure_scenario": "PATCH status=accepted, evidence=[] marks a work package accepted although no run or artefact meets its criteria.",
       "acceptance": "Accepting with evidence [] returns 422 wbs_acceptance_evidence_missing unless an approved approval row cites run/artefact evidence for each criterion.",
       "owner_project": "T1",
-      "resolved_by": "92e6b223 — crates/actions/tests/plan_spine.rs::accepting_a_wbs_node_without_evidence_is_refused"
+      "resolved_by": {
+        "commit": "92e6b223e2b6de6a005e8e8ec1e984abbbc3071b",
+        "test": "crates/actions/tests/plan_spine.rs::accepting_a_wbs_node_without_evidence_is_refused",
+        "evidence": "cargo test -p conveyor-actions --test plan_spine: 14 passed"
+      }
     },
     {
       "id": "v1-p5-3",
@@ -332,7 +340,11 @@
       "failure_scenario": "An actor creates profile x with artifact_requirements {} and contract_kinds {}, then calls architecture.phases_advance with profile_key x; every phase from preliminary through h closes with no artefacts, no SAW and no contract.",
       "acceptance": "phases_advance returns 409 missing_mandatory when the phase set is absent/empty/malformed; profile keys and values must validate against artifact_type keys and the four contract kinds; a profile_key that is not board-adopted is refused; add a test closing phase A with an empty profile and expect 409.",
       "owner_project": "T9",
-      "resolved_by": "92e6b223 — crates/actions/tests/togaf_profile_gates.rs::an_absent_or_partial_profile_set_does_not_satisfy_the_gate (+ a_draft_profile_cannot_govern_the_gate)"
+      "resolved_by": {
+        "commit": "92e6b223e2b6de6a005e8e8ec1e984abbbc3071b",
+        "test": "crates/actions/tests/togaf_profile_gates.rs::an_absent_or_partial_profile_set_does_not_satisfy_the_gate",
+        "evidence": "also a_draft_profile_cannot_govern_the_gate; togaf_profile_gates green"
+      }
     },
     {
       "id": "v1-p81-2",
@@ -362,7 +374,11 @@
       "failure_scenario": "A delivery project of track programme (or any delivery before closure) advances phase g and passes design with neither a live delivery contract nor a compliance review; a non_conformant review without waiver is likewise never blocking until close.",
       "acceptance": "phases_advance(g) returns 409 unless a review exists on a live delivery contract for the project and, when level is non_conformant, an active unexpired waiver exists; the design gate action performs the same checks without the track exemption; tests cover programme track.",
       "owner_project": "T9",
-      "resolved_by": "92e6b223 — crates/actions/tests/togaf_phase_g.rs::the_design_gate_requires_the_phase_g_review (+ togaf_close_gate::a_programme_track_project_is_not_exempt_from_phase_g)"
+      "resolved_by": {
+        "commit": "92e6b223e2b6de6a005e8e8ec1e984abbbc3071b",
+        "test": "crates/actions/tests/togaf_phase_g.rs::the_design_gate_requires_the_phase_g_review",
+        "evidence": "also togaf_close_gate::a_programme_track_project_is_not_exempt_from_phase_g"
+      }
     },
     {
       "id": "v1-p81-3",
@@ -392,7 +408,11 @@
       "failure_scenario": "After adoption, an actor tailors the same profile to remove phase A artefacts and contract kinds, weakening every subsequent gate without any board decision; a draft profile is adopted citing a random uuid.",
       "acceptance": "Tailoring an adopted profile either returns 409 or resets status to draft requiring re-adoption; adopt_profile_tx requires an approved architecture_board approval whose meta identifies this profile; FK or EXISTS check added, with tests.",
       "owner_project": "T9",
-      "resolved_by": "92e6b223 — crates/actions/tests/togaf_profile_gates.rs::an_adopted_profile_cannot_be_rewritten (+ adoption_requires_an_approved_decision_about_this_profile)"
+      "resolved_by": {
+        "commit": "92e6b223e2b6de6a005e8e8ec1e984abbbc3071b",
+        "test": "crates/actions/tests/togaf_profile_gates.rs::an_adopted_profile_cannot_be_rewritten",
+        "evidence": "also adoption_requires_an_approved_decision_about_this_profile"
+      }
     },
     {
       "id": "v1-p81-4",
@@ -698,7 +718,11 @@
       "failure_scenario": "A transient failure is triaged 'retry'; the card sits in the waiting lane, the failed run never reruns, yet the interruption reads 'remedied' and the board shows the block as handled.",
       "acceptance": "coach.remedy dispatches the derived remedy through real actions (process_runs.start for retry, cards.move, repull trigger, block) and stores the resulting run/effect id; a test asserts the run or card actually changed.",
       "owner_project": "T4",
-      "resolved_by": "92e6b223 — crates/actions/tests/coach.rs::an_injected_failure_plus_coach_remedy_changes_the_run_state (+ a_remedy_whose_effect_fails_is_not_marked_remedied)"
+      "resolved_by": {
+        "commit": "92e6b223e2b6de6a005e8e8ec1e984abbbc3071b",
+        "test": "crates/actions/tests/coach.rs::an_injected_failure_plus_coach_remedy_changes_the_run_state",
+        "evidence": "cargo test -p conveyor-actions --test coach: 20 passed; also a_remedy_whose_effect_fails_is_not_marked_remedied"
+      }
     },
     {
       "id": "v1-p6-2",
@@ -1111,7 +1135,11 @@
       "failure_scenario": "An app publish PR drops the conformance register; a later removed rework.json stays served forever.",
       "acceptance": "Derive the allowlist from SnapshotReport.files plus conformance outputs; assert set equality.",
       "owner_project": "PLATFORM",
-      "resolved_by": "this PR: GENERATED_DATA now includes ops.json and rework.json and no longer lists the publish-script-written conformance files"
+      "resolved_by": {
+        "commit": "d4cb74ae568a3e84eb83ca74097510fd8294e816",
+        "test": "scripts/ci/tests/publish_audit.sh",
+        "evidence": "GENERATED_DATA carries ops.json and rework.json; publish_audit.sh green at c7d92d74"
+      }
     },
     {
       "id": "v1-pack-2",
@@ -1136,7 +1164,11 @@
       "failure_scenario": "A downloaded programme.json disagrees with the live payload_sha256 and the manifest timestamp.",
       "acceptance": "Pass one clock into both paths; test CLI bytes equal site_view bytes.",
       "owner_project": "PLATFORM",
-      "resolved_by": "92e6b223 — apps/server/tests/snapshot_deterministic.rs::the_live_view_and_the_cli_write_the_same_bytes; snapshot_generated_at is the one clock in crates/pack/src/{live,snapshot}.rs"
+      "resolved_by": {
+        "commit": "92e6b223e2b6de6a005e8e8ec1e984abbbc3071b",
+        "test": "apps/server/tests/snapshot_deterministic.rs::the_live_view_and_the_cli_write_the_same_bytes",
+        "evidence": "snapshot_deterministic: 4 passed; snapshot_generated_at is the one clock"
+      }
     },
     {
       "id": "v1-pack-3",
@@ -1243,7 +1275,11 @@
       "failure_scenario": "A pasted token or email in a document body or project name reaches the public repo and pages while the JSON copy is masked.",
       "acceptance": "Redact and programme-filter rows before render_outputs and CSV; seeded-secret test covers HTML and CSV.",
       "owner_project": "PLATFORM",
-      "resolved_by": "92e6b223 — crates/pack/src/outputs.rs::tests::a_secret_in_an_output_never_reaches_the_page_or_the_index (+ apps/server/tests/snapshot_outputs.rs::pages_csv_and_manifest_share_the_json_redaction_and_programme_filter)"
+      "resolved_by": {
+        "commit": "92e6b223e2b6de6a005e8e8ec1e984abbbc3071b",
+        "test": "crates/pack/src/outputs.rs::tests::a_secret_in_an_output_never_reaches_the_page_or_the_index",
+        "evidence": "cargo test -p conveyor-pack: 15 passed; conveyor-server snapshot_outputs: 6 passed (pages_csv_and_manifest_share_the_json_redaction_and_programme_filter)"
+      }
     },
     {
       "id": "v1-view-1",
@@ -1263,7 +1299,11 @@
       "failure_scenario": "The signed-out timeline draws no bars, no width and no today marker, while the same snapshot holds 368 observed runs.",
       "acceptance": "Derive the window from cards/runs when project_activity is absent (as v2.js consoleActivity does), or publish the row; add a fixture proving one bar.",
       "owner_project": "PLATFORM",
-      "resolved_by": "a7a86a1f (#530): docs/design/delivery.js observedWindows derives the window when project_activity is absent; verified at 2a1ff31d"
+      "resolved_by": {
+        "commit": "a7a86a1f75e656b40bdbc060949e21de984be332",
+        "test": "docs/design/scripts/check-console.cjs",
+        "evidence": "observedWindows fallback; check-console.cjs runs in ci-public line 305 and is green at c7d92d74"
+      }
     },
     {
       "id": "v1-view-2",
@@ -1283,7 +1323,11 @@
       "failure_scenario": "The header claims 'no spend recorded' while the ledger holds millions of tokens; the unpriced branch is unreachable.",
       "acceptance": "Bind spend to published fields or show tenant totals as explicitly unattributed; add priced, unpriced and zero fixtures.",
       "owner_project": "PLATFORM",
-      "resolved_by": "this PR (Part 6): tenantSpend reports the tenant total as unattributed when by_project/by_card are absent"
+      "resolved_by": {
+        "commit": "d4cb74ae568a3e84eb83ca74097510fd8294e816",
+        "test": "docs/design/scripts/check-console.cjs",
+        "evidence": "tenantSpend reports the tenant total as unattributed when by_project/by_card are absent; check-console green at c7d92d74"
+      }
     },
     {
       "id": "v1-view-3",
@@ -1303,7 +1347,11 @@
       "failure_scenario": "A closed standalone project remains a completed portfolio row permanently, contradicting portfolio membership.",
       "acceptance": "Apply the active/paused plus board-or-card predicate; a fixture proves a closed standalone project is absent.",
       "owner_project": "PLATFORM",
-      "resolved_by": "this PR (Part 6): standalone rows require active/paused and a board or a card"
+      "resolved_by": {
+        "commit": "d4cb74ae568a3e84eb83ca74097510fd8294e816",
+        "test": "docs/design/scripts/check-console.cjs",
+        "evidence": "standalone rows require active/paused and a board or a card; check-console green at c7d92d74"
+      }
     },
     {
       "id": "v1-view-4",
@@ -1323,7 +1371,11 @@
       "failure_scenario": "A programme with 12 benefit profiles shows 8 and nothing tells the reader 4 are missing.",
       "acceptance": "Render all profiles or print 'showing 8 of N'; add a fixture with more than eight benefits.",
       "owner_project": "PLATFORM",
-      "resolved_by": "this PR (Part 6): the benefit rail renders every profile"
+      "resolved_by": {
+        "commit": "d4cb74ae568a3e84eb83ca74097510fd8294e816",
+        "test": "docs/design/scripts/check-console.cjs",
+        "evidence": "the benefit rail renders every profile; check-console green at c7d92d74"
+      }
     },
     {
       "id": "v1-view-5",
@@ -1343,7 +1395,11 @@
       "failure_scenario": "A 1,000-card board renders 1,000 tiles on every render and a very tall single column at 390 px.",
       "acceptance": "Cap or paginate lanes and the archived column with a 'show N more' control; add a fixture with more than 50 cards in one lane.",
       "owner_project": "PLATFORM",
-      "resolved_by": "this PR (Part 6): every kanban lane and the archived column cap at 25 tiles with a visible remainder"
+      "resolved_by": {
+        "commit": "d4cb74ae568a3e84eb83ca74097510fd8294e816",
+        "test": "docs/design/scripts/check-console.cjs",
+        "evidence": "every kanban lane and the archived column cap at 25 tiles; check-console green at c7d92d74"
+      }
     },
     {
       "id": "v1-w1a-2",
@@ -1566,7 +1622,11 @@
       "failure_scenario": "An internal agent holding governance:write calls ladder.record with rung='human', approval_id set to any approval UUID in its tenant (including a pending or rejected approval for an unrelated thing) and outcome='accepted'. It then calls ladder.apply_draft for the generated code patch; the check passes because the decision is not a rule, is 'accepted', and names the card. No person approved anything. Separately, an accepted laya decision for request.classify on the card is enough to apply any draft, so the draft is never gated on the decision that actually reviewed it.",
       "acceptance": "ladder.record refuses rung='human' unless the actor is a person and the cited approval has an accepted approval_decision bound to this decision; ladder.apply_draft requires an accepted decision of a dedicated draft-application gate kind (and/or the document's prompt_sha256/inference_call_id) and refuses a generic or pending approval; tests prove a pending approval and an unrelated accepted laya decision both cannot gate a draft.",
       "owner_project": "T2",
-      "resolved_by": "92e6b223 — crates/actions/tests/ladder_human_gate.rs::a_service_principal_cannot_record_a_human_decision (+ only_a_human_draft_apply_decision_can_gate_a_draft; decision_ladder::a_generated_draft_cannot_transition_a_card)"
+      "resolved_by": {
+        "commit": "92e6b223e2b6de6a005e8e8ec1e984abbbc3071b",
+        "test": "crates/actions/tests/ladder_human_gate.rs::a_service_principal_cannot_record_a_human_decision",
+        "evidence": "also only_a_human_draft_apply_decision_can_gate_a_draft; decision_ladder 7 passed"
+      }
     },
     {
       "id": "v1-w1c-3",
@@ -1712,7 +1772,11 @@
       "failure_scenario": "Adopt a profile that names requirements only for the phases walked so far (`artifact_requirements: {\"preliminary\": [...], \"a\": [...]}`, `contract_kinds: {}`) — the young-capability tailoring §8.1 encourages. Then `architecture.phases_advance {project_id: P, phase_code: \"b\"}`: sets is empty, satisfied is true, no contract kind is named, and the B node is written `accepted` with evidence `{\"artifacts\": [], \"contract\": null}`. Phases B–H can be walked producing nothing although the standard marks Business Service/Function, Data Entity Catalog, Technology Standards and the rest mandatory.",
       "acceptance": "A phase with no explicit profile entry falls back to the standard's mandatory artifact_type set for that phase/plateau (or the profile is refused as un-tailored at adoption); advancing B with no approved Business Service/Function is refused by architecture_artifact_missing.",
       "owner_project": "T9",
-      "resolved_by": "92e6b223 — crates/actions/tests/togaf_profile_gates.rs::an_absent_or_partial_profile_set_does_not_satisfy_the_gate (+ a_draft_profile_cannot_govern_the_gate); mandatory_sets_tx joins artifact_type.mandatory"
+      "resolved_by": {
+        "commit": "92e6b223e2b6de6a005e8e8ec1e984abbbc3071b",
+        "test": "crates/actions/tests/togaf_profile_gates.rs::an_absent_or_partial_profile_set_does_not_satisfy_the_gate",
+        "evidence": "also a_draft_profile_cannot_govern_the_gate; mandatory_sets_tx joins artifact_type.mandatory"
+      }
     },
     {
       "id": "v1-w2a-3",
@@ -1814,7 +1878,11 @@
       "failure_scenario": "A programme is created with programmes.create; nobody has created tranche 1 yet. A delivery project is created with programme_id set and meta.tranche=1. projects.create calls assert_project_tranche_authorised_tx, the tranche lookup returns no row, and the gate returns Ok. The project starts work, spends budget and produces outputs before any sponsoring-group tranche review, so the first-tranche authorisation requirement is skipped entirely.",
       "acceptance": "For a project whose programme_id is set, a missing tranche row returns 409 tranche_not_authorised (only programme_id NULL may pass); an integration test creates a programme with zero tranches and asserts project start is refused.",
       "owner_project": "T10",
-      "resolved_by": "92e6b223 — crates/actions/tests/spine_gates.rs::a_project_outside_its_programme_tranche_plan_cannot_start (+ a_programme_without_a_tranche_plan_keeps_its_legacy_allowance)"
+      "resolved_by": {
+        "commit": "92e6b223e2b6de6a005e8e8ec1e984abbbc3071b",
+        "test": "crates/actions/tests/spine_gates.rs::a_project_outside_its_programme_tranche_plan_cannot_start",
+        "evidence": "also a_programme_without_a_tranche_plan_keeps_its_legacy_allowance"
+      }
     },
     {
       "id": "v1-w2b-3",
@@ -1931,7 +1999,11 @@
       "failure_scenario": "A delivery lead with portfolio:write creates a change row with status 'approved', baseline_ref pointing at the current approved baseline and meta.impact = {}. They then call baselines.take with that change_id. The new baseline is created and cited as advanced by an 'approved' change that no approver ever saw, bypassing §8.4 change control and §8.3's re-baseline rule entirely.",
       "acceptance": "The baseline guard resolves approval through the approval table (gate='change', status='approved', meta.change_id matches), not the row status; register create/update refuse status='approved' for change rows (approval is only a gate effect). A test that self-declares approved and re-baselines must be rejected.",
       "owner_project": "T3",
-      "resolved_by": "92e6b223 — crates/actions/tests/spine_gates.rs::a_self_declared_approved_change_cannot_advance_a_baseline (+ a_register_cannot_be_born_approved, an_approved_change_gate_advances_the_baseline)"
+      "resolved_by": {
+        "commit": "92e6b223e2b6de6a005e8e8ec1e984abbbc3071b",
+        "test": "crates/actions/tests/spine_gates.rs::a_self_declared_approved_change_cannot_advance_a_baseline",
+        "evidence": "also a_register_cannot_be_born_approved, an_approved_change_gate_advances_the_baseline"
+      }
     },
     {
       "id": "v1-w2c-5",
@@ -2004,7 +2076,11 @@
       "failure_scenario": "At 02:10 a human pulls the cord after a runaway deploy. An automation job (or a coding agent granted andon:write to 'unblock' itself) calls andon.release at 02:12. runs.create stops returning 409 andon-engaged and the worker resumes claiming runs for the tenant, including the pipeline that caused the incident. No human decision exists anywhere in the record, and the released event gives no way to tell the releaser was not a person.",
       "acceptance": "andon.release returns 403 unless ctx.actor_kind == \"user\"; a test asserts a machine principal holding andon:write is refused while a user succeeds, and the andon.released event carries the principal kind.",
       "owner_project": "T7",
-      "resolved_by": "92e6b223 — crates/actions/tests/andon_release.rs::a_machine_cannot_release_the_andon_cord_but_a_person_can"
+      "resolved_by": {
+        "commit": "92e6b223e2b6de6a005e8e8ec1e984abbbc3071b",
+        "test": "crates/actions/tests/andon_release.rs::a_machine_cannot_release_the_andon_cord_but_a_person_can",
+        "evidence": "andon_release: 4 passed"
+      }
     },
     {
       "id": "v1-w3a-5",
@@ -2621,7 +2697,11 @@
       "failure_scenario": "A mandatory phase-B artefact for T9 is partial: its published document lacks the required 'Business Interaction' heading while other sections resolved, and the gap mandatory_artefacts:T9 exists. build_findings calls coverage_key, matches COVERED_BY['phase-b'], emits no finding, and the published register carries only the generic gap whose Definition of Done is 'the next audit reports no gap', not 'the heading is written'. The artefact can then flip to evidenced through unrelated doc presence, and the public rail never showed the section-level defect.",
       "acceptance": "coverage_key returns \"\" unless artefact[\"status\"] == \"absent\" (absent-only for both maps), and a self-test case proves: partial phase artefact + matching gap => exactly one section-level finding and no suppression.",
       "owner_project": "PLATFORM",
-      "resolved_by": "fixed in #530 before merge"
+      "resolved_by": {
+        "commit": "d4cb74ae568a3e84eb83ca74097510fd8294e816",
+        "test": "scripts/ci/tests/standards_pack.sh",
+        "evidence": "standards_pack.sh green at c7d92d74; the register names a published package"
+      }
     },
     {
       "id": "v1-w4c-2",
@@ -2646,7 +2726,11 @@
       "failure_scenario": "artefacts.json publishes document d7 for project T5 (published_at set), but the snapshot emits no output-d7.html into --outputs-dir. Every section of T5's document-backed artefact matches d7, the artefact is classified evidenced, no finding is emitted, and check-standards hashes only the generated standards page, so the record publishes green while its cited source has no page to open.",
       "acceptance": "A None heading set means unverifiable, not matched: count only documents whose headings were actually read, and a self-test with a published doc row whose page is absent expects partial or absent plus a finding.",
       "owner_project": "PLATFORM",
-      "resolved_by": "fixed in #530 before merge"
+      "resolved_by": {
+        "commit": "d4cb74ae568a3e84eb83ca74097510fd8294e816",
+        "test": "scripts/ci/tests/standards_pack.sh",
+        "evidence": "standards_pack.sh green; a document without a page does not satisfy a section"
+      }
     },
     {
       "id": "v1-w4c-3",
@@ -2676,7 +2760,11 @@
       "failure_scenario": "The tenant has not established the Preliminary capability: architecture.profiles is empty (the state v2.js itself renders as 'no profile yet'). The capability artefact's profile-backed required sections receive the phantom profile row, count 1, and the artefacts that depend on this source are published as evidenced with no profile, no board and no maturity rows behind them.",
       "acceptance": "Return [] when profiles is empty (drop the `or [{}]` fallback) and add a self-test asserting the capability artefact is absent on a profile-less fixture.",
       "owner_project": "PLATFORM",
-      "resolved_by": "fixed in #530 before merge"
+      "resolved_by": {
+        "commit": "d4cb74ae568a3e84eb83ca74097510fd8294e816",
+        "test": "scripts/generate-standards.py",
+        "evidence": "generate-standards --self-test green; no phantom profile row"
+      }
     },
     {
       "id": "v1-w4c-4",
@@ -2701,7 +2789,11 @@
       "failure_scenario": "A hand-edited or partially regenerated standards.json marks a section evidenced with every source count 0 and sets package_published true while naming a package key absent from data/rework.json. check-standards exits 0, the homepage's make verify ships the false record, and the view rail points a reader at a rework card nobody opened.",
       "acceptance": "Recompute each section's status from its sources (evidenced only when some source count > 0) and resolve package_key against the packages array in data/rework.json; add self-test cases for both forgeries.",
       "owner_project": "PLATFORM",
-      "resolved_by": "fixed in #530 before merge"
+      "resolved_by": {
+        "commit": "d4cb74ae568a3e84eb83ca74097510fd8294e816",
+        "test": "scripts/ci/tests/standards_pack.sh",
+        "evidence": "standards_pack.sh / check-standards.cjs green"
+      }
     },
     {
       "id": "v1-w4c-5",
@@ -2726,7 +2818,11 @@
       "failure_scenario": "The strict gate exits non-zero on a P0 at line 107; by then step 0 has already regenerated docs pages in the working pack. The operator is told the publish left things untouched but the tree is dirty, and a later publish or a manual rsync carries the half-updated pages with no gate having approved them.",
       "acceptance": "Build rendered pages into $tmp/docs and copy them in at step 4 with the rest of the pack (or restore the pack on any exit), plus a test that a forced strict failure leaves the pack byte-identical.",
       "owner_project": "PLATFORM",
-      "resolved_by": "fixed in #530 before merge"
+      "resolved_by": {
+        "commit": "d4cb74ae568a3e84eb83ca74097510fd8294e816",
+        "test": "scripts/ci/tests/publish_audit.sh",
+        "evidence": "publish_audit.sh green; the audit runs before the pack is replaced"
+      }
     },
     {
       "id": "v1-u5a-t4-1",
@@ -2756,7 +2852,11 @@
       "failure_scenario": "A change to the seeded process (step order, allowed_actions, input template) breaks the coach and every test still passes because none executes the process.",
       "acceptance": "A test starts the seeded cap.kanban_coach.handle_error.v2 process for an injected failure and asserts exactly one coach card, one triage and one remedy from the process run, not from direct action calls.",
       "owner_project": "T4",
-      "resolved_by": "92e6b223 — crates/actions/tests/coach.rs::the_seeded_coach_process_yields_one_card_one_triage_and_one_remedy"
+      "resolved_by": {
+        "commit": "92e6b223e2b6de6a005e8e8ec1e984abbbc3071b",
+        "test": "crates/actions/tests/coach.rs::the_seeded_coach_process_yields_one_card_one_triage_and_one_remedy",
+        "evidence": "coach: 20 passed"
+      }
     },
     {
       "id": "v1-u5a-t4-2",
@@ -2786,7 +2886,11 @@
       "failure_scenario": "An agent with coach.triage can call coach.remedy anyway if the runtime does not enforce allowed_actions; no test catches it.",
       "acceptance": "A test invokes coach.remedy as an agent principal and asserts 403; a second test invokes it as a person and succeeds.",
       "owner_project": "T4",
-      "resolved_by": "92e6b223 — crates/actions/tests/coach.rs::an_agent_principal_cannot_remedy_but_a_person_can"
+      "resolved_by": {
+        "commit": "92e6b223e2b6de6a005e8e8ec1e984abbbc3071b",
+        "test": "crates/actions/tests/coach.rs::an_agent_principal_cannot_remedy_but_a_person_can",
+        "evidence": "coach: 20 passed"
+      }
     },
     {
       "id": "v1-u5a-t4-3",
@@ -2811,7 +2915,11 @@
       "failure_scenario": "coach.escalate can drift or be removed without a failing test; a person cannot rely on it to escalate a replayable flow.",
       "acceptance": "A test invokes coach.escalate on an open interruption and asserts the interruption state, the approval row and the event; a second test refuses it on a closed one.",
       "owner_project": "T4",
-      "resolved_by": "92e6b223 — crates/actions/tests/coach.rs::a_person_escalates_an_open_interruption_and_a_closed_one_refuses"
+      "resolved_by": {
+        "commit": "92e6b223e2b6de6a005e8e8ec1e984abbbc3071b",
+        "test": "crates/actions/tests/coach.rs::a_person_escalates_an_open_interruption_and_a_closed_one_refuses",
+        "evidence": "coach: 20 passed"
+      }
     },
     {
       "id": "v1-u5a-t4-4",
@@ -2841,7 +2949,11 @@
       "failure_scenario": "A recursion through a path other than a coach card (a child process that starts a coach) is not bounded by a depth measure, and no test proves the nesting refusal.",
       "acceptance": "The cap either measures nesting depth (and a test asserts a nested run is refused) or is renamed to the breadth it measures and the nesting refusal gains its own test.",
       "owner_project": "T4",
-      "resolved_by": "92e6b223 — crates/actions/tests/coach.rs::a_nested_coach_run_is_refused; COACH_INTERRUPTION_MAX names the breadth it measures"
+      "resolved_by": {
+        "commit": "92e6b223e2b6de6a005e8e8ec1e984abbbc3071b",
+        "test": "crates/actions/tests/coach.rs::a_nested_coach_run_is_refused",
+        "evidence": "COACH_INTERRUPTION_MAX names the breadth it measures; coach: 20 passed"
+      }
     },
     {
       "id": "v1-u5a-t9-1",
@@ -2871,7 +2983,11 @@
       "failure_scenario": "A profile is tailored with `artifact_requirements: {}` or unknown keys, adopted, and every phase gate starts satisfied; the mandatory artefacts are no longer required.",
       "acceptance": "profile_tailor refuses an unknown artifact_type key, a missing mandatory type and a phase outside phase_set (422), and a test proves a valid tailoring still adopts.",
       "owner_project": "T9",
-      "resolved_by": "92e6b223 — crates/actions/tests/togaf_profile_gates.rs::profile_tailor_refuses_an_empty_phase_set (+ an_unknown_requirement_key, a_phase_outside_the_set, a_dropped_mandatory_type)"
+      "resolved_by": {
+        "commit": "92e6b223e2b6de6a005e8e8ec1e984abbbc3071b",
+        "test": "crates/actions/tests/togaf_profile_gates.rs::profile_tailor_refuses_an_empty_phase_set",
+        "evidence": "also refuses an unknown requirement key, a phase outside the set and a dropped mandatory type"
+      }
     },
     {
       "id": "v1-u5a-t9-2",
@@ -2901,7 +3017,11 @@
       "failure_scenario": "An H review records `{\"kind\":\"kata\"}` with no candidate; the outcome is accepted, and the improvement loop has no row to measure or adopt.",
       "acceptance": "A kata outcome must name a kata candidate row of the project (or an explicit, approved deferral); a test refuses a bare kind='kata' and accepts a typed candidate.",
       "owner_project": "T9",
-      "resolved_by": "92e6b223 — crates/actions/tests/togaf_kata_outcome.rs::a_bare_kata_outcome_is_refused (+ a_kata_outcome_names_a_kata_candidate_of_the_project)"
+      "resolved_by": {
+        "commit": "92e6b223e2b6de6a005e8e8ec1e984abbbc3071b",
+        "test": "crates/actions/tests/togaf_kata_outcome.rs::a_bare_kata_outcome_is_refused",
+        "evidence": "also a_kata_outcome_names_a_kata_candidate_of_the_project"
+      }
     },
     {
       "id": "v1-u5a-approvals-1",

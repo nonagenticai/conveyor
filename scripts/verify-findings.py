@@ -17,7 +17,9 @@ from __future__ import annotations
 
 import json
 import re
+import subprocess
 import sys
+import tempfile
 from collections import Counter
 from pathlib import Path
 
@@ -40,6 +42,39 @@ REQUIRED = (
     "acceptance",
     "owner_project",
 )
+
+
+def validate_resolution(finding: dict) -> list[str]:
+    """A resolved finding is an object: an ancestor commit, a real test path and its run."""
+    label = str(finding.get("id", "?"))
+    value = finding.get("resolved_by")
+    if not isinstance(value, dict):
+        return [
+            f"{label}: resolved_by must be an object with commit, test and evidence; "
+            "prose is not evidence"
+        ]
+    errors: list[str] = []
+    commit = value.get("commit")
+    test = value.get("test")
+    evidence = value.get("evidence")
+    if not isinstance(commit, str) or not SHA.match(commit):
+        errors.append(f"{label}: resolved_by.commit must be a 40-character lowercase hex commit")
+    else:
+        completed = subprocess.run(
+            ["git", "-C", str(ROOT), "merge-base", "--is-ancestor", commit, "HEAD"],
+            capture_output=True,
+        )
+        if completed.returncode != 0:
+            errors.append(f"{label}: resolved_by.commit {commit[:8]} is not an ancestor of HEAD")
+    if not isinstance(test, str) or not test.strip():
+        errors.append(f"{label}: resolved_by.test must name a test path or path::name")
+    else:
+        path = test.split("::", 1)[0]
+        if not (ROOT / path).exists():
+            errors.append(f"{label}: resolved_by.test path does not exist: {path}")
+    if not isinstance(evidence, str) or not evidence.strip():
+        errors.append(f"{label}: resolved_by.evidence must name the run, command or result")
+    return errors
 
 
 def verify(path: Path) -> list[str]:
@@ -69,9 +104,7 @@ def verify(path: Path) -> list[str]:
             errors.append(f"{label} is missing {missing}")
             continue
         resolved = finding.get("resolved_by")
-        if resolved is not None and (not isinstance(resolved, str) or not resolved.strip()):
-            errors.append(f"{label}: resolved_by must be a non-empty string when present")
-            continue
+        resolution_errors = validate_resolution(finding) if resolved is not None else []
         identifier = finding["id"]
         label = str(identifier)
         if not isinstance(identifier, str) or not re.match(r"^v1-[a-z0-9-]+$", identifier):
@@ -87,9 +120,10 @@ def verify(path: Path) -> list[str]:
             value = finding[field]
             if not isinstance(value, str) or not value.strip():
                 errors.append(f"{label}: {field} must be a non-empty string")
-        if resolved:
+        if resolved is not None:
             # A fixed finding is history: its quoted line may have moved or disappeared BECAUSE
-            # the fix landed. The ledger keeps the claim and names what resolved it.
+            # the fix landed. The ledger keeps the claim and names the commit, test and run.
+            errors.extend(resolution_errors)
             seen.add(identifier)
             continue
         evidence = finding["evidence"]
@@ -134,7 +168,68 @@ def verify(path: Path) -> list[str]:
     return errors
 
 
+def self_test() -> None:
+    """The gate refuses prose, a non-ancestor commit, a missing test and empty evidence."""
+    first_line = (ROOT / "scripts" / "verify-findings.py").read_text(encoding="utf-8").splitlines()[0]
+    base = {
+        "id": "v1-self-1",
+        "area": "§1",
+        "standard": "SPEC",
+        "spec": "§1",
+        "severity": "P2",
+        "title": "self test",
+        "problem": "self test",
+        "evidence": [{"path": "scripts/verify-findings.py", "line": 1, "quote": first_line}],
+        "failure_scenario": "self test",
+        "acceptance": "self test",
+        "owner_project": "PLATFORM",
+        "resolved_by": {
+            "commit": "92e6b223e2b6de6a005e8e8ec1e984abbbc3071b",
+            "test": "scripts/verify-findings.py",
+            "evidence": "self test",
+        },
+    }
+
+    def check(mutate, expected: str | None) -> None:
+        finding = json.loads(json.dumps(base))
+        mutate(finding)
+        document = {
+            "schema": SCHEMA,
+            "audited_sha": "92e6b223e2b6de6a005e8e8ec1e984abbbc3071b",
+            "audited_at": "2026-11-21",
+            "findings": [finding],
+        }
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as handle:
+            json.dump(document, handle)
+            name = handle.name
+        try:
+            errors = verify(Path(name))
+        finally:
+            Path(name).unlink()
+        if expected is None:
+            if errors:
+                raise SystemExit(f"self-test: the valid ledger failed: {errors}")
+        elif not any(expected in error for error in errors):
+            raise SystemExit(f"self-test: expected {expected!r}, got {errors}")
+
+    def noop(finding: dict) -> None:
+        pass
+
+    check(noop, None)
+    check(lambda finding: finding.update(resolved_by="fixed in a PR"), "must be an object")
+    check(lambda finding: finding["resolved_by"].update(commit="0" * 40), "not an ancestor")
+    check(
+        lambda finding: finding["resolved_by"].update(test="scripts/does-not-exist.py"),
+        "does not exist",
+    )
+    check(lambda finding: finding["resolved_by"].pop("evidence"), "must name the run")
+    print("verify-findings: self-test OK")
+
+
 def main(argv: list[str]) -> int:
+    if "--self-test" in argv:
+        self_test()
+        return 0
     arguments = [item for item in argv if item != "--stdout"]
     if len(arguments) > 1:
         print("usage: verify-findings.py [ledger.json]", file=sys.stderr)
