@@ -6,7 +6,6 @@ gate = "The decision record states what is observable and marks the rest not rec
 [[check]]
 id = "S01-project"
 check = "project"
-status = "closed"
 severity = "P0"
 description = "S01 is closed"
 

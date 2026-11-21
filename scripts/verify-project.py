@@ -387,6 +387,7 @@ def run_project(
     evidence_dir: Path,
     kind_filter: str = "all",
     quiet: bool = False,
+    exclude: set[str] | None = None,
 ) -> dict[str, Any]:
     snapshot = Snapshot(snapshot_dir)
     row = snapshot.project(key)
@@ -397,18 +398,21 @@ def run_project(
     allows = {
         str(entry.get("check")): entry for entry in manifest.get("allow", [])
     }
+    excluded = exclude or set()
     checks: list[dict[str, Any]] = []
     failures: list[str] = []
     warnings: list[str] = []
     for index, check in enumerate(manifest.get("check", []), start=1):
         identifier = str(check.get("id") or f"check-{index}")
+        name = str(check.get("check") or "")
         kind = str(check.get("kind") or ("command" if "command" in check else "snapshot"))
         if kind_filter != "all" and kind != kind_filter:
+            continue
+        if identifier in excluded or name in excluded:
             continue
         severity = str(check.get("severity") or "P0").upper()
         if severity not in SEVERITY:
             fail(f"{identifier}: severity must be one of {', '.join(SEVERITY)}")
-        name = str(check.get("check") or "")
         description = str(check.get("description") or "")
         allowed = allows.get(name) or allows.get(identifier)
         record: dict[str, Any] = {
@@ -619,6 +623,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--snapshot", type=Path, default=DEFAULT_SNAPSHOT)
     parser.add_argument("--evidence-dir", type=Path, default=DEFAULT_EVIDENCE)
     parser.add_argument("--kind", choices=("all", "snapshot", "command"), default="all")
+    parser.add_argument("--exclude", default="", help="comma-separated check ids or names to skip")
     parser.add_argument("--self-test", action="store_true")
     args = parser.parse_args(argv)
     if args.self_test:
@@ -636,8 +641,9 @@ def main(argv: list[str] | None = None) -> int:
     for key in keys:
         manifest = args.manifest or (MANIFEST_DIR / f"{key}.toml")
         print(f"== {key} ==")
+        excluded = {item.strip() for item in args.exclude.split(",") if item.strip()}
         evidence = run_project(
-            key, args.snapshot, manifest, args.evidence_dir, kind_filter=args.kind
+            key, args.snapshot, manifest, args.evidence_dir, kind_filter=args.kind, exclude=excluded
         )
         print(
             f"{key}: {evidence['verdict']} — "

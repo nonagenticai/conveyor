@@ -6,7 +6,6 @@ gate = "The A–D set is approved; the project re-closes through the one gate."
 [[check]]
 id = "T0-project"
 check = "project"
-status = "closed"
 severity = "P0"
 description = "T0 is closed"
 

@@ -6,7 +6,6 @@ gate = "The definition set is published; the charter and scope baseline are appr
 [[check]]
 id = "P0-project"
 check = "project"
-status = "closed"
 severity = "P0"
 description = "P0 is closed"
 

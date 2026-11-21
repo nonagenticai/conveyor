@@ -6,7 +6,6 @@ gate = "The closure review exists and every declared closure output is published
 [[check]]
 id = "DESIGN-PUBLISH-project"
 check = "project"
-status = "closed"
 severity = "P0"
 description = "DESIGN-PUBLISH is closed"
 

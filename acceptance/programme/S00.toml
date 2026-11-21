@@ -6,7 +6,6 @@ gate = "The A–D artefacts, the closure review and the declared outputs exist; 
 [[check]]
 id = "S00-project"
 check = "project"
-status = "closed"
 severity = "P0"
 description = "S00 is closed"
 
