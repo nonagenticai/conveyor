@@ -43,9 +43,11 @@ reproducible from the checked-in snapshot.
 from __future__ import annotations
 
 import argparse
+import copy
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -328,6 +330,172 @@ def check_benefit_baseline(
     return True, f"{len(profiles)} benefit baselines are measured"
 
 
+# ── SAFe §8.2 — the cadence, the plan, the demo and the retro ─────────────────────────
+
+
+def _tranche_period(snapshot: Snapshot, key: str) -> tuple[dict[str, Any], int]:
+    row = snapshot.project(key)
+    tranche = (row.get("meta") or {}).get("tranche")
+    if tranche is None:
+        fail(f"{key}: the project names no tranche; the SAFe cadence cannot be resolved")
+    return row, int(tranche)
+
+
+def _tranche_row(snapshot: Snapshot, number: int) -> dict[str, Any] | None:
+    for tranche in snapshot.msp.get("tranches", []):
+        if tranche.get("number") == number:
+            return tranche
+    return None
+
+
+def _cadences(
+    snapshot: Snapshot, row: dict[str, Any], tranche_number: int, kind: str
+) -> list[dict[str, Any]]:
+    """The cadence rows for this tranche, linked by the row's meta or its period.
+
+    The product's own link is the cadence row's `meta` (`tranche_id`/`tranche_number`); a
+    period of `tranche-<n>` or `<n>` is accepted too, because `period` is free text and the
+    retrospective batch writes it that way.
+    """
+    tranche = _tranche_row(snapshot, tranche_number) or {}
+    tranche_id = tranche.get("id")
+    accepted_periods = {f"tranche-{tranche_number}", str(tranche_number)}
+    found = []
+    for cadence in snapshot.msp.get("cadences", []):
+        if cadence.get("programme_id") != row.get("programme_id"):
+            continue
+        if cadence.get("kind") != kind:
+            continue
+        meta = cadence.get("meta") if isinstance(cadence.get("meta"), dict) else {}
+        linked = (
+            (tranche_id is not None and cadence.get("tranche_id") == tranche_id)
+            or (tranche_id is not None and meta.get("tranche_id") == tranche_id)
+            or cadence.get("tranche_number") == tranche_number
+            or meta.get("tranche_number") == tranche_number
+            or cadence.get("period") in accepted_periods
+            or meta.get("period") in accepted_periods
+        )
+        if linked:
+            found.append(cadence)
+    return found
+
+
+def _wbs_nodes(snapshot: Snapshot, row: dict[str, Any]) -> list[dict[str, Any]]:
+    return [
+        node
+        for node in snapshot.msp.get("wbs_nodes", [])
+        if node.get("project_id") == row.get("id")
+    ]
+
+
+def check_pi_cadence(
+    snapshot: Snapshot, key: str, params: dict[str, Any]
+) -> tuple[bool, str]:
+    row, tranche = _tranche_period(snapshot, key)
+    period = f"tranche-{tranche}"
+    pi = _cadences(snapshot, row, tranche, "pi")
+    refinement = _cadences(snapshot, row, tranche, "refinement")
+    if not pi:
+        return False, f"no PI cadence row for {period}"
+    if not refinement:
+        return False, f"no backlog-refinement cadence row for {period}"
+    return True, f"PI cadence {pi[0].get('id')} and refinement {refinement[0].get('id')} for {period}"
+
+
+def check_wsjf(
+    snapshot: Snapshot, key: str, params: dict[str, Any]
+) -> tuple[bool, str]:
+    row = snapshot.project(key)
+    nodes = _wbs_nodes(snapshot, row)
+    if not nodes:
+        return False, "no WBS deliverable carries the plan"
+    bad = []
+    for node in nodes:
+        if int(node.get("job_size") or 0) < 1:
+            bad.append(f"{node.get('id')}: job_size")
+            continue
+        if all(int(node.get(field) or 0) == 0 for field in ("business_value", "time_criticality", "risk_reduction")):
+            bad.append(f"{node.get('id')}: every value input is zero")
+    if bad:
+        return False, "WBS nodes without WSJF inputs: " + ", ".join(bad)
+    return True, f"{len(nodes)} WBS node(s) carry the four WSJF inputs"
+
+
+def check_demo_credits(
+    snapshot: Snapshot, key: str, params: dict[str, Any]
+) -> tuple[bool, str]:
+    row = snapshot.project(key)
+    accepted = [node for node in _wbs_nodes(snapshot, row) if node.get("status") == "accepted"]
+    if not accepted:
+        return False, "no accepted deliverable to demo"
+    credits = {
+        credit.get("deliverable_id"): credit
+        for credit in snapshot.msp.get("demo_credits", [])
+    }
+    missing = [
+        node.get("id")
+        for node in accepted
+        if not (credits.get(node.get("id")) or {}).get("evidence")
+    ]
+    if missing:
+        return False, f"{len(missing)} accepted deliverable(s) have no demo credit with evidence"
+    return True, f"{len(accepted)} accepted deliverable(s), each with a demo credit"
+
+
+def check_lessons(
+    snapshot: Snapshot, key: str, params: dict[str, Any]
+) -> tuple[bool, str]:
+    row, tranche = _tranche_period(snapshot, key)
+    period = f"tranche-{tranche}"
+    retros = _cadences(snapshot, row, tranche, "retro")
+    if not retros:
+        return False, f"no retro cadence row for {period}"
+    retro_ids = {retro.get("id") for retro in retros}
+    lessons = [
+        lesson
+        for lesson in snapshot.msp.get("lessons", [])
+        if lesson.get("cadence_id") in retro_ids
+    ]
+    if not lessons:
+        return False, f"the {period} retro produced no lesson"
+    return True, f"{len(lessons)} lesson(s) from the {period} retro"
+
+
+def _published_for_period(
+    snapshot: Snapshot, category: str, period: str, programme_key: str
+) -> bool:
+    needle = period.lower()
+    for row in snapshot.outputs:
+        if row.get("category") != category or row.get("project_key") != programme_key:
+            continue
+        label = f"{row.get('title') or ''} {row.get('unit') or ''}".lower()
+        if needle in label:
+            return True
+    return False
+
+
+def check_pi_plan(
+    snapshot: Snapshot, key: str, params: dict[str, Any]
+) -> tuple[bool, str]:
+    _, tranche = _tranche_period(snapshot, key)
+    period = f"tranche-{tranche}"
+    programme_key = params.get("programme_key") or "P0"
+    if not _published_for_period(snapshot, "pi-plan", period, programme_key):
+        return False, f"no published pi-plan output for {period}"
+    return True, f"the {period} PI plan is published"
+
+
+def check_pi_objectives(
+    snapshot: Snapshot, key: str, params: dict[str, Any]
+) -> tuple[bool, str]:
+    _, tranche = _tranche_period(snapshot, key)
+    period = f"tranche-{tranche}"
+    programme_key = params.get("programme_key") or "P0"
+    if not _published_for_period(snapshot, "pi-objectives", period, programme_key):
+        return False, f"no published pi-objectives output for {period}"
+    return True, f"the {period} PI objectives are published"
+
+
 CHECKS: dict[str, Callable[[Snapshot, str, dict[str, Any]], tuple[bool, str]]] = {
     "project": check_project,
     "project_baseline": check_project_baseline,
@@ -337,6 +505,12 @@ CHECKS: dict[str, Callable[[Snapshot, str, dict[str, Any]], tuple[bool, str]]] =
     "closure_gate": check_closure_gate,
     "waivers": check_waivers,
     "benefit_baseline": check_benefit_baseline,
+    "pi_cadence": check_pi_cadence,
+    "pi_plan": check_pi_plan,
+    "pi_objectives": check_pi_objectives,
+    "wsjf": check_wsjf,
+    "demo_credits": check_demo_credits,
+    "lessons": check_lessons,
 }
 
 
@@ -451,7 +625,8 @@ def run_project(
             target = failures if severity in ("P0", "P1") else warnings
             target.append(f"{identifier} ({severity}): {detail}")
         if not quiet:
-            print(f"{'PASS' if ok else 'FAIL'}  {identifier}  {detail}")
+            label = "ALLOW" if record["allowed"] else ("PASS" if ok else "FAIL")
+            print(f"{label}  {identifier}  {detail}")
     verdict = "red" if failures else "green"
     if row.get("status") == "closed" and verdict == "red":
         checks.append(
@@ -504,8 +679,9 @@ def self_test() -> int:
                     {
                         "key": "TEST",
                         "id": "project-1",
+                        "programme_id": "prog-1",
                         "status": "closed",
-                        "meta": {"closure_outputs": []},
+                        "meta": {"closure_outputs": [], "tranche": 4},
                     }
                 ]
             }
@@ -517,13 +693,55 @@ def self_test() -> int:
     (snapshot / "data" / "work.json").write_text(
         json.dumps({"approvals": [], "approval_decisions": []})
     )
-    (snapshot / "data" / "msp.json").write_text(json.dumps({"benefit_profiles": []}))
+    (snapshot / "data" / "msp.json").write_text(
+        json.dumps(
+            {
+                "benefit_profiles": [],
+                "tranches": [{"id": "tr-4", "number": 4, "state": "closed"}],
+                "cadences": [
+                    {"id": "c-pi", "programme_id": "prog-1", "kind": "pi",
+                     "period": "PI-2027.1", "meta": {"tranche_id": "tr-4"}},
+                    {"id": "c-ref", "programme_id": "prog-1", "kind": "refinement",
+                     "period": "PI-2027.1", "meta": {"tranche_id": "tr-4"}},
+                    {"id": "c-demo", "programme_id": "prog-1", "kind": "demo",
+                     "period": "PI-2027.1", "meta": {"tranche_id": "tr-4"}},
+                    {"id": "c-retro", "programme_id": "prog-1", "kind": "retro",
+                     "period": "PI-2027.1", "meta": {"tranche_id": "tr-4"}},
+                ],
+                "wbs_nodes": [
+                    {"id": "w1", "project_id": "project-1", "kind": "deliverable",
+                     "status": "accepted", "business_value": 5, "time_criticality": 3,
+                     "risk_reduction": 2, "job_size": 2}
+                ],
+                "demo_credits": [
+                    {"id": "dc1", "cadence_id": "c-demo", "deliverable_id": "w1",
+                     "evidence": ["manifest-run"]}
+                ],
+                "lessons": [
+                    {"id": "l1", "cadence_id": "c-retro",
+                     "statement": "the plan preceded the demo"}
+                ],
+            }
+        )
+    )
     (snapshot / "data" / "artefacts.json").write_text(json.dumps({"documents": []}))
     (snapshot / "data" / "manifest.json").write_text(
         json.dumps({"git_sha": "self-test", "generated_at": "2026-11-21T00:00:00Z"})
     )
     (snapshot / "docs" / "outputs.js").write_text(
-        'window.CONVEYOR_OUTPUTS = {"schema":"v1","outputs":[]};\n'
+        "window.CONVEYOR_OUTPUTS = "
+        + json.dumps(
+            {
+                "schema": "v1",
+                "outputs": [
+                    {"id": "o1", "project_key": "P0", "category": "pi-plan",
+                     "title": "PI plan — tranche 4", "unit": "tranche-4"},
+                    {"id": "o2", "project_key": "P0", "category": "pi-objectives",
+                     "title": "PI objectives — tranche 4", "unit": "tranche-4"},
+                ],
+            }
+        )
+        + ";\n"
     )
     manifest = workdir / "TEST.toml"
     manifest.write_text(
@@ -606,6 +824,112 @@ severity = "P2"
     if not bad or bad[0]["exit"] != 3:
         failures.append("the failing command's exit was not captured")
 
+    # ── the SAFe checks: one green case and one red case per control ──────────────────
+    safe_manifest = workdir / "TEST-safe.toml"
+    safe_manifest.write_text(
+        """
+[project]
+key = "TEST"
+name = "Self-test SAFe"
+gate = "the SAFe cadence, plan, demo and retro"
+
+[[check]]
+id = "pi-cadence"
+check = "pi_cadence"
+severity = "P0"
+
+[[check]]
+id = "wsjf"
+check = "wsjf"
+severity = "P0"
+
+[[check]]
+id = "demo"
+check = "demo_credits"
+severity = "P0"
+
+[[check]]
+id = "lessons"
+check = "lessons"
+severity = "P0"
+
+[[check]]
+id = "pi-plan"
+check = "pi_plan"
+severity = "P0"
+
+[[check]]
+id = "pi-objectives"
+check = "pi_objectives"
+severity = "P0"
+"""
+    )
+    base_msp = json.loads((snapshot / "data" / "msp.json").read_text())
+    base_outputs = json.loads(
+        (snapshot / "docs" / "outputs.js").read_text().split("=", 1)[1].strip().rstrip(";")
+    )["outputs"]
+
+    def safe_case(name: str, msp: dict, outputs: list, expect_green: bool) -> None:
+        case = workdir / f"safe-{name}"
+        (case / "data").mkdir(parents=True)
+        (case / "docs").mkdir()
+        for filename in (
+            "programme.json", "architecture.json", "work.json", "artefacts.json",
+            "manifest.json",
+        ):
+            shutil.copy(snapshot / "data" / filename, case / "data" / filename)
+        (case / "data" / "msp.json").write_text(json.dumps(msp))
+        (case / "docs" / "outputs.js").write_text(
+            "window.CONVEYOR_OUTPUTS = "
+            + json.dumps({"schema": "v1", "outputs": outputs})
+            + ";\n"
+        )
+        result = run_project(
+            "TEST", case / "data", safe_manifest, workdir / f"evidence-{name}", quiet=True
+        )
+        if (result["verdict"] == "green") != expect_green:
+            failures.append(
+                f"SAFe case {name}: verdict {result['verdict']}, "
+                f"expected {'green' if expect_green else 'red'}"
+            )
+
+    safe_case("ok", base_msp, base_outputs, True)
+
+    def mutate(name: str, change) -> None:
+        msp = copy.deepcopy(base_msp)
+        outputs = copy.deepcopy(base_outputs)
+        change(msp, outputs)
+        safe_case(name, msp, outputs, False)
+
+    mutate(
+        "no-pi-cadence",
+        lambda m, o: m.__setitem__("cadences", [c for c in m["cadences"] if c["id"] != "c-pi"]),
+    )
+    mutate(
+        "no-refinement",
+        lambda m, o: m.__setitem__("cadences", [c for c in m["cadences"] if c["id"] != "c-ref"]),
+    )
+    mutate(
+        "zero-wsjf",
+        lambda m, o: m["wbs_nodes"][0].update(
+            {"business_value": 0, "time_criticality": 0, "risk_reduction": 0}
+        ),
+    )
+    mutate("no-credit", lambda m, o: m.__setitem__("demo_credits", []))
+    mutate("no-lesson", lambda m, o: m.__setitem__("lessons", []))
+    mutate(
+        "no-plan",
+        lambda m, o: o.__setitem__(
+            slice(None), [row for row in o if row["category"] != "pi-plan"]
+        ),
+    )
+    mutate(
+        "no-objectives",
+        lambda m, o: o.__setitem__(
+            slice(None), [row for row in o if row["category"] != "pi-objectives"]
+        ),
+    )
+
     if failures:
         print("SELF-TEST FAILED")
         for failure in failures:
@@ -630,6 +954,8 @@ def main(argv: list[str] | None = None) -> int:
         return self_test()
     if not args.project and not args.all:
         fail("--project <KEY> or --all is required (or --self-test)")
+    if args.manifest and args.all:
+        fail("--manifest names one project's manifest; use --project with it, not --all")
     keys = (
         [args.project]
         if args.project
