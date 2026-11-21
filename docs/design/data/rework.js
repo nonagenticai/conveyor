@@ -20707,6 +20707,180 @@ window.CONVEYOR_REWORK = {
       "title": "Programme Stakeholders tab is an empty placeholder"
     },
     {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-p118-1:PLATFORM",
+      "apply_to": "PLATFORM",
+      "artefact": "§11.8",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "A forward migration adds tool_draft to the kind check; a draft-create action writes one; a test creates the draft, attaches an approval decision and only then publishes the toolkit.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "line": 1488,
+              "path": "docs/SPEC_V2.md",
+              "quote": "Reused, not created: V1 `secret` (credential storage), `governed_asset(kind='tool_draft')`, `event`, `audit_event`,",
+              "source": "code"
+            },
+            {
+              "line": 415,
+              "path": "migrations/0044_plan_spine.sql",
+              "quote": "    kind IN ('requirement', 'principle', 'adr', 'charter', 'closure', 'postmortem',",
+              "source": "code"
+            },
+            {
+              "line": 418,
+              "path": "migrations/0044_plan_spine.sql",
+              "quote": "             'projects_dossier')",
+              "source": "code"
+            }
+          ],
+          "rule": "v1-p118-1",
+          "source": "audit"
+        }
+      ],
+      "key": "v1-p118-1:PLATFORM",
+      "owner_project": "PLATFORM",
+      "rule": "v1-p118-1",
+      "scope": "PLATFORM",
+      "severity": "P2",
+      "spec": "§11.8",
+      "standard": "SPEC",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "§11.8 says the tool draft lifecycle reuses governed_asset(kind='tool_draft'), but the live CHECK admits fifteen kinds without it and tool_draft appears nowhere in migrations, seeds or code.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "line": 1488,
+                  "path": "docs/SPEC_V2.md",
+                  "quote": "Reused, not created: V1 `secret` (credential storage), `governed_asset(kind='tool_draft')`, `event`, `audit_event`,",
+                  "source": "code"
+                },
+                {
+                  "line": 415,
+                  "path": "migrations/0044_plan_spine.sql",
+                  "quote": "    kind IN ('requirement', 'principle', 'adr', 'charter', 'closure', 'postmortem',",
+                  "source": "code"
+                },
+                {
+                  "line": 418,
+                  "path": "migrations/0044_plan_spine.sql",
+                  "quote": "             'projects_dossier')",
+                  "source": "code"
+                }
+              ],
+              "rule": "v1-p118-1",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "PLATFORM"
+        }
+      ],
+      "title": "governed_asset(kind='tool_draft') cannot be inserted"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-p118-2:T13",
+      "apply_to": "PLATFORM",
+      "artefact": "§11.8",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Publish copies the manifest output into tool.output_schema, resolution selects it, and a response that violates it is surfaced distinctly; a test asserts a non-NULL stored output schema and flags a drifted response.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "line": 1483,
+              "path": "docs/SPEC_V2.md",
+              "quote": "| `tool` | one operation version | input/output schema, effect, idempotency, timeout, redact, destination alias, status |",
+              "source": "code"
+            },
+            {
+              "line": 523,
+              "path": "crates/store/src/tool.rs",
+              "quote": "        \"INSERT INTO tool (tenant_id, toolkit_id, key, input_schema, effect, timeout_secs,",
+              "source": "code"
+            },
+            {
+              "line": 122,
+              "path": "crates/store/src/tool.rs",
+              "quote": "     k.toolkit_version, t.key AS tool_key, t.input_schema, t.effect, t.timeout_secs, \\",
+              "source": "code"
+            }
+          ],
+          "rule": "v1-p118-2",
+          "source": "audit"
+        }
+      ],
+      "key": "v1-p118-2:T13",
+      "owner_project": "T13",
+      "rule": "v1-p118-2",
+      "scope": "T13",
+      "severity": "P2",
+      "spec": "§11.8",
+      "standard": "SPEC",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "§11.8 requires the tool row to carry an input and an output schema; the column exists, but insert_tool supplies only input_schema and the resolution select never reads output_schema, so it is NULL for every published tool.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "line": 1483,
+                  "path": "docs/SPEC_V2.md",
+                  "quote": "| `tool` | one operation version | input/output schema, effect, idempotency, timeout, redact, destination alias, status |",
+                  "source": "code"
+                },
+                {
+                  "line": 523,
+                  "path": "crates/store/src/tool.rs",
+                  "quote": "        \"INSERT INTO tool (tenant_id, toolkit_id, key, input_schema, effect, timeout_secs,",
+                  "source": "code"
+                },
+                {
+                  "line": 122,
+                  "path": "crates/store/src/tool.rs",
+                  "quote": "     k.toolkit_version, t.key AS tool_key, t.input_schema, t.effect, t.timeout_secs, \\",
+                  "source": "code"
+                }
+              ],
+              "rule": "v1-p118-2",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "T13"
+        }
+      ],
+      "title": "tool.output_schema is never stored or read"
+    },
+    {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-p46-1:T0",
       "apply_to": "PLATFORM",
       "artefact": "§4.6",
@@ -29618,12 +29792,12 @@ window.CONVEYOR_REWORK = {
       "suppressed": 0
     },
     "SPEC": {
-      "findings": 87,
+      "findings": 89,
       "gaps": 38,
       "p0": 0,
       "p1": 5,
       "p2": 33,
-      "packages": 108,
+      "packages": 110,
       "rules": 8,
       "rules_clean": 2,
       "rules_with_gaps": 6,
@@ -29647,24 +29821,24 @@ window.CONVEYOR_REWORK = {
     "by_severity": {
       "P0": 27,
       "P1": 150,
-      "P2": 153
+      "P2": 155
     },
     "by_standard": {
       "MSP": 66,
       "PMP": 49,
       "SAFe": 16,
-      "SPEC": 108,
+      "SPEC": 110,
       "TOGAF": 91
     },
     "by_status": {
-      "open": 327,
+      "open": 329,
       "suppressed": 3
     },
     "duplicates": 0,
-    "open": 327,
-    "packages": 330,
+    "open": 329,
+    "packages": 332,
     "resolved": 11,
-    "subjects": 428,
+    "subjects": 430,
     "suppressed": 3
   }
 };

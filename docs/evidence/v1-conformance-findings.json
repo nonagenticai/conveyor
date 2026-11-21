@@ -3771,6 +3771,64 @@
             "failure_scenario": "A service principal holding approvals:write answers a PM charter or baseline gate through an internal invoke. record_decision_tx writes a service decider and resolves the gate because it is not an eval gate; with two required decisions, two machine principals complete dual control and no human is involved, although the tenant never declared the gate non-governance.",
             "acceptance": "A non-human decision on any gate not declared non-governance in a tenant gate-policy row is refused 403 human_only_gate; the policy row carries the approver kind; tests cover the default refusal and the tenant-declared job or agent approval.",
             "owner_project": "T11"
+        },
+        {
+            "id": "v1-p118-1",
+            "area": "§11.8",
+            "standard": "SPEC",
+            "spec": "§11.8",
+            "severity": "P2",
+            "title": "governed_asset(kind='tool_draft') cannot be inserted",
+            "problem": "§11.8 says the tool draft lifecycle reuses governed_asset(kind='tool_draft'), but the live CHECK admits fifteen kinds without it and tool_draft appears nowhere in migrations, seeds or code.",
+            "evidence": [
+                {
+                    "path": "docs/SPEC_V2.md",
+                    "line": 1488,
+                    "quote": "Reused, not created: V1 `secret` (credential storage), `governed_asset(kind='tool_draft')`, `event`, `audit_event`,"
+                },
+                {
+                    "path": "migrations/0044_plan_spine.sql",
+                    "line": 415,
+                    "quote": "    kind IN ('requirement', 'principle', 'adr', 'charter', 'closure', 'postmortem',"
+                },
+                {
+                    "path": "migrations/0044_plan_spine.sql",
+                    "line": 418,
+                    "quote": "             'projects_dossier')"
+                }
+            ],
+            "failure_scenario": "An imported draft tool is recorded as a governed asset for tenant-admin approval; the insert violates the kind check, so the draft and the approval and contract-test anchor that §11.5 requires cannot exist.",
+            "acceptance": "A forward migration adds tool_draft to the kind check; a draft-create action writes one; a test creates the draft, attaches an approval decision and only then publishes the toolkit.",
+            "owner_project": "PLATFORM"
+        },
+        {
+            "id": "v1-p118-2",
+            "area": "§11.8",
+            "standard": "SPEC",
+            "spec": "§11.8",
+            "severity": "P2",
+            "title": "tool.output_schema is never stored or read",
+            "problem": "§11.8 requires the tool row to carry an input and an output schema; the column exists, but insert_tool supplies only input_schema and the resolution select never reads output_schema, so it is NULL for every published tool.",
+            "evidence": [
+                {
+                    "path": "docs/SPEC_V2.md",
+                    "line": 1483,
+                    "quote": "| `tool` | one operation version | input/output schema, effect, idempotency, timeout, redact, destination alias, status |"
+                },
+                {
+                    "path": "crates/store/src/tool.rs",
+                    "line": 523,
+                    "quote": "        \"INSERT INTO tool (tenant_id, toolkit_id, key, input_schema, effect, timeout_secs,"
+                },
+                {
+                    "path": "crates/store/src/tool.rs",
+                    "line": 122,
+                    "quote": "     k.toolkit_version, t.key AS tool_key, t.input_schema, t.effect, t.timeout_secs, \\"
+                }
+            ],
+            "failure_scenario": "A destination silently renames response fields; the pinned tool version holds no output contract, so the broker passes the changed body to the run and nothing can detect drift from what was published.",
+            "acceptance": "Publish copies the manifest output into tool.output_schema, resolution selects it, and a response that violates it is surfaced distinctly; a test asserts a non-NULL stored output schema and flags a drifted response.",
+            "owner_project": "T13"
         }
     ]
 }
