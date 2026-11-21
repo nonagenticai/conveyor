@@ -296,6 +296,8 @@ pub struct HandlerCtx {
     /// an approval target is refused by [`crate::invoke::invoke`] unless this names an approved
     /// approval for that exact target; every other action ignores it.
     pub approval_id: Option<Uuid>,
+    /// The request's model-call attribution, when the caller supplied one (§7.4).
+    pub usage: Option<UsageContext>,
 }
 
 impl HandlerCtx {
@@ -970,6 +972,7 @@ pub async fn invoke(
         action: spec.name,
         app_key: request.app_key.clone(),
         approval_id: request.approval_id,
+        usage: request.usage.clone(),
     };
 
     // T13 (SPEC_V2 §11.3): the tool broker is dispatched here, on the pool, because it must

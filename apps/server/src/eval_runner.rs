@@ -1056,6 +1056,7 @@ fn service_ctx(tenant: TenantId, app_key: &str, action: &'static str) -> Handler
         action,
         app_key: app_key.to_owned(),
         approval_id: None,
+        usage: None,
     }
 }
 

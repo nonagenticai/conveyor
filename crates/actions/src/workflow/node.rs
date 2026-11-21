@@ -450,6 +450,7 @@ fn handler_ctx(tenant: TenantId, app_key: &str) -> HandlerCtx {
         action: ACTION,
         app_key: app_key.to_owned(),
         approval_id: None,
+        usage: None,
     }
 }
 
