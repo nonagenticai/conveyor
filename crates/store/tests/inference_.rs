@@ -485,3 +485,177 @@ async fn an_other_caller_is_unattributed_even_with_a_run() {
     );
     tx.commit().await.expect("commit");
 }
+
+#[tokio::test]
+async fn the_extended_dimensions_group_by_programme_job_and_run() {
+    let db = support::TestDb::fresh().await;
+    let tenant = tenant(&db, "s16-extended-dimensions").await;
+
+    // Two programmes with a project each: the programme dimension has one row per programme.
+    let mut projects = Vec::new();
+    for key in ["prog-a", "prog-b"] {
+        let programme: Uuid = sqlx::query_scalar(
+            "INSERT INTO programme (tenant_id, name) VALUES ($1, $2) RETURNING id",
+        )
+        .bind(tenant.as_uuid())
+        .bind(key)
+        .fetch_one(&db.super_pool)
+        .await
+        .expect("seed programme");
+        let project: Uuid = sqlx::query_scalar(
+            "INSERT INTO project (tenant_id, key, name, programme_id)
+             VALUES ($1, $2, $2, $3) RETURNING id",
+        )
+        .bind(tenant.as_uuid())
+        .bind(key)
+        .bind(programme)
+        .fetch_one(&db.super_pool)
+        .await
+        .expect("seed project");
+        projects.push((programme, project));
+    }
+
+    // One position, held by the first run only: the second run has no binding and must surface
+    // as `unattributed`, never disappear.
+    let industry: Uuid = sqlx::query_scalar(
+        "INSERT INTO industry (tenant_id, key, name)
+         VALUES ($1, 'delivery', 'Delivery') RETURNING id",
+    )
+    .bind(tenant.as_uuid())
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("seed industry");
+    let job: Uuid = sqlx::query_scalar(
+        "INSERT INTO job_catalogue (tenant_id, job_key, industry_id, family, title, status)
+         VALUES ($1, 'delivery_lead', $2, 'delivery', 'Delivery lead', 'active') RETURNING id",
+    )
+    .bind(tenant.as_uuid())
+    .bind(industry)
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("seed job");
+    let release_hash = "b".repeat(64);
+    let release: Uuid = sqlx::query_scalar(
+        "INSERT INTO job_release (tenant_id, job_id, release_hash, release_snapshot)
+         VALUES ($1, $2, $3, '{}'::jsonb) RETURNING id",
+    )
+    .bind(tenant.as_uuid())
+    .bind(job)
+    .bind(&release_hash)
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("seed release");
+    let process: Uuid = sqlx::query_scalar(
+        "INSERT INTO process (tenant_id, key, title) VALUES ($1, 'deliver', 'Deliver') RETURNING id",
+    )
+    .bind(tenant.as_uuid())
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("seed process");
+    let binding: Uuid = sqlx::query_scalar(
+        "INSERT INTO job_binding
+             (tenant_id, job_id, release_id, release_hash, release_snapshot,
+              process_id, executor_kind, status)
+         VALUES ($1, $2, $3, $4, '{}'::jsonb, $5, 'procedure', 'active') RETURNING id",
+    )
+    .bind(tenant.as_uuid())
+    .bind(job)
+    .bind(release)
+    .bind(&release_hash)
+    .bind(process)
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("seed binding");
+
+    let mut runs = Vec::new();
+    for (index, (_, project)) in projects.iter().enumerate() {
+        let bound = if index == 0 { Some(binding) } else { None };
+        let run: Uuid = sqlx::query_scalar(
+            "INSERT INTO run (tenant_id, project_id, job_binding_id, status)
+             VALUES ($1, $2, $3, 'queued') RETURNING id",
+        )
+        .bind(tenant.as_uuid())
+        .bind(*project)
+        .bind(bound)
+        .fetch_one(&db.super_pool)
+        .await
+        .expect("seed run");
+        runs.push(run);
+    }
+
+    // The two calls belong to different projects, programmes and jobs (`other` never charges a
+    // project, so a real caller kind is required for the joins to resolve).
+    let usage = Usage {
+        prompt_tokens: 10,
+        total_tokens: 10,
+        ..Usage::default()
+    };
+    let mut tx = begin_scoped(&db.runtime, tenant).await.expect("scope");
+    for run in &runs {
+        let mut attributed = call("local-llm", None, Some(usage));
+        attributed.caller_kind = "agent_run";
+        attributed.run_id = Some(*run);
+        inference::insert_call_tx(&mut tx, tenant, &attributed)
+            .await
+            .expect("insert run-bound call");
+    }
+    tx.commit().await.expect("commit");
+
+    let now = Utc::now();
+    let (since, until) = (now - Duration::hours(1), now + Duration::hours(1));
+    let mut tx = begin_scoped(&db.runtime, tenant).await.expect("scope");
+
+    let by_programme =
+        inference::usage_rows_tx(&mut tx, tenant, UsageGroup::Programme, since, until)
+            .await
+            .expect("programme report");
+    assert_eq!(
+        by_programme.len(),
+        2,
+        "one row per programme: {by_programme:?}"
+    );
+    for (programme, _) in &projects {
+        let row = by_programme
+            .iter()
+            .find(|row| row.bucket == programme.to_string())
+            .expect("programme bucket");
+        assert_eq!(row.calls, 1);
+    }
+    assert_eq!(
+        by_programme.iter().map(|row| row.calls).sum::<i64>(),
+        2,
+        "every call lands in a programme row"
+    );
+
+    let by_job = inference::usage_rows_tx(&mut tx, tenant, UsageGroup::Job, since, until)
+        .await
+        .expect("job report");
+    assert_eq!(
+        by_job.len(),
+        2,
+        "the bound job and one unattributed: {by_job:?}"
+    );
+    let bound_row = by_job
+        .iter()
+        .find(|row| row.bucket == binding.to_string())
+        .expect("job binding bucket");
+    assert_eq!(bound_row.calls, 1);
+    let unbound = by_job
+        .iter()
+        .find(|row| row.bucket == "unattributed")
+        .expect("a run with no binding is the explicit unattributed bucket");
+    assert_eq!(unbound.calls, 1);
+
+    let by_run = inference::usage_rows_tx(&mut tx, tenant, UsageGroup::Run, since, until)
+        .await
+        .expect("run report");
+    assert_eq!(by_run.len(), 2, "one row per run: {by_run:?}");
+    for run in &runs {
+        let row = by_run
+            .iter()
+            .find(|row| row.bucket == run.to_string())
+            .expect("run bucket");
+        assert_eq!(row.calls, 1);
+    }
+    tx.commit().await.expect("commit");
+}
