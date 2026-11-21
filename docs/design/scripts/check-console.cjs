@@ -623,13 +623,22 @@ function freshState() {
 // A small real-shaped snapshot for the public-pack shape: two projects, three issues, one board.
 const SNAPSHOT = {
   schema: "design-snapshot/v1",
-  generated_at: "2026-11-14T00:00:00Z",
+  generated_at: "2026-11-20T12:00:00Z",
   git_sha: "0".repeat(40),
   payload_sha256: "a".repeat(64),
   tenant: "nonagentic",
   feedback_url: "https://github.com/nonagenticai/conveyor/discussions",
   programme: {
-    programme: [{ id: "prog-1", name: "conveyor buildout", status: "active" }],
+    programme: [
+      { id: "prog-1", name: "conveyor buildout", status: "active" },
+      // #528: a UUID-shaped programme so the delivery drill route (`#portfolio/<id>`) is
+      // exercised against the same id validation the page uses on a real snapshot.
+      {
+        id: "11111111-1111-7111-8111-111111111111",
+        name: "Delivery programme",
+        status: "active",
+      },
+    ],
     projects: [
       {
         id: "p-s02",
@@ -663,6 +672,35 @@ const SNAPSHOT = {
         name: "Programme definition",
         programme_id: "prog-1",
         status: "active",
+        meta: { track: "v1", plan: "", issues: [], depends_on: [] },
+      },
+      // #528: one project in the UUID programme and one standalone change initiative, both with
+      // dated activity and spend, so L1 (programme + standalone) and L2 (drill) are exercised.
+      {
+        id: "22222222-2222-7222-8222-222222222222",
+        key: "DLV",
+        name: "Delivery project",
+        programme_id: "11111111-1111-7111-8111-111111111111",
+        status: "active",
+        created_at: "2026-11-13T00:00:00Z",
+        updated_at: "2026-11-20T00:00:00Z",
+        meta: {
+          track: "v1",
+          plan: "",
+          issues: [],
+          depends_on: [],
+          plan_start: "2026-11-12",
+          plan_end: "2026-11-24",
+        },
+      },
+      {
+        id: "33333333-3333-7333-8333-333333333333",
+        key: "LONE",
+        name: "Standalone initiative",
+        programme_id: null,
+        status: "active",
+        created_at: "2026-11-15T00:00:00Z",
+        updated_at: "2026-11-16T00:00:00Z",
         meta: { track: "v1", plan: "", issues: [], depends_on: [] },
       },
     ],
@@ -787,9 +825,93 @@ const SNAPSHOT = {
     ],
   },
   work: {
-    boards: [{ id: "b-s02", project_id: "p-s02" }],
-    lists: [{ id: "l-done", board_id: "b-s02", kind: "done" }],
-    cards: [{ id: "c-1", board_id: "b-s02", list_id: "l-done" }],
+    boards: [
+      { id: "b-s02", project_id: "p-s02" },
+      {
+        id: "44444444-4444-7444-8444-444444444444",
+        project_id: "22222222-2222-7222-8222-222222222222",
+        name: "Delivery board",
+        position: 0,
+      },
+    ],
+    lists: [
+      { id: "l-done", board_id: "b-s02", kind: "done" },
+      {
+        id: "55555555-5555-7555-8555-555555555551",
+        board_id: "44444444-4444-7444-8444-444444444444",
+        name: "Active",
+        kind: "active",
+        position: 1,
+      },
+      {
+        id: "55555555-5555-7555-8555-555555555552",
+        board_id: "44444444-4444-7444-8444-444444444444",
+        name: "Done",
+        kind: "done",
+        position: 2,
+      },
+    ],
+    cards: [
+      { id: "c-1", board_id: "b-s02", list_id: "l-done" },
+      // #528: a work package with two children (one done), and one loose card.
+      {
+        id: "66666666-6666-7666-8666-666666666666",
+        board_id: "44444444-4444-7444-8444-444444444444",
+        list_id: "55555555-5555-7555-8555-555555555551",
+        card_type_id: "ct-delivery",
+        name: "Work package Alpha",
+        parent_card_id: null,
+        created_at: "2026-11-13T00:00:00Z",
+        list_changed_at: "2026-11-14T00:00:00Z",
+        archived_at: null,
+      },
+      {
+        id: "77777777-7777-7777-8777-777777777771",
+        board_id: "44444444-4444-7444-8444-444444444444",
+        list_id: "55555555-5555-7555-8555-555555555551",
+        card_type_id: "ct-delivery",
+        name: "Child one",
+        parent_card_id: "66666666-6666-7666-8666-666666666666",
+        created_at: "2026-11-14T00:00:00Z",
+        list_changed_at: "2026-11-15T00:00:00Z",
+        archived_at: null,
+      },
+      {
+        id: "77777777-7777-7777-8777-777777777772",
+        board_id: "44444444-4444-7444-8444-444444444444",
+        list_id: "55555555-5555-7555-8555-555555555552",
+        card_type_id: "ct-delivery",
+        name: "Child two",
+        parent_card_id: "66666666-6666-7666-8666-666666666666",
+        created_at: "2026-11-15T00:00:00Z",
+        list_changed_at: "2026-11-16T00:00:00Z",
+        archived_at: null,
+      },
+      {
+        id: "88888888-8888-7888-8888-888888888888",
+        board_id: "44444444-4444-7444-8444-444444444444",
+        list_id: "55555555-5555-7555-8555-555555555551",
+        card_type_id: "ct-delivery",
+        name: "Loose card",
+        parent_card_id: null,
+        created_at: "2026-11-17T00:00:00Z",
+        list_changed_at: "2026-11-17T00:00:00Z",
+        archived_at: null,
+      },
+    ],
+    card_types: [{ id: "ct-delivery", code: "delivery_task", label: "Delivery task" }],
+    project_activity: [
+      {
+        project_id: "22222222-2222-7222-8222-222222222222",
+        started_at: "2026-11-13T00:00:00Z",
+        last_activity_at: "2026-11-20T00:00:00Z",
+      },
+      {
+        project_id: "33333333-3333-7333-8333-333333333333",
+        started_at: "2026-11-15T00:00:00Z",
+        last_activity_at: "2026-11-16T00:00:00Z",
+      },
+    ],
     runs: [],
   },
   // T16: the published procedure shape the signed-out page renders.
@@ -1032,7 +1154,56 @@ const SNAPSHOT = {
       },
     ],
   },
-  measure: {},
+  // #528: the delivery view's spend. `cost_usd` is a decimal string, as the ledger report renders
+  // it; an unpriced call is counted, never shown as "$0".
+  measure: {
+    inference: {
+      by_project: [
+        {
+          project_id: "22222222-2222-7222-8222-222222222222",
+          calls: 3,
+          prompt_tokens: 1_400_000,
+          completion_tokens: 100_000,
+          total_tokens: 1_500_000,
+          cost_usd: "0.420000",
+          priced_calls: 2,
+          unpriced_calls: 1,
+        },
+        {
+          project_id: "33333333-3333-7333-8333-333333333333",
+          calls: 1,
+          prompt_tokens: 250_000,
+          completion_tokens: 0,
+          total_tokens: 250_000,
+          cost_usd: "0.035000",
+          priced_calls: 1,
+          unpriced_calls: 0,
+        },
+      ],
+      by_card: [
+        {
+          card_id: "66666666-6666-7666-8666-666666666666",
+          calls: 1,
+          prompt_tokens: 900_000,
+          completion_tokens: 60_000,
+          total_tokens: 960_000,
+          cost_usd: "0.270000",
+          priced_calls: 1,
+          unpriced_calls: 0,
+        },
+        {
+          card_id: "77777777-7777-7777-8777-777777777771",
+          calls: 2,
+          prompt_tokens: 500_000,
+          completion_tokens: 40_000,
+          total_tokens: 540_000,
+          cost_usd: "0.150000",
+          priced_calls: 1,
+          unpriced_calls: 1,
+        },
+      ],
+    },
+  },
 };
 
 function json(res, status, body, headers = {}) {  res.writeHead(status, Object.assign({ "Content-Type": "application/json; charset=utf-8" }, headers));
@@ -2758,6 +2929,94 @@ function readBody(req, done) {
         publicProjectText,
         /present, private/,
         "no private draft is public",
+      );
+      // #528: the four delivery levels, on the same published snapshot.
+      await page.goto(`http://127.0.0.1:${snapshotServer.port}/studio.html#portfolio`);
+      await page.waitForSelector(".page");
+      await page.waitForTimeout(300);
+      const timeline = await page.locator("#main").innerText();
+      assert.match(timeline, /Delivery timeline · portfolio/, "L1 renders the portfolio timeline");
+      assert.match(timeline, /Delivery programme/, "a programme row renders at L1");
+      assert.match(timeline, /Standalone initiative/, "a standalone initiative renders at L1");
+      assert.match(timeline, /1\.5M tok/, "the project's token total renders");
+      assert.match(timeline, /\$0\.42\*/, "the derived cost renders, marked unpriced");
+      assert.match(timeline, /1 unpriced call/, "an unpriced call is counted, never priced as free");
+      assert.ok(
+        (await page.locator("#main .gantt .gantt-row").count()) >= 2,
+        "L1 has a row per programme and standalone initiative",
+      );
+      assert.ok(
+        (await page.locator("#main .gantt-actual").count()) >= 2,
+        "the actual bars are drawn",
+      );
+      // L2: the programme drill — only its projects, with a way back.
+      await page.goto(
+        `http://127.0.0.1:${snapshotServer.port}/studio.html#portfolio/11111111-1111-7111-8111-111111111111`,
+      );
+      await page.waitForSelector(".page");
+      await page.waitForTimeout(300);
+      const programmeTimeline = await page.locator("#main").innerText();
+      assert.match(
+        programmeTimeline,
+        /Delivery timeline · programme/,
+        "L2 renders the programme timeline",
+      );
+      assert.match(programmeTimeline, /Delivery project/, "the programme's project renders");
+      const programmeRows = await page
+        .locator("#main .gantt-row .gantt-name")
+        .allInnerTexts();
+      assert.ok(
+        programmeRows.includes("Delivery project"),
+        "L2's timeline carries the programme's project",
+      );
+      assert.ok(
+        !programmeRows.includes("Standalone initiative"),
+        "L2's timeline shows only this programme's projects",
+      );
+      assert.ok(
+        (await page.locator('#main a[href="#portfolio"]').count()) >= 1,
+        "L2 links back to the portfolio",
+      );
+      // L3: the project kanban — the work package and the loose card.
+      await page.goto(
+        `http://127.0.0.1:${snapshotServer.port}/studio.html#projects/22222222-2222-7222-8222-222222222222`,
+      );
+      await page.waitForSelector(".page");
+      await page.waitForTimeout(300);
+      const boardText = await page.locator("#main").innerText();
+      assert.match(boardText, /Work package Alpha/, "the work-package tile renders");
+      assert.match(boardText, /WORK PACKAGE · 2/, "the tile carries its child count");
+      assert.match(boardText, /Loose card/, "a card with no children renders as a card");
+      assert.ok(
+        (await page.locator("#main .kanban .kanban-col").count()) >= 2,
+        "the board's lanes are columns",
+      );
+      // L4: the work package's own kanban, including the archived/done child.
+      await page.goto(
+        `http://127.0.0.1:${snapshotServer.port}/studio.html#projects/22222222-2222-7222-8222-222222222222/wp/66666666-6666-7666-8666-666666666666`,
+      );
+      await page.waitForSelector(".page");
+      await page.waitForTimeout(300);
+      const packageText = await page.locator("#main").innerText();
+      assert.match(packageText, /Child one/, "the work package's first child renders");
+      assert.match(packageText, /Child two/, "the work package's second child renders");
+      assert.match(packageText, /1\/2 cards done/, "the work package shows its progress");
+      assert.ok(
+        (await page.locator('#main a[href="#projects/22222222-2222-7222-8222-222222222222"]').count()) >= 1,
+        "the work package links back to the project board",
+      );
+      // A project with no board says so; it never renders empty columns.
+      await page.goto(
+        `http://127.0.0.1:${snapshotServer.port}/studio.html#projects/33333333-3333-7333-8333-333333333333`,
+      );
+      await page.waitForSelector(".page");
+      await page.waitForTimeout(300);
+      const noBoardText = await page.locator("#main").innerText();
+      assert.match(noBoardText, /no board/i, "a project with no board says so");
+      assert.equal(
+        await page.locator("#main .kanban-col").count(),
+        0,
+        "a project with no board renders no columns",
       );
       await page.goto(`http://127.0.0.1:${snapshotServer.port}/studio.html#contribute`);
       await page.waitForSelector(".page");

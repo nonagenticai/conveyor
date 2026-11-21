@@ -262,10 +262,19 @@ const shot = (name) => path.join(process.env.CONVEYOR_QA_OUTPUT || os.tmpdir(), 
       (await content()).includes("No published snapshot is loaded"),
       "the public portfolio is honest without a snapshot",
     );
+    // #528: a timeline is never drawn from a fixture — no snapshot, no `.gantt`.
+    check(
+      (await page.locator("#main .gantt").count()) === 0,
+      "the portfolio timeline does not render without a snapshot",
+    );
     await nav("projects");
     check(
       (await content()).includes("No published snapshot is loaded"),
       "the public projects page is honest without a snapshot",
+    );
+    check(
+      (await page.locator("#main .kanban").count()) === 0,
+      "the project board does not render without a snapshot",
     );
     await nav("plan");
     check(

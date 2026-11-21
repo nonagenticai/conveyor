@@ -182,6 +182,36 @@ deliverable → work package (card) → run → step / attempt.**
   unless an override is recorded and counted. A gate that never refuses anything in a full
   programme cycle is flagged as broken, not healthy.
 
+### Delivery visualisation (`docs/design/delivery.js`)
+
+The same work model is drawn at four levels, from one published source — `programme` (programmes
+and projects), `work` (boards, lists, cards, runs and `project_activity`) and `measure`
+(`inference.by_project` / `by_card`):
+
+| Level | Route | Renderer | Data |
+|---|---|---|---|
+| L1 portfolio | `#portfolio` | Gantt | one row per programme (rolled up from its projects) plus one per standalone initiative |
+| L2 programme | `#portfolio/<programmeId>` | Gantt | that programme's projects |
+| L3 project | `#projects/<projectId>` | Kanban | the board's lanes as columns; a card with children is a work-package tile |
+| L4 work package | `#projects/<projectId>/wp/<cardId>` | Kanban | the parent card's children across their board's lanes |
+
+- **A bar is actuals, not a promise.** It starts at the first observed card or run activity
+  (`work.project_activity.started_at`) and ends at completion, or at the snapshot's
+  `generated_at` while the work is in flight. A planned window is drawn as a dashed track only
+  when `project.meta.plan_start` and `meta.plan_end` are both present; a row with no event says
+  **no dated activity** rather than inventing a bar.
+- **Spend is the ledger's own number.** Tokens are stored; cost is derived from
+  `commercial_price` and arrives as a decimal string. A model with no price contributes zero and
+  is counted in `unpriced_calls`; the row shows `*` and the count, never a fabricated `$0`.
+  `measure.inference.totals` remains tenant-wide; `by_project`/`by_card` are filtered to the
+  published boundary, so the difference is the boundary, not a missing call.
+- **The public boundary is the portfolio.** A programme-bound project is public; a standalone
+  project is public only when it is `active`/`paused` **and** carries a board or a card. A draft
+  or bare session fixture is not published.
+- **A work package is a card with children** (`card.parent_card_id`). The project board shows
+  work-package tiles and loose cards; the work package's own board shows the children, archived
+  ones included as done. A child whose parent is archived or absent renders as a loose card.
+
 ## Roles — meta-jobs as ordinary jobs
 
 PM, kanban coach, kata facilitator, development projects and operations are `job_key`s using the
