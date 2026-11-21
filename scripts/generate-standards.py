@@ -436,7 +436,8 @@ def resolve_documents(
         if headings[str(doc.get("id"))] is None or heading_key in headings[str(doc.get("id"))]
     ]
     source = {
-        "kind": "documents", "category": wanted, "scope": scope,
+        "kind": "documents", "file": "artefacts.json", "pointer": "/documents",
+        "category": wanted, "scope": scope,
         "count": len(matched),
         "items": [{"id": str(doc.get("id")), "title": str(doc.get("title") or "")}
                   for doc in matched[:12]],
