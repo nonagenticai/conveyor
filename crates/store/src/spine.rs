@@ -2703,6 +2703,48 @@ pub struct CadenceRecord {
 
 const CADENCE_COLUMNS: &str = "id, programme_id, kind, period, state, meta, version";
 
+/// The closed set of `programme_cadence.state` values (0064's CHECK), in lifecycle order.
+///
+/// `active` is carried because the existing MSP editor test corrects a cadence to it through
+/// `cadences.update`; no worker, gate or materialiser writes it.
+pub const CADENCE_STATES: [&str; 6] = [
+    "planned",
+    "awaiting_approval",
+    "rejected",
+    "materialised",
+    "closed",
+    "active",
+];
+
+/// The writer a cadence state move belongs to.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum CadenceWriter {
+    /// The edit and approval-gate paths: `cadences.update` and the PI-plan gate.
+    Edit,
+    /// The materialiser, which sets the state in the transaction that drafts its cards.
+    Materialiser,
+}
+
+/// The one `programme_cadence.state` transition table: every legal `(from, to)` move and the
+/// writer allowed to make it. A same-state write is an idempotent metadata edit and needs no
+/// entry.
+///
+/// `materialised` is the materialiser's own outcome — a cadence becomes materialised only
+/// together with the cards it drafts — so an edit may never set it. `closed` is terminal.
+fn cadence_move(from: &str, to: &str) -> Option<CadenceWriter> {
+    match (from, to) {
+        ("planned", "awaiting_approval" | "rejected" | "closed" | "active") => {
+            Some(CadenceWriter::Edit)
+        }
+        ("planned", "materialised") => Some(CadenceWriter::Materialiser),
+        ("awaiting_approval", "rejected") => Some(CadenceWriter::Edit),
+        ("awaiting_approval", "materialised") => Some(CadenceWriter::Materialiser),
+        ("rejected", "awaiting_approval") => Some(CadenceWriter::Edit),
+        ("materialised", "closed") => Some(CadenceWriter::Edit),
+        _ => None,
+    }
+}
+
 /// Insert a cadence row.
 pub async fn insert_cadence_tx(
     conn: &mut PgConnection,
@@ -2791,6 +2833,18 @@ pub async fn update_cadence_tx(
         return Err(PlanStoreError::Stale {
             what: "cadence row",
         });
+    }
+    // The state is a move in the one table, not a string the caller rewrites. `materialised` is
+    // the materialiser's outcome and is refused here even though the table has it.
+    if let Some(to) = &patch.state {
+        if to != &current.state && cadence_move(&current.state, to) != Some(CadenceWriter::Edit) {
+            return Err(PlanStoreError::Illegal(
+                PlanError::CadenceIllegalTransition {
+                    from: current.state.clone(),
+                    to: to.clone(),
+                },
+            ));
+        }
     }
     let sql = format!(
         "UPDATE programme_cadence SET
@@ -2976,13 +3030,36 @@ pub async fn open_pi_plan_approval_tx(
 /// Record the state a PI plan's approval leaves the cadence in.
 ///
 /// `awaiting_approval` means "nothing may be drafted until a person approves"; `rejected` is
-/// the person's refusal. A materialised cadence is never moved — its cards are the record.
+/// the person's refusal. A materialised cadence is never moved — its cards are the record — and
+/// every other move is checked against [`cadence_move`], so a closed cadence cannot re-open.
 pub async fn set_pi_cadence_approval_state_tx(
     conn: &mut PgConnection,
     tenant: TenantId,
     cadence_id: Uuid,
     state: &str,
 ) -> Result<(), PlanStoreError> {
+    let current: Option<String> = sqlx::query_scalar(
+        "SELECT state FROM programme_cadence
+          WHERE tenant_id = $1 AND id = $2 AND kind = 'pi' FOR UPDATE",
+    )
+    .bind(tenant.as_uuid())
+    .bind(cadence_id)
+    .fetch_optional(&mut *conn)
+    .await?;
+    let Some(from) = current else {
+        return Ok(());
+    };
+    if from == "materialised" {
+        return Ok(());
+    }
+    if state != from && cadence_move(&from, state) != Some(CadenceWriter::Edit) {
+        return Err(PlanStoreError::Illegal(
+            PlanError::CadenceIllegalTransition {
+                from,
+                to: state.to_owned(),
+            },
+        ));
+    }
     sqlx::query(
         "UPDATE programme_cadence
             SET state = $3, version = version + 1, updated_at = now()
@@ -3044,6 +3121,17 @@ pub async fn materialise_pi_tx(
         .is_none()
     {
         return Err(PlanStoreError::PiPlanNotApproved);
+    }
+    // The materialising move is the table's own: a planned or awaiting-approval cadence becomes
+    // materialised with the cards drafted below. A rejected, active or closed cadence has no
+    // path to cards.
+    if cadence_move(&cadence.state, "materialised") != Some(CadenceWriter::Materialiser) {
+        return Err(PlanStoreError::Illegal(
+            PlanError::CadenceIllegalTransition {
+                from: cadence.state.clone(),
+                to: "materialised".to_owned(),
+            },
+        ));
     }
     let board_id: Uuid = cadence
         .meta
