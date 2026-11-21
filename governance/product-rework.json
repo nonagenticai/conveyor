@@ -424,7 +424,12 @@
         "risk_reduction": 5,
         "job_size": 3
       },
-      "status": "planned"
+      "status": "executing",
+      "evidence": {
+        "test": "crates/actions/tests/demo_credit.rs::a_retro_closes_once_each_finding_has_a_lesson",
+        "refusal": "crates/actions/tests/demo_credit.rs::a_retro_close_without_a_lesson_is_refused_and_stays_open",
+        "note": "actions retros.record_findings|retros.close registered (510 actions); the WBS deliverable, demo credit and Phase-G record are tranche 4 (U5d)"
+      }
     },
     {
       "id": "WP-T10-3",

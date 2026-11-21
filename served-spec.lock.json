@@ -1,7 +1,7 @@
 {
   "version": 1,
   "operations": {
-    "GET /api/actions": "6e0c3ae3ae12f024ceeb80079f433fc578269acf5a93d8e5edd7a2aac64c8cc7",
+    "GET /api/actions": "bcab459c7ca9524eaf30df0800484ec946f1b8e6678be666327352efa4976459",
     "GET /api/boards/{id}": "e1a5ad504ea61c9f6f4c9940f6bce0a13a06587c4545d9d52616852f0e67fa5b",
     "GET /api/boards/{id}/cards": "be3ca9f8fea011aa8b097206310d24ba4641698d2a8d239c5b2df6c48b784502",
     "GET /api/boards/{id}/webhooks": "5b77b802ff044156108b56072acb99bed0e2f9dfb5f2dc667b000af191cffd1b",
@@ -445,6 +445,8 @@
     "POST /api/actions/requirements.transition/invocations": "a8b8dc23cad73aa84e2bb8423839b6f10bee5120a2d1007e0da43a00aea0d9ef",
     "POST /api/actions/requirements.update/invocations": "4a48b2cae01a8f1275015ffd1489b04ab296ccb3fe82b6dd5a2f87a50abf09ee",
     "POST /api/actions/retrieval.query/invocations": "ad8c80e3f823318560a0191c24befa52c89f77e2c16cd724a03f9db4d7ccbf95",
+    "POST /api/actions/retros.close/invocations": "c88766fad820ec32cfedb5957254be358e1d50d5cc82fefd903a8d754c4c6b81",
+    "POST /api/actions/retros.record_findings/invocations": "e958ff42ff5e16549c92110f72a14f6cc5f11b0d61eba9aa7710204e54d108a1",
     "POST /api/actions/roles.policy_get/invocations": "db14ad0b597b2a79baba03c1cbf175e8569a91ac87aedea382609c935e712355",
     "POST /api/actions/roles.policy_reset/invocations": "ef02e27e9bdf82bd045b81741e40cc5290b97c36a9bf9e1894097942aa9d687a",
     "POST /api/actions/roles.policy_set/invocations": "6ea89c127e6c0a4adc42d73e493e24e291b417eb213e0cfc519f6598a921abf1",

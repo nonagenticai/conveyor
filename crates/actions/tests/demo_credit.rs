@@ -9,6 +9,7 @@
 mod support;
 
 use serde_json::{Value, json};
+use uuid::Uuid;
 
 const TOKEN: &str = "dev:alice";
 
@@ -301,5 +302,185 @@ async fn a_credit_and_a_lesson_round_trip() {
     assert_eq!(
         lessons[0]["statement"], "Accept the increment with its evidence.",
         "{body}"
+    );
+}
+
+async fn retro_meta(pg: &support::Pg, tenant: Uuid, project: &str) -> Value {
+    let project_id = Uuid::parse_str(project).expect("the project id");
+    let board: Uuid = sqlx::query_scalar(
+        "INSERT INTO board (tenant_id, project_id, name, position)
+         VALUES ($1, $2, 'Retro board', 0) RETURNING id",
+    )
+    .bind(tenant)
+    .bind(project_id)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("insert the board");
+    sqlx::query(
+        "INSERT INTO list (tenant_id, board_id, name, position, kind)
+         VALUES ($1, $2, 'Intake', 0, 'intake')",
+    )
+    .bind(tenant)
+    .bind(board)
+    .execute(&pg.super_pool)
+    .await
+    .expect("insert the intake lane");
+    sqlx::query(
+        "INSERT INTO card_type (tenant_id, code, label) VALUES ($1, 'retro', 'Retro')
+         ON CONFLICT DO NOTHING",
+    )
+    .bind(tenant)
+    .execute(&pg.super_pool)
+    .await
+    .expect("insert the card type");
+    json!({"board_id": board.to_string(), "card_type_code": "retro"})
+}
+
+async fn create_retro_cadence(running: &support::Running, programme: &str, meta: Value) -> String {
+    let (status, body) = running
+        .invoke(
+            "cadences.create",
+            TOKEN,
+            json!({
+                "programme_id": programme,
+                "kind": "retro",
+                "period": "PI 1 retro",
+                "meta": meta,
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "{body}");
+    text(output(&body), "id")
+}
+
+async fn cadence_state(running: &support::Running, programme: &str, cadence: &str) -> String {
+    let (status, body) = running
+        .invoke(
+            "cadences.list",
+            TOKEN,
+            json!({"programme_id": programme}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{body}");
+    output(&body)["items"]
+        .as_array()
+        .expect("a page")
+        .iter()
+        .find(|row| row["id"] == json!(cadence))
+        .map(|row| text(row, "state"))
+        .expect("the cadence row")
+}
+
+/// A retro cannot close over a finding with no lesson; the refusal writes nothing.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_retro_close_without_a_lesson_is_refused_and_stays_open() {
+    let (pg, running, seeded) = fixture().await;
+    let programme = create_programme(&running, "Retro refusal").await;
+    let project = create_project(&running).await;
+    let meta = retro_meta(&pg, seeded.tenant_id, &project).await;
+    let cadence = create_retro_cadence(&running, &programme, meta).await;
+
+    let (status, body) = running
+        .invoke(
+            "retros.record_findings",
+            TOKEN,
+            json!({
+                "cadence_id": cadence,
+                "findings": [{"key": "F-1", "statement": "the deploy took four tries"}],
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{body}");
+
+    let (status, body) = running
+        .invoke(
+            "retros.close",
+            TOKEN,
+            json!({"cadence_id": cadence}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    refused(status, &body, "cadence_id");
+    assert_ne!(
+        cadence_state(&running, &programme, &cadence).await,
+        "closed",
+        "a refused close leaves the cadence open"
+    );
+}
+
+/// The retro records its findings and closes only once every one has a lesson.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_retro_closes_once_each_finding_has_a_lesson() {
+    let (pg, running, seeded) = fixture().await;
+    let programme = create_programme(&running, "Retro close").await;
+    let project = create_project(&running).await;
+    let meta = retro_meta(&pg, seeded.tenant_id, &project).await;
+    let cadence = create_retro_cadence(&running, &programme, meta).await;
+
+    let (status, body) = running
+        .invoke(
+            "retros.record_findings",
+            TOKEN,
+            json!({
+                "cadence_id": cadence,
+                "findings": [
+                    {"key": "F-1", "statement": "the deploy took four tries"},
+                    {"key": "F-2", "statement": "the lease proof was missing"},
+                ],
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{body}");
+
+    for key in ["F-1", "F-2"] {
+        let (status, body) = running
+            .invoke(
+                "lessons.propose",
+                TOKEN,
+                json!({
+                    "programme_id": programme,
+                    "cadence_id": cadence,
+                    "finding_key": key,
+                    "statement": format!("lesson for {key}"),
+                    "evidence": ["retro:note-1", "retro:note-2"],
+                }),
+                None,
+                None,
+                None,
+            )
+            .await;
+        assert_eq!(status, 201, "{body}");
+    }
+
+    let (status, body) = running
+        .invoke(
+            "retros.close",
+            TOKEN,
+            json!({"cadence_id": cadence}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{body}");
+    assert_eq!(output(&body)["state"], json!("closed"), "{body}");
+    assert_eq!(
+        cadence_state(&running, &programme, &cadence).await,
+        "closed",
+        "the cadence closes with the retro"
     );
 }
