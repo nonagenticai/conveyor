@@ -15,17 +15,19 @@ async fn one_level_and_a_dated_waiver() {
     let f = arch::fixture().await;
     let project = arch::raw_project(&f.pg, f.seeded.tenant_id, "Delivery").await;
     let project_id = project.to_string();
-    let contract = arch::live_contract(&f.running, &project_id, "delivery_contract", "f").await;
+    let contract = arch::live_contract(&f, &project_id, "delivery_contract", "f").await;
 
-    let review = arch::created(
+    let review = arch::created_as(
         &f.running,
+        support::REVIEWER,
         "architecture.reviews_record",
         json!({
             "project_id": project_id,
             "contract_id": contract,
             "level": "compliant",
+            "delegation_ref": f.delegation,
             "findings": [{ "finding": "one deviation, waived below" }],
-            "evidence": [{ "ref": "run:1" }],
+            "evidence": {"ref": "run:1", "delegation_ref": f.delegation},
         }),
         None,
     )
@@ -33,13 +35,15 @@ async fn one_level_and_a_dated_waiver() {
     let review_id = arch::id_of(&review);
     assert_eq!(review["level"], "compliant", "{review}");
 
-    let (status, refused) = arch::call(
+    let (status, refused) = arch::call_as(
         &f.running,
+        support::REVIEWER,
         "architecture.reviews_record",
         json!({
             "project_id": project_id,
             "contract_id": contract,
             "level": "non_conformant",
+            "delegation_ref": f.delegation,
         }),
         None,
     )
@@ -50,8 +54,9 @@ async fn one_level_and_a_dated_waiver() {
     );
     assert_eq!(refused["type"], "conflict", "{refused}");
 
-    let (status, refused) = arch::call(
+    let (status, refused) = arch::call_as(
         &f.running,
+        arch::OWNER,
         "architecture.reviews_waive",
         json!({
             "review_id": review_id,
@@ -68,9 +73,10 @@ async fn one_level_and_a_dated_waiver() {
         "{refused}"
     );
 
-    let owner = support::reviewer_id(&f.pg).await;
-    let waiver = arch::created(
+    let owner = f.owner;
+    let waiver = arch::created_as(
         &f.running,
+        arch::OWNER,
         "architecture.reviews_waive",
         json!({
             "review_id": review_id,
