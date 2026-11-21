@@ -119,6 +119,14 @@ fn spine_error(error: PlanStoreError, action: &str) -> ActionError {
             "benefit_map_incomplete",
             format!("a benefits-map edge is missing: {missing:?}"),
         ),
+        PlanStoreError::Illegal(PlanError::BenefitOutputUnresolved { output_ref }) => invalid(
+            "output_ref",
+            "benefit_output_unresolved",
+            format!(
+                "output_ref {output_ref:?} names no wbs_node of this programme; pass the \
+                 node's id"
+            ),
+        ),
         PlanStoreError::Illegal(PlanError::TrancheReviewEvidenceMissing) => invalid(
             "evidence",
             "tranche_evidence_missing",
@@ -934,7 +942,7 @@ pub struct BenefitLinkIn {
     pub programme_id: Uuid,
     /// The benefit.
     pub benefit_id: Uuid,
-    /// The output level.
+    /// The output level: a `wbs_node` id of a project in the same programme.
     #[serde(default)]
     pub output_ref: String,
     /// The capability level.

@@ -61,6 +61,54 @@ async fn create_project(running: &support::Running, title: &str) -> String {
     id_of(output(&body), "id")
 }
 
+/// A project inside a programme: only such a project's WBS nodes are the programme's outputs.
+async fn create_programme_project(
+    running: &support::Running,
+    programme: &str,
+    title: &str,
+) -> String {
+    let (status, body) = running
+        .invoke(
+            "projects.create",
+            "dev:alice",
+            json!({
+                "title": title,
+                "project_type_code": "delivery",
+                "programme_id": programme
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "{body}");
+    id_of(output(&body), "id")
+}
+
+/// The output a benefits-map edge names: a `wbs_node` of the programme.
+async fn create_output(running: &support::Running, project: &str, title: &str) -> String {
+    let (status, body) = running
+        .invoke(
+            "wbs.create",
+            "dev:alice",
+            json!({
+                "project_id": project,
+                "kind": "deliverable",
+                "title": title,
+                "business_value": 3,
+                "time_criticality": 2,
+                "risk_reduction": 1,
+                "job_size": 2
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "{body}");
+    id_of(output(&body), "id")
+}
+
 /// A job the benefit profile can name as its BCM owner (the completeness rule requires one).
 async fn create_owner_job(pg: &support::Pg, seeded: &support::Seeded) -> uuid::Uuid {
     let industry: uuid::Uuid = sqlx::query_scalar(
@@ -205,6 +253,8 @@ async fn benefit_update_requires_current_version() {
 async fn delete_benefit_cascades_links_and_transition() {
     let (pg, running, seeded) = fixture().await;
     let programme = create_programme(&running, "Cascade programme").await;
+    let project = create_programme_project(&running, &programme, "Cascade project").await;
+    let node = create_output(&running, &project, "T1 plan spine").await;
     let job = create_owner_job(&pg, &seeded).await;
     let (benefit, etag) = create_benefit(&running, &programme, job).await;
 
@@ -215,7 +265,7 @@ async fn delete_benefit_cascades_links_and_transition() {
             json!({
                 "programme_id": programme,
                 "benefit_id": benefit,
-                "output_ref": "T1 plan spine",
+                "output_ref": node,
                 "capability_ref": "WBS and baseline",
                 "operational_outcome": "the plan is managed",
                 "strategic_objective": "faster IT delivery"
@@ -283,6 +333,8 @@ async fn delete_benefit_cascades_links_and_transition() {
 async fn benefit_links_are_listable_and_removable() {
     let (pg, running, seeded) = fixture().await;
     let programme = create_programme(&running, "Map read programme").await;
+    let project = create_programme_project(&running, &programme, "Map read project").await;
+    let node = create_output(&running, &project, "T1 plan spine").await;
     let job = create_owner_job(&pg, &seeded).await;
     let (benefit, _etag) = create_benefit(&running, &programme, job).await;
 
@@ -293,7 +345,7 @@ async fn benefit_links_are_listable_and_removable() {
             json!({
                 "programme_id": programme,
                 "benefit_id": benefit,
-                "output_ref": "T1 plan spine",
+                "output_ref": node,
                 "capability_ref": "WBS and baseline",
                 "operational_outcome": "the plan is managed",
                 "strategic_objective": "faster IT delivery"
@@ -304,6 +356,7 @@ async fn benefit_links_are_listable_and_removable() {
         )
         .await;
     assert_eq!(status, 201, "{linked}");
+    assert_eq!(output(&linked)["output_ref"], node);
     let link = id_of(output(&linked), "id");
     let etag = headers
         .get("etag")
