@@ -1,13 +1,14 @@
 //! Live proof against the real `strata_rag` (S15 step 6–10), `#[ignore]` by default.
 //!
-//! Run with the compose `strata` profile up on mini3:
-//!
 //! ```sh
-//! rbuild -- test -p conveyor-actions --test strata_live -- --ignored --nocapture
+//! CONVEYOR_STRATA_RAG_URL=<url> ~/.claude/scripts/cargo-guard.py test \
+//!   -p conveyor-actions --test strata_live -- --ignored --nocapture
 //! ```
 //!
-//! The service is reached by its compose name (`strata-rag:8092`); the raw LAN IP times out. The
-//! dev token is the one `compose.yaml` sets; it is a local test credential, not an estate secret.
+//! The URL is read from `CONVEYOR_STRATA_RAG_URL`, defaulting to the compose name
+//! (`http://strata-rag:8092`) for a run inside that compose network. The token is the compose
+//! profile's local test credential, not an estate secret. No strata instance is deployed on
+//! mini1/mini2 as of 2026-11-21 (v1-s15-1), so this test is the proof the deployment unlocks.
 
 use conveyor_actions::integrations::strata::Strata;
 use conveyor_domain::TenantId;
@@ -19,11 +20,12 @@ const TOKEN: &str = "conveyor-strata-dev";
 const TENANT: Uuid = Uuid::from_u128(0x0197_a0c0_0000_7000_8000_0000_0000_00a1);
 
 #[tokio::test]
-#[ignore = "needs the real strata_rag on mini3 (:8092)"]
+#[ignore = "needs a reachable strata_rag (CONVEYOR_STRATA_RAG_URL)"]
 async fn a_document_is_ingested_queried_and_pruned_for_one_source() {
     // SAFETY: set before the first `Strata::from_env` call in this binary.
+    let url = std::env::var("CONVEYOR_STRATA_RAG_URL").unwrap_or_else(|_| URL.to_owned());
     unsafe {
-        std::env::set_var("CONVEYOR_STRATA_RAG_URL", URL);
+        std::env::set_var("CONVEYOR_STRATA_RAG_URL", url);
     }
     let client = Strata::from_env().expect("strata configured");
     let tenant = TenantId::from_uuid(TENANT).expect("non-nil tenant");
