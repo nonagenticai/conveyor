@@ -3941,7 +3941,12 @@
       ],
       "failure_scenario": "An agent with documents:write composes the model's patch as a document with card_id set (with meta.generated=true, or with no flag at all). The draft is attached to the card immediately and no draft.apply decision or approval is consulted. The documents.update guard is never reached, so a_generated_draft_cannot_transition_a_card only proves a path the production caller need not use.",
       "acceptance": "documents.compose refuses a card_id on a generated draft and the generated class is derived from a bound inference_call, not caller meta; ladder.apply_draft remains the only attach path; tests prove compose with card_id cannot attach a generated draft and that a model draft without the meta flag is still recognised.",
-      "owner_project": "T2"
+      "owner_project": "T2",
+      "resolved_by": {
+        "commit": "920a1dcbfa6427b59aada92a63b6c29eb6bdcde6",
+        "test": "crates/actions/tests/documents_compose_gate.rs",
+        "evidence": "documents_compose_gate 4/4 and process_step 20/20. The generated class is read from the request's UsageContext (copilot/agent-run or a conversation turn), never from caller meta; a generated compose with card_id is 409 draft_requires_gate before any row; a model draft without the flag is created and stamped meta.generated + generated_by; a declared generated draft with a card is refused; a person-authored attach still works. The process-step declared-output compose carries prompt_ref only and stays authored, so the READY flow still delivers its artefact."
+      }
     },
     {
       "id": "v1-t2-3",
@@ -4047,7 +4052,12 @@
       ],
       "failure_scenario": "The lease-exclusivity arm can be removed from `claim_card_tx` and every S03 gate test still passes; property (b) is recorded as proven while only the stale-version guard is exercised.",
       "acceptance": "Add a race of 32 distinct app_users against one live lease and assert exactly one grant, or remove the same-assignee arm from `claim_card_tx`; restate property (b) to match the implemented renewal semantics.",
-      "owner_project": "S03"
+      "owner_project": "S03",
+      "resolved_by": {
+        "commit": "beaa04041dd5e01f124780dddd1de4504d2e2e44",
+        "test": "crates/store/tests/claim_race.rs",
+        "evidence": "claim_race 2/2: thirty-two distinct app_users race one card at version 1 — exactly one Some (fence 1/version 2), 31 None; the holder re-claims (fence 2/version 3), renews with the fence, and a stranger at the current version is refused. Property (b) is restated to the implemented renewal semantics in the S03 plan."
+      }
     },
     {
       "id": "v1-s03-2",
