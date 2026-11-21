@@ -160,6 +160,10 @@ test "$(psql "$DATABASE_URL" -tAc "SELECT count(*) FROM pg_class WHERE relname I
 #    The shipped test is `a_real_external_call_records_the_router_usage_field_for_field`.
 one_test a_real_external_call_records_the_router_usage_field_for_field -p conveyor-actions --test inference_capture
 rbuild -- test -p conveyor-actions --test inference_capture -- --exact a_real_external_call_records_the_router_usage_field_for_field
+# 2b. the live rehearsal (v1-s16-1): one real call through the estate router, then one ledger row with
+#     a served model. Ignored without `CONVEYOR_LIVE_ROUTER_TOKEN`; when a token is supplied this is the
+#     line that proves the seam against the deployed router, not a stub. It is recorded as a gap until run.
+rbuild -- test -p conveyor-actions --test inference_live -- --ignored --nocapture
 # 3. the derivation is exhaustive — read>0 hit, creation-only write, both-zero miss, no usage unknown (unit, no router)
 #    There is no `inference_usage` integration target: the shipped proof is the domain lib's `inference::tests`.
 some_tests 2 -p conveyor-domain --lib inference::tests
