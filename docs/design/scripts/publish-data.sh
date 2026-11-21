@@ -120,7 +120,7 @@ python3 "$root/scripts/generate-standards.py" \
   --gaps "$tmp/conformance/conformance-gap-register.json" \
   --register "$tmp/data/rework.json" \
   --data-out "$tmp/data" --html-out "$tmp/docs/standards" \
-  --findings-out "$tmp/conformance/standards-findings.json" >/dev/null
+  --findings-out "$root/docs/evidence/standards-findings.json" >/dev/null
 test -f "$tmp/data/standards.json" || {
   echo "publish-data: the standards generator produced no record" >&2
   exit 1
