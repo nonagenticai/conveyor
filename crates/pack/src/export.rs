@@ -5,7 +5,7 @@
 //! paths, `generated_at` is the newest published row's `updated_at`, never the wall clock — so
 //! two exports of an unchanged database are byte-identical and `--check` is meaningful.
 //!
-//! The reader is the live public reader's: the same `publishable AND status='active' AND body IS
+//! The reader is the live public reader's: the same `published_at IS NOT NULL AND status='active' AND body IS
 //! NOT NULL` query and the same `redact_text` safety net ([`crate::live`]). A private row cannot
 //! reach the export because it cannot reach the query.
 //!
