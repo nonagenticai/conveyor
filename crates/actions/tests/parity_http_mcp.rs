@@ -5812,9 +5812,11 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
             });
             expecting(sample, 201)
         },
+        // U4: the act now names the published standing delegation. The sample is the boundary
+        // refusal (the field is absent); the full approval has its own suite (`programme_close`).
         expecting(
             on_prepared("architecture.contracts_approve", Some("\"1\"")),
-            200,
+            422,
         ),
         expecting(
             on_prepared("architecture.contracts_supersede", Some("\"1\"")),
@@ -5841,7 +5843,8 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
                     "level": "compliant",
                 })
             });
-            expecting(sample, 201)
+            // U4: the review names the standing delegation; without it the boundary refuses.
+            expecting(sample, 422)
         },
         {
             let mut sample = plain("architecture.reviews_waive", json!({}), None);
@@ -5854,7 +5857,9 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
                     "reassessment_at": "2027-01-31T00:00:00Z",
                 })
             });
-            expecting(sample, 201)
+            // U4: the seeded review cites no standing delegation (and its requester is the
+            // actor), so the waiver is refused before it is written. The refusal is the parity.
+            expecting(sample, 409)
         },
         expecting(
             plain(
@@ -6077,8 +6082,9 @@ fn pm_samples() -> Vec<Sample> {
             expecting(sample, 201)
         },
         {
-            // A prepared project whose closure gate is APPROVED: the closure record is written
-            // and the project moves out of `active`.
+            // A prepared project whose closure gate is APPROVED but names no closure asset:
+            // U4's close gate refuses `closure_asset_missing` before the status moves. The
+            // refusal is the parity; the conformant close has its own suite (`programme_close`).
             let mut sample = plain("pm.close", json!({}), None);
             sample.prepare = true;
             sample.input = Box::new(|ctx: &Ctx| {
@@ -6088,7 +6094,7 @@ fn pm_samples() -> Vec<Sample> {
                     "closure": "Parity closure narrative",
                 })
             });
-            expecting(sample, 201)
+            expecting(sample, 409)
         },
         {
             // A prepared APPROVED baseline on a prepared project: the change register item and

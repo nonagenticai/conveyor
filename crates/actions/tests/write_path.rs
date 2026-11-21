@@ -554,16 +554,26 @@ async fn legacy_contract_requester_flagged() {
 
 #[tokio::test]
 async fn tranche_authorise_links_review() {
-    let (_pg, running, _seeded) = fixture().await;
+    let (pg, running, _seeded) = fixture().await;
     let programme = create_programme(&running, "Repair programme").await;
     let t0 = create_tranche(&running, &programme, 0).await;
-    // The review is recorded before the next tranche exists, exactly as the historical review
-    // predates the row its authorisation would have moved.
+    let t1 = create_tranche(&running, &programme, 1).await;
+    // The real review authorises tranche 1 in the same write. The repair path exists for the
+    // historical review whose authorisation never landed, so the fixture withdraws it after the
+    // fact: the review row stays, the next tranche reads planned, and the repair re-links it.
     let delegation = support::delegation_ref(&running, TOKEN).await;
     let (status, _body) = review_tranche(&running, &t0, "continue", &delegation).await;
     assert_eq!(status, 200);
     let review = latest_review(&running, &programme).await;
-    create_tranche(&running, &programme, 1).await;
+    sqlx::query(
+        "UPDATE programme_tranche
+            SET state = 'planned', authorised_at = NULL, authorisation_review_id = NULL
+          WHERE id = $1::uuid",
+    )
+    .bind(&t1.0)
+    .execute(&pg.super_pool)
+    .await
+    .expect("withdraw the authorisation");
     assert_eq!(
         tranche_state(&running, &programme, 1).await["state"],
         "planned"
@@ -633,11 +643,11 @@ async fn tranche_authorise_is_idempotent() {
     let (_pg, running, _seeded) = fixture().await;
     let programme = create_programme(&running, "Idempotent programme").await;
     let t0 = create_tranche(&running, &programme, 0).await;
+    let _t1 = create_tranche(&running, &programme, 1).await;
     let delegation = support::delegation_ref(&running, TOKEN).await;
     let (status, _body) = review_tranche(&running, &t0, "continue", &delegation).await;
     assert_eq!(status, 200);
     let review = latest_review(&running, &programme).await;
-    create_tranche(&running, &programme, 1).await;
 
     let (status, first) = running
         .invoke(

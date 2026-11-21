@@ -555,6 +555,19 @@ async fn a_tranche_review_without_evidence_is_refused() {
         "{refused}"
     );
 
+    // U4: a `continue` authorises the next tranche, so the plan needs one to authorise.
+    let (status, next) = running
+        .invoke(
+            "tranches.create",
+            "dev:alice",
+            json!({"programme_id": programme, "number": 1}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "{next}");
+
     let input = json!({
         "id": id,
         "decision": "continue",
