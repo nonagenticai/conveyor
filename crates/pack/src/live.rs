@@ -56,6 +56,9 @@ pub struct SiteArgs<'a> {
     pub tenant_slug: &'a str,
     /// The committed issue registry (`{"issues": [...]}` or a bare array).
     pub issues: Value,
+    /// The committed rework register (`conveyor-rework/v1`), when this image carries one.
+    /// Absent means the wrapper publishes no `rework` section.
+    pub rework: Option<Value>,
     /// Linked from every page.
     pub feedback_url: &'a str,
     /// The commit the served image was built from.
@@ -100,8 +103,11 @@ pub async fn site_view(pool: &PgPool, args: SiteArgs<'_>) -> Result<SiteView, Sn
         object.insert("issue_registry".to_owned(), args.issues.clone());
         object.insert("feedback".to_owned(), Value::Array(feedback));
     }
+    // The rework register is a commit-time artefact like the issue registry: it is carried into
+    // the wrapper from `args`, and omitted from it when the image has no register.
     let snapshot_js = snapshot_js(
         &data,
+        args.rework.as_ref(),
         args.tenant_slug,
         args.feedback_url,
         &generated_at,

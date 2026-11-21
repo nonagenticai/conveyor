@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "standard": "SPEC_V2 §8.1 (tailored TOGAF ADM), §8.2 (SAFe) and §8.3 (MSP as rows and gates)",
+  "standard": "SPEC_V2 \u00a78.1 (tailored TOGAF ADM) and \u00a78.3 (MSP as rows and gates)",
   "sources": {
     "output_standard": "seed/output-standard.json",
     "programme_seed": "seed/programme.json",
@@ -14,43 +14,588 @@
   },
   "programme": {
     "project_key": "P0",
-    "required_baselines": ["management", "governance", "boundary"],
-    "tranche_states_authorising_delivery": ["authorised", "in_review", "closed"],
+    "required_baselines": [
+      "management",
+      "governance",
+      "boundary"
+    ],
+    "tranche_states_authorising_delivery": [
+      "authorised",
+      "in_review",
+      "closed"
+    ],
     "closure_review_category": "closure-review"
   },
   "rules": {
-    "snapshot_schema_stale": "P2",
-    "programme_outputs": "P1",
-    "tranche_plan": "P2",
-    "pi_cadence_missing": "P1",
-    "pi_plan_missing": "P0",
-    "pi_objectives_missing": "P1",
-    "demo_credit_missing": "P1",
-    "retro_lesson_missing": "P1",
-    "wsjf_inputs_missing": "P1",
-    "backlog_refinement_missing": "P1",
-    "tranche_review_without_authorisation": "P0",
-    "project_in_unauthorised_tranche": "P0",
-    "closed_without_closure_review": "P0",
-    "closure_outputs_undeclared": "P1",
-    "unpublished_declared_output": "P1",
-    "benefit_profile_incomplete": "P1",
-    "benefit_baseline_placeholder": "P1",
-    "realized_without_transition": "P0",
-    "transition_order": "P1",
-    "programme_baselines": "P1",
-    "profile_adopted": "P0",
-    "board_not_approved": "P1",
-    "contract_missing": "P1",
-    "contract_unapproved": "P1",
-    "requester_is_approver": "P0",
-    "compliance_review_missing": "P1",
-    "waiver_invalid": "P1",
-    "capability_artefacts": "P1",
-    "mandatory_artefacts": "P1",
-    "seed_live_drift": "P1",
-    "derivation_missing": "P1",
-    "status_source_drift": "P2"
+    "snapshot_schema_stale": {
+      "severity": "P2",
+      "standard": "SPEC",
+      "spec": "\u00a710.3",
+      "artefact": "snapshot_schema",
+      "scope": "programme",
+      "owner_project": "PLATFORM",
+      "rework": {
+        "title": "Bring the published snapshot schema up to date",
+        "dod": [
+          "The snapshot manifest schema equals the schema the code writes",
+          "check-data.cjs passes against the regenerated pack"
+        ]
+      }
+    },
+    "programme_outputs": {
+      "severity": "P1",
+      "standard": "MSP",
+      "spec": "\u00a78.3",
+      "artefact": "programme_brief",
+      "scope": "programme",
+      "owner_project": "P0",
+      "rework": {
+        "title": "Publish the complete programme-definition output set",
+        "dod": [
+          "All 21 p0 output categories are published under the programme project",
+          "The audit reports zero programme_outputs gaps"
+        ]
+      }
+    },
+    "tranche_plan": {
+      "severity": "P2",
+      "standard": "MSP",
+      "spec": "\u00a78.3",
+      "artefact": "tranche_plan",
+      "scope": "tranche",
+      "owner_project": "T12",
+      "rework": {
+        "title": "Complete the tranche plan",
+        "dod": [
+          "Every tranche row carries a state, entry criterion, exit criterion and review date",
+          "The audit reports zero tranche_plan gaps"
+        ]
+      }
+    },
+    "tranche_review_without_authorisation": {
+      "severity": "P0",
+      "standard": "MSP",
+      "spec": "\u00a78.3",
+      "artefact": "tranche_review",
+      "scope": "tranche",
+      "owner_project": "T12",
+      "rework": {
+        "title": "Record the tranche gate decision",
+        "dod": [
+          "A tranche_review row carries continue|pause|stop with its evidence for the tranche",
+          "No project is active or closed in that tranche without the authorising decision"
+        ]
+      }
+    },
+    "project_in_unauthorised_tranche": {
+      "severity": "P0",
+      "standard": "MSP",
+      "spec": "\u00a78.3",
+      "artefact": "tranche_review",
+      "scope": "tranche",
+      "owner_project": "T12",
+      "rework": {
+        "title": "Authorise or re-plan a tranche that is delivering without a gate decision",
+        "dod": [
+          "The tranche has a recorded continue|pause|stop decision",
+          "The audit reports no project_in_unauthorised_tranche gap for that tranche"
+        ]
+      }
+    },
+    "closed_without_closure_review": {
+      "severity": "P0",
+      "standard": "MSP",
+      "spec": "\u00a78.4",
+      "artefact": "closure_review",
+      "scope": "project",
+      "owner_project": null,
+      "rework": {
+        "title": "Publish the project's closure review",
+        "dod": [
+          "A closure review output is published for the project",
+          "The audit reports no closed_without_closure_review gap for the project"
+        ]
+      }
+    },
+    "closure_outputs_undeclared": {
+      "severity": "P1",
+      "standard": "MSP",
+      "spec": "\u00a78.3",
+      "artefact": "closure_outputs",
+      "scope": "tranche",
+      "owner_project": null,
+      "rework": {
+        "title": "Declare and publish the project's closure outputs",
+        "dod": [
+          "meta.closure_outputs names the closure categories and each is published",
+          "The audit reports no closure_outputs_undeclared gap for the project"
+        ]
+      }
+    },
+    "unpublished_declared_output": {
+      "severity": "P1",
+      "standard": "MSP",
+      "spec": "\u00a78.3",
+      "artefact": "published_output",
+      "scope": "tranche",
+      "owner_project": null,
+      "rework": {
+        "title": "Publish every output the project declares",
+        "dod": [
+          "Every category in expected_outputs and closure_outputs resolves to a published output",
+          "The audit reports no unpublished_declared_output gap for the project"
+        ]
+      }
+    },
+    "benefit_profile_incomplete": {
+      "severity": "P1",
+      "standard": "MSP",
+      "spec": "\u00a78.3",
+      "artefact": "benefit_profile",
+      "scope": "programme",
+      "owner_project": "T12",
+      "rework": {
+        "title": "Complete the benefit profiles",
+        "dod": [
+          "Every benefit profile carries all six mandatory field groups",
+          "The audit reports zero benefit_profile_incomplete gaps"
+        ]
+      }
+    },
+    "benefit_baseline_placeholder": {
+      "severity": "P1",
+      "standard": "MSP",
+      "spec": "\u00a78.3",
+      "artefact": "benefit_profile.baseline",
+      "scope": "programme",
+      "owner_project": "T12",
+      "rework": {
+        "title": "Measure the benefit baselines",
+        "dod": [
+          "Every benefit carries a numeric baseline, a measurement method and a measured date",
+          "The audit reports zero benefit_baseline_placeholder gaps"
+        ]
+      }
+    },
+    "realized_without_transition": {
+      "severity": "P0",
+      "standard": "MSP",
+      "spec": "\u00a78.3",
+      "artefact": "benefit_transition",
+      "scope": "programme",
+      "owner_project": "T12",
+      "rework": {
+        "title": "Evidence benefit realisation through a transition",
+        "dod": [
+          "The benefit is realised only through a benefit_transition with a post measurement",
+          "The audit reports zero realized_without_transition gaps"
+        ]
+      }
+    },
+    "transition_order": {
+      "severity": "P1",
+      "standard": "MSP",
+      "spec": "\u00a78.3",
+      "artefact": "benefit_transition",
+      "scope": "programme",
+      "owner_project": "T12",
+      "rework": {
+        "title": "Correct the benefit transition dates",
+        "dod": [
+          "baseline_measured_at <= enacted_at <= post_measured_at <= retired_at for every transition",
+          "The audit reports zero transition_order gaps"
+        ]
+      }
+    },
+    "programme_baselines": {
+      "severity": "P1",
+      "standard": "MSP",
+      "spec": "\u00a78.3",
+      "artefact": "programme_baseline",
+      "scope": "programme",
+      "owner_project": "T12",
+      "rework": {
+        "title": "Take and approve the programme baselines",
+        "dod": [
+          "The management, governance and boundary baselines are recorded and approved",
+          "The audit reports zero programme_baselines gaps"
+        ]
+      }
+    },
+    "profile_adopted": {
+      "severity": "P0",
+      "standard": "TOGAF",
+      "spec": "\u00a78.1",
+      "artefact": "adm_profile",
+      "scope": "programme",
+      "owner_project": "T9",
+      "rework": {
+        "title": "Adopt the ADM profile",
+        "dod": [
+          "The profile is approved and names phases Preliminary and A\u2013H with artefact sets",
+          "The audit reports zero profile_adopted gaps"
+        ]
+      }
+    },
+    "board_not_approved": {
+      "severity": "P1",
+      "standard": "TOGAF",
+      "spec": "\u00a78.1",
+      "artefact": "architecture_board",
+      "scope": "programme",
+      "owner_project": "T9",
+      "rework": {
+        "title": "Approve the Architecture Board",
+        "dod": [
+          "The board record is approved by a distinct approver",
+          "The audit reports zero board_not_approved gaps"
+        ]
+      }
+    },
+    "contract_missing": {
+      "severity": "P1",
+      "standard": "TOGAF",
+      "spec": "\u00a78.1",
+      "artefact": "architecture_contract",
+      "scope": "tranche",
+      "owner_project": null,
+      "rework": {
+        "title": "Put the project under an approved architecture contract",
+        "dod": [
+          "An architecture_contract exists for the project with a declared kind",
+          "The audit reports no contract_missing gap for the project"
+        ]
+      }
+    },
+    "contract_unapproved": {
+      "severity": "P1",
+      "standard": "TOGAF",
+      "spec": "\u00a78.1",
+      "artefact": "architecture_contract",
+      "scope": "project",
+      "owner_project": null,
+      "rework": {
+        "title": "Approve the project's architecture contract before delivery",
+        "dod": [
+          "The contract's approved body is immutable and approved by a distinct approver",
+          "The audit reports no contract_unapproved gap for the project"
+        ]
+      }
+    },
+    "requester_is_approver": {
+      "severity": "P0",
+      "standard": "TOGAF",
+      "spec": "\u00a78.1",
+      "artefact": "architecture_contract",
+      "scope": "programme",
+      "owner_project": "T9",
+      "rework": {
+        "title": "Separate the contract requester from its approver",
+        "dod": [
+          "No contract is approved by the user who requested it",
+          "The audit reports zero requester_is_approver gaps"
+        ]
+      }
+    },
+    "compliance_review_missing": {
+      "severity": "P1",
+      "standard": "TOGAF",
+      "spec": "\u00a78.1",
+      "artefact": "compliance_review",
+      "scope": "project",
+      "owner_project": null,
+      "rework": {
+        "title": "Publish the project's Phase G compliance review",
+        "dod": [
+          "A compliance review names one of the six verdicts against the project's contract",
+          "The audit reports no compliance_review_missing gap for the project"
+        ]
+      }
+    },
+    "waiver_invalid": {
+      "severity": "P1",
+      "standard": "TOGAF",
+      "spec": "\u00a78.1",
+      "artefact": "waiver",
+      "scope": "programme",
+      "owner_project": "T9",
+      "rework": {
+        "title": "Correct the architecture waivers",
+        "dod": [
+          "Every waiver names an owner and a review date and is unexpired",
+          "The audit reports zero waiver_invalid gaps"
+        ]
+      }
+    },
+    "capability_artefacts": {
+      "severity": "P1",
+      "standard": "TOGAF",
+      "spec": "\u00a78.1",
+      "artefact": "preliminary_artefacts",
+      "scope": "programme",
+      "owner_project": "T9",
+      "rework": {
+        "title": "Publish the Preliminary capability artefacts",
+        "dod": [
+          "The principles catalog, tailored ADM profile and artefact standard are approved artefacts",
+          "The audit reports zero capability_artefacts gaps"
+        ]
+      }
+    },
+    "mandatory_artefacts": {
+      "severity": "P1",
+      "standard": "TOGAF",
+      "spec": "\u00a78.1",
+      "artefact": "phase_artefacts",
+      "scope": "tranche",
+      "owner_project": "T9",
+      "rework": {
+        "title": "Complete the mandatory phase artefact sets",
+        "dod": [
+          "Every phase the projects claim has its mandatory artefact set present",
+          "The audit reports no mandatory_artefacts gap for those projects"
+        ]
+      }
+    },
+    "seed_live_drift": {
+      "severity": "P1",
+      "standard": "SPEC",
+      "spec": "\u00a75.3",
+      "artefact": "seed_reconciliation",
+      "scope": "programme",
+      "owner_project": "PLATFORM",
+      "rework": {
+        "title": "Reconcile the seed with the live rows",
+        "dod": [
+          "The seeded project facts equal the live rows, or the drift is recorded and approved",
+          "The audit reports no seed_live_drift gap for the project"
+        ]
+      }
+    },
+    "derivation_missing": {
+      "severity": "P1",
+      "standard": "SPEC",
+      "spec": "\u00a75.3",
+      "artefact": "derived_value",
+      "scope": "programme",
+      "owner_project": "PLATFORM",
+      "rework": {
+        "title": "Correct a claim that a stored value is derived when it is not",
+        "dod": [
+          "The artefact is computed on read from its source rows, never pasted",
+          "The audit reports zero derivation_missing gaps"
+        ]
+      }
+    },
+    "status_source_drift": {
+      "severity": "P2",
+      "standard": "SPEC",
+      "spec": "\u00a75.3",
+      "artefact": "status_source",
+      "scope": "project",
+      "owner_project": null,
+      "rework": {
+        "title": "Reconcile the project's status source",
+        "dod": [
+          "The reported status is the live source, not a stale pasted value",
+          "The audit reports no status_source_drift gap for the project"
+        ]
+      }
+    },
+    "dependency_cycle": {
+      "severity": "P0",
+      "standard": "SPEC",
+      "spec": "\u00a75.1",
+      "artefact": "project_dependency",
+      "scope": "programme",
+      "owner_project": "T12",
+      "rework": {
+        "title": "Break the project dependency cycle",
+        "dod": [
+          "The published dependency graph has no cycle",
+          "The audit reports zero dependency_cycle gaps"
+        ]
+      }
+    },
+    "dependency_unknown_target": {
+      "severity": "P1",
+      "standard": "SPEC",
+      "spec": "\u00a75.1",
+      "artefact": "project_dependency",
+      "scope": "programme",
+      "owner_project": "T12",
+      "rework": {
+        "title": "Point every dependency edge at a real project",
+        "dod": [
+          "Every declared dependency resolves to a project key in the programme",
+          "The audit reports zero dependency_unknown_target gaps"
+        ]
+      }
+    },
+    "dependency_untyped": {
+      "severity": "P2",
+      "standard": "SPEC",
+      "spec": "\u00a75.1",
+      "artefact": "project_dependency",
+      "scope": "programme",
+      "owner_project": "T12",
+      "rework": {
+        "title": "Type the declared project dependencies",
+        "dod": [
+          "Every edge carries blocks|needs|supersedes|informs, not an untyped declaration",
+          "The audit reports zero dependency_untyped gaps"
+        ]
+      }
+    },
+    "cadence_absent": {
+      "severity": "P1",
+      "standard": "SAFe",
+      "spec": "\u00a78.2",
+      "artefact": "programme_cadence",
+      "scope": "programme",
+      "owner_project": "T10",
+      "rework": {
+        "title": "Publish the programme cadence",
+        "dod": [
+          "At least one programme_cadence row (pi|demo|retro|refinement) exists for the current period",
+          "The audit reports zero cadence_absent gaps"
+        ]
+      }
+    },
+    "wbs_absent": {
+      "severity": "P2",
+      "standard": "SPEC",
+      "spec": "\u00a75.1",
+      "artefact": "wbs_node",
+      "scope": "tranche",
+      "owner_project": null,
+      "rework": {
+        "title": "Plan the project's WBS",
+        "dod": [
+          "The project has a WBS with at least one work_package node carrying acceptance criteria",
+          "The audit reports no wbs_absent gap for the project"
+        ]
+      }
+    },
+    "pi_plan_missing": {
+      "severity": "P0",
+      "standard": "SAFe",
+      "spec": "\u00a78.2",
+      "artefact": "pi-plan",
+      "scope": "tranche",
+      "owner_project": "T10",
+      "rework": {
+        "title": "Publish the tranche's PI plan before its cards materialise",
+        "dod": [
+          "Every authorised tranche that carries projects has a published pi-plan output naming that tranche",
+          "No card is materialised from a PI plan a person has not approved",
+          "The audit reports zero pi_plan_missing gaps"
+        ]
+      }
+    },
+    "pi_cadence_missing": {
+      "severity": "P1",
+      "standard": "SAFe",
+      "spec": "\u00a78.2",
+      "artefact": "programme_cadence",
+      "scope": "tranche",
+      "owner_project": "T10",
+      "rework": {
+        "title": "Give every carrying tranche a PI cadence",
+        "dod": [
+          "A programme_cadence row of kind pi exists for each tranche that carries projects",
+          "The cadence names the tranche's period or number",
+          "The audit reports zero pi_cadence_missing gaps"
+        ]
+      }
+    },
+    "pi_objectives_missing": {
+      "severity": "P1",
+      "standard": "SAFe",
+      "spec": "\u00a78.2",
+      "artefact": "pi-objectives",
+      "scope": "tranche",
+      "owner_project": "T10",
+      "rework": {
+        "title": "Publish the PI objectives with the plan",
+        "dod": [
+          "Every authorised tranche has a published pi-objectives output naming that tranche",
+          "The objectives are published with the PI plan, not after delivery",
+          "The audit reports zero pi_objectives_missing gaps"
+        ]
+      }
+    },
+    "demo_credit_missing": {
+      "severity": "P1",
+      "standard": "SAFe",
+      "spec": "\u00a78.2",
+      "artefact": "demo_credit",
+      "scope": "project",
+      "owner_project": "T10",
+      "rework": {
+        "title": "Credit every accepted deliverable at the demo",
+        "dod": [
+          "Every accepted deliverable in an authorised tranche has a demo credit",
+          "Every credit carries non-empty evidence",
+          "The audit reports zero demo_credit_missing gaps"
+        ]
+      }
+    },
+    "retro_lesson_missing": {
+      "severity": "P1",
+      "standard": "SAFe",
+      "spec": "\u00a78.2",
+      "artefact": "lesson",
+      "scope": "tranche",
+      "owner_project": "T10",
+      "rework": {
+        "title": "Close every retro with at least one lesson",
+        "dod": [
+          "Every closed tranche has a retro cadence for its period",
+          "The retro produced at least one lesson with a statement",
+          "The audit reports zero retro_lesson_missing gaps"
+        ]
+      }
+    },
+    "wsjf_inputs_missing": {
+      "severity": "P1",
+      "standard": "SAFe",
+      "spec": "\u00a78.2",
+      "artefact": "wbs_node",
+      "scope": "project",
+      "owner_project": "T10",
+      "rework": {
+        "title": "Score every WBS deliverable from its four inputs",
+        "dod": [
+          "Every deliverable has job_size at least 1",
+          "At least one of business_value, time_criticality and risk_reduction is positive",
+          "The order is computed from the inputs, never stored as a score",
+          "The audit reports zero wsjf_inputs_missing gaps"
+        ]
+      }
+    },
+    "backlog_refinement_missing": {
+      "severity": "P1",
+      "standard": "SAFe",
+      "spec": "\u00a78.2",
+      "artefact": "programme_cadence",
+      "scope": "tranche",
+      "owner_project": "T10",
+      "rework": {
+        "title": "Refine the backlog before the PI plan",
+        "dod": [
+          "Every carrying tranche has a refinement cadence for its period",
+          "The refinement is dated before the PI plan it feeds",
+          "The audit reports zero backlog_refinement_missing gaps"
+        ]
+      }
+    }
   },
-  "dispositions": ["rework", "fold", "waiver", "correct-the-claim", "unprovable"]
+  "dispositions": [
+    "rework",
+    "fold",
+    "waiver",
+    "correct-the-claim",
+    "unprovable"
+  ]
 }

@@ -101,6 +101,12 @@ enum Command {
         /// The committed `gh issue list` registry.
         #[arg(long, default_value = "docs/design/data/issues.json")]
         issues: PathBuf,
+        /// The committed rework register (`schema: "conveyor-rework/v1"`).
+        ///
+        /// When given, the pack carries a `rework` section and writes `rework.json`; without it
+        /// the snapshot is byte-for-byte what it was before the section existed.
+        #[arg(long)]
+        conformance: Option<PathBuf>,
         /// The feedback surface linked from every studio page.
         #[arg(long, default_value = conveyor_server::snapshot::DEFAULT_FEEDBACK_URL)]
         feedback_url: String,
@@ -537,6 +543,7 @@ async fn run(command: Command) -> Result<(), RunError> {
             outputs_dir,
             generated_at,
             issues,
+            conformance,
             feedback_url,
             database_url,
             git_sha,
@@ -547,6 +554,7 @@ async fn run(command: Command) -> Result<(), RunError> {
                 outputs_dir,
                 generated_at,
                 issues,
+                conformance,
                 feedback_url,
                 database_url,
                 git_sha,

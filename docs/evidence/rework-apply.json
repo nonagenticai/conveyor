@@ -1,0 +1,15 @@
+{
+  "applied": {
+    "closed_without_closure_review:DESIGN-PUBLISH": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-21T18:37:12+00:00",
+      "card_id": "01a1ff65-ef71-7ccb-96de-373594bc2670",
+      "severity": "P0"
+    }
+  },
+  "cleared": [],
+  "failures": [],
+  "schema": "conveyor-rework-apply/v1",
+  "tenant": "nonagentic",
+  "updated_at": "2026-11-21T18:37:12+00:00"
+}
