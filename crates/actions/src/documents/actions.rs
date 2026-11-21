@@ -618,7 +618,7 @@ async fn documents_compose(
     if let Some(unit) = &unit {
         meta["unit"] = json!(unit);
     }
-    let created = store::document::create_document_tx(
+    let mut created = store::document::create_document_tx(
         &mut *tx,
         ctx.tenant,
         &NewDocument {
@@ -643,6 +643,21 @@ async fn documents_compose(
     )
     .await
     .map_err(|error| document_error(error, action))?;
+    // A compose that asks for public is the same transition as `documents.publish`: the one
+    // publish writer stamps `published_at`/`published_by` before the revision snapshot, so the
+    // created version is recorded as published and the row enters the public window.
+    if input.publishable == Some(true) {
+        created = store::document::set_publishable_tx(
+            &mut *tx,
+            ctx.tenant,
+            created.id,
+            created.version,
+            true,
+            ctx.actor_id,
+        )
+        .await
+        .map_err(|error| document_error(error, action))?;
+    }
     store::document::write_document_revision_tx(
         &mut *tx,
         ctx.tenant,
@@ -950,7 +965,7 @@ async fn documents_update(
             "only an admin may publish or unpublish an output",
         ));
     }
-    if current.publishable && !can_publish(&ctx) {
+    if current.published_at.is_some() && !can_publish(&ctx) {
         return Err(ActionError::new(
             409,
             "published_locked",
@@ -1035,7 +1050,7 @@ async fn documents_update(
     // The transition to public is the gate; an edit to a row already public is never re-checked,
     // and an unpublish never is. The body being judged is the one the row will carry after this
     // update, so a body and a publish bit in the same call are checked together.
-    if input.publishable == Some(true) && !current.publishable {
+    if input.publishable == Some(true) && current.published_at.is_none() {
         super::require_complete(
             category_final.as_deref(),
             body.as_deref().or(current.body.as_deref()),

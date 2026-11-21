@@ -10,8 +10,9 @@
 //! /design/docs/output-<uuid>.html   one rendered published output
 //! ```
 //!
-//! **Publication is the filter.** Only `publishable AND status='active'` rows with a body are
-//! served, in one read-only transaction built by [`conveyor_pack::live::site_view`].
+//! **Publication is the filter.** Only rows with `published_at IS NOT NULL AND status='active'`
+//! and a body are served, in one read-only transaction built by
+//! [`conveyor_pack::live::site_view`]. `publishable` alone is not publication.
 //!
 //! **Cache correctness.** A missing asset must never be cached as a 404: Cloudflare held a
 //! static 404 for four hours on 2026-11-14. Every miss is `Cache-Control: no-store`; a hit

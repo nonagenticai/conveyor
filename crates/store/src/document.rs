@@ -127,7 +127,9 @@ pub struct DocumentPatch {
     pub content_hash: Option<String>,
     /// The owning card, when the caller links the output.
     pub card_id: Option<Uuid>,
-    /// Whether the public snapshot may carry this row.
+    /// The requested public state. `Some(true)` sets `published_at` and `published_by` in the
+    /// same UPDATE, preserving an existing publication instant; `Some(false)` clears both;
+    /// `None` leaves publication unchanged. The public window itself reads `published_at`.
     pub publishable: Option<bool>,
     /// The output-standard slot; `Some("")` clears it, `None` leaves it unchanged.
     pub category: Option<String>,
@@ -524,14 +526,28 @@ async fn apply_patch_tx(
         current.content_hash.clone()
     };
     let card_id = patch.card_id.or(current.card_id);
-    let publishable = patch.publishable.unwrap_or(current.publishable);
+    // Publication is a state change carried by `published_at`, not the bare bit. When the patch
+    // asks for a state, the same UPDATE that writes the content writes the publication columns,
+    // so the revision written afterwards snapshots the post-publication state. `None` leaves
+    // publication untouched; an existing publication instant is never moved by an edit.
+    let publish_intent = patch.publishable;
+    let publishable = publish_intent.unwrap_or(current.publishable);
     let category = normalize_slot(patch.category.clone(), current.category.clone());
     let unit = normalize_slot(patch.unit.clone(), current.unit.clone());
     let updated_by = patch.updated_by.or(current.updated_by);
     let sql = format!(
         "UPDATE document
             SET title = $3, meta = $4, body = $5, content_hash = $6, card_id = $7,
-                publishable = $8, category = $9, unit = $10, updated_by = $11,
+                publishable = $8,
+                published_at = CASE WHEN $9::boolean IS NULL THEN published_at
+                                    WHEN $9 THEN COALESCE(published_at, now())
+                                    ELSE NULL END,
+                published_by = CASE WHEN $9::boolean IS NULL THEN published_by
+                                    WHEN $9 THEN COALESCE(published_by, $10)
+                                    ELSE NULL END,
+                publish_requested_at = CASE WHEN $9::boolean IS NULL THEN publish_requested_at
+                                            ELSE NULL END,
+                category = $11, unit = $12, updated_by = $10,
                 version = version + 1, updated_at = now()
           WHERE tenant_id = $1 AND id = $2
           RETURNING {DOCUMENT_COLUMNS}"
@@ -545,9 +561,10 @@ async fn apply_patch_tx(
         .bind(content_hash)
         .bind(card_id)
         .bind(publishable)
+        .bind(publish_intent)
+        .bind(updated_by)
         .bind(category)
         .bind(unit)
-        .bind(updated_by)
         .fetch_one(&mut *conn)
         .await?;
     Ok(row.into())
@@ -897,7 +914,7 @@ pub async fn list_published_attachments_tx(
              ON p.id = a.parent_document_id AND p.tenant_id = a.tenant_id
           WHERE a.tenant_id = $1
             AND a.kind = 'attachment' AND a.status = 'active'
-            AND p.status = 'active' AND p.publishable
+            AND p.status = 'active' AND p.published_at IS NOT NULL
           ORDER BY a.parent_document_id, a.created_at, a.id",
     )
     .bind(tenant.as_uuid())
@@ -906,7 +923,7 @@ pub async fn list_published_attachments_tx(
     Ok(rows.into_iter().map(Into::into).collect())
 }
 
-/// One attachment that the public may serve: active, and its parent active and publishable.
+/// One attachment that the public may serve: active, and its parent active and published.
 pub async fn get_published_attachment_tx(
     conn: &mut PgConnection,
     tenant: TenantId,
@@ -919,7 +936,7 @@ pub async fn get_published_attachment_tx(
              ON p.id = a.parent_document_id AND p.tenant_id = a.tenant_id
           WHERE a.tenant_id = $1 AND a.id = $2
             AND a.kind = 'attachment' AND a.status = 'active'
-            AND p.status = 'active' AND p.publishable",
+            AND p.status = 'active' AND p.published_at IS NOT NULL",
     )
     .bind(tenant.as_uuid())
     .bind(id)
@@ -1033,7 +1050,7 @@ pub async fn write_document_revision_tx(
 ) -> Result<Uuid, DocumentStoreError> {
     let content = document_snapshot(record);
     let content_hash = conveyor_domain::compare::content_hash(&content);
-    let status = if record.publishable {
+    let status = if record.published_at.is_some() {
         RevisionStatus::Published
     } else {
         RevisionStatus::Draft

@@ -41,6 +41,16 @@ async fn compose(running: &support::Running, token: &str, input: Value) -> (u16,
         .await
 }
 
+/// Reproduce the legacy publishable-but-unpublished row: the bit is set, `published_at` was
+/// never stamped. No action can create this state after #537, so the test writes it directly.
+async fn make_limbo(pg: &support::Pg, id: &str) {
+    sqlx::query("UPDATE document SET publishable = true, published_at = NULL WHERE id = $1")
+        .bind(Uuid::parse_str(id).expect("document id"))
+        .execute(&pg.super_pool)
+        .await
+        .expect("set the legacy limbo state");
+}
+
 /// A member of the seeded tenant: the author whose draft an admin returns.
 async fn add_member(pg: &support::Pg, seeded: &support::Seeded) -> String {
     let id: Uuid = sqlx::query_scalar(
@@ -211,6 +221,164 @@ async fn an_output_composed_straight_to_public_is_checked() {
     .await;
     assert_eq!(status, 201, "{created}");
     assert_eq!(output(&created)["publishable"], true);
+    assert!(
+        output(&created)["published_at"].is_string(),
+        "a compose straight to public stamps published_at: {created}"
+    );
+}
+
+#[tokio::test(flavor = "multi_thread")]
+async fn a_publishable_but_unpublished_row_is_checked_on_transition() {
+    let (pg, running, _seeded) = fixture().await;
+
+    // The incomplete row carries the bit but was never published: publishing it is exactly
+    // the transition the headings gate exists for.
+    let (status, created) = compose(
+        &running,
+        "dev:alice",
+        json!({"title": "Vision", "body": INCOMPLETE_VISION, "category": "vision"}),
+    )
+    .await;
+    assert_eq!(status, 201, "{created}");
+    let document = output(&created);
+    let id = document["id"].as_str().expect("id").to_owned();
+    let version = etag(document);
+    make_limbo(&pg, &id).await;
+
+    let (status, refused) = running
+        .invoke(
+            "documents.publish",
+            "dev:alice",
+            json!({"id": id, "publish": true}),
+            Some(&version),
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 409, "{refused}");
+    assert!(
+        refused.to_string().contains("output_incomplete"),
+        "{refused}"
+    );
+    let (status, got) = running
+        .invoke(
+            "documents.get",
+            "dev:alice",
+            json!({"id": id}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{got}");
+    assert_eq!(
+        output(&got)["published_at"],
+        Value::Null,
+        "a refused publish never makes the row public"
+    );
+
+    // A complete row in the same legacy state publishes and is stamped.
+    let (status, created) = compose(
+        &running,
+        "dev:alice",
+        json!({"title": "Vision", "body": COMPLETE_VISION, "category": "vision"}),
+    )
+    .await;
+    assert_eq!(status, 201, "{created}");
+    let document = output(&created);
+    let id = document["id"].as_str().expect("id").to_owned();
+    let version = etag(document);
+    make_limbo(&pg, &id).await;
+    let (status, published) = running
+        .invoke(
+            "documents.publish",
+            "dev:alice",
+            json!({"id": id, "publish": true}),
+            Some(&version),
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{published}");
+    assert_eq!(output(&published)["publishable"], true);
+    assert!(
+        output(&published)["published_at"].is_string(),
+        "{published}"
+    );
+}
+
+#[tokio::test(flavor = "multi_thread")]
+async fn a_publishable_but_unpublished_row_is_not_history_published() {
+    let (pg, running, _seeded) = fixture().await;
+    let (status, created) = compose(
+        &running,
+        "dev:alice",
+        json!({"title": "Vision", "body": COMPLETE_VISION, "category": "vision"}),
+    )
+    .await;
+    assert_eq!(status, 201, "{created}");
+    let document = output(&created);
+    let id = document["id"].as_str().expect("id").to_owned();
+    let v1 = etag(document);
+    make_limbo(&pg, &id).await;
+
+    // A content edit writes a revision while the row carries the bit and no publication.
+    let (status, updated) = running
+        .invoke(
+            "documents.update",
+            "dev:alice",
+            json!({"id": id, "title": "Vision (revised)"}),
+            Some(&v1),
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{updated}");
+    let v2 = etag(output(&updated));
+
+    let (status, revisions) = running
+        .invoke(
+            "documents.revision_list",
+            "dev:alice",
+            json!({"id": id}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{revisions}");
+    let rows = output(&revisions).as_array().expect("revisions");
+    assert_eq!(rows[0]["seq"], 2);
+    assert_eq!(
+        rows[0]["status"], "draft",
+        "publication is published_at, not the bare bit: {revisions}"
+    );
+
+    // A limbo row is not public: the request is accepted and the admin may return it.
+    let (status, requested) = running
+        .invoke(
+            "documents.request_publish",
+            "dev:alice",
+            json!({"id": id}),
+            Some(&v2),
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{requested}");
+    assert!(output(&requested)["publish_requested_at"].is_string());
+    let (status, returned) = running
+        .invoke(
+            "documents.return",
+            "dev:alice",
+            json!({"id": id, "note": "Rework the headings."}),
+            Some(&v2),
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{returned}");
+    assert_eq!(output(&returned)["publish_requested_at"], Value::Null);
 }
 
 #[tokio::test(flavor = "multi_thread")]

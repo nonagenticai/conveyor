@@ -71,7 +71,7 @@ async fn documents_publish(
         .await
         .map_err(|error| document_error(error, action))?
         .ok_or_else(|| ActionError::resource_not_found("such document"))?;
-    let was_published = current.publishable;
+    let was_published = current.published_at.is_some();
     let category = current.category.clone();
     let body = current.body.clone();
     let expected = crate::control::require_precondition_with(
@@ -139,7 +139,7 @@ async fn documents_request_publish(
         .await
         .map_err(|error| document_error(error, action))?
         .ok_or_else(|| ActionError::resource_not_found("such document"))?;
-    if current.publishable {
+    if current.published_at.is_some() {
         return Err(ActionError::new(
             409,
             "already_published",
@@ -218,7 +218,7 @@ async fn documents_return(
         .await
         .map_err(|error| document_error(error, action))?
         .ok_or_else(|| ActionError::resource_not_found("such document"))?;
-    if current.publishable {
+    if current.published_at.is_some() {
         return Err(ActionError::new(
             409,
             "published_locked",
@@ -491,7 +491,7 @@ async fn documents_revisions_restore(
             "this document's content is an object; history restores text only — re-upload the file",
         ));
     }
-    if current.publishable && !can_publish(&ctx) {
+    if current.published_at.is_some() && !can_publish(&ctx) {
         return Err(ActionError::new(
             409,
             "published_locked",
@@ -574,7 +574,8 @@ async fn documents_revisions_restore(
         body: Some(body),
         content_hash: Some(content_hash),
         card_id: None,
-        // Restoring never republishes: a person publishes, after reading the restored text.
+        // Restoring never republishes — and a public row is unpublished by the same UPDATE.
+        // A person publishes, after reading the restored text.
         publishable: Some(false),
         category: Some(category.unwrap_or_default()),
         unit: Some(unit.unwrap_or_default()),
