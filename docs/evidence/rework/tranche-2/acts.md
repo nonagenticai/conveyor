@@ -118,3 +118,12 @@ select the three fields but cannot be built against the live `0061` schema, so t
 acceptance evidence is reproducible only after the lane's migrations are applied.
 
 The tranche review document records both corrections and was republished to v3.
+
+## What the pause cost, found by using it
+
+S03's record is complete and its Phase-G review is `compliant`, so it should close. It cannot:
+`projects.close` requires the project's tranche to be `authorised`, `in_review` or `closed`, and
+tranche 2 is `paused`. There is no resume action, and a tranche can be reviewed only once. The pause
+this batch recorded honestly, because the exit criteria were not met, is therefore a one-way door
+that freezes the projects it was meant to gate. Recorded as `v1-tr2-1` (P1, owner T1) with the three
+evidence lines; it is a product gap, not a data problem, and no SQL was used to work around it.

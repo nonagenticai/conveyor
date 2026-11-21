@@ -170,6 +170,36 @@
    "failure_scenario": "A later slice trusts 'every hot index' and assumes archived cards cannot be reached through lease or search scans; the schema never enforced that, and no test asserts it.",
    "acceptance": "Restate the claim to name the two board-scan indexes that filter archived rows and list which other indexes include them deliberately (lease sweep, search); add `archived_at IS NULL` only where exclusion is actually intended.",
    "owner_project": "S03"
+  },
+  {
+   "id": "v1-tr2-1",
+   "area": "\u00a78.3 MSP / T1 plan spine",
+   "standard": "SPEC",
+   "spec": "\u00a78.3",
+   "severity": "P1",
+   "title": "A paused tranche is a one-way door that freezes every project in it",
+   "problem": "`tranches.review` maps `pause` to state `paused` and a tranche can be reviewed only once. `projects.close` requires the project's tranche to be `authorised`, `in_review` or `closed`, so a paused tranche's projects can never close; the only remaining tranche actions are `tranches.update` (plan fields only), `tranches.retire` and `tranches.delete`, none of which resumes it. This was found by using the product: tranche 2 was paused on evidence with two projects open, and the close of S03 \u2014 whose Phase-G review is compliant and whose record is complete \u2014 was then refused `409 tranche_not_authorised`.",
+   "evidence": [
+    {
+     "path": "crates/store/src/spine.rs",
+     "line": 1204,
+     "quote": "        \"pause\" => \"paused\","
+    },
+    {
+     "path": "crates/store/src/spine.rs",
+     "line": 3630,
+     "quote": "            if matches!(state.as_str(), \"authorised\" | \"in_review\" | \"closed\") =>"
+    },
+    {
+     "path": "crates/actions/src/programme.rs",
+     "line": 291,
+     "quote": "    conveyor_store::spine::assert_project_tranche_authorised_tx(&mut *tx, tenant, project_id)"
+    }
+   ],
+   "failure_scenario": "A tranche review that honestly records `pause` \u2014 the MSP answer when the exit criteria are not met \u2014 permanently prevents the very projects that could still meet them from closing. The programme has no way to resume short of deleting or retiring the tranche, so an honest pause converts a recoverable slip into a dead end.",
+   "acceptance": "Add a resume path (`tranches.resume` with an approving decision, or allow `tranches.review` to record a second dated review) and let a project close while its tranche is paused, with the closure recorded as in-flight work; a test proves a paused tranche can be resumed and that a compliant project can close in it.",
+   "owner_project": "T1",
+   "found_by": "use, during the tranche-2 rework (2026-11-21)"
   }
  ],
  "dropped_duplicates": [
@@ -180,6 +210,13 @@
   {
    "id": "v1-t2-4",
    "of": "duplicate of v1-w1c-4 (options inline, answer unchecked)"
+  }
+ ],
+ "discovery": [
+  {
+   "id": "v1-tr2-1",
+   "how": "found by running the tranche-2 lifecycle, not by reading the code",
+   "at": "2026-11-21T23:32:31+00:00"
   }
  ]
 }
