@@ -2353,7 +2353,12 @@
       ],
       "failure_scenario": "A `write` tool (for example `coding.jobs.create`) is published with no checks declaration. The destination answers 200 after a partial write — the branch was created but the commit was not. The broker ledgers `ok`, the run proceeds on the belief that the write verified itself, and the unverified write is indistinguishable in the ledger from a verified one.",
       "acceptance": "`toolkits.publish` refuses a `write`/`destructive` tool whose action declares no verification path, naming the tool; a call whose result carries a failing `verdict` or `checks[]` is ledgered `check_failed` and returned to the caller distinctly from `ok`; a test publishes a write tool with no verification and asserts no `tool` row is created.",
-      "owner_project": "T13"
+      "owner_project": "T13",
+      "resolved_by": {
+        "commit": "78bb25d5b018751c67dd298089ced9edf16c3db8",
+        "test": "crates/actions/tests/tool_platform.rs",
+        "evidence": "cargo test -p conveyor-actions --lib --test tool_platform: 158 lib + 13 integration passed. Manifest validation refuses a write tool with no verification path; a failing verdict or a missing declared verdict is 422 write_not_verified with exactly one check_failed ledger row; a passing verdict + checks is ok. The declaration is stored on the tool version (0063)."
+      }
     },
     {
       "id": "v1-w4a-3",
@@ -2376,7 +2381,7 @@
         },
         {
           "path": "crates/actions/src/broker.rs",
-          "line": 326,
+          "line": 394,
           "quote": "        idempotency_key: request.idempotency_key.clone(),"
         },
         {
@@ -2410,7 +2415,7 @@
         },
         {
           "path": "crates/actions/src/broker.rs",
-          "line": 334,
+          "line": 402,
           "quote": "        authority: Authority::Internal,"
         }
       ],
@@ -2444,7 +2449,7 @@
         },
         {
           "path": "crates/actions/src/broker.rs",
-          "line": 391,
+          "line": 475,
           "quote": "                _ => \"backend_error\","
         }
       ],
@@ -3134,7 +3139,12 @@
       ],
       "failure_scenario": "The S06 gate is permanently red; retry, andon, delivery and approval-expiry regressions ship unseen.",
       "acceptance": "Add the named targets (or point the gate at the real ones) and prove properties c-e green.",
-      "owner_project": "S06"
+      "owner_project": "S06",
+      "resolved_by": {
+        "commit": "78bb25d5b018751c67dd298089ced9edf16c3db8",
+        "test": "crates/api/tests/golden_path.rs",
+        "evidence": "All ten corrected targets green at 78bb25d5: conveyor-api golden_path 4, claim_race 7, approval_dual 8, notifications 8, sse_control 5, channel_inbound 7; conveyor-server run_retry 4, approval_expire 1, andon 3, delivery_retry 7. No target is absent."
+      }
     },
     {
       "id": "v1-s06-2",
@@ -3182,7 +3192,12 @@
       ],
       "failure_scenario": "The S06c gate is red despite working tasks, or a dead literal is added to satisfy the grep.",
       "acceptance": "Replace the grep with a registry assertion (or match the real task = true derive) and prove the one-task-capable-action property.",
-      "owner_project": "S06"
+      "owner_project": "S06",
+      "resolved_by": {
+        "commit": "78bb25d5b018751c67dd298089ced9edf16c3db8",
+        "test": "crates/actions/tests/mcp_tasks_contract.rs",
+        "evidence": "cargo test -p conveyor-actions --test mcp_tasks_contract only_projects_execute_is_task_capable: 1 passed, 2 filtered. The gate now asserts the compiled registry (the derive's `task = true`), not a source grep."
+      }
     },
     {
       "id": "v1-s06-4",
@@ -3588,7 +3603,12 @@
       ],
       "failure_scenario": "The gate aborts on the first command; the arm's refusal and the improvement job's person-equivalent calls are unverified.",
       "acceptance": "Both commands select real targets and run their named assertions.",
-      "owner_project": "S18"
+      "owner_project": "S18",
+      "resolved_by": {
+        "commit": "78bb25d5b018751c67dd298089ced9edf16c3db8",
+        "test": "apps/server/tests/benchmark_improvement.rs",
+        "evidence": "cargo test -p conveyor-server --test benchmark_improvement: 3 passed. An empty payload is a permanent refusal, an already judged candidate writes nothing, and a running candidate schedules exactly one benchmark.improvement.run job with the tick in its dedupe key."
+      }
     },
     {
       "id": "v1-s19-1",
