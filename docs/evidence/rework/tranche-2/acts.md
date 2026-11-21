@@ -54,15 +54,48 @@ from this session: `documents.delete` is `effect = destructive` with
 Neither is publishable, so neither can reach the public pack; both should be deleted at the next
 destructive-approval window.
 
-## The lifecycle is blocked on the lane's own migrations
+## The lifecycle ran against an in-pod snapshot
 
-`scripts/rework-project.py` builds its review snapshot with `$PROGRAMME_RECORD_BIN` against the
-read-only primary. That build now fails:
+`scripts/rework-project.py` builds its review snapshot with `$PROGRAMME_RECORD_BIN`, and that build
+fails on the live primary: the branch is at `0063_tool_verify` and the database at
+`0061_contract_requester`, so the branch query reads `departments.archetype`, which
+`0062_release_layers` adds. The batch therefore built each snapshot with the **deployed** engine in a
+one-off pod (`tr2-snapshot`, restricted security context, `emptyDir`, `envFrom conveyor-secrets`),
+copied it out, and ran a local copy of the runner that reads that directory and rebuilds it through
+the same pod command after each write. Nothing was migrated out of band and nothing in `scripts/`
+was changed on the branch.
 
-    error: snapshot: database: error returned from database: column d.archetype does not exist at line 3854
+Both projects ran: S03 and T2 each reopened, chartered, contract requested and approved, seven
+Phase A–D artefacts created and approved, baseline taken, Phase-G review recorded, three outputs
+composed and published, WBS recorded and the demo credit issued. The full act list is in
+`S03/transcript.jsonl` and `T2/transcript.jsonl` in this directory.
 
-The branch is at migration `0063_tool_verify`; the live database is at `0061_contract_requester`.
-`0062_release_layers` adds the column the branch's snapshot query reads. So until the lane merges
-and its migrations are applied — or the batch runs against a snapshot built by the deployed
-engine — no project can be taken through the runner. The two content records are authored and pass
-`rework-content-check.py` offline; they are stored beside this file.
+## The manifests are red, and the tranche is paused
+
+Run at the 23:17Z snapshot (`7ff27efd`):
+
+| project | verdict | failing checks |
+|---|---|---|
+| S03 | red, 5 | contract, review, closure gate, demo credit, lessons |
+| T2 | red, 4 | contract, review, demo credit, lessons |
+
+Both projects are active. `projects.close` is refused while a Phase-G review is `non_conformant`
+and no active waiver covers it, and the tenant has no accepting owner other than its two service
+principals and a test identity — so no honest waiver can be signed.
+
+Tranche 2's review is therefore recorded as **pause** (`01a2006c-8f71-733d-a562-103c144882ce`,
+decided by `conveyor-approver` on the requester's gate; the tranche is `paused`, tranche 3 stays
+`planned`). The review document is published as
+`01a2006a-8db7-764e-9b21-fee33e71e815`.
+
+## The acts of this batch
+
+| act | action | row |
+|---|---|---|
+| PI cadence | `cadences.create` | `01a2004a-51f4-7482-b5f8-455a4bd371b5` |
+| backlog refinement | `cadences.create` | `01a2004a-739d-717e-81dd-15ddf37f4c2f` |
+| system demo | `cadences.create` | `01a2004a-87d8-77e9-b06a-171361548e38` |
+| inspect and adapt | `cadences.create` | `01a2004a-9c9a-7999-bbbd-9976427009b6` |
+| PI plan | `documents.compose` + `documents.publish` | `01a20051-62d5-76b5-9c22-a298c4c31c46` |
+| PI objectives | `documents.compose` + `documents.publish` | `01a20052-1d3e-71e4-9490-f531e1592cc0` |
+| tranche review | `tranches.review` (approval `01a2006b-6ffb-7a76-95ad-73cbae124869`) | `01a2006c-8f71-733d-a562-103c144882ce` |
