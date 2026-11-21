@@ -290,8 +290,20 @@ if (fs.existsSync(reworkJsPath)) {
     }
     if (!Array.isArray(register.packages)) bad("data/rework.js carries no packages array");
     if (fs.existsSync(reworkPath)) {
+      // Compare content, not key order: the live publish writes rework.json through the Rust
+      // snapshot and the generator writes rework.js with sorted keys.
+      const canonical = (value) => {
+        if (Array.isArray(value)) return `[${value.map(canonical).join(",")}]`;
+        if (value && typeof value === "object") {
+          return `{${Object.keys(value)
+            .sort()
+            .map((key) => `${JSON.stringify(key)}:${canonical(value[key])}`)
+            .join(",")}}`;
+        }
+        return JSON.stringify(value);
+      };
       const published = JSON.parse(fs.readFileSync(reworkPath, "utf8"));
-      if (JSON.stringify(published) !== JSON.stringify(register)) {
+      if (canonical(published) !== canonical(register)) {
         bad("data/rework.js differs from data/rework.json");
       } else {
         ok("data/rework.js matches the published register");

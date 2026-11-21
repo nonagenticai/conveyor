@@ -3249,8 +3249,12 @@ function readBody(req, done) {
   const snapshotServer = await startServer({
     config: null,
     state: snapshotState,
-    snapshot: SNAPSHOT,
+    // #546: the register is published as its own generated global. Drop it from the snapshot so
+    // every scorecard and rail assertion below proves `live.rework || window.CONVEYOR_REWORK` on
+    // the committed-pack path; the live embedded path stays covered by check-v2's fixtures.
+    snapshot: { ...SNAPSHOT, rework: undefined },
     standards: STANDARDS,
+    rework: SNAPSHOT.rework,
   });
   // #386: three projects that isolate the closure-debt rule. C1 is closed and owes one
   // at-closure category; C2 is closed and complete; A1 is active and owes nothing yet.
