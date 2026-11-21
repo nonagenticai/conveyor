@@ -288,13 +288,40 @@ async fn a_project_closes_only_after_the_closure_gate() {
         "the PM requested the closure gate"
     );
 
+    // U4: the request writes the draft closure asset; the gate names it and the deciding
+    // approver approves it. The PM's `pm.route_gate` does not write the asset itself.
+    let closure_asset: Uuid = sqlx::query_scalar(
+        "INSERT INTO governed_asset
+             (tenant_id, kind, key, title, body, status, project_id, owner_user_id)
+         VALUES ($1, 'closure', $2, 'Closure', 'The closure narrative.', 'draft', $3, $4)
+         RETURNING id",
+    )
+    .bind(seeded.tenant_id)
+    .bind(format!("closure-{}", Uuid::now_v7().simple()))
+    .bind(project_id)
+    .bind(seeded.user_id)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("the draft closure asset");
+    sqlx::query(
+        "UPDATE approval
+            SET meta = meta || jsonb_build_object('closure_asset_id', $2::text)
+          WHERE tenant_id = $1 AND id = $3",
+    )
+    .bind(seeded.tenant_id)
+    .bind(closure_asset.to_string())
+    .bind(closure_gate)
+    .execute(&pg.super_pool)
+    .await
+    .expect("name the closure asset on the gate");
+
     // ── a close while the gate is pending is refused and writes nothing ──────────────────
     let (status, body) = close(&pg, seeded.tenant, &running, bindings.pm, project_id).await;
     assert_eq!(
         status, 409,
         "a pending closure gate must refuse the close: {body}"
     );
-    assert_eq!(body["type"], "closure_gate_missing", "{body}");
+    assert_eq!(body["type"], "closure_gate_pending", "{body}");
 
     let project_status: String =
         sqlx::query_scalar("SELECT status FROM project WHERE tenant_id = $1 AND id = $2")
@@ -317,8 +344,19 @@ async fn a_project_closes_only_after_the_closure_gate() {
     .await
     .expect("closure assets");
     assert_eq!(
-        closures, 0,
-        "a refused pm.close wrote a closure governed asset"
+        closures, 1,
+        "the seeded draft asset is the only closure asset; the refused close wrote none"
+    );
+    let asset_status: String =
+        sqlx::query_scalar("SELECT status FROM governed_asset WHERE tenant_id = $1 AND id = $2")
+            .bind(seeded.tenant_id)
+            .bind(closure_asset)
+            .fetch_one(&pg.super_pool)
+            .await
+            .expect("the draft asset");
+    assert_eq!(
+        asset_status, "draft",
+        "the refused close approved the asset"
     );
 
     // ── the second principal approves; the close then lands ─────────────────────────────
@@ -327,9 +365,9 @@ async fn a_project_closes_only_after_the_closure_gate() {
     assert_eq!(output(&body)["status"], "approved", "{body}");
 
     let (status, body) = close(&pg, seeded.tenant, &running, bindings.pm, project_id).await;
-    // The close creates the closure asset, so the action is a `201 Created` (the same
-    // `HandlerOutput::created` shape `pm.charter` and `pm.plan` return); the project's own
-    // status is the "closed" below.
+    // The closure request wrote the asset; the gate's deciding approver approved it, and
+    // `pm.close` passes the one close gate. The action is a `201 Created` (the same
+    // `HandlerOutput::created` shape `pm.charter` and `pm.plan` return).
     assert_eq!(
         status, 201,
         "pm.close after the approved closure gate: {body}"

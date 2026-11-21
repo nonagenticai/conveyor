@@ -409,37 +409,38 @@ pub(crate) async fn assert_project_can_close(
             ActionError::internal()
         })?
         .ok_or_else(|| ActionError::resource_not_found("project"))?;
-    if project.programme_id.is_none() {
+    let since = reopened_at(&project);
+    let gate = crate::pm::latest_gate_tx(&mut *tx, tenant, project_id, "closure", since).await?;
+    // A standalone project with no closure decision keeps the #302 output gate only. Once a
+    // closure gate exists (the PM's route), it governs the close even for a standalone project.
+    if project.programme_id.is_none() && gate.is_none() {
         return Ok(());
     }
-    let since = reopened_at(&project);
-
-    spine_store::assert_project_tranche_authorised_tx(&mut *tx, tenant, project_id)
-        .await
-        .map_err(|error| match error {
-            spine_store::PlanStoreError::Illegal(
-                conveyor_domain::spine::PlanError::TrancheNotAuthorised,
-            ) => ActionError::new(
-                409,
-                "closure_tranche_not_authorised",
-                "the project's tranche is not authorised; the programme's review authorises it",
-            ),
-            other => {
-                tracing::error!(error = %other, "close gate: tranche authorisation");
-                ActionError::internal()
-            }
-        })?;
-
-    let (gate_id, gate_status) =
-        crate::pm::latest_gate_tx(&mut *tx, tenant, project_id, "closure", since)
-            .await?
-            .ok_or_else(|| {
-                ActionError::new(
+    if project.programme_id.is_some() {
+        spine_store::assert_project_tranche_authorised_tx(&mut *tx, tenant, project_id)
+            .await
+            .map_err(|error| match error {
+                spine_store::PlanStoreError::Illegal(
+                    conveyor_domain::spine::PlanError::TrancheNotAuthorised,
+                ) => ActionError::new(
                     409,
-                    "closure_gate_missing",
-                    "the project has no closure gate; request the closure first",
-                )
+                    "closure_tranche_not_authorised",
+                    "the project's tranche is not authorised; the programme's review authorises it",
+                ),
+                other => {
+                    tracing::error!(error = %other, "close gate: tranche authorisation");
+                    ActionError::internal()
+                }
             })?;
+    }
+
+    let (gate_id, gate_status) = gate.ok_or_else(|| {
+        ActionError::new(
+            409,
+            "closure_gate_missing",
+            "the project has no closure gate; request the closure first",
+        )
+    })?;
     if gate_status != "approved" {
         return Err(ActionError::new(
             409,
@@ -494,19 +495,21 @@ pub(crate) async fn assert_project_can_close(
                 "the closure gate does not name the closure asset it authorises",
             )
         })?;
-    let delegation_ref = gate
-        .meta
-        .get("delegation_ref")
-        .and_then(Value::as_str)
-        .and_then(|raw| raw.parse::<Uuid>().ok())
-        .ok_or_else(|| {
-            ActionError::new(
-                409,
-                "delegation_ref_missing",
-                "the closure gate does not cite the standing delegation",
-            )
-        })?;
-    assert_delegation_ref(&mut *tx, tenant, delegation_ref).await?;
+    if project.programme_id.is_some() {
+        let delegation_ref = gate
+            .meta
+            .get("delegation_ref")
+            .and_then(Value::as_str)
+            .and_then(|raw| raw.parse::<Uuid>().ok())
+            .ok_or_else(|| {
+                ActionError::new(
+                    409,
+                    "delegation_ref_missing",
+                    "the closure gate does not cite the standing delegation",
+                )
+            })?;
+        assert_delegation_ref(&mut *tx, tenant, delegation_ref).await?;
+    }
     let asset = governance_store::get_asset_record_tx(&mut *tx, tenant, asset_id)
         .await
         .map_err(|error| {
@@ -536,6 +539,11 @@ pub(crate) async fn assert_project_can_close(
             "closure_self_approved",
             "the closure author approved their own closure",
         ));
+    }
+    // The decision and the asset govern a standalone project's close; the programme records
+    // (charter, baseline, delivery contract, Phase-G) apply only to a programme project.
+    if project.programme_id.is_none() {
+        return Ok(());
     }
 
     if crate::pm::approved_gate(&mut *tx, tenant, project_id, "charter")
