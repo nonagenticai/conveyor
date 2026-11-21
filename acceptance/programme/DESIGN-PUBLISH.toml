@@ -1,0 +1,64 @@
+[project]
+key = "DESIGN-PUBLISH"
+name = "Publish the SPEC_V2 studio design pack, live"
+gate = "The closure review exists and every declared closure output is published; the project re-closes through the one gate."
+
+[[check]]
+id = "DESIGN-PUBLISH-project"
+check = "project"
+status = "closed"
+severity = "P0"
+description = "DESIGN-PUBLISH is closed"
+
+[[check]]
+id = "DESIGN-PUBLISH-baseline"
+check = "project_baseline"
+require_approved = true
+severity = "P0"
+description = "the scope baseline is approved; the close gate reads the approved row"
+
+[[check]]
+id = "DESIGN-PUBLISH-charter"
+kind = "command"
+severity = "P0"
+description = "the charter asset exists and the charter gate is approved"
+command = '''python3 scripts/programme-record.py --check --action pm.get --input '{"project_id":"01a1d039-0d39-7414-b43c-450de170ffe1"}' | python3 -c '
+import json,sys
+s=sys.stdin.read()
+d=json.loads(s[s.find("{"):])
+o=d.get("output",d)
+assert o.get("charter_asset_id"), "no charter asset"
+gates={g.get("gate"):g.get("status") for g in o.get("gates",[])}
+assert gates.get("charter")=="approved", gates
+'
+'''
+
+[[check]]
+id = "DESIGN-PUBLISH-closure-outputs"
+check = "closure_outputs"
+severity = "P0"
+description = "the declared closure outputs are declared and published"
+
+[[check]]
+id = "DESIGN-PUBLISH-contract"
+check = "contract"
+severity = "P0"
+description = "a live board-approved delivery contract exists"
+
+[[check]]
+id = "DESIGN-PUBLISH-review"
+check = "review"
+severity = "P0"
+description = "the Phase-G review cites a published standing delegation"
+
+[[check]]
+id = "DESIGN-PUBLISH-closure-gate"
+check = "closure_gate"
+severity = "P0"
+description = "the closure gate was decided by an approver other than its requester"
+
+[[check]]
+id = "DESIGN-PUBLISH-waivers"
+check = "waivers"
+severity = "P0"
+description = "no active waiver is expired or owned by its reviewer"

@@ -1,0 +1,34 @@
+[project]
+key = "PLATFORM"
+name = "CI, runners and platform"
+gate = "The standing platform row carries an approved charter and a baseline; it does not close."
+
+[[check]]
+id = "PLATFORM-project"
+check = "project"
+status = "active"
+severity = "P0"
+description = "PLATFORM is active"
+
+[[check]]
+id = "PLATFORM-baseline"
+check = "project_baseline"
+require_approved = false
+severity = "P0"
+description = "the standing row carries a project baseline"
+
+[[check]]
+id = "PLATFORM-charter"
+kind = "command"
+severity = "P0"
+description = "the charter asset exists and the charter gate is approved"
+command = '''python3 scripts/programme-record.py --check --action pm.get --input '{"project_id":"01a1d039-0d39-79ce-84b6-1173b94bc67f"}' | python3 -c '
+import json,sys
+s=sys.stdin.read()
+d=json.loads(s[s.find("{"):])
+o=d.get("output",d)
+assert o.get("charter_asset_id"), "no charter asset"
+gates={g.get("gate"):g.get("status") for g in o.get("gates",[])}
+assert gates.get("charter")=="approved", gates
+'
+'''
