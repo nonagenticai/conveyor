@@ -387,7 +387,8 @@ impl MeteringLevel {
     }
 
     /// The grouping expression over the attributed CTEs. `priced` exposes `id`, `run_id`,
-    /// `run_step_id`, `project_id`, `job_binding_id`, `programme_id` and `department`.
+    /// `run_step_id`, `caller_kind`, `project_id`, `job_binding_id`, `programme_id` and
+    /// `department`.
     fn key(self) -> &'static str {
         match self {
             Self::Tenant => "'tenant'",
@@ -427,11 +428,20 @@ pub async fn usage_by_level_tx(
     filter: Option<Uuid>,
 ) -> Result<Vec<UsageRow>, MetricsStoreError> {
     let key = level.key();
+    // `caller_kind = 'other'` is the synthetic/administrative caller: it is its own explicit
+    // bucket, never a project's usage, even when the call carries a run.
+    let inference_key = match level {
+        MeteringLevel::Project => {
+            "CASE WHEN caller_kind = 'other' THEN 'unattributed' \
+             ELSE coalesce(project_id::text, 'unattributed') END"
+        }
+        _ => key,
+    };
     let (filter_clause, has_filter) = level_filter(level, filter);
     let inference = format!(
         "WITH priced AS (
-             SELECT ic.id, ic.run_id, ic.run_step_id, r.project_id, r.job_binding_id,
-                    p.programme_id,
+             SELECT ic.id, ic.run_id, ic.run_step_id, ic.caller_kind, r.project_id,
+                    r.job_binding_id, p.programme_id,
                     coalesce(dep.name, 'unattributed') AS department,
                     (ic.prompt_tokens + ic.completion_tokens)::bigint AS tokens,
                     CASE
@@ -453,7 +463,7 @@ pub async fn usage_by_level_tx(
                      AND ((pr.unit = 'token' AND ic.usage_unit IS NULL) OR pr.unit = ic.usage_unit)
               WHERE ic.tenant_id = $1 AND ic.created_at >= $2 AND ic.created_at < $3{filter_clause}
          )
-         SELECT {key} AS key,
+         SELECT {inference_key} AS key,
                 count(*)::bigint AS calls,
                 coalesce(sum(tokens), 0)::bigint AS tokens,
                 coalesce(round(sum(cost), 6), 0)::double precision AS cost_usd,
