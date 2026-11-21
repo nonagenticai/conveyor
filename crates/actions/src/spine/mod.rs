@@ -1191,6 +1191,16 @@ async fn wbs_update(
             "status must be open, accepted or cancelled",
         ));
     }
+    if input.status.as_deref() == Some("accepted")
+        && !input.evidence.as_ref().is_some_and(carries_evidence)
+        && !carries_evidence(&current.evidence)
+    {
+        return Err(invalid(
+            "evidence",
+            "required",
+            "an accepted deliverable must carry the evidence that met its acceptance",
+        ));
+    }
     let patch = WbsPatch {
         title: trimmed(input.title),
         body: input.body,
@@ -1344,8 +1354,13 @@ async fn baselines_take(
 }
 
 /// Take a baseline under T3's change guard: an approved baseline of the same kind advances only
-/// through an approved change request that names it. The change row and the new baseline cite
-/// each other (`change_id` on the baseline, `meta.baseline_id` on the change).
+/// through a change request whose `change` gate an approver has decided. The change row and the
+/// new baseline cite each other (`change_id` on the baseline, `meta.baseline_id` on the change).
+///
+/// The approval is the second principal's decision, NEVER the row's self-declared `status`:
+/// `registers.create`/`update` write any status, so a status read would let any
+/// `portfolio:write` caller approve its own change and re-baseline (§8.4). The guard reads
+/// [`store::spine::change_is_approved_tx`], the same approval the decide path writes.
 async fn take_baseline_guarded(
     tx: &mut PgConnection,
     ctx: &HandlerCtx,
@@ -1374,16 +1389,17 @@ async fn take_baseline_guarded(
             .await
             .map_err(|error| spine_error(error, action))?
             .ok_or_else(|| invalid("change_id", "not_found", "no such change request"))?;
-        if change.kind != "change"
-            || change.status != "approved"
-            || change.baseline_ref != Some(previous.id)
-        {
+        let approved =
+            store::spine::change_is_approved_tx(tx, ctx.tenant, change_id, Some(project_id))
+                .await
+                .map_err(|error| store_error(error, action))?;
+        if change.kind != "change" || !approved || change.baseline_ref != Some(previous.id) {
             return Err(ActionError::new(
                 409,
                 "change_request_invalid",
                 format!(
-                    "change {change_id} must be an approved change whose baseline_ref is the \
-                     approved baseline {}",
+                    "change {change_id} must be a change whose `change` gate is approved and \
+                     whose baseline_ref is the approved baseline {}",
                     previous.id
                 ),
             ));
@@ -1487,6 +1503,16 @@ async fn registers_create(
             "kind must be risk, issue, assumption, dependency, benefit or change",
         ));
     }
+    // §8.4: approval is a gate effect, never a row write. A change is approved by its `change`
+    // gate's decision (the read `baselines.take` uses); a create that self-declares `approved`
+    // would be the bypass that guard exists to close.
+    if kind == "change" && input.status.as_deref() == Some("approved") {
+        return Err(invalid(
+            "status",
+            "approval_gate_only",
+            "a change is approved by its `change` gate decision, not by a status write",
+        ));
+    }
     let record = store::spine::insert_register_tx(
         &mut *tx,
         ctx.tenant,
@@ -1540,6 +1566,15 @@ async fn registers_update(
         .await
         .map_err(|error| spine_error(error, ctx.action))?
         .ok_or_else(|| ActionError::resource_not_found("such register item"))?;
+    // The same rule as `registers.create`: a change's approval is the `change` gate's decision,
+    // so a status edit cannot manufacture one.
+    if current.kind == "change" && input.status.as_deref() == Some("approved") {
+        return Err(invalid(
+            "status",
+            "approval_gate_only",
+            "a change is approved by its `change` gate decision, not by a status write",
+        ));
+    }
     let expected = require_precondition_with(
         &ctx,
         ctx.action,
@@ -3556,6 +3591,17 @@ async fn stakeholders_profile_list(
 /// `stakeholders.profile_delete`'s approval target: what the gate authorises, computed from the input alone.
 fn target_stakeholders_profile_delete(input: &IdIn) -> Result<String, String> {
     Ok(format!("stakeholder/{}/profile", input.id))
+}
+
+/// Whether a WBS patch (or the stored row) carries evidence a person can read.
+fn carries_evidence(value: &serde_json::Value) -> bool {
+    match value {
+        serde_json::Value::Array(items) => !items.is_empty(),
+        serde_json::Value::Object(map) => !map.is_empty(),
+        serde_json::Value::String(text) => !text.trim().is_empty(),
+        serde_json::Value::Null => false,
+        _ => true,
+    }
 }
 
 /// Remove a stakeholder profile.

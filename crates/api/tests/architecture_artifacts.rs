@@ -12,7 +12,7 @@ use serde_json::json;
 #[tokio::test]
 async fn a_catalog_is_queryable_rows() {
     let f = arch::fixture().await;
-    arch::tailor(&f.running, json!({}), json!({})).await;
+    arch::tailor(&f, json!({}), json!({})).await;
     let project = arch::project(&f.running, "architecture").await;
     let document = arch::document(
         &f.pg,
@@ -80,7 +80,7 @@ async fn a_catalog_is_queryable_rows() {
 #[tokio::test]
 async fn an_approved_artefact_is_immutable() {
     let f = arch::fixture().await;
-    arch::tailor(&f.running, json!({}), json!({})).await;
+    arch::tailor(&f, json!({}), json!({})).await;
     let project = arch::project(&f.running, "architecture").await;
     let artifact_type_id = arch::type_id(&f.running, "stakeholder_map").await;
     let created = arch::artifact(
@@ -138,7 +138,7 @@ async fn an_approved_artefact_is_immutable() {
 #[tokio::test]
 async fn reuse_is_searchable_across_plateaus() {
     let f = arch::fixture().await;
-    arch::tailor(&f.running, json!({}), json!({})).await;
+    arch::tailor(&f, json!({}), json!({})).await;
 
     let enterprise_type = arch::type_id(&f.running, "business_capability_map").await;
     let enterprise = arch::artifact(

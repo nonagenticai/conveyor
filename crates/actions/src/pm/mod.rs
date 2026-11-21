@@ -597,12 +597,18 @@ pub struct PmGateIn {
     /// How many distinct approvals resolve it; defaults to one.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub required_decisions: Option<u16>,
-    /// The typed evidence the gate resolves against.
+    /// The typed evidence the gate resolves against. §5.4: a gate with no evidence is refused
+    /// (`422 gate_evidence_missing`); the only opt-out is [`Self::evidence_waiver`].
     #[serde(default)]
     pub evidence: Vec<EvidenceRef>,
-    /// Refuse an empty evidence list when true.
-    #[serde(default)]
-    pub require_evidence: bool,
+    /// Why this gate carries no evidence — the explicit §5.4 override.
+    ///
+    /// A gate is required to name the artefact or run it judges. There is no boolean that turns
+    /// that off: the one override is this non-empty reason, which is stored on the approval
+    /// (`meta.evidence_waiver`) so the override is a row the governance audit reads, not a
+    /// caller's unrecorded flag.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub evidence_waiver: Option<String>,
     /// What is being asked.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub description: Option<String>,
@@ -651,7 +657,7 @@ async fn pm_route_gate(
     // T9 (SPEC_V2 §8.1, D63): a delivery project cannot pass its design gate without the live
     // architecture contract that governs it. The refusal writes no approval row.
     if gate == "design" {
-        store::architecture::assert_design_contract_tx(&mut *tx, ctx.tenant, input.project_id)
+        store::architecture::assert_phase_g_tx(&mut *tx, ctx.tenant, input.project_id)
             .await
             .map_err(|error| match error {
                 store::architecture::ArchitectureStoreError::Database(error) => {
@@ -664,6 +670,22 @@ async fn pm_route_gate(
                     "architecture_contract_not_live",
                     format!("the delivery project's architecture contract is not live: {status}"),
                 ),
+                store::architecture::ArchitectureStoreError::Illegal(
+                    store::architecture::ArchitectureRule::ReviewMissing,
+                ) => ActionError::new(
+                    409,
+                    "architecture_review_missing",
+                    "the delivery project's live delivery contract has no Phase-G compliance review",
+                ),
+                store::architecture::ArchitectureStoreError::Illegal(
+                    store::architecture::ArchitectureRule::ReviewNonConformant(level),
+                ) => ActionError::new(
+                    409,
+                    "architecture_review_non_conformant",
+                    format!(
+                        "the Phase-G compliance review is {level}; an active waiver is required"
+                    ),
+                ),
                 _ => ActionError::new(
                     409,
                     "architecture_contract_missing",
@@ -671,13 +693,29 @@ async fn pm_route_gate(
                 ),
             })?;
     }
-    let evidence = resolve_evidence(
-        &mut *tx,
-        ctx.tenant,
-        &input.evidence,
-        input.require_evidence,
-    )
-    .await?;
+    // SPEC_V2 §5.4: a gate with no evidence is refused. The rule is not a caller's flag — the
+    // request carries evidence or a recorded waiver reason, and nothing else opens the gate.
+    let waiver = input
+        .evidence_waiver
+        .as_deref()
+        .map(str::trim)
+        .filter(|reason| !reason.is_empty());
+    if input.evidence.is_empty() && waiver.is_none() {
+        return Err(ActionError::new(
+            422,
+            "gate_evidence_missing",
+            "a gate needs at least one typed evidence reference; pass `evidence`, or record an \
+             explicit `evidence_waiver` reason (the waiver is stored on the approval)",
+        ));
+    }
+    let evidence = resolve_evidence(&mut *tx, ctx.tenant, &input.evidence, false).await?;
+    let mut meta = serde_json::Map::new();
+    meta.insert("description".to_owned(), json!(input.description));
+    meta.insert("evidence".to_owned(), Value::Array(evidence));
+    if let Some(reason) = waiver {
+        // The override is recorded where the governance audit reads it (§5.4).
+        meta.insert("evidence_waiver".to_owned(), json!(reason));
+    }
     let approval_id = open_gate(
         &mut *tx,
         &ctx,
@@ -685,10 +723,7 @@ async fn pm_route_gate(
         gate,
         kind,
         required,
-        json!({
-            "description": input.description,
-            "evidence": evidence,
-        }),
+        Value::Object(meta),
     )
     .await?;
     Ok(HandlerOutput::created(PmGateOut { approval_id }))

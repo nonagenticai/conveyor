@@ -958,8 +958,9 @@ async fn documents_update(
             .unwrap_or(Value::Null),
     )?;
     // §7.1/§7.4: a generated draft is applied only through `ladder.apply_draft`, whose gate is
-    // an accepted L1/L3 decision. The ordinary edit path cannot attach one to a card, so the
-    // ladder's decision record cannot be bypassed by an update.
+    // an accepted L3 human decision of the dedicated `draft.apply` gate. The ordinary edit path
+    // cannot attach one to a card, so the ladder's decision record cannot be bypassed by an
+    // update.
     if input
         .card_id
         .is_some_and(|card| Some(card) != current.card_id)

@@ -570,59 +570,52 @@ pub(crate) async fn assert_project_can_close(
         ));
     }
 
-    let track = project
-        .meta
-        .get("track")
-        .and_then(Value::as_str)
-        .unwrap_or("");
-    if track != "programme" {
-        // The board-approved live delivery contract is the design approval at programme level:
-        // the PM's own `design` gate is PM-binding-only, and `contracts_approve` already
-        // requires the board decision about this contract.
-        let contract = architecture_store::live_delivery_contract_tx(&mut *tx, tenant, project_id)
+    // The board-approved live delivery contract is the design approval at programme level: the
+    // PM's own `design` gate is PM-binding-only, and `contracts_approve` already requires the
+    // board decision about this contract. Phase G binds EVERY programme project — no `meta.track`
+    // is exempt from the contract, its compliance review or the waiver rule.
+    let contract = architecture_store::live_delivery_contract_tx(&mut *tx, tenant, project_id)
+        .await
+        .map_err(|error| {
+            tracing::error!(%error, "close gate: read the delivery contract");
+            ActionError::internal()
+        })?
+        .ok_or_else(|| {
+            ActionError::new(
+                409,
+                "closure_contract_missing",
+                "the delivery project has no live, board-approved delivery contract",
+            )
+        })?;
+    let review = architecture_store::review_for_contract_tx(&mut *tx, tenant, contract.id)
+        .await
+        .map_err(|error| {
+            tracing::error!(%error, "close gate: read the compliance review");
+            ActionError::internal()
+        })?
+        .ok_or_else(|| {
+            ActionError::new(
+                409,
+                "closure_review_missing",
+                "the delivery contract has no Phase-G compliance review",
+            )
+        })?;
+    if matches!(review.level.as_str(), "non_conformant" | "irrelevant") {
+        let waiver = architecture_store::active_waiver_for_review_tx(&mut *tx, tenant, review.id)
             .await
             .map_err(|error| {
-                tracing::error!(%error, "close gate: read the delivery contract");
+                tracing::error!(%error, "close gate: read the waiver");
                 ActionError::internal()
-            })?
-            .ok_or_else(|| {
-                ActionError::new(
-                    409,
-                    "closure_contract_missing",
-                    "the delivery project has no live, board-approved delivery contract",
-                )
             })?;
-        let review = architecture_store::review_for_contract_tx(&mut *tx, tenant, contract.id)
-            .await
-            .map_err(|error| {
-                tracing::error!(%error, "close gate: read the compliance review");
-                ActionError::internal()
-            })?
-            .ok_or_else(|| {
-                ActionError::new(
-                    409,
-                    "closure_review_missing",
-                    "the delivery contract has no Phase-G compliance review",
-                )
-            })?;
-        if matches!(review.level.as_str(), "non_conformant" | "irrelevant") {
-            let waiver =
-                architecture_store::active_waiver_for_review_tx(&mut *tx, tenant, review.id)
-                    .await
-                    .map_err(|error| {
-                        tracing::error!(%error, "close gate: read the waiver");
-                        ActionError::internal()
-                    })?;
-            if waiver.is_none() {
-                return Err(ActionError::new(
-                    409,
-                    "closure_review_non_conformant",
-                    format!(
-                        "the Phase-G review is {}; an active waiver is required",
-                        review.level
-                    ),
-                ));
-            }
+        if waiver.is_none() {
+            return Err(ActionError::new(
+                409,
+                "closure_review_non_conformant",
+                format!(
+                    "the Phase-G review is {}; an active waiver is required",
+                    review.level
+                ),
+            ));
         }
     }
     Ok(())

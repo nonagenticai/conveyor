@@ -20,6 +20,9 @@ async fn route(f: &arch::Fixture, project: Uuid) -> (u16, Value) {
             "gate": "design",
             "kind": "design_gate",
             "evidence": [],
+            // SPEC_V2 §5.4: an evidence-less gate needs a recorded waiver reason; this suite is
+            // about the contract half of the design gate.
+            "evidence_waiver": "the live delivery contract is the design gate's evidence",
         }),
         None,
     )
@@ -81,7 +84,24 @@ async fn a_superseded_contract_refuses_design() {
 async fn a_live_contract_opens_the_design_gate() {
     let f = arch::fixture().await;
     let project = arch::raw_project(&f.pg, f.seeded.tenant_id, "Delivery").await;
-    arch::live_contract(&f, &project.to_string(), "delivery_contract", "f").await;
+    let contract = arch::live_contract(&f, &project.to_string(), "delivery_contract", "f").await;
+    // Phase G is the design gate for every delivery project: the live contract alone is not
+    // enough, its compliance review is the second half of the gate.
+    arch::created_as(
+        &f.running,
+        support::REVIEWER,
+        "architecture.reviews_record",
+        json!({
+            "project_id": project.to_string(),
+            "contract_id": contract,
+            "level": "compliant",
+            "delegation_ref": f.delegation,
+            "findings": [{ "finding": "the design is compliant" }],
+            "evidence": { "ref": "design gate" },
+        }),
+        None,
+    )
+    .await;
 
     let (status, out) = route(&f, project).await;
     assert_eq!(status, 201, "{out}");

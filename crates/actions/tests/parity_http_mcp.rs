@@ -1831,6 +1831,137 @@ async fn seed_parity_cadence(pg: &support::Pg, ctx: &Ctx, programme: Uuid) -> Uu
     id
 }
 
+/// A cadence of `kind` on a programme, carrying `meta` — the demo/retro samples' starting row.
+///
+/// `retros.record_findings` opens the retro's coach card from `meta.board_id` and
+/// `meta.card_type_code`, so a retro cadence names the fixture board and a card type it holds.
+async fn seed_parity_cadence_kind(
+    pg: &support::Pg,
+    ctx: &Ctx,
+    programme: Uuid,
+    kind: &str,
+    meta: Value,
+) -> Uuid {
+    let mut tx = begin_scoped(&pg.owner, ctx.tenant).await.expect("scope");
+    let id: Uuid = sqlx::query_scalar(
+        "INSERT INTO programme_cadence (tenant_id, programme_id, kind, period, meta)
+         VALUES ($1, $2, $3, $4, $5) RETURNING id",
+    )
+    .bind(ctx.tenant_id)
+    .bind(programme)
+    .bind(kind)
+    .bind(format!("{kind}-{}", Uuid::now_v7().simple()))
+    .bind(meta)
+    .fetch_one(&mut *tx)
+    .await
+    .expect("insert cadence");
+    tx.commit().await.expect("commit");
+    id
+}
+
+/// An accepted deliverable carrying one evidence ref — `cadences.credit_demo`'s precondition.
+async fn seed_parity_accepted_deliverable(pg: &support::Pg, ctx: &Ctx, project: Uuid) -> Uuid {
+    let mut tx = begin_scoped(&pg.owner, ctx.tenant).await.expect("scope");
+    let id: Uuid = sqlx::query_scalar(
+        "INSERT INTO wbs_node (tenant_id, project_id, kind, title, status, evidence)
+         VALUES ($1, $2, 'deliverable', 'Parity demo deliverable', 'accepted', $3) RETURNING id",
+    )
+    .bind(ctx.tenant_id)
+    .bind(project)
+    .bind(json!(["parity:demo:evidence"]))
+    .fetch_one(&mut *tx)
+    .await
+    .expect("insert accepted deliverable");
+    tx.commit().await.expect("commit");
+    id
+}
+
+/// Record a demo credit through the store writer `cadences.credit_demo` uses.
+async fn seed_parity_demo_credit(
+    pg: &support::Pg,
+    ctx: &Ctx,
+    cadence: Uuid,
+    deliverable: Uuid,
+) -> Uuid {
+    scoped(pg, ctx, async move |conn| {
+        store::spine::credit_demo_tx(conn, ctx.tenant, cadence, deliverable)
+            .await
+            .expect("seed a demo credit")
+    })
+    .await
+}
+
+/// One lesson row for a retro finding — the organisational-memory record `retros.close` checks.
+async fn seed_parity_lesson(
+    pg: &support::Pg,
+    ctx: &Ctx,
+    programme: Uuid,
+    cadence: Uuid,
+    finding_key: &str,
+) -> Uuid {
+    let mut tx = begin_scoped(&pg.owner, ctx.tenant).await.expect("scope");
+    let id: Uuid = sqlx::query_scalar(
+        "INSERT INTO lesson (tenant_id, programme_id, cadence_id, finding_key, statement, evidence)
+         VALUES ($1, $2, $3, $4, $5, $6) RETURNING id",
+    )
+    .bind(ctx.tenant_id)
+    .bind(programme)
+    .bind(cadence)
+    .bind(finding_key)
+    .bind(format!("Parity lesson for {finding_key}"))
+    .bind(json!(["parity:lesson:evidence"]))
+    .fetch_one(&mut *tx)
+    .await
+    .expect("insert lesson");
+    tx.commit().await.expect("commit");
+    id
+}
+
+/// A retro whose coach card already carries `finding_key`, and the lesson for that key.
+///
+/// `retros.close` refuses until every recorded finding key has a lesson, so the fixture holds
+/// both halves: the findings live on the card the store looks up by `meta.cadence_id`.
+async fn seed_parity_retro_to_close(
+    pg: &support::Pg,
+    ctx: &Ctx,
+    programme: Uuid,
+    finding_key: &str,
+) -> Uuid {
+    let cadence = seed_parity_cadence_kind(
+        pg,
+        ctx,
+        programme,
+        "retro",
+        json!({"board_id": ctx.board_id, "card_type_code": "feature"}),
+    )
+    .await;
+    let board = Uuid::parse_str(&ctx.board_id).expect("board uuid");
+    let list = Uuid::parse_str(&ctx.lane("intake")).expect("list uuid");
+    scoped(pg, ctx, async move |conn| {
+        sqlx::query(
+            "INSERT INTO card (tenant_id, board_id, list_id, card_type_id, name, position, meta)
+             SELECT $1, $2, $3, t.id, $4, 0, $5
+               FROM card_type t
+              WHERE t.tenant_id = $1 AND t.code = 'feature'",
+        )
+        .bind(ctx.tenant_id)
+        .bind(board)
+        .bind(list)
+        .bind(format!("Parity retro {}", Uuid::now_v7().simple()))
+        .bind(json!({
+            "cadence_id": cadence,
+            "owner_kind": "coach",
+            "findings": [{"key": finding_key, "statement": "the parity finding"}],
+        }))
+        .execute(&mut *conn)
+        .await
+        .expect("seed the retro card");
+    })
+    .await;
+    seed_parity_lesson(pg, ctx, programme, cadence, finding_key).await;
+    cadence
+}
+
 /// Seed a decision policy for one (kind, gate) case the T2 samples evaluate and refine.
 ///
 /// The kind embeds the row id, so a sample's input can derive the case from the prepared id and
@@ -1869,15 +2000,51 @@ async fn seed_parity_laya(pg: &support::Pg, ctx: &Ctx) -> Uuid {
     id
 }
 
-/// Seed an accepted L1 decision for the draft-application sample.
+/// Seed the human `draft.apply` decision the application sample names (§7.4).
+///
+/// The gate is approved by alice through the store — `requested_by: None` keeps the requester
+/// exclusion out of the fixture — and the decision cites it: a generated draft is applied only
+/// through a human `draft.apply` decision backed by an approved gate on the card.
 async fn seed_parity_decision(pg: &support::Pg, ctx: &Ctx, card: Uuid) -> Uuid {
     let mut tx = begin_scoped(&pg.owner, ctx.tenant).await.expect("scope");
+    let approval = store::approval::insert_approval_tx(
+        &mut tx,
+        ctx.tenant,
+        &store::approval::NewApproval {
+            run_id: None,
+            card_id: Some(card),
+            project_id: None,
+            eval_id: None,
+            gate: "draft.apply".to_owned(),
+            kind: "gate".to_owned(),
+            required_decisions: 1,
+            requested_by: None,
+            expires_at: None,
+            callback_url: None,
+            correlation_id: None,
+            meta: json!({"target": card}),
+        },
+    )
+    .await
+    .expect("insert the draft.apply gate");
+    store::approval::record_decision_tx(
+        &mut tx,
+        ctx.tenant,
+        approval.id,
+        &conveyor_domain::Decision::approve(ctx.alice_user),
+        false,
+    )
+    .await
+    .expect("approve the draft.apply gate");
     let id: Uuid = sqlx::query_scalar(
-        "INSERT INTO decision (tenant_id, kind, rung, actor_kind, card_id, outcome)
-         VALUES ($1, 'parity.case', 'laya', 'system', $2, 'accepted') RETURNING id",
+        "INSERT INTO decision (tenant_id, kind, rung, actor_kind, card_id, outcome, answer,
+                               approval_id)
+         VALUES ($1, 'draft.apply', 'human', 'user', $2, 'accepted', 'apply', $3)
+         RETURNING id",
     )
     .bind(ctx.tenant_id)
     .bind(card)
+    .bind(approval.id)
     .fetch_one(&mut *tx)
     .await
     .expect("insert decision");
@@ -2027,23 +2194,123 @@ async fn seed_arch_review(pg: &support::Pg, ctx: &Ctx, project: Uuid, contract: 
     .await
 }
 
-/// The tenant's newest ADM profile, with no mandatory artefacts, so a phase can advance on its
-/// contract alone (this sample is about the gate's contract rule, not the artefact rule).
-async fn seed_arch_profile(pg: &support::Pg, ctx: &Ctx) {
+/// A board-adopted ADM profile and the approved Preliminary set that opens its first gate.
+///
+/// Only an adopted profile governs a phase advance, and the standard's mandatory artefacts join
+/// every set, so the sample's fixture holds both: three approved Preliminary artefacts of this
+/// project, the profile that names them, and the board decision that adopts it.
+async fn seed_arch_profile(pg: &support::Pg, ctx: &Ctx, project: Uuid) {
     scoped(pg, ctx, async move |conn| {
-        store::architecture::upsert_profile_tx(
-            conn,
+        store::architecture::seed_standard_tx(&mut *conn, ctx.tenant)
+            .await
+            .expect("seed the artefact standard");
+        for (key, kind) in [
+            ("principles_catalog", "principles_catalog"),
+            ("principle_derivation", "diagram"),
+            ("principle_realization", "diagram"),
+        ] {
+            let type_id: Uuid = sqlx::query_scalar(
+                "SELECT id FROM artifact_type
+                  WHERE tenant_id = $1 AND key = $2 AND phase_code = 'preliminary'
+                  ORDER BY position, plateau LIMIT 1",
+            )
+            .bind(ctx.tenant.as_uuid())
+            .bind(key)
+            .fetch_one(&mut *conn)
+            .await
+            .expect("read the seeded artifact_type");
+            let artifact = store::architecture::create_artifact_tx(
+                &mut *conn,
+                ctx.tenant,
+                &store::architecture::NewArtifact {
+                    project_id: Some(project),
+                    artifact_type_id: Some(type_id),
+                    phase_code: "preliminary".to_owned(),
+                    plateau: "psa".to_owned(),
+                    artifact_kind: kind.to_owned(),
+                    title: format!("Parity {key}"),
+                    change_initiative: None,
+                    purpose: Some("the preliminary gate's fixture".to_owned()),
+                    stakeholders: None,
+                    scope: None,
+                    document_id: None,
+                    contract_id: None,
+                    meta: None,
+                    author_id: Some(ctx.alice_user),
+                },
+                &[],
+            )
+            .await
+            .expect("seed a preliminary artefact");
+            store::architecture::approve_artifact_tx(
+                &mut *conn,
+                ctx.tenant,
+                artifact.id,
+                artifact.version,
+                ctx.alice_user,
+            )
+            .await
+            .expect("approve the preliminary artefact");
+        }
+        let profile = store::architecture::upsert_profile_tx(
+            &mut *conn,
             ctx.tenant,
             &store::architecture::NewProfile {
                 key: format!("parity-adm-{}", Uuid::now_v7().simple()),
                 name: "Parity ADM".to_owned(),
                 phase_set: json!(["preliminary"]),
-                artifact_requirements: json!({}),
+                artifact_requirements: json!({
+                    "preliminary": {
+                        "psa": [
+                            "principles_catalog",
+                            "principle_derivation",
+                            "principle_realization"
+                        ]
+                    }
+                }),
                 contract_kinds: json!({}),
             },
         )
         .await
         .expect("seed a profile");
+        let board = store::architecture::open_body_tx(
+            &mut *conn,
+            ctx.tenant,
+            &store::architecture::NewBody {
+                kind: "architecture_board".to_owned(),
+                key: format!("parity-profile-board-{}", Uuid::now_v7().simple()),
+                name: "Parity profile board".to_owned(),
+                charter: "parity: adopt the ADM profile".to_owned(),
+                commissioning_authority: "parity programme".to_owned(),
+                decision_limits: json!({}),
+                members: json!([]),
+            },
+        )
+        .await
+        .expect("open the profile board");
+        let decision = store::architecture::decide_board_tx(
+            &mut *conn,
+            ctx.tenant,
+            board.id,
+            "approved",
+            json!({ "charter": "parity" }),
+            ctx.alice_user,
+            store::architecture::BoardSubject {
+                kind: Some("adm_profile"),
+                id: Some(profile.id),
+            },
+        )
+        .await
+        .expect("record the adoption decision");
+        store::architecture::adopt_profile_tx(
+            &mut *conn,
+            ctx.tenant,
+            profile.id,
+            profile.version,
+            decision,
+        )
+        .await
+        .expect("adopt the profile");
     })
     .await;
 }
@@ -2231,6 +2498,56 @@ async fn prepare(sample: &Sample, pg: &support::Pg, ctx: &Ctx) {
         "cadences.list" => {
             let g = seed_parity_programme(pg, ctx).await;
             ctx.push("cadences.list", g);
+        }
+        // ── #526: the demo credit and the retro/lesson memory ────────────────────────────
+        // A credit needs a demo cadence and an ACCEPTED deliverable with its evidence; the
+        // cadence and deliverable are fresh per round, so the sample's own call is the insert.
+        "cadences.credit_demo" => {
+            let g = seed_parity_programme(pg, ctx).await;
+            let c = seed_parity_cadence_kind(pg, ctx, g, "demo", json!({})).await;
+            let p = seed_parity_project(pg, ctx).await;
+            let d = seed_parity_accepted_deliverable(pg, ctx, p).await;
+            ctx.push("cadences.credit_demo", c);
+            ctx.push("cadences.credit_demo", d);
+        }
+        "cadences.credit_list" => {
+            let g = seed_parity_programme(pg, ctx).await;
+            let c = seed_parity_cadence_kind(pg, ctx, g, "demo", json!({})).await;
+            let p = seed_parity_project(pg, ctx).await;
+            let d = seed_parity_accepted_deliverable(pg, ctx, p).await;
+            seed_parity_demo_credit(pg, ctx, c, d).await;
+            ctx.push("cadences.credit_list", c);
+        }
+        // The retro cadence names the fixture board and a card type the tenant holds, because
+        // recording findings opens the coach card in that board's intake lane.
+        "retros.record_findings" => {
+            let g = seed_parity_programme(pg, ctx).await;
+            let c = seed_parity_cadence_kind(
+                pg,
+                ctx,
+                g,
+                "retro",
+                json!({"board_id": ctx.board_id, "card_type_code": "feature"}),
+            )
+            .await;
+            ctx.push("retros.record_findings", c);
+        }
+        "retros.close" => {
+            let g = seed_parity_programme(pg, ctx).await;
+            let c = seed_parity_retro_to_close(pg, ctx, g, "parity-close").await;
+            ctx.push("retros.close", c);
+        }
+        "lessons.propose" => {
+            let g = seed_parity_programme(pg, ctx).await;
+            let c = seed_parity_cadence_kind(pg, ctx, g, "retro", json!({})).await;
+            ctx.push("lessons.propose", g);
+            ctx.push("lessons.propose", c);
+        }
+        "lessons.list" => {
+            let g = seed_parity_programme(pg, ctx).await;
+            let c = seed_parity_cadence_kind(pg, ctx, g, "retro", json!({})).await;
+            seed_parity_lesson(pg, ctx, g, c, "parity-list").await;
+            ctx.push("lessons.list", g);
         }
         "stakeholders.profile_create" => {
             let g = seed_parity_programme(pg, ctx).await;
@@ -3093,9 +3410,10 @@ async fn prepare(sample: &Sample, pg: &support::Pg, ctx: &Ctx) {
             let project = seed_parity_project(pg, ctx).await;
             seed_pm_approved_gate(pg, ctx, project, "charter").await;
             if sample.name == "pm.route_gate" {
-                // T9 (#81): the sample routes the `design` gate, which the T9 rule resolves
-                // only against a live architecture contract.
-                seed_arch_live_contract(pg, ctx, project).await;
+                // T9 (#81): the sample routes the `design` gate, which resolves only against a
+                // live architecture contract AND its Phase-G compliance review.
+                let contract = seed_arch_live_contract(pg, ctx, project).await;
+                seed_arch_review(pg, ctx, project, contract).await;
             }
             ctx.push(sample.name, project);
         }
@@ -3146,7 +3464,7 @@ async fn prepare(sample: &Sample, pg: &support::Pg, ctx: &Ctx) {
         }
         "architecture.phases_advance" => {
             let project = seed_arch_project(pg, ctx).await;
-            seed_arch_profile(pg, ctx).await;
+            seed_arch_profile(pg, ctx, project).await;
             ctx.push("architecture.phases_advance", project);
         }
         "architecture.reviews_record" => {
@@ -3154,6 +3472,12 @@ async fn prepare(sample: &Sample, pg: &support::Pg, ctx: &Ctx) {
             let contract = seed_arch_contract(pg, ctx, project).await;
             ctx.push("architecture.reviews_record", project);
             ctx.push("architecture.reviews_record", contract);
+        }
+        "architecture.reviews_get" => {
+            let project = seed_parity_project(pg, ctx).await;
+            let contract = seed_arch_contract(pg, ctx, project).await;
+            let review = seed_arch_review(pg, ctx, project, contract).await;
+            ctx.push("architecture.reviews_get", review);
         }
         "architecture.reviews_waive" => {
             let project = seed_parity_project(pg, ctx).await;
@@ -5765,12 +6089,25 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
             expecting(sample, 200)
         },
         {
-            // The key is unique per (tenant, key), so it is minted per ROUND.
+            // The key is unique per (tenant, key), so it is minted per ROUND. The payload names
+            // a non-empty phase set and keeps every mandatory Preliminary type: `profile_tailor`
+            // refuses an empty phase set and a profile that subtracts `artifact_type.mandatory`.
             let mut sample = plain("architecture.profile_tailor", json!({}), None);
             sample.input = Box::new(|_ctx: &Ctx| {
                 json!({
                     "key": format!("parity-adm-{}", Uuid::now_v7().simple()),
                     "name": "Parity tailored ADM",
+                    "phase_set": ["preliminary"],
+                    "artifact_requirements": {
+                        "preliminary": {
+                            "psa": [
+                                "principles_catalog",
+                                "principle_derivation",
+                                "principle_realization"
+                            ]
+                        }
+                    },
+                    "contract_kinds": {},
                 })
             });
             expecting(sample, 200)
@@ -5845,6 +6182,14 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
             });
             // U4: the review names the standing delegation; without it the boundary refuses.
             expecting(sample, 422)
+        },
+        {
+            // The read of the review `seed_arch_review` wrote: one row, fresh per round, so the
+            // body the two transports compare is a real execution against a real review.
+            let mut sample = plain("architecture.reviews_get", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| json!({"id": ctx.pop("architecture.reviews_get")}));
+            expecting(sample, 200)
         },
         {
             let mut sample = plain("architecture.reviews_waive", json!({}), None);
@@ -6066,8 +6411,8 @@ fn pm_samples() -> Vec<Sample> {
             expecting(sample, 201)
         },
         {
-            // A typed-evidence gate with no evidence: the empty list is legal until a caller
-            // asks for `require_evidence`.
+            // SPEC_V2 §5.4: an evidence-less gate needs a recorded waiver reason. The prepared
+            // project already carries the live delivery contract and its Phase-G review.
             let mut sample = plain("pm.route_gate", json!({}), None);
             sample.prepare = true;
             sample.input = Box::new(|ctx: &Ctx| {
@@ -6077,6 +6422,7 @@ fn pm_samples() -> Vec<Sample> {
                     "gate": "design",
                     "kind": "pm",
                     "evidence": [],
+                    "evidence_waiver": "parity: the live contract is the gate's evidence",
                 })
             });
             expecting(sample, 201)
@@ -6444,6 +6790,66 @@ fn spine_samples() -> Vec<Sample> {
             let mut sample = plain("cadences.list", json!({}), None);
             sample.prepare = true;
             sample.input = Box::new(|ctx: &Ctx| json!({"programme_id": ctx.pop("cadences.list")}));
+            expecting(sample, 200)
+        },
+        // ── #526: the demo credit and the retro/lesson memory ────────────────────────────
+        // Each sample prepares its own row per round, so both directions execute against a
+        // real precondition rather than replaying the other transport's answer.
+        {
+            let mut sample = plain("cadences.credit_demo", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "cadence_id": ctx.pop("cadences.credit_demo"),
+                    "deliverable_id": ctx.pop("cadences.credit_demo"),
+                })
+            });
+            expecting(sample, 201)
+        },
+        {
+            let mut sample = plain("cadences.credit_list", json!({}), None);
+            sample.prepare = true;
+            sample.input =
+                Box::new(|ctx: &Ctx| json!({"cadence_id": ctx.pop("cadences.credit_list")}));
+            expecting(sample, 200)
+        },
+        {
+            let mut sample = plain("retros.record_findings", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "cadence_id": ctx.pop("retros.record_findings"),
+                    "findings": [
+                        {"key": "F-1", "statement": "the parity deploy took four tries"},
+                    ],
+                })
+            });
+            expecting(sample, 200)
+        },
+        {
+            let mut sample = plain("retros.close", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| json!({"cadence_id": ctx.pop("retros.close")}));
+            expecting(sample, 200)
+        },
+        {
+            let mut sample = plain("lessons.propose", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "programme_id": ctx.pop("lessons.propose"),
+                    "cadence_id": ctx.pop("lessons.propose"),
+                    "finding_key": "F-1",
+                    "statement": "accept the increment with its evidence",
+                    "evidence": ["parity:retro:note"],
+                })
+            });
+            expecting(sample, 201)
+        },
+        {
+            let mut sample = plain("lessons.list", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| json!({"programme_id": ctx.pop("lessons.list")}));
             expecting(sample, 200)
         },
         {

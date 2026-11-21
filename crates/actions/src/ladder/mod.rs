@@ -21,6 +21,7 @@
 
 use chrono::{DateTime, Utc};
 use conveyor_domain::ladder::{LadderError, Outcome, Rung, evaluate};
+use conveyor_domain::{ApprovalStatus, TenantId};
 use conveyor_store as store;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
@@ -40,6 +41,14 @@ pub use store::ladder::{
 
 /// The one event every ladder mutation emits.
 pub const DECISION_CHANGED: &str = "decision.changed";
+
+/// The dedicated gate a generated draft is applied through (§7.4).
+///
+/// Both halves of the application carry the same name: the human decision that applies a draft
+/// has this `kind`, and the approval it cites is a gate of this name. A generic accepted
+/// decision on the card — a routine classification, an unrelated L1 answer — is not a draft
+/// review and cannot apply one.
+pub const DRAFT_APPLY_GATE: &str = "draft.apply";
 
 /// Append one `decision.changed` row in the caller's transaction.
 async fn emit_decision_event(
@@ -894,6 +903,54 @@ pub struct RecordIn {
     pub meta: Option<Value>,
 }
 
+/// Whether `approval_id` is an approved gate that a person actually decided on `card_id`.
+///
+/// A human decision is only as strong as the approval it cites: the row must exist in this
+/// tenant, be `approved` (not pending, rejected, expired or voided), carry at least one
+/// `approve` decision recorded by a human — not by an agent, rule or service — and, when
+/// `card_id` names a card, cover that same card. `gate` names the required gate where the
+/// caller has one (`draft.apply`); a human ladder record cites whatever gate posed its question.
+async fn human_approved_gate_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    approval_id: Uuid,
+    gate: Option<&str>,
+    card_id: Option<Uuid>,
+) -> Result<bool, ActionError> {
+    let approval = store::approval::get_approval_tx(&mut *conn, tenant, approval_id)
+        .await
+        .map_err(|error| {
+            tracing::error!(%error, "read the approval a human decision cites");
+            ActionError::internal()
+        })?;
+    let Some(approval) = approval else {
+        return Ok(false);
+    };
+    let approval = approval.approval;
+    if approval.status != ApprovalStatus::Approved {
+        return Ok(false);
+    }
+    if gate.is_some_and(|gate| approval.gate != gate) {
+        return Ok(false);
+    }
+    if card_id.is_some() && approval.card_id != card_id {
+        return Ok(false);
+    }
+    let decisions = store::approval::list_decisions_for_approvals_tx(
+        &mut *conn,
+        tenant,
+        &[approval_id],
+    )
+    .await
+    .map_err(|error| {
+        tracing::error!(%error, "read the decisions of the approval a human decision cites");
+        ActionError::internal()
+    })?;
+    Ok(decisions
+        .iter()
+        .any(|decision| decision.decision == "approve" && decision.decided_by_kind == "human"))
+}
+
 /// Record an L0 rule or an L3 human decision in the same shape as an evaluated one.
 #[crate::action(
     name = "ladder.record",
@@ -920,6 +977,35 @@ async fn ladder_record(
                 "record accepts the rule and human rungs; an evaluated decision goes through ladder.evaluate",
             )
         })?;
+    // §7.1: the human rung is a person's act. A machine holding `governance:write` cannot
+    // record one on a person's behalf, and the approval it cites must be a resolved gate with a
+    // human `approve` decision — not any approval id that happens to exist in the tenant.
+    if matches!(rung, Rung::Human) {
+        if ctx.actor_kind != "user" {
+            return Err(ActionError::new(
+                403,
+                "person_required",
+                "ladder.record at the human rung is a person's act; a machine cannot record it",
+            ));
+        }
+        let approval_id = input.approval_id.ok_or_else(|| {
+            invalid(
+                "approval_id",
+                "approval_missing",
+                "a human decision must cite its approval",
+            )
+        })?;
+        let approved =
+            human_approved_gate_tx(&mut *tx, ctx.tenant, approval_id, None, input.card_id).await?;
+        if !approved {
+            return Err(invalid(
+                "approval_id",
+                "approval_missing",
+                "a human decision must cite an approved approval with a human approve decision \
+                 on the same card",
+            ));
+        }
+    }
     let outcome = Outcome::parse(input.outcome.trim()).ok_or_else(|| {
         invalid(
             "outcome",
@@ -1081,7 +1167,7 @@ pub struct ApplyDraftIn {
     pub document_id: Uuid,
     /// The card it is applied to.
     pub card_id: Uuid,
-    /// The accepted L1 or L3 decision that gates the application.
+    /// The accepted human `draft.apply` decision that gates the application.
     pub decision_id: Uuid,
 }
 
@@ -1096,12 +1182,15 @@ pub struct AppliedDraftOut {
     pub decision_id: String,
 }
 
-/// Apply a generated draft artefact to a card — the only path, and it needs a decision.
+/// Apply a generated draft artefact to a card — the only path, and it needs a human gate.
 ///
-/// §7.4: a generation result is a draft artefact; applying it is an action whose gate is L1/L3.
-/// An accepted laya or human decision tied to the same card is the gate; without one the
-/// application is refused and nothing is attached. The ordinary `documents.update` path refuses
-/// a `meta.generated = true` draft outright, so the gate cannot be bypassed by an edit.
+/// §7.4: a generation result is a draft artefact; applying it is an action whose gate is a
+/// human review. The gate is the dedicated [`DRAFT_APPLY_GATE`]: an accepted decision recorded
+/// by a person, of kind `draft.apply`, naming this card, backed by an approved approval of the
+/// same gate on the same card with a human `approve` decision. A routine accepted laya
+/// decision, a generic decision kind, a decision with no card, or a pending approval is not
+/// that review and is refused. The ordinary `documents.update` path refuses a
+/// `meta.generated = true` draft outright, so the gate cannot be bypassed by an edit.
 #[crate::action(
     name = "ladder.apply_draft",
     version = 1,
@@ -1123,18 +1212,48 @@ async fn ladder_apply_draft(
         .map_err(|error| ladder_error(error, ctx.action))?
         .ok_or_else(|| ActionError::resource_not_found("decision"))?;
     let rung = Rung::parse(&decision.rung).ok_or_else(ActionError::internal)?;
-    if matches!(rung, Rung::Rule) || decision.outcome.as_deref() != Some("accepted") {
+    let card_id = Some(input.card_id);
+    // The gate is one dedicated kind, recorded by a person, naming this card. Everything else
+    // — a rule answer, a laya classification, a human decision about something else — is not a
+    // review of this draft.
+    if rung != Rung::Human
+        || decision.kind != DRAFT_APPLY_GATE
+        || decision.actor_kind != "user"
+        || decision.outcome.as_deref() != Some("accepted")
+    {
         return Err(ActionError::new(
             422,
             "draft_requires_gate",
-            "applying a generated draft needs an accepted L1 or L3 decision",
+            "applying a generated draft needs an accepted human draft.apply decision",
         ));
     }
-    if decision.card_id.is_some_and(|card| card != input.card_id) {
+    if decision.card_id != card_id {
         return Err(ActionError::new(
             422,
             "draft_requires_gate",
-            "the decision belongs to another card",
+            "the draft.apply decision belongs to another card",
+        ));
+    }
+    let Some(approval_id) = decision.approval_id else {
+        return Err(ActionError::new(
+            422,
+            "draft_requires_gate",
+            "the draft.apply decision cites no approved gate",
+        ));
+    };
+    if !human_approved_gate_tx(
+        &mut *tx,
+        ctx.tenant,
+        approval_id,
+        Some(DRAFT_APPLY_GATE),
+        card_id,
+    )
+    .await?
+    {
+        return Err(ActionError::new(
+            422,
+            "draft_requires_gate",
+            "the draft.apply decision's approval is not an approved human gate on this card",
         ));
     }
     let document = store::document::get_document_tx(&mut *tx, ctx.tenant, input.document_id)

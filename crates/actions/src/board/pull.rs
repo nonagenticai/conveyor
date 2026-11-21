@@ -148,10 +148,10 @@ pub async fn wip_pull(
 /// the index is root-only and a coach for a dead run has no live parent to hang from.
 pub const COACH_ERROR_PROCESS: &str = "cap.kanban_coach.handle_error.v2";
 
-/// The most coach root runs one card may accumulate before `err.card` stops starting them
+/// The most coach interruptions one card may accumulate before `err.card` stops starting them
 /// (SPEC_V2 §1.4 · §12 T4's depth cap). Three failures are enough to show the coach is not
 /// converging; a fourth would only repeat the first three.
-pub const COACH_CHAIN_MAX: i64 = 3;
+pub const COACH_INTERRUPTION_MAX: i64 = 3;
 
 /// The failure comment's marker: the old flow's `BLOCKED/flow_error` line, kept verbatim so a
 /// person (and the parity ledger) can still recognise it.
@@ -188,7 +188,7 @@ pub struct ErrCardOutcome {
 /// writing a second comment or starting a second coach. The move also skips when the card is
 /// already in waiting, and the coach skips when the card already holds a live root run — the
 /// two effects a replay would otherwise duplicate — or when the recursion guard refuses
-/// ([`COACH_CHAIN_MAX`], a coach-about-a-coach, a closed project).
+/// ([`COACH_INTERRUPTION_MAX`], a coach-about-a-coach, a closed project).
 ///
 /// A matrix refusal of the move is a real answer (not every card type may enter waiting); it is
 /// logged and the comment/coach still run. A transport failure is returned so the job retries.
@@ -338,7 +338,7 @@ pub async fn err_card(
         .is_some_and(|status| matches!(status, "closed" | "archived"))
     {
         Some("the card's project is closed")
-    } else if prior_interruptions >= COACH_CHAIN_MAX {
+    } else if prior_interruptions >= COACH_INTERRUPTION_MAX {
         Some("the coach chain reached its cap")
     } else {
         None

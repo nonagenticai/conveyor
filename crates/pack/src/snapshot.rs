@@ -24,8 +24,13 @@
 //! docs/design/data/snapshot.js        window.CONVEYOR_SNAPSHOT = {…}
 //! ```
 //!
-//! **Determinism.** The same database and the same `--generated-at` produce byte-identical
-//! files. Every array is ordered by the store query; every object is built in a fixed order.
+//! **Determinism.** The same database produces byte-identical files. `--generated-at` overrides
+//! the clock; without it the clock is derived from the snapshot (the newest published document),
+//! exactly as the live view derives it. Every array is ordered by the store query; every object
+//! is built in a fixed order.
+//!
+//! **Manifest.** `manifest.json` hashes every published file: the data files above, the output
+//! pages and `outputs.js` when `--outputs-dir` is set, and the issue registry the run read.
 //!
 //! **Redaction.** The store queries select explicit columns (see `conveyor_store::snapshot`):
 //! no secret value, no encryption key id, no email, no OIDC subject, no session or licence
@@ -61,7 +66,9 @@ pub struct SnapshotArgs {
     /// When set, also render every published platform output into this directory
     /// (`docs/design/docs`). Absent means the data snapshot only.
     pub outputs_dir: Option<PathBuf>,
-    /// A fixed RFC 3339 timestamp, for a byte-identical re-run. Defaults to now.
+    /// A fixed RFC 3339 timestamp, for a byte-identical re-run. Absent means the newest
+    /// published document's `updated_at` — the same clock the live view uses — so the same
+    /// database still produces byte-identical files.
     pub generated_at: Option<String>,
     /// The committed `gh issue list` registry (`issues.json`).
     pub issues: PathBuf,
@@ -162,10 +169,6 @@ pub async fn run_with_pool(
         .await?
         .ok_or_else(|| SnapshotError::UnknownTenant(args.tenant.clone()))?;
 
-    let generated_at = args
-        .generated_at
-        .clone()
-        .unwrap_or_else(|| chrono::Utc::now().to_rfc3339());
     let git_sha = args.git_sha.clone().unwrap_or_else(git_sha);
     let migration_version = store::MIGRATOR
         .iter()
@@ -182,7 +185,14 @@ pub async fn run_with_pool(
     let mut data = store::snapshot::snapshot_tx(&mut tx, tenant).await?;
     tx.rollback().await?;
 
-    let issues = read_issues(&args.issues)?;
+    // One clock for both producers (v1-pack-2): the live view derives the same value from the
+    // same `SnapshotData`, so a download served from memory is the file this run writes.
+    let generated_at = args
+        .generated_at
+        .clone()
+        .unwrap_or_else(|| snapshot_generated_at(&data));
+
+    let (issues, issues_bytes) = read_issues(&args.issues)?;
     let feedback = feedback_issues(&issues);
     // The rework register is a file input like the issue registry, but the flag is explicit:
     // an unreadable register or a wrong schema is refused, never silently omitted.
@@ -296,8 +306,38 @@ pub async fn run_with_pool(
     // documents (`docs/design/docs`), not in the data directory, and the pack mirrors both.
     let mut outputs = 0usize;
     if let Some(dir) = args.outputs_dir.as_deref() {
-        outputs = crate::outputs::write_outputs(pool, tenant, &generated_at, dir).await?;
+        let (count, written) =
+            crate::outputs::write_outputs_with_files(pool, tenant, &generated_at, dir).await?;
+        outputs = count;
+        // ⛔ Every published page is in the manifest (v1-pack-3): the path is relative to the
+        // data directory, so `check-data.cjs` hashes a page exactly as it hashes `programme.json`.
+        for output in written {
+            files.push(SnapshotFile {
+                path: relative_manifest_path(&args.out, dir, &output.name),
+                sha256: sha256_hex(&output.bytes),
+                bytes: output.bytes.len(),
+                records: 0,
+            });
+        }
         tracing::info!(outputs, dir = %dir.display(), "platform outputs written");
+    }
+
+    // The issue registry is an input, but it publishes beside the data (`data/issues.json`). Its
+    // hash in the manifest is the registry's provenance (v1-pack-3/5): an app publish that carries
+    // another image's registry names a hash the target branch does not have, and the public gate
+    // rejects it instead of silently relabelling producer B's registry as tenant A's.
+    if let Some(bytes) = issues_bytes
+        && args.issues.file_name() == Some(std::ffi::OsStr::new("issues.json"))
+    {
+        files.push(SnapshotFile {
+            path: "issues.json".to_owned(),
+            sha256: sha256_hex(&bytes),
+            bytes: bytes.len(),
+            records: issues
+                .get("issues")
+                .and_then(Value::as_array)
+                .map_or(0, Vec::len),
+        });
     }
 
     files.sort_by(|a, b| a.path.cmp(&b.path));
@@ -339,6 +379,57 @@ pub(crate) fn section_json(section: &Value, generated_at: &str) -> Result<String
     let mut text = serde_json::to_string_pretty(&value)?;
     text.push('\n');
     Ok(text)
+}
+
+/// The clock the CLI and the live view share: the newest published document in the programme
+/// snapshot, or [`crate::live::EMPTY_GENERATED_AT`] when there is none.
+///
+/// v1-pack-2: both producers compute this from the same `SnapshotData`, so a CLI run without
+/// `--generated-at` and the live route cannot disagree about `generated_at` — and therefore about
+/// the manifest timestamp or `snapshot.js.payload_sha256`.
+pub(crate) fn snapshot_generated_at(data: &store::snapshot::SnapshotData) -> String {
+    data.artefacts
+        .get("documents")
+        .and_then(Value::as_array)
+        .into_iter()
+        .flatten()
+        .filter_map(|document| document.get("updated_at").and_then(Value::as_str))
+        .filter_map(|at| chrono::DateTime::parse_from_rfc3339(at).ok())
+        .max()
+        .map(|at| at.to_rfc3339())
+        .unwrap_or_else(|| crate::live::EMPTY_GENERATED_AT.to_owned())
+}
+
+/// The manifest path of one file in the outputs directory, relative to the data directory.
+///
+/// The pack's two writers lay the directories out as siblings (`data/` and `docs/`), so
+/// `output-<id>.html` is `../docs/output-<id>.html` in `data/manifest.json` — the form
+/// `check-data.cjs` resolves against its data directory.
+fn relative_manifest_path(out: &Path, outputs_dir: &Path, name: &str) -> String {
+    let mut base = out;
+    let mut ups = 0usize;
+    loop {
+        if let Ok(rest) = outputs_dir.strip_prefix(base) {
+            if rest.as_os_str().is_empty() {
+                return name.to_owned();
+            }
+            let mut path = PathBuf::new();
+            for _ in 0..ups {
+                path.push("..");
+            }
+            path.push(rest);
+            path.push(name);
+            return path.to_string_lossy().replace('\\', "/");
+        }
+        match base.parent() {
+            Some(parent) => {
+                base = parent;
+                ups += 1;
+            }
+            None => break,
+        }
+    }
+    outputs_dir.join(name).to_string_lossy().replace('\\', "/")
 }
 
 /// Add the schema and timestamp so every file is self-describing.
@@ -519,18 +610,24 @@ pub(crate) fn redact_text(text: &str) -> String {
 
 /// The issue registry written by `scripts/fetch-issues.sh`. Absent is not fatal: the app does
 /// not call GitHub at runtime, and a snapshot without the registry still renders every row.
-fn read_issues(path: &Path) -> Result<Value, SnapshotError> {
+///
+/// The bytes come back so the manifest can name the registry it published — its provenance.
+fn read_issues(path: &Path) -> Result<(Value, Option<Vec<u8>>), SnapshotError> {
     if !path.exists() {
         tracing::warn!(path = %path.display(), "issue registry absent; publishing no issue links");
-        return Ok(json!({"issues": []}));
+        return Ok((json!({"issues": []}), None));
     }
     let text = std::fs::read_to_string(path)?;
+    let bytes = text.clone().into_bytes();
     let value: Value = serde_json::from_str(&text)?;
-    Ok(if value.get("issues").is_some() {
-        value
-    } else {
-        json!({"issues": value})
-    })
+    Ok((
+        if value.get("issues").is_some() {
+            value
+        } else {
+            json!({"issues": value})
+        },
+        Some(bytes),
+    ))
 }
 
 /// The rework register `--conformance` names.
@@ -663,5 +760,48 @@ impl SnapshotReport {
             self.manifest_sha256
         );
         line
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// v1-pack-3: an output page in the sibling `docs/` directory is named from the data
+    /// directory the manifest lives in, so the public gate can hash it like any data file.
+    #[test]
+    fn an_output_page_is_named_relative_to_the_data_directory() {
+        assert_eq!(
+            relative_manifest_path(
+                Path::new("/pack/data"),
+                Path::new("/pack/docs"),
+                "output-1.html"
+            ),
+            "../docs/output-1.html"
+        );
+        assert_eq!(
+            relative_manifest_path(
+                Path::new("/pack/data"),
+                Path::new("/pack/docs"),
+                "outputs.js"
+            ),
+            "../docs/outputs.js"
+        );
+        assert_eq!(
+            relative_manifest_path(
+                Path::new("/pack/data"),
+                Path::new("/pack/data"),
+                "outputs.js"
+            ),
+            "outputs.js"
+        );
+        assert_eq!(
+            relative_manifest_path(
+                Path::new("/pack/data"),
+                Path::new("/pack/data/pages"),
+                "output-1.html"
+            ),
+            "pages/output-1.html"
+        );
     }
 }

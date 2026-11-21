@@ -22,6 +22,16 @@
 //! * The remedy is never the model's choice: the coach agent's `allowed_actions` carries
 //!   `coach.triage` and not `coach.remedy`, and the computed step supplies the class.
 //!
+//! # The remedy is APPLIED, not only recorded
+//!
+//! `coach.remedy` writes its one row **after** the class's effect has succeeded, in the same
+//! transaction: `retry` starts the failed process again on the interrupted card, `repull`
+//! queues the board's `wip.pull`, `move` and `block` move the card through the registered
+//! `cards.move` handler, `ask` starts `ask_fr` and parks the human gate, and a systemic class
+//! opens `kata.open`. A failed effect rolls the remedy back, so an interruption is never
+//! `remedied` by a write alone. The effect's run/job ids travel in the remedy's `detail`
+//! (`detail.effect`) and in the `coach.remedied` event.
+//!
 //! # Policy, not constants
 //!
 //! The repeat window, the confidence floor and the systemic classes are read from the tenant's
@@ -30,7 +40,7 @@
 //! `conveyor_defect` systemic.
 
 use chrono::{Duration, Utc};
-use conveyor_domain::RunStatus;
+use conveyor_domain::{ListKind, RunStatus};
 use conveyor_store as store;
 use rust_decimal::Decimal;
 use schemars::JsonSchema;
@@ -42,7 +52,7 @@ use uuid::Uuid;
 use crate::board::views::CardCreateIn;
 use crate::invoke::{ActionError, HandlerCtx};
 use crate::process::views::ProcessRunStartIn;
-use crate::spec::HandlerOutput;
+use crate::spec::{HandlerOutput, HandlerRef};
 
 /// The decision-policy kind the coach reads its window, floor and systemic classes from.
 pub const COACH_POLICY_KIND: &str = "coach.window";
@@ -62,6 +72,15 @@ pub const ESCALATION_GATE: &str = "coach.escalation";
 
 /// The low-confidence human gate's name.
 pub const ASK_GATE: &str = "coach.ask";
+
+/// The seeded human-question route an `ask` remedy starts (`ask_fr`).
+pub const ASK_FR_PROCESS: &str = "ask_fr";
+
+/// The kata process a systemic class opens.
+pub const KATA_PROCESS: &str = "kata.open";
+
+/// The platform job that re-pulls a board's queue: the `repull` remedy's trigger.
+pub const WIP_PULL_KIND: &str = "wip.pull";
 
 // ── the inputs and outputs ───────────────────────────────────────────────────────────────
 
@@ -252,6 +271,226 @@ async fn open_gate_tx(
         .map_err(|error| store_failure("coach: open the human gate", error))
 }
 
+/// Start a ROOT process run on the interrupted card, in the remedy's transaction.
+async fn start_process_tx(
+    tx: &mut PgConnection,
+    ctx: &HandlerCtx,
+    card_id: Uuid,
+    process_key: &str,
+    inputs: Value,
+) -> Result<String, ActionError> {
+    let started = crate::process::runs::process_runs_start(
+        &mut *tx,
+        ctx.clone(),
+        ProcessRunStartIn {
+            card_id,
+            process_id: None,
+            process_key: Some(process_key.to_owned()),
+            inputs,
+            parent_run_id: None,
+            step_id: None,
+            workflow_step_id: None,
+            job_binding_id: None,
+            release_hash: None,
+        },
+    )
+    .await?;
+    Ok(started.value.id)
+}
+
+/// Move one card through the registered `cards.move` handler, in this transaction.
+///
+/// The handler is the action's own body: it applies the precondition, the project-type matrix,
+/// the position arithmetic and the `card.moved` event exactly as a person's move does. The
+/// coach passes the version it just read as the precondition.
+async fn move_card_action_tx(
+    tx: &mut PgConnection,
+    ctx: &HandlerCtx,
+    card_id: Uuid,
+    list_id: Uuid,
+    version: u64,
+) -> Result<(), ActionError> {
+    let spec = crate::registry::registry()
+        .get("cards.move")
+        .ok_or_else(ActionError::internal)?;
+    let HandlerRef::Internal(handler) = spec.handler else {
+        return Err(ActionError::internal());
+    };
+    let mut move_ctx = ctx.clone();
+    move_ctx.version = i64::try_from(version).ok();
+    handler(
+        &mut *tx,
+        move_ctx,
+        json!({ "id": card_id, "list_id": list_id }),
+    )
+    .await
+    .map(|_| ())
+}
+
+/// Apply one remedy's effect and return the document recorded on the remedy row.
+///
+/// Every effect is a real mutation through an existing surface — a process run, a job, or the
+/// `cards.move` handler — not a marker. `note` is the one class that changes nothing: its
+/// contract is to record the diagnosis and not act on a third party's behalf.
+async fn apply_effect_tx(
+    tx: &mut PgConnection,
+    ctx: &HandlerCtx,
+    interruption: &store::coach::CoachInterruption,
+    remedy_class: &str,
+    triage_class: &str,
+    confidence: f64,
+) -> Result<Value, ActionError> {
+    if remedy_class == "note" {
+        return Ok(json!({ "kind": "note" }));
+    }
+    let card =
+        store::card::get_card_record_tx(&mut *tx, ctx.tenant, interruption.interrupted_card_id)
+            .await
+            .map_err(|error| store_failure("coach.remedy: read the interrupted card", error))?
+            .ok_or_else(|| ActionError::resource_not_found("card"))?;
+    let board = store::board::get_board_tx(&mut *tx, ctx.tenant, card.card.board_id)
+        .await
+        .map_err(|error| store_failure("coach.remedy: read the board", error))?
+        .ok_or_else(|| ActionError::resource_not_found("board"))?;
+    match remedy_class {
+        // The rerun guard is `process_runs.start`'s own `uq_run_live`: a retry while another
+        // execution is live is refused, and the remedy is not written.
+        "retry" => {
+            let failed =
+                store::run::get_run_detail_tx(&mut *tx, ctx.tenant, interruption.failed_run_id)
+                    .await
+                    .map_err(|error| store_failure("coach.remedy: read the failed run", error))?
+                    .ok_or_else(|| ActionError::resource_not_found("run"))?;
+            let process_key =
+                store::run::process_key_of_run_tx(&mut *tx, ctx.tenant, interruption.failed_run_id)
+                    .await
+                    .map_err(|error| {
+                        store_failure("coach.remedy: read the failed run's process", error)
+                    })?
+                    .ok_or_else(|| {
+                        ActionError::new(
+                            409,
+                            "coach.no_process",
+                            "the failed run has no published process to rerun",
+                        )
+                    })?;
+            let run_id =
+                start_process_tx(&mut *tx, ctx, card.card.id, &process_key, failed.inputs).await?;
+            Ok(json!({
+                "kind": "retry",
+                "run_id": run_id,
+                "process_key": process_key,
+            }))
+        }
+        "repull" => {
+            let job = store::jobs::enqueue_tx(
+                &mut *tx,
+                ctx.tenant,
+                WIP_PULL_KIND,
+                &format!("{WIP_PULL_KIND}:{}", board.id),
+                json!({ "board_id": board.id }),
+                None,
+                3,
+            )
+            .await
+            .map_err(|error| store_failure("coach.remedy: queue the re-pull", error))?;
+            Ok(json!({
+                "kind": "repull",
+                "board_id": board.id,
+                "job_id": job.map(|id| id.to_string()),
+            }))
+        }
+        "move" => {
+            let active =
+                store::list::list_of_kind_tx(&mut *tx, ctx.tenant, board.id, ListKind::Active)
+                    .await
+                    .map_err(|error| store_failure("coach.remedy: read the active lane", error))?
+                    .ok_or_else(|| {
+                        ActionError::new(
+                            409,
+                            "coach.no_active_lane",
+                            "the board has no active lane to move the card to",
+                        )
+                    })?;
+            move_card_action_tx(
+                &mut *tx,
+                ctx,
+                card.card.id,
+                active.list.id,
+                card.card.version.get(),
+            )
+            .await?;
+            Ok(json!({
+                "kind": "move",
+                "card_id": card.card.id,
+                "list_id": active.list.id,
+            }))
+        }
+        "block" => {
+            let waiting =
+                store::list::list_of_kind_tx(&mut *tx, ctx.tenant, board.id, ListKind::Waiting)
+                    .await
+                    .map_err(|error| store_failure("coach.remedy: read the waiting lane", error))?
+                    .ok_or_else(|| {
+                        ActionError::new(
+                            409,
+                            "coach.no_waiting_lane",
+                            "the board has no waiting lane to block the card in",
+                        )
+                    })?;
+            move_card_action_tx(
+                &mut *tx,
+                ctx,
+                card.card.id,
+                waiting.list.id,
+                card.card.version.get(),
+            )
+            .await?;
+            Ok(json!({
+                "kind": "block",
+                "card_id": card.card.id,
+                "list_id": waiting.list.id,
+            }))
+        }
+        "ask" => {
+            let run_id = start_process_tx(
+                &mut *tx,
+                ctx,
+                card.card.id,
+                ASK_FR_PROCESS,
+                json!({ "interruption_id": interruption.id }),
+            )
+            .await?;
+            let approval_id = open_gate_tx(
+                &mut *tx,
+                ctx,
+                ASK_GATE,
+                interruption.interrupted_card_id,
+                board.project_id,
+                json!({
+                    "interruption_id": interruption.id,
+                    "triage_class": triage_class,
+                    "confidence": confidence,
+                }),
+            )
+            .await?;
+            store::coach::set_approval_tx(&mut *tx, ctx.tenant, interruption.id, approval_id)
+                .await
+                .map_err(|error| store_failure("coach.remedy: record the ask gate", error))?;
+            Ok(json!({
+                "kind": "ask",
+                "run_id": run_id,
+                "approval_id": approval_id,
+            }))
+        }
+        other => {
+            // The caller validated the closed set; a value outside it here is a build defect.
+            tracing::error!(remedy_class = other, "coach.remedy: unknown remedy class");
+            Err(ActionError::internal())
+        }
+    }
+}
+
 async fn emit(
     conn: &mut PgConnection,
     ctx: &HandlerCtx,
@@ -356,14 +595,17 @@ async fn coach_interrupt(
         .map_err(|error| store_failure("coach.interrupt: read the board", error))?
         .ok_or_else(|| ActionError::resource_not_found("board"))?;
 
-    // The per-card depth cap: three interruptions without convergence is the whole answer.
+    // The per-card BREADTH cap: three interruptions without convergence is the whole answer.
+    // (`COACH_INTERRUPTION_MAX` counts interruptions on one card, not run nesting depth; nesting is
+    // refused wholesale by the coach-about-a-coach guard above — a coach card's failure never
+    // opens another coach card, and `process_runs.start` refuses a run tree deeper than 3.)
     let prior =
         store::coach::count_interruptions_for_card_tx(&mut *tx, ctx.tenant, interrupted_card_id)
             .await
             .map_err(|error| {
                 store_failure("coach.interrupt: count the card's interruptions", error)
             })?;
-    if prior >= crate::board::pull::COACH_CHAIN_MAX {
+    if prior >= crate::board::pull::COACH_INTERRUPTION_MAX {
         return Err(ActionError::new(
             409,
             "coach.chain_capped",
@@ -624,11 +866,14 @@ async fn coach_triage(
 
 // ── coach.remedy ─────────────────────────────────────────────────────────────────────────
 
-/// Write the interruption's one remedy — and open exactly one kata for a systemic class.
+/// Apply the interruption's one remedy — then record it — and open exactly one kata for a
+/// systemic class.
 ///
 /// The remedy is derived from the triage class and the confidence floor when the caller does not
-/// name one; the computed step never does. A class the tenant policy marks systemic opens one
-/// kata run and records it as the interruption's `kata_candidate_id`.
+/// name one; the computed step never does. The class's effect runs through a real surface before
+/// the row is written (`retry` → `process_runs.start`, `repull` → a `wip.pull` job, `move` /
+/// `block` → `cards.move`, `ask` → `ask_fr` plus the human gate). A class the tenant policy marks
+/// systemic opens one `kata.open` run and records it as the interruption's `kata_candidate_id`.
 #[crate::action(
     name = "coach.remedy",
     version = 1,
@@ -663,6 +908,14 @@ async fn coach_remedy(
             409,
             "coach.escalated",
             "an escalated interruption stays blocked for its human",
+        ));
+    }
+    // Only an open interruption has a remedy to apply; a closed one is history.
+    if interruption.state != "open" {
+        return Err(ActionError::new(
+            409,
+            "coach.not_open",
+            "only an open interruption carries a remedy",
         ));
     }
     if store::coach::get_remedy_tx(&mut *tx, ctx.tenant, interruption.id)
@@ -710,13 +963,48 @@ async fn coach_remedy(
             "a triage below the confidence floor routes to ask, never to an action",
         ));
     }
-    let detail = input.detail.unwrap_or_else(|| json!({}));
+    let mut detail = input.detail.unwrap_or_else(|| json!({}));
     if !detail.is_object() {
         return Err(invalid(
             "detail",
             "invalid_value",
             "the remedy detail is a JSON object",
         ));
+    }
+
+    // The effect is applied FIRST, inside this transaction: a failure rolls the whole remedy
+    // back, so the interruption is never marked `remedied` by a row alone.
+    let mut effect = apply_effect_tx(
+        &mut *tx,
+        &ctx,
+        &interruption,
+        &remedy_class,
+        &triage_class,
+        confidence,
+    )
+    .await?;
+
+    // P4: a systemic class opens exactly one kata; every other class opens none.
+    let mut kata_run_id = None;
+    if policy.systemic.iter().any(|class| class == &triage_class) {
+        let run_id = start_process_tx(
+            &mut *tx,
+            &ctx,
+            interruption.interrupted_card_id,
+            KATA_PROCESS,
+            json!({ "interruption_id": interruption.id }),
+        )
+        .await?;
+        if let Ok(run_id) = Uuid::parse_str(&run_id) {
+            store::coach::set_kata_candidate_tx(&mut *tx, ctx.tenant, interruption.id, run_id)
+                .await
+                .map_err(|error| store_failure("coach.remedy: record the kata candidate", error))?;
+        }
+        effect["kata_run_id"] = json!(run_id);
+        kata_run_id = Some(run_id);
+    }
+    if let Some(map) = detail.as_object_mut() {
+        map.insert("effect".to_owned(), effect.clone());
     }
 
     let remedy = store::coach::insert_remedy_tx(
@@ -739,63 +1027,6 @@ async fn coach_remedy(
         .await
         .map_err(|error| store_failure("coach.remedy: mark remedied", error))?;
 
-    // P1.3: the ask parks a human gate on the coach card.
-    if remedy_class == "ask" {
-        let card =
-            store::card::get_card_record_tx(&mut *tx, ctx.tenant, interruption.interrupted_card_id)
-                .await
-                .map_err(|error| store_failure("coach.remedy: read the interrupted card", error))?
-                .ok_or_else(|| ActionError::resource_not_found("card"))?;
-        let board = store::board::get_board_tx(&mut *tx, ctx.tenant, card.card.board_id)
-            .await
-            .map_err(|error| store_failure("coach.remedy: read the board", error))?
-            .ok_or_else(|| ActionError::resource_not_found("board"))?;
-        let approval_id = open_gate_tx(
-            &mut *tx,
-            &ctx,
-            ASK_GATE,
-            interruption.interrupted_card_id,
-            board.project_id,
-            json!({
-                "interruption_id": interruption.id,
-                "triage_class": triage_class,
-                "confidence": confidence,
-            }),
-        )
-        .await?;
-        store::coach::set_approval_tx(&mut *tx, ctx.tenant, interruption.id, approval_id)
-            .await
-            .map_err(|error| store_failure("coach.remedy: record the ask gate", error))?;
-    }
-
-    // P4: a systemic class opens exactly one kata; every other class opens none.
-    let mut kata_run_id = None;
-    if policy.systemic.iter().any(|class| class == &triage_class) {
-        let started = crate::process::runs::process_runs_start(
-            &mut *tx,
-            ctx.clone(),
-            ProcessRunStartIn {
-                card_id: interruption.interrupted_card_id,
-                process_id: None,
-                process_key: Some("kata.open".to_owned()),
-                inputs: json!({ "interruption_id": interruption.id }),
-                parent_run_id: None,
-                step_id: None,
-                workflow_step_id: None,
-                job_binding_id: None,
-                release_hash: None,
-            },
-        )
-        .await?;
-        let started = started.value;
-        kata_run_id = Some(started.id.clone());
-        if let Ok(run_id) = Uuid::parse_str(&started.id) {
-            store::coach::set_kata_candidate_tx(&mut *tx, ctx.tenant, interruption.id, run_id)
-                .await
-                .map_err(|error| store_failure("coach.remedy: record the kata candidate", error))?;
-        }
-    }
-
     emit(
         &mut *tx,
         &ctx,
@@ -805,6 +1036,7 @@ async fn coach_remedy(
             "interruption_id": interruption.id,
             "remedy_id": remedy.id,
             "remedy_class": remedy.remedy_class,
+            "effect": effect,
             "kata_run_id": kata_run_id,
         }),
     )
@@ -854,6 +1086,15 @@ async fn coach_escalate(
             409,
             "coach.already_escalated",
             "the interruption already waits on a human",
+        ));
+    }
+    // A closed interruption is settled history: escalating it would reopen a window the store
+    // already closed and raise a gate nothing will decide.
+    if interruption.state != "open" {
+        return Err(ActionError::new(
+            409,
+            "coach.not_open",
+            "only an open interruption escalates",
         ));
     }
     let card =
