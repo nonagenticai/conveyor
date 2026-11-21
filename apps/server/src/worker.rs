@@ -3290,20 +3290,22 @@ mod tick_claim_tests {
             .count()
     }
 
-    /// P2.1: one tick claims exactly the free permits — never the tenant batch beyond them —
-    /// and runs each claimed job in its own task.
+    /// P2.1: one tick claims exactly the free permits — five, never the tenant batch beyond
+    /// them — and runs each claimed job in its own task.
     #[tokio::test(flavor = "multi_thread")]
     async fn one_tick_claims_exactly_the_free_permit_budget() {
         let db = common::TestDb::fresh().await;
         let tenant = a_tenant(&db).await;
-        for key in ["tick-1", "tick-2", "tick-3", "tick-4", "tick-5"] {
+        for key in [
+            "tick-1", "tick-2", "tick-3", "tick-4", "tick-5", "tick-6", "tick-7", "tick-8",
+        ] {
             enqueue(&db, tenant, key).await;
         }
         let worker = worker_for(&db).await;
 
-        // Leave exactly three slots free: the claim must be sized three, not BATCH_PER_TENANT.
+        // Leave exactly five slots free: the claim must be sized five, not BATCH_PER_TENANT.
         let mut held = Vec::new();
-        for _ in 0..(MAX_IN_FLIGHT_JOBS - 3) {
+        for _ in 0..(MAX_IN_FLIGHT_JOBS - 5) {
             held.push(
                 Arc::clone(&worker.in_flight)
                     .acquire_owned()
@@ -3315,21 +3317,21 @@ mod tick_claim_tests {
         worker.tick().await.expect("the tick");
         assert_eq!(
             status_count(&db, tenant, "pending").await,
-            2,
+            3,
             "the tick fills exactly the free permits; got {:?}",
             statuses(&db, tenant).await,
         );
 
-        // One task per claimed job: the three reach `succeeded` in this process.
+        // One task per claimed job: the five reach `succeeded` in this process.
         for _ in 0..400 {
-            if status_count(&db, tenant, "succeeded").await == 3 {
+            if status_count(&db, tenant, "succeeded").await == 5 {
                 break;
             }
             tokio::time::sleep(Duration::from_millis(25)).await;
         }
         assert_eq!(
             status_count(&db, tenant, "succeeded").await,
-            3,
+            5,
             "each claimed job ran in its own task and finished; got {:?}",
             statuses(&db, tenant).await,
         );
