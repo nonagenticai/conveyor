@@ -271,17 +271,32 @@ pub enum UsageGroup {
     PromptSha,
     /// The run's project; a call with no run is the empty bucket.
     Project,
+    /// The primary department of the run's job (via its binding); `unattributed` otherwise.
+    Department,
+    /// The run's project's programme; `unattributed` outside a programme.
+    Programme,
+    /// The run's job binding; `unattributed` for a run with no binding.
+    Job,
+    /// The run itself; `unattributed` for a call with no run.
+    Run,
+    /// The run step; `unattributed` for a call not made inside a step.
+    Step,
 }
 
 impl UsageGroup {
     /// Every dimension.
-    pub const ALL: [UsageGroup; 6] = [
+    pub const ALL: [UsageGroup; 11] = [
         UsageGroup::Day,
         UsageGroup::Model,
         UsageGroup::CallerKind,
         UsageGroup::CacheStatus,
         UsageGroup::PromptSha,
         UsageGroup::Project,
+        UsageGroup::Department,
+        UsageGroup::Programme,
+        UsageGroup::Job,
+        UsageGroup::Run,
+        UsageGroup::Step,
     ];
 
     /// The stored spelling (also the report's `group_by` input).
@@ -293,6 +308,11 @@ impl UsageGroup {
             UsageGroup::CacheStatus => "cache_status",
             UsageGroup::PromptSha => "prompt_sha",
             UsageGroup::Project => "project",
+            UsageGroup::Department => "department",
+            UsageGroup::Programme => "programme",
+            UsageGroup::Job => "job",
+            UsageGroup::Run => "run",
+            UsageGroup::Step => "step",
         }
     }
 
@@ -305,7 +325,8 @@ impl UsageGroup {
 /// One report row.
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct UsageRow {
-    /// The group's value (a date, a model, a caller kind, a cache class, a SHA or a project).
+    /// The group's value (a date, a model, a caller kind, a cache class, a SHA, or a
+    /// project/department/programme/job/run/step id).
     pub bucket: String,
     /// Calls in the bucket.
     pub calls: i64,

@@ -259,7 +259,10 @@ struct UsageAggregateRow {
 /// so the dynamic SQL has no writable surface. `model` groups on the served model with the
 /// requested one as the fallback (owner decision, 2026-11-09). `project` joins the run the call
 /// belongs to; a `caller_kind = 'other'` call is the explicit `unattributed` bucket even when it
-/// carries a run, and a call with no project is `unattributed` too.
+/// carries a run, and a call with no project is `unattributed` too. `department`, `programme`,
+/// `job`, `run` and `step` follow the same joins `metrics.usage` uses (the run's project and
+/// programme, its primary job department, the binding, the run and the step), and a call missing
+/// the join value is the `unattributed` bucket — a row is never dropped.
 ///
 /// Cost is derived from the ledger and `commercial_price` at read time (SPEC_V2 D52) and is
 /// never stored. A model with no price contributes zero to `cost_usd` and is counted in
@@ -288,6 +291,11 @@ pub async fn usage_rows_tx(
             "CASE WHEN c.caller_kind = 'other' THEN 'unattributed' \
              ELSE coalesce(c.project_id::text, 'unattributed') END"
         }
+        UsageGroup::Department => "coalesce(c.department, 'unattributed')",
+        UsageGroup::Programme => "coalesce(c.programme_id::text, 'unattributed')",
+        UsageGroup::Job => "coalesce(c.job_binding_id::text, 'unattributed')",
+        UsageGroup::Run => "coalesce(c.run_id::text, 'unattributed')",
+        UsageGroup::Step => "coalesce(c.run_step_id::text, 'unattributed')",
     };
     usage_rows_for_bucket_tx(conn, tenant, bucket, since, until).await
 }
@@ -320,6 +328,9 @@ async fn usage_rows_for_bucket_tx(
              SELECT ic.*,
                     r.project_id,
                     r.card_id,
+                    r.job_binding_id,
+                    pj.programme_id,
+                    coalesce(dep.name, 'unattributed') AS department,
                     CASE
                         WHEN p.model IS NULL THEN NULL
                         WHEN p.unit = 'token' THEN
@@ -335,6 +346,10 @@ async fn usage_rows_for_bucket_tx(
                       ON p.model = coalesce(ic.served_model, ic.model)
                      AND ((p.unit = 'token' AND ic.usage_unit IS NULL) OR p.unit = ic.usage_unit)
                LEFT JOIN run r ON r.id = ic.run_id
+               LEFT JOIN project pj ON pj.id = r.project_id
+               LEFT JOIN job_binding jb ON jb.id = r.job_binding_id
+               LEFT JOIN job_department jd ON jd.job_id = jb.job_id AND jd.is_primary
+               LEFT JOIN department dep ON dep.id = jd.department_id
               WHERE ic.tenant_id = $1 AND ic.created_at >= $2 AND ic.created_at < $3
          )
          SELECT {bucket} AS bucket,

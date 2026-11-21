@@ -119,6 +119,14 @@ fn spine_error(error: PlanStoreError, action: &str) -> ActionError {
             "benefit_map_incomplete",
             format!("a benefits-map edge is missing: {missing:?}"),
         ),
+        PlanStoreError::Illegal(PlanError::BenefitOutputUnresolved { output_ref }) => invalid(
+            "output_ref",
+            "benefit_output_unresolved",
+            format!(
+                "output_ref {output_ref:?} names no wbs_node of this programme; pass the \
+                 node's id"
+            ),
+        ),
         PlanStoreError::Illegal(PlanError::TrancheReviewEvidenceMissing) => invalid(
             "evidence",
             "tranche_evidence_missing",
@@ -360,6 +368,10 @@ pub struct WbsCreateIn {
     pub job_size: Option<i32>,
     /// Free-form metadata.
     pub meta: Option<Value>,
+    /// The approved change request that authorises this mutation under the project's approved
+    /// scope baseline. Required once such a baseline exists (`409 rebaseline_requires_change`).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub change_id: Option<Uuid>,
 }
 
 /// `wbs.update`; every field is optional and `If-Match` is required.
@@ -391,6 +403,21 @@ pub struct WbsUpdateIn {
     pub position: Option<f64>,
     /// A new parent.
     pub parent_id: Option<Uuid>,
+    /// The approved change request that authorises this mutation under the project's approved
+    /// scope baseline. Required once such a baseline exists (`409 rebaseline_requires_change`).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub change_id: Option<Uuid>,
+}
+
+/// `wbs.delete`; `If-Match` is required.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct WbsDeleteIn {
+    /// The node to remove.
+    pub id: Uuid,
+    /// The approved change request that authorises this mutation under the project's approved
+    /// scope baseline. Required once such a baseline exists (`409 rebaseline_requires_change`).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub change_id: Option<Uuid>,
 }
 
 /// `wbs.list`.
@@ -643,6 +670,31 @@ pub struct InFlightOut {
     pub programme_id: Option<String>,
     /// The If-Match version.
     pub version: i64,
+}
+
+/// One in-flight programme. A programme with no projects is still in flight.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct InFlightProgrammeOut {
+    /// The programme id.
+    pub id: String,
+    /// The name.
+    pub name: String,
+    /// The status.
+    pub status: String,
+    /// The If-Match version.
+    pub version: i64,
+}
+
+/// `portfolio.in_flight`'s output: the project page plus the in-flight programmes.
+#[derive(Clone, Debug, Default, Serialize, Deserialize, JsonSchema)]
+pub struct InFlightPageOut {
+    /// The in-flight projects — the page envelope's rows, unchanged.
+    pub items: Vec<InFlightOut>,
+    /// The programmes in the in-flight set; a programme with no projects still appears.
+    pub programmes: Vec<InFlightProgrammeOut>,
+    /// The cursor for the next page, if there is one.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub next_cursor: Option<String>,
 }
 
 /// `portfolio.in_flight` — the shared page envelope, no filters.
@@ -934,7 +986,7 @@ pub struct BenefitLinkIn {
     pub programme_id: Uuid,
     /// The benefit.
     pub benefit_id: Uuid,
-    /// The output level.
+    /// The output level: a `wbs_node` id of a project in the same programme.
     #[serde(default)]
     pub output_ref: String,
     /// The capability level.
@@ -1118,6 +1170,47 @@ fn benefit_transition_out(record: &TransitionRecord) -> BenefitTransitionOut {
 
 // ── WBS actions ─────────────────────────────────────────────────────────────────────────
 
+/// Refuse a direct WBS mutation under an approved scope baseline unless the caller cites the
+/// approved change request that names that baseline (v1-p5-4, T3's change guard).
+///
+/// `take_baseline_guarded` guards the baseline itself; without this guard a `wbs.*` call
+/// would edit the scope a frozen, approved baseline records without the change control the
+/// baseline exists to impose. A project with no approved scope baseline is untouched.
+async fn wbs_change_guard(
+    tx: &mut PgConnection,
+    ctx: &HandlerCtx,
+    project_id: Uuid,
+    change_id: Option<Uuid>,
+) -> Result<(), ActionError> {
+    let Some(baseline) =
+        store::spine::latest_approved_baseline_tx(&mut *tx, ctx.tenant, project_id, "scope")
+            .await
+            .map_err(|error| spine_error(error, ctx.action))?
+    else {
+        return Ok(());
+    };
+    let refusal = |detail: String| ActionError::new(409, "rebaseline_requires_change", detail);
+    let Some(change_id) = change_id else {
+        return Err(refusal(format!(
+            "project {project_id} already holds an approved scope baseline ({}); a WBS mutation \
+             needs the approved change request that cites it in `change_id`",
+            baseline.id
+        )));
+    };
+    let approved =
+        store::spine::approved_change_for_baseline_tx(&mut *tx, ctx.tenant, change_id, baseline.id)
+            .await
+            .map_err(|error| store_error(error, ctx.action))?;
+    if !approved {
+        return Err(refusal(format!(
+            "`change_id` {change_id} is not an approved change request whose `baseline_ref` is \
+             the approved scope baseline {}",
+            baseline.id
+        )));
+    }
+    Ok(())
+}
+
 /// Create a WBS node.
 #[crate::action(
     name = "wbs.create",
@@ -1154,6 +1247,7 @@ async fn wbs_create(
         job_size: input.job_size.unwrap_or(1),
     };
     wsjf(inputs).map_err(|error| spine_error(error.into(), ctx.action))?;
+    wbs_change_guard(&mut *tx, &ctx, input.project_id, input.change_id).await?;
     let record = store::spine::insert_wbs_tx(
         &mut *tx,
         ctx.tenant,
@@ -1201,6 +1295,7 @@ async fn wbs_update(
         ctx.action,
         serde_json::json!({ "version": current.version }),
     )?;
+    wbs_change_guard(&mut *tx, &ctx, current.project_id, input.change_id).await?;
     let inputs = match (
         input.business_value,
         input.time_criticality,
@@ -1332,7 +1427,7 @@ async fn wbs_list(
 }
 
 /// `wbs.delete`'s approval target: what the gate authorises, computed from the input alone.
-fn target_wbs_delete(input: &IdIn) -> Result<String, String> {
+fn target_wbs_delete(input: &WbsDeleteIn) -> Result<String, String> {
     Ok(format!("wbs/{}", input.id))
 }
 
@@ -1352,7 +1447,7 @@ fn target_wbs_delete(input: &IdIn) -> Result<String, String> {
 async fn wbs_delete(
     tx: &mut PgConnection,
     ctx: HandlerCtx,
-    input: IdIn,
+    input: WbsDeleteIn,
 ) -> Result<HandlerOutput<()>, ActionError> {
     let current = store::spine::get_wbs_tx(&mut *tx, ctx.tenant, input.id)
         .await
@@ -1363,6 +1458,7 @@ async fn wbs_delete(
         ctx.action,
         serde_json::json!({ "version": current.version }),
     )?;
+    wbs_change_guard(&mut *tx, &ctx, current.project_id, input.change_id).await?;
     store::spine::delete_wbs_tx(
         &mut *tx,
         ctx.tenant,
@@ -1872,12 +1968,13 @@ async fn portfolio_in_flight(
     tx: &mut PgConnection,
     ctx: HandlerCtx,
     _input: InFlightIn,
-) -> Result<Page<InFlightOut>, ActionError> {
-    let records = store::spine::in_flight_tx(&mut *tx, ctx.tenant)
+) -> Result<InFlightPageOut, ActionError> {
+    let in_flight = store::spine::in_flight_tx(&mut *tx, ctx.tenant)
         .await
         .map_err(|error| spine_error(error, ctx.action))?;
-    Ok(Page {
-        items: records
+    Ok(InFlightPageOut {
+        items: in_flight
+            .projects
             .iter()
             .map(|record: &InFlightRecord| InFlightOut {
                 id: record.id.to_string(),
@@ -1885,6 +1982,16 @@ async fn portfolio_in_flight(
                 name: record.name.clone(),
                 status: record.status.clone(),
                 programme_id: record.programme_id.map(|id| id.to_string()),
+                version: record.version,
+            })
+            .collect(),
+        programmes: in_flight
+            .programmes
+            .iter()
+            .map(|record| InFlightProgrammeOut {
+                id: record.id.to_string(),
+                name: record.name.clone(),
+                status: record.status.clone(),
                 version: record.version,
             })
             .collect(),

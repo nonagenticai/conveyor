@@ -78,7 +78,7 @@
       "evidence": [
         {
           "path": "crates/domain/src/spine.rs",
-          "line": 235,
+          "line": 244,
           "quote": "    let has_impact = impact.is_some_and(|value| !value.is_null());"
         }
       ],
@@ -97,7 +97,7 @@
       "evidence": [
         {
           "path": "crates/actions/src/spine/mod.rs",
-          "line": 1241,
+          "line": 1249,
           "quote": "        && !matches!(status, \"open\" | \"accepted\" | \"cancelled\")"
         },
         {
@@ -107,13 +107,18 @@
         },
         {
           "path": "crates/actions/src/spine/mod.rs",
-          "line": 1435,
+          "line": 1443,
           "quote": "                \"change_request_required\","
         }
       ],
       "failure_scenario": "After the scope baseline is approved, WBS titles/body/inputs are edited; no change row exists and runs execute against unpinned scope.",
       "acceptance": "After an approved baseline, WBS mutations return 409 rebaseline_requires_change unless an approved kind='change' references that baseline with an impact block.",
-      "owner_project": "T1"
+      "owner_project": "T1",
+      "resolved_by": {
+        "commit": "16e095fd025366774419fd0b34481e192909b4d0",
+        "test": "crates/actions/tests/plan_spine.rs",
+        "evidence": "plan_spine 19/19: after an approved baseline, wbs.create/update/delete return 409 rebaseline_requires_change without an approved kind='change' citing that baseline with an impact block; a project with no baseline is unchanged."
+      }
     },
     {
       "id": "v1-p5-5",
@@ -156,7 +161,12 @@
       ],
       "failure_scenario": "A tenant with an active programme and no active projects sees an empty portfolio; programme work is invisible in the delivery view.",
       "acceptance": "portfolio.in_flight returns projects and programmes in the configured in-flight set (an active programme with zero projects appears) and writes no portfolio row.",
-      "owner_project": "T1"
+      "owner_project": "T1",
+      "resolved_by": {
+        "commit": "16e095fd025366774419fd0b34481e192909b4d0",
+        "test": "crates/actions/tests/plan_spine.rs",
+        "evidence": "plan_spine 19/19: portfolio.in_flight returns a programmes array alongside the unchanged project items; an active programme with zero projects appears and a closed one does not; the action writes no row."
+      }
     },
     {
       "id": "v1-p75-1",
@@ -208,7 +218,7 @@
         },
         {
           "path": "crates/store/src/inference.rs",
-          "line": 329,
+          "line": 340,
           "quote": "                        ELSE NULL"
         }
       ],
@@ -238,7 +248,12 @@
       ],
       "failure_scenario": "The UI cannot show department, programme, job or run-level spend; those panels render empty.",
       "acceptance": "The report returns each required level from the ledgers; a test rolls one call up to the job_binding primary department and its programme.",
-      "owner_project": "T11"
+      "owner_project": "T11",
+      "resolved_by": {
+        "commit": "1e0a27922441fcbb66cbd715712169e33defc3bb",
+        "test": "crates/store/tests/inference_.rs",
+        "evidence": "inference_ 6/6: UsageGroup now carries department, programme, job, run and step (11 dimensions); usage_rows_tx joins run->binding->primary department, run->project->programme, the binding, the run and the step with unattributed fallbacks, and the_extended_dimensions_group_by_programme_job_and_run proves the rows."
+      }
     },
     {
       "id": "v1-p75-4",
@@ -309,7 +324,7 @@
         },
         {
           "path": "crates/store/src/inference.rs",
-          "line": 266,
+          "line": 269,
           "quote": "/// `unpriced_calls` — \"no price\" must not render as \"free\"."
         }
       ],
@@ -547,7 +562,7 @@
         },
         {
           "path": "crates/store/src/spine.rs",
-          "line": 3520,
+          "line": 3630,
           "quote": "            if matches!(state.as_str(), \"authorised\" | \"in_review\" | \"closed\") =>"
         }
       ],
@@ -566,7 +581,7 @@
       "evidence": [
         {
           "path": "crates/store/src/spine.rs",
-          "line": 2426,
+          "line": 2536,
           "quote": "/// The editable fields of a realization record. `None` leaves the stored value in place."
         }
       ],
@@ -619,7 +634,7 @@
         },
         {
           "path": "crates/store/src/spine.rs",
-          "line": 1468,
+          "line": 1504,
           "quote": "            \"SELECT EXISTS (SELECT 1 FROM programme_baseline WHERE tenant_id = $1 AND id = $2)\","
         }
       ],
@@ -643,12 +658,12 @@
         },
         {
           "path": "crates/store/src/spine.rs",
-          "line": 3679,
+          "line": 3819,
           "quote": "pub async fn close_programme_tx("
         },
         {
           "path": "crates/store/src/spine.rs",
-          "line": 3713,
+          "line": 3853,
           "quote": "        \"UPDATE programme SET status = 'closed', version = version + 1, updated_at = now()"
         }
       ],
@@ -874,12 +889,12 @@
       "evidence": [
         {
           "path": "crates/actions/src/spine/mod.rs",
-          "line": 3061,
+          "line": 3168,
           "quote": "            state: input.state,"
         },
         {
           "path": "crates/store/src/spine.rs",
-          "line": 2688,
+          "line": 2798,
           "quote": "            state = coalesce($5, state),"
         },
         {
@@ -951,7 +966,7 @@
       "evidence": [
         {
           "path": "crates/store/src/spine.rs",
-          "line": 3003,
+          "line": 3113,
           "quote": "          WHERE tenant_id = $1 AND project_id = $2 AND kind = 'deliverable'"
         }
       ],
@@ -989,13 +1004,18 @@
       "evidence": [
         {
           "path": "docs/design/v2.js",
-          "line": 4848,
-          "quote": "      [\"Timeline\", \"In flight\", \"Dependencies\", \"Programme\"],"
+          "line": 4885,
+          "quote": "    const tab = [\"Timeline\", \"In flight\", \"Dependencies\", \"Programme\", \"Backlog\"].includes("
         }
       ],
       "failure_scenario": "An operator opens Portfolio and cannot rank work by WSJF, see PI planning/demo/retro dates, capacity, or spend per project; prioritisation and budget review happen outside the console.",
       "acceptance": "Portfolio exposes backlog+WSJF, cadence (PI/demo/retro), capacity and per-project metering panels fed by their real actions/rows, with fixtures only behind ?design=1.",
-      "owner_project": "PLATFORM"
+      "owner_project": "PLATFORM",
+      "resolved_by": {
+        "commit": "6b4ccc2ddd88ea80c00148ee496717990fe52c70",
+        "test": "docs/design/scripts/check-v2.cjs",
+        "evidence": "The Portfolio destination now composes a WSJF backlog panel (ranked WBS rows), a cadence panel, a real capacity panel (WIP limits vs live cards) and a per-project metering panel from run rows, on both the console and public paths, with honest empty states and no fixture money. check-v2 281 checks; check-console: 0 unhandled page errors."
+      }
     },
     {
       "id": "v1-p105-2",
@@ -1067,7 +1087,12 @@
       ],
       "failure_scenario": "A programme manager cannot see the consolidated project dossier (which projects, their state and evidence) inside the programme; it exists only as scattered tranche rows.",
       "acceptance": "A Dossier tab lists the programme's projects with tranche, state, baseline and evidence read from the programme/project store.",
-      "owner_project": "PLATFORM"
+      "owner_project": "PLATFORM",
+      "resolved_by": {
+        "commit": "4d68301aa5bb95d0028852ad5c884bbe7e33d9ea",
+        "test": "docs/design/scripts/check-v2.cjs",
+        "evidence": "The programme definition gains a Dossier tab over real project rows: status, tranche joined from meta.tranche, project-filtered baseline (or 'not in this read'), and real document/evidence counts; the public path reads live.programme.projects. check-v2 281 checks; check-console 0 unhandled page errors."
+      }
     },
     {
       "id": "v1-p105-5",
@@ -1080,7 +1105,7 @@
       "evidence": [
         {
           "path": "docs/design/v2.js",
-          "line": 7560,
+          "line": 7817,
           "quote": "  // Live: the platform publishes `measure.inference` (calls, tokens and cache hits by caller and"
         }
       ],
@@ -1202,7 +1227,12 @@
       ],
       "failure_scenario": "A modified conformance.json, issues.json or output page passes the strict gate with no hash to compare.",
       "acceptance": "Manifest every published data/output file and assert the directory set equals manifest.files.",
-      "owner_project": "PLATFORM"
+      "owner_project": "PLATFORM",
+      "resolved_by": {
+        "commit": "aa735094f7c2d0640ef63842fc35c33baa2d060e",
+        "test": "crates/pack/src/snapshot.rs",
+        "evidence": "The manifest-only finalise rehashes the finished data dir (conformance, standards record, build-docs outputs) after the last generator; the shipped manifest went from 12 to 18 files and check-data.cjs (30 checks) now fails on any unlisted data/ file. pack 16/16 including manifest_only_rehashes_the_finished_pack."
+      }
     },
     {
       "id": "v1-pack-4",
@@ -1221,7 +1251,12 @@
       ],
       "failure_scenario": "A failed strict audit still leaves rebuilt HTML published; a removed section file keeps being served.",
       "acceptance": "Confine writes to tmp and --delete the data sync; test the pack is untouched when the audit fails.",
-      "owner_project": "PLATFORM"
+      "owner_project": "PLATFORM",
+      "resolved_by": {
+        "commit": "aa735094f7c2d0640ef63842fc35c33baa2d060e",
+        "test": "docs/design/scripts/publish-data.sh",
+        "evidence": "The data rsync now uses --delete, so a stale data file cannot survive a publish; the finalise runs after build-docs and before the copy, so the copied pack is the one hashed. publish_audit.sh green; snapshot tests 6/6."
+      }
     },
     {
       "id": "v1-pack-5",
@@ -1239,7 +1274,7 @@
         },
         {
           "path": "crates/pack/src/snapshot.rs",
-          "line": 206,
+          "line": 226,
           "quote": "        object.insert(\"issue_registry\".to_owned(), issues.clone());"
         }
       ],
@@ -1486,7 +1521,7 @@
       "evidence": [
         {
           "path": "crates/actions/src/spine/mod.rs",
-          "line": 1643,
+          "line": 1739,
           "quote": "        input.status.as_deref(),"
         },
         {
@@ -1684,17 +1719,17 @@
       "evidence": [
         {
           "path": "crates/actions/src/ladder/mod.rs",
-          "line": 784,
+          "line": 831,
           "quote": "    let confidence = input.confidence.ok_or_else(|| {"
         },
         {
           "path": "crates/actions/src/ladder/mod.rs",
-          "line": 836,
+          "line": 883,
           "quote": "            rung: Rung::Laya,"
         },
         {
           "path": "crates/actions/src/ladder/mod.rs",
-          "line": 854,
+          "line": 901,
           "quote": "            latency_ms: input.latency_ms,"
         }
       ],
@@ -1713,12 +1748,12 @@
       "evidence": [
         {
           "path": "crates/actions/src/ladder/mod.rs",
-          "line": 740,
+          "line": 787,
           "quote": "    pub options: Option<Vec<OptionIn>>,"
         },
         {
           "path": "crates/actions/src/ladder/mod.rs",
-          "line": 825,
+          "line": 872,
           "quote": "        .or_else(|| (!options.is_empty()).then_some(1));"
         },
         {
@@ -1747,7 +1782,7 @@
         },
         {
           "path": "crates/actions/src/ladder/mod.rs",
-          "line": 794,
+          "line": 841,
           "quote": "    let outcome = evaluate(confidence, threshold, action)"
         },
         {
@@ -1990,7 +2025,12 @@
       ],
       "failure_scenario": "The BCM links the benefit to output_ref '3.2.1 Onboarding walkthrough' (a WBS label) instead of the wbs_node UUID. benefits.link accepts it and the map is accepted. When that output's dependency slips, record_dependency_slip_tx matches benefit_link.output_ref against wbs_node ids, finds nothing, and reports zero benefits at risk; the benefit-at-risk metric and the sponsor's escalation both under-report by exactly the benefits the map intended to protect.",
       "acceptance": "benefits.link resolves output_ref to an existing wbs_node id in the same programme (refusing a non-uuid or a node from another programme), or the dependency-slip path returns an error when an edge names no node instead of silently returning an empty list.",
-      "owner_project": "T10"
+      "owner_project": "T10",
+      "resolved_by": {
+        "commit": "7a38afacb49313738fd939218b27857d1cde419e",
+        "test": "crates/actions/tests/plan_spine.rs",
+        "evidence": "plan_spine 17/17 and spine_msp 10/10: a benefit link with a non-UUID output_ref or a node from another programme is 422 benefit_output_unresolved before any row; a node in the benefit's programme is stored as the canonical id; the dependency-slip path now refuses an edge that names no node."
+      }
     },
     {
       "id": "v1-w2c-2",
@@ -2003,7 +2043,7 @@
       "evidence": [
         {
           "path": "crates/actions/src/spine/mod.rs",
-          "line": 3061,
+          "line": 3168,
           "quote": "            state: input.state,"
         },
         {
@@ -2013,7 +2053,7 @@
         },
         {
           "path": "crates/store/src/spine.rs",
-          "line": 3485,
+          "line": 3595,
           "quote": "                PlanError::RetroFindingWithoutLesson(key),"
         }
       ],
@@ -2095,7 +2135,7 @@
         },
         {
           "path": "crates/actions/src/spine/mod.rs",
-          "line": 1123,
+          "line": 1216,
           "quote": "    name = \"wbs.create\","
         }
       ],
@@ -3521,12 +3561,12 @@
       "spec": "§7",
       "severity": "P0",
       "title": "S15 memory and knowledge gate targets are missing",
-      "problem": "The S15 gate named conveyor-api targets that exist nowhere and are now corrected to shipped ones. Two live gaps remain: the real pack/layer knowledge hit and run-transactional memory. The ignored strata_live test now reads CONVEYOR_STRATA_RAG_URL (default http://strata-rag:8092) and compiles, but no strata_rag is deployed: mini3 has no image/credentials, and mini1 and mini2 (the owner-corrected hosts) have no docker, container, process or :8092 listener. The live half is a deployment blocker, not a test one.",
+      "problem": "The S15 gate names shipped targets now, and the real strata services ARE in the cluster: strata-rag (ns strata-rag, 10.43.80.129:8092) and strata-ingest (:9135) are Running, and /health reports db, embed, rerank, chat and laya all ok through a kubectl port-forward from m4. The ignored strata_live test is env-configurable and reaches the live service, but the service rejects the compose dev token (401 Unauthorized on create_root_store): the cluster's STRATA_API_TOKENS admits care-bus, enterprise-mcp and strata-ingest, not conveyor. The live half needs a per-caller conveyor token in strata-rag-secrets and its NetworkPolicy — a gitops/strata change, not a conveyor code change.",
       "evidence": [
         {
           "path": "crates/actions/tests/strata_live.rs",
-          "line": 18,
-          "quote": "const URL: &str = \"http://strata-rag:8092\";"
+          "line": 22,
+          "quote": "#[tokio::test]"
         },
         {
           "path": "docs/plans/slices/S15-capability-knowledge-memory.md",
@@ -3975,7 +4015,12 @@
       ],
       "failure_scenario": "A service principal holding governance:write calls refinements.publish with threshold_override=0.0. The next ladder.evaluate on a 0.01-confidence answer is accepted, and no approval row or human decision exists to explain the threshold change; the decision rows pin refinement_version=2 as if the change had been governed.",
       "acceptance": "refinements.publish routes through the tenant's approval policy (a human gate) before the new version is visible to evaluation; a test proves publishing without the configured approval is refused and no evaluation uses the unapproved refinement.",
-      "owner_project": "T2"
+      "owner_project": "T2",
+      "resolved_by": {
+        "commit": "fcb96fa93b33a0a7689418163d4c2613cc1917e8",
+        "test": "crates/actions/tests/decision_ladder.rs",
+        "evidence": "decision_ladder 10/10, ladder_human_gate 10/10, parity 7/7: refinements.publish requires a human-approved approval with gate refinement.publish targeting that policy; missing, wrong-gate and other-policy approvals are 422 approval_missing before any row; the lock is regenerated and --check-lock is green."
+      }
     },
     {
       "id": "v1-t2-5",
@@ -4023,7 +4068,12 @@
       ],
       "failure_scenario": "A card carries an approved publish gate. A person records a human decision kind=gate.precheck outcome=accepted citing that publish approval. The row is a valid L3 decision for a gate nobody approved; any later consumer that trusts an accepted human decision of that kind proceeds. With no card_id on the record, the same person can cite any approved approval in the tenant.",
       "acceptance": "ladder.record requires the cited approval's gate to match the decision's gate/kind (and a project when no card is named) and refuses otherwise; a test proves an approval for another gate cannot back a human decision.",
-      "owner_project": "T2"
+      "owner_project": "T2",
+      "resolved_by": {
+        "commit": "1167127da271d1ae1409806ffc436a0f07b6f3b5",
+        "test": "crates/actions/tests/ladder_human_gate.rs",
+        "evidence": "ladder_human_gate 10/10 (plus decision_ladder green): a human decision citing an approval for another gate is refused 422; a cardless decision must cite an approval in its own project; a matching gate is accepted. The expected gate is the decision's gate, else the kind's single policy gate."
+      }
     },
     {
       "id": "v1-s03-1",

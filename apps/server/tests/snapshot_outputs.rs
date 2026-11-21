@@ -116,6 +116,7 @@ async fn only_published_outputs_are_public_and_rendered_safely() {
             feedback_url: "https://example.test/feedback".to_owned(),
             database_url: None,
             git_sha: Some("0123456789abcdef0123456789abcdef01234567".to_owned()),
+            manifest_only: false,
         },
     )
     .await
@@ -295,6 +296,7 @@ async fn pages_csv_and_manifest_share_the_json_redaction_and_programme_filter() 
             feedback_url: "https://example.test/feedback".to_owned(),
             database_url: None,
             git_sha: Some("0123456789abcdef0123456789abcdef01234567".to_owned()),
+            manifest_only: false,
         },
     )
     .await

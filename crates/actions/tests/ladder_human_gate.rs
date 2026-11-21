@@ -181,22 +181,35 @@ async fn fixture() -> Fixture {
 impl Fixture {
     /// Insert a `draft.apply` gate on the card, pending unless `decide` names the approver.
     async fn gate(&self, decide: Option<(Uuid, DeciderKind)>) -> Uuid {
+        self.insert_gate(DRAFT_APPLY_GATE, Some(self.card_id), None, decide)
+            .await
+    }
+
+    /// Insert a gate of `gate` on the given card and/or project, pending unless `decide`
+    /// names the approver.
+    async fn insert_gate(
+        &self,
+        gate: &str,
+        card_id: Option<Uuid>,
+        project_id: Option<Uuid>,
+        decide: Option<(Uuid, DeciderKind)>,
+    ) -> Uuid {
         let mut tx = store::begin_scoped(&self.pg.runtime, self.seeded.tenant)
             .await
             .expect("scope the approval insert");
         let new = store::approval::NewApproval {
             run_id: None,
-            card_id: Some(self.card_id),
-            project_id: None,
+            card_id,
+            project_id,
             eval_id: None,
-            gate: DRAFT_APPLY_GATE.to_owned(),
+            gate: gate.to_owned(),
             kind: "gate".to_owned(),
             required_decisions: 1,
             requested_by: None,
             expires_at: None,
             callback_url: None,
             correlation_id: None,
-            meta: json!({"target": self.card_id}),
+            meta: json!({"target": card_id}),
         };
         let approval = store::approval::insert_approval_tx(&mut tx, self.seeded.tenant, &new)
             .await
@@ -250,6 +263,24 @@ fn human_record(card_id: Option<Uuid>, approval_id: Uuid, kind: &str) -> Value {
     });
     if let Some(card_id) = card_id {
         input["card_id"] = json!(card_id);
+    }
+    input
+}
+
+/// A human record that names its project and, when the caller has one, the gate it answers.
+fn human_record_for(
+    project_id: Option<Uuid>,
+    card_id: Option<Uuid>,
+    gate: Option<&str>,
+    approval_id: Uuid,
+    kind: &str,
+) -> Value {
+    let mut input = human_record(card_id, approval_id, kind);
+    if let Some(project_id) = project_id {
+        input["project_id"] = json!(project_id);
+    }
+    if let Some(gate) = gate {
+        input["gate"] = json!(gate);
     }
     input
 }
@@ -596,4 +627,113 @@ async fn a_human_draft_apply_decision_and_approval_applies_the_draft() {
         "{}",
         applied.body
     );
+}
+
+/// 6. A human decision answers one gate: an approval of another gate on the same card does
+/// not authorise it, and an approval of the gate the decision names does.
+#[tokio::test(flavor = "multi_thread")]
+async fn a_human_decision_cannot_cite_an_approval_for_another_gate() {
+    let fx = fixture().await;
+    let publish = fx
+        .insert_gate(
+            "publish",
+            Some(fx.card_id),
+            None,
+            Some((fx.seeded.user_id, DeciderKind::Human)),
+        )
+        .await;
+
+    let refused = fx
+        .invoke(
+            "ladder.record",
+            human_record_for(
+                None,
+                Some(fx.card_id),
+                Some("precheck"),
+                publish,
+                "gate.precheck",
+            ),
+            "user",
+        )
+        .await
+        .expect_err("an approval for another gate must not authorise the decision");
+    assert_field_refusal(&refused, "approval_missing");
+
+    let precheck = fx
+        .insert_gate(
+            "precheck",
+            Some(fx.card_id),
+            None,
+            Some((fx.seeded.user_id, DeciderKind::Human)),
+        )
+        .await;
+    let recorded = fx
+        .invoke(
+            "ladder.record",
+            human_record_for(
+                None,
+                Some(fx.card_id),
+                Some("precheck"),
+                precheck,
+                "gate.precheck",
+            ),
+            "user",
+        )
+        .await
+        .expect("the matching gate authorises the decision");
+    assert_eq!(recorded.status, 201, "{}", recorded.body);
+}
+
+/// 7. A gateless human decision that names no card is bound to its project: an approval in
+/// another project does not authorise it, and one in the named project does.
+#[tokio::test(flavor = "multi_thread")]
+async fn a_gateless_human_decision_without_a_card_must_cite_its_projects_approval() {
+    let fx = fixture().await;
+
+    let other = fx
+        .invoke(
+            "projects.create",
+            json!({"title": "Another gate project", "project_type_code": "delivery"}),
+            "user",
+        )
+        .await
+        .expect("create the other project");
+    assert_eq!(other.status, 201, "{}", other.body);
+    let other_project_id = uuid_of(&other.body, "id");
+
+    let foreign = fx
+        .insert_gate(
+            "precheck",
+            None,
+            Some(other_project_id),
+            Some((fx.seeded.user_id, DeciderKind::Human)),
+        )
+        .await;
+    let refused = fx
+        .invoke(
+            "ladder.record",
+            human_record_for(Some(fx.project_id), None, None, foreign, "gate.precheck"),
+            "user",
+        )
+        .await
+        .expect_err("an approval in another project must not authorise the decision");
+    assert_field_refusal(&refused, "approval_missing");
+
+    let own = fx
+        .insert_gate(
+            "precheck",
+            None,
+            Some(fx.project_id),
+            Some((fx.seeded.user_id, DeciderKind::Human)),
+        )
+        .await;
+    let recorded = fx
+        .invoke(
+            "ladder.record",
+            human_record_for(Some(fx.project_id), None, None, own, "gate.precheck"),
+            "user",
+        )
+        .await
+        .expect("the project's own approval authorises the decision");
+    assert_eq!(recorded.status, 201, "{}", recorded.body);
 }

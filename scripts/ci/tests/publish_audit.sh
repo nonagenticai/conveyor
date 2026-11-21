@@ -80,14 +80,18 @@ set -euo pipefail
 out=""
 docs=""
 conf=""
+manifest_only=0
 while [ $# -gt 0 ]; do
   case "$1" in
     --out) out="$2"; shift 2 ;;
     --outputs-dir) docs="$2"; shift 2 ;;
     --conformance) conf="$2"; shift 2 ;;
+    --manifest-only) manifest_only=1; shift ;;
     *) shift ;;
   esac
 done
+# The finalise pass only rehashes the pack; it writes no snapshot and needs no outputs dir.
+[ "$manifest_only" = 1 ] && exit 0
 mkdir -p "$out" "$docs"
 cp "$FIXTURE"/*.json "$out/"
 cp "$FIXTURE_DOCS/outputs.js" "$docs/"
