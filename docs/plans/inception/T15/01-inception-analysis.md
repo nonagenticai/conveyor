@@ -4,13 +4,13 @@ Project: T15 — Tool authoring and BYO · Track: v2 · Tranche: 12 · Plan: doc
 Unit: #86 (this document is dependency-shaping work; blocked-by T13, T6 and P0)
 Baseline: main@70d31773, 2026-11-21 (content reviewed at main@61edfcf8, 2026-11-18; citations re-verified at this baseline) · Project row: active, meta.depends_on = ["T13", "T6", "P0"]
 
-- **Status:** draft
-- **Version:** 0.1
+- **Status:** published
+- **Version:** 1.0
 - **Author / date:** conveyor programme session / 2026-11-21
-- **Reviewer / review date:** pending / pending
+- **Reviewer / review date:** #347 independent review / 2026-11-18; owner publication / 2026-11-21
 - **Related project:** T15 — Tool authoring and BYO · issue #86 · live document `01a1ee5f-51f8-7613-8d20-35d470d53ecc`
 - **Rationale:** Establish what exists and what is reused for Tool authoring and BYO: current state, build-vs-reuse decisions and the risks the architecture must answer.
-- **Published document:** `01a1ee5f-51f8-7613-8d20-35d470d53ecc` — `published_at` null (draft; not published)
+- **Published document:** `01a1ee5f-51f8-7613-8d20-35d470d53ecc` — published 2026-11-21
 - **Contract:** pending
 - **ADM phase / plateau:** A / PSA for the artefact (project row: G / capability)
 - **Entries:** current-state rows, reuse sources, build-vs-reuse decisions, risks, open questions.

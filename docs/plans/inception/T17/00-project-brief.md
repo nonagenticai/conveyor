@@ -1,12 +1,12 @@
 # T17 — Tenant asset authoring
 
-- **Status:** draft
-- **Version:** 0.1
+- **Status:** published
+- **Version:** 1.0
 - **Author / date:** conveyor programme session / 2026-11-21
-- **Reviewer / review date:** pending / pending
+- **Reviewer / review date:** #347 independent review / 2026-11-18; owner publication / 2026-11-21
 - **Related project:** T17 — Tenant asset authoring · issue #87 · live document `01a1e008-58e9-772a-87a3-ad2e9a1e8354`
 - **Rationale:** state the inception basis for T17: a tenant's brief and documents become a reviewed catalogue of departments, jobs, procedures and policies, and no asset publishes itself or widens a tool grant.
-- **Published document:** `01a1e008-58e9-772a-87a3-ad2e9a1e8354` — `published_at` null (draft; not published)
+- **Published document:** `01a1e008-58e9-772a-87a3-ad2e9a1e8354` — published 2026-11-21
 - **Contract:** pending
 - **ADM phase / plateau:** A / PSA for the artefact (project row: G / capability)
 - **Entries:** outcome, boundary, reuse sources, inception units, dependencies, acceptance, capabilities, plan, risks, links.
@@ -36,10 +36,10 @@ Out of scope: writing the target tables (departments, jobs, procedures, policies
 
 ## Inception units
 
-1. `inception-analysis` — `01-inception-analysis.md`; live `01a1ee42-312b-770c-bdae-36a1b077d2e6` (draft, unpublished).
-2. `architecture-design` — `02-architecture-design.md`; live `01a1ee42-3aca-7179-867c-000d986a865e` (draft, unpublished).
+1. `inception-analysis` — `01-inception-analysis.md`; live `01a1ee42-312b-770c-bdae-36a1b077d2e6` (published 2026-11-21).
+2. `architecture-design` — `02-architecture-design.md`; live `01a1ee42-3aca-7179-867c-000d986a865e` (published 2026-11-21).
 
-Both are drafts; publication is the owner's acceptance act and the inception gate stays unmet until then. #87 is claimed by its delivery session; this brief does not change that issue's status.
+Both are published (owner publication, 2026-11-21); the inception gate is met. #87 is claimed by its delivery session; this brief does not change that issue's status.
 
 ## Dependencies
 

@@ -1,12 +1,12 @@
 # T5 — Kata
 
-- **Status:** draft
-- **Version:** 0.1
+- **Status:** published
+- **Version:** 1.0
 - **Author / date:** conveyor programme session / 2026-11-21
-- **Reviewer / review date:** pending / pending
+- **Reviewer / review date:** #347 independent review / 2026-11-18; owner publication / 2026-11-21
 - **Related project:** T5 — Kata · issue #77 · live document `01a1e008-7d05-75d4-ae9d-4e2d485271b4`
 - **Rationale:** state the inception basis for T5 Kata: the outcome, the boundary it must not cross, the surfaces it reuses, and how the delivery unit is accepted.
-- **Published document:** `01a1e008-7d05-75d4-ae9d-4e2d485271b4` — `published_at` null (draft; not published)
+- **Published document:** `01a1e008-7d05-75d4-ae9d-4e2d485271b4` — published 2026-11-21
 - **Contract:** pending
 - **ADM phase / plateau:** A / PSA for the artefact (project row: G / capability)
 - **Entries:** outcome, boundary, reuse sources, inception units, dependencies, acceptance, capabilities, plan, risks, links.
@@ -37,10 +37,10 @@ Out of scope: the V1 built slices (not re-opened); the benchmark/eval instrument
 
 ## Inception units
 
-1. `inception-analysis` — `01-inception-analysis.md`; live `01a1ee4b-fbb1-7433-8ad7-2e75199c733f` (draft, unpublished).
-2. `architecture-design` — `02-architecture-design.md`; live `01a1ee4c-04d8-757b-ad3d-1807a55e0ae1` (draft, unpublished).
+1. `inception-analysis` — `01-inception-analysis.md`; live `01a1ee4b-fbb1-7433-8ad7-2e75199c733f` (published 2026-11-21).
+2. `architecture-design` — `02-architecture-design.md`; live `01a1ee4c-04d8-757b-ad3d-1807a55e0ae1` (published 2026-11-21).
 
-Both are drafts on the project with `meta.category` set. Publication (`documents.publish`) is the owner's acceptance act; until then the project answers `409 inception_missing` to a build-run start. This brief does not authorise the tranche.
+Both are published on the project with `meta.category` set (owner publication, 2026-11-21); the inception gate is met. This brief does not authorise the tranche.
 
 ## Dependencies
 

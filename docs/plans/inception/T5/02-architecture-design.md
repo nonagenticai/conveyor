@@ -4,13 +4,13 @@ Project: T5 — Kata · Track: v2 · Tranche: 10 · Plan: docs/SPEC_V2.md §12
 Unit: #77 (this document is dependency-shaping work; blocked-by T2, S16–S20 and P0)
 Baseline: main@70d31773, 2026-11-21 (content reviewed at main@61edfcf8, 2026-11-18; citations re-verified at this baseline) · Project row: active, meta.depends_on = ["T2", "S16", "S17", "S18", "S19", "S20", "P0"]
 
-- **Status:** draft
-- **Version:** 0.1
+- **Status:** published
+- **Version:** 1.0
 - **Author / date:** conveyor programme session / 2026-11-21
-- **Reviewer / review date:** pending / pending
+- **Reviewer / review date:** #347 independent review / 2026-11-18; owner publication / 2026-11-21
 - **Related project:** T5 — Kata · issue #77 · live document `01a1ee4c-04d8-757b-ad3d-1807a55e0ae1`
 - **Rationale:** Define the to-be architecture for Kata: aggregates, tables and actions, decisions, acceptance and the artefact set.
-- **Published document:** `01a1ee4c-04d8-757b-ad3d-1807a55e0ae1` — `published_at` null (draft; not published)
+- **Published document:** `01a1ee4c-04d8-757b-ad3d-1807a55e0ae1` — published 2026-11-21
 - **Contract:** pending
 - **ADM phase / plateau:** A / PSA for the artefact (project row: G / capability)
 - **Entries:** context and boundary; aggregate/table/action rows; decisions; acceptance scenarios; PSA set; typed artefacts; rollout.

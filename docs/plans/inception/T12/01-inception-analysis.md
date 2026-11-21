@@ -6,13 +6,13 @@ Baseline: main@70d31773, 2026-11-21 (content reviewed at main@61edfcf8, 2026-11-
 
 Measurement note: 61edfcf8 is an ancestor of the observed origin/main `b439d506` (2026-11-18); every citation resolves at origin/main. Labels describe rows and handlers, not a passing gate.
 
-- **Status:** draft
-- **Version:** 0.1
+- **Status:** published
+- **Version:** 1.0
 - **Author / date:** conveyor programme session / 2026-11-21
-- **Reviewer / review date:** pending / pending
+- **Reviewer / review date:** #347 independent review / 2026-11-18; owner publication / 2026-11-21
 - **Related project:** T12 — One organisation loop · issue #88 · live document `01a1ee5f-b75b-76ee-93f3-62903c1661ba`
 - **Rationale:** Establish what exists and what is reused for One organisation loop: current state, build-vs-reuse decisions and the risks the architecture must answer.
-- **Published document:** `01a1ee5f-b75b-76ee-93f3-62903c1661ba` — `published_at` null (draft; not published)
+- **Published document:** `01a1ee5f-b75b-76ee-93f3-62903c1661ba` — published 2026-11-21
 - **Contract:** pending
 - **ADM phase / plateau:** A / PSA for the artefact (project row: G / capability)
 - **Entries:** current-state rows, reuse sources, build-vs-reuse decisions, risks, open questions.

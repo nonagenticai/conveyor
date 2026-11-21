@@ -1,12 +1,12 @@
 # T12 — One organisation loop
 
-- **Status:** draft
-- **Version:** 0.1
+- **Status:** published
+- **Version:** 1.0
 - **Author / date:** conveyor programme session / 2026-11-21
-- **Reviewer / review date:** pending / pending
+- **Reviewer / review date:** #347 independent review / 2026-11-18; owner publication / 2026-11-21
 - **Related project:** T12 — One organisation loop · issue #88 · live document `01a1e008-2e2f-71fa-8714-2c4802220b43`
 - **Rationale:** state the inception basis for T12 — the acceptance of V2: one tenant runs the whole loop, audited and within budget, proved by a harness rather than a new production aggregate.
-- **Published document:** `01a1e008-2e2f-71fa-8714-2c4802220b43` — `published_at` null (draft; not published)
+- **Published document:** `01a1e008-2e2f-71fa-8714-2c4802220b43` — published 2026-11-21
 - **Contract:** pending
 - **ADM phase / plateau:** A / PSA for the artefact (project row: G / capability)
 - **Entries:** outcome, boundary, reuse sources, inception units, dependencies, acceptance, capabilities, plan, risks, links.
@@ -39,10 +39,10 @@ Out of scope: any production table, action, module or migration; a loop aggregat
 
 ## Inception units
 
-1. `inception-analysis` — `01-inception-analysis.md`; live `01a1ee5f-b75b-76ee-93f3-62903c1661ba` (draft, unpublished).
-2. `architecture-design` — `02-architecture-design.md`; live `01a1ee5f-c33a-70bd-8cb2-a8ca3b379634` (draft, unpublished).
+1. `inception-analysis` — `01-inception-analysis.md`; live `01a1ee5f-b75b-76ee-93f3-62903c1661ba` (published 2026-11-21).
+2. `architecture-design` — `02-architecture-design.md`; live `01a1ee5f-c33a-70bd-8cb2-a8ca3b379634` (published 2026-11-21).
 
-Both are drafts; publication is the owner's acceptance act and the inception gate stays unmet until then.
+Both are published (owner publication, 2026-11-21); the inception gate is met.
 
 ## Dependencies
 

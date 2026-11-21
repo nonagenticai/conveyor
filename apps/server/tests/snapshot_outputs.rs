@@ -16,7 +16,7 @@ fn read_value(path: &Path) -> Value {
 }
 
 #[tokio::test]
-async fn only_publishable_outputs_are_public_and_rendered_safely() {
+async fn only_published_outputs_are_public_and_rendered_safely() {
     let db = common::TestDb::fresh().await;
 
     let tenant: Uuid = sqlx::query_scalar(
@@ -55,10 +55,11 @@ async fn only_publishable_outputs_are_public_and_rendered_safely() {
 
     let published = Uuid::now_v7();
     let private = Uuid::now_v7();
+    let publishable_only = Uuid::now_v7();
     let hostile = "before <script>alert(1)</script> <img src=x onerror=alert(1)> [x](javascript:alert(1)) after";
     sqlx::query(
-        "INSERT INTO document (id, tenant_id, project_id, kind, title, status, body, publishable, meta)
-         VALUES ($1, $2, $3, 'document', 'Published note', 'active', $4, true, '{}'::jsonb)",
+        "INSERT INTO document (id, tenant_id, project_id, kind, title, status, body, publishable, published_at, meta)
+         VALUES ($1, $2, $3, 'document', 'Published note', 'active', $4, true, now(), '{}'::jsonb)",
     )
     .bind(published)
     .bind(tenant)
@@ -77,6 +78,16 @@ async fn only_publishable_outputs_are_public_and_rendered_safely() {
     .execute(&db.super_pool)
     .await
     .expect("private output");
+    sqlx::query(
+        "INSERT INTO document (id, tenant_id, project_id, kind, title, status, body, publishable, meta)
+         VALUES ($1, $2, $3, 'document', 'Publishable but never published', 'active', 'metadata only', true, '{}'::jsonb)",
+    )
+    .bind(publishable_only)
+    .bind(tenant)
+    .bind(project)
+    .execute(&db.super_pool)
+    .await
+    .expect("publishable-only output");
 
     let data = std::env::temp_dir().join(format!("conveyor-outputs-data-{}", Uuid::now_v7()));
     let docs = std::env::temp_dir().join(format!("conveyor-outputs-docs-{}", Uuid::now_v7()));
@@ -103,7 +114,11 @@ async fn only_publishable_outputs_are_public_and_rendered_safely() {
 
     let artefacts = read_value(&data.join("artefacts.json"));
     let documents = artefacts["documents"].as_array().expect("documents");
-    assert_eq!(documents.len(), 1, "the private output is absent");
+    assert_eq!(documents.len(), 1, "only the published output is public");
+    assert!(
+        !artefacts.contains("Publishable but never published"),
+        "publishable alone is not publication"
+    );
     assert_eq!(documents[0]["title"], "Published note");
     assert_eq!(documents[0]["project_id"], project.to_string());
     for forbidden in ["body", "content_hash", "meta", "status"] {
@@ -120,12 +135,20 @@ async fn only_publishable_outputs_are_public_and_rendered_safely() {
         "the private output is not public"
     );
     assert!(!snapshot.contains("do not publish me"));
+    assert!(
+        !snapshot.contains("Publishable but never published"),
+        "a publishable row that was never published stays private"
+    );
 
     let index = std::fs::read_to_string(docs.join("outputs.js")).expect("outputs.js");
     assert!(index.starts_with("window.CONVEYOR_OUTPUTS = {"));
     assert!(index.contains("\"schema\":\"design-outputs/v1\""));
     assert!(index.contains("Published note"));
     assert!(!index.contains("Private note"));
+    assert!(
+        !index.contains("Publishable but never published"),
+        "the outputs index carries only rows that were published"
+    );
 
     let page = std::fs::read_to_string(docs.join(format!("output-{published}.html")))
         .expect("the published page");

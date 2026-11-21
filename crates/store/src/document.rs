@@ -432,8 +432,10 @@ pub async fn published_categories_tx(
 
 /// Every published, active text output, oldest first.
 ///
-/// This is the publish path's read: the filter is the publication decision (`publishable AND
-/// status='active'`), and a body is required because an output page has something to render.
+/// This is the publish path's read: the filter is the publication decision (`published_at IS NOT
+/// NULL AND status='active'`), and a body is required because an output page has something to
+/// render. `publishable` alone is not publication — a row composed through the bulk path can carry
+/// the bit without ever having been published.
 /// There is deliberately no page: a tenant's published output set is small, and a publish must
 /// see all of it to build one complete index.
 pub async fn list_published_outputs_tx(
@@ -442,7 +444,7 @@ pub async fn list_published_outputs_tx(
 ) -> Result<Vec<DocumentRecord>, DocumentStoreError> {
     let sql = format!(
         "SELECT {DOCUMENT_COLUMNS} FROM document
-          WHERE tenant_id = $1 AND publishable AND status = 'active' AND body IS NOT NULL
+          WHERE tenant_id = $1 AND published_at IS NOT NULL AND status = 'active' AND body IS NOT NULL
           ORDER BY created_at, id"
     );
     let rows: Vec<DocumentRow> = sqlx::query_as(sqlx::AssertSqlSafe(sql))

@@ -4,13 +4,13 @@ Project: T6 — Development project · Track: v2 · Tranche: 11 · Plan: docs/SP
 Unit: #80 (this document is dependency-shaping work; blocked-by T5, T13 and P0)
 Baseline: main@70d31773, 2026-11-21 (content reviewed at main@61edfcf8, 2026-11-18; citations re-verified at this baseline) · Project row: active, meta.depends_on = ["T5", "T13", "P0"]
 
-- **Status:** draft
-- **Version:** 0.1
+- **Status:** published
+- **Version:** 1.0
 - **Author / date:** conveyor programme session / 2026-11-21
-- **Reviewer / review date:** pending / pending
+- **Reviewer / review date:** #347 independent review / 2026-11-18; owner publication / 2026-11-21
 - **Related project:** T6 — Development project · issue #80 · live document `01a1ee4e-b842-70a4-81ee-aacce62c31a9`
 - **Rationale:** Define the to-be architecture for Development project: aggregates, tables and actions, decisions, acceptance and the artefact set.
-- **Published document:** `01a1ee4e-b842-70a4-81ee-aacce62c31a9` — `published_at` null (draft; not published)
+- **Published document:** `01a1ee4e-b842-70a4-81ee-aacce62c31a9` — published 2026-11-21
 - **Contract:** pending
 - **ADM phase / plateau:** A / PSA for the artefact (project row: G / capability)
 - **Entries:** context and boundary; aggregate/table/action rows; decisions; acceptance scenarios; PSA set; typed artefacts; rollout.

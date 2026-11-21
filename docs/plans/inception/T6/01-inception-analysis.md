@@ -4,13 +4,13 @@ Project: T6 — Development project · Track: v2 · Tranche: 11 · Plan: docs/SP
 Unit: #80 (this document is dependency-shaping work; blocked-by T5, T13 and P0)
 Baseline: main@70d31773, 2026-11-21 (content reviewed at main@61edfcf8, 2026-11-18; citations re-verified at this baseline) · Project row: active, meta.depends_on = ["T5", "T13", "P0"]
 
-- **Status:** draft
-- **Version:** 0.1
+- **Status:** published
+- **Version:** 1.0
 - **Author / date:** conveyor programme session / 2026-11-21
-- **Reviewer / review date:** pending / pending
+- **Reviewer / review date:** #347 independent review / 2026-11-18; owner publication / 2026-11-21
 - **Related project:** T6 — Development project · issue #80 · live document `01a1ee4e-ac03-76aa-8f54-81018d8bcd57`
 - **Rationale:** Establish what exists and what is reused for Development project: current state, build-vs-reuse decisions and the risks the architecture must answer.
-- **Published document:** `01a1ee4e-ac03-76aa-8f54-81018d8bcd57` — `published_at` null (draft; not published)
+- **Published document:** `01a1ee4e-ac03-76aa-8f54-81018d8bcd57` — published 2026-11-21
 - **Contract:** pending
 - **ADM phase / plateau:** A / PSA for the artefact (project row: G / capability)
 - **Entries:** current-state rows, reuse sources, build-vs-reuse decisions, risks, open questions.

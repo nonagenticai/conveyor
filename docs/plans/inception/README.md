@@ -1,13 +1,12 @@
-# Inception drafts — the five proposed V2 projects
+# Inception record — the five proposed V2 projects
 
 This folder holds the durable inception artefacts for the five proposed V2 projects: **T5 Kata**,
 **T6 Development project**, **T12 One organisation loop**, **T15 Tool authoring and BYO** and
 **T17 Tenant asset authoring**.
 
-Every file is a **draft**. Publication is the owner's acceptance act (`documents.publish`); until an
-`inception-analysis` and an `architecture-design` are published on the project, the inception gate
-(`crates/actions/src/programme.rs::assert_inception_published`) refuses a build-run start. These
-drafts authorise no tranche and claim no completion.
+All fifteen are **published** (2026-11-21) under the owner's direction in #527. The inception gate
+(`crates/actions/src/programme.rs::assert_inception_published`) is met for each project; this record
+authorises no tranche and claims no completion.
 
 ## The standard
 
@@ -28,13 +27,14 @@ entries, links). Current-state rows cite `path:symbol`; every future claim is ph
 
 ## The live record
 
-The bodies were first written and independently reviewed under #347 (2026-11-18). That unit closed
-on `publishable = true`, while the inception gate reads `published_at IS NOT NULL` — so the
-documents were never published, and the public index carried them as publishable drafts. This unit
-makes the bodies durable here and corrects the live rows: the same document ids, the exact file
-bytes, `publishable = false`, `published_at` still null.
+The bodies were written and independently reviewed under #347 (2026-11-18). That unit closed on
+`publishable = true`, while the inception gate reads `published_at IS NOT NULL` — so the documents
+were never actually published and the public index carried them as publishable drafts. This unit
+makes the bodies durable here, corrects the briefs, updates the live rows to the exact file bytes,
+and publishes all fifteen through `documents.publish` (2026-11-21). It also fixes the snapshot and
+outputs-index filters that treated `publishable` as publication.
 
-| Project | Category | Live document |
+| Project | Category | Live document (published 2026-11-21) |
 |---|---|---|
 | T5 | project-brief | `01a1e008-7d05-75d4-ae9d-4e2d485271b4` |
 | T5 | inception-analysis | `01a1ee4b-fbb1-7433-8ad7-2e75199c733f` |
@@ -52,18 +52,19 @@ bytes, `publishable = false`, `published_at` still null.
 | T17 | inception-analysis | `01a1ee42-312b-770c-bdae-36a1b077d2e6` |
 | T17 | architecture-design | `01a1ee42-3aca-7179-867c-000d986a865e` |
 
-## Acceptance path
+## Publication and what follows
 
-1. The owner (or a reviewer named on the document) reads the three files for a project.
-2. The reviewer records a verdict and review date in the metadata block.
-3. A person publishes `inception-analysis` and `architecture-design` through `documents.publish`.
-   `project-brief` is part of the due-now set but is not read by the gate.
-4. The project then satisfies `assert_inception_published`; the tranche's own authorisation remains
-   a separate act.
+1. The bodies were reviewed independently under #347; the review defects are recorded on that issue.
+2. The owner directed publication in #527 (2026-11-21); `documents.publish` set `published_at` and
+   `published_by` on all fifteen through the operator transport.
+3. The project now satisfies `assert_inception_published`. The tranche's own authorisation remains a
+   separate act: these documents do not authorise tranche 10, 11, 12, 13 or 5.
 
 ## Verification
 
 - Headings and metadata: the check in issue #527 (P1.1–P5.1).
 - Live bytes: `documents.download` must hash to the file's `shasum -a 256`.
-- Publication state: `documents.get` must read `publishable = false`, `published_at = null`.
+- Publication state: `documents.get` must read `publishable = true`, `published_at` non-null.
+- Public window: only `published_at IS NOT NULL` rows reach the snapshot and the outputs index
+  (`crates/store/src/snapshot.rs`, `crates/store/src/document.rs::list_published_outputs_tx`).
 - No private host, path, token or credential appears in any file.

@@ -1,12 +1,12 @@
 # T15 — Tool authoring and BYO
 
-- **Status:** draft
-- **Version:** 0.1
+- **Status:** published
+- **Version:** 1.0
 - **Author / date:** conveyor programme session / 2026-11-21
-- **Reviewer / review date:** pending / pending
+- **Reviewer / review date:** #347 independent review / 2026-11-18; owner publication / 2026-11-21
 - **Related project:** T15 — Tool authoring and BYO · issue #86 · live document `01a1e008-4866-73b3-aff3-4b81913d1e23`
 - **Rationale:** state the inception basis for T15: a tool generated from an OpenAPI spec or a BYO MCP server is published, called by a job, and bounded by its effect ceiling and the tenant approval policy.
-- **Published document:** `01a1e008-4866-73b3-aff3-4b81913d1e23` — `published_at` null (draft; not published)
+- **Published document:** `01a1e008-4866-73b3-aff3-4b81913d1e23` — published 2026-11-21
 - **Contract:** pending
 - **ADM phase / plateau:** A / PSA for the artefact (project row: G / capability)
 - **Entries:** outcome, boundary, reuse sources, inception units, dependencies, acceptance, capabilities, plan, risks, links.
@@ -36,10 +36,10 @@ Out of scope: executing tenant code; a caller-supplied URL at call time (§11.5)
 
 ## Inception units
 
-1. `inception-analysis` — `01-inception-analysis.md`; live `01a1ee5f-51f8-7613-8d20-35d470d53ecc` (draft, unpublished).
-2. `architecture-design` — `02-architecture-design.md`; live `01a1ee5f-5b42-70c5-9c35-86f977d14e85` (draft, unpublished).
+1. `inception-analysis` — `01-inception-analysis.md`; live `01a1ee5f-51f8-7613-8d20-35d470d53ecc` (published 2026-11-21).
+2. `architecture-design` — `02-architecture-design.md`; live `01a1ee5f-5b42-70c5-9c35-86f977d14e85` (published 2026-11-21).
 
-Both are drafts; publication is the owner's acceptance act and the inception gate stays unmet until then.
+Both are published (owner publication, 2026-11-21); the inception gate is met.
 
 ## Dependencies
 

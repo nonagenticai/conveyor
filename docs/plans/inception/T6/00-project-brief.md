@@ -1,12 +1,12 @@
 # T6 — Development project
 
-- **Status:** draft
-- **Version:** 0.1
+- **Status:** published
+- **Version:** 1.0
 - **Author / date:** conveyor programme session / 2026-11-21
-- **Reviewer / review date:** pending / pending
+- **Reviewer / review date:** #347 independent review / 2026-11-18; owner publication / 2026-11-21
 - **Related project:** T6 — Development project · issue #80 · live document `01a1e008-8640-73e4-a90a-6bf8c250a0af`
 - **Rationale:** state the inception basis for T6: a real feature lands on the conveyor and one dependency repo through the lane, PR, CI, review, merge, deploy and live-verify path, without the project changing its own gates.
-- **Published document:** `01a1e008-8640-73e4-a90a-6bf8c250a0af` — `published_at` null (draft; not published)
+- **Published document:** `01a1e008-8640-73e4-a90a-6bf8c250a0af` — published 2026-11-21
 - **Contract:** pending
 - **ADM phase / plateau:** A / PSA for the artefact (project row: G / capability)
 - **Entries:** outcome, boundary, reuse sources, inception units, dependencies, acceptance, capabilities, plan, risks, links.
@@ -35,10 +35,10 @@ Out of scope: the V1 built slices (not re-opened); a second GitHub client or tok
 
 ## Inception units
 
-1. `inception-analysis` — `01-inception-analysis.md`; live `01a1ee4e-ac03-76aa-8f54-81018d8bcd57` (draft, unpublished).
-2. `architecture-design` — `02-architecture-design.md`; live `01a1ee4e-b842-70a4-81ee-aacce62c31a9` (draft, unpublished).
+1. `inception-analysis` — `01-inception-analysis.md`; live `01a1ee4e-ac03-76aa-8f54-81018d8bcd57` (published 2026-11-21).
+2. `architecture-design` — `02-architecture-design.md`; live `01a1ee4e-b842-70a4-81ee-aacce62c31a9` (published 2026-11-21).
 
-Both are drafts; publication is the owner's acceptance act and the inception gate stays unmet until then.
+Both are published (owner publication, 2026-11-21); the inception gate is met.
 
 ## Dependencies
 

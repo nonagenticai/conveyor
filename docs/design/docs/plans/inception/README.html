@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
     <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
-    <title>Inception drafts — the five proposed V2 projects · conveyor documents</title>
+    <title>Inception record — the five proposed V2 projects · conveyor documents</title>
     <link rel="icon" href="../../../assets/conveyor.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="../../../assets/plex-sans.css" />
     <link rel="stylesheet" href="../../../assets/plex-mono.css" />
@@ -23,9 +23,9 @@
         >source ↗</a
       >
     </header>
-    <main class="doc-body"><h1 id="inception-drafts--the-five-proposed-v2-projects">Inception drafts — the five proposed V2 projects</h1>
+    <main class="doc-body"><h1 id="inception-record--the-five-proposed-v2-projects">Inception record — the five proposed V2 projects</h1>
 <p>This folder holds the durable inception artefacts for the five proposed V2 projects: <strong>T5 Kata</strong>, <strong>T6 Development project</strong>, <strong>T12 One organisation loop</strong>, <strong>T15 Tool authoring and BYO</strong> and <strong>T17 Tenant asset authoring</strong>.</p>
-<p>Every file is a <strong>draft</strong>. Publication is the owner's acceptance act (<code>documents.publish</code>); until an <code>inception-analysis</code> and an <code>architecture-design</code> are published on the project, the inception gate (<code>crates/actions/src/programme.rs::assert_inception_published</code>) refuses a build-run start. These drafts authorise no tranche and claim no completion.</p>
+<p>All fifteen are <strong>published</strong> (2026-11-21) under the owner's direction in #527. The inception gate (<code>crates/actions/src/programme.rs::assert_inception_published</code>) is met for each project; this record authorises no tranche and claims no completion.</p>
 <h2 id="the-standard">The standard</h2>
 <p>Each project carries the three categories its <code>v2-proposed</code> class declares in <code>seed/output-standard.json</code>:</p>
 <table>
@@ -57,13 +57,13 @@
 <p>Each file opens with the SPEC_V2 §8.1 common metadata (status, version, author/date, reviewer/review date, related project, rationale, published document/contract, phase/plateau, entries, links). Current-state rows cite <code>path:symbol</code>; every future claim is phrased as plan.</p>
 <p><code>statement-of-architecture-work</code> is <strong>not</strong> part of this set: it is a T9-only contract kind.</p>
 <h2 id="the-live-record">The live record</h2>
-<p>The bodies were first written and independently reviewed under #347 (2026-11-18). That unit closed on <code>publishable = true</code>, while the inception gate reads <code>published_at IS NOT NULL</code> — so the documents were never published, and the public index carried them as publishable drafts. This unit makes the bodies durable here and corrects the live rows: the same document ids, the exact file bytes, <code>publishable = false</code>, <code>published_at</code> still null.</p>
+<p>The bodies were written and independently reviewed under #347 (2026-11-18). That unit closed on <code>publishable = true</code>, while the inception gate reads <code>published_at IS NOT NULL</code> — so the documents were never actually published and the public index carried them as publishable drafts. This unit makes the bodies durable here, corrects the briefs, updates the live rows to the exact file bytes, and publishes all fifteen through <code>documents.publish</code> (2026-11-21). It also fixes the snapshot and outputs-index filters that treated <code>publishable</code> as publication.</p>
 <table>
 <thead>
 <tr>
 <th>Project</th>
 <th>Category</th>
-<th>Live document</th>
+<th>Live document (published 2026-11-21)</th>
 </tr>
 </thead>
 <tbody>
@@ -144,18 +144,18 @@
 </tr>
 </tbody>
 </table>
-<h2 id="acceptance-path">Acceptance path</h2>
+<h2 id="publication-and-what-follows">Publication and what follows</h2>
 <ol type="1">
-<li>The owner (or a reviewer named on the document) reads the three files for a project.</li>
-<li>The reviewer records a verdict and review date in the metadata block.</li>
-<li>A person publishes <code>inception-analysis</code> and <code>architecture-design</code> through <code>documents.publish</code>. <code>project-brief</code> is part of the due-now set but is not read by the gate.</li>
-<li>The project then satisfies <code>assert_inception_published</code>; the tranche's own authorisation remains a separate act.</li>
+<li>The bodies were reviewed independently under #347; the review defects are recorded on that issue.</li>
+<li>The owner directed publication in #527 (2026-11-21); <code>documents.publish</code> set <code>published_at</code> and <code>published_by</code> on all fifteen through the operator transport.</li>
+<li>The project now satisfies <code>assert_inception_published</code>. The tranche's own authorisation remains a separate act: these documents do not authorise tranche 10, 11, 12, 13 or 5.</li>
 </ol>
 <h2 id="verification">Verification</h2>
 <ul>
 <li>Headings and metadata: the check in issue #527 (P1.1–P5.1).</li>
 <li>Live bytes: <code>documents.download</code> must hash to the file's <code>shasum -a 256</code>.</li>
-<li>Publication state: <code>documents.get</code> must read <code>publishable = false</code>, <code>published_at = null</code>.</li>
+<li>Publication state: <code>documents.get</code> must read <code>publishable = true</code>, <code>published_at</code> non-null.</li>
+<li>Public window: only <code>published_at IS NOT NULL</code> rows reach the snapshot and the outputs index (<code>crates/store/src/snapshot.rs</code>, <code>crates/store/src/document.rs::list_published_outputs_tx</code>).</li>
 <li>No private host, path, token or credential appears in any file.</li>
 </ul>
 </main>

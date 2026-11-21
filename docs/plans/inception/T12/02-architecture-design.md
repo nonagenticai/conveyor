@@ -4,13 +4,13 @@ Project: T12 — One organisation loop · Track: v2 · Tranche: 13 · Plan: docs
 Unit: #88 (this document is dependency-shaping work; T12 depends on every T slice and P0)
 Baseline: main@70d31773, 2026-11-21 (content reviewed at main@61edfcf8, 2026-11-18; citations re-verified at this baseline) · Project row: active, meta.depends_on = all T slices + P0
 
-- **Status:** draft
-- **Version:** 0.1
+- **Status:** published
+- **Version:** 1.0
 - **Author / date:** conveyor programme session / 2026-11-21
-- **Reviewer / review date:** pending / pending
+- **Reviewer / review date:** #347 independent review / 2026-11-18; owner publication / 2026-11-21
 - **Related project:** T12 — One organisation loop · issue #88 · live document `01a1ee5f-c33a-70bd-8cb2-a8ca3b379634`
 - **Rationale:** Define the to-be architecture for One organisation loop: aggregates, tables and actions, decisions, acceptance and the artefact set.
-- **Published document:** `01a1ee5f-c33a-70bd-8cb2-a8ca3b379634` — `published_at` null (draft; not published)
+- **Published document:** `01a1ee5f-c33a-70bd-8cb2-a8ca3b379634` — published 2026-11-21
 - **Contract:** pending
 - **ADM phase / plateau:** A / PSA for the artefact (project row: G / capability)
 - **Entries:** context and boundary; aggregate/table/action rows; decisions; acceptance scenarios; PSA set; typed artefacts; rollout.
