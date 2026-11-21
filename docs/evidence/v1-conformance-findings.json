@@ -26,7 +26,8 @@
       ],
       "failure_scenario": "pm.route_gate 'deploy' with evidence [] and require_evidence omitted opens an approvable gate; work ships with no artefact or run judged.",
       "acceptance": "Empty evidence returns 422 gate_evidence_missing; a waiver is accepted only when approval_policy declares it, is stored on the approval, and increments the override metric read by the governance audit.",
-      "owner_project": "PLATFORM"
+      "owner_project": "PLATFORM",
+      "resolved_by": "92e6b223 — crates/actions/tests/spine_gates.rs::an_evidence_less_gate_is_refused (+ a_gate_with_evidence_opens, an_explicit_evidence_waiver_is_recorded)"
     },
     {
       "id": "v1-p5-2",
@@ -55,7 +56,8 @@
       ],
       "failure_scenario": "PATCH status=accepted, evidence=[] marks a work package accepted although no run or artefact meets its criteria.",
       "acceptance": "Accepting with evidence [] returns 422 wbs_acceptance_evidence_missing unless an approved approval row cites run/artefact evidence for each criterion.",
-      "owner_project": "T1"
+      "owner_project": "T1",
+      "resolved_by": "92e6b223 — crates/actions/tests/plan_spine.rs::accepting_a_wbs_node_without_evidence_is_refused"
     },
     {
       "id": "v1-p5-3",
@@ -97,7 +99,7 @@
         },
         {
           "path": "crates/actions/src/spine/mod.rs",
-          "line": 1365,
+          "line": 1380,
           "quote": "                \"change_request_required\","
         }
       ],
@@ -329,7 +331,8 @@
       ],
       "failure_scenario": "An actor creates profile x with artifact_requirements {} and contract_kinds {}, then calls architecture.phases_advance with profile_key x; every phase from preliminary through h closes with no artefacts, no SAW and no contract.",
       "acceptance": "phases_advance returns 409 missing_mandatory when the phase set is absent/empty/malformed; profile keys and values must validate against artifact_type keys and the four contract kinds; a profile_key that is not board-adopted is refused; add a test closing phase A with an empty profile and expect 409.",
-      "owner_project": "T9"
+      "owner_project": "T9",
+      "resolved_by": "92e6b223 — crates/actions/tests/togaf_profile_gates.rs::an_absent_or_partial_profile_set_does_not_satisfy_the_gate (+ a_draft_profile_cannot_govern_the_gate)"
     },
     {
       "id": "v1-p81-2",
@@ -358,7 +361,8 @@
       ],
       "failure_scenario": "A delivery project of track programme (or any delivery before closure) advances phase g and passes design with neither a live delivery contract nor a compliance review; a non_conformant review without waiver is likewise never blocking until close.",
       "acceptance": "phases_advance(g) returns 409 unless a review exists on a live delivery contract for the project and, when level is non_conformant, an active unexpired waiver exists; the design gate action performs the same checks without the track exemption; tests cover programme track.",
-      "owner_project": "T9"
+      "owner_project": "T9",
+      "resolved_by": "92e6b223 — crates/actions/tests/togaf_phase_g.rs::the_design_gate_requires_the_phase_g_review (+ togaf_close_gate::a_programme_track_project_is_not_exempt_from_phase_g)"
     },
     {
       "id": "v1-p81-3",
@@ -387,7 +391,8 @@
       ],
       "failure_scenario": "After adoption, an actor tailors the same profile to remove phase A artefacts and contract kinds, weakening every subsequent gate without any board decision; a draft profile is adopted citing a random uuid.",
       "acceptance": "Tailoring an adopted profile either returns 409 or resets status to draft requiring re-adoption; adopt_profile_tx requires an approved architecture_board approval whose meta identifies this profile; FK or EXISTS check added, with tests.",
-      "owner_project": "T9"
+      "owner_project": "T9",
+      "resolved_by": "92e6b223 — crates/actions/tests/togaf_profile_gates.rs::an_adopted_profile_cannot_be_rewritten (+ adoption_requires_an_approved_decision_about_this_profile)"
     },
     {
       "id": "v1-p81-4",
@@ -400,12 +405,12 @@
       "evidence": [
         {
           "path": "crates/store/src/architecture.rs",
-          "line": 1303,
+          "line": 1381,
           "quote": "    get_body_tx(&mut *conn, tenant, body_id)"
         },
         {
           "path": "crates/store/src/architecture.rs",
-          "line": 1345,
+          "line": 1423,
           "quote": "    if subject_kind == Some(\"board\") && decision == \"approved\" {"
         },
         {
@@ -444,23 +449,18 @@
       "evidence": [
         {
           "path": "crates/actions/src/architecture.rs",
-          "line": 254,
+          "line": 279,
           "quote": "    pub project_id: Option<Uuid>,"
         },
         {
           "path": "crates/actions/src/architecture.rs",
-          "line": 257,
+          "line": 282,
           "quote": "    pub artifact_type_id: Option<Uuid>,"
         },
         {
-          "path": "migrations/0054_architecture.sql",
-          "line": 147,
-          "quote": "    project_id        uuid,"
-        },
-        {
-          "path": "migrations/0054_architecture.sql",
-          "line": 233,
-          "quote": "    CONSTRAINT architecture_artifact_link_from_fk FOREIGN KEY (from_artifact_id) REFERENCES architecture_artifact (id) ON DELETE CASCADE,"
+          "path": "crates/store/src/architecture.rs",
+          "line": 933,
+          "quote": "pub async fn link_artifacts_tx("
         }
       ],
       "failure_scenario": "A client creates an artefact with null type and project (invisible to every gate), then links two artefacts from different projects or tenants; the repository reports a trace edge that crosses governance boundaries.",
@@ -478,12 +478,12 @@
       "evidence": [
         {
           "path": "crates/store/src/architecture.rs",
-          "line": 1806,
+          "line": 2027,
           "quote": "                 WHERE tenant_id = $1 AND project_id = $2 AND outcome IS NOT NULL"
         },
         {
           "path": "crates/store/src/architecture.rs",
-          "line": 1921,
+          "line": 2222,
           "quote": "         ON CONFLICT (tenant_id, project_id, contract_id) DO NOTHING"
         },
         {
@@ -493,7 +493,7 @@
         },
         {
           "path": "crates/store/src/architecture.rs",
-          "line": 1806,
+          "line": 2027,
           "quote": "                 WHERE tenant_id = $1 AND project_id = $2 AND outcome IS NOT NULL"
         }
       ],
@@ -522,7 +522,7 @@
         },
         {
           "path": "crates/store/src/spine.rs",
-          "line": 3332,
+          "line": 3337,
           "quote": "            if matches!(state.as_str(), \"authorised\" | \"in_review\" | \"closed\") =>"
         }
       ],
@@ -638,12 +638,12 @@
         },
         {
           "path": "crates/store/src/spine.rs",
-          "line": 3471,
+          "line": 3496,
           "quote": "pub async fn close_programme_tx("
         },
         {
           "path": "crates/store/src/spine.rs",
-          "line": 3505,
+          "line": 3530,
           "quote": "        \"UPDATE programme SET status = 'closed', version = version + 1, updated_at = now()"
         }
       ],
@@ -697,7 +697,8 @@
       ],
       "failure_scenario": "A transient failure is triaged 'retry'; the card sits in the waiting lane, the failed run never reruns, yet the interruption reads 'remedied' and the board shows the block as handled.",
       "acceptance": "coach.remedy dispatches the derived remedy through real actions (process_runs.start for retry, cards.move, repull trigger, block) and stores the resulting run/effect id; a test asserts the run or card actually changed.",
-      "owner_project": "T4"
+      "owner_project": "T4",
+      "resolved_by": "92e6b223 — crates/actions/tests/coach.rs::an_injected_failure_plus_coach_remedy_changes_the_run_state (+ a_remedy_whose_effect_fails_is_not_marked_remedied)"
     },
     {
       "id": "v1-p6-2",
@@ -709,39 +710,19 @@
       "problem": "The systemic path's whole effect is starting process key kata.open and storing its run id as kata_candidate_id. There is no kata record naming an instrument and threshold, no tenant-kata scoping, no kata-candidate trigger that opens a development project or config change, and no measurement or mandatory adoption approval anywhere in the loop.",
       "evidence": [
         {
-          "path": "crates/actions/src/ops/incidents.rs",
-          "line": 790,
-          "quote": "        kata_candidate_id = Some(started.value.id);"
+          "path": "crates/actions/src/coach.rs",
+          "line": 994,
+          "quote": "            KATA_PROCESS,"
         },
         {
           "path": "crates/actions/src/coach.rs",
-          "line": 780,
-          "quote": "                process_key: Some(\"kata.open\".to_owned()),"
+          "line": 995,
+          "quote": "            json!({ \"interruption_id\": interruption.id }),"
         },
         {
-          "path": "docs/SPEC_V2.md",
-          "line": 1024,
-          "quote": "`development` type and a stricter gate set:"
-        },
-        {
-          "path": "docs/SPEC_V2.md",
-          "line": 1208,
-          "quote": "| development | `dev.open\\|implement\\|verify\\|merge\\|release\\|rollback` (composes coding/git/CI actions) |"
-        },
-        {
-          "path": "crates/actions/src/lib.rs",
-          "line": 20,
-          "quote": "pub mod agent_surface;"
-        },
-        {
-          "path": "crates/actions/src/lib.rs",
-          "line": 107,
-          "quote": "pub mod youtube;"
-        },
-        {
-          "path": "crates/actions/src/registry.rs",
-          "line": 184,
-          "quote": "        let mut actions: Vec<ActionSpec> = inventory::iter::<ActionRegistration>()"
+          "path": "crates/actions/src/coach.rs",
+          "line": 999,
+          "quote": "            store::coach::set_kata_candidate_tx(&mut *tx, ctx.tenant, interruption.id, run_id)"
         }
       ],
       "failure_scenario": "A postmortem or systemic triage marks the finding 'systemic'; a kata run appears, nothing else. The candidate change is never built, measured on held-out data, or gated for adoption, so production never changes.",
@@ -778,23 +759,18 @@
       "evidence": [
         {
           "path": "crates/actions/src/coach.rs",
-          "line": 366,
-          "quote": "    if prior >= crate::board::pull::COACH_CHAIN_MAX {"
+          "line": 603,
+          "quote": "        store::coach::count_interruptions_for_card_tx(&mut *tx, ctx.tenant, interrupted_card_id)"
+        },
+        {
+          "path": "crates/actions/src/coach.rs",
+          "line": 608,
+          "quote": "    if prior >= crate::board::pull::COACH_INTERRUPTION_MAX {"
         },
         {
           "path": "crates/actions/src/board/pull.rs",
           "line": 358,
           "quote": "        coach_skipped: live.is_some() || coach_refusal.is_some(),"
-        },
-        {
-          "path": "crates/actions/src/coach.rs",
-          "line": 366,
-          "quote": "    if prior >= crate::board::pull::COACH_CHAIN_MAX {"
-        },
-        {
-          "path": "crates/actions/src/coach.rs",
-          "line": 370,
-          "quote": "            \"the card has already had three interruptions; a fourth would only repeat them\","
         }
       ],
       "failure_scenario": "A card fails four times with four distinct defects; the fourth failure is logged and commented but never triaged, so a real interruption has no card and no owner.",
@@ -884,7 +860,7 @@
       "evidence": [
         {
           "path": "crates/actions/src/spine/mod.rs",
-          "line": 2971,
+          "line": 3006,
           "quote": "            state: input.state,"
         },
         {
@@ -1153,13 +1129,14 @@
         },
         {
           "path": "crates/pack/src/snapshot.rs",
-          "line": 332,
+          "line": 372,
           "quote": "/// The live `/design/data/programme.json` route serves this from memory, so the download and the"
         }
       ],
       "failure_scenario": "A downloaded programme.json disagrees with the live payload_sha256 and the manifest timestamp.",
       "acceptance": "Pass one clock into both paths; test CLI bytes equal site_view bytes.",
-      "owner_project": "PLATFORM"
+      "owner_project": "PLATFORM",
+      "resolved_by": "92e6b223 — apps/server/tests/snapshot_deterministic.rs::the_live_view_and_the_cli_write_the_same_bytes; snapshot_generated_at is the one clock in crates/pack/src/{live,snapshot}.rs"
     },
     {
       "id": "v1-pack-3",
@@ -1230,7 +1207,7 @@
         },
         {
           "path": "crates/pack/src/snapshot.rs",
-          "line": 196,
+          "line": 206,
           "quote": "        object.insert(\"issue_registry\".to_owned(), issues.clone());"
         }
       ],
@@ -1265,7 +1242,8 @@
       ],
       "failure_scenario": "A pasted token or email in a document body or project name reaches the public repo and pages while the JSON copy is masked.",
       "acceptance": "Redact and programme-filter rows before render_outputs and CSV; seeded-secret test covers HTML and CSV.",
-      "owner_project": "PLATFORM"
+      "owner_project": "PLATFORM",
+      "resolved_by": "92e6b223 — crates/pack/src/outputs.rs::tests::a_secret_in_an_output_never_reaches_the_page_or_the_index (+ apps/server/tests/snapshot_outputs.rs::pages_csv_and_manifest_share_the_json_redaction_and_programme_filter)"
     },
     {
       "id": "v1-view-1",
@@ -1407,7 +1385,7 @@
       "evidence": [
         {
           "path": "crates/actions/src/spine/mod.rs",
-          "line": 1553,
+          "line": 1588,
           "quote": "        input.status.as_deref(),"
         },
         {
@@ -1479,18 +1457,18 @@
       "evidence": [
         {
           "path": "crates/actions/src/coach.rs",
-          "line": 778,
-          "quote": "                card_id: interruption.interrupted_card_id,"
+          "line": 989,
+          "quote": "    if policy.systemic.iter().any(|class| class == &triage_class) {"
         },
         {
           "path": "crates/actions/src/coach.rs",
-          "line": 780,
-          "quote": "                process_key: Some(\"kata.open\".to_owned()),"
+          "line": 994,
+          "quote": "            KATA_PROCESS,"
         },
         {
           "path": "crates/actions/src/coach.rs",
-          "line": 781,
-          "quote": "                inputs: json!({ \"interruption_id\": interruption.id }),"
+          "line": 995,
+          "quote": "            json!({ \"interruption_id\": interruption.id }),"
         }
       ],
       "failure_scenario": "A systemic `conveyor_defect` opens a kata that is an ordinary document-composing agent run bound to the target project's card and tenant. It can compose and comment but cannot measure, cannot open its mandatory adoption approval, and any write it is later granted runs under the target tenant's autonomy. Every systemic signal yields a document, never a measured, adopted change.",
@@ -1547,7 +1525,7 @@
         },
         {
           "path": "crates/actions/src/pm/mod.rs",
-          "line": 643,
+          "line": 649,
           "quote": "    let required = input.required_decisions.unwrap_or(1);"
         },
         {
@@ -1587,7 +1565,8 @@
       ],
       "failure_scenario": "An internal agent holding governance:write calls ladder.record with rung='human', approval_id set to any approval UUID in its tenant (including a pending or rejected approval for an unrelated thing) and outcome='accepted'. It then calls ladder.apply_draft for the generated code patch; the check passes because the decision is not a rule, is 'accepted', and names the card. No person approved anything. Separately, an accepted laya decision for request.classify on the card is enough to apply any draft, so the draft is never gated on the decision that actually reviewed it.",
       "acceptance": "ladder.record refuses rung='human' unless the actor is a person and the cited approval has an accepted approval_decision bound to this decision; ladder.apply_draft requires an accepted decision of a dedicated draft-application gate kind (and/or the document's prompt_sha256/inference_call_id) and refuses a generic or pending approval; tests prove a pending approval and an unrelated accepted laya decision both cannot gate a draft.",
-      "owner_project": "T2"
+      "owner_project": "T2",
+      "resolved_by": "92e6b223 — crates/actions/tests/ladder_human_gate.rs::a_service_principal_cannot_record_a_human_decision (+ only_a_human_draft_apply_decision_can_gate_a_draft; decision_ladder::a_generated_draft_cannot_transition_a_card)"
     },
     {
       "id": "v1-w1c-3",
@@ -1600,17 +1579,17 @@
       "evidence": [
         {
           "path": "crates/actions/src/ladder/mod.rs",
-          "line": 775,
+          "line": 784,
           "quote": "    let confidence = input.confidence.ok_or_else(|| {"
         },
         {
           "path": "crates/actions/src/ladder/mod.rs",
-          "line": 827,
+          "line": 836,
           "quote": "            rung: Rung::Laya,"
         },
         {
           "path": "crates/actions/src/ladder/mod.rs",
-          "line": 845,
+          "line": 854,
           "quote": "            latency_ms: input.latency_ms,"
         }
       ],
@@ -1629,7 +1608,12 @@
       "evidence": [
         {
           "path": "crates/actions/src/ladder/mod.rs",
-          "line": 816,
+          "line": 740,
+          "quote": "    pub options: Option<Vec<OptionIn>>,"
+        },
+        {
+          "path": "crates/actions/src/ladder/mod.rs",
+          "line": 825,
           "quote": "        .or_else(|| (!options.is_empty()).then_some(1));"
         },
         {
@@ -1658,7 +1642,7 @@
         },
         {
           "path": "crates/actions/src/ladder/mod.rs",
-          "line": 785,
+          "line": 794,
           "quote": "    let outcome = evaluate(confidence, threshold, action)"
         },
         {
@@ -1727,7 +1711,8 @@
       ],
       "failure_scenario": "Adopt a profile that names requirements only for the phases walked so far (`artifact_requirements: {\"preliminary\": [...], \"a\": [...]}`, `contract_kinds: {}`) — the young-capability tailoring §8.1 encourages. Then `architecture.phases_advance {project_id: P, phase_code: \"b\"}`: sets is empty, satisfied is true, no contract kind is named, and the B node is written `accepted` with evidence `{\"artifacts\": [], \"contract\": null}`. Phases B–H can be walked producing nothing although the standard marks Business Service/Function, Data Entity Catalog, Technology Standards and the rest mandatory.",
       "acceptance": "A phase with no explicit profile entry falls back to the standard's mandatory artifact_type set for that phase/plateau (or the profile is refused as un-tailored at adoption); advancing B with no approved Business Service/Function is refused by architecture_artifact_missing.",
-      "owner_project": "T9"
+      "owner_project": "T9",
+      "resolved_by": "92e6b223 — crates/actions/tests/togaf_profile_gates.rs::an_absent_or_partial_profile_set_does_not_satisfy_the_gate (+ a_draft_profile_cannot_govern_the_gate); mandatory_sets_tx joins artifact_type.mandatory"
     },
     {
       "id": "v1-w2a-3",
@@ -1745,7 +1730,7 @@
         },
         {
           "path": "crates/store/src/architecture.rs",
-          "line": 1079,
+          "line": 1157,
           "quote": "            SET status = 'adopted', adopted_at = now(), board_decision_id = $4,"
         }
       ],
@@ -1764,7 +1749,7 @@
       "evidence": [
         {
           "path": "crates/store/src/architecture.rs",
-          "line": 1400,
+          "line": 1478,
           "quote": "              WHERE tenant_id = $1 AND id = $2 AND status IN ('draft', 'live')\","
         }
       ],
@@ -1828,7 +1813,8 @@
       ],
       "failure_scenario": "A programme is created with programmes.create; nobody has created tranche 1 yet. A delivery project is created with programme_id set and meta.tranche=1. projects.create calls assert_project_tranche_authorised_tx, the tranche lookup returns no row, and the gate returns Ok. The project starts work, spends budget and produces outputs before any sponsoring-group tranche review, so the first-tranche authorisation requirement is skipped entirely.",
       "acceptance": "For a project whose programme_id is set, a missing tranche row returns 409 tranche_not_authorised (only programme_id NULL may pass); an integration test creates a programme with zero tranches and asserts project start is refused.",
-      "owner_project": "T10"
+      "owner_project": "T10",
+      "resolved_by": "92e6b223 — crates/actions/tests/spine_gates.rs::a_project_outside_its_programme_tranche_plan_cannot_start (+ a_programme_without_a_tranche_plan_keeps_its_legacy_allowance)"
     },
     {
       "id": "v1-w2b-3",
@@ -1841,12 +1827,12 @@
       "evidence": [
         {
           "path": "crates/actions/src/spine/mod.rs",
-          "line": 2139,
+          "line": 2174,
           "quote": "            capabilities: input.capabilities.unwrap_or_else(|| serde_json::json!([])),"
         },
         {
           "path": "crates/actions/src/spine/mod.rs",
-          "line": 2144,
+          "line": 2179,
           "quote": "            operational_area: input.operational_area.unwrap_or_default(),"
         },
         {
@@ -1880,7 +1866,7 @@
         },
         {
           "path": "crates/actions/src/spine/mod.rs",
-          "line": 2239,
+          "line": 2274,
           "quote": "            output_ref: input.output_ref,"
         }
       ],
@@ -1899,7 +1885,7 @@
       "evidence": [
         {
           "path": "crates/actions/src/spine/mod.rs",
-          "line": 2971,
+          "line": 3006,
           "quote": "            state: input.state,"
         },
         {
@@ -1944,7 +1930,8 @@
       ],
       "failure_scenario": "A delivery lead with portfolio:write creates a change row with status 'approved', baseline_ref pointing at the current approved baseline and meta.impact = {}. They then call baselines.take with that change_id. The new baseline is created and cited as advanced by an 'approved' change that no approver ever saw, bypassing §8.4 change control and §8.3's re-baseline rule entirely.",
       "acceptance": "The baseline guard resolves approval through the approval table (gate='change', status='approved', meta.change_id matches), not the row status; register create/update refuse status='approved' for change rows (approval is only a gate effect). A test that self-declares approved and re-baselines must be rejected.",
-      "owner_project": "T3"
+      "owner_project": "T3",
+      "resolved_by": "92e6b223 — crates/actions/tests/spine_gates.rs::a_self_declared_approved_change_cannot_advance_a_baseline (+ a_register_cannot_be_born_approved, an_approved_change_gate_advances_the_baseline)"
     },
     {
       "id": "v1-w2c-5",
@@ -2016,7 +2003,8 @@
       ],
       "failure_scenario": "At 02:10 a human pulls the cord after a runaway deploy. An automation job (or a coding agent granted andon:write to 'unblock' itself) calls andon.release at 02:12. runs.create stops returning 409 andon-engaged and the worker resumes claiming runs for the tenant, including the pipeline that caused the incident. No human decision exists anywhere in the record, and the released event gives no way to tell the releaser was not a person.",
       "acceptance": "andon.release returns 403 unless ctx.actor_kind == \"user\"; a test asserts a machine principal holding andon:write is refused while a user succeeds, and the andon.released event carries the principal kind.",
-      "owner_project": "T7"
+      "owner_project": "T7",
+      "resolved_by": "92e6b223 — crates/actions/tests/andon_release.rs::a_machine_cannot_release_the_andon_cord_but_a_person_can"
     },
     {
       "id": "v1-w3a-5",
@@ -2130,19 +2118,19 @@
       "problem": "SPEC §10.4 declares kata.open|observe|analyse|propose|measure|adopt|propagate|close. No kata.* ActionSpec is registered. The implementation uses the string as a process-catalogue key: coach.escalate starts a process run with process_key 'kata.open' (coach.rs:780) and ops.incident names the same const (incidents.rs:64). There is no action to list a kata, read its Six Gests state, measure or adopt it, so the Improve destination's kata queue has no action surface.",
       "evidence": [
         {
-          "path": "docs/SPEC_V2.md",
-          "line": 1207,
-          "quote": "| kata | `kata.open\\|observe\\|analyse\\|propose\\|measure\\|adopt\\|propagate\\|close` |"
-        },
-        {
           "path": "crates/actions/src/ops/incidents.rs",
           "line": 64,
           "quote": "pub const KATA_PROCESS: &str = \"kata.open\";"
         },
         {
           "path": "crates/actions/src/coach.rs",
-          "line": 780,
-          "quote": "                process_key: Some(\"kata.open\".to_owned()),"
+          "line": 80,
+          "quote": "pub const KATA_PROCESS: &str = \"kata.open\";"
+        },
+        {
+          "path": "crates/actions/src/coach.rs",
+          "line": 994,
+          "quote": "            KATA_PROCESS,"
         }
       ],
       "failure_scenario": "coach.escalate opens a kata process run, but no kata.observe/measure/adopt action exists: an MCP client or the Improve screen cannot query the kata queue, record an observation/measurement or adopt the improvement, and the only way to advance it is the generic process_runs.start with a process key that must already be seeded. The systemic-improvement loop is not a discoverable API.",
@@ -2767,7 +2755,8 @@
       ],
       "failure_scenario": "A change to the seeded process (step order, allowed_actions, input template) breaks the coach and every test still passes because none executes the process.",
       "acceptance": "A test starts the seeded cap.kanban_coach.handle_error.v2 process for an injected failure and asserts exactly one coach card, one triage and one remedy from the process run, not from direct action calls.",
-      "owner_project": "T4"
+      "owner_project": "T4",
+      "resolved_by": "92e6b223 — crates/actions/tests/coach.rs::the_seeded_coach_process_yields_one_card_one_triage_and_one_remedy"
     },
     {
       "id": "v1-u5a-t4-2",
@@ -2796,7 +2785,8 @@
       ],
       "failure_scenario": "An agent with coach.triage can call coach.remedy anyway if the runtime does not enforce allowed_actions; no test catches it.",
       "acceptance": "A test invokes coach.remedy as an agent principal and asserts 403; a second test invokes it as a person and succeeds.",
-      "owner_project": "T4"
+      "owner_project": "T4",
+      "resolved_by": "92e6b223 — crates/actions/tests/coach.rs::an_agent_principal_cannot_remedy_but_a_person_can"
     },
     {
       "id": "v1-u5a-t4-3",
@@ -2820,7 +2810,8 @@
       ],
       "failure_scenario": "coach.escalate can drift or be removed without a failing test; a person cannot rely on it to escalate a replayable flow.",
       "acceptance": "A test invokes coach.escalate on an open interruption and asserts the interruption state, the approval row and the event; a second test refuses it on a closed one.",
-      "owner_project": "T4"
+      "owner_project": "T4",
+      "resolved_by": "92e6b223 — crates/actions/tests/coach.rs::a_person_escalates_an_open_interruption_and_a_closed_one_refuses"
     },
     {
       "id": "v1-u5a-t4-4",
@@ -2849,7 +2840,8 @@
       ],
       "failure_scenario": "A recursion through a path other than a coach card (a child process that starts a coach) is not bounded by a depth measure, and no test proves the nesting refusal.",
       "acceptance": "The cap either measures nesting depth (and a test asserts a nested run is refused) or is renamed to the breadth it measures and the nesting refusal gains its own test.",
-      "owner_project": "T4"
+      "owner_project": "T4",
+      "resolved_by": "92e6b223 — crates/actions/tests/coach.rs::a_nested_coach_run_is_refused; COACH_INTERRUPTION_MAX names the breadth it measures"
     },
     {
       "id": "v1-u5a-t9-1",
@@ -2878,7 +2870,8 @@
       ],
       "failure_scenario": "A profile is tailored with `artifact_requirements: {}` or unknown keys, adopted, and every phase gate starts satisfied; the mandatory artefacts are no longer required.",
       "acceptance": "profile_tailor refuses an unknown artifact_type key, a missing mandatory type and a phase outside phase_set (422), and a test proves a valid tailoring still adopts.",
-      "owner_project": "T9"
+      "owner_project": "T9",
+      "resolved_by": "92e6b223 — crates/actions/tests/togaf_profile_gates.rs::profile_tailor_refuses_an_empty_phase_set (+ an_unknown_requirement_key, a_phase_outside_the_set, a_dropped_mandatory_type)"
     },
     {
       "id": "v1-u5a-t9-2",
@@ -2907,7 +2900,32 @@
       ],
       "failure_scenario": "An H review records `{\"kind\":\"kata\"}` with no candidate; the outcome is accepted, and the improvement loop has no row to measure or adopt.",
       "acceptance": "A kata outcome must name a kata candidate row of the project (or an explicit, approved deferral); a test refuses a bare kind='kata' and accepts a typed candidate.",
-      "owner_project": "T9"
+      "owner_project": "T9",
+      "resolved_by": "92e6b223 — crates/actions/tests/togaf_kata_outcome.rs::a_bare_kata_outcome_is_refused (+ a_kata_outcome_names_a_kata_candidate_of_the_project)"
+    },
+    {
+      "id": "v1-u5a-approvals-1",
+      "area": "§5.4",
+      "standard": "SPEC",
+      "spec": "§5.4",
+      "severity": "P1",
+      "title": "The generic approval request still lets the caller opt out of evidence",
+      "problem": "approvals.request takes a caller-supplied require_evidence bool (default false). The PM route gate now requires evidence or a recorded waiver, but a destructive-action or process gate can still be requested with an empty evidence list and no policy declares it mandatory.",
+      "evidence": [
+        {
+          "path": "crates/actions/src/control/views.rs",
+          "line": 353,
+          "quote": "    pub require_evidence: bool,"
+        },
+        {
+          "path": "crates/actions/src/control/approvals.rs",
+          "line": 388,
+          "quote": "        input.require_evidence,"
+        }
+      ],
+      "failure_scenario": "A destructive action requests its gate with require_evidence=false and no evidence; the approval row opens and can be decided with nothing to read.",
+      "acceptance": "A tenant policy or gate declares evidence mandatory; approvals.request refuses an empty evidence set unless an explicit waiver reason is recorded, and tests prove both the refusal and the waiver.",
+      "owner_project": "PLATFORM"
     }
   ]
 }
