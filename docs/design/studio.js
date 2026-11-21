@@ -1680,14 +1680,16 @@ Effect: no changes applied automatically</div>${btn("Inspect agent context", "op
     ].map((page) => [page, page]),
   );
   window.addEventListener("conveyor-console", () => {
-    const page = CONSOLE_PAGES.get(location.hash.slice(1));
+    const page = CONSOLE_PAGES.get(location.hash.slice(1).split("/")[0]);
     if (page) state.page = page;
     render();
   });
   // A direct hash change (a pasted #projects link, back/forward) navigates through the same
   // constant map. A hash is user input; an unknown one stays put rather than naming a method.
+  // A delivery drill is `#projects/<id>/wp/<cardId>`: only the FIRST segment picks the page; the
+  // remaining segments are ids the pack validates itself, never a second dispatch key.
   window.addEventListener("hashchange", () => {
-    const page = CONSOLE_PAGES.get(location.hash.slice(1));
+    const page = CONSOLE_PAGES.get(location.hash.slice(1).split("/")[0]);
     if (page) state.page = page;
     render();
   });
@@ -3452,7 +3454,9 @@ Effect: no changes applied automatically</div>${btn("Inspect agent context", "op
     );
   });
   // Allow direct links into the prototype's information architecture.
-  const initial = location.hash.slice(1);
+  // A delivery drill adds id segments after the page (`#projects/<id>/wp/<cardId>`); the page is
+  // the first segment, and the ids are read and validated by the pack that renders the drill.
+  const initial = location.hash.slice(1).split("/")[0];
   if (
     [
       "overview",

@@ -204,6 +204,50 @@
 <li><strong>Cadence</strong> is a <code>programme_cadence</code> row: PI planning materialises draft cards from the backlog by WSJF within WIP limits; a person approves the plan. The system demo requires every completed deliverable to exhibit evidence; inspect &amp; adapt produces lessons and kata candidates. <strong>WSJF is arithmetic</strong>: <code>(business_value + time_criticality + risk_reduction) / job_size</code>, four typed integer inputs; the score is computed, never stored.</li>
 <li><strong>Gates are approvals.</strong> A gate names its required decisions, approver kinds, evidence refs and expiry. Dual control is <code>required_decisions ≥ 2</code> with distinct approvers; the executor, assignee or requester cannot approve the gate that judges their work. A gate with no evidence is refused unless an override is recorded and counted. A gate that never refuses anything in a full programme cycle is flagged as broken, not healthy.</li>
 </ul>
+<h3 id="delivery-visualisation-docsdesigndeliveryjs">Delivery visualisation (<code>docs/design/delivery.js</code>)</h3>
+<p>The same work model is drawn at four levels, from one published source — <code>programme</code> (programmes and projects), <code>work</code> (boards, lists, cards, runs and <code>project_activity</code>) and <code>measure</code> (<code>inference.by_project</code> / <code>by_card</code>):</p>
+<table>
+<thead>
+<tr>
+<th>Level</th>
+<th>Route</th>
+<th>Renderer</th>
+<th>Data</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>L1 portfolio</td>
+<td><code>#portfolio</code></td>
+<td>Gantt</td>
+<td>one row per programme (rolled up from its projects) plus one per standalone initiative</td>
+</tr>
+<tr>
+<td>L2 programme</td>
+<td><code>#portfolio/&lt;programmeId&gt;</code></td>
+<td>Gantt</td>
+<td>that programme's projects</td>
+</tr>
+<tr>
+<td>L3 project</td>
+<td><code>#projects/&lt;projectId&gt;</code></td>
+<td>Kanban</td>
+<td>the board's lanes as columns; a card with children is a work-package tile</td>
+</tr>
+<tr>
+<td>L4 work package</td>
+<td><code>#projects/&lt;projectId&gt;/wp/&lt;cardId&gt;</code></td>
+<td>Kanban</td>
+<td>the parent card's children across their board's lanes</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>A bar is actuals, not a promise.</strong> It starts at the first observed card or run activity (<code>work.project_activity.started_at</code>) and ends at completion, or at the snapshot's <code>generated_at</code> while the work is in flight. A planned window is drawn as a dashed track only when <code>project.meta.plan_start</code> and <code>meta.plan_end</code> are both present; a row with no event says <strong>no dated activity</strong> rather than inventing a bar.</li>
+<li><strong>Spend is the ledger's own number.</strong> Tokens are stored; cost is derived from <code>commercial_price</code> and arrives as a decimal string. A model with no price contributes zero and is counted in <code>unpriced_calls</code>; the row shows <code>*</code> and the count, never a fabricated <code>$0</code>. <code>measure.inference.totals</code> remains tenant-wide; <code>by_project</code>/<code>by_card</code> are filtered to the published boundary, so the difference is the boundary, not a missing call.</li>
+<li><strong>The public boundary is the portfolio.</strong> A programme-bound project is public; a standalone project is public only when it is <code>active</code>/<code>paused</code> <strong>and</strong> carries a board or a card. A draft or bare session fixture is not published.</li>
+<li><strong>A work package is a card with children</strong> (<code>card.parent_card_id</code>). The project board shows work-package tiles and loose cards; the work package's own board shows the children, archived ones included as done. A child whose parent is archived or absent renders as a loose card.</li>
+</ul>
 <h2 id="roles--meta-jobs-as-ordinary-jobs">Roles — meta-jobs as ordinary jobs</h2>
 <p>PM, kanban coach, kata facilitator, development projects and operations are <code>job_key</code>s using the same card, run, approval and event primitives. The authority matrix is data (<code>tenant_role_scope</code> plus the binding's <code>authority</code>), not branches in code.</p>
 <table>

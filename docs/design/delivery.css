@@ -1,0 +1,278 @@
+/* Delivery view — the L1/L2 Gantt and the L3/L4 kanban.
+   Tokens, type and dark mode come from studio.css; this file only adds the two components. No
+   chart library, no canvas: the bars are positioned spans, the board is a CSS grid. */
+
+/* ------------------------------------------------------------------ Gantt */
+.gantt {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--panel);
+  overflow: hidden;
+}
+.gantt-head,
+.gantt-row {
+  display: grid;
+  grid-template-columns: minmax(220px, 300px) 1fr;
+  min-width: 640px;
+}
+.gantt-head {
+  background: var(--sunk);
+  border-bottom: 1px solid var(--line);
+}
+.gantt-head-label {
+  padding: 8px 12px;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.gantt-axis {
+  position: relative;
+  height: 30px;
+  overflow: hidden;
+}
+.gantt-tick {
+  position: absolute;
+  top: 9px;
+  transform: translateX(-50%);
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.gantt-now {
+  position: absolute;
+  top: 5px;
+  bottom: 5px;
+  width: 2px;
+  border-radius: 1px;
+  background: var(--orange);
+}
+.gantt-body {
+  max-height: 460px;
+  overflow: auto;
+}
+.gantt-row {
+  border-top: 1px solid var(--line);
+  align-items: center;
+}
+.gantt-row:first-child {
+  border-top: 0;
+}
+.gantt-label {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 12px;
+  min-width: 0;
+}
+.gantt-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink);
+  text-decoration: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+a.gantt-name:hover {
+  color: var(--accent);
+  text-decoration: underline;
+}
+.gantt-label small {
+  font-size: 10px;
+  color: var(--muted);
+}
+.gantt-progress {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--muted);
+}
+.gantt-cost {
+  font-size: 10px;
+  color: var(--faint);
+}
+.gantt-track {
+  position: relative;
+  height: 52px;
+  background: linear-gradient(var(--sunk), var(--sunk)) center / 100% 1px no-repeat;
+  overflow: hidden;
+}
+.gantt-actual {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 14px;
+  border-radius: 4px;
+  border: 1px solid var(--accent);
+  background: var(--accent-soft);
+}
+.gantt-actual.in_progress {
+  background: repeating-linear-gradient(
+    45deg,
+    var(--accent-soft),
+    var(--accent-soft) 6px,
+    var(--panel) 6px,
+    var(--panel) 12px
+  );
+}
+.gantt-actual.completed {
+  background: var(--accent);
+  opacity: 0.7;
+}
+.gantt-plan {
+  position: absolute;
+  top: calc(50% + 10px);
+  height: 0;
+  border-top: 2px dashed var(--faint);
+}
+.gantt-nodate {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 11px;
+}
+.gantt-row[data-state="completed"] .gantt-name {
+  color: var(--muted);
+}
+.gantt-data summary {
+  padding: 8px 12px;
+  border-top: 1px solid var(--line);
+  font-size: 11px;
+  color: var(--muted);
+  cursor: pointer;
+}
+.gantt-empty,
+.kanban-empty {
+  padding: 16px;
+  border: 1px dashed var(--line);
+  border-radius: 10px;
+  background: var(--sunk);
+  font-size: 12px;
+}
+
+/* ------------------------------------------------------------------ Kanban */
+.kanban {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(200px, 1fr);
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+}
+.kanban-col {
+  background: var(--sunk);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 8px;
+  min-height: 120px;
+}
+.kanban-col > header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.kanban-col > header b {
+  font-family: var(--mono);
+  font-weight: 500;
+}
+.kanban-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.kanban-card {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+}
+.kanban-card.work-package {
+  border-left: 3px solid var(--purple);
+}
+.kanban-card.done {
+  opacity: 0.62;
+}
+.kanban-kind {
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  color: var(--purple);
+}
+.kanban-title,
+.kanban-open {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink);
+  text-decoration: none;
+}
+a.kanban-open:hover {
+  color: var(--accent);
+  text-decoration: underline;
+}
+.kanban-meta {
+  font-size: 10px;
+  color: var(--muted);
+}
+.kanban-issue {
+  color: var(--accent);
+  text-decoration: none;
+}
+.kanban-count,
+.kanban-cost {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--faint);
+}
+.kanban-run {
+  align-self: flex-start;
+  padding: 1px 6px;
+  border-radius: 999px;
+  font-size: 9px;
+  background: var(--amber-soft);
+  color: var(--amber);
+}
+.kanban-run.ok {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+.kanban-run.bad {
+  background: var(--orange-soft);
+  color: var(--red);
+}
+.kanban-package-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+  font-size: 12px;
+}
+
+/* A phone gets the same components, scrolled inside their own box — never the page. */
+@media (max-width: 760px) {
+  .gantt-head,
+  .gantt-row {
+    grid-template-columns: 180px 1fr;
+    min-width: 560px;
+  }
+  .gantt-body {
+    max-height: 380px;
+  }
+  .kanban {
+    grid-auto-columns: minmax(180px, 78%);
+  }
+  .kanban-package-head {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+  }
+}
