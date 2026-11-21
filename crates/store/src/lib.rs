@@ -190,7 +190,7 @@ pub use delivery::{
 pub use governance::{GovernanceStoreError, NewAsset};
 pub use idempotency::{Lookup, request_hash};
 pub use identity::{Identity, MembershipRow, resolve_identity};
-pub use jobs::{Job, claim, enqueue, fail, finish_dead, finish_succeeded};
+pub use jobs::{Job, claim, claim_batch, enqueue, fail, finish_dead, finish_succeeded};
 pub use label::{LabelStoreError, NewLabel};
 pub use licence::{LicenceRow, LicenceUpsert};
 pub use list::{ListStoreError, NewList};

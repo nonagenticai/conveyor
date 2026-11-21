@@ -12,6 +12,7 @@ mod support;
 
 use base64::Engine as _;
 use serde_json::json;
+use uuid::Uuid;
 
 /// The support config with one extra setting: the tenant whose published rows are public.
 fn config_with_public_tenant(pg: &support::Pg, slug: &str) -> conveyor_api::Config {
@@ -194,6 +195,88 @@ async fn published_attachments_are_served_safely_and_leave_with_the_parent() {
             .and_then(|value| value.to_str().ok()),
         Some("no-store")
     );
+}
+
+/// #537: a publishable-but-unpublished parent is not public; its attachment must not be served
+/// through the unauthenticated window, nor enter the pack index.
+#[tokio::test(flavor = "multi_thread")]
+async fn a_publishable_but_unpublished_parent_serves_no_attachment() {
+    let pg = support::Pg::fresh().await;
+    support::seed(&pg, "public", "alice", "Alice").await;
+    let running =
+        support::Running::start_with_config(config_with_public_tenant(&pg, "public")).await;
+
+    let parent = compose(&running, "dev:alice", "Evidence", "# Evidence", false).await;
+    let png = base64::engine::general_purpose::STANDARD
+        .encode([0x89, b'P', b'N', b'G', 0x0d, 0x0a, 0x1a, 0x0a]);
+    let (status, attachment) = running
+        .invoke(
+            "documents.create",
+            "dev:alice",
+            json!({
+                "title": "evidence.png",
+                "content_type": "image/png",
+                "content_base64": png,
+                "parent_document_id": parent,
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "{attachment}");
+    let attachment_id = attachment["output"]["id"]
+        .as_str()
+        .expect("attachment id")
+        .to_owned();
+
+    // The legacy state: the bit is set, `published_at` was never stamped.
+    sqlx::query("UPDATE document SET publishable = true, published_at = NULL WHERE id = $1")
+        .bind(Uuid::parse_str(&parent).expect("parent id"))
+        .execute(&pg.super_pool)
+        .await
+        .expect("legacy limbo");
+
+    let response = get(
+        &running,
+        &format!("/design/docs/attachment-{attachment_id}"),
+    )
+    .await;
+    assert_eq!(response.status(), 404, "the parent is not public");
+    assert_eq!(
+        response
+            .headers()
+            .get("cache-control")
+            .and_then(|value| value.to_str().ok()),
+        Some("no-store")
+    );
+
+    let index = get(&running, "/design/docs/outputs.js")
+        .await
+        .text()
+        .await
+        .expect("outputs index");
+    assert!(!index.contains(&parent), "{index}");
+    assert!(!index.contains(&attachment_id), "{index}");
+
+    // Publishing the parent enters both; no category means no template gate to fail.
+    let (status, published) = running
+        .invoke(
+            "documents.publish",
+            "dev:alice",
+            json!({"id": parent, "publish": true}),
+            Some("\"1\""),
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{published}");
+    let response = get(
+        &running,
+        &format!("/design/docs/attachment-{attachment_id}"),
+    )
+    .await;
+    assert_eq!(response.status(), 200);
 }
 
 async fn compose(

@@ -17,10 +17,12 @@
 //! a retry requested at the last attempt also lands `dead`.
 //!
 //! Every public database function takes a [`TenantId`] and opens its own [`begin_scoped`]
-//! transaction; the internal `reap_exhausted` runs on the caller's already-scoped
-//! connection, and `truncate` touches no database. The worker iterates tenants (the `tenant`
-//! table has no RLS) instead of using a `BYPASSRLS` role that S2-D3 deliberately does not
-//! create.
+//! transaction, except [`claim_batch_tx`], which runs on a caller-scoped connection and shares
+//! the caller's transaction; a `max = 0` claim returns before opening anything. The internal
+//! `reap_exhausted` runs on the caller's
+//! already-scoped connection, and `truncate` touches no database. The worker iterates tenants
+//! (the `tenant` table has no RLS) instead of using a `BYPASSRLS` role that S2-D3 deliberately
+//! does not create.
 
 use std::time::Duration;
 
@@ -141,15 +143,59 @@ pub async fn claim_with(
     lease_secs: i64,
     kinds: Option<&[&str]>,
 ) -> Result<Option<Job>, sqlx::Error> {
+    Ok(claim_batch(pool, tenant, lease_secs, kinds, 1).await?.pop())
+}
+
+/// Claim up to `max` due jobs for `tenant` in one scoped transaction.
+///
+/// The worker's tick claims its batch here rather than one job at a time: the transaction, the
+/// tenant GUC and [`reap_exhausted`] are paid once per batch instead of once per job. The claim
+/// is the statement the single claim always ran, with `LIMIT $3`; `max = 0` claims nothing and
+/// opens no transaction.
+pub async fn claim_batch(
+    pool: &PgPool,
+    tenant: TenantId,
+    lease_secs: i64,
+    kinds: Option<&[&str]>,
+    max: usize,
+) -> Result<Vec<Job>, sqlx::Error> {
+    if max == 0 {
+        return Ok(Vec::new());
+    }
+    let mut tx = begin_scoped(pool, tenant).await?;
+    let jobs = claim_batch_tx(&mut tx, lease_secs, kinds, max).await?;
+    tx.commit().await?;
+    Ok(jobs)
+}
+
+/// The claim body, on an already-scoped connection.
+///
+/// Split from [`claim_batch`] so a caller that shares its transaction — a handler's `_tx`
+/// write, or a test holding two claims open to prove `SKIP LOCKED` — runs the same statement
+/// without the commit. `conn` must already carry the tenant scope. The reap runs first, in
+/// this transaction, for the reason on [`reap_exhausted`]. `max = 0` claims nothing and does
+/// not reap, exactly as [`claim_batch`] does.
+pub async fn claim_batch_tx(
+    conn: &mut PgConnection,
+    lease_secs: i64,
+    kinds: Option<&[&str]>,
+    max: usize,
+) -> Result<Vec<Job>, sqlx::Error> {
+    if max == 0 {
+        return Ok(Vec::new());
+    }
     let lease_secs = lease_secs.max(1);
+    // `LIMIT` is an i64. An absurd `usize` must not wrap negative and turn the claim into a
+    // database error; the batch is bounded by the caller's permits, and this only guards the
+    // public API.
+    let max = i64::try_from(max).unwrap_or(i64::MAX);
     let kinds: Option<Vec<String>> = kinds.map(|kinds| {
         kinds
             .iter()
             .map(|kind| (*kind).to_owned())
             .collect::<Vec<String>>()
     });
-    let mut tx = begin_scoped(pool, tenant).await?;
-    reap_exhausted(&mut tx).await?;
+    reap_exhausted(&mut *conn).await?;
 
     let sql = format!(
         // The CTE renames `id` to `job_id`: an unqualified `RETURNING id` with `due` in the
@@ -161,7 +207,7 @@ pub async fn claim_with(
                 AND ($2::text[] IS NULL OR kind = ANY($2))
               ORDER BY run_after, id
               FOR UPDATE SKIP LOCKED
-              LIMIT 1
+              LIMIT $3
          )
          UPDATE job j
             SET status = 'running',
@@ -176,13 +222,12 @@ pub async fn claim_with(
           WHERE j.id = due.job_id
          RETURNING {COLUMNS}"
     );
-    let job: Option<Job> = sqlx::query_as(sqlx::AssertSqlSafe(sql))
+    sqlx::query_as(sqlx::AssertSqlSafe(sql))
         .bind(lease_secs as f64)
         .bind(&kinds)
-        .fetch_optional(&mut *tx)
-        .await?;
-    tx.commit().await?;
-    Ok(job)
+        .bind(max)
+        .fetch_all(&mut *conn)
+        .await
 }
 
 /// One job by id, in the caller's tenant scope. `None` is "no such job here" — a job belonging to
