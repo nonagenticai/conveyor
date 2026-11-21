@@ -113,7 +113,12 @@
       ],
       "failure_scenario": "After the scope baseline is approved, WBS titles/body/inputs are edited; no change row exists and runs execute against unpinned scope.",
       "acceptance": "After an approved baseline, WBS mutations return 409 rebaseline_requires_change unless an approved kind='change' references that baseline with an impact block.",
-      "owner_project": "T1"
+      "owner_project": "T1",
+      "resolved_by": {
+        "commit": "16e095fd025366774419fd0b34481e192909b4d0",
+        "test": "crates/actions/tests/plan_spine.rs",
+        "evidence": "plan_spine 19/19: after an approved baseline, wbs.create/update/delete return 409 rebaseline_requires_change without an approved kind='change' citing that baseline with an impact block; a project with no baseline is unchanged."
+      }
     },
     {
       "id": "v1-p5-5",
@@ -156,7 +161,12 @@
       ],
       "failure_scenario": "A tenant with an active programme and no active projects sees an empty portfolio; programme work is invisible in the delivery view.",
       "acceptance": "portfolio.in_flight returns projects and programmes in the configured in-flight set (an active programme with zero projects appears) and writes no portfolio row.",
-      "owner_project": "T1"
+      "owner_project": "T1",
+      "resolved_by": {
+        "commit": "16e095fd025366774419fd0b34481e192909b4d0",
+        "test": "crates/actions/tests/plan_spine.rs",
+        "evidence": "plan_spine 19/19: portfolio.in_flight returns a programmes array alongside the unchanged project items; an active programme with zero projects appears and a closed one does not; the action writes no row."
+      }
     },
     {
       "id": "v1-p75-1",
@@ -552,7 +562,7 @@
         },
         {
           "path": "crates/store/src/spine.rs",
-          "line": 3551,
+          "line": 3630,
           "quote": "            if matches!(state.as_str(), \"authorised\" | \"in_review\" | \"closed\") =>"
         }
       ],
@@ -571,7 +581,7 @@
       "evidence": [
         {
           "path": "crates/store/src/spine.rs",
-          "line": 2457,
+          "line": 2536,
           "quote": "/// The editable fields of a realization record. `None` leaves the stored value in place."
         }
       ],
@@ -624,7 +634,7 @@
         },
         {
           "path": "crates/store/src/spine.rs",
-          "line": 1468,
+          "line": 1504,
           "quote": "            \"SELECT EXISTS (SELECT 1 FROM programme_baseline WHERE tenant_id = $1 AND id = $2)\","
         }
       ],
@@ -648,12 +658,12 @@
         },
         {
           "path": "crates/store/src/spine.rs",
-          "line": 3740,
+          "line": 3819,
           "quote": "pub async fn close_programme_tx("
         },
         {
           "path": "crates/store/src/spine.rs",
-          "line": 3774,
+          "line": 3853,
           "quote": "        \"UPDATE programme SET status = 'closed', version = version + 1, updated_at = now()"
         }
       ],
@@ -879,12 +889,12 @@
       "evidence": [
         {
           "path": "crates/actions/src/spine/mod.rs",
-          "line": 3069,
+          "line": 3168,
           "quote": "            state: input.state,"
         },
         {
           "path": "crates/store/src/spine.rs",
-          "line": 2719,
+          "line": 2798,
           "quote": "            state = coalesce($5, state),"
         },
         {
@@ -956,7 +966,7 @@
       "evidence": [
         {
           "path": "crates/store/src/spine.rs",
-          "line": 3034,
+          "line": 3113,
           "quote": "          WHERE tenant_id = $1 AND project_id = $2 AND kind = 'deliverable'"
         }
       ],
@@ -1217,7 +1227,12 @@
       ],
       "failure_scenario": "A modified conformance.json, issues.json or output page passes the strict gate with no hash to compare.",
       "acceptance": "Manifest every published data/output file and assert the directory set equals manifest.files.",
-      "owner_project": "PLATFORM"
+      "owner_project": "PLATFORM",
+      "resolved_by": {
+        "commit": "aa735094f7c2d0640ef63842fc35c33baa2d060e",
+        "test": "crates/pack/src/snapshot.rs",
+        "evidence": "The manifest-only finalise rehashes the finished data dir (conformance, standards record, build-docs outputs) after the last generator; the shipped manifest went from 12 to 18 files and check-data.cjs (30 checks) now fails on any unlisted data/ file. pack 16/16 including manifest_only_rehashes_the_finished_pack."
+      }
     },
     {
       "id": "v1-pack-4",
@@ -1236,7 +1251,12 @@
       ],
       "failure_scenario": "A failed strict audit still leaves rebuilt HTML published; a removed section file keeps being served.",
       "acceptance": "Confine writes to tmp and --delete the data sync; test the pack is untouched when the audit fails.",
-      "owner_project": "PLATFORM"
+      "owner_project": "PLATFORM",
+      "resolved_by": {
+        "commit": "aa735094f7c2d0640ef63842fc35c33baa2d060e",
+        "test": "docs/design/scripts/publish-data.sh",
+        "evidence": "The data rsync now uses --delete, so a stale data file cannot survive a publish; the finalise runs after build-docs and before the copy, so the copied pack is the one hashed. publish_audit.sh green; snapshot tests 6/6."
+      }
     },
     {
       "id": "v1-pack-5",
@@ -1254,7 +1274,7 @@
         },
         {
           "path": "crates/pack/src/snapshot.rs",
-          "line": 206,
+          "line": 226,
           "quote": "        object.insert(\"issue_registry\".to_owned(), issues.clone());"
         }
       ],
@@ -1501,7 +1521,7 @@
       "evidence": [
         {
           "path": "crates/actions/src/spine/mod.rs",
-          "line": 1651,
+          "line": 1739,
           "quote": "        input.status.as_deref(),"
         },
         {
@@ -2023,7 +2043,7 @@
       "evidence": [
         {
           "path": "crates/actions/src/spine/mod.rs",
-          "line": 3069,
+          "line": 3168,
           "quote": "            state: input.state,"
         },
         {
@@ -2033,7 +2053,7 @@
         },
         {
           "path": "crates/store/src/spine.rs",
-          "line": 3516,
+          "line": 3595,
           "quote": "                PlanError::RetroFindingWithoutLesson(key),"
         }
       ],
@@ -2115,7 +2135,7 @@
         },
         {
           "path": "crates/actions/src/spine/mod.rs",
-          "line": 1131,
+          "line": 1216,
           "quote": "    name = \"wbs.create\","
         }
       ],
