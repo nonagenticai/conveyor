@@ -4127,6 +4127,14 @@ window.installV2 = function (api, enterprise) {
       { id: "CR-018", title: "Add delegated identity scope", baseline: "B3", impact: "scope +2 deliverables · schedule +9 d · cost +€0.8m · risk medium", rationale: "", state: "Draft" },
       { id: "CR-017", title: "Move portal gate to PI-2026.4", baseline: "B2", impact: "schedule −14 d · cost −€0.2m · risk low", rationale: "Programme board rationale recorded", state: "Approved" },
     ],
+    /* Stakeholder profiles in the shape the live store uses (`stakeholders.profile_list`:
+       name, importance, influence, interest, support_level, support_trend, engagement_target,
+       concerns, sensitivities, disbenefits); organisation and role are study-only columns. */
+    stakeholders: [
+      { id: "SH-01", name: "N. de Vries", organisation: "sponsoring group", role: "programme sponsor · chair", importance: "High", influence: "High · funds the tranche and decides continue, pause or stop", interest: "High · outcome and cost", support_level: "supportive", support_trend: "stable", engagement_target: "manage closely · every tranche review and mandate gate", concerns: "benefit profiles claim outcomes no baseline has measured yet", sensitivities: "public commitments", disbenefits: "sponsor attention is finite; a competing programme is paused" },
+      { id: "SH-02", name: "G. Dekker", organisation: "asset owners", role: "SRO · asset owner, operations", importance: "High", influence: "High · accepts waivers, operational risk and cost", interest: "High · run cost and reliability", support_level: "supportive", support_trend: "improving", engagement_target: "manage closely · every design gate and waiver", concerns: "a waiver without a reassessment date becomes permanent", sensitivities: "outage window", disbenefits: "extra maintenance load on the operations job" },
+      { id: "SH-03", name: "R. Slot", organisation: "delivery", role: "programme manager", importance: "Medium", influence: "Medium · owns the WBS, the cadence and the gate route", interest: "High · schedule and dependencies", support_level: "neutral", support_trend: "stable", engagement_target: "keep informed · weekly plan review", concerns: "a re-baseline after every forecast variance", sensitivities: "schedule slip", disbenefits: "rework when a baseline moves" },
+    ],
     sops: [
       { id: "SOP-01", name: "Tenant onboarding SOP", source: "PDF · tenant-supplied", pages: 18, state: "Draft · PDDL", provenance: "untrusted input · governed_asset(sop_source)" },
       { id: "SOP-02", name: "Release verification SOP", source: "URL · internal wiki", pages: 9, state: "Review", provenance: "untrusted input · provenance recorded" },
@@ -4927,6 +4935,21 @@ window.installV2 = function (api, enterprise) {
             ["Tranche exit criteria", "3 of 4 met"],
           ]
         : [["First review is due on " + tranche.review, "not started"]];
+    // Stakeholders: the store's own profiles when present, the study fixture otherwise.
+    const stakeholderRows = list(mspSource().stakeholders).length
+      ? list(mspSource().stakeholders)
+      : F.stakeholders;
+    const stakeholdersPanel = panel(
+      "Stakeholder profiles",
+      `${table(
+        ["Name", "Organisation", "Role", "Influence", "Interest", "Support", "Disbenefits"],
+        stakeholderRows.map(
+          (s) =>
+            `<tr><td><strong>${E(s.name || "—")}</strong><small>${E(s.id || "")}</small></td><td>${E(s.organisation || "—")}</td><td><small>${E(s.role || s.engagement_target || "—")}</small></td><td><small>${E(s.influence || "—")}</small></td><td><small>${E(s.interest || "—")}</small></td><td>${B(s.support_level || "—", s.support_level === "supportive" ? "green" : s.support_level === "neutral" ? "amber" : "")}</td><td><small>${E(s.disbenefits || "—")}</small></td></tr>`,
+        ),
+      )}${note("A profile names what the programme wants from the engagement and what the engagement costs the stakeholder. Influence without interest is kept satisfied, interest without influence is kept informed, both high is managed closely; a disbenefit is tracked as evidence, not as a reason to omit the row.")}`,
+      B(`${stakeholderRows.length} profiles`, stakeholderRows.length ? "green" : ""),
+    );
 
     const definition =
       `${panel("Mandate · " + def.name, `${table(
@@ -5020,7 +5043,7 @@ window.installV2 = function (api, enterprise) {
             ? tranches
             : tab === "Benefits realization"
               ? realization
-              : panel("Stakeholders", note("The design study carries no stakeholder fixture. The live page reads stakeholder profiles from the programme store; the public snapshot carries the published profiles."));
+              : stakeholdersPanel;
 
     return `<div class="page enterprise">${heading(
       "Programme definition",
@@ -5916,8 +5939,10 @@ window.installV2 = function (api, enterprise) {
     const snapshotMsp = !signed && !!(live && live.msp);
     const consoleCapable = !!(C && C.config());
     const names = signed || snapshotMsp
-      ? ["Boards", "WBS", "Baseline vs forecast", "Registers", "Cadence"]
-      : ["Boards"];
+      ? ["Boards", "WBS", "Baseline vs forecast", "Registers", "Cadence", "Change control"]
+      : studyOn()
+        ? ["Boards", "Change control"]
+        : ["Boards"];
     const tab = names.includes(v.tab.plan) ? v.tab.plan : "Boards";
     const content = tab === "Boards" ? planBoards(work) : planMspContent(tab);
     const planRibbon =
@@ -5926,7 +5951,7 @@ window.installV2 = function (api, enterprise) {
           ? `<div class="v2-ribbon live" role="note"><strong>LIVE</strong><span>Operator console · the platform's own projects, boards and cards, joined to the GitHub issue registry. Signed in as ${E(C.status().name)} · tenant ${E(C.status().tenant)}.</span><span class="v2-src">API · no snapshot</span></div>`
           : ribbon("LIVE · GitHub issues are read at publish and joined to the conveyor's own cards and runs. A unit with no real card is shown as not intaken; nothing is seeded.", liveBoards)
         : consoleRibbon("The plan spine reads the programme store: WBS nodes, baselines, registers and cadences. Signed out it is the published snapshot, read-only.", signed || snapshotMsp);
-    return `<div class="page enterprise">${heading("Plan & WBS", "The plan spine: WBS, frozen baselines, one six-kind register and cadence. Boards join GitHub issues to the conveyor's own cards and runs.", `${route("Portfolio", "portfolio", "", "projects")}${route("Assurance", "assurance", "", "shield")}`, "PLAN")}${planRibbon}${tabs(names, tab, "plan")}${content}<div class="toolbar" style="margin-top:16px"><span class="mono muted">Existing V1 surfaces stay available:</span>${signed ? `${route("Work breakdown editor", "work", "small", "board")}${route("Assurance & baselines", "assurance", "small", "shield")}` : ""}<span class="muted">Change control is T10 and stays out of this surface.${snapshotMsp ? " The published snapshot is read-only." : ""}</span></div></div>`;
+    return `<div class="page enterprise">${heading("Plan & WBS", "The plan spine: WBS, frozen baselines, one six-kind register and cadence. Boards join GitHub issues to the conveyor's own cards and runs.", `${route("Portfolio", "portfolio", "", "projects")}${route("Assurance", "assurance", "", "shield")}`, "PLAN")}${planRibbon}${tabs(names, tab, "plan")}${content}<div class="toolbar" style="margin-top:16px"><span class="mono muted">Existing V1 surfaces stay available:</span>${signed ? `${route("Work breakdown editor", "work", "small", "board")}${route("Assurance & baselines", "assurance", "small", "shield")}` : ""}<span class="muted">Change control is T10 and is on the Change control tab: a request names the baseline it moves, its impact and a decision with a rationale.${snapshotMsp ? " The published snapshot is read-only." : ""}</span></div></div>`;
   }
 
   function planMspContent(tab) {
@@ -5946,7 +5971,7 @@ window.installV2 = function (api, enterprise) {
         ["Kind", "Taken at", "Reference", "Version"],
         rows.length ? rows.map((b) => `<tr><td>${B(b.kind || "—")}</td><td>${E(b.taken_at || b.created_at || "—")}</td><td class="mono">${E(b.id || "—")}</td><td>${E(b.version == null ? "—" : "v" + b.version)}</td></tr>`)
           : [`<tr><td colspan="4">No baseline is recorded. A baseline is a frozen, approved snapshot and is never recomputed.</td></tr>`]
-      )}${note("A forecast is derived from current rows; a variance is not a change until change control (T10) approves it.")}`, source.readOnly ? "" : `<div class="toolbar">${["scope", "schedule", "cost"].map((kind) => button("Take " + kind, "msp-baseline-take", `data-kind="${kind}"`, "small", "shield")).join("")}</div>`)}${panel("Forecast", `${kv([["Scope", "computed from the WBS rows"], ["Schedule", "computed from the node dates"], ["Cost", "computed from the register and job rows"]])}${note("Change control is T10 and is not part of this surface; a forecast never rewrites an approved baseline.")}`)}`;
+      )}${note("A forecast is derived from current rows; a variance is not a change until change control (T10) approves it.")}`, source.readOnly ? "" : `<div class="toolbar">${["scope", "schedule", "cost"].map((kind) => button("Take " + kind, "msp-baseline-take", `data-kind="${kind}"`, "small", "shield")).join("")}</div>`)}${panel("Forecast", `${kv([["Scope", "computed from the WBS rows"], ["Schedule", "computed from the node dates"], ["Cost", "computed from the register and job rows"]])}${note("Change control is T10 and its approved requests are on the Change control tab; a forecast never rewrites an approved baseline.")}`)}`;
     }
     if (tab === "Registers") {
       const rows = list(source.registers);
@@ -5956,12 +5981,68 @@ window.installV2 = function (api, enterprise) {
           : [`<tr><td colspan="5">No register item is recorded.</td></tr>`]
       )}${note("A risk can open a mitigation card; a dependency can link two projects; a benefit is measured at closure.")}`, source.readOnly ? "" : button("New register item", "msp-register-new", "", "small", "plus"))}`;
     }
+    if (tab === "Change control") return planChanges(source);
     const rows = list(source.cadences);
     return `${mspError()}${panel("Cadence", `${table(
       ["Kind", "Period", "State", ""],
       rows.length ? rows.map((c) => `<tr><td>${B(c.kind || "—")}</td><td><strong>${E(c.period || "—")}</strong></td><td>${E(c.state || "—")}</td><td>${source.readOnly ? "" : `${button("Edit", "msp-cadence-edit", `data-id="${E(c.id)}"`, "small", "edit")}${button("Delete", "msp-delete", `data-kind="cadence" data-id="${E(c.id)}" data-version="${E(c.version)}"`, "small", "close")}`}</td></tr>`)
         : [`<tr><td colspan="4">No cadence is recorded.</td></tr>`]
     )}${note("A tranche is not a PI: the PI cadence is the delivery rhythm inside it; the review is the sponsoring group's decision to continue, pause or stop on evidence.")}`, source.readOnly ? "" : button("New cadence", "msp-cadence-new", "", "small", "plus"))}`;
+  }
+
+  /* Change control (T10) on the plan spine: the programme register's `change` rows when a
+     store is loaded; the design study's change-request fixture in reviewer mode only, so a
+     live or published store with no change row says so instead of rendering fiction. */
+  function planChanges(source) {
+    const register = list(source.registers).filter(
+      (r) => String(r.kind || "").toLowerCase() === "change",
+    );
+    const study = !consoleOn() && !(live && live.msp);
+    const rows = register.length
+      ? register.map((r) => ({
+          id: r.id || "—",
+          title: r.title || "—",
+          baseline: r.baseline || r.baseline_ref || "—",
+          impact:
+            typeof r.impact === "object" && r.impact
+              ? JSON.stringify(r.impact)
+              : r.body || r.impact || "—",
+          decision: r.status || r.decision || "Open",
+          rationale: r.rationale || r.note || "—",
+        }))
+      : study
+        ? F.changes.map((c) => ({
+            id: c.id,
+            title: c.title,
+            baseline: c.baseline,
+            impact: c.impact,
+            decision: c.state,
+            rationale: c.rationale || "—",
+          }))
+        : [];
+    const tone = (decision) =>
+      /approved/i.test(decision)
+        ? "green"
+        : /rejected|returned|refused/i.test(decision)
+          ? "bad"
+          : "amber";
+    const tableRows = rows.length
+      ? table(
+          ["ID", "Change request", "Baseline", "Impact", "Decision", "Rationale"],
+          rows.map(
+            (c) =>
+              `<tr><td class="mono">${E(c.id)}</td><td><strong>${E(c.title)}</strong></td><td>${E(c.baseline)}</td><td><small>${E(c.impact)}</small></td><td>${B(c.decision, tone(c.decision))}</td><td><small>${E(c.rationale)}</small></td></tr>`,
+          ),
+        )
+      : `<p class="muted">No change request is recorded against this programme.</p>`;
+    const decide = study
+      ? `<label class="field full"><span>Decision rationale</span><input data-v2-input="rationale" placeholder="Why the request is approved or returned; a decision with no rationale is refused" aria-label="Decision rationale"></label><div class="toolbar">${button("Approve the request", "change-approve", "", "small", "shield")}${button("Return for analysis", "change-return", "", "small", "replay")}</div>${v.review === "change-blocked" ? note("<strong>422 change_rationale_required</strong> · the decision was refused; the baseline is unchanged.", "bad") : v.review === "change-ok" ? note("<strong>Rationale recorded</strong> · the decision is recorded by the change gate; the baseline changes only through that gate, never through a forecast.", "ok") : ""}`
+      : "";
+    return `${mspError()}${panel(
+      "Change control",
+      `${tableRows}${note(study ? "Design study · <span class='mono'>F.changes</span> renders because no programme register row of kind <span class='mono'>change</span> is loaded. A change request names the baseline it moves and carries an impact block; only an approved request moves a baseline." : "A change request is a register row of kind <span class='mono'>change</span>: it names the baseline it moves and carries an impact block. Only an approved request moves a baseline.")}${decide}`,
+      B(`${rows.length} request${rows.length === 1 ? "" : "s"}`, rows.length ? "amber" : ""),
+    )}`;
   }
 
   /* The plan is a join, not a seed: the project's GitHub issues (the registry fetched at
