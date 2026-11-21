@@ -1143,9 +1143,9 @@
       "area": "§10.5",
       "standard": "SPEC",
       "spec": "§10.5",
-      "severity": "P0",
-      "title": "Portfolio has no WSJF backlog, cadence, capacity or per-project metering",
-      "problem": "The console Portfolio renders only Timeline, In flight, Dependencies and Programme. The WSJF backlog, PI/demo/retro cadence, capacity and per-project metering named by §10.5 are absent; README admits those fixtures stay the study.",
+      "severity": "P1",
+      "title": "Portfolio does not compose the WSJF backlog, cadence, capacity or per-project metering",
+      "problem": "The console Portfolio renders only Timeline, In flight, Dependencies and Programme. The WSJF ranking exists on Plan (v2.js:4641), the cadence kinds at v2.js:979 and a Metering screen at v2.js:7483, so the missing piece is Portfolio composition; the §10.5 panels are not composed into Portfolio and README admits the remaining fixtures stay the study.",
       "evidence": [
         {
           "path": "docs/design/v2.js",
