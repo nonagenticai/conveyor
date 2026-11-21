@@ -114,7 +114,11 @@ use serde_json::{Value, json};
 /// authorises). 500 → **502**.
 /// **#526 adds 1 internal**: `architecture.reviews_get` — the Phase-G review read the verifier
 /// needs; `reviews_record` had no read action. 502 → **503**.
-const EXPECTED: [&str; 504] = [
+/// **#524 (U4) adds 1 internal**: `projects.close_request` — the programme's closure request
+/// that opens the closure gate. 503 → **504**.
+/// **#526 (5a) adds 4 internal**: `cadences.credit_demo|credit_list` and `lessons.propose|list`
+/// — the SAFe demo credits and the retro lessons. 504 → **508**.
+const EXPECTED: [&str; 508] = [
     "actions.describe",
     "actions.list",
     "analyse.site",
@@ -190,6 +194,8 @@ const EXPECTED: [&str; 504] = [
     "boards.get",
     "boards.set_member",
     "cadences.create",
+    "cadences.credit_demo",
+    "cadences.credit_list",
     "cadences.delete",
     "cadences.list",
     "cadences.update",
@@ -353,6 +359,8 @@ const EXPECTED: [&str; 504] = [
     "laya.judge",
     "laya_configs.create",
     "laya_configs.list",
+    "lessons.list",
+    "lessons.propose",
     "licences.get",
     "lists.create",
     "lists.move",
@@ -711,7 +719,9 @@ fn the_registry_is_exactly_the_declared_set() {
     // request that opens the closure gate): 489 -> 490; external stays 13.
     // #526 adds one internal action (`architecture.reviews_get`, the Phase-G review read):
     // 490 -> 491; external stays 13.
-    assert_eq!((internal, external), (491, 13));
+    // #526 (5a) adds four internal actions (`cadences.credit_demo|credit_list`,
+    // `lessons.propose|list`): 491 -> 495; external stays 13.
+    assert_eq!((internal, external), (495, 13));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),

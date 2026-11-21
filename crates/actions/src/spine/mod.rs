@@ -33,10 +33,10 @@ use crate::views::{Page, PageIn};
 pub use crate::board::views::IdIn;
 pub use store::spine::{
     BaselineRecord, BenefitLinkRecord, BenefitPatch, BenefitRecord, CadencePatch, CadenceRecord,
-    DependencyRecord, InFlightRecord, NewBenefitLink, NewBenefitProfile, NewRegisterItem,
-    NewStakeholderProfile, NewWbsNode, PlanStoreError, RegisterRecord, StakeholderPatch,
-    StakeholderRecord, TranchePatch, TrancheRecord, TrancheReviewRecord, TransitionPatch,
-    TransitionRecord, WbsPatch, WbsRecord,
+    DemoCreditRecord, DependencyRecord, InFlightRecord, LessonRecord, NewBenefitLink,
+    NewBenefitProfile, NewRegisterItem, NewStakeholderProfile, NewWbsNode, PlanStoreError,
+    RegisterRecord, StakeholderPatch, StakeholderRecord, TranchePatch, TrancheRecord,
+    TrancheReviewRecord, TransitionPatch, TransitionRecord, WbsPatch, WbsRecord,
 };
 
 /// The one event every spine mutation emits.
@@ -78,6 +78,21 @@ fn spine_error(error: PlanStoreError, action: &str) -> ActionError {
             format!("the {what} changed since it was read"),
         ),
         PlanStoreError::Parent(parent) => parent_error(parent, action),
+        PlanStoreError::Illegal(PlanError::CadenceWrongKind { expected, actual }) => invalid(
+            "cadence_id",
+            "cadence_wrong_kind",
+            format!("the cadence is {actual}; a credit needs a {expected} cadence"),
+        ),
+        PlanStoreError::Illegal(PlanError::DemoDeliverableNotComplete) => invalid(
+            "deliverable_id",
+            "deliverable_not_accepted",
+            "a credit needs an accepted deliverable",
+        ),
+        PlanStoreError::Illegal(PlanError::DemoEvidenceMissing) => invalid(
+            "deliverable_id",
+            "evidence_missing",
+            "a credit needs a deliverable with at least one evidence ref",
+        ),
         PlanStoreError::Illegal(PlanError::DependencyCycle { from, to }) => ActionError::new(
             409,
             "dependency_cycle",
@@ -2998,6 +3013,281 @@ async fn cadences_delete(
     .map_err(|error| spine_error(error, ctx.action))?;
     emit_spine_event(&mut *tx, &ctx, "programme_cadence", input.id, "deleted").await?;
     Ok(HandlerOutput::no_content(()))
+}
+
+// ── demo credits and lessons ────────────────────────────────────────────────────────────
+
+/// A demo credit as `cadences.credit_*` returns it.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct DemoCreditOut {
+    /// The credit id.
+    pub id: String,
+    /// The demo cadence the credit was recorded at.
+    pub cadence_id: String,
+    /// The accepted deliverable the credit names.
+    pub deliverable_id: String,
+    /// The deliverable's evidence, copied when the credit was recorded.
+    pub evidence: Value,
+    /// When the credit was recorded.
+    pub credited_at: DateTime<Utc>,
+    /// The If-Match version.
+    pub version: i64,
+}
+
+fn demo_credit_out(record: &DemoCreditRecord) -> DemoCreditOut {
+    DemoCreditOut {
+        id: record.id.to_string(),
+        cadence_id: record.cadence_id.to_string(),
+        deliverable_id: record.deliverable_id.to_string(),
+        evidence: record.evidence.clone(),
+        credited_at: record.credited_at,
+        version: record.version,
+    }
+}
+
+/// `cadences.credit_demo`.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct CreditDemoIn {
+    /// The demo cadence.
+    pub cadence_id: Uuid,
+    /// The completed deliverable.
+    pub deliverable_id: Uuid,
+}
+
+/// `cadences.credit_list`.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct CreditListIn {
+    /// The demo cadence whose credits are read.
+    pub cadence_id: Uuid,
+}
+
+/// Record a demo credit; a repeat returns the credit already recorded.
+#[crate::action(
+    name = "cadences.credit_demo",
+    version = 1,
+    kind = "internal",
+    scopes = ["portfolio:write"],
+    idempotent = true,
+    timeout_ms = 30000,
+    effect = "write",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn cadences_credit_demo(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: CreditDemoIn,
+) -> Result<HandlerOutput<DemoCreditOut>, ActionError> {
+    let existing = store::spine::find_demo_credit_tx(
+        &mut *tx,
+        ctx.tenant,
+        input.cadence_id,
+        input.deliverable_id,
+    )
+    .await
+    .map_err(|error| spine_error(error, ctx.action))?;
+    if let Some(existing) = existing {
+        return Ok(
+            HandlerOutput::ok(demo_credit_out(&existing)).with_etag(etag_of(existing.version))
+        );
+    }
+    let id =
+        store::spine::credit_demo_tx(&mut *tx, ctx.tenant, input.cadence_id, input.deliverable_id)
+            .await
+            .map_err(|error| spine_error(error, ctx.action))?;
+    let record = store::spine::get_demo_credit_tx(&mut *tx, ctx.tenant, id)
+        .await
+        .map_err(|error| spine_error(error, ctx.action))?
+        .ok_or_else(ActionError::internal)?;
+    emit_spine_event(
+        &mut *tx,
+        &ctx,
+        "programme_demo_credit",
+        record.id,
+        "created",
+    )
+    .await?;
+    Ok(HandlerOutput::created(demo_credit_out(&record)).with_etag(etag_of(record.version)))
+}
+
+/// List a demo cadence's credits.
+#[crate::action(
+    name = "cadences.credit_list",
+    version = 1,
+    kind = "internal",
+    scopes = ["portfolio:read"],
+    idempotent = true,
+    timeout_ms = 30000,
+    effect = "read",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn cadences_credit_list(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: CreditListIn,
+) -> Result<Page<DemoCreditOut>, ActionError> {
+    let records = store::spine::list_demo_credits_tx(&mut *tx, ctx.tenant, input.cadence_id)
+        .await
+        .map_err(|error| spine_error(error, ctx.action))?;
+    Ok(Page {
+        items: records.iter().map(demo_credit_out).collect(),
+        next_cursor: None,
+    })
+}
+
+/// A lesson as `lessons.*` returns it.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct LessonOut {
+    /// The row id.
+    pub id: String,
+    /// The programme whose memory holds the lesson.
+    pub programme_id: String,
+    /// The retro cadence the finding came from, when known.
+    pub cadence_id: Option<String>,
+    /// The finding's key within the retro.
+    pub finding_key: String,
+    /// The lesson itself.
+    pub statement: String,
+    /// The evidence refs behind the lesson.
+    pub evidence: Value,
+    /// How many of the refs are independent.
+    pub independent_count: i32,
+    /// `proposed | reviewed | promoted | rejected`.
+    pub state: String,
+    /// Where the lesson came from.
+    pub source: String,
+    /// Free-form metadata.
+    pub meta: Value,
+    /// The If-Match version.
+    pub version: i64,
+    /// Creation time.
+    pub created_at: DateTime<Utc>,
+    /// Last write.
+    pub updated_at: DateTime<Utc>,
+}
+
+fn lesson_out(record: &LessonRecord) -> LessonOut {
+    LessonOut {
+        id: record.id.to_string(),
+        programme_id: record.programme_id.to_string(),
+        cadence_id: record.cadence_id.map(|id| id.to_string()),
+        finding_key: record.finding_key.clone(),
+        statement: record.statement.clone(),
+        evidence: record.evidence.clone(),
+        independent_count: record.independent_count,
+        state: record.state.clone(),
+        source: record.source.clone(),
+        meta: record.meta.clone(),
+        version: record.version,
+        created_at: record.created_at,
+        updated_at: record.updated_at,
+    }
+}
+
+/// `lessons.propose`.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct LessonProposeIn {
+    /// The programme whose memory receives the lesson.
+    pub programme_id: Uuid,
+    /// The retro cadence the finding came from, when known.
+    pub cadence_id: Option<Uuid>,
+    /// The finding's key within the retro.
+    pub finding_key: String,
+    /// The lesson itself.
+    pub statement: String,
+    /// The evidence refs behind the lesson.
+    pub evidence: Value,
+}
+
+/// `lessons.list`.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct LessonListIn {
+    /// The programme whose lessons are read.
+    pub programme_id: Uuid,
+}
+
+/// Propose a lesson for a retro finding.
+#[crate::action(
+    name = "lessons.propose",
+    version = 1,
+    kind = "internal",
+    scopes = ["portfolio:write"],
+    idempotent = false,
+    timeout_ms = 30000,
+    effect = "write",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn lessons_propose(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: LessonProposeIn,
+) -> Result<HandlerOutput<LessonOut>, ActionError> {
+    let statement = input.statement.trim().to_owned();
+    if statement.is_empty() {
+        return Err(invalid(
+            "statement",
+            "required",
+            "a lesson needs a statement",
+        ));
+    }
+    if !input.evidence.is_array() {
+        return Err(invalid(
+            "evidence",
+            "array_required",
+            "evidence must be an array of refs",
+        ));
+    }
+    if let Some(cadence_id) = input.cadence_id {
+        store::spine::get_cadence_tx(&mut *tx, ctx.tenant, cadence_id)
+            .await
+            .map_err(|error| spine_error(error, ctx.action))?
+            .ok_or_else(|| ActionError::resource_not_found("such cadence row"))?;
+    }
+    let id = store::spine::propose_lesson_tx(
+        &mut *tx,
+        ctx.tenant,
+        input.programme_id,
+        input.cadence_id,
+        input.finding_key.trim(),
+        &statement,
+        &input.evidence,
+    )
+    .await
+    .map_err(|error| spine_error(error, ctx.action))?;
+    let record = store::spine::get_lesson_tx(&mut *tx, ctx.tenant, id)
+        .await
+        .map_err(|error| spine_error(error, ctx.action))?
+        .ok_or_else(ActionError::internal)?;
+    emit_spine_event(&mut *tx, &ctx, "lesson", record.id, "created").await?;
+    Ok(HandlerOutput::created(lesson_out(&record)).with_etag(etag_of(record.version)))
+}
+
+/// List a programme's lessons.
+#[crate::action(
+    name = "lessons.list",
+    version = 1,
+    kind = "internal",
+    scopes = ["portfolio:read"],
+    idempotent = true,
+    timeout_ms = 30000,
+    effect = "read",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn lessons_list(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: LessonListIn,
+) -> Result<Page<LessonOut>, ActionError> {
+    let records = store::spine::list_lessons_tx(&mut *tx, ctx.tenant, input.programme_id)
+        .await
+        .map_err(|error| spine_error(error, ctx.action))?;
+    Ok(Page {
+        items: records.iter().map(lesson_out).collect(),
+        next_cursor: None,
+    })
 }
 
 /// Create a stakeholder profile.

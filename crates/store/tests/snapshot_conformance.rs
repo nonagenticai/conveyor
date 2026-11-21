@@ -14,6 +14,7 @@ use uuid::Uuid;
 
 struct Fixture {
     tenant: TenantId,
+    tenant_id: Uuid,
     programme: Uuid,
     reviewer: Uuid,
     review: Uuid,
@@ -45,8 +46,9 @@ async fn architecture_tree(
 ) -> (Uuid, Uuid) {
     let contract: Uuid = sqlx::query_scalar(
         "INSERT INTO architecture_contract
-             (tenant_id, project_id, kind, phase_code, title, status, approved_by, approved_at)
-         VALUES ($1, $2, 'statement_of_architecture_work', 'a', 'SAW', 'live', $3, now())
+             (tenant_id, project_id, kind, phase_code, title, status, approved_by,
+              requested_by, approved_at)
+         VALUES ($1, $2, 'statement_of_architecture_work', 'a', 'SAW', 'live', $3, $3, now())
          RETURNING id",
     )
     .bind(tenant)
@@ -58,7 +60,8 @@ async fn architecture_tree(
     let review: Uuid = sqlx::query_scalar(
         "INSERT INTO architecture_compliance_review
              (tenant_id, project_id, contract_id, level, findings, evidence, reviewed_by)
-         VALUES ($1, $2, $3, 'compliant', '[]'::jsonb, '[]'::jsonb, $4)
+         VALUES ($1, $2, $3, 'compliant',
+                 '[{\"code\": \"ARCH-1\"}]'::jsonb, '[{\"ref\": \"saw-doc\"}]'::jsonb, $4)
          RETURNING id",
     )
     .bind(tenant)
@@ -150,6 +153,7 @@ async fn fixture(db: &support::TestDb) -> Fixture {
     architecture_tree(&db.super_pool, tenant_id, unbound_project, reviewer).await;
     Fixture {
         tenant,
+        tenant_id,
         programme,
         reviewer,
         review,
@@ -225,4 +229,93 @@ async fn the_snapshot_carries_the_tranche_link_reviews_and_waivers() {
         );
     }
     let _ = (f.programme, f.reviewer, f.unbound_project);
+}
+
+/// The cadence projection and the audit fields: a cadence's demo credits and lessons travel in
+/// the `msp` object beside it, and the contract/review rows carry the requester, findings and
+/// evidence an MSP/TOGAF conformance audit must read back.
+#[tokio::test]
+async fn the_snapshot_carries_the_cadence_credits_lessons_and_audit_fields() {
+    let db = support::TestDb::fresh().await;
+    let f = fixture(&db).await;
+    let cadence: Uuid = sqlx::query_scalar(
+        "INSERT INTO programme_cadence (tenant_id, programme_id, kind, period)
+         VALUES ($1, $2, 'sprint', 'S-1') RETURNING id",
+    )
+    .bind(f.tenant_id)
+    .bind(f.programme)
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("insert the cadence");
+    let deliverable: Uuid = sqlx::query_scalar(
+        "INSERT INTO wbs_node (tenant_id, project_id, kind, title)
+         VALUES ($1, $2, 'deliverable', 'Increment') RETURNING id",
+    )
+    .bind(f.tenant_id)
+    .bind(f.bound_project)
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("insert the deliverable");
+    sqlx::query(
+        "INSERT INTO programme_demo_credit (tenant_id, cadence_id, deliverable_id, evidence)
+         VALUES ($1, $2, $3, '[{\"ref\": \"demo-1\"}]'::jsonb)",
+    )
+    .bind(f.tenant_id)
+    .bind(cadence)
+    .bind(deliverable)
+    .execute(&db.super_pool)
+    .await
+    .expect("insert the demo credit");
+    sqlx::query(
+        "INSERT INTO lesson (tenant_id, programme_id, cadence_id, finding_key, statement)
+         VALUES ($1, $2, $3, 'L-1', 'Demo arrived a day late')",
+    )
+    .bind(f.tenant_id)
+    .bind(f.programme)
+    .bind(cadence)
+    .execute(&db.super_pool)
+    .await
+    .expect("insert the lesson");
+
+    let data = snapshot(&db, f.tenant).await;
+
+    let credits = data.msp["demo_credits"].as_array().expect("demo credits");
+    assert_eq!(credits.len(), 1, "{credits:?}");
+    assert_eq!(credits[0]["cadence_id"], cadence.to_string());
+    assert_eq!(credits[0]["deliverable_id"], deliverable.to_string());
+    assert_eq!(credits[0]["evidence"][0]["ref"], "demo-1");
+    assert!(credits[0]["credited_at"].is_string(), "{}", credits[0]);
+
+    let lessons = data.msp["lessons"].as_array().expect("lessons");
+    assert_eq!(lessons.len(), 1, "{lessons:?}");
+    assert_eq!(lessons[0]["programme_id"], f.programme.to_string());
+    assert_eq!(lessons[0]["cadence_id"], cadence.to_string());
+    assert_eq!(lessons[0]["finding_key"], "L-1");
+    assert_eq!(lessons[0]["state"], "proposed");
+    assert_eq!(lessons[0]["source"], "retro");
+
+    let contracts = data.architecture["contracts"]
+        .as_array()
+        .expect("contracts");
+    assert!(
+        contracts
+            .iter()
+            .all(|row| row["requested_by"] == f.reviewer.to_string()),
+        "{contracts:?}"
+    );
+    let reviews = data.architecture["compliance_reviews"]
+        .as_array()
+        .expect("reviews");
+    assert!(
+        reviews
+            .iter()
+            .all(|row| row["findings"][0]["code"] == "ARCH-1"),
+        "{reviews:?}"
+    );
+    assert!(
+        reviews
+            .iter()
+            .all(|row| row["evidence"][0]["ref"] == "saw-doc"),
+        "{reviews:?}"
+    );
 }
