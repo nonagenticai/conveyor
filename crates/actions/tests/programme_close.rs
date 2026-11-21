@@ -244,7 +244,12 @@ async fn contract(
     contract_id
 }
 
-async fn review(running: &support::Running, project: &str, contract: &str, delegation: &str) {
+async fn review(
+    running: &support::Running,
+    project: &str,
+    contract: &str,
+    delegation: &str,
+) -> String {
     let (status, body) = running
         .invoke(
             "architecture.reviews_record",
@@ -266,6 +271,7 @@ async fn review(running: &support::Running, project: &str, contract: &str, deleg
         )
         .await;
     assert_eq!(status, 201, "{body}");
+    text(output(&body), "id")
 }
 
 async fn close_request(running: &support::Running, project: &str, delegation: &str) -> String {
@@ -616,4 +622,52 @@ async fn reviews_record_refuses_the_contract_requester() {
         .await;
     assert_eq!(status, 409, "{body}");
     assert_eq!(body["type"], "requester_is_reviewer", "{body}");
+}
+
+/// The Phase-G review reads back with its authority (#526 P1b).
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn reviews_get_reads_the_review_with_its_delegation() {
+    let (pg, running, seeded) = fixture().await;
+    let delegation = support::delegation_ref(&running, TOKEN).await;
+    let project = programme_project(&pg, &running, &seeded).await;
+    charter(&running, &project).await;
+    baseline(&running, &project).await;
+    let contract = contract(&pg, &running, &seeded, &project, &delegation).await;
+    let review_id = review(&running, &project, &contract, &delegation).await;
+
+    let (status, body) = running
+        .invoke(
+            "architecture.reviews_get",
+            TOKEN,
+            json!({"id": review_id}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{body}");
+    let read = output(&body);
+    assert_eq!(text(read, "id"), review_id);
+    assert_eq!(text(read, "project_id"), project);
+    let evidence = read["evidence"]
+        .as_object()
+        .expect("the review carries its evidence");
+    assert_eq!(
+        evidence["delegation_ref"],
+        json!(delegation),
+        "the review reads back with the delegation it was recorded under"
+    );
+
+    let (status, body) = running
+        .invoke(
+            "architecture.reviews_get",
+            TOKEN,
+            json!({"id": Uuid::now_v7()}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 404, "{body}");
+    assert_eq!(body["type"], "not_found", "{body}");
 }

@@ -32,9 +32,23 @@ Read-back map (write -> read), used when --read-action is not given:
   architecture.board_decide -> architecture.board_get
   approvals.decide          -> approvals.list
   documents.publish         -> documents.get
+  documents.create          -> documents.get            (read id from the write output)
+  documents.update          -> documents.get
+  pm.plan                   -> pm.get
   pm.close                  -> pm.get
   projects.reopen           -> projects.get
   projects.charter          -> pm.get
+  projects.baseline         -> baselines.get            (read id from the write output)
+  projects.close            -> projects.get
+  architecture.contracts_request  -> architecture.contracts_get
+  architecture.contracts_approve  -> architecture.contracts_get
+  architecture.artifacts_create   -> architecture.artifacts_get
+  architecture.artifacts_approve  -> architecture.artifacts_get
+  architecture.reviews_record     -> architecture.reviews_get
+
+A create whose read input is the created row's id needs no --read-id-from-output: the
+READBACK_ID_FROM_OUTPUT table supplies the field, unless --read-input (or an explicit
+--read-id-from-output) overrides it.
 
 Python 3 stdlib only; no shell strings, no network libraries.
 """
@@ -63,12 +77,33 @@ READBACK_MAP = {
     "approvals.decide": "approvals.list",
     "documents.publish": "documents.get",
     "documents.compose": "documents.get",
+    "documents.create": "documents.get",
+    "documents.update": "documents.get",
     "registers.create": "registers.get",
     "registers.update": "registers.get",
+    "pm.plan": "pm.get",
     "pm.close": "pm.get",
     "projects.close_request": "projects.get",
+    "projects.close": "projects.get",
     "projects.reopen": "projects.get",
     "projects.charter": "pm.get",
+    "projects.baseline": "baselines.get",
+    "architecture.contracts_request": "architecture.contracts_get",
+    "architecture.contracts_approve": "architecture.contracts_get",
+    "architecture.artifacts_create": "architecture.artifacts_get",
+    "architecture.artifacts_approve": "architecture.artifacts_get",
+    "architecture.reviews_record": "architecture.reviews_get",
+}
+
+# A create whose read-back is the row it just made. The write output's field is the read
+# input's `id`; --read-input and an explicit --read-id-from-output both override this.
+READBACK_ID_FROM_OUTPUT = {
+    "documents.create": "id",
+    "registers.create": "id",
+    "projects.baseline": "id",
+    "architecture.contracts_request": "id",
+    "architecture.artifacts_create": "id",
+    "architecture.reviews_record": "id",
 }
 
 # A read-back that needs identifiers different from the write's input.
@@ -294,11 +329,14 @@ def run_record(args, transport):
     read_action, read_input = resolve_readback(
         action, payload, args.read_action, args.read_input
     )
+    read_id_field = args.read_id_from_output
+    if read_id_field is None and args.read_input is None:
+        read_id_field = READBACK_ID_FROM_OUTPUT.get(action)
 
     if args.dry_run:
         planned_read = (
-            {"id": f"<from write output: {args.read_id_from_output}>"}
-            if args.read_id_from_output
+            {"id": f"<from write output: {read_id_field}>"}
+            if read_id_field
             else read_input
         )
         print_plan(
@@ -319,12 +357,10 @@ def run_record(args, transport):
         if_match=if_match,
     )
     print_result("write", action, write_result)
-    if args.read_id_from_output:
-        created_id = write_result.get(args.read_id_from_output)
+    if read_id_field:
+        created_id = write_result.get(read_id_field)
         if not isinstance(created_id, str) or not created_id:
-            fail(
-                f"the write returned no {args.read_id_from_output!r}; cannot read it back"
-            )
+            fail(f"the write returned no {read_id_field!r}; cannot read it back")
         read_input = {"id": created_id}
     read_result = execute(transport, read_action, read_input, actor_id=actor_id)
     if not has_row(read_result):
@@ -356,7 +392,7 @@ if name and os.environ.get("PROGRAMME_RECORD_EMPTY") == name:
 elif name == "documents.compose":
     print(json.dumps({"id": "doc-1", "title": "composed"}))
 else:
-    print(json.dumps({"ok": True, "action": name, "input": payload}))
+    print(json.dumps({"ok": True, "id": "row-1", "action": name, "input": payload}))
 """
 
 
@@ -626,11 +662,61 @@ def self_test():
         ),
     )
 
+    # The lifecycle's writes must each resolve a read-back; a create whose read input is the
+    # row it made reads the id from the write output unless --read-input overrides it.
+    lifecycle = {
+        "projects.close": "projects.get",
+        "projects.close_request": "projects.get",
+        "projects.reopen": "projects.get",
+        "projects.baseline": "baselines.get",
+        "pm.plan": "pm.get",
+        "architecture.contracts_request": "architecture.contracts_get",
+        "architecture.contracts_approve": "architecture.contracts_get",
+        "architecture.artifacts_create": "architecture.artifacts_get",
+        "architecture.artifacts_approve": "architecture.artifacts_get",
+        "architecture.reviews_record": "architecture.reviews_get",
+        "documents.create": "documents.get",
+        "documents.update": "documents.get",
+    }
+    mapping_failures = []
+    for write_action, read_action in lifecycle.items():
+        if os.path.exists(log):
+            os.remove(log)
+        completed = child(
+            [
+                "--action", write_action,
+                "--input", '{"id":"00000000-0000-0000-0000-000000000001"}',
+                "--evidence", evidence,
+            ],
+            fake_env,
+        )
+        if completed.returncode != 0:
+            mapping_failures.append(
+                f"{write_action}: exit {completed.returncode}: "
+                f"{completed.stderr.strip()[:200]}"
+            )
+            continue
+        calls_for_action = actions()
+        if calls_for_action != [write_action, read_action]:
+            mapping_failures.append(f"{write_action}: calls were {calls_for_action!r}")
+            continue
+        if write_action in READBACK_ID_FROM_OUTPUT and calls()[1]["input"] != {"id": "row-1"}:
+            mapping_failures.append(
+                f"{write_action}: read input was {calls()[1]['input']!r}"
+            )
+    if mapping_failures:
+        failures.append("lifecycle mappings")
+        print("FAIL lifecycle mappings")
+        for problem in mapping_failures:
+            print(f"  - {problem}")
+    else:
+        print("PASS lifecycle mappings")
+
     print()
     if failures:
-        print(f"SELF-TEST FAILED: {len(failures)} of 10 cases: {', '.join(failures)}")
+        print(f"SELF-TEST FAILED: {len(failures)} of 11 cases: {', '.join(failures)}")
         return 1
-    print("SELF-TEST OK: 10 cases passed")
+    print("SELF-TEST OK: 11 cases passed")
     return 0
 
 

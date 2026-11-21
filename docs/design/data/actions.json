@@ -38,6 +38,7 @@
     "architecture.profile_get",
     "architecture.profile_tailor",
     "architecture.repository_search",
+    "architecture.reviews_get",
     "architecture.reviews_record",
     "architecture.reviews_waive",
     "architecture.skills_assess",

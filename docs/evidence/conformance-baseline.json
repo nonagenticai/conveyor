@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 3,
   "standard": "governance/conformance.json",
   "entries": [
     {
@@ -9,7 +9,16 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
+    },
+    {
+      "rule": "closed_without_closure_review",
+      "subject": "T11",
+      "severity": "P0",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "closed_without_closure_review",
@@ -18,7 +27,25 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
+    },
+    {
+      "rule": "closed_without_closure_review",
+      "subject": "T16",
+      "severity": "P0",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
+    },
+    {
+      "rule": "closed_without_closure_review",
+      "subject": "T7",
+      "severity": "P0",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "project_in_unauthorised_tranche",
@@ -27,7 +54,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "project_in_unauthorised_tranche",
@@ -36,7 +63,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "project_in_unauthorised_tranche",
@@ -45,7 +72,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "project_in_unauthorised_tranche",
@@ -54,7 +81,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "project_in_unauthorised_tranche",
@@ -63,7 +90,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "project_in_unauthorised_tranche",
@@ -72,7 +99,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "project_in_unauthorised_tranche",
@@ -81,7 +108,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "project_in_unauthorised_tranche",
@@ -90,7 +117,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "project_in_unauthorised_tranche",
@@ -99,7 +126,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "project_in_unauthorised_tranche",
@@ -108,7 +135,25 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
+    },
+    {
+      "rule": "project_in_unauthorised_tranche",
+      "subject": "S12",
+      "severity": "P0",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
+    },
+    {
+      "rule": "project_in_unauthorised_tranche",
+      "subject": "S13",
+      "severity": "P0",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "project_in_unauthorised_tranche",
@@ -117,16 +162,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "project_in_unauthorised_tranche",
-      "subject": "T1",
-      "severity": "P0",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "project_in_unauthorised_tranche",
@@ -135,7 +171,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "project_in_unauthorised_tranche",
@@ -144,7 +180,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "project_in_unauthorised_tranche",
@@ -153,7 +189,16 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
+    },
+    {
+      "rule": "project_in_unauthorised_tranche",
+      "subject": "T16",
+      "severity": "P0",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "project_in_unauthorised_tranche",
@@ -162,7 +207,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "project_in_unauthorised_tranche",
@@ -171,7 +216,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "project_in_unauthorised_tranche",
@@ -180,7 +225,16 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
+    },
+    {
+      "rule": "project_in_unauthorised_tranche",
+      "subject": "T7",
+      "severity": "P0",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "project_in_unauthorised_tranche",
@@ -189,16 +243,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "tranche_review_without_authorisation",
-      "subject": "tranche 0 review",
-      "severity": "P0",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "benefit_baseline_placeholder",
@@ -207,7 +252,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "benefit_baseline_placeholder",
@@ -216,7 +261,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "benefit_baseline_placeholder",
@@ -225,7 +270,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "benefit_baseline_placeholder",
@@ -234,7 +279,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "benefit_baseline_placeholder",
@@ -243,7 +288,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "benefit_baseline_placeholder",
@@ -252,7 +297,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "benefit_profile_incomplete",
@@ -261,16 +306,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "board_not_approved",
-      "subject": "board",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "closed_without_closure_review",
@@ -279,7 +315,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "closed_without_closure_review",
@@ -288,7 +324,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "closed_without_closure_review",
@@ -297,7 +333,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "closed_without_closure_review",
@@ -306,7 +342,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "closed_without_closure_review",
@@ -315,7 +351,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "closed_without_closure_review",
@@ -324,7 +360,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "closed_without_closure_review",
@@ -333,7 +369,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "closed_without_closure_review",
@@ -342,7 +378,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "closed_without_closure_review",
@@ -351,7 +387,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "closed_without_closure_review",
@@ -360,7 +396,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "closed_without_closure_review",
@@ -369,7 +405,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "closed_without_closure_review",
@@ -378,7 +414,25 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
+    },
+    {
+      "rule": "closed_without_closure_review",
+      "subject": "S12",
+      "severity": "P1",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
+    },
+    {
+      "rule": "closed_without_closure_review",
+      "subject": "S13",
+      "severity": "P1",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "closed_without_closure_review",
@@ -387,7 +441,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "closed_without_closure_review",
@@ -396,7 +450,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "closure_outputs_undeclared",
@@ -405,7 +459,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "closure_outputs_undeclared",
@@ -414,7 +468,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "closure_outputs_undeclared",
@@ -423,7 +477,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "closure_outputs_undeclared",
@@ -432,7 +486,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "closure_outputs_undeclared",
@@ -441,7 +495,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "closure_outputs_undeclared",
@@ -450,7 +504,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "closure_outputs_undeclared",
@@ -459,7 +513,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "closure_outputs_undeclared",
@@ -468,7 +522,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "closure_outputs_undeclared",
@@ -477,7 +531,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "closure_outputs_undeclared",
@@ -486,7 +540,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "closure_outputs_undeclared",
@@ -495,7 +549,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "closure_outputs_undeclared",
@@ -504,7 +558,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "closure_outputs_undeclared",
@@ -513,7 +567,25 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
+    },
+    {
+      "rule": "closure_outputs_undeclared",
+      "subject": "S12",
+      "severity": "P1",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
+    },
+    {
+      "rule": "closure_outputs_undeclared",
+      "subject": "S13",
+      "severity": "P1",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "closure_outputs_undeclared",
@@ -522,7 +594,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "closure_outputs_undeclared",
@@ -531,7 +603,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "contract_missing",
@@ -540,7 +612,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "contract_missing",
@@ -549,7 +621,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "contract_missing",
@@ -558,7 +630,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "contract_missing",
@@ -567,7 +639,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "contract_missing",
@@ -576,7 +648,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "contract_missing",
@@ -585,7 +657,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "contract_missing",
@@ -594,7 +666,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "contract_missing",
@@ -603,7 +675,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "contract_missing",
@@ -612,7 +684,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "contract_missing",
@@ -621,7 +693,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "contract_missing",
@@ -630,7 +702,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "contract_missing",
@@ -639,7 +711,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "contract_missing",
@@ -648,7 +720,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "contract_missing",
@@ -657,7 +729,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "contract_missing",
@@ -666,7 +738,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "contract_missing",
@@ -675,7 +747,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "mandatory_artefacts",
@@ -684,7 +756,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "mandatory_artefacts",
@@ -693,7 +765,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "mandatory_artefacts",
@@ -702,7 +774,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "mandatory_artefacts",
@@ -711,7 +783,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "mandatory_artefacts",
@@ -720,7 +792,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "mandatory_artefacts",
@@ -729,7 +801,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "mandatory_artefacts",
@@ -738,16 +810,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "mandatory_artefacts",
-      "subject": "S06a",
-      "severity": "P1",
-      "disposition": "fold",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "mandatory_artefacts",
@@ -756,7 +819,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "mandatory_artefacts",
@@ -765,7 +828,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "mandatory_artefacts",
@@ -774,7 +837,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "mandatory_artefacts",
@@ -783,7 +846,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "mandatory_artefacts",
@@ -792,7 +855,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "mandatory_artefacts",
@@ -801,7 +864,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "mandatory_artefacts",
@@ -810,7 +873,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "mandatory_artefacts",
@@ -819,7 +882,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "mandatory_artefacts",
@@ -828,7 +891,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "mandatory_artefacts",
@@ -837,7 +900,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "mandatory_artefacts",
@@ -846,7 +909,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "mandatory_artefacts",
@@ -855,7 +918,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "mandatory_artefacts",
@@ -864,7 +927,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "mandatory_artefacts",
@@ -873,7 +936,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "mandatory_artefacts",
@@ -882,7 +945,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "mandatory_artefacts",
@@ -891,7 +954,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "mandatory_artefacts",
@@ -900,7 +963,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "mandatory_artefacts",
@@ -909,7 +972,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "mandatory_artefacts",
@@ -918,7 +981,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "mandatory_artefacts",
@@ -927,7 +990,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "mandatory_artefacts",
@@ -936,7 +999,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "mandatory_artefacts",
@@ -945,7 +1008,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "mandatory_artefacts",
@@ -954,7 +1017,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "mandatory_artefacts",
@@ -963,7 +1026,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "mandatory_artefacts",
@@ -972,7 +1035,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "mandatory_artefacts",
@@ -981,7 +1044,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "mandatory_artefacts",
@@ -990,7 +1053,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "mandatory_artefacts",
@@ -999,7 +1062,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "mandatory_artefacts",
@@ -1008,7 +1071,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "mandatory_artefacts",
@@ -1017,7 +1080,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "mandatory_artefacts",
@@ -1026,7 +1089,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "mandatory_artefacts",
@@ -1035,7 +1098,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "mandatory_artefacts",
@@ -1044,7 +1107,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "mandatory_artefacts",
@@ -1053,7 +1116,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "mandatory_artefacts",
@@ -1062,7 +1125,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "mandatory_artefacts",
@@ -1071,43 +1134,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "programme_baselines",
-      "subject": "boundary",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "programme_baselines",
-      "subject": "governance",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "programme_baselines",
-      "subject": "management",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "project_in_unauthorised_tranche",
-      "subject": "S02",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "project_in_unauthorised_tranche",
@@ -1116,7 +1143,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "project_in_unauthorised_tranche",
@@ -1125,25 +1152,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "project_in_unauthorised_tranche",
-      "subject": "S12",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "project_in_unauthorised_tranche",
-      "subject": "S13",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "project_in_unauthorised_tranche",
@@ -1152,7 +1161,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "project_in_unauthorised_tranche",
@@ -1161,7 +1170,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "project_in_unauthorised_tranche",
@@ -1170,7 +1179,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "project_in_unauthorised_tranche",
@@ -1179,7 +1188,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "project_in_unauthorised_tranche",
@@ -1188,7 +1197,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "project_in_unauthorised_tranche",
@@ -1197,7 +1206,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "project_in_unauthorised_tranche",
@@ -1206,16 +1215,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "project_in_unauthorised_tranche",
-      "subject": "T11",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "project_in_unauthorised_tranche",
@@ -1224,7 +1224,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "project_in_unauthorised_tranche",
@@ -1233,16 +1233,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "project_in_unauthorised_tranche",
-      "subject": "T16",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "project_in_unauthorised_tranche",
@@ -1251,7 +1242,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "project_in_unauthorised_tranche",
@@ -1260,7 +1251,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "project_in_unauthorised_tranche",
@@ -1269,16 +1260,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "project_in_unauthorised_tranche",
-      "subject": "T7",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "project_in_unauthorised_tranche",
@@ -1287,52 +1269,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "seed_live_drift",
-      "subject": "S12",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "seed_live_drift",
-      "subject": "S13",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "seed_live_drift",
-      "subject": "T11",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "seed_live_drift",
-      "subject": "T16",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
-    },
-    {
-      "rule": "seed_live_drift",
-      "subject": "T7",
-      "severity": "P1",
-      "disposition": "rework",
-      "owner": "programme owner",
-      "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "unpublished_declared_output",
@@ -1341,7 +1278,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "unpublished_declared_output",
@@ -1350,7 +1287,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "unpublished_declared_output",
@@ -1359,7 +1296,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "unpublished_declared_output",
@@ -1368,7 +1305,7 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     },
     {
       "rule": "unpublished_declared_output",
@@ -1377,7 +1314,19 @@
       "disposition": "rework",
       "owner": "programme owner",
       "expires": "2027-02-18",
-      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+      "reason": "accepted in the U5a ledger act (2026-11-21); rework before 2027-02-18 under the standing delegation"
     }
-  ]
+  ],
+  "accepted_at": "2026-11-21T11:08:14Z",
+  "accepted_by": "conveyor-e2e",
+  "approver": "conveyor-approver",
+  "acceptance_ref": "01a1fdca-949a-7129-ab76-e6f7868826be",
+  "delegation_ref": "01a1fb9f-ac2d-732d-b274-1079be3dd2b3",
+  "snapshot": {
+    "git_sha": "5dfd3fa0",
+    "generated_at": "2026-11-21T11:06:22.287278+00:00",
+    "manifest_sha256": "a71ec6abd972908e6a23439eadec713848ec519d9c216706aa70939847fa382c",
+    "tenant": "nonagentic",
+    "outputs": 170
+  }
 }

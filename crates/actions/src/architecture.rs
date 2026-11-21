@@ -1388,6 +1388,36 @@ async fn architecture_reviews_record(
     Ok(HandlerOutput::created(review_out(&record)))
 }
 
+/// `architecture.reviews_get`.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct ReviewIdIn {
+    /// The review.
+    pub id: Uuid,
+}
+
+#[crate::action(
+    name = "architecture.reviews_get",
+    version = 1,
+    kind = "internal",
+    scopes = ["projects:read"],
+    idempotent = true,
+    timeout_ms = 30000,
+    effect = "read",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn architecture_reviews_get(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: ReviewIdIn,
+) -> Result<HandlerOutput<ReviewOut>, ActionError> {
+    let record = store::architecture::get_review_tx(&mut *tx, ctx.tenant, input.id)
+        .await
+        .map_err(|error| arch_error(error, ctx.action))?
+        .ok_or_else(|| ActionError::resource_not_found("compliance review"))?;
+    Ok(HandlerOutput::ok(review_out(&record)).with_etag(etag_of(record.version)))
+}
+
 /// `architecture.reviews_waive`.
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 pub struct WaiverIn {
