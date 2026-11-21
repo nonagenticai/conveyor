@@ -102,3 +102,9 @@ id = "S01-demo-credits"
 check = "demo_credits"
 severity = "P0"
 description = "every accepted deliverable has a demo credit carrying its evidence"
+
+[[check]]
+id = "S01-product"
+check = "product_findings"
+severity = "P0"
+description = "no open P0 product finding remains for the project"

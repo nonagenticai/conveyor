@@ -110,3 +110,9 @@ id = "P0-pi-objectives"
 check = "pi_objectives"
 severity = "P0"
 description = "the PI objectives are a published programme output"
+
+[[check]]
+id = "P0-product"
+check = "product_findings"
+severity = "P0"
+description = "no open P0 product finding remains for the project"

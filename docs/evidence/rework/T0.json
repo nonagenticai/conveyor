@@ -113,20 +113,30 @@
       "kind": "snapshot",
       "result": "pass",
       "severity": "P0"
+    },
+    {
+      "allowed": false,
+      "check": "product_findings",
+      "description": "no open P0 product finding remains for the project",
+      "detail": "no open P0 product finding for this project",
+      "id": "T0-product",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
     }
   ],
   "failures": [],
   "gate": "The A\u2013D set is approved; the project re-closes through the one gate.",
-  "generated_at": "2026-11-21T18:51:10.947189+00:00",
+  "generated_at": "2026-11-21T19:55:12.547376+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T0.toml",
   "name": "Model and contracts",
   "project": "T0",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-21T18:50:29.096406+00:00",
-    "git_sha": "ede4ceb594b4c43298cc657fbb943e5450783ceb",
-    "path": "retained-snapshot/ede4ceb594b4c43298cc657fbb943e5450783ceb"
+    "generated_at": "2026-11-21T19:48:06.428670+00:00",
+    "git_sha": "d367a4a992ca5338c82466e9d6ef308e62b01ba6",
+    "path": "retained-snapshot/d367a4a992ca5338c82466e9d6ef308e62b01ba6"
   },
   "verdict": "green",
   "warnings": []

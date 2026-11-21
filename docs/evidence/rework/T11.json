@@ -143,11 +143,21 @@
       "kind": "snapshot",
       "result": "pass",
       "severity": "P1"
+    },
+    {
+      "allowed": false,
+      "check": "product_findings",
+      "description": "no open P0 product finding remains for the project",
+      "detail": "no open P0 product finding for this project",
+      "id": "T11-product",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
     }
   ],
   "failures": [],
   "gate": "The A\u2013D artefacts, the delivery contract, the closure review and the declared outputs exist; the project re-closes through the one gate.",
-  "generated_at": "2026-11-21T19:48:35.242034+00:00",
+  "generated_at": "2026-11-21T19:55:20.425530+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T11.toml",
   "name": "Metrics, metering and maturity",

@@ -1,0 +1,482 @@
+{
+  "version": 1,
+  "standard": "governance/conformance.json",
+  "description": "The product conformance findings and their work packages. A finding either becomes an executed work package (commit + named test + demo credit) or an accepted waiver with an owner and an expiry; scripts/check-product-rework.py is the gate. The computed WSJF score is never stored; the four inputs are.",
+  "snapshot": {
+    "git_sha": "f98918d8",
+    "generated_at": "2026-11-21T19:48:06.428670+00:00"
+  },
+  "findings": [
+    {
+      "id": "F-T4-1",
+      "slice": "T4",
+      "project": "T4",
+      "spec_clause": "SPEC_V2 §12 T4 gate — one remedy per interruption",
+      "claim": "an injected failure yields exactly one coach card and one remedy through the seeded coach process",
+      "observed": "the proof calls coach.triage and coach.remedy directly; no test executes the seeded cap.kanban_coach.handle_error.v2 steps, so the process wiring (which action runs when) is unproven",
+      "evidence": [
+        "crates/actions/tests/coach.rs:458",
+        "seed/processes/named.yaml:1804"
+      ],
+      "severity": "P1",
+      "disposition": "execute",
+      "verifier": "read the test body: it invokes coach.triage/coach.remedy over HTTP after err_card; no process run is started",
+      "status": "verified"
+    },
+    {
+      "id": "F-T4-2",
+      "slice": "T4",
+      "project": "T4",
+      "spec_clause": "SPEC_V2 §6.2 — the executor may triage but never choose the remedy",
+      "claim": "an agent-issued coach.remedy is refused",
+      "observed": "the exclusion is data-only in the seeded process's allowed_actions; no negative test proves an executor calling coach.remedy is refused",
+      "evidence": [
+        "seed/processes/named.yaml:110",
+        "crates/actions/src/coach.rs:1"
+      ],
+      "severity": "P2",
+      "disposition": "execute",
+      "verifier": "rg for coach.remedy in the tests: only the direct helper and the happy path call it; no executor-refusal case",
+      "status": "verified"
+    },
+    {
+      "id": "F-T4-3",
+      "slice": "T4",
+      "project": "T4",
+      "spec_clause": "SPEC_V2 §6.2 — escalation",
+      "claim": "the escalation path is exercised",
+      "observed": "coach.escalate is registered and exposed but no test or seeded process calls it; only the automatic repeat-signature escalation is proved",
+      "evidence": [
+        "crates/actions/src/coach.rs:820",
+        "crates/actions/tests/coach.rs:551"
+      ],
+      "severity": "P2",
+      "disposition": "execute",
+      "verifier": "rg coach.escalate across tests and seed: the action exists, no caller",
+      "status": "verified"
+    },
+    {
+      "id": "F-T4-4",
+      "slice": "T4",
+      "project": "T4",
+      "spec_clause": "SPEC_V2 §12 T4 gate — depth cap",
+      "claim": "a depth cap bounds coach recursion",
+      "observed": "COACH_CHAIN_MAX counts interruptions per card (breadth); nesting is prevented wholesale by the coach-card refusal, and no test asserts run nesting",
+      "evidence": [
+        "crates/actions/src/board/pull.rs:151",
+        "crates/actions/src/board/pull.rs:341"
+      ],
+      "severity": "P2",
+      "disposition": "execute",
+      "verifier": "read the constant and its use: it bounds interruptions attached to one card, not nested coach runs",
+      "status": "verified"
+    },
+    {
+      "id": "F-T9-1",
+      "slice": "T9",
+      "project": "T9",
+      "spec_clause": "SPEC_V2 §8.1 — the mandatory artefact set comes from the standard, filtered by the adm_profile",
+      "claim": "a phase cannot pass with a mandatory artefact missing",
+      "observed": "the gate starts satisfied when the profile names no requirements for a phase (`satisfied = sets.is_empty()`), never reads artifact_type.mandatory, and profile_tailor accepts any map: a tenant can tailor an empty profile and advance every phase vacuously",
+      "evidence": [
+        "crates/store/src/architecture.rs:1707",
+        "crates/store/src/architecture.rs:1726",
+        "crates/actions/src/architecture.rs:851",
+        "migrations/0054_architecture.sql:30"
+      ],
+      "severity": "P1",
+      "disposition": "execute",
+      "verifier": "read the gate: sets empty -> satisfied true; grep for artifact_type.mandatory in the gate: no use",
+      "status": "verified"
+    },
+    {
+      "id": "F-T9-2",
+      "slice": "T9",
+      "project": "T9",
+      "spec_clause": "SPEC_V2 §8.1 Preliminary — the board adopts the profile",
+      "claim": "phase advance is governed by an adopted profile",
+      "observed": "get_profile_tx prefers an adopted row but falls back to the latest draft; adopt_with_decision_id is optional, so a draft profile governs advance",
+      "evidence": [
+        "crates/store/src/architecture.rs:1010",
+        "crates/actions/src/architecture.rs:869"
+      ],
+      "severity": "P2",
+      "disposition": "execute",
+      "verifier": "read get_profile_tx: adopted preferred, otherwise latest draft is returned",
+      "status": "verified"
+    },
+    {
+      "id": "F-T9-3",
+      "slice": "T9",
+      "project": "T9",
+      "spec_clause": "SPEC_V2 §8.1 Phase H — exactly one typed outcome",
+      "claim": "the H advance is satisfied by a review of the H contract",
+      "observed": "the check is EXISTS any compliance review for the project with a non-null outcome, so a Phase-G review's outcome satisfies H and the outcome field is optional on every review",
+      "evidence": [
+        "crates/store/src/architecture.rs:1801",
+        "crates/store/src/architecture.rs:1862"
+      ],
+      "severity": "P2",
+      "disposition": "execute",
+      "verifier": "read the SQL: project_id only, no contract_id or phase filter",
+      "status": "verified"
+    },
+    {
+      "id": "F-T9-4",
+      "slice": "T9",
+      "project": "T9",
+      "spec_clause": "SPEC_V2 §8.1 Phase H — a kata candidate",
+      "claim": "a kata outcome names a typed candidate",
+      "observed": "change outcomes validate a change_id; kata outcomes accept any free-form object with no candidate row or identity",
+      "evidence": [
+        "crates/store/src/architecture.rs:1884"
+      ],
+      "severity": "P2",
+      "disposition": "execute",
+      "verifier": "read the outcome validation branch: change is typed, kata is unvalidated",
+      "status": "verified"
+    },
+    {
+      "id": "F-T10-1",
+      "slice": "T10",
+      "project": "T10",
+      "spec_clause": "SPEC_V2 §8.2 — a person approves the PI plan",
+      "claim": "a PI plan is approved before cards are materialised",
+      "observed": "the worker tick materialises every planned PI cadence in its own transaction and flips planned -> materialised with no approval gate; no approve/reject action or approval target exists",
+      "evidence": [
+        "apps/server/src/cadence.rs:22",
+        "crates/store/src/spine.rs:2884",
+        "crates/actions/src/spine/mod.rs:2925"
+      ],
+      "severity": "P1",
+      "disposition": "execute",
+      "verifier": "read the tick and the cadence action list: no approve action; materialise commits without an approval id",
+      "status": "verified"
+    },
+    {
+      "id": "F-T10-2",
+      "slice": "T10",
+      "project": "T10",
+      "spec_clause": "SPEC_V2 §8.2 — inspect and adapt produces lessons; §12 T10 — retro produces lessons",
+      "claim": "a retro can record its findings and close",
+      "observed": "record_retro_findings_tx and close_retro_tx exist only as store functions; no actions are registered, so a coach or a person cannot drive a retro through the API",
+      "evidence": [
+        "crates/store/src/spine.rs:3231",
+        "crates/store/src/spine.rs:3265",
+        "crates/actions/src/spine/mod.rs:3068"
+      ],
+      "severity": "P1",
+      "disposition": "execute",
+      "verifier": "rg for name = \"retros.\" or \"retro.\" in crates/actions: none; registry lists no retro action",
+      "status": "verified"
+    },
+    {
+      "id": "F-T10-3",
+      "slice": "T10",
+      "project": "T10",
+      "spec_clause": "SPEC_V2 §8.2 — backlog refinement re-scores WSJF and flags stale items",
+      "claim": "a refinement cadence does work",
+      "observed": "kind='refinement' is accepted at creation but the cadence tick handles only pi, demo and retro; no stale-item flag exists",
+      "evidence": [
+        "apps/server/src/cadence.rs:22",
+        "crates/actions/src/spine/mod.rs:2871"
+      ],
+      "severity": "P2",
+      "disposition": "execute",
+      "verifier": "read the tick's kind filter: refinement is not selected",
+      "status": "verified"
+    },
+    {
+      "id": "F-T10-4",
+      "slice": "T10",
+      "project": "T10",
+      "spec_clause": "SPEC_V2 §8.2 — PI planning materialises from the programme's standing backlog",
+      "claim": "a programme PI plans its cross-project backlog",
+      "observed": "materialisation selects backlog for one board.project_id, so a multi-project programme PI cannot plan the programme backlog; tests cover one project",
+      "evidence": [
+        "crates/store/src/spine.rs:2767",
+        "crates/store/tests/programme_cadence.rs:28"
+      ],
+      "severity": "P2",
+      "disposition": "execute",
+      "verifier": "read materialise_pi_tx: the backlog query is scoped by board.project_id",
+      "status": "verified"
+    }
+  ],
+  "work_packages": [
+    {
+      "id": "WP-T4-1",
+      "finding_ids": [
+        "F-T4-1"
+      ],
+      "project": "T4",
+      "tranche": 4,
+      "kind": "code_rework",
+      "title": "prove one remedy through the seeded coach process, not direct action calls",
+      "definition_of_done": "an end-to-end test starts the seeded cap.kanban_coach.handle_error.v2 run and asserts exactly one coach card, one remedy and (for a systemic class) one kata without manual action calls",
+      "acceptance": [
+        "Given an injected failure, when the seeded coach process runs, then exactly one remedy row exists and no test code called coach.remedy directly"
+      ],
+      "verify": "cargo test -p conveyor-actions --test coach",
+      "affected_paths": [
+        "crates/actions/tests/coach.rs",
+        "seed/processes/named.yaml"
+      ],
+      "wsjf": {
+        "business_value": 3,
+        "time_criticality": 3,
+        "risk_reduction": 5,
+        "job_size": 2
+      },
+      "status": "planned"
+    },
+    {
+      "id": "WP-T4-2",
+      "finding_ids": [
+        "F-T4-2",
+        "F-T4-3"
+      ],
+      "project": "T4",
+      "tranche": 4,
+      "kind": "code_rework",
+      "title": "close the coach's untested edges: agent-issued remedy refusal and coach.escalate",
+      "definition_of_done": "an executor calling coach.remedy is refused with a named error, and coach.escalate is either exercised by a test/seed process or removed with a recorded reason",
+      "acceptance": [
+        "Given an agent step, when it calls coach.remedy, then the call is refused and no remedy row is written",
+        "Given an escalated interruption, when coach.escalate is invoked, then the state and approval are recorded"
+      ],
+      "verify": "cargo test -p conveyor-actions --test coach",
+      "affected_paths": [
+        "crates/actions/tests/coach.rs",
+        "crates/actions/src/coach.rs"
+      ],
+      "wsjf": {
+        "business_value": 2,
+        "time_criticality": 2,
+        "risk_reduction": 3,
+        "job_size": 2
+      },
+      "status": "planned"
+    },
+    {
+      "id": "WP-T4-3",
+      "finding_ids": [
+        "F-T4-4"
+      ],
+      "project": "T4",
+      "tranche": 4,
+      "kind": "code_rework",
+      "title": "name the coach chain cap what it measures or assert nesting",
+      "definition_of_done": "the cap's name and documentation state breadth (interruptions per card), or a test asserts the nesting it claims to bound",
+      "acceptance": [
+        "Given a coach card about a coach card, when the pull guard runs, then it is refused and the test names the guard that did it"
+      ],
+      "verify": "cargo test -p conveyor-actions --test coach",
+      "affected_paths": [
+        "crates/actions/src/board/pull.rs",
+        "crates/actions/tests/coach.rs"
+      ],
+      "wsjf": {
+        "business_value": 1,
+        "time_criticality": 1,
+        "risk_reduction": 2,
+        "job_size": 1
+      },
+      "status": "planned"
+    },
+    {
+      "id": "WP-T9-1",
+      "finding_ids": [
+        "F-T9-1"
+      ],
+      "project": "T9",
+      "tranche": 4,
+      "kind": "code_rework",
+      "title": "a tailored ADM profile cannot empty a phase or drop the standard's mandatory artefacts",
+      "definition_of_done": "profile_tailor refuses a requirement key that is not a seeded artifact_type for that phase, refuses a phase in the phase_set with no requirement set, and refuses dropping a standard-mandatory type; the phase gate keeps its refusal and its tests",
+      "acceptance": [
+        "Given a profile naming a phase with no requirement set, when it is tailored, then the action refuses",
+        "Given a profile dropping artifact_type.mandatory for a phase, when it is tailored, then the action refuses",
+        "Given a valid adopted profile, when a phase misses a named artefact, then the advance refuses 409 and writes nothing"
+      ],
+      "verify": "cargo test -p conveyor-api --test togaf_architecture_phases",
+      "affected_paths": [
+        "crates/actions/src/architecture.rs",
+        "crates/store/src/architecture.rs",
+        "crates/api/tests/togaf_architecture_phases.rs"
+      ],
+      "wsjf": {
+        "business_value": 8,
+        "time_criticality": 5,
+        "risk_reduction": 8,
+        "job_size": 5
+      },
+      "status": "planned"
+    },
+    {
+      "id": "WP-T9-2",
+      "finding_ids": [
+        "F-T9-2"
+      ],
+      "project": "T9",
+      "tranche": 4,
+      "kind": "code_rework",
+      "title": "phase advance refuses a profile the board has not adopted",
+      "definition_of_done": "the advance path resolves only an adopted profile; a draft profile refuses with a named error and writes nothing",
+      "acceptance": [
+        "Given only a draft profile, when a phase advance runs, then it is refused and no WBS row moves"
+      ],
+      "verify": "cargo test -p conveyor-api --test togaf_architecture_phases",
+      "affected_paths": [
+        "crates/store/src/architecture.rs",
+        "crates/api/tests/togaf_architecture_phases.rs"
+      ],
+      "wsjf": {
+        "business_value": 3,
+        "time_criticality": 3,
+        "risk_reduction": 5,
+        "job_size": 2
+      },
+      "status": "planned"
+    },
+    {
+      "id": "WP-T9-3",
+      "finding_ids": [
+        "F-T9-3",
+        "F-T9-4"
+      ],
+      "project": "T9",
+      "tranche": 4,
+      "kind": "code_rework",
+      "title": "the H outcome is the H contract's review, and a kata outcome names a candidate",
+      "definition_of_done": "the H gate reads a review against the H contract (or the project's open H contract), and a kata outcome is validated against a typed candidate reference",
+      "acceptance": [
+        "Given a G review with an outcome and no H review, when H advances, then it is refused",
+        "Given a kata outcome with no candidate reference, when it is recorded, then it is refused"
+      ],
+      "verify": "cargo test -p conveyor-api --test togaf_h_change",
+      "affected_paths": [
+        "crates/store/src/architecture.rs",
+        "crates/api/tests/togaf_h_change.rs",
+        "crates/api/tests/architecture_compliance.rs"
+      ],
+      "wsjf": {
+        "business_value": 3,
+        "time_criticality": 2,
+        "risk_reduction": 5,
+        "job_size": 3
+      },
+      "status": "planned"
+    },
+    {
+      "id": "WP-T10-1",
+      "finding_ids": [
+        "F-T10-1"
+      ],
+      "project": "T10",
+      "tranche": 4,
+      "kind": "code_rework",
+      "title": "a PI plan is approved by a person before any card is materialised",
+      "definition_of_done": "the cadence states are planned -> proposed -> approved -> materialised; cadences.approve_plan/approve the plan carries an approval gate decided by someone other than the proposer; the worker materialises only approved plans and a unit test proves an unapproved plan creates no card",
+      "acceptance": [
+        "Given a planned PI cadence with no approval, when the worker ticks, then no card is created and the cadence stays unapproved",
+        "Given an approved PI plan, when the worker ticks, then the cards are created once and the cadence moves to materialised",
+        "Given the proposer, when they decide their own plan approval, then the approval is refused 409"
+      ],
+      "verify": "cargo test -p conveyor-store --test programme_cadence",
+      "affected_paths": [
+        "crates/actions/src/spine/mod.rs",
+        "crates/store/src/spine.rs",
+        "apps/server/src/cadence.rs",
+        "crates/store/tests/programme_cadence.rs"
+      ],
+      "wsjf": {
+        "business_value": 8,
+        "time_criticality": 8,
+        "risk_reduction": 8,
+        "job_size": 8
+      },
+      "status": "planned"
+    },
+    {
+      "id": "WP-T10-2",
+      "finding_ids": [
+        "F-T10-2"
+      ],
+      "project": "T10",
+      "tranche": 4,
+      "kind": "code_rework",
+      "title": "retro findings and closure are actions, not store-only functions",
+      "definition_of_done": "retros.record_findings and retros.close are registered actions with refusal tests (a retro cannot close with no lesson), and the existing store tests stay green",
+      "acceptance": [
+        "Given an open retro with no findings, when retros.close runs, then it is refused and the cadence stays open",
+        "Given a recorded finding, when retros.close runs, then the cadence closes and a lesson is proposed"
+      ],
+      "verify": "cargo test -p conveyor-actions --test demo_credit",
+      "affected_paths": [
+        "crates/actions/src/spine/mod.rs",
+        "crates/store/src/spine.rs",
+        "crates/actions/tests/registry.rs"
+      ],
+      "wsjf": {
+        "business_value": 5,
+        "time_criticality": 5,
+        "risk_reduction": 5,
+        "job_size": 3
+      },
+      "status": "planned"
+    },
+    {
+      "id": "WP-T10-3",
+      "finding_ids": [
+        "F-T10-3"
+      ],
+      "project": "T10",
+      "tranche": 4,
+      "kind": "code_rework",
+      "title": "a refinement cadence scores its backlog or is not accepted",
+      "definition_of_done": "either the tick re-scores WSJF and flags stale items for refinement cadences (with a test), or the kind is removed from the accepted set with a recorded reason",
+      "acceptance": [
+        "Given a refinement cadence, when the worker ticks, then the stale backlog items are flagged once"
+      ],
+      "verify": "cargo test -p conveyor-store --test programme_cadence",
+      "affected_paths": [
+        "apps/server/src/cadence.rs",
+        "crates/store/src/spine.rs"
+      ],
+      "wsjf": {
+        "business_value": 2,
+        "time_criticality": 2,
+        "risk_reduction": 3,
+        "job_size": 3
+      },
+      "status": "planned"
+    },
+    {
+      "id": "WP-T10-4",
+      "finding_ids": [
+        "F-T10-4"
+      ],
+      "project": "T10",
+      "tranche": 4,
+      "kind": "code_rework",
+      "title": "a programme PI materialises the programme backlog, not one project's",
+      "definition_of_done": "PI materialisation selects the backlog across the programme's in-flight projects in WSJF order within the WIP limit, with a two-project test",
+      "acceptance": [
+        "Given two in-flight projects with backlog items, when the PI materialises, then the items are ordered by WSJF across both projects and bounded by the WIP limit"
+      ],
+      "verify": "cargo test -p conveyor-store --test programme_cadence",
+      "affected_paths": [
+        "crates/store/src/spine.rs",
+        "crates/store/tests/programme_cadence.rs"
+      ],
+      "wsjf": {
+        "business_value": 3,
+        "time_criticality": 3,
+        "risk_reduction": 5,
+        "job_size": 3
+      },
+      "status": "planned"
+    }
+  ]
+}

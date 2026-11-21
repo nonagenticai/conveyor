@@ -501,6 +501,41 @@ def check_pi_objectives(
     return True, f"the {period} PI objectives are published"
 
 
+def check_product_findings(
+    snapshot: Snapshot, key: str, params: dict[str, Any]
+) -> tuple[bool, str]:
+    """No open P0 product finding may outlive the project that owns it.
+
+    The register is the product conformance audit's output: a finding is closed by an executed
+    work package (a commit, a named test and a demo credit) or by an accepted waiver with an
+    owner and an expiry. A project cannot close over an open P0 of its own.
+    """
+    path = ROOT / "governance" / "product-rework.json"
+    if not path.exists():
+        return False, "the product-rework register is missing"
+    register = json.loads(path.read_text(encoding="utf-8"))
+    executed = {
+        finding_id
+        for package in register.get("work_packages") or []
+        if package.get("status") == "executed"
+        for finding_id in package.get("finding_ids") or []
+    }
+    open_p0 = [
+        finding.get("id")
+        for finding in register.get("findings") or []
+        if finding.get("project") == key
+        and finding.get("severity") == "P0"
+        and finding.get("status") != "closed"
+        and finding.get("id") not in executed
+        and not (
+            finding.get("disposition") == "accept" and finding.get("waiver")
+        )
+    ]
+    if open_p0:
+        return False, f"{len(open_p0)} open P0 product finding(s): " + ", ".join(open_p0)
+    return True, "no open P0 product finding for this project"
+
+
 CHECKS: dict[str, Callable[[Snapshot, str, dict[str, Any]], tuple[bool, str]]] = {
     "project": check_project,
     "project_baseline": check_project_baseline,
@@ -516,6 +551,7 @@ CHECKS: dict[str, Callable[[Snapshot, str, dict[str, Any]], tuple[bool, str]]] =
     "wsjf": check_wsjf,
     "demo_credits": check_demo_credits,
     "lessons": check_lessons,
+    "product_findings": check_product_findings,
 }
 
 
