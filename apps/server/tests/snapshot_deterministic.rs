@@ -104,9 +104,9 @@ async fn snapshot_is_byte_identical_and_redacts_secrets_and_pii() {
     // not selected at all; the title is, so the redaction pass must catch it there.
     let token = format!("ghp_{}", "A".repeat(30));
     let title = format!("contact alice@example.com · token {token}");
-    sqlx::query(
+    let card: Uuid = sqlx::query_scalar(
         "INSERT INTO card (tenant_id, board_id, list_id, card_type_id, name, description, position, assignee_id)
-         VALUES ($1, $2, $3, $4, $5, 'private body that is never selected', 0, $6)",
+         VALUES ($1, $2, $3, $4, $5, 'private body that is never selected', 0, $6) RETURNING id",
     )
     .bind(tenant)
     .bind(board)
@@ -114,9 +114,43 @@ async fn snapshot_is_byte_identical_and_redacts_secrets_and_pii() {
     .bind(card_type)
     .bind(&title)
     .bind(user)
-    .execute(&db.super_pool)
+    .fetch_one(&db.super_pool)
     .await
     .expect("card");
+    // The delivery view (#528): a work package with one child, a run, and a call on a model with
+    // no commercial price. The child's `parent_card_id` must survive, the activity window must be
+    // published, and the unpriced call must be counted — never rendered as free.
+    sqlx::query(
+        "INSERT INTO card (tenant_id, board_id, list_id, card_type_id, name, description, position, parent_card_id)
+         VALUES ($1, $2, $3, $4, 'Snapshot child card', '', 1, $5)",
+    )
+    .bind(tenant)
+    .bind(board)
+    .bind(list)
+    .bind(card_type)
+    .bind(card)
+    .execute(&db.super_pool)
+    .await
+    .expect("child card");
+    let run: Uuid = sqlx::query_scalar(
+        "INSERT INTO run (tenant_id, project_id, card_id) VALUES ($1, $2, $3) RETURNING id",
+    )
+    .bind(tenant)
+    .bind(project)
+    .bind(card)
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("run");
+    sqlx::query(
+        "INSERT INTO inference_call
+            (tenant_id, caller_kind, run_id, model, prompt_tokens, completion_tokens, total_tokens)
+         VALUES ($1, 'agent_run', $2, 'unpriced-model-x', 10, 5, 15)",
+    )
+    .bind(tenant)
+    .bind(run)
+    .execute(&db.super_pool)
+    .await
+    .expect("inference call");
 
     // The secret table stores ciphertext; the snapshot may publish the NAME and must publish
     // neither the ciphertext nor the key id.
@@ -311,6 +345,53 @@ async fn snapshot_is_byte_identical_and_redacts_secrets_and_pii() {
         "card bodies are not selected at all"
     );
     assert!(work.contains("Alice"), "the display name stays public");
+
+    // The delivery view's rows (#528). The activity window, the work-package parent link and the
+    // per-project/per-card spend are new public keys; they must survive redaction and stay stable.
+    let work_json: Value = serde_json::from_str(&work).expect("work json");
+    let activity = work_json["project_activity"]
+        .as_array()
+        .expect("project_activity is an array");
+    assert!(
+        activity
+            .iter()
+            .any(|row| row["project_id"] == json!(project.to_string())),
+        "the project's activity window is published: {activity:?}"
+    );
+    assert!(
+        work_json["cards"]
+            .as_array()
+            .expect("cards")
+            .iter()
+            .any(|row| row["parent_card_id"] == json!(card.to_string())),
+        "a child card names its work package"
+    );
+    let measure: Value = serde_json::from_str(
+        &std::fs::read_to_string(dir.join("measure.json")).expect("measure.json"),
+    )
+    .expect("measure json");
+    let by_project = measure["inference"]["by_project"]
+        .as_array()
+        .expect("by_project is an array");
+    let spend = by_project
+        .iter()
+        .find(|row| row["project_id"] == json!(project.to_string()))
+        .expect("the project's spend is published");
+    assert_eq!(spend["calls"], 1);
+    assert_eq!(
+        spend["unpriced_calls"], 1,
+        "a model with no price is counted, never rendered as free"
+    );
+    assert_eq!(spend["priced_calls"], 0);
+    let by_card = measure["inference"]["by_card"]
+        .as_array()
+        .expect("by_card is an array");
+    assert!(
+        by_card
+            .iter()
+            .any(|row| row["card_id"] == json!(card.to_string())),
+        "the card's spend is published: {by_card:?}"
+    );
 
     let msp = std::fs::read_to_string(dir.join("msp.json")).expect("msp.json");
     assert!(msp.contains("BEN-SNAP"), "the benefit profile is public");
