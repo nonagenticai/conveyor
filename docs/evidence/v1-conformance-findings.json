@@ -1303,7 +1303,12 @@
       ],
       "failure_scenario": "The signed-out timeline draws no bars, no width and no today marker, while the same snapshot holds 368 observed runs.",
       "acceptance": "Derive the window from cards/runs when project_activity is absent (as v2.js consoleActivity does), or publish the row; add a fixture proving one bar.",
-      "owner_project": "PLATFORM"
+      "owner_project": "PLATFORM",
+      "resolved_by": {
+        "commit": "de0fefe9f7b5abf39140d92a53a4ae1b5b8df43f",
+        "test": "docs/design/scripts/check-console.cjs",
+        "evidence": "node docs/design/scripts/check-console.cjs green twice; assertions at lines 3865-3888; each mutation-checked"
+      }
     },
     {
       "id": "v1-view-2",
@@ -1332,7 +1337,12 @@
       ],
       "failure_scenario": "The header claims 'no spend recorded' while the ledger holds millions of tokens; the unpriced branch is unreachable.",
       "acceptance": "Bind spend to published fields or show tenant totals as explicitly unattributed; add priced, unpriced and zero fixtures.",
-      "owner_project": "PLATFORM"
+      "owner_project": "PLATFORM",
+      "resolved_by": {
+        "commit": "de0fefe9f7b5abf39140d92a53a4ae1b5b8df43f",
+        "test": "docs/design/scripts/check-console.cjs",
+        "evidence": "node docs/design/scripts/check-console.cjs green twice; assertions at lines 3891-3908; each mutation-checked"
+      }
     },
     {
       "id": "v1-view-3",
@@ -1361,7 +1371,12 @@
       ],
       "failure_scenario": "A closed standalone project remains a completed portfolio row permanently, contradicting portfolio membership.",
       "acceptance": "Apply the active/paused plus board-or-card predicate; a fixture proves a closed standalone project is absent.",
-      "owner_project": "PLATFORM"
+      "owner_project": "PLATFORM",
+      "resolved_by": {
+        "commit": "de0fefe9f7b5abf39140d92a53a4ae1b5b8df43f",
+        "test": "docs/design/scripts/check-console.cjs",
+        "evidence": "node docs/design/scripts/check-console.cjs green twice; assertions at lines 3910-3914; each mutation-checked"
+      }
     },
     {
       "id": "v1-view-4",
@@ -1385,7 +1400,12 @@
       ],
       "failure_scenario": "A programme with 12 benefit profiles shows 8 and nothing tells the reader 4 are missing.",
       "acceptance": "Render all profiles or print 'showing 8 of N'; add a fixture with more than eight benefits.",
-      "owner_project": "PLATFORM"
+      "owner_project": "PLATFORM",
+      "resolved_by": {
+        "commit": "de0fefe9f7b5abf39140d92a53a4ae1b5b8df43f",
+        "test": "docs/design/scripts/check-console.cjs",
+        "evidence": "node docs/design/scripts/check-console.cjs green twice; assertions at lines 3916-3918; each mutation-checked"
+      }
     },
     {
       "id": "v1-view-5",
@@ -1414,7 +1434,12 @@
       ],
       "failure_scenario": "A 1,000-card board renders 1,000 tiles on every render and a very tall single column at 390 px.",
       "acceptance": "Cap or paginate lanes and the archived column with a 'show N more' control; add a fixture with more than 50 cards in one lane.",
-      "owner_project": "PLATFORM"
+      "owner_project": "PLATFORM",
+      "resolved_by": {
+        "commit": "de0fefe9f7b5abf39140d92a53a4ae1b5b8df43f",
+        "test": "docs/design/scripts/check-console.cjs",
+        "evidence": "node docs/design/scripts/check-console.cjs green twice; assertions at lines 3920-3941; each mutation-checked"
+      }
     },
     {
       "id": "v1-w1a-2",
