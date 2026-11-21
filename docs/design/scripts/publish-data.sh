@@ -130,7 +130,9 @@ test -f "$tmp/docs/standards/index.html" || {
   exit 1
 }
 
-# 4. Only now does the fresh pack replace the published one.
+# 4. Only now does the fresh pack replace the published one. The standards directory is replaced
+#    wholesale: a page for an artefact that no longer exists must not survive the publish.
+rsync -a --delete "$tmp/docs/standards/" "$pack/docs/standards/"
 rsync -a "$tmp/data/" "$data/"
 rsync -a "$tmp/docs/" "$pack/docs/"
 
