@@ -807,6 +807,30 @@ const SNAPSHOT = {
         version: 1,
       },
     ],
+    // #528: when the audit publishes realisation rows they are the benefit rail's truth — a
+    // numeric baseline and post measurement for BEN-P0, and an honestly unbaselined BEN-P1 whose
+    // baseline is a placeholder with no value.
+    benefit_realisation: [
+      {
+        reference: "BEN-P0",
+        programme_id: "11111111-1111-7111-8111-111111111111",
+        state: "realised",
+        baseline: { value: 12, measured_at: "2026-10-01T00:00:00Z", placeholder: false },
+        latest_post: 8,
+        delta: 4,
+        target: "half the cycle time",
+        measurement_method: "cycle time from the run ledger",
+        owner_role: "benefit owner",
+      },
+      {
+        reference: "BEN-P1",
+        programme_id: "11111111-1111-7111-8111-111111111111",
+        state: "unbaselined",
+        baseline: { value: null, measured_at: null, placeholder: true },
+        latest_post: null,
+        delta: null,
+      },
+    ],
     stakeholder_profiles: [
       {
         id: "sp-p0",
@@ -871,6 +895,22 @@ const SNAPSHOT = {
         status: "planned",
         version: 1,
       },
+      // #528: the delivery project's own WBS work package — the Plan lane reads it by project id
+      // and renders its title, status and WSJF (8 + 5 + 2 over a job size of 5).
+      {
+        id: "wn-dlv-1",
+        project_id: "22222222-2222-7222-8222-222222222222",
+        code: "DLV.1",
+        kind: "work_package",
+        title: "Deliver the pack",
+        status: "accepted",
+        acceptance: { items: ["a", "b", "c"] },
+        job_size: 5,
+        business_value: 8,
+        time_criticality: 5,
+        risk_reduction: 2,
+        version: 1,
+      },
     ],
     project_baselines: [
       { id: "bl-p0", kind: "scope", taken_at: "2026-11-01T00:00:00Z", version: 1 },
@@ -891,6 +931,38 @@ const SNAPSHOT = {
     project_dependencies: [
       { id: "dep-p0", from_project: "p-p0", to_project: "p-s02", kind: "needs", status: "open" },
     ],
+    // #528: the declaration register the dependency rail reads — one typed edge, one untyped, one
+    // unknown target and no cycle. The renderer derives the typed/untagged totals from the edges.
+    dependencies: {
+      edges: [
+        { from: "DLV", to: "P0", kind: "needs", typed: true },
+        { from: "S03", to: "S02", kind: null, typed: false },
+      ],
+      counts: { blocks: 0, needs: 1, supersedes: 0, informs: 0 },
+      untyped: 1,
+      unknown_targets: [{ from: "S02", to: "GONE" }],
+      cycles: [],
+    },
+    // #528: declared state against the review's authorisation. T0 is authorised by a continue
+    // review; T1 has no review at all and carries the review_missing flag.
+    tranche_reconciliation: [
+      {
+        number: 0,
+        declared_state: "closed",
+        authorised: true,
+        review: { decision: "continue", decided_at: "2026-11-17T00:00:00Z" },
+        projects: { total: 1, active: 0, closed: 1, archived: 0 },
+        flags: [],
+      },
+      {
+        number: 1,
+        declared_state: "planned",
+        authorised: false,
+        review: null,
+        projects: { total: 0, active: 0, closed: 0, archived: 0 },
+        flags: ["review_missing"],
+      },
+    ],
   },
   work: {
     boards: [
@@ -899,6 +971,14 @@ const SNAPSHOT = {
         id: "44444444-4444-7444-8444-444444444444",
         project_id: "22222222-2222-7222-8222-222222222222",
         name: "Delivery board",
+        position: 0,
+      },
+      // #528: a standalone initiative is a portfolio row only when it is active/paused AND has a
+      // board or a card. LONE carries a board, so the boundary rule is exercised, not bypassed.
+      {
+        id: "b-lone",
+        project_id: "33333333-3333-7333-8333-333333333333",
+        name: "Standalone board",
         position: 0,
       },
     ],
@@ -978,6 +1058,11 @@ const SNAPSHOT = {
         created_at: "2026-11-17T00:00:00Z",
         list_changed_at: "2026-11-17T00:00:00Z",
         archived_at: null,
+        // #528: the card the audit's P0 rework package materialised as. Its key matches the
+        // package, so L3's Rework lane renders the tile and L4 leads with the register panel.
+        rework_key: "contract_missing:tranche-4",
+        rule: "contract_missing",
+        severity: "P0",
       },
       // #528: an archived root card — a closed project's completed work stays visible.
       {
@@ -1311,6 +1396,30 @@ const SNAPSHOT = {
         evidence: "assessment",
       },
     ],
+    // #528: the delivery project's TOGAF A–H progress — phase A evidenced by a compliant contract,
+    // B–H not evidenced, and B named as the next required phase. The phase rail reads it by id.
+    phase_progress: [
+      {
+        project: "22222222-2222-7222-8222-222222222222",
+        declared: { adm_phase: "A", plateau: "hld" },
+        phases: [
+          {
+            phase: "a",
+            state: "evidenced",
+            contract: "delivery_contract",
+            compliance: "compliant",
+          },
+          { phase: "b", state: "not-evidenced" },
+          { phase: "c", state: "not-evidenced" },
+          { phase: "d", state: "not-evidenced" },
+          { phase: "e", state: "not-evidenced" },
+          { phase: "f", state: "not-evidenced" },
+          { phase: "g", state: "not-evidenced" },
+          { phase: "h", state: "not-evidenced" },
+        ],
+        next_required: "b",
+      },
+    ],
   },
   // #434: the T7 incident record as the snapshot's `ops` section. One card, its runbook
   // selection resolved to a published procedure title and its linked postmortem asset.
@@ -1395,8 +1504,141 @@ const SNAPSHOT = {
       ],
     },
   },
+  // #528: the conformance audit's rework register as the snapshot publishes it. Three packages:
+  // one P0 applied to the delivery project with a card, one P1 with no card (not materialised),
+  // and one suppressed P1. The scorecard's open counts come from the packages, not its own row.
+  rework: {
+    schema: "conveyor-rework/v1",
+    generated_at: "2026-11-20T11:00:00Z",
+    scorecard: {
+      MSP: {
+        rules: 12,
+        rules_clean: 4,
+        rules_with_gaps: 8,
+        gaps: 88,
+        p0: 22,
+        p1: 65,
+        p2: 1,
+        suppressed: 0,
+        packages: 3,
+        findings: 1,
+      },
+      TOGAF: {
+        rules: 10,
+        rules_clean: 7,
+        rules_with_gaps: 3,
+        gaps: 12,
+        p0: 0,
+        p1: 8,
+        p2: 4,
+        suppressed: 0,
+        packages: 0,
+        findings: 0,
+      },
+      SAFe: {
+        rules: 8,
+        rules_clean: 6,
+        rules_with_gaps: 2,
+        gaps: 5,
+        p0: 0,
+        p1: 4,
+        p2: 1,
+        suppressed: 0,
+        packages: 0,
+        findings: 0,
+      },
+      PMP: {
+        rules: 9,
+        rules_clean: 5,
+        rules_with_gaps: 4,
+        gaps: 14,
+        p0: 1,
+        p1: 6,
+        p2: 2,
+        suppressed: 0,
+        packages: 0,
+        findings: 0,
+      },
+      SPEC: {
+        rules: 11,
+        rules_clean: 8,
+        rules_with_gaps: 3,
+        gaps: 9,
+        p0: 0,
+        p1: 3,
+        p2: 3,
+        suppressed: 0,
+        packages: 0,
+        findings: 0,
+      },
+    },
+    summary: {
+      packages: 3,
+      open: 2,
+      suppressed: 1,
+      subjects: 4,
+      duplicates: 0,
+      resolved: 1,
+      by_standard: { MSP: 3 },
+      by_severity: { P0: 1, P1: 1 },
+      by_status: { open: 2, suppressed: 1 },
+    },
+    packages: [
+      {
+        key: "contract_missing:tranche-4",
+        standard: "MSP",
+        spec: "MSP §8.3",
+        rule: "contract_missing",
+        severity: "P0",
+        status: "open",
+        title: "Publish the tranche-4 delivery contract",
+        apply_to: "DLV",
+        owner_project: "T9",
+        artefact: "architecture contract",
+        scope: "tranche 4",
+        depends_on: [],
+        subjects: [
+          {
+            subject: "conveyor:DLV",
+            detail: "the delivery project has no evidenced A-phase contract",
+            severity: "P0",
+            disposition: "open",
+            owner: "architecture board",
+            evidence: { path: "docs/design/data/architecture.json" },
+          },
+        ],
+        dod: [{ item: "the tranche-4 delivery contract is published", met: false }],
+        acceptance_command:
+          "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --report",
+      },
+      {
+        key: "wbs_absent:tranche-4",
+        standard: "MSP",
+        spec: "MSP §8.1",
+        rule: "wbs_absent",
+        severity: "P1",
+        status: "open",
+        title: "Publish the tranche-4 WBS",
+        apply_to: "DLV",
+        evidence: { path: "docs/design/data/msp.json" },
+      },
+      {
+        key: "benefit_unbaselined:tranche-4",
+        standard: "MSP",
+        spec: "MSP §8.3",
+        rule: "benefit_unbaselined",
+        severity: "P1",
+        status: "suppressed",
+        title: "Baseline the tranche-4 benefits",
+        apply_to: "DLV",
+      },
+    ],
+  },
 };
 
+// #528: delivery.js's dependencyRail is handed the whole MSP section (`D.dependencyRail(data.msp)`)
+// while the published snapshot nests the register at `msp.dependencies`; expose the register at
+// both levels so the rail reads the same rows the snapshot publishes.
 function json(res, status, body, headers = {}) {  res.writeHead(status, Object.assign({ "Content-Type": "application/json; charset=utf-8" }, headers));
   res.end(JSON.stringify(body));
 }
@@ -3150,6 +3392,16 @@ function readBody(req, done) {
         .first()
         .evaluate((el) => parseFloat(el.style.width));
       assert.ok(barWidth > 20, `an in-flight programme bar spans its window (${barWidth}%)`);
+      // #528: L1's standards scorecard — the audit's own record per standard, with an open-package
+      // and findings count on each tile.
+      assert.ok(
+        (await page.locator("#main .delivery-scorecard").count()) >= 1,
+        "L1 carries the standards scorecard",
+      );
+      const scorecardText = await page.locator("#main .delivery-scorecard").innerText();
+      assert.match(scorecardText, /MSP/, "the scorecard scores MSP");
+      assert.match(scorecardText, /TOGAF/, "the scorecard scores TOGAF");
+      assert.match(scorecardText, /2 open · 1 findings/, "an open-package count renders");
       // L2: the programme drill — only its projects, grouped by MSP tranche.
       await page.goto(
         `http://127.0.0.1:${snapshotServer.port}/studio.html#portfolio/11111111-1111-7111-8111-111111111111`,
@@ -3187,6 +3439,24 @@ function readBody(req, done) {
       assert.match(programmeTimeline, /—\*/, "an unpriced-only spend renders —, never $0.00");
       assert.match(programmeTimeline, /Closed project/, "a completed project stays visible at L2");
       assert.match(programmeTimeline, /MSP benefits/i, "the benefit rail renders");
+      // #528: L2's derived rails — the declaration register, the reconciliation and TOGAF phases,
+      // and the realisation rows that replace the profile-only benefit state.
+      assert.ok(
+        (await page.locator("#main .delivery-rail.phase-rail").count()) >= 1,
+        "L2 carries the TOGAF phase rail",
+      );
+      assert.match(programmeTimeline, /dependencies/i, "the dependency rail renders");
+      assert.match(programmeTimeline, /1 typed · 1 untyped/, "typed and untyped edges are counted");
+      assert.match(programmeTimeline, /unknown targets/i, "an unknown dependency target is named");
+      assert.match(programmeTimeline, /S02→GONE/, "the unknown target edge is shown");
+      assert.match(programmeTimeline, /tranche reconciliation/i, "the reconciliation rail renders");
+      assert.match(programmeTimeline, /not authorised/, "a tranche with no authorisation says so");
+      assert.match(programmeTimeline, /1 flag/, "a reconciliation flag is counted");
+      assert.match(programmeTimeline, /evidenced/, "a TOGAF phase state renders");
+      assert.match(programmeTimeline, /not-evidenced/, "an unevidenced phase says so");
+      assert.match(programmeTimeline, /next b/, "the next required phase is named");
+      assert.match(programmeTimeline, /realised/, "a realised benefit renders");
+      assert.match(programmeTimeline, /unbaselined/, "an unbaselined benefit says so");
       assert.ok(
         (await page.locator('#main a[href="#portfolio"]').count()) >= 1,
         "L2 links back to the portfolio",
@@ -3217,6 +3487,21 @@ function readBody(req, done) {
         (await page.locator('#main .kanban-card a.kanban-open[href*="/wp/"]').count()) >= 3,
         "every card opens its own work-package view",
       );
+      // #528: L3's Plan and Rework lanes — the WBS work package, the applied rework card, and the
+      // register package that has no card yet.
+      assert.ok(
+        (await page.locator("#main .kanban-col.kanban-rework").count()) >= 1,
+        "the project board carries its Rework lane",
+      );
+      const reworkLane = await page.locator("#main .kanban-col.kanban-rework").innerText();
+      assert.match(reworkLane, /P0 · contract_missing/, "the applied package renders as a rework card");
+      assert.match(
+        reworkLane,
+        /not yet materialised/,
+        "a register package with no card is not materialised",
+      );
+      const planLane = await page.locator("#main .kanban-col.kanban-plan").innerText();
+      assert.match(planLane, /Deliver the pack/, "the Plan lane carries the WBS work package");
       // L4: the work package's execution and its own kanban, including the done child.
       await page.goto(
         `http://127.0.0.1:${snapshotServer.port}/studio.html#projects/22222222-2222-7222-8222-222222222222/wp/66666666-6666-7666-8666-666666666666`,
@@ -3262,6 +3547,29 @@ function readBody(req, done) {
       assert.match(childlessText, /No child cards/, "a childless work package says so");
       assert.match(childlessText, /No run is recorded/, "its empty execution is honest");
       assert.match(childlessText, /definition of done/i, "it still carries its Definition of Done");
+      // #528: the loose card is the applied rework card; L4 leads with its register package.
+      await page.goto(
+        `http://127.0.0.1:${snapshotServer.port}/studio.html#projects/22222222-2222-7222-8222-222222222222/wp/88888888-8888-7888-8888-888888888888`,
+      );
+      await page.waitForSelector(".page");
+      await page.waitForTimeout(300);
+      assert.ok(
+        (await page.locator("#main .exec.rework-package").count()) >= 1,
+        "the work package shows its rework register package",
+      );
+      const reworkPackageText = await page.locator("#main .exec.rework-package").innerText();
+      assert.match(reworkPackageText, /contract_missing/, "the package's rule is shown");
+      assert.match(reworkPackageText, /MSP · MSP §8\.3/, "the standard and SPEC clause are shown");
+      assert.match(
+        reworkPackageText,
+        /the tranche-4 delivery contract is published/,
+        "the package's Definition of Done item is shown",
+      );
+      assert.match(
+        reworkPackageText,
+        /python3 scripts\/audit-programme-conformance\.py --snapshot docs\/design\/data --report/,
+        "the verify command is shown",
+      );
       // A phone gets the same view, scrolled inside its own box: the page itself never overflows.
       await page.setViewportSize({ width: 390, height: 844 });
       await page.waitForTimeout(150);
@@ -3270,9 +3578,10 @@ function readBody(req, done) {
       );
       assert.ok(overflow <= 1, `the page has no horizontal overflow at 390px (${overflow})`);
       await page.setViewportSize({ width: 1440, height: 1000 });
-      // A project with no board says so; it never renders empty columns.
+      // A project with no board says so; it never renders empty columns. QUIET carries no board;
+      // LONE now carries one because the §5.1 boundary admits it to L1 only with a board or card.
       await page.goto(
-        `http://127.0.0.1:${snapshotServer.port}/studio.html#projects/33333333-3333-7333-8333-333333333333`,
+        `http://127.0.0.1:${snapshotServer.port}/studio.html#projects/99999999-9999-7999-8999-999999999999`,
       );
       await page.waitForSelector(".page");
       await page.waitForTimeout(300);

@@ -213,6 +213,7 @@ async fn build_or_cached(state: &AppState, slug: &str) -> Result<(Arc<SiteView>,
             tenant,
             tenant_slug: slug,
             issues,
+            rework: rework_register(),
             feedback_url: DEFAULT_FEEDBACK_URL,
             git_sha: state.config.git_sha.as_deref().unwrap_or("unknown"),
         },
@@ -258,6 +259,19 @@ fn issues_registry() -> Value {
             }
         })
         .unwrap_or_else(|| json!({"issues": []}))
+}
+
+/// The committed rework register beside the pack, when the image carries one.
+///
+/// A missing or unparseable register is `None` — the honest "register not published" the
+/// wrapper renders — never an error: the live view must serve the rest of the pack either way.
+fn rework_register() -> Option<Value> {
+    let path = crate::web::web_root()
+        .map(|root| root.join("design/data/rework.json"))
+        .filter(|path| path.is_file())?;
+    std::fs::read_to_string(&path)
+        .ok()
+        .and_then(|text| serde_json::from_str::<Value>(&text).ok())
 }
 
 fn not_modified(headers: &HeaderMap, etag: &str) -> Option<Response> {

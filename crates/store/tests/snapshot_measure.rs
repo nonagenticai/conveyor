@@ -32,6 +32,8 @@ async fn snapshot(db: &common::TestDb, tenant: TenantId) -> store::snapshot::Sna
 struct Project {
     project: Uuid,
     board: Uuid,
+    list: Uuid,
+    card_type: Uuid,
     card: Uuid,
     package: Uuid,
     run: Uuid,
@@ -147,6 +149,8 @@ async fn project_tree(
     Project {
         project: project.id,
         board: board.id,
+        list: list.id,
+        card_type,
         card: card.id,
         package: package.id,
         run: run.id,
@@ -362,4 +366,381 @@ async fn the_snapshot_attributes_tokens_and_cost_by_project_and_card() {
             .all(|row| row["parent_card_id"] == serde_json::json!(public.package.to_string())),
         "a child names its work package: {children:?}"
     );
+}
+
+/// A tenant, its programme and one programme-bound project with a board, lane, card type and
+/// card — enough for every derived section to have a public project to describe.
+async fn programme_fixture() -> (common::TestDb, TenantId, Uuid, Project) {
+    let db = common::TestDb::fresh().await;
+    let tenant_id: Uuid = sqlx::query_scalar(
+        "INSERT INTO tenant (slug, name) VALUES ('delivery-msp', 'Delivery MSP') RETURNING id",
+    )
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("insert the tenant");
+    let tenant = TenantId::from_uuid(tenant_id).expect("non-nil tenant");
+    let programme: Uuid = sqlx::query_scalar(
+        "INSERT INTO programme (tenant_id, name) VALUES ($1, 'MSP programme') RETURNING id",
+    )
+    .bind(tenant_id)
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("insert the programme");
+    let project = project_tree(&db, tenant, Some(programme), "MSP").await;
+    (db, tenant, programme, project)
+}
+
+/// A bare programme-bound project row, for the dependency and tranche sections.
+async fn project_row(db: &common::TestDb, tenant: TenantId, programme: Uuid, key: &str) -> Uuid {
+    sqlx::query_scalar(
+        "INSERT INTO project (tenant_id, key, name, programme_id)
+         VALUES ($1, $2, $3, $4) RETURNING id",
+    )
+    .bind(tenant.as_uuid())
+    .bind(key)
+    .bind(format!("Project {key}"))
+    .bind(programme)
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("insert the project")
+}
+
+/// The reviewer a compliance review and a tranche review must name.
+async fn reviewer(db: &common::TestDb) -> Uuid {
+    sqlx::query_scalar(
+        "INSERT INTO app_user (oidc_subject, email, display_name)
+         VALUES ($1, 'reviewer@delivery.invalid', 'Delivery Reviewer') RETURNING id",
+    )
+    .bind(format!("reviewer-{}", Uuid::now_v7().simple()))
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("insert the reviewer")
+}
+
+/// A benefit with a placeholder baseline stays `unbaselined` even when it carries a stray number
+/// and a transition row exists: the explicit placeholder wins over the number, the section reports
+/// the measurement gap, and the transition's post value is still carried.
+#[tokio::test]
+async fn a_placeholder_baseline_benefit_is_unbaselined_and_carries_its_transition() {
+    let (db, tenant, programme, project) = programme_fixture().await;
+    let benefit: Uuid = sqlx::query_scalar(
+        "INSERT INTO benefit_profile
+             (tenant_id, programme_id, project_id, reference, baseline, target,
+              measurement_method, operational_area)
+         VALUES ($1, $2, $3, 'B-1', $4, $5, 'cycle-time survey', 'Benefits owner')
+         RETURNING id",
+    )
+    .bind(tenant.as_uuid())
+    .bind(programme)
+    .bind(project.project)
+    .bind(serde_json::json!({"placeholder": true, "value": 3.0}))
+    .bind(serde_json::json!("40%"))
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("insert the benefit");
+    sqlx::query(
+        "INSERT INTO benefit_transition (tenant_id, benefit_id, evidence) VALUES ($1, $2, $3)",
+    )
+    .bind(tenant.as_uuid())
+    .bind(benefit)
+    .bind(serde_json::json!({"post_value": 14.0}))
+    .execute(&db.super_pool)
+    .await
+    .expect("insert the transition");
+
+    let data = snapshot(&db, tenant).await;
+    let rows = data.msp["benefit_realisation"]
+        .as_array()
+        .expect("benefit_realisation is an array");
+    let row = rows
+        .iter()
+        .find(|row| row["reference"] == "B-1")
+        .expect("the benefit");
+    assert_eq!(row["state"], "unbaselined", "{row}");
+    assert_eq!(row["baseline"]["placeholder"], true, "{row}");
+    assert!(row["baseline"]["value"].is_null(), "{row}");
+    assert_eq!(row["project"], "MSP");
+    assert_eq!(row["owner_role"], "Benefits owner");
+    assert_eq!(row["transitions"].as_array().expect("transitions").len(), 1);
+    assert_eq!(row["latest_post"], serde_json::json!(14.0));
+    assert!(
+        row["delta"].is_null(),
+        "no measured baseline means no delta: {row}"
+    );
+}
+
+/// The declared graph publishes typed and untyped edges, an unknown target and a cycle; nothing
+/// is invented and nothing is fatal.
+#[tokio::test]
+async fn declared_dependencies_publish_edges_unknown_targets_and_cycles() {
+    let (db, tenant, programme, project_a) = programme_fixture().await;
+    let project_b = project_row(&db, tenant, programme, "B").await;
+    project_row(&db, tenant, programme, "C").await;
+    sqlx::query("UPDATE project SET meta = $1 WHERE id = $2")
+        .bind(serde_json::json!({
+            "depends_on": [
+                "B",
+                {"to": "C", "kind": "blocks"},
+                {"to": "GHOST"},
+                {"to": "B", "kind": "bogus"},
+            ]
+        }))
+        .bind(project_a.project)
+        .execute(&db.super_pool)
+        .await
+        .expect("declare project A's dependencies");
+    sqlx::query("UPDATE project SET meta = $1 WHERE id = $2")
+        .bind(serde_json::json!({"depends_on": ["MSP"]}))
+        .bind(project_b)
+        .execute(&db.super_pool)
+        .await
+        .expect("declare project B's dependency");
+
+    let data = snapshot(&db, tenant).await;
+    let section = &data.msp["dependencies"];
+    let edges = section["edges"].as_array().expect("edges is an array");
+    let triples: Vec<(String, String, Option<String>, bool)> = edges
+        .iter()
+        .map(|edge| {
+            (
+                edge["from"].as_str().expect("from").to_owned(),
+                edge["to"].as_str().expect("to").to_owned(),
+                edge["kind"].as_str().map(str::to_owned),
+                edge["typed"].as_bool().expect("typed"),
+            )
+        })
+        .collect();
+    assert_eq!(
+        triples,
+        vec![
+            ("B".to_owned(), "MSP".to_owned(), None, false),
+            ("MSP".to_owned(), "B".to_owned(), None, false),
+            (
+                "MSP".to_owned(),
+                "B".to_owned(),
+                Some("blocks".to_owned()),
+                true
+            ),
+            (
+                "MSP".to_owned(),
+                "C".to_owned(),
+                Some("blocks".to_owned()),
+                true
+            ),
+            ("MSP".to_owned(), "GHOST".to_owned(), None, false),
+        ],
+        "edges are sorted by (from, to); a string or unknown kind is never typed: {edges:?}"
+    );
+    assert_eq!(section["counts"]["blocks"], 2);
+    assert_eq!(section["counts"]["needs"], 0);
+    assert_eq!(section["counts"]["supersedes"], 0);
+    assert_eq!(section["counts"]["informs"], 0);
+    assert_eq!(
+        section["untyped"], 3,
+        "two string edges after deduplication, plus the unknown-kind object"
+    );
+    assert_eq!(
+        section["unknown_targets"],
+        serde_json::json!([{"from": "MSP", "to": "GHOST"}])
+    );
+    assert_eq!(section["cycles"], serde_json::json!([["B", "MSP"]]));
+}
+
+/// A tranche with a closed project and no review is flagged, not corrected; a reviewed `continue`
+/// tranche is the only authorised kind.
+#[tokio::test]
+async fn a_tranche_with_a_closed_project_and_no_review_is_flagged() {
+    let (db, tenant, programme, project) = programme_fixture().await;
+    let review_by = reviewer(&db).await;
+    let tranche0: Uuid = sqlx::query_scalar(
+        "INSERT INTO programme_tranche (tenant_id, programme_id, number, state)
+         VALUES ($1, $2, 0, 'closed') RETURNING id",
+    )
+    .bind(tenant.as_uuid())
+    .bind(programme)
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("insert tranche 0");
+    sqlx::query(
+        "INSERT INTO programme_tranche (tenant_id, programme_id, number, state)
+         VALUES ($1, $2, 1, 'planned')",
+    )
+    .bind(tenant.as_uuid())
+    .bind(programme)
+    .execute(&db.super_pool)
+    .await
+    .expect("insert tranche 1");
+    sqlx::query(
+        "INSERT INTO programme_tranche_review (tenant_id, tranche_id, decision, evidence, reviewed_by)
+         VALUES ($1, $2, 'continue', '{\"baselines\": {}}'::jsonb, $3)",
+    )
+    .bind(tenant.as_uuid())
+    .bind(tranche0)
+    .bind(review_by)
+    .execute(&db.super_pool)
+    .await
+    .expect("review tranche 0");
+    sqlx::query("UPDATE project SET status = 'closed', meta = $1 WHERE id = $2")
+        .bind(serde_json::json!({"tranche": 1}))
+        .bind(project.project)
+        .execute(&db.super_pool)
+        .await
+        .expect("close the tranche-1 project");
+
+    let data = snapshot(&db, tenant).await;
+    let rows = data.msp["tranche_reconciliation"]
+        .as_array()
+        .expect("tranche_reconciliation is an array");
+    assert_eq!(rows.len(), 2);
+    assert_eq!(rows[0]["number"], serde_json::json!(0), "sorted by number");
+    assert_eq!(rows[1]["number"], serde_json::json!(1));
+    assert_eq!(rows[0]["authorised"], true);
+    assert_eq!(rows[0]["review"]["decision"], "continue");
+    assert!(rows[0]["review"]["decided_at"].is_string());
+    let unreviewed = &rows[1];
+    assert_eq!(unreviewed["declared_state"], "planned");
+    assert!(unreviewed["review"].is_null(), "{unreviewed}");
+    assert_eq!(unreviewed["authorised"], false);
+    assert_eq!(unreviewed["projects"]["total"], 1);
+    assert_eq!(unreviewed["projects"]["closed"], 1);
+    let flags = unreviewed["flags"].as_array().expect("flags");
+    assert!(
+        flags.contains(&serde_json::json!("review_missing")),
+        "{unreviewed}"
+    );
+    assert!(
+        flags.contains(&serde_json::json!("projects_closed_before_authorisation")),
+        "{unreviewed}"
+    );
+}
+
+/// A declared ADM phase reports every phase `a..h`, the contract and compliance row that evidence
+/// one phase, and the next phase that still lacks evidence.
+#[tokio::test]
+async fn a_declared_adm_phase_reports_contract_compliance_and_next_required() {
+    let (db, tenant, _programme, project) = programme_fixture().await;
+    let review_by = reviewer(&db).await;
+    sqlx::query("UPDATE project SET meta = $1 WHERE id = $2")
+        .bind(serde_json::json!({"adm_phase": "b", "plateau": "hld"}))
+        .bind(project.project)
+        .execute(&db.super_pool)
+        .await
+        .expect("declare the ADM phase");
+    let contract: Uuid = sqlx::query_scalar(
+        "INSERT INTO architecture_contract
+             (tenant_id, project_id, kind, phase_code, title, status)
+         VALUES ($1, $2, 'statement_of_architecture_work', 'a', 'SAW', 'live')
+         RETURNING id",
+    )
+    .bind(tenant.as_uuid())
+    .bind(project.project)
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("insert the contract");
+    sqlx::query(
+        "INSERT INTO architecture_artifact
+             (tenant_id, project_id, phase_code, plateau, artifact_kind, title)
+         VALUES ($1, $2, 'a', 'hld', 'catalog', 'Baseline architecture')",
+    )
+    .bind(tenant.as_uuid())
+    .bind(project.project)
+    .execute(&db.super_pool)
+    .await
+    .expect("insert the artefact");
+    sqlx::query(
+        "INSERT INTO architecture_compliance_review
+             (tenant_id, project_id, contract_id, level, findings, evidence, reviewed_by, outcome)
+         VALUES ($1, $2, $3, 'compliant', '[]'::jsonb, '[]'::jsonb, $4, $5)",
+    )
+    .bind(tenant.as_uuid())
+    .bind(project.project)
+    .bind(contract)
+    .bind(review_by)
+    .bind(serde_json::json!({"kind": "change"}))
+    .execute(&db.super_pool)
+    .await
+    .expect("insert the compliance review");
+
+    let data = snapshot(&db, tenant).await;
+    let rows = data.architecture["phase_progress"]
+        .as_array()
+        .expect("phase_progress is an array");
+    let row = rows
+        .iter()
+        .find(|row| row["project"] == "MSP")
+        .expect("the declaring project");
+    assert_eq!(row["declared"]["adm_phase"], "b");
+    assert_eq!(row["declared"]["plateau"], "hld");
+    let phases = row["phases"].as_array().expect("phases");
+    assert_eq!(phases.len(), 8, "a..h; preliminary is not declared");
+    assert_eq!(phases[0]["phase"], "a");
+    assert_eq!(phases[0]["state"], "evidenced");
+    assert_eq!(
+        phases[0]["contract"],
+        serde_json::json!({
+            "id": contract.to_string(),
+            "kind": "statement_of_architecture_work",
+            "status": "live",
+        })
+    );
+    assert_eq!(
+        phases[0]["compliance"]["outcome"],
+        serde_json::json!({"kind": "change"})
+    );
+    assert!(phases[0]["compliance"]["reviewed_at"].is_string());
+    assert_eq!(phases[1]["phase"], "b");
+    assert_eq!(phases[1]["state"], "not-evidenced");
+    assert!(phases[1]["contract"].is_null());
+    assert!(phases[1]["compliance"].is_null());
+    assert_eq!(row["next_required"], "b");
+}
+
+/// A rework card's meta keys are projected onto the card row; absent meta is JSON null, never an
+/// empty string.
+#[tokio::test]
+async fn a_card_publishes_its_rework_keys_and_absent_meta_is_null() {
+    let (db, tenant, _programme, project) = programme_fixture().await;
+    let mut tx = store::begin_scoped(&db.owner, tenant)
+        .await
+        .expect("scoped tx");
+    let rework = store::card::insert_card_tx(
+        &mut tx,
+        tenant,
+        &store::card::NewCard {
+            list_id: project.list,
+            card_type_id: project.card_type,
+            name: "Rework package".to_owned(),
+            description: String::new(),
+            position: Decimal::new(5, 0),
+            parent_card_id: None,
+            due_at: None,
+            assignee_id: None,
+            created_by: None,
+            meta: serde_json::json!({
+                "rework_key": "RW-1",
+                "rule": "rule-x",
+                "severity": "high",
+            }),
+        },
+    )
+    .await
+    .expect("insert the rework card");
+    tx.commit().await.expect("commit the rework card");
+
+    let data = snapshot(&db, tenant).await;
+    let cards = data.work["cards"].as_array().expect("cards");
+    let row = cards
+        .iter()
+        .find(|row| row["id"] == serde_json::json!(rework.id.to_string()))
+        .expect("the rework card");
+    assert_eq!(row["rework_key"], "RW-1");
+    assert_eq!(row["rule"], "rule-x");
+    assert_eq!(row["severity"], "high");
+    let plain = cards
+        .iter()
+        .find(|row| row["id"] == serde_json::json!(project.card.to_string()))
+        .expect("the card with no meta");
+    assert!(plain["rework_key"].is_null(), "{plain}");
+    assert!(plain["rule"].is_null(), "{plain}");
+    assert!(plain["severity"].is_null(), "{plain}");
 }

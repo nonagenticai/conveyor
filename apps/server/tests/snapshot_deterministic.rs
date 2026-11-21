@@ -310,6 +310,7 @@ async fn snapshot_is_byte_identical_and_redacts_secrets_and_pii() {
         outputs_dir: None,
         generated_at: Some("2026-11-12T00:00:00Z".to_owned()),
         issues: issues_path,
+        conformance: None,
         feedback_url: "https://example.test/feedback".to_owned(),
         database_url: None,
         git_sha: Some("0123456789abcdef0123456789abcdef01234567".to_owned()),
@@ -492,6 +493,172 @@ async fn snapshot_is_byte_identical_and_redacts_secrets_and_pii() {
     let _ = std::fs::remove_dir_all(&dir);
 }
 
+/// #528 P4/R2: the rework register rides `--conformance`. With the flag the pack writes
+/// `rework.json`, carries a top-level `snapshot.js.rework`, and names the file in the manifest;
+/// without it the payload is exactly what it was before the section existed.
+#[tokio::test]
+async fn the_rework_register_rides_the_conformance_flag() {
+    let db = common::TestDb::fresh().await;
+    sqlx::query("INSERT INTO tenant (slug, name) VALUES ('rework', 'Rework tenant')")
+        .execute(&db.super_pool)
+        .await
+        .expect("tenant");
+
+    let dir = std::env::temp_dir().join(format!("conveyor-rework-{}", Uuid::now_v7()));
+    std::fs::create_dir_all(&dir).expect("snapshot dir");
+    let issues_path = dir.join("issues.json");
+    std::fs::write(&issues_path, r#"{"issues": []}"#).expect("write issues");
+
+    // The register carries an email and a token-shaped string: the same safety net every other
+    // public section passes must mask them here too.
+    let token = format!("ghp_{}", "B".repeat(30));
+    let register_path = dir.join("conformance.json");
+    std::fs::write(
+        &register_path,
+        serde_json::to_string(&json!({
+            "schema": "conveyor-rework/v1",
+            "generated_at": "2026-11-20T00:00:00Z",
+            "programmes": [{
+                "key": "conveyor",
+                "verdict": "rework",
+                "reason": format!("contact alice@example.com · token {token}"),
+            }],
+        }))
+        .expect("register json"),
+    )
+    .expect("write the register");
+
+    let base = SnapshotArgs {
+        tenant: "rework".to_owned(),
+        out: dir.clone(),
+        outputs_dir: None,
+        generated_at: Some("2026-11-12T00:00:00Z".to_owned()),
+        issues: issues_path,
+        conformance: None,
+        feedback_url: "https://example.test/feedback".to_owned(),
+        database_url: None,
+        git_sha: Some("0123456789abcdef0123456789abcdef01234567".to_owned()),
+    };
+
+    // (c) Without the flag nothing changes: no file, no key, no manifest entry.
+    run_with_pool(&db.runtime, base.clone())
+        .await
+        .expect("snapshot without the register");
+    assert!(
+        !dir.join("rework.json").exists(),
+        "a snapshot without --conformance writes no rework.json"
+    );
+    let plain_js = std::fs::read_to_string(dir.join("snapshot.js")).expect("snapshot.js");
+    assert!(
+        !plain_js.contains("\"rework\""),
+        "a snapshot without --conformance carries no rework key"
+    );
+    let plain_manifest: Value = serde_json::from_str(
+        &std::fs::read_to_string(dir.join("manifest.json")).expect("manifest.json"),
+    )
+    .expect("manifest json");
+    assert!(
+        !plain_manifest["files"]
+            .as_array()
+            .expect("file list")
+            .iter()
+            .any(|file| file["path"] == "rework.json"),
+        "the manifest names no rework.json"
+    );
+
+    // (a) With the flag, a pinned --generated-at is still byte-identical.
+    let with_register = SnapshotArgs {
+        conformance: Some(register_path),
+        ..base
+    };
+    let first = run_with_pool(&db.runtime, with_register.clone())
+        .await
+        .expect("first snapshot with the register");
+    let first_files = files_in(&dir);
+    let second = run_with_pool(&db.runtime, with_register.clone())
+        .await
+        .expect("second snapshot with the register");
+    let second_files = files_in(&dir);
+    assert_eq!(
+        first.manifest_sha256, second.manifest_sha256,
+        "a fixed --generated-at must produce an identical manifest"
+    );
+    assert_eq!(
+        first_files, second_files,
+        "every file must be byte-identical"
+    );
+
+    // (b) rework.json, snapshot.js.rework and a manifest entry with the file's sha256.
+    let rework_bytes = std::fs::read(dir.join("rework.json")).expect("rework.json");
+    let rework: Value = serde_json::from_slice(&rework_bytes).expect("rework json");
+    assert_eq!(
+        rework["schema"], "conveyor-rework/v1",
+        "the register keeps its own schema"
+    );
+    assert_eq!(rework["programmes"][0]["key"], "conveyor");
+    let js = std::fs::read_to_string(dir.join("snapshot.js")).expect("snapshot.js");
+    let document = js
+        .strip_prefix("window.CONVEYOR_SNAPSHOT = ")
+        .and_then(|rest| rest.strip_suffix(";\n"))
+        .expect("the wrapper's shape");
+    let document: Value = serde_json::from_str(document).expect("snapshot json");
+    assert_eq!(
+        document["rework"], rework,
+        "the wrapper carries the same register rows as the file"
+    );
+    let manifest: Value = serde_json::from_str(
+        &std::fs::read_to_string(dir.join("manifest.json")).expect("manifest.json"),
+    )
+    .expect("manifest json");
+    let listed = manifest["files"]
+        .as_array()
+        .expect("file list")
+        .iter()
+        .find(|file| file["path"] == "rework.json")
+        .expect("the manifest names rework.json");
+    assert_eq!(
+        listed["sha256"].as_str().expect("file hash"),
+        sha256_hex(&rework_bytes),
+        "the manifest hash covers the written bytes"
+    );
+    assert_eq!(listed["bytes"], json!(rework_bytes.len()));
+
+    // (d) No secret or email regression: the register passes the same redaction pass.
+    assert!(
+        !js.contains("alice@example.com"),
+        "the register's email is masked"
+    );
+    assert!(!js.contains(&token), "the register's token is redacted");
+    assert!(
+        document["rework"]["programmes"][0]["reason"]
+            .as_str()
+            .is_some_and(
+                |reason| reason.contains("***@redacted") && reason.contains("[redacted-token]")
+            ),
+        "the register's free text is visibly masked: {}",
+        document["rework"]["programmes"][0]["reason"]
+    );
+
+    // A register that is not `conveyor-rework/v1` is refused, naming the expected schema.
+    let bad_path = dir.join("bad-conformance.json");
+    std::fs::write(&bad_path, r#"{"schema": "something-else/v1"}"#).expect("bad register");
+    let error = run_with_pool(
+        &db.runtime,
+        SnapshotArgs {
+            conformance: Some(bad_path),
+            ..with_register
+        },
+    )
+    .await
+    .expect_err("a wrong schema must be refused");
+    assert!(
+        error.to_string().contains("conveyor-rework/v1"),
+        "the refusal names the expected schema: {error}"
+    );
+
+    let _ = std::fs::remove_dir_all(&dir);
+}
+
 /// T0 P5.1: the seeded organisation spine is published, with the design site's keys.
 #[tokio::test]
 async fn organisation_is_populated_for_a_seeded_tenant() {
@@ -517,6 +684,7 @@ async fn organisation_is_populated_for_a_seeded_tenant() {
         outputs_dir: None,
         generated_at: Some("2026-11-13T00:00:00Z".to_owned()),
         issues: issues_path,
+        conformance: None,
         feedback_url: "https://example.test/feedback".to_owned(),
         database_url: None,
         git_sha: Some("0123456789abcdef0123456789abcdef01234567".to_owned()),
@@ -649,6 +817,18 @@ async fn the_live_view_and_the_cli_write_the_same_bytes() {
     let issues_path = dir.join("issues.json");
     std::fs::write(&issues_path, r#"{"issues": []}"#).expect("write issues");
     let issues: Value = serde_json::from_str(r#"{"issues": []}"#).expect("issues json");
+    // The rework register rides both producers: the wrapper's `rework` section is part of the
+    // byte-for-byte parity the live route and the CLI must keep.
+    let rework = json!({
+        "schema": "conveyor-rework/v1",
+        "programmes": [{"key": "conveyor", "verdict": "rework"}],
+    });
+    let rework_path = dir.join("conformance.json");
+    std::fs::write(
+        &rework_path,
+        serde_json::to_string(&rework).expect("register json"),
+    )
+    .expect("write the register");
     let feedback = "https://example.test/feedback";
     let git_sha = "0123456789abcdef0123456789abcdef01234567";
 
@@ -658,6 +838,7 @@ async fn the_live_view_and_the_cli_write_the_same_bytes() {
             tenant,
             tenant_slug: "snap-live",
             issues,
+            rework: Some(rework),
             feedback_url: feedback,
             git_sha,
         },
@@ -673,6 +854,7 @@ async fn the_live_view_and_the_cli_write_the_same_bytes() {
             outputs_dir: Some(dir.join("docs")),
             generated_at: Some(view.generated_at.clone()),
             issues: issues_path,
+            conformance: Some(rework_path),
             feedback_url: feedback.to_owned(),
             database_url: None,
             git_sha: Some(git_sha.to_owned()),
