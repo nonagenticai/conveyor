@@ -104,9 +104,9 @@ async fn snapshot_is_byte_identical_and_redacts_secrets_and_pii() {
     // not selected at all; the title is, so the redaction pass must catch it there.
     let token = format!("ghp_{}", "A".repeat(30));
     let title = format!("contact alice@example.com · token {token}");
-    sqlx::query(
+    let card: Uuid = sqlx::query_scalar(
         "INSERT INTO card (tenant_id, board_id, list_id, card_type_id, name, description, position, assignee_id)
-         VALUES ($1, $2, $3, $4, $5, 'private body that is never selected', 0, $6)",
+         VALUES ($1, $2, $3, $4, $5, 'private body that is never selected', 0, $6) RETURNING id",
     )
     .bind(tenant)
     .bind(board)
@@ -114,9 +114,43 @@ async fn snapshot_is_byte_identical_and_redacts_secrets_and_pii() {
     .bind(card_type)
     .bind(&title)
     .bind(user)
-    .execute(&db.super_pool)
+    .fetch_one(&db.super_pool)
     .await
     .expect("card");
+    // The delivery view (#528): a work package with one child, a run, and a call on a model with
+    // no commercial price. The child's `parent_card_id` must survive, the activity window must be
+    // published, and the unpriced call must be counted — never rendered as free.
+    sqlx::query(
+        "INSERT INTO card (tenant_id, board_id, list_id, card_type_id, name, description, position, parent_card_id)
+         VALUES ($1, $2, $3, $4, 'Snapshot child card', '', 1, $5)",
+    )
+    .bind(tenant)
+    .bind(board)
+    .bind(list)
+    .bind(card_type)
+    .bind(card)
+    .execute(&db.super_pool)
+    .await
+    .expect("child card");
+    let run: Uuid = sqlx::query_scalar(
+        "INSERT INTO run (tenant_id, project_id, card_id) VALUES ($1, $2, $3) RETURNING id",
+    )
+    .bind(tenant)
+    .bind(project)
+    .bind(card)
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("run");
+    sqlx::query(
+        "INSERT INTO inference_call
+            (tenant_id, caller_kind, run_id, model, prompt_tokens, completion_tokens, total_tokens)
+         VALUES ($1, 'agent_run', $2, 'unpriced-model-x', 10, 5, 15)",
+    )
+    .bind(tenant)
+    .bind(run)
+    .execute(&db.super_pool)
+    .await
+    .expect("inference call");
 
     // The secret table stores ciphertext; the snapshot may publish the NAME and must publish
     // neither the ciphertext nor the key id.
@@ -276,6 +310,7 @@ async fn snapshot_is_byte_identical_and_redacts_secrets_and_pii() {
         outputs_dir: None,
         generated_at: Some("2026-11-12T00:00:00Z".to_owned()),
         issues: issues_path,
+        conformance: None,
         feedback_url: "https://example.test/feedback".to_owned(),
         database_url: None,
         git_sha: Some("0123456789abcdef0123456789abcdef01234567".to_owned()),
@@ -311,6 +346,53 @@ async fn snapshot_is_byte_identical_and_redacts_secrets_and_pii() {
         "card bodies are not selected at all"
     );
     assert!(work.contains("Alice"), "the display name stays public");
+
+    // The delivery view's rows (#528). The activity window, the work-package parent link and the
+    // per-project/per-card spend are new public keys; they must survive redaction and stay stable.
+    let work_json: Value = serde_json::from_str(&work).expect("work json");
+    let activity = work_json["project_activity"]
+        .as_array()
+        .expect("project_activity is an array");
+    assert!(
+        activity
+            .iter()
+            .any(|row| row["project_id"] == json!(project.to_string())),
+        "the project's activity window is published: {activity:?}"
+    );
+    assert!(
+        work_json["cards"]
+            .as_array()
+            .expect("cards")
+            .iter()
+            .any(|row| row["parent_card_id"] == json!(card.to_string())),
+        "a child card names its work package"
+    );
+    let measure: Value = serde_json::from_str(
+        &std::fs::read_to_string(dir.join("measure.json")).expect("measure.json"),
+    )
+    .expect("measure json");
+    let by_project = measure["inference"]["by_project"]
+        .as_array()
+        .expect("by_project is an array");
+    let spend = by_project
+        .iter()
+        .find(|row| row["project_id"] == json!(project.to_string()))
+        .expect("the project's spend is published");
+    assert_eq!(spend["calls"], 1);
+    assert_eq!(
+        spend["unpriced_calls"], 1,
+        "a model with no price is counted, never rendered as free"
+    );
+    assert_eq!(spend["priced_calls"], 0);
+    let by_card = measure["inference"]["by_card"]
+        .as_array()
+        .expect("by_card is an array");
+    assert!(
+        by_card
+            .iter()
+            .any(|row| row["card_id"] == json!(card.to_string())),
+        "the card's spend is published: {by_card:?}"
+    );
 
     let msp = std::fs::read_to_string(dir.join("msp.json")).expect("msp.json");
     assert!(msp.contains("BEN-SNAP"), "the benefit profile is public");
@@ -411,6 +493,180 @@ async fn snapshot_is_byte_identical_and_redacts_secrets_and_pii() {
     let _ = std::fs::remove_dir_all(&dir);
 }
 
+/// #528 P4/R2: the rework register rides `--conformance`. With the flag the pack writes
+/// `rework.json`, carries a top-level `snapshot.js.rework`, and names the file in the manifest;
+/// without it the payload is exactly what it was before the section existed.
+#[tokio::test]
+async fn the_rework_register_rides_the_conformance_flag() {
+    let db = common::TestDb::fresh().await;
+    sqlx::query("INSERT INTO tenant (slug, name) VALUES ('rework', 'Rework tenant')")
+        .execute(&db.super_pool)
+        .await
+        .expect("tenant");
+
+    let dir = std::env::temp_dir().join(format!("conveyor-rework-{}", Uuid::now_v7()));
+    std::fs::create_dir_all(&dir).expect("snapshot dir");
+    let issues_path = dir.join("issues.json");
+    std::fs::write(&issues_path, r#"{"issues": []}"#).expect("write issues");
+
+    // The register carries an email and a token-shaped string: the same safety net every other
+    // public section passes must mask them here too.
+    let token = format!("ghp_{}", "B".repeat(30));
+    let register_path = dir.join("conformance.json");
+    std::fs::write(
+        &register_path,
+        serde_json::to_string(&json!({
+            "schema": "conveyor-rework/v1",
+            "generated_at": "2026-11-20T00:00:00Z",
+            "programmes": [{
+                "key": "conveyor",
+                "verdict": "rework",
+                "reason": format!("contact alice@example.com · token {token}"),
+            }],
+        }))
+        .expect("register json"),
+    )
+    .expect("write the register");
+
+    let base = SnapshotArgs {
+        tenant: "rework".to_owned(),
+        out: dir.clone(),
+        outputs_dir: None,
+        generated_at: Some("2026-11-12T00:00:00Z".to_owned()),
+        issues: issues_path,
+        conformance: None,
+        feedback_url: "https://example.test/feedback".to_owned(),
+        database_url: None,
+        git_sha: Some("0123456789abcdef0123456789abcdef01234567".to_owned()),
+    };
+
+    // (c) Without the flag nothing changes: no file, no key, no manifest entry.
+    run_with_pool(&db.runtime, base.clone())
+        .await
+        .expect("snapshot without the register");
+    assert!(
+        !dir.join("rework.json").exists(),
+        "a snapshot without --conformance writes no rework.json"
+    );
+    let plain_js = std::fs::read_to_string(dir.join("snapshot.js")).expect("snapshot.js");
+    // Structural, not a substring: the test tenant's own slug is "rework".
+    let plain_document: Value = serde_json::from_str(
+        plain_js
+            .strip_prefix("window.CONVEYOR_SNAPSHOT = ")
+            .and_then(|rest| rest.strip_suffix(";\n"))
+            .expect("the wrapper's shape"),
+    )
+    .expect("snapshot json");
+    assert!(
+        plain_document.get("rework").is_none(),
+        "a snapshot without --conformance carries no rework key"
+    );
+    let plain_manifest: Value = serde_json::from_str(
+        &std::fs::read_to_string(dir.join("manifest.json")).expect("manifest.json"),
+    )
+    .expect("manifest json");
+    assert!(
+        !plain_manifest["files"]
+            .as_array()
+            .expect("file list")
+            .iter()
+            .any(|file| file["path"] == "rework.json"),
+        "the manifest names no rework.json"
+    );
+
+    // (a) With the flag, a pinned --generated-at is still byte-identical.
+    let with_register = SnapshotArgs {
+        conformance: Some(register_path),
+        ..base
+    };
+    let first = run_with_pool(&db.runtime, with_register.clone())
+        .await
+        .expect("first snapshot with the register");
+    let first_files = files_in(&dir);
+    let second = run_with_pool(&db.runtime, with_register.clone())
+        .await
+        .expect("second snapshot with the register");
+    let second_files = files_in(&dir);
+    assert_eq!(
+        first.manifest_sha256, second.manifest_sha256,
+        "a fixed --generated-at must produce an identical manifest"
+    );
+    assert_eq!(
+        first_files, second_files,
+        "every file must be byte-identical"
+    );
+
+    // (b) rework.json, snapshot.js.rework and a manifest entry with the file's sha256.
+    let rework_bytes = std::fs::read(dir.join("rework.json")).expect("rework.json");
+    let rework: Value = serde_json::from_slice(&rework_bytes).expect("rework json");
+    assert_eq!(
+        rework["schema"], "conveyor-rework/v1",
+        "the register keeps its own schema"
+    );
+    assert_eq!(rework["programmes"][0]["key"], "conveyor");
+    let js = std::fs::read_to_string(dir.join("snapshot.js")).expect("snapshot.js");
+    let document = js
+        .strip_prefix("window.CONVEYOR_SNAPSHOT = ")
+        .and_then(|rest| rest.strip_suffix(";\n"))
+        .expect("the wrapper's shape");
+    let document: Value = serde_json::from_str(document).expect("snapshot json");
+    assert_eq!(
+        document["rework"], rework,
+        "the wrapper carries the same register rows as the file"
+    );
+    let manifest: Value = serde_json::from_str(
+        &std::fs::read_to_string(dir.join("manifest.json")).expect("manifest.json"),
+    )
+    .expect("manifest json");
+    let listed = manifest["files"]
+        .as_array()
+        .expect("file list")
+        .iter()
+        .find(|file| file["path"] == "rework.json")
+        .expect("the manifest names rework.json");
+    assert_eq!(
+        listed["sha256"].as_str().expect("file hash"),
+        sha256_hex(&rework_bytes),
+        "the manifest hash covers the written bytes"
+    );
+    assert_eq!(listed["bytes"], json!(rework_bytes.len()));
+
+    // (d) No secret or email regression: the register passes the same redaction pass.
+    assert!(
+        !js.contains("alice@example.com"),
+        "the register's email is masked"
+    );
+    assert!(!js.contains(&token), "the register's token is redacted");
+    assert!(
+        document["rework"]["programmes"][0]["reason"]
+            .as_str()
+            .is_some_and(
+                |reason| reason.contains("***@redacted") && reason.contains("[redacted-token]")
+            ),
+        "the register's free text is visibly masked: {}",
+        document["rework"]["programmes"][0]["reason"]
+    );
+
+    // A register that is not `conveyor-rework/v1` is refused, naming the expected schema.
+    let bad_path = dir.join("bad-conformance.json");
+    std::fs::write(&bad_path, r#"{"schema": "something-else/v1"}"#).expect("bad register");
+    let error = run_with_pool(
+        &db.runtime,
+        SnapshotArgs {
+            conformance: Some(bad_path),
+            ..with_register
+        },
+    )
+    .await
+    .expect_err("a wrong schema must be refused");
+    assert!(
+        error.to_string().contains("conveyor-rework/v1"),
+        "the refusal names the expected schema: {error}"
+    );
+
+    let _ = std::fs::remove_dir_all(&dir);
+}
+
 /// T0 P5.1: the seeded organisation spine is published, with the design site's keys.
 #[tokio::test]
 async fn organisation_is_populated_for_a_seeded_tenant() {
@@ -436,6 +692,7 @@ async fn organisation_is_populated_for_a_seeded_tenant() {
         outputs_dir: None,
         generated_at: Some("2026-11-13T00:00:00Z".to_owned()),
         issues: issues_path,
+        conformance: None,
         feedback_url: "https://example.test/feedback".to_owned(),
         database_url: None,
         git_sha: Some("0123456789abcdef0123456789abcdef01234567".to_owned()),
@@ -568,6 +825,18 @@ async fn the_live_view_and_the_cli_write_the_same_bytes() {
     let issues_path = dir.join("issues.json");
     std::fs::write(&issues_path, r#"{"issues": []}"#).expect("write issues");
     let issues: Value = serde_json::from_str(r#"{"issues": []}"#).expect("issues json");
+    // The rework register rides both producers: the wrapper's `rework` section is part of the
+    // byte-for-byte parity the live route and the CLI must keep.
+    let rework = json!({
+        "schema": "conveyor-rework/v1",
+        "programmes": [{"key": "conveyor", "verdict": "rework"}],
+    });
+    let rework_path = dir.join("conformance.json");
+    std::fs::write(
+        &rework_path,
+        serde_json::to_string(&rework).expect("register json"),
+    )
+    .expect("write the register");
     let feedback = "https://example.test/feedback";
     let git_sha = "0123456789abcdef0123456789abcdef01234567";
 
@@ -577,6 +846,7 @@ async fn the_live_view_and_the_cli_write_the_same_bytes() {
             tenant,
             tenant_slug: "snap-live",
             issues,
+            rework: Some(rework),
             feedback_url: feedback,
             git_sha,
         },
@@ -592,6 +862,7 @@ async fn the_live_view_and_the_cli_write_the_same_bytes() {
             outputs_dir: Some(dir.join("docs")),
             generated_at: Some(view.generated_at.clone()),
             issues: issues_path,
+            conformance: Some(rework_path),
             feedback_url: feedback.to_owned(),
             database_url: None,
             git_sha: Some(git_sha.to_owned()),

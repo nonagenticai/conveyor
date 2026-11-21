@@ -77,6 +77,46 @@ requests** panel lists every draft whose author asked for publication
 (`documents.list {publish_requested: true}`) and publishes it in place; publication is the same
 `documents.publish` action as the register's, and there is no separate approve/deny action.
 
+**The delivery view** renders the work model at four levels from the same published snapshot.
+**Portfolio** draws a Gantt of every in-flight programme — rolled up from its projects, counting
+the completed ones — plus every standalone change initiative; a programme row opens the
+programme's own Gantt at `#portfolio/<programmeId>`. **Programme** groups its projects by their
+MSP tranche (`project.meta.tranche`) under the tranche rail, the benefit rail (measured vs
+unmeasured baseline, never "realised" without a transition) and the SAFe cadence / TOGAF
+capability line. **Projects** draws the selected project's board as a kanban at
+`#projects/<projectId>`, with the project's own record above it — TOGAF contract and compliance
+review, PMP WBS/register/baseline counts when present, and the declared artefacts. A card with
+children is a work-package tile, and opening any card (`#projects/<projectId>/wp/<cardId>`) shows
+its execution — runs and steps, gate, Definition of Done, spend — followed by its child cards
+across their lanes, archived children included as done. A childless card is still a work package:
+its execution is the whole answer and the page says there are no child cards. A bar is
+**actuals** — first observed card or run activity to completion, or to the snapshot time while in
+flight — and a planned window is a dashed track only when `project.meta.plan_start`/`meta.plan_end`
+are present; a row with no event says *no dated activity* rather than inventing one. Spend comes
+from `measure.inference` (`by_project`, `by_card`): tokens are stored, cost is derived from the
+pinned commercial price, and a row with no priced call renders `—*` with its unpriced count —
+never `$0`. The public boundary is the tenant portfolio: a programme-bound project is public; a
+standalone project is public only when it is `active`/`paused` and carries a board or a card.
+
+**The standards record is generated, not asserted.** The snapshot computes
+`msp.benefit_realisation` (baseline → transition → post measurement), `msp.dependencies` (the
+declared graph, typed only where the declaration is typed), `msp.tranche_reconciliation`
+(declared state vs the authorising review and the projects actually delivering) and
+`architecture.phase_progress` (A–H per project with its contract and compliance review). An
+artefact that needs a decision nobody made is published as absent, never invented. The L1
+scorecard and the L2 rails read those sections plus the `rework` register, whose denominators
+come from `governance/conformance.json`, not from the view.
+
+**The rework loop.** `scripts/audit-programme-conformance.py --rework-out` turns the gap register
+and the checked-in v1 audit (`docs/evidence/v1-conformance-findings.json`) into
+`data/rework.json`: one package per remediation unit, carrying its standard, SPEC clause,
+artefact, severity, evidence and Definition of Done. The publish carries it into `snapshot.js`
+(`conveyor snapshot --conformance`); `scripts/materialise-rework.py` turns an open package into a
+card with `meta.rework_key` on the owning project's board. Materialisation is a separate,
+explicit, dry-run-first command with its own writable URL — the publish transaction stays
+read-only. A card already applied is never duplicated; a package no longer in the register is
+reported cleared, never auto-archived.
+
 **The output standard** is data: `seed/output-standard.json` owns the vocabulary and the
 per-project-class due-now and at-closure sets. `scripts/build-programme-seed.py` writes
 `meta.expected_outputs` / `meta.closure_outputs` into the seed and `data/output-standard.js` for

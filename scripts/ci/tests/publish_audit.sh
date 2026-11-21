@@ -64,16 +64,21 @@ cat > "$tmp/bin/conveyor" <<'SH'
 set -euo pipefail
 out=""
 docs=""
+conf=""
 while [ $# -gt 0 ]; do
   case "$1" in
     --out) out="$2"; shift 2 ;;
     --outputs-dir) docs="$2"; shift 2 ;;
+    --conformance) conf="$2"; shift 2 ;;
     *) shift ;;
   esac
 done
 mkdir -p "$out" "$docs"
 cp "$FIXTURE"/*.json "$out/"
 cp "$FIXTURE_DOCS/outputs.js" "$docs/"
+# The real binary embeds the register the --conformance file names; the stub copies it so the
+# register's publication is exercised end to end.
+[ -z "$conf" ] || cp "$conf" "$out/rework.json"
 SH
 chmod +x "$tmp/bin/conveyor"
 # publish-data.sh stamps the snapshot with the root's HEAD; the temp root is its own repo.
@@ -93,6 +98,10 @@ if [ -e "$tmp/docs/design/data/programme.json" ]; then
   echo "FAIL: strict publish wrote the pack before the audit passed" >&2
   exit 1
 fi
+if [ -e "$tmp/docs/design/data/rework.json" ]; then
+  echo "FAIL: strict publish wrote the rework register before the audit passed" >&2
+  exit 1
+fi
 grep -q 'FAIL new P0' "$tmp/strict.log" || {
   echo "FAIL: the strict failure did not name the new P0" >&2
   cat "$tmp/strict.log" >&2
@@ -108,6 +117,16 @@ test -f "$tmp/docs/design/data/programme.json" || {
 test -f "$tmp/docs/design/data/conformance.json" || {
   echo "FAIL: report-only publish did not copy the conformance register" >&2
   cat "$tmp/report.log" >&2
+  exit 1
+}
+test -f "$tmp/docs/design/data/rework.json" || {
+  echo "FAIL: report-only publish did not carry the rework register" >&2
+  cat "$tmp/report.log" >&2
+  exit 1
+}
+python3 -c 'import json,sys; d=json.load(open(sys.argv[1])); assert d["schema"]=="conveyor-rework/v1", d.get("schema")' \
+  "$tmp/docs/design/data/rework.json" || {
+  echo "FAIL: the published rework register is not conveyor-rework/v1" >&2
   exit 1
 }
 echo "publish_audit: OK"

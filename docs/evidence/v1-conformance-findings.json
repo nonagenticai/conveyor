@@ -1,0 +1,1241 @@
+{
+  "schema": "conveyor-v1-findings/v1",
+  "audited_sha": "6663d9f9672d002a654a60a3467679e698890a1d",
+  "audited_at": "2026-11-21",
+  "method": "Fresh auditors read SPEC_V2 section by section against the tree; every evidence quote is the raw line at the cited path and is re-verified by scripts/verify-findings.py before admission.",
+  "findings": [
+    {
+      "id": "v1-p5-1",
+      "area": "§5.4",
+      "standard": "SPEC",
+      "spec": "§5.4",
+      "severity": "P0",
+      "title": "Gate evidence is caller-opt-in, not required",
+      "problem": "require_evidence defaults false and is supplied per call; no gate/policy declares evidence mandatory, and a no-evidence gate records no override, so the refusal/override/metric rule does not exist.",
+      "evidence": [
+        {
+          "path": "crates/actions/src/pm/mod.rs",
+          "line": 605,
+          "quote": "    pub require_evidence: bool,"
+        }
+      ],
+      "failure_scenario": "pm.route_gate 'deploy' with evidence [] and require_evidence omitted opens an approvable gate; work ships with no artefact or run judged.",
+      "acceptance": "Empty evidence returns 422 gate_evidence_missing; a waiver is accepted only when approval_policy declares it, is stored on the approval, and increments the override metric read by the governance audit.",
+      "owner_project": "PLATFORM"
+    },
+    {
+      "id": "v1-p5-2",
+      "area": "§5.3",
+      "standard": "SPEC",
+      "spec": "§5.3",
+      "severity": "P1",
+      "title": "WBS nodes accepted on a checkbox",
+      "problem": "wbs.update validates status only against the enum, then writes acceptance/evidence verbatim; an empty evidence array is legal.",
+      "evidence": [
+        {
+          "path": "crates/actions/src/spine/mod.rs",
+          "line": 1166,
+          "quote": "        && !matches!(status, \"open\" | \"accepted\" | \"cancelled\")"
+        }
+      ],
+      "failure_scenario": "PATCH status=accepted, evidence=[] marks a work package accepted although no run or artefact meets its criteria.",
+      "acceptance": "Accepting with evidence [] returns 422 wbs_acceptance_evidence_missing unless an approved approval row cites run/artefact evidence for each criterion.",
+      "owner_project": "T1"
+    },
+    {
+      "id": "v1-p5-3",
+      "area": "§5.5",
+      "standard": "SPEC",
+      "spec": "§5.5",
+      "severity": "P1",
+      "title": "Change requests may carry an empty impact block",
+      "problem": "validate_change only rejects null; {} passes and the DB CHECK only tests key presence, so no scope/schedule/cost/risk impact analysis is required.",
+      "evidence": [
+        {
+          "path": "crates/domain/src/spine.rs",
+          "line": 235,
+          "quote": "    let has_impact = impact.is_some_and(|value| !value.is_null());"
+        }
+      ],
+      "failure_scenario": "A change is inserted with meta.impact {}; the approver sees no scope, schedule, cost or risk delta yet can advance the baseline.",
+      "acceptance": "Inserting kind='change' with an impact lacking any of scope/schedule/cost/risk returns 422 change_impact_missing, enforced in the store and the DB constraint.",
+      "owner_project": "T1"
+    },
+    {
+      "id": "v1-p5-4",
+      "area": "§5.3",
+      "standard": "SPEC",
+      "spec": "§5.3",
+      "severity": "P1",
+      "title": "Post-baseline scope edits bypass change control",
+      "problem": "wbs.create/update/delete mutate plan fields with no approved-change check; only baseline advancement goes through changes.request, so plan and frozen baseline diverge silently.",
+      "evidence": [
+        {
+          "path": "crates/store/src/spine.rs",
+          "line": 301,
+          "quote": "            status = coalesce($6, status), acceptance = coalesce($7, acceptance),"
+        }
+      ],
+      "failure_scenario": "After the scope baseline is approved, WBS titles/body/inputs are edited; no change row exists and runs execute against unpinned scope.",
+      "acceptance": "After an approved baseline, WBS mutations return 409 rebaseline_requires_change unless an approved kind='change' references that baseline with an impact block.",
+      "owner_project": "T1"
+    },
+    {
+      "id": "v1-p5-5",
+      "area": "§5.1",
+      "standard": "SPEC",
+      "spec": "§5.1",
+      "severity": "P1",
+      "title": "Work package to card to run chain is unenforced",
+      "problem": "wbs_node.card_id and run.card_id are both nullable, and wbs.create cannot set card_id at all, so work packages and runs exist outside the hierarchy.",
+      "evidence": [
+        {
+          "path": "migrations/0044_plan_spine.sql",
+          "line": 42,
+          "quote": "    card_id          uuid,"
+        },
+        {
+          "path": "migrations/0002_domain.sql",
+          "line": 169,
+          "quote": "    card_id        uuid,"
+        }
+      ],
+      "failure_scenario": "A cardless run or an unlinked work_package node is created and executes steps with no path from project to WBS to work package.",
+      "acceptance": "work_package nodes require card_id and run.card_id is NOT NULL (or the store refuses cardless runs), proven by an insert without the link being refused.",
+      "owner_project": "T1"
+    },
+    {
+      "id": "v1-p5-6",
+      "area": "§5.1",
+      "standard": "SPEC",
+      "spec": "§5.1",
+      "severity": "P2",
+      "title": "Portfolio read model omits in-flight programmes",
+      "problem": "in_flight_tx selects only FROM project by status, although §5.1 defines the portfolio as every project and programme in flight.",
+      "evidence": [
+        {
+          "path": "crates/store/src/spine.rs",
+          "line": 1031,
+          "quote": "    let sql = \"SELECT id, key, name, status, programme_id, version FROM project"
+        }
+      ],
+      "failure_scenario": "A tenant with an active programme and no active projects sees an empty portfolio; programme work is invisible in the delivery view.",
+      "acceptance": "portfolio.in_flight returns projects and programmes in the configured in-flight set (an active programme with zero projects appears) and writes no portfolio row.",
+      "owner_project": "T1"
+    },
+    {
+      "id": "v1-p75-1",
+      "area": "§7.5",
+      "standard": "SPEC",
+      "spec": "§7.5",
+      "severity": "P0",
+      "title": "Budget enforcement is off by default and no run/binding declares a budget",
+      "problem": "No migration gives run or job_binding a token/cost budget, and the router gate defaults to Off; even in enforce mode the gate must allow no_active_budget, so an undeclared budget is never refused.",
+      "evidence": [
+        {
+          "path": "apps/inference-router/src/config.rs",
+          "line": 275,
+          "quote": "            None => GateMode::Off,"
+        },
+        {
+          "path": "apps/inference-router/src/billing.rs",
+          "line": 55,
+          "quote": "    /// `no_active_budget` — must allow; refusing on them turns a billing blip into an outage."
+        }
+      ],
+      "failure_scenario": "An unbudgeted run calls upstream indefinitely; no 429 is ever produced and spend is discovered after the fact.",
+      "acceptance": "A binding without a budget refuses run start (409/422 naming the missing budget); with a declared budget call N+1 returns 429 budget_exceeded before dispatch and the provider-call counter is unchanged.",
+      "owner_project": "T11"
+    },
+    {
+      "id": "v1-p75-2",
+      "area": "§7.5",
+      "standard": "SPEC",
+      "spec": "§7.5",
+      "severity": "P1",
+      "title": "Tool spend is a stored column and is absent from every usage roll-up",
+      "problem": "tool_call.cost is stored (violating read-time derivation), and the usage aggregate reads only inference_call, so tool spend never reaches tenant/job/run totals.",
+      "evidence": [
+        {
+          "path": "migrations/0055_tool_platform.sql",
+          "line": 163,
+          "quote": "    cost           numeric(18, 6) CHECK (cost >= 0),"
+        },
+        {
+          "path": "crates/store/src/inference.rs",
+          "line": 329,
+          "quote": "               FROM inference_call ic"
+        }
+      ],
+      "failure_scenario": "Tenant and job spend exclude tool costs, so reported spend and budget utilisation understate actual consumption.",
+      "acceptance": "The usage report derives tool spend at read time and includes it at tenant and run levels; a priced tool_call appears in both totals in tests.",
+      "owner_project": "T11"
+    },
+    {
+      "id": "v1-p75-3",
+      "area": "§7.5",
+      "standard": "SPEC",
+      "spec": "§7.5",
+      "severity": "P1",
+      "title": "Roll-ups stop at tenant/project/card",
+      "problem": "The UsageGroup set has no department, programme/portfolio, job, run or step dimension; the snapshot measure publishes only by_project/by_card, so Portfolio and Organisation panels have no data source.",
+      "evidence": [
+        {
+          "path": "crates/store/src/inference.rs",
+          "line": 286,
+          "quote": "        UsageGroup::Project => \"coalesce(c.project_id::text, '')\","
+        },
+        {
+          "path": "crates/store/src/snapshot.rs",
+          "line": 895,
+          "quote": "                \"by_project\": usage_by_project,"
+        }
+      ],
+      "failure_scenario": "The UI cannot show department, programme, job or run-level spend; those panels render empty.",
+      "acceptance": "The report returns each required level from the ledgers; a test rolls one call up to the job_binding primary department and its programme.",
+      "owner_project": "T11"
+    },
+    {
+      "id": "v1-p75-4",
+      "area": "§7.5",
+      "standard": "SPEC",
+      "spec": "§7.5",
+      "severity": "P1",
+      "title": "Attribution joins only run; unattributed calls merge into a project bucket",
+      "problem": "Aggregation joins only run for project/card; job_binding, department and programme are never joined, and caller_kind='other' is placed in the run's project rather than reported separately.",
+      "evidence": [
+        {
+          "path": "crates/store/src/inference.rs",
+          "line": 333,
+          "quote": "               LEFT JOIN run r ON r.id = ic.run_id"
+        },
+        {
+          "path": "crates/store/src/inference.rs",
+          "line": 261,
+          "quote": "/// belongs to; a call with no run is the empty bucket, visible rather than dropped."
+        }
+      ],
+      "failure_scenario": "Unattributed calls are silently charged to a project/department, and department breakdowns cannot be produced.",
+      "acceptance": "The report returns an explicit other/unattributed bucket; a caller_kind='other' call is excluded from project totals and counted separately.",
+      "owner_project": "T11"
+    },
+    {
+      "id": "v1-p75-5",
+      "area": "§7.5",
+      "standard": "SPEC",
+      "spec": "§7.5",
+      "severity": "P1",
+      "title": "Reconciliation compares conveyor to itself; billing_service is never read",
+      "problem": "#46 redefines billing.summary as conveyor's own derived ledger, and metrics.reconcile consumes that caller-supplied figure, so no external charging-system roll-up is compared.",
+      "evidence": [
+        {
+          "path": "crates/actions/src/metrics/mod.rs",
+          "line": 850,
+          "quote": "/// V1 read this from a separate Python billing service. #46 (owner, 2026-11-16) ruled billing is"
+        },
+        {
+          "path": "crates/actions/src/metrics/mod.rs",
+          "line": 896,
+          "quote": "    pub billing_total_usd: Option<f64>,"
+        }
+      ],
+      "failure_scenario": "Charges diverge from billing_service, yet reconciliation reports exact because it compares the ledger to itself.",
+      "acceptance": "reconcile reads billing_service's tenant×day×project×actor×app×provider×model roll-up via the declared action; a test where it differs from conveyor opens an incident card.",
+      "owner_project": "T11"
+    },
+    {
+      "id": "v1-p75-6",
+      "area": "§7.5",
+      "standard": "SPEC",
+      "spec": "§7.5",
+      "severity": "P2",
+      "title": "Unpriced calls become zero in the billing/reconciliation figure",
+      "problem": "BillingSummaryOut carries no unpriced count; unpriced calls contribute zero to total_usd, the figure reconcile compares, so a false exact match hides unmeasured spend. No Portfolio/Organisation panel consumes usage data.",
+      "evidence": [
+        {
+          "path": "crates/actions/src/metrics/mod.rs",
+          "line": 841,
+          "quote": "    pub total_usd: f64,"
+        },
+        {
+          "path": "crates/store/src/inference.rs",
+          "line": 265,
+          "quote": "/// `unpriced_calls` — \"no price\" must not render as \"free\"."
+        }
+      ],
+      "failure_scenario": "An unpriced model renders as free in tenant and billing totals, and reconciliation passes while spend is hidden.",
+      "acceptance": "billing.summary and reconcile expose unpriced_calls and refuse an exact verdict when it is greater than zero; a snapshot test asserts the count is present.",
+      "owner_project": "T11"
+    },
+    {
+      "id": "v1-p81-1",
+      "area": "§8.1",
+      "standard": "TOGAF",
+      "spec": "§8.1",
+      "severity": "P0",
+      "title": "Phase gates are vacuous without a hand-authored profile, and the caller may choose a draft profile",
+      "problem": "advance_phase_tx reads only adm_profile.artifact_requirements and adm_profile.contract_kinds; the standard's artifact_type.mandatory rows are never consulted. A phase key absent from the profile yields an empty set, which is treated as satisfied, and a contract kind is required only when the profile maps the phase to a string other than none. phases_advance accepts a client-supplied profile_key, and get_profile_tx resolves a named profile regardless of its status.",
+      "evidence": [
+        {
+          "path": "crates/store/src/architecture.rs",
+          "line": 1728,
+          "quote": "    let mut satisfied = sets.is_empty();"
+        },
+        {
+          "path": "crates/store/src/architecture.rs",
+          "line": 1725,
+          "quote": "        _ => Vec::new(),"
+        },
+        {
+          "path": "crates/store/src/architecture.rs",
+          "line": 1018,
+          "quote": "            AND (($2::text IS NOT NULL AND key = $2) OR $2::text IS NULL)"
+        },
+        {
+          "path": "crates/actions/src/architecture.rs",
+          "line": 1213,
+          "quote": "    pub profile_key: Option<String>,"
+        }
+      ],
+      "failure_scenario": "An actor creates profile x with artifact_requirements {} and contract_kinds {}, then calls architecture.phases_advance with profile_key x; every phase from preliminary through h closes with no artefacts, no SAW and no contract.",
+      "acceptance": "phases_advance returns 409 missing_mandatory when the phase set is absent/empty/malformed; profile keys and values must validate against artifact_type keys and the four contract kinds; a profile_key that is not board-adopted is refused; add a test closing phase A with an empty profile and expect 409.",
+      "owner_project": "T9"
+    },
+    {
+      "id": "v1-p81-2",
+      "area": "§8.1",
+      "standard": "TOGAF",
+      "spec": "§8.1",
+      "severity": "P0",
+      "title": "Phase G is not a gate: no contract/review required at design or phase advance, and programme-track projects skip it",
+      "problem": "advance_phase_tx special-cases only phase h; closing g (or any phase) never reads architecture_compliance_review, live_delivery_contract_tx or an active waiver. The only enforcement is the project-close check, which is skipped entirely for track == programme and runs after work is done, not at the design gate.",
+      "evidence": [
+        {
+          "path": "crates/store/src/architecture.rs",
+          "line": 1802,
+          "quote": "    if requested == \"h\" {"
+        },
+        {
+          "path": "crates/actions/src/programme.rs",
+          "line": 578,
+          "quote": "    if track != \"programme\" {"
+        },
+        {
+          "path": "crates/actions/src/programme.rs",
+          "line": 595,
+          "quote": "        let review = architecture_store::review_for_contract_tx(&mut *tx, tenant, contract.id)"
+        }
+      ],
+      "failure_scenario": "A delivery project of track programme (or any delivery before closure) advances phase g and passes design with neither a live delivery contract nor a compliance review; a non_conformant review without waiver is likewise never blocking until close.",
+      "acceptance": "phases_advance(g) returns 409 unless a review exists on a live delivery contract for the project and, when level is non_conformant, an active unexpired waiver exists; the design gate action performs the same checks without the track exemption; tests cover programme track.",
+      "owner_project": "T9"
+    },
+    {
+      "id": "v1-p81-3",
+      "area": "§8.1",
+      "standard": "TOGAF",
+      "spec": "§8.1",
+      "severity": "P0",
+      "title": "Board-adopted ADM profile can be rewritten after adoption and adoption cites an unvalidated decision",
+      "problem": "profile_tailor upserts on (tenant,key) and updates artifact_requirements/contract_kinds on a row whose status is adopted, with no re-adoption; the WHERE clause only excludes retired. adopt_profile_tx writes any board_decision_id with no check that it is an approved architecture_board decision about this profile, and the column has no FK.",
+      "evidence": [
+        {
+          "path": "crates/store/src/architecture.rs",
+          "line": 1044,
+          "quote": "         ON CONFLICT (tenant_id, key) DO UPDATE SET"
+        },
+        {
+          "path": "crates/store/src/architecture.rs",
+          "line": 1047,
+          "quote": "            artifact_requirements = EXCLUDED.artifact_requirements,"
+        },
+        {
+          "path": "crates/store/src/architecture.rs",
+          "line": 1051,
+          "quote": "          WHERE adm_profile.status <> 'retired'"
+        },
+        {
+          "path": "crates/store/src/architecture.rs",
+          "line": 1079,
+          "quote": "            SET status = 'adopted', adopted_at = now(), board_decision_id = $4,"
+        },
+        {
+          "path": "migrations/0054_architecture.sql",
+          "line": 59,
+          "quote": "    board_decision_id     uuid,"
+        }
+      ],
+      "failure_scenario": "After adoption, an actor tailors the same profile to remove phase A artefacts and contract kinds, weakening every subsequent gate without any board decision; a draft profile is adopted citing a random uuid.",
+      "acceptance": "Tailoring an adopted profile either returns 409 or resets status to draft requiring re-adoption; adopt_profile_tx requires an approved architecture_board approval whose meta identifies this profile; FK or EXISTS check added, with tests.",
+      "owner_project": "T9"
+    },
+    {
+      "id": "v1-p81-4",
+      "area": "§8.1",
+      "standard": "TOGAF",
+      "spec": "§8.1",
+      "severity": "P1",
+      "title": "A draft Architecture Board can govern, and can be approved with an empty charter",
+      "problem": "decide_board_tx verifies only that the body row exists, then inserts an architecture_board approval for any subject, including a delivery contract, without requiring the body's status to be active. Only a board-subject approval activates a draft body. Contract approval checks the approval row's gate/status but not the body behind it. Charter, commissioning authority and members default to empty.",
+      "evidence": [
+        {
+          "path": "crates/store/src/architecture.rs",
+          "line": 1303,
+          "quote": "    get_body_tx(&mut *conn, tenant, body_id)"
+        },
+        {
+          "path": "crates/store/src/architecture.rs",
+          "line": 1345,
+          "quote": "    if subject_kind == Some(\"board\") && decision == \"approved\" {"
+        },
+        {
+          "path": "migrations/0054_architecture.sql",
+          "line": 82,
+          "quote": "    charter                 text NOT NULL DEFAULT '',"
+        }
+      ],
+      "failure_scenario": "A draft, never-approved governance_body issues an approved architecture_board decision for a delivery contract; contracts_approve accepts it and the contract goes live under a board with empty charter and no members.",
+      "acceptance": "decide_board_tx returns 409 unless body status is active, except a subject_kind board self-approval; board approval refuses empty charter/commissioning_authority/members; contract approval resolves body_id from approval meta and requires active status; tests added.",
+      "owner_project": "T9"
+    },
+    {
+      "id": "v1-p81-5",
+      "area": "§8.1",
+      "standard": "TOGAF",
+      "spec": "§8.1",
+      "severity": "P1",
+      "title": "Untyped, unprojected artefacts and links with no tenant/project consistency",
+      "problem": "artifacts_create accepts project_id and artifact_type_id as null, so artefacts exist outside the standard and outside any project; the phase gate joins artifact_type and can never count them. link_artifacts_tx inserts from/to ids with only existence FKs, no join proving both artefacts share a tenant or project.",
+      "evidence": [
+        {
+          "path": "crates/actions/src/architecture.rs",
+          "line": 254,
+          "quote": "    pub project_id: Option<Uuid>,"
+        },
+        {
+          "path": "crates/actions/src/architecture.rs",
+          "line": 257,
+          "quote": "    pub artifact_type_id: Option<Uuid>,"
+        },
+        {
+          "path": "migrations/0054_architecture.sql",
+          "line": 147,
+          "quote": "    project_id        uuid,"
+        },
+        {
+          "path": "migrations/0054_architecture.sql",
+          "line": 233,
+          "quote": "    CONSTRAINT architecture_artifact_link_from_fk FOREIGN KEY (from_artifact_id) REFERENCES architecture_artifact (id) ON DELETE CASCADE,"
+        }
+      ],
+      "failure_scenario": "A client creates an artefact with null type and project (invisible to every gate), then links two artefacts from different projects or tenants; the repository reports a trace edge that crosses governance boundaries.",
+      "acceptance": "artifacts_create requires non-null project_id and artifact_type_id (422 otherwise); link_artifacts_tx refuses when from/to differ in tenant or project, implemented as a JOIN in the INSERT/SELECT and covered by cross-tenant and cross-project tests.",
+      "owner_project": "T9"
+    },
+    {
+      "id": "v1-p81-6",
+      "area": "§8.1",
+      "standard": "TOGAF",
+      "spec": "§8.1",
+      "severity": "P2",
+      "title": "Phase H enforces existence, not exactly one typed outcome",
+      "problem": "The H gate asks whether any compliance review in the project has a non-null outcome. Uniqueness is per (project, contract), so a project with two delivery contracts can record two typed outcomes, and an outcome attached to a phase-G review satisfies H.",
+      "evidence": [
+        {
+          "path": "crates/store/src/architecture.rs",
+          "line": 1806,
+          "quote": "                 WHERE tenant_id = $1 AND project_id = $2 AND outcome IS NOT NULL"
+        },
+        {
+          "path": "crates/store/src/architecture.rs",
+          "line": 1921,
+          "quote": "         ON CONFLICT (tenant_id, project_id, contract_id) DO NOTHING"
+        },
+        {
+          "path": "migrations/0054_architecture.sql",
+          "line": 270,
+          "quote": "    CONSTRAINT architecture_compliance_review_one UNIQUE (tenant_id, project_id, contract_id)"
+        }
+      ],
+      "failure_scenario": "Two contracts each record a change outcome, or a G review carries an outcome; phase h advances with two typed outcomes, so the change/kata decision is ambiguous.",
+      "acceptance": "H advance returns 409 unless exactly one review row with an outcome exists for the project and that review belongs to a live delivery contract; a second outcome row is refused by constraint; tests cover zero, two and G-attached outcomes.",
+      "owner_project": "T9"
+    },
+    {
+      "id": "v1-p83-1",
+      "area": "§8.3",
+      "standard": "MSP",
+      "spec": "§8.3",
+      "severity": "P1",
+      "title": "Tranche authorisation is asserted by the seed, not earned by a review",
+      "problem": "The seed inserts tranches with a state but no authorisation_review_id (tranche 1 is seeded authorised), and the start gate accepts authorised/in_review/closed without ever checking a review exists. The review evidence check accepts any non-null, non-empty-array value for three free-text keys, so baselines, benefit status and risk register need not reference rows.",
+      "evidence": [
+        {
+          "path": "crates/store/src/seed_programme.rs",
+          "line": 350,
+          "quote": "                (tenant_id, programme_id, number, state, entry_criteria, exit_criteria, review_at)"
+        },
+        {
+          "path": "crates/store/src/spine.rs",
+          "line": 3194,
+          "quote": "            if matches!(state.as_str(), \"authorised\" | \"in_review\" | \"closed\") =>"
+        },
+        {
+          "path": "crates/domain/src/spine.rs",
+          "line": 311,
+          "quote": "                .is_some_and(|value| !value.is_null() && value != &Value::Array(Vec::new()))"
+        }
+      ],
+      "failure_scenario": "A fresh tenant seeds tranche 1 as authorised with no programme_tranche_review; every tranche-1 project passes assert_project_tranche_authorised_tx and starts. A reviewer can submit evidence {\"baselines\":\"none\",\"benefit_status\":\"none\",\"risk_register\":\"none\"} and the continue/pause/stop gate records it.",
+      "acceptance": "A start gate refuses any tranche whose authorisation_review_id is NULL; evidence must cite existing baseline, benefit-status and risk-register row ids; seeded authorised/closed tranches carry a review row or are refused.",
+      "owner_project": "T10"
+    },
+    {
+      "id": "v1-p83-2",
+      "area": "§8.3",
+      "standard": "MSP",
+      "spec": "§8.3",
+      "severity": "P1",
+      "title": "Benefit measurement is presence-only and realized needs only two timestamps",
+      "problem": "Completeness checks baseline/target for non-null only, so {} or the literal \"not measured\" passes; the seeded B1-B6 baselines are exactly that text. realized is allowed when the transition has baseline_measured_at and post_measured_at, with no post measurement value or evidence required.",
+      "evidence": [
+        {
+          "path": "crates/domain/src/spine.rs",
+          "line": 245,
+          "quote": "    if profile.baseline.is_none() {"
+        },
+        {
+          "path": "crates/store/src/spine.rs",
+          "line": 2001,
+          "quote": "            .is_some_and(|t| t.baseline_measured_at.is_some() && t.post_measured_at.is_some());"
+        },
+        {
+          "path": "seed/programme-definition.json",
+          "line": 13,
+          "quote": "      \"baseline\": \"not measured - no instrument exists (recorded as a kata on the kata project)\","
+        }
+      ],
+      "failure_scenario": "benefits.transition_upsert accepts baseline_measured_at and post_measured_at with evidence [], then benefits.update sets status realized. No post-transition measurement exists, yet the benefit claims improvement.",
+      "acceptance": "Completeness rejects empty/whitespace/non-measurement baselines and targets; realized requires a transition with baseline and post measurement values plus evidence, not timestamps alone.",
+      "owner_project": "T10"
+    },
+    {
+      "id": "v1-p83-3",
+      "area": "§8.3",
+      "standard": "MSP",
+      "spec": "§8.3",
+      "severity": "P1",
+      "title": "BCM and benefit ownership are free text, not job_keys",
+      "problem": "No SRO, BCM, sponsoring-group or board job_key is seeded. The seed writes owner_role into operational_area and omits owner_job_id and benefit_owner_job_id, bypassing insert_benefit_tx. All six seeded benefits therefore have no job owner; benefits.update then refuses them as benefit_owner incomplete.",
+      "evidence": [
+        {
+          "path": "crates/store/src/seed_programme.rs",
+          "line": 291,
+          "quote": "                 target, baseline, measurement_method, operational_area, status)"
+        },
+        {
+          "path": "crates/store/src/seed_programme.rs",
+          "line": 306,
+          "quote": "        .bind(&benefit.owner_role)"
+        },
+        {
+          "path": "seed/programme-definition.json",
+          "line": 15,
+          "quote": "      \"owner_role\": \"BCM\","
+        }
+      ],
+      "failure_scenario": "The programme's benefits are owned by the string \"BCM\"; any job or no job can own a benefit through the action path, and the seeded rows cannot be edited because benefit_owner_job_id is NULL.",
+      "acceptance": "Roles are seeded as job_keys; benefit_owner_job_id must resolve to the BCM job; the seed uses insert_benefit_tx or supplies a real job id.",
+      "owner_project": "T10"
+    },
+    {
+      "id": "v1-p83-4",
+      "area": "§8.3",
+      "standard": "MSP",
+      "spec": "§8.3",
+      "severity": "P1",
+      "title": "Programme baselines can be taken and approved but no gate requires them",
+      "problem": "programme_tranche.baseline_ref is nullable and update_tranche_tx only checks that a cited baseline exists, never that it is approved or which of management/governance/boundary it is. Tranche review evidence mentions baselines as free text, so an authorised tranche can cite nothing or an unapproved row.",
+      "evidence": [
+        {
+          "path": "migrations/0044_plan_spine.sql",
+          "line": 242,
+          "quote": "    baseline_ref   uuid,"
+        },
+        {
+          "path": "crates/store/src/spine.rs",
+          "line": 1461,
+          "quote": "            \"SELECT EXISTS (SELECT 1 FROM programme_baseline WHERE tenant_id = $1 AND id = $2)\","
+        }
+      ],
+      "failure_scenario": "A tranche with baseline_ref NULL is reviewed continue and authorises the next tranche; alternatively it cites an unapproved management baseline. The management/governance/boundary trio is never recorded against the work it governs.",
+      "acceptance": "A tranche cannot be authorised without cited baselines of the required kinds, each approved_by set; review evidence resolves to those ids.",
+      "owner_project": "T10"
+    },
+    {
+      "id": "v1-p83-5",
+      "area": "§8.3",
+      "standard": "MSP",
+      "spec": "§8.3",
+      "severity": "P1",
+      "title": "Closure bypasses the closure review and the realisation plan",
+      "problem": "A standalone project with no closure gate returns Ok, so with no declared outputs it closes with no closure asset or review. Programme closure accepts any benefits_realization_plan asset, approved or not, and checks only a free-text meta post_closure_owner, not a measurement plan.",
+      "evidence": [
+        {
+          "path": "crates/actions/src/programme.rs",
+          "line": 416,
+          "quote": "    if project.programme_id.is_none() && gate.is_none() {"
+        },
+        {
+          "path": "crates/store/src/spine.rs",
+          "line": 3353,
+          "quote": "            AND a.kind = 'benefits_realization_plan'"
+        },
+        {
+          "path": "crates/store/src/spine.rs",
+          "line": 3363,
+          "quote": "    if owner.as_deref().is_none_or(|value| value.trim().is_empty()) {"
+        }
+      ],
+      "failure_scenario": "A project with no outputs closes with neither approval nor closure record; the programme closes on a draft plan whose only post-closure content is the owner string.",
+      "acceptance": "Every close requires an approved closure asset and gate; programme close requires an approved, published realisation plan naming measured post-closure ownership (a job), not free text.",
+      "owner_project": "T10"
+    },
+    {
+      "id": "v1-p83-6",
+      "area": "§8.4",
+      "standard": "PMP",
+      "spec": "§8.4",
+      "severity": "P2",
+      "title": "PMP enforcement is partial: closure requires only the scope baseline",
+      "problem": "Closure reads the approved scope baseline only. Schedule and cost baselines are never required, no WBS node is required for execution or closure, and the risk/issue/assumption/dependency registers need not be non-empty. Those artefacts exist as tables and actions but are not gated.",
+      "evidence": [
+        {
+          "path": "crates/actions/src/programme.rs",
+          "line": 559,
+          "quote": "    let baseline = spine_store::latest_approved_baseline_tx(&mut *tx, tenant, project_id, \"scope\")"
+        }
+      ],
+      "failure_scenario": "A programme project closes with an empty WBS, no schedule/cost baseline and empty registers, provided its charter and scope baseline exist.",
+      "acceptance": "Closure refuses unless approved scope, schedule and cost baselines exist, at least one accepted WBS deliverable exists, and the register kinds required by the project's standard are populated.",
+      "owner_project": "T10"
+    },
+    {
+      "id": "v1-p6-1",
+      "area": "§6.2",
+      "standard": "SAFe",
+      "spec": "§6.2",
+      "severity": "P0",
+      "title": "Coach remedies are recorded, never applied",
+      "problem": "coach.remedy validates the closed set, inserts a coach_remedy row, marks the interruption remedied and returns. No consumer reads coach_remedy to retry, move, repull or block anything; the charter's 'apply a bounded remedy' step is a database write only, and the policy retry cap is moot because nothing is ever retried.",
+      "evidence": [
+        {
+          "path": "crates/actions/src/coach.rs",
+          "line": 738,
+          "quote": "    store::coach::mark_remedied_tx(&mut *tx, ctx.tenant, interruption.id)"
+        }
+      ],
+      "failure_scenario": "A transient failure is triaged 'retry'; the card sits in the waiting lane, the failed run never reruns, yet the interruption reads 'remedied' and the board shows the block as handled.",
+      "acceptance": "coach.remedy dispatches the derived remedy through real actions (process_runs.start for retry, cards.move, repull trigger, block) and stores the resulting run/effect id; a test asserts the run or card actually changed.",
+      "owner_project": "T4"
+    },
+    {
+      "id": "v1-p6-2",
+      "area": "§6.4/§9.4",
+      "standard": "SAFe",
+      "spec": "§6.4",
+      "severity": "P1",
+      "title": "Systemic finding terminates at a process-run id; no development project, measurement or adoption gate",
+      "problem": "The systemic path's whole effect is starting process key kata.open and storing its run id as kata_candidate_id. There is no kata record naming an instrument and threshold, no tenant-kata scoping, no kata-candidate trigger that opens a development project or config change, and no measurement or mandatory adoption approval anywhere in the loop.",
+      "evidence": [
+        {
+          "path": "crates/actions/src/ops/incidents.rs",
+          "line": 790,
+          "quote": "        kata_candidate_id = Some(started.value.id);"
+        },
+        {
+          "path": "crates/actions/src/coach.rs",
+          "line": 780,
+          "quote": "                process_key: Some(\"kata.open\".to_owned()),"
+        }
+      ],
+      "failure_scenario": "A postmortem or systemic triage marks the finding 'systemic'; a kata run appears, nothing else. The candidate change is never built, measured on held-out data, or gated for adoption, so production never changes.",
+      "acceptance": "A systemic finding opens a kata with named instrument and success threshold under the kata tenant; a kata candidate opens a development project or config-change path; measurement and a dual-control adoption approval block production until granted; tests exercise the full chain.",
+      "owner_project": "T4"
+    },
+    {
+      "id": "v1-p6-3",
+      "area": "§7.5",
+      "standard": "SAFe",
+      "spec": "§7.5",
+      "severity": "P1",
+      "title": "Rework rate is not computed anywhere",
+      "problem": "The quality family requires rework rate from run/approval/eval rows. metrics.flow and evidence_tx expose only approvals, run totals, benefits and flow figures; FlowOut has no rework or first-pass-yield field, and rework is not even listed as unavailable. No rework computation exists in crates or apps.",
+      "evidence": [
+        {
+          "path": "crates/actions/src/metrics/mod.rs",
+          "line": 306,
+          "quote": "    evidence.insert(\"runs.failed\".to_owned(), runs.failed as f64);"
+        }
+      ],
+      "failure_scenario": "An operator asking Measure for rework rate cannot get the figure at all, so first-pass yield and rework improvement claims are unverifiable.",
+      "acceptance": "A read-time rework-rate derivation over run/approval rows is exposed by the metrics family (or declared unavailable with a real reason); unit/integration test asserts the arithmetic.",
+      "owner_project": "T11"
+    },
+    {
+      "id": "v1-p6-4",
+      "area": "§6.2",
+      "standard": "SAFe",
+      "spec": "§6.2",
+      "severity": "P1",
+      "title": "Interruptions are silently dropped: per-card cap and live-run skip",
+      "problem": "The cap counts every interruption on a card regardless of signature and refuses the fourth failed run, which then gets no coach card and no escalation. err.card also suppresses coaching whenever any live root run exists on the card. §6.2 only permits folding/refusing a repeat of the same signature inside its window.",
+      "evidence": [
+        {
+          "path": "crates/actions/src/coach.rs",
+          "line": 366,
+          "quote": "    if prior >= crate::board::pull::COACH_CHAIN_MAX {"
+        },
+        {
+          "path": "crates/actions/src/board/pull.rs",
+          "line": 358,
+          "quote": "        coach_skipped: live.is_some() || coach_refusal.is_some(),"
+        }
+      ],
+      "failure_scenario": "A card fails four times with four distinct defects; the fourth failure is logged and commented but never triaged, so a real interruption has no card and no owner.",
+      "acceptance": "Every failed-run interruption either creates exactly one coach card or escalates/folds under the (card_id, signature) rule; a distinct signature is never suppressed by a card-level count or an unrelated live run.",
+      "owner_project": "T4"
+    },
+    {
+      "id": "v1-p6-5",
+      "area": "§6.2",
+      "standard": "SAFe",
+      "spec": "§6.2",
+      "severity": "P1",
+      "title": "Coach is wired only to failed runs",
+      "problem": "coach.interrupt has one caller: err.card on a failed run. WIP breaches, stale leases, gate timeouts and board events, all named charter inputs, have no producer that opens an interruption or coach card, so flow protection is reactive to crashes only.",
+      "evidence": [
+        {
+          "path": "crates/actions/src/board/pull.rs",
+          "line": 423,
+          "quote": "            \"coach.interrupt\","
+        }
+      ],
+      "failure_scenario": "A board exceeds its WIP limit or a lease goes stale for days; no interruption, triage or remedy exists, and the Measure views show the block only after a downstream failure.",
+      "acceptance": "Each §6.2 input kind (WIP breach, stale lease, gate timeout, board event) invokes coach.interrupt through a tested producer carrying its own signature.",
+      "owner_project": "T4"
+    },
+    {
+      "id": "v1-p6-6",
+      "area": "§6.2",
+      "standard": "SAFe",
+      "spec": "§6.2",
+      "severity": "P2",
+      "title": "Orphan coach cards can be created by the public create path",
+      "problem": "cards.create accepts any catalogue card type, including coach, and validates neither an interruption row nor the meta.interrupted_card_id it is handed. Only coach.interrupt is supposed to mint coach cards; a direct caller can create one with no interruption backing it.",
+      "evidence": [
+        {
+          "path": "crates/actions/src/board/cards.rs",
+          "line": 104,
+          "quote": "        store::board::get_card_type_by_code_tx(&mut *tx, ctx.tenant, &input.card_type_code)"
+        }
+      ],
+      "failure_scenario": "A caller with cards:write creates a coach card naming an arbitrary or nonexistent interrupted_card_id; the board shows a coach card with no triage, remedy or escalation and no row to audit.",
+      "acceptance": "Card type coach is refused on the public create path, or coach cards must be created atomically with an interruption referencing them; a test proves an orphan is impossible.",
+      "owner_project": "T4"
+    },
+    {
+      "id": "v1-p82-1",
+      "area": "§8.2",
+      "standard": "SAFe",
+      "spec": "§8.2",
+      "severity": "P0",
+      "title": "PI plan auto-materialises with no human approval",
+      "problem": "materialise_pi_tx creates cards and sets the cadence to materialised in one transaction; no approver, approval row or approval_target gates materialisation, and the scheduler calls it unattended.",
+      "evidence": [
+        {
+          "path": "crates/store/src/spine.rs",
+          "line": 2886,
+          "quote": "            SET state = 'materialised', version = version + 1, updated_at = now(),"
+        }
+      ],
+      "failure_scenario": "An unattended tick commits an unapproved plan, with unvalidated WSJF inputs, as materialised work.",
+      "acceptance": "Materialisation stops at awaiting_approval; a named human approval is required before cards count as planned and the tick cannot bypass it.",
+      "owner_project": "T10"
+    },
+    {
+      "id": "v1-p82-2",
+      "area": "§8.2",
+      "standard": "SAFe",
+      "spec": "§8.2",
+      "severity": "P1",
+      "title": "programme_cadence state machine unenforced",
+      "problem": "state is an unconstrained text column and cadences.update writes input.state verbatim; no CHECK, transition table or guard refuses illegal jumps.",
+      "evidence": [
+        {
+          "path": "crates/actions/src/spine/mod.rs",
+          "line": 2949,
+          "quote": "            state: input.state,"
+        }
+      ],
+      "failure_scenario": "A caller moves planned directly to closed, or persists an arbitrary string, destroying cadence history.",
+      "acceptance": "The five states are CHECKed and disallowed transitions are refused with 409 and covered by tests.",
+      "owner_project": "T10"
+    },
+    {
+      "id": "v1-p82-3",
+      "area": "§8.2",
+      "standard": "SAFe",
+      "spec": "§8.2",
+      "severity": "P1",
+      "title": "Programme/ART has no shared_config and no computed portfolio view",
+      "problem": "programme is a flat row (name/status/owner); grep finds no shared_config in crates, apps or migrations, and no CREATE VIEW exists though §8.2 requires shared, locked ART config.",
+      "evidence": [
+        {
+          "path": "migrations/0002_domain.sql",
+          "line": 18,
+          "quote": "CREATE TABLE programme ("
+        }
+      ],
+      "failure_scenario": "Every project re-declares cadence/ART config; nothing inherits or locks it, so programmes drift.",
+      "acceptance": "programme.shared_config exists with inheritance/lock semantics, resolved on read, and tests prove a locked value cannot be overridden per project.",
+      "owner_project": "T10"
+    },
+    {
+      "id": "v1-p82-4",
+      "area": "§8.2",
+      "standard": "SAFe",
+      "spec": "§8.2",
+      "severity": "P1",
+      "title": "Backlog refinement is a dead cadence kind",
+      "problem": "kind='refinement' is accepted at creation, but the only scheduled pass processes pi, demo and retro; no refinement job re-scores WSJF or flags stale items.",
+      "evidence": [
+        {
+          "path": "apps/server/src/cadence.rs",
+          "line": 52,
+          "quote": "              WHERE tenant_id = $1 AND kind IN ('demo', 'retro') AND state = 'planned'"
+        }
+      ],
+      "failure_scenario": "Refinement cadences sit planned forever and stale backlog inputs are never flagged.",
+      "acceptance": "The tick handles refinement, revalidates/re-scores the four inputs and flags stale backlog rows with evidence.",
+      "owner_project": "T10"
+    },
+    {
+      "id": "v1-p82-5",
+      "area": "§8.2",
+      "standard": "SAFe",
+      "spec": "§8.2",
+      "severity": "P2",
+      "title": "PI backlog is one project's WBS, not the programme's standing backlog",
+      "problem": "The backlog query pins project_id from the board named in meta.board_id, so a programme PI drafts from one project rather than the ART's standing backlog.",
+      "evidence": [
+        {
+          "path": "crates/store/src/spine.rs",
+          "line": 2820,
+          "quote": "          WHERE tenant_id = $1 AND project_id = $2 AND kind = 'deliverable'"
+        }
+      ],
+      "failure_scenario": "A two-project programme plans only the board's project; the other project's deliverables never enter the PI.",
+      "acceptance": "Backlog selection spans every project whose programme_id matches the cadence programme, with a two-project test.",
+      "owner_project": "T10"
+    },
+    {
+      "id": "v1-p82-6",
+      "area": "§8.2",
+      "standard": "SAFe",
+      "spec": "§8.2",
+      "severity": "P2",
+      "title": "Retro lessons need no evidence and produce no kata candidates",
+      "problem": "propose_lesson_tx validates only statement; evidence may be [] with independent_count 0, and the retro path inserts lesson rows only, never kata candidates.",
+      "evidence": [
+        {
+          "path": "migrations/0056_cadence_tranche.sql",
+          "line": 17,
+          "quote": "    evidence          jsonb NOT NULL DEFAULT '[]'::jsonb,"
+        }
+      ],
+      "failure_scenario": "Unverifiable lessons accrue and systemic retro findings never reach the kata loop.",
+      "acceptance": "Lesson insert refuses empty evidence and a systemic retro finding emits a typed kata candidate with review state.",
+      "owner_project": "T10"
+    },
+    {
+      "id": "v1-p105-1",
+      "area": "§10.5",
+      "standard": "SPEC",
+      "spec": "§10.5",
+      "severity": "P0",
+      "title": "Portfolio has no WSJF backlog, cadence, capacity or per-project metering",
+      "problem": "The console Portfolio renders only Timeline, In flight, Dependencies and Programme. The WSJF backlog, PI/demo/retro cadence, capacity and per-project metering named by §10.5 are absent; README admits those fixtures stay the study.",
+      "evidence": [
+        {
+          "path": "docs/design/v2.js",
+          "line": 4827,
+          "quote": "      [\"Timeline\", \"In flight\", \"Dependencies\", \"Programme\"],"
+        }
+      ],
+      "failure_scenario": "An operator opens Portfolio and cannot rank work by WSJF, see PI planning/demo/retro dates, capacity, or spend per project; prioritisation and budget review happen outside the console.",
+      "acceptance": "Portfolio exposes backlog+WSJF, cadence (PI/demo/retro), capacity and per-project metering panels fed by their real actions/rows, with fixtures only behind ?design=1.",
+      "owner_project": "PLATFORM"
+    },
+    {
+      "id": "v1-p105-2",
+      "area": "§10.5",
+      "standard": "SPEC",
+      "spec": "§10.5",
+      "severity": "P1",
+      "title": "Plan destination omits change control",
+      "problem": "The Plan tab list stops at Cadence, and the page footer explicitly excludes the required capability: 'Change control is T10 and stays out of this surface.' §10.5 requires Plan to expose change control.",
+      "evidence": [
+        {
+          "path": "docs/design/v2.js",
+          "line": 5906,
+          "quote": "      ? [\"Boards\", \"WBS\", \"Baseline vs forecast\", \"Registers\", \"Cadence\"]"
+        }
+      ],
+      "failure_scenario": "A change request or baseline re-baseline cannot be raised or viewed from the plan, so approved change and its impact are invisible exactly where the plan is managed.",
+      "acceptance": "Plan exposes a change-control tab showing change requests and decisions, with the create/approve path wired; the exclusion sentence is removed.",
+      "owner_project": "PLATFORM"
+    },
+    {
+      "id": "v1-p105-3",
+      "area": "§10.5",
+      "standard": "SPEC",
+      "spec": "§10.5",
+      "severity": "P1",
+      "title": "Programme definition links are dead in the operator console",
+      "problem": "v2.js emits route links to 'programme', but studio.js CONSOLE_PAGES has no 'programme' entry, so the hash handler leaves the current page unchanged. Every Programme definition link is a dead control in the console.",
+      "evidence": [
+        {
+          "path": "docs/design/v2.js",
+          "line": 5079,
+          "quote": "      `${route(\"Programme definition\", \"programme\", \"\", \"shield\")}${route(\"System architecture\", \"architecture\", \"\", \"model\")}`,"
+        },
+        {
+          "path": "docs/design/studio.js",
+          "line": 1638,
+          "quote": "  const CONSOLE_PAGES = new Map("
+        }
+      ],
+      "failure_scenario": "Clicking Programme definition from Architecture capability or Plan does nothing; the programme screen is unreachable in the console.",
+      "acceptance": "CONSOLE_PAGES includes 'programme' and dispatches it to the programme definition renderer; the link navigates in the console.",
+      "owner_project": "PLATFORM"
+    },
+    {
+      "id": "v1-p105-4",
+      "area": "§10.5",
+      "standard": "SPEC",
+      "spec": "§10.5",
+      "severity": "P1",
+      "title": "Programme destination has no projects dossier",
+      "problem": "MSP_TABS defines five tabs and none is the projects dossier §10.5 requires. The dossier rows are neither loaded in the programme store fetch nor rendered.",
+      "evidence": [
+        {
+          "path": "docs/design/v2.js",
+          "line": 1343,
+          "quote": "  const MSP_TABS = [\"Definition\", \"Benefits map & profiles\", \"Tranches & reviews\", \"Benefits realization\", \"Stakeholders\"];"
+        }
+      ],
+      "failure_scenario": "A programme manager cannot see the consolidated project dossier (which projects, their state and evidence) inside the programme; it exists only as scattered tranche rows.",
+      "acceptance": "A Dossier tab lists the programme's projects with tranche, state, baseline and evidence read from the programme/project store.",
+      "owner_project": "PLATFORM"
+    },
+    {
+      "id": "v1-p105-5",
+      "area": "§7.5",
+      "standard": "SPEC",
+      "spec": "§7.5",
+      "severity": "P1",
+      "title": "Live Metering screen shows no cost, tool spend or budget utilisation",
+      "problem": "The live path is built solely from measure.inference (calls, tokens, cache hits); it reads no tool_call and renders no tenant cost, tool spend or budget utilisation, all required by §7.5 tenant-level roll-up.",
+      "evidence": [
+        {
+          "path": "docs/design/v2.js",
+          "line": 7466,
+          "quote": "  // Live: the platform publishes `measure.inference` (calls, tokens and cache hits by caller and"
+        }
+      ],
+      "failure_scenario": "A tenant on the published pack sees call counts only and cannot check spend, tool spend or budget headroom, nor drill to a tool call.",
+      "acceptance": "Live Metering renders tokens, derived cost, tool spend and budget utilisation and drills from tenant to run/step/tool call from the ledger rows.",
+      "owner_project": "PLATFORM"
+    },
+    {
+      "id": "v1-p105-6",
+      "area": "§10.5",
+      "standard": "SPEC",
+      "spec": "§10.5",
+      "severity": "P2",
+      "title": "Programme Stakeholders tab is an empty placeholder",
+      "problem": "The Stakeholders destination required by §10.5 renders only a note instead of profiles: the design study carries no fixture and no table, list or detail is shown.",
+      "evidence": [
+        {
+          "path": "docs/design/v2.js",
+          "line": 5010,
+          "quote": "              : panel(\"Stakeholders\", note(\"The design study carries no stakeholder fixture. The live page reads stakeholder profiles from the programme store; the public snapshot carries the published profiles.\"));"
+        }
+      ],
+      "failure_scenario": "A reviewer of the published design pack opens Stakeholders and sees an explanation, never a stakeholder profile, so the claimed capability is unverifiable.",
+      "acceptance": "The tab renders stakeholder profiles (name, role, influence, interest, disbenefits) from fixtures in study mode and from the store otherwise.",
+      "owner_project": "PLATFORM"
+    },
+    {
+      "id": "v1-pack-1",
+      "area": "publication",
+      "standard": "SPEC",
+      "spec": "§10.3",
+      "severity": "P1",
+      "title": "Allowlist diverges from writer: ops.json undeletable, conformance files always deleted",
+      "problem": "run_with_pool writes ops.json (and will write rework.json), but GENERATED_DATA omits it, so deletions() can never retire it. Conversely conformance.json/md are allowlisted although only publish-data.sh writes them, so an app publish deletes them.",
+      "evidence": [
+        {
+          "path": "apps/server/src/publish.rs",
+          "line": 339,
+          "quote": "const GENERATED_DATA: [&str; 15] = ["
+        },
+        {
+          "path": "crates/pack/src/snapshot.rs",
+          "line": 256,
+          "quote": "        \"ops.json\","
+        },
+        {
+          "path": "apps/server/src/publish.rs",
+          "line": 351,
+          "quote": "    \"conformance.json\","
+        }
+      ],
+      "failure_scenario": "An app publish PR drops the conformance register; a later removed rework.json stays served forever.",
+      "acceptance": "Derive the allowlist from SnapshotReport.files plus conformance outputs; assert set equality.",
+      "owner_project": "PLATFORM",
+      "resolved_by": "this PR: GENERATED_DATA now includes ops.json and rework.json and no longer lists the publish-script-written conformance files"
+    },
+    {
+      "id": "v1-pack-2",
+      "area": "publication",
+      "standard": "SPEC",
+      "spec": "§10.3",
+      "severity": "P2",
+      "title": "Live download is not the bytes the CLI wrote",
+      "problem": "site_view derives generated_at from the newest document (1970 constant when empty); run_with_pool uses wall clock or --generated-at. Live also serves no secrets/evidence/feedback files. The claimed one-header same-bytes download cannot match.",
+      "evidence": [
+        {
+          "path": "crates/pack/src/live.rs",
+          "line": 97,
+          "quote": "    let generated_at = generated_at(&records);"
+        },
+        {
+          "path": "crates/pack/src/snapshot.rs",
+          "line": 332,
+          "quote": "/// The live `/design/data/programme.json` route serves this from memory, so the download and the"
+        }
+      ],
+      "failure_scenario": "A downloaded programme.json disagrees with the live payload_sha256 and the manifest timestamp.",
+      "acceptance": "Pass one clock into both paths; test CLI bytes equal site_view bytes.",
+      "owner_project": "PLATFORM"
+    },
+    {
+      "id": "v1-pack-3",
+      "area": "publication",
+      "standard": "SPEC",
+      "spec": "§10.3",
+      "severity": "P1",
+      "title": "Manifest covers only snapshot files; conformance, issues and output pages publish unhashed",
+      "problem": "publish-data.sh adds conformance.json/md and issues.json to tmp/data after snapshot wrote manifest.json; write_outputs pages never enter files[]. check-data tests listed files only and never rejects unlisted extras, so unhashed files publish and pass.",
+      "evidence": [
+        {
+          "path": "docs/design/scripts/publish-data.sh",
+          "line": 90,
+          "quote": "cp \"$tmp/conformance/conformance-gap-register.json\" \"$tmp/data/conformance.json\""
+        },
+        {
+          "path": "docs/design/scripts/check-data.cjs",
+          "line": 97,
+          "quote": "for (const file of manifest.files || []) {"
+        }
+      ],
+      "failure_scenario": "A modified conformance.json, issues.json or output page passes the strict gate with no hash to compare.",
+      "acceptance": "Manifest every published data/output file and assert the directory set equals manifest.files.",
+      "owner_project": "PLATFORM"
+    },
+    {
+      "id": "v1-pack-4",
+      "area": "publication",
+      "standard": "SPEC",
+      "spec": "§10.3",
+      "severity": "P1",
+      "title": "Publish mutates the shipped pack before the audit and never deletes stale data",
+      "problem": "build-docs.py writes directly into the shipped PACK/docs before the strict audit, contradicting the temp-only contract. The docs/design/data rsync lacks --delete, so files omitted by a later snapshot remain published.",
+      "evidence": [
+        {
+          "path": "docs/design/scripts/publish-data.sh",
+          "line": 42,
+          "quote": "python3 \"$pack/scripts/build-docs.py\""
+        },
+        {
+          "path": "docs/design/scripts/build-docs.py",
+          "line": 41,
+          "quote": "OUT = PACK / \"docs\""
+        },
+        {
+          "path": "docs/design/scripts/publish-data.sh",
+          "line": 94,
+          "quote": "rsync -a \"$tmp/data/\" \"$data/\""
+        }
+      ],
+      "failure_scenario": "A failed strict audit still leaves rebuilt HTML published; a removed section file keeps being served.",
+      "acceptance": "Confine writes to tmp and --delete the data sync; test the pack is untouched when the audit fails.",
+      "owner_project": "PLATFORM"
+    },
+    {
+      "id": "v1-pack-5",
+      "area": "publication",
+      "standard": "SPEC",
+      "spec": "§10.3",
+      "severity": "P1",
+      "title": "App publisher labels the image's issue registry as the target tenant's",
+      "problem": "The console publisher reads /srv/site/design/data/issues.json from whichever pack the image carries, with no tenant check, then injects it into the target tenant's programme and manifest. Staleness or a wrong image silently relabels another producer's registry.",
+      "evidence": [
+        {
+          "path": "apps/server/src/publish.rs",
+          "line": 124,
+          "quote": "    let issues = pack_root.join(\"data/issues.json\");"
+        },
+        {
+          "path": "crates/pack/src/snapshot.rs",
+          "line": 196,
+          "quote": "        object.insert(\"issue_registry\".to_owned(), issues.clone());"
+        }
+      ],
+      "failure_scenario": "A stale or other-tenant image publishes producer B's issue titles and numbers under tenant A's label.",
+      "acceptance": "Resolve the registry per target tenant and record its provenance; reject a mismatch.",
+      "owner_project": "PLATFORM"
+    },
+    {
+      "id": "v1-pack-6",
+      "area": "publication",
+      "standard": "SPEC",
+      "spec": "§10.3",
+      "severity": "P0",
+      "title": "Output pages and programme.csv bypass the redaction and programme filters",
+      "problem": "run_with_pool's write_outputs renders document titles, bodies and attachments straight from the database with no redact_text and no in-programme filter, both of which site_view applies. Live programme.csv is also built from unredacted data.programme.",
+      "evidence": [
+        {
+          "path": "crates/pack/src/snapshot.rs",
+          "line": 299,
+          "quote": "        outputs = crate::outputs::write_outputs(pool, tenant, &generated_at, dir).await?;"
+        },
+        {
+          "path": "crates/pack/src/live.rs",
+          "line": 119,
+          "quote": "    let programme_csv = programme_csv(&data.programme);"
+        },
+        {
+          "path": "crates/pack/src/live.rs",
+          "line": 125,
+          "quote": "        record.title = redact_text(&record.title);"
+        }
+      ],
+      "failure_scenario": "A pasted token or email in a document body or project name reaches the public repo and pages while the JSON copy is masked.",
+      "acceptance": "Redact and programme-filter rows before render_outputs and CSV; seeded-secret test covers HTML and CSV.",
+      "owner_project": "PLATFORM"
+    },
+    {
+      "id": "v1-view-1",
+      "area": "view",
+      "standard": "SPEC",
+      "spec": "§10.5",
+      "severity": "P0",
+      "title": "Gantt reads absent project_activity",
+      "problem": "activityIndex reads work.project_activity; the pack's snapshot has no such key (boards/lists/cards/runs only), so all 48 projects and the programme render 'no dated activity' with no bar despite 368 runs carrying timestamps.",
+      "evidence": [
+        {
+          "path": "docs/design/delivery.js",
+          "line": 286,
+          "quote": "      list((work || {}).project_activity).map((row) => [row.project_id, row]),"
+        }
+      ],
+      "failure_scenario": "The signed-out timeline draws no bars, no width and no today marker, while the same snapshot holds 368 observed runs.",
+      "acceptance": "Derive the window from cards/runs when project_activity is absent (as v2.js consoleActivity does), or publish the row; add a fixture proving one bar.",
+      "owner_project": "PLATFORM",
+      "resolved_by": "this PR (Part 6): observedWindows derives the window from cards/runs when work.project_activity is absent"
+    },
+    {
+      "id": "v1-view-2",
+      "area": "view",
+      "standard": "SPEC",
+      "spec": "§10.5",
+      "severity": "P1",
+      "title": "Spend always reads 'no spend'",
+      "problem": "Reads inference.by_project/by_card; measure.json publishes only by_caller/by_model/totals (calls, tokens, no cost_usd; its note says the app derives cost), so every row, card and execution panel says 'no spend'.",
+      "evidence": [
+        {
+          "path": "docs/design/delivery.js",
+          "line": 289,
+          "quote": "    const usage = new Map(list(inference.by_project).map((row) => [row.project_id, row]));"
+        }
+      ],
+      "failure_scenario": "The header claims 'no spend recorded' while the ledger holds millions of tokens; the unpriced branch is unreachable.",
+      "acceptance": "Bind spend to published fields or show tenant totals as explicitly unattributed; add priced, unpriced and zero fixtures.",
+      "owner_project": "PLATFORM",
+      "resolved_by": "this PR (Part 6): tenantSpend reports the tenant total as unattributed when by_project/by_card are absent"
+    },
+    {
+      "id": "v1-view-3",
+      "area": "view",
+      "standard": "SPEC",
+      "spec": "§5.1",
+      "severity": "P1",
+      "title": "Standalone rows ignore status",
+      "problem": "Every project without programme_id becomes a portfolio row with no status test; §5.1 lists only the in-flight set (default active/paused) and excludes closed/archived work, and the README public boundary requires active/paused with a board or card.",
+      "evidence": [
+        {
+          "path": "docs/design/delivery.js",
+          "line": 394,
+          "quote": "    const standalone = [...index.values()].filter((p) => !p.programmeId);"
+        }
+      ],
+      "failure_scenario": "A closed standalone project remains a completed portfolio row permanently, contradicting portfolio membership.",
+      "acceptance": "Apply the active/paused plus board-or-card predicate; a fixture proves a closed standalone project is absent.",
+      "owner_project": "PLATFORM",
+      "resolved_by": "this PR (Part 6): standalone rows require active/paused and a board or a card"
+    },
+    {
+      "id": "v1-view-4",
+      "area": "view",
+      "standard": "SPEC",
+      "spec": "The delivery view",
+      "severity": "P2",
+      "title": "Benefit rail silently drops profiles past eight",
+      "problem": "benefitRail slices to eight profiles with no note, while the run table in the same module prints 'Showing the latest 8 of N runs' and the rail count still reports the full total.",
+      "evidence": [
+        {
+          "path": "docs/design/delivery.js",
+          "line": 220,
+          "quote": "      .slice(0, 8)"
+        }
+      ],
+      "failure_scenario": "A programme with 12 benefit profiles shows 8 and nothing tells the reader 4 are missing.",
+      "acceptance": "Render all profiles or print 'showing 8 of N'; add a fixture with more than eight benefits.",
+      "owner_project": "PLATFORM",
+      "resolved_by": "this PR (Part 6): the benefit rail renders every profile"
+    },
+    {
+      "id": "v1-view-5",
+      "area": "view",
+      "standard": "SPEC",
+      "spec": "§10.6",
+      "severity": "P2",
+      "title": "Kanban DOM is unbounded per render",
+      "problem": "kanban maps every root and archived card into DOM; the fixture already draws 63 archived tiles in one column, with no cap, page or virtualisation, and the table view repeats the rows.",
+      "evidence": [
+        {
+          "path": "docs/design/delivery.js",
+          "line": 735,
+          "quote": "          <div class=\"kanban-cards\">${cards.map((card) => tile(card, model)).join(\"\")}</div>"
+        }
+      ],
+      "failure_scenario": "A 1,000-card board renders 1,000 tiles on every render and a very tall single column at 390 px.",
+      "acceptance": "Cap or paginate lanes and the archived column with a 'show N more' control; add a fixture with more than 50 cards in one lane.",
+      "owner_project": "PLATFORM",
+      "resolved_by": "this PR (Part 6): every kanban lane and the archived column cap at 25 tiles with a visible remainder"
+    }
+  ]
+}

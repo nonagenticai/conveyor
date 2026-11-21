@@ -1,9 +1,10 @@
-//! The public snapshot is the PROGRAMME's view (issue #382, SPEC_V2 §5).
+//! The public snapshot is the TENANT'S PORTFOLIO (owner brief 2026-11-21, SPEC_V2 §5.1).
 //!
-//! A project outside a programme is a session fixture — a proof, a scratch reproduction — and
-//! none of its boards, cards, runs, approvals or comments may reach the public payload. The
-//! console's own project list filters the same way (`docs/design/v2.js:4193`); this suite makes
-//! the pack's data agree.
+//! Every programme-bound project is public. A standalone project is public only when it is a real
+//! change initiative: status `active`/`paused` AND a board or a card. A standalone draft, or a
+//! bare row with neither, is a session fixture — a proof, a scratch reproduction — and none of its
+//! boards, cards, runs, approvals or comments may reach the public payload. This suite makes the
+//! pack's data agree with that boundary.
 
 #[path = "../../../apps/server/tests/common/mod.rs"]
 mod common;
@@ -22,12 +23,17 @@ struct Fixture {
     bound_incident: Uuid,
     bound_run: Uuid,
     bound_approval: Uuid,
-    unbound_project: Uuid,
-    unbound_board: Uuid,
-    unbound_card: Uuid,
-    unbound_incident: Uuid,
-    unbound_run: Uuid,
-    unbound_approval: Uuid,
+    initiative_project: Uuid,
+    initiative_board: Uuid,
+    initiative_card: Uuid,
+    initiative_incident: Uuid,
+    initiative_run: Uuid,
+    initiative_approval: Uuid,
+    draft_project: Uuid,
+    draft_board: Uuid,
+    draft_card: Uuid,
+    draft_incident: Uuid,
+    bare_project: Uuid,
 }
 
 /// One project with a board, a lane, a card, an incident, a run, an approval and a comment.
@@ -35,6 +41,7 @@ async fn project_tree(
     db: &common::TestDb,
     tenant: TenantId,
     programme: Option<Uuid>,
+    status: Option<&str>,
     key: &str,
 ) -> (Uuid, Uuid, Uuid, Uuid, Uuid, Uuid) {
     let mut tx = store::begin_scoped(&db.owner, tenant)
@@ -42,6 +49,7 @@ async fn project_tree(
         .expect("scoped tx");
     let mut new = store::project::NewProject::new(key, format!("Project {key}"));
     new.programme_id = programme;
+    new.status = status.map(str::to_owned);
     let project = store::project::insert_project_tx(&mut tx, tenant, &new)
         .await
         .expect("insert the project");
@@ -196,15 +204,33 @@ async fn fixture() -> (common::TestDb, Fixture) {
     .expect("insert the programme");
 
     let (bound_project, bound_board, bound_card, bound_incident, bound_run, bound_approval) =
-        project_tree(&db, tenant, Some(programme), "BOUND").await;
+        project_tree(&db, tenant, Some(programme), None, "BOUND").await;
     let (
-        unbound_project,
-        unbound_board,
-        unbound_card,
-        unbound_incident,
-        unbound_run,
-        unbound_approval,
-    ) = project_tree(&db, tenant, None, "SCRATCH").await;
+        initiative_project,
+        initiative_board,
+        initiative_card,
+        initiative_incident,
+        initiative_run,
+        initiative_approval,
+    ) = project_tree(&db, tenant, None, None, "INITIATIVE").await;
+    // A standalone draft with a board and a card: work exists, but a draft is not portfolio work.
+    let (draft_project, draft_board, draft_card, draft_incident, _draft_run, _draft_approval) =
+        project_tree(&db, tenant, None, Some("draft"), "DRAFT").await;
+    // A standalone active project with neither a board nor a card: a bare row, not an initiative.
+    let bare_project = {
+        let mut tx = store::begin_scoped(&db.owner, tenant)
+            .await
+            .expect("scoped tx");
+        let bare = store::project::insert_project_tx(
+            &mut tx,
+            tenant,
+            &store::project::NewProject::new("BARE", "Project BARE"),
+        )
+        .await
+        .expect("insert the bare project");
+        tx.commit().await.expect("commit the bare project");
+        bare.id
+    };
     (
         db,
         Fixture {
@@ -215,12 +241,17 @@ async fn fixture() -> (common::TestDb, Fixture) {
             bound_incident,
             bound_run,
             bound_approval,
-            unbound_project,
-            unbound_board,
-            unbound_card,
-            unbound_incident,
-            unbound_run,
-            unbound_approval,
+            initiative_project,
+            initiative_board,
+            initiative_card,
+            initiative_incident,
+            initiative_run,
+            initiative_approval,
+            draft_project,
+            draft_board,
+            draft_card,
+            draft_incident,
+            bare_project,
         },
     )
 }
@@ -250,7 +281,7 @@ fn has(section: &Value, id: Uuid) -> bool {
 }
 
 #[tokio::test]
-async fn the_snapshot_carries_only_programme_bound_projects() {
+async fn the_public_snapshot_carries_programme_and_standalone_change_initiatives() {
     let (db, f) = fixture().await;
     let data = snapshot(&db, f.tenant).await;
     let work = &data.work;
@@ -258,24 +289,42 @@ async fn the_snapshot_carries_only_programme_bound_projects() {
 
     assert!(
         has(projects, f.bound_project),
-        "the programme's own project is public"
+        "a programme-bound project is public"
     );
     assert!(
-        !has(projects, f.unbound_project),
-        "an unbound project is not the programme: {projects}"
+        has(projects, f.initiative_project),
+        "a standalone active project with a board is a change initiative"
     );
+    assert!(
+        !has(projects, f.draft_project),
+        "a standalone draft is not portfolio work: {projects}"
+    );
+    assert!(
+        !has(projects, f.bare_project),
+        "a standalone project with no board or card is a fixture: {projects}"
+    );
+
     for (name, section, id) in [
-        ("boards", &work["boards"], f.unbound_board),
-        ("cards", &work["cards"], f.unbound_card),
-        ("runs", &work["runs"], f.unbound_run),
-        ("approvals", &work["approvals"], f.unbound_approval),
+        ("boards", &work["boards"], f.initiative_board),
+        ("cards", &work["cards"], f.initiative_card),
+        ("runs", &work["runs"], f.initiative_run),
+        ("approvals", &work["approvals"], f.initiative_approval),
+    ] {
+        assert!(
+            has(section, id),
+            "an initiative keeps its {name}: {section}"
+        );
+    }
+    for (name, section, id) in [
+        ("boards", &work["boards"], f.draft_board),
+        ("cards", &work["cards"], f.draft_card),
     ] {
         assert!(
             !has(section, id),
-            "{name} must not carry an unbound project's row"
+            "a draft's {name} must not be public: {section}"
         );
     }
-    // No row in any work section may name the unbound project or its board.
+    // No row in any work section may name the draft project, its board, or the bare project.
     for section in [
         "boards",
         "lists",
@@ -287,20 +336,42 @@ async fn the_snapshot_carries_only_programme_bound_projects() {
     ] {
         let text = work[section].to_string();
         assert!(
-            !text.contains(&f.unbound_project.to_string()),
-            "{section} names the unbound project"
+            !text.contains(&f.draft_project.to_string()),
+            "{section} names the draft project"
         );
         assert!(
-            !text.contains(&f.unbound_board.to_string()),
-            "{section} names the unbound project's board"
+            !text.contains(&f.draft_board.to_string()),
+            "{section} names the draft project's board"
+        );
+        assert!(
+            !text.contains(&f.bare_project.to_string()),
+            "{section} names the bare project"
         );
     }
-    let bindings = work["comments"].as_array().expect("comments");
-    assert!(
-        bindings
+    // The activity window follows the same boundary.
+    let activity = work["project_activity"]
+        .as_array()
+        .expect("project_activity is an array");
+    let names = |id: Uuid| {
+        activity
             .iter()
-            .all(|row| row.get("card_id") != Some(&serde_json::json!(f.unbound_card))),
-        "comments must not hang from an unbound project's card"
+            .any(|row| row["project_id"] == serde_json::json!(id.to_string()))
+    };
+    assert!(
+        names(f.bound_project),
+        "the bound project's window is public"
+    );
+    assert!(
+        names(f.initiative_project),
+        "the initiative's window is public"
+    );
+    assert!(
+        !names(f.draft_project),
+        "the draft project's window is not public"
+    );
+    assert!(
+        !names(f.bare_project),
+        "a bare project has no public window"
     );
 }
 
@@ -337,11 +408,11 @@ async fn a_bound_project_keeps_its_whole_work_tree() {
     );
 }
 
-/// The T7 incident record is a card; the `ops` section follows the programme boundary like the
+/// The T7 incident record is a card; the `ops` section follows the portfolio boundary like the
 /// work sections, and it carries the named lifecycle keys and the runbook/postmortem titles —
 /// never the operator's narrative or evidence text (#434).
 #[tokio::test]
-async fn the_ops_section_carries_only_programme_bound_incidents() {
+async fn the_ops_section_carries_only_portfolio_incidents() {
     let (db, f) = fixture().await;
     let data = snapshot(&db, f.tenant).await;
     let incidents = &data.ops["incidents"];
@@ -350,8 +421,12 @@ async fn the_ops_section_carries_only_programme_bound_incidents() {
         "the programme's own incident is public"
     );
     assert!(
-        !has(incidents, f.unbound_incident),
-        "a scratch incident is not the programme: {incidents}"
+        has(incidents, f.initiative_incident),
+        "a change initiative's incident is public"
+    );
+    assert!(
+        !has(incidents, f.draft_incident),
+        "a draft project's incident is not portfolio work: {incidents}"
     );
     let row = incidents
         .as_array()

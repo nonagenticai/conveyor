@@ -5,8 +5,8 @@ Snapshot: `a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b` generated `2026-11-20T11:50
 | Severity | Count |
 |---|---:|
 | P0 | 22 |
-| P1 | 131 |
-| P2 | 12 |
+| P1 | 132 |
+| P2 | 35 |
 | P3 | 0 |
 
 ## P0 and P1
@@ -43,6 +43,7 @@ Snapshot: `a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b` generated `2026-11-20T11:50
 | `benefit_baseline_placeholder` | `B6` | P1 | baseline is a placeholder: 'not measured - no instrument exists (recorded as a kata on the kata project)' |
 | `benefit_profile_incomplete` | `B1` | P1 | missing operational_area |
 | `board_not_approved` | `board` | P1 | the architecture board is not active |
+| `cadence_absent` | `programme` | P1 | the snapshot publishes no programme_cadence row (pi\|demo\|retro\|refinement) |
 | `closed_without_closure_review` | `S00` | P1 | project is closed but its closure review is not published |
 | `closed_without_closure_review` | `S01` | P1 | project is closed but its closure review is not published |
 | `closed_without_closure_review` | `S03` | P1 | project is closed but its closure review is not published |
@@ -173,14 +174,14 @@ Snapshot: `a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b` generated `2026-11-20T11:50
 |---|---|---:|---:|---:|---:|---:|
 | DESIGN-PUBLISH | closed | 0 | 1 | 1 | 0 | 0 |
 | P0 | closed | 0 | 0 | 1 | 0 | 0 |
-| PLATFORM | active | 0 | 0 | 0 | 0 | 0 |
+| PLATFORM | active | 0 | 0 | 0 | 1 | 0 |
 | S00 | closed | 0 | 0 | 3 | 0 | 0 |
 | S01 | closed | 0 | 0 | 3 | 0 | 0 |
-| S02 | active | 1 | 0 | 2 | 0 | 0 |
+| S02 | active | 1 | 0 | 2 | 1 | 0 |
 | S03 | closed | 2 | 1 | 3 | 0 | 0 |
-| S04 | active | 3 | 0 | 2 | 0 | 0 |
+| S04 | active | 3 | 0 | 2 | 1 | 0 |
 | S05 | closed | 4 | 1 | 3 | 0 | 0 |
-| S06 | active | 5 | 0 | 2 | 0 | 0 |
+| S06 | active | 5 | 0 | 2 | 1 | 0 |
 | S06a | archived | 6 | 0 | 1 | 1 | 0 |
 | S06b | closed | 6 | 1 | 3 | 0 | 0 |
 | S06c | closed | 7 | 1 | 3 | 0 | 0 |
@@ -190,32 +191,32 @@ Snapshot: `a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b` generated `2026-11-20T11:50
 | S09 | closed | 4 | 1 | 3 | 0 | 0 |
 | S10 | closed | 6 | 1 | 3 | 0 | 0 |
 | S11 | closed | 6 | 1 | 3 | 0 | 0 |
-| S12 | active | 10 | 0 | 3 | 0 | 0 |
-| S13 | active | 8 | 0 | 3 | 0 | 0 |
-| S14 | active | 11 | 0 | 2 | 0 | 0 |
-| S15 | active | 7 | 0 | 2 | 0 | 0 |
+| S12 | active | 10 | 0 | 3 | 1 | 0 |
+| S13 | active | 8 | 0 | 3 | 1 | 0 |
+| S14 | active | 11 | 0 | 2 | 1 | 0 |
+| S15 | active | 7 | 0 | 2 | 1 | 0 |
 | S16 | closed | 7 | 1 | 3 | 0 | 0 |
-| S17 | active | 5 | 0 | 2 | 0 | 0 |
-| S18 | active | 9 | 0 | 2 | 0 | 0 |
-| S19 | active | 8 | 0 | 2 | 0 | 0 |
-| S20 | active | 9 | 0 | 2 | 0 | 0 |
-| S21 | active | 9 | 0 | 2 | 0 | 0 |
+| S17 | active | 5 | 0 | 2 | 1 | 0 |
+| S18 | active | 9 | 0 | 2 | 1 | 0 |
+| S19 | active | 8 | 0 | 2 | 1 | 0 |
+| S20 | active | 9 | 0 | 2 | 1 | 0 |
+| S21 | active | 9 | 0 | 2 | 1 | 0 |
 | SPEC-V2 | closed | 0 | 0 | 2 | 0 | 0 |
 | T0 | closed | 0 | 0 | 1 | 0 | 0 |
 | T1 | closed | 1 | 1 | 2 | 0 | 0 |
 | T10 | closed | 4 | 1 | 2 | 0 | 0 |
-| T11 | active | 1 | 0 | 5 | 0 | 0 |
-| T12 | active | 13 | 0 | 3 | 1 | 0 |
+| T11 | active | 1 | 0 | 5 | 1 | 0 |
+| T12 | active | 13 | 0 | 3 | 2 | 0 |
 | T13 | closed | 3 | 1 | 2 | 0 | 0 |
 | T14 | closed | 4 | 2 | 3 | 0 | 0 |
-| T15 | active | 12 | 0 | 3 | 1 | 0 |
-| T16 | active | 4 | 0 | 5 | 0 | 0 |
-| T17 | active | 5 | 0 | 3 | 1 | 0 |
+| T15 | active | 12 | 0 | 3 | 2 | 0 |
+| T16 | active | 4 | 0 | 5 | 1 | 0 |
+| T17 | active | 5 | 0 | 3 | 2 | 0 |
 | T2 | closed | 2 | 1 | 2 | 0 | 0 |
 | T3 | closed | 3 | 1 | 2 | 0 | 0 |
 | T4 | closed | 4 | 1 | 2 | 0 | 0 |
-| T5 | active | 10 | 0 | 3 | 1 | 0 |
-| T6 | active | 11 | 0 | 3 | 1 | 0 |
-| T7 | active | 5 | 0 | 5 | 0 | 0 |
-| T8 | active | 11 | 0 | 3 | 0 | 0 |
+| T5 | active | 10 | 0 | 3 | 2 | 0 |
+| T6 | active | 11 | 0 | 3 | 2 | 0 |
+| T7 | active | 5 | 0 | 5 | 1 | 0 |
+| T8 | active | 11 | 0 | 3 | 1 | 0 |
 | T9 | closed | 4 | 1 | 1 | 1 | 0 |

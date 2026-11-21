@@ -285,10 +285,37 @@ pub async fn usage_rows_tx(
         UsageGroup::PromptSha => "coalesce(c.prompt_sha256, '')",
         UsageGroup::Project => "coalesce(c.project_id::text, '')",
     };
+    usage_rows_for_bucket_tx(conn, tenant, bucket, since, until).await
+}
+
+/// The same priced bucket grouped by the run's **card**.
+///
+/// The design pack's work-package tiles need a card's spend. This is deliberately not a
+/// [`UsageGroup`] variant: the public `inference_usage.report` action's dimension set is a
+/// contract, and the pack is its only consumer. The bucket expression is an internal constant.
+pub async fn usage_by_card_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    since: DateTime<Utc>,
+    until: DateTime<Utc>,
+) -> Result<Vec<UsageRow>, InferenceStoreError> {
+    usage_rows_for_bucket_tx(conn, tenant, "coalesce(c.card_id::text, '')", since, until).await
+}
+
+/// The one aggregate behind every bucket. `bucket` is a closed expression chosen by an internal
+/// caller — never input text — so the dynamic SQL has no writable surface.
+async fn usage_rows_for_bucket_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    bucket: &str,
+    since: DateTime<Utc>,
+    until: DateTime<Utc>,
+) -> Result<Vec<UsageRow>, InferenceStoreError> {
     let sql = format!(
         "WITH priced AS (
              SELECT ic.*,
                     r.project_id,
+                    r.card_id,
                     CASE
                         WHEN p.model IS NULL THEN NULL
                         WHEN p.unit = 'token' THEN

@@ -59,11 +59,27 @@ if [ -n "${GENERATED_AT:-}" ]; then
 fi
 "$conveyor" "${snapshot_args[@]}"
 
-# 3. The conformance audit runs on the fresh snapshot before anything is published. Strict is
-#    the default from U4: a new or worsened P0/P1, an expired ledger entry, or a ledger entry
-#    with no live gap fails the publish. A local, exploratory publish may opt out explicitly
-#    with CONFORMANCE_STRICT=0; CI and the release path must not.
+# 3. The conformance audit runs on the draft BEFORE anything is published. It writes the rework
+#    register the pack must carry, so the published register is the one computed from this
+#    snapshot. A failed audit leaves the published data and output pages untouched.
 audit_args=(--snapshot "$tmp/data" --out "$tmp/conformance")
+python3 "$root/scripts/audit-programme-conformance.py" "${audit_args[@]}" \
+  --report --rework-out "$tmp/conformance/rework.json"
+test -f "$tmp/conformance/rework.json" || {
+  echo "publish-data: the audit produced no rework register" >&2
+  exit 1
+}
+
+# 3b. The FINAL snapshot carries that register (`rework.json` and `snapshot.js.rework`), and the
+#     strict gate below audits THESE bytes — not the draft's.
+"$conveyor" "${snapshot_args[@]}" --conformance "$tmp/conformance/rework.json"
+test -f "$tmp/data/rework.json" || {
+  echo "publish-data: the snapshot did not publish the rework register" >&2
+  exit 1
+}
+
+# 3c. Strict is the default: a new or worsened P0/P1, an expired ledger entry, or a ledger entry
+#     with no live gap fails the publish. The final gap register is what gets published.
 if [ "${CONFORMANCE_STRICT:-1}" = "1" ]; then
   python3 "$root/scripts/audit-programme-conformance.py" "${audit_args[@]}" \
     --strict --fail-on P0,P1 --baseline "$root/docs/evidence/conformance-baseline.json"

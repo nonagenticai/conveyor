@@ -128,6 +128,10 @@ pub async fn run(pool: &PgPool, tenant: TenantId, payload: &Value) -> Result<(),
             issues.display()
         )));
     }
+    // The rework register is optional: a pack that carries one re-publishes it unchanged, a pack
+    // that does not publishes none. Its absence is honest, never a job failure.
+    let conformance = pack_root.join("data/rework.json");
+    let conformance = conformance.is_file().then_some(conformance);
     let generated_at = Utc::now().to_rfc3339();
     let report = snapshot::run_with_pool(
         pool,
@@ -137,6 +141,7 @@ pub async fn run(pool: &PgPool, tenant: TenantId, payload: &Value) -> Result<(),
             outputs_dir: Some(temp.0.join("docs")),
             generated_at: Some(generated_at.clone()),
             issues,
+            conformance,
             feedback_url: snapshot::DEFAULT_FEEDBACK_URL.to_owned(),
             database_url: None,
             git_sha: std::env::var("CONVEYOR_GIT_SHA").ok(),
@@ -336,6 +341,9 @@ fn targets(files: &BTreeMap<String, Vec<u8>>) -> BTreeMap<String, Vec<u8>> {
 /// The generated files the publisher owns: the snapshot's data files and the published output
 /// pages. Everything else under `docs/design/` is hand-authored (documents, decisions, scripts,
 /// the issue registry) and a publish never deletes it.
+///
+/// `conformance.json` and `conformance.md` are deliberately absent: only
+/// `scripts/publish-data.sh` writes them, so the app publisher must never delete them.
 const GENERATED_DATA: [&str; 15] = [
     "programme.json",
     "organisation.json",
@@ -344,12 +352,12 @@ const GENERATED_DATA: [&str; 15] = [
     "msp.json",
     "architecture.json",
     "artefacts.json",
+    "ops.json",
     "measure.json",
     "secrets.json",
     "evidence.json",
     "feedback.json",
-    "conformance.json",
-    "conformance.md",
+    "rework.json",
     "snapshot.js",
     "manifest.json",
 ];
@@ -469,11 +477,17 @@ mod tests {
     }
 
     #[test]
-    fn generated_data_includes_the_conformance_and_architecture_files() {
-        for name in ["architecture.json", "conformance.json", "conformance.md"] {
+    fn generated_data_includes_the_pack_outputs_but_not_the_script_written_conformance() {
+        for name in ["architecture.json", "ops.json", "rework.json"] {
             assert!(
                 GENERATED_DATA.contains(&name),
-                "{name} is generated and must be deletable when a later pack omits it"
+                "{name} is written by the pack and must be deletable when a later pack omits it"
+            );
+        }
+        for name in ["conformance.json", "conformance.md"] {
+            assert!(
+                !GENERATED_DATA.contains(&name),
+                "{name} is written by publish-data.sh alone; the app publisher must never delete it"
             );
         }
     }
@@ -489,6 +503,8 @@ mod tests {
             entry("docs/design/docs/outputs.js"),
             entry("docs/design/data/snapshot.js"),
             entry("docs/design/data/architecture.json"),
+            entry("docs/design/data/ops.json"),
+            entry("docs/design/data/rework.json"),
             entry("docs/design/data/conformance.json"),
             entry("docs/design/data/conformance.md"),
             entry("docs/design/data/issues.json"),
@@ -509,9 +525,17 @@ mod tests {
         assert!(deletes.contains(&"docs/design/docs/outputs.js".to_owned()));
         assert!(deletes.contains(&"docs/design/data/snapshot.js".to_owned()));
         assert!(deletes.contains(&"docs/design/data/architecture.json".to_owned()));
-        assert!(deletes.contains(&"docs/design/data/conformance.json".to_owned()));
-        assert!(deletes.contains(&"docs/design/data/conformance.md".to_owned()));
+        assert!(
+            deletes.contains(&"docs/design/data/ops.json".to_owned()),
+            "ops.json is pack-written and deletable when a later pack omits it"
+        );
+        assert!(
+            deletes.contains(&"docs/design/data/rework.json".to_owned()),
+            "a pack without --conformance publishes no rework register, so a stale one is deleted"
+        );
         for keep in [
+            "docs/design/data/conformance.json",
+            "docs/design/data/conformance.md",
             "docs/design/data/issues.json",
             "docs/design/data/coverage.json",
             "docs/design/docs/documents.js",
