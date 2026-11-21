@@ -517,12 +517,6 @@ async fn declared_dependencies_publish_edges_unknown_targets_and_cycles() {
             ("MSP".to_owned(), "B".to_owned(), None, false),
             (
                 "MSP".to_owned(),
-                "B".to_owned(),
-                Some("blocks".to_owned()),
-                true
-            ),
-            (
-                "MSP".to_owned(),
                 "C".to_owned(),
                 Some("blocks".to_owned()),
                 true
