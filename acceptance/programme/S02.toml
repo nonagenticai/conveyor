@@ -1,14 +1,14 @@
 [project]
 key = "S02"
 name = "Skeleton — workspace, tenancy, auth, jobs, SSE"
-gate = "The A–D artefacts and the delivery contract exist, the project brief and evidence are published, and the project stays ACTIVE because issue #2 is open."
+gate = "The A–D artefacts and the delivery contract exist, the brief and the evidence are published, the P2 long-job proof is landed, and the project closes through the one gate."
 
 [[check]]
 id = "S02-project"
 check = "project"
-status = "active"
+status = "closed"
 severity = "P0"
-description = "S02 is active — its open issue #2 forbids a closure"
+description = "S02 is closed on the P2 proof at the named SHA"
 
 [[check]]
 id = "S02-baseline"
@@ -36,9 +36,8 @@ assert gates.get("charter")=="approved", gates
 [[check]]
 id = "S02-closure-outputs"
 check = "closure_outputs"
-allow_empty = true
-severity = "P1"
-description = "an active project declares no closure outputs"
+severity = "P0"
+description = "the declared closure outputs are declared and published"
 
 [[check]]
 id = "S02-contract"

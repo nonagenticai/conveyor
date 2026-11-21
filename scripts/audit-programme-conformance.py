@@ -1021,11 +1021,17 @@ class Audit:
             track = (project.get("meta") or {}).get("track")
             if track and track != "v2":
                 continue
-            contracts = [
+            live = [
                 row
                 for row in self.data.contracts
                 if row.get("project_id") == project.get("id") and row.get("status") == "live"
             ]
+            # Phase G reviews the contract that governs delivery (phase F). A Statement of
+            # Architecture Work is the phase-A assignment, not the gate the review answers; a
+            # project that carries both would otherwise be flagged for a review it must not
+            # have. Fall back to every live contract only when no delivery contract exists, so
+            # a project governed by one contract is still reviewed.
+            contracts = [row for row in live if row.get("kind") == "delivery_contract"] or live
             for contract in contracts:
                 reviews = [
                     row
@@ -1038,7 +1044,8 @@ class Audit:
                         "compliance_review_missing",
                         "P1",
                         key,
-                        "closed delivery project has no Phase-G compliance review",
+                        "closed delivery project has no Phase-G compliance review "
+                        "against its live delivery contract",
                     )
                     continue
                 for review in reviews:
@@ -1898,6 +1905,41 @@ def self_test() -> None:
         data.contracts.clear()
 
     expect(no_contract, "contract_missing")
+
+    def two_live_contracts_one_review(data: Dataset) -> None:
+        """A closed T project with a live SoAW and a live delivery contract, reviewed once."""
+        data.by_key["T1"]["status"] = "closed"
+        data.published["T1"].add("closure-review")
+        data.contracts.append(
+            {
+                "id": "c2",
+                "project_id": "t1",
+                "kind": "delivery_contract",
+                "status": "live",
+                "approved_at": "2026-11-20T03:00:00+00:00",
+                "approved_by": "u1",
+                "requested_by": "u2",
+            }
+        )
+
+    # The Phase-G review answers the delivery contract, not the phase-A assignment: the
+    # delivery contract with no review is the gap, and a review of the SoAW alone must not
+    # satisfy it (nor must a second live contract silence the check).
+    expect(two_live_contracts_one_review, "compliance_review_missing", "P1")
+
+    def reviewed_delivery_contract(data: Dataset) -> None:
+        two_live_contracts_one_review(data)
+        data.reviews_arch.append(
+            {
+                "id": "r2",
+                "project_id": "t1",
+                "contract_id": "c2",
+                "level": "compliant",
+                "reviewed_at": "2026-11-20T04:00:00+00:00",
+            }
+        )
+
+    expect_absent(reviewed_delivery_contract, "compliance_review_missing")
 
     def draft_board(data: Dataset) -> None:
         data.architecture["board"][0]["status"] = "draft"
