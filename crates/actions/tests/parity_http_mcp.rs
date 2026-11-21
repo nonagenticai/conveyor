@@ -3353,6 +3353,21 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
             expect_status: None,
         },
         on_prepared("projects.close", None),
+        // U4's closure request: a random project id is a uniform 404 on both transports, which
+        // is what the parity sweep compares. The real request path has its own suite
+        // (`programme_close`).
+        expecting(
+            plain(
+                "projects.close_request",
+                json!({
+                    "id": Uuid::now_v7(),
+                    "closure": "A parity closure request.",
+                    "delegation_ref": Uuid::now_v7(),
+                }),
+                None,
+            ),
+            404,
+        ),
         {
             // #511's rework path: an existing project gains a charter and its gate. `prepare`
             // gives each round its own project, so the 201 is a real write, not a replay.

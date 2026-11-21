@@ -452,6 +452,11 @@ pub async fn delegation_ref(running: &Running, login: &str) -> String {
         .as_str()
         .expect("the P0 project id")
         .to_owned();
+    let decision_body = conveyor_domain::output_standard::template("decision")
+        .map(|template| template.skeleton)
+        .unwrap_or_else(|| {
+            "# Decision record\n\n## Context\n\nA context.\n\n## Decision\n\nA decision.\n\n## Consequences\n\nThe consequences.\n\n## Evidence\n\nThe evidence.\n".to_owned()
+        });
     let (status, body) = running
         .invoke(
             "documents.compose",
@@ -459,7 +464,7 @@ pub async fn delegation_ref(running: &Running, login: &str) -> String {
             json!({
                 "title": "Standing delegation",
                 "project_id": p0,
-                "body": "The owner delegates the programme's governance acts to the delegate.",
+                "body": decision_body,
                 "category": "decision",
                 "publishable": true,
             }),
