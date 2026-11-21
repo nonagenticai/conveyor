@@ -26,7 +26,6 @@ import json
 import os
 import subprocess
 import sys
-import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -70,6 +69,9 @@ class Runner:
         dry_run: bool,
         demo_cadence: str = DEMO_CADENCE,
         delegation: str = DELEGATION,
+        tranche_label: str = "tranche 0",
+        acts_path: Path | None = None,
+        today: str | None = None,
     ) -> None:
         self.project = project
         self.content = content
@@ -77,6 +79,9 @@ class Runner:
         self.dry_run = dry_run
         self.demo_cadence = demo_cadence
         self.delegation = delegation
+        self.tranche_label = tranche_label
+        self.acts_path = acts_path or evidence
+        self.today = today or datetime.now(timezone.utc).strftime("%Y-%m-%d")
         self.transcript = evidence.parent / "transcript.jsonl"
         self.snapshot = ""
         self.board = ""
@@ -84,6 +89,20 @@ class Runner:
             ["git", "rev-parse", "HEAD"], cwd=ROOT, capture_output=True, text=True
         ).stdout.strip()
         self.acts = 0
+
+    # ── labels ──────────────────────────────────────────────────────────────────────
+
+    def reopen_reason(self) -> str:
+        return f"the retrospective MSP/TOGAF/SAFe rework of {self.tranche_label} (#526)"
+
+    def close_reason(self) -> str:
+        return f"the retrospective rework of {self.tranche_label} (#526)"
+
+    def acts_ref(self) -> str:
+        try:
+            return str(self.acts_path.relative_to(ROOT))
+        except ValueError:
+            return str(self.acts_path)
 
     # ── transport ───────────────────────────────────────────────────────────────────
 
@@ -240,7 +259,7 @@ class Runner:
                 "projects.reopen",
                 {
                     "id": self.project_id,
-                    "reason": "the retrospective MSP/TOGAF/SAFe rework of tranche 0 (#526)",
+                    "reason": self.reopen_reason(),
                     "decision_ref": self.delegation,
                 },
             )
@@ -419,7 +438,7 @@ class Runner:
             review = self.invoke(
                 "documents.compose",
                 {
-                    "title": f"Closure review — {self.project} (retrospective, 2026-11-21)",
+                    "title": f"Closure review — {self.project} (retrospective, {self.today})",
                     "project_id": self.project_id,
                     "body": self.content["closure_review"],
                     "category": "closure-review",
@@ -456,7 +475,7 @@ class Runner:
                 "documents.compose",
                 {
                     "title": f"{category.replace('-', ' ').title()} — {self.project} "
-                             f"(retrospective, 2026-11-21)",
+                             f"(retrospective, {self.today})",
                     "project_id": self.project_id,
                     "body": body,
                     "category": category,
@@ -522,7 +541,7 @@ class Runner:
                     "evidence": [
                         f"acceptance/programme/{self.project}.toml",
                         f"docs/evidence/rework/{self.project}.json",
-                        f"docs/evidence/rework/tranche-0/acts.md",
+                        self.acts_ref(),
                     ],
                     "business_value": wbs["business_value"],
                     "time_criticality": wbs["time_criticality"],
@@ -587,7 +606,7 @@ class Runner:
             self.decide(gate["id"], "approve the destructive close", close_gate=True)
             closed = self.invoke(
                 "projects.close",
-                {"id": self.project_id, "reason": "the retrospective rework of tranche 0 (#526)"},
+                {"id": self.project_id, "reason": self.close_reason()},
                 approval_id=gate["id"],
                 read_action="projects.get",
                 read_input={"id": self.project_id},
@@ -645,22 +664,84 @@ class Runner:
         )
 
 
+def self_test() -> None:
+    """The tranche label, the demo cadence and the acts path reach every payload."""
+
+    def runner(**kwargs) -> Runner:
+        return Runner(
+            "S00",
+            {},
+            ROOT / "docs" / "evidence" / "rework" / "S00" / "acts.md",
+            True,
+            **kwargs,
+        )
+
+    default = runner()
+    if default.demo_cadence != DEMO_CADENCE or "tranche 0" not in default.reopen_reason():
+        raise SystemExit("self-test: the default shape is no longer tranche 0")
+
+    second = runner(
+        demo_cadence="demo-cadence-1",
+        tranche_label="tranche 1",
+        acts_path=ROOT / "docs" / "evidence" / "rework" / "tranche-1" / "acts.md",
+        today="2026-11-22",
+    )
+    for text in (second.reopen_reason(), second.close_reason()):
+        if "tranche 0" in text or "tranche 1" not in text:
+            raise SystemExit(f"self-test: {text!r} names the wrong tranche")
+    if second.acts_ref() != "docs/evidence/rework/tranche-1/acts.md":
+        raise SystemExit(f"self-test: acts_ref {second.acts_ref()!r} names the wrong tranche")
+    if second.today != "2026-11-22":
+        raise SystemExit("self-test: the date is not the one passed")
+    print("rework-project: self-test ok")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--project", required=True)
-    parser.add_argument("--content", type=Path, required=True)
+    parser.add_argument("--project")
+    parser.add_argument("--content", type=Path)
     parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument("--self-test", action="store_true")
+    parser.add_argument(
+        "--tranche-label",
+        default="tranche 0",
+        help="the tranche this batch reworks, e.g. 'tranche 1' (issue #526)",
+    )
+    parser.add_argument(
+        "--demo-cadence",
+        default=DEMO_CADENCE,
+        help="the demo cadence row this tranche's deliverables are credited to",
+    )
+    parser.add_argument(
+        "--acts",
+        type=Path,
+        help="the batch acts page (default docs/evidence/rework/<KEY>/acts.md)",
+    )
     args = parser.parse_args()
+    if args.self_test:
+        self_test()
+        return
+    if not args.project or not args.content:
+        parser.error("--project and --content are required")
     content = json.loads(args.content.read_text(encoding="utf-8"))
     evidence = ROOT / "docs" / "evidence" / "rework" / args.project / "acts.md"
     evidence.parent.mkdir(parents=True, exist_ok=True)
     if not evidence.exists():
+        today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
         evidence.write_text(
-            f"# {args.project} — retrospective rework acts (2026-11-21)\n\n"
-            f"Delegation: `{DELEGATION}`. Tranche 0.\n\n",
+            f"# {args.project} — retrospective rework acts ({today})\n\n"
+            f"Delegation: `{DELEGATION}`. {args.tranche_label.capitalize()}.\n\n",
             encoding="utf-8",
         )
-    Runner(args.project, content, evidence, args.dry_run).run()
+    Runner(
+        args.project,
+        content,
+        evidence,
+        args.dry_run,
+        demo_cadence=args.demo_cadence,
+        tranche_label=args.tranche_label,
+        acts_path=args.acts,
+    ).run()
 
 
 if __name__ == "__main__":
