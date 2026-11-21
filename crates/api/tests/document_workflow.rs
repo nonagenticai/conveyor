@@ -18,6 +18,25 @@ fn output(body: &Value) -> &Value {
     body.get("output").unwrap_or(body)
 }
 
+fn etag(value: &Value) -> String {
+    format!(
+        "\"{}\"",
+        value["version"].as_i64().expect("a document version")
+    )
+}
+
+/// The ids the public output window currently serves, read through the store's own reader.
+async fn published_output_ids(pg: &support::Pg, tenant: TenantId) -> Vec<String> {
+    let mut tx = conveyor_store::begin_scoped(&pg.owner, tenant)
+        .await
+        .expect("scoped tx");
+    let rows = conveyor_store::document::list_published_outputs_tx(&mut tx, tenant)
+        .await
+        .expect("published outputs");
+    tx.rollback().await.expect("rollback");
+    rows.into_iter().map(|row| row.id.to_string()).collect()
+}
+
 /// Add a `member` principal to an existing tenant.
 async fn add_member(pg: &support::Pg, tenant: TenantId, login: &str, name: &str) {
     let subject = format!("dev:{login}");
@@ -491,5 +510,206 @@ async fn a_category_alias_is_canonicalised_and_an_unknown_one_is_refused() {
     assert!(
         refused.to_string().contains("unknown_category"),
         "the refusal names the category: {refused}"
+    );
+}
+
+/// #537: the public state is `published_at`; an update that asks for public stamps it, an edit
+/// that does not touch publication keeps it, and an unpublish clears it.
+#[tokio::test(flavor = "multi_thread")]
+async fn update_publish_and_unpublish_move_published_at() {
+    let pg = support::Pg::fresh().await;
+    let seeded = support::seed(&pg, "workflow-update", "alice", "Alice").await;
+    let running = support::Running::start(&pg).await;
+
+    let (status, created) = running
+        .invoke(
+            "documents.compose",
+            "dev:alice",
+            json!({"title": "Note", "body": "# Note\n\nFirst."}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "{created}");
+    let document = output(&created);
+    assert_eq!(document["published_at"], Value::Null);
+    let id = document["id"].as_str().expect("id").to_owned();
+    let v1 = etag(document);
+
+    // An update that asks for public is a transition to public, stamped in the same write.
+    let (status, published) = running
+        .invoke(
+            "documents.update",
+            "dev:alice",
+            json!({"id": id, "publishable": true}),
+            Some(&v1),
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{published}");
+    assert_eq!(output(&published)["publishable"], true);
+    let first = output(&published)["published_at"]
+        .as_str()
+        .expect("published_at")
+        .to_owned();
+    assert!(
+        published_output_ids(&pg, seeded.tenant).await.contains(&id),
+        "the public output window serves the published row"
+    );
+    let v2 = etag(output(&published));
+
+    // An edit that does not touch publication keeps the publication instant and the row public.
+    let (status, edited) = running
+        .invoke(
+            "documents.update",
+            "dev:alice",
+            json!({"id": id, "body": "# Note\n\nRevised."}),
+            Some(&v2),
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{edited}");
+    assert_eq!(output(&edited)["publishable"], true);
+    assert_eq!(
+        output(&edited)["published_at"].as_str(),
+        Some(first.as_str())
+    );
+    assert!(
+        published_output_ids(&pg, seeded.tenant).await.contains(&id),
+        "an edit that does not touch publication keeps the row public"
+    );
+    let v3 = etag(output(&edited));
+
+    // The other direction clears the window.
+    let (status, unpublished) = running
+        .invoke(
+            "documents.update",
+            "dev:alice",
+            json!({"id": id, "publishable": false}),
+            Some(&v3),
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{unpublished}");
+    assert_eq!(output(&unpublished)["publishable"], false);
+    assert_eq!(output(&unpublished)["published_at"], Value::Null);
+    assert!(
+        !published_output_ids(&pg, seeded.tenant).await.contains(&id),
+        "the public output window drops the unpublished row"
+    );
+
+    // The audit stream crosses the boundary with the state, exactly as documents.publish does.
+    let published_events: i64 = sqlx::query_scalar(
+        "SELECT count(*) FROM event
+          WHERE tenant_id = $1 AND topic = 'document:' || $2 AND type = 'document.published'",
+    )
+    .bind(seeded.tenant_id)
+    .bind(&id)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("count the publication events");
+    let unpublished_events: i64 = sqlx::query_scalar(
+        "SELECT count(*) FROM event
+          WHERE tenant_id = $1 AND topic = 'document:' || $2 AND type = 'document.unpublished'",
+    )
+    .bind(seeded.tenant_id)
+    .bind(&id)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("count the unpublish events");
+    assert_eq!(published_events, 1, "one update publish event");
+    assert_eq!(unpublished_events, 1, "one update unpublish event");
+}
+
+/// #537: a restore on a published row is an unpublish; it must clear `published_at`, not just
+/// the bare bit, or the row stays in the public window.
+#[tokio::test(flavor = "multi_thread")]
+async fn restoring_a_published_row_unpublishes_it() {
+    let pg = support::Pg::fresh().await;
+    let seeded = support::seed(&pg, "workflow-restore", "alice", "Alice").await;
+    let running = support::Running::start(&pg).await;
+
+    let (status, created) = running
+        .invoke(
+            "documents.compose",
+            "dev:alice",
+            json!({"title": "Note", "body": "# Note\n\nFirst."}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "{created}");
+    let id = output(&created)["id"].as_str().expect("id").to_owned();
+    let v1 = etag(output(&created));
+
+    let (status, published) = running
+        .invoke(
+            "documents.publish",
+            "dev:alice",
+            json!({"id": id, "publish": true}),
+            Some(&v1),
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{published}");
+    let published_at = output(&published)["published_at"]
+        .as_str()
+        .expect("published_at")
+        .to_owned();
+
+    // Publish is not a content edit: the row is still at version 1.
+    let (status, edited) = running
+        .invoke(
+            "documents.update",
+            "dev:alice",
+            json!({"id": id, "body": "# Note\n\nSecond."}),
+            Some(&v1),
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{edited}");
+    assert_eq!(
+        output(&edited)["published_at"].as_str(),
+        Some(published_at.as_str())
+    );
+    let v2 = etag(output(&edited));
+
+    let (status, restored) = running
+        .invoke(
+            "documents.revision_restore",
+            "dev:alice",
+            json!({"id": id, "seq": 1}),
+            Some(&v2),
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{restored}");
+    assert_eq!(output(&restored)["publishable"], false);
+    assert_eq!(
+        output(&restored)["published_at"],
+        Value::Null,
+        "a restored row leaves the public window"
+    );
+
+    let unpublished_events: i64 = sqlx::query_scalar(
+        "SELECT count(*) FROM event
+          WHERE tenant_id = $1 AND topic = 'document:' || $2 AND type = 'document.unpublished'",
+    )
+    .bind(seeded.tenant_id)
+    .bind(&id)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("count the unpublish events");
+    assert_eq!(
+        unpublished_events, 1,
+        "the restore that leaves the public window emits document.unpublished"
     );
 }
