@@ -903,19 +903,46 @@ pub struct RecordIn {
     pub meta: Option<Value>,
 }
 
-/// Whether `approval_id` is an approved gate that a person actually decided on `card_id`.
+/// The one gate a case kind's policies are specific to, when they name exactly one.
+///
+/// The store keys policies by `(kind, gate)`, so a kind whose policies name a single gate
+/// resolves to it. A kind whose policies name several gates — or none — yields no expected
+/// gate: the record itself does not say which question it answers, and no gate is invented.
+async fn policy_gate_for_kind_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    kind: &str,
+) -> Result<Option<String>, LadderStoreError> {
+    let policies = store::ladder::list_policies_tx(&mut *conn, tenant, Some(kind)).await?;
+    let mut gates: Vec<String> = policies
+        .into_iter()
+        .filter_map(|policy| policy.gate)
+        .collect();
+    gates.sort();
+    gates.dedup();
+    match gates.as_slice() {
+        [only] => Ok(Some(only.clone())),
+        _ => Ok(None),
+    }
+}
+
+/// Whether `approval_id` is an approved gate that a person actually decided for this decision.
 ///
 /// A human decision is only as strong as the approval it cites: the row must exist in this
 /// tenant, be `approved` (not pending, rejected, expired or voided), carry at least one
-/// `approve` decision recorded by a human — not by an agent, rule or service — and, when
-/// `card_id` names a card, cover that same card. `gate` names the required gate where the
-/// caller has one (`draft.apply`); a human ladder record cites whatever gate posed its question.
+/// `approve` decision recorded by a human — not by an agent, rule or service — and answer the
+/// same gate. `gate` names the required gate (the one the caller named, the one the case
+/// kind's policy is specific to, or `draft.apply`); when it is absent the approval's gate is
+/// not compared. The decision's card is authoritative when it names one; a decision that
+/// names no card must cite an approval of its project, so a gateless, cardless record cannot
+/// pick any approved approval in the tenant.
 async fn human_approved_gate_tx(
     conn: &mut PgConnection,
     tenant: TenantId,
     approval_id: Uuid,
     gate: Option<&str>,
     card_id: Option<Uuid>,
+    project_id: Option<Uuid>,
 ) -> Result<bool, ActionError> {
     let approval = store::approval::get_approval_tx(&mut *conn, tenant, approval_id)
         .await
@@ -934,6 +961,11 @@ async fn human_approved_gate_tx(
         return Ok(false);
     }
     if card_id.is_some() && approval.card_id != card_id {
+        return Ok(false);
+    }
+    // The card check is authoritative when the decision names a card; the project binding
+    // applies only to a cardless decision, which otherwise matched every approval in the tenant.
+    if card_id.is_none() && project_id.is_some() && approval.project_id != project_id {
         return Ok(false);
     }
     let decisions = store::approval::list_decisions_for_approvals_tx(
@@ -977,6 +1009,7 @@ async fn ladder_record(
                 "record accepts the rule and human rungs; an evaluated decision goes through ladder.evaluate",
             )
         })?;
+    let gate = trimmed(input.gate.clone());
     // §7.1: the human rung is a person's act. A machine holding `governance:write` cannot
     // record one on a person's behalf, and the approval it cites must be a resolved gate with a
     // human `approve` decision — not any approval id that happens to exist in the tenant.
@@ -995,14 +1028,30 @@ async fn ladder_record(
                 "a human decision must cite its approval",
             )
         })?;
-        let approved =
-            human_approved_gate_tx(&mut *tx, ctx.tenant, approval_id, None, input.card_id).await?;
+        // The approval must answer the gate this decision is about: the gate the caller named,
+        // else the one gate the case kind's policy is specific to when there is exactly one.
+        // Otherwise the card/project binding alone stands — a gate is never invented.
+        let expected_gate = match gate.clone() {
+            Some(gate) => Some(gate),
+            None => policy_gate_for_kind_tx(&mut *tx, ctx.tenant, input.kind.trim())
+                .await
+                .map_err(|error| ladder_error(error, ctx.action))?,
+        };
+        let approved = human_approved_gate_tx(
+            &mut *tx,
+            ctx.tenant,
+            approval_id,
+            expected_gate.as_deref(),
+            input.card_id,
+            input.project_id,
+        )
+        .await?;
         if !approved {
             return Err(invalid(
                 "approval_id",
                 "approval_missing",
                 "a human decision must cite an approved approval with a human approve decision \
-                 on the same card",
+                 on the same card or project, for the gate the decision answers",
             ));
         }
     }
@@ -1017,7 +1066,6 @@ async fn ladder_record(
     if kind.is_empty() {
         return Err(invalid("kind", "missing", "a case kind is required"));
     }
-    let gate = trimmed(input.gate);
     let question = input.question.clone().unwrap_or_else(|| kind.to_owned());
 
     // Resolve the policy: an explicit id is read and pinned; otherwise the case's effective
@@ -1247,6 +1295,7 @@ async fn ladder_apply_draft(
         approval_id,
         Some(DRAFT_APPLY_GATE),
         card_id,
+        None,
     )
     .await?
     {
