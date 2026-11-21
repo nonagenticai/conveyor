@@ -61,9 +61,12 @@ fi
 
 # 3. The conformance audit runs on the draft BEFORE anything is published. It writes the rework
 #    register the pack must carry, so the published register is the one computed from this
-#    snapshot. A failed audit leaves the published data and output pages untouched.
+#    snapshot. The checked-in v1 findings ledger is merged here too: a register that carried only
+#    the live data gaps would silently drop every audited code finding from the published pack.
+#    A failed audit leaves the published data and output pages untouched.
 audit_args=(--snapshot "$tmp/data" --out "$tmp/conformance")
 python3 "$root/scripts/audit-programme-conformance.py" "${audit_args[@]}" \
+  --findings "$root/docs/evidence/v1-conformance-findings.json" \
   --report --rework-out "$tmp/conformance/rework.json"
 test -f "$tmp/conformance/rework.json" || {
   echo "publish-data: the audit produced no rework register" >&2
