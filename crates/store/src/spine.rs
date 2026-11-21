@@ -1223,15 +1223,23 @@ pub async fn review_tranche_tx(
         .fetch_optional(&mut *conn)
         .await?
         .ok_or(PlanStoreError::NotFound { what: "tranche" })?;
-    // A tranche close has one review. The check runs before the state guard so a second review
-    // of a row the first review closed reports "already reviewed", not "not reviewable".
+    // A tranche close has one review, with ONE exception (#526 v1-tr2-1): a tranche whose
+    // honest review PAUSED it and which was then resumed under its approved `tranche.resume`
+    // gate — back in `in_review` — records the second, dated review that can authorise its
+    // successor. The pause stays on record, so the dead end an unreviewable resume would leave
+    // (a programme that can never advance past a paused tranche) is closed without letting a
+    // second review of any other row through. The check runs before the state guard so a second
+    // review of a row the first review closed reports "already reviewed", not "not reviewable".
     let already: bool = sqlx::query_scalar(
         "SELECT EXISTS (
-            SELECT 1 FROM programme_tranche_review WHERE tenant_id = $1 AND tranche_id = $2
+            SELECT 1 FROM programme_tranche_review
+             WHERE tenant_id = $1 AND tranche_id = $2
+               AND NOT (decision = 'pause' AND $3 = 'in_review')
         )",
     )
     .bind(tenant.as_uuid())
     .bind(id)
+    .bind(&reviewed.state)
     .fetch_one(&mut *conn)
     .await?;
     if already {
@@ -1635,6 +1643,97 @@ pub async fn retire_tranche_tx(
         .fetch_optional(&mut *conn)
         .await?;
     row.ok_or(PlanStoreError::Stale { what: "tranche" })
+}
+
+/// Resume a paused tranche under the cited `tranche.resume` gate (v1-tr2-1).
+///
+/// A `pause` review maps the tranche to `paused`, a tranche is reviewed only once, and the
+/// start/close gate accepts only `authorised | in_review | closed`: without this path a paused
+/// tranche froze every project in it and no action could move it back. The gate is the only
+/// authorisation — approved, opened for `tranche.resume`, naming this tranche in `meta.target`
+/// (the PI-plan gate's identity pattern), and carrying at least one human `approve` decision.
+/// A machine decision is not a resume authorisation.
+///
+/// `programme_tranche` has no `meta`/evidence column (0044, 0052, 0056), so the resume record is
+/// merged into the cited gate's own `meta` under `resume` — the row that authorises the move is
+/// the row that records it, and the action's outbox event names the tranche.
+pub async fn resume_tranche_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    tranche_id: Uuid,
+    approval_id: Uuid,
+    note: Option<&str>,
+) -> Result<TrancheRecord, PlanStoreError> {
+    let sql = format!(
+        "SELECT {TRANCHE_COLUMNS} FROM programme_tranche
+          WHERE tenant_id = $1 AND id = $2 FOR UPDATE"
+    );
+    let current: TrancheRecord = sqlx::query_as(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(tranche_id)
+        .fetch_optional(&mut *conn)
+        .await?
+        .ok_or(PlanStoreError::NotFound { what: "tranche" })?;
+    if current.state != "paused" {
+        return Err(PlanStoreError::Illegal(PlanError::TrancheNotPaused {
+            state: current.state,
+        }));
+    }
+    let authorised: bool = sqlx::query_scalar(
+        "SELECT EXISTS (
+            SELECT 1 FROM approval a
+             WHERE a.tenant_id = $1 AND a.id = $2
+               AND a.status = 'approved' AND a.gate = 'tranche.resume'
+               AND a.meta->>'target' = $3
+               AND EXISTS (
+                   SELECT 1 FROM approval_decision d
+                    WHERE d.tenant_id = a.tenant_id AND d.approval_id = a.id
+                      AND d.decision = 'approve' AND d.decided_by_kind = 'human'))",
+    )
+    .bind(tenant.as_uuid())
+    .bind(approval_id)
+    .bind(tranche_id.to_string())
+    .fetch_one(&mut *conn)
+    .await?;
+    if !authorised {
+        return Err(PlanStoreError::Illegal(
+            PlanError::TrancheResumeApprovalMissing { approval_id },
+        ));
+    }
+    sqlx::query(
+        "UPDATE approval
+            SET meta = meta || jsonb_build_object(
+                    'resume', jsonb_build_object(
+                        'resumed_at', to_jsonb(now()),
+                        'resume_approval_id', $3::text,
+                        'tranche_id', $4::text,
+                        'note', $5::text)),
+                version = version + 1, updated_at = now()
+          WHERE tenant_id = $1 AND id = $2",
+    )
+    .bind(tenant.as_uuid())
+    .bind(approval_id)
+    .bind(approval_id.to_string())
+    .bind(tranche_id.to_string())
+    .bind(note)
+    .execute(&mut *conn)
+    .await?;
+    let sql = format!(
+        "UPDATE programme_tranche
+            SET state = 'in_review', version = version + 1, updated_at = now()
+          WHERE tenant_id = $1 AND id = $2 AND state = 'paused'
+          RETURNING {TRANCHE_COLUMNS}"
+    );
+    let row: Option<TrancheRecord> = sqlx::query_as(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(tranche_id)
+        .fetch_optional(&mut *conn)
+        .await?;
+    // The row was locked above, so this is unreachable while the lock is held; a changed row
+    // is still refused rather than reported as a successful resume.
+    row.ok_or(PlanStoreError::Illegal(PlanError::TrancheNotPaused {
+        state: "changed".to_owned(),
+    }))
 }
 
 // ── benefit_profile / benefit_link ─────────────────────────────────────────────────────

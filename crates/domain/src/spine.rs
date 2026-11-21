@@ -170,6 +170,18 @@ pub enum PlanError {
     /// The tranche is already retired.
     #[error("tranche_retired")]
     TrancheRetired,
+    /// Only a paused tranche can be resumed.
+    #[error("the tranche is {state}; only a paused tranche can be resumed")]
+    TrancheNotPaused {
+        /// The state the row carries.
+        state: String,
+    },
+    /// The cited gate does not authorise resuming this tranche.
+    #[error("approval {approval_id} is not an approved tranche.resume gate naming this tranche")]
+    TrancheResumeApprovalMissing {
+        /// The approval the caller cited.
+        approval_id: Uuid,
+    },
     /// The cadence's kind does not match the operation that reads it.
     #[error("the cadence is {actual:?}; this operation needs {expected:?}")]
     CadenceWrongKind {

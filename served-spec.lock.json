@@ -1,7 +1,7 @@
 {
   "version": 1,
   "operations": {
-    "GET /api/actions": "ef9fbcb9d63f91b44f2fffff53884d92d9095452bbb8b92d5fc547902ef288bc",
+    "GET /api/actions": "0828d9f5016c26bd0a17ede6b97cf1871b4401b363d7fae3cb08eea7bf459ab0",
     "GET /api/boards/{id}": "e1a5ad504ea61c9f6f4c9940f6bce0a13a06587c4545d9d52616852f0e67fa5b",
     "GET /api/boards/{id}/cards": "be3ca9f8fea011aa8b097206310d24ba4641698d2a8d239c5b2df6c48b784502",
     "GET /api/boards/{id}/webhooks": "5b77b802ff044156108b56072acb99bed0e2f9dfb5f2dc667b000af191cffd1b",
@@ -496,6 +496,7 @@
     "POST /api/actions/tranches.create/invocations": "1196fa52dc635e5ffa1772310cf926035d9460ef3180dc0749979e8be3dbb29e",
     "POST /api/actions/tranches.delete/invocations": "b42dbce4fc135d67f68d1631daedb20f9c65256926cb92584fdab0743d791413",
     "POST /api/actions/tranches.list/invocations": "02825b6e443c4c492406e071befcee21dc3a47d6efdf65e7a1c03a099d6ec0cc",
+    "POST /api/actions/tranches.resume/invocations": "0b687b27e1e9661e108434368f1745e52e4aa94526c62ebfed77322a423d7f64",
     "POST /api/actions/tranches.retire/invocations": "eba590ab2ef999d04fe2330aaf125dda3340f74518837b7d225141326d0d634c",
     "POST /api/actions/tranches.review/invocations": "ddaa09cb300ac0acdef141614ffaad28938084ebcce46c52f668b804c7857a21",
     "POST /api/actions/tranches.review_list/invocations": "b37d80a322a75a7d1dfaec656aa56aacc86d56a7f2245651264a89bf619b1a35",

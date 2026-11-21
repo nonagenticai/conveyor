@@ -1761,6 +1761,64 @@ async fn seed_parity_tranche(pg: &support::Pg, ctx: &Ctx, programme: Uuid) -> Uu
     id
 }
 
+/// A paused tranche and the approved human `tranche.resume` gate naming it (#526 U5c).
+///
+/// The resume reads the authorisation off the approval row itself — status `approved`, gate
+/// `tranche.resume`, a HUMAN approve decision and `meta.target` naming this tranche — so the
+/// fixture builds exactly that through the store's own writers. The refusal paths (wrong gate,
+/// pending, wrong target, machine-only) are proved in `spine_gates`;
+/// here the sample needs the surface both transports share.
+async fn seed_parity_paused_tranche_resume(pg: &support::Pg, ctx: &Ctx) -> (Uuid, Uuid) {
+    let mut tx = begin_scoped(&pg.owner, ctx.tenant).await.expect("scope");
+    let programme: Uuid = sqlx::query_scalar(
+        "INSERT INTO programme (tenant_id, name) VALUES ($1, 'Parity resume') RETURNING id",
+    )
+    .bind(ctx.tenant_id)
+    .fetch_one(&mut *tx)
+    .await
+    .expect("insert programme");
+    let tranche: Uuid = sqlx::query_scalar(
+        "INSERT INTO programme_tranche (tenant_id, programme_id, number, state)
+         VALUES ($1, $2, 0, 'paused') RETURNING id",
+    )
+    .bind(ctx.tenant_id)
+    .bind(programme)
+    .fetch_one(&mut *tx)
+    .await
+    .expect("insert paused tranche");
+    let approval = store::approval::insert_approval_tx(
+        &mut tx,
+        ctx.tenant,
+        &store::approval::NewApproval {
+            run_id: None,
+            card_id: None,
+            project_id: None,
+            eval_id: None,
+            gate: "tranche.resume".to_owned(),
+            kind: "gate".to_owned(),
+            required_decisions: 1,
+            requested_by: None,
+            expires_at: None,
+            callback_url: None,
+            correlation_id: None,
+            meta: json!({"target": tranche.to_string()}),
+        },
+    )
+    .await
+    .expect("insert the tranche.resume gate");
+    store::approval::record_decision_tx(
+        &mut tx,
+        ctx.tenant,
+        approval.id,
+        &conveyor_domain::Decision::approve(ctx.alice_user),
+        false,
+    )
+    .await
+    .expect("approve the tranche.resume gate");
+    tx.commit().await.expect("commit the resume fixture");
+    (tranche, approval.id)
+}
+
 async fn seed_parity_benefit(pg: &support::Pg, ctx: &Ctx, programme: Uuid) -> Uuid {
     let mut tx = begin_scoped(&pg.owner, ctx.tenant).await.expect("scope");
     let id: Uuid = sqlx::query_scalar(
@@ -2533,6 +2591,11 @@ async fn prepare(sample: &Sample, pg: &support::Pg, ctx: &Ctx) {
             let g = seed_parity_programme(pg, ctx).await;
             let t = seed_parity_tranche(pg, ctx, g).await;
             ctx.push("tranches.retire", t);
+        }
+        "tranches.resume" => {
+            let (t, gate) = seed_parity_paused_tranche_resume(pg, ctx).await;
+            ctx.push("tranches.resume.tranche", t);
+            ctx.push("tranches.resume.approval", gate);
         }
         "cadences.create" => {
             let g = seed_parity_programme(pg, ctx).await;
@@ -6748,6 +6811,21 @@ fn spine_samples() -> Vec<Sample> {
                 json!({
                     "id": ctx.pop("tranches.retire"),
                     "reason": "parity retirement",
+                })
+            });
+            expecting(sample, 200)
+        },
+        {
+            // #526 (U5c): a paused tranche resumes ONLY under its approved human
+            // `tranche.resume` gate naming it. Prepare builds that gate fresh per round; the
+            // refusal paths (wrong gate, pending, machine-only) live in `spine_gates`.
+            let mut sample = plain("tranches.resume", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "tranche_id": ctx.pop("tranches.resume.tranche"),
+                    "approval_id": ctx.pop("tranches.resume.approval"),
+                    "note": "parity resume",
                 })
             });
             expecting(sample, 200)
