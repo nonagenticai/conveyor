@@ -1022,7 +1022,6 @@ def generate(
 ) -> tuple[dict[str, Any], dict[str, Any]]:
     instances, _ = build_instances(std, snapshot, outputs_dir)
     findings = build_findings(instances, snapshot, covered_keys)
-    document = build_document(std, snapshot, instances, findings, html_out)
     if register is not None:
         packages = [package for package in register.get("packages") or [] if isinstance(package, dict)]
         by_key = {str(package.get("key")): package for package in packages}
@@ -1055,6 +1054,9 @@ def generate(
                 artefact["package_published"] = True
             else:
                 artefact["package_published"] = False
+    # Render only after the register has been resolved: the page and its hash must name the
+    # published package, not the pre-register fallback.
+    document = build_document(std, snapshot, instances, findings, html_out)
     findings_doc = findings_document(findings, snapshot)
     return document, findings_doc
 
