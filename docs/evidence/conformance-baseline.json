@@ -9,7 +9,7 @@
   "snapshot": {
     "git_sha": "d7293f96082dbf2f99f53bb8fd765834dddf6858",
     "generated_at": "2026-11-21T18:17:55.718331+00:00",
-    "manifest_sha256": null,
+    "manifest_sha256": "ba8129181a213aa76e642f9a83673c26ed82dabec3f8eeaa364fe825e18968c4",
     "tenant": "nonagentic",
     "outputs": 116
   },
@@ -1778,5 +1778,6 @@
       "expires": "2027-02-18",
       "reason": "accepted with baseline v4 under delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14 (2026-11-21); the batch that fixes it deletes the entry"
     }
-  ]
+  ],
+  "correction_ref": "01a1ff58-b79a-70dc-a429-20345ad49214"
 }
