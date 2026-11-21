@@ -594,8 +594,9 @@ window.installV2 = function (api, enterprise) {
             measure: live.measure || {},
             msp: live.msp || {},
             architecture: live.architecture || {},
-            // The audit's rework register rides in the snapshot beside the rows it judges.
-            rework: live.rework || null,
+            // The audit's rework register rides in the snapshot beside the rows it judges. A pack
+            // published from the committed snapshot carries it as its own generated global.
+            rework: live.rework || window.CONVEYOR_REWORK || null,
             // The generated MSP/TOGAF/SAFe/PMP record is its own published file.
             standards: window.CONVEYOR_STANDARDS || null,
             generated_at: live.generated_at || null,

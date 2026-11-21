@@ -135,6 +135,9 @@ python3 "$pack/scripts/build-docs.py"
 rsync -a --delete "$tmp/docs/standards/" "$pack/docs/standards/"
 rsync -a "$tmp/data/" "$data/"
 rsync -a "$tmp/docs/" "$pack/docs/"
+# The canonical register is an evidence ledger as well as a published row: the committed-pack
+# publish (`publish-standards.sh`) compares its build against this copy.
+cp "$tmp/conformance/rework.json" "$root/docs/evidence/rework-register.json"
 
 # 5. Mirror the pack (including data/ and docs/) and let the homepage's own gate decide.
 # `issues.json` is an INPUT to the snapshot (the redacted registry is inside programme.json).

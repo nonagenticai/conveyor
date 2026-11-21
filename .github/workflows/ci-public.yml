@@ -295,7 +295,7 @@ jobs:
           node docs/design/scripts/check-coverage.cjs --self-test
           node docs/design/scripts/check-data.cjs
           node docs/design/scripts/check-standards.cjs --self-test
-          node docs/design/scripts/check-standards.cjs
+          node docs/design/scripts/check-standards.cjs --data docs/design/data --documents docs/design
           node docs/design/scripts/check-outputs.cjs --self-test
           node docs/design/scripts/check-outputs.cjs
           node docs/design/scripts/check-docs.cjs

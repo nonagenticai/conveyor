@@ -1756,7 +1756,7 @@ function runDetail(state, id) {
   };
 }
 
-function startServer({ config, state, snapshot, outputs, standards }) {
+function startServer({ config, state, snapshot, outputs, standards, rework }) {
   const server = http.createServer((req, res) => {
     const url = new URL(req.url, "http://127.0.0.1");
     const pathname = decodeURIComponent(url.pathname);
@@ -3191,6 +3191,14 @@ function startServer({ config, state, snapshot, outputs, standards }) {
         standards
           ? "window.CONVEYOR_STANDARDS = " + JSON.stringify(standards) + ";"
           : "window.CONVEYOR_STANDARDS = null;",
+      );
+    }
+    // The register is a generated global of the pack. Fixtures that do not supply one see null,
+    // so the committed register can never leak into a no-snapshot case.
+    if (pathname === "/data/rework.js") {
+      res.writeHead(200, { "Content-Type": MIME[".js"] });
+      return res.end(
+        rework ? "window.CONVEYOR_REWORK = " + JSON.stringify(rework) + ";" : "window.CONVEYOR_REWORK = null;",
       );
     }
     // #386's fixture serves its own published-output index; the committed docs/outputs.js is a

@@ -2,8 +2,10 @@
 /*
  * check-standards.cjs — the generated MSP/TOGAF/SAFe/PMP artefact record.
  *
- * A clean checkout has no `data/standards.json`: the generator has not run, and this check is a
- * no-op. When the record IS published, the check is the gate on its honesty:
+ * The record is a published artefact of the pack, not an optional side note: when
+ * `data/standards.json` is absent the check fails, because a pack that ships the four-level view
+ * without the artefact record is the exact defect this gate exists for. When the record is
+ * published, the check is the gate on its honesty:
  *   - the schema is design-standards/v1 and the summary matches the artefacts;
  *   - every artefact's status is exactly the status of its sections;
  *   - every mandatory artefact that is not evidenced names a package that the published register
@@ -188,12 +190,11 @@ function selfTest() {
 function main() {
   if (process.argv.includes("--self-test")) return selfTest();
   if (!fs.existsSync(dataPath)) {
-    if (argv.includes("--data")) {
-      console.log(`check-standards: no standards record at ${dataPath}; the gate built nothing to verify`);
-      return 1;
-    }
-    console.log("check-standards: no standards record published yet (nothing to verify)");
-    return 0;
+    console.log(
+      `check-standards: no standards record at ${dataPath}; ` +
+        "run docs/design/scripts/publish-standards.sh and commit the pack",
+    );
+    return 1;
   }
   let record;
   try {
@@ -204,14 +205,30 @@ function main() {
   }
   let registerKeys = null;
   const reworkPath = path.join(dataDir, "rework.json");
+  const reworkJsPath = path.join(dataDir, "rework.js");
+  let register = null;
   if (fs.existsSync(reworkPath)) {
     try {
-      const register = JSON.parse(fs.readFileSync(reworkPath, "utf8"));
-      registerKeys = new Set((register.packages || []).map((pkg) => String(pkg.key)));
+      register = JSON.parse(fs.readFileSync(reworkPath, "utf8"));
     } catch (error) {
       console.log(`check-standards: data/rework.json does not parse: ${error.message}`);
       return 1;
     }
+  } else if (fs.existsSync(reworkJsPath)) {
+    try {
+      register = JSON.parse(
+        fs
+          .readFileSync(reworkJsPath, "utf8")
+          .replace(/^window\.CONVEYOR_REWORK = /, "")
+          .replace(/;\s*$/, ""),
+      );
+    } catch (error) {
+      console.log(`check-standards: data/rework.js does not parse: ${error.message}`);
+      return 1;
+    }
+  }
+  if (register) {
+    registerKeys = new Set((register.packages || []).map((pkg) => String(pkg.key)));
   }
   const errors = validate(record, root, registerKeys);
   if (errors.length) {
