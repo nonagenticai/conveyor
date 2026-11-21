@@ -3695,6 +3695,250 @@ function readBody(req, done) {
         0,
         "a project with no board renders no columns",
       );
+      // #526: the five reopened delivery-view findings, asserted on the module's own renderers.
+      // Each fixture is the smallest snapshot shape that exercises the reported branch.
+      const views = await page.evaluate(() => {
+        const D = window.CONVEYOR_DELIVERY;
+        const clock = Date.parse("2026-11-20T00:00:00Z");
+        // v1-view-1: no work.project_activity; one project has a card and a run, one has neither.
+        const observedWork = {
+          boards: [{ id: "b-ob", project_id: "p-ob" }],
+          cards: [
+            {
+              id: "c-ob",
+              board_id: "b-ob",
+              created_at: "2026-11-01T00:00:00Z",
+              updated_at: "2026-11-03T00:00:00Z",
+            },
+          ],
+          runs: [
+            {
+              id: "r-ob",
+              project_id: "p-ob",
+              created_at: "2026-11-05T00:00:00Z",
+              finished_at: "2026-11-06T00:00:00Z",
+            },
+          ],
+        };
+        const observedProgramme = {
+          generated_at: "2026-11-20T00:00:00Z",
+          projects: [
+            { id: "p-ob", key: "OB", name: "Observed project", status: "active" },
+            { id: "p-none", key: "NONE", name: "No card and no run", status: "active" },
+          ],
+        };
+        const observed = D.activityIndex(observedProgramme, observedWork, {}, clock);
+        // v1-view-2: totals only (no by_project/by_card), in priced, unpriced and zero shapes.
+        const spend = (totals) => {
+          const acc = D.tenantSpend({ inference: { totals } });
+          return acc ? D.spendText(acc.tokens, acc.usd, acc.priced, acc.unpriced) : null;
+        };
+        const totalsOnly = {
+          inference: {
+            totals: {
+              total_tokens: 4200000,
+              cost_usd: "1.250000",
+              priced_calls: 4,
+              unpriced_calls: 2,
+            },
+          },
+        };
+        const spendWork = {
+          boards: [{ id: "b-sp", project_id: "p-sp" }],
+          lists: [{ id: "l-sp", board_id: "b-sp", kind: "active" }],
+          cards: [{ id: "c-sp", board_id: "b-sp", list_id: "l-sp", name: "Spend card" }],
+        };
+        const spendBoard = D.boardModel(spendWork, { id: "p-sp", key: "SP" }, totalsOnly, {}, {});
+        // v1-view-3: standalone membership needs active/paused AND a board or a card.
+        const standaloneProgramme = {
+          generated_at: "2026-11-20T00:00:00Z",
+          programme: [],
+          projects: [
+            { id: "p-a", key: "PA", name: "Active with board", status: "active" },
+            { id: "p-p", key: "PP", name: "Paused with card", status: "paused" },
+            { id: "p-c", key: "PC", name: "Closed with board", status: "closed" },
+            { id: "p-d", key: "PD", name: "Draft with board", status: "draft" },
+            { id: "p-e", key: "PE", name: "Archived with board", status: "archived" },
+            { id: "p-b", key: "PB", name: "Active but bare", status: "active" },
+          ],
+        };
+        const standaloneWork = {
+          boards: [
+            { id: "b-a", project_id: "p-a" },
+            { id: "b-p", project_id: "p-p" },
+            { id: "b-c", project_id: "p-c" },
+            { id: "b-d", project_id: "p-d" },
+            { id: "b-e", project_id: "p-e" },
+          ],
+          lists: [
+            { id: "l-a", board_id: "b-a", kind: "active" },
+            { id: "l-p", board_id: "b-p", kind: "active" },
+            { id: "l-c", board_id: "b-c", kind: "active" },
+            { id: "l-d", board_id: "b-d", kind: "active" },
+            { id: "l-e", board_id: "b-e", kind: "active" },
+          ],
+          cards: [{ id: "c-p", board_id: "b-p", list_id: "l-p", name: "Paused card" }],
+        };
+        const standalone = D.portfolioRows(
+          standaloneProgramme,
+          D.activityIndex(standaloneProgramme, standaloneWork, {}, clock),
+          clock,
+          {},
+        );
+        // v1-view-4: twelve benefit profiles; the old rail stopped at eight.
+        const benefits = Array.from({ length: 12 }, (_, i) => ({
+          reference: "BEN-" + String(i + 1).padStart(2, "0"),
+          description: "Benefit " + (i + 1),
+          target: "target " + (i + 1),
+        }));
+        // v1-view-5: 60 cards in one lane, 30 in another, 30 archived.
+        const cards = [];
+        for (let i = 0; i < 60; i += 1) {
+          cards.push({ id: "a-" + i, board_id: "b-kb", list_id: "l-kb-1", name: "Lane one " + i });
+        }
+        for (let i = 0; i < 30; i += 1) {
+          cards.push({ id: "b-" + i, board_id: "b-kb", list_id: "l-kb-2", name: "Lane two " + i });
+        }
+        for (let i = 0; i < 30; i += 1) {
+          cards.push({
+            id: "z-" + i,
+            board_id: "b-kb",
+            list_id: "l-kb-1",
+            name: "Archived " + i,
+            archived_at: "2026-11-10T00:00:00Z",
+          });
+        }
+        const kanbanHtml = D.kanban(
+          D.boardModel(
+            {
+              boards: [{ id: "b-kb", project_id: "p-kb", position: 0 }],
+              lists: [
+                { id: "l-kb-1", board_id: "b-kb", name: "One", kind: "active", position: 1 },
+                { id: "l-kb-2", board_id: "b-kb", name: "Two", kind: "active", position: 2 },
+                { id: "l-kb-done", board_id: "b-kb", name: "Done", kind: "done", position: 3 },
+              ],
+              cards,
+            },
+            { id: "p-kb", key: "KB" },
+            {},
+            {},
+            {},
+          ),
+        );
+        const holder = document.createElement("div");
+        holder.innerHTML = kanbanHtml;
+        return {
+          view1: {
+            start: observed.get("p-ob").start,
+            end: observed.get("p-ob").end,
+            quietStart: observed.get("p-none").start,
+            html: D.gantt([...observed.values()]),
+          },
+          view2: {
+            note:
+              (D.kanban(spendBoard).match(/<p class="muted kanban-note">([^<]*)<\/p>/) || [])[1] || "",
+            attributed: D.tenantSpend({
+              inference: {
+                by_project: [{ project_id: "p", total_tokens: 10 }],
+                totals: totalsOnly.inference.totals,
+              },
+            }),
+            priced: spend({ total_tokens: 1000000, cost_usd: "0.500000", priced_calls: 2, unpriced_calls: 0 }),
+            unpriced: spend({ total_tokens: 5000, cost_usd: "0.000000", priced_calls: 0, unpriced_calls: 3 }),
+            zero: spend({ total_tokens: 0, cost_usd: "0.000000", priced_calls: 0, unpriced_calls: 0 }),
+            absent: D.tenantSpend({ inference: {} }),
+          },
+          view3: standalone.standalone.map((row) => row.key),
+          view4: {
+            html: D.benefitRail({ benefits }),
+            count: (D.benefitRail({ benefits }).match(/<span class="rail-chip/g) || []).length,
+          },
+          view5: [...holder.querySelectorAll(".kanban-col")].map((col) => ({
+            lane: col.getAttribute("data-lane"),
+            archived: col.classList.contains("kanban-archived"),
+            tiles: col.querySelectorAll(".kanban-card").length,
+            more: [...col.querySelectorAll(".kanban-more")].map((el) => el.textContent.trim()),
+          })),
+        };
+      });
+      // v1-view-1: the window is derived from the card and the run when project_activity is absent.
+      assert.equal(
+        views.view1.start,
+        Date.parse("2026-11-01T00:00:00Z"),
+        "v1-view-1: the earliest card event opens the derived window",
+      );
+      assert.equal(
+        views.view1.end,
+        Date.parse("2026-11-20T00:00:00Z"),
+        "v1-view-1: an open project's derived window reaches the snapshot clock",
+      );
+      assert.equal(
+        views.view1.quietStart,
+        null,
+        "v1-view-1: a project with no card and no run has no window",
+      );
+      assert.equal(
+        (views.view1.html.match(/gantt-actual/g) || []).length,
+        1,
+        "v1-view-1: the observed project draws one bar",
+      );
+      assert.equal(
+        (views.view1.html.match(/gantt-nodate/g) || []).length,
+        1,
+        "v1-view-1: a project with no card and no run gets no bar",
+      );
+      // v1-view-2: the tenant total is named unattributed, in priced, unpriced and zero shapes.
+      assert.match(
+        views.view2.note,
+        /^4\.2M tok · \$1\.25\* unattributed to a project\.$/,
+        "v1-view-2: tenant-only spend is reported as unattributed",
+      );
+      assert.equal(
+        views.view2.attributed,
+        null,
+        "v1-view-2: attributed spend is not duplicated as unattributed",
+      );
+      assert.match(views.view2.priced, /^1\.0M tok · \$0\.50$/, "v1-view-2: a priced total renders dollars");
+      assert.match(
+        views.view2.unpriced,
+        /^5\.0k tok · —\*$/,
+        "v1-view-2: an unpriced total renders —*, never $0.00",
+      );
+      assert.match(views.view2.zero, /^0 tok · \$0\.00$/, "v1-view-2: a zero total is a real zero");
+      assert.equal(views.view2.absent, null, "v1-view-2: a missing totals row is not a spend claim");
+      // v1-view-3: only an active/paused standalone row with a board or a card is public.
+      assert.deepEqual(
+        views.view3,
+        ["PA", "PP"],
+        "v1-view-3: closed, draft, archived and bare standalone rows are excluded",
+      );
+      // v1-view-4: every benefit profile renders; the old rail stopped at eight.
+      assert.equal(views.view4.count, 12, "v1-view-4: all twelve benefit profiles render");
+      assert.match(views.view4.html, /BEN-09/, "v1-view-4: the ninth profile is not dropped");
+      assert.match(views.view4.html, /BEN-12/, "v1-view-4: the twelfth profile is not dropped");
+      // v1-view-5: every lane and the archived column cap at 25 with a visible remainder.
+      assert.ok(
+        views.view5
+          .filter((col) => ["active", "done", "archived"].includes(col.lane))
+          .every((col) => col.tiles <= 25),
+        "v1-view-5: no board lane renders more than 25 tiles",
+      );
+      assert.deepEqual(
+        views.view5
+          .filter((col) => col.lane === "active")
+          .map((col) => [col.tiles, col.more.join("")]),
+        [
+          [25, "35 more"],
+          [25, "5 more"],
+        ],
+        "v1-view-5: both crowded lanes cap at 25 and carry their remainder",
+      );
+      const archivedColumn = views.view5.find((col) => col.archived);
+      assert.deepEqual(
+        [archivedColumn.tiles, archivedColumn.more.join("")],
+        [25, "5 more"],
+        "v1-view-5: the archived column caps at 25 and carries its remainder",
+      );
       await page.goto(`http://127.0.0.1:${snapshotServer.port}/studio.html#contribute`);
       await page.waitForSelector(".page");
       await page.waitForTimeout(200);
