@@ -496,3 +496,118 @@ async fn close_request_refuses_a_standalone_project() {
     assert_eq!(status, 409, "{body}");
     assert_eq!(body["type"], "not_a_programme_project", "{body}");
 }
+
+/// A delegated act without the reference is refused at the boundary, before the handler.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn close_request_requires_a_delegation_ref() {
+    let (pg, running, seeded) = fixture().await;
+    let project = programme_project(&pg, &running, &seeded).await;
+    let (status, body) = running
+        .invoke(
+            "projects.close_request",
+            TOKEN,
+            json!({"id": project, "closure": "A closure."}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 422, "{body}");
+}
+
+/// A decision output under another project is not the standing delegation.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn close_request_refuses_a_decision_from_another_project() {
+    let (pg, running, seeded) = fixture().await;
+    let project = programme_project(&pg, &running, &seeded).await;
+    let (status, created) = running
+        .invoke(
+            "projects.create",
+            TOKEN,
+            json!({"title": "Not P0"}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "{created}");
+    let other = text(output(&created), "id");
+    let (status, body) = running
+        .invoke(
+            "documents.compose",
+            TOKEN,
+            json!({
+                "title": "Another decision",
+                "project_id": other,
+                "body": "A decision under another project.",
+                "category": "decision",
+                "publishable": true,
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "{body}");
+    let document = text(output(&body), "id");
+    let version = output(&body)["version"].as_i64().expect("a version");
+    let (status, body) = running
+        .invoke(
+            "documents.publish",
+            TOKEN,
+            json!({"id": document, "publish": true}),
+            Some(&format!("\"{version}\"")),
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{body}");
+
+    let (status, body) = running
+        .invoke(
+            "projects.close_request",
+            TOKEN,
+            json!({
+                "id": project,
+                "closure": "A closure.",
+                "delegation_ref": document,
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 409, "{body}");
+    assert_eq!(body["type"], "delegation_wrong_project", "{body}");
+}
+
+/// The contract's requester cannot record the compliance review of their own contract.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn reviews_record_refuses_the_contract_requester() {
+    let (pg, running, seeded) = fixture().await;
+    let delegation = support::delegation_ref(&running, TOKEN).await;
+    let project = programme_project(&pg, &running, &seeded).await;
+    charter(&running, &project).await;
+    baseline(&running, &project).await;
+    let contract = contract(&pg, &running, &seeded, &project, &delegation).await;
+
+    let (status, body) = running
+        .invoke(
+            "architecture.reviews_record",
+            TOKEN,
+            json!({
+                "project_id": project,
+                "contract_id": contract,
+                "level": "compliant",
+                "findings": [],
+                "evidence": {"delegation_ref": delegation},
+                "delegation_ref": delegation,
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 409, "{body}");
+    assert_eq!(body["type"], "requester_is_reviewer", "{body}");
+}
