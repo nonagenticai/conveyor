@@ -37,10 +37,6 @@ tmp="$(mktemp -d)"
 trap 'rm -rf "$tmp"' EXIT
 mkdir -p "$tmp/data" "$tmp/docs" "$tmp/conformance"
 
-# 0. Markdown -> standalone HTML. The pack is published verbatim, so the pages must exist
-#    here; check-docs.cjs gates the committed output without needing pandoc.
-python3 "$pack/scripts/build-docs.py"
-
 # 1. The issue registry is the only GitHub-derived input the snapshot needs. The programme seed
 #    is an IMAGE INPUT (`include_str!`), so it changes only in a repository PR and never during a
 #    publish. The plan seed is retired: execution state (boards, cards, runs) is never seeded, so
@@ -129,6 +125,10 @@ test -f "$tmp/docs/standards/index.html" || {
   echo "publish-data: the standards generator produced no index" >&2
   exit 1
 }
+
+# 3e. Markdown -> standalone HTML. This writes the pack's document pages, so it runs only after
+#     the gate: a failed publish leaves both the data and the documents untouched.
+python3 "$pack/scripts/build-docs.py"
 
 # 4. Only now does the fresh pack replace the published one. The standards directory is replaced
 #    wholesale: a page for an artefact that no longer exists must not survive the publish.
