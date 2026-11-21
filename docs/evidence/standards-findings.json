@@ -1,0 +1,3633 @@
+{
+  "audited_at": "2026-11-20",
+  "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
+  "findings": [
+    {
+      "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+      "area": "§8.3",
+      "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
+      "category": "benefit-transition",
+      "evidence": [
+        {
+          "artefact": "std-msp-benefit-transition-b1",
+          "section": "Baseline measurement",
+          "snapshot": [
+            [
+              "msp.json",
+              "/benefit_transitions",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-msp-benefit-transition-b1",
+          "section": "Readiness",
+          "snapshot": [
+            [
+              "msp.json",
+              "/benefit_transitions",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-msp-benefit-transition-b1",
+          "section": "Transition",
+          "snapshot": [
+            [
+              "msp.json",
+              "/benefit_transitions",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-msp-benefit-transition-b1",
+          "section": "Post-transition measurement",
+          "snapshot": [
+            [
+              "msp.json",
+              "/benefit_transitions",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-msp-benefit-transition-b1",
+          "section": "Legacy retirement",
+          "snapshot": [
+            [
+              "msp.json",
+              "/benefit_transitions",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a MSP artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-msp-benefit-transition-b1",
+      "missing": [
+        "Baseline measurement",
+        "Readiness",
+        "Transition",
+        "Post-transition measurement",
+        "Legacy retirement"
+      ],
+      "owner_project": "PLATFORM",
+      "package_key": "std-msp-benefit-transition-b1:PLATFORM",
+      "problem": "The benefit-transition artefact for Auditable decisions is absent; missing required sections: Baseline measurement, Readiness, Transition, Post-transition measurement, Legacy retirement.",
+      "severity": "P1",
+      "source": "artefact",
+      "spec": "§8.3",
+      "standard": "MSP",
+      "subject": {
+        "id": "01a1e9de-4e4f-757e-a8c8-bf3522e5adcf",
+        "key": "B1",
+        "kind": "benefit",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "",
+        "title": "Auditable decisions"
+      },
+      "title": "MSP artefact absent: benefit-transition"
+    },
+    {
+      "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+      "area": "§8.3",
+      "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
+      "category": "benefit-transition",
+      "evidence": [
+        {
+          "artefact": "std-msp-benefit-transition-b2",
+          "section": "Baseline measurement",
+          "snapshot": [
+            [
+              "msp.json",
+              "/benefit_transitions",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-msp-benefit-transition-b2",
+          "section": "Readiness",
+          "snapshot": [
+            [
+              "msp.json",
+              "/benefit_transitions",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-msp-benefit-transition-b2",
+          "section": "Transition",
+          "snapshot": [
+            [
+              "msp.json",
+              "/benefit_transitions",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-msp-benefit-transition-b2",
+          "section": "Post-transition measurement",
+          "snapshot": [
+            [
+              "msp.json",
+              "/benefit_transitions",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-msp-benefit-transition-b2",
+          "section": "Legacy retirement",
+          "snapshot": [
+            [
+              "msp.json",
+              "/benefit_transitions",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a MSP artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-msp-benefit-transition-b2",
+      "missing": [
+        "Baseline measurement",
+        "Readiness",
+        "Transition",
+        "Post-transition measurement",
+        "Legacy retirement"
+      ],
+      "owner_project": "PLATFORM",
+      "package_key": "std-msp-benefit-transition-b2:PLATFORM",
+      "problem": "The benefit-transition artefact for Less bespoke tooling is absent; missing required sections: Baseline measurement, Readiness, Transition, Post-transition measurement, Legacy retirement.",
+      "severity": "P1",
+      "source": "artefact",
+      "spec": "§8.3",
+      "standard": "MSP",
+      "subject": {
+        "id": "01a1e9df-0308-7fdc-8492-32db1e582a2d",
+        "key": "B2",
+        "kind": "benefit",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "",
+        "title": "Less bespoke tooling"
+      },
+      "title": "MSP artefact absent: benefit-transition"
+    },
+    {
+      "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+      "area": "§8.3",
+      "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
+      "category": "benefit-transition",
+      "evidence": [
+        {
+          "artefact": "std-msp-benefit-transition-b3",
+          "section": "Baseline measurement",
+          "snapshot": [
+            [
+              "msp.json",
+              "/benefit_transitions",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-msp-benefit-transition-b3",
+          "section": "Readiness",
+          "snapshot": [
+            [
+              "msp.json",
+              "/benefit_transitions",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-msp-benefit-transition-b3",
+          "section": "Transition",
+          "snapshot": [
+            [
+              "msp.json",
+              "/benefit_transitions",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-msp-benefit-transition-b3",
+          "section": "Post-transition measurement",
+          "snapshot": [
+            [
+              "msp.json",
+              "/benefit_transitions",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-msp-benefit-transition-b3",
+          "section": "Legacy retirement",
+          "snapshot": [
+            [
+              "msp.json",
+              "/benefit_transitions",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a MSP artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-msp-benefit-transition-b3",
+      "missing": [
+        "Baseline measurement",
+        "Readiness",
+        "Transition",
+        "Post-transition measurement",
+        "Legacy retirement"
+      ],
+      "owner_project": "PLATFORM",
+      "package_key": "std-msp-benefit-transition-b3:PLATFORM",
+      "problem": "The benefit-transition artefact for Self-development is absent; missing required sections: Baseline measurement, Readiness, Transition, Post-transition measurement, Legacy retirement.",
+      "severity": "P1",
+      "source": "artefact",
+      "spec": "§8.3",
+      "standard": "MSP",
+      "subject": {
+        "id": "01a1e9df-0c4b-7807-b35c-5810ec418d45",
+        "key": "B3",
+        "kind": "benefit",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "",
+        "title": "Self-development"
+      },
+      "title": "MSP artefact absent: benefit-transition"
+    },
+    {
+      "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+      "area": "§8.3",
+      "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
+      "category": "benefit-transition",
+      "evidence": [
+        {
+          "artefact": "std-msp-benefit-transition-b4",
+          "section": "Baseline measurement",
+          "snapshot": [
+            [
+              "msp.json",
+              "/benefit_transitions",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-msp-benefit-transition-b4",
+          "section": "Readiness",
+          "snapshot": [
+            [
+              "msp.json",
+              "/benefit_transitions",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-msp-benefit-transition-b4",
+          "section": "Transition",
+          "snapshot": [
+            [
+              "msp.json",
+              "/benefit_transitions",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-msp-benefit-transition-b4",
+          "section": "Post-transition measurement",
+          "snapshot": [
+            [
+              "msp.json",
+              "/benefit_transitions",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-msp-benefit-transition-b4",
+          "section": "Legacy retirement",
+          "snapshot": [
+            [
+              "msp.json",
+              "/benefit_transitions",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a MSP artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-msp-benefit-transition-b4",
+      "missing": [
+        "Baseline measurement",
+        "Readiness",
+        "Transition",
+        "Post-transition measurement",
+        "Legacy retirement"
+      ],
+      "owner_project": "PLATFORM",
+      "package_key": "std-msp-benefit-transition-b4:PLATFORM",
+      "problem": "The benefit-transition artefact for Public collaboration is absent; missing required sections: Baseline measurement, Readiness, Transition, Post-transition measurement, Legacy retirement.",
+      "severity": "P1",
+      "source": "artefact",
+      "spec": "§8.3",
+      "standard": "MSP",
+      "subject": {
+        "id": "01a1e9df-1592-79a5-839e-037d8fe4251b",
+        "key": "B4",
+        "kind": "benefit",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "",
+        "title": "Public collaboration"
+      },
+      "title": "MSP artefact absent: benefit-transition"
+    },
+    {
+      "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+      "area": "§8.3",
+      "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
+      "category": "benefit-transition",
+      "evidence": [
+        {
+          "artefact": "std-msp-benefit-transition-b5",
+          "section": "Baseline measurement",
+          "snapshot": [
+            [
+              "msp.json",
+              "/benefit_transitions",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-msp-benefit-transition-b5",
+          "section": "Readiness",
+          "snapshot": [
+            [
+              "msp.json",
+              "/benefit_transitions",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-msp-benefit-transition-b5",
+          "section": "Transition",
+          "snapshot": [
+            [
+              "msp.json",
+              "/benefit_transitions",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-msp-benefit-transition-b5",
+          "section": "Post-transition measurement",
+          "snapshot": [
+            [
+              "msp.json",
+              "/benefit_transitions",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-msp-benefit-transition-b5",
+          "section": "Legacy retirement",
+          "snapshot": [
+            [
+              "msp.json",
+              "/benefit_transitions",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a MSP artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-msp-benefit-transition-b5",
+      "missing": [
+        "Baseline measurement",
+        "Readiness",
+        "Transition",
+        "Post-transition measurement",
+        "Legacy retirement"
+      ],
+      "owner_project": "PLATFORM",
+      "package_key": "std-msp-benefit-transition-b5:PLATFORM",
+      "problem": "The benefit-transition artefact for One model is absent; missing required sections: Baseline measurement, Readiness, Transition, Post-transition measurement, Legacy retirement.",
+      "severity": "P1",
+      "source": "artefact",
+      "spec": "§8.3",
+      "standard": "MSP",
+      "subject": {
+        "id": "01a1e9df-1e42-7199-87e1-23c577c62f8e",
+        "key": "B5",
+        "kind": "benefit",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "",
+        "title": "One model"
+      },
+      "title": "MSP artefact absent: benefit-transition"
+    },
+    {
+      "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+      "area": "§8.3",
+      "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
+      "category": "benefit-transition",
+      "evidence": [
+        {
+          "artefact": "std-msp-benefit-transition-b6",
+          "section": "Baseline measurement",
+          "snapshot": [
+            [
+              "msp.json",
+              "/benefit_transitions",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-msp-benefit-transition-b6",
+          "section": "Readiness",
+          "snapshot": [
+            [
+              "msp.json",
+              "/benefit_transitions",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-msp-benefit-transition-b6",
+          "section": "Transition",
+          "snapshot": [
+            [
+              "msp.json",
+              "/benefit_transitions",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-msp-benefit-transition-b6",
+          "section": "Post-transition measurement",
+          "snapshot": [
+            [
+              "msp.json",
+              "/benefit_transitions",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-msp-benefit-transition-b6",
+          "section": "Legacy retirement",
+          "snapshot": [
+            [
+              "msp.json",
+              "/benefit_transitions",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a MSP artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-msp-benefit-transition-b6",
+      "missing": [
+        "Baseline measurement",
+        "Readiness",
+        "Transition",
+        "Post-transition measurement",
+        "Legacy retirement"
+      ],
+      "owner_project": "PLATFORM",
+      "package_key": "std-msp-benefit-transition-b6:PLATFORM",
+      "problem": "The benefit-transition artefact for Predictable delivery is absent; missing required sections: Baseline measurement, Readiness, Transition, Post-transition measurement, Legacy retirement.",
+      "severity": "P1",
+      "source": "artefact",
+      "spec": "§8.3",
+      "standard": "MSP",
+      "subject": {
+        "id": "01a1e9df-27b8-7827-ae4e-6d48ca5904e8",
+        "key": "B6",
+        "kind": "benefit",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "",
+        "title": "Predictable delivery"
+      },
+      "title": "MSP artefact absent: benefit-transition"
+    },
+    {
+      "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+      "area": "§8.3",
+      "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
+      "category": "blueprint",
+      "evidence": [
+        {
+          "artefact": "std-msp-blueprint-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "section": "Aggregates and services",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "blueprint",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-msp-blueprint-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "section": "Action registry and data model",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "blueprint",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-msp-blueprint-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "section": "Deployment estate",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "blueprint",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-msp-blueprint-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "section": "The to-be the projects deliver",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "blueprint",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a MSP artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-msp-blueprint-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+      "missing": [
+        "Aggregates and services",
+        "Action registry and data model",
+        "Deployment estate",
+        "The to-be the projects deliver"
+      ],
+      "owner_project": "PLATFORM",
+      "package_key": "std-msp-blueprint-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM",
+      "problem": "The blueprint artefact for conveyor buildout is absent; missing required sections: Aggregates and services, Action registry and data model, Deployment estate, The to-be the projects deliver.",
+      "severity": "P1",
+      "source": "artefact",
+      "spec": "§8.3",
+      "standard": "MSP",
+      "subject": {
+        "id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "key": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "kind": "programme",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "",
+        "title": "conveyor buildout"
+      },
+      "title": "MSP artefact absent: blueprint"
+    },
+    {
+      "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+      "area": "§8.3",
+      "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
+      "category": "governance",
+      "evidence": [
+        {
+          "artefact": "std-msp-governance-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "section": "Roles",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "governance",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-msp-governance-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "section": "Decision ladder",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "governance",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-msp-governance-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "section": "Assurance",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "governance",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-msp-governance-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "section": "The unit protocol",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "governance",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a MSP artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-msp-governance-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+      "missing": [
+        "Roles",
+        "Decision ladder",
+        "Assurance",
+        "The unit protocol"
+      ],
+      "owner_project": "PLATFORM",
+      "package_key": "std-msp-governance-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM",
+      "problem": "The governance artefact for conveyor buildout is absent; missing required sections: Roles, Decision ladder, Assurance, The unit protocol.",
+      "severity": "P1",
+      "source": "artefact",
+      "spec": "§8.3",
+      "standard": "MSP",
+      "subject": {
+        "id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "key": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "kind": "programme",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "",
+        "title": "conveyor buildout"
+      },
+      "title": "MSP artefact absent: governance"
+    },
+    {
+      "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+      "area": "§8.3",
+      "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
+      "category": "programme-plan",
+      "evidence": [
+        {
+          "artefact": "std-msp-programme-plan-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "section": "Tranches",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "programme-plan",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-msp-programme-plan-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "section": "Projects and sequencing",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "programme-plan",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-msp-programme-plan-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "section": "Gates",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "programme-plan",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-msp-programme-plan-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "section": "First three months",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "programme-plan",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a MSP artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-msp-programme-plan-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+      "missing": [
+        "Tranches",
+        "Projects and sequencing",
+        "Gates",
+        "First three months"
+      ],
+      "owner_project": "PLATFORM",
+      "package_key": "std-msp-programme-plan-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM",
+      "problem": "The programme-plan artefact for conveyor buildout is absent; missing required sections: Tranches, Projects and sequencing, Gates, First three months.",
+      "severity": "P1",
+      "source": "artefact",
+      "spec": "§8.3",
+      "standard": "MSP",
+      "subject": {
+        "id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "key": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "kind": "programme",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "",
+        "title": "conveyor buildout"
+      },
+      "title": "MSP artefact absent: programme-plan"
+    },
+    {
+      "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+      "area": "§8.3",
+      "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
+      "category": "programme-strategies",
+      "evidence": [
+        {
+          "artefact": "std-msp-programme-strategies-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "section": "Information strategy",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "programme-strategies",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-msp-programme-strategies-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "section": "Risk strategy",
+          "snapshot": [
+            [
+              "msp.json",
+              "/register_items",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-msp-programme-strategies-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "section": "Issue strategy",
+          "snapshot": [
+            [
+              "msp.json",
+              "/register_items",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-msp-programme-strategies-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "section": "Monitoring strategy",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "programme-strategies",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-msp-programme-strategies-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "section": "Communications strategy",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "programme-strategies",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-msp-programme-strategies-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "section": "Quality strategy",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "programme-strategies",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-msp-programme-strategies-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "section": "Resource strategy",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "programme-strategies",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a MSP artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-msp-programme-strategies-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+      "missing": [
+        "Information strategy",
+        "Risk strategy",
+        "Issue strategy",
+        "Monitoring strategy",
+        "Communications strategy",
+        "Quality strategy",
+        "Resource strategy"
+      ],
+      "owner_project": "PLATFORM",
+      "package_key": "std-msp-programme-strategies-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM",
+      "problem": "The programme-strategies artefact for conveyor buildout is absent; missing required sections: Information strategy, Risk strategy, Issue strategy, Monitoring strategy, Communications strategy, Quality strategy, Resource strategy.",
+      "severity": "P1",
+      "source": "artefact",
+      "spec": "§8.3",
+      "standard": "MSP",
+      "subject": {
+        "id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "key": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "kind": "programme",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "",
+        "title": "conveyor buildout"
+      },
+      "title": "MSP artefact absent: programme-strategies"
+    },
+    {
+      "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+      "area": "§8.3",
+      "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
+      "category": "refined-vision",
+      "evidence": [
+        {
+          "artefact": "std-msp-refined-vision-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "section": "Refined vision",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "refined-vision",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-msp-refined-vision-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "section": "Changes from the mandate",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "refined-vision",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a MSP artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-msp-refined-vision-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+      "missing": [
+        "Refined vision",
+        "Changes from the mandate"
+      ],
+      "owner_project": "PLATFORM",
+      "package_key": "std-msp-refined-vision-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM",
+      "problem": "The refined-vision artefact for conveyor buildout is absent; missing required sections: Refined vision, Changes from the mandate.",
+      "severity": "P1",
+      "source": "artefact",
+      "spec": "§8.3",
+      "standard": "MSP",
+      "subject": {
+        "id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "key": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "kind": "programme",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "",
+        "title": "conveyor buildout"
+      },
+      "title": "MSP artefact absent: refined-vision"
+    },
+    {
+      "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+      "area": "§8.1",
+      "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
+      "category": "delivery-contract",
+      "evidence": [
+        {
+          "artefact": "std-togaf-delivery-contract-t9",
+          "section": "Commitments",
+          "snapshot": [
+            [
+              "architecture.json",
+              "/contracts",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-togaf-delivery-contract-t9",
+          "section": "Compliance method",
+          "snapshot": [
+            [
+              "architecture.json",
+              "/contracts",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-togaf-delivery-contract-t9",
+          "section": "Approval",
+          "snapshot": [
+            [
+              "architecture.json",
+              "/contracts",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a TOGAF artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-togaf-delivery-contract-t9",
+      "missing": [
+        "Commitments",
+        "Compliance method",
+        "Approval"
+      ],
+      "owner_project": "T9",
+      "package_key": "std-togaf-delivery-contract-t9:T9",
+      "problem": "The delivery-contract artefact for SPEC_V2 slice T9 (docs/SPEC_V2.md §12) is absent; missing required sections: Commitments, Compliance method, Approval.",
+      "severity": "P1",
+      "source": "artefact",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "subject": {
+        "id": "01a1d039-0d35-7bd1-945d-cea12c5dfd6d",
+        "key": "T9",
+        "kind": "project",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "T9",
+        "title": "SPEC_V2 slice T9 (docs/SPEC_V2.md §12)"
+      },
+      "title": "TOGAF artefact absent: delivery-contract"
+    },
+    {
+      "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+      "area": "§8.3",
+      "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
+      "category": "business-case",
+      "evidence": [
+        {
+          "artefact": "std-msp-business-case-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "section": "Licensing frame",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "business-case",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a MSP artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-msp-business-case-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+      "missing": [
+        "Licensing frame"
+      ],
+      "owner_project": "PLATFORM",
+      "package_key": "std-msp-business-case-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM",
+      "problem": "The business-case artefact for conveyor buildout is partial; missing required sections: Licensing frame.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.3",
+      "standard": "MSP",
+      "subject": {
+        "id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "key": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "kind": "programme",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "",
+        "title": "conveyor buildout"
+      },
+      "title": "MSP artefact partial: business-case"
+    },
+    {
+      "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+      "area": "§8.3",
+      "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
+      "category": "programme-brief",
+      "evidence": [
+        {
+          "artefact": "std-msp-programme-brief-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "section": "Vision and outcomes",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "programme-brief",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-msp-programme-brief-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "section": "Benefit categories",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "programme-brief",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-msp-programme-brief-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "section": "Cost, timescale and effort",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "programme-brief",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-msp-programme-brief-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "section": "Risks and support",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "programme-brief",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-msp-programme-brief-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "section": "Delivery options",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "programme-brief",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a MSP artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-msp-programme-brief-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+      "missing": [
+        "Vision and outcomes",
+        "Benefit categories",
+        "Cost, timescale and effort",
+        "Risks and support",
+        "Delivery options"
+      ],
+      "owner_project": "PLATFORM",
+      "package_key": "std-msp-programme-brief-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM",
+      "problem": "The programme-brief artefact for conveyor buildout is partial; missing required sections: Vision and outcomes, Benefit categories, Cost, timescale and effort, Risks and support, Delivery options.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.3",
+      "standard": "MSP",
+      "subject": {
+        "id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "key": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "kind": "programme",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "",
+        "title": "conveyor buildout"
+      },
+      "title": "MSP artefact partial: programme-brief"
+    },
+    {
+      "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+      "area": "§8.3",
+      "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
+      "category": "projects-dossier",
+      "evidence": [
+        {
+          "artefact": "std-msp-projects-dossier-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "section": "Delivery risks",
+          "snapshot": [
+            [
+              "msp.json",
+              "/register_items",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a MSP artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-msp-projects-dossier-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+      "missing": [
+        "Delivery risks"
+      ],
+      "owner_project": "PLATFORM",
+      "package_key": "std-msp-projects-dossier-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM",
+      "problem": "The projects-dossier artefact for conveyor buildout is partial; missing required sections: Delivery risks.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.3",
+      "standard": "MSP",
+      "subject": {
+        "id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "key": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "kind": "programme",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "",
+        "title": "conveyor buildout"
+      },
+      "title": "MSP artefact partial: projects-dossier"
+    },
+    {
+      "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+      "area": "§8.4",
+      "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
+      "category": "project-brief",
+      "evidence": [
+        {
+          "artefact": "std-pmp-project-brief-platform",
+          "section": "Plan",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "project-brief",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a PMP artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-pmp-project-brief-platform",
+      "missing": [
+        "Plan"
+      ],
+      "owner_project": "PLATFORM",
+      "package_key": "std-pmp-project-brief-platform:PLATFORM",
+      "problem": "The project-brief artefact for Programme-level unit (plan: docs/plans/development-process-speed.md) is partial; missing required sections: Plan.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.4",
+      "standard": "PMP",
+      "subject": {
+        "id": "01a1d039-0d39-79ce-84b6-1173b94bc67f",
+        "key": "PLATFORM",
+        "kind": "project",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "PLATFORM",
+        "title": "Programme-level unit (plan: docs/plans/development-process-speed.md)"
+      },
+      "title": "PMP artefact partial: project-brief"
+    },
+    {
+      "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+      "area": "§8.4",
+      "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
+      "category": "project-brief",
+      "evidence": [
+        {
+          "artefact": "std-pmp-project-brief-s00",
+          "section": "Capabilities",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "project-brief",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-pmp-project-brief-s00",
+          "section": "Plan",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "project-brief",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a PMP artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-pmp-project-brief-s00",
+      "missing": [
+        "Capabilities",
+        "Plan"
+      ],
+      "owner_project": "S00",
+      "package_key": "std-pmp-project-brief-s00:S00",
+      "problem": "The project-brief artefact for Plan: docs/plans/slices/S00-usage-inventory.md is partial; missing required sections: Capabilities, Plan.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.4",
+      "standard": "PMP",
+      "subject": {
+        "id": "01a1d039-0d26-7573-9b0c-e0f60af92003",
+        "key": "S00",
+        "kind": "project",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "S00",
+        "title": "Plan: docs/plans/slices/S00-usage-inventory.md"
+      },
+      "title": "PMP artefact partial: project-brief"
+    },
+    {
+      "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+      "area": "§8.4",
+      "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
+      "category": "project-brief",
+      "evidence": [
+        {
+          "artefact": "std-pmp-project-brief-s01",
+          "section": "Plan",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "project-brief",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a PMP artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-pmp-project-brief-s01",
+      "missing": [
+        "Plan"
+      ],
+      "owner_project": "S01",
+      "package_key": "std-pmp-project-brief-s01:S01",
+      "problem": "The project-brief artefact for Plan: docs/plans/slices/S01-ui-spike.md is partial; missing required sections: Plan.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.4",
+      "standard": "PMP",
+      "subject": {
+        "id": "01a1d039-0d27-724c-9bae-af96b2d926b1",
+        "key": "S01",
+        "kind": "project",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "S01",
+        "title": "Plan: docs/plans/slices/S01-ui-spike.md"
+      },
+      "title": "PMP artefact partial: project-brief"
+    },
+    {
+      "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+      "area": "§8.4",
+      "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
+      "category": "project-brief",
+      "evidence": [
+        {
+          "artefact": "std-pmp-project-brief-s02",
+          "section": "Plan",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "project-brief",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a PMP artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-pmp-project-brief-s02",
+      "missing": [
+        "Plan"
+      ],
+      "owner_project": "S02",
+      "package_key": "std-pmp-project-brief-s02:S02",
+      "problem": "The project-brief artefact for Plan: docs/plans/slices/S02-skeleton.md is partial; missing required sections: Plan.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.4",
+      "standard": "PMP",
+      "subject": {
+        "id": "01a1d039-0d27-7b45-abb5-bf851a4c3d4a",
+        "key": "S02",
+        "kind": "project",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "S02",
+        "title": "Plan: docs/plans/slices/S02-skeleton.md"
+      },
+      "title": "PMP artefact partial: project-brief"
+    },
+    {
+      "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+      "area": "§8.4",
+      "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
+      "category": "project-brief",
+      "evidence": [
+        {
+          "artefact": "std-pmp-project-brief-s03",
+          "section": "Capabilities",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "project-brief",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-pmp-project-brief-s03",
+          "section": "Plan",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "project-brief",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a PMP artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-pmp-project-brief-s03",
+      "missing": [
+        "Capabilities",
+        "Plan"
+      ],
+      "owner_project": "S03",
+      "package_key": "std-pmp-project-brief-s03:S03",
+      "problem": "The project-brief artefact for Plan: docs/plans/slices/S03-domain-schema.md is partial; missing required sections: Capabilities, Plan.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.4",
+      "standard": "PMP",
+      "subject": {
+        "id": "01a1d039-0d28-743b-86c7-0d0698ed69c1",
+        "key": "S03",
+        "kind": "project",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "S03",
+        "title": "Plan: docs/plans/slices/S03-domain-schema.md"
+      },
+      "title": "PMP artefact partial: project-brief"
+    },
+    {
+      "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+      "area": "§8.4",
+      "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
+      "category": "project-brief",
+      "evidence": [
+        {
+          "artefact": "std-pmp-project-brief-s04",
+          "section": "Capabilities",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "project-brief",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-pmp-project-brief-s04",
+          "section": "Plan",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "project-brief",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a PMP artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-pmp-project-brief-s04",
+      "missing": [
+        "Capabilities",
+        "Plan"
+      ],
+      "owner_project": "S04",
+      "package_key": "std-pmp-project-brief-s04:S04",
+      "problem": "The project-brief artefact for Plan: docs/plans/slices/S04-action-registry.md is partial; missing required sections: Capabilities, Plan.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.4",
+      "standard": "PMP",
+      "subject": {
+        "id": "01a1d039-0d28-7eb6-a62a-f420e742595c",
+        "key": "S04",
+        "kind": "project",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "S04",
+        "title": "Plan: docs/plans/slices/S04-action-registry.md"
+      },
+      "title": "PMP artefact partial: project-brief"
+    },
+    {
+      "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+      "area": "§8.4",
+      "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
+      "category": "project-brief",
+      "evidence": [
+        {
+          "artefact": "std-pmp-project-brief-s05",
+          "section": "Capabilities",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "project-brief",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-pmp-project-brief-s05",
+          "section": "Plan",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "project-brief",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a PMP artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-pmp-project-brief-s05",
+      "missing": [
+        "Capabilities",
+        "Plan"
+      ],
+      "owner_project": "S05",
+      "package_key": "std-pmp-project-brief-s05:S05",
+      "problem": "The project-brief artefact for Plan: docs/plans/slices/S05-board.md is partial; missing required sections: Capabilities, Plan.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.4",
+      "standard": "PMP",
+      "subject": {
+        "id": "01a1d039-0d29-796d-967b-1e819a4dd40a",
+        "key": "S05",
+        "kind": "project",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "S05",
+        "title": "Plan: docs/plans/slices/S05-board.md"
+      },
+      "title": "PMP artefact partial: project-brief"
+    },
+    {
+      "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+      "area": "§8.4",
+      "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
+      "category": "project-brief",
+      "evidence": [
+        {
+          "artefact": "std-pmp-project-brief-s06",
+          "section": "Plan",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "project-brief",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a PMP artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-pmp-project-brief-s06",
+      "missing": [
+        "Plan"
+      ],
+      "owner_project": "S06",
+      "package_key": "std-pmp-project-brief-s06:S06",
+      "problem": "The project-brief artefact for Plan: docs/plans/slices/S06-control-plane.md is partial; missing required sections: Plan.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.4",
+      "standard": "PMP",
+      "subject": {
+        "id": "01a1d039-0d2a-7007-bcd8-29bb24f36b54",
+        "key": "S06",
+        "kind": "project",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "S06",
+        "title": "Plan: docs/plans/slices/S06-control-plane.md"
+      },
+      "title": "PMP artefact partial: project-brief"
+    },
+    {
+      "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+      "area": "§8.4",
+      "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
+      "category": "project-brief",
+      "evidence": [
+        {
+          "artefact": "std-pmp-project-brief-s06a",
+          "section": "Capabilities",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "project-brief",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-pmp-project-brief-s06a",
+          "section": "Plan",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "project-brief",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a PMP artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-pmp-project-brief-s06a",
+      "missing": [
+        "Capabilities",
+        "Plan"
+      ],
+      "owner_project": "S06a",
+      "package_key": "std-pmp-project-brief-s06a:S06a",
+      "problem": "The project-brief artefact for Plan: docs/plans/slices/S06a-mcp-server-channel.md is partial; missing required sections: Capabilities, Plan.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.4",
+      "standard": "PMP",
+      "subject": {
+        "id": "01a1d039-0d2a-779c-8d89-3bc79003b513",
+        "key": "S06a",
+        "kind": "project",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "S06a",
+        "title": "Plan: docs/plans/slices/S06a-mcp-server-channel.md"
+      },
+      "title": "PMP artefact partial: project-brief"
+    },
+    {
+      "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+      "area": "§8.4",
+      "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
+      "category": "project-brief",
+      "evidence": [
+        {
+          "artefact": "std-pmp-project-brief-s06b",
+          "section": "Plan",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "project-brief",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a PMP artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-pmp-project-brief-s06b",
+      "missing": [
+        "Plan"
+      ],
+      "owner_project": "S06b",
+      "package_key": "std-pmp-project-brief-s06b:S06b",
+      "problem": "The project-brief artefact for Plan: docs/plans/slices/S06b-agent-direct-interface.md is partial; missing required sections: Plan.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.4",
+      "standard": "PMP",
+      "subject": {
+        "id": "01a1d039-0d2a-7ea9-b809-929452f221fd",
+        "key": "S06b",
+        "kind": "project",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "S06b",
+        "title": "Plan: docs/plans/slices/S06b-agent-direct-interface.md"
+      },
+      "title": "PMP artefact partial: project-brief"
+    },
+    {
+      "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+      "area": "§8.4",
+      "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
+      "category": "project-brief",
+      "evidence": [
+        {
+          "artefact": "std-pmp-project-brief-s06c",
+          "section": "Capabilities",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "project-brief",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-pmp-project-brief-s06c",
+          "section": "Plan",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "project-brief",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a PMP artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-pmp-project-brief-s06c",
+      "missing": [
+        "Capabilities",
+        "Plan"
+      ],
+      "owner_project": "S06c",
+      "package_key": "std-pmp-project-brief-s06c:S06c",
+      "problem": "The project-brief artefact for Plan: docs/plans/slices/S06c-mcp-tasks.md is partial; missing required sections: Capabilities, Plan.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.4",
+      "standard": "PMP",
+      "subject": {
+        "id": "01a1d039-0d2b-7542-9574-e961ffd1b597",
+        "key": "S06c",
+        "kind": "project",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "S06c",
+        "title": "Plan: docs/plans/slices/S06c-mcp-tasks.md"
+      },
+      "title": "PMP artefact partial: project-brief"
+    },
+    {
+      "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+      "area": "§8.4",
+      "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
+      "category": "project-brief",
+      "evidence": [
+        {
+          "artefact": "std-pmp-project-brief-s06d",
+          "section": "Inception units",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "project-brief",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-pmp-project-brief-s06d",
+          "section": "Dependencies",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "project-brief",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-pmp-project-brief-s06d",
+          "section": "Acceptance",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "project-brief",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-pmp-project-brief-s06d",
+          "section": "Plan",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "project-brief",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a PMP artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-pmp-project-brief-s06d",
+      "missing": [
+        "Inception units",
+        "Dependencies",
+        "Acceptance",
+        "Plan"
+      ],
+      "owner_project": "S06d",
+      "package_key": "std-pmp-project-brief-s06d:S06d",
+      "problem": "The project-brief artefact for Plan: docs/plans/slices/S06d-connector-standard.md is partial; missing required sections: Inception units, Dependencies, Acceptance, Plan.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.4",
+      "standard": "PMP",
+      "subject": {
+        "id": "01a1d039-0d2b-7b80-93fe-c1daf60c5c1f",
+        "key": "S06d",
+        "kind": "project",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "S06d",
+        "title": "Plan: docs/plans/slices/S06d-connector-standard.md"
+      },
+      "title": "PMP artefact partial: project-brief"
+    },
+    {
+      "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+      "area": "§8.4",
+      "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
+      "category": "project-brief",
+      "evidence": [
+        {
+          "artefact": "std-pmp-project-brief-s07",
+          "section": "Capabilities",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "project-brief",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-pmp-project-brief-s07",
+          "section": "Plan",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "project-brief",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a PMP artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-pmp-project-brief-s07",
+      "missing": [
+        "Capabilities",
+        "Plan"
+      ],
+      "owner_project": "S07",
+      "package_key": "std-pmp-project-brief-s07:S07",
+      "problem": "The project-brief artefact for Plan: docs/plans/slices/S07-requirements-search.md is partial; missing required sections: Capabilities, Plan.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.4",
+      "standard": "PMP",
+      "subject": {
+        "id": "01a1d039-0d2c-7322-b2f9-4dd041153894",
+        "key": "S07",
+        "kind": "project",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "S07",
+        "title": "Plan: docs/plans/slices/S07-requirements-search.md"
+      },
+      "title": "PMP artefact partial: project-brief"
+    },
+    {
+      "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+      "area": "§8.4",
+      "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
+      "category": "project-brief",
+      "evidence": [
+        {
+          "artefact": "std-pmp-project-brief-s08",
+          "section": "Capabilities",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "project-brief",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-pmp-project-brief-s08",
+          "section": "Plan",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "project-brief",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a PMP artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-pmp-project-brief-s08",
+      "missing": [
+        "Capabilities",
+        "Plan"
+      ],
+      "owner_project": "S08",
+      "package_key": "std-pmp-project-brief-s08:S08",
+      "problem": "The project-brief artefact for Plan: docs/plans/slices/S08-governance-modelling.md is partial; missing required sections: Capabilities, Plan.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.4",
+      "standard": "PMP",
+      "subject": {
+        "id": "01a1d039-0d2c-7bad-8e6c-b5c5d1fd40e2",
+        "key": "S08",
+        "kind": "project",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "S08",
+        "title": "Plan: docs/plans/slices/S08-governance-modelling.md"
+      },
+      "title": "PMP artefact partial: project-brief"
+    },
+    {
+      "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+      "area": "§8.4",
+      "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
+      "category": "project-brief",
+      "evidence": [
+        {
+          "artefact": "std-pmp-project-brief-s09",
+          "section": "Capabilities",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "project-brief",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-pmp-project-brief-s09",
+          "section": "Plan",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "project-brief",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a PMP artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-pmp-project-brief-s09",
+      "missing": [
+        "Capabilities",
+        "Plan"
+      ],
+      "owner_project": "S09",
+      "package_key": "std-pmp-project-brief-s09:S09",
+      "problem": "The project-brief artefact for Plan: docs/plans/slices/S09-documents-integrations.md is partial; missing required sections: Capabilities, Plan.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.4",
+      "standard": "PMP",
+      "subject": {
+        "id": "01a1d039-0d2d-71f1-a403-c9abe52c1888",
+        "key": "S09",
+        "kind": "project",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "S09",
+        "title": "Plan: docs/plans/slices/S09-documents-integrations.md"
+      },
+      "title": "PMP artefact partial: project-brief"
+    },
+    {
+      "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+      "area": "§8.4",
+      "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
+      "category": "project-brief",
+      "evidence": [
+        {
+          "artefact": "std-pmp-project-brief-s10",
+          "section": "Plan",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "project-brief",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a PMP artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-pmp-project-brief-s10",
+      "missing": [
+        "Plan"
+      ],
+      "owner_project": "S10",
+      "package_key": "std-pmp-project-brief-s10:S10",
+      "problem": "The project-brief artefact for Plan: docs/plans/slices/S10-copilot-ag-ui.md is partial; missing required sections: Plan.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.4",
+      "standard": "PMP",
+      "subject": {
+        "id": "01a1d039-0d2d-787e-853e-fef542ec8815",
+        "key": "S10",
+        "kind": "project",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "S10",
+        "title": "Plan: docs/plans/slices/S10-copilot-ag-ui.md"
+      },
+      "title": "PMP artefact partial: project-brief"
+    },
+    {
+      "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+      "area": "§8.4",
+      "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
+      "category": "project-brief",
+      "evidence": [
+        {
+          "artefact": "std-pmp-project-brief-s11",
+          "section": "Capabilities",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "project-brief",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-pmp-project-brief-s11",
+          "section": "Plan",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "project-brief",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a PMP artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-pmp-project-brief-s11",
+      "missing": [
+        "Capabilities",
+        "Plan"
+      ],
+      "owner_project": "S11",
+      "package_key": "std-pmp-project-brief-s11:S11",
+      "problem": "The project-brief artefact for Plan: docs/plans/slices/S11-procedures.md is partial; missing required sections: Capabilities, Plan.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.4",
+      "standard": "PMP",
+      "subject": {
+        "id": "01a1d039-0d2d-7ec6-aef0-4096ea66e7a4",
+        "key": "S11",
+        "kind": "project",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "S11",
+        "title": "Plan: docs/plans/slices/S11-procedures.md"
+      },
+      "title": "PMP artefact partial: project-brief"
+    },
+    {
+      "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+      "area": "§8.4",
+      "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
+      "category": "project-brief",
+      "evidence": [
+        {
+          "artefact": "std-pmp-project-brief-s12",
+          "section": "Capabilities",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "project-brief",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-pmp-project-brief-s12",
+          "section": "Plan",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "project-brief",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a PMP artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-pmp-project-brief-s12",
+      "missing": [
+        "Capabilities",
+        "Plan"
+      ],
+      "owner_project": "S12",
+      "package_key": "std-pmp-project-brief-s12:S12",
+      "problem": "The project-brief artefact for Plan: docs/plans/slices/S12-ui-buildout.md is partial; missing required sections: Capabilities, Plan.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.4",
+      "standard": "PMP",
+      "subject": {
+        "id": "01a1d039-0d2e-7585-8cb4-ab197d2e6dab",
+        "key": "S12",
+        "kind": "project",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "S12",
+        "title": "Plan: docs/plans/slices/S12-ui-buildout.md"
+      },
+      "title": "PMP artefact partial: project-brief"
+    },
+    {
+      "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+      "area": "§8.4",
+      "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
+      "category": "project-brief",
+      "evidence": [
+        {
+          "artefact": "std-pmp-project-brief-s13",
+          "section": "Capabilities",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "project-brief",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-pmp-project-brief-s13",
+          "section": "Plan",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "project-brief",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a PMP artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-pmp-project-brief-s13",
+      "missing": [
+        "Capabilities",
+        "Plan"
+      ],
+      "owner_project": "S13",
+      "package_key": "std-pmp-project-brief-s13:S13",
+      "problem": "The project-brief artefact for Plan: docs/plans/slices/S13-n8n-engine.md is partial; missing required sections: Capabilities, Plan.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.4",
+      "standard": "PMP",
+      "subject": {
+        "id": "01a1d039-0d2e-7ed4-9cda-a7fce9fffa8e",
+        "key": "S13",
+        "kind": "project",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "S13",
+        "title": "Plan: docs/plans/slices/S13-n8n-engine.md"
+      },
+      "title": "PMP artefact partial: project-brief"
+    },
+    {
+      "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+      "area": "§8.4",
+      "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
+      "category": "project-brief",
+      "evidence": [
+        {
+          "artefact": "std-pmp-project-brief-s14",
+          "section": "Capabilities",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "project-brief",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-pmp-project-brief-s14",
+          "section": "Plan",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "project-brief",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a PMP artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-pmp-project-brief-s14",
+      "missing": [
+        "Capabilities",
+        "Plan"
+      ],
+      "owner_project": "S14",
+      "package_key": "std-pmp-project-brief-s14:S14",
+      "problem": "The project-brief artefact for Plan: docs/plans/slices/S14-cutover.md is partial; missing required sections: Capabilities, Plan.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.4",
+      "standard": "PMP",
+      "subject": {
+        "id": "01a1d039-0d2f-75f2-a1fb-aa95893aa206",
+        "key": "S14",
+        "kind": "project",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "S14",
+        "title": "Plan: docs/plans/slices/S14-cutover.md"
+      },
+      "title": "PMP artefact partial: project-brief"
+    },
+    {
+      "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+      "area": "§8.4",
+      "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
+      "category": "project-brief",
+      "evidence": [
+        {
+          "artefact": "std-pmp-project-brief-s15",
+          "section": "Capabilities",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "project-brief",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-pmp-project-brief-s15",
+          "section": "Plan",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "project-brief",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a PMP artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-pmp-project-brief-s15",
+      "missing": [
+        "Capabilities",
+        "Plan"
+      ],
+      "owner_project": "S15",
+      "package_key": "std-pmp-project-brief-s15:S15",
+      "problem": "The project-brief artefact for Plan: docs/plans/slices/S15-capability-knowledge-memory.md is partial; missing required sections: Capabilities, Plan.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.4",
+      "standard": "PMP",
+      "subject": {
+        "id": "01a1d039-0d2f-7ca0-9d3d-534ca7d673fb",
+        "key": "S15",
+        "kind": "project",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "S15",
+        "title": "Plan: docs/plans/slices/S15-capability-knowledge-memory.md"
+      },
+      "title": "PMP artefact partial: project-brief"
+    },
+    {
+      "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+      "area": "§8.4",
+      "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
+      "category": "project-brief",
+      "evidence": [
+        {
+          "artefact": "std-pmp-project-brief-s16",
+          "section": "Capabilities",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "project-brief",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-pmp-project-brief-s16",
+          "section": "Plan",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "project-brief",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a PMP artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-pmp-project-brief-s16",
+      "missing": [
+        "Capabilities",
+        "Plan"
+      ],
+      "owner_project": "S16",
+      "package_key": "std-pmp-project-brief-s16:S16",
+      "problem": "The project-brief artefact for Plan: docs/plans/slices/S16-inference-audit.md is partial; missing required sections: Capabilities, Plan.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.4",
+      "standard": "PMP",
+      "subject": {
+        "id": "01a1d039-0d30-72a1-9bba-29fadf6170cf",
+        "key": "S16",
+        "kind": "project",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "S16",
+        "title": "Plan: docs/plans/slices/S16-inference-audit.md"
+      },
+      "title": "PMP artefact partial: project-brief"
+    },
+    {
+      "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+      "area": "§8.4",
+      "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
+      "category": "project-brief",
+      "evidence": [
+        {
+          "artefact": "std-pmp-project-brief-s17",
+          "section": "Capabilities",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "project-brief",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-pmp-project-brief-s17",
+          "section": "Plan",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "project-brief",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a PMP artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-pmp-project-brief-s17",
+      "missing": [
+        "Capabilities",
+        "Plan"
+      ],
+      "owner_project": "S17",
+      "package_key": "std-pmp-project-brief-s17:S17",
+      "problem": "The project-brief artefact for Plan: docs/plans/slices/S17-benchmark-harness.md is partial; missing required sections: Capabilities, Plan.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.4",
+      "standard": "PMP",
+      "subject": {
+        "id": "01a1d039-0d30-794f-bd53-c72986b18e60",
+        "key": "S17",
+        "kind": "project",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "S17",
+        "title": "Plan: docs/plans/slices/S17-benchmark-harness.md"
+      },
+      "title": "PMP artefact partial: project-brief"
+    },
+    {
+      "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+      "area": "§8.4",
+      "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
+      "category": "project-brief",
+      "evidence": [
+        {
+          "artefact": "std-pmp-project-brief-s18",
+          "section": "Capabilities",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "project-brief",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-pmp-project-brief-s18",
+          "section": "Plan",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "project-brief",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a PMP artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-pmp-project-brief-s18",
+      "missing": [
+        "Capabilities",
+        "Plan"
+      ],
+      "owner_project": "S18",
+      "package_key": "std-pmp-project-brief-s18:S18",
+      "problem": "The project-brief artefact for Plan: docs/plans/slices/S18-kata-improvement.md is partial; missing required sections: Capabilities, Plan.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.4",
+      "standard": "PMP",
+      "subject": {
+        "id": "01a1d039-0d30-7f95-9d93-30eaabfec6da",
+        "key": "S18",
+        "kind": "project",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "S18",
+        "title": "Plan: docs/plans/slices/S18-kata-improvement.md"
+      },
+      "title": "PMP artefact partial: project-brief"
+    },
+    {
+      "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+      "area": "§8.4",
+      "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
+      "category": "project-brief",
+      "evidence": [
+        {
+          "artefact": "std-pmp-project-brief-s19",
+          "section": "Plan",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "project-brief",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a PMP artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-pmp-project-brief-s19",
+      "missing": [
+        "Plan"
+      ],
+      "owner_project": "S19",
+      "package_key": "std-pmp-project-brief-s19:S19",
+      "problem": "The project-brief artefact for Plan: docs/plans/slices/S19-eval-builder.md is partial; missing required sections: Plan.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.4",
+      "standard": "PMP",
+      "subject": {
+        "id": "01a1d039-0d31-77b6-80e2-1c7205d63f99",
+        "key": "S19",
+        "kind": "project",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "S19",
+        "title": "Plan: docs/plans/slices/S19-eval-builder.md"
+      },
+      "title": "PMP artefact partial: project-brief"
+    },
+    {
+      "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+      "area": "§8.4",
+      "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
+      "category": "project-brief",
+      "evidence": [
+        {
+          "artefact": "std-pmp-project-brief-s20",
+          "section": "Plan",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "project-brief",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a PMP artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-pmp-project-brief-s20",
+      "missing": [
+        "Plan"
+      ],
+      "owner_project": "S20",
+      "package_key": "std-pmp-project-brief-s20:S20",
+      "problem": "The project-brief artefact for Plan: docs/plans/slices/S20-eval-hillclimb.md is partial; missing required sections: Plan.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.4",
+      "standard": "PMP",
+      "subject": {
+        "id": "01a1d039-0d31-7d0f-ab1f-16240952e223",
+        "key": "S20",
+        "kind": "project",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "S20",
+        "title": "Plan: docs/plans/slices/S20-eval-hillclimb.md"
+      },
+      "title": "PMP artefact partial: project-brief"
+    },
+    {
+      "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+      "area": "§8.4",
+      "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
+      "category": "project-brief",
+      "evidence": [
+        {
+          "artefact": "std-pmp-project-brief-s21",
+          "section": "Plan",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "project-brief",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a PMP artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-pmp-project-brief-s21",
+      "missing": [
+        "Plan"
+      ],
+      "owner_project": "S21",
+      "package_key": "std-pmp-project-brief-s21:S21",
+      "problem": "The project-brief artefact for Plan: docs/plans/slices/S21-message-construction.md is partial; missing required sections: Plan.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.4",
+      "standard": "PMP",
+      "subject": {
+        "id": "01a1d039-0d32-71f6-bad4-81493c102060",
+        "key": "S21",
+        "kind": "project",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "S21",
+        "title": "Plan: docs/plans/slices/S21-message-construction.md"
+      },
+      "title": "PMP artefact partial: project-brief"
+    },
+    {
+      "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+      "area": "§8.4",
+      "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
+      "category": "project-brief",
+      "evidence": [
+        {
+          "artefact": "std-pmp-project-brief-spec-v2",
+          "section": "Plan",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "project-brief",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a PMP artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-pmp-project-brief-spec-v2",
+      "missing": [
+        "Plan"
+      ],
+      "owner_project": "SPEC-V2",
+      "package_key": "std-pmp-project-brief-spec-v2:SPEC-V2",
+      "problem": "The project-brief artefact for Programme-level unit (plan: docs/SPEC_V2.md) is partial; missing required sections: Plan.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.4",
+      "standard": "PMP",
+      "subject": {
+        "id": "01a1d039-0d39-7f3b-bd04-211f7dfe1e50",
+        "key": "SPEC-V2",
+        "kind": "project",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "SPEC-V2",
+        "title": "Programme-level unit (plan: docs/SPEC_V2.md)"
+      },
+      "title": "PMP artefact partial: project-brief"
+    },
+    {
+      "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+      "area": "§8.4",
+      "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
+      "category": "project-brief",
+      "evidence": [
+        {
+          "artefact": "std-pmp-project-brief-t0",
+          "section": "Plan",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "project-brief",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a PMP artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-pmp-project-brief-t0",
+      "missing": [
+        "Plan"
+      ],
+      "owner_project": "T0",
+      "package_key": "std-pmp-project-brief-t0:T0",
+      "problem": "The project-brief artefact for SPEC_V2 slice T0 (docs/SPEC_V2.md §12) is partial; missing required sections: Plan.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.4",
+      "standard": "PMP",
+      "subject": {
+        "id": "01a1d039-0d32-7734-98da-fb7f1e2386c7",
+        "key": "T0",
+        "kind": "project",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "T0",
+        "title": "SPEC_V2 slice T0 (docs/SPEC_V2.md §12)"
+      },
+      "title": "PMP artefact partial: project-brief"
+    },
+    {
+      "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+      "area": "§8.4",
+      "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
+      "category": "project-brief",
+      "evidence": [
+        {
+          "artefact": "std-pmp-project-brief-t1",
+          "section": "Plan",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "project-brief",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a PMP artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-pmp-project-brief-t1",
+      "missing": [
+        "Plan"
+      ],
+      "owner_project": "T1",
+      "package_key": "std-pmp-project-brief-t1:T1",
+      "problem": "The project-brief artefact for SPEC_V2 slice T1 (docs/SPEC_V2.md §12) is partial; missing required sections: Plan.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.4",
+      "standard": "PMP",
+      "subject": {
+        "id": "01a1d039-0d32-7c81-8365-371217d16ef7",
+        "key": "T1",
+        "kind": "project",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "T1",
+        "title": "SPEC_V2 slice T1 (docs/SPEC_V2.md §12)"
+      },
+      "title": "PMP artefact partial: project-brief"
+    },
+    {
+      "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+      "area": "§8.4",
+      "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
+      "category": "project-brief",
+      "evidence": [
+        {
+          "artefact": "std-pmp-project-brief-t10",
+          "section": "Plan",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "project-brief",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a PMP artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-pmp-project-brief-t10",
+      "missing": [
+        "Plan"
+      ],
+      "owner_project": "T10",
+      "package_key": "std-pmp-project-brief-t10:T10",
+      "problem": "The project-brief artefact for SPEC_V2 slice T10 (docs/SPEC_V2.md §12) is partial; missing required sections: Plan.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.4",
+      "standard": "PMP",
+      "subject": {
+        "id": "01a1d039-0d36-70c1-a5e8-f50956c5e3f9",
+        "key": "T10",
+        "kind": "project",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "T10",
+        "title": "SPEC_V2 slice T10 (docs/SPEC_V2.md §12)"
+      },
+      "title": "PMP artefact partial: project-brief"
+    },
+    {
+      "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+      "area": "§8.4",
+      "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
+      "category": "project-brief",
+      "evidence": [
+        {
+          "artefact": "std-pmp-project-brief-t12",
+          "section": "Plan",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "project-brief",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a PMP artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-pmp-project-brief-t12",
+      "missing": [
+        "Plan"
+      ],
+      "owner_project": "T12",
+      "package_key": "std-pmp-project-brief-t12:T12",
+      "problem": "The project-brief artefact for SPEC_V2 slice T12 (docs/SPEC_V2.md §12) is partial; missing required sections: Plan.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.4",
+      "standard": "PMP",
+      "subject": {
+        "id": "01a1d039-0d36-7de8-891c-4d3dcf110cf5",
+        "key": "T12",
+        "kind": "project",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "T12",
+        "title": "SPEC_V2 slice T12 (docs/SPEC_V2.md §12)"
+      },
+      "title": "PMP artefact partial: project-brief"
+    },
+    {
+      "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+      "area": "§8.4",
+      "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
+      "category": "project-brief",
+      "evidence": [
+        {
+          "artefact": "std-pmp-project-brief-t13",
+          "section": "Plan",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "project-brief",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a PMP artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-pmp-project-brief-t13",
+      "missing": [
+        "Plan"
+      ],
+      "owner_project": "T13",
+      "package_key": "std-pmp-project-brief-t13:T13",
+      "problem": "The project-brief artefact for SPEC_V2 slice T13 (docs/SPEC_V2.md §12) is partial; missing required sections: Plan.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.4",
+      "standard": "PMP",
+      "subject": {
+        "id": "01a1d039-0d37-730f-8f8a-2f50e5a0933d",
+        "key": "T13",
+        "kind": "project",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "T13",
+        "title": "SPEC_V2 slice T13 (docs/SPEC_V2.md §12)"
+      },
+      "title": "PMP artefact partial: project-brief"
+    },
+    {
+      "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+      "area": "§8.4",
+      "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
+      "category": "project-brief",
+      "evidence": [
+        {
+          "artefact": "std-pmp-project-brief-t15",
+          "section": "Plan",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "project-brief",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a PMP artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-pmp-project-brief-t15",
+      "missing": [
+        "Plan"
+      ],
+      "owner_project": "T15",
+      "package_key": "std-pmp-project-brief-t15:T15",
+      "problem": "The project-brief artefact for SPEC_V2 slice T15 (docs/SPEC_V2.md §12) is partial; missing required sections: Plan.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.4",
+      "standard": "PMP",
+      "subject": {
+        "id": "01a1d039-0d37-7f20-9959-979c31daeb5e",
+        "key": "T15",
+        "kind": "project",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "T15",
+        "title": "SPEC_V2 slice T15 (docs/SPEC_V2.md §12)"
+      },
+      "title": "PMP artefact partial: project-brief"
+    },
+    {
+      "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+      "area": "§8.4",
+      "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
+      "category": "project-brief",
+      "evidence": [
+        {
+          "artefact": "std-pmp-project-brief-t17",
+          "section": "Plan",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "project-brief",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a PMP artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-pmp-project-brief-t17",
+      "missing": [
+        "Plan"
+      ],
+      "owner_project": "T17",
+      "package_key": "std-pmp-project-brief-t17:T17",
+      "problem": "The project-brief artefact for SPEC_V2 slice T17 (docs/SPEC_V2.md §12) is partial; missing required sections: Plan.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.4",
+      "standard": "PMP",
+      "subject": {
+        "id": "01a1d039-0d38-7db1-b685-d76bd4cebf47",
+        "key": "T17",
+        "kind": "project",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "T17",
+        "title": "SPEC_V2 slice T17 (docs/SPEC_V2.md §12)"
+      },
+      "title": "PMP artefact partial: project-brief"
+    },
+    {
+      "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+      "area": "§8.4",
+      "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
+      "category": "project-brief",
+      "evidence": [
+        {
+          "artefact": "std-pmp-project-brief-t2",
+          "section": "Plan",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "project-brief",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a PMP artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-pmp-project-brief-t2",
+      "missing": [
+        "Plan"
+      ],
+      "owner_project": "T2",
+      "package_key": "std-pmp-project-brief-t2:T2",
+      "problem": "The project-brief artefact for SPEC_V2 slice T2 (docs/SPEC_V2.md §12) is partial; missing required sections: Plan.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.4",
+      "standard": "PMP",
+      "subject": {
+        "id": "01a1d039-0d33-7282-b7b0-6dde32c38ab1",
+        "key": "T2",
+        "kind": "project",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "T2",
+        "title": "SPEC_V2 slice T2 (docs/SPEC_V2.md §12)"
+      },
+      "title": "PMP artefact partial: project-brief"
+    },
+    {
+      "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+      "area": "§8.4",
+      "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
+      "category": "project-brief",
+      "evidence": [
+        {
+          "artefact": "std-pmp-project-brief-t3",
+          "section": "Plan",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "project-brief",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a PMP artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-pmp-project-brief-t3",
+      "missing": [
+        "Plan"
+      ],
+      "owner_project": "T3",
+      "package_key": "std-pmp-project-brief-t3:T3",
+      "problem": "The project-brief artefact for SPEC_V2 slice T3 (docs/SPEC_V2.md §12) is partial; missing required sections: Plan.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.4",
+      "standard": "PMP",
+      "subject": {
+        "id": "01a1d039-0d33-7915-8833-75f4dc31cc07",
+        "key": "T3",
+        "kind": "project",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "T3",
+        "title": "SPEC_V2 slice T3 (docs/SPEC_V2.md §12)"
+      },
+      "title": "PMP artefact partial: project-brief"
+    },
+    {
+      "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+      "area": "§8.4",
+      "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
+      "category": "project-brief",
+      "evidence": [
+        {
+          "artefact": "std-pmp-project-brief-t4",
+          "section": "Plan",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "project-brief",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a PMP artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-pmp-project-brief-t4",
+      "missing": [
+        "Plan"
+      ],
+      "owner_project": "T4",
+      "package_key": "std-pmp-project-brief-t4:T4",
+      "problem": "The project-brief artefact for SPEC_V2 slice T4 (docs/SPEC_V2.md §12) is partial; missing required sections: Plan.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.4",
+      "standard": "PMP",
+      "subject": {
+        "id": "01a1d039-0d33-7e7e-890e-b437b0c78db9",
+        "key": "T4",
+        "kind": "project",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "T4",
+        "title": "SPEC_V2 slice T4 (docs/SPEC_V2.md §12)"
+      },
+      "title": "PMP artefact partial: project-brief"
+    },
+    {
+      "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+      "area": "§8.4",
+      "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
+      "category": "project-brief",
+      "evidence": [
+        {
+          "artefact": "std-pmp-project-brief-t5",
+          "section": "Plan",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "project-brief",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a PMP artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-pmp-project-brief-t5",
+      "missing": [
+        "Plan"
+      ],
+      "owner_project": "T5",
+      "package_key": "std-pmp-project-brief-t5:T5",
+      "problem": "The project-brief artefact for SPEC_V2 slice T5 (docs/SPEC_V2.md §12) is partial; missing required sections: Plan.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.4",
+      "standard": "PMP",
+      "subject": {
+        "id": "01a1d039-0d34-73db-975e-5d178d729cef",
+        "key": "T5",
+        "kind": "project",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "T5",
+        "title": "SPEC_V2 slice T5 (docs/SPEC_V2.md §12)"
+      },
+      "title": "PMP artefact partial: project-brief"
+    },
+    {
+      "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+      "area": "§8.4",
+      "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
+      "category": "project-brief",
+      "evidence": [
+        {
+          "artefact": "std-pmp-project-brief-t6",
+          "section": "Plan",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "project-brief",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a PMP artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-pmp-project-brief-t6",
+      "missing": [
+        "Plan"
+      ],
+      "owner_project": "T6",
+      "package_key": "std-pmp-project-brief-t6:T6",
+      "problem": "The project-brief artefact for SPEC_V2 slice T6 (docs/SPEC_V2.md §12) is partial; missing required sections: Plan.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.4",
+      "standard": "PMP",
+      "subject": {
+        "id": "01a1d039-0d34-7973-8989-0b83246fc888",
+        "key": "T6",
+        "kind": "project",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "T6",
+        "title": "SPEC_V2 slice T6 (docs/SPEC_V2.md §12)"
+      },
+      "title": "PMP artefact partial: project-brief"
+    },
+    {
+      "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+      "area": "§8.4",
+      "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
+      "category": "project-brief",
+      "evidence": [
+        {
+          "artefact": "std-pmp-project-brief-t8",
+          "section": "Plan",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "project-brief",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a PMP artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-pmp-project-brief-t8",
+      "missing": [
+        "Plan"
+      ],
+      "owner_project": "T8",
+      "package_key": "std-pmp-project-brief-t8:T8",
+      "problem": "The project-brief artefact for SPEC_V2 slice T8 (docs/SPEC_V2.md §12) is partial; missing required sections: Plan.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.4",
+      "standard": "PMP",
+      "subject": {
+        "id": "01a1d039-0d35-76bb-a22e-be49e3e95d16",
+        "key": "T8",
+        "kind": "project",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "T8",
+        "title": "SPEC_V2 slice T8 (docs/SPEC_V2.md §12)"
+      },
+      "title": "PMP artefact partial: project-brief"
+    },
+    {
+      "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+      "area": "§8.4",
+      "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
+      "category": "project-brief",
+      "evidence": [
+        {
+          "artefact": "std-pmp-project-brief-t9",
+          "section": "Plan",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "project-brief",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a PMP artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-pmp-project-brief-t9",
+      "missing": [
+        "Plan"
+      ],
+      "owner_project": "T9",
+      "package_key": "std-pmp-project-brief-t9:T9",
+      "problem": "The project-brief artefact for SPEC_V2 slice T9 (docs/SPEC_V2.md §12) is partial; missing required sections: Plan.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.4",
+      "standard": "PMP",
+      "subject": {
+        "id": "01a1d039-0d35-7bd1-945d-cea12c5dfd6d",
+        "key": "T9",
+        "kind": "project",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "T9",
+        "title": "SPEC_V2 slice T9 (docs/SPEC_V2.md §12)"
+      },
+      "title": "PMP artefact partial: project-brief"
+    },
+    {
+      "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+      "area": "§8.2",
+      "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
+      "category": "safe-art",
+      "evidence": [
+        {
+          "artefact": "std-safe-safe-art-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "section": "Backlog with WSJF",
+          "snapshot": [
+            [
+              "msp.json",
+              "/wbs_nodes",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a SAFe artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-safe-safe-art-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+      "missing": [
+        "Backlog with WSJF"
+      ],
+      "owner_project": "PLATFORM",
+      "package_key": "std-safe-safe-art-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM",
+      "problem": "The safe-art artefact for conveyor buildout is partial; missing required sections: Backlog with WSJF.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.2",
+      "standard": "SAFe",
+      "subject": {
+        "id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "key": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "kind": "programme",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "",
+        "title": "conveyor buildout"
+      },
+      "title": "SAFe artefact partial: safe-art"
+    },
+    {
+      "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+      "area": "§8.2",
+      "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
+      "category": "safe-cadence",
+      "evidence": [
+        {
+          "artefact": "std-safe-safe-cadence-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "section": "PI plan",
+          "snapshot": [
+            [
+              "msp.json",
+              "/cadences",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-safe-safe-cadence-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "section": "System demo",
+          "snapshot": [
+            [
+              "msp.json",
+              "/cadences",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-safe-safe-cadence-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "section": "Inspect and adapt",
+          "snapshot": [
+            [
+              "msp.json",
+              "/cadences",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a SAFe artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-safe-safe-cadence-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+      "missing": [
+        "PI plan",
+        "System demo",
+        "Inspect and adapt"
+      ],
+      "owner_project": "PLATFORM",
+      "package_key": "std-safe-safe-cadence-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM",
+      "problem": "The safe-cadence artefact for conveyor buildout is partial; missing required sections: PI plan, System demo, Inspect and adapt.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.2",
+      "standard": "SAFe",
+      "subject": {
+        "id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "key": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "kind": "programme",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "",
+        "title": "conveyor buildout"
+      },
+      "title": "SAFe artefact partial: safe-cadence"
+    },
+    {
+      "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+      "area": "§8.1",
+      "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
+      "category": "architecture-artifact",
+      "evidence": [
+        {
+          "artefact": "std-togaf-architecture-artifact-design-publish",
+          "section": "Metadata",
+          "snapshot": [
+            [
+              "architecture.json",
+              "/artifacts",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-togaf-architecture-artifact-design-publish",
+          "section": "Entries",
+          "snapshot": [
+            [
+              "architecture.json",
+              "/artifacts",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-togaf-architecture-artifact-design-publish",
+          "section": "Document",
+          "snapshot": [
+            [
+              null,
+              null,
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a TOGAF artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-togaf-architecture-artifact-design-publish",
+      "missing": [
+        "Metadata",
+        "Entries",
+        "Document"
+      ],
+      "owner_project": "DESIGN-PUBLISH",
+      "package_key": "std-togaf-architecture-artifact-design-publish:DESIGN-PUBLISH",
+      "problem": "The architecture-artifact artefact for Programme-level unit (plan: docs/design/STUDIO-SPEC.md) is partial; missing required sections: Metadata, Entries, Document.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "subject": {
+        "id": "01a1d039-0d39-7414-b43c-450de170ffe1",
+        "key": "DESIGN-PUBLISH",
+        "kind": "project",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "DESIGN-PUBLISH",
+        "title": "Programme-level unit (plan: docs/design/STUDIO-SPEC.md)"
+      },
+      "title": "TOGAF artefact partial: architecture-artifact"
+    },
+    {
+      "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+      "area": "§8.1",
+      "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
+      "category": "architecture-artifact",
+      "evidence": [
+        {
+          "artefact": "std-togaf-architecture-artifact-p0",
+          "section": "Metadata",
+          "snapshot": [
+            [
+              "architecture.json",
+              "/artifacts",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-togaf-architecture-artifact-p0",
+          "section": "Entries",
+          "snapshot": [
+            [
+              "architecture.json",
+              "/artifacts",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-togaf-architecture-artifact-p0",
+          "section": "Document",
+          "snapshot": [
+            [
+              null,
+              null,
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a TOGAF artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-togaf-architecture-artifact-p0",
+      "missing": [
+        "Metadata",
+        "Entries",
+        "Document"
+      ],
+      "owner_project": "P0",
+      "package_key": "std-togaf-architecture-artifact-p0:P0",
+      "problem": "The architecture-artifact artefact for Programme-level unit (plan: docs/plans/P0-programme-definition.md) is partial; missing required sections: Metadata, Entries, Document.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "subject": {
+        "id": "01a1dcb8-d24b-76de-b901-56fd56e001bc",
+        "key": "P0",
+        "kind": "project",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "P0",
+        "title": "Programme-level unit (plan: docs/plans/P0-programme-definition.md)"
+      },
+      "title": "TOGAF artefact partial: architecture-artifact"
+    },
+    {
+      "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+      "area": "§8.1",
+      "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
+      "category": "architecture-artifact",
+      "evidence": [
+        {
+          "artefact": "std-togaf-architecture-artifact-platform",
+          "section": "Metadata",
+          "snapshot": [
+            [
+              "architecture.json",
+              "/artifacts",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-togaf-architecture-artifact-platform",
+          "section": "Entries",
+          "snapshot": [
+            [
+              "architecture.json",
+              "/artifacts",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-togaf-architecture-artifact-platform",
+          "section": "Document",
+          "snapshot": [
+            [
+              null,
+              null,
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a TOGAF artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-togaf-architecture-artifact-platform",
+      "missing": [
+        "Metadata",
+        "Entries",
+        "Document"
+      ],
+      "owner_project": "PLATFORM",
+      "package_key": "std-togaf-architecture-artifact-platform:PLATFORM",
+      "problem": "The architecture-artifact artefact for Programme-level unit (plan: docs/plans/development-process-speed.md) is partial; missing required sections: Metadata, Entries, Document.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "subject": {
+        "id": "01a1d039-0d39-79ce-84b6-1173b94bc67f",
+        "key": "PLATFORM",
+        "kind": "project",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "PLATFORM",
+        "title": "Programme-level unit (plan: docs/plans/development-process-speed.md)"
+      },
+      "title": "TOGAF artefact partial: architecture-artifact"
+    },
+    {
+      "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+      "area": "§8.1",
+      "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
+      "category": "architecture-artifact",
+      "evidence": [
+        {
+          "artefact": "std-togaf-architecture-artifact-spec-v2",
+          "section": "Metadata",
+          "snapshot": [
+            [
+              "architecture.json",
+              "/artifacts",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-togaf-architecture-artifact-spec-v2",
+          "section": "Entries",
+          "snapshot": [
+            [
+              "architecture.json",
+              "/artifacts",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-togaf-architecture-artifact-spec-v2",
+          "section": "Document",
+          "snapshot": [
+            [
+              null,
+              null,
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a TOGAF artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-togaf-architecture-artifact-spec-v2",
+      "missing": [
+        "Metadata",
+        "Entries",
+        "Document"
+      ],
+      "owner_project": "SPEC-V2",
+      "package_key": "std-togaf-architecture-artifact-spec-v2:SPEC-V2",
+      "problem": "The architecture-artifact artefact for Programme-level unit (plan: docs/SPEC_V2.md) is partial; missing required sections: Metadata, Entries, Document.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "subject": {
+        "id": "01a1d039-0d39-7f3b-bd04-211f7dfe1e50",
+        "key": "SPEC-V2",
+        "kind": "project",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "SPEC-V2",
+        "title": "Programme-level unit (plan: docs/SPEC_V2.md)"
+      },
+      "title": "TOGAF artefact partial: architecture-artifact"
+    },
+    {
+      "acceptance": "Every required section resolves to a named row or published document, or the artefact is retired from the standard with an owner's decision; the package is closed only when the generated artefact is evidenced.",
+      "area": "§8.1",
+      "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
+      "category": "requirements-catalog",
+      "evidence": [
+        {
+          "artefact": "std-togaf-requirements-catalog-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "section": "Requirements",
+          "snapshot": [
+            [
+              null,
+              null,
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-togaf-requirements-catalog-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "section": "Types",
+          "snapshot": [
+            [
+              null,
+              null,
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a TOGAF artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-togaf-requirements-catalog-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+      "missing": [
+        "Requirements",
+        "Types"
+      ],
+      "owner_project": "PLATFORM",
+      "package_key": "std-togaf-requirements-catalog-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM",
+      "problem": "The requirements-catalog artefact for conveyor buildout is partial; missing required sections: Requirements, Types.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "subject": {
+        "id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "key": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "kind": "programme",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "",
+        "title": "conveyor buildout"
+      },
+      "title": "TOGAF artefact partial: requirements-catalog"
+    }
+  ],
+  "method": "generate-standards.py resolves every section of every applicable standards artefact against the published snapshot, its documents and the artefact standard; only an unresolved mandatory section becomes a finding.",
+  "schema": "conveyor-v1-findings/v1"
+}
