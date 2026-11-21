@@ -52,6 +52,19 @@ diff -r "$tmp/run1/docs" "$tmp/run2/docs"
 # The committed ledger is the record of this snapshot, not a stale side note.
 cmp "$tmp/run1/standards-findings.json" docs/evidence/standards-findings.json
 
+# The pack must CARRY the record, not merely be able to produce it. Without these comparisons a
+# green run proves only that a temp root could be populated, which is exactly how the artefact set
+# stayed absent from the public pack while CI passed.
+stale() {
+  echo "standards_pack: $1 is stale or missing; run docs/design/scripts/publish-standards.sh" >&2
+  exit 1
+}
+cmp "$tmp/run1/data/standards.json" docs/design/data/standards.json || stale "docs/design/data/standards.json"
+cmp "$tmp/run1/data/standards.js" docs/design/data/standards.js || stale "docs/design/data/standards.js"
+cmp "$tmp/run1/data/rework.js" docs/design/data/rework.js || stale "docs/design/data/rework.js"
+cmp "$tmp/run1/rework.json" docs/evidence/rework-register.json || stale "docs/evidence/rework-register.json"
+diff -r "$tmp/run1/docs/standards" docs/design/docs/standards >/dev/null || stale "docs/design/docs/standards"
+
 # The record's schema, page hashes and package linkage are checked over the generated tree.
 node docs/design/scripts/check-standards.cjs --data "$tmp/run1/data" --documents "$tmp/run1"
 

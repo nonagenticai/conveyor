@@ -263,6 +263,77 @@ if (!fs.existsSync(reworkPath)) {
   }
 }
 
+// A pack published from the committed snapshot carries the register as its own generated global
+// (`data/rework.js`), because `snapshot.js` and the manifest are written only by the live
+// `--conformance` snapshot. The record and the register are published together: a record without
+// its register would render every absent artefact as a dead end.
+const reworkJsPath = path.join(dataDir, "rework.js");
+if (fs.existsSync(standardsPath) && !fs.existsSync(reworkJsPath)) {
+  bad("standards.json is published but data/rework.js is absent; the register must travel with it");
+}
+if (fs.existsSync(reworkJsPath)) {
+  let register = null;
+  try {
+    register = JSON.parse(
+      fs
+        .readFileSync(reworkJsPath, "utf8")
+        .replace(/^window\.CONVEYOR_REWORK = /, "")
+        .replace(/;\s*$/, ""),
+    );
+    ok(`data/rework.js parses (${(register.packages || []).length} packages)`);
+  } catch (error) {
+    bad(`data/rework.js does not parse: ${error.message}`);
+  }
+  if (register) {
+    if (register.schema !== "conveyor-rework/v1") {
+      bad(`data/rework.js schema is ${JSON.stringify(register.schema)}, expected "conveyor-rework/v1"`);
+    }
+    if (!Array.isArray(register.packages)) bad("data/rework.js carries no packages array");
+    // Compare content, not key order: the live publish writes rework.json through the Rust
+    // snapshot and the generator writes rework.js and the evidence ledger with sorted keys.
+    const canonical = (value) => {
+      if (Array.isArray(value)) return `[${value.map(canonical).join(",")}]`;
+      if (value && typeof value === "object") {
+        return `{${Object.keys(value)
+          .sort()
+          .map((key) => `${JSON.stringify(key)}:${canonical(value[key])}`)
+          .join(",")}}`;
+      }
+      return JSON.stringify(value);
+    };
+    // The canonical register for this snapshot is the evidence ledger. A global that only has to
+    // carry a schema and an array would let an emptied register pass while every unresolved
+    // artefact still names a package that no longer exists.
+    const evidenceRegister = path.resolve(__dirname, "..", "..", "evidence", "rework-register.json");
+    if (fs.existsSync(evidenceRegister)) {
+      try {
+        const canonicalRegister = JSON.parse(fs.readFileSync(evidenceRegister, "utf8"));
+        if (canonical(register) !== canonical(canonicalRegister)) {
+          bad("data/rework.js differs from docs/evidence/rework-register.json");
+        } else {
+          ok("data/rework.js matches the canonical register ledger");
+        }
+      } catch (error) {
+        bad(`docs/evidence/rework-register.json does not parse: ${error.message}`);
+      }
+    } else if (!fs.existsSync(reworkPath)) {
+      bad("data/rework.js is published with no canonical register at docs/evidence/rework-register.json");
+    }
+    if (fs.existsSync(reworkPath)) {
+      try {
+        const published = JSON.parse(fs.readFileSync(reworkPath, "utf8"));
+        if (canonical(published) !== canonical(register)) {
+          bad("data/rework.js differs from data/rework.json");
+        } else {
+          ok("data/rework.js matches the published register");
+        }
+      } catch (error) {
+        bad(`data/rework.json does not parse: ${error.message}`);
+      }
+    }
+  }
+}
+
 const secretsPath = path.join(dataDir, "secrets.json");if (fs.existsSync(secretsPath)) {
   const secrets = JSON.parse(fs.readFileSync(secretsPath, "utf8"));
   const allowed = new Set(["count", "scopes", "last_rotated_at"]);
@@ -387,6 +458,15 @@ if (fs.existsSync(studioPath)) {
     bad("studio.html must load data/standards.js before delivery.js");
   } else {
     ok("studio.html loads data/standards.js before delivery.js");
+  }
+  // The register is a generated global of the pack, read before the view that renders its rails.
+  const reworkAt = html.indexOf('src="data/rework.js"');
+  if (reworkAt === -1) {
+    bad("studio.html does not load data/rework.js");
+  } else if (deliveryAt === -1 || reworkAt > deliveryAt) {
+    bad("studio.html must load data/rework.js before delivery.js");
+  } else {
+    ok("studio.html loads data/rework.js before delivery.js");
   }
 }
 
