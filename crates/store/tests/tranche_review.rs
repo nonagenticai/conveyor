@@ -184,20 +184,22 @@ async fn a_review_records_continue_pause_or_stop() {
     );
     assert!(review_id.is_some(), "the authorisation names its review");
 
-    // The other decisions are the other outcomes, on fresh rows.
-    let other = fixture(&db).await;
-    review(&db, &other, other.tranche0, "pause")
+    // The other decisions are the other outcomes, each on its own tranche: a tranche close has
+    // one review, so a second decision over the same row is refused by `review_refuses_a_second_review`.
+    let paused = fixture(&db).await;
+    review(&db, &paused, paused.tranche0, "pause")
         .await
         .expect("the review pauses");
     assert_eq!(
-        tranche_state(&db, other.tenant, other.tranche0).await.0,
+        tranche_state(&db, paused.tenant, paused.tranche0).await.0,
         "paused"
     );
-    review(&db, &other, other.tranche0, "stop")
+    let stopped = fixture(&db).await;
+    review(&db, &stopped, stopped.tranche0, "stop")
         .await
-        .expect("a second review stops it");
+        .expect("the review stops");
     assert_eq!(
-        tranche_state(&db, other.tenant, other.tranche0).await.0,
+        tranche_state(&db, stopped.tenant, stopped.tranche0).await.0,
         "stopped"
     );
 }
@@ -323,4 +325,135 @@ async fn a_project_cannot_start_before_its_tranche_is_authorised() {
     tx.commit().await.expect("commit");
     assert!(allowed.is_ok(), "the identical start proceeds: {allowed:?}");
     let _ = f.programme;
+}
+
+async fn review_count(db: &support::TestDb, tenant: TenantId, tranche: Uuid) -> i64 {
+    sqlx::query_scalar(
+        "SELECT count(*) FROM programme_tranche_review WHERE tenant_id = $1 AND tranche_id = $2",
+    )
+    .bind(tenant.as_uuid())
+    .bind(tranche)
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("count reviews")
+}
+
+/// A tranche close has one review: a second decision over the same row is refused and writes
+/// nothing.
+#[tokio::test]
+async fn review_refuses_a_second_review() {
+    let db = support::TestDb::fresh().await;
+    let f = fixture(&db).await;
+    review(&db, &f, f.tranche0, "continue")
+        .await
+        .expect("the first review");
+
+    let refused = review(&db, &f, f.tranche0, "pause").await;
+    assert!(
+        matches!(
+            refused,
+            Err(PlanStoreError::Illegal(PlanError::TrancheAlreadyReviewed))
+        ),
+        "a tranche close has one review: {refused:?}"
+    );
+    assert_eq!(
+        review_count(&db, f.tenant, f.tranche0).await,
+        1,
+        "the refusal writes no second review row"
+    );
+}
+
+/// A closed or retired tranche is not open to a review.
+#[tokio::test]
+async fn review_refuses_a_closed_tranche() {
+    let db = support::TestDb::fresh().await;
+    let f = fixture(&db).await;
+    sqlx::query("UPDATE programme_tranche SET state = 'closed' WHERE id = $1")
+        .bind(f.tranche0)
+        .execute(&db.super_pool)
+        .await
+        .expect("close the tranche");
+
+    let refused = review(&db, &f, f.tranche0, "pause").await;
+    assert!(
+        matches!(
+            refused,
+            Err(PlanStoreError::Illegal(
+                PlanError::TrancheNotReviewable { .. }
+            ))
+        ),
+        "a closed tranche cannot be reviewed: {refused:?}"
+    );
+    assert_eq!(
+        review_count(&db, f.tenant, f.tranche0).await,
+        0,
+        "the refusal writes no review row"
+    );
+}
+
+/// A `continue` with no next tranche authorises nothing, so it refuses before writing.
+#[tokio::test]
+async fn continue_refuses_a_missing_next_tranche() {
+    let db = support::TestDb::fresh().await;
+    let f = fixture(&db).await;
+
+    // The fixture's tranche 1 is the last one.
+    let refused = review(&db, &f, f.tranche1, "continue").await;
+    assert!(
+        matches!(
+            refused,
+            Err(PlanStoreError::Illegal(PlanError::NextTrancheMissing))
+        ),
+        "a continue with nothing to authorise is refused: {refused:?}"
+    );
+    assert_eq!(
+        review_count(&db, f.tenant, f.tranche1).await,
+        0,
+        "the refusal writes no review row"
+    );
+}
+
+/// A `continue` whose next tranche is not `planned` is refused before the review is written.
+#[tokio::test]
+async fn continue_refuses_a_next_tranche_not_planned() {
+    let db = support::TestDb::fresh().await;
+    let f = fixture(&db).await;
+    sqlx::query("UPDATE programme_tranche SET state = 'authorised' WHERE id = $1")
+        .bind(f.tranche1)
+        .execute(&db.super_pool)
+        .await
+        .expect("authorise the next tranche out of band");
+
+    let refused = review(&db, &f, f.tranche0, "continue").await;
+    match &refused {
+        Err(PlanStoreError::Illegal(PlanError::NextTrancheNotPlanned { state })) => {
+            assert_eq!(state, "authorised")
+        }
+        other => panic!("a continue needs a planned next tranche: {other:?}"),
+    }
+    assert_eq!(
+        review_count(&db, f.tenant, f.tranche0).await,
+        0,
+        "the refusal writes no review row"
+    );
+}
+
+/// `pause` and `stop` end the tranche; they do not need a next tranche to authorise.
+#[tokio::test]
+async fn pause_and_stop_do_not_need_a_next_tranche() {
+    let db = support::TestDb::fresh().await;
+    let f = fixture(&db).await;
+    review(&db, &f, f.tranche1, "pause")
+        .await
+        .expect("pause needs no next tranche");
+    assert_eq!(tranche_state(&db, f.tenant, f.tranche1).await.0, "paused");
+
+    let stopped = fixture(&db).await;
+    review(&db, &stopped, stopped.tranche1, "stop")
+        .await
+        .expect("stop needs no next tranche");
+    assert_eq!(
+        tranche_state(&db, stopped.tenant, stopped.tranche1).await.0,
+        "stopped"
+    );
 }

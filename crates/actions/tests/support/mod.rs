@@ -431,6 +431,102 @@ pub async fn approved_gate(
     id
 }
 
+/// A published P0 decision document the delegated acts cite (U4).
+///
+/// The standing delegation is the owner's published decision output under the programme
+/// definition project. The fixture creates P0 and publishes one through the real document
+/// actions, so the reference is a real published row, never a test flag.
+pub async fn delegation_ref(running: &Running, login: &str) -> String {
+    let (status, body) = running
+        .invoke(
+            "projects.create",
+            login,
+            json!({"title": "Programme definition", "key": "P0"}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "create P0: {body}");
+    let p0 = body["output"]["id"]
+        .as_str()
+        .expect("the P0 project id")
+        .to_owned();
+    let (status, body) = running
+        .invoke(
+            "documents.compose",
+            login,
+            json!({
+                "title": "Standing delegation",
+                "project_id": p0,
+                "body": "The owner delegates the programme's governance acts to the delegate.",
+                "category": "decision",
+                "publishable": true,
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "compose the delegation: {body}");
+    let id = body["output"]["id"]
+        .as_str()
+        .expect("the delegation document id")
+        .to_owned();
+    let version = body["output"]["version"]
+        .as_i64()
+        .expect("the delegation document version");
+    let (status, body) = running
+        .invoke(
+            "documents.publish",
+            login,
+            json!({"id": id, "publish": true}),
+            Some(&format!("\"{version}\"")),
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "publish the delegation: {body}");
+    id
+}
+
+/// Open a tranche-review gate as `login`, decide it as the distinct [`REVIEWER`], and return
+/// the approved gate id. The requester is the executor; the approver is the delegate.
+pub async fn review_gate(running: &Running, login: &str, input: &Value) -> Uuid {
+    let (status, body) = running
+        .invoke(
+            "approvals.request",
+            login,
+            json!({
+                "gate": "tranches.review",
+                "kind": "action",
+                "action": "tranches.review",
+                "input": input,
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "request the tranche review gate: {body}");
+    let id = body["output"]["id"]
+        .as_str()
+        .and_then(|raw| Uuid::parse_str(raw).ok())
+        .expect("the tranche review gate id");
+    let (status, body) = running
+        .invoke(
+            "approvals.decide",
+            REVIEWER,
+            json!({"approval_id": id, "decision": "approve"}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "decide the tranche review gate: {body}");
+    id
+}
+
 /// Create and publish a checker-inspected SOP, returning its id (S13: every step names one).
 ///
 /// `processes.publish` refuses a step with no `procedure_id`, so a process fixture must have a

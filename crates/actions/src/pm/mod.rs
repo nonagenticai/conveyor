@@ -223,6 +223,38 @@ pub(crate) async fn approved_gate(
     Ok(id)
 }
 
+/// The newest gate of `gate` on the project, with its status, optionally only those created
+/// after `since`.
+///
+/// The closure gate is per lifecycle: a reopened project's old closure gate is older than its
+/// `reopened_at` and must not authorise the new close. The same read also lets a closure
+/// request refuse a second pending gate instead of opening one beside it.
+pub(crate) async fn latest_gate_tx(
+    conn: &mut PgConnection,
+    tenant: store::TenantId,
+    project_id: Uuid,
+    gate: &str,
+    since: Option<chrono::DateTime<chrono::Utc>>,
+) -> Result<Option<(Uuid, String)>, ActionError> {
+    let row: Option<(Uuid, String)> = sqlx::query_as(
+        "SELECT id, status FROM approval
+          WHERE tenant_id = $1 AND project_id = $2 AND gate = $3
+            AND ($4::timestamptz IS NULL OR created_at > $4)
+          ORDER BY created_at DESC, id DESC LIMIT 1",
+    )
+    .bind(tenant.as_uuid())
+    .bind(project_id)
+    .bind(gate)
+    .bind(since)
+    .fetch_optional(&mut *conn)
+    .await
+    .map_err(|error| {
+        tracing::error!(%error, "pm: read the newest gate");
+        ActionError::internal()
+    })?;
+    Ok(row)
+}
+
 /// `pm.charter` — create the project, its charter and the charter gate.
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 pub struct PmCharterIn {
@@ -662,14 +694,15 @@ async fn pm_route_gate(
     Ok(HandlerOutput::created(PmGateOut { approval_id }))
 }
 
-/// `pm.close` — the closure record, after the closure gate.
+/// `pm.close` — the PM's close, after the closure gate. The closure request (the draft asset
+/// and the gate) is `projects.close_request`; this action passes the one close gate and closes.
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 pub struct PmCloseIn {
     /// The PM's active job binding.
     pub job_binding_id: Uuid,
     /// The project.
     pub project_id: Uuid,
-    /// The closure narrative.
+    /// The PM's closing narrative; recorded as the close reason when `reason` is absent.
     pub closure: String,
     /// Why the project closes.
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -713,14 +746,6 @@ async fn pm_close(
     input: PmCloseIn,
 ) -> Result<HandlerOutput<PmCloseOut>, ActionError> {
     assert_pm(&mut *tx, ctx.tenant, input.job_binding_id).await?;
-    let closure_gate = approved_gate(&mut *tx, ctx.tenant, input.project_id, "closure").await?;
-    let Some(_closure_gate) = closure_gate else {
-        return Err(ActionError::new(
-            409,
-            "closure_gate_missing",
-            "the closure gate must be approved before the PM may close the project",
-        ));
-    };
     let project = store::project::get_project_tx(&mut *tx, ctx.tenant, input.project_id)
         .await
         .map_err(|error| {
@@ -728,27 +753,52 @@ async fn pm_close(
             ActionError::internal()
         })?
         .ok_or_else(|| ActionError::resource_not_found("project"))?;
-    let mut closure = NewAsset::new(
-        AssetKind::Closure,
-        format!("{}-CLOSURE", project.key),
-        format!("Closure — {}", project.name),
-    );
-    closure.body = input.closure;
-    closure.project_id = Some(project.id);
-    closure.owner_user_id = Some(ctx.actor_id);
-    closure.author_id = Some(ctx.actor_id);
-    let asset = store::governance::insert_asset_tx(&mut *tx, ctx.tenant, &closure)
+    let since = crate::programme::reopened_at(&project);
+    let (gate_id, _gate_status) = latest_gate_tx(
+        &mut *tx, ctx.tenant, project.id, "closure", since,
+    )
+    .await?
+    .ok_or_else(|| {
+        ActionError::new(
+            409,
+            "closure_gate_missing",
+            "the closure gate must be requested and approved before the PM may close the project",
+        )
+    })?;
+    let gate = store::approval::get_approval_tx(&mut *tx, ctx.tenant, gate_id)
         .await
         .map_err(|error| {
-            tracing::error!(%error, "pm.close: insert closure");
+            tracing::error!(%error, "pm.close: read the closure gate");
             ActionError::internal()
+        })?
+        .ok_or_else(|| {
+            ActionError::new(
+                409,
+                "closure_gate_missing",
+                "the closure gate is no longer readable",
+            )
         })?;
-    approve_asset(&mut *tx, ctx.tenant, asset.id, ctx.actor_id).await?;
+    let closure_asset_id = gate
+        .meta
+        .get("closure_asset_id")
+        .and_then(Value::as_str)
+        .and_then(|raw| raw.parse::<Uuid>().ok())
+        .ok_or_else(|| {
+            ActionError::new(
+                409,
+                "closure_asset_missing",
+                "the closure gate does not name the closure asset it authorises",
+            )
+        })?;
+    // The one close gate: the tranche, the published outputs, the distinct closure decision,
+    // the approved closure asset, the charter, the baseline and (for a delivery project) the
+    // board-approved live contract and its Phase-G review.
+    crate::programme::assert_project_can_close(&mut *tx, ctx.tenant, input.project_id).await?;
     let closed = store::project::close_project_tx(
         &mut *tx,
         ctx.tenant,
         input.project_id,
-        input.reason.as_deref(),
+        input.reason.as_deref().or(Some(input.closure.as_str())),
     )
     .await
     .map_err(|error| {
@@ -765,7 +815,7 @@ async fn pm_close(
     Ok(HandlerOutput::created(PmCloseOut {
         project_id: closed.id,
         status: closed.status,
-        closure_asset_id: asset.id,
+        closure_asset_id,
     }))
 }
 
@@ -1083,6 +1133,11 @@ pub(crate) async fn apply_gate_effect_tx(
             .and_then(|raw| raw.parse::<Uuid>().ok())
     };
     if let Some(asset_id) = id_of("charter_asset_id") {
+        approve_asset(&mut *tx, tenant, asset_id, approver).await?;
+    }
+    // A closure request opens its gate with the draft closure asset it authorises. The
+    // gate's deciding approver approves the asset — never the actor who wrote it.
+    if let Some(asset_id) = id_of("closure_asset_id") {
         approve_asset(&mut *tx, tenant, asset_id, approver).await?;
     }
     if let Some(baseline_id) = id_of("baseline_id") {

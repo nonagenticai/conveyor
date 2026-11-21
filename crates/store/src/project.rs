@@ -505,7 +505,8 @@ pub async fn reopen_project_tx(
             SET status = 'active',
                 meta = meta || jsonb_build_object(
                     'reopen_reason', $3::text,
-                    'reopen_decision_ref', $4::text
+                    'reopen_decision_ref', $4::text,
+                    'reopened_at', now()
                 ),
                 version = version + 1,
                 updated_at = now()

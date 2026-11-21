@@ -1596,6 +1596,18 @@ def self_test() -> None:
     ) != "unprovable":
         fail("an unprovable gap is not marked unprovable")
 
+    # The derived-status assertion: a closed project with a new closure gap fails strict with
+    # the project named, not only the rule, so a publish refusal is actionable.
+    closed_gap = base()
+    closed_gap.by_key["T1"]["status"] = "closed"
+    closed_gap.by_key["T1"]["meta"]["closure_outputs"] = []
+    closed_gap.published["T1"].discard("closure-review")
+    closed_failure = " | ".join(
+        check_strict(audit(closed_gap), {"version": 1, "entries": []}, {"P0", "P1"})
+    )
+    if "closed_without_closure_review T1" not in closed_failure:
+        fail(f"strict did not name the closed project: {closed_failure}")
+
     # The run is deterministic: same inputs, same bytes.
     first = json.dumps([gap for gap in audit(base())], sort_keys=True)
     second = json.dumps([gap for gap in audit(base())], sort_keys=True)

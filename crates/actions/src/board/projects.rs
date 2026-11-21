@@ -14,6 +14,8 @@ use conveyor_domain::{AssetKind, CatalogueKind, ListKind};
 use conveyor_store as store;
 use conveyor_store::governance::NewAsset;
 use conveyor_store::project::{NewProject, ProjectPatch};
+use schemars::JsonSchema;
+use serde::{Deserialize, Serialize};
 use sqlx::PgConnection;
 use uuid::Uuid;
 
@@ -486,7 +488,7 @@ async fn projects_close(
             ),
         ));
     }
-    crate::programme::assert_closure_outputs_published(&mut *tx, ctx.tenant, input.id).await?;
+    crate::programme::assert_project_can_close(&mut *tx, ctx.tenant, input.id).await?;
     let closed =
         store::project::close_project_tx(&mut *tx, ctx.tenant, input.id, input.reason.as_deref())
             .await
@@ -511,6 +513,129 @@ async fn projects_close(
         .await
         .map_err(|error| store_error(error, "projects.close"))?;
     Ok(project_view(&project, &boards))
+}
+
+/// `projects.close_request` — the programme's closure request.
+///
+/// The close is a decision, not a status edit: this writes the draft closure asset and opens the
+/// closure gate a distinct delegate decides, then returns. `projects.close` reads that gate and
+/// performs the close; the asset is approved by the gate's deciding approver, never by its author.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct ProjectCloseRequestIn {
+    /// The project.
+    pub id: Uuid,
+    /// The closure narrative written into the draft closure asset.
+    pub closure: String,
+    /// The published P0 standing-delegation decision output.
+    pub delegation_ref: Uuid,
+    /// The acceptance manifest the closure gate is decided on.
+    #[serde(default)]
+    pub evidence: serde_json::Value,
+    /// Why the project closes.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub reason: Option<String>,
+}
+
+/// `projects.close_request`'s result.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct ProjectCloseRequestOut {
+    /// The project.
+    pub project_id: Uuid,
+    /// `requested` — the project is not closed yet.
+    pub status: String,
+    /// The draft closure asset.
+    pub closure_asset_id: Uuid,
+    /// The closure gate a distinct approver decides.
+    pub approval_id: Uuid,
+}
+
+#[crate::action(
+    name = "projects.close_request",
+    version = 1,
+    kind = "internal",
+    scopes = ["projects:write"],
+    idempotent = false,
+    timeout_ms = 30000,
+    effect = "write",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn projects_close_request(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: ProjectCloseRequestIn,
+) -> Result<HandlerOutput<ProjectCloseRequestOut>, ActionError> {
+    if input.closure.trim().is_empty() {
+        return Err(invalid("closure", "required", "must not be empty"));
+    }
+    let project = load_project(tx, ctx.tenant, input.id).await?;
+    if project.programme_id.is_none() {
+        return Err(ActionError::new(
+            409,
+            "not_a_programme_project",
+            "a standalone project closes through projects.close",
+        ));
+    }
+    if matches!(project.status.as_str(), "closed" | "archived") {
+        return Err(ActionError::new(
+            409,
+            "conflict",
+            format!(
+                "project {} is {}; only an open project can request a close",
+                project.id, project.status
+            ),
+        ));
+    }
+    crate::programme::assert_delegation_ref(&mut *tx, ctx.tenant, input.delegation_ref).await?;
+    let since = crate::programme::reopened_at(&project);
+    if let Some((gate_id, status)) =
+        crate::pm::latest_gate_tx(&mut *tx, ctx.tenant, project.id, "closure", since).await?
+    {
+        return Err(ActionError::new(
+            409,
+            "closure_already_requested",
+            format!(
+                "the closure gate {gate_id} is {status}; decide it and close, do not request a \
+                 second"
+            ),
+        ));
+    }
+    let mut closure = NewAsset::new(
+        AssetKind::Closure,
+        format!("{}-CLOSURE-{}", project.key, project.version),
+        format!("Closure — {}", project.name),
+    );
+    closure.body = input.closure;
+    closure.project_id = Some(project.id);
+    closure.owner_user_id = Some(ctx.actor_id);
+    closure.author_id = Some(ctx.actor_id);
+    let asset = store::governance::insert_asset_tx(&mut *tx, ctx.tenant, &closure)
+        .await
+        .map_err(|error| {
+            tracing::error!(%error, "projects.close_request: insert closure");
+            ActionError::internal()
+        })?;
+    let approval_id = crate::pm::open_gate(
+        &mut *tx,
+        &ctx,
+        project.id,
+        "closure",
+        "pm",
+        1,
+        serde_json::json!({
+            "closure_asset_id": asset.id.to_string(),
+            "delegation_ref": input.delegation_ref.to_string(),
+            "evidence": input.evidence,
+            "description": input.reason.unwrap_or_else(|| format!("Close {}", project.key)),
+        }),
+    )
+    .await?;
+    Ok(HandlerOutput::created(ProjectCloseRequestOut {
+        project_id: project.id,
+        status: "requested".to_owned(),
+        closure_asset_id: asset.id,
+        approval_id,
+    }))
 }
 
 /// `projects.charter` — the retrospective rework's charter path: the project already exists.

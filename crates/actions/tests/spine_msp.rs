@@ -381,23 +381,20 @@ async fn tranche_review_persists_decision_and_evidence() {
         "mandate approved",
         "{updated}"
     );
+    let delegation = support::delegation_ref(&running, "dev:alice").await;
+    let input = json!({
+        "id": tranche,
+        "decision": "continue",
+        "delegation_ref": delegation,
+        "evidence": {
+            "baselines": ["B0"],
+            "benefit_status": {"BEN-T": "tracking"},
+            "risk_register": ["risk-1"]
+        }
+    });
+    let gate = support::review_gate(&running, "dev:alice", &input).await;
     let (status, reviewed) = running
-        .invoke(
-            "tranches.review",
-            "dev:alice",
-            json!({
-                "id": tranche,
-                "decision": "continue",
-                "evidence": {
-                    "baselines": ["B0"],
-                    "benefit_status": {"BEN-T": "tracking"},
-                    "risk_register": ["risk-1"]
-                }
-            }),
-            None,
-            None,
-            None,
-        )
+        .invoke_approved("tranches.review", "dev:alice", input, None, gate)
         .await;
     assert_eq!(status, 200, "{reviewed}");
     assert_eq!(output(&reviewed)["state"], "closed");

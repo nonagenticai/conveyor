@@ -19,8 +19,12 @@
 
 use std::collections::HashMap;
 
-use conveyor_domain::Project;
-use conveyor_store::{TenantId, document as document_store, project as project_store};
+use conveyor_domain::{AssetStatus, Project};
+use conveyor_store::{
+    TenantId, approval as approval_store, architecture as architecture_store,
+    document as document_store, governance as governance_store, project as project_store,
+    spine as spine_store,
+};
 use serde_json::Value;
 use sqlx::PgConnection;
 use uuid::Uuid;
@@ -301,6 +305,319 @@ pub(crate) async fn assert_project_can_start(
         })?;
     assert_dependencies_met(&mut *tx, tenant, project_id).await?;
     assert_inception_published(&mut *tx, tenant, project_id).await
+}
+
+/// The project's reopen timestamp, when the retrospective rework reopened it.
+///
+/// `projects.reopen` writes this with the reason and the decision reference. The closure gate is
+/// per lifecycle: a gate created before the reopen cannot authorise the new close, so the close
+/// gate reads only the gates created after this instant.
+pub(crate) fn reopened_at(project: &Project) -> Option<chrono::DateTime<chrono::Utc>> {
+    project
+        .meta
+        .get("reopened_at")
+        .and_then(Value::as_str)
+        .and_then(|raw| chrono::DateTime::parse_from_rfc3339(raw).ok())
+        .map(|at| at.with_timezone(&chrono::Utc))
+}
+
+/// Refuse unless `delegation_ref` is the published standing-delegation decision output under P0.
+///
+/// The reference is the owner's delegation record, not a caller's claim: it must be an active,
+/// publishable document in the `decision` category owned by the programme-definition project.
+/// Every delegated act validates it and records it, so the act reads back with its authority.
+pub(crate) async fn assert_delegation_ref(
+    tx: &mut PgConnection,
+    tenant: TenantId,
+    delegation_ref: Uuid,
+) -> Result<(), ActionError> {
+    let document = document_store::get_document_tx(&mut *tx, tenant, delegation_ref)
+        .await
+        .map_err(|error| {
+            tracing::error!(%error, "delegation: read document");
+            ActionError::internal()
+        })?
+        .ok_or_else(|| {
+            ActionError::new(
+                409,
+                "delegation_ref_invalid",
+                format!("no document {delegation_ref} in this tenant"),
+            )
+        })?;
+    if document.status != "active" || !document.publishable || document.published_at.is_none() {
+        return Err(ActionError::new(
+            409,
+            "delegation_unpublished",
+            "the delegation reference is not a published, publishable decision output",
+        ));
+    }
+    if document.category.as_deref() != Some("decision") {
+        return Err(ActionError::new(
+            409,
+            "delegation_wrong_category",
+            "the delegation reference is not a decision output",
+        ));
+    }
+    let Some(project_id) = document.project_id else {
+        return Err(ActionError::new(
+            409,
+            "delegation_wrong_project",
+            "the delegation output is not owned by P0",
+        ));
+    };
+    let project = project_store::get_project_tx(&mut *tx, tenant, project_id)
+        .await
+        .map_err(|error| {
+            tracing::error!(%error, "delegation: read the owning project");
+            ActionError::internal()
+        })?
+        .ok_or_else(|| {
+            ActionError::new(
+                409,
+                "delegation_wrong_project",
+                "the delegation output's owning project no longer exists",
+            )
+        })?;
+    if project.key != "P0" {
+        return Err(ActionError::new(
+            409,
+            "delegation_wrong_project",
+            "the delegation output is not owned by P0",
+        ));
+    }
+    Ok(())
+}
+
+/// The one close gate every writer that reaches `closed` calls.
+///
+/// A standalone project keeps the #302 output gate only: the MSP and TOGAF obligations attach to
+/// the programme's projects. A programme project closes only when its tranche is authorised,
+/// every declared closure output is published, the closure decision was taken by a distinct
+/// actor over an approved closure asset, and — for a delivery project — the charter, the scope
+/// baseline, a live board-approved delivery contract and its Phase-G compliance review (or an
+/// active waiver) all exist. The refusal writes nothing; the caller checks before its update.
+pub(crate) async fn assert_project_can_close(
+    tx: &mut PgConnection,
+    tenant: TenantId,
+    project_id: Uuid,
+) -> Result<(), ActionError> {
+    assert_closure_outputs_published(&mut *tx, tenant, project_id).await?;
+    let project = project_store::get_project_tx(&mut *tx, tenant, project_id)
+        .await
+        .map_err(|error| {
+            tracing::error!(%error, "close gate: read project");
+            ActionError::internal()
+        })?
+        .ok_or_else(|| ActionError::resource_not_found("project"))?;
+    if project.programme_id.is_none() {
+        return Ok(());
+    }
+    let since = reopened_at(&project);
+
+    spine_store::assert_project_tranche_authorised_tx(&mut *tx, tenant, project_id)
+        .await
+        .map_err(|error| match error {
+            spine_store::PlanStoreError::Illegal(
+                conveyor_domain::spine::PlanError::TrancheNotAuthorised,
+            ) => ActionError::new(
+                409,
+                "closure_tranche_not_authorised",
+                "the project's tranche is not authorised; the programme's review authorises it",
+            ),
+            other => {
+                tracing::error!(error = %other, "close gate: tranche authorisation");
+                ActionError::internal()
+            }
+        })?;
+
+    let (gate_id, gate_status) =
+        crate::pm::latest_gate_tx(&mut *tx, tenant, project_id, "closure", since)
+            .await?
+            .ok_or_else(|| {
+                ActionError::new(
+                    409,
+                    "closure_gate_missing",
+                    "the project has no closure gate; request the closure first",
+                )
+            })?;
+    if gate_status != "approved" {
+        return Err(ActionError::new(
+            409,
+            "closure_gate_pending",
+            format!(
+                "the closure gate is {gate_status}; a distinct approver must decide it before the close"
+            ),
+        ));
+    }
+    let gate = approval_store::get_approval_tx(&mut *tx, tenant, gate_id)
+        .await
+        .map_err(|error| {
+            tracing::error!(%error, "close gate: read the closure gate");
+            ActionError::internal()
+        })?
+        .ok_or_else(|| {
+            ActionError::new(
+                409,
+                "closure_gate_missing",
+                "the closure gate is no longer readable",
+            )
+        })?;
+    let approver = approval_store::deciding_approver_tx(&mut *tx, tenant, gate_id)
+        .await
+        .map_err(|error| {
+            tracing::error!(%error, "close gate: read the deciding approver");
+            ActionError::internal()
+        })?
+        .ok_or_else(|| {
+            ActionError::new(
+                409,
+                "closure_gate_pending",
+                "the closure gate has no approving decision",
+            )
+        })?;
+    if gate.requested_by == Some(approver) {
+        return Err(ActionError::new(
+            409,
+            "closure_self_approved",
+            "the actor who requested the closure gate also decided it",
+        ));
+    }
+    let asset_id = gate
+        .meta
+        .get("closure_asset_id")
+        .and_then(Value::as_str)
+        .and_then(|raw| raw.parse::<Uuid>().ok())
+        .ok_or_else(|| {
+            ActionError::new(
+                409,
+                "closure_asset_missing",
+                "the closure gate does not name the closure asset it authorises",
+            )
+        })?;
+    let delegation_ref = gate
+        .meta
+        .get("delegation_ref")
+        .and_then(Value::as_str)
+        .and_then(|raw| raw.parse::<Uuid>().ok())
+        .ok_or_else(|| {
+            ActionError::new(
+                409,
+                "delegation_ref_missing",
+                "the closure gate does not cite the standing delegation",
+            )
+        })?;
+    assert_delegation_ref(&mut *tx, tenant, delegation_ref).await?;
+    let asset = governance_store::get_asset_record_tx(&mut *tx, tenant, asset_id)
+        .await
+        .map_err(|error| {
+            tracing::error!(%error, "close gate: read the closure asset");
+            ActionError::internal()
+        })?
+        .ok_or_else(|| {
+            ActionError::new(
+                409,
+                "closure_asset_missing",
+                "the closure asset named by the gate does not exist",
+            )
+        })?;
+    if asset.status != AssetStatus::Approved {
+        return Err(ActionError::new(
+            409,
+            "closure_asset_not_approved",
+            format!(
+                "the closure asset is {}; the gate's approver must approve it",
+                asset.status.as_str()
+            ),
+        ));
+    }
+    if asset.owner_user_id.is_some_and(|owner| owner == approver) {
+        return Err(ActionError::new(
+            409,
+            "closure_self_approved",
+            "the closure author approved their own closure",
+        ));
+    }
+
+    if crate::pm::approved_gate(&mut *tx, tenant, project_id, "charter")
+        .await?
+        .is_none()
+    {
+        return Err(ActionError::new(
+            409,
+            "closure_charter_missing",
+            "the project has no approved charter gate",
+        ));
+    }
+    let baseline = spine_store::latest_approved_baseline_tx(&mut *tx, tenant, project_id, "scope")
+        .await
+        .map_err(|error| {
+            tracing::error!(%error, "close gate: read the baseline");
+            ActionError::internal()
+        })?;
+    if baseline.is_none() {
+        return Err(ActionError::new(
+            409,
+            "closure_baseline_missing",
+            "the project has no approved scope baseline",
+        ));
+    }
+
+    let track = project
+        .meta
+        .get("track")
+        .and_then(Value::as_str)
+        .unwrap_or("");
+    if track != "programme" {
+        // The board-approved live delivery contract is the design approval at programme level:
+        // the PM's own `design` gate is PM-binding-only, and `contracts_approve` already
+        // requires the board decision about this contract.
+        let contract = architecture_store::live_delivery_contract_tx(&mut *tx, tenant, project_id)
+            .await
+            .map_err(|error| {
+                tracing::error!(%error, "close gate: read the delivery contract");
+                ActionError::internal()
+            })?
+            .ok_or_else(|| {
+                ActionError::new(
+                    409,
+                    "closure_contract_missing",
+                    "the delivery project has no live, board-approved delivery contract",
+                )
+            })?;
+        let review = architecture_store::review_for_contract_tx(&mut *tx, tenant, contract.id)
+            .await
+            .map_err(|error| {
+                tracing::error!(%error, "close gate: read the compliance review");
+                ActionError::internal()
+            })?
+            .ok_or_else(|| {
+                ActionError::new(
+                    409,
+                    "closure_review_missing",
+                    "the delivery contract has no Phase-G compliance review",
+                )
+            })?;
+        if matches!(review.level.as_str(), "non_conformant" | "irrelevant") {
+            let waiver =
+                architecture_store::active_waiver_for_review_tx(&mut *tx, tenant, review.id)
+                    .await
+                    .map_err(|error| {
+                        tracing::error!(%error, "close gate: read the waiver");
+                        ActionError::internal()
+                    })?;
+            if waiver.is_none() {
+                return Err(ActionError::new(
+                    409,
+                    "closure_review_non_conformant",
+                    format!(
+                        "the Phase-G review is {}; an active waiver is required",
+                        review.level
+                    ),
+                ));
+            }
+        }
+    }
+    Ok(())
 }
 
 /// A dependency is met when its project is closed or archived. `archived` covers a superseded
