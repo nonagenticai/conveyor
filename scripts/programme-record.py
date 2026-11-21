@@ -55,13 +55,16 @@ DEFAULT_READ_ACTION = "programmes.list"
 
 READBACK_MAP = {
     "tranches.authorise": "tranches.list",
+    "tranches.update": "tranches.list",
     "programmes.baseline": "programmes.baselines_list",
+    "programmes.baseline_approve": "programmes.baselines_list",
     "projects.programme_meta": "projects.get",
     "architecture.board_decide": "architecture.board_get",
     "approvals.decide": "approvals.list",
     "documents.publish": "documents.get",
     "documents.compose": "documents.get",
     "registers.create": "registers.get",
+    "registers.update": "registers.get",
     "pm.close": "pm.get",
     "projects.reopen": "projects.get",
     "projects.charter": "pm.get",
