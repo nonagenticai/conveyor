@@ -2392,7 +2392,12 @@
       ],
       "failure_scenario": "An executor retries a write step after a transport timeout and sends no Idempotency-Key. Nothing at the broker refuses the call for a tool whose `idempotency='required'`; both attempts reach the destination and two branches (or two PRs, two uploads) exist for one step.",
       "acceptance": "A call to a tool whose `idempotency='required'` with no key returns `422 tool_input_invalid` before any network call; `tool.idempotency` is resolved into the broker and a caller-supplied key is forwarded unchanged; a test asserts the missing-key refusal and that no destination call was made.",
-      "owner_project": "T13"
+      "owner_project": "T13",
+      "resolved_by": {
+        "commit": "168e2a86302879a6351acf80480b45839fd5038f",
+        "test": "crates/actions/tests/tool_platform.rs",
+        "evidence": "cargo test -p conveyor-actions --test tool_platform: 15 passed. A tool whose resolved version declares idempotency='required' refuses a call without a key (422 tool_input_invalid naming idempotency_key, zero destination calls); with the key the call reaches the destination once and a same-key replay returns the stored response with the hit counter still at one."
+      }
     },
     {
       "id": "v1-w4a-4",
@@ -2405,7 +2410,7 @@
       "evidence": [
         {
           "path": "crates/store/src/tool.rs",
-          "line": 73,
+          "line": 75,
           "quote": "    pub credential_alias: Option<String>,"
         },
         {
@@ -2415,7 +2420,7 @@
         },
         {
           "path": "crates/actions/src/broker.rs",
-          "line": 402,
+          "line": 417,
           "quote": "        authority: Authority::Internal,"
         }
       ],
@@ -2449,7 +2454,7 @@
         },
         {
           "path": "crates/actions/src/broker.rs",
-          "line": 475,
+          "line": 490,
           "quote": "                _ => \"backend_error\","
         }
       ],
@@ -3894,6 +3899,25 @@
       "failure_scenario": "A session copies the S17 gate verbatim, runs `rbuild -- test ...`, and gets command-not-found. It either reports a red gate that is an artifact of the retired runner, or it drops the test step and reports green on the checks that happened to be local.",
       "acceptance": "Every current gate document names a runnable route (preflight for the verdict, cargo-guard for interactive feedback); every historical build-order line that keeps `rbuild` is labelled historical, and the CONTRACT §16 retirement note is the rule of record.",
       "owner_project": "PLATFORM"
+    },
+    {
+      "id": "v1-u5a-tool-idempotency-publish-1",
+      "area": "§11.3",
+      "standard": "SPEC",
+      "spec": "§11.3",
+      "severity": "P2",
+      "title": "No publish path can declare a tool's idempotency policy",
+      "problem": "The broker now honours tool.idempotency, but toolkits.publish copies only the effect, timeout and input schema from the action spec: NewTool has no idempotency field and no manifest field names it, so every published tool keeps the column default 'optional'. 'required' and 'forbidden' are reachable only by a direct database write.",
+      "evidence": [
+        {
+          "path": "crates/actions/src/toolkits/publish.rs",
+          "line": 198,
+          "quote": "                effect: spec.effect.as_str(),"
+        }
+      ],
+      "failure_scenario": "A person publishes a write toolkit and believes its operations are keyed because the slice says writes take an idempotency key; every tool lands 'optional', so the broker never asks for the key and a retried write is duplicated.",
+      "acceptance": "A toolkit manifest may declare a per-tool idempotency policy (or a stated rule derives write -> required), toolkits.publish stores it on the tool version, and a test publishes a required tool and proves the broker refuses a keyless call.",
+      "owner_project": "T13"
     }
   ]
 }
