@@ -27,7 +27,7 @@ const LEVELS = new Set(["portfolio", "programme", "project", "work_package"]);
 const SUBJECTS = new Set(["programme", "project", "tranche", "benefit", "capability", "phase", "card"]);
 const SOURCE_KINDS = new Set(["rows", "documents", "computed", "register"]);
 
-function validate(record, documentsRoot) {
+function validate(record, documentsRoot, registerKeys) {
   const errors = [];
   if (!record || typeof record !== "object") return ["the record is not an object"];
   if (record.schema !== "design-standards/v1") {
@@ -60,6 +60,12 @@ function validate(record, documentsRoot) {
     for (const section of sections) {
       if (!section.heading) errors.push(`${id}: a section has no heading`);
       if (!STATUSES.has(section.status)) errors.push(`${id}: section ${section.heading} has no status`);
+      if (
+        section.status === "evidenced" &&
+        !(section.sources || []).some((source) => Number(source.count) > 0)
+      ) {
+        errors.push(`${id}: section ${section.heading} is evidenced with no source`);
+      }
       for (const source of section.sources || []) {
         if (!SOURCE_KINDS.has(source.kind)) {
           errors.push(`${id}: section ${section.heading} has source kind ${source.kind}`);
@@ -73,6 +79,8 @@ function validate(record, documentsRoot) {
       if (!artefact.package_key) errors.push(`${id}: ${artefact.status} and no package key`);
       if (artefact.package_published !== true) {
         errors.push(`${id}: ${artefact.status} but its package is not in the published register`);
+      } else if (registerKeys && !registerKeys.has(artefact.package_key)) {
+        errors.push(`${id}: package ${artefact.package_key} is not in data/rework.json`);
       }
     }
     const document = artefact.document;
@@ -181,7 +189,18 @@ function main() {
     console.log(`check-standards: standards.json does not parse: ${error.message}`);
     return 1;
   }
-  const errors = validate(record, root);
+  let registerKeys = null;
+  const reworkPath = path.join(root, "data", "rework.json");
+  if (fs.existsSync(reworkPath)) {
+    try {
+      const register = JSON.parse(fs.readFileSync(reworkPath, "utf8"));
+      registerKeys = new Set((register.packages || []).map((pkg) => String(pkg.key)));
+    } catch (error) {
+      console.log(`check-standards: data/rework.json does not parse: ${error.message}`);
+      return 1;
+    }
+  }
+  const errors = validate(record, root, registerKeys);
   if (errors.length) {
     for (const error of errors) console.log(`check-standards: ERROR: ${error}`);
     return 1;

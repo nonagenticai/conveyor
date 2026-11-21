@@ -382,9 +382,12 @@ def computed_rows(
             for link in msp.get("benefit_links") or []
         ]
     if name == "architecture_capability":
-        profile = (architecture.get("profiles") or [{}])[0]
+        rows: list[dict[str, Any]] = []
+        profiles = architecture.get("profiles") or []
+        if profiles:
+            rows.append({"kind": "profile", **profiles[0]})
         return [
-            {"kind": "profile", **profile},
+            *rows,
             *[{"kind": "standard", **row} for row in architecture.get("standard") or []],
             *[{"kind": "board", **row} for row in architecture.get("board") or []],
             *[{"kind": "maturity", **row} for row in architecture.get("maturity") or []],
@@ -440,7 +443,8 @@ def resolve_documents(
     heading_key = normalise(heading)
     matched = [
         doc for doc in docs
-        if headings[str(doc.get("id"))] is None or heading_key in headings[str(doc.get("id"))]
+        if headings[str(doc.get("id"))] is not None
+        and heading_key in headings[str(doc.get("id"))]
     ]
     source = {
         "kind": "documents", "file": "artefacts.json", "pointer": "/documents",
@@ -449,7 +453,7 @@ def resolve_documents(
         "items": [{"id": str(doc.get("id")), "title": str(doc.get("title") or "")}
                   for doc in matched[:12]],
     }
-    return source, bool(matched) or not docs
+    return source, bool(matched)
 
 
 def resolve_section(
@@ -738,9 +742,11 @@ def build_findings(
             continue
         covered = coverage_key(artefact["category"], artefact, covered_keys)
         artefact["covered_key"] = covered
-        if covered:
-            # The gap rule owns this defect. The artefact record keeps the honest status and
-            # links to that package; emitting a second finding would create a duplicate card.
+        if covered and artefact["status"] == "absent":
+            # The gap rule owns the whole artefact. The artefact record keeps the honest status
+            # and links to that package; a second finding would be the same defect twice. A
+            # PARTIAL artefact is different: its missing sections are section-level findings the
+            # gap rules do not see, so it keeps its own package.
             continue
         missing = [
             section["heading"] for section in artefact["sections"] if section["status"] != "evidenced"
@@ -1039,7 +1045,10 @@ def generate(
             if artefact["status"] == "evidenced":
                 artefact.pop("package_published", None)
                 continue
-            expected_rule = (artefact.get("covered_key") or "").split(":")[0] or artefact["id"]
+            expected_rule = (
+                artefact.get("covered_key") if artefact["status"] == "absent" else ""
+            )
+            expected_rule = (expected_rule or "").split(":")[0] or artefact["id"]
             found = by_key.get(artefact["package_key"])
             if expected_rule != artefact["id"]:
                 found = None
