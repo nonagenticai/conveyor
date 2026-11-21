@@ -258,7 +258,8 @@ struct UsageAggregateRow {
 /// The bucket expression is chosen from the closed [`UsageGroup`] enum — never from input text —
 /// so the dynamic SQL has no writable surface. `model` groups on the served model with the
 /// requested one as the fallback (owner decision, 2026-11-09). `project` joins the run the call
-/// belongs to; a call with no run is the empty bucket, visible rather than dropped.
+/// belongs to; a `caller_kind = 'other'` call is the explicit `unattributed` bucket even when it
+/// carries a run, and a call with no project is `unattributed` too.
 ///
 /// Cost is derived from the ledger and `commercial_price` at read time (SPEC_V2 D52) and is
 /// never stored. A model with no price contributes zero to `cost_usd` and is counted in
@@ -283,7 +284,10 @@ pub async fn usage_rows_tx(
         UsageGroup::CallerKind => "c.caller_kind",
         UsageGroup::CacheStatus => "c.cache_status",
         UsageGroup::PromptSha => "coalesce(c.prompt_sha256, '')",
-        UsageGroup::Project => "coalesce(c.project_id::text, '')",
+        UsageGroup::Project => {
+            "CASE WHEN c.caller_kind = 'other' THEN 'unattributed' \
+             ELSE coalesce(c.project_id::text, 'unattributed') END"
+        }
     };
     usage_rows_for_bucket_tx(conn, tenant, bucket, since, until).await
 }
