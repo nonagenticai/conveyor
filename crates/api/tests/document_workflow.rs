@@ -30,7 +30,7 @@ async fn published_output_ids(pg: &support::Pg, tenant: TenantId) -> Vec<String>
     let mut tx = conveyor_store::begin_scoped(&pg.owner, tenant)
         .await
         .expect("scoped tx");
-    let rows = conveyor_store::document::list_published_outputs_tx(&mut *tx, tenant)
+    let rows = conveyor_store::document::list_published_outputs_tx(&mut tx, tenant)
         .await
         .expect("published outputs");
     tx.rollback().await.expect("rollback");
