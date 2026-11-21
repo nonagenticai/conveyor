@@ -261,6 +261,28 @@ a.gantt-name:hover {
   color: var(--ink);
   font-weight: 600;
 }
+.rail-chip small {
+  font-size: 9px;
+  color: var(--muted);
+}
+a.rail-chip {
+  text-decoration: none;
+}
+a.rail-chip:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.rail-chip.sev-p0 {
+  border-color: var(--red);
+  color: var(--red);
+}
+.rail-chip.sev-p1 {
+  border-color: var(--amber);
+  color: var(--amber);
+}
+.rail-chip.sev-p2 {
+  border-color: var(--line);
+}
 .rail-chip.ok {
   border-color: var(--accent);
   color: var(--accent);
@@ -270,7 +292,205 @@ a.gantt-name:hover {
   color: var(--amber);
 }
 
+/* --------------------------------------------------------------- scorecard */
+.delivery-scorecard {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 8px;
+  max-width: 100%;
+  margin: 0 0 10px;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--panel);
+}
+.delivery-scorecard > .muted {
+  grid-column: 1 / -1;
+  font-size: 11px;
+}
+.score-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  padding: 7px 9px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--sunk);
+}
+.score-tile.absent {
+  border-style: dashed;
+  opacity: 0.75;
+}
+.score-tile.score-delivery {
+  border-color: var(--accent);
+}
+.score-standard {
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.score-value {
+  font-size: 11px;
+  color: var(--ink);
+}
+.score-value b {
+  font-family: var(--mono);
+}
+.score-meta {
+  font-size: 10px;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+.score-foot {
+  margin: -4px 0 10px;
+  font-size: 10px;
+}
+
+/* --------------------------------------------------------- phase progress */
+.phase-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1 1 320px;
+  min-width: 0;
+  max-width: 100%;
+}
+.phase-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  min-width: 0;
+  max-width: 100%;
+}
+.phase-project {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--muted);
+  min-width: 54px;
+}
+.phase-strip {
+  display: flex;
+  gap: 2px;
+  overflow-x: auto;
+  max-width: 100%;
+  padding-bottom: 2px;
+}
+.phase-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 34px;
+  padding: 2px 5px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--panel);
+  font-size: 9px;
+  white-space: nowrap;
+}
+.phase-cell b {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--ink);
+}
+.phase-cell small {
+  font-size: 8px;
+  color: var(--muted);
+}
+.phase-cell.ok {
+  border-color: var(--accent);
+}
+.phase-cell.amber {
+  border-color: var(--amber);
+}
+
 /* ------------------------------------------------------------------ Kanban */
+.kanban-more {
+  padding: 4px 2px;
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--muted);
+}
+.kanban-note {
+  margin: 0;
+  font-size: 11px;
+}
+.kanban-rework {
+  align-self: flex-start;
+  padding: 1px 6px;
+  border-radius: 999px;
+  font-size: 9px;
+  background: var(--orange-soft);
+  color: var(--red);
+}
+.kanban-rework.sev-p0 {
+  font-weight: 600;
+}
+.kanban-rework.sev-p1 {
+  background: var(--amber-soft);
+  color: var(--amber);
+}
+.kanban-col.kanban-plan {
+  border-left: 3px solid var(--accent);
+}
+.kanban-col.kanban-rework {
+  border-left: 3px solid var(--orange);
+}
+.kanban-card.not-materialised {
+  border-style: dashed;
+  background: transparent;
+}
+
+/* ---------------------------------------------------------- rework package */
+.rework-package {
+  border-left: 3px solid var(--orange);
+}
+.rework-subjects {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 2px 0 0 16px;
+  padding: 0;
+  list-style: none;
+  font-size: 11px;
+}
+.rework-subject {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: baseline;
+  min-width: 0;
+}
+.rework-subject small {
+  font-size: 10px;
+}
+.rework-evidence,
+.rework-command {
+  max-width: 100%;
+  padding: 1px 4px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--panel);
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.rework-command {
+  display: block;
+  margin-top: 2px;
+  white-space: pre-wrap;
+}
+.exec-dod li.met {
+  color: var(--accent);
+}
+.exec-dod li.open {
+  color: var(--amber);
+}
+
+/* ------------------------------------------------------ board columns */
 .kanban-wrap {
   display: flex;
   flex-direction: column;

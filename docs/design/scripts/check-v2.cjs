@@ -272,6 +272,10 @@ const shot = (name) => path.join(process.env.CONVEYOR_QA_OUTPUT || os.tmpdir(), 
       (await page.locator("#main .delivery-rail").count()) === 0,
       "no tranche or benefit rail renders without a snapshot",
     );
+    check(
+      (await page.locator("#main .delivery-scorecard").count()) === 0,
+      "no standards scorecard renders without a snapshot",
+    );
     await nav("projects");
     check(
       (await content()).includes("No published snapshot is loaded"),
@@ -280,6 +284,10 @@ const shot = (name) => path.join(process.env.CONVEYOR_QA_OUTPUT || os.tmpdir(), 
     check(
       (await page.locator("#main .kanban").count()) === 0,
       "the project board does not render without a snapshot",
+    );
+    check(
+      (await page.locator("#main .kanban-rework").count()) === 0,
+      "the rework lane does not render without a snapshot",
     );
     await nav("plan");
     check(

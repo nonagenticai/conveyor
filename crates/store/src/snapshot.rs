@@ -13,7 +13,7 @@
 //! is normalised by the server, so the same rows produce the same bytes on every run. Any
 //! ordering that matters is in the `ORDER BY`.
 
-use std::collections::HashSet;
+use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 
 use chrono::{DateTime, Utc};
 use conveyor_domain::TenantId;
@@ -113,6 +113,11 @@ pub async fn snapshot_tx(
                     -- The plan seed's named keys only. `card.meta` is free-form JSONB and may
                     -- hold a person's text; the public payload never selects the whole object.
                     c.meta ->> 'unit_key' AS unit_key,
+                    -- A rework package's typed keys; absent meta is SQL NULL, rendered as JSON
+                    -- null, never as an empty string.
+                    c.meta ->> 'rework_key' AS rework_key,
+                    c.meta ->> 'rule' AS rule,
+                    c.meta ->> 'severity' AS severity,
                     c.meta -> 'issue' AS issue,
                     c.meta ->> 'process_key' AS process_key,
                     c.meta ->> 'plan' AS plan
@@ -802,6 +807,22 @@ pub async fn snapshot_tx(
             })
             .collect();
 
+    // The derived read-model sections (issue #528, Part 4). Each is a pure function over rows
+    // already loaded above and runs AFTER the portfolio boundary, so a derived row can never
+    // name a project the pack does not publish. The row sections stay as they are; these answer
+    // the questions an MSP/TOGAF reader asks of them.
+    let benefit_realisation_section =
+        benefit_realisation(&benefit_profiles, &benefit_transitions, &projects);
+    let dependency_section = dependencies(&projects);
+    let tranche_reconciliation_section =
+        tranche_reconciliation(&tranches, &tranche_reviews, &projects);
+    let phase_progress_section = phase_progress(
+        &projects,
+        &architecture_artifacts,
+        &architecture_contracts,
+        &architecture_reviews,
+    );
+
     Ok(SnapshotData {
         programme: json!({"programme": programme, "projects": projects}),
         // T0: the organisation spine (§4) — industries, the placed departments, the job
@@ -844,7 +865,10 @@ pub async fn snapshot_tx(
             "wbs_nodes": wbs_nodes,
             "project_baselines": project_baselines,
             "register_items": register_items,
-            "project_dependencies": project_dependencies
+            "project_dependencies": project_dependencies,
+            "benefit_realisation": benefit_realisation_section,
+            "dependencies": dependency_section,
+            "tranche_reconciliation": tranche_reconciliation_section
         }),
         artefacts: json!({"governed_assets": assets, "documents": documents}),
         architecture: json!({
@@ -857,7 +881,8 @@ pub async fn snapshot_tx(
             "waivers": architecture_waivers,
             "board": architecture_board,
             "maturity": architecture_maturity,
-            "skills": architecture_skills
+            "skills": architecture_skills,
+            "phase_progress": phase_progress_section
         }),
         ops: json!({
             "incidents": incidents
@@ -884,6 +909,610 @@ fn inference_error(error: crate::inference::InferenceStoreError) -> sqlx::Error 
     match error {
         crate::inference::InferenceStoreError::Database(inner) => inner,
     }
+}
+
+/// The public project keys by row id. A derived section names a project by key: the key is the
+/// reader's name for it, and an id would dangle outside the tenant.
+fn project_key_by_id(projects: &Value) -> HashMap<String, String> {
+    projects
+        .as_array()
+        .map(|rows| {
+            rows.iter()
+                .filter_map(|row| {
+                    Some((
+                        row.get("id")?.as_str()?.to_owned(),
+                        row.get("key")?.as_str()?.to_owned(),
+                    ))
+                })
+                .collect()
+        })
+        .unwrap_or_default()
+}
+
+/// `msp.benefit_realisation`: one entry per benefit profile, sorted by reference.
+///
+/// The arithmetic is `spine::benefit_realization_tx`'s, applied to the rows already loaded: the
+/// profile's `baseline.value` first, then the first transition's `evidence.baseline_value`; the
+/// post value is the latest transition's `evidence.post_value`; the delta is post minus baseline.
+/// A profile whose baseline is missing, a placeholder or non-numeric is NOT measured — it is
+/// `unbaselined`, whatever a transition row claims, so the gap is visible instead of implied.
+fn benefit_realisation(profiles: &Value, transitions: &Value, projects: &Value) -> Value {
+    let project_keys = project_key_by_id(projects);
+    let mut by_benefit: HashMap<&str, Vec<&Value>> = HashMap::new();
+    for transition in transitions
+        .as_array()
+        .map(Vec::as_slice)
+        .unwrap_or_default()
+    {
+        if let Some(id) = transition.get("benefit_id").and_then(Value::as_str) {
+            by_benefit.entry(id).or_default().push(transition);
+        }
+    }
+    let mut entries: Vec<(&str, &str, Value)> = profiles
+        .as_array()
+        .map(Vec::as_slice)
+        .unwrap_or_default()
+        .iter()
+        .map(|profile| {
+            let id = profile
+                .get("id")
+                .and_then(Value::as_str)
+                .unwrap_or_default();
+            let reference = profile
+                .get("reference")
+                .and_then(Value::as_str)
+                .unwrap_or_default();
+            let rows = by_benefit.get(id).cloned().unwrap_or_default();
+            let baseline_json = profile.get("baseline").filter(|value| !value.is_null());
+            let raw_baseline = baseline_json
+                .and_then(|baseline| baseline.get("value"))
+                .and_then(Value::as_f64)
+                .or_else(|| baseline_json.and_then(Value::as_f64))
+                .or_else(|| {
+                    rows.iter().find_map(|transition| {
+                        transition
+                            .get("evidence")
+                            .and_then(|evidence| evidence.get("baseline_value"))
+                            .and_then(Value::as_f64)
+                    })
+                });
+            // A baseline is a placeholder when no numeric value exists anywhere (the seeded
+            // profiles carry a qualitative "not measured …" string) or when the row says so.
+            // The explicit flag WINS over a stray number: a placeholder is not a measurement,
+            // so it contributes neither a state nor a delta.
+            let placeholder = raw_baseline.is_none()
+                || baseline_json
+                    .and_then(|baseline| baseline.get("placeholder"))
+                    .and_then(Value::as_bool)
+                    .unwrap_or(false);
+            let baseline_value = if placeholder { None } else { raw_baseline };
+            let baseline_measured_at = baseline_json
+                .and_then(|baseline| baseline.get("measured_at"))
+                .filter(|value| !value.is_null())
+                .cloned()
+                .or_else(|| {
+                    rows.iter().find_map(|transition| {
+                        transition
+                            .get("baseline_measured_at")
+                            .filter(|value| !value.is_null())
+                            .cloned()
+                    })
+                })
+                .unwrap_or(Value::Null);
+            let post_value = rows.iter().rev().find_map(|transition| {
+                transition
+                    .get("evidence")
+                    .and_then(|evidence| evidence.get("post_value"))
+                    .and_then(Value::as_f64)
+            });
+            let delta = match (baseline_value, post_value) {
+                (Some(baseline), Some(post)) => Some(post - baseline),
+                _ => None,
+            };
+            let enacted = |transition: &&Value| {
+                transition
+                    .get("enacted_at")
+                    .is_some_and(|value| !value.is_null())
+            };
+            let retired = |transition: &&Value| {
+                transition
+                    .get("retired_at")
+                    .is_some_and(|value| !value.is_null())
+            };
+            let state = if rows.iter().any(retired) {
+                "retired"
+            } else if rows.iter().any(|transition| {
+                transition
+                    .get("post_measured_at")
+                    .is_some_and(|value| !value.is_null())
+                    && transition
+                        .get("evidence")
+                        .and_then(|evidence| evidence.get("post_value"))
+                        .and_then(Value::as_f64)
+                        .is_some()
+            }) {
+                "realised"
+            } else if rows.iter().any(enacted) {
+                "transitioned"
+            } else if baseline_value.is_some() {
+                // A dormant transition row (no `enacted_at`) leaves the benefit baselined.
+                "baselined"
+            } else {
+                "unbaselined"
+            };
+            let transitions: Vec<Value> = rows
+                .iter()
+                .map(|transition| {
+                    json!({
+                        "baseline_measured_at": transition
+                            .get("baseline_measured_at")
+                            .cloned()
+                            .unwrap_or(Value::Null),
+                        "enacted_at": transition.get("enacted_at").cloned().unwrap_or(Value::Null),
+                        "post_measured_at": transition
+                            .get("post_measured_at")
+                            .cloned()
+                            .unwrap_or(Value::Null),
+                        "retired_at": transition.get("retired_at").cloned().unwrap_or(Value::Null),
+                        "evidence": transition.get("evidence").cloned().unwrap_or(Value::Null),
+                    })
+                })
+                .collect();
+            let project = profile
+                .get("project_id")
+                .and_then(Value::as_str)
+                .and_then(|id| project_keys.get(id))
+                .map(|key| Value::String(key.clone()))
+                .unwrap_or(Value::Null);
+            let entry = json!({
+                "reference": reference,
+                "project": project,
+                "baseline": {
+                    "value": baseline_value,
+                    "measured_at": baseline_measured_at,
+                    "placeholder": placeholder,
+                },
+                "target": profile.get("target").cloned().unwrap_or(Value::Null),
+                "measurement_method": profile
+                    .get("measurement_method")
+                    .and_then(Value::as_str)
+                    .unwrap_or_default(),
+                // The seeded profile records its owner role in `operational_area`.
+                "owner_role": profile
+                    .get("operational_area")
+                    .and_then(Value::as_str)
+                    .unwrap_or_default(),
+                "transitions": transitions,
+                "latest_post": post_value,
+                "delta": delta,
+                "state": state,
+            });
+            (reference, id, entry)
+        })
+        .collect();
+    entries.sort_by(|left, right| left.0.cmp(right.0).then_with(|| left.1.cmp(right.1)));
+    Value::Array(entries.into_iter().map(|(_, _, entry)| entry).collect())
+}
+
+/// The typed kinds `project_dependency` accepts. A declared edge with any other kind stays
+/// untyped: the snapshot never invents a kind.
+const DEPENDENCY_KINDS: [&str; 4] = ["blocks", "needs", "supersedes", "informs"];
+
+/// A declared edge: `(from, to, kind, typed)`.
+type DependencyEdge = (String, String, Option<String>, bool);
+
+/// `msp.dependencies`: the programme's DECLARED edges — each project's `meta.depends_on`, not the
+/// `project_dependency` rows. A string is an untyped edge (`kind: null, typed: false`); an object
+/// may carry `{to, kind}` but its kind counts only when it is one `project_dependency` accepts.
+/// Unknown targets and cycles are published, never fatal: they are the record's condition.
+fn dependencies(projects: &Value) -> Value {
+    let rows = projects.as_array().map(Vec::as_slice).unwrap_or_default();
+    let known: BTreeSet<&str> = rows
+        .iter()
+        .filter_map(|project| project.get("key").and_then(Value::as_str))
+        .collect();
+    let mut edges: BTreeSet<DependencyEdge> = BTreeSet::new();
+    for project in rows {
+        let Some(from) = project.get("key").and_then(Value::as_str) else {
+            continue;
+        };
+        let Some(items) = project
+            .get("meta")
+            .and_then(|meta| meta.get("depends_on"))
+            .and_then(Value::as_array)
+        else {
+            continue;
+        };
+        for item in items {
+            let (to, kind) = match item {
+                Value::String(text) => (text.trim(), None),
+                Value::Object(_) => {
+                    let Some(to) = item.get("to").and_then(Value::as_str) else {
+                        continue;
+                    };
+                    let kind = item
+                        .get("kind")
+                        .and_then(Value::as_str)
+                        .filter(|kind| DEPENDENCY_KINDS.contains(kind))
+                        .map(str::to_owned);
+                    (to.trim(), kind)
+                }
+                _ => continue,
+            };
+            if to.is_empty() {
+                continue;
+            }
+            let typed = kind.is_some();
+            edges.insert((from.to_owned(), to.to_owned(), kind, typed));
+        }
+    }
+    let mut counts: BTreeMap<&str, u64> = DEPENDENCY_KINDS.iter().map(|kind| (*kind, 0)).collect();
+    let mut untyped = 0u64;
+    for (_, _, kind, _) in &edges {
+        match kind {
+            Some(kind) => *counts.entry(kind.as_str()).or_default() += 1,
+            None => untyped += 1,
+        }
+    }
+    let unknown: BTreeSet<(String, String)> = edges
+        .iter()
+        .filter(|(_, to, _, _)| !known.contains(to.as_str()))
+        .map(|(from, to, _, _)| (from.clone(), to.clone()))
+        .collect();
+    let edges_json: Vec<Value> = edges
+        .iter()
+        .map(
+            |(from, to, kind, typed)| json!({"from": from, "to": to, "kind": kind, "typed": typed}),
+        )
+        .collect();
+    let unknown_targets: Vec<Value> = unknown
+        .iter()
+        .map(|(from, to)| json!({"from": from, "to": to}))
+        .collect();
+    let cycles = dependency_cycles(&known, &edges);
+    json!({
+        "edges": edges_json,
+        "counts": {
+            "blocks": counts["blocks"],
+            "needs": counts["needs"],
+            "supersedes": counts["supersedes"],
+            "informs": counts["informs"],
+        },
+        "untyped": untyped,
+        "unknown_targets": unknown_targets,
+        "cycles": cycles,
+    })
+}
+
+/// The strongly connected components of the declared graph that contain a cycle (an SCC of more
+/// than one node, or one node with a self-edge). Kosaraju, iterating nodes and neighbours in
+/// sorted order, so the output is identical on every run.
+fn dependency_cycles(nodes: &BTreeSet<&str>, edges: &BTreeSet<DependencyEdge>) -> Vec<Vec<String>> {
+    let mut adjacency: BTreeMap<&str, Vec<&str>> =
+        nodes.iter().map(|node| (*node, Vec::new())).collect();
+    let mut reverse: BTreeMap<&str, Vec<&str>> =
+        nodes.iter().map(|node| (*node, Vec::new())).collect();
+    for (from, to, _, _) in edges {
+        if !nodes.contains(to.as_str()) {
+            continue;
+        }
+        if let Some(neighbours) = adjacency.get_mut(from.as_str()) {
+            neighbours.push(to.as_str());
+        }
+        if let Some(neighbours) = reverse.get_mut(to.as_str()) {
+            neighbours.push(from.as_str());
+        }
+    }
+    for neighbours in adjacency.values_mut() {
+        neighbours.sort_unstable();
+        neighbours.dedup();
+    }
+    for neighbours in reverse.values_mut() {
+        neighbours.sort_unstable();
+        neighbours.dedup();
+    }
+    // First pass: finish order on the graph.
+    let mut visited: BTreeSet<&str> = BTreeSet::new();
+    let mut finish: Vec<&str> = Vec::new();
+    for start in nodes {
+        if visited.contains(*start) {
+            continue;
+        }
+        visited.insert(*start);
+        let mut stack: Vec<(&str, usize)> = vec![(*start, 0)];
+        while let Some((node, position)) = stack.pop() {
+            let neighbours = &adjacency[node];
+            if position < neighbours.len() {
+                stack.push((node, position + 1));
+                let next = neighbours[position];
+                if visited.insert(next) {
+                    stack.push((next, 0));
+                }
+            } else {
+                finish.push(node);
+            }
+        }
+    }
+    // Second pass: components on the reversed graph, in reverse finish order.
+    let mut assigned: BTreeSet<&str> = BTreeSet::new();
+    let mut cycles: Vec<Vec<String>> = Vec::new();
+    for start in finish.into_iter().rev() {
+        if !assigned.insert(start) {
+            continue;
+        }
+        let mut component: Vec<&str> = Vec::new();
+        let mut stack = vec![start];
+        while let Some(node) = stack.pop() {
+            component.push(node);
+            for &neighbour in &reverse[node] {
+                if assigned.insert(neighbour) {
+                    stack.push(neighbour);
+                }
+            }
+        }
+        let self_loop = component.len() == 1 && adjacency[component[0]].contains(&component[0]);
+        if component.len() > 1 || self_loop {
+            component.sort_unstable();
+            cycles.push(component.into_iter().map(str::to_owned).collect());
+        }
+    }
+    cycles.sort();
+    cycles
+}
+
+/// `msp.tranche_reconciliation`: one entry per tranche, sorted by number. The review is the
+/// latest one; `authorised` is true only when its decision is `continue`. A closed project in a
+/// tranche with no such decision is a flag, not a correction — the snapshot reports it.
+fn tranche_reconciliation(tranches: &Value, reviews: &Value, projects: &Value) -> Value {
+    let mut latest_review: HashMap<&str, &Value> = HashMap::new();
+    for review in reviews.as_array().map(Vec::as_slice).unwrap_or_default() {
+        let Some(tranche_id) = review.get("tranche_id").and_then(Value::as_str) else {
+            continue;
+        };
+        let replace = latest_review
+            .get(tranche_id)
+            .is_none_or(|current| row_is_later(review, *current, "reviewed_at"));
+        if replace {
+            latest_review.insert(tranche_id, review);
+        }
+    }
+    let projects = projects.as_array().map(Vec::as_slice).unwrap_or_default();
+    let mut entries: Vec<(i64, String, Value)> = tranches
+        .as_array()
+        .map(Vec::as_slice)
+        .unwrap_or_default()
+        .iter()
+        .map(|tranche| {
+            let number = tranche
+                .get("number")
+                .and_then(Value::as_i64)
+                .unwrap_or_default();
+            let programme = tranche
+                .get("programme_id")
+                .and_then(Value::as_str)
+                .unwrap_or_default();
+            let id = tranche
+                .get("id")
+                .and_then(Value::as_str)
+                .unwrap_or_default();
+            let review = latest_review.get(id).copied();
+            let authorised = review
+                .and_then(|review| review.get("decision"))
+                .and_then(Value::as_str)
+                == Some("continue");
+            let mut total = 0u64;
+            let mut active = 0u64;
+            let mut closed = 0u64;
+            let mut archived = 0u64;
+            for project in projects {
+                let same_programme =
+                    project.get("programme_id").and_then(Value::as_str) == Some(programme);
+                let in_tranche = project
+                    .get("meta")
+                    .and_then(|meta| meta.get("tranche"))
+                    .and_then(tranche_number)
+                    == Some(number);
+                if !(same_programme && in_tranche) {
+                    continue;
+                }
+                total += 1;
+                match project.get("status").and_then(Value::as_str) {
+                    Some("active") => active += 1,
+                    Some("closed") => closed += 1,
+                    Some("archived") => archived += 1,
+                    _ => {}
+                }
+            }
+            let mut flags: Vec<&str> = Vec::new();
+            if review.is_none() {
+                flags.push("review_missing");
+            }
+            if !authorised && closed > 0 {
+                flags.push("projects_closed_before_authorisation");
+            }
+            let review_value = review
+                .map(|review| {
+                    json!({
+                        "decision": review.get("decision").cloned().unwrap_or(Value::Null),
+                        "decided_at": review.get("reviewed_at").cloned().unwrap_or(Value::Null),
+                    })
+                })
+                .unwrap_or(Value::Null);
+            let entry = json!({
+                "number": number,
+                "declared_state": tranche.get("state").cloned().unwrap_or(Value::Null),
+                "review": review_value,
+                "authorised": authorised,
+                "projects": {
+                    "total": total,
+                    "active": active,
+                    "closed": closed,
+                    "archived": archived,
+                },
+                "flags": flags,
+            });
+            (number, programme.to_owned(), entry)
+        })
+        .collect();
+    entries.sort_by(|left, right| left.0.cmp(&right.0).then_with(|| left.1.cmp(&right.1)));
+    Value::Array(entries.into_iter().map(|(_, _, entry)| entry).collect())
+}
+
+/// A `meta.tranche` value is a number in the seed and may be a numeric string in a hand edit.
+fn tranche_number(value: &Value) -> Option<i64> {
+    value
+        .as_i64()
+        .or_else(|| value.as_str().and_then(|text| text.trim().parse().ok()))
+}
+
+/// Whether `candidate` is later than `current` by a timestamp field, breaking a tie by row id.
+fn row_is_later(candidate: &Value, current: &Value, timestamp: &str) -> bool {
+    let candidate_at = candidate
+        .get(timestamp)
+        .and_then(Value::as_str)
+        .unwrap_or_default();
+    let current_at = current
+        .get(timestamp)
+        .and_then(Value::as_str)
+        .unwrap_or_default();
+    candidate_at > current_at
+        || (candidate_at == current_at
+            && candidate
+                .get("id")
+                .and_then(Value::as_str)
+                .unwrap_or_default()
+                > current
+                    .get("id")
+                    .and_then(Value::as_str)
+                    .unwrap_or_default())
+}
+
+/// `architecture.phase_progress`: one entry per project that declares `meta.adm_phase` (or has a
+/// contract), sorted by project key. Phases `a..h` are always listed; `preliminary` is listed only
+/// when declared. A phase is `evidenced` when an artefact, contract or compliance review names it;
+/// absence is explicit, and `next_required` is the first phase that still lacks evidence.
+fn phase_progress(
+    projects: &Value,
+    artifacts: &Value,
+    contracts: &Value,
+    reviews: &Value,
+) -> Value {
+    let mut artifact_phases: HashSet<(String, String)> = HashSet::new();
+    for artifact in artifacts.as_array().map(Vec::as_slice).unwrap_or_default() {
+        if let (Some(project), Some(phase)) = (
+            artifact.get("project_id").and_then(Value::as_str),
+            artifact.get("phase_code").and_then(Value::as_str),
+        ) {
+            artifact_phases.insert((project.to_owned(), phase.to_owned()));
+        }
+    }
+    let mut contract_by_phase: HashMap<(String, String), &Value> = HashMap::new();
+    for contract in contracts.as_array().map(Vec::as_slice).unwrap_or_default() {
+        let (Some(project), Some(phase)) = (
+            contract.get("project_id").and_then(Value::as_str),
+            contract.get("phase_code").and_then(Value::as_str),
+        ) else {
+            continue;
+        };
+        let key = (project.to_owned(), phase.to_owned());
+        let replace = contract_by_phase
+            .get(&key)
+            .is_none_or(|current| row_is_later(contract, *current, "created_at"));
+        if replace {
+            contract_by_phase.insert(key, contract);
+        }
+    }
+    let mut review_by_contract: HashMap<&str, &Value> = HashMap::new();
+    for review in reviews.as_array().map(Vec::as_slice).unwrap_or_default() {
+        let Some(contract_id) = review.get("contract_id").and_then(Value::as_str) else {
+            continue;
+        };
+        let replace = review_by_contract
+            .get(contract_id)
+            .is_none_or(|current| row_is_later(review, *current, "reviewed_at"));
+        if replace {
+            review_by_contract.insert(contract_id, review);
+        }
+    }
+    let mut entries: Vec<(&str, Value)> = Vec::new();
+    for project in projects.as_array().map(Vec::as_slice).unwrap_or_default() {
+        let Some(key) = project.get("key").and_then(Value::as_str) else {
+            continue;
+        };
+        let Some(id) = project.get("id").and_then(Value::as_str) else {
+            continue;
+        };
+        let declared_phase = project
+            .get("meta")
+            .and_then(|meta| meta.get("adm_phase"))
+            .and_then(Value::as_str);
+        let has_contract = contract_by_phase
+            .keys()
+            .any(|(project_id, _)| project_id == id);
+        if declared_phase.is_none() && !has_contract {
+            continue;
+        }
+        let mut order: Vec<&str> = Vec::new();
+        if declared_phase == Some("preliminary") {
+            order.push("preliminary");
+        }
+        order.extend(["a", "b", "c", "d", "e", "f", "g", "h"]);
+        let mut phases: Vec<Value> = Vec::new();
+        let mut next_required = Value::Null;
+        for phase in order {
+            let phase_key = (id.to_owned(), phase.to_owned());
+            let contract = contract_by_phase.get(&phase_key).copied();
+            let compliance = contract
+                .and_then(|contract| contract.get("id").and_then(Value::as_str))
+                .and_then(|contract_id| review_by_contract.get(contract_id))
+                .map(|review| {
+                    json!({
+                        "outcome": review.get("outcome").cloned().unwrap_or(Value::Null),
+                        "reviewed_at": review.get("reviewed_at").cloned().unwrap_or(Value::Null),
+                    })
+                });
+            let evidenced =
+                artifact_phases.contains(&phase_key) || contract.is_some() || compliance.is_some();
+            if !evidenced && next_required.is_null() {
+                next_required = Value::String(phase.to_owned());
+            }
+            phases.push(json!({
+                "phase": phase,
+                "state": if evidenced { "evidenced" } else { "not-evidenced" },
+                "contract": contract
+                    .map(|contract| json!({
+                        "id": contract.get("id").cloned().unwrap_or(Value::Null),
+                        "kind": contract.get("kind").cloned().unwrap_or(Value::Null),
+                        "status": contract.get("status").cloned().unwrap_or(Value::Null),
+                    }))
+                    .unwrap_or(Value::Null),
+                "compliance": compliance.unwrap_or(Value::Null),
+            }));
+        }
+        let declared = declared_phase
+            .map(|phase| {
+                json!({
+                    "adm_phase": phase,
+                    "plateau": project
+                        .get("meta")
+                        .and_then(|meta| meta.get("plateau"))
+                        .cloned()
+                        .unwrap_or(Value::Null),
+                })
+            })
+            .unwrap_or(Value::Null);
+        entries.push((
+            key,
+            json!({
+                "project": key,
+                "declared": declared,
+                "phases": phases,
+                "next_required": next_required,
+            }),
+        ));
+    }
+    entries.sort_by(|left, right| left.0.cmp(right.0));
+    Value::Array(entries.into_iter().map(|(_, entry)| entry).collect())
 }
 
 /// The `id`s of the rows whose `key` field satisfies `keep`.

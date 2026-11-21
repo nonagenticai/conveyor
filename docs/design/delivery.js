@@ -93,6 +93,110 @@ window.CONVEYOR_DELIVERY = (function () {
     return acc;
   }
 
+  // The tenant's own metering total, when the snapshot publishes no per-project/per-card split.
+  // Absence of attribution is named, never rendered as "no spend".
+  function tenantSpend(measure) {
+    const inference = (measure || {}).inference || {};
+    if (list(inference.by_project).length || list(inference.by_card).length) return null;
+    const totals = inference.totals;
+    if (!totals) return null;
+    const row = Array.isArray(totals) ? totals[0] : totals;
+    if (!row) return null;
+    // A totals row with no amount is not a spend claim; stay silent rather than render "0 tok".
+    if (!Number.isFinite(Number(row.total_tokens)) && !Number.isFinite(num(row.cost_usd))) {
+      return null;
+    }
+    const acc = { tokens: 0, usd: 0, priced: 0, unpriced: 0, any: false };
+    addSpend(acc, row);
+    return acc;
+  }
+
+  // When `work.project_activity` is absent (or omits a project), the window is derived from the
+  // observed cards and runs, exactly as the signed-in console computes it: first and last event.
+  // A project with no card and no run still gets no bar.
+  function observedWindows(work) {
+    const boardProject = new Map(
+      list((work || {}).boards).map((row) => [row.id, row.project_id]),
+    );
+    const cardProject = new Map();
+    const events = new Map();
+    const add = (projectId, value) => {
+      const at = parse(value);
+      if (!projectId || at == null) return;
+      const entry = events.get(projectId) || { start: at, end: at };
+      entry.start = Math.min(entry.start, at);
+      entry.end = Math.max(entry.end, at);
+      events.set(projectId, entry);
+    };
+    list((work || {}).cards).forEach((card) => {
+      const projectId = boardProject.get(card.board_id);
+      if (!projectId) return;
+      cardProject.set(card.id, projectId);
+      add(projectId, card.created_at);
+      add(projectId, card.list_changed_at);
+      add(projectId, card.updated_at);
+      add(projectId, card.archived_at);
+    });
+    list((work || {}).runs).forEach((run) => {
+      const projectId = run.project_id || cardProject.get(run.card_id);
+      add(projectId, run.created_at);
+      add(projectId, run.started_at);
+      add(projectId, run.finished_at);
+    });
+    return events;
+  }
+
+  // A code finding's evidence is a location (`path:line`); any other evidence is its own text.
+  function evidenceText(value) {
+    if (value == null || value === "") return "";
+    if (typeof value === "string") return value;
+    if (Array.isArray(value)) return list(value).map(evidenceText).filter(Boolean).join(" · ");
+    if (typeof value === "object") {
+      const path = value.path || value.file || value.location;
+      const line = value.line != null ? value.line : value.line_start;
+      if (path && line != null) return `${path}:${line}`;
+      if (path) return String(path);
+      if (value.subject) return evidenceText(value.subject);
+      if (value.detail) return evidenceText(value.detail);
+      return "";
+    }
+    return String(value);
+  }
+
+  // A tile cap keeps a lane readable; the note carries the full remainder, never a silent cut.
+  const TILE_CAP = 25;
+  function cardColumn(cards, render) {
+    const all = list(cards);
+    const shown = all.slice(0, TILE_CAP);
+    const rest = all.length - shown.length;
+    return `${shown.map(render).join("")}${
+      rest > 0 ? `<div class="kanban-more">${rest} more</div>` : ""
+    }`;
+  }
+
+  // WSJF only exists when job_size is positive and all three components are measured.
+  function wsjfOf(node) {
+    const size = num(node.job_size);
+    if (!Number.isFinite(size) || size <= 0) return null;
+    const parts = [node.business_value, node.time_criticality, node.risk_reduction].map(num);
+    if (!parts.every(Number.isFinite)) return null;
+    return parts.reduce((sum, value) => sum + value, 0) / size;
+  }
+
+  // `rework.apply_to` names a project by id or key; both resolve to the same route.
+  function appliesTo(row, projectId, projectKey) {
+    const target = row && row.apply_to;
+    if (target == null) return false;
+    return target === projectId || (projectKey != null && target === projectKey);
+  }
+
+  function projectRef(project) {
+    if (project && typeof project === "object") {
+      return { id: project.id, key: project.key || null };
+    }
+    return { id: project, key: null };
+  }
+
   /* ------------------------------------------------------------- the artefacts */
   // MSP §8.3 and TOGAF §8.1 rows, scoped to one programme. A row without `programme_id` is from an
   // older snapshot or a study fixture; it is shown rather than dropped.
@@ -108,8 +212,27 @@ window.CONVEYOR_DELIVERY = (function () {
     const stakeholders = scoped(M.stakeholder_profiles, programmeId);
     const links = scoped(M.benefit_links, programmeId);
     const cadences = scoped(M.cadences, programmeId);
+    // The realisation rows carry the project and the benefit reference; they are scoped by the
+    // programme's own benefit references (a row for another programme's benefit is not ours).
+    const realisationPublished = Array.isArray(M.benefit_realisation);
+    const refs = new Set(benefits.map((row) => row.reference).filter(Boolean));
+    const realisation = realisationPublished
+      ? list(M.benefit_realisation)
+          .filter((row) => !row.programme_id || row.programme_id === programmeId)
+          .filter((row) => !refs.size || refs.has(row.reference))
+      : [];
+    const realisationByRef = new Map(realisation.map((row) => [row.reference, row]));
     const measured = benefits.filter((row) => benefitMeasured(row, transitions));
     const realised = benefits.filter((row) => benefitRealised(row, transitions));
+    // A realisation claim counts only with a measured baseline / a numeric post measurement.
+    const measuredRealisation = realisation.filter(
+      (row) => row.baseline && row.baseline.measured_at && !row.baseline.placeholder,
+    );
+    const realisedRealisation = realisation.filter(
+      (row) =>
+        String(row.state || "").toLowerCase() === "realised" &&
+        Number.isFinite(num(row.latest_post)),
+    );
     const stateByNumber = new Map(tranches.map((row) => [Number(row.number), row]));
     return {
       tranches,
@@ -119,10 +242,13 @@ window.CONVEYOR_DELIVERY = (function () {
       stakeholders,
       links,
       cadences,
+      realisationPublished,
+      realisation,
+      realisationByRef,
       stateByNumber,
       trancheSummary: trancheSummary(tranches),
-      benefitsMeasured: measured.length,
-      benefitsRealised: realised.length,
+      benefitsMeasured: realisationPublished ? measuredRealisation.length : measured.length,
+      benefitsRealised: realisationPublished ? realisedRealisation.length : realised.length,
     };
   }
 
@@ -213,12 +339,67 @@ window.CONVEYOR_DELIVERY = (function () {
     }</div></div>`;
   }
 
-  // MSP benefit rail: the profile's own baseline/target, measured vs not.
+  // MSP benefit rail. When the register publishes `benefit_realisation`, that row is the truth
+  // (state, measured vs placeholder baseline, delta); otherwise the older profile/transition rows
+  // are read. Every profile renders — nothing is silently truncated.
   function benefitRail(artefacts) {
     const a = artefacts || {};
-    const chips = list(a.benefits)
-      .slice(0, 8)
+    const benefits = list(a.benefits);
+    const byRef = a.realisationByRef || new Map();
+    const useRealisation = Boolean(a.realisationPublished);
+    const chips = benefits
       .map((row) => {
+        if (useRealisation) {
+          const real = byRef.get(row.reference) || null;
+          const state = real ? realisationState(real) : "—";
+          const baseline = real ? baselineText(real.baseline) : "baseline —";
+          // The baseline state is visible, not hidden in a title: a phone has no hover.
+          const baselineMark = real && real.baseline
+            ? real.baseline.placeholder
+              ? "baseline placeholder"
+              : real.baseline.measured_at
+                ? "baseline measured"
+                : `baseline ${
+                    real.baseline.value == null || real.baseline.value === ""
+                      ? "—"
+                      : real.baseline.value
+                  }`
+            : "baseline —";
+          const delta =
+            real && Number.isFinite(num(real.delta))
+              ? ` · Δ ${num(real.delta) > 0 ? "+" : ""}${num(real.delta)}`
+              : "";
+          const target =
+            real && real.target != null
+              ? ` · target ${real.target}`
+              : String(row.target || row.observable_outcome || "").trim()
+                ? ` · target ${String(row.target || row.observable_outcome).trim()}`
+                : "";
+          const title = [
+            baseline,
+            real && real.measurement_method
+              ? `method: ${real.measurement_method}`
+              : row.measurement_method
+                ? `method: ${row.measurement_method}`
+                : "",
+            real && real.owner_role ? `owner: ${real.owner_role}` : "",
+            real && real.latest_post != null ? `latest post: ${real.latest_post}` : "",
+          ]
+            .filter(Boolean)
+            .join(" · ");
+          return chip(
+            row.reference || String(row.id || "").slice(0, 8),
+            `${row.description || ""} · ${state} · ${baselineMark}${delta}${target}`,
+            state === "realised"
+              ? "closed"
+              : state === "baselined" || state === "transitioned"
+                ? "in_review"
+                : state === "retired"
+                  ? "planned"
+                  : "",
+            title,
+          );
+        }
         const measured = benefitMeasured(row, a.transitions);
         const realised = benefitRealised(row, a.transitions);
         const state = realised ? "realised" : measured ? "measured" : "unmeasured";
@@ -233,8 +414,8 @@ window.CONVEYOR_DELIVERY = (function () {
         );
       })
       .join("");
-    const count = a.benefits
-      ? `${a.benefitsRealised}/${list(a.benefits).length} realised · ${a.benefitsMeasured} with a measured baseline`
+    const count = benefits.length
+      ? `${a.benefitsRealised}/${benefits.length} realised · ${a.benefitsMeasured} with a measured baseline`
       : "";
     return `<div class="delivery-rail"><span class="rail-label">MSP benefits${esc(
       count ? ` · ${count}` : "",
@@ -243,16 +424,321 @@ window.CONVEYOR_DELIVERY = (function () {
     }</div></div>`;
   }
 
+  // A claimed "realised" without a numeric post measurement is not realised; say "—" instead.
+  function realisationState(row) {
+    const state = String(row.state || "").toLowerCase();
+    if (!state) return "—";
+    if (state === "realised" && !Number.isFinite(num(row.latest_post))) return "—";
+    return state;
+  }
+
+  function baselineText(baseline) {
+    if (!baseline) return "baseline —";
+    const value = baseline.value == null || baseline.value === "" ? "—" : baseline.value;
+    if (baseline.placeholder) return `baseline ${value} (placeholder)`;
+    if (baseline.measured_at) {
+      return `baseline ${value} (measured ${shortDate(parse(baseline.measured_at))})`;
+    }
+    return `baseline ${value}`;
+  }
+
+  // MSP dependency register: typed/untyped edges, unknown targets and cycles.
+  function dependencyRail(dependencies) {
+    const d = dependencies || null;
+    if (!d || (!d.edges && !d.counts)) {
+      return `<div class="delivery-rail"><span class="rail-label">Dependencies</span><div class="rail-chips"><span class="rail-chip">no dependency row published</span></div></div>`;
+    }
+    const edges = list(d.edges);
+    const counts = d.counts || {};
+    const typed = Number.isFinite(Number(counts.typed))
+      ? Number(counts.typed)
+      : edges.filter((row) => row && row.typed).length;
+    const untyped = Number.isFinite(Number(counts.untyped))
+      ? Number(counts.untyped)
+      : edges.filter((row) => row && !row.typed).length;
+    const total = Number.isFinite(Number(counts.total)) ? Number(counts.total) : edges.length;
+    const unknown = list(d.unknown_targets);
+    const cycles = list(d.cycles);
+    const chips = [
+      chip(
+        "Edges",
+        `${total} · ${typed} typed · ${untyped} untyped`,
+        untyped > 0 ? "in_review" : "approved",
+      ),
+      unknown.length
+        ? chip(
+            "Unknown targets",
+            `${unknown.length}: ${unknown
+              .slice(0, 3)
+              .map((row) => `${row.from || "—"}→${row.to || "—"}`)
+              .join(", ")}${unknown.length > 3 ? ` +${unknown.length - 3}` : ""}`,
+            "planned",
+          )
+        : "",
+      cycles.length
+        ? chip(
+            "Cycles",
+            `${cycles
+              .slice(0, 3)
+              .map((cycle) => list(cycle).join(" → "))
+              .join(" · ")}${cycles.length > 3 ? ` +${cycles.length - 3}` : ""}`,
+            "planned",
+          )
+        : "",
+      !unknown.length && !cycles.length
+        ? chip("Integrity", "no unknown target · no cycle", "approved")
+        : "",
+    ]
+      .filter(Boolean)
+      .join("");
+    return `<div class="delivery-rail"><span class="rail-label">Dependencies</span><div class="rail-chips">${chips}</div></div>`;
+  }
+
+  // MSP tranche reconciliation: declared state vs the review's authorisation, with its flags.
+  function reconciliationRail(rows) {
+    const listRows = list(rows);
+    if (!listRows.length) {
+      return `<div class="delivery-rail"><span class="rail-label">Tranche reconciliation</span><div class="rail-chips"><span class="rail-chip">no tranche reconciliation published</span></div></div>`;
+    }
+    const chips = listRows
+      .sort(byNumber)
+      .map((row) => {
+        const review = row.review
+          ? `${row.review.decision || "—"} ${shortDate(parse(row.review.decided_at))}`
+          : "no review";
+        const projects = row.projects || {};
+        const counts = [
+          projects.total != null
+            ? `${projects.active == null ? "—" : projects.active}/${projects.total} active`
+            : "",
+          projects.closed != null ? `${projects.closed} closed` : "",
+          projects.archived ? `${projects.archived} archived` : "",
+        ]
+          .filter(Boolean)
+          .join(" · ");
+        const flags = list(row.flags);
+        return chip(
+          `T${row.number == null ? "—" : row.number}`,
+          `${row.declared_state || "—"} · ${row.authorised ? "authorised" : "not authorised"} · ${review}${
+            counts ? ` · ${counts}` : ""
+          }${flags.length ? ` · ${flags.length} flag${flags.length === 1 ? "" : "s"}` : ""}`,
+          flags.length ? "in_review" : row.authorised ? "authorised" : "planned",
+          flags.join(" · "),
+        );
+      })
+      .join("");
+    return `<div class="delivery-rail"><span class="rail-label">Tranche reconciliation</span><div class="rail-chips">${chips}</div></div>`;
+  }
+
+  // TOGAF A–H phase progress per project. Each cell names its own contract and compliance state.
+  function phaseStrip(phaseProgress, projects) {
+    const rows = list(phaseProgress);
+    if (!rows.length) {
+      return `<div class="delivery-rail"><span class="rail-label">TOGAF A–H phases</span><div class="rail-chips"><span class="rail-chip">phase progress not published</span></div></div>`;
+    }
+    const ids = new Set();
+    const keys = new Set();
+    list(projects).forEach((row) => {
+      if (row && row.id) ids.add(row.id);
+      if (row && row.key) keys.add(row.key);
+    });
+    const mine = rows.filter((row) => ids.has(row.project) || keys.has(row.project));
+    const shown = list(projects).length ? mine : rows;
+    if (!shown.length) {
+      return `<div class="delivery-rail"><span class="rail-label">TOGAF A–H phases</span><div class="rail-chips"><span class="rail-chip">no phase progress for this programme's projects</span></div></div>`;
+    }
+    const rank = (value) => {
+      const text = String(value || "").toUpperCase();
+      if (/^PREL/.test(text)) return 0;
+      const code = text.charCodeAt(0) - 64;
+      return code >= 1 && code <= 8 ? code : 99;
+    };
+    const lines = shown
+      .map((row) => {
+        const phases = list(row.phases)
+          .slice()
+          .sort((a, b) => rank(a.phase) - rank(b.phase));
+        const cells = phases
+          .map((phase) => {
+            const title = [
+              `state ${phase.state || "—"}`,
+              phase.contract ? `contract ${phase.contract}` : "",
+              phase.compliance ? `compliance ${phase.compliance}` : "",
+            ]
+              .filter(Boolean)
+              .join(" · ");
+            return `<span class="phase-cell ${tone(phase.state)}" title="${esc(title)}"><b>${esc(
+              phase.phase || "—",
+            )}</b><small>${esc(phase.state || "—")}</small></span>`;
+          })
+          .join("");
+        const declared = row.declared
+          ? chip(
+              "declared",
+              `${row.declared.adm_phase || "—"}${
+                row.declared.plateau ? ` · plateau ${row.declared.plateau}` : ""
+              }`,
+            )
+          : chip("declared", "—");
+        const next = row.next_required ? chip("next", row.next_required) : "";
+        return `<div class="phase-row"><span class="phase-project">${esc(
+          row.project || "—",
+        )}</span><div class="phase-strip">${
+          cells || `<span class="muted">no phase row</span>`
+        }</div>${declared}${next}</div>`;
+      })
+      .join("");
+    return `<div class="delivery-rail phase-rail"><span class="rail-label">TOGAF A–H phases</span><div class="phase-rows">${lines}</div></div>`;
+  }
+
+  // SAFe cadences: the programme's own rows, or the absence.
+  function cadenceRail(artefacts) {
+    const rows = list((artefacts || {}).cadences);
+    const chips = rows
+      .map((row) => {
+        const kind = row.kind || row.name || "cadence";
+        const cadence = row.cadence || row.frequency || row.rhythm || row.period || "";
+        const owner = row.owner_role || row.owner || "";
+        return chip(
+          kind,
+          [cadence, owner].filter(Boolean).join(" · "),
+          row.state || "active",
+        );
+      })
+      .join("");
+    return `<div class="delivery-rail"><span class="rail-label">SAFe cadence</span><div class="rail-chips">${
+      chips || `<span class="rail-chip">no cadence row</span>`
+    }</div></div>`;
+  }
+
+  // Rework register grouped by standard: open P0/P1/P2 counts and one chip per package. A package
+  // whose `apply_to` names a project links to that project's board; the rest say what they apply to.
+  function reworkRail(rework, projects) {
+    const register = rework || null;
+    const packages = list(register && register.packages);
+    if (!packages.length) {
+      return `<div class="delivery-rail"><span class="rail-label">Rework</span><div class="rail-chips"><span class="rail-chip">${
+        register ? "rework register · no package" : "rework register not published"
+      }</span></div></div>`;
+    }
+    const target = new Map();
+    list(projects).forEach((row) => {
+      if (!row) return;
+      if (row.id) target.set(row.id, row.id);
+      if (row.key) target.set(row.key, row.id);
+    });
+    const open = packages.filter((row) => String(row.status || "open") !== "suppressed");
+    const groups = new Map();
+    open.forEach((row) => {
+      const standard = String(row.standard || "—");
+      if (!groups.has(standard)) groups.set(standard, { p0: 0, p1: 0, p2: 0 });
+      const severity = String(row.severity || "").toUpperCase();
+      if (severity === "P0" || severity === "P1" || severity === "P2") {
+        groups.get(standard)[severity.toLowerCase()] += 1;
+      }
+    });
+    const counts = [...groups.entries()]
+      .map(
+        ([standard, group]) =>
+          `<span class="rail-chip"><b>${esc(standard)}</b> P0 ${group.p0} · P1 ${group.p1} · P2 ${group.p2}</span>`,
+      )
+      .join("");
+    const items = open
+      .slice(0, 12)
+      .map((row) => {
+        const label = `${row.severity ? String(row.severity).toUpperCase() + " · " : ""}${
+          row.rule || row.key || "package"
+        }`;
+        const title = [row.title || "", row.apply_to ? `applies to ${row.apply_to}` : ""]
+          .filter(Boolean)
+          .join(" · ");
+        const severity = String(row.severity || "").toLowerCase();
+        const body = `${esc(label)}${
+          row.title ? ` <small>${esc(row.title)}</small>` : ""
+        }`;
+        const id = target.get(row.apply_to);
+        return id
+          ? `<a class="rail-chip sev-${esc(severity)}" href="#projects/${esc(
+              id,
+            )}" title="${esc(title)}">${body}</a>`
+          : `<span class="rail-chip sev-${esc(severity)}" title="${esc(title)}">${body}</span>`;
+      })
+      .join("");
+    const more =
+      open.length > 12
+        ? `<span class="rail-chip">showing 12 of ${open.length} packages</span>`
+        : "";
+    const suppressed = packages.length - open.length;
+    return `<div class="delivery-rail"><span class="rail-label">Rework${
+      suppressed ? ` · ${suppressed} suppressed` : ""
+    }</span><div class="rail-chips">${counts}${items}${more}</div></div>`;
+  }
+
+  // L1 scorecard: one tile per standard from the register's own scorecard, plus the delivery tile.
+  // A standard the register does not score shows "—"; a denominator is never invented.
+  function scorecard(rework, delivery) {
+    const register = rework || null;
+    const score = register && register.scorecard ? register.scorecard : null;
+    const d = delivery || {};
+    if (!score) {
+      return `<div class="delivery-scorecard"><span class="muted">rework register not published</span></div>`;
+    }
+    const openByStandard = new Map();
+    list(register.packages).forEach((row) => {
+      if (String(row.status || "open") === "suppressed") return;
+      const standard = String(row.standard || "—");
+      openByStandard.set(standard, (openByStandard.get(standard) || 0) + 1);
+    });
+    const tiles = ["MSP", "TOGAF", "SAFe", "PMP", "SPEC"]
+      .map((standard) => {
+        const row = score[standard] || null;
+        const clean =
+          row && Number.isFinite(num(row.rules_clean)) && Number.isFinite(num(row.rules))
+            ? `${num(row.rules_clean)}/${num(row.rules)}`
+            : "—";
+        const counted = openByStandard.get(standard);
+        const open =
+          counted != null
+            ? counted
+            : row && Number.isFinite(num(row.packages)) && Number.isFinite(num(row.suppressed))
+              ? Math.max(num(row.packages) - num(row.suppressed), 0)
+              : "—";
+        const findings = row && Number.isFinite(num(row.findings)) ? num(row.findings) : "—";
+        const gaps =
+          row && Number.isFinite(num(row.rules_with_gaps))
+            ? `${num(row.rules_with_gaps)} rule${num(row.rules_with_gaps) === 1 ? "" : "s"} with gaps`
+            : "";
+        return `<div class="score-tile${row ? "" : " absent"}">
+          <span class="score-standard">${esc(standard)}</span>
+          <span class="score-value"><b>${esc(clean)}</b> clean</span>
+          <span class="score-meta">${open === "—" ? "open —" : `${open} open`} · ${
+            findings === "—" ? "findings —" : `${findings} findings`
+          }</span>
+          ${row ? "" : `<span class="score-meta">not in the register</span>`}
+          ${gaps ? `<span class="score-meta">${esc(gaps)}</span>` : ""}
+        </div>`;
+      })
+      .join("");
+    const deliveryTile = `<div class="score-tile score-delivery">
+      <span class="score-standard">Delivery</span>
+      <span class="score-value"><b>${
+        Number.isFinite(num(d.inFlight)) ? num(d.inFlight) : "—"
+      }</b> in flight · <b>${
+        Number.isFinite(num(d.completed)) ? num(d.completed) : "—"
+      }</b> completed</span>
+      <span class="score-meta">${esc(d.spend || "spend —")}</span>
+    </div>`;
+    const generated = register.generated_at
+      ? `<p class="score-foot muted">register generated ${esc(day(parse(register.generated_at)))}</p>`
+      : "";
+    return `<div class="delivery-scorecard">${tiles}${deliveryTile}</div>${generated}`;
+  }
+
   // SAFe cadence and the TOGAF capability the programme runs under. Both are the snapshot's rows;
   // an empty set is named, not faked.
   function governanceLine(artefacts, architecture) {
     const a = artefacts || {};
     const arch = architecture || {};
-    const cadence = list(a.cadences).length
-      ? `${list(a.cadences).length} cadence row${list(a.cadences).length === 1 ? "" : "s"} (${[
-          ...new Set(list(a.cadences).map((row) => row.kind).filter(Boolean)),
-        ].join(", ") || "kind not named"})`
-      : "no cadence row";
     const profile = list(arch.profiles)[0];
     const board = list(arch.board)[0];
     const contracts = list(arch.contracts).length;
@@ -267,13 +753,9 @@ window.CONVEYOR_DELIVERY = (function () {
     } · ${list(a.links).length} benefit-map edge${list(a.links).length === 1 ? "" : "s"}${
       reviews ? ` · ${reviews} compliance review${reviews === 1 ? "" : "s"}` : ""
     }`;
-    return `<div class="delivery-rail"><span class="rail-label">SAFe cadence · TOGAF capability</span><div class="rail-chips">${chip(
-      "Cadence",
-      cadence,
-      list(a.cadences).length ? "active" : "planned",
-    )}<span class="rail-chip ${profile ? tone(profile.status) : ""}">${capability}</span><span class="rail-chip">${esc(
-      counts,
-    )}</span></div></div>`;
+    return `<div class="delivery-rail"><span class="rail-label">TOGAF capability</span><div class="rail-chips"><span class="rail-chip ${
+      profile ? tone(profile.status) : ""
+    }">${capability}</span><span class="rail-chip">${esc(counts)}</span></div></div>`;
   }
 
   /* ---------------------------------------------------------------- the model */
@@ -285,11 +767,18 @@ window.CONVEYOR_DELIVERY = (function () {
     const activity = new Map(
       list((work || {}).project_activity).map((row) => [row.project_id, row]),
     );
-    const inference = ((measure || {}).inference || {});
+    // No `project_activity` row is not "no activity": the same first/last-event rule the signed-in
+    // console uses derives the window from the cards and runs that are in the snapshot.
+    const derived = observedWindows(work);
+    const inference = (measure || {}).inference || {};
     const usage = new Map(list(inference.by_project).map((row) => [row.project_id, row]));
     const boardProject = new Map(
       list((work || {}).boards).map((row) => [row.id, row.project_id]),
     );
+    const boardCount = new Map();
+    boardProject.forEach((projectId) => {
+      boardCount.set(projectId, (boardCount.get(projectId) || 0) + 1);
+    });
     const lanes = new Map(list((work || {}).lists).map((row) => [row.id, row]));
     const progress = new Map();
     list((work || {}).cards).forEach((card) => {
@@ -303,11 +792,20 @@ window.CONVEYOR_DELIVERY = (function () {
     });
     const index = new Map();
     projects.forEach((project) => {
-      const window = activity.get(project.id) || null;
+      const observed = derived.get(project.id) || null;
+      const window =
+        activity.get(project.id) ||
+        (observed
+          ? {
+              started_at: new Date(observed.start).toISOString(),
+              last_activity_at: new Date(observed.end).toISOString(),
+              derived: true,
+            }
+          : null);
       const completed = project.status === "closed" || project.status === "archived";
       const start = window ? parse(window.started_at) : null;
-      const observed = window ? parse(window.last_activity_at) : null;
-      const end = start == null ? null : completed ? observed ?? start : now;
+      const observedEnd = window ? parse(window.last_activity_at) : null;
+      const end = start == null ? null : completed ? observedEnd ?? start : now;
       const spend = usage.get(project.id) || null;
       const counts = progress.get(project.id) || { done: 0, total: 0 };
       index.set(project.id, {
@@ -327,6 +825,7 @@ window.CONVEYOR_DELIVERY = (function () {
         planEnd: parse((project.meta || {}).plan_end),
         done: counts.done,
         total: counts.total,
+        hasBoard: (boardCount.get(project.id) || 0) > 0,
         tokens: spend ? Number(spend.total_tokens) : null,
         usd: spend ? spend.cost_usd : null,
         priced: spend ? Number(spend.priced_calls || 0) : null,
@@ -391,7 +890,14 @@ window.CONVEYOR_DELIVERY = (function () {
         const members = [...index.values()].filter((p) => p.programmeId === row.id);
         return { ...rollUp(row, members, clock), artefacts: programmeArtefacts(msp, row.id) };
       });
-    const standalone = [...index.values()].filter((p) => !p.programmeId);
+    // A standalone project is public only when it is active/paused AND carries a board or a card
+    // (SPEC_V2 §5.1); a draft or a bare session fixture is not a portfolio row.
+    const standalone = [...index.values()].filter(
+      (p) =>
+        !p.programmeId &&
+        ["active", "paused"].includes(String(p.status || "").toLowerCase()) &&
+        (p.hasBoard || p.total > 0),
+    );
     return { programmes, standalone };
   }
 
@@ -653,10 +1159,19 @@ window.CONVEYOR_DELIVERY = (function () {
     const dod = type && type.definition && list(type.definition.acceptance).length
       ? `${list(type.definition.acceptance).length} DoD checks`
       : "";
+    // A rework card carries its register key, rule and severity; the tile says so on the board.
+    const rework = card.rework_key
+      ? `<span class="kanban-rework sev-${esc(
+          String(card.severity || "").toLowerCase(),
+        )}">${esc(String(card.severity || "—").toUpperCase())} · ${esc(
+          card.rule || card.rework_key,
+        )}</span>`
+      : "";
     return `<article class="kanban-card${isPackage ? " work-package" : ""}${isDone(card, model.laneKinds) ? " done" : ""}">
       ${isPackage ? `<span class="kanban-kind">WORK PACKAGE · ${children.length}</span>` : ""}
       ${head}
       <small class="kanban-meta">${esc(type ? type.code : "—")}${card.assignee_name ? ` · ${esc(card.assignee_name)}` : ""} ${issue}</small>
+      ${rework}
       ${isPackage ? `<span class="kanban-count">${closed}/${children.length} cards done</span>` : ""}
       ${dod ? `<span class="kanban-count">${esc(dod)}</span>` : ""}
       ${run ? `<span class="kanban-run ${run.status === "succeeded" ? "ok" : run.status === "failed" ? "bad" : ""}">${esc(run.status)}</span>` : ""}
@@ -669,8 +1184,11 @@ window.CONVEYOR_DELIVERY = (function () {
   }
 
   // L3: one project's boards. Roots only; a root with children is the work package. Archived cards
-  // stay visible in their own column — a closed project's work is still its work.
-  function boardModel(work, projectId, measure) {
+  // stay visible in their own column — a closed project's work is still its work. The WBS plan and
+  // the rework register are the project's own rows; `project` may be the row or its id.
+  function boardModel(work, project, measure, msp, rework) {
+    const ref = projectRef(project);
+    const projectId = ref.id;
     const boards = list((work || {}).boards)
       .filter((row) => row.project_id === projectId)
       .sort(byPosition);
@@ -695,6 +1213,24 @@ window.CONVEYOR_DELIVERY = (function () {
         .filter((lane) => boardIds.has(lane.board_id))
         .map((lane) => [lane.id, lane]),
     );
+    const wbs = list((msp || {}).wbs_nodes).filter(
+      (row) => row.project_id === projectId || (ref.key && row.project_id === ref.key),
+    );
+    const plan = wbs.filter((node) =>
+      /^(work[_-]?package|wp|package)$/i.test(String(node.kind || "")),
+    );
+    const packages = list((rework || {}).packages).filter((row) =>
+      appliesTo(row, projectId, ref.key),
+    );
+    // A card and a register package match on the card's `rework_key` (the package key) or its rule.
+    const cardKeys = new Set();
+    all.forEach((card) => {
+      if (card.rework_key) cardKeys.add(card.rework_key);
+      if (card.rule) cardKeys.add(card.rule);
+    });
+    const unmatchedRework = packages.filter(
+      (row) => !cardKeys.has(row.key) && !cardKeys.has(row.rule),
+    );
     return {
       projectId,
       boards,
@@ -708,48 +1244,121 @@ window.CONVEYOR_DELIVERY = (function () {
       types: new Map(list((work || {}).card_types).map((row) => [row.id, row])),
       runs: latestRun(work),
       spend: spendByCard(measure),
+      unattributed: tenantSpend(measure),
+      wbs,
+      plan,
+      reworkCards: roots.filter((card) => card.rework_key),
+      reworkPackages: packages,
+      unmatchedRework,
       wpBase: `#projects/${projectId}/wp`,
     };
   }
 
+  // L3's Plan lane: the selected project's WBS work packages (never its phase/deliverable rows).
+  // Acceptance is the node's own check count; WSJF appears only when job_size is positive.
+  function planColumn(model) {
+    const nodes = list(model.plan);
+    const body = cardColumn(nodes, (node) => {
+      const acceptance = list(node.acceptance).length;
+      const wsjf = wsjfOf(node);
+      const size = num(node.job_size);
+      return `<article class="kanban-card plan-card">
+        <span class="kanban-open">${esc(node.title || node.id || "—")}</span>
+        <small class="kanban-meta">${esc(node.kind || "wbs")} · ${esc(node.status || "—")}</small>
+        ${acceptance ? `<span class="kanban-count">${acceptance} acceptance check${acceptance === 1 ? "" : "s"}</span>` : ""}
+        ${wsjf != null ? `<span class="kanban-count">WSJF ${wsjf.toFixed(1)}</span>` : size > 0 ? `<span class="kanban-count">WSJF —</span>` : ""}
+      </article>`;
+    });
+    const empty = nodes.length
+      ? ""
+      : `<div class="kanban-more">${
+          list(model.wbs).length
+            ? `no WBS work package row (${list(model.wbs).length} node${list(model.wbs).length === 1 ? "" : "s"} of other kinds)`
+            : "no WBS work package row"
+        }</div>`;
+    return `<section class="kanban-col kanban-plan" data-lane="plan"><header><span>Plan · WBS</span><b>${nodes.length}</b></header><div class="kanban-cards">${body}${empty}</div></section>`;
+  }
+
+  // A register package with no card yet is named as such; it links nowhere because there is no L4.
+  function notMaterialisedTile(pkg) {
+    return `<article class="kanban-card not-materialised">
+      <span class="kanban-open">${esc(pkg.title || pkg.key || "rework package")}</span>
+      <small class="kanban-meta">${esc(
+        [pkg.standard, pkg.rule, String(pkg.severity || "").toUpperCase()]
+          .filter(Boolean)
+          .join(" · "),
+      )}</small>
+      <span class="kanban-count">not yet materialised</span>
+    </article>`;
+  }
+
+  // L3's Rework lane: cards carrying a `rework_key`, plus register packages not yet materialised.
+  function reworkColumn(model) {
+    const cards = list(model.reworkCards);
+    const pending = list(model.unmatchedRework);
+    const total = cards.length + pending.length;
+    return `<section class="kanban-col kanban-rework" data-lane="rework"><header><span>Rework</span><b>${total}</b></header><div class="kanban-cards">${cardColumn(
+      cards,
+      (card) => tile(card, model),
+    )}${cardColumn(pending, notMaterialisedTile)}${
+      total ? "" : `<div class="kanban-more">no rework card on this project</div>`
+    }</div></section>`;
+  }
+
   function kanban(model, options = {}) {
-    if (!model.boards.length) {
+    const side =
+      list(model.plan).length ||
+      list(model.reworkCards).length ||
+      list(model.unmatchedRework).length;
+    if (!model.boards.length && !side) {
       return `<div class="kanban kanban-empty muted">${esc(
         options.noBoard || "This project has no board in the snapshot; cards and runs need one.",
       )}</div>`;
     }
-    if (!model.roots.length && !model.archived.length) {
+    if (!model.roots.length && !model.archived.length && !side) {
       return `<div class="kanban kanban-empty muted">${esc(
         options.emptyNote ||
           "No card on this board. Open a card to see its own execution and child cards.",
       )}</div>`;
     }
     const lanes = model.lanes.filter((lane) => lane.kind !== "archive");
-    const sections = model.boards.map((board) => {
+    const note = model.unattributed
+      ? `<p class="muted kanban-note">${esc(
+          spendText(
+            model.unattributed.tokens,
+            model.unattributed.usd,
+            model.unattributed.priced,
+            model.unattributed.unpriced,
+          ),
+        )} unattributed to a project.</p>`
+      : "";
+    const sections = model.boards.map((board, index) => {
       const boardRoots = model.roots.filter((card) => card.board_id === board.id);
       const boardLanes = lanes.filter((lane) => lane.board_id === board.id);
       const columns = boardLanes.map((lane) => {
         const cards = boardRoots.filter((card) => card.list_id === lane.id).sort(byPosition);
         return `<section class="kanban-col" data-lane="${esc(lane.kind)}">
           <header><span>${esc(lane.name)}</span><b>${cards.length}</b></header>
-          <div class="kanban-cards">${cards.map((card) => tile(card, model)).join("")}</div>
+          <div class="kanban-cards">${cardColumn(cards, (card) => tile(card, model))}</div>
         </section>`;
       });
       const loose = boardRoots.filter((card) => !boardLanes.some((lane) => lane.id === card.list_id));
       if (loose.length) {
         columns.push(`<section class="kanban-col" data-lane="unknown">
           <header><span>No lane</span><b>${loose.length}</b></header>
-          <div class="kanban-cards">${loose.map((card) => tile(card, model)).join("")}</div>
+          <div class="kanban-cards">${cardColumn(loose, (card) => tile(card, model))}</div>
         </section>`);
       }
+      // The project-level Plan and Rework lanes belong to the project, not to one board.
+      if (index === 0) columns.push(planColumn(model), reworkColumn(model));
       const archived = model.archived.filter((card) => card.board_id === board.id);
       if (archived.length) {
         columns.push(`<section class="kanban-col kanban-archived" data-lane="archived">
           <header><span>Archived</span><b>${archived.length}</b></header>
-          <div class="kanban-cards">${archived
-            .sort(byPosition)
-            .map((card) => tile(card, model))
-            .join("")}</div>
+          <div class="kanban-cards">${cardColumn(
+            archived.sort(byPosition),
+            (card) => tile(card, model),
+          )}</div>
         </section>`);
       }
       const heading =
@@ -758,7 +1367,10 @@ window.CONVEYOR_DELIVERY = (function () {
           : "";
       return `${heading}<div class="kanban">${columns.join("")}</div>`;
     });
-    return `<div class="kanban-wrap">${sections.join("")}</div>`;
+    if (!model.boards.length) {
+      sections.push(`<div class="kanban">${planColumn(model)}${reworkColumn(model)}</div>`);
+    }
+    return `<div class="kanban-wrap">${note}${sections.join("")}</div>`;
   }
 
   function runRows(work, card) {
@@ -833,8 +1445,11 @@ window.CONVEYOR_DELIVERY = (function () {
 
   // L4: the work package's own board. The parent lookup is scoped to the named project's boards, so
   // a card id from another project cannot render here. A childless card is a work package too: its
-  // execution is the answer, and the page says there are no child cards.
-  function packageModel(work, projectId, cardId, measure) {
+  // execution is the answer, and the page says there are no child cards. A card carrying a
+  // `rework_key` also resolves its register package, rendered before the execution panel.
+  function packageModel(work, project, cardId, measure, rework) {
+    const ref = projectRef(project);
+    const projectId = ref.id;
     const boards = list((work || {}).boards).filter((board) => board.project_id === projectId);
     const boardIds = new Set(boards.map((board) => board.id));
     const cards = list((work || {}).cards).filter((card) => boardIds.has(card.board_id));
@@ -843,6 +1458,15 @@ window.CONVEYOR_DELIVERY = (function () {
     const lanes = list((work || {}).lists)
       .filter((lane) => boardIds.has(lane.board_id))
       .sort(byPosition);
+    const packages = list((rework || {}).packages);
+    const pkg = parent
+      ? packages.find(
+          (row) =>
+            (parent.rework_key &&
+              (row.key === parent.rework_key || row.rule === parent.rework_key)) ||
+            (parent.rule && row.rule === parent.rule),
+        ) || null
+      : null;
     return {
       projectId,
       parent,
@@ -853,6 +1477,8 @@ window.CONVEYOR_DELIVERY = (function () {
       types: new Map(list((work || {}).card_types).map((row) => [row.id, row])),
       runs: latestRun(work),
       spend: spendByCard(measure),
+      unattributed: tenantSpend(measure),
+      rework: pkg,
       wpBase: `#projects/${projectId}/wp`,
       backHref: `#projects/${projectId}`,
     };
@@ -868,9 +1494,21 @@ window.CONVEYOR_DELIVERY = (function () {
     )}</a><span class="muted">work package · ${
       model.children.length ? `${done}/${model.children.length} cards done` : "no child cards"
     }</span></div>`;
+    // The register package is the reason the card exists; it is read before the execution record.
+    const rework = reworkPackagePanel(model.rework);
     const execution = executionPanel(model, work);
+    const note = model.unattributed
+      ? `<p class="muted kanban-note">${esc(
+          spendText(
+            model.unattributed.tokens,
+            model.unattributed.usd,
+            model.unattributed.priced,
+            model.unattributed.unpriced,
+          ),
+        )} unattributed to a project.</p>`
+      : "";
     if (!model.children.length) {
-      return `<div class="kanban-wrap">${head}${execution}<div class="kanban-empty muted">No child cards. This work package's execution is above; a child card would appear in its lane here.</div></div>`;
+      return `<div class="kanban-wrap">${head}${rework}${execution}${note}<div class="kanban-empty muted">No child cards. This work package's execution is above; a child card would appear in its lane here.</div></div>`;
     }
     const lanes = model.lanes.filter((lane) => lane.kind !== "archive");
     const live = model.children.filter((card) => !card.archived_at);
@@ -878,36 +1516,124 @@ window.CONVEYOR_DELIVERY = (function () {
       const cards = live.filter((card) => card.list_id === lane.id).sort(byPosition);
       return `<section class="kanban-col" data-lane="${esc(lane.kind)}">
         <header><span>${esc(lane.name)}</span><b>${cards.length}</b></header>
-        <div class="kanban-cards">${cards.map((card) => packageTile(card, model)).join("")}</div>
+        <div class="kanban-cards">${cardColumn(cards, (card) => packageTile(card, model))}</div>
       </section>`;
     });
     // An archived child renders once, in the Archived column — never also in its old lane.
     const orphan = live.filter((card) => !lanes.some((lane) => lane.id === card.list_id));
     const archived = model.children.filter((card) => card.archived_at);
     if (orphan.length) {
-      columns.push(`<section class="kanban-col" data-lane="unknown"><header><span>No lane</span><b>${orphan.length}</b></header><div class="kanban-cards">${orphan
-        .map((card) => packageTile(card, model))
-        .join("")}</div></section>`);
+      columns.push(`<section class="kanban-col" data-lane="unknown"><header><span>No lane</span><b>${orphan.length}</b></header><div class="kanban-cards">${cardColumn(
+        orphan,
+        (card) => packageTile(card, model),
+      )}</div></section>`);
     }
     if (archived.length) {
-      columns.push(`<section class="kanban-col kanban-archived" data-lane="archived"><header><span>Archived</span><b>${archived.length}</b></header><div class="kanban-cards">${archived
-        .map((card) => packageTile(card, model))
-        .join("")}</div></section>`);
+      columns.push(`<section class="kanban-col kanban-archived" data-lane="archived"><header><span>Archived</span><b>${archived.length}</b></header><div class="kanban-cards">${cardColumn(
+        archived,
+        (card) => packageTile(card, model),
+      )}</div></section>`);
     }
-    return `<div class="kanban-wrap">${head}${execution}<div class="kanban">${columns.join("")}</div></div>`;
+    return `<div class="kanban-wrap">${head}${rework}${execution}${note}<div class="kanban">${columns.join("")}</div></div>`;
   }
 
   function packageTile(card, model) {
     const spend = model.spend.get(card.id);
+    const rework = card.rework_key
+      ? `<span class="kanban-rework sev-${esc(
+          String(card.severity || "").toLowerCase(),
+        )}">${esc(String(card.severity || "—").toUpperCase())} · ${esc(
+          card.rule || card.rework_key,
+        )}</span>`
+      : "";
     return `<article class="kanban-card${isDone(card, model.laneKinds) ? " done" : ""}">
       <a class="kanban-open" href="${esc(model.wpBase)}/${esc(card.id)}">${esc(card.name)}</a>
       <small class="kanban-meta">${esc((model.types.get(card.card_type_id) || {}).code || "—")}${
         model.runs.get(card.id) ? ` · ${esc(model.runs.get(card.id).status)}` : ""
       }</small>
+      ${rework}
       <span class="kanban-cost">${
         spend ? esc(spendText(Number(spend.total_tokens), spend.cost_usd, spend.priced_calls, spend.unpriced_calls)) : "no spend"
       }</span>
     </article>`;
+  }
+
+  // L4's register panel: why the card exists, what it must prove, and the exact acceptance command.
+  // Evidence is the finding's own location (`path:line`); absence is named, never fabricated.
+  function reworkPackagePanel(pkg) {
+    if (!pkg) return "";
+    const dod = list(pkg.dod);
+    const met = dod.filter((row) => row && row.met).length;
+    const subjects = list(pkg.subjects)
+      .map((subject) => {
+        const facts = [
+          subject.severity ? String(subject.severity).toUpperCase() : "",
+          subject.disposition || "",
+          subject.owner ? `owner ${subject.owner}` : "",
+          subject.expires ? `expires ${day(parse(subject.expires))}` : "",
+          subject.reason || "",
+        ]
+          .filter(Boolean)
+          .join(" · ");
+        const evidence = evidenceText(subject.evidence);
+        return `<li class="rework-subject"><span class="mono">${esc(
+          subject.subject || "—",
+        )}</span>${subject.detail ? ` <span>${esc(subject.detail)}</span>` : ""}${
+          facts ? `<small class="muted">${esc(facts)}</small>` : ""
+        }${evidence ? `<code class="rework-evidence">${esc(evidence)}</code>` : ""}</li>`;
+      })
+      .join("");
+    const dodHtml = dod.length
+      ? `<ul class="exec-dod">${dod
+          .map(
+            (row) =>
+              `<li class="${row && row.met ? "met" : "open"}">${
+                row && row.met ? "met" : "open"
+              } · ${esc(row ? row.item : "—")}</li>`,
+          )
+          .join("")}</ul>`
+      : `<p class="muted">This package carries no Definition of Done item.</p>`;
+    const facts = [
+      chip("Standard", [pkg.standard, pkg.spec].filter(Boolean).join(" · ") || "—"),
+      chip("Rule", pkg.rule || "—"),
+      chip("Severity", String(pkg.severity || "—").toUpperCase()),
+      pkg.artefact ? chip("Artefact", pkg.artefact) : "",
+      pkg.scope ? chip("Scope", pkg.scope) : "",
+      pkg.apply_to ? chip("Applies to", pkg.apply_to) : "",
+      list(pkg.depends_on).length ? chip("Depends on", list(pkg.depends_on).join(", ")) : "",
+      pkg.owner_project ? chip("Owner", pkg.owner_project) : "",
+    ]
+      .filter(Boolean)
+      .join("");
+    const evidence = evidenceText(pkg.evidence);
+    const baseline = pkg.baseline
+      ? `<div class="exec-dod-wrap"><span class="rail-label">Baseline</span><code class="rework-evidence">${esc(
+          evidenceText(pkg.baseline),
+        )}</code></div>`
+      : "";
+    return `<div class="exec rework-package">
+      <div class="exec-head"><span class="exec-title">Rework package</span><span class="muted">${esc(
+        pkg.title || pkg.key || "",
+      )} · ${met}/${dod.length} DoD met</span></div>
+      <div class="delivery-rail"><span class="rail-label">Finding</span><div class="rail-chips">${facts}</div></div>
+      ${baseline}
+      <div class="exec-dod-wrap"><span class="rail-label">Subjects${
+        list(pkg.subjects).length ? ` · ${list(pkg.subjects).length}` : ""
+      }</span>${
+        subjects
+          ? `<ul class="rework-subjects">${subjects}</ul>`
+          : `<p class="muted">No subject is published on this package.</p>`
+      }</div>
+      <div class="exec-dod-wrap"><span class="rail-label">Definition of Done</span>${dodHtml}</div>
+      <div class="exec-dod-wrap"><span class="rail-label">Acceptance command</span><code class="rework-command">${esc(
+        pkg.acceptance_command || "—",
+      )}</code></div>
+      <div class="exec-dod-wrap"><span class="rail-label">Evidence</span>${
+        evidence
+          ? `<code class="rework-evidence">${esc(evidence)}</code>`
+          : `<p class="muted">No evidence reference is published.</p>`
+      }</div>
+    </div>`;
   }
 
   // L3's governance record: the project's own template, plan and TOGAF rows. Absent rows are named.
@@ -973,9 +1699,16 @@ window.CONVEYOR_DELIVERY = (function () {
     programmeArtefacts,
     trancheRail,
     benefitRail,
+    dependencyRail,
+    reconciliationRail,
+    phaseStrip,
+    cadenceRail,
+    reworkRail,
+    scorecard,
     governanceLine,
     projectGovernance,
     executionPanel,
+    reworkPackagePanel,
     summary,
     gantt,
     ganttTable,
@@ -983,6 +1716,7 @@ window.CONVEYOR_DELIVERY = (function () {
     kanban,
     packageModel,
     packageBoard,
+    tenantSpend,
     spendText,
     tokens,
     usd,

@@ -103,6 +103,7 @@ async fn only_published_outputs_are_public_and_rendered_safely() {
             outputs_dir: Some(docs.clone()),
             generated_at: Some("2026-11-13T00:00:00Z".to_owned()),
             issues,
+            conformance: None,
             feedback_url: "https://example.test/feedback".to_owned(),
             database_url: None,
             git_sha: Some("0123456789abcdef0123456789abcdef01234567".to_owned()),

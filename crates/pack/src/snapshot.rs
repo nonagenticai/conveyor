@@ -20,6 +20,7 @@
 //! docs/design/data/secrets.json       secret METADATA only — never a value
 //! docs/design/data/evidence.json      the evidence/plan documents and their hashes
 //! docs/design/data/feedback.json      the external feedback issues
+//! docs/design/data/rework.json        the rework register, only with `--conformance`
 //! docs/design/data/snapshot.js        window.CONVEYOR_SNAPSHOT = {…}
 //! ```
 //!
@@ -43,6 +44,9 @@ use sha2::{Digest, Sha256};
 /// The snapshot format this binary writes.
 pub const SCHEMA: &str = "design-snapshot/v1";
 
+/// The only schema `--conformance` accepts.
+pub const REWORK_SCHEMA: &str = "conveyor-rework/v1";
+
 /// The public feedback surface. Overridable per run; the repo may become public, in which case
 /// this points at its own Discussions.
 pub const DEFAULT_FEEDBACK_URL: &str = "https://github.com/nonagenticai/conveyor/discussions";
@@ -61,6 +65,9 @@ pub struct SnapshotArgs {
     pub generated_at: Option<String>,
     /// The committed `gh issue list` registry (`issues.json`).
     pub issues: PathBuf,
+    /// The committed rework register (`schema: "conveyor-rework/v1"`). Absent means the pack
+    /// publishes no `rework` section and writes no `rework.json`.
+    pub conformance: Option<PathBuf>,
     /// Linked from every studio page.
     pub feedback_url: String,
     /// The read-only database URL. Absent means `DATABASE_URL`; the admin command does not
@@ -122,6 +129,14 @@ pub enum SnapshotError {
     /// A published output page or index could not be written.
     #[error(transparent)]
     PublishOutputs(#[from] crate::outputs::PublishOutputsError),
+    /// The rework register `--conformance` names is unreadable or is not `conveyor-rework/v1`.
+    #[error("rework register {path}: {detail}")]
+    Rework {
+        /// The path the flag named.
+        path: String,
+        /// Why it was refused.
+        detail: String,
+    },
 }
 
 /// Read one tenant and write every snapshot file.
@@ -169,6 +184,9 @@ pub async fn run_with_pool(
 
     let issues = read_issues(&args.issues)?;
     let feedback = feedback_issues(&issues);
+    // The rework register is a file input like the issue registry, but the flag is explicit:
+    // an unreadable register or a wrong schema is refused, never silently omitted.
+    let rework = args.conformance.as_deref().map(read_rework).transpose()?;
 
     std::fs::create_dir_all(&args.out)?;
 
@@ -182,6 +200,7 @@ pub async fn run_with_pool(
     // Build the combined wrapper before the per-file writes consume `data`'s fields.
     let snapshot_js = snapshot_js(
         &data,
+        rework.as_ref(),
         &args.tenant,
         &args.feedback_url,
         &generated_at,
@@ -263,6 +282,12 @@ pub async fn run_with_pool(
         &mut files,
     )?;
 
+    // The register keeps its own `conveyor-rework/v1` schema: it is a self-describing document,
+    // and the pack manifest already carries the snapshot's schema and timestamp for the file.
+    if let Some(rework) = rework {
+        write_file(&args.out, "rework.json", rework, &mut files)?;
+    }
+
     // The combined wrapper the studio loads with one <script> tag. It carries the files the
     // pages render; the raw JSON files stay beside it for sharing and diffing.
     write_bytes(&args.out, "snapshot.js", snapshot_js.as_bytes(), &mut files)?;
@@ -330,6 +355,7 @@ fn with_header(mut value: Value, schema: &str, generated_at: &str) -> Value {
 
 pub(crate) fn snapshot_js(
     data: &store::snapshot::SnapshotData,
+    rework: Option<&Value>,
     tenant: &str,
     feedback_url: &str,
     generated_at: &str,
@@ -351,6 +377,12 @@ pub(crate) fn snapshot_js(
         "ops": data.ops,
         "measure": data.measure,
     });
+    // The register is not a store section (`SnapshotData` is owned by `conveyor_store`), so it
+    // is attached here, before redaction — present only when the caller supplied one, absent
+    // otherwise, so a snapshot without `--conformance` keeps its exact bytes.
+    if let Some(rework) = rework {
+        value["rework"] = rework.clone();
+    }
     redact(&mut value);
     // The hash covers the payload BEFORE this field is added; it is what the LIVE ribbon shows
     // and what a reader cites when reporting on a screenshot.
@@ -499,6 +531,32 @@ fn read_issues(path: &Path) -> Result<Value, SnapshotError> {
     } else {
         json!({"issues": value})
     })
+}
+
+/// The rework register `--conformance` names.
+///
+/// Unlike the issue registry, absence here is a failure: the flag is an explicit request to
+/// publish a register, and claiming success while publishing none would misreport the pack.
+fn read_rework(path: &Path) -> Result<Value, SnapshotError> {
+    let read = std::fs::read_to_string(path).map_err(|error| SnapshotError::Rework {
+        path: path.display().to_string(),
+        detail: error.to_string(),
+    })?;
+    let value: Value = serde_json::from_str(&read).map_err(|error| SnapshotError::Rework {
+        path: path.display().to_string(),
+        detail: error.to_string(),
+    })?;
+    let schema = value.get("schema").and_then(Value::as_str);
+    if schema != Some(REWORK_SCHEMA) {
+        return Err(SnapshotError::Rework {
+            path: path.display().to_string(),
+            detail: format!(
+                "expected schema {REWORK_SCHEMA:?}, found {}",
+                schema.map_or_else(|| "no schema".to_owned(), |found| format!("{found:?}"))
+            ),
+        });
+    }
+    Ok(value)
 }
 
 pub(crate) fn feedback_issues(issues: &Value) -> Vec<Value> {

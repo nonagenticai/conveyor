@@ -1,8 +1,8 @@
 {
   "counts": {
     "P0": 22,
-    "P1": 131,
-    "P2": 12,
+    "P1": 132,
+    "P2": 35,
     "P3": 0
   },
   "gaps": [
@@ -245,6 +245,14 @@
       "rule": "board_not_approved",
       "severity": "P1",
       "subject": "board"
+    },
+    {
+      "detail": "the snapshot publishes no programme_cadence row (pi|demo|retro|refinement)",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "cadence_absent",
+      "severity": "P1",
+      "subject": "programme"
     },
     {
       "detail": "project is closed but its closure review is not published",
@@ -1231,6 +1239,14 @@
       "subject": "T7"
     },
     {
+      "detail": "151 declared dependency edge(s) carry no blocks|needs|supersedes|informs kind",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "dependency_untyped",
+      "severity": "P2",
+      "subject": "programme"
+    },
+    {
       "detail": "the issue registry redacts the body; the derivation claim cannot be checked",
       "disposition": "unprovable",
       "evidence": null,
@@ -1325,6 +1341,182 @@
       "rule": "status_source_drift",
       "severity": "P2",
       "subject": "T6"
+    },
+    {
+      "detail": "no WBS node is published for the active project",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "wbs_absent",
+      "severity": "P2",
+      "subject": "PLATFORM"
+    },
+    {
+      "detail": "no WBS node is published for the active project",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "wbs_absent",
+      "severity": "P2",
+      "subject": "S02"
+    },
+    {
+      "detail": "no WBS node is published for the active project",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "wbs_absent",
+      "severity": "P2",
+      "subject": "S04"
+    },
+    {
+      "detail": "no WBS node is published for the active project",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "wbs_absent",
+      "severity": "P2",
+      "subject": "S06"
+    },
+    {
+      "detail": "no WBS node is published for the active project",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "wbs_absent",
+      "severity": "P2",
+      "subject": "S12"
+    },
+    {
+      "detail": "no WBS node is published for the active project",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "wbs_absent",
+      "severity": "P2",
+      "subject": "S13"
+    },
+    {
+      "detail": "no WBS node is published for the active project",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "wbs_absent",
+      "severity": "P2",
+      "subject": "S14"
+    },
+    {
+      "detail": "no WBS node is published for the active project",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "wbs_absent",
+      "severity": "P2",
+      "subject": "S15"
+    },
+    {
+      "detail": "no WBS node is published for the active project",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "wbs_absent",
+      "severity": "P2",
+      "subject": "S17"
+    },
+    {
+      "detail": "no WBS node is published for the active project",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "wbs_absent",
+      "severity": "P2",
+      "subject": "S18"
+    },
+    {
+      "detail": "no WBS node is published for the active project",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "wbs_absent",
+      "severity": "P2",
+      "subject": "S19"
+    },
+    {
+      "detail": "no WBS node is published for the active project",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "wbs_absent",
+      "severity": "P2",
+      "subject": "S20"
+    },
+    {
+      "detail": "no WBS node is published for the active project",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "wbs_absent",
+      "severity": "P2",
+      "subject": "S21"
+    },
+    {
+      "detail": "no WBS node is published for the active project",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "wbs_absent",
+      "severity": "P2",
+      "subject": "T11"
+    },
+    {
+      "detail": "no WBS node is published for the active project",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "wbs_absent",
+      "severity": "P2",
+      "subject": "T12"
+    },
+    {
+      "detail": "no WBS node is published for the active project",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "wbs_absent",
+      "severity": "P2",
+      "subject": "T15"
+    },
+    {
+      "detail": "no WBS node is published for the active project",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "wbs_absent",
+      "severity": "P2",
+      "subject": "T16"
+    },
+    {
+      "detail": "no WBS node is published for the active project",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "wbs_absent",
+      "severity": "P2",
+      "subject": "T17"
+    },
+    {
+      "detail": "no WBS node is published for the active project",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "wbs_absent",
+      "severity": "P2",
+      "subject": "T5"
+    },
+    {
+      "detail": "no WBS node is published for the active project",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "wbs_absent",
+      "severity": "P2",
+      "subject": "T6"
+    },
+    {
+      "detail": "no WBS node is published for the active project",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "wbs_absent",
+      "severity": "P2",
+      "subject": "T7"
+    },
+    {
+      "detail": "no WBS node is published for the active project",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "wbs_absent",
+      "severity": "P2",
+      "subject": "T8"
     }
   ],
   "snapshot": {

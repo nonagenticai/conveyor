@@ -98,6 +98,25 @@ pinned commercial price, and a row with no priced call renders `—*` with its u
 never `$0`. The public boundary is the tenant portfolio: a programme-bound project is public; a
 standalone project is public only when it is `active`/`paused` and carries a board or a card.
 
+**The standards record is generated, not asserted.** The snapshot computes
+`msp.benefit_realisation` (baseline → transition → post measurement), `msp.dependencies` (the
+declared graph, typed only where the declaration is typed), `msp.tranche_reconciliation`
+(declared state vs the authorising review and the projects actually delivering) and
+`architecture.phase_progress` (A–H per project with its contract and compliance review). An
+artefact that needs a decision nobody made is published as absent, never invented. The L1
+scorecard and the L2 rails read those sections plus the `rework` register, whose denominators
+come from `governance/conformance.json`, not from the view.
+
+**The rework loop.** `scripts/audit-programme-conformance.py --rework-out` turns the gap register
+and the checked-in v1 audit (`docs/evidence/v1-conformance-findings.json`) into
+`data/rework.json`: one package per remediation unit, carrying its standard, SPEC clause,
+artefact, severity, evidence and Definition of Done. The publish carries it into `snapshot.js`
+(`conveyor snapshot --conformance`); `scripts/materialise-rework.py` turns an open package into a
+card with `meta.rework_key` on the owning project's board. Materialisation is a separate,
+explicit, dry-run-first command with its own writable URL — the publish transaction stays
+read-only. A card already applied is never duplicated; a package no longer in the register is
+reported cleared, never auto-archived.
+
 **The output standard** is data: `seed/output-standard.json` owns the vocabulary and the
 per-project-class due-now and at-closure sets. `scripts/build-programme-seed.py` writes
 `meta.expected_outputs` / `meta.closure_outputs` into the seed and `data/output-standard.js` for

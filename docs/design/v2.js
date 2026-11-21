@@ -594,6 +594,8 @@ window.installV2 = function (api, enterprise) {
             measure: live.measure || {},
             msp: live.msp || {},
             architecture: live.architecture || {},
+            // The audit's rework register rides in the snapshot beside the rows it judges.
+            rework: live.rework || null,
             generated_at: live.generated_at || null,
           }
         : null;
@@ -632,6 +634,12 @@ window.installV2 = function (api, enterprise) {
             tranche_reviews: cs.msp.reviews,
             register_items: cs.msp.registers,
             project_baselines: cs.msp.baselines,
+            // The reconciliation and realisation reads are published snapshot rows; the console
+            // does not compose them, so they are taken from `live` when it is loaded.
+            benefit_realisation: live && live.msp ? live.msp.benefit_realisation : null,
+            dependencies: live && live.msp ? live.msp.dependencies : null,
+            tranche_reconciliation:
+              live && live.msp ? live.msp.tranche_reconciliation : null,
           }
         : {},
       // Signed in, the ADM capability is the console's own reads (`consoleLoadAdm`); it is
@@ -644,7 +652,11 @@ window.installV2 = function (api, enterprise) {
         board: cs.adm.boards.items,
         maturity: cs.adm.maturity.items,
         skills: cs.adm.skills.items,
+        phase_progress: live && live.architecture ? live.architecture.phase_progress : null,
       },
+      // Signed in, the register is still the published audit's: it is generated at publish time,
+      // so its own `generated_at` is labelled by the scorecard rather than presented as "now".
+      rework: live && live.rework ? live.rework : null,
       generated_at: null,
     };
   }
@@ -688,9 +700,19 @@ window.installV2 = function (api, enterprise) {
     const totals = D.summary(linked);
     const projects = [...index.values()];
     const projectFlight = projects.filter((row) => row.state !== "completed").length;
+    // A tenant total with no project or card attribution is spend that exists; it is named as
+    // unattributed rather than reported as "no spend".
+    const unattributed = D.tenantSpend(data.measure);
     const spend = totals.hasSpend
       ? D.spendText(totals.tokens, totals.usd, totals.priced, totals.unpriced)
-      : "no spend recorded";
+      : unattributed
+        ? `${D.spendText(
+            unattributed.tokens,
+            unattributed.usd,
+            unattributed.priced,
+            unattributed.unpriced,
+          )} unattributed to a project`
+        : "no spend recorded";
     // At L1 the portfolio's own rows are the programmes; the project counts behind them are what
     // makes completed work legible at portfolio level (SPEC_V2 §5.1 keeps closed rows out of the
     // in-flight portfolio; their bars live inside the programme at L2).
@@ -703,6 +725,15 @@ window.installV2 = function (api, enterprise) {
             projects.length - projectFlight
           }</b> completed</span>`
     }<span>${E(spend)}</span></div>`;
+    // L1's scorecard sits above the Gantt: the audit's standards record plus the delivery count.
+    // A programme view carries the same record in its rails instead.
+    const scorecard = view
+      ? ""
+      : D.scorecard(data.rework, {
+          inFlight: projectFlight,
+          completed: projects.length - projectFlight,
+          spend,
+        });
     // Signed in, the console loads a project's board on demand; a project whose board has not
     // loaded has no observed event to draw yet. Say so, and offer the one action that loads them.
     const pendingBoards = consoleOn()
@@ -724,9 +755,16 @@ window.installV2 = function (api, enterprise) {
           view.programme ? view.programme.name : "Programme",
         )}</span><a class="gantt-name" href="#programme">Programme definition →</a></div>${D.trancheRail(
           view.artefacts,
-        )}${D.benefitRail(view.artefacts)}${D.governanceLine(view.artefacts, data.architecture)}`
+        )}${D.benefitRail(view.artefacts)}${D.dependencyRail(data.msp ? data.msp.dependencies : null)}${D.reconciliationRail(
+          data.msp ? data.msp.tranche_reconciliation : null,
+        )}${D.phaseStrip(data.architecture ? data.architecture.phase_progress : null, view.projects)}${D.cadenceRail(
+          view.artefacts,
+        )}${D.reworkRail(data.rework, view.projects)}${D.governanceLine(
+          view.artefacts,
+          data.architecture,
+        )}`
       : "";
-    const body = `${head}${boardsNote}${summary}${D.gantt(linked, {
+    const body = `${head}${boardsNote}${summary}${scorecard}${D.gantt(linked, {
       label: view ? "Project · MSP tranche" : "Programme / initiative",
       emptyNote: view
         ? "This programme has no project in the published snapshot."
@@ -763,7 +801,7 @@ window.installV2 = function (api, enterprise) {
     const projectId = routeUuid(1);
     const isPackage = cardId && projectId === project.id && routeSegments()[2] === "wp";
     if (isPackage) {
-      const model = D.packageModel(data.work, project.id, cardId, data.measure);
+      const model = D.packageModel(data.work, project, cardId, data.measure, data.rework);
       const done = model.children.filter(
         (card) => card.archived_at || ["done", "archive"].includes(model.laneKinds.get(card.list_id)),
       ).length;
@@ -782,7 +820,7 @@ window.installV2 = function (api, enterprise) {
           : "",
       );
     }
-    const model = D.boardModel(data.work, project.id, data.measure);
+    const model = D.boardModel(data.work, project, data.measure, data.msp, data.rework);
     const packages = model.roots.filter((card) => (model.children.get(card.id) || []).length > 0);
     return panel(
       `${project.key} · Board`,

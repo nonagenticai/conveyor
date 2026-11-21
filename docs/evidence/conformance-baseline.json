@@ -273,6 +273,15 @@
       "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
     },
     {
+      "rule": "cadence_absent",
+      "subject": "programme",
+      "severity": "P1",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+    },
+    {
       "rule": "closed_without_closure_review",
       "subject": "S00",
       "severity": "P1",
