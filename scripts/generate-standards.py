@@ -1127,7 +1127,14 @@ def check(
     # The record names a package for every mandatory artefact that is not evidenced, so a committed
     # record can only be reproduced with the register the pack published. A live publish writes
     # `rework.json`; a committed-snapshot publish writes `rework.js`.
-    register = load_register(snapshot_dir)
+    try:
+        register = load_register(snapshot_dir)
+    except (OSError, json.JSONDecodeError) as error:
+        print(
+            f"generate-standards: the register beside {snapshot_dir} does not parse: {error}",
+            file=sys.stderr,
+        )
+        return 1
     document, findings = generate(std, snapshot, outputs_dir, register, covered_keys=covered_keys)
     problems: list[str] = []
     if FINDINGS_PATH.is_file():

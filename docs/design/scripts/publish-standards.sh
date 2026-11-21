@@ -14,6 +14,13 @@ set -euo pipefail
 root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
 pack="$root/docs/design"
 mode="${1:-}"
+case "$mode" in
+  ""|"--check") ;;
+  *)
+    echo "publish-standards: unknown argument '$mode' (only --check is accepted)" >&2
+    exit 2
+    ;;
+esac
 export TZ=UTC
 export PYTHONHASHSEED=0
 cd "$root"
@@ -24,6 +31,13 @@ snapshot="docs/design/data"
 outputs="docs/design/docs"
 findings_ledger="docs/evidence/standards-findings.json"
 register_ledger="docs/evidence/rework-register.json"
+
+# The record's provenance comes from the snapshot manifest; without it the generator would fall
+# back to an epoch timestamp and an empty commit and publish a record that names no snapshot.
+test -f "$snapshot/manifest.json" || {
+  echo "publish-standards: no snapshot manifest at $snapshot/manifest.json" >&2
+  exit 1
+}
 
 tmp="$(mktemp -d)"
 trap 'rm -rf "$tmp"' EXIT

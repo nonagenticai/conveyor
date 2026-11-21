@@ -302,11 +302,15 @@ if (fs.existsSync(reworkJsPath)) {
         }
         return JSON.stringify(value);
       };
-      const published = JSON.parse(fs.readFileSync(reworkPath, "utf8"));
-      if (canonical(published) !== canonical(register)) {
-        bad("data/rework.js differs from data/rework.json");
-      } else {
-        ok("data/rework.js matches the published register");
+      try {
+        const published = JSON.parse(fs.readFileSync(reworkPath, "utf8"));
+        if (canonical(published) !== canonical(register)) {
+          bad("data/rework.js differs from data/rework.json");
+        } else {
+          ok("data/rework.js matches the published register");
+        }
+      } catch (error) {
+        bad(`data/rework.json does not parse: ${error.message}`);
       }
     }
   }
