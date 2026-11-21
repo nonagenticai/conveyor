@@ -989,7 +989,7 @@
       "evidence": [
         {
           "path": "docs/design/v2.js",
-          "line": 4840,
+          "line": 4848,
           "quote": "      [\"Timeline\", \"In flight\", \"Dependencies\", \"Programme\"],"
         }
       ],
@@ -1014,7 +1014,12 @@
       ],
       "failure_scenario": "A change request or baseline re-baseline cannot be raised or viewed from the plan, so approved change and its impact are invisible exactly where the plan is managed.",
       "acceptance": "Plan exposes a change-control tab showing change requests and decisions, with the create/approve path wired; the exclusion sentence is removed.",
-      "owner_project": "PLATFORM"
+      "owner_project": "PLATFORM",
+      "resolved_by": {
+        "commit": "d59ba796501103811e3aeff1292024407a0cda5a",
+        "test": "docs/design/scripts/check-v2.cjs",
+        "evidence": "The plan destination now carries a Change control tab over the programme register's change rows (the fixture renders only in the design study); the 'T10 stays out of this surface' copy is replaced. check-v2: 281 checks, 0 errors."
+      }
     },
     {
       "id": "v1-p105-3",
@@ -1038,7 +1043,12 @@
       ],
       "failure_scenario": "Clicking Programme definition from Architecture capability or Plan does nothing; the programme screen is unreachable in the console.",
       "acceptance": "CONSOLE_PAGES includes 'programme' and dispatches it to the programme definition renderer; the link navigates in the console.",
-      "owner_project": "PLATFORM"
+      "owner_project": "PLATFORM",
+      "resolved_by": {
+        "commit": "d59ba796501103811e3aeff1292024407a0cda5a",
+        "test": "docs/design/scripts/check-console.cjs",
+        "evidence": "studio.js's CONSOLE_PAGES now includes 'programme', so the sidebar and both Programme definition links resolve instead of staying on the previous page. check-console: 4 servers, 0 unhandled page errors, 412/401 paths rendered."
+      }
     },
     {
       "id": "v1-p105-4",
@@ -1070,7 +1080,7 @@
       "evidence": [
         {
           "path": "docs/design/v2.js",
-          "line": 7479,
+          "line": 7560,
           "quote": "  // Live: the platform publishes `measure.inference` (calls, tokens and cache hits by caller and"
         }
       ],
@@ -1095,7 +1105,12 @@
       ],
       "failure_scenario": "A reviewer of the published design pack opens Stakeholders and sees an explanation, never a stakeholder profile, so the claimed capability is unverifiable.",
       "acceptance": "The tab renders stakeholder profiles (name, role, influence, interest, disbenefits) from fixtures in study mode and from the store otherwise.",
-      "owner_project": "PLATFORM"
+      "owner_project": "PLATFORM",
+      "resolved_by": {
+        "commit": "d59ba796501103811e3aeff1292024407a0cda5a",
+        "test": "docs/design/scripts/check-v2.cjs",
+        "evidence": "The Stakeholders tab renders live stakeholder profiles when present and a three-row study fixture otherwise, replacing the empty placeholder. check-v2: 281 checks, 0 errors."
+      }
     },
     {
       "id": "v1-pack-1",
@@ -3968,7 +3983,7 @@
       "evidence": [
         {
           "path": "crates/actions/src/invoke.rs",
-          "line": 761,
+          "line": 763,
           "quote": "    ActionError::new(429, \"tool_budget_exceeded\", detail)"
         },
         {
