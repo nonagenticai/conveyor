@@ -1985,6 +1985,49 @@ async fn seed_parity_policy(pg: &support::Pg, ctx: &Ctx, kind_prefix: &str, gate
     inserted
 }
 
+/// Seed the approved `refinement.publish` gate the publish sample cites (§7.2).
+///
+/// `prepare` runs before either transport, so the gate is written through the store — the same
+/// rows `approvals.request` and `approvals.decide` produce. It is parentless, which is
+/// legitimate only because `meta.target` names the policy it authorises, and the human approve
+/// decision is alice's (`requested_by: None` keeps the requester exclusion out).
+async fn seed_parity_refinement_gate(pg: &support::Pg, ctx: &Ctx, policy: Uuid) -> Uuid {
+    let mut tx = begin_scoped(&pg.owner, ctx.tenant).await.expect("scope");
+    let approval = store::approval::insert_approval_tx(
+        &mut tx,
+        ctx.tenant,
+        &store::approval::NewApproval {
+            run_id: None,
+            card_id: None,
+            project_id: None,
+            eval_id: None,
+            gate: "refinement.publish".to_owned(),
+            kind: "decision".to_owned(),
+            required_decisions: 1,
+            requested_by: None,
+            expires_at: None,
+            callback_url: None,
+            correlation_id: None,
+            meta: json!({"target": policy.to_string()}),
+        },
+    )
+    .await
+    .expect("insert the refinement.publish gate");
+    store::approval::record_decision_tx(
+        &mut tx,
+        ctx.tenant,
+        approval.id,
+        &conveyor_domain::Decision::approve(ctx.alice_user),
+        false,
+    )
+    .await
+    .expect("approve the refinement.publish gate");
+    tx.commit()
+        .await
+        .expect("commit the refinement.publish gate");
+    approval.id
+}
+
 /// Seed the laya config the L1 sample pins.
 async fn seed_parity_laya(pg: &support::Pg, ctx: &Ctx) -> Uuid {
     let mut tx = begin_scoped(&pg.owner, ctx.tenant).await.expect("scope");
@@ -2576,7 +2619,9 @@ async fn prepare(sample: &Sample, pg: &support::Pg, ctx: &Ctx) {
         }
         "refinements.publish" => {
             let policy = seed_parity_policy(pg, ctx, "parity.refine", "parity_gate").await;
+            let gate = seed_parity_refinement_gate(pg, ctx, policy).await;
             ctx.push("refinements.publish", policy);
+            ctx.push("refinements.publish.approval", gate);
         }
         "ladder.evaluate" => {
             let policy = seed_parity_policy(pg, ctx, "parity.evaluate", "parity_gate").await;
@@ -6500,7 +6545,8 @@ fn ladder_samples() -> Vec<Sample> {
             sample.input = Box::new(|ctx: &Ctx| {
                 json!({
                     "policy_id": ctx.pop("refinements.publish"),
-                    "threshold_override": 0.5
+                    "threshold_override": 0.5,
+                    "approval_id": ctx.pop("refinements.publish.approval")
                 })
             });
             expecting(sample, 200)

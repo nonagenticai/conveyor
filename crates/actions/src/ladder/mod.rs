@@ -50,6 +50,14 @@ pub const DECISION_CHANGED: &str = "decision.changed";
 /// review and cannot apply one.
 pub const DRAFT_APPLY_GATE: &str = "draft.apply";
 
+/// The dedicated gate a refinement policy change passes (§7.2).
+///
+/// §7.2: "Refinements are versioned; changing one is a gated policy change." A principal
+/// holding `governance:write` cannot publish a threshold or rule override alone: it cites an
+/// approved gate of this name whose `meta.target` names the policy it changes, and at least one
+/// of that gate's `approve` decisions must be a person's.
+pub const REFINEMENT_PUBLISH_GATE: &str = "refinement.publish";
+
 /// Append one `decision.changed` row in the caller's transaction.
 async fn emit_decision_event(
     conn: &mut PgConnection,
@@ -428,9 +436,19 @@ pub struct RefinementPublishIn {
     pub fail_action: Option<String>,
     /// The laya config the refinement pins.
     pub laya_config_id: Option<Uuid>,
+    /// The human gate that authorised this policy change (§7.2).
+    ///
+    /// It must be an approved [`REFINEMENT_PUBLISH_GATE`] approval naming this policy in its
+    /// `meta.target`, with at least one human `approve` decision. A refinement is versioned
+    /// configuration, and changing it is a gated policy change — never a caller's own edit.
+    pub approval_id: Option<Uuid>,
 }
 
 /// Publish the tenant's per-case refinement — a configuration change, never a build.
+///
+/// §7.2: the change is gated. The cited approval must answer [`REFINEMENT_PUBLISH_GATE`], be
+/// `approved` with a human `approve` decision, and name this policy in its `meta.target`; the
+/// check runs before the refinement row is written, so a refusal leaves no version behind.
 #[crate::action(
     name = "refinements.publish",
     version = 1,
@@ -447,6 +465,35 @@ async fn refinements_publish(
     ctx: HandlerCtx,
     input: RefinementPublishIn,
 ) -> Result<HandlerOutput<RefinementOut>, ActionError> {
+    // §7.2: changing a refinement is a gated policy change. The gate is checked, and a refusal
+    // returned, before the row is written — a refused publish never advances the version.
+    let approval_id = input.approval_id.ok_or_else(|| {
+        invalid(
+            "approval_id",
+            "approval_missing",
+            "a refinement policy change must cite the approved refinement.publish gate that \
+             authorised it",
+        )
+    })?;
+    let target = input.policy_id.to_string();
+    if !human_approved_gate_tx(
+        &mut *tx,
+        ctx.tenant,
+        approval_id,
+        Some(REFINEMENT_PUBLISH_GATE),
+        None,
+        None,
+        Some(target.as_str()),
+    )
+    .await?
+    {
+        return Err(invalid(
+            "approval_id",
+            "approval_missing",
+            "the cited approval is not an approved refinement.publish gate with a human approve \
+             decision naming this policy",
+        ));
+    }
     let record = store::ladder::publish_refinement_tx(
         &mut *tx,
         ctx.tenant,
@@ -933,9 +980,11 @@ async fn policy_gate_for_kind_tx(
 /// `approve` decision recorded by a human — not by an agent, rule or service — and answer the
 /// same gate. `gate` names the required gate (the one the caller named, the one the case
 /// kind's policy is specific to, or `draft.apply`); when it is absent the approval's gate is
-/// not compared. The decision's card is authoritative when it names one; a decision that
-/// names no card must cite an approval of its project, so a gateless, cardless record cannot
-/// pick any approved approval in the tenant.
+/// not compared. `target`, when given, must equal the approval's `meta.target`: a gate that
+/// authorises a change to one row can never authorise the same change to another. The
+/// decision's card is authoritative when it names one; a decision that names no card must cite
+/// an approval of its project, so a gateless, cardless record cannot pick any approved approval
+/// in the tenant.
 async fn human_approved_gate_tx(
     conn: &mut PgConnection,
     tenant: TenantId,
@@ -943,17 +992,23 @@ async fn human_approved_gate_tx(
     gate: Option<&str>,
     card_id: Option<Uuid>,
     project_id: Option<Uuid>,
+    target: Option<&str>,
 ) -> Result<bool, ActionError> {
-    let approval = store::approval::get_approval_tx(&mut *conn, tenant, approval_id)
+    let record = store::approval::get_approval_tx(&mut *conn, tenant, approval_id)
         .await
         .map_err(|error| {
             tracing::error!(%error, "read the approval a human decision cites");
             ActionError::internal()
         })?;
-    let Some(approval) = approval else {
+    let Some(record) = record else {
         return Ok(false);
     };
-    let approval = approval.approval;
+    if target
+        .is_some_and(|target| record.meta.get("target").and_then(Value::as_str) != Some(target))
+    {
+        return Ok(false);
+    }
+    let approval = record.approval;
     if approval.status != ApprovalStatus::Approved {
         return Ok(false);
     }
@@ -1044,6 +1099,7 @@ async fn ladder_record(
             expected_gate.as_deref(),
             input.card_id,
             input.project_id,
+            None,
         )
         .await?;
         if !approved {
@@ -1295,6 +1351,7 @@ async fn ladder_apply_draft(
         approval_id,
         Some(DRAFT_APPLY_GATE),
         card_id,
+        None,
         None,
     )
     .await?
