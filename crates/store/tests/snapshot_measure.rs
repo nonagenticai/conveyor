@@ -525,7 +525,8 @@ async fn declared_dependencies_publish_edges_unknown_targets_and_cycles() {
         ],
         "edges are sorted by (from, to); a string or unknown kind is never typed: {edges:?}"
     );
-    assert_eq!(section["counts"]["blocks"], 2);
+    // One blocks edge (MSP -> C); the bogus-kind edge to B is never promoted to a typed kind.
+    assert_eq!(section["counts"]["blocks"], 1);
     assert_eq!(section["counts"]["needs"], 0);
     assert_eq!(section["counts"]["supersedes"], 0);
     assert_eq!(section["counts"]["informs"], 0);
