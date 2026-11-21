@@ -58,6 +58,20 @@ JSON
 cat > "$tmp/docs/evidence/conformance-baseline.json" <<'JSON'
 {"version": 1, "entries": []}
 JSON
+# The checked-in v1 ledger is an INPUT to the register, not a side note. The finding below is
+# distinctive; the published register must carry it, or publish-data.sh dropped the ledger.
+cat > "$tmp/docs/evidence/v1-conformance-findings.json" <<'JSON'
+{"schema": "conveyor-v1-findings/v1", "audited_sha": "0000000000000000000000000000000000000000",
+ "audited_at": "2026-11-20", "method": "publish audit fixture",
+ "findings": [{"id": "fixture-p1", "area": "§5.4", "standard": "SPEC", "spec": "§5.4",
+  "severity": "P1", "title": "publish fixture finding",
+  "problem": "the fixture proves the checked-in ledger reaches the published register",
+  "evidence": [{"path": "scripts/ci/tests/publish_audit.sh", "line": 1,
+                "quote": "#!/usr/bin/env bash"}],
+  "failure_scenario": "publish-data.sh runs the audit without --findings and the register omits every audited finding",
+  "acceptance": "the published register carries this package",
+  "owner_project": "PLATFORM"}]}
+JSON
 
 cat > "$tmp/bin/conveyor" <<'SH'
 #!/usr/bin/env bash
@@ -127,6 +141,15 @@ test -f "$tmp/docs/design/data/rework.json" || {
 python3 -c 'import json,sys; d=json.load(open(sys.argv[1])); assert d["schema"]=="conveyor-rework/v1", d.get("schema")' \
   "$tmp/docs/design/data/rework.json" || {
   echo "FAIL: the published rework register is not conveyor-rework/v1" >&2
+  exit 1
+}
+python3 - "$tmp/docs/design/data/rework.json" <<'PY' || {
+import json, sys
+register = json.load(open(sys.argv[1]))
+titles = [package.get("title") for package in register.get("packages", [])]
+assert "publish fixture finding" in titles, titles
+PY
+  echo "FAIL: the published register dropped the checked-in v1 findings ledger" >&2
   exit 1
 }
 echo "publish_audit: OK"
