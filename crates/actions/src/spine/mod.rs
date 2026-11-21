@@ -2693,7 +2693,9 @@ pub struct CadenceCreateIn {
     pub kind: String,
     /// The period label (e.g. `PI-2027.1`).
     pub period: String,
-    /// Free-form metadata.
+    /// Free-form metadata. A cadence that belongs to a programme tranche names it here
+    /// (`tranche_id`/`tranche_number`): `period` is a free-text label, so `meta` is the link
+    /// the conformance audit and the project verifier read.
     pub meta: Option<Value>,
 }
 
