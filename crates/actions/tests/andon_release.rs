@@ -12,6 +12,7 @@ use uuid::Uuid;
 
 fn request(action: &str, input: Value, actor_kind: &str, actor_id: Uuid) -> InvokeRequest {
     InvokeRequest {
+        credential_alias: None,
         action: action.to_owned(),
         input,
         precondition: None,

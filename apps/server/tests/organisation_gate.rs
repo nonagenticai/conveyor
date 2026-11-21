@@ -205,6 +205,7 @@ async fn gate_fixture(db: &common::TestDb) -> Gate {
 
 fn request(gate: &Gate, action: &str, input: Value) -> InvokeRequest {
     InvokeRequest {
+        credential_alias: None,
         action: action.to_owned(),
         input,
         precondition: None,

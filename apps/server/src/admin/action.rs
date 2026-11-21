@@ -102,6 +102,7 @@ impl<'a> ActionCaller<'a> {
             conveyor_actions::registry(),
             self.tenant,
             InvokeRequest {
+                credential_alias: None,
                 action: name.to_owned(),
                 input,
                 precondition: precondition.map(conveyor_actions::Precondition::Version),

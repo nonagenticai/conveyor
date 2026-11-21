@@ -80,6 +80,7 @@ async fn fixture() -> Fixture {
 /// A direct invocation of `documents.compose`; `usage` is the request's model-call attribution.
 fn request(seeded: &support::Seeded, input: Value, usage: Option<UsageContext>) -> InvokeRequest {
     InvokeRequest {
+        credential_alias: None,
         action: "documents.compose".to_owned(),
         input,
         precondition: None,

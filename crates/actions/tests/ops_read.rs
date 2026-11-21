@@ -13,6 +13,7 @@ use uuid::Uuid;
 /// A request as a human caller with the given role and stored scope policy.
 fn request(tenant_role: Role, policy: conveyor_auth::ScopePolicy, input: Value) -> InvokeRequest {
     InvokeRequest {
+        credential_alias: None,
         action: "ops.pods".to_owned(),
         input,
         precondition: None,

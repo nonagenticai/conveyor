@@ -219,6 +219,7 @@ impl ServerHandler for McpServer {
             .map(Value::Object)
             .unwrap_or_else(|| json!({}));
         let invoke_request = InvokeRequest {
+            credential_alias: None,
             action: spec.name.to_owned(),
             input,
             precondition: None,
@@ -349,6 +350,7 @@ pub async fn mcp_tool_body(
     app_key: String,
 ) -> (u16, Value) {
     let request = InvokeRequest {
+        credential_alias: None,
         action: spec.name.to_owned(),
         input: arguments,
         precondition: None,

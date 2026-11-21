@@ -18,6 +18,7 @@ use uuid::Uuid;
 /// A request as an admin caller (holds `ops:write` and `approvals:write`).
 fn request_as(actor: Uuid, action: &str, input: Value, approval_id: Option<Uuid>) -> InvokeRequest {
     InvokeRequest {
+        credential_alias: None,
         action: action.to_owned(),
         input,
         precondition: None,

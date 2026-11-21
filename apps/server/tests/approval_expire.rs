@@ -188,6 +188,7 @@ async fn decide(
         conveyor_actions::registry::registry(),
         fixture.tenant,
         conveyor_actions::InvokeRequest {
+            credential_alias: None,
             action: "approvals.decide".to_owned(),
             input: json!({"approval_id": approval_id, "decision": "approve"}),
             precondition: None,

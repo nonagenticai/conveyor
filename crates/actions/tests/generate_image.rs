@@ -72,6 +72,7 @@ async fn stub_image_host() -> (String, Arc<AtomicUsize>) {
 
 fn request(user_id: Uuid, input: Value) -> InvokeRequest {
     InvokeRequest {
+        credential_alias: None,
         action: "media.generate_image".to_owned(),
         input,
         precondition: None,

@@ -1031,6 +1031,7 @@ async fn a_channel_publisher_can_only_freeze_steps_it_could_invoke() {
         registry(),
         seeded.tenant,
         InvokeRequest {
+            credential_alias: None,
             action: "processes.publish".to_owned(),
             input: json!({"process_id": illegal}),
             precondition: None,
@@ -1073,6 +1074,7 @@ async fn a_channel_publisher_can_only_freeze_steps_it_could_invoke() {
         registry(),
         seeded.tenant,
         InvokeRequest {
+            credential_alias: None,
             action: "processes.publish".to_owned(),
             input: json!({"process_id": legal}),
             precondition: None,

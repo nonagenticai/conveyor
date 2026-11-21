@@ -216,6 +216,7 @@ pub async fn invoke_http(
         .map(str::to_owned);
 
     let request = InvokeRequest {
+        credential_alias: None,
         action: name.clone(),
         input,
         precondition,

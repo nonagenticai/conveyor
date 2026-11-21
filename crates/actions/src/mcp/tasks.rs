@@ -357,6 +357,7 @@ pub async fn update(
             }
         }
         let request = InvokeRequest {
+            credential_alias: None,
             action: "approvals.decide".to_owned(),
             input: json!({
                 "approval_id": approval_id,
@@ -410,6 +411,7 @@ pub async fn cancel(pool: &PgPool, session: &Session, task_id: &str) -> Result<(
         return Ok(());
     }
     let request = InvokeRequest {
+        credential_alias: None,
         action: "runs.cancel".to_owned(),
         input: json!({
             "id": row.run.id,

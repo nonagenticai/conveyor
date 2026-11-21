@@ -44,6 +44,7 @@ async fn invoke(
         conveyor_actions::registry(),
         tenant,
         InvokeRequest {
+            credential_alias: None,
             action: action.to_owned(),
             input,
             precondition: None,
