@@ -3429,6 +3429,165 @@
       "failure_scenario": "A tenant-authored process call names a workflow key; no catalogue row resolves, so the workflow-second limb is unusable outside tests.",
       "acceptance": "Ship the workflows catalogue, or declare the workflow limb out of scope and stop claiming it as built.",
       "owner_project": "S13"
+    },
+    {
+      "id": "v1-s14-1",
+      "area": "S14 cutover",
+      "standard": "SPEC",
+      "spec": "§5",
+      "severity": "P0",
+      "title": "S14 cutover gate's evidence tree does not exist",
+      "problem": "The plan says the cutover evidence is delivered in-tree, and its gate iterates docs/cutover/evidence/R1..R6 before any health, andon, decommission or parity check. At c7d92d74 docs/cutover/ is absent entirely, so the gate exits 1 at R1 and precondition P4 is unmet.",
+      "evidence": [
+        {
+          "path": "docs/plans/slices/S14-cutover.md",
+          "line": 87,
+          "quote": "Also delivered: `docs/cutover/freeze-log.md`, `docs/cutover/rollback.md`, `docs/cutover/evidence/R0..R7-*`"
+        },
+        {
+          "path": "docs/plans/slices/S14-cutover.md",
+          "line": 216,
+          "quote": "for f in R1-live-n8n.md R2-replay.md R3-inapp-engine.md R4-rollback.md R5-parity-final.txt R6-agent-task.md; do test -s \"docs/cutover/evidence/$f\" || { echo \"missing evidence: $f\" >&2; exit 1; }; done"
+        }
+      ],
+      "failure_scenario": "The S14 gate aborts on R1-live-n8n.md, so the health, andon, decommission and parity checks never run.",
+      "acceptance": "R1-R7, freeze-log and rollback exist in-tree; the S14 gate exits 0.",
+      "owner_project": "S14"
+    },
+    {
+      "id": "v1-s15-1",
+      "area": "S15 capability/knowledge/memory",
+      "standard": "SPEC",
+      "spec": "§7",
+      "severity": "P0",
+      "title": "S15 memory and knowledge gate targets are missing",
+      "problem": "Both gate commands select integration targets that exist nowhere; the only knowledge_query/memory_recall code is in src modules. The test target is named but absent, so the compiler refuses the run and properties (a)/(d) are never proved.",
+      "evidence": [
+        {
+          "path": "docs/plans/slices/S15-capability-knowledge-memory.md",
+          "line": 144,
+          "quote": "cargo test -p conveyor-api --test knowledge_query"
+        },
+        {
+          "path": "docs/plans/slices/S15-capability-knowledge-memory.md",
+          "line": 146,
+          "quote": "cargo test -p conveyor-api --test memory_recall"
+        }
+      ],
+      "failure_scenario": "The gate stops at the first missing target; capability, memory, readiness and clippy checks never execute.",
+      "acceptance": "Both test targets exist and assert pack/layer hits and run-visible recall.",
+      "owner_project": "S15"
+    },
+    {
+      "id": "v1-s16-1",
+      "area": "S16 inference audit",
+      "standard": "SPEC",
+      "spec": "§7",
+      "severity": "P0",
+      "title": "S16 inference-capture and audit gates are vacuous",
+      "problem": "Three gate filters select nothing that exists: the --exact name is a_real_call_records_the_router_usage but the test is a_real_external_call_records_the_router_usage_field_for_field; the gate names procedures_write but the registry test is processes_write; and the inference_usage and inference_constraints targets are absent. A filter matching zero tests exits 0, so the only real-call capture proof never executes.",
+      "evidence": [
+        {
+          "path": "docs/plans/slices/S16-inference-audit.md",
+          "line": 145,
+          "quote": "rbuild -- test -p conveyor-actions --test inference_capture -- --exact a_real_call_records_the_router_usage"
+        },
+        {
+          "path": "crates/actions/tests/inference_capture.rs",
+          "line": 19,
+          "quote": "async fn a_real_external_call_records_the_router_usage_field_for_field() {"
+        },
+        {
+          "path": "docs/plans/slices/S16-inference-audit.md",
+          "line": 147,
+          "quote": "rbuild -- test -p conveyor-domain --test inference_usage"
+        },
+        {
+          "path": "docs/plans/slices/S16-inference-audit.md",
+          "line": 153,
+          "quote": "rbuild -- test -p conveyor-actions --test registry -- --exact no_prompt_action_holds_procedures_write"
+        }
+      ],
+      "failure_scenario": "A capture seam that drops router usage yields a green S16 gate because zero capture tests matched.",
+      "acceptance": "Every --exact filter matches one test; a zero-match run fails the gate; the missing targets exist.",
+      "owner_project": "S16"
+    },
+    {
+      "id": "v1-s17-1",
+      "area": "S17 benchmark harness",
+      "standard": "SPEC",
+      "spec": "§10",
+      "severity": "P1",
+      "title": "S17's admitted live sandbox proof has no test artifact",
+      "problem": "The plan represents its only NOT PROVEN item as apps/server/tests/sandbox_live.rs with an #[ignore] test and a documented follow-up command. That file is absent at c7d92d74, so the documented command exits target-not-found and no runnable proof is queued.",
+      "evidence": [
+        {
+          "path": "docs/plans/slices/S17-benchmark-harness.md",
+          "line": 82,
+          "quote": "`apps/server/tests/benchmark_jobs.rs`, `apps/server/tests/sandbox_live.rs` (`#[ignore]`, needs the cluster). Plus"
+        },
+        {
+          "path": "docs/plans/slices/S17-benchmark-harness.md",
+          "line": 187,
+          "quote": "`rbuild -- test -p conveyor-server --test sandbox_live -- --ignored`, run once when the node exists."
+        }
+      ],
+      "failure_scenario": "An operator runs the documented ignored command; cargo exits target-not-found, indistinguishable from an unproven sandbox.",
+      "acceptance": "sandbox_live.rs exists with the named ignored test and its result is recorded.",
+      "owner_project": "S17"
+    },
+    {
+      "id": "v1-s18-1",
+      "area": "S18 kata improvement",
+      "standard": "SPEC",
+      "spec": "§7",
+      "severity": "P0",
+      "title": "S18 gate cites targets in the wrong package",
+      "problem": "benchmark_arm lives in crates/api/tests (package conveyor-api), but the gate asks conveyor-server for it; benchmark_improvement is apps/server/src/benchmark_improvement.rs, a module with no #[test] or [[test]] target. Both commands fail before any arm or improvement assertion runs.",
+      "evidence": [
+        {
+          "path": "docs/plans/slices/S18-kata-improvement.md",
+          "line": 111,
+          "quote": "cargo test -p conveyor-server --test benchmark_arm"
+        },
+        {
+          "path": "crates/api/tests/benchmark_arm.rs",
+          "line": 146,
+          "quote": "async fn the_conveyor_arm_refuses_what_it_cannot_measure() {"
+        },
+        {
+          "path": "docs/plans/slices/S18-kata-improvement.md",
+          "line": 115,
+          "quote": "cargo test -p conveyor-server --test benchmark_improvement"
+        }
+      ],
+      "failure_scenario": "The gate aborts on the first command; the arm's refusal and the improvement job's person-equivalent calls are unverified.",
+      "acceptance": "Both commands select real targets and run their named assertions.",
+      "owner_project": "S18"
+    },
+    {
+      "id": "v1-s19-1",
+      "area": "S19 eval builder",
+      "standard": "SPEC",
+      "spec": "§7",
+      "severity": "P1",
+      "title": "S19 answer-key gate passes on zero tests",
+      "problem": "The filter names no_eval_signoff_or_answer_key_action_is_agent_reachable; the registry test is no_eval_signoff_or_answer_key_action_is_machine_reachable. libtest runs zero tests and exits 0, so the gate is green while the machine_forbidden assertion protecting the held-out wall never executes.",
+      "evidence": [
+        {
+          "path": "docs/plans/slices/S19-eval-builder.md",
+          "line": 268,
+          "quote": "rbuild -- test -p conveyor-actions --test registry -- --exact no_eval_signoff_or_answer_key_action_is_agent_reachable"
+        },
+        {
+          "path": "crates/actions/tests/registry.rs",
+          "line": 1018,
+          "quote": "fn no_eval_signoff_or_answer_key_action_is_machine_reachable() {"
+        }
+      ],
+      "failure_scenario": "A sign-off or answer-key action granted agent reachability still yields a green S19 gate.",
+      "acceptance": "The filter names machine_reachable exactly; a deliberately reachable eval action turns it red.",
+      "owner_project": "S19"
     }
   ]
 }
