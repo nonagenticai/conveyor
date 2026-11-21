@@ -138,7 +138,7 @@
       "allowed": false,
       "check": "product_findings",
       "description": "no open P0 product finding remains for the project",
-      "detail": "no open P0 product finding for this project",
+      "detail": "no open P0 package for this project",
       "id": "S02-product",
       "kind": "snapshot",
       "result": "pass",
@@ -147,16 +147,16 @@
   ],
   "failures": [],
   "gate": "The A\u2013D artefacts and the delivery contract exist, the brief and the evidence are published, the P2 long-job proof is landed, and the project closes through the one gate.",
-  "generated_at": "2026-11-21T19:55:15.340924+00:00",
+  "generated_at": "2026-11-21T20:57:01.750190+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/S02.toml",
   "name": "Skeleton \u2014 workspace, tenancy, auth, jobs, SSE",
   "project": "S02",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-21T19:48:06.428670+00:00",
-    "git_sha": "d367a4a992ca5338c82466e9d6ef308e62b01ba6",
-    "path": "retained-snapshot/d367a4a992ca5338c82466e9d6ef308e62b01ba6"
+    "generated_at": "2026-11-21T20:52:01.734068+00:00",
+    "git_sha": "2a1ff31df668b8fc456dcac2640f29f44cafcf16",
+    "path": "retained-snapshot/2a1ff31df668b8fc456dcac2640f29f44cafcf16"
   },
   "verdict": "green",
   "warnings": []

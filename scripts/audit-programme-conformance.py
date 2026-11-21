@@ -1505,6 +1505,16 @@ def check_strict(
     gaps: list[dict[str, Any]], baseline: dict[str, Any], fail_on: set[str]
 ) -> list[str]:
     failures: list[str] = []
+    # The header is the acceptance: a baseline without one is a list, not an accepted record.
+    for field in (
+        "version", "accepted_at", "accepted_by", "approver", "acceptance_ref", "delegation_ref",
+    ):
+        if not baseline.get(field):
+            failures.append(f"baseline header is missing {field}")
+    snapshot = baseline.get("snapshot") or {}
+    for field in ("git_sha", "generated_at", "manifest_sha256", "outputs"):
+        if not snapshot.get(field):
+            failures.append(f"baseline snapshot is missing {field}")
     current = {gap_key(gap): gap for gap in gaps}
     recorded: dict[tuple[str, str], dict[str, Any]] = {}
     today = datetime.now(timezone.utc).date()
@@ -1514,6 +1524,8 @@ def check_strict(
         key = (str(entry.get("rule")), str(entry.get("subject")))
         recorded[key] = entry
         name = f"{entry.get('rule')} {entry.get('subject')}"
+        if not str(entry.get("owner") or "").strip():
+            failures.append(f"baseline entry has no owner: {name}")
         if entry.get("disposition") not in DISPOSITIONS:
             failures.append(
                 f"baseline entry has no valid disposition: {name} ({entry.get('disposition')!r})"
@@ -2450,16 +2462,59 @@ def self_test() -> None:
     drop_artefact(sample, "type-solution")
     sample_gaps = audit(sample)
     ledger = baseline_entries(sample_gaps, standard)
-    if check_strict(sample_gaps, ledger, {"P0", "P1"}):
+    accepted_ledger = dict(ledger)
+    accepted_ledger.update(
+        {
+            "accepted_at": "2026-11-21T00:00:00Z",
+            "accepted_by": "conveyor-e2e",
+            "approver": "conveyor-approver",
+            "acceptance_ref": "01a1ff54-eb5c-7581-91c6-4e1ea2cde8c7",
+            "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+            "snapshot": {
+                "git_sha": "d7293f96",
+                "generated_at": "2026-11-21T18:17:55Z",
+                "manifest_sha256": "ba8129",
+                "outputs": 116,
+            },
+        }
+    )
+    if check_strict(sample_gaps, accepted_ledger, {"P0", "P1"}):
         fail("strict rejects its own generated ledger")
     if [entry["disposition"] for entry in ledger["entries"]] != ["rework"]:
         fail(f"the base ledger carries {ledger['entries']}")
 
+    def accepted(entries: list[dict[str, Any]]) -> dict[str, Any]:
+        return {
+            "version": 1,
+            "accepted_at": "2026-11-21T00:00:00Z",
+            "accepted_by": "conveyor-e2e",
+            "approver": "conveyor-approver",
+            "acceptance_ref": "01a1ff54-eb5c-7581-91c6-4e1ea2cde8c7",
+            "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+            "snapshot": {
+                "git_sha": "d7293f96",
+                "generated_at": "2026-11-21T18:17:55Z",
+                "manifest_sha256": "ba8129",
+                "outputs": 116,
+            },
+            "entries": entries,
+        }
+
     def strict_failures(entries: list[dict[str, Any]]) -> str:
-        found = check_strict(sample_gaps, {"version": 1, "entries": entries}, {"P0", "P1"})
+        found = check_strict(sample_gaps, accepted(entries), {"P0", "P1"})
         if not found:
             fail(f"strict accepted {entries}")
         return " | ".join(found)
+
+    headerless = check_strict(
+        sample_gaps, {"version": 1, "entries": ledger["entries"]}, {"P0", "P1"}
+    )
+    if not any("header is missing accepted_by" in failure for failure in headerless):
+        fail("strict accepted a baseline without its acceptance header")
+    ownerless = [dict(entry) for entry in ledger["entries"]]
+    ownerless[0]["owner"] = ""
+    if "has no owner" not in strict_failures(ownerless):
+        fail("strict accepted an entry without an owner")
 
     missing_disposition = [dict(entry) for entry in ledger["entries"]]
     del missing_disposition[0]["disposition"]

@@ -501,39 +501,119 @@ def check_pi_objectives(
     return True, f"the {period} PI objectives are published"
 
 
+_REWORK_CACHE: dict[str, Any] | None = None
+_REWORK_ERROR: str | None = None
+
+
+def rework_register(snapshot: Snapshot) -> tuple[dict[str, Any] | None, str | None]:
+    """Build the one rework register from the same snapshot under verification.
+
+    The register is derived, never stored: the conformance audit, the fresh standards
+    findings and the checked-in v1 ledger are merged by `audit --rework-out`. One build per
+    verifier process is enough; every project check reads the same result.
+    """
+    global _REWORK_CACHE, _REWORK_ERROR
+    if _REWORK_CACHE is not None:
+        return _REWORK_CACHE, None
+    if _REWORK_ERROR is not None:
+        return None, _REWORK_ERROR
+    work = Path(tempfile.mkdtemp(prefix="verify-rework-"))
+    try:
+        conformance = work / "conformance"
+        conformance.mkdir()
+        audit = [
+            sys.executable,
+            str(ROOT / "scripts" / "audit-programme-conformance.py"),
+            "--snapshot",
+            str(snapshot.path),
+            "--out",
+            str(conformance),
+            "--report",
+        ]
+        completed = subprocess.run(audit, capture_output=True, text=True)
+        if completed.returncode != 0:
+            _REWORK_ERROR = (
+                "the conformance audit failed: "
+                + (completed.stderr.strip() or completed.stdout.strip())[:300]
+            )
+            return None, _REWORK_ERROR
+        standards = work / "standards-findings.json"
+        completed = subprocess.run(
+            [
+                sys.executable,
+                str(ROOT / "scripts" / "generate-standards.py"),
+                "--snapshot",
+                str(snapshot.path),
+                "--outputs-dir",
+                str(snapshot.path.parent / "docs"),
+                "--gaps",
+                str(conformance / "conformance-gap-register.json"),
+                "--findings-out",
+                str(standards),
+            ],
+            capture_output=True,
+            text=True,
+        )
+        if completed.returncode != 0:
+            _REWORK_ERROR = (
+                "the standards generator failed: "
+                + (completed.stderr.strip() or completed.stdout.strip())[:300]
+            )
+            return None, _REWORK_ERROR
+        register_path = work / "rework.json"
+        register_out = work / "register-conformance"
+        register_out.mkdir()
+        command = [
+            sys.executable,
+            str(ROOT / "scripts" / "audit-programme-conformance.py"),
+            "--snapshot",
+            str(snapshot.path),
+            "--out",
+            str(register_out),
+            "--report",
+            "--rework-out",
+            str(register_path),
+            "--findings",
+            str(ROOT / "docs" / "evidence" / "v1-conformance-findings.json"),
+            "--findings",
+            str(standards),
+        ]
+        completed = subprocess.run(command, capture_output=True, text=True)
+        if completed.returncode != 0:
+            _REWORK_ERROR = (
+                "the rework register failed: "
+                + (completed.stderr.strip() or completed.stdout.strip())[:300]
+            )
+            return None, _REWORK_ERROR
+        _REWORK_CACHE = json.loads(register_path.read_text(encoding="utf-8"))
+        return _REWORK_CACHE, None
+    finally:
+        shutil.rmtree(work, ignore_errors=True)
+
+
 def check_product_findings(
     snapshot: Snapshot, key: str, params: dict[str, Any]
 ) -> tuple[bool, str]:
-    """No open P0 product finding may outlive the project that owns it.
+    """No open P0 rework package may outlive the project that owns it.
 
-    The register is the product conformance audit's output: a finding is closed by an executed
-    work package (a commit, a named test and a demo credit) or by an accepted waiver with an
-    owner and an expiry. A project cannot close over an open P0 of its own.
+    The register is derived from this snapshot and the checked-in v1 ledger. A package is
+    cleared only when its gap disappears from a fresh audit or its finding carries
+    `resolved_by`; a waiver is suppressed, not passed silently. A project cannot close over
+    an open P0 package it owns.
     """
-    path = ROOT / "governance" / "product-rework.json"
-    if not path.exists():
-        return False, "the product-rework register is missing"
-    register = json.loads(path.read_text(encoding="utf-8"))
-    executed = {
-        finding_id
-        for package in register.get("work_packages") or []
-        if package.get("status") == "executed"
-        for finding_id in package.get("finding_ids") or []
-    }
+    register, error = rework_register(snapshot)
+    if error:
+        return False, error
     open_p0 = [
-        finding.get("id")
-        for finding in register.get("findings") or []
-        if finding.get("project") == key
-        and finding.get("severity") == "P0"
-        and finding.get("status") != "closed"
-        and finding.get("id") not in executed
-        and not (
-            finding.get("disposition") == "accept" and finding.get("waiver")
-        )
+        package.get("key")
+        for package in (register or {}).get("packages", [])
+        if package.get("status") == "open"
+        and package.get("severity") == "P0"
+        and package.get("owner_project") == key
     ]
     if open_p0:
-        return False, f"{len(open_p0)} open P0 product finding(s): " + ", ".join(open_p0)
-    return True, "no open P0 product finding for this project"
+        return False, f"{len(open_p0)} open P0 package(s): " + ", ".join(open_p0)
+    return True, "no open P0 package for this project"
 
 
 CHECKS: dict[str, Callable[[Snapshot, str, dict[str, Any]], tuple[bool, str]]] = {

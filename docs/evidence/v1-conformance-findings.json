@@ -1,6 +1,6 @@
 {
   "schema": "conveyor-v1-findings/v1",
-  "audited_sha": "d6a97982cc54aa6fd423355f85fd42a866c4847e",
+  "audited_sha": "2a1ff31df668b8fc456dcac2640f29f44cafcf16",
   "audited_at": "2026-11-21",
   "method": "Fresh auditors read SPEC_V2 section by section against the tree in four waves; every evidence quote is the raw line at the cited path and is re-verified by scripts/verify-findings.py before admission.",
   "findings": [
@@ -19,49 +19,9 @@
           "quote": "    pub require_evidence: bool,"
         },
         {
-          "path": "crates/actions/src/control/views.rs",
-          "line": 353,
-          "quote": "    pub require_evidence: bool,"
-        },
-        {
-          "path": "crates/actions/src/control/approvals.rs",
-          "line": 388,
-          "quote": "        input.require_evidence,"
-        },
-        {
-          "path": "crates/actions/src/control/approvals.rs",
-          "line": 391,
-          "quote": "    if !evidence.is_empty() {"
-        },
-        {
           "path": "crates/actions/src/pm/mod.rs",
           "line": 56,
           "quote": "    if require && evidence.is_empty() {"
-        },
-        {
-          "path": "crates/actions/src/pm/mod.rs",
-          "line": 59,
-          "quote": "            \"gate_evidence_missing\","
-        },
-        {
-          "path": "crates/store/src/metrics.rs",
-          "line": 147,
-          "quote": "                      count(*) FILTER (WHERE status = 'rejected')::bigint AS rejected,"
-        },
-        {
-          "path": "crates/store/src/metrics.rs",
-          "line": 152,
-          "quote": "                              AND jsonb_array_length(meta -> 'evidence') > 0)))::bigint AS with_evidence,"
-        },
-        {
-          "path": "crates/actions/src/metrics/mod.rs",
-          "line": 298,
-          "quote": "        \"approvals.evidence_completeness\".to_owned(),"
-        },
-        {
-          "path": "crates/actions/src/metrics/mod.rs",
-          "line": 364,
-          "quote": "    pub with_evidence: i64,"
         }
       ],
       "failure_scenario": "pm.route_gate 'deploy' with evidence [] and require_evidence omitted opens an approvable gate; work ships with no artefact or run judged.",
@@ -79,33 +39,18 @@
       "evidence": [
         {
           "path": "crates/actions/src/spine/mod.rs",
-          "line": 1166,
+          "line": 1186,
           "quote": "        && !matches!(status, \"open\" | \"accepted\" | \"cancelled\")"
         },
         {
           "path": "crates/actions/src/spine/mod.rs",
-          "line": 1166,
-          "quote": "        && !matches!(status, \"open\" | \"accepted\" | \"cancelled\")"
-        },
-        {
-          "path": "crates/actions/src/spine/mod.rs",
-          "line": 1177,
+          "line": 1197,
           "quote": "        status: input.status,"
         },
         {
           "path": "crates/store/src/spine.rs",
           "line": 301,
           "quote": "            status = coalesce($6, status), acceptance = coalesce($7, acceptance),"
-        },
-        {
-          "path": "migrations/0044_plan_spine.sql",
-          "line": 26,
-          "quote": "-- divides by it; zero is a refusal, never a division. `acceptance` is by artefact/run, not a"
-        },
-        {
-          "path": "crates/actions/src/spine/mod.rs",
-          "line": 1166,
-          "quote": "        && !matches!(status, \"open\" | \"accepted\" | \"cancelled\")"
         }
       ],
       "failure_scenario": "PATCH status=accepted, evidence=[] marks a work package accepted although no run or artefact meets its criteria.",
@@ -138,12 +83,12 @@
       "spec": "§5.3",
       "severity": "P1",
       "title": "Post-baseline scope edits bypass change control",
-      "problem": "wbs.create/update/delete mutate plan fields with no approved-change check; only baseline advancement goes through changes.request, so plan and frozen baseline diverge silently.",
+      "problem": "Post-baseline scope edits bypass change control: the baseline action itself is guarded, but a direct wbs.update after the baseline never consults the baseline or a change_id.",
       "evidence": [
         {
-          "path": "crates/store/src/spine.rs",
-          "line": 301,
-          "quote": "            status = coalesce($6, status), acceptance = coalesce($7, acceptance),"
+          "path": "crates/actions/src/spine/mod.rs",
+          "line": 1186,
+          "quote": "        && !matches!(status, \"open\" | \"accepted\" | \"cancelled\")"
         },
         {
           "path": "crates/actions/src/pm/mod.rs",
@@ -152,7 +97,7 @@
         },
         {
           "path": "crates/actions/src/spine/mod.rs",
-          "line": 1345,
+          "line": 1365,
           "quote": "                \"change_request_required\","
         }
       ],
@@ -226,16 +171,6 @@
           "path": "migrations/0040_organisation.sql",
           "line": 162,
           "quote": "CREATE TABLE job_binding ("
-        },
-        {
-          "path": "crates/actions/src/metrics/mod.rs",
-          "line": 848,
-          "quote": "/// The cost/budget overview, derived from the conveyor's own ledger."
-        },
-        {
-          "path": "crates/store/src/inference.rs",
-          "line": 263,
-          "quote": "/// Cost is derived from the ledger and `commercial_price` at read time (SPEC_V2 D52) and is"
         }
       ],
       "failure_scenario": "An unbudgeted run calls upstream indefinitely; no 429 is ever produced and spend is discovered after the fact.",
@@ -273,7 +208,7 @@
       "spec": "§7.5",
       "severity": "P1",
       "title": "Roll-ups stop at tenant/project/card",
-      "problem": "The UsageGroup set has no department, programme/portfolio, job, run or step dimension; the snapshot measure publishes only by_project/by_card, so Portfolio and Organisation panels have no data source.",
+      "problem": "Roll-ups stop at tenant/project/card: the public UsageGroup set has six dimensions (day, model, caller kind, cache status, prompt sha, project) and no department, programme, job, run or step; the card bucket is a private addition.",
       "evidence": [
         {
           "path": "crates/store/src/inference.rs",
@@ -282,8 +217,13 @@
         },
         {
           "path": "crates/store/src/snapshot.rs",
-          "line": 895,
+          "line": 919,
           "quote": "                \"by_project\": usage_by_project,"
+        },
+        {
+          "path": "crates/store/src/snapshot.rs",
+          "line": 920,
+          "quote": "                \"by_card\": usage_by_card"
         }
       ],
       "failure_scenario": "The UI cannot show department, programme, job or run-level spend; those panels render empty.",
@@ -373,23 +313,18 @@
       "evidence": [
         {
           "path": "crates/store/src/architecture.rs",
-          "line": 1728,
-          "quote": "    let mut satisfied = sets.is_empty();"
-        },
-        {
-          "path": "crates/store/src/architecture.rs",
           "line": 1725,
           "quote": "        _ => Vec::new(),"
         },
         {
           "path": "crates/store/src/architecture.rs",
-          "line": 1018,
-          "quote": "            AND (($2::text IS NOT NULL AND key = $2) OR $2::text IS NULL)"
+          "line": 1728,
+          "quote": "    let mut satisfied = sets.is_empty();"
         },
         {
-          "path": "crates/actions/src/architecture.rs",
-          "line": 1213,
-          "quote": "    pub profile_key: Option<String>,"
+          "path": "crates/store/src/architecture.rs",
+          "line": 1018,
+          "quote": "            AND (($2::text IS NOT NULL AND key = $2) OR $2::text IS NULL)"
         }
       ],
       "failure_scenario": "An actor creates profile x with artifact_requirements {} and contract_kinds {}, then calls architecture.phases_advance with profile_key x; every phase from preliminary through h closes with no artefacts, no SAW and no contract.",
@@ -403,7 +338,7 @@
       "spec": "§8.1",
       "severity": "P0",
       "title": "Phase G is not a gate: no contract/review required at design or phase advance, and programme-track projects skip it",
-      "problem": "advance_phase_tx special-cases only phase h; closing g (or any phase) never reads architecture_compliance_review, live_delivery_contract_tx or an active waiver. The only enforcement is the project-close check, which is skipped entirely for track == programme and runs after work is done, not at the design gate.",
+      "problem": "Phase G is not a gate: only H is special-cased. A non-programme project's contract, review and waiver checks run only at close, after the work; g requires a live contract only when the profile maps g to a contract kind, and review or waiver never gate g.",
       "evidence": [
         {
           "path": "crates/store/src/architecture.rs",
@@ -436,11 +371,6 @@
       "evidence": [
         {
           "path": "crates/store/src/architecture.rs",
-          "line": 1044,
-          "quote": "         ON CONFLICT (tenant_id, key) DO UPDATE SET"
-        },
-        {
-          "path": "crates/store/src/architecture.rs",
           "line": 1047,
           "quote": "            artifact_requirements = EXCLUDED.artifact_requirements,"
         },
@@ -453,16 +383,6 @@
           "path": "crates/store/src/architecture.rs",
           "line": 1079,
           "quote": "            SET status = 'adopted', adopted_at = now(), board_decision_id = $4,"
-        },
-        {
-          "path": "migrations/0054_architecture.sql",
-          "line": 59,
-          "quote": "    board_decision_id     uuid,"
-        },
-        {
-          "path": "crates/store/src/architecture.rs",
-          "line": 1051,
-          "quote": "          WHERE adm_profile.status <> 'retired'"
         }
       ],
       "failure_scenario": "After adoption, an actor tailors the same profile to remove phase A artefacts and contract kinds, weakening every subsequent gate without any board decision; a draft profile is adopted citing a random uuid.",
@@ -596,39 +516,14 @@
           "quote": "                (tenant_id, programme_id, number, state, entry_criteria, exit_criteria, review_at)"
         },
         {
+          "path": "crates/store/src/seed_programme.rs",
+          "line": 359,
+          "quote": "        .bind(&tranche.state)"
+        },
+        {
           "path": "crates/store/src/spine.rs",
-          "line": 3194,
+          "line": 3332,
           "quote": "            if matches!(state.as_str(), \"authorised\" | \"in_review\" | \"closed\") =>"
-        },
-        {
-          "path": "crates/domain/src/spine.rs",
-          "line": 311,
-          "quote": "                .is_some_and(|value| !value.is_null() && value != &Value::Array(Vec::new()))"
-        },
-        {
-          "path": "docs/design/data/msp.json",
-          "line": 402,
-          "quote": "      \"decision\": \"continue\","
-        },
-        {
-          "path": "docs/design/data/msp.json",
-          "line": 429,
-          "quote": "      \"reviewed_at\": \"2026-11-18T07:17:50.738714+00:00\","
-        },
-        {
-          "path": "docs/design/data/msp.json",
-          "line": 459,
-          "quote": "      \"state\": \"planned\","
-        },
-        {
-          "path": "docs/design/data/programme.json",
-          "line": 5558,
-          "quote": "      \"status\": \"closed\","
-        },
-        {
-          "path": "docs/design/data/programme.json",
-          "line": 5559,
-          "quote": "      \"updated_at\": \"2026-11-17T13:49:07.723637+00:00\","
         }
       ],
       "failure_scenario": "A fresh tenant seeds tranche 1 as authorised with no programme_tranche_review; every tranche-1 project passes assert_project_tranche_authorised_tx and starts. A reviewer can submit evidence {\"baselines\":\"none\",\"benefit_status\":\"none\",\"risk_register\":\"none\"} and the continue/pause/stop gate records it.",
@@ -734,23 +629,8 @@
       "spec": "§8.3",
       "severity": "P1",
       "title": "Closure bypasses the closure review and the realisation plan",
-      "problem": "A standalone project with no closure gate returns Ok, so with no declared outputs it closes with no closure asset or review. Programme closure accepts any benefits_realization_plan asset, approved or not, and checks only a free-text meta post_closure_owner, not a measurement plan.",
+      "problem": "Closure bypasses the closure review and the realisation plan: close_programme_tx now refuses a missing plan and an ownerless plan, but programmes.update writes any status unchecked and the transaction checks no review, so the update path still closes a programme without either gate.",
       "evidence": [
-        {
-          "path": "crates/actions/src/programme.rs",
-          "line": 416,
-          "quote": "    if project.programme_id.is_none() && gate.is_none() {"
-        },
-        {
-          "path": "crates/store/src/spine.rs",
-          "line": 3353,
-          "quote": "            AND a.kind = 'benefits_realization_plan'"
-        },
-        {
-          "path": "crates/store/src/spine.rs",
-          "line": 3363,
-          "quote": "    if owner.as_deref().is_none_or(|value| value.trim().is_empty()) {"
-        },
         {
           "path": "crates/actions/src/portfolio/programmes.rs",
           "line": 162,
@@ -758,48 +638,13 @@
         },
         {
           "path": "crates/store/src/spine.rs",
-          "line": 3333,
+          "line": 3471,
           "quote": "pub async fn close_programme_tx("
         },
         {
           "path": "crates/store/src/spine.rs",
-          "line": 3360,
-          "quote": "    let Some(owner) = plans.first() else {"
-        },
-        {
-          "path": "crates/store/src/spine.rs",
-          "line": 3349,
-          "quote": "        \"SELECT a.meta->>'post_closure_owner'"
-        },
-        {
-          "path": "crates/store/src/spine.rs",
-          "line": 3353,
-          "quote": "            AND a.kind = 'benefits_realization_plan'"
-        },
-        {
-          "path": "docs/design/data/programme.json",
-          "line": 5581,
-          "quote": "        \"gate\": \"PI planning materialises cards from the backlog by WSJF within WIP; a deliverable without evidence cannot demo; retro produces lessons; an end-of-tranche review with no baselines, benefit status or risk evidence is refused; a transition that never measured its baseline cannot report the benefit realized\","
-        },
-        {
-          "path": "docs/design/data/programme.json",
-          "line": 5597,
-          "quote": "      \"status\": \"closed\","
-        },
-        {
-          "path": "seed/programme-definition.json",
-          "line": 13,
-          "quote": "      \"baseline\": \"not measured - no instrument exists (recorded as a kata on the kata project)\","
-        },
-        {
-          "path": "docs/design/data/msp.json",
-          "line": 99,
-          "quote": "      \"status\": \"draft\","
-        },
-        {
-          "path": "docs/design/data/msp.json",
-          "line": 459,
-          "quote": "      \"state\": \"planned\","
+          "line": 3505,
+          "quote": "        \"UPDATE programme SET status = 'closed', version = version + 1, updated_at = now()"
         }
       ],
       "failure_scenario": "A project with no outputs closes with neither approval nor closure record; the programme closes on a draft plan whose only post-closure content is the owner string.",
@@ -834,11 +679,6 @@
       "title": "Coach remedies are recorded, never applied",
       "problem": "coach.remedy validates the closed set, inserts a coach_remedy row, marks the interruption remedied and returns. No consumer reads coach_remedy to retry, move, repull or block anything; the charter's 'apply a bounded remedy' step is a database write only, and the policy retry cap is moot because nothing is ever retried.",
       "evidence": [
-        {
-          "path": "crates/actions/src/coach.rs",
-          "line": 738,
-          "quote": "    store::coach::mark_remedied_tx(&mut *tx, ctx.tenant, interruption.id)"
-        },
         {
           "path": "crates/actions/src/coach.rs",
           "line": 722,
@@ -1044,8 +884,18 @@
       "evidence": [
         {
           "path": "crates/actions/src/spine/mod.rs",
-          "line": 2949,
+          "line": 2971,
           "quote": "            state: input.state,"
+        },
+        {
+          "path": "crates/store/src/spine.rs",
+          "line": 2663,
+          "quote": "            state = coalesce($5, state),"
+        },
+        {
+          "path": "migrations/0044_plan_spine.sql",
+          "line": 183,
+          "quote": "    state         text NOT NULL DEFAULT 'planned',"
         }
       ],
       "failure_scenario": "A caller moves planned directly to closed, or persists an arbitrary string, destroying cadence history.",
@@ -1408,9 +1258,9 @@
           "quote": "    let programme_csv = programme_csv(&data.programme);"
         },
         {
-          "path": "crates/pack/src/live.rs",
-          "line": 125,
-          "quote": "        record.title = redact_text(&record.title);"
+          "path": "crates/pack/src/outputs.rs",
+          "line": 105,
+          "quote": "pub async fn write_outputs("
         }
       ],
       "failure_scenario": "A pasted token or email in a document body or project name reaches the public repo and pages while the JSON copy is masked.",
@@ -1435,7 +1285,7 @@
       "failure_scenario": "The signed-out timeline draws no bars, no width and no today marker, while the same snapshot holds 368 observed runs.",
       "acceptance": "Derive the window from cards/runs when project_activity is absent (as v2.js consoleActivity does), or publish the row; add a fixture proving one bar.",
       "owner_project": "PLATFORM",
-      "resolved_by": "this PR (Part 6): observedWindows derives the window from cards/runs when work.project_activity is absent"
+      "resolved_by": "a7a86a1f (#530): docs/design/delivery.js observedWindows derives the window when project_activity is absent; verified at 2a1ff31d"
     },
     {
       "id": "v1-view-2",
@@ -1528,6 +1378,11 @@
       "evidence": [
         {
           "path": "crates/store/src/organisation.rs",
+          "line": 554,
+          "quote": "pub async fn compile_release_tx("
+        },
+        {
+          "path": "crates/store/src/organisation.rs",
           "line": 575,
           "quote": "        \"family\": job.family,"
         },
@@ -1548,11 +1403,11 @@
       "spec": "§5.3.2",
       "severity": "P1",
       "title": "Change requests are approved by a plain registers.update, bypassing the person's decision",
-      "problem": "SPEC_V2 §5.3.2 requires a scope/schedule/cost change to be a change request with an impact analysis and a person's decision. registers.update forwards a caller-supplied status straight into update_register_tx, which writes status unconditionally. There is no approval row, no approver identity recorded, and no impact review on that path, while take_baseline_guarded accepts the literal string status='approved' as proof the change was decided.",
+      "problem": "Change requests are approved by a plain registers.update: registers_update writes any status string, and the baseline guard reads that row status (v1-w2c-3). The approval table itself cannot be written this way.",
       "evidence": [
         {
           "path": "crates/actions/src/spine/mod.rs",
-          "line": 1533,
+          "line": 1553,
           "quote": "        input.status.as_deref(),"
         },
         {
@@ -1928,12 +1783,17 @@
       "evidence": [
         {
           "path": "crates/store/src/snapshot.rs",
-          "line": 1406,
+          "line": 1430,
           "quote": "            artifact_phases.insert((project.to_owned(), phase.to_owned()));"
         },
         {
           "path": "crates/store/src/snapshot.rs",
-          "line": 1475,
+          "line": 1444,
+          "quote": "            .is_none_or(|current| row_is_later(contract, current, \"created_at\"));"
+        },
+        {
+          "path": "crates/store/src/snapshot.rs",
+          "line": 1499,
           "quote": "                artifact_phases.contains(&phase_key) || contract.is_some() || compliance.is_some();"
         }
       ],
@@ -1952,13 +1812,18 @@
       "evidence": [
         {
           "path": "crates/store/src/spine.rs",
-          "line": 3192,
+          "line": 3330,
           "quote": "        None => Ok(()),"
         },
         {
           "path": "crates/store/src/spine.rs",
           "line": 1375,
           "quote": "        .unwrap_or(1);"
+        },
+        {
+          "path": "crates/actions/src/programme.rs",
+          "line": 291,
+          "quote": "    conveyor_store::spine::assert_project_tranche_authorised_tx(&mut *tx, tenant, project_id)"
         }
       ],
       "failure_scenario": "A programme is created with programmes.create; nobody has created tranche 1 yet. A delivery project is created with programme_id set and meta.tranche=1. projects.create calls assert_project_tranche_authorised_tx, the tranche lookup returns no row, and the gate returns Ok. The project starts work, spends budget and produces outputs before any sponsoring-group tranche review, so the first-tranche authorisation requirement is skipped entirely.",
@@ -1976,18 +1841,18 @@
       "evidence": [
         {
           "path": "crates/actions/src/spine/mod.rs",
-          "line": 2119,
+          "line": 2139,
           "quote": "            capabilities: input.capabilities.unwrap_or_else(|| serde_json::json!([])),"
         },
         {
           "path": "crates/actions/src/spine/mod.rs",
-          "line": 2124,
+          "line": 2144,
           "quote": "            operational_area: input.operational_area.unwrap_or_default(),"
         },
         {
-          "path": "crates/store/src/spine.rs",
-          "line": 2025,
-          "quote": "    let fields = BenefitProfileFields {"
+          "path": "migrations/0044_plan_spine.sql",
+          "line": 286,
+          "quote": "    operational_area    text NOT NULL DEFAULT '',"
         }
       ],
       "failure_scenario": "The BCM registers 'faster onboarding' with a baseline, target, method and owner but leaves capabilities and operational_area empty. benefits.create succeeds (only the four measurement fields are checked). The benefit enters the map with no capability dependency and no operational area to change, and can later be marked realized without any programme capability having been delivered or any part of operations having changed — the exact 'wish' the spec says must be refused.",
@@ -2009,14 +1874,14 @@
           "quote": "    output_ref          text NOT NULL,"
         },
         {
-          "path": "crates/actions/src/spine/mod.rs",
-          "line": 2219,
-          "quote": "            output_ref: input.output_ref,"
+          "path": "migrations/0044_plan_spine.sql",
+          "line": 333,
+          "quote": "        btrim(output_ref) <> '' AND btrim(capability_ref) <> ''"
         },
         {
-          "path": "crates/store/src/spine.rs",
-          "line": 3205,
-          "quote": "/// The benefits come from the map's edges — `benefit_link.output_ref` names a `wbs_node` id —"
+          "path": "crates/actions/src/spine/mod.rs",
+          "line": 2239,
+          "quote": "            output_ref: input.output_ref,"
         }
       ],
       "failure_scenario": "The BCM links the benefit to output_ref '3.2.1 Onboarding walkthrough' (a WBS label) instead of the wbs_node UUID. benefits.link accepts it and the map is accepted. When that output's dependency slips, record_dependency_slip_tx matches benefit_link.output_ref against wbs_node ids, finds nothing, and reports zero benefits at risk; the benefit-at-risk metric and the sponsor's escalation both under-report by exactly the benefits the map intended to protect.",
@@ -2030,12 +1895,22 @@
       "spec": "§8.2",
       "severity": "P1",
       "title": "Demo and retro cadence rows enforce nothing: no evidence, no credit, no lessons",
-      "problem": "'demo' and 'retro' are accepted enum values and nothing else. No action requires each completed deliverable to exhibit its evidence at a system demo, no acceptance path withholds credit for a deliverable that was never demoed, and no retro action produces lessons or kata candidates. The spec's 'no demo, no credit' and inspect-and-adapt records have no implementation.",
+      "problem": "Demo and retro cadence rows enforce nothing: retros.close now requires a lesson per finding, but cadences.update can close a retro directly and a demo cadence still requires no credit or evidence.",
       "evidence": [
         {
           "path": "crates/actions/src/spine/mod.rs",
-          "line": 2648,
-          "quote": "    /// `pi | sprint | demo | retro | refinement`."
+          "line": 2971,
+          "quote": "            state: input.state,"
+        },
+        {
+          "path": "migrations/0044_plan_spine.sql",
+          "line": 181,
+          "quote": "                  CHECK (kind IN ('pi', 'sprint', 'demo', 'retro', 'refinement')),"
+        },
+        {
+          "path": "crates/store/src/spine.rs",
+          "line": 3302,
+          "quote": "                PlanError::RetroFindingWithoutLesson(key),"
         }
       ],
       "failure_scenario": "A PI closes without a system demo. Every deliverable stays accepted because acceptance is a status PATCH (see v2-w2c-4); the retro row exists with empty meta and produces no lesson or kata candidate. The improvement loop the spec says is measured has no rows to measure.",
@@ -2053,13 +1928,13 @@
       "evidence": [
         {
           "path": "crates/actions/src/spine/mod.rs",
-          "line": 1533,
-          "quote": "        input.status.as_deref(),"
+          "line": 1378,
+          "quote": "            || change.status != \"approved\""
         },
         {
           "path": "crates/actions/src/spine/mod.rs",
-          "line": 1357,
-          "quote": "        if change.kind != \"change\""
+          "line": 1553,
+          "quote": "        input.status.as_deref(),"
         },
         {
           "path": "crates/store/src/spine.rs",
@@ -2111,7 +1986,7 @@
         },
         {
           "path": "crates/actions/src/spine/mod.rs",
-          "line": 1048,
+          "line": 1068,
           "quote": "    name = \"wbs.create\","
         }
       ],
@@ -2137,11 +2012,6 @@
           "path": "crates/actions/src/control/andon.rs",
           "line": 92,
           "quote": "    let Some(state) = store::andon::release_tx(&mut *tx, ctx.tenant)"
-        },
-        {
-          "path": "crates/actions/src/ops/incidents.rs",
-          "line": 750,
-          "quote": "            owner_user_id: (ctx.actor_kind == \"user\").then_some(ctx.actor_id),"
         }
       ],
       "failure_scenario": "At 02:10 a human pulls the cord after a runaway deploy. An automation job (or a coding agent granted andon:write to 'unblock' itself) calls andon.release at 02:12. runs.create stops returning 409 andon-engaged and the worker resumes claiming runs for the tenant, including the pipeline that caused the incident. No human decision exists anywhere in the record, and the released event gives no way to tell the releaser was not a person.",
@@ -2318,19 +2188,14 @@
       "problem": "§11.3 step 2 requires the broker to check the spend budget and fail with `429 tool_budget_exceeded`; §11.4's spend row requires 'budget check + ledger'; §11.8/§11.9 require cost per call. The broker performs only the effect-ceiling comparison (no budget read, no 429 branch anywhere in crates/), and writes the ledger row with `cost: None` unconditionally, so the column exists but is never populated and per-job 'tool-budget usage' cannot be computed.",
       "evidence": [
         {
-          "path": "docs/SPEC_V2.md",
-          "line": 1386,
-          "quote": "   (`429 tool_budget_exceeded`)."
-        },
-        {
-          "path": "docs/SPEC_V2.md",
-          "line": 1413,
-          "quote": "| **spend** | LLM generation, w2v render, TTS, paid data source | budget check + ledger |"
-        },
-        {
           "path": "crates/actions/src/broker.rs",
           "line": 355,
           "quote": "        cost: None,"
+        },
+        {
+          "path": "docs/SPEC_V2.md",
+          "line": 1386,
+          "quote": "   (`429 tool_budget_exceeded`)."
         }
       ],
       "failure_scenario": "A run whose binding permits `spend` calls `image_gen.generate` in a loop (image_gen is a first-wave toolkit). No budget counter is consulted before any of the calls; the destination produces paid renders on every iteration; every ledger row carries cost NULL, so the tenant's spend cannot be attributed and the gate that should have stopped at the first over-budget call never fires.",
@@ -2347,11 +2212,6 @@
       "problem": "§11.3 states the two rules are 'not negotiable in the conveyor's registry': a write tool returns read-back `checks[]` and a `verdict`, and a write with no verification path cannot be published. The `tool` table has no verification declaration, `toolkits.publish` copies effect and schema from the action spec and inserts unconditionally, and the broker classifies the outcome from the HTTP status alone — it never inspects a `verdict` or `checks[]`. A write tool can therefore be published and called with no verification, and a 200 whose effect did not happen is ledgered `ok`.",
       "evidence": [
         {
-          "path": "docs/SPEC_V2.md",
-          "line": 1402,
-          "quote": "**Writes verify themselves.** A write tool returns read-back `checks[]` and a `verdict`; a write with no verification"
-        },
-        {
           "path": "crates/actions/src/toolkits/publish.rs",
           "line": 191,
           "quote": "                effect: spec.effect.as_str(),"
@@ -2360,6 +2220,11 @@
           "path": "crates/actions/src/broker.rs",
           "line": 315,
           "quote": "                _ => \"backend_error\","
+        },
+        {
+          "path": "docs/SPEC_V2.md",
+          "line": 1402,
+          "quote": "**Writes verify themselves.** A write tool returns read-back `checks[]` and a `verdict`; a write with no verification"
         }
       ],
       "failure_scenario": "A `write` tool (for example `coding.jobs.create`) is published with no checks declaration. The destination answers 200 after a partial write — the branch was created but the commit was not. The broker ledgers `ok`, the run proceeds on the belief that the write verified itself, and the unverified write is indistinguishable in the ledger from a verified one.",
@@ -2874,6 +2739,175 @@
       "acceptance": "Build rendered pages into $tmp/docs and copy them in at step 4 with the rest of the pack (or restore the pack on any exit), plus a test that a forced strict failure leaves the pack byte-identical.",
       "owner_project": "PLATFORM",
       "resolved_by": "fixed in #530 before merge"
+    },
+    {
+      "id": "v1-u5a-t4-1",
+      "area": "§12 T4",
+      "standard": "SPEC",
+      "spec": "§12 T4",
+      "severity": "P1",
+      "title": "The seeded coach process is not exercised end to end",
+      "problem": "The coach tests call coach.triage and coach.remedy directly. No test starts cap.kanban_coach.handle_error.v2 and executes its computed step, so the process wiring — which action runs when, and with which allowed set — is unproven.",
+      "evidence": [
+        {
+          "path": "crates/actions/tests/coach.rs",
+          "line": 13,
+          "quote": "//! `coach.triage` is the engine's own business (and its tool loop is proved elsewhere), so these"
+        },
+        {
+          "path": "crates/actions/tests/coach.rs",
+          "line": 14,
+          "quote": "//! tests call `coach.triage` and `coach.remedy` directly — they are the actions the process's"
+        },
+        {
+          "path": "seed/processes/named.yaml",
+          "line": 1804,
+          "quote": "  - key: cap.kanban_coach.handle_error.v2"
+        }
+      ],
+      "failure_scenario": "A change to the seeded process (step order, allowed_actions, input template) breaks the coach and every test still passes because none executes the process.",
+      "acceptance": "A test starts the seeded cap.kanban_coach.handle_error.v2 process for an injected failure and asserts exactly one coach card, one triage and one remedy from the process run, not from direct action calls.",
+      "owner_project": "T4"
+    },
+    {
+      "id": "v1-u5a-t4-2",
+      "area": "§12 T4",
+      "standard": "SPEC",
+      "spec": "§12 T4",
+      "severity": "P2",
+      "title": "An agent-issued coach.remedy is unproven",
+      "problem": "The seeded process excludes coach.remedy from allowed_actions, but the exclusion is data-only: no negative test proves that an executor or agent principal calling coach.remedy is refused. The out-of-set test refuses a remedy value, not a caller.",
+      "evidence": [
+        {
+          "path": "seed/processes/named.yaml",
+          "line": 109,
+          "quote": "  # `coach.remedy`: the remedy is computed from the class, so the model writes the narrative only."
+        },
+        {
+          "path": "seed/processes/named.yaml",
+          "line": 110,
+          "quote": "  - {key: cap.kanban_coach.handle_error.v2, capability: kanban_coach, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 300, allowed_actions: [documents.compose, documents.get, documents.list, cards.get, cards.comment, coach.triage]}"
+        },
+        {
+          "path": "crates/actions/tests/coach.rs",
+          "line": 492,
+          "quote": "async fn an_out_of_set_triage_or_remedy_is_refused() {"
+        }
+      ],
+      "failure_scenario": "An agent with coach.triage can call coach.remedy anyway if the runtime does not enforce allowed_actions; no test catches it.",
+      "acceptance": "A test invokes coach.remedy as an agent principal and asserts 403; a second test invokes it as a person and succeeds.",
+      "owner_project": "T4"
+    },
+    {
+      "id": "v1-u5a-t4-3",
+      "area": "§12 T4",
+      "standard": "SPEC",
+      "spec": "§12 T4",
+      "severity": "P2",
+      "title": "The explicit coach.escalate action is uncalled",
+      "problem": "coach.escalate is registered and exposed, but no test and no seeded process calls it; the only proved escalation is the automatic repeat-signature path inside coach.triage.",
+      "evidence": [
+        {
+          "path": "crates/actions/src/coach.rs",
+          "line": 155,
+          "quote": "/// `coach.escalate`."
+        },
+        {
+          "path": "crates/actions/tests/coach.rs",
+          "line": 551,
+          "quote": "async fn a_repeat_signature_escalates_instead_of_a_second_card() {"
+        }
+      ],
+      "failure_scenario": "coach.escalate can drift or be removed without a failing test; a person cannot rely on it to escalate a replayable flow.",
+      "acceptance": "A test invokes coach.escalate on an open interruption and asserts the interruption state, the approval row and the event; a second test refuses it on a closed one.",
+      "owner_project": "T4"
+    },
+    {
+      "id": "v1-u5a-t4-4",
+      "area": "§12 T4",
+      "standard": "SPEC",
+      "spec": "§12 T4",
+      "severity": "P2",
+      "title": "The coach chain cap measures breadth, not nesting",
+      "problem": "COACH_CHAIN_MAX counts the prior interruptions on one card (breadth). Run nesting is prevented wholesale by the coach-about-a-coach refusal, and no test asserts that a nested coach run is refused. The constant's name promises a depth cap the code does not implement.",
+      "evidence": [
+        {
+          "path": "crates/actions/src/board/pull.rs",
+          "line": 151,
+          "quote": "/// The most coach root runs one card may accumulate before `err.card` stops starting them"
+        },
+        {
+          "path": "crates/actions/src/board/pull.rs",
+          "line": 154,
+          "quote": "pub const COACH_CHAIN_MAX: i64 = 3;"
+        },
+        {
+          "path": "crates/actions/src/board/pull.rs",
+          "line": 341,
+          "quote": "    } else if prior_interruptions >= COACH_CHAIN_MAX {"
+        }
+      ],
+      "failure_scenario": "A recursion through a path other than a coach card (a child process that starts a coach) is not bounded by a depth measure, and no test proves the nesting refusal.",
+      "acceptance": "The cap either measures nesting depth (and a test asserts a nested run is refused) or is renamed to the breadth it measures and the nesting refusal gains its own test.",
+      "owner_project": "T4"
+    },
+    {
+      "id": "v1-u5a-t9-1",
+      "area": "§8.1",
+      "standard": "SPEC",
+      "spec": "§8.1",
+      "severity": "P1",
+      "title": "profile_tailor accepts an unvalidated requirement map",
+      "problem": "architecture.profile_tailor takes artifact_requirements and contract_kinds as free-form JSON and writes them through upsert_profile_tx, which checks only key and name. It does not validate that requirement keys are known artifact_type keys, that every mandatory type is retained, or that phases are in the phase set. A tenant can tailor a profile that drops the standard's mandatory artefacts and then adopt it.",
+      "evidence": [
+        {
+          "path": "crates/actions/src/architecture.rs",
+          "line": 831,
+          "quote": "    pub artifact_requirements: Value,"
+        },
+        {
+          "path": "crates/actions/src/architecture.rs",
+          "line": 863,
+          "quote": "        artifact_requirements: input.artifact_requirements,"
+        },
+        {
+          "path": "crates/store/src/architecture.rs",
+          "line": 1034,
+          "quote": "    if new.key.trim().is_empty() || new.name.trim().is_empty() {"
+        }
+      ],
+      "failure_scenario": "A profile is tailored with `artifact_requirements: {}` or unknown keys, adopted, and every phase gate starts satisfied; the mandatory artefacts are no longer required.",
+      "acceptance": "profile_tailor refuses an unknown artifact_type key, a missing mandatory type and a phase outside phase_set (422), and a test proves a valid tailoring still adopts.",
+      "owner_project": "T9"
+    },
+    {
+      "id": "v1-u5a-t9-2",
+      "area": "§8.1",
+      "standard": "SPEC",
+      "spec": "§8.1",
+      "severity": "P2",
+      "title": "A kata outcome is free-form, not a typed candidate",
+      "problem": "Phase H validates a change outcome's change_id against an approved change row, but a kata outcome is accepted on kind alone: any object with kind='kata' passes, with no candidate row, identity or owner. The H gate's exactly-one-typed-outcome rule covers only the change half.",
+      "evidence": [
+        {
+          "path": "crates/store/src/architecture.rs",
+          "line": 1882,
+          "quote": "    if let Some(outcome) = &new.outcome {"
+        },
+        {
+          "path": "crates/store/src/architecture.rs",
+          "line": 1884,
+          "quote": "        if kind != \"change\" && kind != \"kata\" {"
+        },
+        {
+          "path": "crates/store/src/architecture.rs",
+          "line": 1890,
+          "quote": "        if kind == \"change\" {"
+        }
+      ],
+      "failure_scenario": "An H review records `{\"kind\":\"kata\"}` with no candidate; the outcome is accepted, and the improvement loop has no row to measure or adopt.",
+      "acceptance": "A kata outcome must name a kata candidate row of the project (or an explicit, approved deferral); a test refuses a bare kind='kata' and accepts a typed candidate.",
+      "owner_project": "T9"
     }
   ]
 }

@@ -1,0 +1,21 @@
+{
+  "schema": "conveyor-rework-migration/v1",
+  "from": "governance/product-rework.json",
+  "to": "docs/evidence/v1-conformance-findings.json",
+  "at": "2026-11-21T20:55:00Z",
+  "note": "The U5a/U5b product register is superseded by the merged #543 chain: one generated register, one finding ledger, no stored package status. Six unique claims were re-anchored at 2a1ff31d and admitted; six were duplicates of a v1 finding or already fixed. The old file and its checker are deleted.",
+  "findings": [
+    {"old": "F-T4-1", "new": "v1-u5a-t4-1", "disposition": "migrated", "reason": "the seeded coach process is not executed end to end"},
+    {"old": "F-T4-2", "new": "v1-u5a-t4-2", "disposition": "migrated", "reason": "agent-issued coach.remedy refusal is unproven"},
+    {"old": "F-T4-3", "new": "v1-u5a-t4-3", "disposition": "migrated", "reason": "the explicit coach.escalate action is uncalled"},
+    {"old": "F-T4-4", "new": "v1-u5a-t4-4", "disposition": "migrated", "reason": "the coach chain cap measures breadth, not nesting"},
+    {"old": "F-T9-1", "new": "v1-u5a-t9-1", "disposition": "migrated", "reason": "narrowed to profile_tailor accepting an unvalidated requirement map; the gate-vacuity half is v1-p81-1/v1-w2a-2"},
+    {"old": "F-T9-2", "new": "v1-p81-1", "disposition": "duplicate", "reason": "the draft-profile advance is the same defect"},
+    {"old": "F-T9-3", "new": "v1-p81-6", "disposition": "duplicate", "reason": "the Phase-H outcome check is the same defect"},
+    {"old": "F-T9-4", "new": "v1-u5a-t9-2", "disposition": "migrated", "reason": "a kata outcome is free-form, not a typed candidate"},
+    {"old": "F-T10-1", "new": "v1-p82-1", "disposition": "duplicate", "reason": "the unapproved PI materialisation is the same defect"},
+    {"old": "F-T10-2", "new": null, "disposition": "resolved", "reason": "fixed by fa364a57: retros.record_findings and retros.close are actions"},
+    {"old": "F-T10-3", "new": "v1-p82-4", "disposition": "duplicate", "reason": "the dead refinement cadence is the same defect"},
+    {"old": "F-T10-4", "new": "v1-p82-5", "disposition": "duplicate", "reason": "the single-project PI backlog is the same defect"}
+  ]
+}
