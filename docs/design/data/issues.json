@@ -1,6 +1,90 @@
 {
   "issues": [
     {
+      "number": 528,
+      "title": "design: the delivery view \u2014 portfolio and programme Gantt, project and work-package kanban",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/528",
+      "updatedAt": "2026-11-21T10:15:52Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        },
+        {
+          "name": "programme",
+          "color": "5319E7"
+        }
+      ]
+    },
+    {
+      "number": 527,
+      "title": "programme: the five proposed V2 inception sets \u2014 author, correct the live record, record the gate",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/527",
+      "updatedAt": "2026-11-21T10:09:07Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        },
+        {
+          "name": "programme",
+          "color": "5319E7"
+        }
+      ]
+    },
+    {
+      "number": 526,
+      "title": "programme: the tranche-0 rework batch \u2014 verifier, manifests and seven retrospective project records (U5a)",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/526",
+      "updatedAt": "2026-11-21T09:11:29Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:blocked",
+          "color": "D93F0B"
+        },
+        {
+          "name": "programme",
+          "color": "5319E7"
+        }
+      ]
+    },
+    {
+      "number": 524,
+      "title": "programme: the strict gates \u2014 one close path, tranche review, dual control and strict publish",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/524",
+      "updatedAt": "2026-11-21T10:19:31Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        },
+        {
+          "name": "programme",
+          "color": "5319E7"
+        }
+      ]
+    },
+    {
       "number": 517,
       "title": "console: check-console's programme-refresh case never renders its control (stub manifest + handler)",
       "state": "CLOSED",
@@ -469,7 +553,7 @@
       "title": "conveyor-buildout \u2014 the SPEC_V2 programme",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/435",
-      "updatedAt": "2026-11-21T01:51:27Z",
+      "updatedAt": "2026-11-21T02:07:14Z",
       "labels": [
         {
           "name": "programme",
