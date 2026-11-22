@@ -5,6 +5,7 @@
     "P2": 36,
     "P3": 0
   },
+  "excluded_test_projects": [],
   "gaps": [
     {
       "detail": "project is closed but its closure review is not published",

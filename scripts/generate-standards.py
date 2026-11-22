@@ -167,9 +167,10 @@ def pointer_problems(std: dict[str, Any], snapshot: dict[str, Any]) -> list[str]
                 if source.get("kind") != "rows":
                     continue
                 # A source the current snapshot projection does not carry yet (compliance
-                # reviews, waivers, lessons, demo credits) is declared optional: the artefact is
-                # honestly absent, and the pointer is not a typo. The flag is removed when the
-                # projection lands, and `check-standards.cjs` still requires the package.
+                # reviews, waivers, lessons, demo credits) is declared optional: its absence is
+                # a P2 section gap, not the severity the source declares, and the pointer is not
+                # a typo. The flag is removed when the projection lands, and
+                # `check-standards.cjs` still requires the package.
                 if source.get("optional"):
                     continue
                 file = str(source.get("file") or "")
@@ -241,6 +242,62 @@ def matches(row: dict[str, Any], wanted: dict[str, Any]) -> bool:
         elif row.get(key) != value:
             return False
     return True
+
+
+# --- WSJF (§8.2) ----------------------------------------------------------------------------
+
+# The four typed integer inputs. WSJF is arithmetic, not opinion: the score
+# `(business_value + time_criticality + risk_reduction) / job_size` is computed on read and
+# never stored. A row missing one input, carrying a non-integer input, a negative value or a
+# `job_size` below 1 cannot be ordered, so it is a record defect, not a row to skip.
+WSJF_FIELDS = ("business_value", "time_criticality", "risk_reduction", "job_size")
+WSJF_VALUE_FIELDS = WSJF_FIELDS[:3]
+SEVERITY_RANK = {"": 0, "P2": 1, "P1": 2, "P0": 3}
+
+
+def json_integer(value: Any) -> int | None:
+    """The value when it is a JSON integer, else None (a bool or float is not an input)."""
+    if isinstance(value, bool) or not isinstance(value, int):
+        return None
+    return value
+
+
+def wsjf_inputs(row: dict[str, Any]) -> dict[str, int] | None:
+    """The four inputs when the row is a valid WSJF candidate, else None."""
+    values: dict[str, int] = {}
+    for field in WSJF_FIELDS:
+        value = json_integer(row.get(field))
+        if value is None:
+            return None
+        values[field] = value
+    if values["job_size"] < 1:
+        return None
+    if any(values[field] < 0 for field in WSJF_VALUE_FIELDS):
+        return None
+    return values
+
+
+def wsjf_ordered(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """The rows in WSJF order, or [] when ANY row is malformed.
+
+    An empty list makes the section absent, so one malformed candidate cannot hide behind its
+    valid siblings. The computed `wsjf` and `rank` are rendering fields: the snapshot is never
+    written, and the score stays out of the record.
+    """
+    scored: list[tuple[float, dict[str, Any]]] = []
+    for row in rows:
+        values = wsjf_inputs(row)
+        if values is None:
+            return []
+        score = (
+            values["business_value"] + values["time_criticality"] + values["risk_reduction"]
+        ) / values["job_size"]
+        scored.append((score, row))
+    scored.sort(key=lambda item: (-item[0], str(item[1].get("position") or ""), str(item[1].get("id") or "")))
+    return [
+        {**row, "wsjf": score, "rank": rank}
+        for rank, (score, row) in enumerate(scored, start=1)
+    ]
 
 
 # --- subjects ------------------------------------------------------------------------------
@@ -521,7 +578,15 @@ def rows_for(
     if not isinstance(value, list):
         return []
     wanted = substitute(source.get("match") or {}, subject, category, phase)
-    return [row for row in value if isinstance(row, dict) and matches(row, wanted)]
+    rows = [row for row in value if isinstance(row, dict) and matches(row, wanted)]
+    if source.get("validate") == "wsjf":
+        # A WSJF read must go through the category's own filter: `/wbs_nodes` unfiltered is
+        # every phase and milestone, not the plan's candidate set, so an unfiltered source is
+        # itself the defect. Every selected row must then carry the four typed inputs.
+        if not wanted:
+            return []
+        return wsjf_ordered(rows)
+    return rows
 
 
 def artifact_satisfies_requirement(artifact: dict[str, Any], key: str) -> bool:
@@ -543,16 +608,215 @@ def artifact_satisfies_requirement(artifact: dict[str, Any], key: str) -> bool:
     return bool(words) and words <= title
 
 
+def shared_config_rows(snapshot: dict[str, Any], subject: dict[str, Any]) -> list[dict[str, Any]]:
+    """The programme's `shared_config` (§8.2), as one summary row when it is a real record.
+
+    The migration defaults the column to `{}`, so an empty object is absence, not evidence. A
+    malformed shape (non-object, `values` not an object, `locked` not an array) yields no rows,
+    which makes the section absent and the artefact's finding name it. A configuration with
+    neither values nor locks is likewise empty: the programme shares nothing.
+    """
+    programmes = (snapshot.get("programme") or {}).get("programme") or []
+    programme = next(
+        (row for row in programmes if str(row.get("id")) == str(subject.get("programme_id"))),
+        programmes[0] if programmes else None,
+    )
+    if not isinstance(programme, dict):
+        return []
+    config = programme.get("shared_config")
+    if not isinstance(config, dict):
+        return []
+    values = config.get("values")
+    locked = config.get("locked")
+    if "values" in config and not isinstance(values, dict):
+        return []
+    if "locked" in config and not isinstance(locked, list):
+        return []
+    # The store reads a flat object as the values (migration 0068: `{ "values": {...},
+    # "locked": [...] }`, with a flat object accepted and read as values with no locks).
+    if "values" not in config:
+        values = {key: value for key, value in config.items() if key != "locked"}
+    values = values if isinstance(values, dict) else {}
+    locked = locked if isinstance(locked, list) else []
+    if not values and not locked:
+        return []
+    return [{
+        "kind": "shared_config",
+        "title": (
+            f"shared configuration — {len(values)} value(s), {len(locked)} locked"
+        ),
+        "programme_id": str(programme.get("id") or subject.get("programme_id") or ""),
+        "values": len(values),
+        "locked": len(locked),
+    }]
+
+
+def dependency_graph_rows(snapshot: dict[str, Any]) -> list[dict[str, Any]]:
+    """The project dependency graph: the typed rows, else the programme's declared edges.
+
+    `msp.project_dependencies` is the typed `project_dependency` table; `msp.dependencies` is the
+    declared graph (each project's `meta.depends_on`, projected by the store). Either is a real
+    graph; an edge without both endpoints is malformed and yields no rows, so the section cannot
+    pass on a partial graph.
+    """
+    msp = snapshot.get("msp") or {}
+    typed = [row for row in msp.get("project_dependencies") or [] if isinstance(row, dict)]
+    if typed:
+        if any(not str(row.get("from_project") or "").strip() or not str(row.get("to_project") or "").strip()
+               for row in typed):
+            return []
+        return [
+            {
+                **row,
+                "title": (
+                    f"{row.get('from_project')} → {row.get('to_project')}"
+                    f" ({row.get('kind') or 'untyped'})"
+                ),
+            }
+            for row in typed
+        ]
+    declared_doc = msp.get("dependencies")
+    if isinstance(declared_doc, dict):
+        declared = declared_doc.get("edges") or []
+    elif isinstance(declared_doc, list):
+        declared = declared_doc
+    else:
+        declared = []
+    declared = [row for row in declared if isinstance(row, dict)]
+    if any(not str(row.get("from") or "").strip() or not str(row.get("to") or "").strip()
+           for row in declared):
+        return []
+    return [
+        {
+            **row,
+            "title": f"{row.get('from')} → {row.get('to')} ({row.get('kind') or 'untyped'})",
+        }
+        for row in declared
+    ]
+
+
+def refinement_cadence_rows(
+    snapshot: dict[str, Any],
+    source: dict[str, Any],
+    subject: dict[str, Any],
+    category: str,
+    phase: str | None,
+) -> list[dict[str, Any]]:
+    """The backlog-refinement cadence for a period (§8.2).
+
+    A cadence of kind `refinement` without a period cannot be matched to the PI it refines, so it
+    is malformed and yields no rows. An unfiltered read of `/cadences` is not a refinement row.
+    """
+    wanted = substitute(source.get("match") or {"kind": "refinement"}, subject, category, phase)
+    if not wanted:
+        return []
+    cadences = (snapshot.get("msp") or {}).get("cadences") or []
+    selected = [row for row in cadences if isinstance(row, dict) and matches(row, wanted)]
+    if any(not str(row.get("period") or "").strip() for row in selected):
+        return []
+    return [
+        {
+            **row,
+            "title": f"Refinement — {row.get('period')} ({row.get('state') or 'recorded'})",
+        }
+        for row in selected
+    ]
+
+
+def kata_candidate_rows(snapshot: dict[str, Any]) -> list[dict[str, Any]]:
+    """Kata candidates: a retro lesson's typed marker, plus the kata register when projected.
+
+    §8.2's inspect-and-adapt produces lessons and kata candidates. A lesson's candidate travels
+    in `meta.kata_candidate` (the typed marker the kata opener consumes); a snapshot may also
+    project the `kata` / `kata_candidate` registers. A candidate with no identifier, signature,
+    title or statement is malformed: the section stays absent rather than counting an empty row.
+    """
+    rows: list[dict[str, Any]] = []
+    for lesson in (snapshot.get("msp") or {}).get("lessons") or []:
+        if not isinstance(lesson, dict):
+            continue
+        meta = lesson.get("meta")
+        marker = meta.get("kata_candidate") if isinstance(meta, dict) else None
+        source_kind = str(lesson.get("source") or "").lower()
+        if marker or source_kind in {"kata", "kata_candidate"}:
+            rows.append({**lesson, "kind": "kata_candidate"})
+    kata_document = snapshot.get("kata")
+    if isinstance(kata_document, dict):
+        registers = [
+            value for key in ("candidates", "kata_candidates", "kata", "katas")
+            if isinstance(value := kata_document.get(key), list)
+        ]
+    elif isinstance(kata_document, list):
+        registers = [kata_document]
+    else:
+        registers = []
+    for register in registers:
+        rows.extend(
+            {**row, "kind": "kata_candidate"}
+            for row in register
+            if isinstance(row, dict)
+        )
+    if not rows:
+        return []
+    malformed = [
+        row for row in rows
+        if not any(
+            str(row.get(field) or "").strip()
+            for field in ("id", "signature", "title", "statement")
+        )
+    ]
+    if malformed:
+        return []
+    seen: set[str] = set()
+    unique: list[dict[str, Any]] = []
+    for row in rows:
+        key = next(
+            (str(row.get(field)) for field in ("id", "signature", "title", "statement") if row.get(field)),
+            "",
+        )
+        if key in seen:
+            continue
+        seen.add(key)
+        unique.append({
+            **row,
+            "title": str(
+                row.get("title") or row.get("signature") or row.get("statement")
+                or row.get("id") or "kata candidate"
+            ),
+        })
+    return unique
+
+
 def computed_rows(
     name: str,
     source: dict[str, Any],
     snapshot: dict[str, Any],
     subject: dict[str, Any],
     programme_projects: dict[str, set[str]],
+    category: str = "",
+    phase: str | None = None,
 ) -> list[dict[str, Any]]:
     msp = snapshot.get("msp") or {}
     architecture = snapshot.get("architecture") or {}
     programme_doc = snapshot.get("programme") or {}
+    if name == "shared_config":
+        return shared_config_rows(snapshot, subject)
+    if name == "dependency_graph":
+        return dependency_graph_rows(snapshot)
+    if name == "refinement_cadence":
+        return refinement_cadence_rows(snapshot, source, subject, category, phase)
+    if name == "kata_candidates":
+        return kata_candidate_rows(snapshot)
+    if name == "wsjf_order":
+        # The plan's candidate set is `status: accepted` unless the source narrows it further.
+        wanted = substitute(
+            source.get("match") or {"status": "accepted"}, subject, category, phase
+        )
+        selected = [
+            row for row in msp.get("wbs_nodes") or []
+            if isinstance(row, dict) and matches(row, wanted)
+        ]
+        return wsjf_ordered(selected)
     if name == "programme_summary":
         projects = programme_doc.get("projects") or []
         programme_id = subject.get("programme_id")
@@ -606,18 +870,18 @@ def computed_rows(
                 # every requirement. A requirement with zero evidence is not a row here: the
                 # section is then absent and names the missing set, instead of rendering a
                 # table of zeroes that reads as evidenced.
-                matches = [
+                typed_matches = [
                     artifact for artifact in evidence
                     if artifact_satisfies_requirement(artifact, str(key))
                 ]
-                if not matches:
+                if not typed_matches:
                     continue
                 rows.append({
                     "kind": "required",
                     "plateau": plateau,
                     "key": key,
                     "name": names.get(str(key), str(key)),
-                    "evidence": len(matches),
+                    "evidence": len(typed_matches),
                 })
         return rows
     if name == "requirements_catalog":
@@ -729,6 +993,18 @@ def resolve_section(
 ) -> dict[str, Any]:
     sources = template.get("sources") or {}
     declared = sources.get(heading)
+    # A declared source flagged `optional` names a projection the snapshot does not carry yet.
+    # Its severity is ignored: the section's absence stays the section-level P2 the artefact has
+    # always carried. Removing the flag — the flip the records session makes when the projection
+    # lands — makes a declared `severity` apply, so the mandatory set fails at that severity.
+    declared_severity = ""
+    for source in declared or []:
+        if source.get("optional"):
+            continue
+        declared_severity = max(
+            declared_severity, str(source.get("severity") or ""),
+            key=lambda value: SEVERITY_RANK.get(value, 0),
+        )
     resolved: list[dict[str, Any]] = []
     missing_headings: list[str] = []
     if declared:
@@ -756,7 +1032,10 @@ def resolve_section(
                     missing_headings.append(heading)
                 resolved.append(document_source)
             elif kind == "computed":
-                rows = computed_rows(str(source.get("name")), source, snapshot, subject, programme_projects)
+                rows = computed_rows(
+                    str(source.get("name")), source, snapshot, subject, programme_projects,
+                    category, subject.get("phase"),
+                )
                 resolved.append({
                     "kind": "computed", "name": str(source.get("name")),
                     "count": len(rows), "items": [row_summary(row) for row in rows[:12]],
@@ -781,6 +1060,7 @@ def resolve_section(
     return {
         "heading": heading,
         "status": status,
+        "severity": declared_severity,
         "sources": resolved,
         "missing": [] if evidence else [
             f"No row or document satisfies '{heading}'"
@@ -948,19 +1228,25 @@ def build_instances(
                     )
                 seen.add(identifier)
                 required = list(template.get("required") or [])
-                sections = [
-                    resolve_section(
+                sections: list[dict[str, Any]] = []
+                for heading in required:
+                    section = resolve_section(
                         heading, template, category, subject, snapshot, outputs_dir, programme_projects
                     )
-                    for heading in required
-                ]
+                    section["required"] = True
+                    sections.append(section)
                 for heading in template.get("optional") or []:
                     if heading in (template.get("sources") or {}):
-                        sections.append(resolve_section(
+                        section = resolve_section(
                             heading, template, category, subject, snapshot, outputs_dir, programme_projects
-                        ))
+                        )
+                        section["required"] = False
+                        sections.append(section)
+                # The status counts every section the page carries, exactly as
+                # `check-standards.cjs` recomputes it; a section is not dropped from the
+                # artefact's honesty because it was declared optional.
                 evidenced = [section for section in sections if section["status"] == "evidenced"]
-                if len(evidenced) == len(required):
+                if len(evidenced) == len(sections):
                     status = "evidenced"
                 elif evidenced:
                     status = "partial"
@@ -1081,6 +1367,21 @@ def build_findings(
         severity = "P2"
         if artefact["status"] == "absent":
             severity = "P0" if artefact["category"] in GATE_OBJECTS else "P1"
+        # A source may declare the severity its absence carries. The standard declares it, not
+        # the generator: the SAFe mandatory set is P1 because its entries say so, and an
+        # unmarked partial artefact keeps the section-level P2 it has always had.
+        declared = max(
+            (
+                str(section.get("severity") or "")
+                for section in artefact["sections"]
+                if section.get("required", True)
+                and section["status"] != "evidenced"
+            ),
+            key=lambda value: SEVERITY_RANK.get(value, 0),
+            default="",
+        )
+        if SEVERITY_RANK.get(declared, 0) > SEVERITY_RANK[severity]:
+            severity = declared
         if not_due:
             severity = "P2"
         due_note = (
@@ -1587,11 +1888,12 @@ def check(
     return 0
 
 
-def self_test() -> int:
-    fixture = {
+def self_test_fixture() -> dict[str, Any]:
+    return {
         "manifest": {"generated_at": "2026-11-20T00:00:00Z", "git_sha": "0" * 40},
         "programme": {
-            "programme": [{"id": "pg1", "name": "fixture programme", "status": "active"}],
+            "programme": [{"id": "pg1", "name": "fixture programme", "status": "active",
+                           "shared_config": {}}],
             "projects": [
                 {"id": "p1", "key": "P0", "programme_id": "pg1", "status": "active",
                  "meta": {"track": "programme", "tranche": 0,
@@ -1614,6 +1916,10 @@ def self_test() -> int:
             "wbs_nodes": [],
             "cadences": [],
             "project_dependencies": [],
+            "dependencies": {"edges": [], "counts": {}, "untyped": 0,
+                             "unknown_targets": [], "cycles": []},
+            "demo_credits": [],
+            "lessons": [],
             "stakeholder_profiles": [],
         },
         "architecture": {
@@ -1639,19 +1945,278 @@ def self_test() -> int:
              "created_at": "2026-11-20T00:00:00Z", "title": "Closure"},
             {"id": "d3", "category": "architecture-artifact", "project_id": "p1", "publishable": True,
              "created_at": "2026-11-20T00:00:00Z", "title": "Principle derivation"},
+            {"id": "d4", "category": "inspect-adapt", "project_id": "p1", "publishable": True,
+             "created_at": "2026-11-20T00:00:00Z", "title": "Retro"},
+            {"id": "d5", "category": "system-demo", "project_id": "p1", "publishable": True,
+             "created_at": "2026-11-20T00:00:00Z", "title": "Demo"},
+            {"id": "d6", "category": "pi-plan", "project_id": "p1", "publishable": True,
+             "created_at": "2026-11-20T00:00:00Z", "title": "PI plan"},
+            {"id": "d7", "category": "pi-objectives", "project_id": "p1", "publishable": True,
+             "created_at": "2026-11-20T00:00:00Z", "title": "PI objectives"},
         ]},
     }
+
+
+def self_test_outputs(outputs: Path) -> None:
+    (outputs / "output-d1.html").write_text(
+        "<h1>Vision</h1><h2>Purpose</h2><h2>Outcomes</h2><h2>Boundary</h2><h2>Who it serves</h2>",
+        encoding="utf-8",
+    )
+    (outputs / "output-d2.html").write_text(
+        "<h1>Closure</h1><h2>Outcome vs acceptance</h2><h2>Evidence</h2>",
+        encoding="utf-8",
+    )
+    (outputs / "output-d4.html").write_text(
+        "<h1>Retro</h1><h2>What went well</h2><h2>What did not</h2>",
+        encoding="utf-8",
+    )
+    (outputs / "output-d5.html").write_text(
+        "<h1>Demo</h1><h2>Findings</h2>",
+        encoding="utf-8",
+    )
+    (outputs / "output-d6.html").write_text(
+        "<h1>PI plan</h1><h2>Objectives</h2>",
+        encoding="utf-8",
+    )
+    (outputs / "output-d7.html").write_text(
+        "<h1>PI objectives</h1><h2>Objectives</h2>",
+        encoding="utf-8",
+    )
+
+
+def mandatory_safe_standard(std: dict[str, Any]) -> dict[str, Any]:
+    """The standard with the records session's exact SAFe entries applied, in memory.
+
+    The committed `seed/output-standard.json` is the records session's file. This variant is the
+    contract the generator must honour once they write it: the computed sources are named, the
+    dependency and refinement headings are required, and the `optional` flags on the demo-credit
+    and lesson sources are removed.
+    """
+    variant = copy.deepcopy(std)
+    safe_art = variant["templates"]["safe-art"]
+    safe_art["required"].append("Shared configuration")
+    safe_art.setdefault("sources", {}).update({
+        "Shared configuration": [
+            {"kind": "computed", "name": "shared_config", "severity": "P1"}
+        ],
+        "Backlog with WSJF": [
+            {"kind": "computed", "name": "wsjf_order", "severity": "P1",
+             "match": {"status": "accepted"}}
+        ],
+    })
+    plan = variant["templates"]["pi-plan"]
+    plan["optional"] = [heading for heading in plan.get("optional") or [] if heading != "Dependencies"]
+    for heading in ("Dependencies", "Backlog refinement"):
+        if heading not in plan["required"]:
+            plan["required"].append(heading)
+    plan.setdefault("sources", {}).update({
+        "WSJF order": [
+            {"kind": "computed", "name": "wsjf_order", "severity": "P1",
+             "match": {"status": "accepted"}}
+        ],
+        "Dependencies": [{"kind": "computed", "name": "dependency_graph", "severity": "P1"}],
+        "Backlog refinement": [
+            {"kind": "computed", "name": "refinement_cadence", "severity": "P1"}
+        ],
+    })
+    for category in ("system-demo", "pi-objectives"):
+        for sources in (variant["templates"][category].get("sources") or {}).values():
+            for source in sources:
+                if source.get("pointer") == "/demo_credits":
+                    source.pop("optional", None)
+                    source["severity"] = "P1"
+    retro = variant["templates"]["inspect-adapt"]
+    for sources in (retro.get("sources") or {}).values():
+        for source in sources:
+            if source.get("pointer") == "/lessons":
+                source.pop("optional", None)
+                source["severity"] = "P1"
+    retro["required"].append("Kata candidates")
+    retro.setdefault("sources", {})["Kata candidates"] = [
+        {"kind": "computed", "name": "kata_candidates", "severity": "P1"}
+    ]
+    return variant
+
+
+def safe_evidence_fixture() -> dict[str, Any]:
+    """The fixture with every SAFe source present and valid: the `evidenced` side of the contract."""
+    fixture = self_test_fixture()
+    fixture["programme"]["programme"][0]["shared_config"] = {
+        "values": {"cadence": "two-week"}, "locked": ["cadence"],
+    }
+    fixture["msp"]["project_dependencies"] = [{
+        "id": "dep1", "programme_id": "pg1", "from_project": "P0", "to_project": "T1",
+        "kind": "needs", "status": "active", "meta": {},
+    }]
+    fixture["msp"]["cadences"] = [
+        {"id": "c-pi", "programme_id": "pg1", "kind": "pi",
+         "period": "tranche-1", "state": "planned", "meta": {}},
+        {"id": "c-demo", "programme_id": "pg1", "kind": "demo",
+         "period": "tranche-1", "state": "planned", "meta": {}},
+        {"id": "c-retro", "programme_id": "pg1", "kind": "retro",
+         "period": "tranche-1", "state": "planned", "meta": {}},
+        {"id": "c-ref", "programme_id": "pg1", "kind": "refinement",
+         "period": "tranche-1", "state": "planned", "meta": {}},
+    ]
+    fixture["msp"]["wbs_nodes"] = [{
+        "id": "w1", "project_id": "p1", "kind": "deliverable", "position": 1,
+        "title": "Deliverable A", "status": "accepted", "business_value": 8,
+        "time_criticality": 5, "risk_reduction": 3, "job_size": 2,
+    }]
+    fixture["msp"]["demo_credits"] = [{
+        "id": "dc1", "cadence_id": "c-demo", "deliverable_id": "w1",
+        "evidence": [{"kind": "acceptance", "ref": "run-1"}],
+    }]
+    fixture["msp"]["lessons"] = [
+        {"id": "l1", "programme_id": "pg1", "cadence_id": "c-retro", "finding_key": "f1",
+         "statement": "name the check first", "evidence": [], "state": "reviewed",
+         "source": "retro", "meta": {"kata_candidate": {"signature": "sig-1",
+                                                        "title": "instrument-first"}}},
+        {"id": "l2", "programme_id": "pg1", "cadence_id": "c-retro", "finding_key": "f2",
+         "statement": "a second lesson", "evidence": [], "state": "proposed",
+         "source": "retro", "meta": {}},
+    ]
+    fixture["work"]["approvals"] = [{
+        "id": "ap1", "project_id": "p1", "gate": "tranche_review",
+        "status": "approved", "created_at": "2026-11-20T00:00:00Z",
+    }]
+    return fixture
+
+
+def finding_for(findings: dict[str, Any], category: str) -> dict[str, Any] | None:
+    return next((row for row in findings["findings"] if row["category"] == category), None)
+
+
+def self_test_safe_sources_absent(outputs: Path, std: dict[str, Any]) -> None:
+    """Absent or malformed derived sources produce the category's P1 finding."""
+    fixture = safe_evidence_fixture()
+    fixture["programme"]["programme"][0]["shared_config"] = {}
+    fixture["msp"]["project_dependencies"] = []
+    fixture["msp"]["cadences"] = [
+        row for row in fixture["msp"]["cadences"] if row["kind"] != "refinement"
+    ]
+    fixture["msp"]["demo_credits"] = []
+    for lesson in fixture["msp"]["lessons"]:
+        lesson["meta"] = {}
+    _, findings = generate(mandatory_safe_standard(std), fixture, outputs)
+    expected = {
+        "safe-art": ["Shared configuration"],
+        "pi-plan": ["Dependencies", "Backlog refinement"],
+        "system-demo": ["Evidence", "Credits"],
+        "inspect-adapt": ["Kata candidates"],
+        "pi-objectives": ["Measurement", "Evidence"],
+    }
+    for category, headings in expected.items():
+        finding = finding_for(findings, category)
+        assert finding is not None, f"{category}: an absent derived source must be a finding"
+        assert finding["severity"] == "P1", f"{category}: expected P1, got {finding['severity']}"
+        for heading in headings:
+            assert heading in finding["missing"], f"{category}: {heading} not in {finding['missing']}"
+    # A malformed shared_config (an array where the migration requires an object) is absence too.
+    malformed = safe_evidence_fixture()
+    malformed["programme"]["programme"][0]["shared_config"] = {"values": ["not", "an", "object"]}
+    _, findings = generate(mandatory_safe_standard(std), malformed, outputs)
+    finding = finding_for(findings, "safe-art")
+    assert finding is not None and "Shared configuration" in finding["missing"], finding
+    print("generate-standards: self-test case safe-derived-sources-absent-is-a-finding OK")
+
+
+def self_test_safe_sources_evidenced(outputs: Path, std: dict[str, Any]) -> None:
+    """Each derived source passes on a present, valid record: no finding, status evidenced."""
+    fixture = safe_evidence_fixture()
+    document, findings = generate(mandatory_safe_standard(std), fixture, outputs)
+    by_id = {artefact["id"]: artefact for artefact in document["artefacts"]}
+    programme_id = "pg1"
+    for category in ("safe-art", "pi-plan", "system-demo", "inspect-adapt", "pi-objectives"):
+        artefact = by_id[f"std-safe-{category}-{programme_id}"]
+        assert artefact["status"] == "evidenced", (
+            f"{category}: expected evidenced, got {artefact['status']} "
+            f"missing {[section['heading'] for section in artefact['sections'] if section['status'] != 'evidenced']}"
+        )
+        assert finding_for(findings, category) is None, f"{category}: an evidenced source must not be a finding"
+    # A flat object is read as values with no locks (migration 0068), so it is evidence too.
+    flat = safe_evidence_fixture()
+    flat["programme"]["programme"][0]["shared_config"] = {"cadence": "two-week"}
+    _, findings = generate(mandatory_safe_standard(std), flat, outputs)
+    assert finding_for(findings, "safe-art") is None, "a flat shared_config is a real configuration"
+    print("generate-standards: self-test case safe-derived-sources-evidenced-passes OK")
+
+
+def self_test_wsjf(outputs: Path, std: dict[str, Any]) -> None:
+    """Malformed or unfiltered WSJF candidates are findings; valid candidates are ordered."""
+    cases = {
+        "missing business_value": lambda node: node.pop("business_value"),
+        "job_size zero": lambda node: node.update({"job_size": 0}),
+        "negative time_criticality": lambda node: node.update({"time_criticality": -1}),
+        "boolean is not an integer": lambda node: node.update({"business_value": True}),
+        "float is not an integer": lambda node: node.update({"risk_reduction": 3.0}),
+    }
+    for label, mutate in cases.items():
+        fixture = safe_evidence_fixture()
+        mutate(fixture["msp"]["wbs_nodes"][0])
+        _, findings = generate(mandatory_safe_standard(std), fixture, outputs)
+        finding = finding_for(findings, "pi-plan")
+        assert finding is not None, f"{label}: a malformed WSJF row must be a finding"
+        assert finding["severity"] == "P1", f"{label}: expected P1, got {finding['severity']}"
+        assert "WSJF order" in finding["missing"], f"{label}: {finding['missing']}"
+        art = finding_for(findings, "safe-art")
+        assert art is not None and "Backlog with WSJF" in art["missing"], (
+            f"{label}: the backlog-with-WSJF section must fail on the same row"
+        )
+    # An unfiltered `/wbs_nodes` read is itself the defect; the filtered read validates.
+    fixture = safe_evidence_fixture()
+    subject = {"id": "p1", "key": "P0", "programme_id": "pg1",
+               "project_id": "p1", "project_key": "P0", "phase": ""}
+    source = {"kind": "rows", "file": "msp.json", "pointer": "/wbs_nodes", "validate": "wsjf"}
+    assert rows_for(fixture, source, subject, "pi-plan", None) == [], "an unfiltered WSJF read must not pass"
+    source["match"] = {"status": "accepted"}
+    assert len(rows_for(fixture, source, subject, "pi-plan", None)) == 1, "a filtered read resolves"
+    # The order is the computed score, descending; the inputs are never rewritten.
+    fixture["msp"]["wbs_nodes"].append({
+        "id": "w2", "project_id": "p1", "kind": "deliverable", "position": 2,
+        "title": "Deliverable B", "status": "accepted", "business_value": 1,
+        "time_criticality": 1, "risk_reduction": 1, "job_size": 1,
+    })
+    ordered = computed_rows("wsjf_order", {"name": "wsjf_order"}, fixture, subject, {}, "pi-plan", None)
+    assert [row["id"] for row in ordered] == ["w1", "w2"], ordered
+    assert [row["rank"] for row in ordered] == [1, 2], ordered
+    assert [row["wsjf"] for row in ordered] == [8.0, 3.0], ordered
+    print("generate-standards: self-test case wsjf-malformed-inputs-is-a-finding OK")
+
+
+def self_test_demo_and_lessons_mandatory(outputs: Path, std: dict[str, Any]) -> None:
+    """Demo-credit and lesson absence is a P2 section gap while optional, P1 once mandatory."""
+    for category, key, headings in (
+        ("system-demo", "demo_credits", ["Evidence", "Credits"]),
+        ("inspect-adapt", "lessons", ["Lessons", "Actions"]),
+    ):
+        fixture = safe_evidence_fixture()
+        fixture["msp"][key] = []
+        document, findings = generate(std, fixture, outputs)
+        by_id = {artefact["id"]: artefact for artefact in document["artefacts"]}
+        artefact = by_id[f"std-safe-{category}-pg1"]
+        assert artefact["status"] == "partial", (
+            f"{category}: the page must state the absence honestly, got {artefact['status']}"
+        )
+        optional = finding_for(findings, category)
+        assert optional is not None and optional["severity"] == "P2", (
+            f"{category}: an `optional` source is a section-level P2, got {optional and optional['severity']}"
+        )
+        _, findings = generate(mandatory_safe_standard(std), fixture, outputs)
+        finding = finding_for(findings, category)
+        assert finding is not None, f"{category}: absence must fail once mandatory"
+        assert finding["severity"] == "P1", f"{category}: expected P1, got {finding['severity']}"
+        for heading in headings:
+            assert heading in finding["missing"], f"{category}: {heading} not in {finding['missing']}"
+    print("generate-standards: self-test case demo-and-lesson-absence-fails-once-mandatory OK")
+
+
+def self_test() -> int:
+    fixture = self_test_fixture()
     std = json.loads(STANDARD_PATH.read_text(encoding="utf-8"))
     with tempfile.TemporaryDirectory() as tmp:
         outputs = Path(tmp)
-        (outputs / "output-d1.html").write_text(
-            "<h1>Vision</h1><h2>Purpose</h2><h2>Outcomes</h2><h2>Boundary</h2><h2>Who it serves</h2>",
-            encoding="utf-8",
-        )
-        (outputs / "output-d2.html").write_text(
-            "<h1>Closure</h1><h2>Outcome vs acceptance</h2><h2>Evidence</h2>",
-            encoding="utf-8",
-        )
+        self_test_outputs(outputs)
         covered = {
             "programme_baselines:management",
             "programme_baselines:governance",
@@ -1689,6 +2254,10 @@ def self_test() -> int:
             f"only second {sorted(second_ids - first_ids)}, only first {sorted(first_ids - second_ids)}"
         )
         assert len(document["artefacts"]) == len(again["artefacts"])
+        self_test_safe_sources_absent(outputs, std)
+        self_test_safe_sources_evidenced(outputs, std)
+        self_test_wsjf(outputs, std)
+        self_test_demo_and_lessons_mandatory(outputs, std)
     print(f"generate-standards: self-test OK ({len(document['artefacts'])} artefact instances)")
     return 0
 

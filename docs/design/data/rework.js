@@ -3360,7 +3360,7 @@ window.CONVEYOR_REWORK = {
       "artefact": "S14 cutover",
       "baseline": null,
       "depends_on": [],
-      "disposition": "rework",
+      "disposition": "waiver",
       "dod": [
         {
           "item": "R1-R7, freeze-log and rollback exist in-tree; the S14 gate exits 0.",
@@ -3394,12 +3394,12 @@ window.CONVEYOR_REWORK = {
       "severity": "P0",
       "spec": "§5",
       "standard": "SPEC",
-      "status": "open",
+      "status": "suppressed",
       "subject_count": 1,
       "subjects": [
         {
           "detail": "The cutover evidence tree does not exist: docs/cutover/ is absent at HEAD, so R0-R7, the freeze log and the rollback runbook are requirements, not receipts. The plan now self-records the absence and the S14 gate fails first naming the gap instead of pretending the tree is delivered. The acceptance (receipts in-tree, gate exits 0) remains unmet.",
-          "disposition": "rework",
+          "disposition": "waiver",
           "evidence": [
             {
               "evidence": [
@@ -3428,156 +3428,6 @@ window.CONVEYOR_REWORK = {
         }
       ],
       "title": "S14 cutover gate's evidence tree does not exist"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-s15-1:S15",
-      "apply_to": "S15",
-      "artefact": "S15 capability/knowledge/memory",
-      "baseline": null,
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "Both test targets exist and assert pack/layer hits and run-visible recall.",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "evidence": [
-            {
-              "line": 22,
-              "path": "crates/actions/tests/strata_live.rs",
-              "quote": "#[tokio::test]",
-              "source": "code"
-            },
-            {
-              "line": 114,
-              "path": "docs/plans/slices/S15-capability-knowledge-memory.md",
-              "quote": "   `cargo test -p conveyor-actions --test strata_live -- --ignored` (real strata) plus",
-              "source": "code"
-            }
-          ],
-          "rule": "v1-s15-1",
-          "source": "audit"
-        }
-      ],
-      "key": "v1-s15-1:S15",
-      "owner_project": "S15",
-      "rule": "v1-s15-1",
-      "scope": "S15",
-      "severity": "P0",
-      "spec": "§7",
-      "standard": "SPEC",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "The S15 gate names shipped targets now, and the real strata services ARE in the cluster: strata-rag (ns strata-rag, [redacted-ip]:8092) and strata-ingest (:9135) are Running, and /health reports db, embed, rerank, chat and laya all ok through a kubectl port-forward from m4. The ignored strata_live test is env-configurable and reaches the live service, but the service rejects the compose dev token (401 Unauthorized on create_root_store): the cluster's STRATA_API_TOKENS admits care-bus, enterprise-mcp and strata-ingest, not conveyor. The live half needs a per-caller conveyor token in strata-rag-secrets and its NetworkPolicy — a gitops/strata change, not a conveyor code change.",
-          "disposition": "rework",
-          "evidence": [
-            {
-              "evidence": [
-                {
-                  "line": 22,
-                  "path": "crates/actions/tests/strata_live.rs",
-                  "quote": "#[tokio::test]",
-                  "source": "code"
-                },
-                {
-                  "line": 114,
-                  "path": "docs/plans/slices/S15-capability-knowledge-memory.md",
-                  "quote": "   `cargo test -p conveyor-actions --test strata_live -- --ignored` (real strata) plus",
-                  "source": "code"
-                }
-              ],
-              "rule": "v1-s15-1",
-              "source": "audit"
-            }
-          ],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P0",
-          "subject": "S15"
-        }
-      ],
-      "title": "S15 memory and knowledge gate targets are missing"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-s16-1:S16",
-      "apply_to": "PLATFORM",
-      "artefact": "S16 inference audit",
-      "baseline": null,
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "Every --exact filter matches one test; a zero-match run fails the gate; the missing targets exist.",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "evidence": [
-            {
-              "line": 1,
-              "path": "crates/actions/tests/inference_live.rs",
-              "quote": "//! One real call through the estate inference router writes exactly one `inference_call` row",
-              "source": "code"
-            },
-            {
-              "line": 166,
-              "path": "docs/plans/slices/S16-inference-audit.md",
-              "quote": "rbuild -- test -p conveyor-actions --test inference_live -- --ignored --nocapture",
-              "source": "code"
-            }
-          ],
-          "rule": "v1-s16-1",
-          "source": "audit"
-        }
-      ],
-      "key": "v1-s16-1:S16",
-      "owner_project": "S16",
-      "rule": "v1-s16-1",
-      "scope": "S16",
-      "severity": "P0",
-      "spec": "§7",
-      "standard": "SPEC",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "The S16 gate's --exact filters now match shipped tests and a zero-match run is red, and the live rehearsal target exists: crates/actions/tests/inference_live.rs (ignored) calls the deployed router and asserts one inference_call row with a served model. The run needs the router's caller licence token (CONVEYOR_LIVE_ROUTER_TOKEN), which is not in any checked-in file; the public endpoint is reachable and licence-enforced. Until that token is supplied the live half is a named gap, not a pass.",
-          "disposition": "rework",
-          "evidence": [
-            {
-              "evidence": [
-                {
-                  "line": 1,
-                  "path": "crates/actions/tests/inference_live.rs",
-                  "quote": "//! One real call through the estate inference router writes exactly one `inference_call` row",
-                  "source": "code"
-                },
-                {
-                  "line": 166,
-                  "path": "docs/plans/slices/S16-inference-audit.md",
-                  "quote": "rbuild -- test -p conveyor-actions --test inference_live -- --ignored --nocapture",
-                  "source": "code"
-                }
-              ],
-              "rule": "v1-s16-1",
-              "source": "audit"
-            }
-          ],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P0",
-          "subject": "S16"
-        }
-      ],
-      "title": "S16 inference-capture and audit gates are vacuous"
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-compliance-review-design-publish:DESIGN-PUBLISH",
@@ -9812,7 +9662,7 @@ window.CONVEYOR_REWORK = {
               "source": "code"
             },
             {
-              "line": 3827,
+              "line": 4073,
               "path": "crates/store/src/spine.rs",
               "quote": "            if matches!(state.as_str(), \"authorised\" | \"in_review\" | \"closed\") =>",
               "source": "code"
@@ -9851,7 +9701,7 @@ window.CONVEYOR_REWORK = {
                   "source": "code"
                 },
                 {
-                  "line": 3827,
+                  "line": 4073,
                   "path": "crates/store/src/spine.rs",
                   "quote": "            if matches!(state.as_str(), \"authorised\" | \"in_review\" | \"closed\") =>",
                   "source": "code"
@@ -9887,7 +9737,7 @@ window.CONVEYOR_REWORK = {
         {
           "evidence": [
             {
-              "line": 2644,
+              "line": 2654,
               "path": "crates/store/src/spine.rs",
               "quote": "/// The editable fields of a realization record. `None` leaves the stored value in place.",
               "source": "code"
@@ -9914,7 +9764,7 @@ window.CONVEYOR_REWORK = {
             {
               "evidence": [
                 {
-                  "line": 2644,
+                  "line": 2654,
                   "path": "crates/store/src/spine.rs",
                   "quote": "/// The editable fields of a realization record. `None` leaves the stored value in place.",
                   "source": "code"
@@ -10112,19 +9962,19 @@ window.CONVEYOR_REWORK = {
         {
           "evidence": [
             {
-              "line": 162,
+              "line": 182,
               "path": "crates/actions/src/portfolio/programmes.rs",
               "quote": "        status: trimmed(input.status),",
               "source": "code"
             },
             {
-              "line": 4016,
+              "line": 4262,
               "path": "crates/store/src/spine.rs",
               "quote": "pub async fn close_programme_tx(",
               "source": "code"
             },
             {
-              "line": 4050,
+              "line": 4296,
               "path": "crates/store/src/spine.rs",
               "quote": "        \"UPDATE programme SET status = 'closed', version = version + 1, updated_at = now()",
               "source": "code"
@@ -10151,19 +10001,19 @@ window.CONVEYOR_REWORK = {
             {
               "evidence": [
                 {
-                  "line": 162,
+                  "line": 182,
                   "path": "crates/actions/src/portfolio/programmes.rs",
                   "quote": "        status: trimmed(input.status),",
                   "source": "code"
                 },
                 {
-                  "line": 4016,
+                  "line": 4262,
                   "path": "crates/store/src/spine.rs",
                   "quote": "pub async fn close_programme_tx(",
                   "source": "code"
                 },
                 {
-                  "line": 4050,
+                  "line": 4296,
                   "path": "crates/store/src/spine.rs",
                   "quote": "        \"UPDATE programme SET status = 'closed', version = version + 1, updated_at = now()",
                   "source": "code"
@@ -13515,243 +13365,6 @@ window.CONVEYOR_REWORK = {
       "title": "Coach is wired only to failed runs"
     },
     {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-p82-3:T10",
-      "apply_to": "PLATFORM",
-      "artefact": "§8.2",
-      "baseline": null,
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "programme.shared_config exists with inheritance/lock semantics, resolved on read, and tests prove a locked value cannot be overridden per project.",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "evidence": [
-            {
-              "line": 18,
-              "path": "migrations/0002_domain.sql",
-              "quote": "CREATE TABLE programme (",
-              "source": "code"
-            },
-            {
-              "line": 87,
-              "path": "crates/actions/src/portfolio/programmes.rs",
-              "quote": "            name: name.to_owned(),",
-              "source": "code"
-            },
-            {
-              "line": 89,
-              "path": "crates/actions/src/portfolio/programmes.rs",
-              "quote": "            owner_user_id: input.owner_user_id,",
-              "source": "code"
-            }
-          ],
-          "rule": "v1-p82-3",
-          "source": "audit"
-        }
-      ],
-      "key": "v1-p82-3:T10",
-      "owner_project": "T10",
-      "rule": "v1-p82-3",
-      "scope": "T10",
-      "severity": "P1",
-      "spec": "§8.2",
-      "standard": "SAFe",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "programme is a flat row (name/status/owner); grep finds no shared_config in crates, apps or migrations, and no CREATE VIEW exists though §8.2 requires shared, locked ART config.",
-          "disposition": "rework",
-          "evidence": [
-            {
-              "evidence": [
-                {
-                  "line": 18,
-                  "path": "migrations/0002_domain.sql",
-                  "quote": "CREATE TABLE programme (",
-                  "source": "code"
-                },
-                {
-                  "line": 87,
-                  "path": "crates/actions/src/portfolio/programmes.rs",
-                  "quote": "            name: name.to_owned(),",
-                  "source": "code"
-                },
-                {
-                  "line": 89,
-                  "path": "crates/actions/src/portfolio/programmes.rs",
-                  "quote": "            owner_user_id: input.owner_user_id,",
-                  "source": "code"
-                }
-              ],
-              "rule": "v1-p82-3",
-              "source": "audit"
-            }
-          ],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "T10"
-        }
-      ],
-      "title": "Programme/ART has no shared_config and no computed portfolio view"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-p82-4:T10",
-      "apply_to": "PLATFORM",
-      "artefact": "§8.2",
-      "baseline": null,
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "The tick handles refinement, revalidates/re-scores the four inputs and flags stale backlog rows with evidence.",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "evidence": [
-            {
-              "line": 92,
-              "path": "apps/server/src/cadence.rs",
-              "quote": "              WHERE tenant_id = $1 AND kind IN ('demo', 'retro') AND state = 'planned'",
-              "source": "code"
-            }
-          ],
-          "rule": "v1-p82-4",
-          "source": "audit"
-        }
-      ],
-      "key": "v1-p82-4:T10",
-      "owner_project": "T10",
-      "rule": "v1-p82-4",
-      "scope": "T10",
-      "severity": "P1",
-      "spec": "§8.2",
-      "standard": "SAFe",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "kind='refinement' is accepted at creation, but the only scheduled pass processes pi, demo and retro; no refinement job re-scores WSJF or flags stale items.",
-          "disposition": "rework",
-          "evidence": [
-            {
-              "evidence": [
-                {
-                  "line": 92,
-                  "path": "apps/server/src/cadence.rs",
-                  "quote": "              WHERE tenant_id = $1 AND kind IN ('demo', 'retro') AND state = 'planned'",
-                  "source": "code"
-                }
-              ],
-              "rule": "v1-p82-4",
-              "source": "audit"
-            }
-          ],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "T10"
-        }
-      ],
-      "title": "Backlog refinement is a dead cadence kind"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-w2c-2:T10",
-      "apply_to": "PLATFORM",
-      "artefact": "§8.2",
-      "baseline": null,
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "A demo cadence refuses to credit/accept a completed deliverable without a typed evidence reference exhibited at that demo, and a retro action writes lessons plus kata candidates linked to the retro cadence row; tests cover the refused credit and the written lessons.",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "evidence": [
-            {
-              "line": 3234,
-              "path": "crates/actions/src/spine/mod.rs",
-              "quote": "            state: input.state,",
-              "source": "code"
-            },
-            {
-              "line": 181,
-              "path": "migrations/0044_plan_spine.sql",
-              "quote": "                  CHECK (kind IN ('pi', 'sprint', 'demo', 'retro', 'refinement')),",
-              "source": "code"
-            },
-            {
-              "line": 3792,
-              "path": "crates/store/src/spine.rs",
-              "quote": "                PlanError::RetroFindingWithoutLesson(key),",
-              "source": "code"
-            }
-          ],
-          "rule": "v1-w2c-2",
-          "source": "audit"
-        }
-      ],
-      "key": "v1-w2c-2:T10",
-      "owner_project": "T10",
-      "rule": "v1-w2c-2",
-      "scope": "T10",
-      "severity": "P1",
-      "spec": "§8.2",
-      "standard": "SAFe",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "Demo and retro cadence rows enforce nothing: retros.close now requires a lesson per finding, but cadences.update can close a retro directly and a demo cadence still requires no credit or evidence.",
-          "disposition": "rework",
-          "evidence": [
-            {
-              "evidence": [
-                {
-                  "line": 3234,
-                  "path": "crates/actions/src/spine/mod.rs",
-                  "quote": "            state: input.state,",
-                  "source": "code"
-                },
-                {
-                  "line": 181,
-                  "path": "migrations/0044_plan_spine.sql",
-                  "quote": "                  CHECK (kind IN ('pi', 'sprint', 'demo', 'retro', 'refinement')),",
-                  "source": "code"
-                },
-                {
-                  "line": 3792,
-                  "path": "crates/store/src/spine.rs",
-                  "quote": "                PlanError::RetroFindingWithoutLesson(key),",
-                  "source": "code"
-                }
-              ],
-              "rule": "v1-w2c-2",
-              "source": "audit"
-            }
-          ],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "T10"
-        }
-      ],
-      "title": "Demo and retro cadence rows enforce nothing: no evidence, no credit, no lessons"
-    },
-    {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check seed_live_drift:programme",
       "apply_to": "PLATFORM",
       "artefact": "seed_reconciliation",
@@ -13860,6 +13473,81 @@ window.CONVEYOR_REWORK = {
         }
       ],
       "title": "Reconcile the seed with the live rows"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-change-1:T3",
+      "apply_to": "PLATFORM",
+      "artefact": "T3 change control / wbs guard",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "A tenant with an approved scope baseline can always authorise a WBS acceptance through a provisioned path: either the organisation seed creates the PM process and its binding that `changes.request` requires, or `changes.request` takes the baseline directly and validates it rather than a PM job binding; a test proves a post-baseline WBS acceptance end to end through that path.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "line": 1234,
+              "path": "crates/actions/src/spine/mod.rs",
+              "quote": "    let Some(change_id) = change_id else {",
+              "source": "code"
+            },
+            {
+              "line": 990,
+              "path": "crates/actions/src/pm/mod.rs",
+              "quote": "    pub job_binding_id: Uuid,",
+              "source": "code"
+            }
+          ],
+          "rule": "v1-change-1",
+          "source": "audit"
+        }
+      ],
+      "key": "v1-change-1:T3",
+      "owner_project": "T3",
+      "rule": "v1-change-1",
+      "scope": "T3",
+      "severity": "P1",
+      "spec": "§5.5",
+      "standard": "SPEC",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "After an approved scope baseline, `wbs.update` refuses unless `change_id` names an approved register `change` whose `baseline_ref` is that baseline and whose approval carries `meta.change_id`. The only action that opens such a change is `changes.request`, and its input requires the PM job's active `job_binding_id`. The tenant has no process with key 'pm' and exactly one job_binding in total, so the guard cannot be satisfied: a WBS acceptance after a baseline is permanently refused. Observed at T13 on 2026-11-22: `wbs.update` refused 409 `rebaseline_requires_change` naming baseline 01a20279-854d-79f6-a751-a34d51be7589, while `changes.request` cannot be called at all.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "line": 1234,
+                  "path": "crates/actions/src/spine/mod.rs",
+                  "quote": "    let Some(change_id) = change_id else {",
+                  "source": "code"
+                },
+                {
+                  "line": 990,
+                  "path": "crates/actions/src/pm/mod.rs",
+                  "quote": "    pub job_binding_id: Uuid,",
+                  "source": "code"
+                }
+              ],
+              "rule": "v1-change-1",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P1",
+          "subject": "T3"
+        }
+      ],
+      "title": "The change guard's only authorised path needs a PM process the tenant has never had"
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-p101-1:T2",
@@ -14720,81 +14408,6 @@ window.CONVEYOR_REWORK = {
       "title": "A pinned release does not pin the executor configuration that runs"
     },
     {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-p44-1:T0",
-      "apply_to": "PLATFORM",
-      "artefact": "§4.4",
-      "baseline": null,
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "Execution resolves the capability agent through the run's job binding, or refuses a step agent that differs from the binding with a 409; a test pins A and resolves B and asserts the refusal, and every run's recorded agent equals its binding's.",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "evidence": [
-            {
-              "line": 1059,
-              "path": "crates/store/src/organisation.rs",
-              "quote": "        capability_agent_id: input.capability_agent_id,",
-              "source": "code"
-            },
-            {
-              "line": 140,
-              "path": "crates/actions/src/process/runs.rs",
-              "quote": "    let capability_agent_id = match bound_agents.as_slice() {",
-              "source": "code"
-            }
-          ],
-          "rule": "v1-p44-1",
-          "source": "audit"
-        }
-      ],
-      "key": "v1-p44-1:T0",
-      "owner_project": "T0",
-      "rule": "v1-p44-1",
-      "scope": "T0",
-      "severity": "P1",
-      "spec": "§4.4",
-      "standard": "SPEC",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "The binding stores capability_agent_id, but a process run resolves its executor from the process's bound agents or the capability's active agents, so the recorded executor and the executed one can differ with no refusal.",
-          "disposition": "rework",
-          "evidence": [
-            {
-              "evidence": [
-                {
-                  "line": 1059,
-                  "path": "crates/store/src/organisation.rs",
-                  "quote": "        capability_agent_id: input.capability_agent_id,",
-                  "source": "code"
-                },
-                {
-                  "line": 140,
-                  "path": "crates/actions/src/process/runs.rs",
-                  "quote": "    let capability_agent_id = match bound_agents.as_slice() {",
-                  "source": "code"
-                }
-              ],
-              "rule": "v1-p44-1",
-              "source": "audit"
-            }
-          ],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "T0"
-        }
-      ],
-      "title": "An internal_agent binding's pinned agent is never the agent that runs"
-    },
-    {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-p44-2:T0",
       "apply_to": "PLATFORM",
       "artefact": "§4.4",
@@ -15198,19 +14811,19 @@ window.CONVEYOR_REWORK = {
         {
           "evidence": [
             {
-              "line": 873,
+              "line": 878,
               "path": "crates/store/src/approval.rs",
               "quote": "    if eval_gate.is_some() {",
               "source": "code"
             },
             {
-              "line": 874,
+              "line": 879,
               "path": "crates/store/src/approval.rs",
               "quote": "        if decision.decided_by_kind != DeciderKind::Human {",
               "source": "code"
             },
             {
-              "line": 117,
+              "line": 132,
               "path": "crates/store/src/approval_policy.rs",
               "quote": "    pub self_approval: SelfApproval,",
               "source": "code"
@@ -15237,19 +14850,19 @@ window.CONVEYOR_REWORK = {
             {
               "evidence": [
                 {
-                  "line": 873,
+                  "line": 878,
                   "path": "crates/store/src/approval.rs",
                   "quote": "    if eval_gate.is_some() {",
                   "source": "code"
                 },
                 {
-                  "line": 874,
+                  "line": 879,
                   "path": "crates/store/src/approval.rs",
                   "quote": "        if decision.decided_by_kind != DeciderKind::Human {",
                   "source": "code"
                 },
                 {
-                  "line": 117,
+                  "line": 132,
                   "path": "crates/store/src/approval_policy.rs",
                   "quote": "    pub self_approval: SelfApproval,",
                   "source": "code"
@@ -15291,7 +14904,7 @@ window.CONVEYOR_REWORK = {
               "source": "code"
             },
             {
-              "line": 1555,
+              "line": 1574,
               "path": "crates/actions/src/spine/mod.rs",
               "quote": "                    \"project {project_id} already holds an approved {kind} baseline ({}); a new \\",
               "source": "code"
@@ -15330,7 +14943,7 @@ window.CONVEYOR_REWORK = {
                   "source": "code"
                 },
                 {
-                  "line": 1555,
+                  "line": 1574,
                   "path": "crates/actions/src/spine/mod.rs",
                   "quote": "                    \"project {project_id} already holds an approved {kind} baseline ({}); a new \\",
                   "source": "code"
@@ -15615,7 +15228,7 @@ window.CONVEYOR_REWORK = {
               "source": "code"
             },
             {
-              "line": 184,
+              "line": 246,
               "path": "crates/actions/src/process/runs.rs",
               "quote": "    let readiness = crate::capability::readiness::capability_readiness_tx(",
               "source": "code"
@@ -15654,7 +15267,7 @@ window.CONVEYOR_REWORK = {
                   "source": "code"
                 },
                 {
-                  "line": 184,
+                  "line": 246,
                   "path": "crates/actions/src/process/runs.rs",
                   "quote": "    let readiness = crate::capability::readiness::capability_readiness_tx(",
                   "source": "code"
@@ -16194,13 +15807,13 @@ window.CONVEYOR_REWORK = {
         {
           "evidence": [
             {
-              "line": 77,
+              "line": 84,
               "path": "docs/plans/slices/S06d-connector-standard.md",
               "quote": "rbuild -- test --workspace --no-fail-fast --locked",
               "source": "code"
             },
             {
-              "line": 87,
+              "line": 94,
               "path": "docs/plans/slices/S06d-connector-standard.md",
               "quote": "The full suite was not repeated end-to-end after the fixes (each affected binary was).",
               "source": "code"
@@ -16233,13 +15846,13 @@ window.CONVEYOR_REWORK = {
             {
               "evidence": [
                 {
-                  "line": 77,
+                  "line": 84,
                   "path": "docs/plans/slices/S06d-connector-standard.md",
                   "quote": "rbuild -- test --workspace --no-fail-fast --locked",
                   "source": "code"
                 },
                 {
-                  "line": 87,
+                  "line": 94,
                   "path": "docs/plans/slices/S06d-connector-standard.md",
                   "quote": "The full suite was not repeated end-to-end after the fixes (each affected binary was).",
                   "source": "code"
@@ -16728,7 +16341,7 @@ window.CONVEYOR_REWORK = {
         {
           "evidence": [
             {
-              "line": 195,
+              "line": 202,
               "path": "docs/plans/slices/S17-benchmark-harness.md",
               "quote": "`rbuild -- test -p conveyor-server --test sandbox_live -- --ignored` exits target-not-found. The",
               "source": "code"
@@ -16755,7 +16368,7 @@ window.CONVEYOR_REWORK = {
             {
               "evidence": [
                 {
-                  "line": 195,
+                  "line": 202,
                   "path": "docs/plans/slices/S17-benchmark-harness.md",
                   "quote": "`rbuild -- test -p conveyor-server --test sandbox_live -- --ignored` exits target-not-found. The",
                   "source": "code"
@@ -16902,7 +16515,7 @@ window.CONVEYOR_REWORK = {
               "source": "code"
             },
             {
-              "line": 471,
+              "line": 483,
               "path": "docs/design/data/actions.json",
               "quote": "    \"tools.call\",",
               "source": "code"
@@ -16941,7 +16554,7 @@ window.CONVEYOR_REWORK = {
                   "source": "code"
                 },
                 {
-                  "line": 471,
+                  "line": 483,
                   "path": "docs/design/data/actions.json",
                   "quote": "    \"tools.call\",",
                   "source": "code"
@@ -16995,7 +16608,7 @@ window.CONVEYOR_REWORK = {
               "source": "code"
             },
             {
-              "line": 347,
+              "line": 359,
               "path": "docs/design/data/actions.json",
               "quote": "    \"procedures.ingest_sop\",",
               "source": "code"
@@ -17040,7 +16653,7 @@ window.CONVEYOR_REWORK = {
                   "source": "code"
                 },
                 {
-                  "line": 347,
+                  "line": 359,
                   "path": "docs/design/data/actions.json",
                   "quote": "    \"procedures.ingest_sop\",",
                   "source": "code"
@@ -17088,7 +16701,7 @@ window.CONVEYOR_REWORK = {
               "source": "code"
             },
             {
-              "line": 246,
+              "line": 258,
               "path": "docs/design/data/actions.json",
               "quote": "    \"lessons.list\",",
               "source": "code"
@@ -17127,7 +16740,7 @@ window.CONVEYOR_REWORK = {
                   "source": "code"
                 },
                 {
-                  "line": 246,
+                  "line": 258,
                   "path": "docs/design/data/actions.json",
                   "quote": "    \"lessons.list\",",
                   "source": "code"
@@ -17175,7 +16788,7 @@ window.CONVEYOR_REWORK = {
               "source": "code"
             },
             {
-              "line": 471,
+              "line": 483,
               "path": "docs/design/data/actions.json",
               "quote": "    \"tools.call\",",
               "source": "code"
@@ -17214,7 +16827,7 @@ window.CONVEYOR_REWORK = {
                   "source": "code"
                 },
                 {
-                  "line": 471,
+                  "line": 483,
                   "path": "docs/design/data/actions.json",
                   "quote": "    \"tools.call\",",
                   "source": "code"
@@ -17232,81 +16845,6 @@ window.CONVEYOR_REWORK = {
         }
       ],
       "title": "T6's tool/broker absence is false"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-u5a-approvals-1:PLATFORM",
-      "apply_to": "PLATFORM",
-      "artefact": "§5.4",
-      "baseline": null,
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "A tenant policy or gate declares evidence mandatory; approvals.request refuses an empty evidence set unless an explicit waiver reason is recorded, and tests prove both the refusal and the waiver.",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "evidence": [
-            {
-              "line": 353,
-              "path": "crates/actions/src/control/views.rs",
-              "quote": "    pub require_evidence: bool,",
-              "source": "code"
-            },
-            {
-              "line": 388,
-              "path": "crates/actions/src/control/approvals.rs",
-              "quote": "        input.require_evidence,",
-              "source": "code"
-            }
-          ],
-          "rule": "v1-u5a-approvals-1",
-          "source": "audit"
-        }
-      ],
-      "key": "v1-u5a-approvals-1:PLATFORM",
-      "owner_project": "PLATFORM",
-      "rule": "v1-u5a-approvals-1",
-      "scope": "PLATFORM",
-      "severity": "P1",
-      "spec": "§5.4",
-      "standard": "SPEC",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "approvals.request takes a caller-supplied require_evidence bool (default false). The PM route gate now requires evidence or a recorded waiver, but a destructive-action or process gate can still be requested with an empty evidence list and no policy declares it mandatory.",
-          "disposition": "rework",
-          "evidence": [
-            {
-              "evidence": [
-                {
-                  "line": 353,
-                  "path": "crates/actions/src/control/views.rs",
-                  "quote": "    pub require_evidence: bool,",
-                  "source": "code"
-                },
-                {
-                  "line": 388,
-                  "path": "crates/actions/src/control/approvals.rs",
-                  "quote": "        input.require_evidence,",
-                  "source": "code"
-                }
-              ],
-              "rule": "v1-u5a-approvals-1",
-              "source": "audit"
-            }
-          ],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "PLATFORM"
-        }
-      ],
-      "title": "The generic approval request still lets the caller opt out of evidence"
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-u5a-budget-1:T0",
@@ -17370,69 +16908,6 @@ window.CONVEYOR_REWORK = {
         }
       ],
       "title": "The seeded job anatomy's limits are a display string, so no seeded binding declares a machine budget"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-u5a-rbuild-1:PLATFORM",
-      "apply_to": "PLATFORM",
-      "artefact": "§12",
-      "baseline": null,
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "Every current gate document names a runnable route (preflight for the verdict, cargo-guard for interactive feedback); every historical build-order line that keeps `rbuild` is labelled historical, and the CONTRACT §16 retirement note is the rule of record.",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "evidence": [
-            {
-              "line": 154,
-              "path": "docs/plans/slices/S17-benchmark-harness.md",
-              "quote": "rbuild -- test -p conveyor-actions --test benchmark_parity -- --nocapture",
-              "source": "code"
-            }
-          ],
-          "rule": "v1-u5a-rbuild-1",
-          "source": "audit"
-        }
-      ],
-      "key": "v1-u5a-rbuild-1:PLATFORM",
-      "owner_project": "PLATFORM",
-      "rule": "v1-u5a-rbuild-1",
-      "scope": "PLATFORM",
-      "severity": "P1",
-      "spec": "§12",
-      "standard": "SPEC",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "The owner's 2026-11-20 ruling retired rbuild, the m1 build host and all local Rust compilation: the compile/lint verdict now comes from GitHub-hosted preflight, and cargo-guard.py on m4 is for interactive work only. The S16 and S17 gate blocks still show `rbuild -- test` (the note above them now says to read them as preflight), and 119 plan lines across the set still name the retired runner. A gate command that names a tool no host installs can never pass as written.",
-          "disposition": "rework",
-          "evidence": [
-            {
-              "evidence": [
-                {
-                  "line": 154,
-                  "path": "docs/plans/slices/S17-benchmark-harness.md",
-                  "quote": "rbuild -- test -p conveyor-actions --test benchmark_parity -- --nocapture",
-                  "source": "code"
-                }
-              ],
-              "rule": "v1-u5a-rbuild-1",
-              "source": "audit"
-            }
-          ],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "PLATFORM"
-        }
-      ],
-      "title": "The slice gates still invoke `rbuild`, retired by the owner on 2026-11-20"
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-w1a-4:T0",
@@ -17688,19 +17163,19 @@ window.CONVEYOR_REWORK = {
         {
           "evidence": [
             {
-              "line": 426,
+              "line": 494,
               "path": "crates/actions/src/control/approvals.rs",
               "quote": "/// SPEC_V2 §11.4: `destructive` = approval + dry-run + dual control. The approval row is the",
               "source": "code"
             },
             {
-              "line": 461,
+              "line": 529,
               "path": "crates/actions/src/control/approvals.rs",
               "quote": "    if record.approval.status != ApprovalStatus::Approved {",
               "source": "code"
             },
             {
-              "line": 318,
+              "line": 356,
               "path": "crates/actions/src/control/approvals.rs",
               "quote": "    let required_decisions = input.required_decisions.unwrap_or(1);",
               "source": "code"
@@ -17733,19 +17208,19 @@ window.CONVEYOR_REWORK = {
             {
               "evidence": [
                 {
-                  "line": 426,
+                  "line": 494,
                   "path": "crates/actions/src/control/approvals.rs",
                   "quote": "/// SPEC_V2 §11.4: `destructive` = approval + dry-run + dual control. The approval row is the",
                   "source": "code"
                 },
                 {
-                  "line": 461,
+                  "line": 529,
                   "path": "crates/actions/src/control/approvals.rs",
                   "quote": "    if record.approval.status != ApprovalStatus::Approved {",
                   "source": "code"
                 },
                 {
-                  "line": 318,
+                  "line": 356,
                   "path": "crates/actions/src/control/approvals.rs",
                   "quote": "    let required_decisions = input.required_decisions.unwrap_or(1);",
                   "source": "code"
@@ -17858,93 +17333,6 @@ window.CONVEYOR_REWORK = {
       "title": "The authority and gate matrix is hard-coded code plus caller input, not tenant data"
     },
     {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-w1c-3:T2",
-      "apply_to": "PLATFORM",
-      "artefact": "§7.2/§7.3",
-      "baseline": null,
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "The L1 path performs the laya request itself (or records a verified laya call id) and derives answer, confidence, probabilities and measured latency from the response; a laya-rung decision without that provenance is refused; a test posts a confidence directly and proves it cannot produce rung='laya'.",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "evidence": [
-            {
-              "line": 831,
-              "path": "crates/actions/src/ladder/mod.rs",
-              "quote": "    let confidence = input.confidence.ok_or_else(|| {",
-              "source": "code"
-            },
-            {
-              "line": 883,
-              "path": "crates/actions/src/ladder/mod.rs",
-              "quote": "            rung: Rung::Laya,",
-              "source": "code"
-            },
-            {
-              "line": 901,
-              "path": "crates/actions/src/ladder/mod.rs",
-              "quote": "            latency_ms: input.latency_ms,",
-              "source": "code"
-            }
-          ],
-          "rule": "v1-w1c-3",
-          "source": "audit"
-        }
-      ],
-      "key": "v1-w1c-3:T2",
-      "owner_project": "T2",
-      "rule": "v1-w1c-3",
-      "scope": "T2",
-      "severity": "P1",
-      "spec": "§7.2/§7.3",
-      "standard": "SPEC",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "§7.2 defines the laya contract (POST /v1/systemone over row-authored questions) and §7.3 makes laya mandatory for the listed decisions. The repository contains no ladder laya client: the only laya HTTP path is process/step.rs's judge. ladder.evaluate instead takes the answer, confidence, probabilities and latency from the request body and writes rung='laya' with whatever configuration versions happen to be resolved. The 'calibrated choice' is therefore an unverifiable assertion; nothing distinguishes a real laya answer from a number an agent invented.",
-          "disposition": "rework",
-          "evidence": [
-            {
-              "evidence": [
-                {
-                  "line": 831,
-                  "path": "crates/actions/src/ladder/mod.rs",
-                  "quote": "    let confidence = input.confidence.ok_or_else(|| {",
-                  "source": "code"
-                },
-                {
-                  "line": 883,
-                  "path": "crates/actions/src/ladder/mod.rs",
-                  "quote": "            rung: Rung::Laya,",
-                  "source": "code"
-                },
-                {
-                  "line": 901,
-                  "path": "crates/actions/src/ladder/mod.rs",
-                  "quote": "            latency_ms: input.latency_ms,",
-                  "source": "code"
-                }
-              ],
-              "rule": "v1-w1c-3",
-              "source": "audit"
-            }
-          ],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "T2"
-        }
-      ],
-      "title": "L1 laya is never invoked: ladder.evaluate stamps rung=laya on caller-supplied answer, confidence and latency"
-    },
-    {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-w1c-4:T2",
       "apply_to": "PLATFORM",
       "artefact": "§7.2",
@@ -17961,19 +17349,19 @@ window.CONVEYOR_REWORK = {
         {
           "evidence": [
             {
-              "line": 787,
+              "line": 1015,
               "path": "crates/actions/src/ladder/mod.rs",
               "quote": "    pub options: Option<Vec<OptionIn>>,",
               "source": "code"
             },
             {
-              "line": 872,
+              "line": 1517,
               "path": "crates/actions/src/ladder/mod.rs",
               "quote": "        .or_else(|| (!options.is_empty()).then_some(1));",
               "source": "code"
             },
             {
-              "line": 851,
+              "line": 901,
               "path": "crates/store/src/ladder.rs",
               "quote": "            \"INSERT INTO decision_option (tenant_id, decision_id, key, label, payload)",
               "source": "code"
@@ -18000,19 +17388,19 @@ window.CONVEYOR_REWORK = {
             {
               "evidence": [
                 {
-                  "line": 787,
+                  "line": 1015,
                   "path": "crates/actions/src/ladder/mod.rs",
                   "quote": "    pub options: Option<Vec<OptionIn>>,",
                   "source": "code"
                 },
                 {
-                  "line": 872,
+                  "line": 1517,
                   "path": "crates/actions/src/ladder/mod.rs",
                   "quote": "        .or_else(|| (!options.is_empty()).then_some(1));",
                   "source": "code"
                 },
                 {
-                  "line": 851,
+                  "line": 901,
                   "path": "crates/store/src/ladder.rs",
                   "quote": "            \"INSERT INTO decision_option (tenant_id, decision_id, key, label, payload)",
                   "source": "code"
@@ -18654,31 +18042,31 @@ window.CONVEYOR_REWORK = {
         {
           "evidence": [
             {
-              "line": 46,
+              "line": 58,
               "path": "crates/store/src/approval_policy.rs",
               "quote": "    /// This tenant has opted out for this action; the call runs without one.",
               "source": "code"
             },
             {
-              "line": 47,
+              "line": 59,
               "path": "crates/store/src/approval_policy.rs",
               "quote": "    Waived,",
               "source": "code"
             },
             {
-              "line": 115,
+              "line": 130,
               "path": "crates/store/src/approval_policy.rs",
               "quote": "    pub approval: ApprovalRequirement,",
               "source": "code"
             },
             {
-              "line": 217,
+              "line": 239,
               "path": "crates/store/src/approval_policy.rs",
               "quote": "        Ok(Some(policy)) => Ok(policy.approval == ApprovalRequirement::Waived),",
               "source": "code"
             },
             {
-              "line": 109,
+              "line": 115,
               "path": "crates/actions/src/control/policies.rs",
               "quote": "    effect = \"write\",",
               "source": "code"
@@ -18705,31 +18093,31 @@ window.CONVEYOR_REWORK = {
             {
               "evidence": [
                 {
-                  "line": 46,
+                  "line": 58,
                   "path": "crates/store/src/approval_policy.rs",
                   "quote": "    /// This tenant has opted out for this action; the call runs without one.",
                   "source": "code"
                 },
                 {
-                  "line": 47,
+                  "line": 59,
                   "path": "crates/store/src/approval_policy.rs",
                   "quote": "    Waived,",
                   "source": "code"
                 },
                 {
-                  "line": 115,
+                  "line": 130,
                   "path": "crates/store/src/approval_policy.rs",
                   "quote": "    pub approval: ApprovalRequirement,",
                   "source": "code"
                 },
                 {
-                  "line": 217,
+                  "line": 239,
                   "path": "crates/store/src/approval_policy.rs",
                   "quote": "        Ok(Some(policy)) => Ok(policy.approval == ApprovalRequirement::Waived),",
                   "source": "code"
                 },
                 {
-                  "line": 109,
+                  "line": 115,
                   "path": "crates/actions/src/control/policies.rs",
                   "quote": "    effect = \"write\",",
                   "source": "code"
@@ -18747,93 +18135,6 @@ window.CONVEYOR_REWORK = {
         }
       ],
       "title": "Earned auto-merge is replaced by an unconditional policy waiver"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-w4b-4:T11",
-      "apply_to": "T11",
-      "artefact": "§14/R5",
-      "baseline": null,
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "Self-approval is unconditional: the decision writer refuses a decision whose approver is the gate's requester/executor, with no policy row able to relax it. Any historical exception is an explicit, audited override rather than a stored permission.",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "evidence": [
-            {
-              "line": 81,
-              "path": "crates/store/src/approval_policy.rs",
-              "quote": "    Allowed,",
-              "source": "code"
-            },
-            {
-              "line": 117,
-              "path": "crates/store/src/approval_policy.rs",
-              "quote": "    pub self_approval: SelfApproval,",
-              "source": "code"
-            },
-            {
-              "line": 850,
-              "path": "crates/store/src/approval.rs",
-              "quote": "            match approval_policy::allows_self_approval(&mut *conn, tenant, &row.gate).await {",
-              "source": "code"
-            }
-          ],
-          "rule": "v1-w4b-4",
-          "source": "audit"
-        }
-      ],
-      "key": "v1-w4b-4:T11",
-      "owner_project": "T11",
-      "rule": "v1-w4b-4",
-      "scope": "T11",
-      "severity": "P1",
-      "spec": "§5.4, P4",
-      "standard": "SPEC",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "P4 and §5.4 state flatly that the executor/assignee/requester cannot approve the gate that judges their work. The policy model adds a second opt-out, `self_approval` (forbidden|allowed), and the decision writer consults `allows_self_approval` for the gate's action. Setting `allowed` therefore makes the requester a valid approver for their own gate, so dual control and P4 are tenant-waivable configuration rather than invariants.",
-          "disposition": "rework",
-          "evidence": [
-            {
-              "evidence": [
-                {
-                  "line": 81,
-                  "path": "crates/store/src/approval_policy.rs",
-                  "quote": "    Allowed,",
-                  "source": "code"
-                },
-                {
-                  "line": 117,
-                  "path": "crates/store/src/approval_policy.rs",
-                  "quote": "    pub self_approval: SelfApproval,",
-                  "source": "code"
-                },
-                {
-                  "line": 850,
-                  "path": "crates/store/src/approval.rs",
-                  "quote": "            match approval_policy::allows_self_approval(&mut *conn, tenant, &row.gate).await {",
-                  "source": "code"
-                }
-              ],
-              "rule": "v1-w4b-4",
-              "source": "audit"
-            }
-          ],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "T11"
-        }
-      ],
-      "title": "self_approval='allowed' lets a requester decide their own gate"
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check board_not_approved:programme",
@@ -22036,7 +21337,7 @@ window.CONVEYOR_REWORK = {
               "source": "code"
             },
             {
-              "line": 1238,
+              "line": 1257,
               "path": "crates/actions/src/spine/mod.rs",
               "quote": "    name = \"wbs.create\",",
               "source": "code"
@@ -22069,7 +21370,7 @@ window.CONVEYOR_REWORK = {
                   "source": "code"
                 },
                 {
-                  "line": 1238,
+                  "line": 1257,
                   "path": "crates/actions/src/spine/mod.rs",
                   "quote": "    name = \"wbs.create\",",
                   "source": "code"
@@ -47269,7 +46570,7 @@ window.CONVEYOR_REWORK = {
         {
           "evidence": [
             {
-              "line": 559,
+              "line": 566,
               "path": "crates/actions/src/programme.rs",
               "quote": "    let baseline = spine_store::latest_approved_baseline_tx(&mut *tx, tenant, project_id, \"scope\")",
               "source": "code"
@@ -47296,7 +46597,7 @@ window.CONVEYOR_REWORK = {
             {
               "evidence": [
                 {
-                  "line": 559,
+                  "line": 566,
                   "path": "crates/actions/src/programme.rs",
                   "quote": "    let baseline = spine_store::latest_approved_baseline_tx(&mut *tx, tenant, project_id, \"scope\")",
                   "source": "code"
@@ -47529,7 +46830,7 @@ window.CONVEYOR_REWORK = {
         {
           "evidence": [
             {
-              "line": 3310,
+              "line": 3320,
               "path": "crates/store/src/spine.rs",
               "quote": "          WHERE tenant_id = $1 AND project_id = $2 AND kind = 'deliverable'",
               "source": "code"
@@ -47556,7 +46857,7 @@ window.CONVEYOR_REWORK = {
             {
               "evidence": [
                 {
-                  "line": 3310,
+                  "line": 3320,
                   "path": "crates/store/src/spine.rs",
                   "quote": "          WHERE tenant_id = $1 AND project_id = $2 AND kind = 'deliverable'",
                   "source": "code"
@@ -48546,13 +47847,13 @@ window.CONVEYOR_REWORK = {
               "source": "code"
             },
             {
-              "line": 1703,
+              "line": 1722,
               "path": "crates/actions/src/spine/mod.rs",
               "quote": "            links: input.links.unwrap_or_else(|| serde_json::json!([])),",
               "source": "code"
             },
             {
-              "line": 2153,
+              "line": 2163,
               "path": "crates/store/src/spine.rs",
               "quote": "    let link = serde_json::json!([{ \"kind\": \"benefit\", \"id\": benefit_id.to_string() }]);",
               "source": "code"
@@ -48585,13 +47886,13 @@ window.CONVEYOR_REWORK = {
                   "source": "code"
                 },
                 {
-                  "line": 1703,
+                  "line": 1722,
                   "path": "crates/actions/src/spine/mod.rs",
                   "quote": "            links: input.links.unwrap_or_else(|| serde_json::json!([])),",
                   "source": "code"
                 },
                 {
-                  "line": 2153,
+                  "line": 2163,
                   "path": "crates/store/src/spine.rs",
                   "quote": "    let link = serde_json::json!([{ \"kind\": \"benefit\", \"id\": benefit_id.to_string() }]);",
                   "source": "code"
@@ -48834,7 +48135,7 @@ window.CONVEYOR_REWORK = {
               "source": "code"
             },
             {
-              "line": 857,
+              "line": 874,
               "path": "crates/actions/src/pm/mod.rs",
               "quote": "/// `pm.get` — the PM's view: project, charter, WBS, baselines and gates.",
               "source": "code"
@@ -48873,7 +48174,7 @@ window.CONVEYOR_REWORK = {
                   "source": "code"
                 },
                 {
-                  "line": 857,
+                  "line": 874,
                   "path": "crates/actions/src/pm/mod.rs",
                   "quote": "/// `pm.get` — the PM's view: project, charter, WBS, baselines and gates.",
                   "source": "code"
@@ -49235,81 +48536,6 @@ window.CONVEYOR_REWORK = {
       "title": "The archive-exclusion claim says every hot index filters archived cards; two card indexes do not"
     },
     {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-t2-5:T2",
-      "apply_to": "PLATFORM",
-      "artefact": "§7.5",
-      "baseline": null,
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "The budget refusal carries the spec's `budget_exceeded` code (or §7.5 is amended to the shipped spelling) and a test asserts the exact code.",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "evidence": [
-            {
-              "line": 770,
-              "path": "crates/actions/src/invoke.rs",
-              "quote": "    ActionError::new(429, \"tool_budget_exceeded\", detail)",
-              "source": "code"
-            },
-            {
-              "line": 714,
-              "path": "docs/SPEC_V2.md",
-              "quote": "  (`429 budget_exceeded`) before the next call, not a silent truncation.",
-              "source": "code"
-            }
-          ],
-          "rule": "v1-t2-5",
-          "source": "audit"
-        }
-      ],
-      "key": "v1-t2-5:T2",
-      "owner_project": "T2",
-      "rule": "v1-t2-5",
-      "scope": "T2",
-      "severity": "P2",
-      "spec": "§7.5",
-      "standard": "SPEC",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "§7.5 names the refusal `429 budget_exceeded`; every budget refusal in the tree is `429 tool_budget_exceeded` (the run-level inference pre-call gate in enforce_run_budget and the broker). The mechanism exists — a missing or exhausted cost_budget_usd is refused before dispatch — but a client or test matching the spec's code will not see it.",
-          "disposition": "rework",
-          "evidence": [
-            {
-              "evidence": [
-                {
-                  "line": 770,
-                  "path": "crates/actions/src/invoke.rs",
-                  "quote": "    ActionError::new(429, \"tool_budget_exceeded\", detail)",
-                  "source": "code"
-                },
-                {
-                  "line": 714,
-                  "path": "docs/SPEC_V2.md",
-                  "quote": "  (`429 budget_exceeded`) before the next call, not a silent truncation.",
-                  "source": "code"
-                }
-              ],
-              "rule": "v1-t2-5",
-              "source": "audit"
-            }
-          ],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P2",
-          "subject": "T2"
-        }
-      ],
-      "title": "The budget refusal code is tool_budget_exceeded, not the spec's budget_exceeded"
-    },
-    {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-u5a-tool-idempotency-publish-1:T13",
       "apply_to": "PLATFORM",
       "artefact": "§11.3",
@@ -49389,15 +48615,15 @@ window.CONVEYOR_REWORK = {
         {
           "evidence": [
             {
-              "line": 262,
+              "line": 268,
               "path": "crates/domain/src/ladder.rs",
               "quote": "pub fn unavailable(fail_policy: FailPolicy, action: FailAction) -> Outcome {",
               "source": "code"
             },
             {
-              "line": 841,
+              "line": 1184,
               "path": "crates/actions/src/ladder/mod.rs",
-              "quote": "    let outcome = evaluate(confidence, threshold, action)",
+              "quote": "    let outcome = evaluate(parsed.confidence, threshold, fail_action)",
               "source": "code"
             },
             {
@@ -49428,15 +48654,15 @@ window.CONVEYOR_REWORK = {
             {
               "evidence": [
                 {
-                  "line": 262,
+                  "line": 268,
                   "path": "crates/domain/src/ladder.rs",
                   "quote": "pub fn unavailable(fail_policy: FailPolicy, action: FailAction) -> Outcome {",
                   "source": "code"
                 },
                 {
-                  "line": 841,
+                  "line": 1184,
                   "path": "crates/actions/src/ladder/mod.rs",
-                  "quote": "    let outcome = evaluate(confidence, threshold, action)",
+                  "quote": "    let outcome = evaluate(parsed.confidence, threshold, fail_action)",
                   "source": "code"
                 },
                 {
@@ -49545,93 +48771,6 @@ window.CONVEYOR_REWORK = {
         }
       ],
       "title": "Knowledge-family metrics are explicitly unavailable because the lesson and pack-hit ledgers are absent"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-w3b-5:PLATFORM",
-      "apply_to": "PLATFORM",
-      "artefact": "§10.4",
-      "baseline": null,
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "Either the eight kata verbs are registered as ActionSpecs (list/read state included) or SPEC §10.4 replaces the family with the process-key design and documents how observe/measure/adopt are expressed; a registry or process-catalogue test covers the chosen contract.",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "evidence": [
-            {
-              "line": 64,
-              "path": "crates/actions/src/ops/incidents.rs",
-              "quote": "pub const KATA_PROCESS: &str = \"kata.open\";",
-              "source": "code"
-            },
-            {
-              "line": 80,
-              "path": "crates/actions/src/coach.rs",
-              "quote": "pub const KATA_PROCESS: &str = \"kata.open\";",
-              "source": "code"
-            },
-            {
-              "line": 994,
-              "path": "crates/actions/src/coach.rs",
-              "quote": "            KATA_PROCESS,",
-              "source": "code"
-            }
-          ],
-          "rule": "v1-w3b-5",
-          "source": "audit"
-        }
-      ],
-      "key": "v1-w3b-5:PLATFORM",
-      "owner_project": "PLATFORM",
-      "rule": "v1-w3b-5",
-      "scope": "PLATFORM",
-      "severity": "P2",
-      "spec": "§10.4",
-      "standard": "SPEC",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "SPEC §10.4 declares kata.open|observe|analyse|propose|measure|adopt|propagate|close. No kata.* ActionSpec is registered. The implementation uses the string as a process-catalogue key: coach.escalate starts a process run with process_key 'kata.open' (coach.rs:780) and ops.incident names the same const (incidents.rs:64). There is no action to list a kata, read its Six Gests state, measure or adopt it, so the Improve destination's kata queue has no action surface.",
-          "disposition": "rework",
-          "evidence": [
-            {
-              "evidence": [
-                {
-                  "line": 64,
-                  "path": "crates/actions/src/ops/incidents.rs",
-                  "quote": "pub const KATA_PROCESS: &str = \"kata.open\";",
-                  "source": "code"
-                },
-                {
-                  "line": 80,
-                  "path": "crates/actions/src/coach.rs",
-                  "quote": "pub const KATA_PROCESS: &str = \"kata.open\";",
-                  "source": "code"
-                },
-                {
-                  "line": 994,
-                  "path": "crates/actions/src/coach.rs",
-                  "quote": "            KATA_PROCESS,",
-                  "source": "code"
-                }
-              ],
-              "rule": "v1-w3b-5",
-              "source": "audit"
-            }
-          ],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P2",
-          "subject": "PLATFORM"
-        }
-      ],
-      "title": "The kata.* family is not an action family; kata exists only as an unregistered process key"
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-w3b-6:PLATFORM",
@@ -60100,19 +59239,19 @@ window.CONVEYOR_REWORK = {
         {
           "evidence": [
             {
-              "line": 1460,
+              "line": 1526,
               "path": "crates/store/src/snapshot.rs",
               "quote": "            artifact_phases.insert((project.to_owned(), phase.to_owned()));",
               "source": "code"
             },
             {
-              "line": 1474,
+              "line": 1540,
               "path": "crates/store/src/snapshot.rs",
               "quote": "            .is_none_or(|current| row_is_later(contract, current, \"created_at\"));",
               "source": "code"
             },
             {
-              "line": 1529,
+              "line": 1595,
               "path": "crates/store/src/snapshot.rs",
               "quote": "                artifact_phases.contains(&phase_key) || contract.is_some() || compliance.is_some();",
               "source": "code"
@@ -60139,19 +59278,19 @@ window.CONVEYOR_REWORK = {
             {
               "evidence": [
                 {
-                  "line": 1460,
+                  "line": 1526,
                   "path": "crates/store/src/snapshot.rs",
                   "quote": "            artifact_phases.insert((project.to_owned(), phase.to_owned()));",
                   "source": "code"
                 },
                 {
-                  "line": 1474,
+                  "line": 1540,
                   "path": "crates/store/src/snapshot.rs",
                   "quote": "            .is_none_or(|current| row_is_later(contract, current, \"created_at\"));",
                   "source": "code"
                 },
                 {
-                  "line": 1529,
+                  "line": 1595,
                   "path": "crates/store/src/snapshot.rs",
                   "quote": "                artifact_phases.contains(&phase_key) || contract.is_some() || compliance.is_some();",
                   "source": "code"
@@ -60198,24 +59337,24 @@ window.CONVEYOR_REWORK = {
       "suppressed": 0
     },
     "SAFe": {
-      "findings": 10,
+      "findings": 7,
       "gaps": 4,
       "p0": 1,
       "p1": 2,
       "p2": 1,
-      "packages": 20,
+      "packages": 17,
       "rules": 8,
       "rules_clean": 4,
       "rules_with_gaps": 4,
       "suppressed": 0
     },
     "SPEC": {
-      "findings": 85,
+      "findings": 77,
       "gaps": 38,
       "p0": 0,
       "p1": 5,
       "p2": 33,
-      "packages": 106,
+      "packages": 98,
       "rules": 8,
       "rules_clean": 2,
       "rules_with_gaps": 6,
@@ -60237,26 +59376,26 @@ window.CONVEYOR_REWORK = {
   "snapshot": "docs/design/data",
   "summary": {
     "by_severity": {
-      "P0": 45,
-      "P1": 186,
-      "P2": 308
+      "P0": 43,
+      "P1": 179,
+      "P2": 306
     },
     "by_standard": {
       "MSP": 84,
       "PMP": 213,
-      "SAFe": 20,
-      "SPEC": 106,
+      "SAFe": 17,
+      "SPEC": 98,
       "TOGAF": 116
     },
     "by_status": {
-      "open": 535,
-      "suppressed": 4
+      "open": 523,
+      "suppressed": 5
     },
     "duplicates": 0,
-    "open": 535,
-    "packages": 539,
-    "resolved": 68,
-    "subjects": 688,
-    "suppressed": 4
+    "open": 523,
+    "packages": 528,
+    "resolved": 89,
+    "subjects": 677,
+    "suppressed": 5
   }
 };
