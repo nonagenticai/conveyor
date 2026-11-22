@@ -11,6 +11,7 @@
 
 use chrono::{DateTime, Utc};
 use conveyor_domain::TenantId;
+use conveyor_domain::organisation::ReleaseAnatomy;
 use conveyor_domain::prompt::{
     CapabilityFacts, CardFacts, KnowledgeFacts, MemorySelector, ProcessFacts, ProjectFacts,
     PromptDefinition, PromptFacts, PromptSection, PromptSource, SelectorError, StepFacts,
@@ -147,6 +148,7 @@ pub async fn facts_for_run_tx(
     run_id: Uuid,
     run_step_id: Option<Uuid>,
     memory_selector: &MemorySelector,
+    release: Option<&ReleaseAnatomy>,
 ) -> Result<PromptFacts, PromptStoreError> {
     let mut facts = PromptFacts::default();
     let run: Option<RunFactRow> = sqlx::query_as(
@@ -177,6 +179,14 @@ pub async fn facts_for_run_tx(
             None => None,
         },
     };
+    // A plain run has no published procedure, so the release's own request renders in the one
+    // `process` section: the job's charter, procedure reference and authority (SPEC_V2 §4.5's
+    // Request source), with the run-level step as the plan. No new section kind, no stored PDDL.
+    if facts.process.is_none()
+        && let Some(anatomy) = release
+    {
+        facts.process = Some(request_facts(anatomy));
+    }
     facts.project = read_project(conn, tenant, project_id).await?;
     facts.card = match card_id {
         Some(id) => read_card(conn, tenant, id).await?,
@@ -192,6 +202,21 @@ pub async fn facts_for_run_tx(
             None => read_step_agent(conn, tenant, run_step_id).await?,
         };
         facts.capability = read_capability(conn, tenant, capability_id, agent_id).await?;
+        // The release is the execution authority (ADR 0010): the compiled capability section
+        // names the same model and the same caps the loop will actually use, never the row's
+        // values when the release pins lower ones.
+        if let Some(anatomy) = release
+            && let Some(capability) = facts.capability.as_mut()
+        {
+            capability.model_ref = anatomy
+                .effective_model_ref(&capability.model_ref)
+                .to_owned();
+            capability.max_iterations =
+                i32::from(anatomy.effective_max_iterations(capability.max_iterations));
+            capability.timeout_secs =
+                i32::try_from(anatomy.effective_timeout_ms(capability.timeout_secs) / 1000)
+                    .unwrap_or(capability.timeout_secs);
+        }
         let packs: Vec<(String, i32)> = sqlx::query_as(
             "SELECT pack_key, pack_version FROM capability_knowledge
               WHERE tenant_id = $1 AND capability_id = $2
@@ -215,6 +240,41 @@ pub async fn facts_for_run_tx(
                 .await?;
     }
     Ok(facts)
+}
+
+/// The Request source for a run with no published procedure: the release's own definition.
+fn request_facts(anatomy: &ReleaseAnatomy) -> ProcessFacts {
+    let mut description = String::new();
+    if let Some(charter) = anatomy.charter.as_deref() {
+        description.push_str(charter);
+    }
+    if let Some(procedure) = anatomy.procedure_ref.as_deref() {
+        if !description.is_empty() {
+            description.push('\n');
+        }
+        description.push_str(&format!("request: {procedure}"));
+    }
+    if let Some(authority) = anatomy.authority.as_deref() {
+        if !description.is_empty() {
+            description.push('\n');
+        }
+        description.push_str(&format!("authority: {authority}"));
+    }
+    ProcessFacts {
+        key: if anatomy.job_key.is_empty() {
+            "job".to_owned()
+        } else {
+            anatomy.job_key.clone()
+        },
+        title: if anatomy.title.is_empty() {
+            anatomy.job_key.clone()
+        } else {
+            anatomy.title.clone()
+        },
+        description,
+        version: 0,
+        steps: vec![(1, "agent.run".to_owned(), anatomy.gate.clone())],
+    }
 }
 
 /// The facts a copilot conversation can supply: its project, and nothing run-scoped.

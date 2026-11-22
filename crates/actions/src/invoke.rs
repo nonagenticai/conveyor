@@ -23,8 +23,10 @@
 
 use std::collections::HashMap;
 use std::collections::VecDeque;
+use std::sync::Arc;
 use std::sync::LazyLock;
 use std::sync::Mutex;
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::time::{Duration, Instant};
 
 use base64::Engine as _;
@@ -1301,6 +1303,17 @@ async fn invoke_external(
         }
         tx.commit().await.map_err(|_| ActionError::internal())?;
     }
+    // The claim is committed, so a caller that disappears is the ONE failure nothing here can
+    // record: the future is dropped and `record_failure` never runs. The guard releases the row
+    // instead (#577). Measured 2026-11-22: a proxy-cut render left its key answering `409 … still
+    // running` for hours after the caller was gone.
+    let claim = ClaimRelease::arm(
+        pool,
+        ctx.tenant,
+        spec.name,
+        request.idempotency_key.as_deref(),
+    );
+    let claim_settled = claim.as_ref().map(ClaimRelease::settled_flag);
 
     if breaker_is_open(ctx.tenant, spec.name, Instant::now()) {
         let elapsed = started.elapsed().as_millis() as i32;
@@ -1315,6 +1328,7 @@ async fn invoke_external(
             elapsed,
         )
         .await;
+        settle_claim(&claim_settled);
         return Err(ActionError::circuit_open(spec.name));
     }
 
@@ -1335,6 +1349,7 @@ async fn invoke_external(
             elapsed,
         )
         .await;
+        settle_claim(&claim_settled);
         return Err(ActionError::unconfigured(service));
     };
     let url = format!("{}{}", base.trim_end_matches('/'), path);
@@ -1385,6 +1400,7 @@ async fn invoke_external(
                         elapsed,
                     )
                     .await;
+                    settle_claim(&claim_settled);
                     return Err(ActionError::unconfigured(service));
                 }
             }
@@ -1494,9 +1510,11 @@ async fn invoke_external(
     // the originals.
     let failure_ctx = ctx.clone();
     let failure_hash = input_hash.clone();
+    let failure_settled = claim_settled.clone();
     let failure = |error: ActionError, breaker: bool| {
         let failure_ctx = failure_ctx.clone();
         let failure_hash = failure_hash.clone();
+        let settled = failure_settled.clone();
         async move {
             if breaker {
                 breaker_record_failure(ctx.tenant, spec.name, Instant::now());
@@ -1512,6 +1530,10 @@ async fn invoke_external(
                 elapsed,
             )
             .await;
+            // AFTER the recorder: `record_failure` releases the claim itself, so disarming first
+            // would leave the row behind if this future is dropped mid-recorder. A late duplicate
+            // delete is the harmless side, and this ordering has none.
+            settle_claim(&settled);
             Err(error)
         }
     };
@@ -1630,6 +1652,10 @@ async fn invoke_external(
         }
     };
     tx.commit().await.map_err(|_| ActionError::internal())?;
+    // The response is saved: the row is now a replay, not a claim.
+    if let Some(settled) = &claim_settled {
+        settled.store(true, Ordering::SeqCst);
+    }
     Ok(InvokeOutcome {
         status: 200,
         body,
@@ -1821,6 +1847,92 @@ async fn record_bookkeeping(
         }
     }
     Ok(invocation_id)
+}
+
+/// Disarm a claim guard on a path where the engine itself has released the row.
+fn settle_claim(settled: &Option<Arc<AtomicBool>>) {
+    if let Some(flag) = settled {
+        flag.store(true, Ordering::SeqCst);
+    }
+}
+
+/// Releases an un-settled idempotency claim when the invocation future is dropped (#577).
+///
+/// An external claim is committed BEFORE the call, so a concurrent replay sees it — and that is
+/// the problem: every later failure is recorded by [`record_failure`], which also releases, but a
+/// future that is dropped records nothing at all. A caller that disconnects, a proxy that gives up
+/// and a cancelled run all drop this future, and the row they leave behind answers
+/// `409 … still running` to every retry until its 24 h TTL expires.
+///
+/// `settled` is the discriminator. Every path the engine *observes* — a saved response, or a
+/// failure that `record_failure` releases — sets it before returning, so `Drop` acts only on the
+/// cancellation path, where the row is provably still ours. Without it a slow release could race a
+/// retry that had already re-claimed the key and delete a live claim.
+struct ClaimRelease {
+    pool: PgPool,
+    tenant: TenantId,
+    scope: &'static str,
+    key: Option<String>,
+    settled: Arc<AtomicBool>,
+}
+
+impl ClaimRelease {
+    /// Arm for one claimed key; `None` when the call carried no idempotency key.
+    fn arm(
+        pool: &PgPool,
+        tenant: TenantId,
+        scope: &'static str,
+        key: Option<&str>,
+    ) -> Option<Self> {
+        key.map(|key| Self {
+            pool: pool.clone(),
+            tenant,
+            scope,
+            key: Some(key.to_owned()),
+            settled: Arc::new(AtomicBool::new(false)),
+        })
+    }
+
+    /// The handle a settled path flips so `Drop` leaves the row alone.
+    fn settled_flag(&self) -> Arc<AtomicBool> {
+        self.settled.clone()
+    }
+}
+
+impl Drop for ClaimRelease {
+    fn drop(&mut self) {
+        let Some(key) = self.key.take() else { return };
+        if self.settled.load(Ordering::SeqCst) {
+            return;
+        }
+        // A drop can happen while the runtime is shutting down; there is nothing to wait for and
+        // the row's TTL is the backstop.
+        let Ok(handle) = tokio::runtime::Handle::try_current() else {
+            return;
+        };
+        let pool = self.pool.clone();
+        let tenant = self.tenant;
+        let scope = self.scope;
+        handle.spawn(async move {
+            if let Err(error) = release_claim(&pool, tenant, scope, &key).await {
+                tracing::warn!(%error, action = scope, "release an abandoned idempotency claim");
+            }
+        });
+    }
+}
+
+/// Delete one in-flight claim, in its own scoped transaction. Best effort by design.
+async fn release_claim(
+    pool: &PgPool,
+    tenant: TenantId,
+    scope: &str,
+    key: &str,
+) -> Result<(), sqlx::Error> {
+    let mut tx = store::begin_scoped(pool, tenant).await?;
+    store::actions::set_statement_timeout(&mut tx, BOOKKEEPING_TIMEOUT_MS).await?;
+    store::actions::release_idempotency(&mut tx, tenant, scope, key).await?;
+    tx.commit().await?;
+    Ok(())
 }
 
 /// Record a refused/error/timeout invocation in its own short transaction.

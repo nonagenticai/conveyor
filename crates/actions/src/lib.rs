@@ -41,6 +41,7 @@ pub mod deck;
 // #366: the spreadsheet toolkit — produce a .xlsx from a workbook, read one back.
 pub mod documents;
 pub mod eval;
+pub mod executor;
 pub mod fixtures;
 pub mod governance;
 pub mod handlers;
