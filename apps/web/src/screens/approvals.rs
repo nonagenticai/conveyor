@@ -80,15 +80,18 @@ pub fn Approvals() -> impl IntoView {
     let retry = Callback::new(move |_| data.refetch());
     let notice = RwSignal::new(Option::<String>::None);
 
-    let decide = move |approval_id: String, decision: &'static str| {
+    // A requires-answer gate always sends its note, even when empty: the writer's 422 is then
+    // surfaced on the screen instead of a decision being recorded without the answer. A normal
+    // gate sends the note only when the person typed one.
+    let decide = move |approval_id: String, decision: &'static str, answer: Option<String>| {
         let ctx = ctx;
         leptos::task::spawn_local(async move {
+            let mut input = json!({"approval_id": approval_id, "decision": decision});
+            if let Some(answer) = answer {
+                input["note"] = Value::String(answer);
+            }
             match ctx
-                .invoke(
-                    "approvals.decide",
-                    json!({"approval_id": approval_id, "decision": decision}),
-                    InvokeOptions::default(),
-                )
+                .invoke("approvals.decide", input, InvokeOptions::default())
                 .await
             {
                 Ok(_) => {
@@ -150,6 +153,11 @@ pub fn Approvals() -> impl IntoView {
                             // allows it; say why, do not hide the control.
                             let refusal =
                                 crate::approvals::self_gate_refusal(mine, &self_approval);
+                            // A requires-answer question gets a box, and its note travels with
+                            // the decision; the writer refuses an empty one with a 422 that the
+                            // notice line shows. A normal gate keeps the bare approve/reject.
+                            let requires_answer = row.requires_answer;
+                            let answer = RwSignal::new(String::new());
                             let approve_id = row.id.clone();
                             let reject_id = row.id.clone();
                             view! {
@@ -179,18 +187,37 @@ pub fn Approvals() -> impl IntoView {
                                     {row.proposed_answer.clone().map(|text| view! {
                                         <p class="muted">{format!("Proposed: {text}")}</p>
                                     })}
+                                    {requires_answer.then(|| view! {
+                                        <label class="filter">
+                                            <span>"Answer (required)"</span>
+                                            <textarea
+                                                rows="2"
+                                                placeholder="An empty answer is refused"
+                                                prop:value=move || answer.get()
+                                                on:input=move |event| answer.set(event_target_value(&event))
+                                            ></textarea>
+                                        </label>
+                                    })}
                                     <div class="approval-actions">
                                         <button
                                             class="btn small"
                                             disabled=refusal.is_some()
                                             title=refusal.clone().unwrap_or_default()
-                                            on:click=move |_| decide(approve_id.clone(), "approve")
+                                            on:click=move |_| decide(
+                                                approve_id.clone(),
+                                                "approve",
+                                                requires_answer.then(|| answer.get_untracked()),
+                                            )
                                         >"Approve"</button>
                                         <button
                                             class="btn small ghost"
                                             disabled=refusal.is_some()
                                             title=refusal.clone().unwrap_or_default()
-                                            on:click=move |_| decide(reject_id.clone(), "reject")
+                                            on:click=move |_| decide(
+                                                reject_id.clone(),
+                                                "reject",
+                                                requires_answer.then(|| answer.get_untracked()),
+                                            )
                                         >"Reject"</button>
                                         {refusal.clone().map(|reason| view! {
                                             <span class="muted refusal">{reason}</span>

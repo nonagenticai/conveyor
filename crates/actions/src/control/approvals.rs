@@ -871,6 +871,13 @@ pub fn approval_out(record: &store::approval::ApprovalRecord) -> ApprovalOut {
             .get("proposed_answer")
             .and_then(Value::as_str)
             .map(str::to_owned),
+        // The store's writer reads `meta->>'requires_answer' = 'true'` (text), so the projection
+        // accepts the string form too: a screen and the writer must never disagree about whether
+        // the gate needs an answer, or the screen invites a decision the writer refuses.
+        requires_answer: record
+            .meta
+            .get("requires_answer")
+            .is_some_and(|value| value.as_bool() == Some(true) || value.as_str() == Some("true")),
         allowed_decisions: record.meta.get("allowed_decisions").cloned(),
         proposed_input: record.meta.get("proposed_input").cloned(),
         requested_by: record.requested_by.map(|id| id.to_string()),

@@ -79,6 +79,12 @@ async fn a_question_that_requires_an_answer_refuses_an_empty_decision() {
         .as_str()
         .expect("the gate id")
         .to_owned();
+    assert_eq!(
+        requested.body["output"]["requires_answer"],
+        json!(true),
+        "the request response says the gate needs an answer: {}",
+        requested.body
+    );
     let reviewer = support::reviewer_id(&pg).await;
 
     // An approve with no note answers nothing and is refused before anything is recorded.
@@ -125,4 +131,99 @@ async fn a_question_that_requires_an_answer_refuses_an_empty_decision() {
     assert_eq!(decision, "approve");
     assert_eq!(note, "No, a service account may not delegate its access");
     assert_eq!(kind, "human", "a person decided it");
+}
+
+/// WP17b: the approvals screen has to know which gates need an answer before it renders the
+/// decide control. The list carries the marker for both shapes, so a question gets an answer
+/// box and a yes/no gate keeps the bare approve/reject.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn the_approvals_list_reports_which_gates_require_an_answer() {
+    let pg = support::Pg::fresh().await;
+    let seeded = support::seed(&pg, "dev-a", "alice", "Alice").await;
+    support::set_env("OPS_API_URL", "http://127.0.0.1:1");
+    support::set_env("OPS_TOKEN", "");
+
+    let question = call(
+        &pg,
+        &seeded,
+        request(
+            seeded.user_id,
+            "approvals.request",
+            json!({
+                "gate": "hr.start_date",
+                "kind": "gate",
+                "target": "employee:42",
+                "description": "Which start date did you agree?",
+                "requires_answer": true,
+            }),
+        ),
+    )
+    .await
+    .expect("the question opens");
+    let question_id = question.body["output"]["id"]
+        .as_str()
+        .expect("the question id")
+        .to_owned();
+    assert_eq!(
+        question.body["output"]["requires_answer"],
+        json!(true),
+        "{}",
+        question.body
+    );
+
+    let gate = call(
+        &pg,
+        &seeded,
+        request(
+            seeded.user_id,
+            "approvals.request",
+            json!({
+                "gate": "release.review",
+                "kind": "gate",
+                "target": "doc:1",
+                "description": "May this be released?",
+            }),
+        ),
+    )
+    .await
+    .expect("the ordinary gate opens");
+    let gate_id = gate.body["output"]["id"]
+        .as_str()
+        .expect("the gate id")
+        .to_owned();
+    assert_eq!(
+        gate.body["output"]["requires_answer"],
+        json!(false),
+        "{}",
+        gate.body
+    );
+
+    let listed = call(
+        &pg,
+        &seeded,
+        request(seeded.user_id, "approvals.list", json!({"limit": 100})),
+    )
+    .await
+    .expect("the gates are listable");
+    let items = listed.body["output"]["items"]
+        .as_array()
+        .expect("the page's items");
+    let row = |id: &str| {
+        items
+            .iter()
+            .find(|row| row["id"] == json!(id))
+            .unwrap_or_else(|| panic!("gate {id} is listed: {}", listed.body))
+    };
+    assert_eq!(
+        row(&question_id)["requires_answer"],
+        json!(true),
+        "{}",
+        listed.body
+    );
+    assert_eq!(
+        row(&gate_id)["requires_answer"],
+        json!(false),
+        "{}",
+        listed.body
+    );
 }
