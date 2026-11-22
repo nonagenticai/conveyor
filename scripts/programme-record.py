@@ -146,7 +146,6 @@ READ_ONLY_ACTIONS = {
     "projects.get",
     "architecture.board_get",
     "approvals.list",
-    "approvals.get",
     "documents.get",
     "pm.get",
 }
@@ -905,10 +904,11 @@ def self_test():
             "--input",
             '{"gate":"projects.close","kind":"action","action":"projects.close","input":{"id":"p1"}}',
             "--evidence", evidence,
-            "--read-action", "approvals.get",
+            "--read-action", "approvals.list",
+            "--read-input", "{}",
             "--read-id-from-output", "id",
         ],
-        fake_env,
+        dict(fake_env, PROGRAMME_RECORD_LIST="1"),
         True,
         verify_wrapped,
     )
@@ -1071,11 +1071,42 @@ def self_test():
     else:
         print("PASS lifecycle mappings")
 
+    # Every action this harness names must exist in the product's registry. The read-back map
+    # and the read-only allowlist are hand-maintained; a typo used to surface only at the live
+    # engine, after the write (approvals.get, 2026-11-22).
+    registry_path = os.path.join(
+        os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+        "docs", "design", "data", "actions.json",
+    )
+    named = (
+        set(READBACK_MAP)
+        | set(READBACK_MAP.values())
+        | set(READ_ONLY_ACTIONS)
+        | set(lifecycle)
+        | set(lifecycle.values())
+    )
+    try:
+        with open(registry_path, encoding="utf-8") as handle:
+            registry = set(json.load(handle)["actions"])
+    except (OSError, ValueError, KeyError) as error:
+        failures.append("registry resolution")
+        print("FAIL registry resolution")
+        print(f"  - cannot read {registry_path}: {error}")
+    else:
+        missing = sorted(named - registry)
+        if missing:
+            failures.append("registry resolution")
+            print("FAIL registry resolution")
+            for action in missing:
+                print(f"  - {action} is not a registered action")
+        else:
+            print(f"PASS registry resolution ({len(named)} actions)")
+
     print()
     if failures:
-        print(f"SELF-TEST FAILED: {len(failures)} of 19 cases: {', '.join(failures)}")
+        print(f"SELF-TEST FAILED: {len(failures)} of 20 cases: {', '.join(failures)}")
         return 1
-    print("SELF-TEST OK: 19 cases passed")
+    print("SELF-TEST OK: 20 cases passed")
     return 0
 
 
