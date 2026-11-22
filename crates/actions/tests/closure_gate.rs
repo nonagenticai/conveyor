@@ -15,6 +15,7 @@
 mod support;
 
 use serde_json::{Value, json};
+use uuid::Uuid;
 
 const TOKEN: &str = "dev:alice";
 
@@ -200,6 +201,26 @@ async fn approval_count(pg: &support::Pg, project: &str) -> i64 {
         .fetch_one(&pg.super_pool)
         .await
         .expect("count approvals")
+}
+
+/// The project aggregate's own events, oldest first:
+/// `(type, aggregate_type, aggregate_id, payload)`.
+async fn project_events(
+    pg: &support::Pg,
+    tenant: Uuid,
+    project: &str,
+) -> Vec<(String, String, Uuid, Value)> {
+    sqlx::query_as(
+        "SELECT type, aggregate_type, aggregate_id, payload
+           FROM event
+          WHERE tenant_id = $1 AND aggregate_type = 'project' AND aggregate_id = $2::uuid
+          ORDER BY seq",
+    )
+    .bind(tenant)
+    .bind(project)
+    .fetch_all(&pg.super_pool)
+    .await
+    .expect("read the project's events")
 }
 
 /// P0's class from the one standard: `now` is what it produces, `closure` what it must publish
@@ -388,7 +409,7 @@ async fn a_class_without_closure_outputs_is_unchanged() {
 /// all unchanged.
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn the_refusal_writes_nothing() {
-    let (pg, running, _seeded) = fixture().await;
+    let (pg, running, seeded) = fixture().await;
     let (project, version) = create_project(&running, "Closure refusal").await;
     declare(
         &running,
@@ -401,8 +422,9 @@ async fn the_refusal_writes_nothing() {
     let row_before = project_row(&pg, &project).await;
     let runs_before = run_count(&pg, &project).await;
     let approvals_before = approval_count(&pg, &project).await;
+    let events_before = project_events(&pg, seeded.tenant_id, &project).await;
 
-    let (status, body) = close(&pg, _seeded.tenant, &running, &project).await;
+    let (status, body) = close(&pg, seeded.tenant, &running, &project).await;
     assert_eq!(status, 409, "{body}");
     assert_eq!(body["type"], "closure_outputs_missing", "{body}");
     assert_eq!(
@@ -419,6 +441,11 @@ async fn the_refusal_writes_nothing() {
         approval_count(&pg, &project).await,
         approvals_before,
         "the refusal wrote an approval"
+    );
+    assert_eq!(
+        project_events(&pg, seeded.tenant_id, &project).await,
+        events_before,
+        "the refusal appended a project event"
     );
 }
 
@@ -452,5 +479,37 @@ async fn the_p0_class_without_the_tranche_review_is_refused() {
         missing(&body),
         vec!["tranche-review".to_owned()],
         "exactly the owner's missing output is named: {body}"
+    );
+}
+
+// ── the outbox assertion: a close is a domain event (v1-project-1) ─────────────────────
+
+/// A successful close appends exactly one `project.updated` event on the project aggregate, in
+/// the close's own transaction; a refused close appends none.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_close_appends_one_project_updated_event() {
+    let (pg, running, seeded) = fixture().await;
+    let (project, _version) = create_project(&running, "Closure event").await;
+
+    let (status, body) = close(&pg, seeded.tenant, &running, &project).await;
+    assert_eq!(status, 200, "{body}");
+    assert_eq!(output(&body)["project"]["status"], "closed", "{body}");
+
+    let events = project_events(&pg, seeded.tenant_id, &project).await;
+    assert_eq!(events.len(), 1, "exactly one project event: {events:?}");
+    let (event_type, aggregate_type, aggregate_id, payload) = &events[0];
+    assert_eq!(event_type, "project.updated", "{events:?}");
+    assert_eq!(aggregate_type, "project", "{events:?}");
+    assert_eq!(aggregate_id.to_string(), project, "{events:?}");
+    assert_eq!(payload["id"], project.as_str(), "{payload}");
+    assert_eq!(payload["changed"], json!(["status"]), "{payload}");
+
+    // The project is already terminal: the 409 refuses, and the refusal appends no event.
+    let (status, again) = close(&pg, seeded.tenant, &running, &project).await;
+    assert_eq!(status, 409, "{again}");
+    assert_eq!(
+        project_events(&pg, seeded.tenant_id, &project).await.len(),
+        1,
+        "the refused close appended an event"
     );
 }
