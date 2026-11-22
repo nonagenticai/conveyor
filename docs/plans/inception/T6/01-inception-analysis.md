@@ -29,7 +29,7 @@ Baseline: main@70d31773, 2026-11-21 (content reviewed at main@61edfcf8, 2026-11-
 
 **PR-only publication — `built`.** `crates/actions/src/publish.rs:PUBLISH_KIND` enqueues `publish.design`; `apps/server/src/publish.rs:run` opens one PR, never merges, `max_attempts = 1`.
 
-**Coding — `partial`.** V1's ad-hoc path is `crates/actions/src/integrations/external.rs:coding_jobs_create`; T13's broker is `absent` (no tool table, no `tools.*` action), so T6 is blocked. The pod substrate exists (`migrations/0041_runner.sql:runner_run`, `apps/server/src/runner_dispatch.rs:POLL_AFTER_SECS`) but runs capabilities, not CI.
+**Coding — `partial`.** V1's ad-hoc path is `crates/actions/src/integrations/external.rs:coding_jobs_create`; T13's broker is **built** (`migrations/0055_tool_platform.sql` creates `tool`, `toolkit`, `tool_binding` and `tool_call`; `tools.call`, `tools.probe`, `tools.resume`, `tools.retire` and `tools.usage` resolve), so the broker is not the block. What T6 still lacks is its own `dev.*` nine-step gate family (v1-p91-1) and the deploy/live-verify gate (v1-p93-2); its coding calls must go through the built broker. The pod substrate exists (`migrations/0041_runner.sql:runner_run`, `apps/server/src/runner_dispatch.rs:POLL_AFTER_SECS`) but runs capabilities, not CI.
 
 **Gates — `partial` and `absent`.** `migrations/0050_approval_policies.sql:approval_policy` holds only `approval` and `self_approval` per action, not §10.3's per-gate decisions, approver kinds and expiry. A sensitive-path list exists (`.github/CODEOWNERS`) but is unarmed: the `main` ruleset keeps `require_code_owner_review: false`, so a PR can edit `.github/workflows/ci-public.yml` unrefused.
 
@@ -37,7 +37,7 @@ Baseline: main@70d31773, 2026-11-21 (content reviewed at main@61edfcf8, 2026-11-
 
 **Deploy read-back — `partial`.** `crates/actions/src/ops/reads.rs:ops_ci_status` and `:ops_deployments`, `crates/actions/src/ops/writes.rs:ops_rollback` exist but are T7's; no `dev_release` records a digest, live check or rollback.
 
-**Dependencies — `absent`.** No `kata.*` action and no tool table: T5 and T13 are open.
+**Dependencies — `partial`.** The `kata.*` family is registered (`kata.open|observe|analyse|measure|adopt|propagate|close`, …) and the tool estate exists (T13); what remains open is T5's evidence-gated lesson-promotion mechanism and T13's BYO publication surface (v1-w4a-6).
 
 ## Reuse sources
 
