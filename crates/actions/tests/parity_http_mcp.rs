@@ -952,6 +952,7 @@ async fn seed_programme(pg: &support::Pg, ctx: &Ctx) -> Uuid {
                 name,
                 status: None,
                 owner_user_id: None,
+                shared_config: serde_json::json!({}),
             },
         )
         .await
