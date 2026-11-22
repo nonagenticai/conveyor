@@ -896,16 +896,28 @@ window.CONVEYOR_DELIVERY = (function () {
     };
   }
 
-  // L1: every in-flight programme, plus every standalone project. SPEC_V2 §5.1: closed and
-  // archived programmes are history and are not listed; the row still carries the programme's
-  // project counts so completed work is visible at portfolio level.
+  // L1's rows for the page. The portfolio READ MODEL stays in flight: SPEC_V2 §5.1 defines the
+  // portfolio as "every project and programme in flight for the tenant" and says closed and
+  // archived work is history and is not listed. The owner asked this page for work in progress
+  // AND completed, including its token cost, so the page appends a clearly labelled history
+  // section BELOW the in-flight Gantt: closed programmes and closed standalone projects with an
+  // observed span. Archived work stays out (it is history in §5.1's sense and still renders at
+  // L2 inside its programme); the in-flight projection (`portfolio.in_flight`) is unchanged.
+  // A completed row with no observed event is not invented — it stays absent, so no bar is
+  // manufactured from a plan date or `created_at`.
+  //
+  // The caller concatenates `programmes` then `standalone` (v2.js), so the history marker and
+  // its rows ride the tail of `standalone`: that is the only position that renders after every
+  // in-flight row without changing the caller. They are page rows, not an in-flight model row.
   function portfolioRows(programme, index, clock, msp) {
-    const programmes = list((programme || {}).programme)
+    const rows = list((programme || {}).programme);
+    const membersOf = (id) => [...index.values()].filter((p) => p.programmeId === id);
+    const programmes = rows
       .filter((row) => row.status !== "closed" && row.status !== "archived")
-      .map((row) => {
-        const members = [...index.values()].filter((p) => p.programmeId === row.id);
-        return { ...rollUp(row, members, clock), artefacts: programmeArtefacts(msp, row.id) };
-      });
+      .map((row) => ({
+        ...rollUp(row, membersOf(row.id), clock),
+        artefacts: programmeArtefacts(msp, row.id),
+      }));
     // A standalone project is public only when it is active/paused AND carries a board or a card
     // (SPEC_V2 §5.1); a draft or a bare session fixture is not a portfolio row.
     const standalone = [...index.values()].filter(
@@ -914,7 +926,35 @@ window.CONVEYOR_DELIVERY = (function () {
         ["active", "paused"].includes(String(p.status || "").toLowerCase()) &&
         (p.hasBoard || p.total > 0),
     );
-    return { programmes, standalone };
+    // Completed history: closed programmes and closed standalone projects, each only when the
+    // snapshot carries an observed span for it. Archived rows are deliberately not listed here.
+    const completed = [
+      ...rows
+        .filter((row) => row.status === "closed")
+        .map((row) => ({
+          ...rollUp(row, membersOf(row.id), clock),
+          artefacts: programmeArtefacts(msp, row.id),
+        }))
+        .filter((row) => Number.isFinite(row.start)),
+      ...[...index.values()]
+        .filter(
+          (p) =>
+            !p.programmeId &&
+            String(p.status || "").toLowerCase() === "closed" &&
+            (p.hasBoard || p.total > 0) &&
+            Number.isFinite(p.start),
+        )
+        .sort((a, b) => (b.end ?? b.start) - (a.end ?? a.start)),
+    ];
+    if (!completed.length) return { programmes, standalone };
+    const marker = {
+      group: true,
+      section: "history",
+      id: "history-completed",
+      label: "Completed · history",
+      sub: `${completed.length} finished row${completed.length === 1 ? "" : "s"} · observed span`,
+    };
+    return { programmes, standalone: [...standalone, marker, ...completed] };
   }
 
   // L2: one programme's projects (completed included — a programme's history is its own)
@@ -1053,6 +1093,17 @@ window.CONVEYOR_DELIVERY = (function () {
       row.total > 0
         ? `<span class="gantt-progress" title="${row.done} of ${row.total} cards done">${row.done}/${row.total} cards</span>`
         : "";
+    // A completed row says so in words, not only in `data-state` and a hover title, and carries
+    // its observed span as text: a phone has no title attribute. History rows always have a
+    // finite start (portfolioRows filters the rest), so this is the span the bar itself spans.
+    const state =
+      row.state === "completed"
+        ? `<span class="gantt-state completed rail-chip ok">completed</span>${
+            Number.isFinite(row.start) && Number.isFinite(row.end)
+              ? `<small class="gantt-span">${esc(day(row.start))} → ${esc(day(row.end))}</small>`
+              : ""
+          }`
+        : "";
     const artefacts = row.artefacts
       ? `<span class="gantt-artefacts">${esc(
           [row.artefacts.trancheSummary, `${row.artefacts.benefitsMeasured}/${row.artefacts.benefits.length} benefits measured`]
@@ -1068,13 +1119,16 @@ window.CONVEYOR_DELIVERY = (function () {
         row.kind === "programme"
           ? ""
           : ` · ${esc(row.status)}${row.type ? ` · ${esc(row.type)}` : ""}`
-      }</small>${progress}${artefacts}${costCell(row)}</div>
+      }</small>${state}${progress}${artefacts}${costCell(row)}</div>
       <div class="gantt-track">${track}</div>
     </div>`;
   }
 
-  function gantt(rows, options = {}) {
-    const visible = list(rows).filter(Boolean);
+  // One Gantt block: its own axis domain, rows and table. `gantt` composes one block for the
+  // in-flight rows and, when the page appended a history marker, a second one below it. A block
+  // with its own domain is what keeps an old completed span from flattening today's bars.
+  function ganttBlock(rows, options = {}) {
+    const visible = list(rows).filter((row) => row && !row.section);
     if (!visible.length) {
       return `<div class="gantt gantt-empty muted">${esc(options.emptyNote || "No work is published for this level.")}</div>`;
     }
@@ -1092,10 +1146,34 @@ window.CONVEYOR_DELIVERY = (function () {
         ? `<span class="gantt-now" style="left:${(((Date.now() - domain.from) / (domain.to - domain.from)) * 100).toFixed(3)}%" title="today"></span>`
         : "";
     const body = visible.map((row) => rowHtml(row, domain || { from: 0, to: 1 })).join("");
-    return `<div class="gantt"><div class="gantt-scroll">
+    return `<div class="gantt${options.section ? ` gantt-${esc(options.section)}` : ""}"${
+      options.section === "history" ? ' style="margin-top:12px"' : ""
+    }><div class="gantt-scroll">
       <div class="gantt-head"><div class="gantt-head-label">${esc(options.label || "Work")}</div><div class="gantt-axis">${axis}${today}</div></div>
       <div class="gantt-body">${body}</div>
     </div><details class="gantt-data"><summary>Table view</summary>${ganttTable(visible)}</details></div>`;
+  }
+
+  // The page's one Gantt call. A `section: "history"` marker (portfolioRows) splits the rows: the
+  // in-flight block keeps its own domain, and the completed block gets the marker's label and a
+  // `gantt-history` class below it. No marker means the ordinary single block.
+  function gantt(rows, options = {}) {
+    const visible = list(rows).filter(Boolean);
+    const marker = visible.find((row) => row && row.section === "history") || null;
+    if (!marker) return ganttBlock(visible, options);
+    const at = visible.indexOf(marker);
+    const live = visible.slice(0, at);
+    const history = visible.slice(at + 1);
+    const head = live.length ? ganttBlock(live, options) : "";
+    const tail = history.length
+      ? ganttBlock(history, {
+          ...options,
+          label: marker.label || "Completed · history",
+          section: "history",
+          emptyNote: "No completed row carries an observed span.",
+        })
+      : "";
+    return head || tail ? `${head}${tail}` : ganttBlock([], options);
   }
 
   function ganttTable(rows) {
