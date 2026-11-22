@@ -13,6 +13,12 @@ The registry is refreshed by the `issue-registry` workflow
 `main` and daily, and opens one generated-data PR when GitHub's issues have moved; merging that PR
 rebuilds the image the API serves the file from.
 
+**The real operator UI is the app, not this pack.** Every V2 destination is a route in `apps/web`
+(Leptos CSR in the same binary); SPEC_V2 §10.5 is its normative specification and
+`docs/plans/T18-real-v2-ui.md` is the delivery plan. The pack remains the public programme site and
+the reviewed design reference: a page here is evidence of intent, never of implementation, and the
+V2 coverage record (`docs/evidence/v2-coverage.json`) measures the app's routes and specs.
+
 **Two surfaces, one pack.** Served by the app at **https://conveyor.nonagentic.ai/design/** the pack
 is the **operating site**: the unauthenticated routes `/design/data/snapshot.js`,
 `/design/docs/outputs.js`, `/design/docs/output-<id>.html` and

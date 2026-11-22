@@ -1265,13 +1265,15 @@
       "key": "T13",
       "name": "Tool platform",
       "description": "SPEC_V2 slice T13 (docs/SPEC_V2.md §12)",
-      "status": "closed",
+      "status": "active",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/SPEC_V2.md#12",
         "track": "v2",
         "issues": [
-          76
+          76,
+          556,
+          557
         ],
         "depends_on": [
           "T2",
@@ -1297,13 +1299,16 @@
       "key": "T14",
       "name": "Estate toolkits",
       "description": "SPEC_V2 slice T14 (docs/SPEC_V2.md §12)",
-      "status": "closed",
+      "status": "active",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/SPEC_V2.md#12",
         "track": "v2",
         "issues": [
-          83
+          83,
+          558,
+          560,
+          561
         ],
         "depends_on": [
           "T13",
@@ -1427,6 +1432,48 @@
         "adm_phase": "G",
         "plateau": "capability",
         "gate": "a tenant supplies a short brief plus documents, and a reviewed catalogue of departments, jobs, procedures and policies is published; no asset can publish itself or widen a tool grant"
+      }
+    },
+    {
+      "key": "T18",
+      "name": "The real V2 UI",
+      "description": "SPEC_V2 slice T18 (docs/SPEC_V2.md §12)",
+      "status": "active",
+      "repo_url": "https://github.com/nonagenticai/conveyor",
+      "meta": {
+        "plan": "docs/SPEC_V2.md#12",
+        "track": "v2",
+        "issues": [
+          559,
+          562,
+          563,
+          564,
+          565,
+          566
+        ],
+        "depends_on": [
+          "T0",
+          "T1",
+          "T2",
+          "T3",
+          "P0"
+        ],
+        "plan_status": "draft",
+        "status_source": "github issue state > measured coverage > plan frontmatter",
+        "measured_status": "proposed",
+        "tranche": 4,
+        "expected_outputs": [
+          "project-brief",
+          "inception-analysis",
+          "architecture-design"
+        ],
+        "closure_outputs": [
+          "evidence",
+          "closure-review"
+        ],
+        "adm_phase": "G",
+        "plateau": "capability",
+        "gate": "a signed-in tenant drives portfolio → programme → project → work package, organisation → release → binding, procedures intake → publish, tools call → ledger, improve → kata → adoption, operations incident → postmortem, and the ADM phase rail from the app; every destination's spec asserts empty, error, happy and one refusal; the V2 coverage record reports `exists` only from a real route + spec; no production screen renders a fixture"
       }
     },
     {

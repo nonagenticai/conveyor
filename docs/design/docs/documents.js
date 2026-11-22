@@ -42,8 +42,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/SPEC_V2.html",
       "source": "docs/SPEC_V2.md",
       "section": "Spec",
-      "sha256": "e7b6a666c2b3a57294cf9517404d4e26fbd6745febeafe0a243c3a597233a663",
-      "bytes": 170681,
+      "sha256": "a9386790e9ea2bebf9f2335d36be99fae8c48ecfc41c6f510275e968fd1a2df9",
+      "bytes": 179883,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/SPEC_V2.md"
     },
     {
@@ -119,6 +119,15 @@ window.CONVEYOR_DOCUMENTS = {
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0008-card-ledger.md"
     },
     {
+      "title": "0009 — The real V2 UI is the app, not the design pack",
+      "path": "docs/decisions/0009-real-v2-ui.html",
+      "source": "docs/decisions/0009-real-v2-ui.md",
+      "section": "Decisions",
+      "sha256": "1c955a3a9a73acb44f7ab188e69ccb5982b45b10fd34c6073516cf1352fd19f6",
+      "bytes": 3686,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0009-real-v2-ui.md"
+    },
+    {
       "title": "Programme architecture and benefits realization",
       "path": "docs/design/Program_Architecture_and_Benefits_Realization.html",
       "source": "docs/design/Program_Architecture_and_Benefits_Realization.md",
@@ -132,8 +141,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/design/README.html",
       "source": "docs/design/README.md",
       "section": "Design",
-      "sha256": "7e936418480e4a295a5686638c45288b8d58b07632040479df467e912969e63b",
-      "bytes": 24880,
+      "sha256": "06d0c2b70541870e0a2f72c2e40712e39b54cf816cdeaf4591d785b5db9dd1f0",
+      "bytes": 25352,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/design/README.md"
     },
     {
@@ -492,8 +501,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/evidence/v2-coverage.html",
       "source": "docs/evidence/v2-coverage.md",
       "section": "Evidence",
-      "sha256": "bee0e074baa69d4c363dae0766c4c9800d72064c78d4e15b97824125304b080d",
-      "bytes": 11107,
+      "sha256": "9ff612516ee9efc0e9b54b62fefd9df8d80e20dfe070e5bf15a018cb5cadcab9",
+      "bytes": 12896,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/v2-coverage.md"
     },
     {
@@ -501,8 +510,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/00-INDEX.html",
       "source": "docs/plans/00-INDEX.md",
       "section": "Plans",
-      "sha256": "aef99a3088bc2666a6598df665221afb32c6abbd9e6a93c893b6176000ffcbda",
-      "bytes": 250980,
+      "sha256": "c16232144a7d9a5e0212fc26d16f83e03884c7a8a17f4bcece1b954d96ce3545",
+      "bytes": 251697,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/00-INDEX.md"
     },
     {
@@ -603,6 +612,42 @@ window.CONVEYOR_DOCUMENTS = {
       "sha256": "538f4aa69586234a3a03c4adb93a51fb30dac859e0b6dc7681ef04988f18cd50",
       "bytes": 13658,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/P0-programme-definition.md"
+    },
+    {
+      "title": "T18 — The real V2 UI",
+      "path": "docs/plans/T18-real-v2-ui.html",
+      "source": "docs/plans/T18-real-v2-ui.md",
+      "section": "Plans",
+      "sha256": "d7788d99bef64cd2988433c5deb0ebdf60cbafde34453b04718ec9985ebfe75e",
+      "bytes": 15774,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T18-real-v2-ui.md"
+    },
+    {
+      "title": "Architecture design — T18, the real V2 UI",
+      "path": "docs/plans/T18/architecture-design.html",
+      "source": "docs/plans/T18/architecture-design.md",
+      "section": "Plans",
+      "sha256": "8ce63c895b0ca28d7cdcf55765dc72f3151e5b5e004984b136020dfc5b39ddd9",
+      "bytes": 5908,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T18/architecture-design.md"
+    },
+    {
+      "title": "Inception analysis — T18, the real V2 UI",
+      "path": "docs/plans/T18/inception-analysis.html",
+      "source": "docs/plans/T18/inception-analysis.md",
+      "section": "Plans",
+      "sha256": "353e35a8879b656ef18fae5e367d73561fcf14692f08a08d1875a1faaacb3475",
+      "bytes": 4318,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T18/inception-analysis.md"
+    },
+    {
+      "title": "Project brief — T18, the real V2 UI",
+      "path": "docs/plans/T18/project-brief.html",
+      "source": "docs/plans/T18/project-brief.md",
+      "section": "Plans",
+      "sha256": "a532c8aab5ef93d8bd5b13d390544ed18050c2fe205ee026fd51e6f0f53b0cc4",
+      "bytes": 3462,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T18/project-brief.md"
     },
     {
       "title": "T9 — TOGAF ADM capability",

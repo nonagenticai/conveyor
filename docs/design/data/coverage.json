@@ -607,6 +607,7 @@
         "T10",
         "T14",
         "T16",
+        "T18",
         "T4",
         "T9"
       ],
@@ -859,6 +860,7 @@
         "T10",
         "T14",
         "T16",
+        "T18",
         "T4",
         "T9"
       ],
@@ -946,6 +948,7 @@
         "T10",
         "T14",
         "T16",
+        "T18",
         "T4",
         "T9"
       ],
@@ -1484,12 +1487,12 @@
       "tranche": 9,
       "units": {
         "blocked": 0,
-        "claimed": 0,
+        "claimed": 1,
         "numbers": [
           15
         ],
         "open": 1,
-        "ready": 1,
+        "ready": 0,
         "unknown": 0
       }
     },
@@ -1655,6 +1658,7 @@
         "S09",
         "T14",
         "T16",
+        "T18",
         "T4",
         "T9"
       ],
@@ -1794,12 +1798,14 @@
       "tranche": 3,
       "units": {
         "blocked": 0,
-        "claimed": 0,
+        "claimed": 1,
         "numbers": [
-          76
+          76,
+          556,
+          557
         ],
-        "open": 0,
-        "ready": 0,
+        "open": 2,
+        "ready": 1,
         "unknown": 0
       }
     },
@@ -1831,6 +1837,7 @@
         "S09",
         "T10",
         "T16",
+        "T18",
         "T4",
         "T9"
       ],
@@ -1842,10 +1849,13 @@
         "blocked": 0,
         "claimed": 0,
         "numbers": [
-          83
+          83,
+          558,
+          560,
+          561
         ],
-        "open": 0,
-        "ready": 0,
+        "open": 3,
+        "ready": 3,
         "unknown": 0
       }
     },
@@ -1917,6 +1927,7 @@
         "S09",
         "T10",
         "T14",
+        "T18",
         "T4",
         "T9"
       ],
@@ -1975,6 +1986,60 @@
           87
         ],
         "open": 1,
+        "ready": 0,
+        "unknown": 0
+      }
+    },
+    {
+      "blocked_by": [],
+      "evidence": [
+        "docs/plans/T18-real-v2-ui.md",
+        "docs/SPEC_V2.md",
+        "apps/web/src/app.rs"
+      ],
+      "gap": "no V2 route exists in apps/web; the destinations are mock pages only",
+      "key": "T18",
+      "measured": {
+        "actions": [
+          0,
+          0
+        ],
+        "modules": [
+          0,
+          0
+        ],
+        "tables": [
+          0,
+          0
+        ]
+      },
+      "name": "The real V2 UI",
+      "parallel_with": [
+        "S05",
+        "S07",
+        "S09",
+        "T10",
+        "T14",
+        "T16",
+        "T4",
+        "T9"
+      ],
+      "plan": "docs/SPEC_V2.md#12",
+      "status": "proposed",
+      "track": "v2",
+      "tranche": 4,
+      "units": {
+        "blocked": 5,
+        "claimed": 1,
+        "numbers": [
+          559,
+          562,
+          563,
+          564,
+          565,
+          566
+        ],
+        "open": 6,
         "ready": 0,
         "unknown": 0
       }
@@ -2091,6 +2156,7 @@
         "T10",
         "T14",
         "T16",
+        "T18",
         "T9"
       ],
       "plan": "docs/SPEC_V2.md#12",
@@ -2310,6 +2376,7 @@
         "T10",
         "T14",
         "T16",
+        "T18",
         "T4"
       ],
       "plan": "docs/SPEC_V2.md#12",
@@ -2573,13 +2640,13 @@
         "built": 39,
         "partial": 2,
         "planned": 0,
-        "proposed": 5,
+        "proposed": 6,
         "standing": 1
       },
-      "total": 48,
+      "total": 49,
       "uncovered": [],
-      "with_open_units": 17,
-      "without_open_units": 31
+      "with_open_units": 20,
+      "without_open_units": 29
     },
     "screens": {
       "actions_invoked": 39,

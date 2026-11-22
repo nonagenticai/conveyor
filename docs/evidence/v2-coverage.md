@@ -5,9 +5,9 @@ code. The JSON beside this file is the record; this page is its rendered form.
 
 | Verdict | Meaning | Count |
 |---|---|---|
-| `exists` | implemented in code and backed by real rows | 46 |
-| `extend` | a partial implementation exists (a page, a table, or a prefix) that must be extended | 6 |
-| `new` | absent | 8 |
+| `exists` | the real route and its Playwright spec exist | 44 |
+| `extend` | a V1 ancestor route exists, or the V2 route exists without its spec | 6 |
+| `new` | neither the route nor an ancestor exists | 12 |
 
 ## Rows
 
@@ -65,11 +65,13 @@ code. The JSON beside this file is the record; this page is its rendered form.
 | `actions:tools` | §10.4 | actions | tools | `extend` | actions: tool_authoring.* absent<br>actions: tool_bindings.* absent<br>actions: tool_calls.* absent<br>actions: toolkits.* found (toolkits.publish)<br>actions: tools.* found (tools.probe, tools.usage) |
 | `actions:memory` | §10.4 | actions | memory | `new` | actions: lessons.* absent |
 | `actions:metrics` | §10.4 | actions | metrics | `exists` | actions: metrics.* found (metrics.flow, metrics.job, metrics.maturity…) |
-| `destination:Organisation` | §10.5 | destination | Organisation | `exists` | docs/design/v2.js: page 'organisation' registered<br>*The page renders the tenant's live industry, department, job, release and binding rows (T0, #34/#65).* |
-| `destination:Procedures` | §10.5 | destination | Procedures | `exists` | docs/design/v2.js: page 'procedures' registered<br>*The page operates the T16 intake live (SOP/BPMN/RDF), the source review and the two human publication gates; signed out it renders the published procedure/process/step rows read-only (#448).* |
-| `destination:Authoring` | §10.5 | destination | Authoring | `new` | docs/design/v2.js: page 'authoring' registered<br>*A design study only: no authoring actions, no intake queue, no draft catalogue (T17).* |
-| `destination:Portfolio` | §10.5 | destination | Portfolio | `extend` | docs/design/v2.js: page 'portfolio' registered<br>*Live programme/project rows render today; shared config, WSJF backlog, cadence and capacity are fixture tabs (T1/T10).* |
-| `destination:Plan` | §10.5 | destination | Plan | `extend` | docs/design/v2.js: page 'plan' registered<br>*The live Boards tab renders real boards and cards (#57); WBS, baseline, registers and change control are T1.* |
-| `destination:Improve` | §10.5 | destination | Improve | `extend` | docs/design/v2.js: page 'improve' registered<br>*The page exists and renders a design study; V1's eval/benchmark/kata rows are the instruments it will read (T5/T8).* |
-| `destination:Operations` | §10.5 | destination | Operations | `new` | docs/design/v2.js: page 'operations' registered<br>*A design study only: no incident/runbook/postmortem rows or operations actions (T7).* |
-| `destination:Tools` | §10.5 | destination | Tools | `new` | docs/design/v2.js: page 'toolkits' registered<br>*The page exists as a catalogue study; tool/toolkit/tool_binding/tool_call do not exist (T13).* |
+| `destination:Organisation` | §10.5 | destination | Organisation | `new` | apps/web/src/app.rs: route '/organisation' absent<br>apps/web/e2e/organisation.spec.ts: absent<br>docs/design/v2.js: page 'organisation' — design reference, not implementation<br>*The mock page is a design study; the app has no /organisation route, and the organisation read/write actions are T0/T2.* |
+| `destination:Procedures` | §10.5 | destination | Procedures | `extend` | apps/web/src/app.rs: route '/procedures' absent<br>apps/web/e2e/procedures.spec.ts: absent<br>apps/web/src/app.rs: V1 ancestor '/build/processes', '/build/process-map' found<br>docs/design/v2.js: page 'procedures' — design reference, not implementation<br>*V1 has the process list/detail and the process map at /build/processes and /build/process-map; V2 adds SOP/RDF/OWL/BPMN intake, PDDL/PKO and the publish gates (T16).* |
+| `destination:Authoring` | §10.5 | destination | Authoring | `new` | apps/web/src/app.rs: route '/authoring' absent<br>apps/web/e2e/authoring.spec.ts: absent<br>docs/design/v2.js: page 'authoring' — design reference, not implementation<br>*No route and no authoring actions; the destination is T17.* |
+| `destination:Portfolio` | §10.5 | destination | Portfolio | `new` | apps/web/src/app.rs: route '/portfolio' absent<br>apps/web/src/app.rs: route '/portfolio/:programme_id' absent<br>apps/web/e2e/portfolio.spec.ts: absent<br>docs/design/v2.js: page 'portfolio' — design reference, not implementation<br>*The V1 boards are the nearest surface; the computed portfolio, shared config, WSJF and cadence are T1/T10.* |
+| `destination:Programme` | §10.5 | destination | Programme | `new` | apps/web/src/app.rs: route '/programme' absent<br>apps/web/e2e/programme.spec.ts: absent<br>docs/design/v2.js: page 'programme' — design reference, not implementation<br>*No route; the MSP definition reads are T10.* |
+| `destination:Architecture` | §10.5 | destination | Architecture | `new` | apps/web/src/app.rs: route '/design/adm' absent<br>apps/web/e2e/adm.spec.ts: absent<br>docs/design/v2.js: page 'adm' — design reference, not implementation<br>*V1 /architecture is the system map; the ADM capability at /design/adm and its actions are T9.* |
+| `destination:Plan` | §10.5 | destination | Plan | `extend` | apps/web/src/app.rs: route '/plan' absent<br>apps/web/e2e/plan.spec.ts: absent<br>apps/web/src/app.rs: V1 ancestor '/boards' found<br>docs/design/v2.js: page 'plan' — design reference, not implementation<br>*The live Boards tab joins real cards at /boards; WBS, baseline, registers and change control are T1.* |
+| `destination:Improve` | §10.5 | destination | Improve | `extend` | apps/web/src/app.rs: route '/improve' absent<br>apps/web/e2e/improve.spec.ts: absent<br>apps/web/src/app.rs: V1 ancestor '/evals/improvement' found<br>docs/design/v2.js: page 'improve' — design reference, not implementation<br>*V1 /evals/improvement carries the improvement campaigns; the coach/kata/lessons path is T4/T5.* |
+| `destination:Operations` | §10.5 | destination | Operations | `new` | apps/web/src/app.rs: route '/operations' absent<br>apps/web/e2e/operations.spec.ts: absent<br>docs/design/v2.js: page 'operations' — design reference, not implementation<br>*No route and no operations actions; the incident/runbook/postmortem path is T7.* |
+| `destination:Tools` | §10.5 | destination | Tools | `new` | apps/web/src/app.rs: route '/tools' absent<br>apps/web/e2e/tools.spec.ts: absent<br>docs/design/v2.js: page 'toolkits' — design reference, not implementation<br>*V1 /tools is a legacy coding-action catalogue; the tool/toolkit/binding/call rows are T13–T15.* |
