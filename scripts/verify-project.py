@@ -785,6 +785,206 @@ def check_product_findings(
     return True, "no open P0 package for this project"
 
 
+STANDARD_ARTEFACT_STANDARDS = ("TOGAF", "PMP", "MSP", "SAFe")
+DEFERRAL_DISPOSITIONS = ("waiver", "deferral")
+
+
+def _register(snapshot: Snapshot) -> tuple[dict[str, Any] | None, str | None]:
+    register, error = rework_register(snapshot)
+    if error:
+        return None, error
+    if not isinstance(register, dict) or not isinstance(register.get("packages"), list):
+        return None, "the register carries no packages"
+    return register, None
+
+
+def _package_field(package: dict[str, Any], field: str) -> Any:
+    value = package.get(field)
+    if value is not None:
+        return value
+    baseline = package.get("baseline")
+    if isinstance(baseline, dict):
+        return baseline.get(field)
+    return None
+
+
+def check_artefact_standard(
+    snapshot: Snapshot, key: str, params: dict[str, Any]
+) -> tuple[bool, str]:
+    """Every mandatory standard artefact this project owns is evidenced.
+
+    A standard package (TOGAF, PMP, MSP, SAFe) is cleared only when its gap disappears from the
+    fresh audit; severity does not exempt it and a suppressed package is not open. The owner
+    may be named by project key or by project id.
+    """
+    register, error = _register(snapshot)
+    if error:
+        return False, error
+    row = snapshot.project(key)
+    owners = {key, str(row["id"])}
+    open_keys = [
+        str(package.get("key"))
+        for package in register["packages"]
+        if package.get("standard") in STANDARD_ARTEFACT_STANDARDS
+        and package.get("status") == "open"
+        and str(package.get("owner_project")) in owners
+    ]
+    if open_keys:
+        preview = ", ".join(open_keys[:8])
+        more = "" if len(open_keys) <= 8 else f", +{len(open_keys) - 8} more"
+        return False, f"{len(open_keys)} mandatory artefact package(s) open: {preview}{more}"
+    return True, "no open standard artefact package for this project"
+
+
+def check_rework_resolution(
+    snapshot: Snapshot, key: str, params: dict[str, Any]
+) -> tuple[bool, str]:
+    """No open P0/P1 rework package without a dated, owned, decided deferral.
+
+    An open P2 is advisory and passes. A waiver or deferral passes only with a named owner, a
+    decision reference and an expiry in the future; anything else blocks.
+    """
+    register, error = _register(snapshot)
+    if error:
+        return False, error
+    row = snapshot.project(key)
+    owners = {key, str(row["id"])}
+    now = datetime.now(timezone.utc)
+    blocking: list[str] = []
+    deferred = 0
+    for package in register["packages"]:
+        if package.get("status") != "open":
+            continue
+        if str(package.get("owner_project")) not in owners:
+            continue
+        severity = str(package.get("severity"))
+        if severity == "P2":
+            continue
+        disposition = str(_package_field(package, "disposition") or "")
+        owners_list = _package_field(package, "owners") or []
+        decision_ref = _package_field(package, "decision_ref")
+        expires = _package_field(package, "earliest_expires")
+        valid = (
+            disposition in DEFERRAL_DISPOSITIONS
+            and bool(owners_list)
+            and bool(str(decision_ref or "").strip())
+            and expires is not None
+            and _timestamp(expires) > now
+        )
+        if valid:
+            deferred += 1
+        else:
+            blocking.append(f"{package.get('key')} ({severity})")
+    if blocking:
+        preview = ", ".join(blocking[:8])
+        more = "" if len(blocking) <= 8 else f", +{len(blocking) - 8} more"
+        return False, f"{len(blocking)} open P0/P1 package(s) without a valid deferral: {preview}{more}"
+    return True, f"no undecided P0/P1 package ({deferred} deferred with owner, decision and expiry)"
+
+
+def check_delegation_provenance(
+    snapshot: Snapshot, key: str, params: dict[str, Any]
+) -> tuple[bool, str]:
+    """Every approval the project relies on is a rule decision under a published delegation.
+
+    A historical `service` decision is tolerated only when the project's accepted provenance
+    residual (a `change` register item with `meta.provenance_residual`) names its approval id.
+    """
+    row = snapshot.project(key)
+    work = snapshot.work or {}
+    approvals = [
+        approval
+        for approval in work.get("approvals") or []
+        if approval.get("project_id") == row["id"] and approval.get("status") == "approved"
+    ]
+    by_approval: dict[str, list[dict[str, Any]]] = {}
+    for decision in work.get("approval_decisions") or []:
+        by_approval.setdefault(str(decision.get("approval_id")), []).append(decision)
+    residual: set[str] = set()
+    for item in snapshot.msp.get("register_items") or []:
+        if (
+            item.get("project_id") == row["id"]
+            and item.get("kind") == "change"
+            and str(item.get("status")) == "accepted"
+        ):
+            meta = item.get("meta") or {}
+            for ref in meta.get("provenance_residual") or []:
+                residual.add(str(ref))
+    rule_seen = 0
+    exempt = 0
+    offending: list[str] = []
+    for approval in approvals:
+        approval_id = str(approval.get("id"))
+        decisions = by_approval.get(approval_id, [])
+        lawful = False
+        for decision in decisions:
+            via = decision.get("via")
+            if (
+                decision.get("decision") == "approve"
+                and decision.get("decided_by_kind") == "rule"
+                and isinstance(via, dict)
+                and via.get("delegation_ref")
+                and snapshot.published_id(str(via["delegation_ref"]))
+            ):
+                lawful = True
+                break
+        if lawful:
+            rule_seen += 1
+            continue
+        if approval_id in residual:
+            exempt += 1
+            continue
+        offending.append(f"{approval_id} ({approval.get('gate')})")
+    if offending:
+        preview = ", ".join(offending[:6])
+        more = "" if len(offending) <= 6 else f", +{len(offending) - 6} more"
+        return False, (
+            f"{len(offending)} approval(s) not decided as a rule under a published delegation: "
+            f"{preview}{more}"
+        )
+    return True, f"{rule_seen} approval(s) decided as rule under a published delegation ({exempt} exempt)"
+
+
+def check_published_proof(
+    snapshot: Snapshot, key: str, params: dict[str, Any]
+) -> tuple[bool, str]:
+    """The snapshot's output index is whole, and the project's closure outputs are in it.
+
+    Every indexed output's file must exist under the snapshot's docs root (a broken export
+    manifest is a red check, never a skipped one), and every declared closure output must be an
+    indexed output of THIS project with its file present.
+    """
+    row = snapshot.project(key)
+    docs_root = snapshot.path.parent
+    outputs = snapshot.outputs
+    broken = []
+    for output in outputs:
+        path = output.get("path")
+        if not path or not (docs_root / str(path)).exists():
+            broken.append(str(output.get("id")))
+    if broken:
+        return False, f"{len(broken)} indexed output(s) carry no file under docs/: " + ", ".join(broken[:6])
+    categories = (row.get("meta") or {}).get("closure_outputs") or []
+    if not categories:
+        return True, f"{len(outputs)} indexed outputs; no closure outputs declared"
+    missing = [
+        category
+        for category in categories
+        if not any(
+            output.get("project_id") == row["id"]
+            and output.get("category") == category
+            and output.get("path")
+            and (docs_root / str(output["path"])).exists()
+            for output in outputs
+        )
+    ]
+    if missing:
+        return False, "declared closure outputs are not published: " + ", ".join(missing)
+    return True, (
+        f"{len(outputs)} indexed outputs; {len(categories)} closure output(s) published with their file"
+    )
+
+
 CHECKS: dict[str, Callable[[Snapshot, str, dict[str, Any]], tuple[bool, str]]] = {
     "project": check_project,
     "project_baseline": check_project_baseline,
@@ -801,6 +1001,10 @@ CHECKS: dict[str, Callable[[Snapshot, str, dict[str, Any]], tuple[bool, str]]] =
     "demo_credits": check_demo_credits,
     "lessons": check_lessons,
     "product_findings": check_product_findings,
+    "artefact_standard": check_artefact_standard,
+    "rework_resolution": check_rework_resolution,
+    "delegation_provenance": check_delegation_provenance,
+    "published_proof": check_published_proof,
 }
 
 
@@ -1538,6 +1742,169 @@ severity = "P0"
         lambda a, w, m, o: m["lessons"][0].update({"evidence": []}),
         False,
     )
+
+    # ── the four programme-level checks ────────────────────────────────────────────────
+    # Each runs on a crafted snapshot and a crafted register; every case is one property that
+    # must green under the right record and red under the wrong one.
+    global _REWORK_CACHE, _REWORK_ERROR
+    saved_cache, saved_error = _REWORK_CACHE, _REWORK_ERROR
+
+    def extra_snapshot(tag: str, **parts: Any) -> Snapshot:
+        base = workdir / f"extra-{tag}"
+        (base / "data").mkdir(parents=True)
+        (base / "docs").mkdir()
+        project = {
+            "key": "TEST",
+            "id": "project-1",
+            "status": "active",
+            "meta": {"closure_outputs": parts.get("closure_outputs", [])},
+        }
+        (base / "data" / "programme.json").write_text(json.dumps({"projects": [project]}))
+        (base / "data" / "architecture.json").write_text(
+            json.dumps({"contracts": [], "compliance_reviews": [], "waivers": []})
+        )
+        (base / "data" / "work.json").write_text(json.dumps(parts.get("work") or {}))
+        (base / "data" / "msp.json").write_text(json.dumps(parts.get("msp") or {}))
+        (base / "data" / "artefacts.json").write_text(json.dumps({"documents": []}))
+        (base / "data" / "manifest.json").write_text(json.dumps({"git_sha": "self-test"}))
+        outputs = parts.get("outputs") or []
+        for output in outputs:
+            if output.get("path"):
+                target = base / str(output["path"])
+                target.parent.mkdir(parents=True, exist_ok=True)
+                target.write_text("x")
+        (base / "docs" / "outputs.js").write_text(
+            "window.CONVEYOR_OUTPUTS = " + json.dumps({"outputs": outputs}) + ";\n"
+        )
+        return Snapshot(base / "data")
+
+    def register_case(tag: str, packages: Any, check: Callable[..., tuple[bool, str]], expect: bool) -> None:
+        global _REWORK_CACHE
+        _REWORK_CACHE = {"packages": packages}
+        snapshot_case = extra_snapshot(tag)
+        ok, detail = check(snapshot_case, "TEST", {})
+        if ok is not expect:
+            failures.append(f"{tag}: expected {'pass' if expect else 'fail'}, got {detail}")
+
+    def standard_package(key: str, severity: str, **fields: Any) -> dict[str, Any]:
+        package = {
+            "key": key,
+            "standard": "PMP",
+            "status": "open",
+            "severity": severity,
+            "owner_project": "TEST",
+        }
+        package.update(fields)
+        return package
+
+    register_case("standard-open", [standard_package("std-pmp-x", "P2")], check_artefact_standard, False)
+    register_case(
+        "standard-other-owner",
+        [standard_package("std-pmp-x", "P0", owner_project="OTHER")],
+        check_artefact_standard,
+        True,
+    )
+    register_case("standard-suppressed", [standard_package("std-pmp-x", "P0", status="suppressed")], check_artefact_standard, True)
+    _REWORK_CACHE = {"packages": None}
+    ok, detail = check_artefact_standard(extra_snapshot("standard-missing"), "TEST", {})
+    if ok:
+        failures.append("a register without a packages array did not red the artefact-standard check")
+
+    register_case("resolution-open-p1", [standard_package("pkg-1", "P1")], check_rework_resolution, False)
+    register_case(
+        "resolution-deferred",
+        [standard_package(
+            "pkg-1", "P1", disposition="waiver",
+            owners=["programme owner"], decision_ref="01a2", earliest_expires="2099-01-01",
+        )],
+        check_rework_resolution,
+        True,
+    )
+    register_case("resolution-open-p2", [standard_package("pkg-1", "P2")], check_rework_resolution, True)
+    register_case(
+        "resolution-expired",
+        [standard_package(
+            "pkg-1", "P0", disposition="deferral",
+            owners=["programme owner"], decision_ref="01a2", earliest_expires="2020-01-01",
+        )],
+        check_rework_resolution,
+        False,
+    )
+
+    def work_case(tag: str, work: dict[str, Any], msp: dict[str, Any], expect: bool) -> None:
+        snapshot_case = extra_snapshot(
+            tag,
+            work=work,
+            msp=msp,
+            outputs=[{"id": "deleg-1", "published_at": "2026-11-01T00:00:00+00:00",
+                      "path": "docs/deleg.html", "category": "decision",
+                      "project_id": "project-1"}],
+        )
+        ok, detail = check_delegation_provenance(snapshot_case, "TEST", {})
+        if ok is not expect:
+            failures.append(f"{tag}: expected {'pass' if expect else 'fail'}, got {detail}")
+
+    rule_approval = {"id": "ap-1", "project_id": "project-1", "gate": "charter", "status": "approved"}
+    rule_decision = {
+        "approval_id": "ap-1", "decision": "approve", "decided_by_kind": "rule",
+        "via": {"delegation_ref": "deleg-1"},
+    }
+    service_decision = {
+        "approval_id": "ap-1", "decision": "approve", "decided_by_kind": "service",
+        "via": {"channel": "internal"},
+    }
+    work_case("delegation-rule", {"approvals": [rule_approval], "approval_decisions": [rule_decision]}, {}, True)
+    work_case("delegation-service", {"approvals": [rule_approval], "approval_decisions": [service_decision]}, {}, False)
+    work_case(
+        "delegation-rule-no-via",
+        {"approvals": [rule_approval], "approval_decisions": [
+            {"approval_id": "ap-1", "decision": "approve", "decided_by_kind": "rule"}]},
+        {},
+        False,
+    )
+    work_case(
+        "delegation-exempt",
+        {"approvals": [rule_approval], "approval_decisions": [service_decision]},
+        {"register_items": [{
+            "id": "chg-1", "project_id": "project-1", "kind": "change", "status": "accepted",
+            "meta": {"provenance_residual": ["ap-1"]},
+        }]},
+        True,
+    )
+
+    def proof_case(tag: str, outputs: list[dict[str, Any]], closure: list[str], expect: bool) -> None:
+        snapshot_case = extra_snapshot(tag, outputs=outputs, closure_outputs=closure)
+        ok, detail = check_published_proof(snapshot_case, "TEST", {})
+        if ok is not expect:
+            failures.append(f"{tag}: expected {'pass' if expect else 'fail'}, got {detail}")
+
+    proof_case(
+        "proof-complete",
+        [{"id": "o1", "project_id": "project-1", "category": "closure-review",
+          "path": "docs/out.html", "published_at": "2026-11-01T00:00:00+00:00"}],
+        ["closure-review"],
+        True,
+    )
+    proof_case("proof-missing", [], ["closure-review"], False)
+    proof_case(
+        "proof-other-project",
+        [{"id": "o1", "project_id": "project-2", "category": "closure-review",
+          "path": "docs/out.html", "published_at": "2026-11-01T00:00:00+00:00"}],
+        ["closure-review"],
+        False,
+    )
+    broken = extra_snapshot(
+        "proof-broken",
+        outputs=[{"id": "o1", "project_id": "project-1", "category": "closure-review",
+                  "path": "docs/gone.html", "published_at": "2026-11-01T00:00:00+00:00"}],
+        closure_outputs=["closure-review"],
+    )
+    (broken.path.parent / "docs" / "gone.html").unlink()
+    ok, detail = check_published_proof(broken, "TEST", {})
+    if ok:
+        failures.append("an indexed output whose file is gone did not red the published-proof check")
+
+    _REWORK_CACHE, _REWORK_ERROR = saved_cache, saved_error
 
     if failures:
         print("SELF-TEST FAILED")
