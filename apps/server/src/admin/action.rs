@@ -68,6 +68,11 @@ impl<'a> ActionCaller<'a> {
         })
     }
 
+    /// The member this caller acts as.
+    pub fn actor_id(&self) -> Uuid {
+        self.actor
+    }
+
     /// Invoke one action and return its `output`. `_version` in the input is honoured by the
     /// engine exactly as it is on HTTP; `precondition` is the typed alternative.
     pub async fn call(
