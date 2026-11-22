@@ -482,26 +482,6 @@ pub async fn failing_step_position_tx(
     Ok(position)
 }
 
-/// How many interruptions a card has ever had, of every signature.
-///
-/// The per-card depth cap (SPEC_V2 §1.4 · §12 T4): three interruptions are enough to show the
-/// coach is not converging, and a fourth would only repeat the first three.
-pub async fn count_interruptions_for_card_tx(
-    conn: &mut PgConnection,
-    tenant: TenantId,
-    card_id: Uuid,
-) -> Result<i64, CoachStoreError> {
-    let count: i64 = sqlx::query_scalar(
-        "SELECT count(*) FROM coach_interruption
-          WHERE tenant_id = $1 AND interrupted_card_id = $2",
-    )
-    .bind(tenant.as_uuid())
-    .bind(card_id)
-    .fetch_one(&mut *conn)
-    .await?;
-    Ok(count)
-}
-
 /// Is this card a coach card?
 ///
 /// The enqueue-time recursion guard (`store::run::enqueue_run_failed_trigger_tx`) and `err.card`
