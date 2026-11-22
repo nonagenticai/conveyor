@@ -293,12 +293,17 @@ impl ServerHandler for McpServer {
         let Some(session) = session_of(&context) else {
             return Err(McpError::invalid_request("unauthenticated", None));
         };
+        // `_meta` is read from the CONTEXT, not from `request.meta`: rmcp strips the wire
+        // `params._meta` into the request extensions and the service loop moves it to
+        // `context.meta` before dispatch, so `UpdateTaskParams.meta` is always `None` on the
+        // wire (measured in rmcp 3.11). This is where the agent platform's
+        // `_meta.delegation_ref` reaches `approvals.decide`.
         tasks::update(
             &self.deps.pool,
             &session,
             &request.task_id,
             &request.input_responses,
-            request.meta,
+            &context.meta,
         )
         .await
     }
