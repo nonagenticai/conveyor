@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>0010 — No deferrals; every finding executes · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0010-no-deferrals.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="0010--no-deferrals-every-finding-executes">0010 — No deferrals; every finding executes</h1>
+<p>Status: Accepted · Date: 2026-11-22 · Slice: #526 (programme)</p>
+<h2 id="context">Context</h2>
+<p>The programme was disposing of open work with dated instruments rather than executing it: <code>v1-s14-1</code> carried a waiver accepted 2026-11-22 and expiring 2027-02-18; the acceptance manifest <code>acceptance/programme/P0.toml</code> carried an <code>[[allow]]</code> for <code>benefit_baseline</code> expiring 2027-02-18; <code>verify-viability.py</code> refused the programme unless every open finding carried a valid deferral; and <code>verify-project.py</code> and <code>audit-programme-conformance.py</code> suppressed non-conformance through active waivers. The measured board at <code>58645942</code> shows what that bought: 12 green / 35 red manifests, 14 closed-on-red projects, 965 artefacts of which 418 are absent and 311 partial, 483 standards findings, 102 audit packages, 62 contract gaps, and 6 of 6 viability checks missing.</p>
+<p>On 2026-11-22 the owner directed that <strong>all dated deferrals are no longer true: the programme defers nothing; it executes the work</strong>, and that decision and approval authority sits with the Claude sessions, exercised with rigour, grounding, and captured and published evidence.</p>
+<h2 id="decision">Decision</h2>
+<ol type="1">
+<li>No deferral, waiver, <code>[[allow]]</code> or dated residual is a valid disposition for any #526 finding or artefact. Every finding is executed.</li>
+<li>Where a proof cannot exist because the system it proved has been decommissioned, the finding's <strong>claim is corrected</strong> to what the surviving system can prove, with the decommissioning as its evidence. A correction is not a waiver and has no expiry.</li>
+<li>The instruments refuse suppression: <code>verify-viability.py</code>, <code>verify-project.py</code>, <code>audit-programme-conformance.py</code> and <code>governance/conformance.json</code> treat a waiver or deferral on programme work as a finding. The TOGAF <code>architecture_waiver</code> remains legal for a deviation from an architecture specification (SPEC_V2 §8.1), requires an accepting owner and a reassessment date, and the programme carries zero active ones at green.</li>
+<li>Decisions are <code>rule</code> decisions with a resolving <code>via.delegation_ref</code>, published with their rationale and evidence. No gate is claimed as human.</li>
+<li>The superseded decision and its register row are kept; history is forward-only.</li>
+</ol>
+<h2 id="consequences">Consequences</h2>
+<ul>
+<li>The findings ledger re-anchors <code>v1-s14-1</code> to decision document <code>01a2029c-9254-7605-8a7c-3013b28ee794</code>; its waiver is removed and the finding stays open until it is executed or its claim corrected.</li>
+<li>Removing suppression turns the gates red-first (98 open findings, 539 packages). The gate stays red until the work clears it; no green is claimed in the meantime.</li>
+<li>Every tranche review from tranche 3 cites this ADR for its no-deferral verdict.</li>
+<li>The acceptance standard (<code>v5 §5</code>, clauses (a)–(j)) is the close gate, and its own change row <code>U5-ACCEPTANCE-STANDARD</code> (<code>01a2029f-8e2e-78de-bc99-119da42fdfbf</code>) stays open until the <code>change</code> gate can be approved (blocked by <code>v1-change-1</code>).</li>
+</ul>
+<h2 id="evidence">Evidence</h2>
+<ul>
+<li>Decision document <code>01a2029c-9254-7605-8a7c-3013b28ee794</code> (published, category <code>decision</code>, unit <code>U5</code>).</li>
+<li>Register row <code>U5-NO-DEFERRALS</code> <code>01a2029f-5a5f-70aa-be13-029435893a40</code>.</li>
+<li>The measured board at <code>58645942</code>: issue #526, comment 7077202144.</li>
+<li>Plan of record <code>~/.claude/plans/which-project-in-the-noble-turing.md</code> v5, rulings R7–R9.</li>
+</ul>
+<h2 id="supersedes">Supersedes</h2>
+<p><code>01a20208-5261-7085-a4a7-74f061e4842b</code> (decision document) and <code>01a20208-0c30-7f4f-a3b7-ab1b467e2b46</code> (register row <code>U5-RESIDUAL-S14</code>).</p>
+<h2 id="not-claimed">Not claimed</h2>
+<p>No finding is marked resolved by this ADR. Nothing is invented. The S14 receipts that the decommissioned systems cannot produce are either executed against the surviving harness or corrected to the surviving proof; they are never asserted as receipts.</p>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/decisions/0010-no-deferrals.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>
