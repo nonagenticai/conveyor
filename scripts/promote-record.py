@@ -109,6 +109,17 @@ WRITE_ACTIONS = {
     "benefits.link",
     "decisions.create",
     "decisions.transition",
+    # The tr3 SAFe cadence family: the cadence rows themselves, their metas, the plan's gate,
+    # the demo credits, the retro and its lessons, and the tranche review chain.
+    "cadences.create",
+    "cadences.update",
+    "cadences.approve_plan",
+    "cadences.credit_demo",
+    "retros.record_findings",
+    "retros.close",
+    "lessons.propose",
+    "tranches.review",
+    "tranches.authorise",
 }
 
 # The ADR register's 57 source rows are NOT journaled one entry per row: the seed
@@ -133,6 +144,13 @@ READ_ACTIONS = {
     "documents.list",
     "decisions.list",
     "decisions.get",
+    "cadences.list",
+    "cadences.credit_list",
+    "lessons.list",
+    "tranches.list",
+    "tranches.review_list",
+    "cards.list",
+    "wbs.list",
 }
 
 # The release this script ships with has no action that lists measurements.  If one is
@@ -153,6 +171,24 @@ CARD_COMMENT_KEY_RE = re.compile(r"^card-comment:([0-9a-f-]{36}):([0-9a-f]{8,64}
 CARD_MOVE_KEY_RE = re.compile(r"^card-move:([0-9a-f-]{36}):(intake|active|waiting|done|archive)$")
 BENEFIT_LINK_KEY_RE = re.compile(rf"^benefit-link:({TOKEN}):(.+)$")
 DECISION_KEY_RE = re.compile(rf"^decision:({TOKEN})(?:/(draft|in_review|approved|superseded|archived))?$")
+# The tr3 SAFe family.  `cadence:<period>/<kind>` is the row; `/meta` is the update that puts the
+# PI plan, the refinement and the retro's board into its meta.  The tranche chain keys carry the
+# tranche NUMBER, because the staging tranche id is not portable and production has its own rows.
+CADENCE_KEY_RE = re.compile(rf"^cadence:({TOKEN})/(sprint|pi|demo|retro|refinement)(?:/(meta))?$")
+PI_PLAN_KEY_RE = re.compile(rf"^pi-plan:({TOKEN})$")
+DEMO_CREDIT_KEY_RE = re.compile(rf"^demo-credit:({TOKEN}):(.+)$")
+RETRO_KEY_RE = re.compile(rf"^retro:({TOKEN})(?:/(close))?$")
+LESSON_KEY_RE = re.compile(rf"^lesson:({TOKEN}):({TOKEN})$")
+TRANCHE_REVIEW_GATE_KEY_RE = re.compile(rf"^tranche-review-gate:(\d+)$")
+TRANCHE_REVIEW_DECIDE_KEY_RE = re.compile(rf"^tranche-review-decide:(\d+)$")
+TRANCHE_REVIEW_KEY_RE = re.compile(rf"^tranche-review:(\d+)$")
+TRANCHE_AUTHORISE_KEY_RE = re.compile(rf"^tranche-authorise:(\d+)$")
+
+# The product's own gate/target grammar, mirrored here so a matcher compares what the engine
+# compares.  `cadences.approve_plan` opens its gate itself; a tranche review needs a gate whose
+# target is `tranche/<id>/review` (crates/actions/src/spine/mod.rs::target_tranches_review).
+PI_PLAN_GATE = "cadences.approve_plan"
+TRANCHE_REVIEW_GATE = "tranches.review"
 
 
 class PromoteError(Exception):
@@ -197,6 +233,26 @@ class NaturalKey:
             return f"benefit-link:{self.first}:{self.second}"
         if self.kind == "decision":
             return f"decision:{self.first}" + (f"/{self.second}" if self.second else "")
+        if self.kind == "cadence":
+            return f"cadence:{self.first}/{self.second}"
+        if self.kind == "cadence_meta":
+            return f"cadence:{self.first}/{self.second}/meta"
+        if self.kind == "pi_plan":
+            return f"pi-plan:{self.first}"
+        if self.kind == "demo_credit":
+            return f"demo-credit:{self.first}:{self.second}"
+        if self.kind == "retro":
+            return f"retro:{self.first}" + (f"/{self.second}" if self.second else "")
+        if self.kind == "lesson":
+            return f"lesson:{self.first}:{self.second}"
+        if self.kind == "tranche_review_gate":
+            return f"tranche-review-gate:{self.first}"
+        if self.kind == "tranche_review_decide":
+            return f"tranche-review-decide:{self.first}"
+        if self.kind == "tranche_review":
+            return f"tranche-review:{self.first}"
+        if self.kind == "tranche_authorise":
+            return f"tranche-authorise:{self.first}"
         raise PromoteError(f"unknown natural-key kind {self.kind!r}")
 
 
@@ -209,6 +265,37 @@ def parse_natural_key(value: str) -> NaturalKey:
     match = DECISION_KEY_RE.match(value)
     if match:
         return NaturalKey("decision", match.group(1), match.group(2))
+    match = CADENCE_KEY_RE.match(value)
+    if match:
+        kind = "cadence_meta" if match.group(3) else "cadence"
+        return NaturalKey(kind, match.group(1), match.group(2))
+    match = TRANCHE_REVIEW_GATE_KEY_RE.match(value)
+    if match:
+        return NaturalKey("tranche_review_gate", match.group(1))
+    match = TRANCHE_REVIEW_DECIDE_KEY_RE.match(value)
+    if match:
+        return NaturalKey("tranche_review_decide", match.group(1))
+    match = TRANCHE_REVIEW_KEY_RE.match(value)
+    if match:
+        return NaturalKey("tranche_review", match.group(1))
+    match = TRANCHE_AUTHORISE_KEY_RE.match(value)
+    if match:
+        return NaturalKey("tranche_authorise", match.group(1))
+    match = PI_PLAN_KEY_RE.match(value)
+    if match:
+        return NaturalKey("pi_plan", match.group(1))
+    match = DEMO_CREDIT_KEY_RE.match(value)
+    if match:
+        title = match.group(2).strip()
+        if not title or any(ord(char) < 0x20 for char in title):
+            raise PromoteError(f"malformed demo-credit natural key: {value!r}")
+        return NaturalKey("demo_credit", match.group(1), title)
+    match = RETRO_KEY_RE.match(value)
+    if match:
+        return NaturalKey("retro", match.group(1), match.group(2))
+    match = LESSON_KEY_RE.match(value)
+    if match:
+        return NaturalKey("lesson", match.group(1), match.group(2))
     match = BENEFIT_LINK_KEY_RE.match(value)
     if match:
         return NaturalKey("benefit_link", match.group(1), match.group(2).strip())
@@ -261,6 +348,10 @@ class Entry:
     payload: dict
     raw: dict
     key: NaturalKey | None = None
+    # Resolution scope the action's own input cannot carry: the programme a cadence belongs to,
+    # the project whose WBS names the demo's deliverable, the tranche number an approval chain
+    # reviews.  Optional; validated as an object, read only by the matchers that need it.
+    meta: dict = field(default_factory=dict)
 
 
 def resolve_path(value: str) -> Path:
@@ -326,6 +417,12 @@ def build_entries(raws: list[tuple[int, dict]]) -> tuple[list[Entry], list[str]]
         if not isinstance(payload, dict):
             errors.append(f"line {lineno}: input {input_path} must be an object")
             continue
+        meta = raw.get("meta")
+        if meta is None:
+            meta = {}
+        if not isinstance(meta, dict):
+            errors.append(f"line {lineno}: meta must be an object")
+            continue
         entries.append(
             Entry(
                 lineno=lineno,
@@ -336,6 +433,7 @@ def build_entries(raws: list[tuple[int, dict]]) -> tuple[list[Entry], list[str]]
                 payload=payload,
                 raw=raw,
                 key=key,
+                meta=meta,
             )
         )
     return entries, errors
@@ -405,6 +503,16 @@ def validate_entries(entries: list[Entry]) -> list[str]:
             if not isinstance(entry.payload.get("title"), str) or not entry.payload["title"]:
                 errors.append(f"line {entry.lineno}: change input has no title")
         elif entry.action == "approvals.decide":
+            if key.kind == "tranche_review_decide":
+                if entry.payload.get("decision") not in ("approve", "reject"):
+                    errors.append(
+                        f"line {entry.lineno}: approval decision must be approve or reject"
+                    )
+                if not entry.payload.get("approval_id"):
+                    errors.append(
+                        f"line {entry.lineno}: approval input has no approval_id"
+                    )
+                continue
             if key.kind != "approval":
                 errors.append(
                     f"line {entry.lineno}: approvals.decide key must be "
@@ -507,6 +615,25 @@ def validate_entries(entries: list[Entry]) -> list[str]:
                     f"input id {entry.payload.get('id')!r}"
                 )
         elif entry.action == "approvals.request":
+            if key.kind == "tranche_review_gate":
+                # The tranche review's gate: the request names the review action and the input
+                # the engine computes `tranche/<id>/review` from; there is no evidence list.
+                if entry.payload.get("gate") != TRANCHE_REVIEW_GATE:
+                    errors.append(
+                        f"line {entry.lineno}: a tranche-review gate must be named "
+                        f"{TRANCHE_REVIEW_GATE!r}"
+                    )
+                if entry.payload.get("action") != TRANCHE_REVIEW_GATE:
+                    errors.append(
+                        f"line {entry.lineno}: a tranche-review gate must open "
+                        f"{TRANCHE_REVIEW_GATE!r}"
+                    )
+                inner = entry.payload.get("input")
+                if not isinstance(inner, dict) or not inner.get("id"):
+                    errors.append(
+                        f"line {entry.lineno}: the tranche-review gate input names no tranche id"
+                    )
+                continue
             if key.kind != "approval":
                 errors.append(
                     f"line {entry.lineno}: approvals.request key must be approval:<gate>/<target>"
@@ -560,6 +687,199 @@ def validate_entries(entries: list[Entry]) -> list[str]:
                 )
             if not entry.payload.get("list_id"):
                 errors.append(f"line {entry.lineno}: move input has no list_id")
+        elif entry.action == "cadences.create":
+            if key.kind != "cadence":
+                errors.append(
+                    f"line {entry.lineno}: cadences.create key must be cadence:<period>/<kind>"
+                )
+                continue
+            if entry.payload.get("period") != key.first:
+                errors.append(
+                    f"line {entry.lineno}: natural key period {key.first!r} does not match "
+                    f"input period {entry.payload.get('period')!r}"
+                )
+            if entry.payload.get("kind") != key.second:
+                errors.append(
+                    f"line {entry.lineno}: natural key kind {key.second!r} does not match "
+                    f"input kind {entry.payload.get('kind')!r}"
+                )
+            if not entry.payload.get("programme_id"):
+                errors.append(f"line {entry.lineno}: cadence input has no programme_id")
+        elif entry.action == "cadences.update":
+            if key.kind != "cadence_meta":
+                errors.append(
+                    f"line {entry.lineno}: cadences.update key must be "
+                    "cadence:<period>/<kind>/meta"
+                )
+                continue
+            if not entry.payload.get("id"):
+                errors.append(f"line {entry.lineno}: cadence update input has no id")
+            if not isinstance(entry.payload.get("meta"), dict):
+                errors.append(f"line {entry.lineno}: cadence update input has no meta object")
+            if not entry.meta.get("programme_id"):
+                errors.append(
+                    f"line {entry.lineno}: cadence update names no meta.programme_id"
+                )
+        elif entry.action == "cadences.approve_plan":
+            if key.kind != "pi_plan":
+                errors.append(
+                    f"line {entry.lineno}: cadences.approve_plan key must be pi-plan:<period>"
+                )
+                continue
+            if not entry.payload.get("cadence_id"):
+                errors.append(f"line {entry.lineno}: plan approval input has no cadence_id")
+            if entry.payload.get("decision") not in (None, "approve", "reject"):
+                errors.append(
+                    f"line {entry.lineno}: plan approval decision must be approve or reject"
+                )
+            if not entry.meta.get("programme_id"):
+                errors.append(f"line {entry.lineno}: plan approval names no meta.programme_id")
+        elif entry.action == "cadences.credit_demo":
+            if key.kind != "demo_credit":
+                errors.append(
+                    f"line {entry.lineno}: cadences.credit_demo key must be "
+                    "demo-credit:<period>:<deliverable title>"
+                )
+                continue
+            for name in ("cadence_id", "deliverable_id"):
+                if not entry.payload.get(name):
+                    errors.append(f"line {entry.lineno}: demo credit input has no {name}")
+            if not entry.meta.get("programme_id") or not entry.meta.get("project_id"):
+                errors.append(
+                    f"line {entry.lineno}: demo credit names no meta.programme_id/project_id"
+                )
+        elif entry.action == "retros.record_findings":
+            if key.kind != "retro" or key.second is not None:
+                errors.append(
+                    f"line {entry.lineno}: retros.record_findings key must be retro:<period>"
+                )
+                continue
+            findings = entry.payload.get("findings")
+            if not isinstance(findings, list) or not findings:
+                errors.append(f"line {entry.lineno}: a retro needs at least one finding")
+            elif any(
+                not isinstance(item, dict) or not item.get("key") for item in findings
+            ):
+                errors.append(f"line {entry.lineno}: every finding needs a key")
+            if not entry.payload.get("cadence_id"):
+                errors.append(f"line {entry.lineno}: retro findings have no cadence_id")
+        elif entry.action == "retros.close":
+            if key.kind != "retro" or key.second != "close":
+                errors.append(
+                    f"line {entry.lineno}: retros.close key must be retro:<period>/close"
+                )
+                continue
+            if not entry.payload.get("cadence_id"):
+                errors.append(f"line {entry.lineno}: retro close has no cadence_id")
+        elif entry.action == "lessons.propose":
+            if key.kind != "lesson":
+                errors.append(
+                    f"line {entry.lineno}: lessons.propose key must be "
+                    "lesson:<period>:<finding key>"
+                )
+                continue
+            if entry.payload.get("finding_key") != key.second:
+                errors.append(
+                    f"line {entry.lineno}: natural key finding {key.second!r} does not "
+                    f"match input finding_key {entry.payload.get('finding_key')!r}"
+                )
+            if not entry.payload.get("statement"):
+                errors.append(f"line {entry.lineno}: a lesson needs a statement")
+            if not isinstance(entry.payload.get("evidence"), list):
+                errors.append(f"line {entry.lineno}: a lesson's evidence must be a list")
+            if not entry.meta.get("programme_id"):
+                errors.append(f"line {entry.lineno}: a lesson names no meta.programme_id")
+        elif entry.action == "tranches.review":
+            if key.kind != "tranche_review":
+                errors.append(
+                    f"line {entry.lineno}: tranches.review key must be tranche-review:<number>"
+                )
+                continue
+            if entry.payload.get("decision") not in ("continue", "pause", "stop"):
+                errors.append(
+                    f"line {entry.lineno}: a tranche review must be continue, pause or stop"
+                )
+            if not entry.payload.get("id"):
+                errors.append(f"line {entry.lineno}: a tranche review names no tranche id")
+            if not entry.raw.get("approval_id"):
+                errors.append(
+                    f"line {entry.lineno}: a tranche review names no approved gate"
+                )
+            if not entry.meta.get("programme_id"):
+                errors.append(f"line {entry.lineno}: a tranche review names no meta.programme_id")
+        elif entry.action == "tranches.authorise":
+            if key.kind != "tranche_authorise":
+                errors.append(
+                    f"line {entry.lineno}: tranches.authorise key must be "
+                    "tranche-authorise:<number>"
+                )
+                continue
+            if not entry.payload.get("review_id"):
+                errors.append(f"line {entry.lineno}: an authorisation names no review_id")
+
+    # The chain is only as good as its links: the review is called with the gate the request
+    # opened, and the authorisation with the review the review produced.
+    gate_outputs = {
+        entry.key.first: entry.output_id
+        for entry in entries
+        if entry.action == "approvals.request"
+        and entry.key is not None
+        and entry.key.kind == "tranche_review_gate"
+    }
+    review_outputs = {
+        entry.key.first: entry.output_id
+        for entry in entries
+        if entry.action == "tranches.review" and entry.key is not None
+    }
+    for entry in entries:
+        key = entry.key
+        if entry.action == "tranches.review" and key is not None:
+            gate = entry.raw.get("approval_id")
+            expected = gate_outputs.get(key.first)
+            if expected is not None and gate != expected:
+                errors.append(
+                    f"line {entry.lineno}: the review's gate {gate!r} is not the request "
+                    f"entry's output {expected!r}"
+                )
+        if entry.action == "tranches.authorise" and key is not None:
+            try:
+                reviewed = str(int(key.first) - 1)
+            except ValueError:
+                reviewed = ""
+            expected = review_outputs.get(reviewed)
+            if expected is not None and entry.payload.get("review_id") != expected:
+                errors.append(
+                    f"line {entry.lineno}: the authorisation's review "
+                    f"{entry.payload.get('review_id')!r} is not the review entry's "
+                    f"output {expected!r}"
+                )
+
+    # A retro closes only when every finding it recorded has its lesson.
+    findings_by_period: dict[str, set[str]] = {}
+    lessons_by_period: dict[str, set[str]] = {}
+    for entry in entries:
+        if entry.key is None:
+            continue
+        if entry.action == "retros.record_findings":
+            findings = entry.payload.get("findings") or []
+            findings_by_period[entry.key.first] = {
+                str(item.get("key"))
+                for item in findings
+                if isinstance(item, dict) and item.get("key")
+            }
+        elif entry.action == "lessons.propose":
+            lessons_by_period.setdefault(entry.key.first, set()).add(str(entry.key.second))
+    for entry in entries:
+        if entry.action != "retros.close" or entry.key is None:
+            continue
+        missing = findings_by_period.get(entry.key.first, set()) - lessons_by_period.get(
+            entry.key.first, set()
+        )
+        if missing:
+            errors.append(
+                f"line {entry.lineno}: the retro closes with no lesson for "
+                f"{sorted(missing)}"
+            )
     return errors
 
 
@@ -782,6 +1102,15 @@ class State:
     documents: list[dict] = field(default_factory=list)
     # The architecture decision register's production rows, by key.
     decisions: list[dict] = field(default_factory=list)
+    # The tr3 SAFe family's production rows.  A cadence is read per programme and matched by
+    # (kind, period); a demo credit, a lesson and a review are read for the row they hang on.
+    cadences: list[dict] = field(default_factory=list)
+    credits: dict[str, list[dict]] = field(default_factory=dict)
+    lessons: list[dict] = field(default_factory=list)
+    tranches: list[dict] = field(default_factory=list)
+    reviews: list[dict] = field(default_factory=list)
+    wbs: dict[str, list[dict]] = field(default_factory=dict)
+    board_cards: dict[str, list[dict]] = field(default_factory=dict)
 
 
 def snapshot_file(directory: str) -> Path:
@@ -806,16 +1135,23 @@ def load_snapshot(directory: str) -> dict:
     return data
 
 
+def rows(client: Any, action: str, payload: dict) -> list[dict]:
+    """One page-less list action's rows.  Sending `limit` to an input that has no PageIn is
+    a 422 under `deny_unknown_fields`, so the paginated helper is not used for these."""
+    return page_items(client.invoke(action, payload))
+
+
 def collect_ids(entries: list[Entry]) -> tuple[set[str], set[str]]:
     programme_ids: set[str] = set()
     project_ids: set[str] = set()
     for entry in entries:
-        programme = entry.payload.get("programme_id")
-        if isinstance(programme, str) and programme:
-            programme_ids.add(programme)
-        project = entry.payload.get("project_id")
-        if isinstance(project, str) and project:
-            project_ids.add(project)
+        for source in (entry.payload, entry.meta):
+            programme = source.get("programme_id")
+            if isinstance(programme, str) and programme:
+                programme_ids.add(programme)
+            project = source.get("project_id")
+            if isinstance(project, str) and project:
+                project_ids.add(project)
     return programme_ids, project_ids
 
 
@@ -923,6 +1259,72 @@ def load_state(
                 state.approvals.extend(
                     list_all(client, "approvals.list", {"project_id": project_id})
                 )
+    cadence_actions = {
+        "cadences.create",
+        "cadences.update",
+        "cadences.approve_plan",
+        "cadences.credit_demo",
+        "retros.record_findings",
+        "retros.close",
+        "lessons.propose",
+        "tranches.review",
+        "tranches.authorise",
+    }
+    if any(entry.action in cadence_actions for entry in entries):
+        for scope in sorted(programme_ids):
+            state.cadences.extend(
+                rows(client, "cadences.list", {"programme_id": scope})
+            )
+            state.lessons.extend(rows(client, "lessons.list", {"programme_id": scope}))
+            state.tranches.extend(rows(client, "tranches.list", {"programme_id": scope}))
+            state.reviews.extend(
+                rows(client, "tranches.review_list", {"programme_id": scope})
+            )
+        for entry in entries:
+            if entry.action == "cadences.credit_demo" and entry.key is not None:
+                cadence = cadence_row(state, entry.key.first, "demo")
+                cadence_id = cadence.get("id") if cadence else None
+                if cadence_id and cadence_id not in state.credits:
+                    state.credits[cadence_id] = rows(
+                        client, "cadences.credit_list", {"cadence_id": cadence_id}
+                    )
+            if (
+                entry.action in ("retros.record_findings", "retros.close")
+                and entry.key is not None
+            ):
+                cadence = cadence_row(state, entry.key.first, "retro")
+                meta = (cadence or {}).get("meta") or {}
+                board = meta.get("board_id") if isinstance(meta, dict) else None
+                if board and board not in state.board_cards:
+                    state.board_cards[board] = list_all(
+                        client, "cards.list", {"board_id": board}
+                    )
+        for project_id in sorted(
+            {
+                entry.meta.get("project_id")
+                for entry in entries
+                if entry.action == "cadences.credit_demo"
+                and entry.meta.get("project_id")
+            }
+        ):
+            state.wbs[project_id] = rows(
+                client, "wbs.list", {"project_id": project_id}
+            )
+    chain_actions = {"cadences.approve_plan", "tranches.review", "tranches.authorise"}
+    if any(
+        entry.action in chain_actions
+        or (
+            entry.action == "approvals.request"
+            and entry.key is not None
+            and entry.key.kind == "tranche_review_gate"
+        )
+        for entry in entries
+    ):
+        seen_gates = {gate.get("id") for gate in state.approvals}
+        for gate in list_all(client, "approvals.list", {}):
+            if gate.get("id") not in seen_gates:
+                state.approvals.append(gate)
+                seen_gates.add(gate.get("id"))
     if snapshot is not None:
         state.measurements.extend(snapshot.get("benefit_measurements") or [])
     return state
@@ -946,6 +1348,132 @@ def risk_by_code(state: State, code: str) -> dict | None:
     for row in state.registers:
         if row.get("kind") == "risk" and row.get("code") == code:
             return row
+    return None
+
+
+def cadence_row(state: State, period: str, kind: str) -> dict | None:
+    for row in state.cadences:
+        if row.get("period") == period and row.get("kind") == kind:
+            return row
+    return None
+
+
+def tranche_by_number(state: State, number: str | int) -> dict | None:
+    try:
+        wanted = int(number)
+    except (TypeError, ValueError):
+        return None
+    for row in state.tranches:
+        try:
+            if int(row.get("number")) == wanted:
+                return row
+        except (TypeError, ValueError):
+            continue
+    return None
+
+
+def review_for(
+    state: State, tranche_id: str | None, decision: str | None = None
+) -> dict | None:
+    matches = [
+        row
+        for row in state.reviews
+        if row.get("tranche_id") == tranche_id
+        and (decision is None or row.get("decision") == decision)
+    ]
+    if not matches:
+        return None
+    # A tranche can be reviewed more than once; the newest review is the one that stands.
+    return sorted(matches, key=lambda row: str(row.get("reviewed_at") or ""))[-1]
+
+
+def wbs_deliverable(state: State, project_id: str | None, title: str) -> dict | None:
+    for row in state.wbs.get(project_id or "", []):
+        if row.get("title") == title:
+            return row
+    return None
+
+
+def lesson_for(state: State, cadence_id: str | None, finding_key: str) -> dict | None:
+    for row in state.lessons:
+        if row.get("finding_key") != finding_key:
+            continue
+        if cadence_id is None or row.get("cadence_id") == cadence_id:
+            return row
+    return None
+
+
+def fresh_review(
+    client: Any, programme: str | None, tranche_id: str, decision: str | None = None
+) -> dict | None:
+    """The review list is re-read after a write: a run's own review is not in the pre-read."""
+    matches = [
+        row
+        for row in rows(client, "tranches.review_list", {"programme_id": programme})
+        if row.get("tranche_id") == tranche_id
+        and (decision is None or row.get("decision") == decision)
+    ]
+    if not matches:
+        return None
+    return sorted(matches, key=lambda row: str(row.get("reviewed_at") or ""))[-1]
+
+
+def upsert_row(items: list[dict], row: dict) -> None:
+    row_id = row.get("id")
+    items[:] = [row if item.get("id") == row_id else item for item in items]
+    if not any(item.get("id") == row_id for item in items):
+        items.append(row)
+
+
+def retro_card(state: State, cadence: dict | None) -> dict | None:
+    meta = (cadence or {}).get("meta") or {}
+    board = meta.get("board_id") if isinstance(meta, dict) else None
+    for card in state.board_cards.get(board or "", []):
+        card_meta = card.get("meta") or {}
+        if isinstance(card_meta, dict) and card_meta.get("cadence_id") == (cadence or {}).get("id"):
+            return card
+    return None
+
+
+def plan_gate(state: State, cadence_id: str) -> dict | None:
+    for gate in state.approvals:
+        if (
+            gate.get("gate") == PI_PLAN_GATE
+            and gate.get("target") == cadence_id
+            and gate.get("status") == "approved"
+        ):
+            return gate
+    return None
+
+
+def tranche_review_target(tranche_id: str) -> str:
+    return f"tranche/{tranche_id}/review"
+
+
+def expected_cadence_meta(state: State, entry: Entry) -> dict | None:
+    """The meta the cadence will carry: the journal's, with the tranche link made production."""
+    meta = entry.payload.get("meta")
+    if not isinstance(meta, dict):
+        return None
+    expected = copy.deepcopy(meta)
+    if expected.get("tranche_number") is not None:
+        tranche = tranche_by_number(state, expected["tranche_number"])
+        if tranche is not None:
+            expected["tranche_id"] = tranche["id"]
+    return expected
+
+
+def tranche_review_gate(state: State, tranche_id: str | None) -> dict | None:
+    if not tranche_id:
+        return None
+    target = tranche_review_target(tranche_id)
+    for gate in state.approvals:
+        if (
+            gate.get("gate") == TRANCHE_REVIEW_GATE
+            and gate.get("target") == target
+            and gate.get("status") != "rejected"
+        ):
+            return gate
     return None
 
 
@@ -1028,6 +1556,10 @@ def requested_target(payload: dict) -> str | None:
         inner = payload.get("input")
         project_id = inner.get("id") if isinstance(inner, dict) else None
         return f"project/{project_id}/close" if project_id else None
+    if payload.get("action") == TRANCHE_REVIEW_GATE:
+        inner = payload.get("input")
+        tranche_id = inner.get("id") if isinstance(inner, dict) else None
+        return f"tranche/{tranche_id}/review" if tranche_id else None
     return None
 
 
@@ -1067,6 +1599,84 @@ def existing_for(
     """The production row that already carries this entry's natural key, if any."""
     key = entry.key
     assert key is not None
+    # The tr3 SAFe family keys by content, never by a staging id.
+    if entry.action == "cadences.create":
+        return cadence_row(state, key.first, key.second or "")
+    if entry.action == "cadences.update":
+        row = cadence_row(state, key.first, key.second or "")
+        if row is not None and row.get("meta") == expected_cadence_meta(state, entry):
+            return row
+        return None
+    if entry.action == "cadences.approve_plan":
+        cadence = cadence_row(state, key.first, "pi")
+        cadence_id = cadence.get("id") if cadence else None
+        return plan_gate(state, cadence_id) if cadence_id else None
+    if entry.action == "cadences.credit_demo":
+        cadence = cadence_row(state, key.first, "demo")
+        deliverable = wbs_deliverable(
+            state, entry.meta.get("project_id"), key.second or ""
+        )
+        if cadence is None or deliverable is None:
+            return None
+        for credit in state.credits.get(cadence.get("id"), []):
+            if credit.get("deliverable_id") == deliverable.get("id"):
+                return credit
+        return None
+    if entry.action == "retros.record_findings":
+        card = retro_card(state, cadence_row(state, key.first, "retro"))
+        if card is None:
+            return None
+        meta = card.get("meta") or {}
+        recorded = {
+            str(item.get("key"))
+            for item in (meta.get("findings") or [])
+            if isinstance(item, dict) and item.get("key")
+        }
+        wanted = {
+            str(item.get("key"))
+            for item in entry.payload.get("findings") or []
+            if isinstance(item, dict) and item.get("key")
+        }
+        return card if recorded == wanted else None
+    if entry.action == "retros.close":
+        cadence = cadence_row(state, key.first, "retro")
+        if cadence is not None and cadence.get("state") == "closed":
+            return cadence
+        return None
+    if entry.action == "lessons.propose":
+        cadence = cadence_row(state, key.first, "retro")
+        cadence_id = cadence.get("id") if cadence else None
+        return lesson_for(state, cadence_id, key.second or "")
+    if entry.action == "tranches.review":
+        tranche = tranche_by_number(state, key.first)
+        tranche_id = tranche.get("id") if tranche else None
+        return review_for(state, tranche_id, entry.payload.get("decision"))
+    if entry.action == "tranches.authorise":
+        tranche = tranche_by_number(state, key.first)
+        reviewed = str(int(key.first) - 1) if key.first.isdigit() else ""
+        predecessor = tranche_by_number(state, reviewed)
+        review = review_for(
+            state, predecessor.get("id") if predecessor else None
+        )
+        if (
+            tranche is not None
+            and review is not None
+            and tranche.get("state") == "authorised"
+            and tranche.get("authorisation_review_id") == review.get("id")
+        ):
+            return tranche
+        return None
+    if entry.action == "approvals.request" and key.kind == "tranche_review_gate":
+        tranche = tranche_by_number(state, key.first)
+        return tranche_review_gate(
+            state, tranche.get("id") if tranche else None
+        )
+    if entry.action == "approvals.decide" and key.kind == "tranche_review_decide":
+        tranche = tranche_by_number(state, key.first)
+        gate = tranche_review_gate(state, tranche.get("id") if tranche else None)
+        if gate is not None and gate.get("status") == expected_gate_status(entry.payload):
+            return gate
+        return None
     if entry.action == "registers.create":
         return risk_by_code(state, key.first)
     if entry.action == "benefits.create":
@@ -1263,6 +1873,38 @@ def readback_gate(client: Any, project_id: str, gate_id: str) -> dict:
     raise ReadbackError(f"approvals.list: gate {gate_id} is not readable")
 
 
+def readback_retro_card(client: Any, cadence: dict, findings: list) -> dict:
+    """The retro's coach card, carrying exactly the finding keys the input records."""
+    meta = cadence.get("meta") or {}
+    board = meta.get("board_id") if isinstance(meta, dict) else None
+    if not board:
+        raise ReadbackError("cards.list: the retro cadence names no board")
+    try:
+        cards = list_all(client, "cards.list", {"board_id": board})
+    except PromoteError as error:
+        raise ReadbackError(str(error)) from None
+    wanted = {
+        str(item.get("key"))
+        for item in findings
+        if isinstance(item, dict) and item.get("key")
+    }
+    for card in cards:
+        card_meta = card.get("meta") or {}
+        if not isinstance(card_meta, dict) or card_meta.get("cadence_id") != cadence.get("id"):
+            continue
+        recorded = {
+            str(item.get("key"))
+            for item in (card_meta.get("findings") or [])
+            if isinstance(item, dict) and item.get("key")
+        }
+        if recorded != wanted:
+            raise ReadbackError(
+                f"cards.list: the retro card records {sorted(recorded)}, not {sorted(wanted)}"
+            )
+        return card
+    raise ReadbackError("cards.list: the retro card is not readable")
+
+
 def readback_measurement(snapshot: str | None, row_id: str) -> dict:
     if not snapshot:
         raise ReadbackError(
@@ -1377,7 +2019,7 @@ def remap_payload(
         if resolved is None:
             raise PromoteError(f"cards.move: no {key.second!r} lane on the card's board")
         payload["list_id"] = resolved
-    elif entry.action == "approvals.request":
+    elif entry.action == "approvals.request" and key.kind != "tranche_review_gate":
         evidence = payload.get("evidence")
         if isinstance(evidence, list):
             remapped: list[dict] = []
@@ -1388,7 +2030,7 @@ def remap_payload(
                     item["id"] = id_map[str(staging)]
                 remapped.append(item)
             payload["evidence"] = remapped
-    elif entry.action == "approvals.decide":
+    elif entry.action == "approvals.decide" and key.kind != "tranche_review_decide":
         staging_approval = payload.get("approval_id")
         production = id_map.get(staging_approval) if staging_approval else None
         if not production:
@@ -1400,6 +2042,101 @@ def remap_payload(
                 "the change entry must create or find it first"
             )
         payload["approval_id"] = production
+    elif entry.action == "approvals.decide" and key.kind == "tranche_review_decide":
+        tranche = tranche_by_number(state, key.first)
+        gate = tranche_review_gate(state, tranche.get("id") if tranche else None)
+        if gate is None:
+            raise PromoteError(
+                f"tranche-review-decide:{key.first}: no gate on the production tranche"
+            )
+        payload["approval_id"] = gate["id"]
+    elif entry.action == "cadences.create":
+        programme = entry.meta.get("programme_id") or payload.get("programme_id")
+        if not programme:
+            raise PromoteError(f"cadence {key.first}/{key.second}: no programme to create in")
+        payload["programme_id"] = programme
+        meta = payload.get("meta")
+        if isinstance(meta, dict) and meta.get("tranche_number") is not None:
+            tranche = tranche_by_number(state, meta["tranche_number"])
+            if tranche is None:
+                raise PromoteError(
+                    f"cadence {key.first}/{key.second}: no production tranche "
+                    f"{meta.get('tranche_number')!r}"
+                )
+            meta["tranche_id"] = tranche["id"]
+    elif entry.action == "cadences.update":
+        row = cadence_row(state, key.first, key.second or "")
+        if row is None:
+            raise PromoteError(
+                f"cadence {key.first}/{key.second}: no production row to update"
+            )
+        payload["id"] = row["id"]
+        meta = payload.get("meta")
+        if isinstance(meta, dict) and meta.get("tranche_number") is not None:
+            tranche = tranche_by_number(state, meta["tranche_number"])
+            if tranche is not None:
+                meta["tranche_id"] = tranche["id"]
+    elif entry.action == "cadences.approve_plan":
+        cadence = cadence_row(state, key.first, "pi")
+        if cadence is None:
+            raise PromoteError(f"pi-plan:{key.first}: no production pi cadence")
+        payload["cadence_id"] = cadence["id"]
+    elif entry.action == "cadences.credit_demo":
+        cadence = cadence_row(state, key.first, "demo")
+        deliverable = wbs_deliverable(
+            state, entry.meta.get("project_id"), key.second or ""
+        )
+        if cadence is None:
+            raise PromoteError(f"demo-credit:{key.first}: no production demo cadence")
+        if deliverable is None:
+            raise PromoteError(
+                f"demo-credit:{key.first}: no production deliverable {key.second!r} "
+                f"in project {entry.meta.get('project_id')!r}"
+            )
+        payload["cadence_id"] = cadence["id"]
+        payload["deliverable_id"] = deliverable["id"]
+    elif entry.action in ("retros.record_findings", "retros.close"):
+        cadence = cadence_row(state, key.first, "retro")
+        if cadence is None:
+            raise PromoteError(f"retro:{key.first}: no production retro cadence")
+        payload["cadence_id"] = cadence["id"]
+    elif entry.action == "lessons.propose":
+        cadence = cadence_row(state, key.first, "retro")
+        if cadence is None:
+            raise PromoteError(f"lesson:{key.first}: no production retro cadence")
+        payload["cadence_id"] = cadence["id"]
+        programme = entry.meta.get("programme_id") or payload.get("programme_id")
+        if not programme:
+            raise PromoteError(f"lesson:{key.first}: no programme for the lesson")
+        payload["programme_id"] = programme
+    elif entry.action == "tranches.review":
+        tranche = tranche_by_number(state, key.first)
+        if tranche is None:
+            raise PromoteError(f"tranche-review:{key.first}: no production tranche")
+        payload["id"] = tranche["id"]
+    elif entry.action == "tranches.authorise":
+        staging = payload.get("review_id")
+        production = id_map.get(staging) if staging else None
+        if not production:
+            reviewed = str(int(key.first) - 1) if key.first.isdigit() else ""
+            predecessor = tranche_by_number(state, reviewed)
+            review = review_for(
+                state, predecessor.get("id") if predecessor else None
+            )
+            production = review.get("id") if review else None
+        if not production:
+            raise PromoteError(
+                f"tranche-authorise:{key.first}: no production review to authorise from"
+            )
+        payload["review_id"] = production
+    elif entry.action == "approvals.request" and key.kind == "tranche_review_gate":
+        tranche = tranche_by_number(state, key.first)
+        inner = payload.get("input")
+        if tranche is None or not isinstance(inner, dict):
+            raise PromoteError(
+                f"tranche-review-gate:{key.first}: no production tranche to gate"
+            )
+        inner["id"] = tranche["id"]
     return payload
 
 
@@ -1424,6 +2161,12 @@ def output_id_for(action: str, output: Any) -> tuple[str, str | None]:
         if not project_id:
             raise PromoteError("projects.close: output has no project id")
         return str(project_id), None
+    if action == "cadences.approve_plan":
+        # The act's output is the gate it opened (or reused), not the cadence.
+        approval_id = output.get("approval_id")
+        if not approval_id:
+            raise PromoteError("cadences.approve_plan: output has no approval_id")
+        return str(approval_id), None
     row_id = output.get("id")
     if not row_id:
         raise PromoteError(f"{action}: output has no id")
@@ -1470,6 +2213,17 @@ def readback_entry(
         if gate_id and project_id:
             readback_gate(client, project_id, gate_id)
         return change
+    if entry.action == "approvals.decide" and key.kind == "tranche_review_decide":
+        for gate in list_all(client, "approvals.list", {}):
+            if gate.get("id") != production_id:
+                continue
+            if gate.get("status") != expected_gate_status(entry.payload):
+                raise ReadbackError(
+                    f"approvals.list: the review gate is {gate.get('status')!r}, not "
+                    f"{expected_gate_status(entry.payload)!r}"
+                )
+            return gate
+        raise ReadbackError("approvals.list: the decided review gate is not readable")
     if entry.action == "approvals.decide":
         project_id = None
         for known in state.approvals:
@@ -1502,6 +2256,16 @@ def readback_entry(
                  "project_id": str(project_id)}
             )
         return project
+    if entry.action == "approvals.request" and key.kind == "tranche_review_gate":
+        for gate in list_all(client, "approvals.list", {}):
+            if gate.get("id") != production_id:
+                continue
+            if gate.get("status") not in ("pending", "approved"):
+                raise ReadbackError(
+                    f"approvals.list: the review gate is {gate.get('status')!r}, not pending"
+                )
+            return gate
+        raise ReadbackError("approvals.list: the tranche-review gate is not readable")
     if entry.action == "approvals.request":
         project_id = entry.payload.get("project_id")
         if not project_id:
@@ -1591,6 +2355,101 @@ def readback_entry(
                     )
                 return row
         raise ReadbackError("benefits.link_list: the link is not on the programme")
+    if entry.action in ("cadences.create", "cadences.update"):
+        programme = entry.meta.get("programme_id") or entry.payload.get("programme_id")
+        if not programme:
+            raise ReadbackError(f"{entry.action}: the entry names no programme")
+        for row in rows(client, "cadences.list", {"programme_id": programme}):
+            if row.get("id") != production_id:
+                continue
+            if entry.action == "cadences.create":
+                if row.get("kind") != key.second or row.get("period") != key.first:
+                    raise ReadbackError(
+                        "cadences.list: the row is not the kind/period the key names"
+                    )
+            elif row.get("meta") != expected_cadence_meta(state, entry):
+                raise ReadbackError("cadences.list: the cadence meta is not the input's")
+            return row
+        raise ReadbackError("cadences.list: the cadence is not readable")
+    if entry.action == "cadences.approve_plan":
+        for gate in list_all(client, "approvals.list", {}):
+            if gate.get("id") != production_id:
+                continue
+            if gate.get("status") != "approved":
+                raise ReadbackError(
+                    f"approvals.list: the plan gate is {gate.get('status')!r}, not approved"
+                )
+            return gate
+        raise ReadbackError("approvals.list: the plan gate is not readable")
+    if entry.action == "cadences.credit_demo":
+        cadence = cadence_row(state, key.first, "demo")
+        cadence_id = cadence.get("id") if cadence else None
+        if not cadence_id:
+            raise ReadbackError("cadences.credit_list: no production demo cadence")
+        deliverable = wbs_deliverable(
+            state, entry.meta.get("project_id"), key.second or ""
+        )
+        for credit in rows(client, "cadences.credit_list", {"cadence_id": cadence_id}):
+            if credit.get("id") != production_id:
+                continue
+            if deliverable is not None and credit.get("deliverable_id") != deliverable.get("id"):
+                raise ReadbackError(
+                    "cadences.credit_list: the credit is on another deliverable"
+                )
+            return credit
+        raise ReadbackError("cadences.credit_list: the credit is not readable")
+    if entry.action == "retros.record_findings":
+        cadence = cadence_row(state, key.first, "retro")
+        if cadence is None:
+            raise ReadbackError("retros.record_findings: no production retro cadence")
+        card = readback_retro_card(client, cadence, entry.payload.get("findings") or [])
+        return card
+    if entry.action == "retros.close":
+        programme = entry.meta.get("programme_id") or entry.payload.get("programme_id")
+        for row in rows(client, "cadences.list", {"programme_id": programme}):
+            if row.get("id") != production_id:
+                continue
+            if row.get("state") != "closed":
+                raise ReadbackError(
+                    f"cadences.list: the retro is {row.get('state')!r}, not closed"
+                )
+            return row
+        raise ReadbackError("cadences.list: the closed retro is not readable")
+    if entry.action == "lessons.propose":
+        programme = entry.meta.get("programme_id")
+        for row in rows(client, "lessons.list", {"programme_id": programme}):
+            if row.get("id") != production_id:
+                continue
+            if row.get("finding_key") != key.second:
+                raise ReadbackError(
+                    f"lessons.list: the lesson is {row.get('finding_key')!r}, "
+                    f"not {key.second!r}"
+                )
+            return row
+        raise ReadbackError("lessons.list: the lesson is not readable")
+    if entry.action == "tranches.review":
+        programme = entry.meta.get("programme_id")
+        for row in rows(client, "tranches.review_list", {"programme_id": programme}):
+            if row.get("id") != production_id:
+                continue
+            if row.get("decision") != entry.payload.get("decision"):
+                raise ReadbackError(
+                    f"tranches.review_list: the decision is {row.get('decision')!r}, "
+                    f"not {entry.payload.get('decision')!r}"
+                )
+            return row
+        raise ReadbackError("tranches.review_list: the review is not readable")
+    if entry.action == "tranches.authorise":
+        programme = entry.meta.get("programme_id")
+        for row in rows(client, "tranches.list", {"programme_id": programme}):
+            if row.get("id") != production_id:
+                continue
+            if row.get("state") != "authorised":
+                raise ReadbackError(
+                    f"tranches.list: the tranche is {row.get('state')!r}, not authorised"
+                )
+            return row
+        raise ReadbackError("tranches.list: the authorised tranche is not readable")
     raise PromoteError(f"{entry.action}: no readback is defined")
 
 
@@ -1625,6 +2484,19 @@ def apply_entries(
                 continue
 
             payload = remap_payload(entry, state, id_map, change_index)
+            approval = None
+            if entry.action == "tranches.review":
+                approval = id_map.get(str(entry.raw.get("approval_id") or ""))
+                if not approval:
+                    tranche = tranche_by_number(state, key.first)
+                    gate = tranche_review_gate(
+                        state, tranche.get("id") if tranche else None
+                    )
+                    approval = gate.get("id") if gate else None
+                if not approval:
+                    raise PromoteError(
+                        f"tranche-review:{key.first}: no production gate to review under"
+                    )
             if entry.action == "cards.move":
                 current = read_row(client, "cards.get", str(payload["id"]))
                 version = current.get("version")
@@ -1657,9 +2529,33 @@ def apply_entries(
                         f"benefits.get: {payload['id']} has no version for If-Match"
                     )
                 output = client.invoke(entry.action, payload, if_match=version)
+            elif entry.action == "cadences.update":
+                row = cadence_row(state, key.first, key.second or "")
+                version = row.get("version") if row else None
+                if not isinstance(version, int):
+                    raise PromoteError(
+                        f"cadences.update: {key.first}/{key.second} has no version "
+                        "for If-Match"
+                    )
+                output = client.invoke(entry.action, payload, if_match=version)
             else:
-                output = client.invoke(entry.action, payload)
+                output = client.invoke(entry.action, payload, approval_id=approval)
             production_id, gate_id = output_id_for(entry.action, output)
+            if entry.action == "tranches.review":
+                # The action returns the tranche; the review it recorded is only readable
+                # through review_list, and it is the review id the authorisation needs.
+                tranche_id = str(output.get("id")) if isinstance(output, dict) else ""
+                review = fresh_review(
+                    client,
+                    entry.meta.get("programme_id"),
+                    tranche_id,
+                    entry.payload.get("decision"),
+                )
+                if review is None:
+                    raise ReadbackError(
+                        "tranches.review_list: the review just recorded is not readable"
+                    )
+                production_id = str(review["id"])
             id_map[entry.output_id] = production_id
             if entry.action == "projects.close_request":
                 asset = output.get("closure_asset_id") if isinstance(output, dict) else None
@@ -1713,6 +2609,27 @@ def apply_entries(
                         row if item.get("id") == production_id else item
                         for item in state.approvals
                     ]
+                elif entry.action in (
+                    "cadences.create",
+                    "cadences.update",
+                    "retros.close",
+                ):
+                    upsert_row(state.cadences, row)
+                elif entry.action == "cadences.approve_plan":
+                    upsert_row(state.approvals, row)
+                elif entry.action == "cadences.credit_demo":
+                    cadence = cadence_row(state, key.first, "demo")
+                    cadence_id = cadence.get("id") if cadence else None
+                    if cadence_id:
+                        upsert_row(state.credits.setdefault(cadence_id, []), row)
+                elif entry.action == "lessons.propose":
+                    upsert_row(state.lessons, row)
+                elif entry.action == "tranches.review":
+                    upsert_row(state.reviews, row)
+                elif entry.action == "tranches.authorise":
+                    upsert_row(state.tranches, row)
+                elif entry.action == "approvals.request" and key.kind == "tranche_review_gate":
+                    upsert_row(state.approvals, row)
             outcomes.append(
                 Outcome(entry, entry.output_id, production_id, "created")
             )
@@ -2041,6 +2958,238 @@ class FakeClient:
             card["list_id"] = payload.get("list_id")
             card["version"] = int(card.get("version") or 0) + 1
             return copy.deepcopy(card)
+        if action == "cadences.list":
+            return {
+                "items": [
+                    copy.deepcopy(row)
+                    for row in self.state.cadences
+                    if row.get("programme_id") == payload.get("programme_id")
+                ],
+                "next_cursor": None,
+            }
+        if action == "cadences.create":
+            row = copy.deepcopy(payload)
+            row.update(id=self._id("cadence"), state="planned", version=1)
+            self.state.cadences.append(row)
+            return copy.deepcopy(row)
+        if action == "cadences.update":
+            for row in self.state.cadences:
+                if row.get("id") != payload.get("id"):
+                    continue
+                if if_match != row.get("version"):
+                    raise PromoteError("cadences.update: If-Match is stale")
+                for name in ("period", "state", "meta"):
+                    if payload.get(name) is not None:
+                        row[name] = payload[name]
+                row["version"] = int(row.get("version") or 1) + 1
+                return copy.deepcopy(row)
+            raise PromoteError("cadences.update: no cadence")
+        if action == "cadences.approve_plan":
+            cadence = next(
+                (
+                    row
+                    for row in self.state.cadences
+                    if row.get("id") == payload.get("cadence_id")
+                ),
+                None,
+            )
+            if cadence is None:
+                raise PromoteError("cadences.approve_plan: no cadence")
+            gate = plan_gate(self.state, cadence["id"])
+            if gate is None:
+                gate = {
+                    "id": self._id("plan-gate"),
+                    "gate": PI_PLAN_GATE,
+                    "status": "pending",
+                    "project_id": None,
+                    "target": cadence["id"],
+                    "version": 1,
+                }
+                self.state.approvals.append(gate)
+            if payload.get("decision") == "approve":
+                gate["status"] = "approved"
+                cadence["state"] = "awaiting_approval"
+            return {
+                "cadence_id": cadence["id"],
+                "approval_id": gate["id"],
+                "status": gate["status"],
+                "decision": payload.get("decision"),
+                "state": cadence["state"],
+                "version": gate.get("version", 1),
+            }
+        if action == "cadences.credit_demo":
+            credits = self.state.credits.setdefault(payload["cadence_id"], [])
+            for row in credits:
+                if row.get("deliverable_id") == payload.get("deliverable_id"):
+                    return copy.deepcopy(row)
+            row = {
+                "id": self._id("credit"),
+                "cadence_id": payload["cadence_id"],
+                "deliverable_id": payload["deliverable_id"],
+                "version": 1,
+            }
+            credits.append(row)
+            return copy.deepcopy(row)
+        if action == "cadences.credit_list":
+            return {
+                "items": copy.deepcopy(
+                    self.state.credits.get(payload.get("cadence_id"), [])
+                ),
+                "next_cursor": None,
+            }
+        if action == "retros.record_findings":
+            cadence = next(
+                (
+                    row
+                    for row in self.state.cadences
+                    if row.get("id") == payload.get("cadence_id")
+                ),
+                None,
+            )
+            if cadence is None:
+                raise PromoteError("retros.record_findings: no cadence")
+            board = (cadence.get("meta") or {}).get("board_id")
+            card = next(
+                (
+                    row
+                    for row in self.state.board_cards.get(board, [])
+                    if (row.get("meta") or {}).get("cadence_id") == cadence["id"]
+                ),
+                None,
+            )
+            if card is None:
+                card = {
+                    "id": self._id("retro-card"),
+                    "board_id": board,
+                    "meta": {"cadence_id": cadence["id"]},
+                    "version": 1,
+                }
+                self.state.board_cards.setdefault(board, []).append(card)
+                self.state.cards[card["id"]] = card
+            card["meta"]["findings"] = copy.deepcopy(payload.get("findings"))
+            card["version"] = int(card.get("version") or 1) + 1
+            return copy.deepcopy(cadence)
+        if action == "retros.close":
+            for row in self.state.cadences:
+                if row.get("id") == payload.get("cadence_id"):
+                    row["state"] = "closed"
+                    return copy.deepcopy(row)
+            raise PromoteError("retros.close: no cadence")
+        if action == "lessons.list":
+            return {
+                "items": [
+                    copy.deepcopy(row)
+                    for row in self.state.lessons
+                    if row.get("programme_id") == payload.get("programme_id")
+                ],
+                "next_cursor": None,
+            }
+        if action == "lessons.propose":
+            row = copy.deepcopy(payload)
+            row.update(id=self._id("lesson"), state="proposed", version=1)
+            self.state.lessons.append(row)
+            return copy.deepcopy(row)
+        if action == "tranches.list":
+            return {
+                "items": [
+                    copy.deepcopy(row)
+                    for row in self.state.tranches
+                    if row.get("programme_id") == payload.get("programme_id")
+                ],
+                "next_cursor": None,
+            }
+        if action == "tranches.review_list":
+            return {
+                "items": [
+                    copy.deepcopy(row)
+                    for row in self.state.reviews
+                    if row.get("programme_id") == payload.get("programme_id")
+                ],
+                "next_cursor": None,
+            }
+        if action == "tranches.review":
+            tranche = next(
+                (
+                    row
+                    for row in self.state.tranches
+                    if row.get("id") == payload.get("id")
+                ),
+                None,
+            )
+            if tranche is None:
+                raise PromoteError("tranches.review: no tranche")
+            review = {
+                "id": self._id("review"),
+                "programme_id": tranche.get("programme_id"),
+                "tranche_id": tranche["id"],
+                "decision": payload.get("decision"),
+                "reviewed_at": "2026-11-22T00:00:00Z",
+                "evidence": payload.get("evidence"),
+                "version": 1,
+            }
+            self.state.reviews.append(review)
+            successor = next(
+                (
+                    row
+                    for row in self.state.tranches
+                    if row.get("programme_id") == tranche.get("programme_id")
+                    and int(row.get("number") or -1) == int(tranche.get("number") or -1) + 1
+                ),
+                None,
+            )
+            if payload.get("decision") == "continue" and successor is not None:
+                successor["state"] = "authorised"
+                successor["authorisation_review_id"] = review["id"]
+            return copy.deepcopy(tranche)
+        if action == "tranches.authorise":
+            review = next(
+                (
+                    row
+                    for row in self.state.reviews
+                    if row.get("id") == payload.get("review_id")
+                ),
+                None,
+            )
+            if review is None:
+                raise PromoteError("tranches.authorise: no review")
+            tranche = next(
+                (
+                    row
+                    for row in self.state.tranches
+                    if row.get("programme_id") == review.get("programme_id")
+                    and row.get("id") == review.get("tranche_id")
+                ),
+                None,
+            )
+            if tranche is None:
+                raise PromoteError("tranches.authorise: no reviewed tranche")
+            successor = next(
+                (
+                    row
+                    for row in self.state.tranches
+                    if row.get("programme_id") == review.get("programme_id")
+                    and int(row.get("number") or -1)
+                    == int(tranche.get("number") or -1) + 1
+                ),
+                None,
+            )
+            if successor is None:
+                raise PromoteError("tranches.authorise: no successor tranche")
+            successor["state"] = "authorised"
+            successor["authorisation_review_id"] = review["id"]
+            return copy.deepcopy(successor)
+        if action == "wbs.list":
+            return {
+                "items": copy.deepcopy(self.state.wbs.get(payload.get("project_id"), [])),
+                "next_cursor": None,
+            }
+        if action == "cards.list":
+            rows = [
+                copy.deepcopy(row)
+                for row in self.state.board_cards.get(payload.get("board_id"), [])
+                if not payload.get("list_id") or row.get("list_id") == payload.get("list_id")
+            ]
+            return {"items": rows, "next_cursor": None}
         raise PromoteError(f"fake client: unknown action {action}")
 
 
@@ -2535,6 +3684,221 @@ def self_test() -> int:
         ])
         _, third = apply_entries(FakeClient(state), create_entries, state, None)
         ok([o.verdict for o in third] == ["skipped"], f"a create replay skips: {third}")
+
+        # 12. the tr3 SAFe family: cadences, the plan gate, the demo credit, the retro and its
+        #     lessons, and the tranche review chain.  Content-keyed; created once, then skipped.
+        programme = "01a1d039-0d24-7d16-ae52-4841e96ccfac"
+        project = "01a1dcb8-d24b-76de-b901-56fd56e001bc"
+        tranche_nine = "aaaaaaaa-0000-4000-8000-000000000009"
+        board = "bbbbbbbb-0000-4000-8000-00000000000b"
+        delegation = "01a1ff1f-e4ba-72dc-9c1a-13049933cf14"
+        cadence_dir = root / "cadence"
+        cadence_dir.mkdir()
+
+        def cadence_input(name: str, payload: dict) -> str:
+            path = cadence_dir / f"{name}.json"
+            path.write_text(json.dumps(payload), encoding="utf-8")
+            return str(path)
+
+        link = {"tranche_number": 9, "tranche_id": "staging-t9", "delegation_ref": delegation}
+        paths_new = {
+            "create_pi": cadence_input(
+                "create_pi",
+                {"programme_id": programme, "kind": "pi", "period": "tranche-9",
+                 "meta": dict(link)},
+            ),
+            "create_demo": cadence_input(
+                "create_demo",
+                {"programme_id": programme, "kind": "demo", "period": "tranche-9",
+                 "meta": dict(link)},
+            ),
+            "create_retro": cadence_input(
+                "create_retro",
+                {"programme_id": programme, "kind": "retro", "period": "tranche-9",
+                 "meta": {**link, "board_id": board}},
+            ),
+            "update_pi": cadence_input(
+                "update_pi",
+                {"id": "staging-pi", "meta": {**link, "plan": "fixture"}},
+            ),
+            "plan": cadence_input(
+                "plan",
+                {"cadence_id": "staging-pi", "decision": "approve",
+                 "note": "rule approval", "delegation_ref": delegation},
+            ),
+            "credit": cadence_input(
+                "credit",
+                {"cadence_id": "staging-demo", "deliverable_id": "staging-deliverable"},
+            ),
+            "findings": cadence_input(
+                "findings",
+                {"cadence_id": "staging-retro",
+                 "findings": [{"key": "k1", "statement": "fixture", "evidence": ["x"]}]},
+            ),
+            "lesson": cadence_input(
+                "lesson",
+                {"programme_id": programme, "cadence_id": "staging-retro",
+                 "finding_key": "k1", "statement": "fixture", "evidence": ["x"]},
+            ),
+            "close": cadence_input("close", {"cadence_id": "staging-retro"}),
+            "gate": cadence_input(
+                "gate",
+                {"gate": "tranches.review", "kind": "action", "action": "tranches.review",
+                 "input": {"id": "staging-t9", "decision": "continue",
+                           "evidence": {"snapshot_sha": "a" * 40},
+                           "delegation_ref": delegation},
+                 "description": "review tranche 9"},
+            ),
+            "decide": cadence_input(
+                "decide",
+                {"approval_id": "staging-gate", "decision": "approve", "note": "approved"},
+            ),
+            "review": cadence_input(
+                "review",
+                {"id": "staging-t9", "decision": "continue",
+                 "evidence": {"snapshot_sha": "a" * 40}, "delegation_ref": delegation},
+            ),
+            "authorise": cadence_input("authorise", {"review_id": "staging-review"}),
+        }
+        scope = {"programme_id": programme}
+        raw_new = [
+            {"action": "cadences.create", "input": paths_new["create_pi"],
+             "natural_key": "cadence:tranche-9/pi", "output_id": "staging-pi-cadence",
+             "meta": scope},
+            {"action": "cadences.create", "input": paths_new["create_demo"],
+             "natural_key": "cadence:tranche-9/demo", "output_id": "staging-demo-cadence",
+             "meta": scope},
+            {"action": "cadences.create", "input": paths_new["create_retro"],
+             "natural_key": "cadence:tranche-9/retro", "output_id": "staging-retro-cadence",
+             "meta": scope},
+            {"action": "cadences.update", "input": paths_new["update_pi"],
+             "natural_key": "cadence:tranche-9/pi/meta", "output_id": "staging-pi-updated",
+             "meta": scope},
+            {"action": "cadences.approve_plan", "input": paths_new["plan"],
+             "natural_key": "pi-plan:tranche-9", "output_id": "staging-plan-gate",
+             "meta": scope},
+            {"action": "cadences.credit_demo", "input": paths_new["credit"],
+             "natural_key": "demo-credit:tranche-9:The accepted deliverable",
+             "output_id": "staging-credit",
+             "meta": {"programme_id": programme, "project_id": project}},
+            {"action": "retros.record_findings", "input": paths_new["findings"],
+             "natural_key": "retro:tranche-9", "output_id": "staging-retro",
+             "meta": scope},
+            {"action": "lessons.propose", "input": paths_new["lesson"],
+             "natural_key": "lesson:tranche-9:k1", "output_id": "staging-lesson-k1",
+             "meta": scope},
+            {"action": "retros.close", "input": paths_new["close"],
+             "natural_key": "retro:tranche-9/close", "output_id": "staging-retro-closed",
+             "meta": scope},
+            {"action": "approvals.request", "input": paths_new["gate"],
+             "natural_key": "tranche-review-gate:9", "output_id": "staging-gate",
+             "meta": scope},
+            {"action": "approvals.decide", "input": paths_new["decide"],
+             "natural_key": "tranche-review-decide:9", "output_id": "staging-gate-decided",
+             "meta": scope},
+            {"action": "tranches.review", "input": paths_new["review"],
+             "natural_key": "tranche-review:9", "output_id": "staging-review",
+             "approval_id": "staging-gate", "meta": scope},
+            {"action": "tranches.authorise", "input": paths_new["authorise"],
+             "natural_key": "tranche-authorise:10", "output_id": "staging-tranche-10",
+             "meta": scope},
+        ]
+        entries, errors = build_entries(
+            [(index + 2, raw) for index, raw in enumerate(raw_new)]
+        )
+        ok(not errors, f"the cadence fixture parses: {errors}")
+        ok(not validate_entries(entries), f"the cadence fixture validates: "
+                                          f"{validate_entries(entries)}")
+        ok(
+            parse_natural_key("cadence:tranche-9/pi/meta").canonical()
+            == "cadence:tranche-9/pi/meta",
+            "a cadence meta key canonicalises to its update form",
+        )
+        state = State()
+        state.tranches.extend([
+            {"id": tranche_nine, "number": 9, "programme_id": programme,
+             "state": "authorised"},
+            {"id": "aaaaaaaa-0000-4000-8000-000000000010", "number": 10,
+             "programme_id": programme, "state": "planned"},
+        ])
+        state.wbs[project] = [
+            {"id": "c1", "project_id": project, "title": "The accepted deliverable"}
+        ]
+        client = FakeClient(state)
+        id_map, outcomes = apply_entries(client, entries, state, None)
+        ok(
+            [outcome.verdict for outcome in outcomes]
+            == ["created"] * 12 + ["skipped"],
+            f"the cadence run creates the record, then skips the review it already "
+            f"authorised: {[(o.entry.natural_key, o.verdict, o.detail) for o in outcomes]}",
+        )
+        review_call = [
+            (payload, approval) for action, payload, _, approval in client.calls
+            if action == "tranches.review"
+        ][-1]
+        ok(
+            review_call[0]["id"] == tranche_nine,
+            "the review's staging tranche id is resolved to the production tranche",
+        )
+        ok(
+            review_call[1] == id_map["staging-gate"],
+            "the review is called with the gate the request opened",
+        )
+        credit_call = [
+            payload for action, payload, _, _ in client.calls
+            if action == "cadences.credit_demo"
+        ][-1]
+        ok(
+            credit_call["deliverable_id"] == "c1",
+            "the demo credit resolves its deliverable by title",
+        )
+        pi_cadence = cadence_row(state, "tranche-9", "pi")
+        ok(
+            pi_cadence is not None
+            and (pi_cadence.get("meta") or {}).get("tranche_id") == tranche_nine,
+            "the cadence meta names the production tranche, not the staging id",
+        )
+        ok(
+            (cadence_row(state, "tranche-9", "retro") or {}).get("state") == "closed",
+            "the retro closed",
+        )
+        _, second = apply_entries(FakeClient(state), entries, state, None)
+        ok(
+            [outcome.verdict for outcome in second] == ["skipped"] * len(entries),
+            f"the cadence replay skips everything: "
+            f"{[(o.entry.natural_key, o.verdict, o.detail) for o in second]}",
+        )
+
+        # 13. the family's refusals: a lesson-free close, a malformed key, a broken chain.
+        lessonless = [
+            {"action": "retros.record_findings", "input": paths_new["findings"],
+             "natural_key": "retro:tranche-9", "output_id": "x", "meta": scope},
+            {"action": "retros.close", "input": paths_new["close"],
+             "natural_key": "retro:tranche-9/close", "output_id": "x", "meta": scope},
+        ]
+        entries, errors = build_entries([(2, raw) for raw in lessonless])
+        ok(not errors, "the lesson-free close parses")
+        ok(
+            any("no lesson" in error for error in validate_entries(entries)),
+            "a retro close with no lesson for its finding is refused",
+        )
+        _, errors = build_entries([
+            (2, {"action": "cadences.create", "input": paths_new["create_pi"],
+                 "natural_key": "cadence:", "output_id": "x"}),
+        ])
+        ok(any("malformed natural key" in error for error in errors),
+           "a malformed cadence key is refused")
+        broken = [dict(raw) for raw in raw_new]
+        broken[11] = {**broken[11], "approval_id": "some-other-gate"}
+        entries, errors = build_entries(
+            [(index + 2, raw) for index, raw in enumerate(broken)]
+        )
+        ok(not errors, "the broken-chain fixture parses")
+        ok(
+            any("is not the request entry's output" in error
+                for error in validate_entries(entries)),
+            "a review whose gate is not the request's output is refused",
+        )
 
     # Transport: the HTTP envelope and the admin CLI's argv/stdin are what the boundary reads.
     http = ActionClient("http://127.0.0.1:1", token="t")
