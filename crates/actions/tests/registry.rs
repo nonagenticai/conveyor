@@ -120,7 +120,9 @@ use serde_json::{Value, json};
 /// catalogue surface. 534 → **539**.
 /// **#526 (tr2) adds 1 internal**: `benefits.measure` — the baseline/interim/post reading a
 /// realization cites. 539 → **540**.
-const EXPECTED: [&str; 540] = [
+/// **#526 register gaps add 1 internal**: `benefits.measurement_list` — the read-back of the
+/// measurements a `benefits.measure` write records. 540 → **541**.
+const EXPECTED: [&str; 541] = [
     "actions.describe",
     "actions.list",
     "analyse.site",
@@ -193,6 +195,7 @@ const EXPECTED: [&str; 540] = [
     "benefits.link_list",
     "benefits.list",
     "benefits.measure",
+    "benefits.measurement_list",
     "benefits.retire",
     "benefits.transition_list",
     "benefits.transition_upsert",
