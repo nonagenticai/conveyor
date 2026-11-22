@@ -804,7 +804,12 @@
       ],
       "failure_scenario": "A card fails four times with four distinct defects; the fourth failure is logged and commented but never triaged, so a real interruption has no card and no owner.",
       "acceptance": "Every failed-run interruption either creates exactly one coach card or escalates/folds under the (card_id, signature) rule; a distinct signature is never suppressed by a card-level count or an unrelated live run.",
-      "owner_project": "T4"
+      "owner_project": "T4",
+      "resolved_by": {
+        "commit": "8842195ff9adb21be6ef2ee9088e8b7eab4db533",
+        "test": "crates/api/tests/computed_set.rs::a_distinct_signature_is_never_suppressed_by_a_card_level_count",
+        "evidence": "The per-card breadth cap and the live-run skip are removed from err.card and coach.interrupt; a fourth DISTINCT signature opens exactly one coach card (the test drives three distinct interruptions then a fourth and asserts the card, the run and four recorded interruptions), and the repeat signature still escalates (crates/actions/tests/coach.rs::a_repeat_signature_escalates_instead_of_a_second_card). Suites: coach 21 passed, computed_set 11 passed."
+      }
     },
     {
       "id": "v1-p6-5",
@@ -857,7 +862,12 @@
       ],
       "failure_scenario": "A caller with cards:write creates a coach card naming an arbitrary or nonexistent interrupted_card_id; the board shows a coach card with no triage, remedy or escalation and no row to audit.",
       "acceptance": "Card type coach is refused on the public create path, or coach cards must be created atomically with an interruption referencing them; a test proves an orphan is impossible.",
-      "owner_project": "T4"
+      "owner_project": "T4",
+      "resolved_by": {
+        "commit": "8842195ff9adb21be6ef2ee9088e8b7eab4db533",
+        "test": "crates/actions/tests/coach.rs::a_coach_card_cannot_be_created_through_the_public_path",
+        "evidence": "cards.create refuses the coach card type unless the internal, serde-skipped flag set only by coach.interrupt is present; the public path (dev:alice) gets 422 coach_card_internal and the board holds zero coach cards, while coach.interrupt still creates its card with the interruption in the same transaction."
+      }
     },
     {
       "id": "v1-p82-1",
@@ -2228,7 +2238,7 @@
       "evidence": [
         {
           "path": "crates/actions/src/ops/incidents.rs",
-          "line": 708,
+          "line": 709,
           "quote": "    if meta.get(META_MITIGATED_AT).is_none() {"
         },
         {
@@ -2238,7 +2248,7 @@
         },
         {
           "path": "crates/actions/src/ops/incidents.rs",
-          "line": 845,
+          "line": 846,
           "quote": "    if meta.get(META_MITIGATED_AT).is_none() {"
         },
         {
@@ -2724,7 +2734,7 @@
         },
         {
           "path": "crates/actions/src/metrics/mod.rs",
-          "line": 1113,
+          "line": 1114,
           "quote": "    store::metrics::record_reconciliation_tx("
         }
       ],
@@ -3796,7 +3806,12 @@
       "failure_scenario": "Propagation is planned against an existing surface, inviting duplicate lesson work or a missed existing writer.",
       "acceptance": "Rewrite the row from the tree; keep only the promotion mechanism absent.",
       "owner_project": "T5",
-      "disposition": "correct-the-claim"
+      "disposition": "correct-the-claim",
+      "resolved_by": {
+        "commit": "d1aca7aaff8caf8cd5706960c048f151c088f0d6",
+        "test": "docs/plans/inception/T5/01-inception-analysis.md",
+        "evidence": "The row now records the lesson table (migrations/0056_cadence_tranche.sql:10) and the registered lessons.propose/list actions (docs/design/data/actions.json), and keeps only the §7.6 promotion mechanism absent."
+      }
     },
     {
       "id": "v1-t6-1",
@@ -3826,7 +3841,12 @@
       "failure_scenario": "T6 is sequenced as blocked on storage that exists, risking duplicate broker work and a wrong dependency statement.",
       "acceptance": "Restate T13's actual remaining scope and re-justify the block.",
       "owner_project": "T6",
-      "disposition": "correct-the-claim"
+      "disposition": "correct-the-claim",
+      "resolved_by": {
+        "commit": "d1aca7aaff8caf8cd5706960c048f151c088f0d6",
+        "test": "docs/plans/inception/T6/01-inception-analysis.md",
+        "evidence": "The row now records the built tool estate (migrations/0055_tool_platform.sql; tools.call/probe/resume/retire/usage in docs/design/data/actions.json) and the registered kata family, and re-justifies T6 by its own dev.* gate family (v1-p91-1) and deploy/live-verify gate (v1-p93-2)."
+      }
     },
     {
       "id": "v1-t12-1",
