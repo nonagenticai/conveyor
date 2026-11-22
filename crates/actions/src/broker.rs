@@ -26,7 +26,7 @@
 //! call into a fake one; the target action's own `action_invocation` row is still the audit of
 //! the dispatch. Nothing here holds a transaction across the HTTP call.
 
-use std::time::Instant;
+use std::time::{Duration, Instant};
 
 use conveyor_store as store;
 use serde_json::Value;
@@ -198,17 +198,30 @@ fn write_verification_failure(tool: &store::tool::ResolvedTool, body: &Value) ->
 /// Resolve, check, validate, gate, call and ledger one tool call.
 pub(crate) async fn invoke_broker(
     pool: &PgPool,
-    _spec: &crate::spec::ActionSpec,
+    spec: &crate::spec::ActionSpec,
     ctx: HandlerCtx,
     input: Value,
     request: &InvokeRequest,
 ) -> Result<InvokeOutcome, ActionError> {
+    if spec.name == crate::tools::TOOLS_RESUME {
+        return invoke_resume(pool, ctx, input, request).await;
+    }
     let call: ToolCallIn = serde_json::from_value(input).map_err(|error| {
         invalid_tool_input(
             "the tools.call input is not a call document",
             vec![field("body", error.to_string())],
         )
     })?;
+    invoke_call(pool, ctx, request, call).await
+}
+
+/// The call path after the action shim: resolve, check, validate, call and ledger.
+async fn invoke_call(
+    pool: &PgPool,
+    ctx: HandlerCtx,
+    request: &InvokeRequest,
+    call: ToolCallIn,
+) -> Result<InvokeOutcome, ActionError> {
     let Some((toolkit_key, tool_key)) = call.tool.split_once('.') else {
         return Err(invalid_tool_input(
             "the tool name is not <toolkit>.<operation>",
@@ -469,7 +482,22 @@ pub(crate) async fn invoke_broker(
     // `invoke` dispatches the broker when it sees `HandlerRef::Broker`, so this edge is recursion
     // the compiler cannot size. Boxing the callee is the standard indirection; the depth counter
     // (`MAX_DEPTH`) is what actually bounds the chain.
-    let result = Box::pin(invoke(pool, registry(), ctx.tenant, target_request)).await;
+    //
+    // §11.3: the tool's own `timeout_secs` bounds the call. A destination that exceeds it is a
+    // long operation, not a silent backend failure: the ledger row is `pending` with a resume
+    // token, and `tools.resume` continues it.
+    let destination_timeout = Duration::from_secs(u64::try_from(tool.timeout_secs).unwrap_or(300));
+    let result = match tokio::time::timeout(
+        destination_timeout,
+        Box::pin(invoke(pool, registry(), ctx.tenant, target_request)),
+    )
+    .await
+    {
+        Ok(result) => result,
+        Err(_) => {
+            return pending_call(pool, &ctx, &run, &tool, &call, destination_timeout).await;
+        }
+    };
     let latency_ms = i32::try_from(started.elapsed().as_millis()).unwrap_or(i32::MAX);
 
     // ── 6: normalise, redact, cap ────────────────────────────────────────────────────────
@@ -581,6 +609,7 @@ pub(crate) async fn invoke_broker(
         cost: None,
         error_class,
         error_message: error_message.as_deref(),
+        resume_token: None,
     };
     match write_ledger(pool, ctx.tenant, &call_id, invocation_id).await {
         Ok(id) => tracing::debug!(
@@ -594,6 +623,157 @@ pub(crate) async fn invoke_broker(
     }
 
     outcome
+}
+
+/// Record a long operation as `pending`: one ledger row, one resume token, a `202` envelope.
+async fn pending_call(
+    pool: &PgPool,
+    ctx: &HandlerCtx,
+    run: &store::tool::RunToolContext,
+    tool: &store::tool::ResolvedTool,
+    call: &ToolCallIn,
+    timeout: Duration,
+) -> Result<InvokeOutcome, ActionError> {
+    let token = Uuid::now_v7().to_string();
+    let input_hash = crate::spec::sha256_hex(&serde_json::to_vec(&call.input).unwrap_or_default());
+    let latency_ms = i32::try_from(timeout.as_millis()).unwrap_or(i32::MAX);
+    let row = store::tool::NewToolCall {
+        run_id: Some(run.run_id),
+        run_step_id: run.run_step_id,
+        card_id: run.card_id,
+        tool_id: tool.tool_id,
+        tool_key: &call.tool,
+        toolkit_key: &tool.toolkit_key,
+        toolkit_version: tool.toolkit_version,
+        input_hash: &input_hash,
+        status: "pending",
+        http_status: None,
+        latency_ms,
+        request_bytes: None,
+        response_bytes: None,
+        cost: None,
+        error_class: None,
+        error_message: Some("the destination exceeded the tool timeout"),
+        resume_token: Some(&token),
+    };
+    let call_id = match write_ledger(pool, ctx.tenant, &row, None).await {
+        Ok(id) => Some(id),
+        Err(error) => {
+            tracing::error!(%error, tool = %call.tool, "broker: write the pending ledger row");
+            None
+        }
+    };
+    let mut body = serde_json::json!({
+        "status": "pending",
+        "resume_token": token,
+        "tool": call.tool,
+        "timeout_secs": tool.timeout_secs,
+    });
+    if let Some(id) = call_id {
+        body["tool_call_id"] = serde_json::json!(id);
+    }
+    Ok(InvokeOutcome::new(202, body))
+}
+
+/// `tools.resume` — continue a pending long operation (§11.3).
+///
+/// The token names a pending ledger row; the input must hash to the original. The run's binding
+/// must still resolve the same tool version (a changed binding is a governance change, not a
+/// resume), and a tool whose idempotency policy is `forbidden` is not resumable: retrying it
+/// could repeat a side effect the tool never promised to make repeatable.
+async fn invoke_resume(
+    pool: &PgPool,
+    ctx: HandlerCtx,
+    input: Value,
+    request: &InvokeRequest,
+) -> Result<InvokeOutcome, ActionError> {
+    let resume: crate::tools::ResumeIn = serde_json::from_value(input).map_err(|error| {
+        invalid_tool_input(
+            "the tools.resume input is not a resume document",
+            vec![field("body", error.to_string())],
+        )
+    })?;
+    let mut tx = store::begin_scoped_read_only(pool, ctx.tenant)
+        .await
+        .map_err(|error| {
+            tracing::error!(%error, "broker: begin the resume transaction");
+            ActionError::internal()
+        })?;
+    let pending = store::tool::pending_call_by_token(&mut tx, ctx.tenant, &resume.resume_token)
+        .await
+        .map_err(|error| {
+            tracing::error!(%error, "broker: read the pending call");
+            ActionError::internal()
+        })?
+        .ok_or_else(|| {
+            ActionError::new(
+                404,
+                "resume_token_unknown",
+                "no pending call for that resume token",
+            )
+        })?;
+    let input_hash =
+        crate::spec::sha256_hex(&serde_json::to_vec(&resume.input).unwrap_or_default());
+    if input_hash != pending.input_hash {
+        return Err(ActionError::new(
+            422,
+            "resume_input_mismatch",
+            "the supplied input does not hash to the pending call's input",
+        ));
+    }
+    let run_id = pending.run_id.ok_or_else(|| {
+        ActionError::new(
+            409,
+            "resume_not_possible",
+            "the pending call carries no run to resume",
+        )
+    })?;
+    let run = store::tool::run_context(&mut tx, ctx.tenant, run_id)
+        .await
+        .map_err(|error| {
+            tracing::error!(%error, run = %run_id, "broker: read the resume run");
+            ActionError::internal()
+        })?
+        .ok_or_else(|| not_ready(format!("no run {run_id} in this tenant")))?;
+    let Some((_toolkit, operation)) = pending.tool_key.split_once('.') else {
+        return Err(ActionError::new(
+            409,
+            "resume_not_possible",
+            "the pending tool name is not <toolkit>.<operation>",
+        ));
+    };
+    let tool = store::tool::resolve(&mut tx, ctx.tenant, &run, &pending.toolkit_key, operation)
+        .await
+        .map_err(|error| {
+            tracing::error!(%error, tool = %pending.tool_key, "broker: resolve the resume tool");
+            ActionError::internal()
+        })?
+        .ok_or_else(|| not_ready(format!("{} is no longer bound", pending.tool_key)))?;
+    let _ = tx.rollback().await;
+    if tool.tool_id != pending.tool_id {
+        return Err(ActionError::new(
+            409,
+            "tool_changed",
+            "the binding now resolves a different tool version; re-issue the call",
+        ));
+    }
+    if tool.idempotency == "forbidden" {
+        return Err(ActionError::new(
+            409,
+            "tool_not_resumable",
+            "this tool forbids retrying the call; it cannot be resumed",
+        ));
+    }
+    let call = ToolCallIn {
+        run_id,
+        tool: pending.tool_key,
+        input: resume.input,
+        step_id: pending.run_step_id,
+    };
+    let mut nested = request.clone();
+    nested.action = crate::tools::TOOLS_CALL.to_owned();
+    nested.idempotency_key = Some(format!("resume:{}", resume.resume_token));
+    invoke_call(pool, ctx, &nested, call).await
 }
 
 /// Append the ledger row and the `tool.called` event in one short transaction.
