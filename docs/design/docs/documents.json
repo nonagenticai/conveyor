@@ -132,9 +132,18 @@
       "path": "docs/decisions/0010-internal-agent-executor-runtime.html",
       "source": "docs/decisions/0010-internal-agent-executor-runtime.md",
       "section": "Decisions",
-      "sha256": "8acb4cb612d7b2d7d687f7a5fe4e4f8b9b5d0cacbeca00a83d49f88412c45e88",
-      "bytes": 8890,
+      "sha256": "322a3262014c4ff44299af7977dc501bcbef9407539f37960665017de1d0b65c",
+      "bytes": 9045,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0010-internal-agent-executor-runtime.md"
+    },
+    {
+      "title": "0011 — The applying gate: a handover parks the run, and a person's approval applies the draft",
+      "path": "docs/decisions/0011-applying-gate.html",
+      "source": "docs/decisions/0011-applying-gate.md",
+      "section": "Decisions",
+      "sha256": "33cd8c2783d3d65b1a4998dcca1866788e1c08c7d7c568ac34d65b3bba42b547",
+      "bytes": 6341,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0011-applying-gate.md"
     },
     {
       "title": "0009 — The real V2 UI is the app, not the design pack",
@@ -398,6 +407,15 @@
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S20.md"
     },
     {
+      "title": "S21 step 5 — the applying gate (issue #590)",
+      "path": "docs/evidence/S21-APPLY.html",
+      "source": "docs/evidence/S21-APPLY.md",
+      "section": "Evidence",
+      "sha256": "9e6164bf9105f29da2dfce274f546251a29b474009726cb28144113c0c0076d0",
+      "bytes": 3906,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S21-APPLY.md"
+    },
+    {
       "title": "S21 step 1 — budgeted compile + the role component — evidence",
       "path": "docs/evidence/S21-BUDGET.html",
       "source": "docs/evidence/S21-BUDGET.md",
@@ -411,8 +429,8 @@
       "path": "docs/evidence/S21-EXECUTOR.html",
       "source": "docs/evidence/S21-EXECUTOR.md",
       "section": "Evidence",
-      "sha256": "2b65b6e139883063b531f5b81b1f9b2a417b147156b670d9002fc9c7d08b51a8",
-      "bytes": 5186,
+      "sha256": "5b86488e0e1a049d3b2afd58f4d7918d2b03e7d2e3f81caa4343a86b091dda2c",
+      "bytes": 5241,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S21-EXECUTOR.md"
     },
     {
@@ -546,8 +564,8 @@
       "path": "docs/plans/00-INDEX.html",
       "source": "docs/plans/00-INDEX.md",
       "section": "Plans",
-      "sha256": "de73d20d9fb31bd838f49dceb986b4a4367a347c70dcdb1ffa10bb9600ae08b7",
-      "bytes": 253129,
+      "sha256": "ad89b0b2dcb6f5ab4fed9ede3f2b27b2d35e4c5fddb269237f2f44f3fd4ac389",
+      "bytes": 253879,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/00-INDEX.md"
     },
     {
@@ -555,8 +573,8 @@
       "path": "docs/plans/01-CONTRACT.html",
       "source": "docs/plans/01-CONTRACT.md",
       "section": "Plans",
-      "sha256": "1092bfce893cce27d37dd8ff0061ba96b814e36646ec97fa34a7f0ddd1a1c09f",
-      "bytes": 71339,
+      "sha256": "18e99a0cd84c55bf66c5a8e398e4234b3c9bf525736a24aaa691c383bf32b02a",
+      "bytes": 73959,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/01-CONTRACT.md"
     },
     {
@@ -564,8 +582,8 @@
       "path": "docs/plans/02-DATA-ARCHITECTURE.html",
       "source": "docs/plans/02-DATA-ARCHITECTURE.md",
       "section": "Plans",
-      "sha256": "179802a593b99091eab57542b0ba4242a77f5f01a1803597fec78641b8b3f58e",
-      "bytes": 143841,
+      "sha256": "dd2d079da26506ec845df4cf0ae2bec6146b5ce909d25e41b32244213118b59f",
+      "bytes": 145573,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/02-DATA-ARCHITECTURE.md"
     },
     {
@@ -636,9 +654,18 @@
       "path": "docs/plans/05-W2V-ABSORPTION.html",
       "source": "docs/plans/05-W2V-ABSORPTION.md",
       "section": "Plans",
-      "sha256": "3bcca544f04f89a22022d4da65180fbe377ef31dedbf4b8addc31e92e41f51be",
-      "bytes": 8235,
+      "sha256": "87944ed8238aec57213b48968950d68ef80c72820c2852d0349fe5e4a5a79461",
+      "bytes": 8865,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/05-W2V-ABSORPTION.md"
+    },
+    {
+      "title": "06 — Tool provenance and the retirement gate",
+      "path": "docs/plans/06-TOOL-PROVENANCE.html",
+      "source": "docs/plans/06-TOOL-PROVENANCE.md",
+      "section": "Plans",
+      "sha256": "16b6910f7805ff530b8a75c1d7211a2d1df5789d0188145d0b84ba41c56822ad",
+      "bytes": 6451,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/06-TOOL-PROVENANCE.md"
     },
     {
       "title": "P0 — Programme definition",
@@ -1086,8 +1113,8 @@
       "path": "docs/plans/slices/S21-message-construction.html",
       "source": "docs/plans/slices/S21-message-construction.md",
       "section": "Plans",
-      "sha256": "839b0fde117c4dbcb6289641430db57655d128203fcb8d5940592489e1743a53",
-      "bytes": 34495,
+      "sha256": "352669eb90ffde211202ef2774c2eb2dff5f91cf96d368b4265d1c59a17b64f3",
+      "bytes": 37491,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S21-message-construction.md"
     }
   ]

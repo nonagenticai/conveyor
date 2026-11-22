@@ -72,8 +72,9 @@
 
 ## Residuals (recorded, not built)
 
-- A run-resume worker kind for a `handover` gate (a plain run fails `gate_requires_approval` and
-  opens a card-scoped approval of kind `executor`; the draft is applied after a human decision).
+- A run-resume worker kind for a `handover` gate — **built in S21 step 5 (#590)**: the run parks in
+  `waiting_approval`, the person's approval records the bound L3 decision, and `run.resume` applies
+  the draft. See `docs/evidence/S21-APPLY.md`.
 - Mid-loop token/cost budget refusal (§7.5): the caps are validated and recorded, not enforced.
 - A `tool_binding` provisioning action: tests insert raw rows; a live job needs an operator row.
 - Broker-side grant enforcement for a direct `tools.call` caller (the agent surface is bounded; a

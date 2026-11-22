@@ -173,6 +173,19 @@ async fn a_rule_a_laya_and_a_human_decision_share_one_audit_shape() {
         .await;
     assert_eq!(status, 200, "{approval}");
     let approval_id = id_of(output(&approval), "id");
+    // A human decision must cite an approval that actually resolved in its favour; the
+    // requester cannot decide their own gate, so the fixture's second admin approves it.
+    let (status, decided) = running
+        .invoke(
+            "approvals.decide",
+            support::REVIEWER,
+            json!({"approval_id": approval_id, "decision": "approve"}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{decided}");
     let (status, human) = running
         .invoke(
             "ladder.record",
@@ -535,7 +548,8 @@ async fn a_generated_draft_cannot_transition_a_card() {
                 "card_id": card_id,
                 "answer": "pass",
                 "confidence": 0.9,
-                "latency_ms": 5
+                "latency_ms": 5,
+                "meta": {"draft_document_id": document_id}
             }),
             None,
             None,

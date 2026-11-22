@@ -20,7 +20,8 @@
 //!
 //! Kinds this build knows: `event.prune`, `job.prune`, `model.prune`, `validation.prune`,
 //! `idempotency.sweep`, `licence.sync`, `webhook.deliver`, the S06-1 run/claim/gate kinds
-//! `run.execute`, `run.reap`, `card.lease_sweep`, `card.claim` and `approval.expire`, the
+//! `run.execute`, S21 step 5's `run.resume` (apply an approved `executor` gate's draft), `run.reap`,
+//! `card.lease_sweep`, `card.claim` and `approval.expire`, the
 //! S06-2 comms kinds `delivery.send` and `approval.closed.emit`, S07's `quality.score`,
 //! S11's `process.step`, and S10's copilot kinds `copilot.turn.reap`,
 //! `copilot.proposal.sweep` and `copilot.proposal.execute`, S16's `prompt_audit.run` and its two
@@ -829,6 +830,7 @@ async fn dispatch(
             );
         }
         "run.execute" => run_execute(pool, tenant, &config.app_key, payload).await?,
+        "run.resume" => run_resume(pool, tenant, &config.app_key, payload).await?,
         "run.reap" => run_reap(pool, tenant).await?,
         "process.step" => process_step(pool, tenant, &config.app_key, payload).await?,
         // S13: one node attempt of a workflow run (the run's single driving tick).
@@ -972,7 +974,7 @@ async fn dispatch(
             return Err(JobFailure::permanent(format!(
                 "unknown job kind {other:?}: this build registers event.prune, job.prune, \
                  model.prune, validation.prune, idempotency.sweep, licence.sync, \
-                 webhook.deliver, run.execute, run.reap, process.step, workflow.node, card.lease_sweep, \
+                 webhook.deliver, run.execute, run.resume, run.reap, process.step, workflow.node, card.lease_sweep, \
                  card.claim, approval.expire, delivery.send, approval.closed.emit, \
                  quality.score, model.validate, copilot.turn.reap, copilot.proposal.sweep, \
                  copilot.proposal.execute, benchmark.run.poll, benchmark.reap, \
@@ -1052,6 +1054,31 @@ async fn run_execute(
 ) -> Result<(), JobFailure> {
     let run_id = want_uuid(payload, "run_id", "run.execute")?;
     conveyor_actions::executor::execute_run(pool, tenant, app_key, run_id)
+        .await
+        .map_err(|failure| {
+            if failure.retryable {
+                JobFailure::retryable(failure.detail)
+            } else {
+                JobFailure::permanent(failure.detail)
+            }
+        })
+}
+
+/// `run.resume` — apply the draft an approved `executor` gate decided (S21 step 5, ADR 0011).
+///
+/// The approval action already recorded the L3 decision and settled the run `running`; this
+/// handler only applies the draft and finishes the run. It never calls the model. A typed
+/// inconsistency finishes the run `failed`; only a database failure is retried.
+async fn run_resume(
+    pool: &PgPool,
+    tenant: TenantId,
+    app_key: &str,
+    payload: &Value,
+) -> Result<(), JobFailure> {
+    let run_id = want_uuid(payload, "run_id", "run.resume")?;
+    let approval_id = want_uuid(payload, "approval_id", "run.resume")?;
+    let decision_id = want_uuid(payload, "decision_id", "run.resume")?;
+    conveyor_actions::executor::resume_run(pool, tenant, app_key, run_id, approval_id, decision_id)
         .await
         .map_err(|failure| {
             if failure.retryable {

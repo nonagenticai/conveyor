@@ -1707,6 +1707,7 @@
         },
         {
             "id": "v1-w1c-2",
+            "resolved_by": "fixed in #590 before merge; proved by crates/actions/tests/draft_apply.rs and internal_agent_runtime.rs",
             "area": "§7.1/§7.4",
             "standard": "SPEC",
             "spec": "§7.1/§7.4",
