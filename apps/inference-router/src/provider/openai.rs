@@ -406,6 +406,23 @@ impl SseState {
     }
 }
 
+/// The reasoning fragment in one message or delta, whichever spelling the upstream uses.
+///
+/// `reasoning_content` is the OpenAI-compatible name; `reasoning` is what vLLM streams and is
+/// the only one the Inkling build emits. A null or empty first key must not shadow a populated
+/// second — `.or_else` on the key alone would — and an empty fragment is treated as absent:
+/// emitting `"reasoning_content":""` would stop an inert frame being byte-identical to the
+/// parity oracle's captured stream.
+fn reasoning_text(object: &Value) -> Option<String> {
+    ["reasoning_content", "reasoning"].iter().find_map(|key| {
+        object
+            .get(*key)
+            .and_then(Value::as_str)
+            .filter(|text| !text.is_empty())
+            .map(str::to_owned)
+    })
+}
+
 /// Parse one upstream chunk dict, with the reference's own rules.
 ///
 /// `model` is the REQUESTED model (what the caller named); `served_model` and
@@ -436,13 +453,8 @@ fn parse_openai_chunk(
                                 .map(str::to_owned),
                             // vLLM's Inkling build streams the trace under `reasoning`; the
                             // OpenAI-compatible spelling is `reasoning_content`. Both land on
-                            // one field, exactly as `parse_openai_response` already does for
-                            // the non-streamed message.
-                            reasoning_content: delta
-                                .get("reasoning_content")
-                                .or_else(|| delta.get("reasoning"))
-                                .and_then(Value::as_str)
-                                .map(str::to_owned),
+                            // one field, exactly as the non-streamed message already does.
+                            reasoning_content: reasoning_text(&delta),
                             tool_calls: delta.get("tool_calls").and_then(Value::as_array).map(
                                 |calls| {
                                     calls
@@ -703,11 +715,7 @@ fn parse_openai_response(
             let content = message.get("content").cloned().unwrap_or(Value::Null);
             // vLLM's reasoning parser emits the trace under either `reasoning_content` or
             // `reasoning`; a reasoning-only answer becomes the content.
-            let reasoning = message
-                .get("reasoning_content")
-                .or_else(|| message.get("reasoning"))
-                .cloned()
-                .filter(|value| !value.is_null());
+            let reasoning = reasoning_text(&message);
             let tool_calls = message
                 .get("tool_calls")
                 .cloned()
@@ -715,7 +723,7 @@ fn parse_openai_response(
 
             let content = if content.is_null() {
                 match &reasoning {
-                    Some(reasoning) if tool_calls.is_none() => reasoning.clone(),
+                    Some(reasoning) if tool_calls.is_none() => Value::String(reasoning.clone()),
                     // Tool-call replies keep content null so callers can branch on tool_calls.
                     _ if tool_calls.is_some() => Value::Null,
                     _ => json!(""),
@@ -739,7 +747,7 @@ fn parse_openai_response(
                     })?),
                     None => None,
                 };
-            let reasoning_content = reasoning.and_then(|value| value.as_str().map(str::to_owned));
+            let reasoning_content = reasoning_text(&message);
 
             choices.push(Choice {
                 index: index as i64,
@@ -1221,5 +1229,31 @@ mod tests {
                 .is_none()
         );
         assert_eq!(body["choices"][0]["delta"]["content"], "");
+    }
+
+    #[test]
+    fn a_null_reasoning_content_does_not_shadow_a_populated_reasoning() {
+        // `.or_else` on the key alone would take the null and lose the text beside it.
+        let text = reasoning_text(&json!({"reasoning_content": null, "reasoning": "text"}));
+        assert_eq!(text.as_deref(), Some("text"));
+    }
+
+    #[test]
+    fn an_empty_reasoning_fragment_is_absent_not_present_but_empty() {
+        assert_eq!(reasoning_text(&json!({"reasoning": ""})), None);
+        let chunk = parse_openai_chunk(
+            &json!({"id": "c1", "created": 1, "choices": [{"index": 0, "delta": {"reasoning": ""}}]}),
+            "alias",
+            "local-llm",
+        )
+        .expect("parses");
+        let frame = chunk.to_sse();
+        let body: Value =
+            serde_json::from_str(frame.trim_start_matches("data: ").trim()).expect("json frame");
+        assert!(
+            body["choices"][0]["delta"]
+                .get("reasoning_content")
+                .is_none()
+        );
     }
 }

@@ -40,10 +40,11 @@ pub struct ChunkDelta {
     pub content: Option<String>,
     /// The model's thinking for this step, when the upstream exposes it.
     ///
-    /// Upstreams spell it two ways — OpenAI-style `reasoning_content` and vLLM's `reasoning`
-    /// (which is what the Inkling build streams) — and the provider normalises both onto this
-    /// field, exactly as the non-streamed message does.
-    #[serde(default, alias = "reasoning", skip_serializing_if = "Option::is_none")]
+    /// The OpenAI-compatible spelling; vLLM streams it as `reasoning`, and the provider's
+    /// parser normalises both onto this field (see `reasoning_text`). The derive path knows
+    /// only this spelling on purpose: an alias would make a frame carrying both keys a
+    /// `duplicate field` error.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub reasoning_content: Option<String>,
     #[serde(default)]
     pub tool_calls: Option<Vec<ToolCallDelta>>,
@@ -106,10 +107,11 @@ mod tests {
     }
 
     #[test]
-    fn the_upstream_reasoning_spelling_lands_on_reasoning_content() {
-        let delta: ChunkDelta =
-            serde_json::from_str(r#"{"reasoning":"thinking"}"#).expect("parses");
-        assert_eq!(delta.reasoning_content.as_deref(), Some("thinking"));
+    fn the_chunk_type_exposes_the_contract_spelling_only() {
+        let delta = ChunkDelta {
+            reasoning_content: Some("thinking".to_owned()),
+            ..ChunkDelta::default()
+        };
         let value = serde_json::to_value(&delta).expect("serialises");
         assert_eq!(value["reasoning_content"], "thinking");
         assert!(value.get("reasoning").is_none());

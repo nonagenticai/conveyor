@@ -177,7 +177,9 @@ impl StreamCapture {
                     "content".to_owned(),
                     parts.content.clone().map_or(Value::Null, Value::String),
                 );
-                // The chunk schema carries no reasoning delta (the reference documents the gap).
+                // Deliberately always null: the row fingerprints the ANSWER. The chunk schema
+                // does now carry the streamed trace, but folding it here would change hashes
+                // for a comparison the parity oracle never made.
                 object.insert("reasoning_content".to_owned(), Value::Null);
                 object.insert(
                     "finish_reason".to_owned(),
