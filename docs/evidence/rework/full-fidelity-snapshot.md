@@ -69,9 +69,12 @@ product's actions (`programme-record.py`, or the deployed engine). The copy is r
    TENANT=nonagentic scripts/snapshot-live.sh /tmp/snap-full
    ```
 
-   Verified 2026-11-22: 155 files, 140 platform outputs, `docs/outputs.js` carries 140 rows **with**
-   `published_at`, `architecture.json` carries 22/23 contracts with `requested_by`, `msp.json`
-   carries 29 demo credits and 10 lessons.
+   Verified 2026-11-22: 155 files in the snapshot — 14 JSON sections under `data/` plus the rendered
+   pages and the `docs/outputs.js` index — with `outputs.js` carrying 140 rows **with**
+   `published_at`, `architecture.json` carrying 22/23 contracts with `requested_by`, and `msp.json`
+   carrying 29 demo credits and 17 lessons. Publication lives in `docs/outputs.js`, never in
+   `artefacts.json`'s `documents` array; counting `published_at` there reads as zero on a healthy
+   record.
 
 5. **Verify with the command clauses pointed at the copy.** Manifest command clauses call
    `programme-record.py`, which uses the *local binary* when `PROGRAMME_RECORD_LOCAL_BIN` is set —

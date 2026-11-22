@@ -4,10 +4,10 @@
       "allowed": false,
       "check": "project",
       "description": "S03 is closed",
-      "detail": "project S03 is active",
+      "detail": "status is 'active', expected 'closed'",
       "id": "S03-project",
       "kind": "snapshot",
-      "result": "pass",
+      "result": "fail",
       "severity": "P0"
     },
     {
@@ -155,9 +155,11 @@
       "severity": "P0"
     }
   ],
-  "failures": [],
+  "failures": [
+    "S03-project (P0): status is 'active', expected 'closed'"
+  ],
   "gate": "proptest on transitions and schema review \u2014 no transition leaves `list.kind` and `archived_at` contradictory, a claim never succeeds twice without release or expiry, one pending approval per (run, gate), and truncate/archive invariants hold",
-  "generated_at": "2026-11-22T00:09:49.068869+00:00",
+  "generated_at": "2026-11-22T00:11:58.021385+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/S03.toml",
   "name": "Domain and schema \u2014 aggregates, state machines, baseline domain migration",
@@ -168,6 +170,6 @@
     "git_sha": "e55b92e050555c6acd2eefa9272a3721657d7de5",
     "path": "retained-snapshot/e55b92e050555c6acd2eefa9272a3721657d7de5"
   },
-  "verdict": "green",
+  "verdict": "red",
   "warnings": []
 }
