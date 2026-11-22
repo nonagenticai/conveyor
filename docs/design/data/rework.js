@@ -7802,10 +7802,10 @@ window.CONVEYOR_REWORK = {
           "subjects": [
             "S12",
             "S13",
+            "S21",
             "T11",
             "T16",
             "T7",
-            "S09",
             "T13",
             "T14",
             "live project meta"
@@ -7846,6 +7846,16 @@ window.CONVEYOR_REWORK = {
           "detail": "seed status 'closed' != live status 'active'",
           "disposition": "rework",
           "evidence": [],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P1",
+          "subject": "S21"
+        },
+        {
+          "detail": "seed status 'closed' != live status 'active'",
+          "disposition": "rework",
+          "evidence": [],
           "expires": "2027-02-18",
           "owner": "programme owner",
           "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
@@ -7871,16 +7881,6 @@ window.CONVEYOR_REWORK = {
           "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
           "subject": "T7"
-        },
-        {
-          "detail": "seed status 'active' != live status 'closed'",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P2",
-          "subject": "S09"
         },
         {
           "detail": "seed status 'active' != live status 'closed'",
@@ -29741,8 +29741,8 @@ window.CONVEYOR_REWORK = {
       "findings": 88,
       "gaps": 41,
       "p0": 0,
-      "p1": 5,
-      "p2": 36,
+      "p1": 6,
+      "p2": 35,
       "packages": 109,
       "rules": 8,
       "rules_clean": 2,

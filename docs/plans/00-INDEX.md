@@ -24,6 +24,14 @@ project — the slice frontmatter, the migrations, the compiled action registry 
 evidence, and `docs/design/scripts/check-coverage.cjs` is the gate. ADR 0005 still fixes the
 absorption order — absorption first (#44 → #45 → #46), the product spine behind it.
 
+**T18 added 2026-11-22.** The real V2 UI is its own slice (`docs/SPEC_V2.md` §12 T18;
+`docs/plans/T18-real-v2-ui.md`): the app (`apps/web`) is the UI, the design pack is the public site
+and the reference, and the V2 coverage instrument measures the app's routes and specs instead of the
+mock. The kickoff unit is **#559** (this plan, the artefact documents and the programme
+registration); it creates the five sequenced delivery units **#562–#566**. Tranche 4 authorises
+construction on the spine (T0/T1/T2/T3); each destination's live acceptance waits on its owning
+slice, and the project closes after T12.
+
 ## Programme `conveyor-buildout`
 
 The whole SPEC_V2 buildout is **one programme**. Every current plan is a **project** in it and the
@@ -31,11 +39,12 @@ registered GitHub issues are its units. `seed/programme.json` is the mapping of 
 `scripts/build-programme-seed.py` regenerates it from these plans and `gh issue list`:
 
 - `S00`–`S21` — the V1 slice plans in `slices/` (including the `S06a`–`S06d` variants);
-- `T0`–`T17` — the SPEC_V2 slices (`docs/SPEC_V2.md` §12); the `T9` row's implementation plan is
+- `T0`–`T18` — the SPEC_V2 slices (`docs/SPEC_V2.md` §12); the `T9` row's implementation plan is
   `docs/plans/T9-architecture-capability.md` (the ADM capability, the artefact standard and the
-  phase/contract gates);
+  phase/contract gates); the `T18` row's is `docs/plans/T18-real-v2-ui.md` (the real UI, its five
+  units and the delivery view);
 - `P0` — the programme definition (`docs/plans/P0-programme-definition.md`), the first project
-  and the gate T1–T17 depend on (issues #120–#122);
+  and the gate T1–T18 depend on (issues #120–#122);
 - `SPEC-V2`, `DESIGN-PUBLISH`, `PLATFORM` — the cross-cutting units.
 
 Each project carries `meta.plan`, `meta.track` and `meta.issues`; each slice plan carries a

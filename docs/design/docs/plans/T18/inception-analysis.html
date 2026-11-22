@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>Inception analysis — T18, the real V2 UI · conveyor documents</title>
+    <link rel="icon" href="../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T18/inception-analysis.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="inception-analysis--t18-the-real-v2-ui">Inception analysis — T18, the real V2 UI</h1>
+<h2 id="current-state">Current state</h2>
+<p>The real application is <code>apps/web</code> (Leptos CSR/WASM, one binary, port 8930). At <code>main@490ad555</code> it has 31 routes (<code>apps/web/src/app.rs:139-169</code>), 25 screen modules (<code>apps/web/src/screens/mod.rs</code>) and 31 Playwright specs (<code>apps/web/e2e/</code>), all V1. It authenticates with OIDC PKCE and holds the token in memory (<code>src/auth.rs</code>); reads are literal <code>GET</code>s and writes are <code>POST /api/actions/{name}/invocations</code> (<code>src/api.rs</code>). There is no V2 route, no <code>/portfolio</code>, no <code>/organisation</code>, no <code>/procedures</code>, no <code>/authoring</code>, no <code>/plan</code>, no <code>/improve</code>, no <code>/operations</code>, no <code>/tools</code>, no <code>/design/adm</code>.</p>
+<p>The V2 destinations exist only in the static design pack (<code>docs/design/studio.html</code>, <code>v2.js</code>): 26 page ids in seven nav groups, plus the L1–L4 delivery view added on 2026-11-21 by #528. The pack has no live rows and no write path; its <code>LIVE</code> ribbon is a snapshot of the published programme.</p>
+<p>The programme's V2 coverage record (<code>docs/evidence/v2-coverage.json</code>) has 60 rows: 46 <code>exists</code>, 6 <code>extend</code>, 8 <code>new</code>. Its destination rows credit the mock page: <code>destination:Organisation</code> and <code>destination:Procedures</code> are <code>exists</code> because <code>docs/design/v2.js</code> registers those pages, not because the app has a route. That is the measurement defect this project corrects (SPEC_V2 D65).</p>
+<p>The action registry (SPEC_V2 §10.4) already carries most destination families, or the owning slice owns them: <code>jobs.*</code>, <code>procedures.*</code>, <code>authoring.*</code>, <code>programmes.*</code>, <code>benefits.*</code>, <code>tranches.*</code>, <code>wbs.*</code>, <code>baselines.*</code>, <code>registers.*</code>, <code>architecture.*</code>, <code>coach.*</code>, <code>kata.*</code>, <code>lessons.*</code>, <code>ops.*</code>, <code>tools.*</code>, <code>toolkits.*</code>, <code>tool_bindings.*</code>, <code>tool_calls.*</code>, <code>metrics.*</code>.</p>
+<h2 id="reuse-sources">Reuse sources</h2>
+<ul>
+<li><strong>The shell and client</strong>: <code>Router</code>, <code>Sidebar</code>, <code>TopBar</code>, <code>Toast</code>, <code>Palette</code> in <code>app.rs</code>; <code>api.rs</code> request shapes (<code>If-Match</code>, <code>Idempotency-Key</code>, approval id); <code>state.rs</code> tenant/me/manifest signals; <code>sse.rs</code>; <code>auth.rs</code>; <code>components.rs</code>.</li>
+<li><strong>The test harness</strong>: <code>apps/web/e2e/fixture.ts</code> (OIDC bearer injection or the dev cookie), <code>playwright.config.ts</code> (dev server on 8931, API on 8930), and <code>web.yml</code> on GitHub-hosted runners.</li>
+<li><strong>The existing screens</strong>: boards, cockpit, processes, process map, evals, usage, prompt audit, platform and settings — linked from the V2 destinations rather than re-implemented.</li>
+<li><strong>The design reference</strong>: <code>docs/design/v2.js</code> page inventory, nav groups, interaction patterns and the delivery view; <code>STUDIO-SPEC.md</code> for the review paths.</li>
+<li><strong>The read models</strong>: the published <code>programme</code>/<code>work</code>/<code>measure</code> sections, exposed through the owning slices' read actions.</li>
+</ul>
+<h2 id="build-vs-reuse">Build vs reuse</h2>
+<p><strong>Reuse</strong> the application, the action registry, the auth flow and the e2e harness. <strong>Do not</strong> embed the design pack, copy its fixture arrays, add server functions, or build a second frontend. <strong>Build</strong> only the routes, screen modules, navigation, honest states and specs. A backend capability that is missing is a typed dependency on its owning slice; the UI never reaches around the action registry with an ad-hoc fetch.</p>
+<h2 id="risks">Risks</h2>
+<ul>
+<li><strong>Action gaps</strong>: a destination may have no read or write action yet. The screen must say <strong>not yet live</strong> and name the missing action/slice; it must not render an empty success.</li>
+<li><strong>Single-writer router</strong>: <code>apps/web/src/app.rs</code> and <code>screens/mod.rs</code> are touched by every unit, so the five units are sequenced with <code>status:blocked</code> on their predecessor.</li>
+<li><strong>Auth and tenancy</strong>: tenant switching, a signed-out deep link and a forbidden route are distinct states; each needs a spec.</li>
+<li><strong>Bundle and render cost</strong>: the V2 screens add WASM and table weight; the web workflow's budget and virtualisation threshold are the guard.</li>
+<li><strong>Mock drift</strong>: the pack and the app will diverge; the coverage instrument measures the app, so the divergence is recorded rather than hidden.</li>
+</ul>
+<h2 id="open-questions">Open questions</h2>
+<ul>
+<li>Which read action exposes the L1–L4 delivery sections to a signed-in tenant? Default: the owning slice's read action; until it exists the view reads the existing programme/project reads and names the partial section.</li>
+<li>The metering drill-down's read path: default <code>metrics.*</code> when T11 exposes it.</li>
+</ul>
+<h2 id="links">Links</h2>
+<p>Issue #559 · SPEC_V2 §10.5, §12 T18, D64, D65 · <code>docs/plans/T18-real-v2-ui.md</code> · <code>docs/decisions/0013-real-v2-ui.md</code>.</p>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/plans/T18/inception-analysis.md</code> at build time.</span>
+      <a href="../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

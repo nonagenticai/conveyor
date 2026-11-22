@@ -31,7 +31,7 @@ use uuid::Uuid;
 
 use crate::invoke::ActionError;
 
-/// The page size while walking the tenant's projects. The programme is 47 today; the loop is
+/// The page size while walking the tenant's projects. The programme is 49 projects today; the loop is
 /// paginated so a larger tenant measures exactly the same way.
 const PAGE: i64 = 200;
 

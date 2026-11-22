@@ -21,7 +21,7 @@ async fn a_fresh_tenant_seeds_its_msp_definition() {
         .expect("first run");
     let counts = first[0].1;
     assert_eq!(counts.benefits, 6, "the six benefit profiles");
-    assert_eq!(counts.links, 6, "the benefits map");
+    assert_eq!(counts.links, 7, "the benefits map");
     assert_eq!(counts.tranches, 14, "fourteen tranches");
 
     let benefits: Vec<(String, String)> = sqlx::query_as(
@@ -56,7 +56,7 @@ async fn a_fresh_tenant_seeds_its_msp_definition() {
         .fetch_one(&db.super_pool)
         .await
         .expect("links");
-    assert_eq!(links, 6);
+    assert_eq!(links, 7);
 
     let tranches: Vec<(i32, String)> = sqlx::query_as(
         "SELECT number, state FROM programme_tranche
