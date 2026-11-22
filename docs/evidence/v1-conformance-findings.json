@@ -4312,12 +4312,7 @@
       ],
       "failure_scenario": "Create an internal_agent binding that pins agent A. Start a run of a process whose step names agent B, or whose capability has one active agent B. The run executes B and records A's binding and release hash; nothing refuses or flags the divergence, and readiness checks the process's agents rather than the binding's.",
       "acceptance": "Execution resolves the capability agent through the run's job binding, or refuses a step agent that differs from the binding with a 409; a test pins A and resolves B and asserts the refusal, and every run's recorded agent equals its binding's.",
-      "owner_project": "T0",
-      "resolved_by": {
-        "commit": "965e22294da68b395ef29c95075cda3f73d85235",
-        "test": "crates/actions/tests/process_start.rs::a_job_binding_whose_executor_differs_from_the_process_is_refused",
-        "evidence": "process_start 14 passed at the merged lane, including both binding tests: a job binding whose executor differs from the process is refused, and a binding's pinned agent is the agent that dispatches."
-      }
+      "owner_project": "T0"
     },
     {
       "id": "v1-p44-2",
