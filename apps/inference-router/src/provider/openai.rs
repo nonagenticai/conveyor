@@ -15,13 +15,27 @@ use serde_json::{Map, Value, json};
 use tokio::sync::Semaphore;
 use uuid::Uuid;
 
-use crate::catalog::ProviderEntry;
+use crate::catalog::{ProviderEntry, ReasoningDialect};
 use crate::contract::schemas::{
     ChatCompletionRequest, ChatCompletionResponse, ChatMessage, Choice, ResponseFormatType, Role,
     ToolCall, Usage,
 };
 
 use super::{BoxFuture, BuildError, Provider, UpstreamBodies, UpstreamError, UpstreamResponse};
+
+/// The per-provider knobs that shape the upstream body. One value, so `chat_payload` stays a
+/// four-argument function and its two call sites (streaming and not) cannot drift apart.
+#[derive(Debug, Clone, Default)]
+pub(crate) struct RenderOptions {
+    /// `json_object` downgrades a `json_schema` request (an upstream with no guided JSON).
+    pub response_format_mode: Option<String>,
+    /// Send `chat_template_kwargs` at all.
+    pub force_chat_template_kwargs: bool,
+    /// How a boolean `enable_reasoning` is spelled for this upstream.
+    pub reasoning_dialect: ReasoningDialect,
+    /// Raise-only floor for `max_tokens`.
+    pub min_completion_tokens: Option<u32>,
+}
 
 /// One OpenAI-compatible provider.
 pub struct OpenAiProvider {
@@ -33,8 +47,7 @@ pub struct OpenAiProvider {
     pub(super) timeout: Duration,
     pub(super) slot: Option<Arc<Semaphore>>,
     pub(super) slot_wait: Duration,
-    pub(super) response_format_mode: Option<String>,
-    pub(super) force_chat_template_kwargs: bool,
+    pub(super) render: RenderOptions,
 }
 
 impl OpenAiProvider {
@@ -73,8 +86,12 @@ impl OpenAiProvider {
                 .max_concurrent
                 .map(|slots| Arc::new(Semaphore::new(slots))),
             slot_wait,
-            response_format_mode: entry.response_format_mode.clone(),
-            force_chat_template_kwargs: entry.force_chat_template_kwargs,
+            render: RenderOptions {
+                response_format_mode: entry.response_format_mode.clone(),
+                force_chat_template_kwargs: entry.force_chat_template_kwargs,
+                reasoning_dialect: entry.reasoning_dialect,
+                min_completion_tokens: entry.min_completion_tokens,
+            },
         })
     }
 }
@@ -91,13 +108,7 @@ impl Provider for OpenAiProvider {
     ) -> BoxFuture<'a, Result<UpstreamResponse, UpstreamError>> {
         Box::pin(async move {
             let model = model_override.unwrap_or(&self.model_id);
-            let payload = chat_payload(
-                request,
-                model,
-                false,
-                self.response_format_mode.as_deref(),
-                self.force_chat_template_kwargs,
-            );
+            let payload = chat_payload(request, model, false, &self.render);
             let body = serde_json::to_string(&payload).expect("the payload serializes");
 
             // The slot wait is OUTSIDE the HTTP timeout, exactly as the live service has it: a
@@ -181,13 +192,7 @@ impl Provider for OpenAiProvider {
     ) -> BoxFuture<'a, Result<super::ChunkStream, UpstreamError>> {
         Box::pin(async move {
             let model = model_override.unwrap_or(&self.model_id);
-            let payload = chat_payload(
-                request,
-                model,
-                true,
-                self.response_format_mode.as_deref(),
-                self.force_chat_template_kwargs,
-            );
+            let payload = chat_payload(request, model, true, &self.render);
             let body = serde_json::to_string(&payload).expect("the payload serializes");
 
             // The slot is held for the whole stream, not just the open: dropping the permit
@@ -551,8 +556,7 @@ pub(crate) fn chat_payload(
     request: &ChatCompletionRequest,
     model: &str,
     stream: bool,
-    response_format_mode: Option<&str>,
-    force_chat_template_kwargs: bool,
+    render: &RenderOptions,
 ) -> Value {
     let mut payload = Map::new();
     payload.insert("model".to_owned(), json!(model));
@@ -561,7 +565,15 @@ pub(crate) fn chat_payload(
         serde_json::to_value(&request.messages).expect("messages serialize"),
     );
     payload.insert("temperature".to_owned(), json!(request.temperature));
-    payload.insert("max_tokens".to_owned(), json!(request.max_tokens));
+    // Raise-only floor: the caller's cap is honoured unless it cannot possibly produce content
+    // (Inkling-2-Mini spends ~130 reasoning tokens even at effort `none`, so a 64-token budget
+    // returns an empty answer). Raising a cap never forces generation — the model still stops at
+    // EOS — it only stops the answer being cut off.
+    let max_tokens = match (request.max_tokens, render.min_completion_tokens) {
+        (Some(requested), Some(floor)) => Some(requested.max(floor)),
+        (requested, _) => requested,
+    };
+    payload.insert("max_tokens".to_owned(), json!(max_tokens));
     if let Some(seed) = request.seed {
         payload.insert("seed".to_owned(), json!(seed));
     }
@@ -577,7 +589,7 @@ pub(crate) fn chat_payload(
     }
 
     if let Some(format) = &request.response_format {
-        if response_format_mode == Some("json_object")
+        if render.response_format_mode.as_deref() == Some("json_object")
             && format.r#type == ResponseFormatType::JsonSchema
         {
             // The upstream cannot do guided JSON: basic JSON mode plus the schema in-prompt.
@@ -630,13 +642,26 @@ pub(crate) fn chat_payload(
     if !request.tool_choice.is_null() {
         payload.insert("tool_choice".to_owned(), request.tool_choice.clone());
     }
-    if force_chat_template_kwargs {
+    if render.force_chat_template_kwargs {
         payload.insert(
             "chat_template_kwargs".to_owned(),
-            json!({"enable_thinking": request.enable_reasoning}),
+            chat_template_kwargs(render.reasoning_dialect, request.enable_reasoning),
         );
     }
     Value::Object(payload)
+}
+
+/// The `chat_template_kwargs` object for one dialect. The two spellings are mutually exclusive: a
+/// template that reads one treats the other as an undefined variable and drops it, which is how a
+/// request for "no reasoning" reached Inkling-2-Mini as effort 0.9. `high` is that model's own
+/// default (0.9), so opting IN keeps the behaviour it has had since the swap.
+fn chat_template_kwargs(dialect: ReasoningDialect, enable_reasoning: bool) -> Value {
+    match dialect {
+        ReasoningDialect::EnableThinking => json!({"enable_thinking": enable_reasoning}),
+        ReasoningDialect::ReasoningEffort => json!({
+            "reasoning_effort": if enable_reasoning { "high" } else { "none" },
+        }),
+    }
 }
 
 fn inject_schema_prompt(payload: &mut Map<String, Value>, schema_json: &str) {
@@ -852,8 +877,7 @@ mod tests {
             timeout: Duration::from_secs(10),
             slot: None,
             slot_wait: Duration::from_secs(1),
-            response_format_mode: None,
-            force_chat_template_kwargs: false,
+            render: RenderOptions::default(),
         }
     }
 
@@ -1013,7 +1037,7 @@ mod tests {
             }),
             r#type: ResponseFormatType::JsonSchema,
         });
-        let payload = chat_payload(&request, "m", false, None, false);
+        let payload = chat_payload(&request, "m", false, &RenderOptions::default());
         assert_eq!(payload["response_format"]["type"], "json_schema");
         assert_eq!(
             payload["response_format"]["json_schema"]["schema"]["type"],
@@ -1030,5 +1054,109 @@ mod tests {
                 .is_none()
         );
         assert!(payload.get("tools").is_none());
+    }
+
+    fn render(dialect: ReasoningDialect, floor: Option<u32>) -> RenderOptions {
+        RenderOptions {
+            force_chat_template_kwargs: true,
+            reasoning_dialect: dialect,
+            min_completion_tokens: floor,
+            ..RenderOptions::default()
+        }
+    }
+
+    #[test]
+    fn the_default_dialect_keeps_the_enable_thinking_kwarg() {
+        let mut request = request("m");
+        request.enable_reasoning = true;
+        let payload = chat_payload(
+            &request,
+            "m",
+            false,
+            &render(ReasoningDialect::EnableThinking, None),
+        );
+        assert_eq!(
+            payload["chat_template_kwargs"],
+            json!({"enable_thinking": true})
+        );
+    }
+
+    #[test]
+    fn the_reasoning_effort_dialect_spells_off_as_none() {
+        let payload = chat_payload(
+            &request("m"),
+            "m",
+            false,
+            &render(ReasoningDialect::ReasoningEffort, None),
+        );
+        assert_eq!(
+            payload["chat_template_kwargs"],
+            json!({"reasoning_effort": "none"})
+        );
+    }
+
+    #[test]
+    fn the_reasoning_effort_dialect_spells_on_as_high() {
+        let mut request = request("m");
+        request.enable_reasoning = true;
+        let payload = chat_payload(
+            &request,
+            "m",
+            false,
+            &render(ReasoningDialect::ReasoningEffort, None),
+        );
+        assert_eq!(
+            payload["chat_template_kwargs"],
+            json!({"reasoning_effort": "high"})
+        );
+    }
+
+    #[test]
+    fn no_chat_template_kwargs_are_sent_when_the_flag_is_false() {
+        let options = RenderOptions {
+            reasoning_dialect: ReasoningDialect::ReasoningEffort,
+            ..RenderOptions::default()
+        };
+        let payload = chat_payload(&request("m"), "m", false, &options);
+        assert!(payload.get("chat_template_kwargs").is_none());
+    }
+
+    #[test]
+    fn the_completion_floor_raises_a_budget_that_cannot_produce_content() {
+        let mut request = request("m");
+        request.max_tokens = Some(64);
+        let payload = chat_payload(
+            &request,
+            "m",
+            false,
+            &render(ReasoningDialect::EnableThinking, Some(256)),
+        );
+        assert_eq!(payload["max_tokens"], 256);
+    }
+
+    #[test]
+    fn the_completion_floor_leaves_a_larger_budget_alone() {
+        let mut request = request("m");
+        request.max_tokens = Some(1024);
+        let payload = chat_payload(
+            &request,
+            "m",
+            false,
+            &render(ReasoningDialect::EnableThinking, Some(256)),
+        );
+        assert_eq!(payload["max_tokens"], 1024);
+    }
+
+    #[test]
+    fn the_completion_floor_leaves_an_absent_budget_absent() {
+        let mut request = request("m");
+        request.max_tokens = None;
+        let payload = chat_payload(
+            &request,
+            "m",
+            false,
+            &render(ReasoningDialect::EnableThinking, Some(256)),
+        );
+        assert!(payload["max_tokens"].is_null());
     }
 }

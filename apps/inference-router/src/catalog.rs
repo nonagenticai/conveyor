@@ -18,6 +18,24 @@ pub enum Protocol {
     Anthropic,
 }
 
+/// How a caller's boolean `enable_reasoning` is spelled for this provider's chat template.
+///
+/// A model's template reads exactly ONE of these vocabularies. A key it does not read is an
+/// undefined Jinja variable, which vLLM passes through and the template silently drops — so the
+/// request falls back to the model's own default. That is how "no reasoning" reached
+/// Inkling-2-Mini as effort 0.9: its template keys on `reasoning_effort` (default 0.9) and has no
+/// `enable_thinking` variable at all. Choosing the spelling per provider is the fix; guessing at
+/// the model name is not.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum ReasoningDialect {
+    /// `chat_template_kwargs.enable_thinking = <bool>` — Qwen/Nanbeige-style templates.
+    #[default]
+    EnableThinking,
+    /// `chat_template_kwargs.reasoning_effort = "none" | "high"` — Inkling-2-Mini.
+    ReasoningEffort,
+}
+
 fn default_timeout() -> f64 {
     600.0
 }
@@ -63,6 +81,14 @@ pub struct ProviderEntry {
     pub failover_on_validation_failure: bool,
     #[serde(default)]
     pub force_chat_template_kwargs: bool,
+    /// How `enable_reasoning` is spelled for this upstream; see [`ReasoningDialect`]. Absent means
+    /// the historical `enable_thinking` spelling, so a catalog that does not name it is unchanged.
+    #[serde(default)]
+    pub reasoning_dialect: ReasoningDialect,
+    /// Raise a caller's `max_tokens` to this floor. Raise-only: a cap cannot force generation, it
+    /// only stops a model that spends its budget on reasoning from returning empty content.
+    #[serde(default)]
+    pub min_completion_tokens: Option<u32>,
     #[serde(default)]
     pub model_aliases: BTreeMap<String, String>,
 }
@@ -362,5 +388,34 @@ default_chain: [paid]
         let catalog = catalog(BASE).expect("valid");
         let pgx = catalog.provider("pgx-local").expect("enabled");
         assert_eq!(pgx.model_ids(), vec!["local-llm", "tier-high"]);
+    }
+
+    #[test]
+    fn an_absent_reasoning_dialect_defaults_to_enable_thinking() {
+        let catalog = catalog(BASE).expect("valid");
+        let pgx = catalog.provider("pgx-local").expect("enabled");
+        assert_eq!(pgx.reasoning_dialect, ReasoningDialect::EnableThinking);
+        assert_eq!(pgx.min_completion_tokens, None);
+    }
+
+    #[test]
+    fn a_catalog_entry_can_select_the_reasoning_effort_dialect_and_a_floor() {
+        let yaml = BASE.replace(
+            "    model: local-llm\n",
+            "    model: local-llm\n    reasoning_dialect: reasoning_effort\n    min_completion_tokens: 256\n",
+        );
+        let catalog = catalog(&yaml).expect("valid");
+        let pgx = catalog.provider("pgx-local").expect("enabled");
+        assert_eq!(pgx.reasoning_dialect, ReasoningDialect::ReasoningEffort);
+        assert_eq!(pgx.min_completion_tokens, Some(256));
+    }
+
+    #[test]
+    fn an_unknown_reasoning_dialect_is_a_load_error() {
+        let yaml = BASE.replace(
+            "    model: local-llm\n",
+            "    model: local-llm\n    reasoning_dialect: mind_reading\n",
+        );
+        assert!(catalog(&yaml).is_err());
     }
 }
