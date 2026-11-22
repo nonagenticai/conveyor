@@ -2,6 +2,8 @@
 //! model. Every cap test is the contract's sentence made executable: a cap fails **typed**, never
 //! silently (CONTRACT §17, S13 §8 trap 5).
 
+use std::collections::BTreeMap;
+
 use conveyor_workflow::agent::{
     Agent, AgentConfig, AgentError, Message, ModelReply, Plan, Reply, ToolCall, ToolReply,
 };
@@ -21,6 +23,7 @@ fn config() -> AgentConfig {
         model: "test-model".to_owned(),
         messages: vec![Message::text("system", "you are a test")],
         tools: vec![json!({"name": "cards.move"})],
+        broker_tools: BTreeMap::new(),
         max_turns: None,
         max_tool_calls: None,
         timeout_ms: None,

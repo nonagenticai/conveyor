@@ -502,3 +502,379 @@ async fn an_unbound_run_refuses_a_claimed_executor() {
     let error = step_error(&pg, &seeded, &run).await.unwrap_or_default();
     assert!(error.contains("agent.config_conflict"), "{error}");
 }
+
+// ── #556: the run's bound tools on the agent surface ──────────────────────────────────────────
+
+use std::sync::atomic::{AtomicUsize, Ordering};
+
+use conveyor_store::tool;
+
+/// A destination that counts every request it answers.
+struct ToolStub {
+    base: String,
+    hits: Arc<AtomicUsize>,
+}
+
+#[derive(Clone)]
+struct ToolStubState {
+    hits: Arc<AtomicUsize>,
+}
+
+async fn tool_stub_answer(
+    axum::extract::State(state): axum::extract::State<ToolStubState>,
+    uri: axum::http::Uri,
+) -> axum::Json<Value> {
+    state.hits.fetch_add(1, Ordering::SeqCst);
+    axum::Json(json!({"stub": true, "path": uri.path()}))
+}
+
+impl ToolStub {
+    async fn start() -> ToolStub {
+        let hits = Arc::new(AtomicUsize::new(0));
+        let app = axum::Router::new()
+            .fallback(axum::routing::any(tool_stub_answer))
+            .with_state(ToolStubState { hits: hits.clone() });
+        let listener = tokio::net::TcpListener::bind("127.0.0.1:0")
+            .await
+            .expect("bind the destination stub");
+        let addr = listener.local_addr().expect("stub addr");
+        tokio::spawn(async move {
+            let _ = axum::serve(listener, app).await;
+        });
+        ToolStub {
+            base: format!("http://{addr}"),
+            hits,
+        }
+    }
+
+    fn hits(&self) -> usize {
+        self.hits.load(Ordering::SeqCst)
+    }
+}
+
+/// One published toolkit, one published tool and a run-scoped binding.
+#[allow(clippy::too_many_arguments)]
+async fn seed_bound_tool(
+    pg: &support::Pg,
+    tenant: conveyor_domain::TenantId,
+    run_id: &str,
+    toolkit_key: &str,
+    tool_key: &str,
+    handler_action: &str,
+    effect: &str,
+    ceiling: &str,
+    input_schema: Value,
+) {
+    let mut tx = begin_scoped(&pg.owner, tenant)
+        .await
+        .expect("a scoped write");
+    let toolkit_id: Uuid = sqlx::query_scalar(
+        "INSERT INTO toolkit (tenant_id, key, toolkit_version, title, service, owner, status)
+         VALUES ($1, $2, 1, $3, $4, 'platform', 'published') RETURNING id",
+    )
+    .bind(tenant.as_uuid())
+    .bind(toolkit_key)
+    .bind(format!("{toolkit_key} toolkit"))
+    .bind(toolkit_key)
+    .fetch_one(&mut *tx)
+    .await
+    .expect("insert the toolkit");
+    let _tool_id: Uuid = sqlx::query_scalar(
+        "INSERT INTO tool (tenant_id, toolkit_id, key, input_schema, effect, timeout_secs,
+                           handler_action, status)
+         VALUES ($1, $2, $3, $4, $5, 30, $6, 'published') RETURNING id",
+    )
+    .bind(tenant.as_uuid())
+    .bind(toolkit_id)
+    .bind(tool_key)
+    .bind(&input_schema)
+    .bind(effect)
+    .bind(handler_action)
+    .fetch_one(&mut *tx)
+    .await
+    .expect("insert the tool");
+    sqlx::query(
+        "INSERT INTO tool_binding (tenant_id, run_id, toolkit_id, effect_ceiling, enabled)
+         VALUES ($1, $2, $3, $4, true)",
+    )
+    .bind(tenant.as_uuid())
+    .bind(Uuid::parse_str(run_id).expect("run uuid"))
+    .bind(toolkit_id)
+    .bind(ceiling)
+    .execute(&mut *tx)
+    .await
+    .expect("insert the binding");
+    tx.commit().await.expect("commit the tool fixture");
+}
+
+fn echo_schema() -> Value {
+    json!({
+        "type": "object",
+        "properties": {"message": {"type": "string"}},
+        "required": ["message"],
+        "additionalProperties": false
+    })
+}
+
+/// A router that asks for `fixtures_echo` once, then answers text.
+async fn stub_router_with_a_tool_call() -> (String, Arc<Mutex<Vec<Value>>>) {
+    let bodies: Arc<Mutex<Vec<Value>>> = Arc::new(Mutex::new(Vec::new()));
+    let captured = bodies.clone();
+    let calls = Arc::new(AtomicUsize::new(0));
+    let app = axum::Router::new().route(
+        "/api/chat/completions",
+        axum::routing::post(move |axum::Json(body): axum::Json<Value>| {
+            let captured = captured.clone();
+            let calls = calls.clone();
+            async move {
+                captured.lock().expect("bodies").push(body);
+                let first = calls.fetch_add(1, Ordering::SeqCst) == 0;
+                let message = if first {
+                    json!({
+                        "role": "assistant",
+                        "content": null,
+                        "tool_calls": [{
+                            "id": "call-1",
+                            "type": "function",
+                            "function": {
+                                "name": "fixtures_echo",
+                                "arguments": "{\"message\":\"hello\"}"
+                            }
+                        }]
+                    })
+                } else {
+                    json!({"role": "assistant", "content": "done"})
+                };
+                axum::Json(json!({
+                    "id": "chatcmpl-tool",
+                    "choices": [{
+                        "index": 0,
+                        "message": message,
+                        "finish_reason": if first { "tool_calls" } else { "stop" }
+                    }],
+                    "usage": {"total_tokens": 9}
+                }))
+            }
+        }),
+    );
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:0")
+        .await
+        .expect("bind stub");
+    let base = format!("http://{}", listener.local_addr().expect("addr"));
+    tokio::spawn(async move {
+        let _ = axum::serve(listener, app).await;
+    });
+    (base, bodies)
+}
+
+#[tokio::test]
+async fn bound_tools_reach_the_model() {
+    let (pg, seeded, running) = fixture().await;
+    let _router = ROUTER.lock().await;
+    let (base, bodies) = stub_router_with_a_tool_call().await;
+    support::set_env("CONVEYOR_EXTERNAL_INFERENCE_URL", &base);
+    let tool_stub = ToolStub::start().await;
+    support::set_env(support::STUB_ENV, &tool_stub.base);
+
+    let (_capability, agent) = seed_executor_with(&pg, &seeded, &["tools.call"]).await;
+    let workflow = published_agent_workflow(&running).await;
+    let project = project(&running).await;
+    let run = start_workflow_run(&running, &project, &workflow, Some(agent)).await;
+    seed_bound_tool(
+        &pg,
+        seeded.tenant,
+        &run,
+        "fixtures",
+        "echo",
+        "fixtures.echo",
+        "read",
+        "read",
+        echo_schema(),
+    )
+    .await;
+
+    drive(&pg, &seeded, &run).await;
+    assert_eq!(run_status(&pg, &seeded, &run).await, "succeeded");
+
+    {
+        let bodies = bodies.lock().expect("bodies");
+        assert_eq!(bodies.len(), 2, "one tool turn, then the answer");
+        let tools = bodies[0]["tools"]
+            .as_array()
+            .unwrap_or_else(|| panic!("the bound surface is sent: {}", bodies[0]));
+        assert_eq!(tools.len(), 1, "only the bound tool: {tools:?}");
+        assert_eq!(tools[0]["function"]["name"], "fixtures_echo");
+        assert_eq!(
+            tools[0]["function"]["parameters"]["required"],
+            json!(["message"]),
+            "the tool's pinned schema, not the broker's generic one"
+        );
+    }
+
+    assert_eq!(tool_stub.hits(), 1, "the destination was called once");
+    let mut tx = begin_scoped(&pg.owner, seeded.tenant).await.expect("scope");
+    let rows = tool::calls_for_run(
+        &mut tx,
+        seeded.tenant,
+        Uuid::parse_str(&run).expect("run uuid"),
+    )
+    .await
+    .expect("read the ledger");
+    tx.commit().await.expect("commit");
+    assert_eq!(rows.len(), 1, "one ledgered tool call");
+    assert_eq!(rows[0].toolkit_key, "fixtures");
+    assert_eq!(rows[0].tool_key, "fixtures.echo");
+    assert_eq!(rows[0].status, "ok");
+}
+
+#[tokio::test]
+async fn no_grant_means_no_tool() {
+    let (pg, seeded, running) = fixture().await;
+    let _router = ROUTER.lock().await;
+    let (base, _models, bodies) = stub_router().await;
+    support::set_env("CONVEYOR_EXTERNAL_INFERENCE_URL", &base);
+    let (_capability, agent) = seed_executor_with(&pg, &seeded, &["tools.call"]).await;
+    let workflow = published_agent_workflow(&running).await;
+    let project = project(&running).await;
+    let run = start_workflow_run(&running, &project, &workflow, Some(agent)).await;
+
+    drive(&pg, &seeded, &run).await;
+    assert_eq!(run_status(&pg, &seeded, &run).await, "succeeded");
+    let bodies = bodies.lock().expect("bodies");
+    assert!(
+        bodies[0].get("tools").is_none(),
+        "tools.call without a binding projects nothing: {}",
+        bodies[0]
+    );
+}
+
+#[tokio::test]
+async fn the_agent_cannot_exceed_its_ceiling() {
+    let (pg, seeded, running) = fixture().await;
+    let _router = ROUTER.lock().await;
+    let (base, _models, bodies) = stub_router().await;
+    support::set_env("CONVEYOR_EXTERNAL_INFERENCE_URL", &base);
+    let (_capability, agent) = seed_executor_with(&pg, &seeded, &["tools.call"]).await;
+    let workflow = published_agent_workflow(&running).await;
+    let project = project(&running).await;
+    let run = start_workflow_run(&running, &project, &workflow, Some(agent)).await;
+    // A write tool under a read ceiling: the broker would refuse it, and the projection must
+    // never offer it in the first place.
+    seed_bound_tool(
+        &pg,
+        seeded.tenant,
+        &run,
+        "fixtures",
+        "echo",
+        "fixtures.echo",
+        "write",
+        "read",
+        echo_schema(),
+    )
+    .await;
+
+    drive(&pg, &seeded, &run).await;
+    assert_eq!(run_status(&pg, &seeded, &run).await, "succeeded");
+    let bodies = bodies.lock().expect("bodies");
+    assert!(
+        bodies[0].get("tools").is_none(),
+        "a tool above the ceiling is absent from the model's surface: {}",
+        bodies[0]
+    );
+}
+
+#[tokio::test]
+async fn the_caller_cannot_supply_broker_tools() {
+    let (pg, seeded, running) = fixture().await;
+    let _router = ROUTER.lock().await;
+    let (base, bodies) = stub_router_with_a_tool_call().await;
+    support::set_env("CONVEYOR_EXTERNAL_INFERENCE_URL", &base);
+    let tool_stub = ToolStub::start().await;
+    support::set_env(support::STUB_ENV, &tool_stub.base);
+    let (_capability, agent) = seed_executor_with(&pg, &seeded, &["tools.call"]).await;
+    // The node claims a broker map of its own; it is not a step-input field, so it cannot widen
+    // the surface the binding resolved.
+    let workflow = published_agent_workflow_with(
+        &running,
+        "cap.broker_tools",
+        json!({
+            "messages": [{"role": "user", "content": "go"}],
+            "broker_tools": {"evil": "coding.jobs.create"}
+        }),
+    )
+    .await;
+    let project = project(&running).await;
+    let run = start_workflow_run(&running, &project, &workflow, Some(agent)).await;
+    seed_bound_tool(
+        &pg,
+        seeded.tenant,
+        &run,
+        "fixtures",
+        "echo",
+        "fixtures.echo",
+        "read",
+        "read",
+        echo_schema(),
+    )
+    .await;
+
+    drive(&pg, &seeded, &run).await;
+    assert_eq!(run_status(&pg, &seeded, &run).await, "succeeded");
+    let bodies = bodies.lock().expect("bodies");
+    let names: Vec<&str> = bodies[0]["tools"]
+        .as_array()
+        .map(|tools| {
+            tools
+                .iter()
+                .filter_map(|tool| tool.pointer("/function/name").and_then(Value::as_str))
+                .collect()
+        })
+        .unwrap_or_default();
+    assert_eq!(
+        names,
+        vec!["fixtures_echo"],
+        "the binding is the only source"
+    );
+}
+
+#[tokio::test]
+async fn a_bound_run_without_tools_call_gets_no_broker_tool() {
+    let (pg, seeded, running) = fixture().await;
+    let _router = ROUTER.lock().await;
+    let (base, _models, bodies) = stub_router().await;
+    support::set_env("CONVEYOR_EXTERNAL_INFERENCE_URL", &base);
+    let (_capability, agent) = seed_executor_with(&pg, &seeded, &["workflows.list"]).await;
+    let workflow = published_agent_workflow(&running).await;
+    let project = project(&running).await;
+    let run = start_workflow_run(&running, &project, &workflow, Some(agent)).await;
+    seed_bound_tool(
+        &pg,
+        seeded.tenant,
+        &run,
+        "fixtures",
+        "echo",
+        "fixtures.echo",
+        "read",
+        "read",
+        echo_schema(),
+    )
+    .await;
+
+    drive(&pg, &seeded, &run).await;
+    assert_eq!(run_status(&pg, &seeded, &run).await, "succeeded");
+    let bodies = bodies.lock().expect("bodies");
+    let names: Vec<&str> = bodies[0]["tools"]
+        .as_array()
+        .map(|tools| {
+            tools
+                .iter()
+                .filter_map(|tool| tool.pointer("/function/name").and_then(Value::as_str))
+                .collect()
+        })
+        .unwrap_or_default();
+    assert_eq!(
+        names,
+        vec!["workflows.list"],
+        "a binding without tools.call does not widen the agent's surface"
+    );
+}
