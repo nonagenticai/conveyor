@@ -2,10 +2,10 @@
   "feedback_url": "https://github.com/nonagenticai/conveyor/discussions",
   "files": [
     {
-      "bytes": 12827,
+      "bytes": 12947,
       "path": "actions.json",
       "records": 0,
-      "sha256": "4a0c0396236dd25e94aef9ca5fd48805a4a478ab22ed18cdceaa9445ba1cc44f"
+      "sha256": "04e298735deab0d18f125c663f70ddd3779ea5fe47162c511dacaaef3f685e62"
     },
     {
       "bytes": 108957,

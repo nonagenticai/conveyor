@@ -14,6 +14,7 @@ use crate::palette::Palette;
 use crate::screens::admin::AdminScreen;
 use crate::screens::approvals::Approvals;
 use crate::screens::architecture::ArchitectureScreen;
+use crate::screens::authoring::Authoring;
 use crate::screens::benchmarks::{BenchmarkRunDetail, Benchmarks};
 use crate::screens::boards::{BoardIndex, BoardScreen};
 use crate::screens::cockpit::Cockpit;
@@ -177,6 +178,7 @@ fn Shell() -> impl IntoView {
                             <Route path=path!("/programme") view=Programme/>
                             <Route path=path!("/organisation") view=Organisation/>
                             <Route path=path!("/procedures") view=Procedures/>
+                            <Route path=path!("/authoring") view=Authoring/>
                             <Route path=path!("/plan") view=Plan/>
                             <Route path=path!("/improve") view=Improve/>
                             <Route path=path!("/operations") view=Operations/>
@@ -294,6 +296,9 @@ fn Sidebar() -> impl IntoView {
                 })}
                 {move || ctx.has_action("procedures.list").then(|| view! {
                     <li><A href="/procedures"><span class="nav-item">"Procedures"</span></A></li>
+                })}
+                {move || ctx.has_action("authoring.assets").then(|| view! {
+                    <li><A href="/authoring"><span class="nav-item">"Authoring"</span></A></li>
                 })}
                 {move || ctx.has_action("projects.list").then(|| view! {
                     <li><A href="/plan"><span class="nav-item">"Plan"</span></A></li>

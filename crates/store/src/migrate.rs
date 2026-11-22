@@ -257,7 +257,11 @@ mod tests {
                 (64, "cadence state".to_owned()),
                 // v1-p5-3 (#526): a change's impact block is an object carrying at least one of
                 // scope/schedule/cost/risk (0065_change_impact_keys.sql, SPEC_V2 §5.5).
-                (65, "change impact keys".to_owned())
+                (65, "change impact keys".to_owned()),
+                // v1-w3b-3 (#526): the tenant-asset authoring family — the intake brief, the
+                // asset drafts, the human review gate and one published row per (kind, key)
+                // (0066_authoring.sql, SPEC_V2 §5.7, §10.4).
+                (66, "authoring".to_owned())
             ],
             "the embedded migration set is {embedded:?}; a wrong sqlx::migrate! path or a \
              file outside the set changes it"

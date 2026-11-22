@@ -61,6 +61,9 @@ pub mod architecture;
 // approval at all, and whether its requester may decide it. A missing row is the strict default.
 pub mod approval_policy;
 pub mod audit;
+// T17 (#526, SPEC_V2 §5.7, §10.4): tenant asset authoring — the intake brief, the asset
+// drafts it produces, the human review gate and the one-published-per-(kind, key) release.
+pub mod authoring;
 pub mod benchmark;
 pub mod board;
 // S13/CONTRACT §7: the bus cursor — the unpublished `event` rows and the mark that records a

@@ -2247,12 +2247,12 @@
         },
         {
           "path": "apps/web/src/app.rs",
-          "line": 145,
+          "line": 146,
           "quote": "                        <Routes fallback=|| view! { <p class=\"muted\">\"No such page.\"</p> }>"
         },
         {
           "path": "apps/web/src/app.rs",
-          "line": 281,
+          "line": 283,
           "quote": "        <nav class=\"rail\" aria-label=\"Destinations\">"
         }
       ],
@@ -3759,7 +3759,7 @@
         },
         {
           "path": "docs/design/data/actions.json",
-          "line": 241,
+          "line": 246,
           "quote": "    \"lessons.list\","
         }
       ],
@@ -3789,7 +3789,7 @@
         },
         {
           "path": "docs/design/data/actions.json",
-          "line": 466,
+          "line": 471,
           "quote": "    \"tools.call\","
         }
       ],
@@ -3854,7 +3854,7 @@
         },
         {
           "path": "docs/design/data/actions.json",
-          "line": 466,
+          "line": 471,
           "quote": "    \"tools.call\","
         }
       ],
@@ -3889,7 +3889,7 @@
         },
         {
           "path": "docs/design/data/actions.json",
-          "line": 342,
+          "line": 347,
           "quote": "    \"procedures.ingest_sop\","
         }
       ],

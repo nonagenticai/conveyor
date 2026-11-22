@@ -123,7 +123,10 @@ use serde_json::{Value, json};
 /// **#526 (U5c) adds 2 internal**: `cadences.approve_plan` — a person's gate before a PI plan
 /// materialises — and `tranches.resume` — a paused tranche resumes only under its approved
 /// human `tranche.resume` gate naming it. 510 → **512**.
-const EXPECTED: [&str; 512] = [
+/// **#526 (V2 shell) adds 5 internal**: the tenant-asset authoring family (SPEC_V2 §5.7/§10.4)
+/// — `authoring.intake`, `authoring.draft`, `authoring.review`, `authoring.publish` and the
+/// `authoring.assets` read. 512 → **517**.
+const EXPECTED: [&str; 517] = [
     "actions.describe",
     "actions.list",
     "analyse.site",
@@ -172,6 +175,11 @@ const EXPECTED: [&str; 512] = [
     "architecture.skills_list",
     "artifacts.list",
     "audit.list",
+    "authoring.assets",
+    "authoring.draft",
+    "authoring.intake",
+    "authoring.publish",
+    "authoring.review",
     "baselines.get",
     "baselines.list",
     "baselines.take",
@@ -732,8 +740,9 @@ fn the_registry_is_exactly_the_declared_set() {
     // `lessons.propose|list`): 491 -> 495; external stays 13.
     // #526 (P) adds two internal actions (`retros.record_findings|close`), the inspect-and-adapt
     // API that had only store functions; #526 (U5c) adds `cadences.approve_plan` and
-    // `tranches.resume`: 495 -> 499; external stays 13.
-    assert_eq!((internal, external), (499, 13));
+    // `tranches.resume`; #526 (V2 shell) adds the five `authoring.*` actions:
+    // 495 -> 504; external stays 13.
+    assert_eq!((internal, external), (504, 13));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),

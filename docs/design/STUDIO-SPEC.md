@@ -34,6 +34,7 @@ only when its screen reads real rows; until then the mock's `V2 · PROPOSED` bad
 |---|---|---|---|
 | Organisation | `/organisation` | `apps/web/src/screens/organisation.rs` | `industries.list`, `departments.list`, `job_catalogue.list`, `job_bindings.list` |
 | Procedures | `/procedures` | `apps/web/src/screens/procedures.rs` | `procedures.list` |
+| Authoring | `/authoring` | `apps/web/src/screens/authoring.rs` | `authoring.assets` (writes are the governed `authoring.intake\|draft\|review\|publish`) |
 | Portfolio | `/portfolio` | `apps/web/src/screens/portfolio.rs` | `portfolio.in_flight` |
 | Programme | `/programme` | `apps/web/src/screens/programme.rs` | `programmes.list`, `tranches.list`, `cadences.list`, `benefits.list`, `lessons.list` |
 | Plan | `/plan` | `apps/web/src/screens/plan.rs` | `projects.list`, `wbs.list`, `baselines.list`, `registers.list`, `project_dependencies.list` |
