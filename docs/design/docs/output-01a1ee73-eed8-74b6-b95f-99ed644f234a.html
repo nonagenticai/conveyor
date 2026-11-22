@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>T1 Plan spine — closure review · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>T1 — Closure review</h1>
+<p>Project: T1 — Plan spine · Track: v2 · Tranche: 1 · Plan: docs/SPEC_V2.md §12
+Unit: #349 (the unit that publishes this output)
+Measured at: main@856cb8e53756b40170353802d9d5c97fdc024ac4, 2026-11-18 · Project row: closed</p>
+<h2>Outcome vs acceptance</h2>
+<p>The acceptance set is the <code>docs/SPEC_V2.md</code> §12 row T1. The project brief declares four of its six gate
+clauses; the SPEC row governs this review.</p>
+<table><thead><tr><th>Gate clause</th><th>Evidence</th><th>Verdict</th></tr></thead><tbody>
+<tr><td>A baseline, a change request and a refused self-approval on one project</td><td><code>migrations/0044_plan_spine.sql:project_register_item_change_impact</code>; <code>crates/actions/tests/plan_spine.rs</code> — <code>a_baseline_does_not_move_when_rows_change</code>, <code>a_change_request_without_impact_is_refused</code>; <code>crates/api/tests/approval_dual.rs</code> — <code>the_requester_cannot_decide_their_own_gate</code></td><td>partial — self-approval refused on a run gate, not the project gate; tenant policy may permit the override</td></tr>
+<tr><td>WSJF recomputes from its inputs</td><td>four typed <code>int</code> inputs with <code>job_size &gt; 0</code> and no score column; <code>crates/domain/src/spine.rs:wsjf</code>; <code>crates/actions/tests/plan_spine.rs</code> — <code>wsjf_recomputes_when_an_input_changes</code></td><td>pass</td></tr>
+<tr><td>The portfolio view lists the in-flight set</td><td><code>crates/store/src/spine.rs:in_flight_set_tx</code> (tenant config, default <code>active,paused</code>) and <code>:in_flight_tx</code>; <code>crates/actions/tests/plan_spine.rs</code> — <code>the_portfolio_lists_only_the_in_flight_set</code></td><td>partial — projects only</td></tr>
+<tr><td>A dependency cycle is refused</td><td>recursive CTE under <code>pg_advisory_xact_lock</code> in <code>crates/store/src/spine.rs:insert_dependency_tx</code>; <code>crates/actions/tests/plan_spine.rs</code> — <code>a_two_node_dependency_cycle_is_refused</code>, <code>a_deep_dependency_cycle_leaves_no_row</code></td><td>pass</td></tr>
+<tr><td>A benefit profile without baseline, target, method or owner is refused</td><td><code>crates/domain/src/spine.rs:benefit_profile_missing</code>; <code>crates/actions/tests/plan_spine.rs</code> — <code>a_benefit_without_baseline_target_method_or_owner_is_refused</code></td><td>pass</td></tr>
+<tr><td>A benefit-map edge names its five levels</td><td><code>migrations/0044_plan_spine.sql:benefit_link_five_levels</code>; <code>crates/actions/tests/plan_spine.rs</code> — <code>a_benefit_map_edge_names_its_five_levels</code></td><td>pass</td></tr>
+</tbody></table>
+<p>The partial is real: <code>in_flight_tx</code> selects <code>project</code>, while §5.1 and §8.2 define the portfolio as every
+project <strong>and</strong> programme in flight; no programme is listed.</p>
+<p>Of the row's scope items, the eleven tables and the MSP <code>governed_asset</code> kinds landed, and cadence is a row.
+<code>programme.shared_config</code> is not built — no column, no code. Project types predate T1
+(<code>catalogue_entry(kind='project_type')</code>) and nothing here asserts them. DoD is <code>card_type.definition</code> storage
+only: <code>cards.move</code> checks the card-type matrix, not the definition (§5.4). Two limits the project's own
+<code>evidence</code> output records: the baseline test proves the snapshot is frozen, not that runs keep their pins;
+the self-approval test seeds a run gate, and tenant policy may permit the override. Tranche review refused
+evidence-free reviews and recorded the state at the merge; the durable decision-plus-evidence record is
+<code>migrations/0051_tranche_review.sql</code> (PR #310), merged a day after the close.</p>
+<h2>Evidence</h2>
+<ul>
+<li><code>migrations/0044_plan_spine.sql</code> — eleven tenant-scoped, FORCE-RLS, versioned tables plus the extended
+<code>governed_asset.kind</code>; landed at <code>e3d7c4eb</code>, present at <code>main@856cb8e5</code>.</li>
+<li><code>crates/domain/src/spine.rs</code>, <code>crates/store/src/spine.rs</code>, <code>crates/actions/src/spine/mod.rs</code> — the typed
+refusals, the cycle check, the in-flight read and the action family; same merge, later extended (#305, #303).</li>
+<li>Tests: <code>crates/actions/tests/plan_spine.rs</code> (nine gate scenarios plus <code>cadences_and_stakeholder_profiles_are_rows</code>),
+<code>crates/api/tests/approval_dual.rs</code> — <code>the_requester_cannot_decide_their_own_gate</code>,
+<code>crates/actions/tests/spine_msp.rs</code> (post-close, #305).</li>
+<li>CI at the T1 merge sha: run 44024620693, workflow <code>ci</code>, push, success at
+<code>e3d7c4eb2bc1b0b4ee2a1b7ba561bf119d75a002</code>; the <code>checks</code> job ran fmt, <code>clippy -D warnings</code> and
+<code>2343 tests run: 2343 passed, 4 skipped</code> against Postgres 18. PR #250's head run 44022324969 is green; the
+#305 extension is green at <code>ed019409</code> (run 44242582995).</li>
+<li>Programme record: issue #72 CLOSED/COMPLETED since 2026-11-17T05:30:45Z, closed by PR #250 (merge <code>e3d7c4eb</code>).</li>
+<li>The project's published <code>evidence</code> output (project T1, category <code>evidence</code>) — the project's own record of the
+same evidence; this review adds no proof beyond it.</li>
+</ul>
+<h2>Open items</h2>
+<ol>
+<li><code>programme.shared_config</code> — absent. Owner: architecture; next step: a follow-up unit for the key set and the
+inheritance/lock rules (§5.1, D49). #82 (T10) records it as T1's unmet dependency; no issue, branch or PR owns the work (<code>gh issue list --state all --search shared_config</code>; <code>git ls-remote --heads origin</code>).</li>
+<li>Portfolio beyond projects — extend the read to programmes and assert both. Owner: T1 follow-up; no claim exists.</li>
+<li>Project types and DoD — decide whether T3 carries the phase template and the §5.4 done-list check; no claim exists.</li>
+<li>Benefit profile to register — <code>benefits.create</code> accepts <code>register_item_id</code> but neither creates nor kind-checks a
+<code>project_register_item(kind='benefit')</code>, which §8.3 calls the profile's index. Owner: T10 (benefits realization)
+or a T1 follow-up; next step: decide which unit pairs the profile with its register row.</li>
+<li>T10 cadence materialisation and benefits realization remain out of scope by design; not T1 debt.</li>
+</ol>
+<h2>Decision</h2>
+<p>T1 is CLOSED, measured today: four of six gate clauses pass, two are partial (the self-approval clause is proved on a run gate, not the project gate, and the portfolio clause covers projects, not
+programmes), and three named scope items are not this unit's delivery. The close stands on the core the gate was
+written for — a working plan spine with typed refusals. T1 closed 2026-11-17T05:30:45Z on PR #250, before the
+closure gate (#302, merged <code>18e06aca</code> on 2026-11-18) existed, so no declared output was required at close. This
+durable review records the close, the per-clause verdicts and the four gaps above; the project's published
+<code>evidence</code> output carries the unit evidence. The gaps are carried forward as open items, not treated as satisfied.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Plan spine · conveyor output · published 2026-11-20T11:50:50.848127361+00:00 · FR Test</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>
