@@ -178,6 +178,7 @@ async fn measure(
     .await
 }
 
+#[allow(clippy::too_many_arguments)] // a fixture: each argument is one pinned input the test varies
 async fn measure_as(
     db: &support::TestDb,
     f: &Fixture,
