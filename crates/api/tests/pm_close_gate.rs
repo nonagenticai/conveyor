@@ -239,6 +239,26 @@ async fn close(
         .await
 }
 
+/// The project aggregate's own events, oldest first:
+/// `(type, aggregate_type, aggregate_id, payload)`.
+async fn project_events(
+    pg: &support::Pg,
+    tenant: Uuid,
+    project: Uuid,
+) -> Vec<(String, String, Uuid, Value)> {
+    sqlx::query_as(
+        "SELECT type, aggregate_type, aggregate_id, payload
+           FROM event
+          WHERE tenant_id = $1 AND aggregate_type = 'project' AND aggregate_id = $2
+          ORDER BY seq",
+    )
+    .bind(tenant)
+    .bind(project)
+    .fetch_all(&pg.super_pool)
+    .await
+    .expect("read the project's events")
+}
+
 /// P1.2 — the closure gate is routed, refused before it approves, and the close lands after.
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn a_project_closes_only_after_the_closure_gate() {
@@ -334,6 +354,12 @@ async fn a_project_closes_only_after_the_closure_gate() {
         project_status, "active",
         "a refused pm.close changed the project's status"
     );
+    assert!(
+        project_events(&pg, seeded.tenant_id, project_id)
+            .await
+            .is_empty(),
+        "the refused pm.close appended a project event"
+    );
     let closures: i64 = sqlx::query_scalar(
         "SELECT count(*) FROM governed_asset
           WHERE tenant_id = $1 AND project_id = $2 AND kind = 'closure'",
@@ -413,6 +439,17 @@ async fn a_project_closes_only_after_the_closure_gate() {
         assets[0].1, "approved",
         "the closure governed asset is not at approved"
     );
+
+    // The close is a domain event (v1-project-1): exactly one `project.updated` on the project
+    // aggregate, written in the close's own transaction.
+    let events = project_events(&pg, seeded.tenant_id, project_id).await;
+    assert_eq!(events.len(), 1, "exactly one project event: {events:?}");
+    let (event_type, aggregate_type, aggregate_id, payload) = &events[0];
+    assert_eq!(event_type, "project.updated", "{events:?}");
+    assert_eq!(aggregate_type, "project", "{events:?}");
+    assert_eq!(*aggregate_id, project_id, "{events:?}");
+    assert_eq!(payload["id"], project_id.to_string(), "{payload}");
+    assert_eq!(payload["changed"], json!(["status"]), "{payload}");
 
     running.shutdown().await;
 }
