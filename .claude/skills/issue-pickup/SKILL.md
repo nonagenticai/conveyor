@@ -50,11 +50,17 @@ gh issue view N --json body --jq .body > /tmp/issue-N.md
 grep -E '^## (References|Baseline|Current state|Parts and acceptance criteria|Dependencies|Definition of ready|Definition of done)' /tmp/issue-N.md
 grep -c 'Verify:' /tmp/issue-N.md          # at least one per `### P` part
 grep -E '^`?Blocker: #[0-9]+' /tmp/issue-N.md  # present iff the label is status:blocked
+python3 scripts/ci/board.py --repo <owner/name> --dor N  # Programme gate; exit 1 names the gaps
 ```
 
 - a blocker line must start the line (the template's placeholder is not a blocker); its number must
   be an issue, not a PR;
 
+- the Programme gate is `--dor N`: it exits 1 for a `unit` issue created on/after 2026-11-18 whose
+  `## Programme` section is missing or has an empty field, and 0 for an earlier issue (forward-only);
+- a `status:blocked` issue whose every `Blocker:` names a **closed** issue is a stale block, not a
+  claimable one: run `python3 scripts/ci/board.py --repo <owner/name>` (apply mode) to release it,
+  re-read the label, then claim. Never claim while the label is `status:blocked`;
 - every path in References resolves (`git cat-file -e <ref>:<path>`); every `#N` resolves
   (`gh issue view N --json number,state`);
 - the Dependencies table agrees with the label: `status:blocked` iff an open `blocked-by`; an
