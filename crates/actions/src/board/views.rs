@@ -353,6 +353,8 @@ pub struct CardOut {
     pub archived_at: Option<DateTime<Utc>>,
     /// The current claimer, when leased.
     pub assignee_id: Option<String>,
+    /// The job binding the card is assigned to (SPEC_V2 §4.4; S21 step 6), when one is named.
+    pub job_binding_id: Option<String>,
     /// The lane the card came from.
     pub prev_list_id: Option<String>,
     /// When the card last changed lane.
@@ -859,6 +861,11 @@ pub struct CardCreateIn {
     /// A parent card on the same board.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub parent_card_id: Option<Uuid>,
+    /// The job binding the card is assigned to (SPEC_V2 §4.4). The id must be an `active`
+    /// binding of this tenant; a draft, retired or foreign binding is refused
+    /// `422 job_binding_unusable`. A run created for the card inherits it (S21 step 6).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub job_binding_id: Option<Uuid>,
     /// Free-form card metadata. Must be a JSON object of at most 16 KiB; this is where a
     /// real intake records its `issue` / `unit_key` / `process_key` / `plan` link.
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -882,6 +889,10 @@ pub struct CardUpdateIn {
     /// `true` stamps the due date done, `false` clears it.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub due_done: Option<bool>,
+    /// Assign the card to an `active` job binding of this tenant (S21 step 6); absent leaves
+    /// the assignment unchanged. The same validation as `cards.create` applies.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub job_binding_id: Option<Uuid>,
 }
 
 /// `webhooks.create`.
@@ -1099,6 +1110,7 @@ pub fn card_out(record: &CardRecord) -> CardOut {
         due_done_at: record.due_done_at,
         archived_at: record.card.archived_at,
         assignee_id: record.card.assignee_id.map(|id| id.to_string()),
+        job_binding_id: record.job_binding_id.map(|id| id.to_string()),
         prev_list_id: record.card.prev_list_id.map(|id| id.to_string()),
         list_changed_at: record.card.list_changed_at,
         meta: record.meta.clone(),

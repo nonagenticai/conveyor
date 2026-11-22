@@ -343,18 +343,17 @@ async fn stub_laya(score: Option<f64>) -> (String, Arc<Mutex<usize>>) {
 
 /// Seal the tenant's `laya.token`, so `laya.judge` reaches the stub instead of failing closed.
 async fn seal_laya_token(pg: &support::Pg, seeded: &support::Seeded) {
+    seal_laya_token_with(pg, seeded, b"test-laya-token").await;
+}
+
+/// Seal a specific token; the live proof seals the estate's real one.
+async fn seal_laya_token_with(pg: &support::Pg, seeded: &support::Seeded, token: &[u8]) {
     let mut tx = conveyor_store::begin_scoped(&pg.runtime, seeded.tenant)
         .await
         .expect("scoped tx");
-    conveyor_store::secret::create_secret_tx(
-        &mut tx,
-        seeded.tenant,
-        "laya.token",
-        b"test-laya-token",
-        "tenant",
-    )
-    .await
-    .expect("seal the laya token");
+    conveyor_store::secret::create_secret_tx(&mut tx, seeded.tenant, "laya.token", token, "tenant")
+        .await
+        .expect("seal the laya token");
     tx.commit().await.expect("commit the laya token");
 }
 
@@ -1404,4 +1403,211 @@ async fn a_grant_op_with_no_binding_refuses_before_a_model_call() {
         models.lock().expect("models").is_empty(),
         "the grant is proved before the model is called"
     );
+}
+
+/// A router stub that records every request body, so a test can read the compiled prompt.
+async fn stub_router_capturing() -> (String, Arc<Mutex<Vec<Value>>>) {
+    let requests: Arc<Mutex<Vec<Value>>> = Arc::new(Mutex::new(Vec::new()));
+    let state = requests.clone();
+    let app = axum::Router::new().route(
+        "/api/chat/completions",
+        axum::routing::post(move |axum::Json(body): axum::Json<Value>| {
+            let state = state.clone();
+            async move {
+                state.lock().expect("requests").push(body);
+                axum::Json(json!({
+                    "id": "chatcmpl-memory",
+                    "choices": [{
+                        "index": 0,
+                        "message": {"role": "assistant", "content": "the memory draft"},
+                        "finish_reason": "stop"
+                    }],
+                    "usage": {"total_tokens": 7}
+                }))
+            }
+        }),
+    );
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:0")
+        .await
+        .expect("bind router stub");
+    let base = format!("http://{}", listener.local_addr().expect("addr"));
+    tokio::spawn(async move {
+        let _ = axum::serve(listener, app).await;
+    });
+    (base, requests)
+}
+
+/// S21 step 6, P2.4: the run's terminal attempt row reaches the next run's compiled prompt.
+///
+/// Without the write-back this is the silent failure ADR 0013 describes: the memory section
+/// renders nothing, and the second run re-derives context the first run already recorded.
+#[tokio::test]
+async fn the_next_run_prompt_reads_the_prior_attempt() {
+    let _guard = STUBS.lock().await;
+    let (pg, seeded, running) = fixture().await;
+    let (router, requests) = stub_router_capturing().await;
+    support::set_env("CONVEYOR_EXTERNAL_INFERENCE_URL", &router);
+    let (capability, agent) = seed_agent(&pg, &seeded, Some("agent@1"), "router/medium").await;
+    let (job, release) = seed_job(
+        &pg,
+        &seeded,
+        "memory_job",
+        json!({"executor_kind": "internal_agent", "prompt_recipe": "agent@1",
+               "model_ref": "router/release", "title": "Memory job", "charter": "write a draft"}),
+    )
+    .await;
+    let binding = bind(&pg, &seeded, job, release, agent, capability).await;
+    let (board, lane) = board_and_lane(&running).await;
+    let card = create_card(&running, &board, &lane).await;
+
+    // First run: it finishes and records its attempt.
+    let first = start_run(&running, &card, binding).await;
+    execute(&pg, &seeded, first).await;
+    let attempts: i64 = scalar(
+        &pg,
+        seeded.tenant,
+        "SELECT count(*) FROM work_package_memory
+          WHERE tenant_id = $1 AND run_id = $2 AND kind = 'attempt'",
+        first,
+    )
+    .await;
+    assert_eq!(attempts, 1, "the terminal run recorded its attempt");
+
+    // Second run on the same card: the compiled prompt carries the prior attempt.
+    let second = start_run(&running, &card, binding).await;
+    execute(&pg, &seeded, second).await;
+
+    let captured = requests.lock().expect("requests");
+    assert_eq!(captured.len(), 2, "one model call per run");
+    let system = captured[1]["messages"][0]["content"]
+        .as_str()
+        .unwrap_or_else(|| panic!("no system message in {}", captured[1]));
+    assert!(
+        system.contains("[attempt/system#"),
+        "the memory section renders the prior attempt: {system}"
+    );
+    assert!(
+        system.contains(&first.to_string()),
+        "the prior run is named in the prompt: {system}"
+    );
+}
+
+/// The live wire (S21 step 6, P3.1): one bound run against the estate's **real** inference-router
+/// and **real** laya bridge, on a fresh local test database.
+///
+/// Ignored because it needs the live endpoints and a real laya token. It refuses to run when they
+/// are unset — a stub agreeing with itself is not this proof.
+///
+/// ```text
+/// CONVEYOR_EXTERNAL_INFERENCE_URL=… CONVEYOR_EXTERNAL_LAYA_URL=… \
+/// CONVEYOR_LIVE_LAYA_TOKEN=… CONVEYOR_LIVE_MODEL=… \
+/// cargo test -p conveyor-actions --test internal_agent_runtime -- --ignored
+/// ```
+#[tokio::test]
+#[ignore = "needs the estate's real inference-router and laya bridge"]
+async fn the_live_run_executes_against_the_real_router_and_laya() {
+    let _guard = STUBS.lock().await;
+    let router = std::env::var("CONVEYOR_EXTERNAL_INFERENCE_URL")
+        .expect("CONVEYOR_EXTERNAL_INFERENCE_URL must point at the real inference-router");
+    let laya = std::env::var("CONVEYOR_EXTERNAL_LAYA_URL")
+        .expect("CONVEYOR_EXTERNAL_LAYA_URL must point at the real laya bridge");
+    let token = std::env::var("CONVEYOR_LIVE_LAYA_TOKEN")
+        .expect("CONVEYOR_LIVE_LAYA_TOKEN must carry the real laya token");
+    let model = std::env::var("CONVEYOR_LIVE_MODEL").unwrap_or_else(|_| "router/medium".to_owned());
+    support::set_env("CONVEYOR_EXTERNAL_INFERENCE_URL", &router);
+    support::set_env("CONVEYOR_EXTERNAL_LAYA_URL", &laya);
+
+    let (pg, seeded, running) = fixture().await;
+    seal_laya_token_with(&pg, &seeded, token.as_bytes()).await;
+    // Threshold 0.0 with `annotate` accepts any score; the proof is that the gate ran and a
+    // decision was recorded, not that the real laya happened to score a particular way.
+    seed_policy(&pg, &seeded, 0.0, "closed", "annotate").await;
+    let (capability, agent) = seed_agent(&pg, &seeded, Some("agent@1"), &model).await;
+    let (job, release) = seed_job(
+        &pg,
+        &seeded,
+        "live_job",
+        json!({"executor_kind": "internal_agent", "prompt_recipe": "agent@1",
+               "model_ref": model, "title": "Live job",
+               "charter": "write one short paragraph about the conveyor"}),
+    )
+    .await;
+    let binding = bind(&pg, &seeded, job, release, agent, capability).await;
+    let (board, lane) = board_and_lane(&running).await;
+    let card = create_card(&running, &board, &lane).await;
+    let run = start_run(&running, &card, binding).await;
+
+    execute(&pg, &seeded, run).await;
+
+    let status: String = scalar(
+        &pg,
+        seeded.tenant,
+        "SELECT status FROM run WHERE tenant_id = $1 AND id = $2",
+        run,
+    )
+    .await;
+    assert_eq!(
+        status, "succeeded",
+        "the live run finished on its draft's gate"
+    );
+    let calls: i64 = scalar(
+        &pg,
+        seeded.tenant,
+        "SELECT count(*) FROM inference_call WHERE tenant_id = $1 AND run_id = $2",
+        run,
+    )
+    .await;
+    assert_eq!(calls, 1, "one real model call");
+    let hash: Option<String> = {
+        let mut tx = begin_scoped(&pg.runtime, seeded.tenant)
+            .await
+            .expect("scope");
+        let row: (Option<String>,) = sqlx::query_as(
+            "SELECT prompt_sha256 FROM inference_call WHERE tenant_id = $1 AND run_id = $2",
+        )
+        .bind(seeded.tenant.as_uuid())
+        .bind(run)
+        .fetch_one(&mut *tx)
+        .await
+        .expect("inference call");
+        tx.commit().await.expect("commit");
+        row.0
+    };
+    assert!(
+        hash.as_deref().is_some_and(|hash| hash.len() == 64),
+        "the compiled prompt's hash is recorded"
+    );
+    let decisions: i64 = {
+        let mut tx = begin_scoped(&pg.runtime, seeded.tenant)
+            .await
+            .expect("scope");
+        let count = sqlx::query_scalar(
+            "SELECT count(*) FROM decision
+              WHERE tenant_id = $1 AND card_id = $2 AND kind = 'gate.precheck'",
+        )
+        .bind(seeded.tenant.as_uuid())
+        .bind(Uuid::parse_str(&card).expect("card id"))
+        .fetch_one(&mut *tx)
+        .await
+        .expect("count the gate decisions");
+        tx.commit().await.expect("commit");
+        count
+    };
+    assert_eq!(decisions, 1, "one real laya gate decision");
+    let drafts: i64 = scalar(
+        &pg,
+        seeded.tenant,
+        "SELECT count(*) FROM document WHERE tenant_id = $1 AND meta->>'run_id' = $2",
+        run,
+    )
+    .await;
+    assert_eq!(drafts, 1, "one draft document");
+    let attempts: i64 = scalar(
+        &pg,
+        seeded.tenant,
+        "SELECT count(*) FROM work_package_memory WHERE tenant_id = $1 AND run_id = $2 AND kind = 'attempt'",
+        run,
+    )
+    .await;
+    assert_eq!(attempts, 1, "the terminal run recorded its attempt");
 }

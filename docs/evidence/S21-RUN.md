@@ -1,52 +1,75 @@
 # S21 step 6 — the work package's run: card binding, terminal memory, live proof
 
 **Issue:** #599 · **Branch:** `issue/599-s21-work-package-run` · **Date:** 2026-11-22 ·
-**Baseline:** `origin/main@dd1b9b4a`
+**Baseline:** `origin/main@dd1b9b4a` (the #597 merge)
 
-> **State: in progress.** The scenario table and measured counts are filled at completion; a
-> skeleton row is never evidence.
+## What was built
 
-## What this step changes
-
-- `cards.create` / `cards.update` accept `job_binding_id` (an active tenant binding; `CardOut`
-  exposes it); `cards.duplicate` leaves it unset.
-- `runs.create` inherits the card's binding when the request omits one; an explicit conflicting
-  binding is `422 card_binding_mismatch` before the INSERT.
-- A terminal root run of a card inserts one `work_package_memory` row (`kind=attempt`,
-  `source=system`, `run_id` set) in the terminal transaction; the existing per-card
-  `memory.consolidate` job then has real rows.
-- The path is proved live against the real inference-router and laya (an `#[ignore]` test).
+- `cards.create` / `cards.update` accept `job_binding_id`; the id must resolve in the tenant and
+  be `active` (`422 job_binding_unusable` otherwise); `CardOut` exposes it; `cards.duplicate` leaves
+  it unset (an assignment is not content).
+- `runs.create` inherits the card's binding when the request omits one; an explicit binding that
+  differs is `422 card_binding_mismatch` before the INSERT; a card with no binding keeps the plain
+  run path. The pin/stale checks stay in `insert_run_tx`.
+- A terminal root run of a card inserts exactly one `work_package_memory` row (`kind=attempt`,
+  `source=system`, `run_id` set) through the existing store writer, in the same transaction as the
+  terminal status (`record_run_memory` in `crates/store/src/run.rs`); the existing per-card
+  `memory.consolidate` job then has real rows. A child run and a card-less run write none.
+- The compiled prompt of the next run on the card carries the prior attempt (the memory selector
+  reads the hot rows; ids make the selection part of the hash).
 
 ## Not this step
 
-The budget. `v1-p75-1`/`v1-w4a-1` are resolved on `origin/issue/526-u5a` (commit `8f1e5770`,
-`crates/actions/tests/tool_budget.rs` 14 passed). The token ceiling (`max_tokens`, recorded-only)
-is that gate's residual. See ADR 0013.
+The budget. `v1-p75-1`/`v1-w4a-1` are resolved on `origin/issue/526-u5a`
+(commit `8f1e5770`, `crates/actions/tests/tool_budget.rs` 14 passed, `422 budget_missing` at run
+start, an invoke precheck that refuses an unbudgeted capturing call). The token ceiling
+(`ReleaseLimits.max_tokens`, recorded-only) is that gate's residual. See ADR 0013.
 
-## Scenarios
+## Measured at the branch head (2026-11-22)
 
-| Scenario | Test | Result |
-|---|---|---|
-| P1.1 | `card_binding::a_cards_binding_reaches_its_run` | pending |
-| P1.2 | `card_binding::a_conflicting_binding_is_refused` | pending |
-| P1.3 | `card_binding::an_unusable_binding_is_refused_on_a_card` | pending |
-| P1.4 | `card_binding::card_out_carries_the_binding` | pending |
-| P2.1 | `run_memory::a_succeeded_root_run_records_one_attempt` | pending |
-| P2.2 | `run_memory::a_failed_run_records_its_class` | pending |
-| P2.3 | `run_memory::only_root_card_runs_record_memory` | pending |
-| P2.4 | `internal_agent_runtime::the_next_run_prompt_reads_the_prior_attempt` | pending |
-| P3.1 | `internal_agent_live` (`--ignored`, real router + laya) | pending |
+| Suite | Result |
+|---|---|
+| `crates/actions/tests/card_binding.rs` (new) | **7 passed** (4 scenarios + 3 support) |
+| `crates/store/tests/run_memory.rs` (new) | **4 passed** |
+| `internal_agent_runtime.rs` (extended) | **16 passed / 1 ignored** (the live proof) |
+| `board` | **15 passed** |
+| `executor_runtime` | **8 passed** |
+| `registry` | **7 passed** |
+| `agent_run_resolved` | **7 passed** |
+| `decision_ladder` | **8 passed** |
+| `draft_apply` | **12 passed** |
+| server `organisation_gate` / `run_retry` / `memory_consolidate` | **1 / 2 / 4 passed** |
+| `clippy -p conveyor-store -p conveyor-actions -p conveyor-server --all-targets -- -D warnings` | **exit 0** |
+| `served-spec.lock.json` | **10 operations re-hashed** (the card reads/writes and `runs.create`), `--check-lock` **exit 0** |
 
-## Reversal evidence
+## Reversal proofs (each guard disabled, its own test red, then restored)
 
-Each negative scenario names the guard it exercises; the guard is removed and the scenario must
-fail. Filled at completion.
+| Guard removed | Test that turned red |
+|---|---|
+| the card's binding inherited by `runs.create` | `card_binding::a_cards_binding_reaches_its_run` |
+| the conflicting-binding refusal | `card_binding::a_conflicting_binding_is_refused` (the run was created 201) |
+| the binding's `active` status check | `card_binding::an_unusable_binding_is_refused_on_a_card` (the draft was assigned) |
+| the terminal memory insert | `run_memory::a_succeeded_root_run_records_one_attempt` (zero rows) |
+| the root-only filter | `run_memory::only_root_card_runs_record_memory` (the child wrote a row) |
 
 ## Generated
 
-`docs/design/data/actions.json`, `coverage.json`, `rework.js`/`rework-register.json`,
-`docs/design/docs/**`, `served-spec.lock.json`, `seed/programme.json`, the diagram SVGs — regenerated
-at the merge point, never hand-merged. Filled with counts at completion.
+- `served-spec.lock.json` — `--print-openapi --write-lock`, then `--check-lock` exit 0.
+- `build-programme-seed.py --check` and `build-coverage.py --check` / `build-v2-coverage.py --check`
+  current. ⚠️ The S21 `issues` list in `seed/programme.json` gains #599 only when the automated
+  issue-registry refresh adds it to `docs/design/data/issues.json`; the generator's mapping is
+  registry-driven, so hand-adding it makes `--check` fail. The seeded card-binding column and the
+  attempt rows need no seed row.
+- `docs/design/docs/**` regenerated; `scripts/ci/board.py --dry-run` clean (recorded at the merge
+  point).
+
+## Live proof
+
+`internal_agent_runtime::the_live_run_executes_against_the_real_router_and_laya` (`#[ignore]`,
+env-gated on `CONVEYOR_EXTERNAL_INFERENCE_URL`, `CONVEYOR_EXTERNAL_LAYA_URL`,
+`CONVEYOR_LIVE_LAYA_TOKEN`, `CONVEYOR_LIVE_MODEL`). **Pending** — it needs the estate's endpoints
+and a real laya token; the run and its measured evidence are recorded here when executed. A stub is
+not the proof.
 
 ## Residuals (recorded, not built)
 

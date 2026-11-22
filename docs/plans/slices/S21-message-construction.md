@@ -566,10 +566,11 @@ and error class — and then enqueues the existing consolidation job. The row an
 commit in one transaction; a child run and a card-less run write none. The one-writer rule is
 amended in CONTRACT §17 to name this runtime writer.
 
-**P3 — the live wire proof.** A new `#[ignore]` test drives one bound run against the estate's real
-inference-router and real laya bridge on a fresh local test database (the `s3_wire.rs` pattern) and
-asserts the model call, the `gate.precheck` decision, the draft, the attempt row and the run's
-terminal state. It refuses when the endpoints or credentials are unset; a stub is not the proof.
+**P3 — the live wire proof.** An `#[ignore]` test in the existing
+`internal_agent_runtime` binary drives one bound run against the estate's real inference-router and
+real laya bridge on a fresh local test database (the `s3_wire.rs` pattern) and asserts the model
+call, the `gate.precheck` decision, the draft, the attempt row and the run's terminal state. It
+refuses when the endpoints or credentials are unset; a stub is not the proof.
 
 **Out of this step.** No budget mechanism (cost, tool spend or token ceiling — `v1-p75-1` is the
 #526 lane's); no automatic apply of an L1-accepted draft; no new `cards.assign` action; no
@@ -577,6 +578,5 @@ auto-start from a claim or lane move; no prior-step memory in the prompt; no pro
 memory (`process_runs.start`); no UI; no PDDL storage; no migration.
 
 **Acceptance.** `crates/actions/tests/card_binding.rs` (new), `crates/store/tests/run_memory.rs`
-(new), `internal_agent_runtime.rs` (extended with the next-run prompt scenario), and
-`crates/actions/tests/internal_agent_live.rs` (new, ignored). The scenarios are issue #599 P1–P3;
-the receipt is `docs/evidence/S21-RUN.md`.
+(new), `internal_agent_runtime.rs` (extended with the next-run prompt and live scenarios). The
+scenarios are issue #599 P1–P3; the receipt is `docs/evidence/S21-RUN.md`.

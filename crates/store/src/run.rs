@@ -122,6 +122,9 @@ pub enum RunStoreError {
     /// The `(parent, step, attempt)` already exists (`uq_run_child_attempt`).
     #[error("the parent step already has a run at that attempt")]
     ChildAttemptExists,
+    /// The run's terminal memory row could not be written (S21 step 6).
+    #[error("the run's memory row could not be written: {0}")]
+    Memory(#[from] crate::memory::MemoryStoreError),
     /// The run named a retired (or draft) binding, or a release that is not its pin
     /// (`409 job_binding_stale`, SPEC_V2 §4.4).
     #[error(
@@ -611,23 +614,31 @@ pub async fn transition_run_tx(
         .await?;
     // The row was locked and the domain agreed; a zero-row write would mean the lock did not
     // hold, which is a bug rather than a business outcome.
+    let is_root = row.as_ref().is_some_and(|row| row.parent_run_id.is_none());
     let run = row
         .map(Run::try_from)
         .transpose()?
         .ok_or(RunStoreError::NotFound)?;
-    enqueue_memory_consolidation(conn, tenant, &run).await?;
+    record_run_memory(conn, tenant, &run, is_root).await?;
     Ok(run)
 }
 
-/// Enqueue the card's memory consolidation when a run reaches a terminal state (S15).
+/// Record the run's terminal outcome in the card's work-package memory, then enqueue its
+/// consolidation (S15; SPEC_V2 §6.6.4, §7.6; S21 step 6).
 ///
-/// One job per card: the dedupe key is deliberately the card, not `(card, run)` — two runs that
-/// finish together collapse into one consolidation, which reads every un-consolidated row anyway.
-/// The job is idempotent, so a replay after a crash writes no second document.
-async fn enqueue_memory_consolidation(
+/// One `attempt`/`system` hot row per terminal **root** run of a card, written through
+/// `store::memory::insert_memory_tx` in the caller's transaction: the row and the terminal status
+/// commit together or not at all. A child run shares its parent's card and is part of the parent's
+/// attempt (writing one row per child would crowd the card's hot rows); a card-less run has no
+/// work package. The consolidation job is still one per card: the dedupe key is deliberately the
+/// card, not `(card, run)` — two runs that finish together collapse into one consolidation, which
+/// reads every un-consolidated row anyway. The job is idempotent, so a replay after a crash writes
+/// no second document.
+async fn record_run_memory(
     conn: &mut PgConnection,
     tenant: TenantId,
     run: &Run,
+    is_root: bool,
 ) -> Result<(), RunStoreError> {
     if !run.status.is_terminal() {
         return Ok(());
@@ -636,6 +647,28 @@ async fn enqueue_memory_consolidation(
         // A project-scoped run has no work package.
         return Ok(());
     };
+    if is_root {
+        let body = run_memory_body(run);
+        crate::memory::insert_memory_tx(
+            conn,
+            tenant,
+            &crate::memory::NewMemory {
+                card_id,
+                run_id: Some(run.id),
+                capability_id: None,
+                kind: conveyor_domain::memory::MemoryKind::Attempt,
+                source: conveyor_domain::memory::MemorySource::System,
+                body: &body,
+                supersedes_id: None,
+                meta: serde_json::json!({
+                    "run_id": run.id,
+                    "status": run.status.as_str(),
+                    "error_class": run.error_class,
+                }),
+            },
+        )
+        .await?;
+    }
     crate::jobs::enqueue_tx(
         conn,
         tenant,
@@ -647,6 +680,28 @@ async fn enqueue_memory_consolidation(
     )
     .await?;
     Ok(())
+}
+
+/// The one-line body of a run's attempt row: what the next run on the card needs to know.
+///
+/// Kept short on purpose — the hot rows are rendered into the next prompt, so the body is the
+/// fact, never a transcript. The cap is far below `domain::memory::MAX_BODY_CHARS` (16 KiB).
+fn run_memory_body(run: &Run) -> String {
+    let mut body = format!(
+        "run {} attempt {} {}",
+        run.id,
+        run.attempt,
+        run.status.as_str()
+    );
+    if let Some(class) = &run.error_class {
+        body.push_str(": ");
+        body.push_str(class);
+        if let Some(message) = &run.error_message {
+            body.push_str(" — ");
+            body.push_str(message);
+        }
+    }
+    body.chars().take(2_000).collect()
 }
 
 /// The process a run executes, if any. The domain `Run` value carries no process id (it is a
@@ -694,6 +749,7 @@ pub async fn fail_run_tx(
         .bind(error_message)
         .fetch_optional(&mut *conn)
         .await?;
+    let is_root = row.as_ref().is_some_and(|row| row.parent_run_id.is_none());
     let run = row.map(Run::try_from).transpose()?;
     if let Some(run) = &run {
         // The run tree is one unit of work on the failure path too: a live child under a failed
@@ -701,7 +757,7 @@ pub async fn fail_run_tx(
         // for, and the root's own queued steps would read as "still to do" forever.
         crate::process::skip_queued_run_steps_tx(conn, tenant, run.id).await?;
         cancel_descendants_tx(conn, tenant, run.id).await?;
-        enqueue_memory_consolidation(conn, tenant, run).await?;
+        record_run_memory(conn, tenant, run, is_root).await?;
     }
     Ok(run)
 }
