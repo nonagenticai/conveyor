@@ -1,0 +1,46 @@
+{
+ "project_id": "01a1d039-0d33-7915-8833-75f4dc31cc07",
+ "contract_id": "01a2052f-29da-76c4-9bda-e45e0f408fe8",
+ "level": "conformant",
+ "findings": [
+  {
+   "finding": "The PM path is dual-controlled on every gate: charter, baseline and acceptance changes each carry a distinct approving decision.",
+   "status": "met"
+  },
+  {
+   "finding": "The scope baseline is frozen at v1 and approved by an actor other than its taker.",
+   "status": "met"
+  },
+  {
+   "finding": "The acceptance of the five deliverables travelled as an approved change request, not a direct mutation.",
+   "status": "met"
+  },
+  {
+   "finding": "Closure is not yet recorded; the review is taken before the closure gate and the closure review will cite it.",
+   "status": "open"
+  }
+ ],
+ "evidence": [
+  {
+   "kind": "row",
+   "ref": "project_baseline/01a2052e-061f-7570-b780-d94101449bef"
+  },
+  {
+   "kind": "row",
+   "ref": "change/01a2052e-5648-7350-a30d-06514a69eced"
+  },
+  {
+   "kind": "test",
+   "ref": "crates/actions/tests/spine_gates.rs"
+  },
+  {
+   "kind": "test",
+   "ref": "crates/actions/tests/closure_gate.rs"
+  },
+  {
+   "kind": "snapshot",
+   "ref": "the tr3c record"
+  }
+ ],
+ "delegation_ref": "01a2021d-cca2-757c-bfc2-21bd4e4b6d85"
+}

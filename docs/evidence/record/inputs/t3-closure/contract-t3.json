@@ -1,0 +1,20 @@
+{
+ "project_id": "01a1d039-0d33-7915-8833-75f4dc31cc07",
+ "kind": "delivery_contract",
+ "phase_code": "g",
+ "title": "T3 \u2014 delivery contract: the PM job's governed path",
+ "body": {
+  "scope": "the PM request-to-plan path, the dual-controlled gates, the change path and closure",
+  "obligations": [
+   "every gate is approved by an actor other than its requester",
+   "a baseline mutation after the scope baseline cites an approved change request",
+   "closure resolves against the frozen baseline with a published closure review"
+  ],
+  "acceptance": "SPEC_V2 \u00a712 T3: PM runs a request end to end; cannot approve its own gate; a baseline change requires a change request",
+  "evidence": [
+   "crates/actions/tests/spine_gates.rs",
+   "crates/actions/tests/closure_gate.rs",
+   "crates/actions/tests/programme_close.rs"
+  ]
+ }
+}
