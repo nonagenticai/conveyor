@@ -9,14 +9,17 @@
 //! ⚠️ Facts are read, never stored: the compiled text is derived on every compile, so changing a
 //! card changes the next prompt rather than leaving a stored copy that disagrees with the board.
 
+use chrono::{DateTime, Utc};
 use conveyor_domain::TenantId;
 use conveyor_domain::prompt::{
-    CapabilityFacts, CardFacts, ProcessFacts, ProjectFacts, PromptDefinition, PromptFacts,
-    PromptSection, PromptSource, StepFacts,
+    CapabilityFacts, CardFacts, KnowledgeFacts, MemorySelector, ProcessFacts, ProjectFacts,
+    PromptDefinition, PromptFacts, PromptSection, PromptSource, SelectorError, StepFacts,
 };
 use serde_json::Value;
 use sqlx::PgConnection;
 use uuid::Uuid;
+
+use crate::memory::MemoryStoreError;
 
 /// One stored recipe: the definition plus the status the caller checks before using it.
 #[derive(Clone, Debug)]
@@ -43,6 +46,24 @@ pub enum PromptStoreError {
         /// Where it sat.
         position: i32,
     },
+    /// The selector a caller supplied is not a valid selection config.
+    #[error(transparent)]
+    Selector(#[from] SelectorError),
+    /// The card's memory could not be read.
+    #[error(transparent)]
+    Memory(#[from] MemoryStoreError),
+    /// No such version (or key) in this tenant.
+    #[error("the prompt does not exist in this tenant")]
+    NotFound,
+    /// The version is already active; activating it again is a refusal, not a no-op.
+    #[error("the prompt version is already active")]
+    AlreadyActive,
+    /// The version is already retired.
+    #[error("the prompt version is already retired")]
+    AlreadyRetired,
+    /// A concurrent write took the version or the active slot.
+    #[error("a concurrent prompt write won the race")]
+    Conflict,
 }
 
 /// Read one recipe by its exact pin. A retired version is returned (`status` says so) so the
@@ -66,8 +87,9 @@ pub async fn get_prompt_tx(
         return Ok(None);
     };
 
-    let sections: Vec<(i32, String, bool, String, Option<i32>)> = sqlx::query_as(
-        "SELECT position, source_kind, required, template, budget_chars FROM prompt_section
+    let sections: Vec<(i32, String, bool, String, Value, Option<i32>)> = sqlx::query_as(
+        "SELECT position, source_kind, required, template, selector, budget_chars
+           FROM prompt_section
           WHERE tenant_id = $1 AND prompt_id = $2
           ORDER BY position",
     )
@@ -77,7 +99,7 @@ pub async fn get_prompt_tx(
     .await?;
 
     let mut parsed = Vec::with_capacity(sections.len());
-    for (position, kind, required, template, budget_chars) in sections {
+    for (position, kind, required, template, selector, budget_chars) in sections {
         let source = PromptSource::parse(&kind).ok_or_else(|| PromptStoreError::UnknownSource {
             kind: kind.clone(),
             position,
@@ -87,6 +109,7 @@ pub async fn get_prompt_tx(
             source,
             required,
             template,
+            selector,
             budget_chars: budget_chars.and_then(|value| u32::try_from(value).ok()),
         });
     }
@@ -123,6 +146,7 @@ pub async fn facts_for_run_tx(
     tenant: TenantId,
     run_id: Uuid,
     run_step_id: Option<Uuid>,
+    memory_selector: &MemorySelector,
 ) -> Result<PromptFacts, PromptStoreError> {
     let mut facts = PromptFacts::default();
     let run: Option<RunFactRow> = sqlx::query_as(
@@ -177,10 +201,18 @@ pub async fn facts_for_run_tx(
         .bind(capability_id)
         .fetch_all(&mut *conn)
         .await?;
-        facts.knowledge = packs
-            .into_iter()
-            .map(|(key, version)| format!("{key}@{version}"))
-            .collect();
+        facts.knowledge = KnowledgeFacts {
+            packs: packs
+                .into_iter()
+                .map(|(key, version)| format!("{key}@{version}"))
+                .collect(),
+            hits: Vec::new(),
+        };
+    }
+    if let Some(card_id) = card_id {
+        facts.memory =
+            crate::memory::select_for_prompt_tx(&mut *conn, tenant, card_id, memory_selector)
+                .await?;
     }
     Ok(facts)
 }
@@ -433,6 +465,7 @@ async fn read_capability(
     .fetch_optional(&mut *conn)
     .await?;
     Ok(agent.map(|agent| CapabilityFacts {
+        id: capability_id,
         key,
         title,
         agent_key: agent.key,
@@ -450,4 +483,263 @@ async fn read_capability(
         max_iterations: agent.max_iterations,
         timeout_secs: agent.timeout_secs,
     }))
+}
+
+/// One section an author supplies to `prompt_recipes.create`.
+#[derive(Clone, Debug)]
+pub struct NewPromptSection {
+    /// 1-based position; unique within the recipe.
+    pub position: i32,
+    /// What it renders from.
+    pub source: PromptSource,
+    /// A required section refuses a compile with no source.
+    pub required: bool,
+    /// The literal text, for a `system` section.
+    pub template: String,
+    /// The selection config for a rendered kind.
+    pub selector: Value,
+    /// Its own character ceiling.
+    pub budget_chars: Option<u32>,
+}
+
+/// A new recipe version, before it is stored.
+#[derive(Clone, Debug)]
+pub struct NewPrompt {
+    /// The recipe key.
+    pub key: String,
+    /// Human title.
+    pub title: String,
+    /// In order.
+    pub sections: Vec<NewPromptSection>,
+}
+
+/// One catalogue row without its sections, for `prompt_recipes.list`.
+#[derive(Clone, Debug)]
+pub struct PromptSummary {
+    /// The recipe key.
+    pub key: String,
+    /// Dense from 1.
+    pub version: i32,
+    /// Human title.
+    pub title: String,
+    /// `draft`, `active` or `retired`.
+    pub status: String,
+    /// When the version was created.
+    pub created_at: DateTime<Utc>,
+    /// When it last changed.
+    pub updated_at: DateTime<Utc>,
+}
+
+/// True when the database refused a duplicate (the version or the active slot).
+fn is_unique_violation(error: &sqlx::Error) -> bool {
+    matches!(error, sqlx::Error::Database(database) if database.code().as_deref() == Some("23505"))
+}
+
+/// Create the next version of a key as a `draft`.
+///
+/// The version number is computed in the INSERT itself, so a missing key starts at 1; a
+/// concurrent create of the same key collides on `(tenant, key, version)` and is a `Conflict`,
+/// never a silent overwrite.
+pub async fn create_prompt_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    prompt: &NewPrompt,
+) -> Result<PromptRecord, PromptStoreError> {
+    let inserted: Result<(Uuid, i32), sqlx::Error> = sqlx::query_as(
+        "INSERT INTO prompt (tenant_id, key, version, status, title)
+         SELECT $1, $2, COALESCE(MAX(version), 0) + 1, 'draft', $3
+           FROM prompt
+          WHERE tenant_id = $1 AND key = $2
+         RETURNING id, version",
+    )
+    .bind(tenant.as_uuid())
+    .bind(&prompt.key)
+    .bind(&prompt.title)
+    .fetch_one(&mut *conn)
+    .await;
+    let (id, version) = inserted.map_err(|error| {
+        if is_unique_violation(&error) {
+            PromptStoreError::Conflict
+        } else {
+            PromptStoreError::Db(error)
+        }
+    })?;
+
+    for section in &prompt.sections {
+        sqlx::query(
+            "INSERT INTO prompt_section
+                 (tenant_id, prompt_id, position, source_kind, required, template, selector,
+                  budget_chars)
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+        )
+        .bind(tenant.as_uuid())
+        .bind(id)
+        .bind(section.position)
+        .bind(section.source.as_str())
+        .bind(section.required)
+        .bind(&section.template)
+        .bind(&section.selector)
+        .bind(section.budget_chars.map(i64::from))
+        .execute(&mut *conn)
+        .await?;
+    }
+
+    get_prompt_tx(&mut *conn, tenant, &prompt.key, version)
+        .await?
+        .ok_or(PromptStoreError::NotFound)
+}
+
+/// One version by key: exact when `version` is named, otherwise the key's active version.
+pub async fn get_prompt_by_key_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    key: &str,
+    version: Option<i32>,
+) -> Result<Option<PromptRecord>, PromptStoreError> {
+    if let Some(version) = version {
+        return get_prompt_tx(&mut *conn, tenant, key, version).await;
+    }
+    let active: Option<i32> = sqlx::query_scalar(
+        "SELECT version FROM prompt
+          WHERE tenant_id = $1 AND key = $2 AND status = 'active'",
+    )
+    .bind(tenant.as_uuid())
+    .bind(key)
+    .fetch_optional(&mut *conn)
+    .await?;
+    match active {
+        Some(version) => get_prompt_tx(&mut *conn, tenant, key, version).await,
+        None => Ok(None),
+    }
+}
+
+/// One page of catalogue rows, newest version first within a key.
+pub async fn list_prompts_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    key: Option<&str>,
+    status: Option<&str>,
+    limit: i64,
+) -> Result<Vec<PromptSummary>, PromptStoreError> {
+    let rows: Vec<(String, i32, String, String, DateTime<Utc>, DateTime<Utc>)> = sqlx::query_as(
+        "SELECT key, version, title, status, created_at, updated_at
+           FROM prompt
+          WHERE tenant_id = $1
+            AND ($2::text IS NULL OR key = $2)
+            AND ($3::text IS NULL OR status = $3)
+          ORDER BY key, version DESC
+          LIMIT $4",
+    )
+    .bind(tenant.as_uuid())
+    .bind(key)
+    .bind(status)
+    .bind(limit)
+    .fetch_all(&mut *conn)
+    .await?;
+    Ok(rows
+        .into_iter()
+        .map(
+            |(key, version, title, status, created_at, updated_at)| PromptSummary {
+                key,
+                version,
+                title,
+                status,
+                created_at,
+                updated_at,
+            },
+        )
+        .collect())
+}
+
+/// Activate one version: the key's current active row is retired in the same transaction.
+///
+/// The target row is locked first, and `uq_prompt_active` is the final authority: two
+/// activations of the same version race to `AlreadyActive`, and two different versions cannot
+/// leave the key with two active rows.
+pub async fn activate_prompt_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    key: &str,
+    version: i32,
+) -> Result<PromptRecord, PromptStoreError> {
+    let status: Option<String> = sqlx::query_scalar(
+        "SELECT status FROM prompt
+          WHERE tenant_id = $1 AND key = $2 AND version = $3
+          FOR UPDATE",
+    )
+    .bind(tenant.as_uuid())
+    .bind(key)
+    .bind(version)
+    .fetch_optional(&mut *conn)
+    .await?;
+    match status.as_deref() {
+        None => return Err(PromptStoreError::NotFound),
+        Some("active") => return Err(PromptStoreError::AlreadyActive),
+        Some("draft" | "retired") => {}
+        Some(_) => return Err(PromptStoreError::Conflict),
+    }
+    sqlx::query(
+        "UPDATE prompt SET status = 'retired', updated_at = now()
+          WHERE tenant_id = $1 AND key = $2 AND status = 'active' AND version <> $3",
+    )
+    .bind(tenant.as_uuid())
+    .bind(key)
+    .bind(version)
+    .execute(&mut *conn)
+    .await?;
+    sqlx::query(
+        "UPDATE prompt SET status = 'active', updated_at = now()
+          WHERE tenant_id = $1 AND key = $2 AND version = $3",
+    )
+    .bind(tenant.as_uuid())
+    .bind(key)
+    .bind(version)
+    .execute(&mut *conn)
+    .await
+    .map_err(|error| {
+        if is_unique_violation(&error) {
+            PromptStoreError::Conflict
+        } else {
+            PromptStoreError::Db(error)
+        }
+    })?;
+    get_prompt_tx(&mut *conn, tenant, key, version)
+        .await?
+        .ok_or(PromptStoreError::NotFound)
+}
+
+/// Retire one version. A retired row stays readable by exact pin.
+pub async fn retire_prompt_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    key: &str,
+    version: i32,
+) -> Result<PromptRecord, PromptStoreError> {
+    let status: Option<String> = sqlx::query_scalar(
+        "SELECT status FROM prompt
+          WHERE tenant_id = $1 AND key = $2 AND version = $3
+          FOR UPDATE",
+    )
+    .bind(tenant.as_uuid())
+    .bind(key)
+    .bind(version)
+    .fetch_optional(&mut *conn)
+    .await?;
+    match status.as_deref() {
+        None => return Err(PromptStoreError::NotFound),
+        Some("retired") => return Err(PromptStoreError::AlreadyRetired),
+        Some(_) => {}
+    }
+    sqlx::query(
+        "UPDATE prompt SET status = 'retired', updated_at = now()
+          WHERE tenant_id = $1 AND key = $2 AND version = $3",
+    )
+    .bind(tenant.as_uuid())
+    .bind(key)
+    .bind(version)
+    .execute(&mut *conn)
+    .await?;
+    get_prompt_tx(&mut *conn, tenant, key, version)
+        .await?
+        .ok_or(PromptStoreError::NotFound)
 }
