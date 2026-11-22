@@ -146,11 +146,11 @@ window.CONVEYOR_DOCUMENTS = {
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0011-applying-gate.md"
     },
     {
-      "title": "0009 — The real V2 UI is the app, not the design pack",
+      "title": "0013 — The real V2 UI is the app, not the design pack",
       "path": "docs/decisions/0013-real-v2-ui.html",
       "source": "docs/decisions/0013-real-v2-ui.md",
       "section": "Decisions",
-      "sha256": "1c955a3a9a73acb44f7ab188e69ccb5982b45b10fd34c6073516cf1352fd19f6",
+      "sha256": "36f048c336414c3935a808810b696c751727bc2a7986dd82a11a99e446c18f88",
       "bytes": 3686,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0013-real-v2-ui.md"
     },
