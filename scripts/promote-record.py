@@ -120,6 +120,7 @@ READ_ACTIONS = {
     "lists.list",
     "pm.get",
     "benefits.link_list",
+    "documents.list",
 }
 
 # The release this script ships with has no action that lists measurements.  If one is
@@ -630,6 +631,8 @@ class State:
     lists: dict[str, dict] = field(default_factory=dict)
     # The tr3 record family's production rows: benefits-map edges by benefit.
     links: list[dict] = field(default_factory=list)
+    # The document family's production rows, by (project, category) as listed.
+    documents: list[dict] = field(default_factory=list)
 
 
 def snapshot_file(directory: str) -> Path:
@@ -697,6 +700,30 @@ def load_state(
             if row.get("id") not in seen_registers:
                 state.registers.append(row)
                 seen_registers.add(row.get("id"))
+    if any(
+        entry.action in ("documents.compose", "documents.publish") for entry in entries
+    ):
+        seen: set[tuple[str, str]] = set()
+        for entry in entries:
+            if entry.action != "documents.compose":
+                continue
+            project_id = entry.payload.get("project_id")
+            category = entry.payload.get("category")
+            if not project_id or not category:
+                raise PromoteError(
+                    f"{entry.action}: the input names no project_id/category"
+                )
+            key = (str(project_id), str(category))
+            if key in seen:
+                continue
+            seen.add(key)
+            state.documents.extend(
+                list_all(
+                    client,
+                    "documents.list",
+                    {"project_id": project_id, "category": category},
+                )
+            )
     if any(entry.action == "benefits.link" for entry in entries):
         state.links.extend(
             list_all(client, "benefits.link_list", {"programme_id": programme_id})
@@ -917,6 +944,31 @@ def existing_for(
         if update_already_reflected(state, key, entry.payload):
             return benefit_by_reference(state, key.first)
         return None
+    if entry.action == "documents.compose":
+        for row in state.documents:
+            if (
+                row.get("title") == entry.payload.get("title")
+                and row.get("category") == entry.payload.get("category")
+                and row.get("project_id") == entry.payload.get("project_id")
+            ):
+                return row
+        return None
+    if entry.action == "documents.publish":
+        parts = key.first.split(":", 2)
+        if len(parts) != 3:
+            raise PromoteError(
+                "document-publish key must be document-publish:<unit>:<category>:<title>"
+            )
+        _unit, category, title = parts
+        for row in state.documents:
+            if (
+                row.get("title") == title
+                and row.get("category") == category
+                and row.get("published_at")
+                and row.get("status") != "deleted"
+            ):
+                return row
+        return None
     if entry.action == "registers.update":
         row = risk_by_code(state, key.first)
         if row is None:
@@ -1123,6 +1175,15 @@ def remap_payload(
             )
         payload["benefit_id"] = benefit["id"]
         payload.pop("benefit_ref", None)
+    elif entry.action == "documents.publish":
+        staging = payload.get("id")
+        production = id_map.get(staging) if staging else None
+        if not production:
+            raise PromoteError(
+                f"document {staging!r} has no production id; the compose entry must "
+                "create or find it first"
+            )
+        payload["id"] = production
     elif entry.action == "cards.move":
         card = state.cards.get(key.first)
         target_id = payload.get("list_id")
@@ -1306,6 +1367,17 @@ def readback_entry(
             )
         state.cards[key.first] = card
         return card
+    if entry.action in ("documents.compose", "documents.publish"):
+        row = read_row(client, "documents.get", production_id)
+        if entry.action == "documents.compose":
+            if row.get("title") != entry.payload.get("title"):
+                raise ReadbackError(
+                    f"documents.get: title is {row.get('title')!r}, not "
+                    f"{entry.payload.get('title')!r}"
+                )
+        elif not row.get("published_at"):
+            raise ReadbackError("documents.get: the document is not published")
+        return row
     if entry.action == "registers.update":
         row = read_row(client, "registers.get", production_id)
         for name, value in entry.payload.items():
@@ -1366,6 +1438,14 @@ def apply_entries(
                 if not isinstance(version, int):
                     raise PromoteError(
                         f"cards.get: {payload['id']} has no version for If-Match"
+                    )
+                output = client.invoke(entry.action, payload, if_match=version)
+            elif entry.action == "documents.publish":
+                current = read_row(client, "documents.get", str(payload["id"]))
+                version = current.get("version")
+                if not isinstance(version, int):
+                    raise PromoteError(
+                        f"documents.get: {payload['id']} has no version for If-Match"
                     )
                 output = client.invoke(entry.action, payload, if_match=version)
             elif entry.action == "registers.update":
@@ -1583,6 +1663,26 @@ class FakeClient:
             row.setdefault("status", "draft")
             self.state.benefits.append(row)
             return copy.deepcopy(row)
+        if action == "documents.compose":
+            row = copy.deepcopy(payload)
+            row.update(id=self._id("document"), version=1, status="draft", published_at=None)
+            self.state.documents.append(row)
+            return copy.deepcopy(row)
+        if action == "documents.publish":
+            for row in self.state.documents:
+                if row.get("id") == payload.get("id"):
+                    row["status"] = "active"
+                    row["published_at"] = "2026-11-22T00:00:00Z"
+                    row["version"] = int(row.get("version") or 1) + 1
+                    return copy.deepcopy(row)
+            raise AssertionError(f"documents.publish: no document {payload.get('id')}")
+        if action == "documents.list":
+            return {"items": self._rows(self.state.documents, payload), "next_cursor": None}
+        if action == "documents.get":
+            for row in self.state.documents:
+                if row.get("id") == payload.get("id"):
+                    return copy.deepcopy(row)
+            return None
         if action == "registers.update":
             for row in self.state.registers:
                 if row.get("id") == payload.get("id"):
@@ -2114,6 +2214,59 @@ def self_test() -> int:
             [outcome.verdict for outcome in second] == ["skipped", "skipped"],
             f"a replay skips the tr3 record entries: "
             f"{[(o.entry.natural_key, o.verdict, o.detail) for o in second]}",
+        )
+
+        # 10. the document family: a compose+publish pair applies once, then skips; a
+        # pre-existing published document with the same title/category suppresses both.
+        doc_payload = {
+            "title": "Fixture Plan", "project_id": "01a1dcb8-d24b-76de-b901-56fd56e001bc",
+            "body": "# Fixture Plan", "category": "pi-plan", "publishable": True,
+        }
+        doc_path = root / "inputs" / "document.json"
+        doc_path.write_text(json.dumps(doc_payload), encoding="utf-8")
+        publish_path = root / "inputs" / "document_publish.json"
+        publish_path.write_text(
+            json.dumps({"id": "staging-document", "publish": True}), encoding="utf-8"
+        )
+        doc_entries = [
+            (2, {"action": "documents.compose", "input": str(doc_path),
+                 "natural_key": "document:tranche-3:pi-plan:Fixture Plan",
+                 "output_id": "staging-document"}),
+            (3, {"action": "documents.publish", "input": str(publish_path),
+                 "natural_key": "document-publish:tranche-3:pi-plan:Fixture Plan",
+                 "output_id": "staging-document"}),
+        ]
+        entries, errors = build_entries(doc_entries)
+        ok(not errors, f"the document fixture parses: {errors}")
+        state = State()
+        client = FakeClient(state)
+        _, outcomes = apply_entries(client, entries, state, None)
+        ok(
+            [o.verdict for o in outcomes] == ["created", "created"],
+            f"the document pair applies: "
+            f"{[(o.entry.natural_key, o.verdict, o.detail) for o in outcomes]}",
+        )
+        ok(
+            any(row.get("published_at") for row in state.documents),
+            "the publish landed",
+        )
+        _, second = apply_entries(FakeClient(state), entries, state, None)
+        ok(
+            [o.verdict for o in second] == ["skipped", "skipped"],
+            f"a replay skips compose and publish: "
+            f"{[(o.entry.natural_key, o.verdict, o.detail) for o in second]}",
+        )
+        pre = State()
+        pre.documents.append({
+            "id": "prod-document", "title": "Fixture Plan", "category": "pi-plan",
+            "project_id": doc_payload["project_id"], "version": 2, "status": "active",
+            "published_at": "2026-11-01T00:00:00Z",
+        })
+        _, third = apply_entries(FakeClient(pre), entries, pre, None)
+        ok(
+            [o.verdict for o in third] == ["skipped", "skipped"],
+            f"a pre-existing published document suppresses both: "
+            f"{[(o.entry.natural_key, o.verdict, o.detail) for o in third]}",
         )
 
     print(f"self-test: {checks} checks passed (offline; no network, no database)")
