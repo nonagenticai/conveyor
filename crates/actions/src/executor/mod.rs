@@ -15,6 +15,9 @@
 
 pub mod internal_agent;
 pub mod procedure;
+mod resume;
+
+pub use resume::resume_run;
 
 use std::collections::BTreeMap;
 use std::future::Future;

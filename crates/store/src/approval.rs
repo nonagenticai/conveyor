@@ -809,6 +809,32 @@ pub async fn approval_meta_tx(
     Ok(row.map(|(meta,)| meta))
 }
 
+/// Whether an approval resolved `approved` with at least one approving decision, and the card it
+/// gates. `None` when the row is absent in the tenant.
+///
+/// The one read behind the L3 checks: `record_decision_tx` uses it to refuse a human decision on a
+/// pending or rejected gate (`rework v1-w1c-2:T2`), and `ladder.apply_draft` re-checks it so a
+/// decision recorded before the rule cannot apply a draft either.
+pub async fn approved_gate_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    approval_id: Uuid,
+) -> Result<Option<(Option<Uuid>, bool)>, sqlx::Error> {
+    sqlx::query_as(
+        "SELECT a.card_id,
+                (a.status = 'approved' AND EXISTS (
+                    SELECT 1 FROM approval_decision d
+                     WHERE d.tenant_id = a.tenant_id AND d.approval_id = a.id
+                       AND d.decision = 'approve'))
+           FROM approval a
+          WHERE a.tenant_id = $1 AND a.id = $2",
+    )
+    .bind(tenant.as_uuid())
+    .bind(approval_id)
+    .fetch_optional(&mut *conn)
+    .await
+}
+
 /// Record one decision and apply it to the gate, in the caller's transaction.
 ///
 /// Order is deliberate: lock the gate, count the approvals that came before, ask the domain

@@ -520,6 +520,7 @@ change; no second apply path; no PDDL storage; no secondary prompt compiler; no 
 enforcement; no `memory.remember` write-back; no card-driven run creation; no live model or laya
 proof; no migration.
 
-**Acceptance.** `crates/actions/tests/draft_apply.rs` (new), `executor_apply.rs` (new), the rewritten
-handover and ladder tests, the `approvals.decide` cases, and `apps/server/tests/approval_expire.rs`
-(stays green). The scenarios are issue #590 P1–P3; the receipt is `docs/evidence/S21-APPLY.md`.
+**Acceptance.** `crates/actions/tests/draft_apply.rs` (new), `internal_agent_runtime.rs` (extended
+with the parked/approved/rejected/reclaimed scenarios), the rewritten ladder tests, and
+`apps/server/tests/approval_expire.rs` (stays green). The scenarios are issue #590 P1–P3; the
+receipt is `docs/evidence/S21-APPLY.md`.

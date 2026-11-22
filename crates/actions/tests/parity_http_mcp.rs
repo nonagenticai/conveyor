@@ -1869,15 +1869,17 @@ async fn seed_parity_laya(pg: &support::Pg, ctx: &Ctx) -> Uuid {
     id
 }
 
-/// Seed an accepted L1 decision for the draft-application sample.
-async fn seed_parity_decision(pg: &support::Pg, ctx: &Ctx, card: Uuid) -> Uuid {
+/// Seed an accepted L1 decision bound to the draft the sample applies.
+async fn seed_parity_decision(pg: &support::Pg, ctx: &Ctx, card: Uuid, document: Uuid) -> Uuid {
     let mut tx = begin_scoped(&pg.owner, ctx.tenant).await.expect("scope");
     let id: Uuid = sqlx::query_scalar(
-        "INSERT INTO decision (tenant_id, kind, rung, actor_kind, card_id, outcome)
-         VALUES ($1, 'parity.case', 'laya', 'system', $2, 'accepted') RETURNING id",
+        "INSERT INTO decision (tenant_id, kind, rung, actor_kind, card_id, outcome, meta)
+         VALUES ($1, 'gate.precheck', 'laya', 'system', $2, 'accepted',
+                 jsonb_build_object('draft_document_id', $3::text)) RETURNING id",
     )
     .bind(ctx.tenant_id)
     .bind(card)
+    .bind(document.to_string())
     .fetch_one(&mut *tx)
     .await
     .expect("insert decision");
@@ -2267,8 +2269,8 @@ async fn prepare(sample: &Sample, pg: &support::Pg, ctx: &Ctx) {
         }
         "ladder.apply_draft" => {
             let card = seed_card(pg, ctx, "active").await;
-            let decision = seed_parity_decision(pg, ctx, card).await;
             let document = seed_parity_document(pg, ctx).await;
+            let decision = seed_parity_decision(pg, ctx, card, document).await;
             ctx.push("ladder.apply_draft.card", card);
             ctx.push("ladder.apply_draft.decision", decision);
             ctx.push("ladder.apply_draft.document", document);

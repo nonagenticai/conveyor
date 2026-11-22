@@ -133,6 +133,21 @@ fn ladder_error(error: LadderStoreError, action: &str) -> ActionError {
             "policy_exists",
             format!("a policy already exists for {kind}/{gate:?}"),
         ),
+        LadderStoreError::HumanRequiresPerson => invalid(
+            "rung",
+            "human_requires_person",
+            "a human decision must be recorded by a person",
+        ),
+        LadderStoreError::ApprovalNotAccepted => invalid(
+            "approval_id",
+            "approval_not_accepted",
+            "a human decision must cite an approved gate with an approve decision",
+        ),
+        LadderStoreError::ApprovalWrongCard => invalid(
+            "approval_id",
+            "approval_wrong_card",
+            "the cited approval belongs to another card",
+        ),
         LadderStoreError::Vocabulary { what, value } => {
             tracing::error!(what, value = %value, "a stored ladder value is outside the domain");
             ActionError::internal()
@@ -1096,12 +1111,14 @@ pub struct AppliedDraftOut {
     pub decision_id: String,
 }
 
-/// Apply a generated draft artefact to a card — the only path, and it needs a decision.
+/// Apply a generated draft artefact to a card — the only path, and it needs a bound decision.
 ///
 /// §7.4: a generation result is a draft artefact; applying it is an action whose gate is L1/L3.
-/// An accepted laya or human decision tied to the same card is the gate; without one the
-/// application is refused and nothing is attached. The ordinary `documents.update` path refuses
-/// a `meta.generated = true` draft outright, so the gate cannot be bypassed by an edit.
+/// The decision must be accepted, non-rule, and must name this exact draft in its `meta`
+/// (`draft_document_id`, plus `prompt_sha256`/`run_id` when the document carries them); a human
+/// decision must also cite an approved gate with an approve decision. The ordinary
+/// `documents.update` path refuses a `meta.generated = true` draft outright, so the gate cannot be
+/// bypassed by an edit.
 #[crate::action(
     name = "ladder.apply_draft",
     version = 1,
@@ -1118,34 +1135,107 @@ async fn ladder_apply_draft(
     ctx: HandlerCtx,
     input: ApplyDraftIn,
 ) -> Result<HandlerOutput<AppliedDraftOut>, ActionError> {
-    let decision = store::ladder::get_decision_tx(&mut *tx, ctx.tenant, input.decision_id)
+    let updated = apply_draft_tx(
+        &mut *tx,
+        &ctx,
+        input.document_id,
+        input.card_id,
+        input.decision_id,
+    )
+    .await?;
+    Ok(HandlerOutput::ok(AppliedDraftOut {
+        document_id: updated.id.to_string(),
+        card_id: updated.card_id.map(|id| id.to_string()).unwrap_or_default(),
+        decision_id: input.decision_id.to_string(),
+    })
+    .with_etag(updated.version.etag()))
+}
+
+/// The L1 case kind the runtime's pre-check records.
+pub(crate) const DRAFT_PRECHECK_GATE: &str = "gate.precheck";
+/// The L3 case kind an approved `executor` gate records.
+pub(crate) const DRAFT_APPLY_GATE: &str = "gate.draft_apply";
+
+fn draft_requires_gate(detail: &'static str) -> ActionError {
+    ActionError::new(422, "draft_requires_gate", detail)
+}
+
+/// The one apply gate, shared by the action and the `run.resume` worker.
+///
+/// The checks are the unit's contract (`rework v1-w1c-2:T2`): the decision is accepted, non-rule
+/// and of a draft-application case kind; it names this document, and the document's own
+/// `prompt_sha256`/`run_id` when present; a human decision cites an approved approval with an
+/// approve decision. The document must be a generated draft and may be attached only once.
+pub(crate) async fn apply_draft_tx(
+    conn: &mut PgConnection,
+    ctx: &HandlerCtx,
+    document_id: Uuid,
+    card_id: Uuid,
+    decision_id: Uuid,
+) -> Result<store::document::DocumentRecord, ActionError> {
+    let decision = store::ladder::get_decision_tx(&mut *conn, ctx.tenant, decision_id)
         .await
         .map_err(|error| ladder_error(error, ctx.action))?
         .ok_or_else(|| ActionError::resource_not_found("decision"))?;
     let rung = Rung::parse(&decision.rung).ok_or_else(ActionError::internal)?;
-    if matches!(rung, Rung::Rule) || decision.outcome.as_deref() != Some("accepted") {
-        return Err(ActionError::new(
-            422,
-            "draft_requires_gate",
-            "applying a generated draft needs an accepted L1 or L3 decision",
+    if matches!(rung, Rung::Rule) {
+        return Err(draft_requires_gate(
+            "applying a generated draft needs an L1 or L3 decision",
         ));
     }
-    if decision.card_id.is_some_and(|card| card != input.card_id) {
-        return Err(ActionError::new(
-            422,
-            "draft_requires_gate",
-            "the decision belongs to another card",
+    if decision.outcome.as_deref() != Some("accepted") {
+        return Err(draft_requires_gate(
+            "applying a generated draft needs an accepted decision",
         ));
     }
-    let document = store::document::get_document_tx(&mut *tx, ctx.tenant, input.document_id)
+    if decision.kind != DRAFT_PRECHECK_GATE && decision.kind != DRAFT_APPLY_GATE {
+        return Err(draft_requires_gate(
+            "the decision is not a draft-application gate",
+        ));
+    }
+    if decision.card_id.is_some_and(|card| card != card_id) {
+        return Err(draft_requires_gate("the decision belongs to another card"));
+    }
+    let document = store::document::get_document_tx(&mut *conn, ctx.tenant, document_id)
         .await
         .map_err(|error| {
             tracing::error!(%error, "ladder.apply_draft: read document");
             ActionError::internal()
         })?
         .ok_or_else(|| ActionError::resource_not_found("document"))?;
+    if document.meta.get("generated") != Some(&Value::Bool(true)) {
+        return Err(draft_requires_gate("the document is not a generated draft"));
+    }
+    let named = decision
+        .meta
+        .get("draft_document_id")
+        .and_then(Value::as_str)
+        .and_then(|raw| Uuid::parse_str(raw).ok());
+    if named != Some(document_id) {
+        return Err(draft_requires_gate("the decision does not name this draft"));
+    }
+    if let Some(expected) = document.meta.get("prompt_sha256").and_then(Value::as_str)
+        && decision.meta.get("prompt_sha256").and_then(Value::as_str) != Some(expected)
+    {
+        return Err(draft_requires_gate("the decision names another prompt"));
+    }
+    if let (Some(document_run), Some(decision_run)) = (
+        document.meta.get("run_id").and_then(Value::as_str),
+        decision.meta.get("run_id").and_then(Value::as_str),
+    ) && document_run != decision_run
+    {
+        return Err(draft_requires_gate("the decision names another run"));
+    }
+    if rung == Rung::Human {
+        let Some(approval_id) = decision.approval_id else {
+            return Err(draft_requires_gate(
+                "a human decision must cite its approval",
+            ));
+        };
+        ensure_approved_approval_tx(&mut *conn, ctx.tenant, approval_id, card_id).await?;
+    }
     if let Some(existing) = document.card_id
-        && existing != input.card_id
+        && existing != card_id
     {
         return Err(ActionError::new(
             409,
@@ -1158,16 +1248,16 @@ async fn ladder_apply_draft(
         meta: None,
         body: None,
         content_hash: None,
-        card_id: Some(input.card_id),
+        card_id: Some(card_id),
         publishable: None,
         category: None,
         unit: None,
         updated_by: Some(ctx.actor_id),
     };
     let updated = store::document::update_document_revisioned_tx(
-        &mut *tx,
+        &mut *conn,
         ctx.tenant,
-        input.document_id,
+        document_id,
         document.version,
         &patch,
         "applied",
@@ -1178,11 +1268,31 @@ async fn ladder_apply_draft(
         tracing::error!(%error, "ladder.apply_draft: attach the draft");
         ActionError::internal()
     })?;
-    emit_decision_event(&mut *tx, &ctx, "document", updated.id, "applied").await?;
-    Ok(HandlerOutput::ok(AppliedDraftOut {
-        document_id: updated.id.to_string(),
-        card_id: updated.card_id.map(|id| id.to_string()).unwrap_or_default(),
-        decision_id: decision.id.to_string(),
-    })
-    .with_etag(updated.version.etag()))
+    emit_decision_event(&mut *conn, ctx, "document", updated.id, "applied").await?;
+    Ok(updated)
+}
+
+/// The approval a human decision cites must be approved with an approve decision, on this card.
+async fn ensure_approved_approval_tx(
+    conn: &mut PgConnection,
+    tenant: conveyor_domain::TenantId,
+    approval_id: Uuid,
+    card_id: Uuid,
+) -> Result<(), ActionError> {
+    let Some((approval_card, approved)) =
+        store::approval::approved_gate_tx(&mut *conn, tenant, approval_id)
+            .await
+            .map_err(|error| store_error(error, "ladder.apply_draft"))?
+    else {
+        return Err(ActionError::resource_not_found("approval"));
+    };
+    if !approved {
+        return Err(draft_requires_gate(
+            "the cited approval is not approved with an approve decision",
+        ));
+    }
+    if approval_card.is_some_and(|card| card != card_id) {
+        return Err(draft_requires_gate("the approval belongs to another card"));
+    }
+    Ok(())
 }
