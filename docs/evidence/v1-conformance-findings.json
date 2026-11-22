@@ -84,7 +84,12 @@
       ],
       "failure_scenario": "A change is inserted with meta.impact {}; the approver sees no scope, schedule, cost or risk delta yet can advance the baseline.",
       "acceptance": "Inserting kind='change' with an impact lacking any of scope/schedule/cost/risk returns 422 change_impact_missing, enforced in the store and the DB constraint.",
-      "owner_project": "T1"
+      "owner_project": "T1",
+      "resolved_by": {
+        "commit": "19231dec8f91835839f21ec92f1f75fcbbc61c85",
+        "test": "crates/actions/tests/spine_gates.rs",
+        "evidence": "spine_gates 17/17. `a_change_with_no_impact_analysis_is_refused`: a change created with `meta.impact` `{}` is refused 422 change_impact_missing and writes no row, a raw INSERT bypassing the store is refused by the 0065 CHECK, and the same change with a `scope` delta is created 201; `a_change_impact_cannot_be_stripped_by_an_update`: an update replacing `meta` with `impact: {}` is refused 422 and neither meta nor version moves. `validate_change` requires a JSON object with at least one non-null scope/schedule/cost/risk key; `changes.request` now takes that typed block instead of an integer."
+      }
     },
     {
       "id": "v1-p5-4",
@@ -562,7 +567,7 @@
         },
         {
           "path": "crates/store/src/spine.rs",
-          "line": 3817,
+          "line": 3825,
           "quote": "            if matches!(state.as_str(), \"authorised\" | \"in_review\" | \"closed\") =>"
         }
       ],
@@ -581,7 +586,7 @@
       "evidence": [
         {
           "path": "crates/store/src/spine.rs",
-          "line": 2635,
+          "line": 2643,
           "quote": "/// The editable fields of a realization record. `None` leaves the stored value in place."
         }
       ],
@@ -634,7 +639,7 @@
         },
         {
           "path": "crates/store/src/spine.rs",
-          "line": 1512,
+          "line": 1520,
           "quote": "            \"SELECT EXISTS (SELECT 1 FROM programme_baseline WHERE tenant_id = $1 AND id = $2)\","
         }
       ],
@@ -658,12 +663,12 @@
         },
         {
           "path": "crates/store/src/spine.rs",
-          "line": 4006,
+          "line": 4014,
           "quote": "pub async fn close_programme_tx("
         },
         {
           "path": "crates/store/src/spine.rs",
-          "line": 4040,
+          "line": 4048,
           "quote": "        \"UPDATE programme SET status = 'closed', version = version + 1, updated_at = now()"
         }
       ],
@@ -971,7 +976,7 @@
       "evidence": [
         {
           "path": "crates/store/src/spine.rs",
-          "line": 3300,
+          "line": 3308,
           "quote": "          WHERE tenant_id = $1 AND project_id = $2 AND kind = 'deliverable'"
         }
       ],
@@ -1536,13 +1541,18 @@
         },
         {
           "path": "crates/store/src/spine.rs",
-          "line": 786,
+          "line": 794,
           "quote": "            status = coalesce($4, status), title = coalesce($5, title),"
         }
       ],
       "failure_scenario": "1) registers.create kind='change' with baseline_ref and meta.impact (satisfies the DB CHECK). 2) registers.update {\"id\": <change>, \"status\": \"approved\"} succeeds with no approver recorded and no decision. 3) baselines.take with that change_id passes take_baseline_guarded's status=='approved' check and freezes a new baseline. The scope changes with no person's decision and no gate.",
       "acceptance": "Only a gated approval action can move a change row to approved; registers.update refuses a caller-supplied status of approved (422/409 change_requires_approval). take_baseline_guarded requires an approval row with a decider distinct from the requester, not a status string, and a negative test proves the direct update is refused.",
-      "owner_project": "T1"
+      "owner_project": "T1",
+      "resolved_by": {
+        "commit": "19231dec8f91835839f21ec92f1f75fcbbc61c85",
+        "test": "crates/actions/tests/spine_gates.rs",
+        "evidence": "spine_gates 17/17. `a_change_status_cannot_be_written_approved`: `registers.update` with `status: approved` on a change is refused 422 approval_gate_only and the row stays `open` at the same version; `a_self_declared_approved_change_cannot_advance_a_baseline` and `an_approved_change_gate_advances_the_baseline` show the baseline guard reads the approved `change` gate (`approved_change_for_baseline_tx`), never the register status, and the decision writer refuses the requester as decider."
+      }
     },
     {
       "id": "v1-w1a-4",
@@ -2063,7 +2073,7 @@
         },
         {
           "path": "crates/store/src/spine.rs",
-          "line": 3782,
+          "line": 3790,
           "quote": "                PlanError::RetroFindingWithoutLesson(key),"
         }
       ],
