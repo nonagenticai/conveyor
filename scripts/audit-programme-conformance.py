@@ -1913,6 +1913,34 @@ def build_register(
         if duplicate_of and str(duplicate_of) in data_keys:
             duplicates.append(identifier)
             continue
+        # An owner-accepted residual is a waiver, not a resolution: the finding still stands and
+        # its package is suppressed and counted, never hidden. A waiver names who accepted it,
+        # the decision that records it, why, and when it must be reassessed; anything less is
+        # refused rather than silently passing.
+        disposition = "rework"
+        waiver = finding.get("waiver")
+        if waiver is not None:
+            if not isinstance(waiver, dict):
+                fail(f"the finding {identifier} has a non-object waiver")
+            missing = [
+                field
+                for field in ("accepted_by", "accepted_at", "decision_ref", "expires", "reason")
+                if not str(waiver.get(field) or "").strip()
+            ]
+            if missing:
+                fail(f"the finding {identifier} waiver is missing " + ", ".join(missing))
+            try:
+                expires = datetime.fromisoformat(
+                    str(waiver["expires"]).replace("Z", "+00:00")
+                ).date()
+            except ValueError:
+                fail(
+                    f"the finding {identifier} waiver expires is not a date: "
+                    f"{waiver.get('expires')!r}"
+                )
+            if expires < datetime.now(timezone.utc).date():
+                fail(f"the finding {identifier} waiver expired at {waiver['expires']}")
+            disposition = "waiver"
         owner = str(finding["owner_project"])
         scope = owner if owner in dataset.by_key else "programme"
         row = {
@@ -1932,7 +1960,7 @@ def build_register(
             "severity": str(finding["severity"]),
             "subject": owner,
             "detail": str(finding["problem"]),
-            "disposition": "rework",
+            "disposition": disposition,
             "evidence": [
                 {"source": "code", **item}
                 for item in finding["evidence"]
@@ -2815,6 +2843,55 @@ def self_test() -> None:
         for package in first["packages"]
     ):
         fail("a waiver did not suppress its package")
+    # A finding's owner-accepted residual is a first-class waiver: its package is suppressed,
+    # and a waiver with no owner, no decision reference or an expired date is refused.
+    def with_waiver(waiver: dict[str, Any]) -> dict[str, Any]:
+        document = json.loads(json.dumps(register_findings))
+        document["findings"][0]["waiver"] = waiver
+        return document
+
+    valid_waiver = {
+        "accepted_by": "programme owner",
+        "accepted_at": "2026-11-22",
+        "decision_ref": "fixture-decision",
+        "expires": "2027-02-18",
+        "reason": "self-test residual",
+    }
+    waived = build_register(
+        register_gaps,
+        register_baseline,
+        with_waiver(valid_waiver),
+        standard,
+        register_data,
+        "fixture",
+    )
+    if not any(
+        package["rule"] == "v1-x-1" and package["status"] == "suppressed"
+        for package in waived["packages"]
+    ):
+        fail("a finding waiver did not suppress its package")
+
+    def refused_waiver(waiver: dict[str, Any], why: str) -> None:
+        try:
+            build_register(
+                register_gaps,
+                register_baseline,
+                with_waiver(waiver),
+                standard,
+                register_data,
+                "fixture",
+            )
+        except SystemExit:
+            return
+        fail(f"an invalid finding waiver was accepted ({why})")
+
+    ownerless = dict(valid_waiver)
+    del ownerless["accepted_by"]
+    refused_waiver(ownerless, "no owner")
+    expired_waiver = dict(valid_waiver)
+    expired_waiver["expires"] = "2020-01-01"
+    refused_waiver(expired_waiver, "expired")
+
     if first["summary"]["duplicates"] != 1:
         fail("duplicate_of did not fold the finding")
     if not any(package["rule"] == "v1-x-1" for package in first["packages"]):
