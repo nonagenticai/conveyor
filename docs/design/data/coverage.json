@@ -333,8 +333,8 @@
       "track": "programme",
       "tranche": 0,
       "units": {
-        "blocked": 2,
-        "claimed": 2,
+        "blocked": 8,
+        "claimed": 3,
         "numbers": [
           17,
           22,
@@ -359,9 +359,17 @@
           435,
           476,
           526,
-          545
+          545,
+          559,
+          562,
+          563,
+          564,
+          565,
+          566,
+          569,
+          572
         ],
-        "open": 14,
+        "open": 22,
         "ready": 5,
         "unknown": 0
       }
@@ -955,16 +963,19 @@
       "tranche": 4,
       "units": {
         "blocked": 0,
-        "claimed": 0,
+        "claimed": 2,
         "numbers": [
           156,
           168,
           183,
           195,
           231,
-          245
+          245,
+          571,
+          577,
+          579
         ],
-        "open": 0,
+        "open": 2,
         "ready": 0,
         "unknown": 0
       }
@@ -1317,12 +1328,12 @@
       "tranche": 5,
       "units": {
         "blocked": 0,
-        "claimed": 0,
+        "claimed": 1,
         "numbers": [
           11
         ],
         "open": 1,
-        "ready": 1,
+        "ready": 0,
         "unknown": 0
       }
     },
@@ -1400,13 +1411,13 @@
       "tranche": 8,
       "units": {
         "blocked": 0,
-        "claimed": 0,
+        "claimed": 1,
         "numbers": [
           13,
           31
         ],
         "open": 2,
-        "ready": 2,
+        "ready": 1,
         "unknown": 0
       }
     },
@@ -1458,6 +1469,7 @@
         "crates/actions/src/knowledge",
         "crates/actions/src/memory",
         "crates/actions/src/prompt",
+        "crates/domain/src/executor.rs",
         "migrations/0030_prompt_catalogue.sql"
       ],
       "gap": null,
@@ -1468,8 +1480,8 @@
           5
         ],
         "modules": [
-          3,
-          3
+          4,
+          4
         ],
         "tables": [
           2,
@@ -1487,12 +1499,13 @@
       "tranche": 9,
       "units": {
         "blocked": 0,
-        "claimed": 0,
+        "claimed": 1,
         "numbers": [
-          15
+          15,
+          581
         ],
         "open": 1,
-        "ready": 1,
+        "ready": 0,
         "unknown": 0
       }
     },
@@ -1799,10 +1812,12 @@
         "blocked": 0,
         "claimed": 0,
         "numbers": [
-          76
+          76,
+          556,
+          557
         ],
-        "open": 0,
-        "ready": 0,
+        "open": 1,
+        "ready": 1,
         "unknown": 0
       }
     },
@@ -1843,12 +1858,15 @@
       "tranche": 4,
       "units": {
         "blocked": 0,
-        "claimed": 0,
+        "claimed": 1,
         "numbers": [
-          83
+          83,
+          558,
+          560,
+          561
         ],
-        "open": 0,
-        "ready": 0,
+        "open": 3,
+        "ready": 2,
         "unknown": 0
       }
     },
@@ -2581,8 +2599,8 @@
       },
       "total": 48,
       "uncovered": [],
-      "with_open_units": 17,
-      "without_open_units": 31
+      "with_open_units": 20,
+      "without_open_units": 28
     },
     "screens": {
       "actions_invoked": 39,
