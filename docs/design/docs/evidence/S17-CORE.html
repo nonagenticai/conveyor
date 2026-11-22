@@ -330,6 +330,52 @@ EOF</code></pre>
 <li>14:35 — <strong>re-measured after S13 landed its six samples</strong>: the missing list is now exactly S19-B's 7 <code>eval_runs.*</code>/<code>eval_results.*</code>. S13's <code>workflows.*</code> samples are present and the lock is 258 ops (<code>--check-lock</code> 0). The one remaining workspace red is S19-B's fixture work — its own next session (an approved eval with a locked split, and a filled result slot). S17 contributes nothing to it. The last lane to settle owns the final workspace gate and the last <code>--write-lock</code>. S17's own targets above are green; this is the shared-tree cost, not an S17 defect.</li>
 </ol>
 <p><strong>Lock, final state (14:29):</strong> the live spec after the peer registrations is <strong>237 actions</strong>, and I regenerated <code>served-spec.lock.json</code> from it — <strong>258 operations</strong>, <code>--check-lock</code> exit 0, with 8 benchmark, 6 <code>workflows.*</code>, 4 <code>eval_runs.*</code> and 3 <code>eval_results.*</code> operations present. The 245-op figure above is this lane's own 224-action state; 258 is what the tree now holds.</p>
+<h2 id="live-run--hp1-2026-11-22">Live run — hp1 (2026-11-22)</h2>
+<p>The deployment-gated proof <code>apps/server/tests/sandbox_live.rs</code> (<code>#[ignore]</code>) ran against the live strato cluster from m4 through an SSH tunnel to the kube-apiserver. This is the P1 end-to-end receipt: the Job object the API stored, the terminal state, the log, and the delete were observed on a real cluster, not against the stub.</p>
+<table>
+<thead>
+<tr>
+<th>input</th>
+<th>value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>namespace / identity</td>
+<td><code>swe-bench</code> / ServiceAccount <code>conveyor-bench</code> (Role <code>conveyor-bench-grader</code>), short-lived token</td>
+</tr>
+<tr>
+<td>image</td>
+<td><code>swebench/sweb.eval.x86_64.django_1776_django-16493@sha256:43fbf022eb3ddbbd32edf3cbc325c8dc532b48551f78fef14c2afd1d26dde858</code> (<code>seed/benchmark/images-verified50-v1.lock.json</code>)</td>
+</tr>
+<tr>
+<td>placement</td>
+<td><code>SANDBOX_NODE_SELECTOR=conveyor.ai/grading=hp1</code>; hp1 is untainted, so no toleration was set</td>
+</tr>
+<tr>
+<td>Job</td>
+<td><code>swb-7fa599e09fc0-conveyor-live-proof</code> (recovered from namespace events; the test does not print it)</td>
+</tr>
+<tr>
+<td>pod</td>
+<td><code>swb-7fa599e09fc0-conveyor-live-proof-xjt4m</code>, scheduled to <strong>hp1</strong></td>
+</tr>
+<tr>
+<td>timeout</td>
+<td><code>SANDBOX_LIVE_TIMEOUT_S=900</code></td>
+</tr>
+</tbody>
+</table>
+<pre class="text"><code>test the_live_sandbox_lifecycle_creates_runs_reads_logs_and_deletes ... ok
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 244.18s</code></pre>
+<p>The test asserts the stored object (digest image; <code>automountServiceAccountToken: false</code>; <code>enableServiceLinks: false</code>; <code>backoffLimit: 0</code>; a positive <code>activeDeadlineSeconds</code>; <code>ttlSecondsAfterFinished: 3600</code>; the hp1 selector), waits for <code>Succeeded</code>, reads the log and finds the runner's apply marker plus the eval proof <code>conveyor sandbox live proof</code>, then deletes the Job and waits until the Job and its pod are gone. Cluster events corroborate the lifecycle: pod scheduled to hp1, image pulled by digest in 3m4s (1,240,562,520 bytes), container started, and <code>Job completed</code> at 10:02:16Z. After the run <code>kubectl -n swe-bench get jobs,pods</code> was empty (only <code>istio-ca-crl</code>, <code>istio-ca-root-cert</code> and <code>kube-root-ca.crt</code> remained), so the test's own cleanup left nothing behind.</p>
+<p>Run through the sanctioned m4 guard (the token was passed in the environment and never printed):</p>
+<pre class="bash"><code>SANDBOX_NAMESPACE=swe-bench SANDBOX_API_URL=https://127.0.0.1:16443 \
+SANDBOX_TOKEN=&quot;$(cat &quot;$TOKEN_FILE&quot;)&quot; SANDBOX_CA_PATH=&quot;$CA_FILE&quot; \
+SANDBOX_NODE_SELECTOR=conveyor.ai/grading=hp1 \
+SANDBOX_LIVE_IMAGE=&#39;swebench/sweb.eval.x86_64.django_1776_django-16493@sha256:43fbf022eb3ddbbd32edf3cbc325c8dc532b48551f78fef14c2afd1d26dde858&#39; \
+SANDBOX_LIVE_TIMEOUT_S=900 \
+  ~/.claude/scripts/cargo-guard.py test -p conveyor-server --test sandbox_live -- --ignored --nocapture</code></pre>
 </main>
     <footer class="doc-footer">
       <span>Rendered from <code>docs/evidence/S17-CORE.md</code> at build time.</span>
