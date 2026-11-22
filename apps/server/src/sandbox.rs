@@ -69,6 +69,9 @@ pub enum SandboxError {
     /// The Job has no pod (yet, or ever).
     #[error("job {0:?} has no pod")]
     NoPod(String),
+    /// The instance image is not pinned to a digest (P1.1: never a mutable tag).
+    #[error("image {0:?} is not pinned by @sha256:<64 hex>")]
+    ImageNotPinned(String),
 }
 
 /// The selector and toleration types are the runner crate's: one definition, two dispatchers.
@@ -302,7 +305,8 @@ impl Sandbox {
     ///
     /// The ConfigMap carries the three inputs (`patch.diff`, `eval.sh`, `run.sh`) and is
     /// refused over [`CONFIGMAP_LIMIT`]. The Job runs the runner script as a non-root,
-    /// token-less pod with CPU/memory/ephemeral caps and the instance image by digest.
+    /// token-less pod with CPU/memory/ephemeral caps and the instance image by digest —
+    /// an unpinned image (a mutable tag) is refused before anything is created.
     pub fn manifests(
         &self,
         run_id: Uuid,
@@ -311,6 +315,9 @@ impl Sandbox {
         eval_script: &str,
         model_patch: &str,
     ) -> Result<(Value, Value), SandboxError> {
+        if !digest_pinned(image) {
+            return Err(SandboxError::ImageNotPinned(image.to_owned()));
+        }
         let name = Self::job_name(run_id, instance_id);
         let labels = json!({
             "app.kubernetes.io/name": "conveyor-bench-grader",
@@ -419,13 +426,18 @@ impl Sandbox {
         Ok(name)
     }
 
-    /// Read one Job's state.
-    pub async fn state(&self, name: &str) -> Result<JobState, SandboxError> {
+    /// The raw Job object, as the API stored it — the live proof asserts the created spec.
+    pub async fn job(&self, name: &str) -> Result<Value, SandboxError> {
         let path = format!(
             "/apis/batch/v1/namespaces/{}/jobs/{name}",
             self.config.namespace
         );
-        let body = self.get(&path, "job", name).await?;
+        self.get(&path, "job", name).await
+    }
+
+    /// Read one Job's state.
+    pub async fn state(&self, name: &str) -> Result<JobState, SandboxError> {
+        let body = self.job(name).await?;
         let status = &body["status"];
         if status["succeeded"].as_i64().unwrap_or(0) > 0 {
             return Ok(JobState::Succeeded);
@@ -567,6 +579,14 @@ exit 0
         eval_timeout_s = EVAL_TIMEOUT_S,
         TIMEOUT_MARKER = TIMEOUT_MARKER,
     )
+}
+
+/// `@sha256:` followed by exactly 64 hex digits — the OCI digest form, never a mutable tag.
+fn digest_pinned(image: &str) -> bool {
+    image
+        .rsplit_once("@sha256:")
+        .map(|(_, digest)| digest.len() == 64 && digest.chars().all(|c| c.is_ascii_hexdigit()))
+        .unwrap_or(false)
 }
 
 fn capped(body: String) -> String {

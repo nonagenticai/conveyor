@@ -2,7 +2,8 @@
 //! S17's run driver and reaper (`benchmark.run.poll`, `benchmark.reap`).
 //!
 //! **One driver, one bounded tick.** `poll` starts at most `concurrency` sandbox Jobs, reads the
-//! state of the ones already running, grades their logs, writes the cases, and re-enqueues the
+//! state of the ones already running, grades their logs, writes the cases, deletes the finished
+//! Jobs and re-enqueues the
 //! next tick as a NEW job (`max_attempts = 1`, per-tick dedupe key). It never loops and never
 //! sleeps: a tick that overran the job lease would be reclaimed and delivered twice.
 //!
@@ -99,23 +100,23 @@ pub async fn poll_with(
     // ── 2. poll the Jobs already running (never hold a transaction across HTTP) ─────────
     let mut completed = 0usize;
     for case in &running {
-        match sandbox.state(&case.sandbox_ref).await {
-            Ok(JobState::Running) => {}
+        let finished = match sandbox.state(&case.sandbox_ref).await {
+            Ok(JobState::Running) => false,
             Ok(JobState::Succeeded) => {
                 let log = sandbox
                     .logs(&case.sandbox_ref)
                     .await
                     .map_err(|error| JobFailure::retryable(format!("sandbox log: {error}")))?;
                 finalise_graded(pool, tenant, &run, case, &log, objects).await?;
-                completed += 1;
+                true
             }
             Ok(JobState::Failed { reason }) => {
                 finalise_infra(pool, tenant, &run, case, &reason).await?;
-                completed += 1;
+                true
             }
             Err(SandboxError::NotFound { .. } | SandboxError::NoPod(_)) => {
                 finalise_infra(pool, tenant, &run, case, "sandbox job disappeared").await?;
-                completed += 1;
+                true
             }
             Err(error) => {
                 return Err(JobFailure::retryable(format!(
@@ -123,6 +124,12 @@ pub async fn poll_with(
                     case.sandbox_ref
                 )));
             }
+        };
+        if finished {
+            completed += 1;
+            // P1.2: the log is stored and the case recorded first, then the pod is removed. A
+            // delete failure is a warning, never a reason to lose a recorded verdict.
+            delete_jobs(sandbox, std::slice::from_ref(&case.sandbox_ref)).await;
         }
     }
 
@@ -556,7 +563,7 @@ fn sandbox() -> Result<Sandbox, JobFailure> {
 }
 
 async fn delete_jobs(sandbox: &Sandbox, names: &[String]) {
-    for name in names {
+    for name in names.iter().filter(|name| !name.is_empty()) {
         if let Err(error) = sandbox.delete(name).await {
             tracing::warn!(job = %name, %error, "benchmark: could not delete sandbox job");
         }
