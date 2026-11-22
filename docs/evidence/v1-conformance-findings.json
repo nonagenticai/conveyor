@@ -687,7 +687,7 @@
       "evidence": [
         {
           "path": "crates/actions/src/programme.rs",
-          "line": 559,
+          "line": 566,
           "quote": "    let baseline = spine_store::latest_approved_baseline_tx(&mut *tx, tenant, project_id, \"scope\")"
         }
       ],
@@ -1754,18 +1754,23 @@
         },
         {
           "path": "crates/actions/src/ladder/mod.rs",
-          "line": 883,
+          "line": 1213,
           "quote": "            rung: Rung::Laya,"
         },
         {
           "path": "crates/actions/src/ladder/mod.rs",
-          "line": 901,
+          "line": 1544,
           "quote": "            latency_ms: input.latency_ms,"
         }
       ],
       "failure_scenario": "An internal agent misroutes a request and posts ladder.evaluate {kind:'request.classify', answer:'bug', confidence:0.99, latency_ms:12}. The ledger records a laya decision with full policy/refinement/laya-config pins and empty probabilities, indistinguishable from a genuine calibrated response. Because nothing compares the row to a systemone response, a fabricated confidence can clear any threshold, and the 'L1 before L2' ordering the chapter depends on is not evidence-backed.",
       "acceptance": "The L1 path performs the laya request itself (or records a verified laya call id) and derives answer, confidence, probabilities and measured latency from the response; a laya-rung decision without that provenance is refused; a test posts a confidence directly and proves it cannot produce rung='laya'.",
-      "owner_project": "T2"
+      "owner_project": "T2",
+      "resolved_by": {
+        "commit": "864e71c45ce4b95f33dd9d9551901d826db17966",
+        "test": "crates/actions/tests/decision_ladder.rs::a_confidence_posted_directly_cannot_produce_a_laya_decision",
+        "evidence": "Suites green at merged head b68307bf: decision_ladder 16 (a_confidence_posted_directly_cannot_produce_a_laya_decision, a_laya_decision_derives_its_fields_latency_and_provenance_from_the_response, a_forged_laya_key_is_refused, a_tampered_laya_request_does_not_verify), ladder_human_gate 10, judge 11, registry 12 (529 actions), parity_http_mcp 7, s07_schema 3, prune 17, and the four ladder::laya unit tests. Migration 0069 adds the laya provenance; v1-w1c-4 stays open (decision_option shape, next ladder card)."
+      }
     },
     {
       "id": "v1-w1c-4",
@@ -1778,17 +1783,17 @@
       "evidence": [
         {
           "path": "crates/actions/src/ladder/mod.rs",
-          "line": 787,
+          "line": 1015,
           "quote": "    pub options: Option<Vec<OptionIn>>,"
         },
         {
           "path": "crates/actions/src/ladder/mod.rs",
-          "line": 872,
+          "line": 1517,
           "quote": "        .or_else(|| (!options.is_empty()).then_some(1));"
         },
         {
           "path": "crates/store/src/ladder.rs",
-          "line": 851,
+          "line": 901,
           "quote": "            \"INSERT INTO decision_option (tenant_id, decision_id, key, label, payload)"
         }
       ],
@@ -1807,13 +1812,13 @@
       "evidence": [
         {
           "path": "crates/domain/src/ladder.rs",
-          "line": 262,
+          "line": 268,
           "quote": "pub fn unavailable(fail_policy: FailPolicy, action: FailAction) -> Outcome {"
         },
         {
           "path": "crates/actions/src/ladder/mod.rs",
-          "line": 841,
-          "quote": "    let outcome = evaluate(confidence, threshold, action)"
+          "line": 1184,
+          "quote": "    let outcome = evaluate(parsed.confidence, threshold, fail_action)"
         },
         {
           "path": "crates/store/src/ladder.rs",
@@ -3812,7 +3817,7 @@
         },
         {
           "path": "docs/design/data/actions.json",
-          "line": 256,
+          "line": 258,
           "quote": "    \"lessons.list\","
         }
       ],
@@ -3842,7 +3847,7 @@
         },
         {
           "path": "docs/design/data/actions.json",
-          "line": 481,
+          "line": 483,
           "quote": "    \"tools.call\","
         }
       ],
@@ -3907,7 +3912,7 @@
         },
         {
           "path": "docs/design/data/actions.json",
-          "line": 481,
+          "line": 483,
           "quote": "    \"tools.call\","
         }
       ],
@@ -3942,7 +3947,7 @@
         },
         {
           "path": "docs/design/data/actions.json",
-          "line": 357,
+          "line": 359,
           "quote": "    \"procedures.ingest_sop\","
         }
       ],
@@ -5319,18 +5324,23 @@
       "evidence": [
         {
           "path": "crates/actions/src/programme.rs",
-          "line": 399,
+          "line": 402,
           "quote": "pub(crate) async fn assert_project_can_close("
         },
         {
           "path": "crates/actions/src/programme.rs",
-          "line": 404,
+          "line": 407,
           "quote": "    assert_closure_outputs_published(&mut *tx, tenant, project_id).await?;"
         }
       ],
       "failure_scenario": "A project closes while owning an open P0 artefact package; the record says closed, the audit says red, and nothing in the close path noticed.",
       "acceptance": "projects.close refuses a project whose mandatory artefact set is incomplete or which owns an open P0 finding/package, reading the artefact standard and the findings directly (never a generated register file), with a test proving the refusal and the green path; the verifier remains the evidence.",
-      "owner_project": "PLATFORM"
+      "owner_project": "PLATFORM",
+      "resolved_by": {
+        "commit": "ceb8bfdac0cfc312bbed5c9201ba4ae64333c522",
+        "test": "crates/actions/tests/programme_close.rs::close_refuses_a_missing_mandatory_artefact",
+        "evidence": "All 15 named suites green at merged head b68307bf: programme_close 21 (including close_refuses_a_missing_mandatory_artefact, close_refuses_an_open_p0_finding and the green path a_programme_project_closes_through_the_one_gate), closure_gate 12, spine_gates 20, pm_close_gate 4. The close gate resolves the first matching output-standard class for every project, the mandatory PMP/TOGAF templates, the adopted profile's approved artefact types and open P0 code findings from the committed ledger (crates/domain/src/findings.rs include_str!), plus materialised P0 cards: a missing artefact is 409 closure_mandatory_artefacts_missing and an open P0 is 409 closure_open_p0; `governed` is computed and the generated register is never read."
+      }
     },
     {
       "id": "v1-ui-1",
@@ -5465,12 +5475,12 @@
       "evidence": [
         {
           "path": "crates/store/src/interaction.rs",
-          "line": 61,
+          "line": 67,
           "quote": "                meta->>'proposed_answer' AS proposed_answer"
         },
         {
           "path": "crates/store/src/interaction.rs",
-          "line": 243,
+          "line": 259,
           "quote": "        \"\\nreply: approve {} [note] | reject {} [note]\","
         },
         {
@@ -5491,7 +5501,12 @@
       ],
       "failure_scenario": "A run-scoped question opens with `requires_answer`: the web inbox and Telegram offer it as approve/reject with no answer form, MCP offers an approved/rejected enum carrying no delegation, and the approvals screen has no note input because the flag is absent from the view. An approver answers in prose; the decision either records no note (refused 422 `note/missing`, unactionable from that surface) or records the decision without the delegation ref, so the answer and its authority never reach the record.",
       "acceptance": "A run-scoped free-text question is offered to web, Telegram and MCP; the first decision resolves it; a second decision on any surface is refused 409; the MCP answer records exactly one decision as `rule` with the delegation ref and the note; no surface claims a human. An explicitly quorumed gate (required_decisions > 1) keeps its opt-in dual-control semantics; only the default quorum-1 gate resolves on the first response.",
-      "owner_project": "S06"
+      "owner_project": "S06",
+      "resolved_by": {
+        "commit": "99b0d457ca7c114c7960953dc96f779af8bbe29d",
+        "test": "apps/server/tests/approval_question_route.rs::a_question_offers_web_and_telegram_and_the_first_answer_wins",
+        "evidence": "All three commits are in the lane (a4acd05c web/Telegram ask shape, b9e6ca02 MCP answer with the delegation, 99b0d457 the cross-surface proof); suites green at merged head b68307bf: approval_question_route 4 (one question to web+Telegram, one rule decision via MCP, a second answer 409 with no row, the close tick expires the losers idempotently), mcp_tasks 5 including mcp_tasks_answers_a_question_under_a_delegation, approval_answer 5. The offer now carries requires_answer, interaction_text asks for the answer, and the MCP elicitation carries the answer schema with _meta.delegation_ref."
+      }
     },
     {
       "id": "v1-recorder-1",
@@ -5516,6 +5531,30 @@
         "test": "scripts/rework-project.py",
         "evidence": "`decision_payload()` now carries `delegation_ref` on every approvals.decide the recorder makes; `rework-project --self-test` refuses a payload without it. Live audit at 2026-11-22 before the fix: charter rule 1/service 12, baseline 1/12, closure 2/14. Recorder runs for the T4/T9/T10/T13 batches set PROGRAMME_RECORD_LOCAL_BIN to the lane binary, which records rule/via.delegation_ref (proved on documents.delete gate 01a2025a)."
       }
+    },
+    {
+      "id": "v1-change-1",
+      "area": "T3 change control / wbs guard",
+      "standard": "SPEC",
+      "spec": "§5.5",
+      "severity": "P1",
+      "title": "The change guard's only authorised path needs a PM process the tenant has never had",
+      "problem": "After an approved scope baseline, `wbs.update` refuses unless `change_id` names an approved register `change` whose `baseline_ref` is that baseline and whose approval carries `meta.change_id`. The only action that opens such a change is `changes.request`, and its input requires the PM job's active `job_binding_id`. The tenant has no process with key 'pm' and exactly one job_binding in total, so the guard cannot be satisfied: a WBS acceptance after a baseline is permanently refused. Observed at T13 on 2026-11-22: `wbs.update` refused 409 `rebaseline_requires_change` naming baseline 01a20279-854d-79f6-a751-a34d51be7589, while `changes.request` cannot be called at all.",
+      "evidence": [
+        {
+          "path": "crates/actions/src/spine/mod.rs",
+          "line": 1234,
+          "quote": "    let Some(change_id) = change_id else {"
+        },
+        {
+          "path": "crates/actions/src/pm/mod.rs",
+          "line": 990,
+          "quote": "    pub job_binding_id: Uuid,"
+        }
+      ],
+      "failure_scenario": "A project's scope baseline is approved (the recorder's normal order). Its WBS deliverable is then accepted with evidence: the guard refuses 409, the only change-opening action needs a PM job binding that no seed ever created, and the deliverable can never reach accepted, so no demo credit can be recorded for it. The record is frozen at the baseline while the work it describes is complete.",
+      "acceptance": "A tenant with an approved scope baseline can always authorise a WBS acceptance through a provisioned path: either the organisation seed creates the PM process and its binding that `changes.request` requires, or `changes.request` takes the baseline directly and validates it rather than a PM job binding; a test proves a post-baseline WBS acceptance end to end through that path.",
+      "owner_project": "T3"
     }
   ]
 }

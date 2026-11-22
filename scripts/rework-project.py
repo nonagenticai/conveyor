@@ -99,6 +99,7 @@ class Runner:
         self.keep_active = keep_active
         self.transcript = evidence.parent / "transcript.jsonl"
         self.snapshot = ""
+        self.baseline_approval: str | None = None
         self.board = ""
         self.head = subprocess.run(
             ["git", "rev-parse", "HEAD"], cwd=ROOT, capture_output=True, text=True
@@ -499,7 +500,13 @@ class Runner:
                 read_id_from_output="baseline_id",
             )
             deliverable = plan["wbs_ids"][0]
-            self.decide(plan["approval_id"], "approve the project baseline")
+            # The baseline's approval is deferred until the deliverable is accepted: once an
+            # approved scope baseline exists, every `wbs.*` mutation needs an approved change
+            # request (`409 rebaseline_requires_change`, v1-p5-4), and this tenant has no PM
+            # process or job binding through which `changes.request` could open one. Accepting
+            # the deliverable before the baseline freezes the scope is also the truer order:
+            # the baseline records the accepted scope.
+            self.baseline_approval = plan["approval_id"]
 
         # 8. publish the retrospective closure review output
         outputs = self._published_outputs()
@@ -612,6 +619,22 @@ class Runner:
                 read_match=[f"deliverable_id={deliverable}"],
                 local=True,
             )
+
+        # 10b. approve the scope baseline now that its deliverable is accepted
+        approval = self.baseline_approval
+        if approval is None and not self.dry_run:
+            pending = [
+                gate
+                for gate in self._read(
+                    "approvals.list", {"project_id": self.project_id, "status": "pending"}
+                ).get("items", [])
+                if gate.get("gate") == "baseline"
+            ]
+            approval = pending[0]["id"] if pending else None
+        if approval:
+            self.decide(approval, "approve the project baseline")
+        else:
+            print("  baseline approval: none pending")
 
         # 11. closure request -> decision -> the destructive close gate -> close
         row = self.project_row()
