@@ -90,3 +90,47 @@ fn tools_call() -> ActionSpec {
 }
 
 inventory::submit! { ActionRegistration::new(tools_call) }
+
+/// `tools.resume` — continue a long operation that exceeded the tool's timeout (§11.3).
+pub const TOOLS_RESUME: &str = "tools.resume";
+
+/// The status tool's input: the token the pending call returned and the original input.
+#[derive(Clone, Debug, serde::Deserialize, schemars::JsonSchema)]
+pub struct ResumeIn {
+    /// The `resume_token` the broker minted on the pending call.
+    pub resume_token: String,
+    /// The original tool input; its hash must match the pending row's.
+    pub input: serde_json::Value,
+}
+
+fn resume_input() -> Schema {
+    schemars::schema_for!(ResumeIn)
+}
+
+fn tools_resume() -> ActionSpec {
+    ActionSpec {
+        name: TOOLS_RESUME,
+        version: 1,
+        kind: ActionKind::Internal,
+        input: resume_input,
+        output: broker_output,
+        // The resume continues a run's call; the run's binding and the pending row are the grant.
+        scopes: &[Scope::RunsWrite],
+        idempotent: false,
+        timeout_ms: 300_000,
+        effect: Effect::Read,
+        confirm: Confirm::None,
+        tenancy: Tenancy::Tenant,
+        agent: AgentHints {
+            tier: AgentTier::None,
+            proposal_required: false,
+        },
+        task_capable: false,
+        captures_usage: false,
+        artefact: None,
+        approval_target: None,
+        handler: HandlerRef::Broker,
+    }
+}
+
+inventory::submit! { ActionRegistration::new(tools_resume) }

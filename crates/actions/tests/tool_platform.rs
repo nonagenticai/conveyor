@@ -471,6 +471,15 @@ fn echo_schema() -> Value {
     })
 }
 
+fn slow_schema() -> Value {
+    json!({
+        "type": "object",
+        "properties": {"delay_ms": {"type": "integer", "minimum": 0}},
+        "required": ["delay_ms"],
+        "additionalProperties": false
+    })
+}
+
 // ── P1.1 ────────────────────────────────────────────────────────────────────────────────
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
@@ -694,6 +703,83 @@ async fn tools_retire_refuses_a_toolkit_used_in_the_window() {
         .await;
     assert_eq!(status, 409, "a used toolkit is not retired: {body}");
     assert!(body.to_string().contains("tool_in_use"), "{body}");
+
+    fixture.running.shutdown().await;
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_call_over_the_tool_timeout_is_pending_and_resumes() {
+    let _serial = SERIAL.lock().await;
+    let fixture = Fixture::new(
+        "fixtures",
+        "slow.run",
+        "fixtures.slow",
+        "read",
+        "read",
+        slow_schema(),
+    )
+    .await;
+    // The tool's own timeout is 1 s; the destination waits 1.5 s.
+    let mut tx = begin_scoped(&fixture.pg.owner, fixture.tenant)
+        .await
+        .expect("a scoped write");
+    sqlx::query("UPDATE tool SET timeout_secs = 1 WHERE tenant_id = $1")
+        .bind(fixture.tenant.as_uuid())
+        .execute(&mut *tx)
+        .await
+        .expect("set the tool timeout");
+    tx.commit().await.expect("commit");
+
+    let (status, body) = fixture
+        .call("fixtures.slow.run", json!({"delay_ms": 1500}))
+        .await;
+    assert_eq!(
+        status, 202,
+        "a slow destination is pending, not failed: {body}"
+    );
+    assert_eq!(body["status"], "pending", "{body}");
+    let token = body["resume_token"]
+        .as_str()
+        .expect("a resume token")
+        .to_owned();
+
+    let (ledger_status, ledger_token): (String, Option<String>) = {
+        let mut tx = begin_scoped(&fixture.pg.owner, fixture.tenant)
+            .await
+            .expect("a scoped read");
+        let row = sqlx::query_as(
+            "SELECT status, resume_token FROM tool_call
+              WHERE tenant_id = $1 ORDER BY created_at DESC, id DESC LIMIT 1",
+        )
+        .bind(fixture.tenant.as_uuid())
+        .fetch_one(&mut *tx)
+        .await
+        .expect("the pending ledger row");
+        tx.commit().await.expect("commit");
+        row
+    };
+    assert_eq!(ledger_status, "pending");
+    assert_eq!(ledger_token.as_deref(), Some(token.as_str()));
+
+    // The operator gives the operation room; the status tool resumes and completes it.
+    let mut tx = begin_scoped(&fixture.pg.owner, fixture.tenant)
+        .await
+        .expect("a scoped write");
+    sqlx::query("UPDATE tool SET timeout_secs = 5 WHERE tenant_id = $1")
+        .bind(fixture.tenant.as_uuid())
+        .execute(&mut *tx)
+        .await
+        .expect("raise the tool timeout");
+    tx.commit().await.expect("commit");
+
+    let (status, body) = fixture
+        .invoke_action(
+            "tools.resume",
+            json!({"resume_token": token, "input": {"delay_ms": 1500}}),
+        )
+        .await;
+    assert_eq!(status, 200, "the resumed call completes: {body}");
+    assert_eq!(body["waited_ms"], 1500, "{body}");
 
     fixture.running.shutdown().await;
 }

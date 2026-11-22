@@ -277,6 +277,8 @@ pub struct NewToolCall<'a> {
     pub error_class: Option<&'a str>,
     /// The error text (already redacted).
     pub error_message: Option<&'a str>,
+    /// The long-operation resume token, written only on a `pending` row (§11.3).
+    pub resume_token: Option<&'a str>,
 }
 
 /// Append one ledger row and return its id.
@@ -292,8 +294,9 @@ pub async fn insert_call(
         "INSERT INTO tool_call (tenant_id, run_id, run_step_id, card_id, tool_id, tool_key,
                                 toolkit_key, toolkit_version, input_hash, status, http_status,
                                 latency_ms, request_bytes, response_bytes, cost, error_class,
-                                error_message)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
+                                error_message, resume_token)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17,
+                 $18)
          RETURNING id",
     )
     .bind(tenant.as_uuid())
@@ -313,9 +316,47 @@ pub async fn insert_call(
     .bind(call.cost)
     .bind(call.error_class)
     .bind(call.error_message)
+    .bind(call.resume_token)
     .fetch_one(conn)
     .await?;
     Ok(id.0)
+}
+
+/// One `pending` call as the status tool sees it.
+#[derive(Clone, Debug, sqlx::FromRow)]
+pub struct PendingToolCall {
+    /// The ledger row (also the status tool's evidence).
+    pub id: Uuid,
+    /// The run the call was made for.
+    pub run_id: Option<Uuid>,
+    /// The step, when the call named one.
+    pub run_step_id: Option<Uuid>,
+    /// The exact tool version the pending call pinned.
+    pub tool_id: Uuid,
+    /// The canonical name the caller used.
+    pub tool_key: String,
+    /// The toolkit key.
+    pub toolkit_key: String,
+    /// The SHA-256 of the original input.
+    pub input_hash: String,
+}
+
+/// The pending call a resume token names, when the token is live.
+pub async fn pending_call_by_token(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    resume_token: &str,
+) -> Result<Option<PendingToolCall>, ToolStoreError> {
+    let row: Option<PendingToolCall> = sqlx::query_as(
+        "SELECT id, run_id, run_step_id, tool_id, tool_key, toolkit_key, input_hash
+           FROM tool_call
+          WHERE tenant_id = $1 AND resume_token = $2 AND status = 'pending'",
+    )
+    .bind(tenant.as_uuid())
+    .bind(resume_token)
+    .fetch_optional(conn)
+    .await?;
+    Ok(row)
 }
 
 /// The ledger for one run, oldest first — the read side of P2.1's assertion.
