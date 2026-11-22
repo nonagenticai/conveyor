@@ -836,3 +836,45 @@ async fn the_caller_cannot_supply_broker_tools() {
         "the binding is the only source"
     );
 }
+
+#[tokio::test]
+async fn a_bound_run_without_tools_call_gets_no_broker_tool() {
+    let (pg, seeded, running) = fixture().await;
+    let _router = ROUTER.lock().await;
+    let (base, _models, bodies) = stub_router().await;
+    support::set_env("CONVEYOR_EXTERNAL_INFERENCE_URL", &base);
+    let (_capability, agent) = seed_executor_with(&pg, &seeded, &["workflows.list"]).await;
+    let workflow = published_agent_workflow(&running).await;
+    let project = project(&running).await;
+    let run = start_workflow_run(&running, &project, &workflow, Some(agent)).await;
+    seed_bound_tool(
+        &pg,
+        seeded.tenant,
+        &run,
+        "fixtures",
+        "echo",
+        "fixtures.echo",
+        "read",
+        "read",
+        echo_schema(),
+    )
+    .await;
+
+    drive(&pg, &seeded, &run).await;
+    assert_eq!(run_status(&pg, &seeded, &run).await, "succeeded");
+    let bodies = bodies.lock().expect("bodies");
+    let names: Vec<&str> = bodies[0]["tools"]
+        .as_array()
+        .map(|tools| {
+            tools
+                .iter()
+                .filter_map(|tool| tool.pointer("/function/name").and_then(Value::as_str))
+                .collect()
+        })
+        .unwrap_or_default();
+    assert_eq!(
+        names,
+        vec!["workflows.list"],
+        "a binding without tools.call does not widen the agent's surface"
+    );
+}
