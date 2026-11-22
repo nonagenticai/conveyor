@@ -57229,7 +57229,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-gap-analysis-t9.html",
-        "sha256": "b38ae219595b6993be282759fc1a91d7e10ddfd7b95e8d8aa81ce364982b026a"
+        "sha256": "7330ccaf08995ea64b9be1de202bc9a3709f9e11df2dbfb78d82298f86645b89"
       },
       "gate": {
         "approval_id": "",
@@ -57285,28 +57285,84 @@ window.CONVEYOR_STANDARDS = {
         },
         {
           "heading": "Gaps and work packages",
-          "missing": [
-            "No row or document satisfies 'Gaps and work packages'; a document exists but lacks the heading"
-          ],
+          "missing": [],
           "required": true,
-          "severity": "",
+          "severity": "P1",
           "sources": [
             {
-              "category": "gap-analysis",
-              "count": 0,
-              "file": "artefacts.json",
-              "items": [],
-              "kind": "documents",
-              "pointer": "/documents",
-              "scope": "subject"
+              "count": 45,
+              "items": [
+                {
+                  "id": "closed_without_closure_review:T9",
+                  "status": "open",
+                  "title": "Publish the project's closure review"
+                },
+                {
+                  "id": "benefit_baseline_placeholder:programme",
+                  "status": "open",
+                  "title": "Measure the benefit baselines"
+                },
+                {
+                  "id": "benefit_profile_incomplete:programme",
+                  "status": "open",
+                  "title": "Complete the benefit profiles"
+                },
+                {
+                  "id": "programme_baselines:programme",
+                  "status": "open",
+                  "title": "Take and approve the programme baselines"
+                },
+                {
+                  "id": "programme_outputs:programme#1",
+                  "status": "open",
+                  "title": "Publish the complete programme-definition output set"
+                },
+                {
+                  "id": "programme_outputs:programme#2",
+                  "status": "open",
+                  "title": "Publish the complete programme-definition output set"
+                },
+                {
+                  "id": "cadence_absent:programme",
+                  "status": "open",
+                  "title": "Publish the programme cadence"
+                },
+                {
+                  "id": "seed_live_drift:programme",
+                  "status": "open",
+                  "title": "Reconcile the seed with the live rows"
+                },
+                {
+                  "id": "board_not_approved:programme",
+                  "status": "open",
+                  "title": "Approve the Architecture Board"
+                },
+                {
+                  "id": "mandatory_artefacts:tranche-0",
+                  "status": "open",
+                  "title": "Complete the mandatory phase artefact sets"
+                },
+                {
+                  "id": "mandatory_artefacts:tranche-1",
+                  "status": "open",
+                  "title": "Complete the mandatory phase artefact sets"
+                },
+                {
+                  "id": "mandatory_artefacts:tranche-10",
+                  "status": "open",
+                  "title": "Complete the mandatory phase artefact sets"
+                }
+              ],
+              "kind": "computed",
+              "name": "gap-analysis"
             }
           ],
-          "status": "partial"
+          "status": "evidenced"
         }
       ],
       "spec": "§8.1",
       "standard": "TOGAF",
-      "status": "absent",
+      "status": "partial",
       "subject": {
         "id": "01a1d039-0d35-7bd1-945d-cea12c5dfd6d",
         "key": "T9",
@@ -62817,22 +62873,22 @@ window.CONVEYOR_STANDARDS = {
       "partial": 0
     },
     "TOGAF": {
-      "absent": 154,
+      "absent": 153,
       "artefacts": 184,
       "evidenced": 24,
-      "partial": 6
+      "partial": 7
     }
   },
   "generated_at": "2026-11-20T11:50:50.848127361+00:00",
   "git_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
-  "payload_sha256": "95ddd9569c424be362454e9b5c56d5999492dcbb5f254d8b090c393be6784854",
+  "payload_sha256": "efb596f4d14f3ba5d42b0e1b41dc323ff910613730fb2fe06b98136ac2d249e5",
   "schema": "design-standards/v1",
   "summary": {
-    "absent": 380,
+    "absent": 379,
     "artefacts": 519,
     "evidenced": 78,
     "findings": 327,
     "mandatory": 480,
-    "partial": 61
+    "partial": 62
   }
 };

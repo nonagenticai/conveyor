@@ -60271,8 +60271,8 @@ window.CONVEYOR_REWORK = {
               "section": "Gaps and work packages",
               "snapshot": [
                 [
-                  "artefacts.json",
-                  "/documents",
+                  null,
+                  null,
                   0
                 ]
               ],
@@ -60328,8 +60328,8 @@ window.CONVEYOR_REWORK = {
                   "section": "Gaps and work packages",
                   "snapshot": [
                     [
-                      "artefacts.json",
-                      "/documents",
+                      null,
+                      null,
                       0
                     ]
                   ],

@@ -3274,13 +3274,9 @@ window.CONVEYOR_OUTPUT_STANDARD = {
         ],
         "Gaps and work packages": [
           {
-            "kind": "documents",
-            "file": "artefacts.json",
-            "pointer": "/documents",
-            "match": {
-              "category": "gap-analysis",
-              "scope": "subject"
-            }
+            "kind": "computed",
+            "name": "gap-analysis",
+            "severity": "P1"
           }
         ]
       }
