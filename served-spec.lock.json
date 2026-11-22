@@ -145,7 +145,7 @@
     "POST /api/actions/channels.test/invocations": "be258442401376c0b2f4bde916a905c888cea18220426e51b0e0a8ce0aa6c1e6",
     "POST /api/actions/channels.unbind/invocations": "4568e41e502f38910cf1e50ef65b239037860e551664ef17355dc190f9286b94",
     "POST /api/actions/coach.escalate/invocations": "402dcc4069d32f0512a12a201eb3b3d98f9f35aa67145af4d5161c7b127789c3",
-    "POST /api/actions/coach.interrupt/invocations": "c9b583ffdc04c0ca8dd58cb668811eca35bc6567d6d6ac927968648610e08cd5",
+    "POST /api/actions/coach.interrupt/invocations": "06284e6aa327409e61f61f6c3cbf0dbccc4a744a509d366d596a5dfddd126d22",
     "POST /api/actions/coach.remedy/invocations": "32a3b6e42baee545f8d77592f45fc1b06763e3b198ebac519f2d8cb9ad048275",
     "POST /api/actions/coach.triage/invocations": "49ac1b68a7e51853623fffddc0bc9c1e124d4f498efe96fa62457b73c4d6bdfd",
     "POST /api/actions/coding_jobs.create/invocations": "28b2d9fd9b2f5d0b10e73c12dc816f530740604a20a0dfdc1068bfc89d1a9f96",
