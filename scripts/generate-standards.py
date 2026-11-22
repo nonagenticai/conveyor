@@ -1332,7 +1332,13 @@ def build_document(
     return document
 
 
-def write_outputs(document: dict[str, Any], findings: dict[str, Any], data_out: Path, findings_out: Path) -> None:
+def write_outputs(
+    document: dict[str, Any],
+    findings: dict[str, Any],
+    data_out: Path,
+    findings_out: Path,
+    register: dict[str, Any] | None = None,
+) -> None:
     data_out.mkdir(parents=True, exist_ok=True)
     (data_out / "standards.json").write_text(
         json.dumps(document, indent=2, sort_keys=True, ensure_ascii=False) + "\n", encoding="utf-8"
@@ -1343,6 +1349,16 @@ def write_outputs(document: dict[str, Any], findings: dict[str, Any], data_out: 
         + ";\n",
         encoding="utf-8",
     )
+    # The console's offline rework register. The canonical register stays `rework.json` in the
+    # repo evidence; this is the same document as the global `delivery.js` reads when the live
+    # snapshot carries no `rework` section.
+    if register is not None:
+        (data_out / "rework.js").write_text(
+            "window.CONVEYOR_REWORK = "
+            + json.dumps(register, indent=2, sort_keys=True, ensure_ascii=False)
+            + ";\n",
+            encoding="utf-8",
+        )
     findings_out.parent.mkdir(parents=True, exist_ok=True)
     findings_out.write_text(
         json.dumps(findings, indent=2, sort_keys=True, ensure_ascii=False) + "\n", encoding="utf-8"
@@ -1592,6 +1608,7 @@ def main() -> int:
             document, findings,
             args.data_out,
             args.findings_out or (args.data_out / "standards-findings.json"),
+            register,
         )
     elif args.findings_out:
         # Pass 1 of the publish writes findings only; the audit consumes the file before the

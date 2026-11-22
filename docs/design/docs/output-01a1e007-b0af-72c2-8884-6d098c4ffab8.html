@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>S12 — UI build-out · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>S12 — UI build-out</h1>
+<p><strong>Track:</strong> v1 · <strong>Tranche:</strong> 10 · <strong>Measured status:</strong> built · <strong>Plan:</strong> <code>docs/plans/slices/S12-ui-buildout.md</code>
+<strong>Dependencies:</strong> S01, S02, S04, S05, S06, S07, S08, S09, S10, S11, S17, S18 · <strong>Issues:</strong> #6, #26, #27, #28</p>
+<h2>Outcome</h2>
+<p>Build every declared screen on S01's stack, each proved by a Playwright click-through against a real API and a real database. S12 designs nothing and invents nothing: no component library (S01's), no action, table, event or screen. The output is the screens plus their specs.</p>
+<h2>Boundary</h2>
+<p><strong>IN</strong> — the twenty-two screens of §5 on S01's stack, each with a Playwright spec that asserts empty state, error state and happy path. <strong>OUT</strong> — design, component-library choice, any new action/table/event/screen, the <strong>execution-graph</strong> editor (the engine has none; screen 22's process map is a declarative map), server-rendered pages (CONTRACT §11: no stack assumption beyond S01's decision).</p>
+<h2>Reuse sources</h2>
+<table><thead><tr><th>path</th><th>read this</th><th>carry</th><th>do not carry</th></tr></thead><tbody>
+<tr><td><code>slices/S01-ui-spike.md</code></td><td>the chosen stack and its ADR</td><td>the decision</td><td>the spike code (deleted)</td></tr>
+<tr><td><code>slices/S02,S05–S11</code> §3 "UI surface declared for S12"</td><td>each screen's actions, read models, SSE topics</td><td>them verbatim — a screen may not call an action its declaring slice does not name</td><td>their API shapes re-invented</td></tr>
+<tr><td><code>02-source-map/20-fr.md</code> §"Frontend (S12)" (<code>fr</code> <code>6f7c5097</code>)</td><td>the 195 <code>+page.svelte</code> route groups</td><td>coverage check only</td><td>the pages themselves</td></tr>
+<tr><td><code>docs/SPEC.md</code> §5.7</td><td>the screen order</td><td>the order</td><td>—</td></tr>
+</tbody></table>
+<h2>Inception units</h2>
+<ol>
+<li><code>analysis</code> — current state and reuse: inventory what already exists, the contract and licence constraints, the build-vs-reuse decision, and the risks.</li>
+<li><code>architecture</code> — the project's design: aggregates, tables, actions, modules, integrations, the decision record, and acceptance.</li>
+</ol>
+<p>Both are documents on this project with <code>meta.category</code> set to <code>analysis</code> / <code>architecture</code>; both published is the inception standard.</p>
+<h2>Dependencies</h2>
+<p>Blocked-by: S01, S02, S04, S05, S06, S07, S08, S09, S10, S11, S17, S18.</p>
+<h2>Acceptance</h2>
+<pre><code class="language-bash">set -euo pipefail
+source ~/.cargo/env          # CONTRACT §16 — cargo is not on PATH
+cd $HOME/Movies/conveyor
+docker compose up -d db &amp;&amp; cargo run -p conveyor-server -- migrate --dev-seed
+CONVEYOR_DEV_AUTH=1 cargo run -p conveyor-server -- serve &amp;
+trap 'kill %1 2&gt;/dev/null || true' EXIT
+for i in $(seq 1 30); do curl -sf -H 'authorization: Bearer dev:alice' localhost:8930/health/ready &gt;/dev/null &amp;&amp; break; sleep 1; done   # readiness, not a fixed sleep
+test "$(yq '[.[]|select(.status=="use…
+
+Verify: the gate script above (its executable acceptance)
+
+## Capabilities
+
+`design`
+
+## Gaps
+
+- None recorded beyond the inception units themselves.
+</code></pre>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>UI build-out · conveyor output · published 2026-11-20T11:50:50.848127361+00:00</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

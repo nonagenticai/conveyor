@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Projects dossier — the 48 projects, their tranches and dependencies · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>Projects dossier</h1>
+<p><strong>Programme:</strong> conveyor buildout · <strong>Status:</strong> proposed for P0 acceptance (drafted 2026-11-17) ·
+<strong>Owner:</strong> the programme manager (interim) · <strong>Artefact:</strong> PD-1, generated from the measured seed and
+coverage at <code>main@42fc299</code> plus #245's branch.</p>
+<h2>Projects</h2>
+<p>The programme has 48 projects. The table is generated from <code>seed/programme.json</code> (the mapping
+of record) and the current <code>docs/design/data/coverage.json</code> (the measured status, units and gaps),
+never typed by hand. "Blocked by" is the coverage's measured open blockers (the gate's source);
+"declared" is the seed's typed <code>meta.depends_on</code>, which may include a dependency that is already
+closed. The two are shown side by side so neither silently replaces the other.</p>
+<table><thead><tr><th>Project</th><th>Name</th><th>Tranche</th><th>Measured</th><th>Blocked by (measured)</th><th>Declared deps</th><th>Units</th><th>Expected outputs (due now)</th><th>Plan</th><th>Gap</th></tr></thead><tbody>
+<tr><td>DESIGN-PUBLISH</td><td>Publish the SPEC_V2 studio design pack, live</td><td>0</td><td>built</td><td>—</td><td>—</td><td>#32, #33, #36, #37, #89, #97, #103, #149</td><td>project-brief, evidence</td><td><code>docs/design/STUDIO-SPEC.md</code></td><td>published by PR today; P4 makes it live from the tenant rows</td></tr>
+<tr><td>P0</td><td>Programme definition — vision, blueprint, plan and project briefs</td><td>0</td><td>planned</td><td>—</td><td>—</td><td>#120, #121, #122</td><td>vision, blueprint, business-case, programme-plan, governance, reuse-map, brief-template, architecture-analysis, benefit-profile, benefits-map, projects-dossier, tranche-plan, tranche-review, benefits-strategy, realization-plan, stakeholder-profiles, architecture-principles, adm-profile, artifact-standard, maturity-assessment, skills-assessment</td><td><code>docs/plans/P0-programme-definition.md</code></td><td>the definition set (#121) and the reuse/architecture pack (#122) are not yet authored</td></tr>
+<tr><td>PLATFORM</td><td>CI, runners and platform</td><td>0</td><td>standing</td><td>—</td><td>—</td><td>#17, #22, #43, #44, #45, #46, #55, #57, #71, #93, #95, #102, #154, #163, #164, #193, #205, #213, #222, #223, #224, #225, #226, #258, #260, #265, #274, #280, #282, #283, #284, #285</td><td>project-brief, evidence</td><td><code>docs/plans/development-process-speed.md</code></td><td>standing project; CI and platform work continues</td></tr>
+<tr><td>S00</td><td>Usage inventory → parity/parity.yaml</td><td>0</td><td>built</td><td>—</td><td>—</td><td>—</td><td>project-brief, evidence</td><td><code>docs/plans/slices/S00-usage-inventory.md</code></td><td>—</td></tr>
+<tr><td>S01</td><td>UI spike — Leptos CSR vs Leptos SSR</td><td>0</td><td>built</td><td>—</td><td>—</td><td>—</td><td>project-brief, evidence</td><td><code>docs/plans/slices/S01-ui-spike.md</code></td><td>—</td></tr>
+<tr><td>SPEC-V2</td><td>SPEC V2 — the organisational operating model</td><td>0</td><td>built</td><td>—</td><td>—</td><td>#24</td><td>spec</td><td><code>docs/SPEC_V2.md</code></td><td>—</td></tr>
+<tr><td>T0</td><td>Model and contracts</td><td>0</td><td>built</td><td>—</td><td>—</td><td>#34</td><td>project-brief, evidence</td><td><code>docs/SPEC_V2.md#12</code></td><td>—</td></tr>
+<tr><td>S02</td><td>Skeleton — workspace, tenancy, auth, jobs, SSE</td><td>1</td><td>built</td><td>—</td><td>S00</td><td>#2</td><td>project-brief, evidence</td><td><code>docs/plans/slices/S02-skeleton.md</code></td><td>—</td></tr>
+<tr><td>T1</td><td>Plan spine</td><td>1</td><td>built</td><td>P0</td><td>T0, P0</td><td>#72</td><td>project-brief, evidence</td><td><code>docs/SPEC_V2.md#12</code></td><td>—</td></tr>
+<tr><td>T11</td><td>Metrics, metering and maturity</td><td>1</td><td>proposed</td><td>P0</td><td>P0</td><td>#84</td><td>project-brief, inception-analysis, architecture-design</td><td><code>docs/SPEC_V2.md#12</code></td><td>no metrics roll-ups, metering drill-down or billing reconciliation (continuous)</td></tr>
+<tr><td>S03</td><td>Domain and schema — aggregates, state machines, baseline domain migration</td><td>2</td><td>built</td><td>—</td><td>S02</td><td>—</td><td>project-brief, evidence</td><td><code>docs/plans/slices/S03-domain-schema.md</code></td><td>—</td></tr>
+<tr><td>T2</td><td>Decision ladder</td><td>2</td><td>proposed</td><td>P0</td><td>T1, P0</td><td>#73</td><td>project-brief, inception-analysis, architecture-design</td><td><code>docs/SPEC_V2.md#12</code></td><td>the decision tables exist as T0 schema; no decision-ladder evaluation, laya client or generation split (T2 behaviour)</td></tr>
+<tr><td>S04</td><td>Action registry — derive, manifest, OpenAPI, MCP, invocation, external ingest</td><td>3</td><td>built</td><td>—</td><td>S02, S03</td><td>#3</td><td>project-brief, evidence</td><td><code>docs/plans/slices/S04-action-registry.md</code></td><td>—</td></tr>
+<tr><td>T13</td><td>Tool platform</td><td>3</td><td>proposed</td><td>P0, T2</td><td>T2, P0</td><td>#76</td><td>project-brief, inception-analysis, architecture-design</td><td><code>docs/SPEC_V2.md#12</code></td><td>table tool, table toolkit, table tool_binding, table tool_call</td></tr>
+<tr><td>T3</td><td>PM job</td><td>3</td><td>proposed</td><td>P0, T2</td><td>T2, P0</td><td>#74</td><td>project-brief, inception-analysis, architecture-design</td><td><code>docs/SPEC_V2.md#12</code></td><td>no PM job: no charter, WBS, baseline, staffing, gate routing or closure run</td></tr>
+<tr><td>S05</td><td>Board — projects, boards, lists, cards, labels, comments, tasks, custom fields, webhooks, SSE</td><td>4</td><td>built</td><td>—</td><td>S03, S04</td><td>—</td><td>project-brief, evidence</td><td><code>docs/plans/slices/S05-board.md</code></td><td>—</td></tr>
+<tr><td>S07</td><td>Requirements, catalogues, revisions, quality scoring, search</td><td>4</td><td>built</td><td>—</td><td>S03, S04</td><td>—</td><td>project-brief, evidence</td><td><code>docs/plans/slices/S07-requirements-search.md</code></td><td>—</td></tr>
+<tr><td>S09</td><td>Documents, repositories, secrets, workers UI, reports/metrics, billing display</td><td>4</td><td>built</td><td>—</td><td>S03, S04</td><td>#156, #168, #183, #195, #231, #245</td><td>project-brief, evidence</td><td><code>docs/plans/slices/S09-documents-integrations.md</code></td><td>—</td></tr>
+<tr><td>T10</td><td>SAFe cadence and MSP tranches</td><td>4</td><td>proposed</td><td>P0, T3</td><td>T1, T3, P0</td><td>#82</td><td>project-brief, inception-analysis, architecture-design</td><td><code>docs/SPEC_V2.md#12</code></td><td>no backlog materialisation, PI planning, demo or inspect-and-adapt cadence</td></tr>
+<tr><td>T14</td><td>Estate toolkits</td><td>4</td><td>proposed</td><td>P0, T13</td><td>T13, P0</td><td>#83</td><td>project-brief, inception-analysis, architecture-design</td><td><code>docs/SPEC_V2.md#12</code></td><td>no estate toolkit published with a probe and a live call</td></tr>
+<tr><td>T16</td><td>SOP, RDF/OWL and process-document ingestion</td><td>4</td><td>proposed</td><td>P0, T13, T2</td><td>T2, T13, P0</td><td>#85</td><td>project-brief, inception-analysis, architecture-design</td><td><code>docs/SPEC_V2.md#12</code></td><td>table pko_release, table pko_entity, table pko_relation</td></tr>
+<tr><td>T4</td><td>Kanban coach</td><td>4</td><td>proposed</td><td>P0, T3</td><td>T3, P0</td><td>#75</td><td>project-brief, inception-analysis, architecture-design</td><td><code>docs/SPEC_V2.md#12</code></td><td>no interruption taxonomy, closed remedy set or coach card</td></tr>
+<tr><td>T9</td><td>TOGAF ADM capability</td><td>4</td><td>proposed</td><td>P0, T3</td><td>T1, T3, P0</td><td>#81</td><td>project-brief, inception-analysis, architecture-design, architecture-principles, adm-profile, artifact-standard, architecture-artifact, statement-of-architecture-work, compliance-review, waiver, maturity-assessment, skills-assessment</td><td><code>docs/SPEC_V2.md#12</code></td><td>no architecture project type and no TOGAF phase contracts</td></tr>
+<tr><td>S06</td><td>Control plane — claims, runs, approvals, andon, comms and notifications</td><td>5</td><td>built</td><td>—</td><td>S03, S04, S05</td><td>#4</td><td>project-brief, evidence</td><td><code>docs/plans/slices/S06-control-plane.md</code></td><td>—</td></tr>
+<tr><td>S08</td><td>Governance, modelling, render and export</td><td>5</td><td>built</td><td>—</td><td>S03, S04, S07</td><td>—</td><td>project-brief, evidence</td><td><code>docs/plans/slices/S08-governance-modelling.md</code></td><td>—</td></tr>
+<tr><td>S17</td><td>Native benchmark harness</td><td>5</td><td>built</td><td>—</td><td>S02, S03, S04, S09</td><td>#11</td><td>project-brief, evidence</td><td><code>docs/plans/slices/S17-benchmark-harness.md</code></td><td>—</td></tr>
+<tr><td>T17</td><td>Tenant asset authoring</td><td>5</td><td>proposed</td><td>P0, T16, T3</td><td>T16, T3, P0</td><td>#87</td><td>project-brief, inception-analysis, architecture-design</td><td><code>docs/SPEC_V2.md#12</code></td><td>no tenant asset authoring intake or review queue</td></tr>
+<tr><td>T7</td><td>Operations</td><td>5</td><td>proposed</td><td>P0, T13, T2, T4</td><td>T2, T4, T13, P0</td><td>#78, #170, #171, #172</td><td>project-brief, inception-analysis, architecture-design</td><td><code>docs/SPEC_V2.md#12</code></td><td>no incident, runbook or postmortem rows and no operations tool call set</td></tr>
+<tr><td>S06a</td><td>mcp_server signed channel — both directions</td><td>6</td><td>archived</td><td>—</td><td>S04, S05, S06</td><td>—</td><td>project-brief</td><td><code>docs/plans/slices/S06a-mcp-server-channel.md</code></td><td>superseded by S06c/S06d</td></tr>
+<tr><td>S06b</td><td>Agent direct interface — the conveyor's own MCP surface</td><td>6</td><td>built</td><td>—</td><td>S04, S05, S06</td><td>—</td><td>project-brief, evidence</td><td><code>docs/plans/slices/S06b-agent-direct-interface.md</code></td><td>—</td></tr>
+<tr><td>S10</td><td>Copilot / AG-UI — one action surface, proposals, conversations</td><td>6</td><td>built</td><td>—</td><td>S02, S03, S04, S06</td><td>—</td><td>project-brief, evidence</td><td><code>docs/plans/slices/S10-copilot-ag-ui.md</code></td><td>—</td></tr>
+<tr><td>S11</td><td>Processes, steps and SOPs — executable documentation</td><td>6</td><td>built</td><td>—</td><td>S03, S04, S06, S07</td><td>#5</td><td>project-brief, evidence</td><td><code>docs/plans/slices/S11-procedures.md</code></td><td>—</td></tr>
+<tr><td>S06c</td><td>MCP tasks — a long-running project asks for input</td><td>7</td><td>built</td><td>—</td><td>S04, S05, S06, S06b</td><td>—</td><td>project-brief, evidence</td><td><code>docs/plans/slices/S06c-mcp-tasks.md</code></td><td>—</td></tr>
+<tr><td>S15</td><td>Capability, knowledge and memory</td><td>7</td><td>built</td><td>—</td><td>S03, S04, S06, S11</td><td>#9</td><td>project-brief, evidence</td><td><code>docs/plans/slices/S15-capability-knowledge-memory.md</code></td><td>—</td></tr>
+<tr><td>S16</td><td>Inference ledger and prompt audit</td><td>7</td><td>built</td><td>—</td><td>S02, S03, S04, S10, S11</td><td>#10</td><td>project-brief, evidence</td><td><code>docs/plans/slices/S16-inference-audit.md</code></td><td>—</td></tr>
+<tr><td>S06d</td><td>Interaction connector standard — web, Telegram, MCP first</td><td>8</td><td>built</td><td>—</td><td>S02, S04, S05, S06, S06b, S06c</td><td>—</td><td>project-brief, evidence</td><td><code>docs/plans/slices/S06d-connector-standard.md</code></td><td>—</td></tr>
+<tr><td>S13</td><td>Process engine, judge, map and care-bus — the process is the executor, the DAG retained as the tool-sequence engine, the 348 flows re-authored</td><td>8</td><td>built</td><td>—</td><td>S03, S04, S11, S15</td><td>#7, #136, #179, #198</td><td>project-brief, evidence</td><td><code>docs/plans/slices/S13-n8n-engine.md</code></td><td>—</td></tr>
+<tr><td>S19</td><td>Eval builder</td><td>8</td><td>built</td><td>—</td><td>S02, S03, S04, S06, S09, S10, S11, S16</td><td>#13, #31</td><td>project-brief, evidence</td><td><code>docs/plans/slices/S19-eval-builder.md</code></td><td>—</td></tr>
+<tr><td>S18</td><td>Kata continuous improvement</td><td>9</td><td>built</td><td>—</td><td>S13, S15, S17</td><td>#12, #30</td><td>project-brief, evidence</td><td><code>docs/plans/slices/S18-kata-improvement.md</code></td><td>—</td></tr>
+<tr><td>S20</td><td>Eval hillclimb</td><td>9</td><td>built</td><td>—</td><td>S19</td><td>#14</td><td>project-brief, evidence</td><td><code>docs/plans/slices/S20-eval-hillclimb.md</code></td><td>—</td></tr>
+<tr><td>S21</td><td>S21</td><td>9</td><td>partial</td><td>—</td><td>S11, S13, S15, S16</td><td>#15</td><td>project-brief, evidence</td><td><code>docs/plans/slices/S21-message-construction.md</code></td><td>the v1 seam is built; the 2026-2027 design is unbuilt (#25)</td></tr>
+<tr><td>S12</td><td>UI build-out</td><td>10</td><td>built</td><td>—</td><td>S01, S02, S04, S05, S06, S07, S08, S09, S10, S11, S17, S18</td><td>#6, #26, #27, #28</td><td>project-brief, evidence</td><td><code>docs/plans/slices/S12-ui-buildout.md</code></td><td>the eight V2 destinations are their own projects, not S12 work</td></tr>
+<tr><td>T5</td><td>Kata</td><td>10</td><td>proposed</td><td>P0, T2</td><td>T2, S16, S17, S18, S19, S20, P0</td><td>#77</td><td>project-brief, inception-analysis, architecture-design</td><td><code>docs/SPEC_V2.md#12</code></td><td>no kata.* action family and no measured procedure-change loop</td></tr>
+<tr><td>S14</td><td>Cutover — deploy, seed, rehearse, decommission fr / RM / Planka</td><td>11</td><td>partial</td><td>—</td><td>S00, S06b, S12, S13</td><td>#8, #29</td><td>project-brief, evidence</td><td><code>docs/plans/slices/S14-cutover.md</code></td><td>the fr/RM/Planka decommission is open (#8, #29); the app itself is deployed</td></tr>
+<tr><td>T6</td><td>Development project</td><td>11</td><td>proposed</td><td>P0, T13, T5</td><td>T5, T13, P0</td><td>#80</td><td>project-brief, inception-analysis, architecture-design</td><td><code>docs/SPEC_V2.md#12</code></td><td>no development-project path over conveyor and a dependency repo</td></tr>
+<tr><td>T8</td><td>Organisational memory</td><td>11</td><td>proposed</td><td>P0, T5</td><td>T5, P0</td><td>#79</td><td>project-brief, inception-analysis, architecture-design</td><td><code>docs/SPEC_V2.md#12</code></td><td>table lesson</td></tr>
+<tr><td>T15</td><td>Tool authoring and BYO</td><td>12</td><td>proposed</td><td>P0, T13, T6</td><td>T13, T6, P0</td><td>#86</td><td>project-brief, inception-analysis, architecture-design</td><td><code>docs/SPEC_V2.md#12</code></td><td>no tool authoring, OpenAPI draft import or BYO tool binding</td></tr>
+<tr><td>T12</td><td>One organisation loop</td><td>13</td><td>proposed</td><td>P0, T10, T11, T13, T14, T15, T16, T17, T2, T3, T4, T5, T6, T7, T8, T9</td><td>T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T13, T14, T15, T16, T17, P0</td><td>#88</td><td>project-brief, inception-analysis, architecture-design</td><td><code>docs/SPEC_V2.md#12</code></td><td>the one-organisation acceptance loop is not built</td></tr>
+</tbody></table>
+<h2>Tranches and dependencies</h2>
+<ul>
+<li>The tranche numbers are the programme's dependency levels; a project sits in the tranche its
+prerequisites allow (<code>docs/SPEC_V2.md</code> §12; the P0 plan §7).</li>
+<li>Dependencies are declared as <code>meta.depends_on</code> in the seed and measured as <code>blocked_by</code> in the
+coverage; the programme gate refuses a run whose blocking dependency is open with <code>409 blocked_by</code>.</li>
+<li>The delivery projects T1–T17 sit behind P0 (the definition set) and, for T1, T0's closed contracts.</li>
+</ul>
+<h2>Resources and budget</h2>
+<p><strong>Not stated in the seed.</strong> The programme's source data carries each project's plan and units, not a
+resource or budget figure. The honest statement is that the resource assumption is the project's
+slice plan and the owner's allocation; a per-project budget is a programme decision that has not been
+taken. The gap is recorded rather than filled with a number.</p>
+<h2>Delivery risks</h2>
+<ul>
+<li><strong>The definition gate.</strong> P0's remaining artefacts are the gate T1–T17's build units wait on; a gap
+here delays the whole tranche chain.</li>
+<li><strong>Plan drift.</strong> The dossier is generated; a hand-edited plan or an unmeasured status is the failure
+mode the coverage gate catches.</li>
+<li><strong>The measured status is a snapshot.</strong> A project's <code>built</code> or <code>proposed</code> status is measured at the
+coverage run; a merged unit not reflected is a coverage defect, not a new status.</li>
+<li><strong>The open units.</strong> 33 projects carry open units at this coverage
+run; the gap column names each project's gap.</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Programme definition — vision, blueprint, plan and project briefs · conveyor output · published 2026-11-20T11:50:50.848127361+00:00 · FR Test</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

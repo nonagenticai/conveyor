@@ -132,8 +132,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/design/README.html",
       "source": "docs/design/README.md",
       "section": "Design",
-      "sha256": "7e936418480e4a295a5686638c45288b8d58b07632040479df467e912969e63b",
-      "bytes": 24880,
+      "sha256": "a08927f435c6bfb80d212ec2034b53fe68cd13e3f48c493c972b0fd80895cfa8",
+      "bytes": 27177,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/design/README.md"
     },
     {
@@ -654,8 +654,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/evidence/rework/full-fidelity-snapshot.html",
       "source": "docs/evidence/rework/full-fidelity-snapshot.md",
       "section": "Evidence",
-      "sha256": "b7871c7112396b0cec6ff33361360b2e557632375ceeb8cd9797ec3d1dd31c94",
-      "bytes": 6032,
+      "sha256": "e9dfa4530366c0d1bbd8bc3097577c5e4850113c8e7a9ae740c76e1d2e99826d",
+      "bytes": 6288,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/full-fidelity-snapshot.md"
     },
     {
@@ -684,6 +684,15 @@ window.CONVEYOR_DOCUMENTS = {
       "sha256": "c8b13408b88c8b3fef68d8d71cd34307ce27ccdb2b5d7d4c8a1451cd925ce83f",
       "bytes": 7532,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/tranche-2/acts.md"
+    },
+    {
+      "title": "Tranche 2 — the retro lessons, one per finding",
+      "path": "docs/evidence/rework/tranche-2/lessons.html",
+      "source": "docs/evidence/rework/tranche-2/lessons.md",
+      "section": "Evidence",
+      "sha256": "a63136f8953dd645d439f5b438ee4c0e00d2281c154b4ae149e243e2098228fc",
+      "bytes": 4576,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/tranche-2/lessons.md"
     },
     {
       "title": "V1 → SPECV2 coverage",
