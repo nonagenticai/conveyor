@@ -6,6 +6,7 @@ gate = "proptest on transitions and schema review — no transition leaves `list
 [[check]]
 id = "S03-project"
 check = "project"
+status = "closed"
 severity = "P0"
 description = "S03 is closed"
 

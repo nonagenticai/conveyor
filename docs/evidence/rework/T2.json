@@ -4,10 +4,10 @@
       "allowed": false,
       "check": "project",
       "description": "T2 is closed",
-      "detail": "project T2 is active",
+      "detail": "status is 'active', expected 'closed'",
       "id": "T2-project",
       "kind": "snapshot",
-      "result": "pass",
+      "result": "fail",
       "severity": "P0"
     },
     {
@@ -155,9 +155,11 @@
       "severity": "P0"
     }
   ],
-  "failures": [],
+  "failures": [
+    "T2-project (P0): status is 'active', expected 'closed'"
+  ],
   "gate": "a rule, a laya decision and a human decision produce the same audit shape; a tenant refinement changes a threshold without a code change; every decision pins the refinement and laya config versions; a generated draft cannot transition a card",
-  "generated_at": "2026-11-22T00:09:49.464387+00:00",
+  "generated_at": "2026-11-22T00:11:58.485131+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T2.toml",
   "name": "Decision ladder",
@@ -168,6 +170,6 @@
     "git_sha": "e55b92e050555c6acd2eefa9272a3721657d7de5",
     "path": "retained-snapshot/e55b92e050555c6acd2eefa9272a3721657d7de5"
   },
-  "verdict": "green",
+  "verdict": "red",
   "warnings": []
 }
