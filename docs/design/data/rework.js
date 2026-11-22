@@ -16902,7 +16902,7 @@ window.CONVEYOR_REWORK = {
               "source": "code"
             },
             {
-              "line": 466,
+              "line": 471,
               "path": "docs/design/data/actions.json",
               "quote": "    \"tools.call\",",
               "source": "code"
@@ -16941,7 +16941,7 @@ window.CONVEYOR_REWORK = {
                   "source": "code"
                 },
                 {
-                  "line": 466,
+                  "line": 471,
                   "path": "docs/design/data/actions.json",
                   "quote": "    \"tools.call\",",
                   "source": "code"
@@ -16995,7 +16995,7 @@ window.CONVEYOR_REWORK = {
               "source": "code"
             },
             {
-              "line": 342,
+              "line": 347,
               "path": "docs/design/data/actions.json",
               "quote": "    \"procedures.ingest_sop\",",
               "source": "code"
@@ -17040,7 +17040,7 @@ window.CONVEYOR_REWORK = {
                   "source": "code"
                 },
                 {
-                  "line": 342,
+                  "line": 347,
                   "path": "docs/design/data/actions.json",
                   "quote": "    \"procedures.ingest_sop\",",
                   "source": "code"
@@ -17088,7 +17088,7 @@ window.CONVEYOR_REWORK = {
               "source": "code"
             },
             {
-              "line": 241,
+              "line": 246,
               "path": "docs/design/data/actions.json",
               "quote": "    \"lessons.list\",",
               "source": "code"
@@ -17127,7 +17127,7 @@ window.CONVEYOR_REWORK = {
                   "source": "code"
                 },
                 {
-                  "line": 241,
+                  "line": 246,
                   "path": "docs/design/data/actions.json",
                   "quote": "    \"lessons.list\",",
                   "source": "code"
@@ -17175,7 +17175,7 @@ window.CONVEYOR_REWORK = {
               "source": "code"
             },
             {
-              "line": 466,
+              "line": 471,
               "path": "docs/design/data/actions.json",
               "quote": "    \"tools.call\",",
               "source": "code"
@@ -17214,7 +17214,7 @@ window.CONVEYOR_REWORK = {
                   "source": "code"
                 },
                 {
-                  "line": 466,
+                  "line": 471,
                   "path": "docs/design/data/actions.json",
                   "quote": "    \"tools.call\",",
                   "source": "code"
@@ -18159,13 +18159,13 @@ window.CONVEYOR_REWORK = {
               "source": "code"
             },
             {
-              "line": 141,
+              "line": 146,
               "path": "apps/web/src/app.rs",
               "quote": "                        <Routes fallback=|| view! { <p class=\"muted\">\"No such page.\"</p> }>",
               "source": "code"
             },
             {
-              "line": 273,
+              "line": 283,
               "path": "apps/web/src/app.rs",
               "quote": "        <nav class=\"rail\" aria-label=\"Destinations\">",
               "source": "code"
@@ -18204,13 +18204,13 @@ window.CONVEYOR_REWORK = {
                   "source": "code"
                 },
                 {
-                  "line": 141,
+                  "line": 146,
                   "path": "apps/web/src/app.rs",
                   "quote": "                        <Routes fallback=|| view! { <p class=\"muted\">\"No such page.\"</p> }>",
                   "source": "code"
                 },
                 {
-                  "line": 273,
+                  "line": 283,
                   "path": "apps/web/src/app.rs",
                   "quote": "        <nav class=\"rail\" aria-label=\"Destinations\">",
                   "source": "code"
@@ -18228,105 +18228,6 @@ window.CONVEYOR_REWORK = {
         }
       ],
       "title": "The live web shell still exposes only V1's nine destinations; six V2 destinations have no route"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-w3b-3:PLATFORM",
-      "apply_to": "PLATFORM",
-      "artefact": "§10.4",
-      "baseline": null,
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "authoring.intake|draft|review|publish and authoring.assets are registered ActionSpecs with handlers, appear in served-spec.lock.json and the MCP manifest, and a registry test asserts the five names; or SPEC_V2 §10.4 is amended by owner decision naming the replacement family.",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "evidence": [
-            {
-              "line": 1202,
-              "path": "docs/SPEC_V2.md",
-              "quote": "| authoring | `authoring.intake\\|draft\\|review\\|publish`, `authoring.assets` |",
-              "source": "code"
-            },
-            {
-              "line": 20,
-              "path": "crates/actions/src/lib.rs",
-              "quote": "pub mod agent_surface;",
-              "source": "code"
-            },
-            {
-              "line": 107,
-              "path": "crates/actions/src/lib.rs",
-              "quote": "pub mod youtube;",
-              "source": "code"
-            },
-            {
-              "line": 184,
-              "path": "crates/actions/src/registry.rs",
-              "quote": "        let mut actions: Vec<ActionSpec> = inventory::iter::<ActionRegistration>()",
-              "source": "code"
-            }
-          ],
-          "rule": "v1-w3b-3",
-          "source": "audit"
-        }
-      ],
-      "key": "v1-w3b-3:PLATFORM",
-      "owner_project": "PLATFORM",
-      "rule": "v1-w3b-3",
-      "scope": "PLATFORM",
-      "severity": "P1",
-      "spec": "§10.4",
-      "standard": "SPEC",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "SPEC §10.4 declares authoring.intake|draft|review|publish and authoring.assets. The actions crate declares no authoring module (the module inventory spans lib.rs:20-107), and the compile-time registry is exactly the inventory submissions (registry.rs:184); enumeration of all ~493 declared names contains no authoring.* action, and served-spec.lock.json contains none. documents.* is the V1 document lifecycle and does not provide an asset draft catalogue or intake queue.",
-          "disposition": "rework",
-          "evidence": [
-            {
-              "evidence": [
-                {
-                  "line": 1202,
-                  "path": "docs/SPEC_V2.md",
-                  "quote": "| authoring | `authoring.intake\\|draft\\|review\\|publish`, `authoring.assets` |",
-                  "source": "code"
-                },
-                {
-                  "line": 20,
-                  "path": "crates/actions/src/lib.rs",
-                  "quote": "pub mod agent_surface;",
-                  "source": "code"
-                },
-                {
-                  "line": 107,
-                  "path": "crates/actions/src/lib.rs",
-                  "quote": "pub mod youtube;",
-                  "source": "code"
-                },
-                {
-                  "line": 184,
-                  "path": "crates/actions/src/registry.rs",
-                  "quote": "        let mut actions: Vec<ActionSpec> = inventory::iter::<ActionRegistration>()",
-                  "source": "code"
-                }
-              ],
-              "rule": "v1-w3b-3",
-              "source": "audit"
-            }
-          ],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "PLATFORM"
-        }
-      ],
-      "title": "The declared authoring.* action family does not exist"
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-w3c-2:T14",
@@ -60309,12 +60210,12 @@ window.CONVEYOR_REWORK = {
       "suppressed": 0
     },
     "SPEC": {
-      "findings": 86,
+      "findings": 85,
       "gaps": 38,
       "p0": 0,
       "p1": 5,
       "p2": 33,
-      "packages": 107,
+      "packages": 106,
       "rules": 8,
       "rules_clean": 2,
       "rules_with_gaps": 6,
@@ -60337,25 +60238,25 @@ window.CONVEYOR_REWORK = {
   "summary": {
     "by_severity": {
       "P0": 45,
-      "P1": 187,
+      "P1": 186,
       "P2": 308
     },
     "by_standard": {
       "MSP": 84,
       "PMP": 213,
       "SAFe": 20,
-      "SPEC": 107,
+      "SPEC": 106,
       "TOGAF": 116
     },
     "by_status": {
-      "open": 536,
+      "open": 535,
       "suppressed": 4
     },
     "duplicates": 0,
-    "open": 536,
-    "packages": 540,
-    "resolved": 67,
-    "subjects": 689,
+    "open": 535,
+    "packages": 539,
+    "resolved": 68,
+    "subjects": 688,
     "suppressed": 4
   }
 };
