@@ -1,0 +1,1529 @@
+#!/usr/bin/env python3
+"""Promote the staging programme record into the production record.
+
+The record was created in a staging copy of production (a production dump migrated to
+0073) and is described by ``docs/evidence/record/journal.jsonl``.  After the deploy has
+applied the migrations, this script replays that journal through the *same product
+actions*, idempotently, and writes ``docs/evidence/record/promotion.json`` with the
+staging-id -> production-id map and a per-entry verdict.
+
+Modes
+-----
+``--check``      offline: every entry names a known action, its input file exists and
+                 parses, ``output_id``/``natural_key`` are present and the natural key
+                 follows the grammar.  Duplicate natural keys are refused.
+``--dry-run``    offline: print ``{action, natural_key, will_create}`` for every entry.
+                 No network, no database.
+``--apply``      read production through the product read actions, skip an entry whose
+                 natural key already exists, invoke the missing action through
+                 ``POST /api/actions/<name>/invocations``, read every created row back,
+                 and write ``promotion.json``.
+``--self-test``  fully offline: fixture journal, fake rows and a fake action client.
+
+Read surfaces
+-------------
+* Registers: ``registers.list`` with ``programme_id`` (programme-level risks).  A
+  ``changes.request`` row is project-scoped, so the project's register is also read with
+  each ``project_id`` named in a change input.
+* Benefits: ``benefits.list`` with ``programme_id``.
+* Approvals: ``approvals.list`` filtered by the change's ``project_id``.
+* Measurements: this release has **no** ``benefits.measurement_list`` action.  ``--apply``
+  therefore requires ``--snapshot DIR`` and reads the production MSP export
+  (``msp.json``).  A measurement created in this run cannot appear in a pre-run export,
+  so its readback is a **failure** until a measurement read action exists; the verdict is
+  recorded as ``readback_failed`` and the command exits non-zero.  It is never reported
+  as a pass.
+
+Natural keys and existence
+--------------------------
+``risk:<code>``
+    a register item with ``kind='risk'`` and that ``code``.
+``benefit:<reference>``
+    a benefit profile with that ``reference``.
+``benefit:<reference>/baseline``
+    a measurement with ``kind='baseline'`` on that profile.
+``change:<title>``
+    a ``kind='change'`` register item.  The journal's key suffix is accepted as a label
+    as well as the action input's title, so a promoted change is not created twice.
+``approval:<gate>/<change>``
+    an approval with that ``gate`` whose target/description/proposed input names the
+    change (the journal writes ``approval:change:<label>``; both separators are legal).
+``benefit:<reference>/fields``, ``/status``
+    the profile named by the reference *already reflects* the patch.  Row existence alone
+    would skip the first run, because B1-B6 pre-exist in the production dump; the update's
+    own effect is the idempotency test.  Likewise a decided gate, not merely an open gate,
+    is an existing approval decision.
+
+Staging ids are remapped from earlier action outputs: ``changes.request`` returns
+``change_id`` and ``approval_id``; ``benefits.create`` returns ``id``; measurements,
+registers and updates return ``id``.  Programme, project, baseline and job ids are
+production ids from the dump and are never rewritten.
+
+The journal is never modified.  ``--apply`` only reads it; the write target is the
+``promotion.json`` given by ``--output``.
+"""
+
+from __future__ import annotations
+
+import argparse
+import copy
+import hashlib
+import json
+import os
+import re
+import sys
+import tempfile
+import urllib.error
+import urllib.request
+from dataclasses import dataclass, field
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Any
+
+REPO_ROOT = Path(__file__).resolve().parent.parent
+DEFAULT_JOURNAL = "docs/evidence/record/journal.jsonl"
+DEFAULT_PROMOTION = "docs/evidence/record/promotion.json"
+JOURNAL_SCHEMA = "conveyor-record-journal/v1"
+PROMOTION_SCHEMA = "conveyor-record-promotion/v1"
+
+# The journal's write actions.  A read action in an entry is malformed.
+WRITE_ACTIONS = {
+    "registers.create",
+    "benefits.create",
+    "benefits.measure",
+    "changes.request",
+    "approvals.decide",
+    "benefits.update",
+}
+
+# Product read actions used by --apply.
+READ_ACTIONS = {
+    "registers.list",
+    "registers.get",
+    "benefits.list",
+    "benefits.get",
+    "approvals.list",
+}
+
+# The release this script ships with has no action that lists measurements.  If one is
+# added later, `load_state` prefers it over the snapshot.  Kept as a constant so the
+# absence is visible rather than implicit.
+MEASUREMENT_LIST_ACTION = "benefits.measurement_list"
+
+TOKEN = r"[A-Za-z0-9][A-Za-z0-9._-]*"
+RISK_KEY_RE = re.compile(rf"^risk:({TOKEN})$")
+BENEFIT_KEY_RE = re.compile(rf"^benefit:({TOKEN})(?:/(baseline|fields|status))?$")
+CHANGE_KEY_RE = re.compile(r"^change:(.+)$")
+APPROVAL_KEY_RE = re.compile(r"^approval:([^/:]+)[/:](.+)$")
+
+
+class PromoteError(Exception):
+    """A refused check, plan or apply."""
+
+
+class ReadbackError(PromoteError):
+    """A row was created but the product could not read it back."""
+
+
+# ── journal parsing ──────────────────────────────────────────────────────────────────────
+
+
+@dataclass
+class NaturalKey:
+    kind: str
+    first: str
+    second: str | None = None
+
+    def canonical(self) -> str:
+        if self.kind == "risk":
+            return f"risk:{self.first}"
+        if self.kind == "benefit":
+            return f"benefit:{self.first}" + (f"/{self.second}" if self.second else "")
+        if self.kind == "change":
+            return f"change:{self.first}"
+        if self.kind == "approval":
+            return f"approval:{self.first}/{self.second}"
+        raise PromoteError(f"unknown natural-key kind {self.kind!r}")
+
+
+def parse_natural_key(value: str) -> NaturalKey:
+    if not isinstance(value, str) or not value:
+        raise PromoteError("natural_key must be a non-empty string")
+    match = RISK_KEY_RE.match(value)
+    if match:
+        return NaturalKey("risk", match.group(1))
+    match = BENEFIT_KEY_RE.match(value)
+    if match:
+        return NaturalKey("benefit", match.group(1), match.group(2))
+    match = APPROVAL_KEY_RE.match(value)
+    if match:
+        return NaturalKey("approval", match.group(1), match.group(2).strip())
+    match = CHANGE_KEY_RE.match(value)
+    if match:
+        title = match.group(1).strip()
+        if not title or any(ord(char) < 0x20 for char in title):
+            raise PromoteError(f"malformed change natural key: {value!r}")
+        return NaturalKey("change", title)
+    raise PromoteError(f"malformed natural key: {value!r}")
+
+
+@dataclass
+class Entry:
+    lineno: int
+    action: str
+    natural_key: str
+    output_id: str
+    input_path: str
+    payload: dict
+    raw: dict
+    key: NaturalKey | None = None
+
+
+def resolve_path(value: str) -> Path:
+    path = Path(value)
+    return path if path.is_absolute() else REPO_ROOT / path
+
+
+def load_journal(path: Path) -> tuple[dict | None, list[tuple[int, dict]], list[str]]:
+    if not path.is_file():
+        return None, [], [f"journal not found: {path}"]
+    header: dict | None = None
+    raws: list[tuple[int, dict]] = []
+    errors: list[str] = []
+    for lineno, raw in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+        if not raw.strip():
+            continue
+        try:
+            obj = json.loads(raw)
+        except ValueError as error:
+            errors.append(f"line {lineno}: not JSON: {error}")
+            continue
+        if not isinstance(obj, dict):
+            errors.append(f"line {lineno}: entry must be an object")
+            continue
+        if header is None and "schema" in obj and "action" not in obj:
+            header = obj
+            continue
+        raws.append((lineno, obj))
+    return header, raws, errors
+
+
+def build_entries(raws: list[tuple[int, dict]]) -> tuple[list[Entry], list[str]]:
+    entries: list[Entry] = []
+    errors: list[str] = []
+    for lineno, raw in raws:
+        action = raw.get("action")
+        if not isinstance(action, str) or action not in WRITE_ACTIONS:
+            errors.append(f"line {lineno}: unknown action {action!r}")
+            continue
+        natural_key = raw.get("natural_key")
+        try:
+            key = parse_natural_key(natural_key)
+        except PromoteError as error:
+            errors.append(f"line {lineno}: {error}")
+            continue
+        output_id = raw.get("output_id")
+        if not isinstance(output_id, str) or not output_id.strip():
+            errors.append(f"line {lineno}: output_id is required")
+            continue
+        input_path = raw.get("input")
+        if not isinstance(input_path, str) or not input_path.strip():
+            errors.append(f"line {lineno}: input is required")
+            continue
+        path = resolve_path(input_path)
+        try:
+            payload = json.loads(path.read_text(encoding="utf-8"))
+        except OSError as error:
+            errors.append(f"line {lineno}: input {input_path}: {error}")
+            continue
+        except ValueError as error:
+            errors.append(f"line {lineno}: input {input_path} is not JSON: {error}")
+            continue
+        if not isinstance(payload, dict):
+            errors.append(f"line {lineno}: input {input_path} must be an object")
+            continue
+        entries.append(
+            Entry(
+                lineno=lineno,
+                action=action,
+                natural_key=natural_key,
+                output_id=output_id,
+                input_path=input_path,
+                payload=payload,
+                raw=raw,
+                key=key,
+            )
+        )
+    return entries, errors
+
+
+def validate_entries(entries: list[Entry]) -> list[str]:
+    errors: list[str] = []
+    seen: dict[str, int] = {}
+    for entry in entries:
+        key = entry.key
+        assert key is not None
+        canonical = key.canonical()
+        if canonical in seen:
+            errors.append(
+                f"line {entry.lineno}: duplicate natural key {canonical!r} "
+                f"(first on line {seen[canonical]})"
+            )
+        else:
+            seen[canonical] = entry.lineno
+
+        if entry.action == "registers.create":
+            if key.kind != "risk":
+                errors.append(
+                    f"line {entry.lineno}: registers.create key must be risk:<code>"
+                )
+                continue
+            if entry.payload.get("kind") != "risk":
+                errors.append(
+                    f"line {entry.lineno}: registers.create natural key is a risk but "
+                    f"input kind is {entry.payload.get('kind')!r}"
+                )
+            code = entry.payload.get("code")
+            if code != key.first:
+                errors.append(
+                    f"line {entry.lineno}: natural key code {key.first!r} does not match "
+                    f"input code {code!r}"
+                )
+        elif entry.action == "benefits.create":
+            if key.kind != "benefit" or key.second is not None:
+                errors.append(
+                    f"line {entry.lineno}: benefits.create key must be benefit:<reference>"
+                )
+                continue
+            if entry.payload.get("reference") != key.first:
+                errors.append(
+                    f"line {entry.lineno}: natural key reference {key.first!r} does not "
+                    f"match input reference {entry.payload.get('reference')!r}"
+                )
+        elif entry.action == "benefits.measure":
+            if key.kind != "benefit" or key.second != "baseline":
+                errors.append(
+                    f"line {entry.lineno}: benefits.measure key must be "
+                    "benefit:<reference>/baseline"
+                )
+                continue
+            if entry.payload.get("kind") != "baseline":
+                errors.append(
+                    f"line {entry.lineno}: benefits.measure key is a baseline but input "
+                    f"kind is {entry.payload.get('kind')!r}"
+                )
+        elif entry.action == "changes.request":
+            if key.kind != "change":
+                errors.append(
+                    f"line {entry.lineno}: changes.request key must be change:<title>"
+                )
+                continue
+            if not isinstance(entry.payload.get("title"), str) or not entry.payload["title"]:
+                errors.append(f"line {entry.lineno}: change input has no title")
+        elif entry.action == "approvals.decide":
+            if key.kind != "approval":
+                errors.append(
+                    f"line {entry.lineno}: approvals.decide key must be "
+                    "approval:<gate>/<change>"
+                )
+                continue
+            if entry.payload.get("decision") not in ("approve", "reject"):
+                errors.append(
+                    f"line {entry.lineno}: approval decision must be approve or reject"
+                )
+            if not entry.payload.get("approval_id"):
+                errors.append(f"line {entry.lineno}: approval input has no approval_id")
+        elif entry.action == "benefits.update":
+            if key.kind != "benefit" or key.second not in ("fields", "status"):
+                errors.append(
+                    f"line {entry.lineno}: benefits.update key must be "
+                    "benefit:<reference>/fields or benefit:<reference>/status"
+                )
+                continue
+            if not entry.payload.get("id"):
+                errors.append(f"line {entry.lineno}: update input has no id")
+            if key.second == "status":
+                if not entry.payload.get("status"):
+                    errors.append(
+                        f"line {entry.lineno}: status update input has no status"
+                    )
+            elif entry.payload.get("status") is not None:
+                errors.append(
+                    f"line {entry.lineno}: fields update must not change status"
+                )
+    return errors
+
+
+def check_journal(path: Path) -> tuple[list[Entry], list[str]]:
+    header, raws, errors = load_journal(path)
+    if header is not None and header.get("schema") != JOURNAL_SCHEMA:
+        errors.append(
+            f"journal header schema is {header.get('schema')!r}, expected {JOURNAL_SCHEMA!r}"
+        )
+    entries, entry_errors = build_entries(raws)
+    errors.extend(entry_errors)
+    errors.extend(validate_entries(entries))
+    return entries, errors
+
+
+# ── HTTP action client (the small urllib shape of scripts/seed-adr-register.py) ─────────
+
+
+class ActionClient:
+    """The one action endpoint: ``POST /api/actions/<name>/invocations``."""
+
+    def __init__(
+        self,
+        url: str,
+        token: str | None = None,
+        app_key: str | None = None,
+        timeout: float = 60.0,
+    ) -> None:
+        if not url:
+            raise PromoteError("--apply requires --url or CONVEYOR_URL")
+        if not token and not app_key:
+            raise PromoteError(
+                "--apply requires --token or --app-key (or their env vars)"
+            )
+        base = url.rstrip("/")
+        if not base.endswith("/api"):
+            base += "/api"
+        self.base = base
+        self.token = token
+        self.app_key = app_key
+        self.timeout = timeout
+
+    def invoke(
+        self, action: str, payload: dict, if_match: int | None = None
+    ) -> Any:
+        endpoint = f"{self.base}/actions/{action}/invocations"
+        request = urllib.request.Request(
+            endpoint,
+            data=json.dumps(
+                payload, separators=(",", ":"), ensure_ascii=False
+            ).encode("utf-8"),
+            method="POST",
+            headers={"Content-Type": "application/json", "Accept": "application/json"},
+        )
+        if self.token:
+            request.add_header("Authorization", f"Bearer {self.token}")
+        if self.app_key:
+            request.add_header("X-App-Key", self.app_key)
+        if if_match is not None:
+            request.add_header("If-Match", f'"{if_match}"')
+        try:
+            with urllib.request.urlopen(request, timeout=self.timeout) as response:
+                body = response.read().decode("utf-8")
+        except urllib.error.HTTPError as error:
+            detail = error.read().decode("utf-8", "replace")
+            raise PromoteError(f"{action}: HTTP {error.code}: {detail[:2000]}") from None
+        except (urllib.error.URLError, OSError) as error:
+            raise PromoteError(f"{action}: cannot reach {endpoint}: {error}") from None
+        try:
+            envelope = json.loads(body)
+        except ValueError:
+            raise PromoteError(f"{action}: response is not JSON: {body[:500]!r}") from None
+        if isinstance(envelope, dict) and "output" in envelope:
+            return envelope["output"]
+        return envelope
+
+
+def page_items(output: Any) -> list[dict]:
+    if isinstance(output, dict) and isinstance(output.get("items"), list):
+        return [row for row in output["items"] if isinstance(row, dict)]
+    if isinstance(output, list):
+        return [row for row in output if isinstance(row, dict)]
+    return []
+
+
+def list_all(client: Any, action: str, payload: dict) -> list[dict]:
+    items: list[dict] = []
+    cursor: str | None = None
+    while True:
+        page_payload = dict(payload)
+        page_payload["limit"] = 200
+        if cursor:
+            page_payload["cursor"] = cursor
+        output = client.invoke(action, page_payload)
+        items.extend(page_items(output))
+        cursor = output.get("next_cursor") if isinstance(output, dict) else None
+        if not cursor:
+            return items
+
+
+# ── production state ────────────────────────────────────────────────────────────────────
+
+
+@dataclass
+class State:
+    registers: list[dict] = field(default_factory=list)
+    benefits: list[dict] = field(default_factory=list)
+    measurements: list[dict] = field(default_factory=list)
+    approvals: list[dict] = field(default_factory=list)
+
+
+def snapshot_file(directory: str) -> Path:
+    path = Path(directory)
+    candidates = [path / "msp.json", path / "data" / "msp.json"]
+    if path.is_file():
+        candidates.insert(0, path)
+    for candidate in candidates:
+        if candidate.is_file():
+            return candidate
+    raise PromoteError(f"--snapshot {directory}: no msp.json")
+
+
+def load_snapshot(directory: str) -> dict:
+    path = snapshot_file(directory)
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except ValueError as error:
+        raise PromoteError(f"--snapshot {path}: not JSON: {error}") from None
+    if not isinstance(data, dict):
+        raise PromoteError(f"--snapshot {path}: top level must be an object")
+    return data
+
+
+def collect_ids(entries: list[Entry]) -> tuple[set[str], set[str]]:
+    programme_ids: set[str] = set()
+    project_ids: set[str] = set()
+    for entry in entries:
+        programme = entry.payload.get("programme_id")
+        if isinstance(programme, str) and programme:
+            programme_ids.add(programme)
+        project = entry.payload.get("project_id")
+        if isinstance(project, str) and project:
+            project_ids.add(project)
+    return programme_ids, project_ids
+
+
+def load_state(
+    client: Any,
+    entries: list[Entry],
+    snapshot: dict | None,
+    programme_id: str | None = None,
+) -> State:
+    programme_ids, project_ids = collect_ids(entries)
+    if programme_id is None:
+        if len(programme_ids) > 1:
+            raise PromoteError(
+                f"inputs name more than one programme_id: {sorted(programme_ids)}"
+            )
+        if not programme_ids:
+            raise PromoteError("no input names a programme_id; --apply needs one")
+        programme_id = next(iter(programme_ids))
+    state = State()
+    state.registers.extend(
+        page_items(client.invoke("registers.list", {"programme_id": programme_id}))
+    )
+    state.benefits.extend(
+        page_items(client.invoke("benefits.list", {"programme_id": programme_id}))
+    )
+    seen_registers = {row.get("id") for row in state.registers}
+    for project_id in sorted(project_ids):
+        for row in page_items(
+            client.invoke("registers.list", {"project_id": project_id})
+        ):
+            if row.get("id") not in seen_registers:
+                state.registers.append(row)
+                seen_registers.add(row.get("id"))
+    if any(entry.action in ("changes.request", "approvals.decide") for entry in entries):
+        for project_id in sorted(project_ids):
+            state.approvals.extend(
+                list_all(client, "approvals.list", {"project_id": project_id})
+            )
+    if snapshot is not None:
+        state.measurements.extend(snapshot.get("benefit_measurements") or [])
+    return state
+
+
+def benefit_by_reference(state: State, reference: str) -> dict | None:
+    for row in state.benefits:
+        if row.get("reference") == reference:
+            return row
+    return None
+
+
+def risk_by_code(state: State, code: str) -> dict | None:
+    for row in state.registers:
+        if row.get("kind") == "risk" and row.get("code") == code:
+            return row
+    return None
+
+
+def change_rows(state: State, key: NaturalKey, payload: dict) -> list[dict]:
+    labels = {key.first}
+    title = payload.get("title")
+    if isinstance(title, str) and title:
+        labels.add(title)
+    return [
+        row
+        for row in state.registers
+        if row.get("kind") == "change" and row.get("title") in labels
+    ]
+
+
+def change_row(state: State, key: NaturalKey, payload: dict) -> dict | None:
+    rows = change_rows(state, key, payload)
+    return rows[0] if rows else None
+
+
+def gate_for_change(state: State, change: dict) -> dict | None:
+    change_id = change.get("id")
+    if not change_id:
+        return None
+    for gate in state.approvals:
+        if gate.get("gate") != "change":
+            continue
+        proposed = gate.get("proposed_input")
+        proposed_id = proposed.get("change_id") if isinstance(proposed, dict) else None
+        description = gate.get("description") or ""
+        if (
+            gate.get("target") == change_id
+            or proposed_id == change_id
+            or change_id in description
+        ):
+            return gate
+    return None
+
+
+def update_already_reflected(state: State, key: NaturalKey, payload: dict) -> bool:
+    benefit = benefit_by_reference(state, key.first)
+    if benefit is None:
+        return False
+    if key.second == "status":
+        return benefit.get("status") == payload.get("status")
+    for name, value in payload.items():
+        if name in ("id", "change_id"):
+            continue
+        if benefit.get(name) != value:
+            return False
+    return True
+
+
+def baseline_measurement(state: State, reference: str) -> dict | None:
+    benefit = benefit_by_reference(state, reference)
+    benefit_ids = {benefit.get("id")} if benefit else set()
+    for row in state.measurements:
+        if row.get("benefit_id") in benefit_ids and row.get("kind") == "baseline":
+            return row
+    return None
+
+
+def expected_gate_status(payload: dict) -> str:
+    return "approved" if payload.get("decision") == "approve" else "rejected"
+
+
+def existing_for(
+    entry: Entry,
+    state: State,
+    change_index: dict[str, dict],
+) -> dict | None:
+    """The production row that already carries this entry's natural key, if any."""
+    key = entry.key
+    assert key is not None
+    if entry.action == "registers.create":
+        return risk_by_code(state, key.first)
+    if entry.action == "benefits.create":
+        return benefit_by_reference(state, key.first)
+    if entry.action == "benefits.measure":
+        return baseline_measurement(state, key.first)
+    if entry.action == "changes.request":
+        return change_row(state, key, entry.payload)
+    if entry.action == "approvals.decide":
+        known = change_index.get(key.second or "")
+        gate = None
+        if known and known.get("approval_id"):
+            for row in state.approvals:
+                if row.get("id") == known["approval_id"]:
+                    gate = row
+                    break
+        if gate is None:
+            change = change_row(
+                state, NaturalKey("change", key.second or ""), entry.payload
+            )
+            if change is not None:
+                gate = gate_for_change(state, change)
+        if gate is not None and gate.get("status") == expected_gate_status(entry.payload):
+            return gate
+        return None
+    if entry.action == "benefits.update":
+        if update_already_reflected(state, key, entry.payload):
+            return benefit_by_reference(state, key.first)
+        return None
+    return None
+
+
+def build_change_index(
+    entries: list[Entry], state: State
+) -> dict[str, dict]:
+    index: dict[str, dict] = {}
+    for entry in entries:
+        if entry.action != "changes.request" or entry.key is None:
+            continue
+        change = change_row(state, entry.key, entry.payload)
+        if change is None:
+            continue
+        gate = gate_for_change(state, change)
+        index[entry.key.first] = {
+            "change_id": change.get("id"),
+            "approval_id": gate.get("id") if gate else None,
+        }
+    return index
+
+
+# ── readback ────────────────────────────────────────────────────────────────────────────
+
+
+def read_row(client: Any, action: str, row_id: str) -> dict:
+    try:
+        output = client.invoke(action, {"id": row_id})
+    except PromoteError as error:
+        raise ReadbackError(str(error)) from None
+    if not isinstance(output, dict):
+        raise ReadbackError(f"{action}: readback returned no row")
+    if output.get("id") != row_id:
+        raise ReadbackError(
+            f"{action}: readback returned id {output.get('id')!r}, expected {row_id!r}"
+        )
+    return output
+
+
+def readback_register(
+    client: Any, row_id: str, kind: str, code: str | None = None,
+    title: str | None = None,
+) -> dict:
+    row = read_row(client, "registers.get", row_id)
+    if row.get("kind") != kind:
+        raise ReadbackError(f"registers.get: {row_id} is {row.get('kind')!r}, not {kind!r}")
+    if code is not None and row.get("code") != code:
+        raise ReadbackError(
+            f"registers.get: {row_id} code is {row.get('code')!r}, not {code!r}"
+        )
+    if title is not None and row.get("title") != title:
+        raise ReadbackError(
+            f"registers.get: {row_id} title is {row.get('title')!r}, not {title!r}"
+        )
+    return row
+
+
+def readback_benefit(client: Any, row_id: str, reference: str) -> dict:
+    row = read_row(client, "benefits.get", row_id)
+    if row.get("reference") != reference:
+        raise ReadbackError(
+            f"benefits.get: {row_id} reference is {row.get('reference')!r}, "
+            f"not {reference!r}"
+        )
+    return row
+
+
+def readback_gate(client: Any, project_id: str, gate_id: str) -> dict:
+    try:
+        gates = list_all(client, "approvals.list", {"project_id": project_id})
+    except PromoteError as error:
+        raise ReadbackError(str(error)) from None
+    for gate in gates:
+        if gate.get("id") == gate_id:
+            return gate
+    raise ReadbackError(f"approvals.list: gate {gate_id} is not readable")
+
+
+def readback_measurement(snapshot: str | None, row_id: str) -> dict:
+    if not snapshot:
+        raise ReadbackError(
+            "no benefits.measurement_list action exists and no --snapshot was given; "
+            f"measurement {row_id} cannot be read back"
+        )
+    data = load_snapshot(snapshot)
+    for row in data.get("benefit_measurements") or []:
+        if isinstance(row, dict) and row.get("id") == row_id:
+            return row
+    raise ReadbackError(
+        f"measurement {row_id} is absent from msp.json and no product read action "
+        "lists measurements"
+    )
+
+
+# ── apply ──────────────────────────────────────────────────────────────────────────────
+
+
+@dataclass
+class Outcome:
+    entry: Entry
+    staging_id: str
+    production_id: str | None
+    verdict: str
+    detail: str = ""
+
+
+def remap_payload(
+    entry: Entry,
+    state: State,
+    id_map: dict[str, str],
+    change_index: dict[str, dict],
+) -> dict:
+    key = entry.key
+    assert key is not None
+    payload = copy.deepcopy(entry.payload)
+    if entry.action == "benefits.measure":
+        benefit = benefit_by_reference(state, key.first)
+        if benefit is None:
+            benefit_id = id_map.get(payload.get("benefit_id", ""))
+            if not benefit_id:
+                raise PromoteError(
+                    f"benefit {key.first!r} has no production id; cannot measure it"
+                )
+            payload["benefit_id"] = benefit_id
+        else:
+            payload["benefit_id"] = benefit["id"]
+    elif entry.action == "benefits.update":
+        benefit = benefit_by_reference(state, key.first)
+        if benefit is None:
+            raise PromoteError(
+                f"benefit {key.first!r} has no production profile to update"
+            )
+        payload["id"] = benefit["id"]
+        change_id = payload.get("change_id")
+        if change_id:
+            production_change = id_map.get(change_id)
+            if not production_change:
+                raise PromoteError(
+                    f"change_id {change_id!r} has no production mapping; "
+                    "the change entry must create or find it first"
+                )
+            payload["change_id"] = production_change
+    elif entry.action == "approvals.decide":
+        staging_approval = payload.get("approval_id")
+        production = id_map.get(staging_approval) if staging_approval else None
+        if not production:
+            known = change_index.get(key.second or "")
+            production = known.get("approval_id") if known else None
+        if not production:
+            raise PromoteError(
+                f"approval gate {staging_approval!r} has no production id; "
+                "the change entry must create or find it first"
+            )
+        payload["approval_id"] = production
+    return payload
+
+
+def output_id_for(action: str, output: Any) -> tuple[str, str | None]:
+    """The created row's id and, for a change, its gate id."""
+    if not isinstance(output, dict):
+        raise PromoteError(f"{action}: response has no output object")
+    if action == "changes.request":
+        change_id = output.get("change_id")
+        approval_id = output.get("approval_id")
+        if not change_id:
+            raise PromoteError("changes.request: output has no change_id")
+        return str(change_id), str(approval_id) if approval_id else None
+    row_id = output.get("id")
+    if not row_id:
+        raise PromoteError(f"{action}: output has no id")
+    return str(row_id), None
+
+
+def readback_entry(
+    entry: Entry,
+    client: Any,
+    state: State,
+    production_id: str,
+    gate_id: str | None,
+    snapshot: str | None,
+) -> dict | None:
+    """Read the created row back.  Raises PromoteError when it cannot be read."""
+    key = entry.key
+    assert key is not None
+    if entry.action == "registers.create":
+        return readback_register(client, production_id, "risk", code=key.first)
+    if entry.action == "benefits.create":
+        return readback_benefit(client, production_id, key.first)
+    if entry.action == "benefits.update":
+        row = readback_benefit(client, production_id, key.first)
+        if key.second == "status":
+            if row.get("status") != entry.payload.get("status"):
+                raise ReadbackError(
+                    f"benefits.get: status is {row.get('status')!r}, not "
+                    f"{entry.payload.get('status')!r}"
+                )
+        else:
+            for name, value in entry.payload.items():
+                if name in ("id", "change_id"):
+                    continue
+                if row.get(name) != value:
+                    raise ReadbackError(
+                        f"benefits.get: field {name!r} is {row.get(name)!r}, not {value!r}"
+                    )
+        return row
+    if entry.action == "changes.request":
+        change = readback_register(
+            client, production_id, "change", title=entry.payload.get("title")
+        )
+        project_id = entry.payload.get("project_id")
+        if gate_id and project_id:
+            readback_gate(client, project_id, gate_id)
+        return change
+    if entry.action == "approvals.decide":
+        project_id = None
+        for known in state.approvals:
+            if known.get("id") == production_id:
+                project_id = known.get("project_id")
+                break
+        if not project_id:
+            raise ReadbackError(
+                "approvals.list: no project_id is known for the decided gate"
+            )
+        gate = readback_gate(client, project_id, production_id)
+        if gate.get("status") != expected_gate_status(entry.payload):
+            raise ReadbackError(
+                f"approvals.list: gate is {gate.get('status')!r}, not "
+                f"{expected_gate_status(entry.payload)!r}"
+            )
+        return gate
+    if entry.action == "benefits.measure":
+        return readback_measurement(snapshot, production_id)
+    raise PromoteError(f"{entry.action}: no readback is defined")
+
+
+def apply_entries(
+    client: Any,
+    entries: list[Entry],
+    state: State,
+    snapshot: str | None,
+) -> tuple[dict[str, str], list[Outcome]]:
+    id_map: dict[str, str] = {}
+    change_index = build_change_index(entries, state)
+    outcomes: list[Outcome] = []
+    for entry in entries:
+        key = entry.key
+        assert key is not None
+        try:
+            existing = existing_for(entry, state, change_index)
+            if existing is not None:
+                production_id = str(existing["id"])
+                id_map[entry.output_id] = production_id
+                if entry.action == "changes.request":
+                    gate = gate_for_change(state, existing)
+                    change_index[key.first] = {
+                        "change_id": production_id,
+                        "approval_id": str(gate["id"]) if gate else None,
+                    }
+                    if entry.raw.get("approval_id") and gate is not None:
+                        id_map[entry.raw["approval_id"]] = str(gate["id"])
+                outcomes.append(
+                    Outcome(entry, entry.output_id, production_id, "skipped")
+                )
+                continue
+
+            payload = remap_payload(entry, state, id_map, change_index)
+            if entry.action == "benefits.update":
+                current = read_row(client, "benefits.get", payload["id"])
+                version = current.get("version")
+                if not isinstance(version, int):
+                    raise PromoteError(
+                        f"benefits.get: {payload['id']} has no version for If-Match"
+                    )
+                output = client.invoke(entry.action, payload, if_match=version)
+            else:
+                output = client.invoke(entry.action, payload)
+            production_id, gate_id = output_id_for(entry.action, output)
+            id_map[entry.output_id] = production_id
+            if entry.action == "changes.request":
+                change_index[key.first] = {
+                    "change_id": production_id,
+                    "approval_id": gate_id,
+                }
+                if entry.raw.get("approval_id") and gate_id:
+                    id_map[entry.raw["approval_id"]] = gate_id
+
+            row = readback_entry(
+                entry, client, state, production_id, gate_id, snapshot
+            )
+            if row is not None:
+                if entry.action == "registers.create":
+                    state.registers.append(row)
+                elif entry.action == "benefits.create":
+                    state.benefits.append(row)
+                elif entry.action == "benefits.update":
+                    state.benefits = [
+                        row if item.get("id") == production_id else item
+                        for item in state.benefits
+                    ]
+                elif entry.action == "changes.request":
+                    state.registers.append(row)
+                    if gate_id:
+                        project_id = entry.payload.get("project_id")
+                        if project_id:
+                            for gate in list_all(
+                                client, "approvals.list", {"project_id": project_id}
+                            ):
+                                if gate.get("id") == gate_id:
+                                    state.approvals.append(gate)
+                                    break
+                elif entry.action == "approvals.decide":
+                    state.approvals = [
+                        row if item.get("id") == production_id else item
+                        for item in state.approvals
+                    ]
+            outcomes.append(
+                Outcome(entry, entry.output_id, production_id, "created")
+            )
+        except ReadbackError as error:
+            outcomes.append(
+                Outcome(entry, entry.output_id, id_map.get(entry.output_id),
+                        "readback_failed", str(error))
+            )
+        except PromoteError as error:
+            outcomes.append(
+                Outcome(entry, entry.output_id, id_map.get(entry.output_id),
+                        "failed", str(error))
+            )
+    return id_map, outcomes
+
+
+# ── promotion file ─────────────────────────────────────────────────────────────────────
+
+
+def build_promotion(
+    entries: list[Entry],
+    id_map: dict[str, str],
+    outcomes: list[Outcome],
+    journal_path: Path,
+    url: str | None,
+    snapshot: str | None,
+) -> dict:
+    verdicts = {}
+    for outcome in outcomes:
+        verdicts[outcome.entry.natural_key] = outcome.verdict
+    return {
+        "schema": PROMOTION_SCHEMA,
+        "generated_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+        "journal": {
+            "path": str(journal_path),
+            "sha256": hashlib.sha256(journal_path.read_bytes()).hexdigest(),
+            "entries": len(entries),
+        },
+        "target": {"url": url, "snapshot": snapshot},
+        "map": {key: id_map[key] for key in sorted(id_map)},
+        "entries": [
+            {
+                "line": outcome.entry.lineno,
+                "action": outcome.entry.action,
+                "natural_key": outcome.entry.natural_key,
+                "staging_id": outcome.staging_id,
+                "production_id": outcome.production_id,
+                "verdict": outcome.verdict,
+                **({"detail": outcome.detail} if outcome.detail else {}),
+            }
+            for outcome in outcomes
+        ],
+        "complete": all(
+            verdict in ("created", "skipped") for verdict in verdicts.values()
+        ),
+    }
+
+
+def write_promotion(path: Path, document: dict) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    descriptor, temporary = tempfile.mkstemp(
+        prefix=".promotion-", suffix=".json", dir=str(path.parent)
+    )
+    try:
+        with os.fdopen(descriptor, "w", encoding="utf-8") as handle:
+            json.dump(document, handle, indent=2, sort_keys=False)
+            handle.write("\n")
+        os.replace(temporary, path)
+    except BaseException:
+        try:
+            os.unlink(temporary)
+        except FileNotFoundError:
+            pass
+        raise
+
+
+# ── self-test ──────────────────────────────────────────────────────────────────────────
+
+
+class FakeClient:
+    """An in-memory product: fake rows, fake read actions, same invoke signature."""
+
+    def __init__(self, state: State, unreadable: set[str] | None = None) -> None:
+        self.state = state
+        self.calls: list[tuple[str, dict, int | None]] = []
+        self.unreadable = unreadable or set()
+        self.counter = 0
+
+    def _id(self, prefix: str) -> str:
+        self.counter += 1
+        return f"00000000-0000-4000-8000-{self.counter:012d}-{prefix}"
+
+    def _rows(self, rows: list[dict], payload: dict) -> list[dict]:
+        selected = rows
+        if payload.get("programme_id"):
+            selected = [
+                row for row in selected
+                if row.get("programme_id") == payload["programme_id"]
+            ]
+        if payload.get("project_id"):
+            selected = [
+                row for row in selected
+                if row.get("project_id") == payload["project_id"]
+            ]
+        return [copy.deepcopy(row) for row in selected]
+
+    def invoke(self, action: str, payload: dict, if_match: int | None = None) -> Any:
+        self.calls.append((action, copy.deepcopy(payload), if_match))
+        if action == "registers.list":
+            return {"items": self._rows(self.state.registers, payload)}
+        if action == "benefits.list":
+            return {"items": self._rows(self.state.benefits, payload)}
+        if action == "approvals.list":
+            return {
+                "items": self._rows(self.state.approvals, payload),
+                "next_cursor": None,
+            }
+        if action == "registers.get":
+            if "registers.get" in self.unreadable:
+                return None
+            for row in self.state.registers:
+                if row.get("id") == payload.get("id"):
+                    return copy.deepcopy(row)
+            return None
+        if action == "benefits.get":
+            if "benefits.get" in self.unreadable:
+                return None
+            for row in self.state.benefits:
+                if row.get("id") == payload.get("id"):
+                    return copy.deepcopy(row)
+            return None
+        if action == "registers.create":
+            row = copy.deepcopy(payload)
+            row.update(id=self._id("register"), version=1)
+            row.setdefault("status", "open")
+            self.state.registers.append(row)
+            return copy.deepcopy(row)
+        if action == "benefits.create":
+            row = copy.deepcopy(payload)
+            row.update(id=self._id("benefit"), version=1)
+            row.setdefault("status", "draft")
+            self.state.benefits.append(row)
+            return copy.deepcopy(row)
+        if action == "benefits.measure":
+            row = copy.deepcopy(payload)
+            row.update(id=self._id("measurement"))
+            self.state.measurements.append(row)
+            return copy.deepcopy(row)
+        if action == "changes.request":
+            change_id = self._id("change")
+            gate_id = self._id("gate")
+            change = {
+                "id": change_id,
+                "kind": "change",
+                "code": "",
+                "title": payload["title"],
+                "project_id": payload.get("project_id"),
+                "programme_id": None,
+                "status": "open",
+                "version": 1,
+                "meta": {"impact": payload.get("impact")},
+            }
+            gate = {
+                "id": gate_id,
+                "gate": "change",
+                "status": "pending",
+                "project_id": payload.get("project_id"),
+                "target": None,
+                "description": f"Approve change {change_id}",
+                "proposed_input": {"change_id": change_id},
+                "version": 1,
+            }
+            self.state.registers.append(change)
+            self.state.approvals.append(gate)
+            return {"change_id": change_id, "approval_id": gate_id}
+        if action == "approvals.decide":
+            for gate in self.state.approvals:
+                if gate.get("id") == payload.get("approval_id"):
+                    gate["status"] = expected_gate_status(payload)
+                    gate["version"] += 1
+                    return copy.deepcopy(gate)
+            raise PromoteError(f"approvals.decide: no gate {payload.get('approval_id')}")
+        if action == "benefits.update":
+            for row in self.state.benefits:
+                if row.get("id") == payload.get("id"):
+                    if if_match != row.get("version"):
+                        raise PromoteError("benefits.update: If-Match is stale")
+                    for name, value in payload.items():
+                        if name in ("id", "change_id"):
+                            continue
+                        row[name] = value
+                    row["version"] += 1
+                    return copy.deepcopy(row)
+            raise PromoteError("benefits.update: no benefit")
+        raise PromoteError(f"fake client: unknown action {action}")
+
+
+def _fixture_inputs(root: Path) -> dict[str, Path]:
+    programme = "01a1d039-0d24-7d16-ae52-4841e96ccfac"
+    project = "01a1dcb8-d24b-76de-b901-56fd56e001bc"
+    baseline = "01a1fbb1-b05c-76b6-a5ac-7186fb859dcc"
+    staging_benefit = "01a1e9de-4e4f-757e-a8c8-bf3522e5adcf"
+    staging_change = "01a204d4-7f2e-7a73-bf79-4b8767d52db8"
+    staging_gate = "01a204d4-7f35-791c-8809-dc947d85a7b4"
+    files = {
+        "risk": {
+            "programme_id": programme, "kind": "risk", "code": "R1",
+            "title": "fixture risk",
+        },
+        "benefit": {
+            "programme_id": programme, "reference": "B1",
+            "description": "fixture benefit", "status": "draft",
+        },
+        "change": {
+            "project_id": project, "baseline_id": baseline,
+            "title": "Record the fixture baselines",
+            "impact": {"scope": "fixture"},
+        },
+        "decide": {"approval_id": staging_gate, "decision": "approve"},
+        "fields": {
+            "id": staging_benefit, "category": "governance",
+            "change_id": staging_change,
+        },
+        "status": {"id": staging_benefit, "status": "active"},
+        "measure": {
+            "benefit_id": staging_benefit, "kind": "baseline",
+            "actual_value": 1.0, "unit": "fixture",
+            "measured_at": "2026-11-22T20:00:00Z",
+        },
+    }
+    paths: dict[str, Path] = {}
+    for name, payload in files.items():
+        path = root / "inputs" / f"{name}.json"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps(payload), encoding="utf-8")
+        paths[name] = path
+    return paths
+
+
+def _fixture_entries(
+    paths: dict[str, Path], include: tuple[str, ...]
+) -> list[tuple[int, dict]]:
+    rows: list[tuple[int, dict]] = []
+    for name in include:
+        if name == "risk":
+            raw = {
+                "action": "registers.create", "input": str(paths["risk"]),
+                "natural_key": "risk:R1",
+                "output_id": "01a204cf-fe6e-783a-a837-ed168b16c967",
+            }
+        elif name == "benefit":
+            raw = {
+                "action": "benefits.create", "input": str(paths["benefit"]),
+                "natural_key": "benefit:B1",
+                "output_id": "01a204d2-dbf6-750a-a031-9f00f5fe7754",
+            }
+        elif name == "change":
+            raw = {
+                "action": "changes.request", "input": str(paths["change"]),
+                "natural_key": "change:fixture-baselines",
+                "output_id": "01a204d4-7f2e-7a73-bf79-4b8767d52db8",
+                "approval_id": "01a204d4-7f35-791c-8809-dc947d85a7b4",
+            }
+        elif name == "approval":
+            raw = {
+                "action": "approvals.decide", "input": str(paths["decide"]),
+                "natural_key": "approval:change:fixture-baselines",
+                "output_id": "01a204d4-7f35-791c-8809-dc947d85a7b4",
+            }
+        elif name == "fields":
+            raw = {
+                "action": "benefits.update", "input": str(paths["fields"]),
+                "natural_key": "benefit:B1/fields",
+                "output_id": "01a1e9de-4e4f-757e-a8c8-bf3522e5adcf",
+            }
+        elif name == "status":
+            raw = {
+                "action": "benefits.update", "input": str(paths["status"]),
+                "natural_key": "benefit:B1/status",
+                "output_id": "01a1e9de-4e4f-757e-a8c8-bf3522e5adcf",
+            }
+        elif name == "measure":
+            raw = {
+                "action": "benefits.measure", "input": str(paths["measure"]),
+                "natural_key": "benefit:B1/baseline",
+                "output_id": "01a204d3-87c0-736a-a0bf-a93aa2b638c0",
+            }
+        else:
+            raise AssertionError(name)
+        rows.append((len(rows) + 2, raw))
+    return rows
+
+
+def self_test() -> int:
+    checks = 0
+
+    def ok(condition: bool, message: str) -> None:
+        nonlocal checks
+        checks += 1
+        if not condition:
+            raise AssertionError(message)
+
+    full = ("risk", "benefit", "change", "approval", "fields", "status")
+    with tempfile.TemporaryDirectory(prefix="promote-record-self-test-") as tmp:
+        root = Path(tmp)
+        paths = _fixture_inputs(root)
+
+        # 1. the parser accepts a well-formed fixture.
+        entries, errors = build_entries(_fixture_entries(paths, full))
+        ok(not errors, f"fixture journal should parse: {errors}")
+        ok(not validate_entries(entries), "fixture journal should validate")
+        ok(
+            parse_natural_key("approval:change:label").canonical()
+            == "approval:change/label",
+            "both approval separators canonicalise",
+        )
+        ok(
+            parse_natural_key("benefit:B1/baseline").second == "baseline",
+            "benefit suffix parses",
+        )
+
+        # 2. duplicate refusal.
+        duplicate = _fixture_entries(paths, ("risk", "risk"))
+        entries, errors = build_entries(duplicate)
+        ok(not errors, "duplicate fixture parses")
+        ok(
+            any("duplicate natural key" in error for error in validate_entries(entries)),
+            "a duplicate natural key is refused",
+        )
+
+        # 3. malformed keys and unknown actions are refused.
+        malformed = [
+            (2, {"action": "registers.create", "input": str(paths["risk"]),
+                 "natural_key": "risk:", "output_id": "x"}),
+            (3, {"action": "risks.create", "input": str(paths["risk"]),
+                 "natural_key": "risk:R1", "output_id": "x"}),
+            (4, {"action": "registers.create", "input": "/does/not/exist.json",
+                 "natural_key": "risk:R1", "output_id": "x"}),
+        ]
+        _, errors = build_entries(malformed)
+        ok(any("malformed natural key" in error for error in errors),
+           "a malformed natural key is refused")
+        ok(any("unknown action" in error for error in errors),
+           "an unknown action is refused")
+        ok(any("does/not/exist" in error for error in errors),
+           "a missing input is refused")
+
+        # 4. natural-key matching against fake rows.
+        state = State()
+        state.registers.append(
+            {"id": "prod-risk", "kind": "risk", "code": "R1",
+             "programme_id": "p", "version": 1}
+        )
+        entries, _ = build_entries(_fixture_entries(paths, ("risk",)))
+        index = build_change_index(entries, state)
+        existing = existing_for(entries[0], state, index)
+        ok(existing is not None and existing["id"] == "prod-risk",
+           "risk:R1 matches the existing row")
+
+        # 5. a full apply creates everything, remaps ids, and a second run skips all.
+        snapshot = root / "snapshot"
+        snapshot.mkdir()
+        (snapshot / "msp.json").write_text(
+            json.dumps({"benefit_measurements": [], "benefit_profiles": []}),
+            encoding="utf-8",
+        )
+        entries, _ = build_entries(_fixture_entries(paths, full))
+        state = State()
+        client = FakeClient(state)
+        id_map, outcomes = apply_entries(client, entries, state, str(snapshot))
+        ok(
+            [outcome.verdict for outcome in outcomes]
+            == ["created"] * len(full),
+            f"first apply creates every entry: "
+            f"{[(o.entry.natural_key, o.verdict, o.detail) for o in outcomes]}",
+        )
+        gate_decision = [
+            payload for action, payload, _ in client.calls
+            if action == "approvals.decide"
+        ][-1]
+        ok(
+            gate_decision["approval_id"] == id_map[entries[3].output_id],
+            "approvals.decide is invoked with the production gate id",
+        )
+        update_call = [
+            payload for action, payload, _ in client.calls
+            if action == "benefits.update"
+        ][0]
+        ok(
+            update_call["change_id"] == id_map[entries[2].output_id],
+            "benefits.update change_id is remapped",
+        )
+        ok(len(set(id_map.values())) >= 4, "the staging -> production map is populated")
+        second_map, second = apply_entries(
+            FakeClient(state), entries, state, str(snapshot)
+        )
+        ok(
+            [outcome.verdict for outcome in second] == ["skipped"] * len(full),
+            f"second apply skips every entry: "
+            f"{[(o.entry.natural_key, o.verdict, o.detail) for o in second]}",
+        )
+        ok(second_map == id_map, "the map is stable across runs")
+
+        # 6. a created row that cannot be read back is a failure, never a pass.
+        entries, _ = build_entries(_fixture_entries(paths, ("risk",)))
+        state = State()
+        _, outcomes = apply_entries(
+            FakeClient(state, unreadable={"registers.get"}),
+            entries, state, str(snapshot),
+        )
+        ok(outcomes[0].verdict == "readback_failed",
+           f"an unreadable row is readback_failed: {outcomes[0].verdict}")
+
+        # 7. a measurement has no product read action: its readback fails, loudly.
+        entries, _ = build_entries(_fixture_entries(paths, ("benefit", "measure")))
+        state = State()
+        _, outcomes = apply_entries(FakeClient(state), entries, state, str(snapshot))
+        ok(outcomes[1].verdict == "readback_failed",
+           f"a measurement absent from msp.json fails readback: {outcomes[1].verdict}")
+        ok(
+            "measurement" in outcomes[1].detail,
+            "the measurement failure says why",
+        )
+
+    print(f"self-test: {checks} checks passed (offline; no network, no database)")
+    return 0
+
+
+# ── CLI ────────────────────────────────────────────────────────────────────────────────
+
+
+def dry_run_plan(entries: list[Entry]) -> list[dict]:
+    return [
+        {
+            "action": entry.action,
+            "natural_key": entry.natural_key,
+            "will_create": True,
+        }
+        for entry in entries
+    ]
+
+
+def summary(entries: list[Entry]) -> str:
+    counts: dict[str, int] = {}
+    for entry in entries:
+        counts[entry.action] = counts.get(entry.action, 0) + 1
+    return ", ".join(f"{count} {action}" for action, count in sorted(counts.items()))
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(
+        description="Promote the staging programme record through the product actions."
+    )
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument("--check", action="store_true", help="offline validation (default)")
+    mode.add_argument(
+        "--dry-run", action="store_true", dest="dry_run", help="offline plan"
+    )
+    mode.add_argument("--apply", action="store_true", help="apply to production")
+    mode.add_argument("--self-test", action="store_true", dest="self_test",
+                      help="offline self-test")
+    parser.add_argument("--journal", default=DEFAULT_JOURNAL)
+    parser.add_argument("--output", default=DEFAULT_PROMOTION)
+    parser.add_argument("--url", default=os.environ.get("CONVEYOR_URL"))
+    parser.add_argument("--token", default=os.environ.get("CONVEYOR_TOKEN"))
+    parser.add_argument("--app-key", default=os.environ.get("CONVEYOR_APP_KEY"))
+    parser.add_argument(
+        "--snapshot",
+        default=os.environ.get("CONVEYOR_SNAPSHOT"),
+        help="directory holding the production msp.json export",
+    )
+    parser.add_argument("--programme-id", default=None)
+    parser.add_argument("--timeout", type=float, default=60.0)
+    args = parser.parse_args(argv)
+
+    if args.self_test:
+        return self_test()
+
+    journal_path = resolve_path(args.journal)
+    entries, errors = check_journal(journal_path)
+    if errors:
+        for error in errors:
+            print(f"error: {error}", file=sys.stderr)
+        print(f"check: {len(errors)} error(s); refusing to continue", file=sys.stderr)
+        return 1
+
+    if args.dry_run:
+        print(json.dumps(dry_run_plan(entries), indent=2))
+        print(
+            f"dry-run: {len(entries)} entries ({summary(entries)}); no network",
+            file=sys.stderr,
+        )
+        return 0
+
+    if not args.apply:
+        print(f"check: {len(entries)} entries ({summary(entries)}); journal is well formed")
+        return 0
+
+    if not args.url:
+        print("error: --apply requires --url or CONVEYOR_URL", file=sys.stderr)
+        return 1
+    if not args.token and not args.app_key:
+        print("error: --apply requires --token or --app-key", file=sys.stderr)
+        return 1
+    needs_snapshot = any(entry.action == "benefits.measure" for entry in entries)
+    snapshot = args.snapshot
+    if needs_snapshot and not snapshot:
+        print(
+            "error: this release has no benefits.measurement_list action; --apply "
+            "requires --snapshot DIR holding the production msp.json export",
+            file=sys.stderr,
+        )
+        return 1
+
+    client = ActionClient(args.url, token=args.token, app_key=args.app_key,
+                          timeout=args.timeout)
+    snapshot_document = None
+    if snapshot:
+        try:
+            snapshot_document = load_snapshot(snapshot)
+        except PromoteError as error:
+            print(f"error: {error}", file=sys.stderr)
+            return 1
+    try:
+        state = load_state(
+            client, entries, snapshot_document, args.programme_id
+        )
+        id_map, outcomes = apply_entries(client, entries, state, snapshot)
+    except PromoteError as error:
+        print(f"error: {error}", file=sys.stderr)
+        return 1
+
+    document = build_promotion(
+        entries, id_map, outcomes, journal_path, args.url, snapshot
+    )
+    output_path = resolve_path(args.output)
+    write_promotion(output_path, document)
+    failures = [
+        outcome for outcome in outcomes
+        if outcome.verdict not in ("created", "skipped")
+    ]
+    for outcome in outcomes:
+        detail = f": {outcome.detail}" if outcome.detail else ""
+        print(
+            f"{outcome.entry.natural_key}: {outcome.verdict} "
+            f"-> {outcome.production_id}{detail}",
+            file=sys.stderr,
+        )
+    print(f"promotion written: {output_path}", file=sys.stderr)
+    if failures:
+        print(
+            f"apply: {len(failures)} of {len(outcomes)} entries failed; see "
+            f"{output_path}",
+            file=sys.stderr,
+        )
+        return 1
+    print(f"apply: {len(outcomes)} entries created or skipped", file=sys.stderr)
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
