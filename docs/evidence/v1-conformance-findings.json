@@ -756,7 +756,12 @@
       ],
       "failure_scenario": "A postmortem or systemic triage marks the finding 'systemic'; a kata run appears, nothing else. The candidate change is never built, measured on held-out data, or gated for adoption, so production never changes.",
       "acceptance": "A systemic finding opens a kata with named instrument and success threshold under the kata tenant; a kata candidate opens a development project or config-change path; measurement and a dual-control adoption approval block production until granted; tests exercise the full chain.",
-      "owner_project": "T4"
+      "owner_project": "T4",
+      "resolved_by": {
+        "commit": "2fe0d30c329fb0cff252f7ff14972e274e9b7799",
+        "test": "crates/actions/tests/coach.rs::a_systemic_class_opens_one_measured_kata",
+        "evidence": "The coach policy declares a kata pin (instrument_kind/id/version, held-out split + sha256, pre-registered prediction, base_ref) and the coach opens the kata rows through the kata capability with the interruption signature (coach.rs::a_systemic_class_opens_one_measured_kata asserts the kata row, its signature and instrument version, no documentation run). A policy without a complete pin escalates through a coach.kata gate and opens no kata (::a_systemic_class_without_a_pinned_instrument_escalates). Measurement and dual-control adoption the path hands to are proved in crates/actions/tests/kata_gate.rs::only_the_held_out_split_on_the_pinned_version_measures, ::adoption_needs_another_person_and_a_measured_candidate and ::the_kata_measurer_cannot_decide_its_adoption. cargo test -p conveyor-actions --test coach: 22 passed."
+      }
     },
     {
       "id": "v1-p6-3",
