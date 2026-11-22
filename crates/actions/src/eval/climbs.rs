@@ -1129,8 +1129,7 @@ async fn eval_climbs_stop(
         &goal,
         &rounds,
         &state,
-        best_round,
-        best_score,
+        (best_round, best_score),
         reason,
         pricing.unit,
     );
@@ -2070,14 +2069,14 @@ fn quality_text(goal: &Goal, outcome: &RoundOutcome) -> String {
 /// prices — subject, judge and billed failed calls — and its quality is the registered hold with
 /// its floor, or the target metric's held-out mean the decision used. A cost climb therefore
 /// names its **cheapest kept** round and its spend, never the zeroes a `cost_usd` grade would
-/// print in a score column.
+/// print in a score column. `best` is [`best_of`]'s winner: `(kept round, the number the goal
+/// ranks it by)`.
 fn build_report(
     climb: &Climb,
     goal: &Goal,
     rounds: &[RoundRow],
     state: &SettleState,
-    best_round: Option<i32>,
-    best_score: Option<f64>,
+    best: (Option<i32>, Option<f64>),
     reason: &str,
     unit: &str,
 ) -> String {
@@ -2183,7 +2182,7 @@ fn build_report(
     }
 
     out.push_str("\n## What to do next\n\n");
-    match (best_round, best_score) {
+    match best {
         (Some(round), _) if goal.is_cost() => {
             let spend = state
                 .settled
