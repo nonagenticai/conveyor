@@ -784,10 +784,10 @@ pub async fn update_register_tx(
     // The create rule is not a one-time admission: an update that replaces `meta` replaces the
     // impact block too, so it is validated against the same §5.5 rule. The row's baseline is
     // immutable here, so the stored `baseline_ref` is the one the new block belongs with.
-    if current.kind == "change" {
-        if let Some(meta) = meta {
-            validate_change(meta.get("impact"), current.baseline_ref)?;
-        }
+    if current.kind == "change"
+        && let Some(meta) = meta
+    {
+        validate_change(meta.get("impact"), current.baseline_ref)?;
     }
     let sql = format!(
         "UPDATE project_register_item SET
@@ -2104,7 +2104,8 @@ pub async fn change_is_approved_tx(
 /// `project_register_item_baseline_fk`; every `kind='change'` row carries one — `validate_change`
 /// refuses a change without it). The change must belong to the same project as the baseline, its
 /// `meta.impact` block must be present (the `validate_change` rule: a §5.5 object carrying at
-/// least one of scope/schedule/cost/risk), and its `change` gate must be approved — the row's own
+/// least one of scope/schedule/cost/risk with a NON-NULL value — the 0065 CHECK is the same
+/// rule), and its `change` gate must be approved — the row's own
 /// `status` is never an approval (`change_is_approved_tx`'s rule).
 ///
 /// The reciprocal `meta.baseline_id` that `link_change_to_baseline_tx` writes names the baseline
@@ -2943,15 +2944,16 @@ pub async fn update_cadence_tx(
     }
     // The state is a move in the one table, not a string the caller rewrites. `materialised` is
     // the materialiser's outcome and is refused here even though the table has it.
-    if let Some(to) = &patch.state {
-        if to != &current.state && cadence_move(&current.state, to) != Some(CadenceWriter::Edit) {
-            return Err(PlanStoreError::Illegal(
-                PlanError::CadenceIllegalTransition {
-                    from: current.state.clone(),
-                    to: to.clone(),
-                },
-            ));
-        }
+    if let Some(to) = &patch.state
+        && to != &current.state
+        && cadence_move(&current.state, to) != Some(CadenceWriter::Edit)
+    {
+        return Err(PlanStoreError::Illegal(
+            PlanError::CadenceIllegalTransition {
+                from: current.state.clone(),
+                to: to.clone(),
+            },
+        ));
     }
     let sql = format!(
         "UPDATE programme_cadence SET

@@ -533,6 +533,7 @@ fn echo_schema() -> Value {
 }
 
 /// One toolkit version, one tool and one run-scoped binding.
+#[allow(clippy::too_many_arguments)] // a fixture: each argument is one column of the row it seeds
 async fn seed_tool(
     pg: &support::Pg,
     tenant: TenantId,
