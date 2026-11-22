@@ -562,6 +562,284 @@ const shot = (name) => path.join(process.env.CONVEYOR_QA_OUTPUT || os.tmpdir(), 
       "the no-measure page shows no fixture number",
     );
 
+    // 10. The delivery view's positive path: a published snapshot carrying work in progress and
+    // completed work, a two-tranche programme, a project board with cards, a work package with
+    // child cards, and priced / unpriced-only spend. Every fixture id that a route uses is a
+    // UUID, because the page validates route ids before lookup.
+    const LIVE_PROG = "11111111-1111-4111-8111-111111111111";
+    const DONE_PROG = "22222222-2222-4222-8222-222222222222";
+    const P_T1 = "33333333-3333-4333-8333-333333333331";
+    const P_T2 = "33333333-3333-4333-8333-333333333332";
+    const P_DONE_A = "44444444-4444-4444-8444-444444444441";
+    const P_DONE_B = "44444444-4444-4444-8444-444444444442";
+    const P_LONE = "55555555-5555-4555-8555-555555555551";
+    const P_LONE_DONE = "66666666-6666-4666-8666-666666666661";
+    const P_LONE_QUIET = "77777777-7777-4777-8777-777777777771";
+    const CARD_WP = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1";
+    const CARD_CHILD_1 = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa2";
+    const CARD_CHILD_2 = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa3";
+    const CARD_LOOSE = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa4";
+    const CARD_LONE = "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb1";
+    const CARD_LONE_DONE = "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb2";
+    const UNKNOWN = "99999999-9999-4999-8999-999999999999";
+    const UNKNOWN_CARD = "99999999-9999-4999-8999-999999999998";
+    await page.addInitScript(() => {
+      window.CONVEYOR_QA_NO_SNAPSHOT = false;
+      Object.defineProperty(window, "CONVEYOR_SNAPSHOT", {
+        configurable: true,
+        set() {},
+        get() {
+          return {
+            schema: "design-snapshot/v1",
+            tenant: "nonagentic",
+            generated_at: "2026-11-20T12:00:00Z",
+            git_sha: "a".repeat(40),
+            payload_sha256: "b".repeat(64),
+            programme: {
+              programme: [
+                { id: "11111111-1111-4111-8111-111111111111", name: "Live programme", status: "active" },
+                { id: "22222222-2222-4222-8222-222222222222", name: "Closed programme", status: "closed" },
+              ],
+              projects: [
+                { id: "33333333-3333-4333-8333-333333333331", key: "T1", name: "Tranche one project", programme_id: "11111111-1111-4111-8111-111111111111", status: "active", meta: { tranche: 1, issues: [], depends_on: [] } },
+                { id: "33333333-3333-4333-8333-333333333332", key: "T2", name: "Tranche two project", programme_id: "11111111-1111-4111-8111-111111111111", status: "active", meta: { tranche: 2, issues: [], depends_on: [] } },
+                { id: "44444444-4444-4444-8444-444444444441", key: "DA", name: "Closed programme project A", programme_id: "22222222-2222-4222-8222-222222222222", status: "closed", meta: { tranche: 1, issues: [], depends_on: [] } },
+                { id: "44444444-4444-4444-8444-444444444442", key: "DB", name: "Closed programme project B", programme_id: "22222222-2222-4222-8222-222222222222", status: "closed", meta: { tranche: 2, issues: [], depends_on: [] } },
+                { id: "55555555-5555-4555-8555-555555555551", key: "LONE", name: "Standalone live initiative", programme_id: null, status: "active", meta: { issues: [], depends_on: [] } },
+                { id: "66666666-6666-4666-8666-666666666661", key: "DONE-LONE", name: "Standalone completed initiative", programme_id: null, status: "closed", meta: { issues: [], depends_on: [] } },
+                { id: "77777777-7777-4777-8777-777777777771", key: "QUIET-LONE", name: "Standalone quiet completed initiative", programme_id: null, status: "closed", meta: { issues: [], depends_on: [] } },
+              ],
+            },
+            work: {
+              boards: [
+                { id: "board-t1", project_id: "33333333-3333-4333-8333-333333333331" },
+                { id: "board-lone", project_id: "55555555-5555-4555-8555-555555555551" },
+                { id: "board-lone-done", project_id: "66666666-6666-4666-8666-666666666661" },
+                { id: "board-lone-quiet", project_id: "77777777-7777-4777-8777-777777777771" },
+              ],
+              lists: [
+                { id: "lane-t1-todo", board_id: "board-t1", name: "To do", kind: "active", position: 1 },
+                { id: "lane-t1-done", board_id: "board-t1", name: "Done", kind: "done", position: 2 },
+                { id: "lane-lone-todo", board_id: "board-lone", name: "To do", kind: "active", position: 1 },
+                { id: "lane-lone-done-todo", board_id: "board-lone-done", name: "To do", kind: "active", position: 1 },
+                { id: "lane-lone-quiet-todo", board_id: "board-lone-quiet", name: "To do", kind: "active", position: 1 },
+              ],
+              cards: [
+                { id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1", board_id: "board-t1", list_id: "lane-t1-todo", name: "Work package alpha", card_type_id: "ct-delivery", position: 1, created_at: "2026-11-01T00:00:00Z", updated_at: "2026-11-20T00:00:00Z" },
+                { id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa2", board_id: "board-t1", list_id: "lane-t1-todo", parent_card_id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1", name: "Child one", card_type_id: "ct-delivery", position: 2, created_at: "2026-11-02T00:00:00Z", updated_at: "2026-11-10T00:00:00Z" },
+                { id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa3", board_id: "board-t1", list_id: "lane-t1-todo", parent_card_id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1", name: "Child two", card_type_id: "ct-delivery", position: 3, created_at: "2026-11-03T00:00:00Z", updated_at: "2026-11-12T00:00:00Z", archived_at: "2026-11-12T00:00:00Z" },
+                { id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa4", board_id: "board-t1", list_id: "lane-t1-todo", name: "Loose card", card_type_id: "ct-delivery", position: 4, created_at: "2026-11-04T00:00:00Z", updated_at: "2026-11-15T00:00:00Z" },
+                { id: "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb1", board_id: "board-lone", list_id: "lane-lone-todo", name: "Standalone card", card_type_id: "ct-delivery", position: 1, created_at: "2026-11-02T00:00:00Z", updated_at: "2026-11-19T00:00:00Z" },
+                { id: "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbb2", board_id: "board-lone-done", list_id: "lane-lone-done-todo", name: "Completed initiative card", card_type_id: "ct-delivery", position: 1, created_at: "2026-06-01T00:00:00Z", updated_at: "2026-07-01T00:00:00Z" },
+              ],
+              card_types: [
+                { id: "ct-delivery", code: "delivery_task", label: "Delivery task", definition: { acceptance: ["accept one"] } },
+              ],
+              project_activity: [
+                { project_id: "33333333-3333-4333-8333-333333333331", started_at: "2026-11-01T00:00:00Z", last_activity_at: "2026-11-20T00:00:00Z" },
+                { project_id: "33333333-3333-4333-8333-333333333332", started_at: "2026-11-05T00:00:00Z", last_activity_at: "2026-11-18T00:00:00Z" },
+                { project_id: "44444444-4444-4444-8444-444444444441", started_at: "2026-08-01T00:00:00Z", last_activity_at: "2026-09-15T00:00:00Z" },
+                { project_id: "44444444-4444-4444-8444-444444444442", started_at: "2026-08-10T00:00:00Z", last_activity_at: "2026-09-30T00:00:00Z" },
+                { project_id: "55555555-5555-4555-8555-555555555551", started_at: "2026-11-02T00:00:00Z", last_activity_at: "2026-11-19T00:00:00Z" },
+                { project_id: "66666666-6666-4666-8666-666666666661", started_at: "2026-06-01T00:00:00Z", last_activity_at: "2026-07-01T00:00:00Z" },
+              ],
+              runs: [],
+              run_steps: [],
+              approvals: [],
+            },
+            measure: {
+              inference: {
+                by_project: [
+                  { project_id: "33333333-3333-4333-8333-333333333331", total_tokens: 1000000, cost_usd: "0.100000", priced_calls: 1, unpriced_calls: 0 },
+                  { project_id: "44444444-4444-4444-8444-444444444441", total_tokens: 1500000, cost_usd: "0.420000", priced_calls: 2, unpriced_calls: 1 },
+                  { project_id: "44444444-4444-4444-8444-444444444442", total_tokens: 500000, cost_usd: "0.080000", priced_calls: 1, unpriced_calls: 0 },
+                  { project_id: "55555555-5555-4555-8555-555555555551", total_tokens: 250000, cost_usd: "0.035000", priced_calls: 1, unpriced_calls: 0 },
+                  { project_id: "66666666-6666-4666-8666-666666666661", total_tokens: 42000, cost_usd: "0.000000", priced_calls: 0, unpriced_calls: 1 },
+                ],
+                by_card: [
+                  { card_id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa1", total_tokens: 960000, cost_usd: "0.270000", priced_calls: 1, unpriced_calls: 0 },
+                  { card_id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa2", total_tokens: 1000, cost_usd: "0.001000", priced_calls: 1, unpriced_calls: 0 },
+                  { card_id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaa4", total_tokens: 5000, cost_usd: "0.000000", priced_calls: 0, unpriced_calls: 1 },
+                ],
+              },
+            },
+            msp: {
+              tranches: [
+                { id: "tr-1", programme_id: "11111111-1111-4111-8111-111111111111", number: 1, state: "closed" },
+                { id: "tr-2", programme_id: "11111111-1111-4111-8111-111111111111", number: 2, state: "active" },
+              ],
+              benefit_profiles: [],
+              benefit_links: [],
+              benefit_transitions: [],
+              stakeholder_profiles: [],
+              cadences: [],
+              wbs_nodes: [
+                { id: "wbs-1", project_id: "33333333-3333-4333-8333-333333333331", kind: "work_package", title: "Ship the delivery view", status: "open", acceptance: ["renders"] },
+              ],
+              tranche_reviews: [],
+              register_items: [],
+              project_baselines: [],
+            },
+          };
+        },
+      });
+    });
+
+    // 10a. L1: in-flight first, completed history below it, with the observed span and spend.
+    await page.setViewportSize({ width: 1440, height: 1060 });
+    await nav("portfolio");
+    const l1 = await content();
+    const historyText = await page.locator("#main .gantt-history").textContent();
+    check(l1.includes("Delivery timeline · portfolio"), "L1 renders the portfolio timeline");
+    check(l1.includes("Live programme"), "L1 lists the in-flight programme");
+    check(l1.includes("Standalone live initiative"), "L1 lists the in-flight standalone initiative");
+    check(
+      (await page.locator("#main .gantt").count()) === 2,
+      "L1 draws the in-flight Gantt and one completed-history Gantt",
+    );
+    check(
+      (await page.locator("#main .gantt-history").count()) === 1,
+      "the completed section is its own Gantt",
+    );
+    check(
+      (await page.locator("#main .gantt-history .gantt-head-label").first().textContent()) ===
+        "Completed · history",
+      "the completed section is labelled as history",
+    );
+    const sectionOrder = await page.evaluate(() =>
+      [...document.querySelectorAll("#main .gantt")].map((el) =>
+        el.classList.contains("gantt-history") ? "history" : "live",
+      ),
+    );
+    check(sectionOrder.join(",") === "live,history", "in-flight work renders before completed history");
+    check(
+      (await page.locator('#main .gantt-history .gantt-row[data-state="completed"]').count()) === 2,
+      "both completed L1 rows carry the completed state",
+    );
+    check(
+      (await page.locator("#main .gantt-history .gantt-state.completed").count()) === 2,
+      "each completed row states completed in visible text",
+    );
+    check(historyText.includes("Closed programme"), "L1 lists the completed programme");
+    check(
+      historyText.includes("Standalone completed initiative"),
+      "L1 lists the completed standalone project",
+    );
+    const ganttText = (await page.locator("#main .gantt").allTextContents()).join("\n");
+    check(
+      !ganttText.includes("Standalone quiet completed initiative"),
+      "a completed row with no observed activity stays absent from the timeline",
+    );
+    check(
+      historyText.includes("1 Aug 2026 → 30 Sep 2026"),
+      "the completed programme shows its observed span",
+    );
+    check(
+      historyText.includes("2.0M tok · $0.50*"),
+      "a priced completed row shows tokens and money, marked unpriced",
+    );
+    check(
+      historyText.includes("42.0k tok · —*"),
+      "an unpriced-only completed row shows —*, never a dollar figure",
+    );
+    check(!l1.includes("$0.00"), "no L1 row prices an unpriced call as $0.00");
+
+    // 10b. L2: a programme with two tranches.
+    await nav(`portfolio/${LIVE_PROG}`);
+    const l2 = await content();
+    check(l2.includes("Delivery timeline · programme"), "the programme deep link opens L2");
+    check(
+      l2.includes("Tranche one project") && l2.includes("Tranche two project"),
+      "L2 renders both of the programme's projects",
+    );
+    check(
+      /TRANCHES? 1 · CLOSED/i.test(l2) && /TRANCHES? 2 · ACTIVE/i.test(l2),
+      "a two-tranche programme groups its projects under both tranches",
+    );
+    check(
+      l2.includes("T1 closed") && l2.includes("T2 active"),
+      "the tranche rail carries both tranche states",
+    );
+    const l2Rows = await page.locator("#main .gantt-row .gantt-name").allInnerTexts();
+    check(
+      l2Rows.includes("Tranche one project") && l2Rows.includes("Tranche two project"),
+      "L2's timeline carries both of the programme's projects",
+    );
+    check(
+      !l2Rows.includes("Standalone live initiative"),
+      "L2's timeline lists only this programme's projects",
+    );
+
+    // 10c. L3: the project kanban with a work package and a loose card.
+    await nav(`projects/${P_T1}`);
+    const l3 = await content();
+    check(l3.includes("T1 · Tranche one project"), "the project deep link opens that project");
+    check(l3.includes("Work package alpha"), "L3 renders the work-package card");
+    check(l3.includes("WORK PACKAGE · 2"), "the work-package tile carries its child count");
+    check(l3.includes("Loose card"), "L3 renders the loose card");
+    check(
+      (await page.locator("#main .kanban-col").count()) >= 2,
+      "L3 renders its board lanes as columns",
+    );
+    check(l3.includes("961.0k tok · $0.27"), "a priced card shows tokens and money");
+    check(l3.includes("5.0k tok · —*"), "an unpriced-only card shows —*, never $0.00");
+    check(!l3.includes("$0.00"), "the project board never prices an unpriced call as $0.00");
+    check(
+      (await page
+        .locator(`#main a.kanban-open[href="#projects/${P_T1}/wp/${CARD_WP}"]`)
+        .count()) === 1,
+      "the work-package card links to its L4 route",
+    );
+
+    // 10d. L4: the work package's own board with its child cards.
+    await nav(`projects/${P_T1}/wp/${CARD_WP}`);
+    const l4 = await content();
+    check(l4.includes("T1 · Work package"), "the card deep link opens the work-package level");
+    check(l4.includes("Work package alpha"), "L4 names the work package");
+    check(l4.includes("Child one"), "L4 renders the open child card");
+    check(l4.includes("1/2 cards done"), "L4 shows the child-card progress");
+    check(l4.includes("No run is recorded"), "L4's empty execution is honest");
+    check(
+      (await page.locator('#main .kanban-col[data-lane="archived"] .kanban-card').count()) === 1,
+      "the archived child renders once, in the archived column",
+    );
+
+    // 10e. Deep links: an unknown id must not silently fabricate a level. The programme id falls
+    // back to the named portfolio level; the project id shows a real project's identity, never
+    // the unknown id; an unknown card id is refused in words rather than rendered as a board.
+    await nav(`portfolio/${UNKNOWN}`);
+    const badProgramme = await content();
+    check(
+      badProgramme.includes("Delivery timeline · portfolio"),
+      "an unknown programme id lands on the named portfolio level",
+    );
+    check(
+      !badProgramme.includes("Delivery timeline · programme"),
+      "an unknown programme id never fabricates a programme drill",
+    );
+    await nav(`projects/${UNKNOWN}`);
+    const badProject = await content();
+    check(!badProject.includes(UNKNOWN), "an unknown project id is never rendered as a project");
+    check(
+      badProject.includes("T1 · Tranche one project"),
+      "an unknown project id falls back to a real project's named identity",
+    );
+    check(
+      !badProject.includes("· Work package"),
+      "an unknown project id does not fabricate a work-package level",
+    );
+    await nav(`projects/${P_T1}/wp/${UNKNOWN_CARD}`);
+    const badCard = await content();
+    check(
+      badCard.includes("This card is not on this project's boards in the published snapshot."),
+      "an unknown card id is refused explicitly, not silently rendered",
+    );
+    check(
+      (await page.locator("#main .kanban-col").count()) === 0,
+      "the refused card renders no board columns",
+    );
+
+
     check(errors.length === 0, "no browser runtime errors: " + errors.join(" | "));
     check(failed.length === 0, "no failed assets: " + failed.join(" | "));
     check(external.length === 0, "no external network dependencies: " + external.join(" | "));
