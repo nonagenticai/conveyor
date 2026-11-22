@@ -300,6 +300,7 @@ pub fn Plan() -> impl IntoView {
                     "wbs.list",
                     "baselines.list",
                     "registers.list",
+                    "project_dependencies.list",
                 ]
                     .into_iter()
                     .filter(|action| !ctx.has_action(action))
