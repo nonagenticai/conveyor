@@ -3390,6 +3390,133 @@ pub async fn materialise_pi_tx(
     })
 }
 
+/// What a backlog refinement revalidated and flagged.
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct BacklogRefinement {
+    /// The open deliverables whose four WSJF inputs were revalidated.
+    pub revalidated: i64,
+    /// The rows that cannot score or have not moved inside the refinement window.
+    pub flagged: i64,
+}
+
+/// Refine the programme's standing backlog for a `kind='refinement'` cadence.
+///
+/// Every open `deliverable` of every project in the cadence's programme is revalidated against
+/// the four typed WSJF inputs. A row is flagged stale, with its reason on `meta.refinement`,
+/// when the inputs do not score (a negative value or a zero-size job), when every value input
+/// is zero (it has no WSJF inputs at all), or when it has not moved for `meta.stale_after_days`
+/// (default 30). A row that scores again loses a previous flag. The score itself is never
+/// stored (D-T1-4); only the flag is, so the board can say why an item needs attention.
+///
+/// The cadence move to `materialised` belongs to the caller (the worker tick), so a failed
+/// refinement never marks the period done.
+pub async fn refine_backlog_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    cadence_id: Uuid,
+) -> Result<BacklogRefinement, PlanStoreError> {
+    let cadence = get_cadence_tx(&mut *conn, tenant, cadence_id)
+        .await?
+        .ok_or(PlanStoreError::NotFound {
+            what: "cadence row",
+        })?;
+    if cadence.kind != "refinement" {
+        return Err(PlanStoreError::Illegal(PlanError::CadenceWrongKind {
+            expected: "refinement",
+            actual: cadence.kind.clone(),
+        }));
+    }
+    if cadence.state == "materialised" {
+        return Ok(BacklogRefinement::default());
+    }
+    if cadence_move(&cadence.state, "materialised") != Some(CadenceWriter::Materialiser) {
+        return Err(PlanStoreError::Illegal(
+            PlanError::CadenceIllegalTransition {
+                from: cadence.state.clone(),
+                to: "materialised".to_owned(),
+            },
+        ));
+    }
+    let stale_after_days = cadence
+        .meta
+        .get("stale_after_days")
+        .and_then(Value::as_i64)
+        .unwrap_or(30)
+        .clamp(1, 3650);
+    let rows: Vec<(Uuid, i32, i32, i32, i32, bool, Value)> = sqlx::query_as(
+        "SELECT w.id, w.business_value, w.time_criticality, w.risk_reduction, w.job_size,
+                (w.updated_at < now() - make_interval(days => $3::int)) AS stale_by_age,
+                w.meta
+           FROM wbs_node w
+           JOIN project p ON p.tenant_id = w.tenant_id AND p.id = w.project_id
+          WHERE w.tenant_id = $1 AND p.programme_id = $2
+            AND w.kind = 'deliverable' AND w.status = 'open'
+          ORDER BY w.id",
+    )
+    .bind(tenant.as_uuid())
+    .bind(cadence.programme_id)
+    .bind(i32::try_from(stale_after_days).unwrap_or(30))
+    .fetch_all(&mut *conn)
+    .await?;
+    let revalidated = i64::try_from(rows.len()).unwrap_or(i64::MAX);
+    let mut flagged = 0i64;
+    for (id, business_value, time_criticality, risk_reduction, job_size, stale_by_age, meta) in rows
+    {
+        let score = conveyor_domain::spine::wsjf(WsjfInputs {
+            business_value,
+            time_criticality,
+            risk_reduction,
+            job_size,
+        })
+        .ok();
+        let reason = match score {
+            None => Some("the four WSJF inputs do not score"),
+            Some(value) if value <= 0.0 => Some("every WSJF value input is zero"),
+            Some(_) if stale_by_age => Some("no change in the refinement window"),
+            Some(_) => None,
+        };
+        let mut next = if meta.is_object() {
+            meta.clone()
+        } else {
+            serde_json::json!({})
+        };
+        let object = next.as_object_mut().expect("just built an object");
+        match reason {
+            Some(reason) => {
+                object.insert(
+                    "refinement".to_owned(),
+                    serde_json::json!({
+                        "stale": true,
+                        "reason": reason,
+                        "cadence_id": cadence_id,
+                        "stale_after_days": stale_after_days,
+                    }),
+                );
+                flagged += 1;
+            }
+            None => {
+                if object.remove("refinement").is_none() {
+                    continue;
+                }
+            }
+        }
+        sqlx::query(
+            "UPDATE wbs_node
+                SET meta = $3, version = version + 1, updated_at = now()
+              WHERE tenant_id = $1 AND id = $2",
+        )
+        .bind(tenant.as_uuid())
+        .bind(id)
+        .bind(&next)
+        .execute(&mut *conn)
+        .await?;
+    }
+    Ok(BacklogRefinement {
+        revalidated,
+        flagged,
+    })
+}
+
 /// Record a demo credit for one completed deliverable, or return the existing one.
 ///
 /// A credit needs the deliverable accepted (`wbs_node.status = 'accepted'`) and exhibiting at
