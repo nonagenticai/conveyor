@@ -3,9 +3,10 @@
 
 The register has two source families and one row per source decision:
 
-* ``docs/decisions/NNNN-slug.md`` — one ADR row per file, keyed by the filename stem
-  (``0012-no-deferrals``).  The filename number is authoritative: ADR 0012's H1 still says
-  ``# 0010`` (a documentation defect), and that must not collide with the real 0010.
+* ``docs/decisions/NNNN-slug.md`` — one ADR row per file, keyed ``adr-NNNN`` (the register's
+  own grammar; ``check-registers.py`` enforces it).  The filename number is authoritative: ADR
+  0012's H1 still says ``# 0010`` (a documentation defect), and that must not collide with the
+  real 0010 — the defect is recorded in ``meta.title_number``.
 * ``docs/SPEC_V2.md`` — one row per distinct ``D##`` decision, keyed ``spec-dNN``.  ``D106``
   and ``D115`` are agent-platform references, not conveyor decisions, and are excluded.  A
   decision an ADR records is *not* a second row: it is named in that ADR row's
@@ -264,6 +265,11 @@ def parse_adr(path: Path, root: Path) -> Row:
         "adr_number": number,
         "status_line": status_line,
         "date": date,
+        # The register's own columns: when the decision was taken (the file's date) and who is
+        # accountable for it. The ADRs are the programme owner's decisions; a session authored
+        # them under the owner's delegation, and the ADR's status line is the record.
+        "decided_at": date or None,
+        "deciders": ["the programme owner"],
         "content_sha256": hashlib.sha256(raw).hexdigest(),
     }
     if title_number is not None and title_number != number:
@@ -271,7 +277,7 @@ def parse_adr(path: Path, root: Path) -> Row:
         # letting a stale H1 collide with another ADR's number.
         meta["title_number"] = title_number
     return Row(
-        key=path.stem,
+        key=f"adr-{number:04d}",
         title=title,
         body=text,
         status=status,
@@ -1144,7 +1150,7 @@ def run_self_test() -> None:
         assert len(register.rows) == 4, register.rows
         assert len(register.spec) == 3
         assert [row.key for row in register.rows] == [
-            "0001-first", "0002-second", "0003-third", "spec-d3",
+            "adr-0001", "adr-0002", "adr-0003", "spec-d3",
         ]
         spec_row = next(row for row in register.rows if row.key == "spec-d3")
         assert spec_row.status == "draft", spec_row.status
@@ -1216,8 +1222,8 @@ def run_self_test() -> None:
         client = FakeClient()
         first = apply_register(register, client)
         assert first == {"created": 4, "updated": 0, "unchanged": 0, "transitions": 4}, first
-        assert client.rows["0001-first"]["status"] == "approved"
-        assert client.rows["0002-second"]["status"] == "approved"
+        assert client.rows["adr-0001"]["status"] == "approved"
+        assert client.rows["adr-0002"]["status"] == "approved"
         assert client.rows["spec-d3"]["status"] == "draft"
         client.calls.clear()
         second = apply_register(build_register(root), client)
@@ -1235,7 +1241,7 @@ def run_self_test() -> None:
         third = apply_register(build_register(root), client)
         assert third == {"created": 0, "updated": 1, "unchanged": 3, "transitions": 0}, third
         update_calls = [call for call in client.calls if call[0] == "decisions.update"]
-        assert len(update_calls) == 1 and update_calls[0][1]["id"] == "id-0001-first"
+        assert len(update_calls) == 1 and update_calls[0][1]["id"] == "id-adr-0001"
         checks += 1
 
         # 10. A same-table supersession is applied once, and a re-run is a no-op.
