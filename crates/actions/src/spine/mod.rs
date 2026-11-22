@@ -101,6 +101,18 @@ fn spine_error(error: PlanStoreError, action: &str) -> ActionError {
             "evidence_missing",
             "a credit needs a deliverable with at least one evidence ref",
         ),
+        PlanStoreError::Illegal(PlanError::DemoEvidenceUntyped) => invalid(
+            "deliverable_id",
+            "evidence_untyped",
+            "a credit needs typed evidence refs: a non-empty string or an object with a value",
+        ),
+        PlanStoreError::Illegal(PlanError::RetroFindingIncomplete(key)) => invalid(
+            "cadence_id",
+            "finding_incomplete",
+            format!(
+                "the retro finding {key:?} needs a statement, evidence and, when systemic, a kata block"
+            ),
+        ),
         PlanStoreError::Illegal(PlanError::DependencyCycle { from, to }) => ActionError::new(
             409,
             "dependency_cycle",
@@ -3209,6 +3221,15 @@ async fn cadences_update(
         .await
         .map_err(|error| spine_error(error, ctx.action))?
         .ok_or_else(|| ActionError::resource_not_found("such cadence row"))?;
+    // A retro closes through `retros.close`, which writes each finding's lesson and refuses a
+    // finding with no lesson content. An edit that sets `closed` directly would bypass that gate.
+    if current.kind == "retro" && input.state.as_deref() == Some("closed") {
+        return Err(invalid(
+            "state",
+            "retro_close_required",
+            "a retro closes through retros.close, which writes every finding's lesson",
+        ));
+    }
     let expected = require_precondition_with(
         &ctx,
         ctx.action,

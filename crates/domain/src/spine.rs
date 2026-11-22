@@ -210,6 +210,13 @@ pub enum PlanError {
     /// A demo credit names a deliverable with no evidence ref — no demo, no credit.
     #[error("gate_evidence_missing")]
     DemoEvidenceMissing,
+    /// A demo credit names evidence that is not a typed reference (a blank string, null or an
+    /// empty object is not evidence a demo can exhibit).
+    #[error("demo_evidence_untyped")]
+    DemoEvidenceUntyped,
+    /// A retro closes while one of its findings has no lesson content.
+    #[error("the retro finding {0:?} has no lesson content")]
+    RetroFindingIncomplete(String),
     /// A retro closes while one of its findings has no lesson.
     #[error("the retro finding {0:?} has no lesson")]
     RetroFindingWithoutLesson(String),
