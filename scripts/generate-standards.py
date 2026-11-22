@@ -1158,10 +1158,16 @@ def resolve_section(
 
     evidence = [source for source in resolved if source["count"] > 0]
     status = "evidenced" if evidence else ("partial" if missing_headings else "absent")
+    # Why the section could not resolve decides the package kind (R11): a heading the template
+    # sources but whose rows/documents are absent is a RECORD gap; a heading the template declares
+    # required yet gives no source (and no document fallback) is a STANDARD defect — it can never
+    # resolve however many rows exist.
+    cause = "record" if (declared or template.get("document_category")) else "standard"
     return {
         "heading": heading,
         "status": status,
         "severity": declared_severity,
+        "cause": cause,
         "sources": resolved,
         "missing": [] if evidence else [
             f"No row or document satisfies '{heading}'"
@@ -1546,6 +1552,17 @@ def build_findings(
             "standard": artefact["standard"],
             "spec": artefact["spec"],
             "severity": severity,
+            # The package kind (R11): a required heading the template never sources is a STANDARD
+            # defect and must be fixed before any row can satisfy it; otherwise the missing rows
+            # or documents are the RECORD work.
+            "kind": "STANDARD"
+            if any(
+                section["status"] != "evidenced"
+                and section.get("required", True)
+                and section.get("cause") == "standard"
+                for section in artefact["sections"]
+            )
+            else "RECORD",
             "title": f"{artefact['standard']} artefact {artefact['status']}: {artefact['category']}",
             "problem": (
                 f"The {artefact['category']} artefact for {artefact['subject']['title']} is "
@@ -2453,6 +2470,27 @@ def self_test_sources_declared(std: dict[str, Any]) -> None:
     assert not problems, "; ".join(problems)
 
 
+def self_test_section_cause(outputs: Path, fixture: dict[str, Any]) -> None:
+    """The section's cause decides the package kind (R11): an unsourced heading is STANDARD,
+    a sourced heading whose rows are absent is RECORD."""
+    subject = {"kind": "programme", "id": "pg1", "title": "Programme", "project_key": ""}
+    unsourced = {"required": ["Objectives"], "sources": {}}
+    section = resolve_section(
+        "Objectives", unsourced, "vision", subject, fixture, outputs, {}
+    )
+    assert section["status"] != "evidenced" and section["cause"] == "standard", section
+    sourced = {
+        "required": ["Objectives"],
+        "sources": {"Objectives": [{"kind": "rows", "file": "msp.json",
+                                     "pointer": "/does-not-exist"}]},
+    }
+    section = resolve_section(
+        "Objectives", sourced, "vision", subject, fixture, outputs, {}
+    )
+    assert section["status"] != "evidenced" and section["cause"] == "record", section
+    print("generate-standards: self-test case section-cause-decides-kind OK")
+
+
 def self_test() -> int:
     fixture = self_test_fixture()
     std = json.loads(STANDARD_PATH.read_text(encoding="utf-8"))
@@ -2512,6 +2550,7 @@ def self_test() -> int:
         self_test_wsjf(outputs, std)
         self_test_demo_and_lessons_mandatory(outputs, std)
         self_test_gap_analysis(outputs, std)
+        self_test_section_cause(outputs, fixture)
     print(f"generate-standards: self-test OK ({len(document['artefacts'])} artefact instances)")
     return 0
 
