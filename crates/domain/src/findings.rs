@@ -85,7 +85,7 @@ fn parse_date(raw: &str) -> Option<NaiveDate> {
 
 #[cfg(test)]
 mod tests {
-    use super::{open_p0_findings, parse_date};
+    use super::{Finding, Waiver, findings, open_p0_findings, parse_date, waived};
     use chrono::{TimeZone, Utc};
 
     fn at(day: &str) -> chrono::DateTime<Utc> {
@@ -106,16 +106,62 @@ mod tests {
         );
     }
 
+    /// The suppression MECHANISM, on synthetic rows: the committed ledger no longer carries a
+    /// waiver (decision 0012 — no deferrals, no waivers), so the rule is proved on constructed
+    /// findings instead of on live ledger content that would make the test stale the day the
+    /// residual is resolved.
     #[test]
     fn an_unexpired_waiver_suppresses_and_an_expired_one_does_not() {
+        let residual = Finding {
+            id: "v1-test-waiver".to_owned(),
+            severity: "P0".to_owned(),
+            owner_project: Some("S14".to_owned()),
+            resolved_by: None,
+            waiver: Some(Waiver {
+                expires: Some("2027-02-18".to_owned()),
+            }),
+        };
         assert!(
-            open_p0_findings("S14", at("2026-11-22")).is_empty(),
-            "the owner-accepted residual is still in date"
+            waived(&residual, at("2026-11-22")),
+            "the residual is still in date"
         );
-        let expired = open_p0_findings("S14", at("2027-02-19"));
         assert!(
-            expired.iter().any(|finding| finding.id == "v1-s14-1"),
-            "after the reassessment date the P0 is open again: {expired:?}"
+            !waived(&residual, at("2027-02-19")),
+            "after the reassessment date the P0 is open again"
+        );
+        // An absent or unparseable expiry never suppresses: a broken waiver is an open P0.
+        let broken = Finding {
+            waiver: Some(Waiver { expires: None }),
+            ..residual.clone()
+        };
+        assert!(
+            !waived(&broken, at("2026-11-22")),
+            "an absent expiry never suppresses"
+        );
+        let unparseable = Finding {
+            waiver: Some(Waiver {
+                expires: Some("not-a-date".to_owned()),
+            }),
+            ..residual.clone()
+        };
+        assert!(
+            !waived(&unparseable, at("2026-11-22")),
+            "a broken waiver is open"
+        );
+    }
+
+    /// The live invariant the mechanism exists under: decision 0012 removed every waiver, so
+    /// no finding in the committed ledger may carry one.
+    #[test]
+    fn the_ledger_carries_no_waiver() {
+        let waived_rows: Vec<String> = findings()
+            .into_iter()
+            .filter(|finding| finding.waiver.is_some())
+            .map(|finding| finding.id)
+            .collect();
+        assert!(
+            waived_rows.is_empty(),
+            "no deferral or waiver of programme work (decision 0012): {waived_rows:?}"
         );
     }
 }

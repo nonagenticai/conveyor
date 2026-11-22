@@ -28,12 +28,12 @@ async fn a_job_object_round_trips_through_the_actions_and_a_cross_tenant_name_is
         )
         .await;
     assert_eq!(status, 200, "the storage path stores: {stored}");
-    let key = stored["key"].as_str().expect("a key");
+    let key = stored["output"]["key"].as_str().expect("a key");
     assert!(
         key.starts_with(&format!("tenant/{}/", seeded.tenant.as_uuid())),
         "the key is tenant-prefixed: {key}"
     );
-    let sha = stored["sha256"].as_str().expect("a hash");
+    let sha = stored["output"]["sha256"].as_str().expect("a hash");
     assert_eq!(sha.len(), 64, "the adapter records the content hash");
 
     let (status, read) = running
@@ -47,9 +47,9 @@ async fn a_job_object_round_trips_through_the_actions_and_a_cross_tenant_name_is
         )
         .await;
     assert_eq!(status, 200, "the storage path reads: {read}");
-    assert_eq!(read["sha256"].as_str(), Some(sha));
+    assert_eq!(read["output"]["sha256"].as_str(), Some(sha));
     assert_eq!(
-        read["body_base64"].as_str(),
+        read["output"]["body_base64"].as_str(),
         Some(body.as_str()),
         "the bytes round-trip"
     );
