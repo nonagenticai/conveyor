@@ -102,6 +102,9 @@ WRITE_ACTIONS = {
     "projects.close",
     "cards.comment",
     "cards.move",
+    # The tr3 record family: a register risk edited in place, a benefits-map edge.
+    "registers.update",
+    "benefits.link",
 }
 
 # Product read actions used by --apply.
@@ -116,6 +119,7 @@ READ_ACTIONS = {
     "cards.get",
     "lists.list",
     "pm.get",
+    "benefits.link_list",
 }
 
 # The release this script ships with has no action that lists measurements.  If one is
@@ -124,7 +128,7 @@ READ_ACTIONS = {
 MEASUREMENT_LIST_ACTION = "benefits.measurement_list"
 
 TOKEN = r"[A-Za-z0-9][A-Za-z0-9._-]*"
-RISK_KEY_RE = re.compile(rf"^risk:({TOKEN})$")
+RISK_KEY_RE = re.compile(rf"^risk:({TOKEN})(?:/(update))?$")
 BENEFIT_KEY_RE = re.compile(rf"^benefit:({TOKEN})(?:/(baseline|fields|status))?$")
 CHANGE_KEY_RE = re.compile(r"^change:(.+)$")
 APPROVAL_KEY_RE = re.compile(r"^approval:([^/:]+)[/:](.+)$")
@@ -134,6 +138,7 @@ PROJECT_CLOSURE_KEY_RE = re.compile(r"^project:closure:([0-9a-f-]{36})$")
 PROJECT_CLOSE_KEY_RE = re.compile(r"^project:close:([0-9a-f-]{36})$")
 CARD_COMMENT_KEY_RE = re.compile(r"^card-comment:([0-9a-f-]{36}):([0-9a-f]{8,64})$")
 CARD_MOVE_KEY_RE = re.compile(r"^card-move:([0-9a-f-]{36}):(intake|active|waiting|done|archive)$")
+BENEFIT_LINK_KEY_RE = re.compile(rf"^benefit-link:({TOKEN}):(.+)$")
 
 
 class PromoteError(Exception):
@@ -155,7 +160,7 @@ class NaturalKey:
 
     def canonical(self) -> str:
         if self.kind == "risk":
-            return f"risk:{self.first}"
+            return f"risk:{self.first}" + (f"/{self.second}" if self.second else "")
         if self.kind == "benefit":
             return f"benefit:{self.first}" + (f"/{self.second}" if self.second else "")
         if self.kind == "change":
@@ -174,6 +179,8 @@ class NaturalKey:
             return f"card-comment:{self.first}:{self.second}"
         if self.kind == "card_move":
             return f"card-move:{self.first}:{self.second}"
+        if self.kind == "benefit_link":
+            return f"benefit-link:{self.first}:{self.second}"
         raise PromoteError(f"unknown natural-key kind {self.kind!r}")
 
 
@@ -182,7 +189,10 @@ def parse_natural_key(value: str) -> NaturalKey:
         raise PromoteError("natural_key must be a non-empty string")
     match = RISK_KEY_RE.match(value)
     if match:
-        return NaturalKey("risk", match.group(1))
+        return NaturalKey("risk", match.group(1), match.group(2))
+    match = BENEFIT_LINK_KEY_RE.match(value)
+    if match:
+        return NaturalKey("benefit_link", match.group(1), match.group(2).strip())
     match = BENEFIT_KEY_RE.match(value)
     if match:
         return NaturalKey("benefit", match.group(1), match.group(2))
@@ -406,6 +416,38 @@ def validate_entries(entries: list[Entry]) -> list[str]:
                 errors.append(
                     f"line {entry.lineno}: fields update must not change status"
                 )
+        elif entry.action == "registers.update":
+            if key.kind != "risk" or key.second != "update":
+                errors.append(
+                    f"line {entry.lineno}: registers.update key must be risk:<code>/update"
+                )
+                continue
+            if not entry.payload.get("id"):
+                errors.append(f"line {entry.lineno}: update input has no id")
+            if not any(
+                entry.payload.get(name) is not None
+                for name in ("owner_job_id", "review_at", "probability", "impact", "links")
+            ):
+                errors.append(
+                    f"line {entry.lineno}: registers.update names no field to change"
+                )
+        elif entry.action == "benefits.link":
+            if key.kind != "benefit_link":
+                errors.append(
+                    f"line {entry.lineno}: benefits.link key must be "
+                    "benefit-link:<benefit reference>:<output ref>"
+                )
+                continue
+            for name in ("programme_id", "benefit_id", "output_ref", "benefit_ref"):
+                if not entry.payload.get(name):
+                    errors.append(
+                        f"line {entry.lineno}: benefits.link input has no {name}"
+                    )
+            if key.first != entry.payload.get("benefit_ref"):
+                errors.append(
+                    f"line {entry.lineno}: natural key {key.first!r} does not match "
+                    f"input benefit_ref {entry.payload.get('benefit_ref')!r}"
+                )
         elif entry.action == "projects.close_request":
             if key.kind != "project_closure":
                 errors.append(
@@ -586,6 +628,8 @@ class State:
     projects: dict[str, dict] = field(default_factory=dict)
     cards: dict[str, dict] = field(default_factory=dict)
     lists: dict[str, dict] = field(default_factory=dict)
+    # The tr3 record family's production rows: benefits-map edges by benefit.
+    links: list[dict] = field(default_factory=list)
 
 
 def snapshot_file(directory: str) -> Path:
@@ -653,6 +697,10 @@ def load_state(
             if row.get("id") not in seen_registers:
                 state.registers.append(row)
                 seen_registers.add(row.get("id"))
+    if any(entry.action == "benefits.link" for entry in entries):
+        state.links.extend(
+            list_all(client, "benefits.link_list", {"programme_id": programme_id})
+        )
     if any(entry.action in ("changes.request", "approvals.decide") for entry in entries):
         for project_id in sorted(project_ids):
             state.approvals.extend(
@@ -869,6 +917,27 @@ def existing_for(
         if update_already_reflected(state, key, entry.payload):
             return benefit_by_reference(state, key.first)
         return None
+    if entry.action == "registers.update":
+        row = risk_by_code(state, key.first)
+        if row is None:
+            return None
+        for name, value in entry.payload.items():
+            if name in ("id", "change_id"):
+                continue
+            if row.get(name) != value:
+                return None
+        return row
+    if entry.action == "benefits.link":
+        benefit = benefit_by_reference(state, entry.payload.get("benefit_ref") or "")
+        if benefit is None:
+            return None
+        for link in state.links:
+            if (
+                link.get("benefit_id") == benefit.get("id")
+                and link.get("output_ref") == entry.payload.get("output_ref")
+            ):
+                return link
+        return None
     if entry.action == "projects.close_request":
         return closure_gate(state, key.first)
     if entry.action == "approvals.request":
@@ -1039,6 +1108,21 @@ def remap_payload(
                     "the change entry must create or find it first"
                 )
             payload["change_id"] = production_change
+    elif entry.action == "registers.update":
+        row = risk_by_code(state, key.first)
+        if row is None:
+            raise PromoteError(
+                f"risk {key.first!r} has no production row to update"
+            )
+        payload["id"] = row["id"]
+    elif entry.action == "benefits.link":
+        benefit = benefit_by_reference(state, entry.payload.get("benefit_ref") or "")
+        if benefit is None:
+            raise PromoteError(
+                f"benefit {entry.payload.get('benefit_ref')!r} has no production profile"
+            )
+        payload["benefit_id"] = benefit["id"]
+        payload.pop("benefit_ref", None)
     elif entry.action == "cards.move":
         card = state.cards.get(key.first)
         target_id = payload.get("list_id")
@@ -1222,6 +1306,26 @@ def readback_entry(
             )
         state.cards[key.first] = card
         return card
+    if entry.action == "registers.update":
+        row = read_row(client, "registers.get", production_id)
+        for name, value in entry.payload.items():
+            if name in ("id", "change_id"):
+                continue
+            if row.get(name) != value:
+                raise ReadbackError(
+                    f"registers.get: field {name!r} is {row.get(name)!r}, not {value!r}"
+                )
+        return row
+    if entry.action == "benefits.link":
+        programme_id = entry.payload.get("programme_id")
+        for row in list_all(client, "benefits.link_list", {"programme_id": programme_id}):
+            if row.get("id") == production_id:
+                if row.get("output_ref") != entry.payload.get("output_ref"):
+                    raise ReadbackError(
+                        "benefits.link_list: the link's output_ref differs from the input"
+                    )
+                return row
+        raise ReadbackError("benefits.link_list: the link is not on the programme")
     raise PromoteError(f"{entry.action}: no readback is defined")
 
 
@@ -1262,6 +1366,14 @@ def apply_entries(
                 if not isinstance(version, int):
                     raise PromoteError(
                         f"cards.get: {payload['id']} has no version for If-Match"
+                    )
+                output = client.invoke(entry.action, payload, if_match=version)
+            elif entry.action == "registers.update":
+                current = read_row(client, "registers.get", str(payload["id"]))
+                version = current.get("version")
+                if not isinstance(version, int):
+                    raise PromoteError(
+                        f"registers.get: {payload['id']} has no version for If-Match"
                     )
                 output = client.invoke(entry.action, payload, if_match=version)
             elif entry.action == "benefits.update":
@@ -1471,6 +1583,22 @@ class FakeClient:
             row.setdefault("status", "draft")
             self.state.benefits.append(row)
             return copy.deepcopy(row)
+        if action == "registers.update":
+            for row in self.state.registers:
+                if row.get("id") == payload.get("id"):
+                    for name, value in payload.items():
+                        if name != "id":
+                            row[name] = value
+                    row["version"] = int(row.get("version") or 1) + 1
+                    return copy.deepcopy(row)
+            raise AssertionError(f"registers.update: no row {payload.get('id')}")
+        if action == "benefits.link":
+            row = copy.deepcopy(payload)
+            row.update(id=self._id("link"))
+            self.state.links.append(row)
+            return copy.deepcopy(row)
+        if action == "benefits.link_list":
+            return {"items": self._rows(self.state.links, payload), "next_cursor": None}
         if action == "benefits.measure":
             row = copy.deepcopy(payload)
             row.update(id=self._id("measurement"))
@@ -1923,6 +2051,68 @@ def self_test() -> int:
             [outcome.verdict for outcome in second]
             == ["skipped"] * len(closure_names),
             f"a replay skips the whole closure chain: "
+            f"{[(o.entry.natural_key, o.verdict, o.detail) for o in second]}",
+        )
+
+        # 9. the tr3 record family: a risk edited in place and a benefits-map edge replay.
+        risk_payload = {
+            "id": "staging-risk",
+            "owner_job_id": "01a1db6b-4f17-7e76-838d-590d71578ad1",
+            "review_at": "2026-11-29",
+        }
+        link_payload = {
+            "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+            "benefit_id": "staging-b7",
+            "benefit_ref": "B7",
+            "output_ref": "01a20277-8d10-702f-a975-4dd6469e7b1d",
+            "capability_ref": "the inference ledger",
+            "operational_outcome": "fewer tokens per deliverable",
+            "strategic_objective": "an economical programme",
+        }
+        extra_inputs = {}
+        for name, payload in (("risk_update", risk_payload), ("link", link_payload)):
+            path = root / "inputs" / f"{name}.json"
+            path.write_text(json.dumps(payload), encoding="utf-8")
+            extra_inputs[name] = path
+        raw_entries = [
+            (2, {"action": "registers.update", "input": str(extra_inputs["risk_update"]),
+                 "natural_key": "risk:R1/update", "output_id": "staging-risk"}),
+            (3, {"action": "benefits.link", "input": str(extra_inputs["link"]),
+                 "natural_key": "benefit-link:B7:01a20277-8d10-702f-a975-4dd6469e7b1d",
+                 "output_id": "staging-link"}),
+        ]
+        entries, errors = build_entries(raw_entries)
+        ok(not errors, f"the tr3 record fixture parses: {errors}")
+        ok(not validate_entries(entries), "the tr3 record fixture validates")
+        state = State()
+        state.registers.append({
+            "id": "prod-R1", "kind": "risk", "code": "R1", "version": 1,
+            "owner_job_id": None, "review_at": None,
+            "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        })
+        state.benefits.append({
+            "id": "prod-B7", "reference": "B7",
+            "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        })
+        client = FakeClient(state)
+        id_map, outcomes = apply_entries(client, entries, state, None)
+        ok(
+            [outcome.verdict for outcome in outcomes] == ["created", "created"],
+            f"the tr3 record family applies: "
+            f"{[(o.entry.natural_key, o.verdict, o.detail) for o in outcomes]}",
+        )
+        ok(
+            state.registers[0]["owner_job_id"] == risk_payload["owner_job_id"],
+            "the risk update landed on the production row by code",
+        )
+        ok(
+            state.links and state.links[0]["benefit_id"] == "prod-B7",
+            "the link resolved the benefit by reference, not by staging id",
+        )
+        _, second = apply_entries(FakeClient(state), entries, state, None)
+        ok(
+            [outcome.verdict for outcome in second] == ["skipped", "skipped"],
+            f"a replay skips the tr3 record entries: "
             f"{[(o.entry.natural_key, o.verdict, o.detail) for o in second]}",
         )
 
