@@ -18,10 +18,16 @@
 //! a second name for the same handler. A toolkit is an **external estate service** the conveyor
 //! reaches over HTTP, which is exactly what `HandlerRef::External` marks.
 
+pub mod bindings;
 pub mod manifest;
 pub mod probe;
 pub mod publish;
 pub mod usage;
+
+pub use bindings::{
+    ToolBindingCreateIn, ToolBindingListIn, ToolBindingListOut, ToolBindingOut,
+    ToolBindingRetireIn, ToolBindingUpdateIn,
+};
 
 pub use manifest::{ManifestError, ToolManifest, ToolkitManifest, content_hash, manifests};
 pub use probe::{ToolkitProbe, ToolsProbeIn, ToolsProbeOut};
