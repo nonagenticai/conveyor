@@ -66,6 +66,9 @@ async fn a_standalone_gate_authorises_the_call_it_names() {
                 "action": "ops.scale",
                 "input": scale_input(),
                 "description": "scale conveyor to 3",
+                // This test is about the computed target and the requester, not evidence;
+                // a destructive gate now requires evidence or an explicit waiver.
+                "evidence_waiver_reason": "test fixture: the gate's subject is the target",
             }),
             None,
         ),
@@ -165,6 +168,9 @@ async fn a_second_principal_decides_a_gate_the_first_requested() {
                 "action": "ops.scale",
                 "input": scale_input(),
                 "description": "scale conveyor to 3",
+                // This test is about the computed target and the requester, not evidence;
+                // a destructive gate now requires evidence or an explicit waiver.
+                "evidence_waiver_reason": "test fixture: the gate's subject is the target",
             }),
             None,
         ),

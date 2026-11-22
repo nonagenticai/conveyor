@@ -67,6 +67,9 @@ async fn a_question_that_requires_an_answer_refuses_an_empty_decision() {
                 },
                 "description": "May a service account delegate its access?",
                 "requires_answer": true,
+                // This test is about the answer, not evidence; a destructive gate now
+                // requires evidence or an explicit waiver (v1-u5a-approvals-1).
+                "evidence_waiver_reason": "test fixture: the gate's subject is the answer",
             }),
         ),
     )
