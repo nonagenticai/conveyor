@@ -1696,8 +1696,8 @@
         },
         {
           "path": "crates/store/src/organisation.rs",
-          "line": 214,
-          "quote": "    /// `department_scope`, authority, limits override."
+          "line": 221,
+          "quote": "/// One binding: a job × release pin × executor."
         }
       ],
       "failure_scenario": "A tenant wants phase gates to need two humans and the coach to be unable to do anything but move cards. Neither is expressible: no authority row exists, and every `pm.route_gate` call supplies `required_decisions` (1 by default) and an arbitrary kind, so the PM's design and closure gates open as single-approval; any binding holding the static action scopes can call `coach.remedy` or `projects.baseline` regardless of its meta-role.",
@@ -2738,23 +2738,18 @@
       "evidence": [
         {
           "path": "docs/design/data/coverage.json",
-          "line": 1811,
-          "quote": "      \"evidence\": ["
-        },
-        {
-          "path": "docs/design/data/coverage.json",
-          "line": 1812,
-          "quote": "        \"crates/actions/src/toolkits\""
-        },
-        {
-          "path": "docs/design/data/coverage.json",
-          "line": 1815,
+          "line": 1831,
           "quote": "      \"key\": \"T14\","
         },
         {
           "path": "docs/design/data/coverage.json",
-          "line": 1841,
-          "quote": "      \"status\": \"built\","
+          "line": 1828,
+          "quote": "        \"crates/actions/src/toolkits\""
+        },
+        {
+          "path": "docs/design/data/coverage.json",
+          "line": 1846,
+          "quote": "      \"name\": \"Estate toolkits\","
         }
       ],
       "failure_scenario": "A toolkit is published and bound from unit code alone; its backend is unreachable or its schema drifted. Jobs bind an unprobed tool, calls fail mid-run, and the zero-use/outage behaviour was never exercised. The estate coverage claim is false until a live call is recorded.",
@@ -2772,33 +2767,13 @@
       "evidence": [
         {
           "path": "docs/design/data/coverage.json",
-          "line": 2247,
-          "quote": "      \"evidence\": ["
-        },
-        {
-          "path": "docs/design/data/coverage.json",
-          "line": 2248,
-          "quote": "        \"migrations/0056_cadence_tranche.sql\""
-        },
-        {
-          "path": "docs/design/data/coverage.json",
-          "line": 2251,
+          "line": 2270,
           "quote": "      \"key\": \"T8\","
         },
         {
           "path": "docs/design/data/coverage.json",
-          "line": 2272,
-          "quote": "      \"status\": \"built\","
-        },
-        {
-          "path": "docs/design/data/coverage.json",
-          "line": 2253,
-          "quote": "        \"actions\": ["
-        },
-        {
-          "path": "docs/design/data/coverage.json",
-          "line": 2254,
-          "quote": "          0,"
+          "line": 2285,
+          "quote": "      \"name\": \"Organisational memory\","
         }
       ],
       "failure_scenario": "A lesson with one evidence ref is accepted or promoted because no refusal path exists; a bad run can become doctrine. T5's kata work and T12's 'lesson' step then rest on a slice that is schema-only.",
@@ -2816,23 +2791,13 @@
       "evidence": [
         {
           "path": "docs/design/data/coverage.json",
-          "line": 2029,
-          "quote": "      \"evidence\": ["
-        },
-        {
-          "path": "docs/design/data/coverage.json",
-          "line": 2030,
-          "quote": "        \"docs/SPEC_V2.md\""
-        },
-        {
-          "path": "docs/design/data/coverage.json",
-          "line": 2033,
+          "line": 2052,
           "quote": "      \"key\": \"T3\","
         },
         {
           "path": "docs/design/data/coverage.json",
-          "line": 2054,
-          "quote": "      \"status\": \"built\","
+          "line": 2067,
+          "quote": "      \"name\": \"PM job\","
         }
       ],
       "failure_scenario": "Downstream slices T4, T7 and T10 treat the PM job as working when no end-to-end PM run or self-approval refusal was ever recorded; the organisation loop (T12) then starts on an unexercised spine.",
@@ -3964,13 +3929,23 @@
       "standard": "SPEC",
       "spec": "§4.2",
       "severity": "P1",
-      "title": "The seeded job anatomy's limits are a display string, so no seeded binding declares a machine budget",
-      "problem": "SPEC_V2 §4.2 makes the release anatomy the job's default max-iterations, timeout, token and cost budget, but every seeded definition carries `limits` as prose ('12 turns · 40k tokens · $2.50'). The store's budget resolver accepts only `limits.cost_budget_usd` as a non-negative JSON number, so a binding compiled from the seed has no enforceable ceiling and, under the #526 fail-closed gate, cannot start an internal-agent run.",
+      "title": "The seeded limits use budget_usd, which the budget resolver never reads",
+      "problem": "The seeded definitions now carry a structured limits object, but its cost field is budget_usd while the store budget resolver reads only limits.cost_budget_usd (crates/store/src/inference.rs:579,622); no seeded binding therefore declares an enforceable cost ceiling, and the seed keeps no display string or recorded migration. The acceptance is unmet.",
       "evidence": [
         {
           "path": "seed/organisation.json",
           "line": 50,
-          "quote": "        \"limits\": \"12 turns · 40k tokens · $2.50\","
+          "quote": "        \"limits\": {\"max_iterations\": 12, \"timeout_secs\": 300, \"max_tool_calls\": 20, \"max_tokens\": 40000, \"budget_usd\": 2.5},"
+        },
+        {
+          "path": "crates/store/src/inference.rs",
+          "line": 579,
+          "quote": "/// `run.inputs->'limits'`. The key is `cost_budget_usd`, a JSON number of US dollars. This is the"
+        },
+        {
+          "path": "crates/store/src/inference.rs",
+          "line": 622,
+          "quote": "                    CASE WHEN jsonb_typeof(r.inputs->'limits'->'cost_budget_usd') = 'number'"
         }
       ],
       "failure_scenario": "A tenant is seeded, a person binds the backend_engineer job to a process, and runs.create is called: the binding resolves, but the run-start budget gate refuses 422 budget_missing although the published anatomy displays a $2.50 ceiling. The displayed limit is not the enforced one.",
@@ -4275,7 +4250,7 @@
       "spec": "§4.2",
       "severity": "P1",
       "title": "A pinned release does not pin the executor configuration that runs",
-      "problem": "Execution reads model_ref, prompt_ref, allowed_actions and the iteration and timeout limits from the live capability_agents row, never from the binding's release_snapshot, so the release hash does not describe the configuration that ran.",
+      "problem": "Execution now resolves model_ref, prompt_ref and the iteration cap from the release snapshot (crates/actions/src/workflow/agent.rs:386-423), but no test mutates a bound agent and proves the pinned run still uses the snapshot; the acceptance's test is missing.",
       "evidence": [
         {
           "path": "crates/actions/src/workflow/agent.rs",
@@ -4289,8 +4264,8 @@
         },
         {
           "path": "crates/actions/src/workflow/agent.rs",
-          "line": 390,
-          "quote": "    let bound_turns = u8::try_from(record.max_iterations).unwrap_or(MAX_TURNS);"
+          "line": 421,
+          "quote": "    let bound_turns = match release {"
         }
       ],
       "failure_scenario": "Publish release R and bind it; run once with model medium and grants G1. Call capability_agents.update to router/large with G2. The next run executes the new model and grants under the unchanged release hash R, and neither the run nor the ledger records the change.",
@@ -4385,8 +4360,8 @@
       "evidence": [
         {
           "path": "crates/actions/src/organisation.rs",
-          "line": 748,
-          "quote": "    _input: EmptyIn,"
+          "line": 766,
+          "quote": "async fn job_catalogue_list("
         },
         {
           "path": "crates/store/src/organisation.rs",
@@ -4771,12 +4746,12 @@
       "spec": "§7.7",
       "severity": "P1",
       "title": "A run can call a model with no compiled prompt and a NULL prompt hash",
-      "problem": "§7.7 requires every prompt to be compiled at run time from the run's sources with a recorded hash; agent.run compiles only when prompt_ref is Some, readiness skips the check when it is None, and the domain claims a default that does not exist.",
+      "problem": "The runtime now refuses a missing prompt before a model call and records the compiled hash (crates/actions/tests/internal_agent_runtime.rs::a_missing_prompt_ref_refuses_before_a_model_call, a_bound_run_generates_a_draft), but the finding closes only when that test run is recorded.",
       "evidence": [
         {
           "path": "crates/actions/src/workflow/agent.rs",
-          "line": 546,
-          "quote": "    if let Some(reference) = record.prompt_ref.as_deref() {"
+          "line": 625,
+          "quote": "    if let Some(reference) = effective_prompt.as_deref() {"
         },
         {
           "path": "crates/actions/src/capability/readiness.rs",
