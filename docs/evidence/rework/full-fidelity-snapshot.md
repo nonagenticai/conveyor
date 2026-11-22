@@ -98,6 +98,14 @@ product's actions (`programme-record.py`, or the deployed engine). The copy is r
    `docs/evidence/rework/`. Run it on a clean tree and restore those generated files unless that
    render is the one being committed.
 
+6. **A live write's read-back is not a branch snapshot.** The branch binary carries the newer
+   projection and **cannot snapshot the live primary while the deployed database is behind its
+   migrations** — measured 2026-11-22 against the primary at `0061`: `column d.archetype does not
+   exist`. A live write's read-back therefore uses the action's own response (and any read action
+   that exists); the copy is refreshed by dump → restore → migrate for the next verdict. This is
+   also why a write recorded against the primary shows up in the *next* full snapshot, not the one
+   at the head that preceded it.
+
 ## What the first run proved
 
 | Reading | Deployed-engine snapshot (23:21Z) | Restored + migrated copy (00:00Z) |
