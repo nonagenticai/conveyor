@@ -20,7 +20,9 @@
 use chrono::{DateTime, Utc};
 use conveyor_domain::TenantId;
 use conveyor_domain::executor::{BindingConfig, BindingError, ExecutorKind, Registry};
-use conveyor_domain::organisation::{BindingStatus, release_hash};
+use conveyor_domain::organisation::{
+    AnatomyError, AnatomyFieldError, BindingStatus, parse_release_anatomy, release_hash,
+};
 use serde_json::{Value, json};
 use sqlx::PgConnection;
 use uuid::Uuid;
@@ -63,6 +65,34 @@ pub enum OrganisationStoreError {
         /// The hash the caller named (the binding's own when the caller named none).
         requested_hash: String,
     },
+    /// The release's `anatomy` is unusable: a malformed grant, an unknown effect, a duplicate
+    /// operation or an unknown/out-of-range limit (S21 step 4, ADR 0010).
+    #[error("the release anatomy is invalid")]
+    ReleaseAnatomyInvalid(Vec<AnatomyFieldError>),
+    /// The binding's executor kind disagrees with the kind the release declares.
+    #[error("the binding names {binding:?} but the release declares {release:?}")]
+    BindingKindMismatch {
+        /// The kind the binding names.
+        binding: String,
+        /// The kind the release's anatomy declares.
+        release: String,
+    },
+}
+
+/// Parse an anatomy, turning a missing one into a field-level refusal.
+fn anatomy_of(
+    snapshot: &Value,
+) -> Result<conveyor_domain::organisation::ReleaseAnatomy, OrganisationStoreError> {
+    parse_release_anatomy(snapshot).map_err(|error| match error {
+        AnatomyError::Missing => {
+            OrganisationStoreError::ReleaseAnatomyInvalid(vec![AnatomyFieldError {
+                field: "anatomy".to_owned(),
+                code: "missing".to_owned(),
+                detail: "the release snapshot carries no anatomy object".to_owned(),
+            }])
+        }
+        AnatomyError::Fields(fields) => OrganisationStoreError::ReleaseAnatomyInvalid(fields),
+    })
 }
 
 /// One industry.
@@ -593,6 +623,9 @@ pub async fn job_release_publish_tx(
         return Err(OrganisationStoreError::NotFound("live job"));
     }
     let snapshot = compile_release_tx(conn, tenant, job_id).await?;
+    // The execution anatomy is proved before the hash: a malformed grant or limit must never
+    // become a released pin (S21 step 4, ADR 0010).
+    anatomy_of(&snapshot)?;
     let hash = release_hash(&snapshot);
     let sql = format!(
         "INSERT INTO job_release (tenant_id, job_id, release_hash, release_snapshot)
@@ -688,6 +721,16 @@ pub async fn job_binding_create_tx(
     let release = job_release_get_tx(conn, tenant, input.release_id).await?;
     if release.job_id != input.job_id {
         return Err(OrganisationStoreError::ReleaseJobMismatch);
+    }
+    // When the release declares its executor, the binding must agree: a procedure release cannot
+    // be pinned as an internal_agent (or the reverse), whatever the binding's own fields say.
+    if let Some(declared) = anatomy_of(&release.release_snapshot)?.executor_kind
+        && declared != input.executor_kind
+    {
+        return Err(OrganisationStoreError::BindingKindMismatch {
+            binding: input.executor_kind.as_str().to_owned(),
+            release: declared.as_str().to_owned(),
+        });
     }
     registry.validate(&BindingConfig {
         executor_kind: input.executor_kind.clone(),

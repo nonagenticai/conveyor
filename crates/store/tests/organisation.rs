@@ -93,7 +93,7 @@ async fn org_fixture(db: &support::TestDb, slug: &str) -> Org {
             definition: json!({
                 "charter": "Implement bounded backend changes; prove them with tests.",
                 "capability": "delivery",
-                "limits": {"turns": 12},
+                "limits": {"max_iterations": 12},
             }),
             meta: json!({}),
             departments: vec![
@@ -348,6 +348,145 @@ async fn release_hash_is_deterministic_and_publish_is_idempotent() {
     tx.commit().await.expect("commit");
 }
 
+#[tokio::test]
+async fn the_publish_refuses_an_untyped_or_unknown_grant() {
+    let db = support::TestDb::fresh().await;
+    let seeded = support::seed_tenant(&db.super_pool, "grants").await;
+    let tenant = TenantId::from_uuid(seeded.tenant).expect("non-nil tenant");
+    let mut tx = begin_scoped(&db.runtime, tenant).await.expect("scope");
+    let industry = industry_create_tx(
+        &mut tx,
+        tenant,
+        &NewIndustry {
+            key: "software".to_owned(),
+            name: "Software".to_owned(),
+            meta: json!({}),
+        },
+    )
+    .await
+    .expect("industry");
+    let delivery = department_create(
+        &mut tx,
+        tenant,
+        &NewDepartment {
+            name: "delivery",
+            parent_id: None,
+            industry_id: Some(industry.id),
+            ordinal: Some(1),
+            is_primary: true,
+        },
+    )
+    .await
+    .expect("delivery");
+    let job = job_create_tx(
+        &mut tx,
+        tenant,
+        &NewJob {
+            job_key: "granted".to_owned(),
+            industry_id: industry.id,
+            family: "engineering".to_owned(),
+            title: "Granted".to_owned(),
+            status: "active".to_owned(),
+            definition: json!({
+                "charter": "Prove the grant is typed.",
+                "grants": [
+                    "coding.jobs.get",
+                    {"op": "coding.jobs.get", "max_side_effect": "admin"}
+                ],
+            }),
+            meta: json!({}),
+            departments: vec![PlacementIn {
+                department_id: delivery.id,
+                ordinal: 1,
+                is_primary: true,
+            }],
+        },
+    )
+    .await
+    .expect("job");
+
+    let error = job_release_publish_tx(&mut tx, tenant, job.id)
+        .await
+        .expect_err("a bare string and an unknown effect are refused");
+    let OrganisationStoreError::ReleaseAnatomyInvalid(fields) = error else {
+        panic!("expected ReleaseAnatomyInvalid, got {error:?}");
+    };
+    assert!(
+        fields.iter().any(|field| field.field == "grants[0]"),
+        "the bare string is named: {fields:?}"
+    );
+    assert!(
+        fields
+            .iter()
+            .any(|field| field.field == "grants[1].max_side_effect"),
+        "the unknown effect is named: {fields:?}"
+    );
+    let releases: i64 =
+        sqlx::query_scalar("SELECT count(*) FROM job_release WHERE tenant_id = $1 AND job_id = $2")
+            .bind(tenant.as_uuid())
+            .bind(job.id)
+            .fetch_one(&mut *tx)
+            .await
+            .expect("count releases");
+    assert_eq!(releases, 0, "nothing was hashed or inserted");
+    tx.commit().await.expect("commit");
+}
+
+#[tokio::test]
+async fn a_binding_must_agree_with_the_release_executor() {
+    let db = support::TestDb::fresh().await;
+    let org = org_fixture(&db, "kind-agreement").await;
+    let mut tx = begin_scoped(&db.runtime, org.tenant).await.expect("scope");
+    let job = job_create_tx(
+        &mut tx,
+        org.tenant,
+        &NewJob {
+            job_key: "procedure_job".to_owned(),
+            industry_id: org.industry,
+            family: "engineering".to_owned(),
+            title: "Procedure job".to_owned(),
+            status: "active".to_owned(),
+            definition: json!({"executor_kind": "procedure"}),
+            meta: json!({}),
+            departments: vec![PlacementIn {
+                department_id: org.delivery,
+                ordinal: 1,
+                is_primary: true,
+            }],
+        },
+    )
+    .await
+    .expect("job");
+    let release = job_release_publish_tx(&mut tx, org.tenant, job.id)
+        .await
+        .expect("publish");
+    let error = job_binding_create_tx(
+        &mut tx,
+        org.tenant,
+        &NewBinding {
+            job_id: job.id,
+            release_id: release.id,
+            executor_kind: ExecutorKind::internal_agent(),
+            process_id: None,
+            capability_agent_id: Some(org.agent),
+            capability_id: None,
+            meta: json!({}),
+            status: BindingStatus::Active,
+        },
+        &Registry::builtin(),
+    )
+    .await
+    .expect_err("the release declares a procedure executor");
+    match error {
+        OrganisationStoreError::BindingKindMismatch { binding, release } => {
+            assert_eq!(binding, "internal_agent");
+            assert_eq!(release, "procedure");
+        }
+        other => panic!("expected BindingKindMismatch, got {other:?}"),
+    }
+    tx.commit().await.expect("commit");
+}
+
 async fn active_binding(
     db: &support::TestDb,
     org: &Org,
@@ -583,6 +722,35 @@ async fn seed_organisation_is_idempotent_and_the_seeded_anatomy_compiles() {
             .and_then(|values| values.first())
             .and_then(|value| value.as_str()),
         Some("delivery")
+    );
+    let grants = anatomy
+        .get("grants")
+        .and_then(|value| value.as_array())
+        .expect("the seeded job carries a typed grant list");
+    assert!(!grants.is_empty(), "backend_engineer is a tool-backed job");
+    for grant in grants {
+        assert!(
+            grant
+                .get("op")
+                .and_then(|op| op.as_str())
+                .is_some_and(|op| op.contains('.')),
+            "every seeded grant names <toolkit>.<operation>: {grant}"
+        );
+        assert!(
+            grant.get("max_side_effect").is_some(),
+            "every seeded grant names its ceiling: {grant}"
+        );
+    }
+    assert_eq!(
+        anatomy
+            .get("prompt_recipe")
+            .and_then(|value| value.as_str()),
+        Some("agent@1"),
+        "the seeded jobs pin a recipe every tenant has"
+    );
+    assert!(
+        anatomy.get("limits").is_some_and(|value| value.is_object()),
+        "the seeded limits are the typed object, not a display string"
     );
 
     let draft_releases: i64 = sqlx::query_scalar(
