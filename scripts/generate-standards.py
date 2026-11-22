@@ -40,7 +40,6 @@ from typing import Any, Iterable
 ROOT = Path(__file__).resolve().parents[1]
 STANDARD_PATH = ROOT / "seed" / "output-standard.json"
 FINDINGS_PATH = ROOT / "docs" / "evidence" / "standards-findings.json"
-DATA_PATH = ROOT / "docs" / "design" / "data" / "standards.json"
 SCHEMA = "design-standards/v1"
 FINDINGS_SCHEMA = "conveyor-v1-findings/v1"
 PACKAGE_SCHEMA = "conveyor-rework/v1"
@@ -650,7 +649,12 @@ def build_instances(
                     continue
                 identifier = f"std-{slug(str(template['standard']))}-{slug(category)}-{slug(subject['key'])}"
                 if identifier in seen:
-                    continue
+                    # Two subjects whose keys slug to the same id would otherwise drop one
+                    # artefact silently — and every gate would rebuild the same omission.
+                    raise GenerationError(
+                        f"two subjects share the artefact id {identifier!r}; "
+                        "their keys collide after slugging"
+                    )
                 seen.add(identifier)
                 required = list(template.get("required") or [])
                 sections = [
@@ -1011,17 +1015,53 @@ def build_document(
     return document
 
 
-def write_outputs(document: dict[str, Any], findings: dict[str, Any], data_out: Path, findings_out: Path) -> None:
+def js_assignment(name: str, payload: dict[str, Any]) -> str:
+    """The one serialisation used for every generated global in the pack."""
+    return (
+        f"window.{name} = "
+        + json.dumps(payload, indent=2, sort_keys=True, ensure_ascii=False)
+        + ";\n"
+    )
+
+
+def load_register(snapshot_dir: Path) -> dict[str, Any] | None:
+    """The register the record names its packages from.
+
+    A live publish writes the Rust snapshot's `rework.json`; a pack published from the committed
+    snapshot writes the generated `rework.js` global instead. Both carry the same object.
+    """
+    json_path = snapshot_dir / "rework.json"
+    if json_path.is_file():
+        return json.loads(json_path.read_text(encoding="utf-8"))
+    js_path = snapshot_dir / "rework.js"
+    if js_path.is_file():
+        text = js_path.read_text(encoding="utf-8")
+        prefix = "window.CONVEYOR_REWORK = "
+        body = text[len(prefix):] if text.startswith(prefix) else text
+        return json.loads(body.rstrip().rstrip(";"))
+    return None
+
+
+def write_outputs(
+    document: dict[str, Any],
+    findings: dict[str, Any],
+    data_out: Path,
+    findings_out: Path,
+    register: dict[str, Any] | None = None,
+) -> None:
     data_out.mkdir(parents=True, exist_ok=True)
     (data_out / "standards.json").write_text(
         json.dumps(document, indent=2, sort_keys=True, ensure_ascii=False) + "\n", encoding="utf-8"
     )
     (data_out / "standards.js").write_text(
-        "window.CONVEYOR_STANDARDS = "
-        + json.dumps(document, indent=2, sort_keys=True, ensure_ascii=False)
-        + ";\n",
-        encoding="utf-8",
+        js_assignment("CONVEYOR_STANDARDS", document), encoding="utf-8"
     )
+    if register is not None:
+        # The register travels with the pack the same way the record does. A live publish keeps
+        # embedding it in snapshot.js as well; the page prefers whichever is present.
+        (data_out / "rework.js").write_text(
+            js_assignment("CONVEYOR_REWORK", register), encoding="utf-8"
+        )
     findings_out.parent.mkdir(parents=True, exist_ok=True)
     findings_out.write_text(
         json.dumps(findings, indent=2, sort_keys=True, ensure_ascii=False) + "\n", encoding="utf-8"
@@ -1085,10 +1125,22 @@ def generate(
 def check(
     std: dict[str, Any],
     snapshot: dict[str, Any],
+    snapshot_dir: Path,
     outputs_dir: Path,
     covered_keys: set[str],
 ) -> int:
-    document, findings = generate(std, snapshot, outputs_dir, covered_keys=covered_keys)
+    # The record names a package for every mandatory artefact that is not evidenced, so a committed
+    # record can only be reproduced with the register the pack published. A live publish writes
+    # `rework.json`; a committed-snapshot publish writes `rework.js`.
+    try:
+        register = load_register(snapshot_dir)
+    except (OSError, json.JSONDecodeError) as error:
+        print(
+            f"generate-standards: the register beside {snapshot_dir} does not parse: {error}",
+            file=sys.stderr,
+        )
+        return 1
+    document, findings = generate(std, snapshot, outputs_dir, register, covered_keys=covered_keys)
     problems: list[str] = []
     if FINDINGS_PATH.is_file():
         committed = json.loads(FINDINGS_PATH.read_text(encoding="utf-8"))
@@ -1096,10 +1148,44 @@ def check(
             problems.append(f"{FINDINGS_PATH} is stale; regenerate it")
     else:
         problems.append(f"{FINDINGS_PATH} is missing; generate it")
-    if DATA_PATH.is_file():
-        committed = json.loads(DATA_PATH.read_text(encoding="utf-8"))
+    record_path = snapshot_dir / "standards.json"
+    if record_path.is_file():
+        committed = json.loads(record_path.read_text(encoding="utf-8"))
         if committed.get("payload_sha256") != document.get("payload_sha256"):
-            problems.append(f"{DATA_PATH} is stale; regenerate it")
+            problems.append(f"{record_path} is stale; regenerate it")
+        else:
+            # The record's own claim is that every artefact has a page whose bytes hash to it.
+            # A deleted or edited page is a stale record even when the payload is unchanged.
+            # `document.path` is relative to the pack root, which is the snapshot's parent — not
+            # the outputs directory (an --outputs-dir anywhere else would hash files outside the
+            # pack). Containment is asserted so a record cannot point the check outside it.
+            pack_root = snapshot_dir.parent.resolve()
+            for artefact in committed.get("artefacts") or []:
+                artefact_id = str(artefact.get("id") or "?")
+                page_doc = artefact.get("document") or {}
+                if not page_doc.get("path"):
+                    problems.append(f"{artefact_id}: the record names no page")
+                    continue
+                page = (pack_root / str(page_doc["path"])).resolve()
+                try:
+                    page.relative_to(pack_root)
+                except ValueError:
+                    problems.append(f"{artefact_id}: page {page_doc['path']} escapes the pack")
+                else:
+                    if not page.is_file():
+                        problems.append(f"{page} is missing; regenerate the record")
+                    elif sha256_text(page.read_text(encoding="utf-8")) != page_doc.get("sha256"):
+                        problems.append(f"{page} does not match its recorded hash")
+        script_path = snapshot_dir / "standards.js"
+        if script_path.is_file():
+            if script_path.read_text(encoding="utf-8") != js_assignment(
+                "CONVEYOR_STANDARDS", committed
+            ):
+                problems.append(f"{script_path} is stale; regenerate it")
+        else:
+            problems.append(f"{script_path} is missing; generate it")
+    else:
+        problems.append(f"{record_path} is missing; generate the record")
     for problem in problems:
         print(f"generate-standards: {problem}", file=sys.stderr)
     if problems:
@@ -1224,7 +1310,7 @@ def main() -> int:
     gap_path = args.gaps or (ROOT / "docs" / "evidence" / "conformance-gap-register.json")
     covered_keys = load_gap_keys(gap_path) if gap_path.is_file() else set()
     if args.check:
-        return check(std, snapshot, args.outputs_dir, covered_keys)
+        return check(std, snapshot, args.snapshot, args.outputs_dir, covered_keys)
     register = None
     if args.register:
         register = json.loads(args.register.read_text(encoding="utf-8"))
@@ -1236,6 +1322,7 @@ def main() -> int:
             document, findings,
             args.data_out,
             args.findings_out or (args.data_out / "standards-findings.json"),
+            register,
         )
     elif args.findings_out:
         # Pass 1 of the publish writes findings only; the audit consumes the file before the

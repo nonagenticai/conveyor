@@ -289,13 +289,14 @@ jobs:
           python3 scripts/check-output-standard.py
           python3 scripts/generate-standards.py --self-test
           python3 scripts/generate-standards.py --check --snapshot docs/design/data
+          docs/design/scripts/publish-standards.sh --check
           bash scripts/ci/tests/standards_pack.sh
           bash scripts/ci/tests/publish_audit.sh
           python3 scripts/ci/board.py --self-test
           node docs/design/scripts/check-coverage.cjs --self-test
           node docs/design/scripts/check-data.cjs
           node docs/design/scripts/check-standards.cjs --self-test
-          node docs/design/scripts/check-standards.cjs
+          node docs/design/scripts/check-standards.cjs --data docs/design/data --documents docs/design
           node docs/design/scripts/check-outputs.cjs --self-test
           node docs/design/scripts/check-outputs.cjs
           node docs/design/scripts/check-docs.cjs
