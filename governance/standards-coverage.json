@@ -557,7 +557,7 @@
         "pointer": "/waivers",
         "reason": "projected by the store's live snapshot; the committed pack is frozen at a33e6562"
       },
-      "spec": "ADR 0010 \u00a7Decision 1",
+      "spec": "ADR 0012 \u00a7Decision 1",
       "standard": "MSP",
       "verifier": {
         "kind": "registry",

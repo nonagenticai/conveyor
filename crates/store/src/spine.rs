@@ -3288,11 +3288,13 @@ pub async fn pending_pi_plan_approval_tx(
     .await?)
 }
 
-/// The approved PI-plan gate whose approving decision a person made, if one exists.
+/// The approved PI-plan gate whose approving decision is a person's or a delegated rule's.
 ///
-/// `decided_by_kind = 'human'` is the rule, not a display detail: a service or an agent can
-/// decide a gate through the generic approvals surface, and that decision must not turn an
-/// unapproved plan into cards. [`materialise_pi_tx`] refuses without this row.
+/// A `human` approve always qualifies; a `rule` approve qualifies only when
+/// `via.delegation_ref` names an active, published `category='decision'` document (the same
+/// shape `tranches.resume` accepts). A service or an undelegated agent can decide a gate
+/// through the generic approvals surface, and that decision must not turn an unapproved plan
+/// into cards. [`materialise_pi_tx`] refuses without this row.
 pub async fn pi_plan_human_approval_tx(
     conn: &mut PgConnection,
     tenant: TenantId,
@@ -3306,7 +3308,17 @@ pub async fn pi_plan_human_approval_tx(
             AND EXISTS (
                 SELECT 1 FROM approval_decision d
                  WHERE d.tenant_id = a.tenant_id AND d.approval_id = a.id
-                   AND d.decision = 'approve' AND d.decided_by_kind = 'human')
+                   AND d.decision = 'approve'
+                   AND (d.decided_by_kind = 'human'
+                        OR (d.decided_by_kind = 'rule'
+                            AND d.via->>'delegation_ref' IS NOT NULL
+                            AND EXISTS (
+                                SELECT 1 FROM document doc
+                                 WHERE doc.tenant_id = a.tenant_id
+                                   AND doc.id::text = d.via->>'delegation_ref'
+                                   AND doc.status = 'active'
+                                   AND doc.published_at IS NOT NULL
+                                   AND doc.category = 'decision'))))
           ORDER BY a.created_at, a.id
           LIMIT 1",
     )

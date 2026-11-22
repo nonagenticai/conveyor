@@ -11,5 +11,5 @@ shared snapshot check (`project`, `project_baseline`, `closure_outputs`, `contra
 `gate` is prose, and `gate_checks = [ids...]` names the checks that discharge it: each id
 must resolve to a row in the same manifest that runs and passes. An active or closed project
 with no `gate_checks` fails with "the gate names no executable checks". A `[[allow]]` row is
-refused as a finding (ADR 0010): no deferral or residual is a disposition. A project closes
+refused as a finding (ADR 0012): no deferral or residual is a disposition. A project closes
 only on a green manifest at a named snapshot.

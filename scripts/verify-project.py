@@ -30,7 +30,7 @@ Manifest shape:
     # command = "..."                 # required when kind = "command"
 
 A `[[allow]]` block is refused as a finding: no deferral, waiver or residual is a
-disposition for programme work (docs/decisions/0010-no-deferrals.md). An active or
+disposition for programme work (docs/decisions/0012-no-deferrals.md). An active or
 closed project's `gate` must be discharged by its `gate_checks`: each named id must
 resolve to a check in this manifest, and that check must run and pass.
 
@@ -307,7 +307,7 @@ def _active_waiver(snapshot: Snapshot, project_id: str) -> dict[str, Any] | None
     """The active TOGAF architecture waiver on a compliance review, if one exists.
 
     Only an `architecture_waiver` may suppress a non-conformant architecture review. A
-    programme waiver (any other kind) never suppresses a programme finding (ADR 0010).
+    programme waiver (any other kind) never suppresses a programme finding (ADR 0012).
     """
     now = datetime.now(timezone.utc)
     for waiver in snapshot.waivers(project_id):
@@ -763,7 +763,7 @@ def check_product_findings(
 
     The register is derived from this snapshot and the checked-in v1 ledger. A package is
     cleared only when its gap disappears from a fresh audit or its finding carries
-    `resolved_by`; a waiver or suppression is not a disposition (ADR 0010), so a
+    `resolved_by`; a waiver or suppression is not a disposition (ADR 0012), so a
     suppressed package counts as open. A project cannot close over an open P0 package.
     """
     register, error = rework_register(snapshot)
@@ -817,7 +817,7 @@ def check_artefact_standard(
     """Every mandatory standard artefact this project owns is evidenced.
 
     A standard package (TOGAF, PMP, MSP, SAFe) is cleared only when its gap disappears from the
-    fresh audit; severity does not exempt it and a suppressed package counts as open (ADR 0010).
+    fresh audit; severity does not exempt it and a suppressed package counts as open (ADR 0012).
     The owner may be named by project key or by project id.
     """
     register, error = _register(snapshot)
@@ -845,7 +845,7 @@ def check_rework_resolution(
     """Fail every unresolved P0/P1 rework package.
 
     An open P2 is advisory and passes. No disposition — waiver, deferral, suppression or a
-    dated residual — resolves a P0/P1 package (ADR 0010): it closes when the work lands.
+    dated residual — resolves a P0/P1 package (ADR 0012): it closes when the work lands.
     """
     register, error = _register(snapshot)
     if error:
@@ -1101,7 +1101,7 @@ def run_project(
     failures: list[str] = []
     warnings: list[str] = []
     # A `[[allow]]` block is refused as a finding, never applied: no deferral, waiver or
-    # residual is a disposition for programme work (ADR 0010). The named check must execute.
+    # residual is a disposition for programme work (ADR 0012). The named check must execute.
     if disallowed:
         detail = (
             f"{len(disallowed)} [[allow]] block(s) in the manifest; programme work permits "
@@ -1845,7 +1845,7 @@ severity = "P0"
         return mutate
 
     # Only an architecture_waiver on the compliance review may suppress a non-conformant
-    # verdict; a programme waiver never does (ADR 0010).
+    # verdict; a programme waiver never does (ADR 0012).
     hardening_case(
         "review-architecture-waiver", review_with_waiver("architecture_waiver"), True
     )
