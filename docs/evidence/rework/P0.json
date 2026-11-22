@@ -1,7 +1,6 @@
 {
   "checks": [
     {
-      "allowed": false,
       "check": "project",
       "description": "P0 is closed",
       "detail": "project P0 is closed",
@@ -11,17 +10,15 @@
       "severity": "P0"
     },
     {
-      "allowed": false,
       "check": "project_baseline",
       "description": "the scope baseline is approved; the close gate reads the approved row",
-      "detail": "1 project baseline(s); 1 approved",
+      "detail": "baseline 01a1fbb1-b05c-76b6-a5ac-7186fb859dcc approved by 01a1e8a7-8b23-76a9-9114-aafb95f7a545, taken by 01a1e607-17d9-77d3-98d3-a43a87c4633d, snapshot frozen",
       "id": "P0-baseline",
       "kind": "snapshot",
       "result": "pass",
       "severity": "P0"
     },
     {
-      "allowed": false,
       "check": null,
       "command": "python3 scripts/programme-record.py --check --action pm.get --input '{\"project_id\":\"01a1dcb8-d24b-76de-b901-56fd56e001bc\"}' | python3 -c '\nimport json,sys\ns=sys.stdin.read()\nd=json.loads(s[s.find(\"{\"):])\no=d.get(\"output\",d)\nassert o.get(\"charter_asset_id\"), \"no charter asset\"\ngates={g.get(\"gate\"):g.get(\"status\") for g in o.get(\"gates\",[])}\nassert gates.get(\"charter\")==\"approved\", gates\n'\n",
       "description": "the charter asset exists and the charter gate is approved",
@@ -35,7 +32,6 @@
       "stdout": ""
     },
     {
-      "allowed": false,
       "check": "closure_outputs",
       "description": "the declared closure outputs are declared and published",
       "detail": "1 closure outputs published",
@@ -45,37 +41,33 @@
       "severity": "P0"
     },
     {
-      "allowed": false,
       "check": "contract",
       "description": "a live board-approved delivery contract exists",
-      "detail": "contract 01a1fdd2-5041-7f80-8032-3305751d498c approved by 01a1e8a7-8b23-76a9-9114-aafb95f7a545, requested by 01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "detail": "contract 01a1fdd2-5041-7f80-8032-3305751d498c approved by board decision 01a1fdd2-74eb-7fe3-a424-cdf02d021931 about this contract; approver 01a1e8a7-8b23-76a9-9114-aafb95f7a545 distinct from requester 01a1e607-17d9-77d3-98d3-a43a87c4633d",
       "id": "P0-contract",
       "kind": "snapshot",
       "result": "pass",
       "severity": "P0"
     },
     {
-      "allowed": false,
       "check": "review",
       "description": "the Phase-G review cites a published standing delegation",
-      "detail": "review 01a1fdd7-8227-7441-8f43-385bd3e186fa cites the published delegation 01a1fb9f-ac2d-732d-b274-1079be3dd2b3",
+      "detail": "review 01a1fdd7-8227-7441-8f43-385bd3e186fa (compliant) of the live contract cites the published delegation 01a1fb9f-ac2d-732d-b274-1079be3dd2b3",
       "id": "P0-review",
       "kind": "snapshot",
       "result": "pass",
       "severity": "P0"
     },
     {
-      "allowed": false,
       "check": "closure_gate",
       "description": "the closure gate was decided by an approver other than its requester",
-      "detail": "closure gate 01a1fdd5-b773-78c3-87d1-8f3c5ae9eeda decided by a distinct approver",
+      "detail": "latest closure gate 01a1fdd5-b773-78c3-87d1-8f3c5ae9eeda decided by a distinct approver",
       "id": "P0-closure-gate",
       "kind": "snapshot",
       "result": "pass",
       "severity": "P0"
     },
     {
-      "allowed": false,
       "check": "waivers",
       "description": "no active waiver is expired or owned by its reviewer",
       "detail": "0 active waiver(s), all dated and distinct from the reviewer",
@@ -85,23 +77,15 @@
       "severity": "P0"
     },
     {
-      "allow": {
-        "expires": "2027-02-18",
-        "issue": "U6",
-        "owner": "programme owner",
-        "reason": "the six benefit instruments and their baselines are U6's measurement unit; the ledger keeps the P1"
-      },
-      "allowed": true,
       "check": "benefit_baseline",
       "description": "the programme's six benefit baselines are measured",
-      "detail": "benefit 01a1e9de-4e4f-757e-a8c8-bf3522e5adcf has a placeholder baseline: 'not measured - no instrument exists (recorded as a kata on the kata project)'",
+      "detail": "benefit 01a1e9de-4e4f-757e-a8c8-bf3522e5adcf baseline is not a structured measurement: 'not measured - no instrument exists (recorded as a kata on the kata project)'",
       "id": "P0-benefit-baseline",
       "kind": "snapshot",
-      "result": "pass",
+      "result": "fail",
       "severity": "P1"
     },
     {
-      "allowed": false,
       "check": "pi_cadence",
       "description": "the project's PI has a cadence row and a backlog-refinement row",
       "detail": "PI cadence 01a1ff21-33f0-7e5a-bafc-b09b6fc73c13 and refinement 01a1ff21-547f-73e8-b256-4bee7fdc9c70 for tranche-0",
@@ -111,7 +95,6 @@
       "severity": "P0"
     },
     {
-      "allowed": false,
       "check": "wsjf",
       "description": "every WBS deliverable of the project carries the four typed WSJF inputs",
       "detail": "1 WBS node(s) carry the four WSJF inputs",
@@ -121,7 +104,6 @@
       "severity": "P0"
     },
     {
-      "allowed": false,
       "check": "demo_credits",
       "description": "every accepted deliverable has a demo credit carrying its evidence",
       "detail": "1 accepted deliverable(s), each with a demo credit",
@@ -131,17 +113,15 @@
       "severity": "P0"
     },
     {
-      "allowed": false,
       "check": "lessons",
       "description": "the PI's retro produced its lessons",
-      "detail": "5 lesson(s) from the tranche-0 retro",
+      "detail": "lesson 01a1ff25-4672-7148-a9f5-acc7213ed48f carries a statement and evidence from the tranche-0 retro",
       "id": "P0-lessons",
       "kind": "snapshot",
       "result": "pass",
       "severity": "P0"
     },
     {
-      "allowed": false,
       "check": "pi_plan",
       "description": "the PI plan is a published programme output",
       "detail": "the tranche-0 PI plan is published",
@@ -151,7 +131,6 @@
       "severity": "P0"
     },
     {
-      "allowed": false,
       "check": "pi_objectives",
       "description": "the PI objectives are a published programme output",
       "detail": "the tranche-0 PI objectives are published",
@@ -161,7 +140,6 @@
       "severity": "P0"
     },
     {
-      "allowed": false,
       "check": "product_findings",
       "description": "no open P0 product finding remains for the project",
       "detail": "no open P0 package for this project",
@@ -169,21 +147,43 @@
       "kind": "snapshot",
       "result": "pass",
       "severity": "P0"
+    },
+    {
+      "check": null,
+      "description": "the declared gate is discharged by executable checks",
+      "detail": "the gate check 'P0-benefit-baseline' did not pass",
+      "id": "gate",
+      "kind": "manifest",
+      "result": "fail",
+      "severity": "P0"
+    },
+    {
+      "check": null,
+      "description": "a closed project must not carry a red acceptance manifest",
+      "detail": "the project is closed while its manifest is red",
+      "id": "closed-on-red",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P0"
     }
   ],
-  "failures": [],
+  "failures": [
+    "P0-benefit-baseline (P1): benefit 01a1e9de-4e4f-757e-a8c8-bf3522e5adcf baseline is not a structured measurement: 'not measured - no instrument exists (recorded as a kata on the kata project)'",
+    "gate (P0): the gate check 'P0-benefit-baseline' did not pass",
+    "closed-on-red (P0): the project is closed on a red manifest"
+  ],
   "gate": "The definition set is published; the charter and scope baseline are approved; the closure review and close gate are recorded.",
-  "generated_at": "2026-11-21T22:39:15.007102+00:00",
+  "generated_at": "2026-11-22T19:42:00.786576+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/P0.toml",
   "name": "Programme definition \u2014 vision, blueprint, plan and project briefs",
   "project": "P0",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-21T20:52:01.734068+00:00",
-    "git_sha": "2a1ff31df668b8fc456dcac2640f29f44cafcf16",
-    "path": "retained-snapshot/2a1ff31df668b8fc456dcac2640f29f44cafcf16"
+    "generated_at": "2026-11-22T09:46:52.711627+00:00",
+    "git_sha": "97d45aa63832ccfcd03cfac5b8a5014bc63155fb",
+    "path": "retained-snapshot/97d45aa63832ccfcd03cfac5b8a5014bc63155fb"
   },
-  "verdict": "green",
+  "verdict": "red",
   "warnings": []
 }

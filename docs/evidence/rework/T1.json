@@ -1,7 +1,6 @@
 {
   "checks": [
     {
-      "allowed": false,
       "check": "project",
       "description": "T1 is closed",
       "detail": "project T1 is closed",
@@ -11,17 +10,15 @@
       "severity": "P0"
     },
     {
-      "allowed": false,
       "check": "project_baseline",
       "description": "the scope baseline is approved; the close gate reads the approved row",
-      "detail": "1 project baseline(s); 1 approved",
+      "detail": "baseline 01a1ff8a-b4f0-7e6e-9cc7-4231076e1039 approved by 01a1e8a7-8b23-76a9-9114-aafb95f7a545, taken by 01a1e607-17d9-77d3-98d3-a43a87c4633d, snapshot frozen",
       "id": "T1-baseline",
       "kind": "snapshot",
       "result": "pass",
       "severity": "P0"
     },
     {
-      "allowed": false,
       "check": null,
       "command": "python3 scripts/programme-record.py --check --action pm.get --input '{\"project_id\":\"01a1d039-0d32-7c81-8365-371217d16ef7\"}' | python3 -c '\nimport json,sys\ns=sys.stdin.read()\nd=json.loads(s[s.find(\"{\"):])\no=d.get(\"output\",d)\nassert o.get(\"charter_asset_id\"), \"no charter asset\"\ngates={g.get(\"gate\"):g.get(\"status\") for g in o.get(\"gates\",[])}\nassert gates.get(\"charter\")==\"approved\", gates\n'\n",
       "description": "the charter asset exists and the charter gate is approved",
@@ -35,7 +32,6 @@
       "stdout": ""
     },
     {
-      "allowed": false,
       "check": "closure_outputs",
       "description": "the declared closure outputs are declared and published",
       "detail": "1 closure outputs published",
@@ -45,37 +41,33 @@
       "severity": "P0"
     },
     {
-      "allowed": false,
       "check": "contract",
       "description": "a live board-approved delivery contract exists",
-      "detail": "contract 01a1ff89-02bd-7b6d-902e-ffa5902cc7f5 approved by 01a1e8a7-8b23-76a9-9114-aafb95f7a545, requested by 01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "detail": "contract 01a1ff89-02bd-7b6d-902e-ffa5902cc7f5 approved by board decision 01a1ff89-1794-79d0-8707-f7614987ee7c about this contract; approver 01a1e8a7-8b23-76a9-9114-aafb95f7a545 distinct from requester 01a1e607-17d9-77d3-98d3-a43a87c4633d",
       "id": "T1-contract",
       "kind": "snapshot",
       "result": "pass",
       "severity": "P0"
     },
     {
-      "allowed": false,
       "check": "review",
       "description": "the Phase-G review cites a published standing delegation",
-      "detail": "review 01a1ff8b-b3ac-7082-bc16-df2f97bd7f8d cites the published delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+      "detail": "review 01a1ff8b-b3ac-7082-bc16-df2f97bd7f8d (compliant) of the live contract cites the published delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
       "id": "T1-review",
       "kind": "snapshot",
       "result": "pass",
       "severity": "P0"
     },
     {
-      "allowed": false,
       "check": "closure_gate",
       "description": "the closure gate was decided by an approver other than its requester",
-      "detail": "closure gate 01a1ff8c-5646-741c-82c6-0665f98c3adb decided by a distinct approver",
+      "detail": "latest closure gate 01a20231-0d43-74ad-80ca-42088a1be984 decided by a distinct approver",
       "id": "T1-closure-gate",
       "kind": "snapshot",
       "result": "pass",
       "severity": "P0"
     },
     {
-      "allowed": false,
       "check": "waivers",
       "description": "no active waiver is expired or owned by its reviewer",
       "detail": "0 active waiver(s), all dated and distinct from the reviewer",
@@ -85,7 +77,6 @@
       "severity": "P0"
     },
     {
-      "allowed": false,
       "check": "pi_cadence",
       "description": "the project's PI has a cadence row and a backlog-refinement row",
       "detail": "PI cadence 01a1ff73-df1f-78c5-8793-101de5a3dd60 and refinement 01a1ff74-8982-77b9-971e-e4517c55d09a for tranche-1",
@@ -95,7 +86,6 @@
       "severity": "P0"
     },
     {
-      "allowed": false,
       "check": "pi_plan",
       "description": "the tranche-1 PI plan is published",
       "detail": "the tranche-1 PI plan is published",
@@ -105,7 +95,6 @@
       "severity": "P0"
     },
     {
-      "allowed": false,
       "check": "pi_objectives",
       "description": "the tranche-1 PI objectives are published",
       "detail": "the tranche-1 PI objectives are published",
@@ -115,7 +104,6 @@
       "severity": "P0"
     },
     {
-      "allowed": false,
       "check": "wsjf",
       "description": "every WBS deliverable of the project carries the four typed WSJF inputs",
       "detail": "1 WBS node(s) carry the four WSJF inputs",
@@ -125,7 +113,6 @@
       "severity": "P0"
     },
     {
-      "allowed": false,
       "check": "demo_credits",
       "description": "every accepted deliverable has a demo credit carrying its evidence",
       "detail": "1 accepted deliverable(s), each with a demo credit",
@@ -135,17 +122,15 @@
       "severity": "P0"
     },
     {
-      "allowed": false,
       "check": "lessons",
       "description": "the tranche-1 retro produced at least one lesson",
-      "detail": "5 lesson(s) from the tranche-1 retro",
+      "detail": "lesson 01a1ff83-3f5c-7734-830a-c8bb6c45024f carries a statement and evidence from the tranche-1 retro",
       "id": "T1-lessons",
       "kind": "snapshot",
       "result": "pass",
       "severity": "P1"
     },
     {
-      "allowed": false,
       "check": "product_findings",
       "description": "no open P0 product finding remains for the project",
       "detail": "no open P0 package for this project",
@@ -153,20 +138,29 @@
       "kind": "snapshot",
       "result": "pass",
       "severity": "P0"
+    },
+    {
+      "check": null,
+      "description": "the declared gate is discharged by executable checks",
+      "detail": "gate discharged by executable checks: T1-project, T1-baseline, T1-charter, T1-closure-outputs, T1-contract, T1-review, T1-closure-gate, T1-waivers, T1-pi-cadence, T1-pi-plan, T1-pi-objectives, T1-wsjf, T1-demo-credits, T1-lessons, T1-product",
+      "id": "gate",
+      "kind": "manifest",
+      "result": "pass",
+      "severity": "P0"
     }
   ],
   "failures": [],
   "gate": "The A\u2013D artefacts, the delivery contract, the closure review and the declared outputs exist; the project re-closes through the one gate.",
-  "generated_at": "2026-11-21T22:39:34.845889+00:00",
+  "generated_at": "2026-11-22T19:42:03.926439+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T1.toml",
   "name": "Plan spine \u2014 WBS, baselines, registers, cadence, tranches, benefits",
   "project": "T1",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-21T20:52:01.734068+00:00",
-    "git_sha": "2a1ff31df668b8fc456dcac2640f29f44cafcf16",
-    "path": "retained-snapshot/2a1ff31df668b8fc456dcac2640f29f44cafcf16"
+    "generated_at": "2026-11-22T09:46:52.711627+00:00",
+    "git_sha": "97d45aa63832ccfcd03cfac5b8a5014bc63155fb",
+    "path": "retained-snapshot/97d45aa63832ccfcd03cfac5b8a5014bc63155fb"
   },
   "verdict": "green",
   "warnings": []
