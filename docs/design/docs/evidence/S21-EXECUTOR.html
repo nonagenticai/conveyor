@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>S21 step 4 — the internalagent executor runtime and its tool grant · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S21-EXECUTOR.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="s21-step-4--the-internal_agent-executor-runtime-and-its-tool-grant">S21 step 4 — the <code>internal_agent</code> executor runtime and its tool grant</h1>
+<p><strong>Issue:</strong> #581 · <strong>Branch:</strong> <code>issue/581-s21-internal-agent-runtime</code> · <strong>Date:</strong> 2026-11-22 · <strong>Baseline:</strong> <code>origin/main@6c1c47b5</code> (the #15 merge)</p>
+<h2 id="what-was-built">What was built</h2>
+<ul>
+<li><code>crates/actions/src/executor/</code> — <code>execute_run</code> (the one dispatch point), <code>ExecutorRuntime</code> (kind → <code>RunExecutor</code>), the <code>internal_agent</code> handler (release resolution, readiness, one <code>run_step</code>, the one compiler, the one loop, the draft <code>document</code>, the laya pre-check, the terminal records) and the <code>procedure</code> refusal.</li>
+<li><code>crates/domain/src/organisation.rs</code> — <code>ReleaseAnatomy</code>, <code>ReleaseGrant</code>, <code>SideEffect</code>, <code>ReleaseLimits</code> and the effective-pin helpers; <code>job_releases.publish</code> refuses a malformed anatomy before the hash, and <code>job_bindings.create</code> refuses a kind the release disagrees with.</li>
+<li><code>crates/actions/src/workflow/agent.rs</code> — release pins and the grant filter in the bound path; <code>run_release_step</code>; <code>AgentRunOut</code> carries the compiled identity.</li>
+<li><code>crates/actions/src/prompt/mod.rs</code> + <code>crates/store/src/prompt.rs</code> — the pins-aware compile and the synthesized Request source for a plain run.</li>
+<li><code>crates/store/src/run.rs</code> — <code>RunContext</code> carries the binding pin; <code>bind_executor_tx</code> fills the run's capability/agent from the binding.</li>
+<li><code>crates/store/src/workflow/run.rs</code> — <code>NewWorkflowStep.node_id: Option&lt;String&gt;</code> (the column is already nullable; no migration).</li>
+<li><code>apps/server/src/worker.rs</code> — <code>run_execute</code> delegates to the executor.</li>
+<li><code>seed/organisation.json</code> — typed grants and limits; the seeded jobs pin <code>agent@1</code>.</li>
+<li>Artifacts: S21 §14/§15, ADR 0010, CONTRACT §17 fix + §22, 02-DATA-ARCHITECTURE §2.22–§2.24, 00-INDEX row, the architecture diagram caption, this receipt.</li>
+</ul>
+<h2 id="measured-at-the-branch-head">Measured at the branch head</h2>
+<table>
+<thead>
+<tr>
+<th>Suite</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>executor_runtime</code> (new)</td>
+<td><strong>5/5</strong></td>
+</tr>
+<tr>
+<td><code>internal_agent_runtime</code> (new)</td>
+<td><strong>9/9</strong></td>
+</tr>
+<tr>
+<td><code>agent_run_resolved</code></td>
+<td><strong>15/15</strong></td>
+</tr>
+<tr>
+<td><code>prompt_compile</code></td>
+<td><strong>7/7</strong></td>
+</tr>
+<tr>
+<td><code>process_agent_resolved</code></td>
+<td><strong>4/4</strong></td>
+</tr>
+<tr>
+<td><code>decision_ladder</code></td>
+<td><strong>7/7</strong></td>
+</tr>
+<tr>
+<td><code>registry</code></td>
+<td><strong>12/12</strong></td>
+</tr>
+<tr>
+<td>store <code>prompt_catalogue</code></td>
+<td><strong>4/4</strong></td>
+</tr>
+<tr>
+<td>store <code>organisation</code></td>
+<td><strong>9/9</strong></td>
+</tr>
+<tr>
+<td>domain <code>organisation</code> (unit)</td>
+<td><strong>12/12</strong></td>
+</tr>
+<tr>
+<td>server <code>run_retry</code></td>
+<td><strong>4/4</strong></td>
+</tr>
+<tr>
+<td>server <code>andon</code></td>
+<td><strong>3/3</strong></td>
+</tr>
+</tbody>
+</table>
+<h2 id="reversal-proofs">Reversal proofs</h2>
+<table>
+<thead>
+<tr>
+<th>Change disabled</th>
+<th>Test that turns red</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>the binding status re-check in <code>execute_run</code></td>
+<td><code>a_retired_binding_refuses_before_any_model_call</code> (the run would proceed)</td>
+</tr>
+<tr>
+<td>the grant filter in <code>resolve_bound</code></td>
+<td><code>a_binding_never_widens_the_release_grant</code> (a non-granted tool is offered)</td>
+</tr>
+<tr>
+<td>the grant-ceiling check</td>
+<td><code>a_granted_tool_above_the_grant_ceiling_is_not_offered</code></td>
+</tr>
+<tr>
+<td>the grant readiness check</td>
+<td><code>a_grant_op_with_no_binding_refuses_before_a_model_call</code></td>
+</tr>
+<tr>
+<td>the <code>run_step</code> insert</td>
+<td><code>a_bound_run_generates_a_draft</code> (no trace, and the loop has no step id)</td>
+</tr>
+<tr>
+<td>the synthesized Request source</td>
+<td><code>a_bound_run_generates_a_draft</code> (<code>capability_not_ready</code> on <code>process</code>)</td>
+</tr>
+<tr>
+<td>the decision record</td>
+<td><code>the_gate_records_a_laya_decision</code> (no <code>decision</code> row)</td>
+</tr>
+<tr>
+<td>the outage branch</td>
+<td><code>an_unavailable_judge_fails_closed</code> (a counterfactual decision would be recorded)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="generated-artifacts">Generated artifacts</h2>
+<ul>
+<li><code>docs/design/data/actions.json</code> — regenerated; <strong>no new action</strong> (508), but <code>agent.run</code>'s output schema names the compiled identity, so its operation changes.</li>
+<li><code>docs/design/data/coverage.json</code> — S21 is built with <strong>4/4</strong> modules (the <code>executor</code> module now exists in <code>crates/actions</code>).</li>
+<li><code>seed/programme.json</code> — S21 links #15 and #581.</li>
+<li><code>docs/design/docs/**</code> — regenerated; only the edited documents move.</li>
+<li><code>served-spec.lock.json</code> — <strong>539 operations, one hash changed for <code>agent.run</code></strong>. The refresh also absorbed <strong>four already-stale hashes on main</strong> (<code>laya.judge</code>, <code>media.generate_image</code>, <code>media.transcribe</code>, <code>produce.speech</code>) left by #573's shared-host timeout change, which merged after #574's branch was cut and whose merge-queue run skips the image build. The new root-lock gate in the <code>image</code> smoke would have caught it on the next PR; this PR is the first to run it and carries the corrected lock.</li>
+</ul>
+<h2 id="residuals-recorded-not-built">Residuals (recorded, not built)</h2>
+<ul>
+<li>A run-resume worker kind for a <code>handover</code> gate (a plain run fails <code>gate_requires_approval</code> and opens a card-scoped approval of kind <code>executor</code>; the draft is applied after a human decision).</li>
+<li>Mid-loop token/cost budget refusal (§7.5): the caps are validated and recorded, not enforced.</li>
+<li>A <code>tool_binding</code> provisioning action: tests insert raw rows; a live job needs an operator row.</li>
+<li>Broker-side grant enforcement for a direct <code>tools.call</code> caller (the agent surface is bounded; a direct caller is governed by the binding ceiling).</li>
+</ul>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/S21-EXECUTOR.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

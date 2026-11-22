@@ -398,6 +398,15 @@ window.CONVEYOR_DOCUMENTS = {
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S21-BUDGET.md"
     },
     {
+      "title": "S21 step 4 — the internalagent executor runtime and its tool grant",
+      "path": "docs/evidence/S21-EXECUTOR.html",
+      "source": "docs/evidence/S21-EXECUTOR.md",
+      "section": "Evidence",
+      "sha256": "da7ec67f6eae6ddd512fca1394769595567fe9cf055808e1a8b590e96da821fe",
+      "bytes": 4680,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S21-EXECUTOR.md"
+    },
+    {
       "title": "S21 step 2 — the plan projection over declared step outputs (receipt)",
       "path": "docs/evidence/S21-PLAN.html",
       "source": "docs/evidence/S21-PLAN.md",
