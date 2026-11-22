@@ -436,12 +436,17 @@ above exactly.
 
 ## 17. The executor model (added 2026-11-09; implements SPEC D22)
 
-A **work executor** drives a `run`. Two kinds exist (amended 2026-11-09); the process is the slot:
+A **work executor** drives a `run`. Two kinds are live (SPEC_V2 §4.5, D46/D61 — renaming V1's
+`process` to `procedure` and retiring `external`):
 
 | executor | drives | steps | recorded as |
 |---|---|---|---|
-| `process` | S11/S13 — a `process` whose steps are `agent \| computed \| gate \| call` | an agent step runs the bounded loop; a computed/tool step invokes one action; a gate parks; a call starts a child run | `run.process_id`, `run_step`, `run.parent_run_id`/`step_id` |
-| `external` | an agent principal over `/mcp` (D19) running a project as a task (D21) | not in this app | `run.external_ref` = task id; `action_invocation.actor`; `approval_decision.decided_by_kind`/`via` |
+| `procedure` | S11/S13 — a published `process` whose steps are `agent \| computed \| gate \| call` | an agent step runs the bounded loop; a computed/tool step invokes one action; a gate parks; a call starts a child run | `run.process_id`, `run_step`, `run.parent_run_id`/`step_id` |
+| `internal_agent` | one generation over the compiled prompt, from the binding's pinned release (§22) | one `run_step` (`agent.run`); tools are the release grant ∩ the binding | `run.job_binding_id`/`release_hash`, `run_step`, `inference_call`, `tool_call`, the draft `document`, the `decision` row |
+
+The `external` executor (V1 D21's MCP task) is **retired**, not renamed: SPEC_V2 D61 makes an
+external runtime an explicit non-goal until its four conditions hold, and no run pauses when the
+agent platform is down (`run.external_ref` stays as a historical column).
 
 - **Two agent roles per capability (added 2026-11-09).** A `capability_agent` row is a **process agent** (one per
   process / card type — the worker that decides, holding the process's domain knowledge) or a **tool agent** (one
@@ -773,3 +778,60 @@ executor.
   `bus_stream_id`/`published_at`), with the `process.step` job as the Redis-absent fallback.
 - **Pins.** S17/S18's subject is the **process** (`process_id`); the old `procedure_id` pin migrates. A procedure
   (SOP) is not a measured subject — the process is.
+
+## 22. The internal executor runtime (added 2026-11-22; S21 step 4, issue #581)
+
+A `run` dispatches on its **binding's** `executor_kind`. The domain registry
+(`conveyor_domain::executor::Registry`) is the contract authority — it validates the binding at
+creation and again at dispatch — and the execution map (`conveyor_actions::executor`) serves the
+kinds this build implements. A new kind is one `RunExecutor` implementation and one registration;
+neither the worker, the run store nor the request loop matches on a kind.
+
+**Resolution order, before any model, tool or laya call.** `run.execute` reads the run's
+`job_binding_id`. No binding → the T0 start hook (`queued → running`, no step). A binding → the
+binding must be `active`, its pinned release `published`, the snapshot hash equal to
+`release_hash`, and the kind served. Any failure is a **terminal run failure** with a typed
+`error_class` (`job_binding_stale`, `executor_unknown_kind`, `executor_kind_unsupported`,
+`capability_not_ready`, `tool_not_ready`); the job returns success, so a refusal is never retried.
+A plain run on a `procedure` binding is refused `executor_kind_unsupported` naming
+`process_runs.start`; the procedure start path stays single.
+
+**The frozen release is the execution authority.** `model_ref`, `prompt_recipe`, the loop caps and
+the tool grants come from `job_binding.release_snapshot.anatomy`; the live `capability_agent` row
+supplies its `allowed_actions` and caps as an outer ceiling. The effective value is the release's
+when present, else the row's; a cap is the minimum of the two and the platform maximum. The same
+effective values feed the compiled prompt's capability section, so the text and the call agree.
+
+**One step, one loop, one compiler, one draft.** An `internal_agent` run materialises exactly one
+`run_step` (position 1, attempt 1, action `agent.run`), compiled by `prompt::compile_for_run` (the
+one compiler) and driven by `workflow::agent::drive` (the one capped loop). A plain run has no
+process, so the release's `job_key`, title, charter, `procedure_ref` and authority render as the
+Request source in the existing `process` section; a missing required section refuses
+`capability_not_ready` naming it, before the call. The generation output is an unattached
+`document` with `meta.generated = true`; `documents.update` refuses to re-attach it and
+`ladder.apply_draft` with an accepted decision is the only apply path. Generation never moves a
+card.
+
+**The gate.** The effective kind-wide `gate.precheck` policy is the one question set. No policy →
+no laya call, `run_step.judge = no_policy`, the run succeeds with the draft. A policy → one
+`laya.judge` with the draft as `state` and the policy's authored question/criteria, then one
+`decision` row through `ladder.evaluate` pinning the option-set, policy, refinement and laya-config
+versions, the answer, confidence, latency and input hash. `accepted` → succeed; `refused` →
+`laya_refused`; below threshold per the policy's action (`block`, `annotate`, `handover` →
+`gate_requires_approval` plus a card-scoped approval). An outage follows `fail_policy` through
+`ladder::unavailable` and never records a counterfactual decision; unavailable is never a pass on a
+closed gate.
+
+**The grant.** The release's `anatomy.grants` is the typed operation allowlist
+`{op, variant, max_side_effect, enabled}`, parsed and refused `422 release.anatomy_invalid` at
+`job_releases.publish`, inside the release hash. The model's tool surface is
+`bound_tools(run) ∩ enabled(grants) ∩ effect ≤ min(grant.max_side_effect, binding.effect_ceiling)`,
+gated by `tools.call` in `allowed_actions`. An enabled grant op with no published bound tool is
+`tool_not_ready` before the model call; a tool above either ceiling is narrowed off the surface; a
+name never offered is refused `action-not-found` by the loop and writes no `tool_call`. The binding
+has no op column and cannot widen the grant; the release carries no tool content.
+
+**Retries.** DB errors and 5xx router/laya responses are retryable under the same idempotency
+prefix (`turn{N}`, `tool{N}`, `draft`, `judge`, `decision`); every typed refusal is recorded on the
+run and finishes the job. A failure emits one `run.failed` and enqueues the existing `err.card`
+trigger; a success emits one `run.succeeded`.

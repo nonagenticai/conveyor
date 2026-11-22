@@ -16,6 +16,7 @@ pub mod recipes;
 
 use conveyor_domain::TenantId;
 use conveyor_domain::capability::PromptRef;
+use conveyor_domain::organisation::ReleaseAnatomy;
 use conveyor_domain::prompt::{
     CompiledPrompt, KnowledgeHit, KnowledgeSelector, MemorySelector, PromptCompileError,
     PromptFacts, PromptSource,
@@ -136,6 +137,22 @@ pub async fn compile_for_run(
     run_step_id: Option<Uuid>,
     reference: &str,
 ) -> Result<CompiledPrompt, PromptError> {
+    compile_for_run_with_pins(pool, tenant, run_id, run_step_id, reference, None).await
+}
+
+/// [`compile_for_run`] with the run's pinned release in force (S21 step 4).
+///
+/// The release supplies the model and caps the compiled capability section names, and the
+/// Request source for a plain run that has no published procedure. It is still the ONE compiler:
+/// there is no second render path, and the compiled text is still never stored.
+pub async fn compile_for_run_with_pins(
+    pool: &sqlx::PgPool,
+    tenant: TenantId,
+    run_id: Uuid,
+    run_step_id: Option<Uuid>,
+    reference: &str,
+    release: Option<&ReleaseAnatomy>,
+) -> Result<CompiledPrompt, PromptError> {
     let mut tx = store::begin_scoped(pool, tenant)
         .await
         .map_err(store::prompt::PromptStoreError::Db)?;
@@ -143,9 +160,15 @@ pub async fn compile_for_run(
     let record = resolve(&mut tx, tenant, &key, version, reference).await?;
     let memory_selector = memory_selector_of(&record.definition)?;
     let knowledge_selector = knowledge_selector_of(&record.definition)?;
-    let mut facts =
-        store::prompt::facts_for_run_tx(&mut tx, tenant, run_id, run_step_id, &memory_selector)
-            .await?;
+    let mut facts = store::prompt::facts_for_run_tx(
+        &mut tx,
+        tenant,
+        run_id,
+        run_step_id,
+        &memory_selector,
+        release,
+    )
+    .await?;
     // Resolve the knowledge targets in the transaction; retrieve after it commits, so no
     // network call is ever made while a database transaction is open (S21 §4, ADR 0009).
     let targets = match (&knowledge_selector, facts.capability.as_ref()) {
@@ -185,12 +208,30 @@ pub async fn compile_for_run_tx(
     run_step_id: Option<Uuid>,
     reference: &str,
 ) -> Result<CompiledPrompt, PromptError> {
+    compile_for_run_tx_with_pins(conn, tenant, run_id, run_step_id, reference, None).await
+}
+
+/// [`compile_for_run_tx`] with the run's pinned release in force (S21 step 4).
+pub async fn compile_for_run_tx_with_pins(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    run_id: Uuid,
+    run_step_id: Option<Uuid>,
+    reference: &str,
+    release: Option<&ReleaseAnatomy>,
+) -> Result<CompiledPrompt, PromptError> {
     let (key, version) = parse_ref(reference)?;
     let record = resolve(conn, tenant, &key, version, reference).await?;
     let memory_selector = memory_selector_of(&record.definition)?;
-    let facts =
-        store::prompt::facts_for_run_tx(&mut *conn, tenant, run_id, run_step_id, &memory_selector)
-            .await?;
+    let facts = store::prompt::facts_for_run_tx(
+        &mut *conn,
+        tenant,
+        run_id,
+        run_step_id,
+        &memory_selector,
+        release,
+    )
+    .await?;
     compile(record, facts, reference)
 }
 

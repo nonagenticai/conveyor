@@ -1067,6 +1067,113 @@ CREATE TABLE prompt_section (
 );</code></pre>
 <p><strong><code>system</code> is the only literal kind.</strong> The other six are rendered from the run's facts — the process (stored as a process) and its step, the capability/agent row, the role, the project and card, the capability's bound packs with their selected hits, and the card's memory. A <code>required</code> section with no source is a readiness refusal, not an empty section. The built-in recipes (<code>copilot_system@1</code>, <code>prompt_audit@1</code>, <code>agent@1</code>) are seeded per tenant by <code>seed::prompts_for_tenant</code>; an existing <code>(key, version)</code> is never rewritten by a seed.</p>
 <p><strong>Recipe lifecycle (0062, ADR 0009).</strong> A version is immutable per <code>(tenant, key, version)</code>. A tenant creates a <code>draft</code>, activates it (the previous active becomes <code>retired</code> in the same transaction), or retires a version. Exact pins stay readable; a new run resolves only an <code>active</code> row. <code>prompt_section.selector</code> is the one selection config — memory <code>{kinds, limit, include_digest}</code> and knowledge <code>{query, top_k}</code> — never a second template language. Knowledge targets are resolved in the compile transaction, but retrieval runs after that transaction commits, reusing the <code>knowledge.query</code> path; the compiled text itself is still never stored.</p>
+<h3 id="222-organisation-spine--t0-5">2.22 Organisation spine — T0 (5)</h3>
+<p><code>migrations/0040_organisation.sql</code> — <code>industry</code>, <code>department</code>, <code>job_catalogue</code>, <code>job_release</code>, <code>job_binding</code>, each <code>ENABLE</code>+<code>FORCE</code> RLS with one <code>tenant_isolation</code> policy. The catalogue row is the editable draft; a release is the immutable compile; a binding pins one release like a lockfile.</p>
+<pre class="sql"><code>CREATE TABLE job_release (
+    id               uuid PRIMARY KEY DEFAULT uuidv7(),
+    tenant_id        uuid NOT NULL DEFAULT app_current_tenant(),
+    job_id           uuid NOT NULL,
+    release_hash     text NOT NULL,                    -- sha256 over the canonical snapshot
+    release_snapshot jsonb NOT NULL,                   -- {job_key,title,family,industry,departments,anatomy}
+    status           text NOT NULL DEFAULT &#39;published&#39; CHECK (status IN (&#39;published&#39;,&#39;retired&#39;)),
+    ...
+    CONSTRAINT job_release_tenant_job_hash_key UNIQUE (tenant_id, job_id, release_hash),
+    CONSTRAINT job_release_snapshot_is_object CHECK (jsonb_typeof(release_snapshot) = &#39;object&#39;)
+);
+
+CREATE TABLE job_binding (
+    id                  uuid PRIMARY KEY DEFAULT uuidv7(),
+    tenant_id           uuid NOT NULL DEFAULT app_current_tenant(),
+    job_id              uuid NOT NULL,
+    release_id          uuid NOT NULL,
+    release_hash        text NOT NULL,                 -- copied from the release, never refreshed
+    release_snapshot    jsonb NOT NULL,                -- the frozen copy
+    capability_id       uuid,
+    process_id          uuid,                          -- procedure executor
+    capability_agent_id uuid,                          -- internal_agent executor
+    executor_kind       text NOT NULL,                 -- open slug ^[a-z][a-z0-9_]{1,31}$
+    status              text NOT NULL DEFAULT &#39;draft&#39; CHECK (status IN (&#39;draft&#39;,&#39;active&#39;,&#39;retired&#39;)),
+    meta                jsonb NOT NULL DEFAULT &#39;{}&#39;::jsonb,
+    ...
+    CONSTRAINT job_binding_has_executor CHECK (process_id IS NOT NULL OR capability_agent_id IS NOT NULL)
+);</code></pre>
+<p><code>card.job_binding_id</code> names the binding; <code>run.job_binding_id</code>/<code>run.release_hash</code> record what ran (§2.24). <code>release_snapshot.anatomy</code> is the job definition verbatim; since S21 step 4 the executor parses the execution fields it needs from it — <code>executor_kind</code>, <code>model_ref</code>, <code>prompt_recipe</code>, <code>charter</code>, <code>authority</code>, <code>gate</code>, <code>limits</code>, <code>grants</code> — with one typed parser (<code>conveyor_domain::organisation::ReleaseAnatomy</code>) and refuses a malformed anatomy at <code>job_releases.publish</code> (<code>422 release.anatomy_invalid</code>) <strong>before</strong> hashing. The anatomy is inside <code>release_hash</code>, so a grant change is a new release and a new binding (D38); nothing is refreshed in place.</p>
+<p><strong>The tool grant lives here, not in a table.</strong> <code>anatomy.grants</code> is the release's operation allowlist <code>[{op, variant, max_side_effect, enabled}]</code>; <code>tool_binding</code> (§2.23) pins the toolkit versions, ceiling and credential. The release never carries tool content, and the binding never widens the grant (SPEC_V2 §11.1).</p>
+<h3 id="223-tool-estate--t13-4">2.23 Tool estate — T13 (4)</h3>
+<p><code>migrations/0055_tool_platform.sql</code> — <code>toolkit</code>, <code>tool</code>, <code>tool_binding</code>, <code>tool_call</code>, each scoped by tenant with <code>ENABLE</code>+<code>FORCE</code> RLS.</p>
+<table>
+<thead>
+<tr>
+<th>Table</th>
+<th>What it is</th>
+<th>What it must never hold</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>toolkit</code></td>
+<td>one service's published, versioned bundle (<code>key</code>, <code>version</code>, <code>status</code>, destination)</td>
+<td>a credential</td>
+</tr>
+<tr>
+<td><code>tool</code></td>
+<td>one callable operation inside a toolkit version: closed <code>input_schema</code>, <code>effect</code>, <code>timeout_secs</code>, <code>redact</code>, <code>handler_action</code></td>
+<td>a caller URL</td>
+</tr>
+<tr>
+<td><code>tool_binding</code></td>
+<td>a tenant-scoped grant of pinned toolkit versions to a job binding OR a run, narrowed by <code>effect_ceiling</code>, <code>rate</code>, <code>credential_alias</code></td>
+<td>an operation list (that is the release's grant)</td>
+</tr>
+<tr>
+<td><code>tool_call</code></td>
+<td>one audited call: run/step, tool version, input hash, status, latency, bytes, cost</td>
+<td>the input body, the credential</td>
+</tr>
+</tbody>
+</table>
+<p><code>store::tool::resolve</code> resolves one <code>(toolkit, operation)</code> through the run's binding; <code>bound_tools</code> returns every published tool reachable through the run-scoped or job-binding grant, with the pinned schema and the binding's ceiling. The broker (<code>crates/actions/src/broker.rs</code>) is the one call path: resolve → effect check → schema validate → credential by alias → destination alias → normalise/redact → <code>tool_call</code> + <code>tool.called</code>. The ceiling narrows only; a tool above it is absent from the agent's surface and refused <code>403 tool_effect_forbidden</code> at the broker.</p>
+<h3 id="224-the-internal_agent-run-trace--s21-step-4-0-new-tables">2.24 The <code>internal_agent</code> run trace — S21 step 4 (0 new tables)</h3>
+<p>A bound run reuses the existing rows; no table and no migration.</p>
+<table>
+<thead>
+<tr>
+<th>Row</th>
+<th>What the runtime writes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>run</code></td>
+<td>the binding pin (<code>job_binding_id</code>, <code>release_hash</code>, both from 0040), <code>capability_id</code>/<code>capability_agent_id</code> from the binding, the status path <code>queued → running → succeeded | failed</code> (never <code>waiting_approval</code> in this unit)</td>
+</tr>
+<tr>
+<td><code>run_step</code></td>
+<td>exactly one row: position 1, attempt 1, action <code>agent.run</code>, the pin envelope as <code>input</code>, the draft's hash as <code>output_hash</code>, and <code>judge</code> = the laya pre-check record or <code>{decision:"no_policy"}</code></td>
+</tr>
+<tr>
+<td><code>document</code></td>
+<td>the draft: <code>body</code> = the model's text, <code>meta.generated = true</code> + the prompt/binding/run identity; <code>card_id</code> null until <code>ladder.apply_draft</code> attaches it</td>
+</tr>
+<tr>
+<td><code>decision</code></td>
+<td>one <code>gate.precheck</code> row when a policy exists: rung <code>laya</code>, option-set version, policy/refinement/laya-config versions, answer, probabilities, confidence, input hash, latency</td>
+</tr>
+<tr>
+<td><code>inference_call</code></td>
+<td>one per model turn, naming <code>prompt_ref</code>/<code>prompt_version</code>/<code>prompt_sha256</code> and usage</td>
+</tr>
+<tr>
+<td><code>tool_call</code></td>
+<td>one per tool call the loop dispatches through <code>tools.call</code></td>
+</tr>
+<tr>
+<td><code>approval</code></td>
+<td>one card-scoped row only when the gate's action is <code>handover</code> (no <code>run_id</code>; the run is terminal)</td>
+</tr>
+</tbody>
+</table>
+<p>The compiled prompt text is never stored: <code>inference_call</code> and the draft's <code>meta</code> carry the identity and the hash. <code>run_step.node_id</code> is nullable (0019), so the same store serves a workflow node and this run-level step.</p>
 <h2 id="3-state-machines-and-enforcement">3. State machines and enforcement</h2>
 <p>Every transition is a pure function in <code>crates/domain</code>; no DB trigger, no per-flow rule, no CHECK that duplicates the function. The CHECK constraints below guard <em>vocabulary</em>, never <em>legality</em>.</p>
 <h3 id="31-card-lifecycle">3.1 Card lifecycle</h3>
@@ -1120,6 +1227,7 @@ CREATE TABLE prompt_section (
 </tr>
 </tbody>
 </table>
+<p><strong>A bound <code>internal_agent</code> run (S21 step 4) uses <code>queued → running → succeeded | failed</code> only.</strong> Its gate pre-check is recorded on the step and, on <code>handover</code>, fails the run <code>gate_requires_approval</code> and opens a card-scoped approval — the run never enters <code>waiting_approval</code>, because no worker kind resumes a plain run and parking would hold <code>uq_run_live</code>. A resume worker is a separate unit.</p>
 <h3 id="33-approval">3.3 Approval</h3>
 <table>
 <tbody>

@@ -14,8 +14,8 @@ sequenceDiagram
   P->>API: start a run for a card and binding
   API->>WF: enqueue the run
   WF->>B: check the pinned release_hash
-  alt stale or retired binding
-    B-->>WF: 409 job_binding_stale
+  alt retired binding, stale pin or unknown kind
+    B-->>WF: 409 job_binding_stale / unknown_executor_kind
     WF-->>P: refused before any model call
   else pinned release
     WF->>PC: compile the step
@@ -27,9 +27,9 @@ sequenceDiagram
       BR-->>WF: status, data, checks, next
     end
     opt internal_agent executor
-      PC-->>R: generation over the compiled prompt
-      R-->>WF: draft artefact only
-      WF->>L: decide the configured option set
+      PC-->>R: generation over the compiled envelope
+      R-->>WF: unattached draft artefact
+      WF->>L: gate.precheck over the draft
       L-->>WF: answer and confidence
     end
     opt gate requires approval
