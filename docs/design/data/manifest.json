@@ -2,10 +2,10 @@
   "feedback_url": "https://github.com/nonagenticai/conveyor/discussions",
   "files": [
     {
-      "bytes": 12804,
+      "bytes": 12827,
       "path": "actions.json",
       "records": 0,
-      "sha256": "7f0c1d86f4b39bc4d0d8925ea4eb9a0bb5326ba817b90684e8c3a949c509b7f7"
+      "sha256": "4a0c0396236dd25e94aef9ca5fd48805a4a478ab22ed18cdceaa9445ba1cc44f"
     },
     {
       "bytes": 108957,
@@ -26,16 +26,16 @@
       "sha256": "a8fd56b89802f3d35199cac1b3b75a10e6d1562781fbf15020192791fd7c588c"
     },
     {
-      "bytes": 26595,
+      "bytes": 26599,
       "path": "coverage.js",
       "records": 0,
-      "sha256": "a5748f2331875d2dd907f0e9fb4aabf2ae6fe794ea883c0ac8f429331ca95125"
+      "sha256": "18c16315bb02416cdcd1752408e258b515ae040c4e052c60ffc3447351925188"
     },
     {
-      "bytes": 48826,
+      "bytes": 48841,
       "path": "coverage.json",
       "records": 0,
-      "sha256": "455fbee650608f51a55aa31ca394d78f0e51db959b1d62be0bad91665e36d2ee"
+      "sha256": "53bb25f65af9dc7be35090033df1ff6ddfab4c3201c5fa39a1990f55a07152e0"
     },
     {
       "bytes": 109,
@@ -50,10 +50,10 @@
       "sha256": "c0dd0d7c535bbdc7ceb958fffa8f3eb7b28893c3a07f64b6524d3bbbf0d89736"
     },
     {
-      "bytes": 123611,
+      "bytes": 125170,
       "path": "issues.json",
       "records": 0,
-      "sha256": "517f420cd7e6df52f180cedd53a85b16c9c70966198585b171452df2c6b2bfa7"
+      "sha256": "d6f0af86389c3fcd30dd7073469854fad00e7ebf89739ad85e99baee5881c53e"
     },
     {
       "bytes": 1349,
@@ -86,6 +86,12 @@
       "sha256": "e868cfc4d87105681c7ec5c022093b37f59223b288ce686d7ec2ce20d4fa58d3"
     },
     {
+      "bytes": 1042396,
+      "path": "rework.js",
+      "records": 0,
+      "sha256": "b75450070b034027252f6ea94d8ea259c453723b35fe7e9055273859c459a6b9"
+    },
+    {
       "bytes": 225,
       "path": "secrets.json",
       "records": 0,
@@ -98,10 +104,16 @@
       "sha256": "f14da210b7930ea189d21257895fd4df743dc0a4acdb855abcbec3cf816c7afe"
     },
     {
-      "bytes": 34,
+      "bytes": 1085362,
       "path": "standards.js",
       "records": 0,
-      "sha256": "48fefe08af2a0a7f2516459ab6c604f97361ac2534c9faf19f0b7e71af46b6e1"
+      "sha256": "781e431326bc0e69af8e90efe5238296447891849c380a679d161abed4c036b7"
+    },
+    {
+      "bytes": 1085333,
+      "path": "standards.json",
+      "records": 0,
+      "sha256": "c833b399458f903ee29d0878c94ea6350f369288e08b6a74acb713a7ab7acb18"
     },
     {
       "bytes": 1091172,
