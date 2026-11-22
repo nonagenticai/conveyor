@@ -181,9 +181,21 @@ async fn runs_create(
         .await
         .map_err(|error| store_error(error, action))?;
 
-    // #526 / D45: `runs.create` carries no run inputs, so an internal-agent binding must itself
-    // declare the ceiling; a budgetless one is refused here rather than at its first model call.
+    // v1-p44-1 (SPEC_V2 §4.4): a ROOT run's executor is the agent its binding pins. `runs.create`
+    // has no process to resolve an agent from, so the binding is authoritative; a binding that
+    // pins no agent, or no binding at all, records `None`.
+    let mut capability_agent_id: Option<Uuid> = None;
     if let Some(binding_id) = input.job_binding_id {
+        let binding = store::organisation::job_binding_get_tx(&mut *tx, ctx.tenant, binding_id)
+            .await
+            // The same mapping `insert_run_tx` applies to its own pin resolution: a missing or
+            // foreign binding is a 404, a database failure is internal.
+            .map_err(|error| run_error(store::RunStoreError::from(error), action))?;
+        capability_agent_id = binding.capability_agent_id;
+
+        // #526 / D45: `runs.create` carries no run inputs, so an internal-agent binding must
+        // itself declare the ceiling; a budgetless one is refused here rather than at its first
+        // model call.
         crate::invoke::ensure_binding_budget(
             &mut *tx,
             ctx.tenant,
@@ -204,7 +216,7 @@ async fn runs_create(
             process_id: None,
             inputs: serde_json::Value::Object(serde_json::Map::new()),
             capability_id: None,
-            capability_agent_id: None,
+            capability_agent_id,
             // `runs.create` is a ROOT: a plain run has no parent, no step and pins no process.
             parent_run_id: None,
             step_id: None,
