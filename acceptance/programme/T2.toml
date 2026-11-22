@@ -6,6 +6,7 @@ gate = "a rule, a laya decision and a human decision produce the same audit shap
 [[check]]
 id = "T2-project"
 check = "project"
+status = "closed"
 severity = "P0"
 description = "T2 is closed"
 

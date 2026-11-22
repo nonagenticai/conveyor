@@ -146,14 +146,24 @@ projection does not carry yet (compliance reviews, waivers, lessons, demo credit
 silence a typo. `check-standards.cjs`, `check-data.cjs` and `scripts/ci/tests/standards_pack.sh`
 gate the published record, its page hashes, its package linkage and two-run byte identity.
 
+**The record is committed, not only buildable.** `docs/design/scripts/publish-standards.sh` runs
+the same pass-1/pass-2 pipeline against the committed snapshot with no database and installs
+`data/standards.json`, `data/standards.js`, one page per artefact under `docs/standards/` and the
+register global `data/rework.js`; `docs/evidence/rework-register.json` is the canonical register
+for that snapshot, and `docs/evidence/standards-findings.json` is its findings ledger. `--check`
+compares the committed pack with a fresh build, and `scripts/ci/tests/standards_pack.sh` refuses a
+pack that is missing or stale — the record cannot silently disappear from the served site again.
+
 **The rework loop.** `scripts/audit-programme-conformance.py --rework-out` turns the gap register,
 the checked-in v1 audit (`docs/evidence/v1-conformance-findings.json`) and the artefact findings
 (`docs/evidence/standards-findings.json`) into
 `data/rework.json`: one package per remediation unit, carrying its standard, SPEC clause,
 artefact, severity, evidence and Definition of Done. A data gap and an artefact that describe the
 same missing record are one package, never two: the generator suppresses the artefact finding when
-the gap register already owns the defect. The publish carries the register into `snapshot.js`
-(`conveyor snapshot --conformance`); `scripts/materialise-rework.py` turns an open package into a
+the gap register already owns the defect. The live publish carries the register into `snapshot.js`
+(`conveyor snapshot --conformance`); a pack published from the committed snapshot carries it as
+`data/rework.js`, and the public view reads either (`live.rework || CONVEYOR_REWORK`).
+`scripts/materialise-rework.py` turns an open package into a
 card with `meta.rework_key` on the owning project's board. Materialisation is a separate,
 explicit, dry-run-first command with its own writable URL — the publish transaction stays
 read-only. A card already applied is never duplicated; a package no longer in the register is
