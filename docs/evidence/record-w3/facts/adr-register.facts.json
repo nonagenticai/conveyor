@@ -1,0 +1,221 @@
+{
+  "category": "adr-register",
+  "standard": "TOGAF",
+  "spec": "\u00a78.1",
+  "subject": {
+    "kind": "programme",
+    "id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+    "key": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+    "title": "conveyor buildout",
+    "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+    "project_key": ""
+  },
+  "template_skeleton": "# ADR Register\n\nThe architecture decisions of record, their status, and the decision each supersedes or is superseded by. An ADR without a status is refused.\n\n## Register\n\nEvery architecture decision record, with its reference, title, date and governing project.\n\n## Status and supersession\n\nEach ADR's status and the ADR it supersedes or is superseded by; a superseded ADR names its replacement.\n\n## Decisions\n\nThe decision statement each ADR records, with its rationale and consequences.\n\n## Links\n\nThe artefacts, contracts and issues each decision governs.\n",
+  "headings": [
+    {
+      "heading": "Register",
+      "status": "evidenced",
+      "sources": [
+        {
+          "kind": "rows",
+          "file": "artefacts.json",
+          "pointer": "/governed_assets",
+          "category": null,
+          "count": 1
+        }
+      ],
+      "items": [
+        {
+          "confidence": null,
+          "created_at": "2026-11-22T09:39:47.475171+00:00",
+          "effort": null,
+          "id": "01a202a0-4781-78ca-ad82-525217c02ad0",
+          "impact": null,
+          "key": "adr-0010",
+          "kind": "adr",
+          "links": [
+            {
+              "id": "01a202a6-c20c-7079-9e0e-488009d21e86",
+              "kind": "document"
+            },
+            {
+              "id": "01a2029f-5a5f-70aa-be13-029435893a40",
+              "kind": "register_item"
+            },
+            {
+              "kind": "issue",
+              "number": 526
+            }
+          ],
+          "meta": {
+            "decided_at": "2026-11-22",
+            "decided_by_kind": "rule",
+            "deciders": [
+              "the assistant under the owner's delegation"
+            ],
+            "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+            "document": "01a202a6-c20c-7079-9e0e-488009d21e86",
+            "documents": [
+              "01a202a6-c20c-7079-9e0e-488009d21e86",
+              "01a202a3-76b1-72da-8a41-7a1662b91fc7",
+              "01a2029c-9254-7605-8a7c-3013b28ee794"
+            ],
+            "number": "0010",
+            "path": "docs/decisions/0010-no-deferrals.md",
+            "record": "#526",
+            "register_item": "01a2029f-5a5f-70aa-be13-029435893a40",
+            "status": "approved",
+            "supersedes": "01a20208-5261-7085-a4a7-74f061e4842b"
+          },
+          "owner_user_id": null,
+          "phase_code": null,
+          "project_id": null,
+          "reach": null,
+          "status": "approved",
+          "superseded_by_id": null,
+          "supersedes_id": null,
+          "title": "No deferrals; every finding executes",
+          "updated_at": "2026-11-22T09:47:15.540219+00:00",
+          "version": 5
+        }
+      ]
+    },
+    {
+      "heading": "Status and supersession",
+      "status": "evidenced",
+      "sources": [
+        {
+          "kind": "rows",
+          "file": "artefacts.json",
+          "pointer": "/governed_assets",
+          "category": null,
+          "count": 1
+        }
+      ],
+      "items": [
+        {
+          "confidence": null,
+          "created_at": "2026-11-22T09:39:47.475171+00:00",
+          "effort": null,
+          "id": "01a202a0-4781-78ca-ad82-525217c02ad0",
+          "impact": null,
+          "key": "adr-0010",
+          "kind": "adr",
+          "links": [
+            {
+              "id": "01a202a6-c20c-7079-9e0e-488009d21e86",
+              "kind": "document"
+            },
+            {
+              "id": "01a2029f-5a5f-70aa-be13-029435893a40",
+              "kind": "register_item"
+            },
+            {
+              "kind": "issue",
+              "number": 526
+            }
+          ],
+          "meta": {
+            "decided_at": "2026-11-22",
+            "decided_by_kind": "rule",
+            "deciders": [
+              "the assistant under the owner's delegation"
+            ],
+            "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+            "document": "01a202a6-c20c-7079-9e0e-488009d21e86",
+            "documents": [
+              "01a202a6-c20c-7079-9e0e-488009d21e86",
+              "01a202a3-76b1-72da-8a41-7a1662b91fc7",
+              "01a2029c-9254-7605-8a7c-3013b28ee794"
+            ],
+            "number": "0010",
+            "path": "docs/decisions/0010-no-deferrals.md",
+            "record": "#526",
+            "register_item": "01a2029f-5a5f-70aa-be13-029435893a40",
+            "status": "approved",
+            "supersedes": "01a20208-5261-7085-a4a7-74f061e4842b"
+          },
+          "owner_user_id": null,
+          "phase_code": null,
+          "project_id": null,
+          "reach": null,
+          "status": "approved",
+          "superseded_by_id": null,
+          "supersedes_id": null,
+          "title": "No deferrals; every finding executes",
+          "updated_at": "2026-11-22T09:47:15.540219+00:00",
+          "version": 5
+        }
+      ]
+    },
+    {
+      "heading": "Decisions",
+      "status": "evidenced",
+      "sources": [
+        {
+          "kind": "rows",
+          "file": "artefacts.json",
+          "pointer": "/governed_assets",
+          "category": null,
+          "count": 1
+        }
+      ],
+      "items": [
+        {
+          "confidence": null,
+          "created_at": "2026-11-22T09:39:47.475171+00:00",
+          "effort": null,
+          "id": "01a202a0-4781-78ca-ad82-525217c02ad0",
+          "impact": null,
+          "key": "adr-0010",
+          "kind": "adr",
+          "links": [
+            {
+              "id": "01a202a6-c20c-7079-9e0e-488009d21e86",
+              "kind": "document"
+            },
+            {
+              "id": "01a2029f-5a5f-70aa-be13-029435893a40",
+              "kind": "register_item"
+            },
+            {
+              "kind": "issue",
+              "number": 526
+            }
+          ],
+          "meta": {
+            "decided_at": "2026-11-22",
+            "decided_by_kind": "rule",
+            "deciders": [
+              "the assistant under the owner's delegation"
+            ],
+            "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+            "document": "01a202a6-c20c-7079-9e0e-488009d21e86",
+            "documents": [
+              "01a202a6-c20c-7079-9e0e-488009d21e86",
+              "01a202a3-76b1-72da-8a41-7a1662b91fc7",
+              "01a2029c-9254-7605-8a7c-3013b28ee794"
+            ],
+            "number": "0010",
+            "path": "docs/decisions/0010-no-deferrals.md",
+            "record": "#526",
+            "register_item": "01a2029f-5a5f-70aa-be13-029435893a40",
+            "status": "approved",
+            "supersedes": "01a20208-5261-7085-a4a7-74f061e4842b"
+          },
+          "owner_user_id": null,
+          "phase_code": null,
+          "project_id": null,
+          "reach": null,
+          "status": "approved",
+          "superseded_by_id": null,
+          "supersedes_id": null,
+          "title": "No deferrals; every finding executes",
+          "updated_at": "2026-11-22T09:47:15.540219+00:00",
+          "version": 5
+        }
+      ]
+    }
+  ],
+  "definition_project_id": "01a1dcb8-d24b-76de-b901-56fd56e001bc"
+}
