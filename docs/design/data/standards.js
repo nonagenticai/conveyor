@@ -39600,7 +39600,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-preliminary-01a1d039-0d24-7d16-ae52-4841e96ccfac.html",
-        "sha256": "754d2597d41aa296ace81a6a00ff73918cdbc7a326b461d2cc7ee34d1865ea8e"
+        "sha256": "4555366c0d54128f31eaf50da70ad9d63f6e9beff8e59093e18101cbcabcb578"
       },
       "gate": {
         "approval_id": "",
@@ -39618,12 +39618,22 @@ window.CONVEYOR_STANDARDS = {
           "missing": [],
           "sources": [
             {
-              "count": 1,
+              "count": 3,
               "items": [
                 {
                   "id": "",
                   "status": "",
                   "title": "Principles Catalog"
+                },
+                {
+                  "id": "",
+                  "status": "",
+                  "title": "Principle Derivation Diagram"
+                },
+                {
+                  "id": "",
+                  "status": "",
+                  "title": "Principle Realization Diagram"
                 }
               ],
               "kind": "computed",
@@ -56505,7 +56515,7 @@ window.CONVEYOR_STANDARDS = {
   },
   "generated_at": "2026-11-20T11:50:50.848127361+00:00",
   "git_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
-  "payload_sha256": "a95d976cbbed684301caa7a2cf11d81eb81612b9120b34da3f79603a7aeda6d1",
+  "payload_sha256": "517e896d8406516c39a935768e8fb6125c8e6a282c17f6846a509c72a3bd0a6d",
   "schema": "design-standards/v1",
   "summary": {
     "absent": 373,
