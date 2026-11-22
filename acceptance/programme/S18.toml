@@ -2,6 +2,7 @@
 key = "S18"
 name = "Kata continuous improvement"
 gate = "The end-to-end proof is one real katas-tenant iteration: a candidate `capability_agent` version, one run, a comparison against the promoted baseline, and a recorded keep/revert — with the screen showing the same numbers."
+gate_checks = ["S18-project", "S18-baseline", "S18-charter", "S18-closure-outputs", "S18-contract", "S18-review", "S18-closure-gate", "S18-waivers", "S18-pi-cadence", "S18-pi-plan", "S18-pi-objectives", "S18-lessons", "S18-wsjf", "S18-demo-credits", "S18-product"]
 
 [[check]]
 id = "S18-project"

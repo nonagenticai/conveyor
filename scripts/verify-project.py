@@ -19,6 +19,7 @@ Manifest shape:
     key = "P0"
     name = "..."
     gate = "the project's declared acceptance, in one sentence"
+    gate_checks = ["P0-closure-outputs", "P0-charter"]   # ids that must run and pass
 
     [[check]]
     id = "P0-closure-outputs"
@@ -28,12 +29,10 @@ Manifest shape:
     kind = "snapshot"                 # snapshot | command
     # command = "..."                 # required when kind = "command"
 
-    [[allow]]                         # a documented residual, never a silent pass
-    check = "benefit_baseline"
-    reason = "..."
-    owner = "programme owner"
-    issue = "U6"
-    expires = "2027-02-18"
+A `[[allow]]` block is refused as a finding: no deferral, waiver or residual is a
+disposition for programme work (docs/decisions/0010-no-deferrals.md). An active or
+closed project's `gate` must be discharged by its `gate_checks`: each named id must
+resolve to a check in this manifest, and that check must run and pass.
 
 The shared registry is deliberately small: a check that needs the live engine is a
 `command` clause (usually `programme-record.py --check`), so the static verdict is always
@@ -65,6 +64,8 @@ PLACEHOLDER = re.compile(
     re.IGNORECASE,
 )
 SEVERITY = ("P0", "P1", "P2")
+OPEN_PROJECT_STATES = ("active", "closed")
+UNRESOLVED_PACKAGE_STATES = ("open", "suppressed")
 
 
 def fail(message: str, code: int = 2) -> NoReturn:
@@ -303,9 +304,19 @@ def _timestamp(value: Any) -> datetime:
 
 
 def _active_waiver(snapshot: Snapshot, project_id: str) -> dict[str, Any] | None:
+    """The active TOGAF architecture waiver on a compliance review, if one exists.
+
+    Only an `architecture_waiver` may suppress a non-conformant architecture review. A
+    programme waiver (any other kind) never suppresses a programme finding (ADR 0010).
+    """
     now = datetime.now(timezone.utc)
     for waiver in snapshot.waivers(project_id):
         if waiver.get("status") != "active":
+            continue
+        kind = str(
+            waiver.get("kind") or waiver.get("waiver_type") or "architecture_waiver"
+        )
+        if kind != "architecture_waiver" or not waiver.get("review_id"):
             continue
         if _timestamp(waiver.get("reassessment_at")) <= now:
             continue
@@ -752,8 +763,8 @@ def check_product_findings(
 
     The register is derived from this snapshot and the checked-in v1 ledger. A package is
     cleared only when its gap disappears from a fresh audit or its finding carries
-    `resolved_by`; a waiver is suppressed, not passed silently. A project cannot close over
-    an open P0 package it owns.
+    `resolved_by`; a waiver or suppression is not a disposition (ADR 0010), so a
+    suppressed package counts as open. A project cannot close over an open P0 package.
     """
     register, error = rework_register(snapshot)
     if error:
@@ -767,7 +778,10 @@ def check_product_findings(
     unowned: list[str] = []
     open_p0: list[str] = []
     for package in register.get("packages") or []:
-        if package.get("status") != "open" or package.get("severity") != "P0":
+        if (
+            package.get("status") not in UNRESOLVED_PACKAGE_STATES
+            or package.get("severity") != "P0"
+        ):
             continue
         owner = package.get("owner_project")
         # An open P0 with no owner at all is not attributable to another project; it must not
@@ -786,7 +800,6 @@ def check_product_findings(
 
 
 STANDARD_ARTEFACT_STANDARDS = ("TOGAF", "PMP", "MSP", "SAFe")
-DEFERRAL_DISPOSITIONS = ("waiver", "deferral")
 
 
 def _register(snapshot: Snapshot) -> tuple[dict[str, Any] | None, str | None]:
@@ -798,24 +811,14 @@ def _register(snapshot: Snapshot) -> tuple[dict[str, Any] | None, str | None]:
     return register, None
 
 
-def _package_field(package: dict[str, Any], field: str) -> Any:
-    value = package.get(field)
-    if value is not None:
-        return value
-    baseline = package.get("baseline")
-    if isinstance(baseline, dict):
-        return baseline.get(field)
-    return None
-
-
 def check_artefact_standard(
     snapshot: Snapshot, key: str, params: dict[str, Any]
 ) -> tuple[bool, str]:
     """Every mandatory standard artefact this project owns is evidenced.
 
     A standard package (TOGAF, PMP, MSP, SAFe) is cleared only when its gap disappears from the
-    fresh audit; severity does not exempt it and a suppressed package is not open. The owner
-    may be named by project key or by project id.
+    fresh audit; severity does not exempt it and a suppressed package counts as open (ADR 0010).
+    The owner may be named by project key or by project id.
     """
     register, error = _register(snapshot)
     if error:
@@ -826,7 +829,7 @@ def check_artefact_standard(
         str(package.get("key"))
         for package in register["packages"]
         if package.get("standard") in STANDARD_ARTEFACT_STANDARDS
-        and package.get("status") == "open"
+        and package.get("status") in UNRESOLVED_PACKAGE_STATES
         and str(package.get("owner_project")) in owners
     ]
     if open_keys:
@@ -839,47 +842,32 @@ def check_artefact_standard(
 def check_rework_resolution(
     snapshot: Snapshot, key: str, params: dict[str, Any]
 ) -> tuple[bool, str]:
-    """No open P0/P1 rework package without a dated, owned, decided deferral.
+    """Fail every unresolved P0/P1 rework package.
 
-    An open P2 is advisory and passes. A waiver or deferral passes only with a named owner, a
-    decision reference and an expiry in the future; anything else blocks.
+    An open P2 is advisory and passes. No disposition — waiver, deferral, suppression or a
+    dated residual — resolves a P0/P1 package (ADR 0010): it closes when the work lands.
     """
     register, error = _register(snapshot)
     if error:
         return False, error
     row = snapshot.project(key)
     owners = {key, str(row["id"])}
-    now = datetime.now(timezone.utc)
     blocking: list[str] = []
-    deferred = 0
     for package in register["packages"]:
-        if package.get("status") != "open":
+        # The register lists unresolved packages; only an explicit resolution clears one.
+        if package.get("status") in ("resolved", "closed"):
             continue
         if str(package.get("owner_project")) not in owners:
             continue
         severity = str(package.get("severity"))
         if severity == "P2":
             continue
-        disposition = str(_package_field(package, "disposition") or "")
-        owners_list = _package_field(package, "owners") or []
-        decision_ref = _package_field(package, "decision_ref")
-        expires = _package_field(package, "earliest_expires")
-        valid = (
-            disposition in DEFERRAL_DISPOSITIONS
-            and bool(owners_list)
-            and bool(str(decision_ref or "").strip())
-            and expires is not None
-            and _timestamp(expires) > now
-        )
-        if valid:
-            deferred += 1
-        else:
-            blocking.append(f"{package.get('key')} ({severity})")
+        blocking.append(f"{package.get('key')} ({severity})")
     if blocking:
         preview = ", ".join(blocking[:8])
         more = "" if len(blocking) <= 8 else f", +{len(blocking) - 8} more"
-        return False, f"{len(blocking)} open P0/P1 package(s) without a valid deferral: {preview}{more}"
-    return True, f"no undecided P0/P1 package ({deferred} deferred with owner, decision and expiry)"
+        return False, f"{len(blocking)} unresolved P0/P1 package(s): {preview}{more}"
+    return True, "no unresolved P0/P1 package for this project"
 
 
 def check_delegation_provenance(
@@ -1060,26 +1048,36 @@ def snapshot_label(path: Path, manifest: dict[str, Any]) -> str:
         return f"retained-snapshot/{manifest.get('git_sha') or 'unknown'}"
 
 
-def allow_error(allowed: dict[str, Any]) -> str | None:
-    """An allow is a documented residual, not a silent pass.
+def gate_problem(
+    manifest: dict[str, Any], row: dict[str, Any], checks: list[dict[str, Any]]
+) -> tuple[bool, str | None]:
+    """Whether the gate is required, and why it is not discharged by executable checks.
 
-    It must name who owns it, why it is accepted, and when it must be reassessed.  A manifest
-    whose allow has no owner, no reason or no unexpired date is refused: otherwise a residual
-    clears the verdict by simply existing.
+    An active or closed project's `[project].gate` is prose; `gate_checks` names the check ids
+    that discharge it. Each id must resolve to a check in the same manifest, and that check
+    must have run and passed in this verdict. A gate with no `gate_checks` names no executable
+    checks and therefore fails.
     """
-    for field in ("reason", "owner", "expires"):
-        if not str(allowed.get(field) or "").strip():
-            return f"the allow entry has no {field}"
-    raw = str(allowed.get("expires")).replace("Z", "+00:00")
-    try:
-        expires = datetime.fromisoformat(raw)
-    except ValueError:
-        return f"the allow entry's expires is not a date: {allowed.get('expires')!r}"
-    if expires.tzinfo is None:
-        expires = expires.replace(tzinfo=timezone.utc)
-    if expires <= datetime.now(timezone.utc):
-        return f"the allow entry expired at {allowed.get('expires')}"
-    return None
+    if str(row.get("status")) not in OPEN_PROJECT_STATES:
+        return False, None
+    declared = manifest.get("project", {})
+    gate_checks = declared.get("gate_checks")
+    if not isinstance(gate_checks, list) or not gate_checks:
+        return True, "the gate names no executable checks"
+    declared_ids = {str(check.get("id")) for check in manifest.get("check", [])}
+    ran = {str(record.get("id")): record for record in checks}
+    problems: list[str] = []
+    for raw in gate_checks:
+        identifier = str(raw)
+        if identifier not in declared_ids:
+            problems.append(f"the gate check {identifier!r} resolves to no check in the manifest")
+        elif identifier not in ran:
+            problems.append(f"the gate check {identifier!r} did not run")
+        elif ran[identifier].get("result") != "pass":
+            problems.append(f"the gate check {identifier!r} did not pass")
+    if problems:
+        return True, "; ".join(problems)
+    return True, None
 
 
 def run_project(
@@ -1097,13 +1095,32 @@ def run_project(
     declared = manifest.get("project", {})
     if str(declared.get("key", key)) != key:
         fail(f"the manifest names {declared.get('key')!r}, not {key!r}")
-    allows = {
-        str(entry.get("check")): entry for entry in manifest.get("allow", [])
-    }
+    disallowed = manifest.get("allow") or []
     excluded = exclude or set()
     checks: list[dict[str, Any]] = []
     failures: list[str] = []
     warnings: list[str] = []
+    # A `[[allow]]` block is refused as a finding, never applied: no deferral, waiver or
+    # residual is a disposition for programme work (ADR 0010). The named check must execute.
+    if disallowed:
+        detail = (
+            f"{len(disallowed)} [[allow]] block(s) in the manifest; programme work permits "
+            "no allow — execute the check"
+        )
+        checks.append(
+            {
+                "id": "allow",
+                "check": None,
+                "kind": "manifest",
+                "severity": "P0",
+                "description": "no [[allow]] block is permitted in an acceptance manifest",
+                "result": "fail",
+                "detail": detail,
+            }
+        )
+        failures.append(f"allow (P0): {detail}")
+        if not quiet:
+            print(f"FAIL  allow  {detail}")
     for index, check in enumerate(manifest.get("check", []), start=1):
         identifier = str(check.get("id") or f"check-{index}")
         name = str(check.get("check") or "")
@@ -1116,18 +1133,12 @@ def run_project(
         if severity not in SEVERITY:
             fail(f"{identifier}: severity must be one of {', '.join(SEVERITY)}")
         description = str(check.get("description") or "")
-        allowed = allows.get(name) or allows.get(identifier)
-        if allowed:
-            problem = allow_error(allowed)
-            if problem:
-                fail(f"{identifier}: {problem}")
         record: dict[str, Any] = {
             "id": identifier,
             "check": name or None,
             "kind": kind,
             "severity": severity,
             "description": description,
-            "allowed": False,
         }
         if kind == "command":
             command = str(check.get("command") or "")
@@ -1143,13 +1154,6 @@ def run_project(
             if name not in CHECKS:
                 fail(f"{identifier}: no shared check named {name!r}")
             ok, detail = CHECKS[name](snapshot, key, check)
-        if not ok and allowed:
-            ok = True
-            record["allowed"] = True
-            record["allow"] = {
-                field: allowed.get(field)
-                for field in ("reason", "owner", "issue", "expires")
-            }
         record["result"] = "pass" if ok else "fail"
         record["detail"] = detail
         checks.append(record)
@@ -1157,8 +1161,36 @@ def run_project(
             target = failures if severity in ("P0", "P1") else warnings
             target.append(f"{identifier} ({severity}): {detail}")
         if not quiet:
-            label = "ALLOW" if record["allowed"] else ("PASS" if ok else "FAIL")
-            print(f"{label}  {identifier}  {detail}")
+            print(f"{'PASS' if ok else 'FAIL'}  {identifier}  {detail}")
+    required, gate_detail = gate_problem(manifest, row, checks)
+    if required and gate_detail:
+        checks.append(
+            {
+                "id": "gate",
+                "check": None,
+                "kind": "manifest",
+                "severity": "P0",
+                "description": "the declared gate is discharged by executable checks",
+                "result": "fail",
+                "detail": gate_detail,
+            }
+        )
+        failures.append(f"gate (P0): {gate_detail}")
+        if not quiet:
+            print(f"FAIL  gate  {gate_detail}")
+    elif required:
+        discharged = ", ".join(str(item) for item in declared.get("gate_checks") or [])
+        checks.append(
+            {
+                "id": "gate",
+                "check": None,
+                "kind": "manifest",
+                "severity": "P0",
+                "description": "the declared gate is discharged by executable checks",
+                "result": "pass",
+                "detail": f"gate discharged by executable checks: {discharged}",
+            }
+        )
     verdict = "red" if failures else "green"
     if row.get("status") == "closed" and verdict == "red":
         checks.append(
@@ -1170,7 +1202,6 @@ def run_project(
                 "description": "a closed project must not carry a red acceptance manifest",
                 "result": "fail",
                 "detail": "the project is closed while its manifest is red",
-                "allowed": False,
             }
         )
         failures.append("closed-on-red (P0): the project is closed on a red manifest")
@@ -1296,6 +1327,7 @@ def self_test() -> int:
 key = "TEST"
 name = "Self-test project"
 gate = "a closed project has published closure outputs"
+gate_checks = ["project", "outputs"]
 
 [[check]]
 id = "project"
@@ -1318,55 +1350,117 @@ severity = "P0"
     if not any(row.get("id") == "closed-on-red" for row in red["checks"]):
         failures.append("the closed-on-red finding was not recorded")
 
-    allowed = workdir / "TEST-allowed.toml"
-    allowed.write_text(
+    # A [[allow]] is refused as a finding, never applied: the failing check stays red and the
+    # refusal is visible in the evidence.
+    allow_manifest = workdir / "TEST-allow.toml"
+    allow_manifest.write_text(
         manifest.read_text()
         + """
 [[allow]]
-check = "closure_outputs"
+check = "outputs"
 reason = "self-test residual"
 owner = "programme owner"
 issue = "U6"
 expires = "2027-02-18"
 """
     )
-    green = run_project(
-        "TEST", snapshot / "data", allowed, workdir / "evidence", quiet=True
+    refused = run_project(
+        "TEST", snapshot / "data", allow_manifest, workdir / "evidence", quiet=True
     )
-    if green["verdict"] != "green":
-        failures.append("an allowed residual did not clear the verdict")
-    if not any(row.get("allowed") for row in green["checks"]):
-        failures.append("the allowed residual was not recorded")
+    if refused["verdict"] != "red":
+        failures.append("an [[allow]] block cleared the verdict")
+    if not any(
+        row.get("id") == "allow" and row.get("result") == "fail"
+        for row in refused["checks"]
+    ):
+        failures.append("the refused [[allow]] block was not recorded as a finding")
 
-    # An allow is a documented residual: ownerless and expired ones are refused, never
-    # silently accepted. These are the two ways a residual could otherwise pass by existing.
-    def refused_allow(name: str, body: str) -> None:
-        path = workdir / f"TEST-allow-{name}.toml"
-        path.write_text(manifest.read_text() + body)
-        try:
-            run_project("TEST", snapshot / "data", path, workdir / "evidence", quiet=True)
-        except SystemExit:
-            return
-        failures.append(f"an invalid allow ({name}) was accepted")
+    # The gate contract: an active or closed project's gate is discharged only by named
+    # checks in the same manifest that run and pass.
+    def gate_case(name: str, body: str, expect_green: bool, detail: str) -> None:
+        path = workdir / f"TEST-gate-{name}.toml"
+        path.write_text(body)
+        result = run_project(
+            "TEST", snapshot / "data", path, workdir / f"evidence-gate-{name}", quiet=True
+        )
+        if (result["verdict"] == "green") != expect_green:
+            failures.append(
+                f"gate case {name}: verdict {result['verdict']}, "
+                f"expected {'green' if expect_green else 'red'}"
+            )
+        if detail and not any(
+            detail in str(row.get("detail") or "") for row in result["checks"]
+        ):
+            failures.append(f"gate case {name}: no check detail names {detail!r}")
 
-    refused_allow(
-        "ownerless",
+    gate_case(
+        "missing",
         """
-[[allow]]
-check = "closure_outputs"
-reason = "self-test residual"
-expires = "2027-02-18"
+[project]
+key = "TEST"
+name = "Self-test gate missing"
+gate = "a gate with no executable checks"
+
+[[check]]
+id = "project"
+check = "project"
+severity = "P0"
 """,
+        False,
+        "the gate names no executable checks",
     )
-    refused_allow(
-        "expired",
+    gate_case(
+        "unknown",
         """
-[[allow]]
-check = "closure_outputs"
-reason = "self-test residual"
-owner = "programme owner"
-expires = "2020-01-01"
+[project]
+key = "TEST"
+name = "Self-test gate unknown"
+gate = "a gate naming a check that does not exist"
+gate_checks = ["missing-check"]
+
+[[check]]
+id = "project"
+check = "project"
+severity = "P0"
 """,
+        False,
+        "resolves to no check in the manifest",
+    )
+    gate_case(
+        "passing",
+        """
+[project]
+key = "TEST"
+name = "Self-test gate passing"
+gate = "a gate discharged by one executable check"
+gate_checks = ["ok"]
+
+[[check]]
+id = "ok"
+kind = "command"
+command = "python3 -c 'import sys; sys.exit(0)'"
+severity = "P0"
+""",
+        True,
+        "gate discharged by executable checks: ok",
+    )
+    gate_case(
+        "failing",
+        """
+[project]
+key = "TEST"
+name = "Self-test gate failing"
+gate = "a gate whose check fails"
+gate_checks = ["bad"]
+
+[[check]]
+id = "bad"
+kind = "command"
+command = "python3 -c 'import sys; sys.exit(3)'"
+severity = "P0"
+""",
+        False,
+        "did not pass",
     )
 
     command_manifest = workdir / "TEST-command.toml"
@@ -1376,6 +1470,7 @@ expires = "2020-01-01"
 key = "TEST"
 name = "Self-test project"
 gate = "a command check"
+gate_checks = ["ok"]
 
 [[check]]
 id = "ok"
@@ -1409,6 +1504,7 @@ severity = "P2"
 key = "TEST"
 name = "Self-test SAFe"
 gate = "the SAFe cadence, plan, demo and retro"
+gate_checks = ["pi-cadence", "benefit-baseline", "wsjf", "demo", "lessons", "pi-plan", "pi-objectives"]
 
 [[check]]
 id = "pi-cadence"
@@ -1545,6 +1641,7 @@ severity = "P0"
 key = "TEST"
 name = "Self-test product findings"
 gate = "no open P0 product finding remains for the project"
+gate_checks = ["product"]
 
 [[check]]
 id = "product"
@@ -1580,6 +1677,15 @@ severity = "P0"
         True,
     )
     product_case("no-packages", {}, False)
+    product_case(
+        "suppressed-p0",
+        {
+            "packages": [
+                {"key": "p1", "status": "suppressed", "severity": "P0", "owner_project": "TEST"}
+            ]
+        },
+        False,
+    )
 
     # ── the hardened rules: every crafted case passes under the old rule and fails now ─
     hardening_manifest = workdir / "TEST-hardening.toml"
@@ -1589,6 +1695,7 @@ severity = "P0"
 key = "TEST"
 name = "Self-test hardening"
 gate = "each check proves its TOML description"
+gate_checks = ["baseline", "contract", "review", "closure-gate", "lessons"]
 
 [[check]]
 id = "baseline"
@@ -1719,6 +1826,30 @@ severity = "P0"
         lambda a, w, m, o: a["compliance_reviews"][0].update({"level": "non_conformant"}),
         False,
     )
+
+    def review_with_waiver(kind: str):
+        def mutate(arch, work, msp, outputs) -> None:
+            arch["compliance_reviews"][0]["level"] = "non_conformant"
+            arch["waivers"].append(
+                {
+                    "id": f"w-{kind}",
+                    "review_id": "rv-live",
+                    "kind": kind,
+                    "status": "active",
+                    "owner_user_id": "u-owner",
+                    "reason": "self-test",
+                    "reassessment_at": "2099-01-01T00:00:00+00:00",
+                }
+            )
+
+        return mutate
+
+    # Only an architecture_waiver on the compliance review may suppress a non-conformant
+    # verdict; a programme waiver never does (ADR 0010).
+    hardening_case(
+        "review-architecture-waiver", review_with_waiver("architecture_waiver"), True
+    )
+    hardening_case("review-programme-waiver", review_with_waiver("programme"), False)
     hardening_case(
         "review-superseded-contract",
         lambda a, w, m, o: a["compliance_reviews"][0].update({"contract_id": "ct-old"}),
@@ -1804,7 +1935,12 @@ severity = "P0"
         check_artefact_standard,
         True,
     )
-    register_case("standard-suppressed", [standard_package("std-pmp-x", "P0", status="suppressed")], check_artefact_standard, True)
+    register_case(
+        "standard-suppressed",
+        [standard_package("std-pmp-x", "P0", status="suppressed")],
+        check_artefact_standard,
+        False,
+    )
     _REWORK_CACHE = {"packages": None}
     ok, detail = check_artefact_standard(extra_snapshot("standard-missing"), "TEST", {})
     if ok:
@@ -1812,13 +1948,28 @@ severity = "P0"
 
     register_case("resolution-open-p1", [standard_package("pkg-1", "P1")], check_rework_resolution, False)
     register_case(
-        "resolution-deferred",
+        "resolution-waiver-p1",
         [standard_package(
             "pkg-1", "P1", disposition="waiver",
             owners=["programme owner"], decision_ref="01a2", earliest_expires="2099-01-01",
         )],
         check_rework_resolution,
-        True,
+        False,
+    )
+    register_case(
+        "resolution-waiver-p0",
+        [standard_package(
+            "pkg-1", "P0", disposition="waiver",
+            owners=["programme owner"], decision_ref="01a2", earliest_expires="2099-01-01",
+        )],
+        check_rework_resolution,
+        False,
+    )
+    register_case(
+        "resolution-suppressed-p1",
+        [standard_package("pkg-1", "P1", status="suppressed", disposition="unprovable")],
+        check_rework_resolution,
+        False,
     )
     register_case("resolution-open-p2", [standard_package("pkg-1", "P2")], check_rework_resolution, True)
     register_case(

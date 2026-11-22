@@ -2,6 +2,7 @@
 key = "T3"
 name = "PM job"
 gate = "PM runs a request end to end; cannot approve its own gate; a baseline change requires a change request"
+gate_checks = ["T3-project", "T3-baseline", "T3-charter", "T3-closure-outputs", "T3-contract", "T3-review", "T3-closure-gate", "T3-waivers", "T3-pi-cadence", "T3-pi-plan", "T3-pi-objectives", "T3-wsjf", "T3-demo-credits", "T3-lessons", "T3-product"]
 
 [[check]]
 id = "T3-project"

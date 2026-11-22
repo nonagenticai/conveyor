@@ -2,6 +2,7 @@
 key = "S12"
 name = "UI build-out"
 gate = "S12 is accepted when every spec asserts empty state, error state and happy path — a spec that only asserts the happy path fails review — and the coverage table has no orphan."
+gate_checks = ["S12-project", "S12-baseline", "S12-charter", "S12-closure-outputs", "S12-contract", "S12-review", "S12-closure-gate", "S12-waivers", "S12-pi-cadence", "S12-pi-plan", "S12-pi-objectives", "S12-lessons", "S12-wsjf", "S12-demo-credits", "S12-product"]
 
 [[check]]
 id = "S12-project"

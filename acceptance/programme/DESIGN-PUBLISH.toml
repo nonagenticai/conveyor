@@ -2,6 +2,7 @@
 key = "DESIGN-PUBLISH"
 name = "Publish the SPEC_V2 studio design pack, live"
 gate = "The closure review exists and every declared closure output is published; the project re-closes through the one gate."
+gate_checks = ["DESIGN-PUBLISH-project", "DESIGN-PUBLISH-baseline", "DESIGN-PUBLISH-charter", "DESIGN-PUBLISH-closure-outputs", "DESIGN-PUBLISH-contract", "DESIGN-PUBLISH-review", "DESIGN-PUBLISH-closure-gate", "DESIGN-PUBLISH-waivers", "DESIGN-PUBLISH-pi-cadence", "DESIGN-PUBLISH-wsjf", "DESIGN-PUBLISH-demo-credits", "DESIGN-PUBLISH-product"]
 
 [[check]]
 id = "DESIGN-PUBLISH-project"

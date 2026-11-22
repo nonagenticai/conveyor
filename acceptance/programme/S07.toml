@@ -2,6 +2,7 @@
 key = "S07"
 name = "Requirements, catalogues, revisions, quality scoring, search"
 gate = "the relevance eval set beats the agreed baseline — 3 revisions with a dense sequence, an idempotent seed, both GIN indexes used, relevance targets met, traceability in both directions with 0 cross-tenant rows, quality read-only, and no orphan"
+gate_checks = ["S07-project", "S07-baseline", "S07-charter", "S07-closure-outputs", "S07-contract", "S07-review", "S07-closure-gate", "S07-waivers", "S07-pi-cadence", "S07-pi-plan", "S07-pi-objectives", "S07-lessons", "S07-wsjf", "S07-demo-credits", "S07-product"]
 
 [[check]]
 id = "S07-project"

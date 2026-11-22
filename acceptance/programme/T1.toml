@@ -2,6 +2,7 @@
 key = "T1"
 name = "Plan spine — WBS, baselines, registers, cadence, tranches, benefits"
 gate = "The A–D artefacts, the delivery contract, the closure review and the declared outputs exist; the project re-closes through the one gate."
+gate_checks = ["T1-project", "T1-baseline", "T1-charter", "T1-closure-outputs", "T1-contract", "T1-review", "T1-closure-gate", "T1-waivers", "T1-pi-cadence", "T1-pi-plan", "T1-pi-objectives", "T1-wsjf", "T1-demo-credits", "T1-lessons", "T1-product"]
 
 [[check]]
 id = "T1-project"

@@ -2,9 +2,11 @@
 """Verify the v1 conformance findings ledger against the tree it cites.
 
 Every finding is an evidence-backed claim about the code. This gate re-reads each
-`evidence[].path` line and refuses the ledger unless the quoted text is exactly that line.
-A stale quote is a stale finding: the fix has landed, the line moved, or the claim was never
-true. Either way it must not reach the rework register.
+`evidence[].path` and refuses the ledger unless the quoted text is still in that file: at the
+recorded line, or — when the line has drifted under a refactor — unique in the file. The quote is
+the evidence; the line is a hint. A quote that is gone, or that now appears more than once, is a
+stale finding: the fix has landed or the claim was never true. Either way it must not reach the
+rework register.
 
 Usage:
     python3 scripts/verify-findings.py [docs/evidence/v1-conformance-findings.json]
@@ -155,16 +157,21 @@ def verify(path: Path) -> list[str]:
                 errors.append(f"{where}: path {relative!r} does not exist")
                 continue
             lines = target.read_text(encoding="utf-8", errors="replace").splitlines()
-            if line > len(lines):
-                errors.append(f"{where}: line {line} is past the end of {relative} ({len(lines)} lines)")
+            if line <= len(lines) and lines[line - 1] == quote:
                 continue
-            actual = lines[line - 1]
-            if actual != quote:
-                errors.append(
-                    f"{where}: quote does not match {relative}:{line}\n"
-                    f"    expected: {quote!r}\n"
-                    f"    actual:   {actual!r}"
-                )
+            # The line is a hint; the quote is the evidence. A unique quote is accepted when a
+            # refactor moved it (the old contract turned every such refactor into a false red).
+            matches = [number for number, text in enumerate(lines, start=1) if text == quote]
+            if len(matches) == 1:
+                continue
+            if not matches:
+                detail = "quote is not in the file (the fix landed or the claim was never true)"
+            else:
+                detail = f"quote appears {len(matches)} times, so the line cannot disambiguate"
+            errors.append(
+                f"{where}: {detail} — {relative}:{line}\n"
+                f"    expected: {quote!r}"
+            )
     return errors
 
 
@@ -228,6 +235,19 @@ def self_test() -> None:
         pass
 
     check(noop, None)
+
+    def drifted(finding: dict) -> None:
+        finding["resolved_by"] = None
+        finding["evidence"][0]["line"] = 999
+
+    def absent(finding: dict) -> None:
+        finding["resolved_by"] = None
+        finding["evidence"][0]["quote"] = "this quote is not in the file"
+
+    # A refactor moves the line but keeps the quote: accepted on a unique match.
+    check(drifted, None)
+    # A quote that is gone is still refused.
+    check(absent, "quote is not in the file")
     check(lambda finding: finding.update(resolved_by="fixed in a PR"), "must be an object")
     check(lambda finding: finding["resolved_by"].update(commit="0" * 40), "not an ancestor")
     check(

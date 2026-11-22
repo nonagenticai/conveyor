@@ -2,6 +2,7 @@
 key = "S05"
 name = "Board — projects, boards, lists, cards, labels, comments, tasks, custom fields, webhooks, SSE"
 gate = "replay a board export, win a two-client race and survive the 1k-card load — zero deltas on 1,000 cards, one 200 and one 412 with the current representation, p95 ≤ 120 ms at 20 rps, the exact webhook shape, SSE within 200 ms, and no second store"
+gate_checks = ["S05-project", "S05-baseline", "S05-charter", "S05-closure-outputs", "S05-contract", "S05-review", "S05-closure-gate", "S05-waivers", "S05-pi-cadence", "S05-pi-plan", "S05-pi-objectives", "S05-lessons", "S05-wsjf", "S05-demo-credits", "S05-product"]
 
 [[check]]
 id = "S05-project"

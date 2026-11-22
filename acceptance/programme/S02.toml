@@ -2,6 +2,7 @@
 key = "S02"
 name = "Skeleton — workspace, tenancy, auth, jobs, SSE"
 gate = "The A–D artefacts and the delivery contract exist, the brief and the evidence are published, the P2 long-job proof is landed, and the project closes through the one gate."
+gate_checks = ["S02-project", "S02-baseline", "S02-charter", "S02-closure-outputs", "S02-contract", "S02-review", "S02-waivers", "S02-pi-cadence", "S02-pi-plan", "S02-pi-objectives", "S02-wsjf", "S02-demo-credits", "S02-lessons", "S02-product"]
 
 [[check]]
 id = "S02-project"

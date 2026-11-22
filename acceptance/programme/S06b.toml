@@ -2,6 +2,7 @@
 key = "S06b"
 name = "Agent direct interface — the conveyor's own MCP surface"
 gate = "At the end, one real agent task creates a project, reads its progress, answers an approval and closes the project — with the decision recorded as `decided_by_kind='agent'` — and no component called `nonagenticai_mcp_server` is in the path."
+gate_checks = ["S06b-project", "S06b-baseline", "S06b-charter", "S06b-closure-outputs", "S06b-contract", "S06b-review", "S06b-closure-gate", "S06b-waivers", "S06b-pi-cadence", "S06b-pi-plan", "S06b-pi-objectives", "S06b-wsjf", "S06b-demo-credits", "S06b-lessons", "S06b-product"]
 
 [[check]]
 id = "S06b-project"
