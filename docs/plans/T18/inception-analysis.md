@@ -69,4 +69,4 @@ with an ad-hoc fetch.
 ## Links
 
 Issue #559 · SPEC_V2 §10.5, §12 T18, D64, D65 · `docs/plans/T18-real-v2-ui.md` ·
-`docs/decisions/0009-real-v2-ui.md`.
+`docs/decisions/0013-real-v2-ui.md`.

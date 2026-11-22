@@ -119,13 +119,31 @@
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0008-card-ledger.md"
     },
     {
+      "title": "0009 — Prompt selection and recipe authoring",
+      "path": "docs/decisions/0009-prompt-selection-and-recipe-authoring.html",
+      "source": "docs/decisions/0009-prompt-selection-and-recipe-authoring.md",
+      "section": "Decisions",
+      "sha256": "f9900bfe8e8870119e0e335fa7d51020459d91a548b0c2f43701794b9097a4c3",
+      "bytes": 4223,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0009-prompt-selection-and-recipe-authoring.md"
+    },
+    {
+      "title": "0010 — The internalagent executor runtime and its tool grant",
+      "path": "docs/decisions/0010-internal-agent-executor-runtime.html",
+      "source": "docs/decisions/0010-internal-agent-executor-runtime.md",
+      "section": "Decisions",
+      "sha256": "8acb4cb612d7b2d7d687f7a5fe4e4f8b9b5d0cacbeca00a83d49f88412c45e88",
+      "bytes": 8890,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0010-internal-agent-executor-runtime.md"
+    },
+    {
       "title": "0009 — The real V2 UI is the app, not the design pack",
-      "path": "docs/decisions/0009-real-v2-ui.html",
-      "source": "docs/decisions/0009-real-v2-ui.md",
+      "path": "docs/decisions/0013-real-v2-ui.html",
+      "source": "docs/decisions/0013-real-v2-ui.md",
       "section": "Decisions",
       "sha256": "1c955a3a9a73acb44f7ab188e69ccb5982b45b10fd34c6073516cf1352fd19f6",
       "bytes": 3686,
-      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0009-real-v2-ui.md"
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0013-real-v2-ui.md"
     },
     {
       "title": "Programme architecture and benefits realization",
@@ -389,6 +407,15 @@
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S21-BUDGET.md"
     },
     {
+      "title": "S21 step 4 — the internalagent executor runtime and its tool grant",
+      "path": "docs/evidence/S21-EXECUTOR.html",
+      "source": "docs/evidence/S21-EXECUTOR.md",
+      "section": "Evidence",
+      "sha256": "2b65b6e139883063b531f5b81b1f9b2a417b147156b670d9002fc9c7d08b51a8",
+      "bytes": 5186,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S21-EXECUTOR.md"
+    },
+    {
       "title": "S21 step 2 — the plan projection over declared step outputs (receipt)",
       "path": "docs/evidence/S21-PLAN.html",
       "source": "docs/evidence/S21-PLAN.md",
@@ -396,6 +423,15 @@
       "sha256": "d443636e29dde0a62fbc76c71113ff2e6cdaa2e9d8bdd64135d26e9bd73213f1",
       "bytes": 9316,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S21-PLAN.md"
+    },
+    {
+      "title": "S21 step 3 — the work-package prompt envelope (issue #15)",
+      "path": "docs/evidence/S21-WORKPACKAGE.html",
+      "source": "docs/evidence/S21-WORKPACKAGE.md",
+      "section": "Evidence",
+      "sha256": "d7ce665d7ac7e8ce18f9ca8434a3324ef83061e1d0651fe6ecf16c26a3177cab",
+      "bytes": 5255,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S21-WORKPACKAGE.md"
     },
     {
       "title": "The analysis service — capture and drop table (2026-11-15)",
@@ -510,8 +546,8 @@
       "path": "docs/plans/00-INDEX.html",
       "source": "docs/plans/00-INDEX.md",
       "section": "Plans",
-      "sha256": "c16232144a7d9a5e0212fc26d16f83e03884c7a8a17f4bcece1b954d96ce3545",
-      "bytes": 251697,
+      "sha256": "de73d20d9fb31bd838f49dceb986b4a4367a347c70dcdb1ffa10bb9600ae08b7",
+      "bytes": 253129,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/00-INDEX.md"
     },
     {
@@ -519,8 +555,8 @@
       "path": "docs/plans/01-CONTRACT.html",
       "source": "docs/plans/01-CONTRACT.md",
       "section": "Plans",
-      "sha256": "587eafdcc4c89b990fe063ebabe6d7784c6fe935ed515c2a7db83a2c237d862e",
-      "bytes": 65856,
+      "sha256": "1092bfce893cce27d37dd8ff0061ba96b814e36646ec97fa34a7f0ddd1a1c09f",
+      "bytes": 71339,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/01-CONTRACT.md"
     },
     {
@@ -528,8 +564,8 @@
       "path": "docs/plans/02-DATA-ARCHITECTURE.html",
       "source": "docs/plans/02-DATA-ARCHITECTURE.md",
       "section": "Plans",
-      "sha256": "b7404c934cfeb204416287493b420c6b5377feaa81203c1766bb16abcef30d8f",
-      "bytes": 136458,
+      "sha256": "179802a593b99091eab57542b0ba4242a77f5f01a1803597fec78641b8b3f58e",
+      "bytes": 143841,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/02-DATA-ARCHITECTURE.md"
     },
     {
@@ -582,8 +618,8 @@
       "path": "docs/plans/03-DELIVERY.html",
       "source": "docs/plans/03-DELIVERY.md",
       "section": "Plans",
-      "sha256": "3cc0009a9ce7c398071d84d23533c2dab86cef39b02fbc8d99a8ec5dcf719675",
-      "bytes": 24410,
+      "sha256": "9413f92167d008328c5d294de4abbb6f33784b0a30ca6bcfb31832257fcc4533",
+      "bytes": 25084,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/03-DELIVERY.md"
     },
     {
@@ -627,7 +663,7 @@
       "path": "docs/plans/T18/architecture-design.html",
       "source": "docs/plans/T18/architecture-design.md",
       "section": "Plans",
-      "sha256": "8ce63c895b0ca28d7cdcf55765dc72f3151e5b5e004984b136020dfc5b39ddd9",
+      "sha256": "f106e4bc5763a242a949f56afb79206d9d37ba1e4d917730ce8b500f6cb2e182",
       "bytes": 5908,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T18/architecture-design.md"
     },
@@ -636,7 +672,7 @@
       "path": "docs/plans/T18/inception-analysis.html",
       "source": "docs/plans/T18/inception-analysis.md",
       "section": "Plans",
-      "sha256": "353e35a8879b656ef18fae5e367d73561fcf14692f08a08d1875a1faaacb3475",
+      "sha256": "f68b03b787e41ba3f2a7cb2ec53a57994ac302c8d19953180c12ed83b06428fa",
       "bytes": 4318,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T18/inception-analysis.md"
     },
@@ -1050,8 +1086,8 @@
       "path": "docs/plans/slices/S21-message-construction.html",
       "source": "docs/plans/slices/S21-message-construction.md",
       "section": "Plans",
-      "sha256": "a78024dd459c2aa659cecf9791e8c3aee8f844161bae993d97e5c827431aa021",
-      "bytes": 19218,
+      "sha256": "839b0fde117c4dbcb6289641430db57655d128203fcb8d5940592489e1743a53",
+      "bytes": 34495,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S21-message-construction.md"
     }
   ]

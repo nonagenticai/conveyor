@@ -379,7 +379,9 @@
           195,
           231,
           245,
-          571
+          571,
+          577,
+          579
         ],
         "depends_on": [
           "S03",
@@ -770,7 +772,7 @@
     },
     {
       "key": "S21",
-      "name": "S21",
+      "name": "Message construction (the compiled prompt)",
       "description": "Plan: docs/plans/slices/S21-message-construction.md",
       "status": "active",
       "repo_url": "https://github.com/nonagenticai/conveyor",
@@ -778,25 +780,28 @@
         "plan": "docs/plans/slices/S21-message-construction.md",
         "track": "v1",
         "issues": [
-          15
+          15,
+          581,
+          590
         ],
         "depends_on": [
+          "S09",
           "S11",
           "S13",
           "S15",
-          "S16"
+          "S16",
+          "T2",
+          "T13"
         ],
-        "plan_status": "plan written 2026-11-09",
+        "plan_status": "built",
         "status_source": "github issue state > measured coverage > plan frontmatter",
-        "measured_status": "partial",
+        "measured_status": "built",
         "tranche": 9,
         "expected_outputs": [
           "project-brief",
           "evidence"
         ],
-        "closure_outputs": [
-          "closure-review"
-        ],
+        "closure_outputs": [],
         "adm_phase": "G",
         "plateau": "delivery"
       }
@@ -1594,7 +1599,9 @@
           526,
           545,
           569,
-          572
+          572,
+          582,
+          588
         ],
         "depends_on": [],
         "plan_status": "active",

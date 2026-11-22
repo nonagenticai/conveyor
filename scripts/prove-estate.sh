@@ -19,7 +19,7 @@
 #   CONVEYOR_DEPLOYMENT    deployment whose pod runs the action  (default: conveyor)
 #   CONVEYOR_TENANT        tenant slug — required
 #   CONVEYOR_DATABASE_URL  only for `seed` — the tenant's database as its owner role
-#   CONVEYOR_BINARY        the binary inside the pod             (default: /usr/local/bin/service)
+#   CONVEYOR_BINARY        the binary inside the pod             (default: /usr/local/bin/conveyor)
 #   KUBECTL                required — a kubectl command that reaches the deployed cluster
 set -euo pipefail
 cd "$(dirname "$0")/.."

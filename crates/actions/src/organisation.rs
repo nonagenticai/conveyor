@@ -407,6 +407,26 @@ fn organisation_error(error: OrganisationStoreError, action: &str) -> ActionErro
                 "the binding pins release {binding_hash} but the run requested {requested_hash}"
             ),
         ),
+        OrganisationStoreError::ReleaseAnatomyInvalid(fields) => ActionError::new(
+            422,
+            "release.anatomy_invalid",
+            "the release's execution anatomy is invalid",
+        )
+        .with_errors(
+            fields
+                .into_iter()
+                .map(|field| crate::spec::FieldError {
+                    field: field.field,
+                    code: field.code,
+                    detail: field.detail,
+                })
+                .collect(),
+        ),
+        OrganisationStoreError::BindingKindMismatch { binding, release } => invalid(
+            "executor_kind",
+            "binding_kind_mismatch",
+            format!("the binding names {binding:?} but the release declares {release:?}"),
+        ),
         OrganisationStoreError::Database(error) => store_error(error, action),
     }
 }

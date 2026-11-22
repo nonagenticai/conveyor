@@ -18,11 +18,13 @@
 //! model names but the executor did not declare is refused **before** execution
 //! (`action-not-found`) and fed back to the model, never audited after the fact (CONTRACT §17).
 
+use std::collections::{BTreeMap, BTreeSet};
 use std::time::{Duration, Instant};
 
 use conveyor_auth::Role;
 use conveyor_domain::TenantId;
 use conveyor_domain::inference::CallerKind;
+use conveyor_domain::organisation::ReleaseAnatomy;
 use conveyor_store as store;
 use conveyor_workflow::agent::{
     Agent, AgentConfig, AgentError, MAX_TURNS, Message, ModelReply, Plan, Reply, ToolCall,
@@ -36,7 +38,7 @@ use uuid::Uuid;
 
 use crate::invoke::{ActionError, Authority, HandlerCtx, InvokeRequest, UsageContext, invoke};
 use crate::registry::registry;
-use crate::spec::{FieldError, HandlerOutput};
+use crate::spec::{Effect, FieldError, HandlerOutput};
 
 /// The external action the loop calls for the model.
 pub const MODEL_ACTION: &str = "inference.chat";
@@ -133,6 +135,7 @@ impl AgentRunIn {
                 })
                 .collect(),
             tools: self.tools,
+            broker_tools: BTreeMap::new(),
             max_turns: self.max_turns,
             max_tool_calls: self.max_tool_calls,
             timeout_ms: self.timeout_ms,
@@ -181,6 +184,12 @@ pub struct AgentRunOut {
     /// `<name>@<version>`.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub prompt_ref: Option<String>,
+    /// The compiled recipe's version (S16 W7).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub prompt_version: Option<String>,
+    /// SHA-256 of the compiled system text — the draft's provenance (S21 step 4).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub prompt_sha256: Option<String>,
 }
 
 impl From<conveyor_workflow::agent::AgentOutput> for AgentRunOut {
@@ -201,6 +210,8 @@ impl From<conveyor_workflow::agent::AgentOutput> for AgentRunOut {
             usage: output.usage,
             capability_agent_id: output.capability_agent_id,
             prompt_ref: output.prompt_ref,
+            prompt_version: None,
+            prompt_sha256: None,
         }
     }
 }
@@ -263,9 +274,19 @@ pub(crate) async fn resolve(
     run_step_id: Option<Uuid>,
     capability_agent_id: Option<Uuid>,
     node_input: &Value,
+    release: Option<&ReleaseAnatomy>,
 ) -> Result<AgentConfig, ActionError> {
     if let Some(agent_id) = capability_agent_id {
-        return resolve_bound(pool, tenant, run_id, run_step_id, agent_id, node_input).await;
+        return resolve_bound(
+            pool,
+            tenant,
+            run_id,
+            run_step_id,
+            agent_id,
+            node_input,
+            release,
+        )
+        .await;
     }
 
     let has_model = node_input.get("model").and_then(Value::as_str).is_some();
@@ -308,6 +329,7 @@ async fn resolve_bound(
     run_step_id: Option<Uuid>,
     agent_id: Uuid,
     node_input: &Value,
+    release: Option<&ReleaseAnatomy>,
 ) -> Result<AgentConfig, ActionError> {
     if let Some(claimed) = node_input
         .get("capability_agent_id")
@@ -356,13 +378,25 @@ async fn resolve_bound(
         ));
     }
 
+    // The frozen release is the execution authority (ADR 0010): its model, recipe and caps win
+    // over the live row, and the row is the outer ceiling the release may narrow.
+    let effective_model = match release {
+        Some(anatomy) => anatomy.effective_model_ref(&record.model_ref).to_owned(),
+        None => record.model_ref.clone(),
+    };
+    let effective_prompt = match release {
+        Some(anatomy) => anatomy
+            .effective_prompt_ref(record.prompt_ref.as_deref())
+            .map(str::to_owned),
+        None => record.prompt_ref.clone(),
+    };
+
     // How the row's configuration is defended: a step may narrow it, never substitute it.
     if let Some(model) = node_input.get("model").and_then(Value::as_str)
-        && model != record.model_ref.as_str()
+        && model != effective_model.as_str()
     {
         return Err(config_conflict(format!(
-            "the step input names model {model:?}; the bound capability_agent {agent_id} uses {:?}",
-            record.model_ref
+            "the step input names model {model:?}; the bound capability_agent {agent_id} uses {effective_model:?}"
         )));
     }
     if let Some(tools) = node_input.get("tools") {
@@ -377,15 +411,17 @@ async fn resolve_bound(
         }
     }
     if let Some(reference) = node_input.get("prompt_ref").and_then(Value::as_str)
-        && Some(reference) != record.prompt_ref.as_deref()
+        && Some(reference) != effective_prompt.as_deref()
     {
         return Err(config_conflict(format!(
             "the step input names prompt {reference:?}; the bound capability_agent {agent_id} \
-             resolves {:?}",
-            record.prompt_ref
+             resolves {effective_prompt:?}"
         )));
     }
-    let bound_turns = u8::try_from(record.max_iterations).unwrap_or(MAX_TURNS);
+    let bound_turns = match release {
+        Some(anatomy) => anatomy.effective_max_iterations(record.max_iterations),
+        None => u8::try_from(record.max_iterations).unwrap_or(MAX_TURNS),
+    };
     let max_turns = match node_input.get("max_turns") {
         None | Some(Value::Null) => bound_turns,
         Some(value) => {
@@ -402,7 +438,10 @@ async fn resolve_bound(
             u8::try_from(asked).map_err(|_| config_invalid("max_turns does not fit a u8"))?
         }
     };
-    let bound_timeout_ms = i64::from(record.timeout_secs) * 1000;
+    let bound_timeout_ms = match release {
+        Some(anatomy) => anatomy.effective_timeout_ms(record.timeout_secs),
+        None => i64::from(record.timeout_secs) * 1000,
+    };
     let timeout_ms = match node_input.get("timeout_ms") {
         None | Some(Value::Null) => bound_timeout_ms,
         Some(value) => {
@@ -415,18 +454,31 @@ async fn resolve_bound(
             asked
         }
     };
+    let bound_tool_calls = release.and_then(ReleaseAnatomy::effective_max_tool_calls);
     let max_tool_calls = match node_input.get("max_tool_calls") {
-        None | Some(Value::Null) => None,
-        Some(value) => Some(
-            value
+        None | Some(Value::Null) => bound_tool_calls,
+        Some(value) => {
+            let asked = value
                 .as_u64()
                 .and_then(|asked| u8::try_from(asked).ok())
-                .ok_or_else(|| config_invalid("max_tool_calls is not a u8"))?,
-        ),
+                .ok_or_else(|| config_invalid("max_tool_calls is not a u8"))?;
+            if let Some(bound) = bound_tool_calls
+                && asked > bound
+            {
+                return Err(cap_exceeds_bound("max_tool_calls", asked, bound));
+            }
+            Some(asked)
+        }
     };
 
     let mut tools = Vec::with_capacity(record.allowed_actions.len());
+    let mut projected: BTreeSet<String> = BTreeSet::new();
     for name in &record.allowed_actions {
+        // `tools.call` is the broker's dispatch action, never a model-facing tool. When it is in
+        // the allowlist, the run's bound tools are projected below in its place (#556).
+        if name.as_str() == crate::tools::TOOLS_CALL {
+            continue;
+        }
         let Some(spec) = registry().get(name) else {
             return Err(capability_not_ready(
                 "allowed_actions",
@@ -436,10 +488,120 @@ async fn resolve_bound(
         };
         let parameters = serde_json::to_value((spec.input)())
             .unwrap_or_else(|_| json!({"type": "object", "additionalProperties": true}));
+        projected.insert(spec.name.to_owned());
         tools.push(json!({
             "type": "function",
             "function": {"name": spec.name, "parameters": parameters}
         }));
+    }
+
+    // SPEC_V2 §4.5: the agent's Tools source is "the curated list of tools bound to this job,
+    // with their closed schemas". `tools.call` in `allowed_actions` is the permission gate
+    // (CONTRACT §17: the row remains the allowlist); the binding pins which tools exist. The set
+    // is resolved once, here, and pinned for the step — a mid-run binding change is a new step.
+    let mut broker_tools = BTreeMap::new();
+    if record
+        .allowed_actions
+        .iter()
+        .any(|name| name.as_str() == crate::tools::TOOLS_CALL)
+    {
+        let mut tx = store::begin_scoped(pool, tenant).await.map_err(|error| {
+            tracing::error!(%error, "agent.run: begin the tool-binding read");
+            ActionError::internal()
+        })?;
+        let run_ctx = store::tool::run_context(&mut tx, tenant, run_id)
+            .await
+            .map_err(|error| {
+                tracing::error!(%error, "agent.run: read the run's tool context");
+                ActionError::internal()
+            })?
+            .ok_or_else(|| {
+                ActionError::new(
+                    409,
+                    "tool_not_ready",
+                    format!("run {run_id} is not in this tenant"),
+                )
+            })?;
+        let bound = store::tool::bound_tools(&mut tx, tenant, &run_ctx)
+            .await
+            .map_err(|error| {
+                tracing::error!(%error, "agent.run: read the run's bound tools");
+                ActionError::internal()
+            })?;
+        tx.commit().await.map_err(|error| {
+            tracing::error!(%error, "agent.run: commit the tool-binding read");
+            ActionError::internal()
+        })?;
+
+        // Every canonical name the BINDING reaches, before either ceiling narrows it. The
+        // release-grant readiness check below reads this set: a granted op with no bound tool is
+        // a refusal, while an op narrowed off by a ceiling is a legitimate silent absence.
+        let mut bound_canonical: BTreeSet<String> = BTreeSet::new();
+        for tool in bound {
+            let Some(effect) = Effect::parse(&tool.effect) else {
+                tracing::error!(tool = %tool.tool_key, effect = %tool.effect, "agent.run: unknown tool effect");
+                return Err(ActionError::internal());
+            };
+            let Some(ceiling) = Effect::parse(&tool.effect_ceiling) else {
+                tracing::error!(tool = %tool.tool_key, ceiling = %tool.effect_ceiling, "agent.run: unknown binding ceiling");
+                return Err(ActionError::internal());
+            };
+            let canonical = format!("{}.{}", tool.toolkit_key, tool.tool_key);
+            bound_canonical.insert(canonical.clone());
+            // A binding narrows: a tool above the ceiling is not offered to the model. The broker
+            // re-checks at call time if the model names it by another route.
+            if effect.rank() > ceiling.rank() {
+                continue;
+            }
+            // The release grant narrows further (SPEC_V2 §11.4): only an enabled operation whose
+            // effect is within the grant's ceiling reaches the model. A release that declares no
+            // grants projects no brokered tool at all — an empty allowlist, never "allow all".
+            if let Some(anatomy) = release {
+                let Some(grant) = anatomy.enabled_grant(&canonical) else {
+                    continue;
+                };
+                if effect.rank() > grant.max_side_effect.rank() {
+                    continue;
+                }
+            }
+            let wire = format!("{}_{}", tool.toolkit_key, tool.tool_key.replace('.', "_"));
+            if !projected.insert(wire.clone()) {
+                return Err(capability_not_ready(
+                    "allowed_actions",
+                    "tool_name_conflict",
+                    format!("the projected tool {wire:?} collides with an allowed action"),
+                ));
+            }
+            let parameters = tool.input_schema.clone();
+            tools.push(json!({
+                "type": "function",
+                "function": {
+                    "name": wire,
+                    "description": format!("Bound tool {canonical}"),
+                    "parameters": parameters,
+                }
+            }));
+            broker_tools.insert(wire, canonical);
+        }
+
+        // An enabled grant op the binding cannot reach is a refusal, before any model call: the
+        // model must not be offered a job the run cannot do, and the run must not silently lack a
+        // tool its release promises (SPEC_V2 §11.3 step 1 applied to the agent surface).
+        if let Some(anatomy) = release {
+            for grant in anatomy.grants.iter().filter(|grant| grant.enabled) {
+                if !bound_canonical.contains(&grant.op) {
+                    return Err(capability_not_ready(
+                        "grants",
+                        "tool_not_ready",
+                        format!(
+                            "the release grants {} but the run's binding reaches no published tool \
+                             for it",
+                            grant.op
+                        ),
+                    ));
+                }
+            }
+        }
     }
 
     let mut messages: Vec<AgentMessage> = node_input
@@ -460,7 +622,7 @@ async fn resolve_bound(
     // A caller-supplied one here would make the compiled prompt and the input two truths, so it
     // is refused rather than silently preferred either way.
     let mut compiled_identity: Option<(String, String)> = None;
-    if let Some(reference) = record.prompt_ref.as_deref() {
+    if let Some(reference) = effective_prompt.as_deref() {
         if messages.iter().any(|message| message.role == "system") {
             return Err(ActionError::new(
                 422,
@@ -471,9 +633,16 @@ async fn resolve_bound(
                 ),
             ));
         }
-        let compiled = crate::prompt::compile_for_run(pool, tenant, run_id, run_step_id, reference)
-            .await
-            .map_err(|error| error.into_action_error("agent.run"))?;
+        let compiled = crate::prompt::compile_for_run_with_pins(
+            pool,
+            tenant,
+            run_id,
+            run_step_id,
+            reference,
+            release,
+        )
+        .await
+        .map_err(|error| error.into_action_error("agent.run"))?;
         compiled_identity = Some((compiled.version.clone(), compiled.sha256.clone()));
         messages.insert(
             0,
@@ -488,19 +657,20 @@ async fn resolve_bound(
     }
 
     let input = AgentRunIn {
-        model: record.model_ref.clone(),
+        model: effective_model,
         messages,
         tools,
         max_turns: Some(max_turns),
         max_tool_calls,
         timeout_ms: Some(timeout_ms),
         capability_agent_id: Some(agent_id),
-        prompt_ref: record.prompt_ref.clone(),
+        prompt_ref: effective_prompt,
         run_id: Some(run_id),
         run_step_id,
         depth: Some(0),
     };
     let mut config = input.into_config();
+    config.broker_tools = broker_tools;
     if let Some((version, sha256)) = compiled_identity {
         config.prompt_version = Some(version);
         config.prompt_sha256 = Some(sha256);
@@ -680,13 +850,29 @@ pub(crate) async fn drive(
             Plan::CallTool(call) => {
                 let reply = if allowed.iter().any(|name| name == &call.name) {
                     let index = agent.tool_calls();
+                    // A projected bound tool goes through the one broker action; an ordinary
+                    // registry action keeps its own name. The map was resolved once, before the
+                    // loop, so the step's tool surface cannot widen mid-run.
+                    let broker = agent.broker_tool(&call.name).map(str::to_owned);
+                    let (action, tool_input) = match broker {
+                        Some(canonical) => (
+                            crate::tools::TOOLS_CALL.to_owned(),
+                            json!({
+                                "run_id": run.run_id,
+                                "step_id": run.run_step_id,
+                                "tool": canonical,
+                                "input": call.arguments.clone(),
+                            }),
+                        ),
+                        None => (call.name.clone(), call.arguments.clone()),
+                    };
                     let invocation = invoke(
                         pool,
                         registry(),
                         tenant,
                         InvokeRequest {
-                            action: call.name.clone(),
-                            input: call.arguments.clone(),
+                            action,
+                            input: tool_input,
                             precondition: None,
                             idempotency_key: run
                                 .idempotency_prefix
@@ -758,7 +944,15 @@ pub(crate) async fn drive(
                 };
                 plan = agent.apply(Reply::Tool(reply));
             }
-            Plan::Finished(output) => return Ok(AgentRunOut::from(output)),
+            Plan::Finished(output) => {
+                let mut out = AgentRunOut::from(output);
+                if out.prompt_ref.is_none() {
+                    out.prompt_ref = prompt_ref.clone();
+                }
+                out.prompt_version = prompt_version.clone();
+                out.prompt_sha256 = prompt_sha256.clone();
+                return Ok(out);
+            }
             Plan::Failed(error) => return Err(typed(error)),
         }
     }
@@ -797,6 +991,45 @@ pub async fn run_step(
         run_step_id,
         capability_agent_id,
         input,
+        None,
+    )
+    .await?;
+    let trace = RunTrace {
+        run_id,
+        run_step_id,
+        depth,
+        idempotency_prefix,
+        app_key,
+    };
+    drive(pool, tenant, &trace, config).await
+}
+
+/// Resolve and drive one run-level `internal_agent` step under its pinned release (S21 step 4).
+///
+/// It is [`run_step`] with the release in force: the release's `model_ref`, `prompt_recipe` and
+/// caps win over the live row, and its grant bounds the tools the model is offered. The idempotency
+/// prefix makes a reclaimed job replay its stored model/tool responses rather than buy them twice.
+#[allow(clippy::too_many_arguments)]
+pub async fn run_release_step(
+    pool: &PgPool,
+    tenant: TenantId,
+    run_id: Uuid,
+    run_step_id: Option<Uuid>,
+    capability_agent_id: Option<Uuid>,
+    app_key: &str,
+    idempotency_prefix: Option<&str>,
+    depth: u32,
+    release: &ReleaseAnatomy,
+    input: &Value,
+) -> Result<AgentRunOut, ActionError> {
+    let config = resolve(
+        pool,
+        tenant,
+        run_id,
+        run_step_id,
+        capability_agent_id,
+        input,
+        Some(release),
     )
     .await?;
     let trace = RunTrace {

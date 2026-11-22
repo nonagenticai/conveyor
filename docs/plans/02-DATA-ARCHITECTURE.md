@@ -1241,16 +1241,18 @@ CREATE TABLE prompt (
     tenant_id   uuid NOT NULL DEFAULT app_current_tenant(),
     key         text NOT NULL,
     version     int  NOT NULL CHECK (version >= 1),
-    status      text NOT NULL DEFAULT 'active' CHECK (status IN ('active','retired')),
+    status      text NOT NULL DEFAULT 'active' CHECK (status IN ('draft','active','retired')),
     title       text NOT NULL,
+    budget_chars int CHECK (budget_chars > 0),          -- 0031
     created_at  timestamptz NOT NULL DEFAULT now(),
     updated_at  timestamptz NOT NULL DEFAULT now(),
     CONSTRAINT prompt_key_not_blank   CHECK (btrim(key) <> ''),
     CONSTRAINT prompt_title_not_blank CHECK (btrim(title) <> ''),
     CONSTRAINT prompt_tenant_key_version_key UNIQUE (tenant_id, key, version)
 );
--- At most one active version per key; retired rows stay addressable by exact pin.
+-- At most one active and one draft version per key; retired rows stay addressable by exact pin.
 CREATE UNIQUE INDEX uq_prompt_active ON prompt (tenant_id, key) WHERE status = 'active';
+CREATE UNIQUE INDEX uq_prompt_draft  ON prompt (tenant_id, key) WHERE status = 'draft';   -- 0062
 
 CREATE TABLE prompt_section (
     id          uuid PRIMARY KEY DEFAULT uuidv7(),
@@ -1258,9 +1260,12 @@ CREATE TABLE prompt_section (
     prompt_id   uuid NOT NULL,
     position    int  NOT NULL CHECK (position >= 1),
     source_kind text NOT NULL
-                CHECK (source_kind IN ('system','procedure','capability','project_card','knowledge')),
+                CHECK (source_kind IN ('system','process','capability','role','project_card','knowledge','memory')),
     required    boolean NOT NULL DEFAULT false,
     template    text NOT NULL DEFAULT '',
+    selector    jsonb NOT NULL DEFAULT '{}'             -- 0062
+                CHECK (jsonb_typeof(selector) = 'object'),
+    budget_chars int CHECK (budget_chars > 0),          -- 0031
     created_at  timestamptz NOT NULL DEFAULT now(),
     CONSTRAINT prompt_section_prompt_fk
         FOREIGN KEY (prompt_id) REFERENCES prompt (id) ON DELETE CASCADE,
@@ -1270,11 +1275,108 @@ CREATE TABLE prompt_section (
 );
 ```
 
-**`system` is the only literal kind.** The other four are rendered from the run's facts — the process (stored as a
-process) and its step, the capability/agent row, the project and card, and the capability's bound packs. A
-`required` section with no source is a readiness refusal, not an empty section. The built-in recipes
-(`copilot_system@1`, `prompt_audit@1`, `agent@1`) are seeded per tenant by `seed::prompts_for_tenant`; an
-existing `(key, version)` is never rewritten by a seed.
+**`system` is the only literal kind.** The other six are rendered from the run's facts — the process
+(stored as a process) and its step, the capability/agent row, the role, the project and card, the
+capability's bound packs with their selected hits, and the card's memory. A `required` section with
+no source is a readiness refusal, not an empty section. The built-in recipes (`copilot_system@1`,
+`prompt_audit@1`, `agent@1`) are seeded per tenant by `seed::prompts_for_tenant`; an existing
+`(key, version)` is never rewritten by a seed.
+
+**Recipe lifecycle (0062, ADR 0009).** A version is immutable per `(tenant, key, version)`. A tenant
+creates a `draft`, activates it (the previous active becomes `retired` in the same transaction), or
+retires a version. Exact pins stay readable; a new run resolves only an `active` row.
+`prompt_section.selector` is the one selection config — memory `{kinds, limit, include_digest}` and
+knowledge `{query, top_k}` — never a second template language. Knowledge targets are resolved in the
+compile transaction, but retrieval runs after that transaction commits, reusing the
+`knowledge.query` path; the compiled text itself is still never stored.
+
+### 2.22 Organisation spine — T0 (5)
+
+`migrations/0040_organisation.sql` — `industry`, `department`, `job_catalogue`, `job_release`,
+`job_binding`, each `ENABLE`+`FORCE` RLS with one `tenant_isolation` policy. The catalogue row is the
+editable draft; a release is the immutable compile; a binding pins one release like a lockfile.
+
+```sql
+CREATE TABLE job_release (
+    id               uuid PRIMARY KEY DEFAULT uuidv7(),
+    tenant_id        uuid NOT NULL DEFAULT app_current_tenant(),
+    job_id           uuid NOT NULL,
+    release_hash     text NOT NULL,                    -- sha256 over the canonical snapshot
+    release_snapshot jsonb NOT NULL,                   -- {job_key,title,family,industry,departments,anatomy}
+    status           text NOT NULL DEFAULT 'published' CHECK (status IN ('published','retired')),
+    ...
+    CONSTRAINT job_release_tenant_job_hash_key UNIQUE (tenant_id, job_id, release_hash),
+    CONSTRAINT job_release_snapshot_is_object CHECK (jsonb_typeof(release_snapshot) = 'object')
+);
+
+CREATE TABLE job_binding (
+    id                  uuid PRIMARY KEY DEFAULT uuidv7(),
+    tenant_id           uuid NOT NULL DEFAULT app_current_tenant(),
+    job_id              uuid NOT NULL,
+    release_id          uuid NOT NULL,
+    release_hash        text NOT NULL,                 -- copied from the release, never refreshed
+    release_snapshot    jsonb NOT NULL,                -- the frozen copy
+    capability_id       uuid,
+    process_id          uuid,                          -- procedure executor
+    capability_agent_id uuid,                          -- internal_agent executor
+    executor_kind       text NOT NULL,                 -- open slug ^[a-z][a-z0-9_]{1,31}$
+    status              text NOT NULL DEFAULT 'draft' CHECK (status IN ('draft','active','retired')),
+    meta                jsonb NOT NULL DEFAULT '{}'::jsonb,
+    ...
+    CONSTRAINT job_binding_has_executor CHECK (process_id IS NOT NULL OR capability_agent_id IS NOT NULL)
+);
+```
+
+`card.job_binding_id` names the binding; `run.job_binding_id`/`run.release_hash` record what ran
+(§2.24). `release_snapshot.anatomy` is the job definition verbatim; since S21 step 4 the executor
+parses the execution fields it needs from it — `executor_kind`, `model_ref`, `prompt_recipe`,
+`charter`, `authority`, `gate`, `limits`, `grants` — with one typed parser
+(`conveyor_domain::organisation::ReleaseAnatomy`) and refuses a malformed anatomy at
+`job_releases.publish` (`422 release.anatomy_invalid`) **before** hashing. The anatomy is inside
+`release_hash`, so a grant change is a new release and a new binding (D38); nothing is refreshed in
+place.
+
+**The tool grant lives here, not in a table.** `anatomy.grants` is the release's operation
+allowlist `[{op, variant, max_side_effect, enabled}]`; `tool_binding` (§2.23) pins the toolkit
+versions, ceiling and credential. The release never carries tool content, and the binding never
+widens the grant (SPEC_V2 §11.1).
+
+### 2.23 Tool estate — T13 (4)
+
+`migrations/0055_tool_platform.sql` — `toolkit`, `tool`, `tool_binding`, `tool_call`, each scoped by
+tenant with `ENABLE`+`FORCE` RLS.
+
+| Table | What it is | What it must never hold |
+|---|---|---|
+| `toolkit` | one service's published, versioned bundle (`key`, `version`, `status`, destination) | a credential |
+| `tool` | one callable operation inside a toolkit version: closed `input_schema`, `effect`, `timeout_secs`, `redact`, `handler_action` | a caller URL |
+| `tool_binding` | a tenant-scoped grant of pinned toolkit versions to a job binding OR a run, narrowed by `effect_ceiling`, `rate`, `credential_alias` | an operation list (that is the release's grant) |
+| `tool_call` | one audited call: run/step, tool version, input hash, status, latency, bytes, cost | the input body, the credential |
+
+`store::tool::resolve` resolves one `(toolkit, operation)` through the run's binding; `bound_tools`
+returns every published tool reachable through the run-scoped or job-binding grant, with the pinned
+schema and the binding's ceiling. The broker (`crates/actions/src/broker.rs`) is the one call path:
+resolve → effect check → schema validate → credential by alias → destination alias → normalise/redact
+→ `tool_call` + `tool.called`. The ceiling narrows only; a tool above it is absent from the agent's
+surface and refused `403 tool_effect_forbidden` at the broker.
+
+### 2.24 The `internal_agent` run trace — S21 step 4 (0 new tables)
+
+A bound run reuses the existing rows; no table and no migration.
+
+| Row | What the runtime writes |
+|---|---|
+| `run` | the binding pin (`job_binding_id`, `release_hash`, both from 0040), `capability_id`/`capability_agent_id` from the binding, the status path `queued → running → succeeded \| failed` (never `waiting_approval` in this unit) |
+| `run_step` | exactly one row: position 1, attempt 1, action `agent.run`, the pin envelope as `input`, the draft's hash as `output_hash`, and `judge` = the laya pre-check record or `{decision:"no_policy"}` |
+| `document` | the draft: `body` = the model's text, `meta.generated = true` + the prompt/binding/run identity; `card_id` null until `ladder.apply_draft` attaches it |
+| `decision` | one `gate.precheck` row when a policy exists: rung `laya`, option-set version, policy/refinement/laya-config versions, answer, probabilities, confidence, input hash, latency |
+| `inference_call` | one per model turn, naming `prompt_ref`/`prompt_version`/`prompt_sha256` and usage |
+| `tool_call` | one per tool call the loop dispatches through `tools.call` |
+| `approval` | one card-scoped row only when the gate's action is `handover` (no `run_id`; the run is terminal) |
+
+The compiled prompt text is never stored: `inference_call` and the draft's `meta` carry the
+identity and the hash. `run_step.node_id` is nullable (0019), so the same store serves a workflow
+node and this run-level step.
 
 ## 3. State machines and enforcement
 
@@ -1303,6 +1405,11 @@ duplicates the function. The CHECK constraints below guard *vocabulary*, never *
 | Enforced | `domain::run::transition(from, to) -> Result<Run, RunError>`; the store layer refuses a status the function rejects |
 | Stored | `run.status`, `started_at`, `finished_at`, `attempt`, `error_class`, `error_message` |
 | Invariant | **a run is a tree (2026-11-09).** Partial unique `(tenant_id, card_id) WHERE parent_run_id IS NULL AND status IN ('queued','running','waiting_approval')` — **one live ROOT run per card**; the project form is `(tenant_id, project_id) WHERE parent_run_id IS NULL AND card_id IS NULL AND status IN (…)`; one live child per `(parent_run_id, step_id)` and one row per `(parent_run_id, step_id, attempt)`. `CHECK (parent_run_id IS NULL OR step_id IS NOT NULL)` and `CHECK (depth BETWEEN 0 AND 3)`. Cancel cascades from a parent to its children; a child's failure does not re-fire the parent's `err.card`. Enforced by the DB even if two API pods race |
+
+**A bound `internal_agent` run (S21 step 4) uses `queued → running → succeeded | failed` only.** Its
+gate pre-check is recorded on the step and, on `handover`, fails the run `gate_requires_approval`
+and opens a card-scoped approval — the run never enters `waiting_approval`, because no worker kind
+resumes a plain run and parking would hold `uq_run_live`. A resume worker is a separate unit.
 
 ### 3.3 Approval
 
