@@ -12,13 +12,16 @@ parity_ids: PENDING-S0
 
 # S21 — Message construction (the compiled prompt)
 
-Programme project: S21 · issues #15, #581
+Programme project: S21 · issues #15, #581, #590, #599
 
 **Status:** `plan written 2026-11-09`; the v1 seam is built (D27) and steps 1–2 are built. Step 3
 (the work-package prompt envelope — recipe authoring, memory selection, knowledge content) is
 **built, #574, 2026-11-22**; the design is §12 and the build record is §13. Step 4 (the
 `internal_agent` executor runtime and its dynamic tool grant) is **built, #581, 2026-11-22**; the
-design is §14 and the build record is §15.
+design is §14 and the build record is §15. Step 5 (the applying gate) is **built, #590,
+2026-11-22**; the design is §16 and the receipt is `docs/evidence/S21-APPLY.md`. Step 6 (the work
+package's run — the card's binding, the terminal run's memory and the live proof) is **open,
+#599**; the design is §17.
 **Depends on:** S15 (capability/knowledge), S16 (prompt audit), S13 (agent.run), S11 (procedure steps),
 S09 (`retrieval.query` / `strata` packs).
 **Owner ruling:** George, 2026-11-09 — *a prompt is a run-time compilation from the procedure and the
@@ -524,3 +527,56 @@ proof; no migration.
 with the parked/approved/rejected/reclaimed scenarios), the rewritten ladder tests, and
 `apps/server/tests/approval_expire.rs` (stays green). The scenarios are issue #590 P1–P3; the
 receipt is `docs/evidence/S21-APPLY.md`.
+
+**Next lane.** Step 6 (issue #599, §17): the work package's run — a card that names its job
+binding drives the run that inherits it, every terminal root run records one attempt in the
+card's hot memory, and the path is proved live against the real router and laya. No budget
+mechanism (the #526 lane owns `v1-p75-1`), no PDDL storage, no second compiler, no external runtime.
+
+## 17. Build plan — step 6: the work package's run (2026-11-22, issue #599)
+
+**Why this step.** Steps 3–5 built the compiled prompt, the executor and the applying gate, but the
+work package itself is still inert: `card.job_binding_id` (`migrations/0040_organisation.sql:203`)
+has no reader or writer, so a run is bound only because its caller passed a binding, and the
+executor never writes `work_package_memory`, so the prompt's memory section is always empty while
+`memory.consolidate` is already enqueued on every terminal transition
+(`crates/store/src/run.rs:641`). SPEC_V2 §4.4 ("a card names a binding"), §5.1 (card → run),
+§6.6.4 ("memory is written at handoff") and §7.6 (hot rows + derived digest) describe the target;
+rework `v1-p66-1` names the handoff gap. This step joins them.
+
+**Not this step — the budget.** `v1-p75-1` (P0, "budget enforcement is off by default and no
+run/binding declares a budget") is **already resolved on `origin/issue/526-u5a`** (commit
+`8f1e5770`, `crates/actions/tests/tool_budget.rs` 14 passed, an invoke precheck that refuses an
+unbudgeted capturing call, `422 budget_missing` at run start). A second gate here would be a
+duplicate mechanism. The token ceiling (`ReleaseLimits.max_tokens`, still recorded-only) is that
+gate's residual, not this step's.
+
+**P1 — the card names the binding.** `cards.create` and `cards.update` accept `job_binding_id`; the
+binding must resolve in the tenant and be `active` (`422 job_binding_unusable` otherwise); `CardOut`
+exposes it. `runs.create` resolves the card's binding when the request omits one and refuses an
+explicit binding that differs (`422 card_binding_mismatch`); a card with no binding keeps the plain
+run path. The pin and stale checks stay in `insert_run_tx`. `cards.duplicate` leaves the binding
+unset (an assignment is not content).
+
+**P2 — the terminal run writes its memory.** `enqueue_memory_consolidation` becomes
+`record_run_memory`: when a terminal run is card-scoped and a root, it inserts one
+`work_package_memory` row through the existing `store::memory::insert_memory_tx` — kind `attempt`,
+source `system`, `run_id` set, body naming the attempt and its outcome, `meta` carrying the status
+and error class — and then enqueues the existing consolidation job. The row and the terminal status
+commit in one transaction; a child run and a card-less run write none. The one-writer rule is
+amended in CONTRACT §17 to name this runtime writer.
+
+**P3 — the live wire proof.** A new `#[ignore]` test drives one bound run against the estate's real
+inference-router and real laya bridge on a fresh local test database (the `s3_wire.rs` pattern) and
+asserts the model call, the `gate.precheck` decision, the draft, the attempt row and the run's
+terminal state. It refuses when the endpoints or credentials are unset; a stub is not the proof.
+
+**Out of this step.** No budget mechanism (cost, tool spend or token ceiling — `v1-p75-1` is the
+#526 lane's); no automatic apply of an L1-accepted draft; no new `cards.assign` action; no
+auto-start from a claim or lane move; no prior-step memory in the prompt; no procedure-process run
+memory (`process_runs.start`); no UI; no PDDL storage; no migration.
+
+**Acceptance.** `crates/actions/tests/card_binding.rs` (new), `crates/store/tests/run_memory.rs`
+(new), `internal_agent_runtime.rs` (extended with the next-run prompt scenario), and
+`crates/actions/tests/internal_agent_live.rs` (new, ignored). The scenarios are issue #599 P1–P3;
+the receipt is `docs/evidence/S21-RUN.md`.
