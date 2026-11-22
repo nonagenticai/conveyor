@@ -1084,6 +1084,8 @@ async fn a_tranche_review_without_evidence_is_refused() {
         "decision": "continue",
         "delegation_ref": delegation,
         "evidence": {
+            // v1-tr2-2: the review names the snapshot it judged.
+            "snapshot_sha": "0123456789abcdef0123456789abcdef01234567",
             "baselines": ["B0"],
             "benefit_status": {"BEN-01": "tracking"},
             "risk_register": ["risk-1"]

@@ -17,7 +17,7 @@
 //! surface uses, so a subscriber watches one row or a family.
 
 use chrono::{DateTime, Utc};
-use conveyor_domain::spine::{PlanError, WsjfInputs, wsjf};
+use conveyor_domain::spine::{PlanError, WsjfInputs, tranche_review_has_evidence, wsjf};
 use conveyor_domain::{ApprovalError, DeciderKind, Decision, DecisionKind};
 use conveyor_store as store;
 use schemars::JsonSchema;
@@ -2076,6 +2076,22 @@ async fn tranches_create(
     Ok(HandlerOutput::created(tranche_out(&record)).with_etag(etag_of(record.version)))
 }
 
+/// A git commit id as review evidence names it: exactly 40 hexadecimal characters, either case.
+fn is_git_sha(raw: &str) -> bool {
+    raw.len() == 40 && raw.chars().all(|character| character.is_ascii_hexdigit())
+}
+
+/// The refusal for a review whose evidence does not name the revision it judged (v1-tr2-2).
+fn tranche_review_unpinned() -> ActionError {
+    ActionError::new(
+        422,
+        "tranche_review_unpinned",
+        "a tranche review must name the revision it judged: evidence.snapshot_sha must be a \
+         40-character hex commit id; evidence.snapshot.git_sha is accepted and recorded as \
+         snapshot_sha",
+    )
+}
+
 /// Record an end-of-tranche review; evidence is mandatory.
 #[crate::action(
     name = "tranches.review",
@@ -2118,7 +2134,7 @@ async fn tranches_review(
                 "the tranche review gate has no approving decision",
             )
         })?;
-    let evidence = match input.evidence {
+    let mut evidence = match input.evidence {
         Value::Object(mut map) => {
             map.insert(
                 "delegation_ref".to_owned(),
@@ -2137,6 +2153,29 @@ async fn tranches_review(
             ));
         }
     };
+    // v1-tr2-2 — once the evidence is complete enough for the §8.3 check to pass, it must also
+    // name the revision it judged, or the review is not pinned to anything reproducible. The
+    // flat `snapshot_sha` is canonical; the nested `snapshot.git_sha` the pack emits is accepted
+    // and normalised into it, so every stored review carries the same key. The pin is checked
+    // only after the completeness predicate, so an empty evidence object still reports the more
+    // fundamental `tranche_evidence_missing` from the store.
+    if tranche_review_has_evidence(&evidence) {
+        let flat = evidence.get("snapshot_sha").cloned();
+        let nested = evidence
+            .pointer("/snapshot/git_sha")
+            .and_then(Value::as_str)
+            .map(str::to_owned);
+        match flat {
+            Some(Value::String(sha)) if is_git_sha(&sha) => {}
+            Some(_) => return Err(tranche_review_unpinned()),
+            None => match nested {
+                Some(sha) if is_git_sha(&sha) => {
+                    evidence["snapshot_sha"] = Value::String(sha);
+                }
+                _ => return Err(tranche_review_unpinned()),
+            },
+        }
+    }
     let record = store::spine::review_tranche_tx(
         &mut *tx,
         ctx.tenant,
