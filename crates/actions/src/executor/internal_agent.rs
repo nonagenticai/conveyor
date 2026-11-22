@@ -367,6 +367,7 @@ async fn run(request: RunRequest<'_>) -> Result<(), ExecutorFailure> {
             depth: 1,
             app_key: app_key.to_owned(),
             usage: None,
+            credential_alias: None,
         },
     )
     .await;
@@ -606,6 +607,7 @@ async fn decide(
             depth: 1,
             app_key: app_key.to_owned(),
             usage: None,
+            credential_alias: None,
         },
     )
     .await;
@@ -691,6 +693,7 @@ async fn decide(
             depth: 1,
             app_key: app_key.to_owned(),
             usage: None,
+            credential_alias: None,
         },
     )
     .await;

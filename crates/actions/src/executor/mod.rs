@@ -157,6 +157,7 @@ pub(crate) fn service_ctx(
         action,
         app_key: app_key.to_owned(),
         approval_id: None,
+        usage: None,
     }
 }
 
