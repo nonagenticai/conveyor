@@ -627,9 +627,18 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/05-W2V-ABSORPTION.html",
       "source": "docs/plans/05-W2V-ABSORPTION.md",
       "section": "Plans",
-      "sha256": "3bcca544f04f89a22022d4da65180fbe377ef31dedbf4b8addc31e92e41f51be",
-      "bytes": 8235,
+      "sha256": "87944ed8238aec57213b48968950d68ef80c72820c2852d0349fe5e4a5a79461",
+      "bytes": 8865,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/05-W2V-ABSORPTION.md"
+    },
+    {
+      "title": "06 — Tool provenance and the retirement gate",
+      "path": "docs/plans/06-TOOL-PROVENANCE.html",
+      "source": "docs/plans/06-TOOL-PROVENANCE.md",
+      "section": "Plans",
+      "sha256": "16b6910f7805ff530b8a75c1d7211a2d1df5789d0188145d0b84ba41c56822ad",
+      "bytes": 6451,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/06-TOOL-PROVENANCE.md"
     },
     {
       "title": "P0 — Programme definition",
