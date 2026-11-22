@@ -314,6 +314,12 @@ pub struct ApprovalRequestIn {
     /// The answer the requester proposes; stored in `meta.proposed_answer`.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub proposed_answer: Option<String>,
+    /// Whether a decision must carry an answer in its note.
+    ///
+    /// A free-text question sets this; a yes/no gate does not. The decision writer refuses an
+    /// empty note on such a gate, on every channel, so the answer cannot be lost.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub requires_answer: Option<bool>,
     /// The decisions a responder may give; stored in `meta.allowed_decisions`.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub allowed_decisions: Option<Value>,
