@@ -11,7 +11,7 @@ programme-level assertions no manifest can make on its own:
                     exits 0 (every mandatory artefact evidenced).
   C. findings       `verify-findings.py` exits 0, and no finding is open: no
                     deferral, waiver or dated residual is a disposition
-                    (ADR 0010), so every open row is a miss.
+                    (ADR 0012), so every open row is a miss.
   D. contracts      every active or closed project has a live Statement of
                     Architecture Work AND a live delivery contract, each with a
                     requester, an approving actor and the approval row that
@@ -75,7 +75,7 @@ def read_json(path: Path) -> Any:
 
 
 def check_findings(ledger: dict[str, Any]) -> tuple[bool, str]:
-    """No open finding: every finding is executed (ADR 0010, no deferrals)."""
+    """No open finding: every finding is executed (ADR 0012, no deferrals)."""
     findings = ledger.get("findings")
     if not isinstance(findings, list):
         return False, "the ledger has no findings array"
@@ -323,7 +323,7 @@ def render(rows: list[tuple[str, str, bool, str]]) -> bool:
 
 def self_test() -> None:
     # The superseded S14 residual: a complete, in-date, owner-accepted waiver. It is not a
-    # disposition (ADR 0010); the finding stays open and the waiver is its own finding.
+    # disposition (ADR 0012); the finding stays open and the waiver is its own finding.
     s14_waiver = {
         "accepted_by": "programme owner",
         "accepted_at": "2026-11-22",
