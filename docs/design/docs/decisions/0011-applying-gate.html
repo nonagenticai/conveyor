@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>0011 — The applying gate: a handover parks the run, and a person's approval applies the draft · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0011-applying-gate.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="0011--the-applying-gate-a-handover-parks-the-run-and-a-persons-approval-applies-the-draft">0011 — The applying gate: a handover parks the run, and a person's approval applies the draft</h1>
+<p>Status: Accepted · Date: 2026-11-22 · Issue: #590 · Resolves: S21 §16, SPEC_V2 §5.1, §7.1, §7.4, rework <code>v1-w1c-2:T2</code></p>
+<h2 id="decision">Decision</h2>
+<ol type="1">
+<li><p><strong>A handover parks the run; it does not fail it.</strong> The <code>internal_agent</code>'s <code>gate.precheck</code> handover opens a card-scoped <code>executor</code> approval in the same transaction that finishes the step: <code>running → waiting_approval</code> through <code>open_gate_with_meta_tx</code>, the step <code>succeeded</code> with the draft output and its judge record, the draft unattached. The run holds <code>uq_run_live</code> on purpose — it is live work waiting on a person, not a terminal failure.</p></li>
+<li><p><strong>The approval names the draft.</strong> <code>approval.meta</code> carries <code>{run_id, gate, draft_document_id, prompt_sha256, position: 1, attempt: 1, threshold, policy_id, laya_config_id}</code>. The approval inherits the run's <code>card_id</code> and <code>project_id</code>; no new column, no migration.</p></li>
+<li><p><strong>The L3 decision is a fact of the approval, recorded in its transaction.</strong> An <code>executor</code> gate is a person's act: the one approval writer refuses a non-human <code>decided_by_kind</code>. On approval, <code>approvals.decide</code> records one ladder decision — <code>rung=human</code>, <code>kind=gate.draft_apply</code>, <code>answer="approved"</code>, <code>outcome=accepted</code>, <code>approval_id</code>, the run's <code>card_id</code>, and <code>meta</code> naming the same draft identity — through the ladder's one writer. The decision and the <code>approval_decision</code> commit together, so an approval can never exist without its ladder row.</p></li>
+<li><p><strong><code>ladder.record</code> refuses a forged human rung; <code>ladder.apply_draft</code> accepts only a decision bound to the draft.</strong> <code>record_decision_tx</code> requires <code>actor_kind="user"</code> for <code>rung=human</code>, and an approved approval with an approve <code>approval_decision</code> when one is cited. <code>apply_draft</code> requires the document to be a generated draft, the decision to be accepted and non-rule, its kind to be <code>gate.precheck</code> (L1) or <code>gate.draft_apply</code> (L3), and its <code>meta</code> to name the exact <code>draft_document_id</code>, with <code>prompt_sha256</code> and <code>run_id</code> matching when the document carries them. A generic accepted decision on the card no longer applies anything.</p></li>
+<li><p><strong>The resume is one idempotent job.</strong> Approval settles <code>waiting_approval → running</code> and enqueues <code>run.resume</code> (<code>{run_id, approval_id, decision_id}</code>, dedupe <code>run.resume:{run_id}:{approval_id}</code>). The worker applies the draft through the same <code>apply_draft_tx</code> the action uses and finishes the run <code>succeeded</code> with one <code>run.succeeded</code>. It never calls the model, so the draft is not re-generated or re-charged. A terminal run or a non-approved approval is a quiet no-op (a reclaimed job is safe); inconsistent stored state fails the run <code>draft_apply_invalid</code>, releasing <code>uq_run_live</code>.</p></li>
+<li><p><strong>Rejection and expiry leave the draft unattached.</strong> A rejection cancels the run through the existing generic approval path; expiry cancels a still-<code>waiting_approval</code> run with <code>approval_expired</code>. Neither records a ladder decision: the <code>approval_decision</code> (or the absence of one) is the record.</p></li>
+<li><p><strong>No migration.</strong> <code>approval.meta</code> and <code>decision.meta</code> are existing jsonb; <code>approval.kind</code> and <code>job.kind</code> are free text; the run states and the <code>waiting_approval → running</code> edge already exist in the domain table.</p></li>
+</ol>
+<h2 id="why">Why</h2>
+<p>Step 4 generated the draft but could not deliver it through a human gate: <code>open_handover</code> opened the approval in its own transaction and the finish block then called <code>fail_run_tx</code>, which force-fails any non-terminal run. The run ended <code>failed</code> with a pending approval, and <code>approvals.decide</code> could not move <code>failed → running</code>. At the same time, <code>ladder.apply_draft</code> admitted any accepted non-rule decision that named the card, so a routine laya classification could apply a patch and a service principal could record <code>rung=human</code> against a pending approval (<code>v1-w1c-2:T2</code>). SPEC_V2 §5.1 already has the <code>waiting_approval → running</code> edge, §7.1 makes L3 a human approval, and §7.4 makes an action with a gate the only way a generated draft becomes applicable. This unit makes the implementation match those sentences.</p>
+<h2 id="alternatives-rejected">Alternatives rejected</h2>
+<ul>
+<li><strong>Apply the draft synchronously inside <code>approvals.decide</code>.</strong> It would make the approval action do the apply and finish, with no retry seam for a database fault and no place for a later non-attach effect. The job keeps the approval decision atomic and the application retryable.</li>
+<li><strong>Leave the run <code>failed</code> and apply through a manual <code>ladder.apply_draft</code> call.</strong> The run would never return to <code>running</code>/<code>succeeded</code>, so the work package's trace would say "failed" for work a person accepted. The state machine has the right path; use it.</li>
+<li><strong>Record the L3 decision in the resume worker.</strong> The worker runs as the service actor; it cannot honestly claim a human rung. The decision belongs to the approval transaction, where the person's identity and the approved <code>approval_decision</code> are present.</li>
+<li><strong>A <code>decision_document</code> link table.</strong> The draft identity is already in both rows' jsonb and in the document's meta; a third store would drift. The apply check reads the existing columns.</li>
+<li><strong>Re-generate on resume.</strong> The step already holds the draft, the inference call and the hash; re-running would buy the model twice and could apply a different draft than the one approved.</li>
+<li><strong>Auto-apply an L1-accepted draft.</strong> A policy choice, not this unit; the explicit apply gate stays.</li>
+</ul>
+<h2 id="consequences">Consequences</h2>
+<ul>
+<li>A parked run is a live run: one per card (<code>uq_run_live</code>), visible in the run list as <code>waiting_approval</code>, and cancellable. Expiry is the existing <code>approval.expire</code> path.</li>
+<li><code>run.resume</code> is a job kind like <code>run.execute</code>; it is not added to <code>ANDON_ALLOWED_KINDS</code>, so an andon defers the application just as it defers new work.</li>
+<li><code>ladder.apply_draft</code>'s contract is narrower; a caller that previously passed any accepted card decision must now name the draft in the decision's <code>meta</code>. The tests that encoded the old contract are rewritten, not relaxed.</li>
+<li>No new action, scope or route. The served-spec lock moves only because the action's descriptions change; the registry count does not.</li>
+<li>Rework register package <code>v1-w1c-2:T2</code> clears when the findings ledger marks the finding resolved; the unit's acceptance command proves the package is gone.</li>
+</ul>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/decisions/0011-applying-gate.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

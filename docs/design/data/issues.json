@@ -1,11 +1,49 @@
 {
   "issues": [
     {
+      "number": 590,
+      "title": "add: the applying gate \u2014 a handover parks the run and the approval applies the draft",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/590",
+      "updatedAt": "2026-11-22T19:28:33Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        },
+        {
+          "name": "S21",
+          "color": "6E7781"
+        }
+      ]
+    },
+    {
+      "number": 588,
+      "title": "deps: bump url to 2.5.9 for RUSTSEC-2026-0592 (green cargo audit)",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/588",
+      "updatedAt": "2026-11-22T19:09:26Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
       "number": 582,
       "title": "code: remove retired application names from Rust identities",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/582",
-      "updatedAt": "2026-11-22T10:29:10Z",
+      "updatedAt": "2026-11-22T19:20:14Z",
       "labels": [
         {
           "name": "unit",
@@ -20,9 +58,9 @@
     {
       "number": 581,
       "title": "add: the internal_agent executor runtime and its tool grant",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/581",
-      "updatedAt": "2026-11-22T09:35:54Z",
+      "updatedAt": "2026-11-22T12:01:29Z",
       "labels": [
         {
           "name": "unit",
@@ -148,7 +186,7 @@
       "title": "conveyor-buildout \u2014 the SPEC_V2 programme",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/569",
-      "updatedAt": "2026-11-22T09:34:54Z",
+      "updatedAt": "2026-11-22T12:01:43Z",
       "labels": [
         {
           "name": "programme",
@@ -307,7 +345,7 @@
       "title": "add: the scientific toolkit as a draft",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/560",
-      "updatedAt": "2026-11-22T10:32:36Z",
+      "updatedAt": "2026-11-22T10:44:43Z",
       "labels": [
         {
           "name": "unit",
@@ -328,7 +366,7 @@
       "title": "T18: the real V2 UI \u2014 the normative spec, the plan and the programme artefacts",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/559",
-      "updatedAt": "2026-11-22T07:55:57Z",
+      "updatedAt": "2026-11-22T19:32:39Z",
       "labels": [
         {
           "name": "unit",
@@ -353,7 +391,7 @@
       "title": "add: the executable tool-provenance and retirement gate",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/558",
-      "updatedAt": "2026-11-22T10:05:09Z",
+      "updatedAt": "2026-11-22T19:19:55Z",
       "labels": [
         {
           "name": "unit",
@@ -559,7 +597,7 @@
       "title": "#526 programme: the retrospective rework \u2014 tranche 0, all remaining tranches, benefits and the viability gate (U5a\u2013U5h, U6, U7)",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/526",
-      "updatedAt": "2026-11-22T10:26:35Z",
+      "updatedAt": "2026-11-22T10:35:05Z",
       "labels": [
         {
           "name": "unit",
