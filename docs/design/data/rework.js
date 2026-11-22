@@ -3355,81 +3355,6 @@ window.CONVEYOR_REWORK = {
       "title": "S06b gate proofs are admitted NOT PROVEN/PARTIAL"
     },
     {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-s14-1:S14",
-      "apply_to": "S14",
-      "artefact": "S14 cutover",
-      "baseline": null,
-      "depends_on": [],
-      "disposition": "waiver",
-      "dod": [
-        {
-          "item": "R1-R7, freeze-log and rollback exist in-tree; the S14 gate exits 0.",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "evidence": [
-            {
-              "line": 35,
-              "path": "docs/plans/slices/S14-cutover.md",
-              "quote": "| P4 | Old system frozen (D8) | **NOT PROVEN in-tree (v1-s14-1):** `docs/cutover/` is absent at HEAD, so `docs/cutover/freeze-log.md` does not exist. The freeze is recorded only in this plan and in gitops-production #5333; until the log is committed this precondition is unmet and the §7 gate stays red. |",
-              "source": "code"
-            },
-            {
-              "line": 89,
-              "path": "docs/plans/slices/S14-cutover.md",
-              "quote": "`docs/cutover/fixtures/` (recorded payloads). ⚠️ `docs/cutover/` is **absent at HEAD**",
-              "source": "code"
-            }
-          ],
-          "rule": "v1-s14-1",
-          "source": "audit"
-        }
-      ],
-      "key": "v1-s14-1:S14",
-      "owner_project": "S14",
-      "rule": "v1-s14-1",
-      "scope": "S14",
-      "severity": "P0",
-      "spec": "§5",
-      "standard": "SPEC",
-      "status": "suppressed",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "The cutover evidence tree does not exist: docs/cutover/ is absent at HEAD, so R0-R7, the freeze log and the rollback runbook are requirements, not receipts. The plan now self-records the absence and the S14 gate fails first naming the gap instead of pretending the tree is delivered. The acceptance (receipts in-tree, gate exits 0) remains unmet.",
-          "disposition": "waiver",
-          "evidence": [
-            {
-              "evidence": [
-                {
-                  "line": 35,
-                  "path": "docs/plans/slices/S14-cutover.md",
-                  "quote": "| P4 | Old system frozen (D8) | **NOT PROVEN in-tree (v1-s14-1):** `docs/cutover/` is absent at HEAD, so `docs/cutover/freeze-log.md` does not exist. The freeze is recorded only in this plan and in gitops-production #5333; until the log is committed this precondition is unmet and the §7 gate stays red. |",
-                  "source": "code"
-                },
-                {
-                  "line": 89,
-                  "path": "docs/plans/slices/S14-cutover.md",
-                  "quote": "`docs/cutover/fixtures/` (recorded payloads). ⚠️ `docs/cutover/` is **absent at HEAD**",
-                  "source": "code"
-                }
-              ],
-              "rule": "v1-s14-1",
-              "source": "audit"
-            }
-          ],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P0",
-          "subject": "S14"
-        }
-      ],
-      "title": "S14 cutover gate's evidence tree does not exist"
-    },
-    {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-compliance-review-design-publish:DESIGN-PUBLISH",
       "apply_to": "PLATFORM",
       "artefact": "compliance-review",
@@ -13523,15 +13448,15 @@ window.CONVEYOR_REWORK = {
       "title": "Reconcile the seed with the live rows"
     },
     {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-change-1:T3",
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-outputs-1:PLATFORM",
       "apply_to": "PLATFORM",
-      "artefact": "T3 change control / wbs guard",
+      "artefact": "public pack / output index",
       "baseline": null,
       "depends_on": [],
       "disposition": "rework",
       "dod": [
         {
-          "item": "A tenant with an approved scope baseline can always authorise a WBS acceptance through a provisioned path: either the organisation seed creates the PM process and its binding that `changes.request` requires, or `changes.request` takes the baseline directly and validates it rather than a PM job binding; a test proves a post-baseline WBS acceptance end to end through that path.",
+          "item": "A published decision is either rendered in the output index or the publish refuses with a reason naming the missing text body; a programme-level decision can be created project-scoped to PLATFORM through a text compose path and appears in `docs/outputs.js`; a test proves a byte-backed published document is refused at publish or surfaced in the index.",
           "met": false
         }
       ],
@@ -13539,52 +13464,52 @@ window.CONVEYOR_REWORK = {
         {
           "evidence": [
             {
-              "line": 1234,
-              "path": "crates/actions/src/spine/mod.rs",
-              "quote": "    let Some(change_id) = change_id else {",
+              "line": 449,
+              "path": "crates/store/src/document.rs",
+              "quote": "          WHERE tenant_id = $1 AND published_at IS NOT NULL AND status = 'active' AND body IS NOT NULL",
               "source": "code"
             },
             {
-              "line": 990,
-              "path": "crates/actions/src/pm/mod.rs",
-              "quote": "    pub job_binding_id: Uuid,",
+              "line": 10,
+              "path": "crates/pack/src/outputs.rs",
+              "quote": "//! **The filter is the publication decision.** Only `published_at IS NOT NULL AND status='active'` rows with a",
               "source": "code"
             }
           ],
-          "rule": "v1-change-1",
+          "rule": "v1-outputs-1",
           "source": "audit"
         }
       ],
-      "key": "v1-change-1:T3",
-      "owner_project": "T3",
-      "rule": "v1-change-1",
-      "scope": "T3",
+      "key": "v1-outputs-1:PLATFORM",
+      "owner_project": "PLATFORM",
+      "rule": "v1-outputs-1",
+      "scope": "PLATFORM",
       "severity": "P1",
-      "spec": "§5.5",
+      "spec": "§12",
       "standard": "SPEC",
       "status": "open",
       "subject_count": 1,
       "subjects": [
         {
-          "detail": "After an approved scope baseline, `wbs.update` refuses unless `change_id` names an approved register `change` whose `baseline_ref` is that baseline and whose approval carries `meta.change_id`. The only action that opens such a change is `changes.request`, and its input requires the PM job's active `job_binding_id`. The tenant has no process with key 'pm' and exactly one job_binding in total, so the guard cannot be satisfied: a WBS acceptance after a baseline is permanently refused. Observed at T13 on 2026-11-22: `wbs.update` refused 409 `rebaseline_requires_change` naming baseline 01a20279-854d-79f6-a751-a34d51be7589, while `changes.request` cannot be called at all.",
+          "detail": "The pack renders only published documents whose body is stored as text and that belong to the programme: `list_published_outputs_tx` filters `body IS NOT NULL`, and the pack documents that as the publication decision. A decision created from bytes (object-backed, body null) is therefore published but absent from `docs/outputs.js` and `documents.preview` refuses it. R7 was first created projectless (excluded twice) and re-issued under PLATFORM (01a202a3) — still excluded, because its body is null (measured 2026-11-22: body null for 01a2029c and 01a202a3; the earlier delegation 01a2021d has a text body and is indexed). The re-issue was recorded as the fix; it is not one.",
           "disposition": "rework",
           "evidence": [
             {
               "evidence": [
                 {
-                  "line": 1234,
-                  "path": "crates/actions/src/spine/mod.rs",
-                  "quote": "    let Some(change_id) = change_id else {",
+                  "line": 449,
+                  "path": "crates/store/src/document.rs",
+                  "quote": "          WHERE tenant_id = $1 AND published_at IS NOT NULL AND status = 'active' AND body IS NOT NULL",
                   "source": "code"
                 },
                 {
-                  "line": 990,
-                  "path": "crates/actions/src/pm/mod.rs",
-                  "quote": "    pub job_binding_id: Uuid,",
+                  "line": 10,
+                  "path": "crates/pack/src/outputs.rs",
+                  "quote": "//! **The filter is the publication decision.** Only `published_at IS NOT NULL AND status='active'` rows with a",
                   "source": "code"
                 }
               ],
-              "rule": "v1-change-1",
+              "rule": "v1-outputs-1",
               "source": "audit"
             }
           ],
@@ -13592,10 +13517,10 @@ window.CONVEYOR_REWORK = {
           "owner": null,
           "reason": null,
           "severity": "P1",
-          "subject": "T3"
+          "subject": "PLATFORM"
         }
       ],
-      "title": "The change guard's only authorised path needs a PM process the tenant has never had"
+      "title": "A ruling published without a text body is invisible to the pack, even when project-scoped"
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-p101-1:T2",
@@ -13614,13 +13539,13 @@ window.CONVEYOR_REWORK = {
         {
           "evidence": [
             {
-              "line": 1446,
+              "line": 1451,
               "path": "crates/actions/src/process/step.rs",
               "quote": "        \"decision\": if verdict.accepted { \"accept\" } else { \"reject\" },",
               "source": "code"
             },
             {
-              "line": 1493,
+              "line": 1498,
               "path": "crates/actions/src/process/step.rs",
               "quote": "        store::process_judge::set_verdict_tx(&mut tx, tenant, row.id, verdict)",
               "source": "code"
@@ -13653,13 +13578,13 @@ window.CONVEYOR_REWORK = {
             {
               "evidence": [
                 {
-                  "line": 1446,
+                  "line": 1451,
                   "path": "crates/actions/src/process/step.rs",
                   "quote": "        \"decision\": if verdict.accepted { \"accept\" } else { \"reject\" },",
                   "source": "code"
                 },
                 {
-                  "line": 1493,
+                  "line": 1498,
                   "path": "crates/actions/src/process/step.rs",
                   "quote": "        store::process_judge::set_verdict_tx(&mut tx, tenant, row.id, verdict)",
                   "source": "code"
@@ -13962,7 +13887,7 @@ window.CONVEYOR_REWORK = {
         {
           "evidence": [
             {
-              "line": 539,
+              "line": 572,
               "path": "crates/store/src/tool.rs",
               "quote": "        \"INSERT INTO tool (tenant_id, toolkit_id, key, input_schema, effect, timeout_secs,",
               "source": "code"
@@ -14001,7 +13926,7 @@ window.CONVEYOR_REWORK = {
             {
               "evidence": [
                 {
-                  "line": 539,
+                  "line": 572,
                   "path": "crates/store/src/tool.rs",
                   "quote": "        \"INSERT INTO tool (tenant_id, toolkit_id, key, input_schema, effect, timeout_secs,",
                   "source": "code"
@@ -14385,7 +14310,7 @@ window.CONVEYOR_REWORK = {
         {
           "evidence": [
             {
-              "line": 330,
+              "line": 332,
               "path": "crates/actions/src/workflow/agent.rs",
               "quote": "    let record = store::capability::get_agent_tx(&mut tx, tenant, agent_id)",
               "source": "code"
@@ -14397,7 +14322,7 @@ window.CONVEYOR_REWORK = {
               "source": "code"
             },
             {
-              "line": 388,
+              "line": 390,
               "path": "crates/actions/src/workflow/agent.rs",
               "quote": "    let bound_turns = u8::try_from(record.max_iterations).unwrap_or(MAX_TURNS);",
               "source": "code"
@@ -14424,7 +14349,7 @@ window.CONVEYOR_REWORK = {
             {
               "evidence": [
                 {
-                  "line": 330,
+                  "line": 332,
                   "path": "crates/actions/src/workflow/agent.rs",
                   "quote": "    let record = store::capability::get_agent_tx(&mut tx, tenant, agent_id)",
                   "source": "code"
@@ -14436,7 +14361,7 @@ window.CONVEYOR_REWORK = {
                   "source": "code"
                 },
                 {
-                  "line": 388,
+                  "line": 390,
                   "path": "crates/actions/src/workflow/agent.rs",
                   "quote": "    let bound_turns = u8::try_from(record.max_iterations).unwrap_or(MAX_TURNS);",
                   "source": "code"
@@ -14547,7 +14472,7 @@ window.CONVEYOR_REWORK = {
         {
           "evidence": [
             {
-              "line": 38,
+              "line": 42,
               "path": "crates/domain/src/prompt.rs",
               "quote": "    Knowledge,",
               "source": "code"
@@ -14580,7 +14505,7 @@ window.CONVEYOR_REWORK = {
             {
               "evidence": [
                 {
-                  "line": 38,
+                  "line": 42,
                   "path": "crates/domain/src/prompt.rs",
                   "quote": "    Knowledge,",
                   "source": "code"
@@ -14946,7 +14871,7 @@ window.CONVEYOR_REWORK = {
         {
           "evidence": [
             {
-              "line": 560,
+              "line": 562,
               "path": "crates/actions/src/pm/mod.rs",
               "quote": "        store::spine::take_baseline_tx(&mut *tx, ctx.tenant, project_id, &kind, ctx.actor_id, None)",
               "source": "code"
@@ -14985,7 +14910,7 @@ window.CONVEYOR_REWORK = {
             {
               "evidence": [
                 {
-                  "line": 560,
+                  "line": 562,
                   "path": "crates/actions/src/pm/mod.rs",
                   "quote": "        store::spine::take_baseline_tx(&mut *tx, ctx.tenant, project_id, &kind, ctx.actor_id, None)",
                   "source": "code"
@@ -15282,7 +15207,7 @@ window.CONVEYOR_REWORK = {
               "source": "code"
             },
             {
-              "line": 161,
+              "line": 185,
               "path": "crates/store/src/prompt.rs",
               "quote": "    if let Some(capability_id) = capability_id {",
               "source": "code"
@@ -15321,7 +15246,7 @@ window.CONVEYOR_REWORK = {
                   "source": "code"
                 },
                 {
-                  "line": 161,
+                  "line": 185,
                   "path": "crates/store/src/prompt.rs",
                   "quote": "    if let Some(capability_id) = capability_id {",
                   "source": "code"
@@ -15357,7 +15282,7 @@ window.CONVEYOR_REWORK = {
         {
           "evidence": [
             {
-              "line": 463,
+              "line": 546,
               "path": "crates/actions/src/workflow/agent.rs",
               "quote": "    if let Some(reference) = record.prompt_ref.as_deref() {",
               "source": "code"
@@ -15396,7 +15321,7 @@ window.CONVEYOR_REWORK = {
             {
               "evidence": [
                 {
-                  "line": 463,
+                  "line": 546,
                   "path": "crates/actions/src/workflow/agent.rs",
                   "quote": "    if let Some(reference) = record.prompt_ref.as_deref() {",
                   "source": "code"
@@ -16563,7 +16488,7 @@ window.CONVEYOR_REWORK = {
               "source": "code"
             },
             {
-              "line": 483,
+              "line": 493,
               "path": "docs/design/data/actions.json",
               "quote": "    \"tools.call\",",
               "source": "code"
@@ -16602,7 +16527,7 @@ window.CONVEYOR_REWORK = {
                   "source": "code"
                 },
                 {
-                  "line": 483,
+                  "line": 493,
                   "path": "docs/design/data/actions.json",
                   "quote": "    \"tools.call\",",
                   "source": "code"
@@ -16656,7 +16581,7 @@ window.CONVEYOR_REWORK = {
               "source": "code"
             },
             {
-              "line": 359,
+              "line": 364,
               "path": "docs/design/data/actions.json",
               "quote": "    \"procedures.ingest_sop\",",
               "source": "code"
@@ -16701,7 +16626,7 @@ window.CONVEYOR_REWORK = {
                   "source": "code"
                 },
                 {
-                  "line": 359,
+                  "line": 364,
                   "path": "docs/design/data/actions.json",
                   "quote": "    \"procedures.ingest_sop\",",
                   "source": "code"
@@ -16749,7 +16674,7 @@ window.CONVEYOR_REWORK = {
               "source": "code"
             },
             {
-              "line": 258,
+              "line": 263,
               "path": "docs/design/data/actions.json",
               "quote": "    \"lessons.list\",",
               "source": "code"
@@ -16788,7 +16713,7 @@ window.CONVEYOR_REWORK = {
                   "source": "code"
                 },
                 {
-                  "line": 258,
+                  "line": 263,
                   "path": "docs/design/data/actions.json",
                   "quote": "    \"lessons.list\",",
                   "source": "code"
@@ -16836,7 +16761,7 @@ window.CONVEYOR_REWORK = {
               "source": "code"
             },
             {
-              "line": 483,
+              "line": 493,
               "path": "docs/design/data/actions.json",
               "quote": "    \"tools.call\",",
               "source": "code"
@@ -16875,7 +16800,7 @@ window.CONVEYOR_REWORK = {
                   "source": "code"
                 },
                 {
-                  "line": 483,
+                  "line": 493,
                   "path": "docs/design/data/actions.json",
                   "quote": "    \"tools.call\",",
                   "source": "code"
@@ -17310,13 +17235,13 @@ window.CONVEYOR_REWORK = {
         {
           "evidence": [
             {
-              "line": 160,
+              "line": 162,
               "path": "crates/actions/src/pm/mod.rs",
               "quote": "    if !job.job_key.eq_ignore_ascii_case(PM_JOB_KEY)",
               "source": "code"
             },
             {
-              "line": 649,
+              "line": 651,
               "path": "crates/actions/src/pm/mod.rs",
               "quote": "    let required = input.required_decisions.unwrap_or(1);",
               "source": "code"
@@ -17349,13 +17274,13 @@ window.CONVEYOR_REWORK = {
             {
               "evidence": [
                 {
-                  "line": 160,
+                  "line": 162,
                   "path": "crates/actions/src/pm/mod.rs",
                   "quote": "    if !job.job_key.eq_ignore_ascii_case(PM_JOB_KEY)",
                   "source": "code"
                 },
                 {
-                  "line": 649,
+                  "line": 651,
                   "path": "crates/actions/src/pm/mod.rs",
                   "quote": "    let required = input.required_decisions.unwrap_or(1);",
                   "source": "code"
@@ -17379,93 +17304,6 @@ window.CONVEYOR_REWORK = {
         }
       ],
       "title": "The authority and gate matrix is hard-coded code plus caller input, not tenant data"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-w1c-4:T2",
-      "apply_to": "PLATFORM",
-      "artefact": "§7.2",
-      "baseline": null,
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "option sets are authored/versioned rows resolved by policy+question, the evaluate action references the set (and a real version), and the answer must equal one of that set's keys or the action returns 422; tests cover an answer outside the set and a caller trying to pass its own option list.",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "evidence": [
-            {
-              "line": 1015,
-              "path": "crates/actions/src/ladder/mod.rs",
-              "quote": "    pub options: Option<Vec<OptionIn>>,",
-              "source": "code"
-            },
-            {
-              "line": 1517,
-              "path": "crates/actions/src/ladder/mod.rs",
-              "quote": "        .or_else(|| (!options.is_empty()).then_some(1));",
-              "source": "code"
-            },
-            {
-              "line": 901,
-              "path": "crates/store/src/ladder.rs",
-              "quote": "            \"INSERT INTO decision_option (tenant_id, decision_id, key, label, payload)",
-              "source": "code"
-            }
-          ],
-          "rule": "v1-w1c-4",
-          "source": "audit"
-        }
-      ],
-      "key": "v1-w1c-4:T2",
-      "owner_project": "T2",
-      "rule": "v1-w1c-4",
-      "scope": "T2",
-      "severity": "P1",
-      "spec": "§7.2",
-      "standard": "SPEC",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "§7.2 requires options to be authored and versioned rows (decision_option) and never free text from a prompt, so a choice is provably one of a finite set. In the ladder surfaces, options arrive in the same request body as the answer, the option-set version is fabricated as 1 whenever any options are supplied, and record_decision_tx inserts the options after the decision without comparing new.answer to any option key. A laya decision can therefore carry an answer outside its own recorded option set, or a one-element option set that merely echoes the answer.",
-          "disposition": "rework",
-          "evidence": [
-            {
-              "evidence": [
-                {
-                  "line": 1015,
-                  "path": "crates/actions/src/ladder/mod.rs",
-                  "quote": "    pub options: Option<Vec<OptionIn>>,",
-                  "source": "code"
-                },
-                {
-                  "line": 1517,
-                  "path": "crates/actions/src/ladder/mod.rs",
-                  "quote": "        .or_else(|| (!options.is_empty()).then_some(1));",
-                  "source": "code"
-                },
-                {
-                  "line": 901,
-                  "path": "crates/store/src/ladder.rs",
-                  "quote": "            \"INSERT INTO decision_option (tenant_id, decision_id, key, label, payload)",
-                  "source": "code"
-                }
-              ],
-              "rule": "v1-w1c-4",
-              "source": "audit"
-            }
-          ],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "T2"
-        }
-      ],
-      "title": "Options are inline request text, not authored/versioned rows, and the answer is never checked against them"
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-w3a-5:T7",
@@ -17682,25 +17520,25 @@ window.CONVEYOR_REWORK = {
         {
           "evidence": [
             {
-              "line": 1808,
+              "line": 1811,
               "path": "docs/design/data/coverage.json",
               "quote": "      \"evidence\": [",
               "source": "code"
             },
             {
-              "line": 1809,
+              "line": 1812,
               "path": "docs/design/data/coverage.json",
               "quote": "        \"crates/actions/src/toolkits\"",
               "source": "code"
             },
             {
-              "line": 1812,
+              "line": 1815,
               "path": "docs/design/data/coverage.json",
               "quote": "      \"key\": \"T14\",",
               "source": "code"
             },
             {
-              "line": 1838,
+              "line": 1841,
               "path": "docs/design/data/coverage.json",
               "quote": "      \"status\": \"built\",",
               "source": "code"
@@ -17727,25 +17565,25 @@ window.CONVEYOR_REWORK = {
             {
               "evidence": [
                 {
-                  "line": 1808,
+                  "line": 1811,
                   "path": "docs/design/data/coverage.json",
                   "quote": "      \"evidence\": [",
                   "source": "code"
                 },
                 {
-                  "line": 1809,
+                  "line": 1812,
                   "path": "docs/design/data/coverage.json",
                   "quote": "        \"crates/actions/src/toolkits\"",
                   "source": "code"
                 },
                 {
-                  "line": 1812,
+                  "line": 1815,
                   "path": "docs/design/data/coverage.json",
                   "quote": "      \"key\": \"T14\",",
                   "source": "code"
                 },
                 {
-                  "line": 1838,
+                  "line": 1841,
                   "path": "docs/design/data/coverage.json",
                   "quote": "      \"status\": \"built\",",
                   "source": "code"
@@ -17781,37 +17619,37 @@ window.CONVEYOR_REWORK = {
         {
           "evidence": [
             {
-              "line": 2244,
+              "line": 2247,
               "path": "docs/design/data/coverage.json",
               "quote": "      \"evidence\": [",
               "source": "code"
             },
             {
-              "line": 2245,
+              "line": 2248,
               "path": "docs/design/data/coverage.json",
               "quote": "        \"migrations/0056_cadence_tranche.sql\"",
               "source": "code"
             },
             {
-              "line": 2248,
+              "line": 2251,
               "path": "docs/design/data/coverage.json",
               "quote": "      \"key\": \"T8\",",
               "source": "code"
             },
             {
-              "line": 2269,
+              "line": 2272,
               "path": "docs/design/data/coverage.json",
               "quote": "      \"status\": \"built\",",
               "source": "code"
             },
             {
-              "line": 2250,
+              "line": 2253,
               "path": "docs/design/data/coverage.json",
               "quote": "        \"actions\": [",
               "source": "code"
             },
             {
-              "line": 2251,
+              "line": 2254,
               "path": "docs/design/data/coverage.json",
               "quote": "          0,",
               "source": "code"
@@ -17838,37 +17676,37 @@ window.CONVEYOR_REWORK = {
             {
               "evidence": [
                 {
-                  "line": 2244,
+                  "line": 2247,
                   "path": "docs/design/data/coverage.json",
                   "quote": "      \"evidence\": [",
                   "source": "code"
                 },
                 {
-                  "line": 2245,
+                  "line": 2248,
                   "path": "docs/design/data/coverage.json",
                   "quote": "        \"migrations/0056_cadence_tranche.sql\"",
                   "source": "code"
                 },
                 {
-                  "line": 2248,
+                  "line": 2251,
                   "path": "docs/design/data/coverage.json",
                   "quote": "      \"key\": \"T8\",",
                   "source": "code"
                 },
                 {
-                  "line": 2269,
+                  "line": 2272,
                   "path": "docs/design/data/coverage.json",
                   "quote": "      \"status\": \"built\",",
                   "source": "code"
                 },
                 {
-                  "line": 2250,
+                  "line": 2253,
                   "path": "docs/design/data/coverage.json",
                   "quote": "        \"actions\": [",
                   "source": "code"
                 },
                 {
-                  "line": 2251,
+                  "line": 2254,
                   "path": "docs/design/data/coverage.json",
                   "quote": "          0,",
                   "source": "code"
@@ -17916,7 +17754,7 @@ window.CONVEYOR_REWORK = {
               "source": "code"
             },
             {
-              "line": 70,
+              "line": 74,
               "path": "crates/actions/src/tools.rs",
               "quote": "        timeout_ms: 300_000,",
               "source": "code"
@@ -17961,7 +17799,7 @@ window.CONVEYOR_REWORK = {
                   "source": "code"
                 },
                 {
-                  "line": 70,
+                  "line": 74,
                   "path": "crates/actions/src/tools.rs",
                   "quote": "        timeout_ms: 300_000,",
                   "source": "code"
@@ -47538,9 +47376,9 @@ window.CONVEYOR_REWORK = {
         {
           "evidence": [
             {
-              "line": 273,
+              "line": 275,
               "path": "crates/actions/src/process/judge.rs",
-              "quote": "        timeout_ms: 30_000,",
+              "quote": "        timeout_ms: 60_000,",
               "source": "code"
             },
             {
@@ -47577,9 +47415,9 @@ window.CONVEYOR_REWORK = {
             {
               "evidence": [
                 {
-                  "line": 273,
+                  "line": 275,
                   "path": "crates/actions/src/process/judge.rs",
-                  "quote": "        timeout_ms: 30_000,",
+                  "quote": "        timeout_ms: 60_000,",
                   "source": "code"
                 },
                 {
@@ -47805,7 +47643,7 @@ window.CONVEYOR_REWORK = {
               "source": "code"
             },
             {
-              "line": 539,
+              "line": 572,
               "path": "crates/store/src/tool.rs",
               "quote": "        \"INSERT INTO tool (tenant_id, toolkit_id, key, input_schema, effect, timeout_secs,",
               "source": "code"
@@ -47844,7 +47682,7 @@ window.CONVEYOR_REWORK = {
                   "source": "code"
                 },
                 {
-                  "line": 539,
+                  "line": 572,
                   "path": "crates/store/src/tool.rs",
                   "quote": "        \"INSERT INTO tool (tenant_id, toolkit_id, key, input_schema, effect, timeout_secs,",
                   "source": "code"
@@ -48255,7 +48093,7 @@ window.CONVEYOR_REWORK = {
               "source": "code"
             },
             {
-              "line": 874,
+              "line": 876,
               "path": "crates/actions/src/pm/mod.rs",
               "quote": "/// `pm.get` — the PM's view: project, charter, WBS, baselines and gates.",
               "source": "code"
@@ -48294,7 +48132,7 @@ window.CONVEYOR_REWORK = {
                   "source": "code"
                 },
                 {
-                  "line": 874,
+                  "line": 876,
                   "path": "crates/actions/src/pm/mod.rs",
                   "quote": "/// `pm.get` — the PM's view: project, charter, WBS, baselines and gates.",
                   "source": "code"
@@ -48411,13 +48249,13 @@ window.CONVEYOR_REWORK = {
         {
           "evidence": [
             {
-              "line": 346,
+              "line": 438,
               "path": "crates/store/src/memory.rs",
               "quote": "         VALUES ($1, $2, $3, 'digest', 'system', $4, now(), $5)",
               "source": "code"
             },
             {
-              "line": 229,
+              "line": 453,
               "path": "crates/store/src/memory.rs",
               "quote": "          WHERE tenant_id = $1 AND card_id = $2",
               "source": "code"
@@ -48450,13 +48288,13 @@ window.CONVEYOR_REWORK = {
             {
               "evidence": [
                 {
-                  "line": 346,
+                  "line": 438,
                   "path": "crates/store/src/memory.rs",
                   "quote": "         VALUES ($1, $2, $3, 'digest', 'system', $4, now(), $5)",
                   "source": "code"
                 },
                 {
-                  "line": 229,
+                  "line": 453,
                   "path": "crates/store/src/memory.rs",
                   "quote": "          WHERE tenant_id = $1 AND card_id = $2",
                   "source": "code"
@@ -48498,13 +48336,13 @@ window.CONVEYOR_REWORK = {
         {
           "evidence": [
             {
-              "line": 1272,
+              "line": 1275,
               "path": "crates/store/src/seed.rs",
               "quote": "            \"INSERT INTO prompt (tenant_id, key, version, status, title)",
               "source": "code"
             },
             {
-              "line": 1289,
+              "line": 1292,
               "path": "crates/store/src/seed.rs",
               "quote": "                     (tenant_id, prompt_id, position, source_kind, required, template)",
               "source": "code"
@@ -48537,13 +48375,13 @@ window.CONVEYOR_REWORK = {
             {
               "evidence": [
                 {
-                  "line": 1272,
+                  "line": 1275,
                   "path": "crates/store/src/seed.rs",
                   "quote": "            \"INSERT INTO prompt (tenant_id, key, version, status, title)",
                   "source": "code"
                 },
                 {
-                  "line": 1289,
+                  "line": 1292,
                   "path": "crates/store/src/seed.rs",
                   "quote": "                     (tenant_id, prompt_id, position, source_kind, required, template)",
                   "source": "code"
@@ -48735,19 +48573,19 @@ window.CONVEYOR_REWORK = {
         {
           "evidence": [
             {
-              "line": 268,
+              "line": 432,
               "path": "crates/domain/src/ladder.rs",
               "quote": "pub fn unavailable(fail_policy: FailPolicy, action: FailAction) -> Outcome {",
               "source": "code"
             },
             {
-              "line": 1184,
+              "line": 1716,
               "path": "crates/actions/src/ladder/mod.rs",
               "quote": "    let outcome = evaluate(parsed.confidence, threshold, fail_action)",
               "source": "code"
             },
             {
-              "line": 572,
+              "line": 1348,
               "path": "crates/store/src/ladder.rs",
               "quote": "    pub fn fail_policy(&self) -> Result<FailPolicy, LadderStoreError> {",
               "source": "code"
@@ -48774,19 +48612,19 @@ window.CONVEYOR_REWORK = {
             {
               "evidence": [
                 {
-                  "line": 268,
+                  "line": 432,
                   "path": "crates/domain/src/ladder.rs",
                   "quote": "pub fn unavailable(fail_policy: FailPolicy, action: FailAction) -> Outcome {",
                   "source": "code"
                 },
                 {
-                  "line": 1184,
+                  "line": 1716,
                   "path": "crates/actions/src/ladder/mod.rs",
                   "quote": "    let outcome = evaluate(parsed.confidence, threshold, fail_action)",
                   "source": "code"
                 },
                 {
-                  "line": 572,
+                  "line": 1348,
                   "path": "crates/store/src/ladder.rs",
                   "quote": "    pub fn fail_policy(&self) -> Result<FailPolicy, LadderStoreError> {",
                   "source": "code"
@@ -48996,25 +48834,25 @@ window.CONVEYOR_REWORK = {
         {
           "evidence": [
             {
-              "line": 2026,
+              "line": 2029,
               "path": "docs/design/data/coverage.json",
               "quote": "      \"evidence\": [",
               "source": "code"
             },
             {
-              "line": 2027,
+              "line": 2030,
               "path": "docs/design/data/coverage.json",
               "quote": "        \"docs/SPEC_V2.md\"",
               "source": "code"
             },
             {
-              "line": 2030,
+              "line": 2033,
               "path": "docs/design/data/coverage.json",
               "quote": "      \"key\": \"T3\",",
               "source": "code"
             },
             {
-              "line": 2051,
+              "line": 2054,
               "path": "docs/design/data/coverage.json",
               "quote": "      \"status\": \"built\",",
               "source": "code"
@@ -49041,25 +48879,25 @@ window.CONVEYOR_REWORK = {
             {
               "evidence": [
                 {
-                  "line": 2026,
+                  "line": 2029,
                   "path": "docs/design/data/coverage.json",
                   "quote": "      \"evidence\": [",
                   "source": "code"
                 },
                 {
-                  "line": 2027,
+                  "line": 2030,
                   "path": "docs/design/data/coverage.json",
                   "quote": "        \"docs/SPEC_V2.md\"",
                   "source": "code"
                 },
                 {
-                  "line": 2030,
+                  "line": 2033,
                   "path": "docs/design/data/coverage.json",
                   "quote": "      \"key\": \"T3\",",
                   "source": "code"
                 },
                 {
-                  "line": 2051,
+                  "line": 2054,
                   "path": "docs/design/data/coverage.json",
                   "quote": "      \"status\": \"built\",",
                   "source": "code"
@@ -49113,7 +48951,7 @@ window.CONVEYOR_REWORK = {
               "source": "code"
             },
             {
-              "line": 59,
+              "line": 61,
               "path": "crates/actions/src/pm/mod.rs",
               "quote": "            \"gate_evidence_missing\",",
               "source": "code"
@@ -49158,7 +48996,7 @@ window.CONVEYOR_REWORK = {
                   "source": "code"
                 },
                 {
-                  "line": 59,
+                  "line": 61,
                   "path": "crates/actions/src/pm/mod.rs",
                   "quote": "            \"gate_evidence_missing\",",
                   "source": "code"
@@ -59469,12 +59307,12 @@ window.CONVEYOR_REWORK = {
       "suppressed": 0
     },
     "SPEC": {
-      "findings": 77,
+      "findings": 75,
       "gaps": 38,
       "p0": 0,
       "p1": 5,
       "p2": 33,
-      "packages": 98,
+      "packages": 96,
       "rules": 8,
       "rules_clean": 2,
       "rules_with_gaps": 6,
@@ -59496,26 +59334,26 @@ window.CONVEYOR_REWORK = {
   "snapshot": "docs/design/data",
   "summary": {
     "by_severity": {
-      "P0": 43,
-      "P1": 179,
+      "P0": 42,
+      "P1": 178,
       "P2": 306
     },
     "by_standard": {
       "MSP": 84,
       "PMP": 213,
       "SAFe": 17,
-      "SPEC": 98,
+      "SPEC": 96,
       "TOGAF": 116
     },
     "by_status": {
-      "open": 523,
-      "suppressed": 5
+      "open": 522,
+      "suppressed": 4
     },
     "duplicates": 0,
-    "open": 523,
-    "packages": 528,
-    "resolved": 89,
-    "subjects": 677,
-    "suppressed": 5
+    "open": 522,
+    "packages": 526,
+    "resolved": 92,
+    "subjects": 675,
+    "suppressed": 4
   }
 };
