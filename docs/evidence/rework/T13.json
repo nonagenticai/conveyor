@@ -3,7 +3,7 @@
     {
       "check": "project",
       "description": "T13 is closed",
-      "detail": "project T13 is active",
+      "detail": "project T13 is closed",
       "id": "T13-project",
       "kind": "snapshot",
       "result": "pass",
@@ -61,10 +61,10 @@
     {
       "check": "closure_gate",
       "description": "the closure gate was decided by an approver other than its requester",
-      "detail": "no approved closure gate for the project",
+      "detail": "latest closure gate 01a2051f-d614-7c07-a57e-ac31652e51d1 decided by a distinct approver",
       "id": "T13-closure-gate",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
@@ -88,19 +88,19 @@
     {
       "check": "pi_plan",
       "description": "the project tranche's PI plan is published",
-      "detail": "no published pi-plan output for tranche-3",
+      "detail": "the tranche-3 PI plan is published",
       "id": "T13-pi-plan",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
       "check": "pi_objectives",
       "description": "the project tranche's PI objectives are published",
-      "detail": "no published pi-objectives output for tranche-3",
+      "detail": "the tranche-3 PI objectives are published",
       "id": "T13-pi-objectives",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
@@ -124,10 +124,10 @@
     {
       "check": "lessons",
       "description": "the tranche retro produced at least one lesson",
-      "detail": "the tranche-3 retro produced no lesson",
+      "detail": "lesson 01a2051b-442c-7b07-a8b4-4c7a1f518b74 carries a statement and evidence from the tranche-3 retro",
       "id": "T13-lessons",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P1"
     },
     {
@@ -142,32 +142,26 @@
     {
       "check": null,
       "description": "the declared gate is discharged by executable checks",
-      "detail": "the gate check 'T13-closure-gate' did not pass; the gate check 'T13-pi-plan' did not pass; the gate check 'T13-pi-objectives' did not pass; the gate check 'T13-lessons' did not pass",
+      "detail": "gate discharged by executable checks: T13-project, T13-baseline, T13-charter, T13-closure-outputs, T13-contract, T13-review, T13-closure-gate, T13-waivers, T13-pi-cadence, T13-pi-plan, T13-pi-objectives, T13-wsjf, T13-demo-credits, T13-lessons, T13-product",
       "id": "gate",
       "kind": "manifest",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     }
   ],
-  "failures": [
-    "T13-closure-gate (P0): no approved closure gate for the project",
-    "T13-pi-plan (P0): no published pi-plan output for tranche-3",
-    "T13-pi-objectives (P0): no published pi-objectives output for tranche-3",
-    "T13-lessons (P1): the tranche-3 retro produced no lesson",
-    "gate (P0): the gate check 'T13-closure-gate' did not pass; the gate check 'T13-pi-plan' did not pass; the gate check 'T13-pi-objectives' did not pass; the gate check 'T13-lessons' did not pass"
-  ],
+  "failures": [],
   "gate": "a development job calls coding through the broker (not `nonagenticai_mcp_server`); a `tool_call` is recorded; a destructive call without the tenant's configured approvals is refused; schema-invalid input is refused before the backend call; a job writes and reads a tenant-prefixed MinIO object with no S3 key in the prompt",
-  "generated_at": "2026-11-22T19:42:04.373327+00:00",
+  "generated_at": "2026-11-22T21:28:59.150654+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T13.toml",
   "name": "Tool platform",
   "project": "T13",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-22T09:46:52.711627+00:00",
-    "git_sha": "97d45aa63832ccfcd03cfac5b8a5014bc63155fb",
-    "path": "retained-snapshot/97d45aa63832ccfcd03cfac5b8a5014bc63155fb"
+    "generated_at": "2026-11-22T21:26:54.990814+00:00",
+    "git_sha": "206668306197e6bb69f06a0d5332e4ca03256053",
+    "path": "retained-snapshot/206668306197e6bb69f06a0d5332e4ca03256053"
   },
-  "verdict": "red",
+  "verdict": "green",
   "warnings": []
 }
