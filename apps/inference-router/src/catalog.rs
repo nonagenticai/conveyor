@@ -87,6 +87,7 @@ pub struct ProviderEntry {
     pub reasoning_dialect: ReasoningDialect,
     /// Raise a caller's `max_tokens` to this floor. Raise-only: a cap cannot force generation, it
     /// only stops a model that spends its budget on reasoning from returning empty content.
+    /// Honoured by the OpenAI-compatible provider — the only one that builds a `max_tokens`.
     #[serde(default)]
     pub min_completion_tokens: Option<u32>,
     #[serde(default)]

@@ -1148,7 +1148,7 @@ mod tests {
     }
 
     #[test]
-    fn the_completion_floor_leaves_an_absent_budget_absent() {
+    fn the_completion_floor_leaves_an_absent_budget_as_an_explicit_null() {
         let mut request = request("m");
         request.max_tokens = None;
         let payload = chat_payload(
@@ -1157,6 +1157,8 @@ mod tests {
             false,
             &render(ReasoningDialect::EnableThinking, Some(256)),
         );
-        assert!(payload["max_tokens"].is_null());
+        // The payload contract is "always present, null when unset" — asserting only `is_null`
+        // would also pass on a MISSING key, which is a different body.
+        assert!(payload.get("max_tokens").is_some_and(Value::is_null));
     }
 }
