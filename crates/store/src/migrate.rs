@@ -244,7 +244,10 @@ mod tests {
                 (60, "procedure ingestion".to_owned()),
                 // #508: the contract's requester, recorded at request time and never rewritten
                 // (0061_contract_requester.sql, SPEC_V2 §8.1 — the approver must differ).
-                (61, "contract requester".to_owned())
+                (61, "contract requester".to_owned()),
+                // S21 step 3 (#15): the draft recipe lifecycle, the section selector and the
+                // memory source kind (0062_s21_prompt_selection.sql, ADR 0009).
+                (62, "s21 prompt selection".to_owned())
             ],
             "the embedded migration set is {embedded:?}; a wrong sqlx::migrate! path or a \
              file outside the set changes it"

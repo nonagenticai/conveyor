@@ -17,10 +17,11 @@ mod support;
 
 use conveyor_domain::TenantId;
 use conveyor_domain::memory::{MemoryKind, MemorySource, digest};
+use conveyor_domain::prompt::MemorySelector;
 use conveyor_store::begin_scoped;
 use conveyor_store::memory::{
     MemoryStoreError, NewMemory, context_for_card_tx, hot_for_card_tx, insert_memory_tx,
-    unconsolidated_for_card_tx, write_digest_tx,
+    select_for_prompt_tx, unconsolidated_for_card_tx, write_digest_tx,
 };
 use serde_json::json;
 use uuid::Uuid;
@@ -123,6 +124,125 @@ async fn memory_is_tenant_scoped_and_newest_first() {
         matches!(refused, Err(MemoryStoreError::Parent(_))),
         "a cross-tenant card must be a parent miss: {refused:?}"
     );
+    tx.rollback().await.expect("rollback");
+}
+
+/// Insert one row of any kind; the prompt selection reads facts, decisions and the digest.
+async fn remember_as(
+    db: &support::TestDb,
+    seed: &support::Seeded,
+    card: Uuid,
+    kind: MemoryKind,
+    body: &str,
+) -> Uuid {
+    let mut tx = begin_scoped(&db.runtime, tenant(seed))
+        .await
+        .expect("scope");
+    let id: Uuid = sqlx::query_scalar(
+        "INSERT INTO work_package_memory
+             (tenant_id, project_id, card_id, kind, source, body, meta)
+         VALUES ($1, $2, $3, $4, 'human', $5, '{}') RETURNING id",
+    )
+    .bind(seed.tenant)
+    .bind(seed.project)
+    .bind(card)
+    .bind(kind.as_str())
+    .bind(body)
+    .fetch_one(&mut *tx)
+    .await
+    .expect("insert memory row");
+    tx.commit().await.expect("commit");
+    id
+}
+
+#[tokio::test]
+async fn the_prompt_selection_is_hot_first_bounded_and_digest_aware() {
+    let db = support::TestDb::fresh().await;
+    let seed = support::seed_tenant(&db.super_pool, "s21-prompt-memory").await;
+    let first = remember_as(&db, &seed, seed.card, MemoryKind::Fact, "first fact").await;
+    let second = remember_as(&db, &seed, seed.card, MemoryKind::Decision, "a decision").await;
+    let third = remember_as(&db, &seed, seed.card, MemoryKind::Fact, "third fact").await;
+    let digest = remember_as(&db, &seed, seed.card, MemoryKind::Digest, "the digest").await;
+
+    let mut tx = begin_scoped(&db.runtime, tenant(&seed))
+        .await
+        .expect("scope");
+    // Two hot rows, then the digest because the limit leaves room.
+    let selected = select_for_prompt_tx(
+        &mut tx,
+        tenant(&seed),
+        seed.card,
+        &MemorySelector {
+            kinds: Vec::new(),
+            limit: 4,
+            include_digest: true,
+        },
+    )
+    .await
+    .expect("selection");
+    let ids: Vec<Uuid> = selected.iter().map(|line| line.id).collect();
+    assert_eq!(
+        ids,
+        vec![first, second, third, digest],
+        "hot rows oldest-first, then one digest: {ids:?}"
+    );
+
+    // The kinds filter excludes the decision; the digest still follows when there is room.
+    let selected = select_for_prompt_tx(
+        &mut tx,
+        tenant(&seed),
+        seed.card,
+        &MemorySelector {
+            kinds: vec![MemoryKind::Fact],
+            limit: 4,
+            include_digest: true,
+        },
+    )
+    .await
+    .expect("selection");
+    let ids: Vec<Uuid> = selected.iter().map(|line| line.id).collect();
+    assert_eq!(ids, vec![first, third, digest], "{ids:?}");
+
+    // Hot never yields its slot to the digest.
+    let selected = select_for_prompt_tx(
+        &mut tx,
+        tenant(&seed),
+        seed.card,
+        &MemorySelector {
+            kinds: Vec::new(),
+            limit: 2,
+            include_digest: true,
+        },
+    )
+    .await
+    .expect("selection");
+    let ids: Vec<Uuid> = selected.iter().map(|line| line.id).collect();
+    assert_eq!(
+        ids,
+        vec![second, third],
+        "the digest does not displace hot: {ids:?}"
+    );
+
+    // A consolidated hot row is no longer hot.
+    sqlx::query("UPDATE work_package_memory SET consolidated_at = now() WHERE id = $1")
+        .bind(second)
+        .execute(&mut *tx)
+        .await
+        .expect("consolidate");
+    let selected = select_for_prompt_tx(
+        &mut tx,
+        tenant(&seed),
+        seed.card,
+        &MemorySelector {
+            kinds: Vec::new(),
+            limit: 2,
+            include_digest: false,
+        },
+    )
+    .await
+    .expect("selection");
+    let ids: Vec<Uuid> = selected.iter().map(|line| line.id).collect();
+    assert_eq!(ids, vec![first, third], "{ids:?}");
     tx.rollback().await.expect("rollback");
 }
 
