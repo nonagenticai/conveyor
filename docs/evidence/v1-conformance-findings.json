@@ -2555,7 +2555,12 @@
       ],
       "failure_scenario": "A video-compiler render exceeds the 300 s action deadline. The broker ledgers `backend_error` and returns a failure, while the durable compile job keeps running at the destination. The run has no `pending` result and no `resume_token`, so it cannot poll or continue — a slow-but-succeeding operation is recorded as a backend failure and the work is orphaned.",
       "acceptance": "A call whose destination exceeds the tool's `timeout_secs` returns `{status:\"pending\", resume_token}` and ledgers status `pending`, not `backend_error`; the matching status tool accepts the token and continues; a test with a slow destination asserts the pending envelope and a follow-up call that completes.",
-      "owner_project": "T13"
+      "owner_project": "T13",
+      "resolved_by": {
+        "commit": "94f090b4c8afaa9c67043347b0569569456745da",
+        "test": "crates/actions/tests/tool_platform.rs::a_call_over_the_tool_timeout_is_pending_and_resumes",
+        "evidence": "pending/resume implemented at 94f090b4 (migration 0075, broker timeout→202+pending ledger row, tools.resume with hash/idempotency guards); the test runs in the PR CI shard"
+      }
     },
     {
       "id": "v1-w4a-6",
@@ -4707,7 +4712,7 @@
         },
         {
           "path": "crates/actions/src/broker.rs",
-          "line": 532,
+          "line": 560,
           "quote": "                422 => \"check_failed\","
         }
       ],
