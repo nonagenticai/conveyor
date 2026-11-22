@@ -105,6 +105,30 @@ async fn ready_instrument(running: &support::Running) -> (String, String) {
         )
         .await;
     assert_eq!(status, 201, "{body}");
+    sign_off_instrument(running, &eval_id).await;
+
+    let (status, body) = running
+        .invoke(
+            "evals.draw_split",
+            TOKEN,
+            json!({ "eval_id": eval_id, "train_ratio": 0.5 }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{body}");
+    (eval_id, version_id)
+}
+
+/// Request and decide both gating sign-offs at the instrument's **current** digest.
+///
+/// The version's `prices` are part of the instrument digest (`version_digest_tx`), and readiness
+/// requires each sign-off's `artifact_sha256` to match the recomputed digest. A test that writes
+/// prices after `ready_instrument` must sign off again afterwards; otherwise the earlier sign-off
+/// covers the unpriced instrument and `eval_climbs.start` refuses with
+/// `eval_inputs, eval_grading`.
+async fn sign_off_instrument(running: &support::Running, eval_id: &str) {
     for gate in ["eval_inputs", "eval_grading"] {
         let (status, body) = running
             .invoke(
@@ -130,18 +154,6 @@ async fn ready_instrument(running: &support::Running) -> (String, String) {
             .await;
         assert_eq!(status, 200, "{body}");
     }
-    let (status, body) = running
-        .invoke(
-            "evals.draw_split",
-            TOKEN,
-            json!({ "eval_id": eval_id, "train_ratio": 0.5 }),
-            None,
-            None,
-            None,
-        )
-        .await;
-    assert_eq!(status, 200, "{body}");
-    (eval_id, version_id)
 }
 
 /// Start a climb whose plateau fires at 5 — later than the triage wall the test is about.
@@ -443,6 +455,8 @@ async fn spend_at_the_ceiling_refuses_the_next_round() {
     let running = support::Running::start(&pg).await;
     let (eval_id, version_id) = ready_instrument(&running).await;
     set_prices(&pg, seeded.tenant, &version_id).await;
+    // The price write is an edit to the instrument: the earlier sign-offs no longer cover it.
+    sign_off_instrument(&running, &eval_id).await;
 
     let (status, body) = start_climb(&running, &eval_id, Some(5)).await;
     assert_eq!(status, 201, "{body}");
