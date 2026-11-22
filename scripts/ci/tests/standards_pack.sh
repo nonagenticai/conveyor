@@ -32,23 +32,7 @@ build() {
     --rework-out "$run/rework.json" >/dev/null
   # The public register must not carry a private address; redact at the one point every consumer
   # reads, exactly as publish-standards.sh does.
-  python3 - "$run/rework.json" <<'PY'
-import json, pathlib, re, sys
-path = pathlib.Path(sys.argv[1])
-register = json.loads(path.read_text(encoding="utf-8"))
-def redact(value):
-    if isinstance(value, str):
-        return re.sub(r"\b(?:\d{1,3}\.){3}\d{1,3}\b", "[redacted-ip]", value)
-    if isinstance(value, list):
-        return [redact(item) for item in value]
-    if isinstance(value, dict):
-        return {key: redact(item) for key, item in value.items()}
-    return value
-path.write_text(
-    json.dumps(redact(register), indent=2, sort_keys=True, ensure_ascii=False) + "\n",
-    encoding="utf-8",
-)
-PY
+  python3 scripts/redact-public-register.py "$run/rework.json"
   python3 scripts/generate-standards.py \
     --snapshot docs/design/data --outputs-dir docs/design/docs \
     --gaps "$run/audit/conformance-gap-register.json" \

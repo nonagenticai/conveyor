@@ -91,23 +91,7 @@ test -f "$tmp/conformance/rework.json" || {
 # The live register is public: evidence quotes code and plans, and must never carry a private
 # address. Redact before it is embedded in the snapshot, so the pack and the committed register
 # are the same document. publish-standards.sh does the same for the committed-pack half.
-python3 - "$tmp/conformance/rework.json" <<'PY'
-import json, pathlib, re, sys
-path = pathlib.Path(sys.argv[1])
-register = json.loads(path.read_text(encoding="utf-8"))
-def redact(value):
-    if isinstance(value, str):
-        return re.sub(r"\b(?:\d{1,3}\.){3}\d{1,3}\b", "[redacted-ip]", value)
-    if isinstance(value, list):
-        return [redact(item) for item in value]
-    if isinstance(value, dict):
-        return {key: redact(item) for key, item in value.items()}
-    return value
-path.write_text(
-    json.dumps(redact(register), indent=2, sort_keys=True, ensure_ascii=False) + "\n",
-    encoding="utf-8",
-)
-PY
+python3 "$root/scripts/redact-public-register.py" "$tmp/conformance/rework.json"
 
 # 3b. The FINAL snapshot carries that register (`rework.json` and `snapshot.js.rework`), and the
 #     strict gate below audits THESE bytes — not the draft's.

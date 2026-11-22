@@ -120,8 +120,9 @@ drafted.
 
 **Every mandatory artefact is instanced, even when nothing evidences it.** A PMP artefact is
 generated for every live project (an archived project is history, not work); every project's
-declared `adm_phase` in `seed/programme.json` produces its phase page even before a contract
-exists; and every `architecture_artifact` row is its own typed page (catalog, matrix or diagram)
+declared A–H phase in `seed/programme.json` produces its own phase page even before a contract
+exists (Preliminary is the programme-level capability, not a per-project phase); and every
+`architecture_artifact` row is its own typed page (catalog, matrix or diagram)
 with its metadata, entries, links and document, rather than one summary page per project. The
 result is a larger and more honest record: at the committed snapshot it is **505 artefacts — 75
 evidenced, 57 partial, 373 absent** — where the earlier generator omitted the absent ones and a

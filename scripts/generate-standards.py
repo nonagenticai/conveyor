@@ -367,6 +367,11 @@ def build_subjects(
         ).strip().lower()
         if phase not in PHASE_ORDER or (subject["id"], phase) in seen_phases:
             continue
+        if phase == "preliminary":
+            # Preliminary is the capability, not a per-project phase: its record is the
+            # programme-level `phase-preliminary` page. Creating a phase subject for each
+            # programme-definition project would produce a subject no category can render.
+            continue
         seen_phases.add((subject["id"], phase))
         subjects["phase"].append({
             "kind": "phase",
@@ -491,6 +496,25 @@ def rows_for(
     return [row for row in value if isinstance(row, dict) and matches(row, wanted)]
 
 
+def artifact_satisfies_requirement(artifact: dict[str, Any], key: str) -> bool:
+    """Does this artefact satisfy a required artifact type?
+
+    The snapshot projects `artifact_kind` (the type's code, e.g. `principles_catalog` or the
+    generic `diagram`) and a UUID `artifact_type_id`, but not the type's `key`. A diagram whose
+    title is "Principle derivation — …" is the `principle_derivation` requirement; matching only
+    the kind would report two of the three Preliminary requirements missing while their artefacts
+    exist. The title fallback requires every distinctive word of the key.
+    """
+    kind = str(artifact.get("artifact_kind") or "").lower()
+    if kind == str(key).lower():
+        return True
+    if str(artifact.get("id") or "") == str(key):
+        return True
+    words = {word for word in re.split(r"[^a-z0-9]+", str(key).lower()) if len(word) > 3}
+    title = {word for word in re.split(r"[^a-z0-9]+", str(artifact.get("title") or "").lower()) if len(word) > 3}
+    return bool(words) and words <= title
+
+
 def computed_rows(
     name: str,
     source: dict[str, Any],
@@ -556,8 +580,7 @@ def computed_rows(
                 # table of zeroes that reads as evidenced.
                 matches = [
                     artifact for artifact in evidence
-                    if str(artifact.get("artifact_kind") or "").lower() == str(key).lower()
-                    or str(artifact.get("id") or "") == str(key)
+                    if artifact_satisfies_requirement(artifact, str(key))
                 ]
                 if not matches:
                     continue
@@ -889,7 +912,12 @@ def build_instances(
                     continue
                 identifier = f"std-{slug(str(template['standard']))}-{slug(category)}-{slug(subject['key'])}"
                 if identifier in seen:
-                    continue
+                    # Two subjects whose keys slug to the same id would otherwise drop one
+                    # artefact silently — and every gate would rebuild the same omission.
+                    raise GenerationError(
+                        f"two subjects share the artefact id {identifier!r}; "
+                        "their keys collide after slugging"
+                    )
                 seen.add(identifier)
                 required = list(template.get("required") or [])
                 sections = [
@@ -1332,6 +1360,39 @@ def build_document(
     return document
 
 
+def js_assignment(name: str, payload: Any) -> str:
+    return (
+        "window."
+        + name
+        + " = "
+        + json.dumps(payload, indent=2, sort_keys=True, ensure_ascii=False)
+        + ";\n"
+    )
+
+
+def load_register(snapshot_dir: Path) -> dict[str, Any] | None:
+    """The register the committed record names its packages from.
+
+    A live publish writes `rework.json` beside the snapshot; the committed pack writes the same
+    document as `rework.js`. `--check` must use it, or every artefact renders without
+    `package_published` and a reproducible record can never be verified.
+    """
+    json_path = snapshot_dir / "rework.json"
+    if json_path.is_file():
+        return json.loads(json_path.read_text(encoding="utf-8"))
+    js_path = snapshot_dir / "rework.js"
+    if not js_path.is_file():
+        return None
+    text = js_path.read_text(encoding="utf-8")
+    match = re.search(r"window\.CONVEYOR_REWORK\s*=\s*", text)
+    if not match:
+        raise ValueError(f"{js_path} has no CONVEYOR_REWORK assignment")
+    payload = text[match.end():].strip()
+    if payload.endswith(";"):
+        payload = payload[:-1]
+    return json.loads(payload)
+
+
 def write_outputs(
     document: dict[str, Any],
     findings: dict[str, Any],
@@ -1344,20 +1405,14 @@ def write_outputs(
         json.dumps(document, indent=2, sort_keys=True, ensure_ascii=False) + "\n", encoding="utf-8"
     )
     (data_out / "standards.js").write_text(
-        "window.CONVEYOR_STANDARDS = "
-        + json.dumps(document, indent=2, sort_keys=True, ensure_ascii=False)
-        + ";\n",
-        encoding="utf-8",
+        js_assignment("CONVEYOR_STANDARDS", document), encoding="utf-8"
     )
     # The console's offline rework register. The canonical register stays `rework.json` in the
     # repo evidence; this is the same document as the global `delivery.js` reads when the live
     # snapshot carries no `rework` section.
     if register is not None:
         (data_out / "rework.js").write_text(
-            "window.CONVEYOR_REWORK = "
-            + json.dumps(register, indent=2, sort_keys=True, ensure_ascii=False)
-            + ";\n",
-            encoding="utf-8",
+            js_assignment("CONVEYOR_REWORK", register), encoding="utf-8"
         )
     findings_out.parent.mkdir(parents=True, exist_ok=True)
     findings_out.write_text(
@@ -1423,16 +1478,31 @@ def generate(
 def check(
     std: dict[str, Any],
     snapshot: dict[str, Any],
+    snapshot_dir: Path,
     outputs_dir: Path,
     covered_keys: set[str],
     declared_phases: dict[str, str] | None = None,
     findings_path: Path | None = None,
-    data_path: Path | None = None,
 ) -> int:
     findings_path = findings_path or FINDINGS_PATH
-    data_path = data_path or DATA_PATH
+    # The record names a package for every mandatory artefact that is not evidenced, so a
+    # committed record can only be reproduced with the register the pack published. A live
+    # publish writes `rework.json`; the committed pack writes `rework.js`.
+    try:
+        register = load_register(snapshot_dir)
+    except (OSError, ValueError, json.JSONDecodeError) as error:
+        print(
+            f"generate-standards: the register beside {snapshot_dir} does not parse: {error}",
+            file=sys.stderr,
+        )
+        return 1
     document, findings = generate(
-        std, snapshot, outputs_dir, covered_keys=covered_keys, declared_phases=declared_phases
+        std,
+        snapshot,
+        outputs_dir,
+        register,
+        covered_keys=covered_keys,
+        declared_phases=declared_phases,
     )
     problems: list[str] = pointer_problems(std, snapshot)
     if findings_path.is_file():
@@ -1441,12 +1511,42 @@ def check(
             problems.append(f"{findings_path} is stale; regenerate it")
     else:
         problems.append(f"{findings_path} is missing; generate it")
-    if data_path.is_file():
-        committed = json.loads(data_path.read_text(encoding="utf-8"))
+    record_path = snapshot_dir / "standards.json"
+    if record_path.is_file():
+        committed = json.loads(record_path.read_text(encoding="utf-8"))
         if committed.get("payload_sha256") != document.get("payload_sha256"):
-            problems.append(f"{data_path} is stale; regenerate it")
+            problems.append(f"{record_path} is stale; regenerate it")
+        else:
+            # The record claims every artefact has a page whose bytes hash to it. A deleted or
+            # edited page is stale even when the payload is unchanged. Containment is asserted
+            # so a record cannot point the check outside the pack.
+            pack_root = snapshot_dir.parent.resolve()
+            for artefact in committed.get("artefacts") or []:
+                artefact_id = str(artefact.get("id") or "?")
+                page_doc = artefact.get("document") or {}
+                if not page_doc.get("path"):
+                    problems.append(f"{artefact_id}: the record names no page")
+                    continue
+                page = (pack_root / str(page_doc["path"])).resolve()
+                try:
+                    page.relative_to(pack_root)
+                except ValueError:
+                    problems.append(f"{artefact_id}: page {page_doc['path']} escapes the pack")
+                else:
+                    if not page.is_file():
+                        problems.append(f"{page} is missing; regenerate the record")
+                    elif sha256_text(page.read_text(encoding="utf-8")) != page_doc.get("sha256"):
+                        problems.append(f"{page} does not match its recorded hash")
+        script_path = snapshot_dir / "standards.js"
+        if script_path.is_file():
+            if script_path.read_text(encoding="utf-8") != js_assignment(
+                "CONVEYOR_STANDARDS", committed
+            ):
+                problems.append(f"{script_path} is stale; regenerate it")
+        else:
+            problems.append(f"{script_path} is missing; generate it")
     else:
-        problems.append(f"{data_path} is missing; generate it")
+        problems.append(f"{record_path} is missing; generate the record")
     for problem in problems:
         print(f"generate-standards: {problem}", file=sys.stderr)
     if problems:
@@ -1591,11 +1691,9 @@ def main() -> int:
     gap_path = args.gaps or (ROOT / "docs" / "evidence" / "conformance-gap-register.json")
     covered_keys = load_gap_keys(gap_path) if gap_path.is_file() else set()
     if args.check:
-        data_path = (args.data_out / "standards.json") if args.data_out else DATA_PATH
         return check(
-            std, snapshot, args.outputs_dir, covered_keys, declared_phases,
+            std, snapshot, args.snapshot, args.outputs_dir, covered_keys, declared_phases,
             findings_path=args.findings_out or FINDINGS_PATH,
-            data_path=data_path,
         )
     register = None
     if args.register:
