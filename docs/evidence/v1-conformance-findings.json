@@ -5234,6 +5234,54 @@
         "test": "crates/store/tests/snapshot_scope.rs::test_rows_are_excluded_and_listed",
         "evidence": "snapshot_scope 4 passed at the merged lane: the snapshot partitions programme.projects, removing meta.test_row rows and the two named legacy keys and listing them under programme.test_projects with their reasons. board_satellites 11 passed, including a_test_row_project_carries_the_marker: projects.create accepts test_row and stores meta.test_row=true, and the e2e fixtures set it. The creation-side marker is 74f0fcd6; the pack exclusion and generator predicate are 4ff8d49d; generate-standards --self-test passes."
       }
+    },
+    {
+      "id": "v1-tr2-2",
+      "area": "T1 plan spine / tranche review",
+      "standard": "SPEC",
+      "spec": "§8.3",
+      "severity": "P1",
+      "title": "A tranche review can be recorded with no snapshot identity",
+      "problem": "The tranche-2 continue review 01a20227 carries baselines, benefit status and a risk register, but no snapshot identity: the pause review it supersedes cited snapshot_sha 7ff27efd, while the continue review names none. `tranche_review_has_evidence` accepts any non-empty object, so a review is not pinned to the revision it judged and a later reader cannot reproduce what was reviewed.",
+      "evidence": [
+        {
+          "path": "crates/domain/src/spine.rs",
+          "line": 383,
+          "quote": "pub fn tranche_review_has_evidence(evidence: &Value) -> bool {"
+        },
+        {
+          "path": "crates/store/src/spine.rs",
+          "line": 1205,
+          "quote": "    if !tranche_review_has_evidence(evidence) {"
+        }
+      ],
+      "failure_scenario": "A tranche continues on evidence that no revision can reproduce; the gate is green because the object is non-empty, not because the record was judged.",
+      "acceptance": "A tranche review is refused unless its evidence names the snapshot it judged (snapshot_sha or snapshot.git_sha, 40-hex), and a test proves the refusal and the accepted form.",
+      "owner_project": "T1"
+    },
+    {
+      "id": "v1-project-1",
+      "area": "projects / domain events",
+      "standard": "SPEC",
+      "spec": "§10.4",
+      "severity": "P2",
+      "title": "projects.close writes no domain event",
+      "problem": "Closing a project updates the row and leaves complete audit_event and action_invocation rows, but appends no project event: the live S03/T2 closures emitted approval.approved and nothing on the project aggregate. A consumer subscribed to project events cannot observe a closure, so its view disagrees with the row.",
+      "evidence": [
+        {
+          "path": "crates/actions/src/board/projects.rs",
+          "line": 520,
+          "quote": "    Ok(project_view(&project, &boards))"
+        },
+        {
+          "path": "crates/store/src/project.rs",
+          "line": 443,
+          "quote": "        \"UPDATE project"
+        }
+      ],
+      "failure_scenario": "A delivery consumer watching project events never learns a project closed; the record says closed and the consumer's view does not.",
+      "acceptance": "projects.close appends one project.updated (or project.closed) event in the same transaction, and a test asserts the event, its type and its aggregate id.",
+      "owner_project": "PLATFORM"
     }
   ]
 }
