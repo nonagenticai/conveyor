@@ -113,6 +113,9 @@ pub enum ApprovalStoreError {
     /// An eval gate was offered a machine decision (S06d / W1). A sign-off is a person's act.
     #[error("an eval sign-off must be decided by a human, not a machine")]
     HumanOnlyGate,
+    /// An `executor` gate was offered a machine decision (S21 step 5, ADR 0011). It is L3.
+    #[error("an executor gate must be decided by a human, not a machine")]
+    ExecutorGateHumanOnly,
     /// A human decided an eval gate without `evals:approve` (S06d / W1). The generic
     /// `approvals.decide` path must not be a weaker door into the same row.
     #[error("an eval sign-off requires the evals:approve scope")]
@@ -903,6 +906,12 @@ pub async fn record_decision_tx(
         if !eval_authorized {
             return Err(ApprovalStoreError::EvalScopeRequired);
         }
+    }
+    // S21 step 5: an `executor` gate is a person's act (SPEC_V2 §7.1). Like the eval gate, the
+    // refusal lives in the one writer every decision path traverses, so `approvals.decide`, MCP
+    // and a connector reply cannot disagree.
+    if row.kind == "executor" && decision.decided_by_kind != DeciderKind::Human {
+        return Err(ApprovalStoreError::ExecutorGateHumanOnly);
     }
 
     let prior: i64 = sqlx::query_scalar(
