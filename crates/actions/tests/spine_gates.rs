@@ -13,6 +13,9 @@
 //!   human-approved `tranche.resume` gate naming the tranche moves it to `in_review`
 //!   (`tranches.resume`), a compliant project can then close, and the resumed tranche records
 //!   the second, dated review that authorises its successor.
+//! * `v1-tr2-2` — a tranche review is refused unless its evidence names the snapshot it judged
+//!   (`snapshot_sha` or `snapshot.git_sha`, 40-hex), and the accepted hash is recorded under
+//!   the flat `snapshot_sha` every stored review carries (`tranches.review`).
 //! * `v1-p5-3` — a change's `meta.impact` is a real §5.5 scope/schedule/cost/risk block: `{}`
 //!   is refused on create AND on an update that replaces `meta` (`registers.create`,
 //!   `registers.update`).
@@ -745,6 +748,8 @@ async fn a_programme_without_a_tranche_plan_keeps_its_legacy_allowance() {
 
 const TOKEN: &str = "dev:alice";
 const REVIEWER: &str = "dev:reviewer";
+/// The fixed commit id every review fixture names as the snapshot it judged (v1-tr2-2).
+const SNAPSHOT_SHA: &str = "0123456789abcdef0123456789abcdef01234567";
 
 fn output(body: &Value) -> &Value {
     body.get("output").unwrap_or(body)
@@ -770,11 +775,13 @@ async fn running_fixture() -> (support::Pg, support::Running, support::Seeded) {
 }
 
 /// A programme and one tranche, created by raw SQL: these tests are about the state transition,
-/// not `tranches.create`'s validation.
+/// not `tranches.create`'s validation. The name is unique per call because a tenant's programme
+/// names are unique, and one test may need two programmes.
 async fn programme_and_tranche(pg: &support::Pg, tenant_id: Uuid, state: &str) -> (Uuid, Uuid) {
     let programme: Uuid =
-        sqlx::query_scalar("INSERT INTO programme (tenant_id, name) VALUES ($1, 'P') RETURNING id")
+        sqlx::query_scalar("INSERT INTO programme (tenant_id, name) VALUES ($1, $2) RETURNING id")
             .bind(tenant_id)
+            .bind(format!("P {}", Uuid::now_v7()))
             .fetch_one(&pg.super_pool)
             .await
             .expect("insert the programme");
@@ -792,8 +799,8 @@ async fn programme_and_tranche(pg: &support::Pg, tenant_id: Uuid, state: &str) -
 }
 
 /// Submit a tranche review through the real `tranches.review` action: a review gate decided by
-/// the distinct reviewer, the published delegation, and the evidence §8.3 requires. Raw SQL for
-/// this transition would hide the defect's own setup.
+/// the distinct reviewer, the published delegation, and the evidence §8.3 requires — pinned to
+/// [`SNAPSHOT_SHA`] (v1-tr2-2). Raw SQL for this transition would hide the defect's own setup.
 async fn try_review_tranche(
     pg: &support::Pg,
     running: &support::Running,
@@ -802,15 +809,31 @@ async fn try_review_tranche(
     decision: &str,
     delegation: &str,
 ) -> Result<conveyor_actions::InvokeOutcome, conveyor_actions::ActionError> {
+    let evidence = json!({
+        "snapshot_sha": SNAPSHOT_SHA,
+        "baselines": ["B0"],
+        "benefit_status": {"BEN-1": "tracking"},
+        "risk_register": ["risk-1"]
+    });
+    try_review_tranche_with_evidence(pg, running, seeded, tranche, decision, delegation, evidence)
+        .await
+}
+
+/// Submit a tranche review with caller-supplied evidence (the snapshot-identity cases).
+async fn try_review_tranche_with_evidence(
+    pg: &support::Pg,
+    running: &support::Running,
+    seeded: &support::Seeded,
+    tranche: Uuid,
+    decision: &str,
+    delegation: &str,
+    evidence: Value,
+) -> Result<conveyor_actions::InvokeOutcome, conveyor_actions::ActionError> {
     let input = json!({
         "id": tranche,
         "decision": decision,
         "delegation_ref": delegation,
-        "evidence": {
-            "baselines": ["B0"],
-            "benefit_status": {"BEN-1": "tracking"},
-            "risk_register": ["risk-1"]
-        }
+        "evidence": evidence
     });
     let gate = support::review_gate(running, TOKEN, &input).await;
     let mut review = request(seeded.user_id, "tranches.review", input);
@@ -931,6 +954,18 @@ async fn tranche_state(pg: &support::Pg, tenant_id: Uuid, tranche: Uuid) -> Stri
         .fetch_one(&pg.super_pool)
         .await
         .expect("read the tranche state")
+}
+
+/// The evidence a recorded review actually stores.
+async fn recorded_review_evidence(pg: &support::Pg, tenant_id: Uuid, tranche: Uuid) -> Value {
+    sqlx::query_scalar(
+        "SELECT evidence FROM programme_tranche_review WHERE tenant_id = $1 AND tranche_id = $2",
+    )
+    .bind(tenant_id)
+    .bind(tranche)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("read the recorded review evidence")
 }
 
 /// v1-tr2-1 — `tranches.review` maps `pause` to `paused`, and a paused tranche froze every
@@ -1173,8 +1208,117 @@ async fn a_resumed_tranche_reviews_again_and_authorises_its_successor() {
     );
 }
 
-// ── the project-close fixture (copied from `programme_close.rs`, which proves it conformant) ──
+/// v1-tr2-2 — a tranche review must name the snapshot it judged. Evidence that carries the
+/// §8.3 facts but no snapshot identity is refused before anything is written.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_tranche_review_without_a_snapshot_identity_is_refused() {
+    let (pg, running, seeded) = running_fixture().await;
+    let (_programme, tranche) = programme_and_tranche(&pg, seeded.tenant_id, "planned").await;
+    let delegation = support::delegation_ref(&running, TOKEN).await;
+    let evidence = json!({
+        "baselines": ["B0"],
+        "benefit_status": {"BEN-1": "tracking"},
+        "risk_register": ["risk-1"]
+    });
+    let error = try_review_tranche_with_evidence(
+        &pg,
+        &running,
+        &seeded,
+        tranche,
+        "pause",
+        &delegation,
+        evidence,
+    )
+    .await
+    .expect_err("a review with no snapshot identity must be refused");
+    assert_eq!(error.status, 422, "{}", error.detail);
+    assert_eq!(error.code, "tranche_review_unpinned", "{}", error.detail);
+    assert!(
+        error.detail.contains("snapshot_sha"),
+        "the refusal names the missing key: {}",
+        error.detail
+    );
+    // The refusal wrote nothing: no review row, and the tranche did not move.
+    let reviews: i64 = sqlx::query_scalar(
+        "SELECT count(*) FROM programme_tranche_review WHERE tenant_id = $1 AND tranche_id = $2",
+    )
+    .bind(seeded.tenant_id)
+    .bind(tranche)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("count the tranche's reviews");
+    assert_eq!(reviews, 0, "the refused review left no row");
+    assert_eq!(
+        tranche_state(&pg, seeded.tenant_id, tranche).await,
+        "planned",
+        "the refused review moved the tranche"
+    );
+}
 
+/// v1-tr2-2 — both forms of snapshot identity are accepted, and the nested `snapshot.git_sha`
+/// is normalised into the flat `snapshot_sha` every stored review carries.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_tranche_review_records_the_snapshot_it_judged() {
+    let (pg, running, seeded) = running_fixture().await;
+    let delegation = support::delegation_ref(&running, TOKEN).await;
+
+    let (_programme, flat_tranche) = programme_and_tranche(&pg, seeded.tenant_id, "planned").await;
+    let flat = json!({
+        "snapshot_sha": SNAPSHOT_SHA,
+        "baselines": ["B0"],
+        "benefit_status": {"BEN-1": "tracking"},
+        "risk_register": ["risk-1"]
+    });
+    let outcome = try_review_tranche_with_evidence(
+        &pg,
+        &running,
+        &seeded,
+        flat_tranche,
+        "pause",
+        &delegation,
+        flat,
+    )
+    .await
+    .expect("a review naming snapshot_sha");
+    assert_eq!(outcome.status, 200, "{}", outcome.body);
+
+    let (_programme, nested_tranche) =
+        programme_and_tranche(&pg, seeded.tenant_id, "planned").await;
+    let nested = json!({
+        "snapshot": {"git_sha": SNAPSHOT_SHA},
+        "baselines": ["B0"],
+        "benefit_status": {"BEN-1": "tracking"},
+        "risk_register": ["risk-1"]
+    });
+    let outcome = try_review_tranche_with_evidence(
+        &pg,
+        &running,
+        &seeded,
+        nested_tranche,
+        "pause",
+        &delegation,
+        nested,
+    )
+    .await
+    .expect("a review naming snapshot.git_sha");
+    assert_eq!(outcome.status, 200, "{}", outcome.body);
+
+    let stored = recorded_review_evidence(&pg, seeded.tenant_id, flat_tranche).await;
+    assert_eq!(stored["snapshot_sha"], json!(SNAPSHOT_SHA), "{stored}");
+    let stored = recorded_review_evidence(&pg, seeded.tenant_id, nested_tranche).await;
+    assert_eq!(
+        stored["snapshot_sha"],
+        json!(SNAPSHOT_SHA),
+        "the nested form is normalised into the flat key: {stored}"
+    );
+    assert_eq!(
+        stored["snapshot"]["git_sha"],
+        json!(SNAPSHOT_SHA),
+        "{stored}"
+    );
+}
+
+// ── the project-close fixture (copied from `programme_close.rs`, which proves it conformant) ──
 async fn programme_project(
     pg: &support::Pg,
     running: &support::Running,

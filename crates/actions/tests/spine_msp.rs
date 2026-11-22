@@ -444,6 +444,8 @@ async fn tranche_review_persists_decision_and_evidence() {
         "decision": "continue",
         "delegation_ref": delegation,
         "evidence": {
+            // v1-tr2-2: the review names the snapshot it judged.
+            "snapshot_sha": "0123456789abcdef0123456789abcdef01234567",
             "baselines": ["B0"],
             "benefit_status": {"BEN-T": "tracking"},
             "risk_register": ["risk-1"]
