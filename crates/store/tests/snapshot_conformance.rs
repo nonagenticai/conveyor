@@ -319,3 +319,87 @@ async fn the_snapshot_carries_the_cadence_credits_lessons_and_audit_fields() {
         "{reviews:?}"
     );
 }
+
+/// The register checker can only assess what the public projection shows: the governed
+/// asset's `meta` (the ADR content hash, deciders and decided_at) and a contract's `links`/`meta`
+/// (its ADR citations). The keys are always present — an authored-away value is `{}`, not omitted.
+#[tokio::test]
+async fn the_snapshot_projects_governed_asset_meta_and_contract_citations() {
+    let db = support::TestDb::fresh().await;
+    let f = fixture(&db).await;
+
+    sqlx::query(
+        "INSERT INTO governed_asset (tenant_id, kind, key, title, status, meta)
+         VALUES ($1, 'adr', 'adr-9001', 'Projection ADR', 'approved', $2)",
+    )
+    .bind(f.tenant_id)
+    .bind(serde_json::json!({
+        "content_sha256": "0f0f",
+        "deciders": ["architecture-board"],
+        "decided_at": "2026-11-01T00:00:00Z",
+    }))
+    .execute(&db.super_pool)
+    .await
+    .expect("insert the ADR asset");
+    // Negative control: a row that never set meta must project `{}`, not drop the key.
+    sqlx::query(
+        "INSERT INTO governed_asset (tenant_id, kind, key, title, status)
+         VALUES ($1, 'requirement', 'req-9001', 'No meta', 'draft')",
+    )
+    .bind(f.tenant_id)
+    .execute(&db.super_pool)
+    .await
+    .expect("insert the meta-less asset");
+
+    sqlx::query(
+        "INSERT INTO architecture_contract (tenant_id, project_id, kind, phase_code, title, body)
+         VALUES ($1, $2, 'delivery_contract', 'b', 'Cite ADRs', $3)",
+    )
+    .bind(f.tenant_id)
+    .bind(f.bound_project)
+    .bind(serde_json::json!({
+        "links": {"adr": ["adr-0001"]},
+        "meta": {"deciders": ["architecture-board"]},
+    }))
+    .execute(&db.super_pool)
+    .await
+    .expect("insert the citing contract");
+
+    let data = snapshot(&db, f.tenant).await;
+
+    let assets = data.artefacts["governed_assets"]
+        .as_array()
+        .expect("governed assets");
+    let adr = assets
+        .iter()
+        .find(|row| row["key"] == "adr-9001")
+        .expect("the ADR asset");
+    assert_eq!(adr["meta"]["content_sha256"], "0f0f", "{adr}");
+    assert_eq!(adr["meta"]["deciders"][0], "architecture-board", "{adr}");
+    assert_eq!(adr["meta"]["decided_at"], "2026-11-01T00:00:00Z", "{adr}");
+    let no_meta = assets
+        .iter()
+        .find(|row| row["key"] == "req-9001")
+        .expect("the meta-less asset");
+    assert_eq!(no_meta["meta"], serde_json::json!({}), "{no_meta}");
+
+    let contracts = data.architecture["contracts"]
+        .as_array()
+        .expect("contracts");
+    let citing = contracts
+        .iter()
+        .find(|row| row["title"] == "Cite ADRs")
+        .expect("the citing contract");
+    assert_eq!(citing["links"]["adr"][0], "adr-0001", "{citing}");
+    assert_eq!(
+        citing["meta"]["deciders"][0], "architecture-board",
+        "{citing}"
+    );
+    // The fixture's contract has an empty body: both keys are present and empty.
+    let bare = contracts
+        .iter()
+        .find(|row| row["title"] == "SAW")
+        .expect("the fixture contract");
+    assert_eq!(bare["links"], serde_json::json!({}), "{bare}");
+    assert_eq!(bare["meta"], serde_json::json!({}), "{bare}");
+}
