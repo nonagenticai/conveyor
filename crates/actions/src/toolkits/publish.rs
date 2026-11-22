@@ -195,6 +195,7 @@ async fn insert_version(
                 handler_action: &tool.action,
                 input_schema: &schema,
                 verify: &verify,
+                redact: &tool.redact,
                 effect: spec.effect.as_str(),
                 timeout_secs,
             },
