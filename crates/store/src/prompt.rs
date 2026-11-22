@@ -613,6 +613,17 @@ pub async fn get_prompt_by_key_tx(
     }
 }
 
+/// The columns `list_prompts_tx` reads; a row type rather than a six-tuple, which clippy refuses.
+#[derive(sqlx::FromRow)]
+struct PromptSummaryRow {
+    key: String,
+    version: i32,
+    title: String,
+    status: String,
+    created_at: DateTime<Utc>,
+    updated_at: DateTime<Utc>,
+}
+
 /// One page of catalogue rows, newest version first within a key.
 pub async fn list_prompts_tx(
     conn: &mut PgConnection,
@@ -621,7 +632,7 @@ pub async fn list_prompts_tx(
     status: Option<&str>,
     limit: i64,
 ) -> Result<Vec<PromptSummary>, PromptStoreError> {
-    let rows: Vec<(String, i32, String, String, DateTime<Utc>, DateTime<Utc>)> = sqlx::query_as(
+    let rows: Vec<PromptSummaryRow> = sqlx::query_as(
         "SELECT key, version, title, status, created_at, updated_at
            FROM prompt
           WHERE tenant_id = $1
@@ -638,16 +649,14 @@ pub async fn list_prompts_tx(
     .await?;
     Ok(rows
         .into_iter()
-        .map(
-            |(key, version, title, status, created_at, updated_at)| PromptSummary {
-                key,
-                version,
-                title,
-                status,
-                created_at,
-                updated_at,
-            },
-        )
+        .map(|row| PromptSummary {
+            key: row.key,
+            version: row.version,
+            title: row.title,
+            status: row.status,
+            created_at: row.created_at,
+            updated_at: row.updated_at,
+        })
         .collect())
 }
 
