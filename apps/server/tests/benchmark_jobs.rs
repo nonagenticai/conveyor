@@ -294,7 +294,10 @@ async fn create_job(
     (StatusCode::CREATED, Json(body))
 }
 
-async fn get_job(State(stub): State<Stub>, Path(name): Path<String>) -> impl IntoResponse {
+async fn get_job(
+    State(stub): State<Stub>,
+    Path((_ns, name)): Path<(String, String)>,
+) -> impl IntoResponse {
     // The stub finishes every Job immediately, so the second tick reads it Succeeded.
     stub.record(format!("job:get:{name}"));
     Json(json!({"status": {"succeeded": 1}}))
@@ -309,17 +312,26 @@ async fn list_pods(Query(query): Query<HashMap<String, String>>) -> impl IntoRes
     Json(json!({"items": [{"metadata": {"name": pod}}]}))
 }
 
-async fn read_log(State(stub): State<Stub>, Path(pod): Path<String>) -> impl IntoResponse {
+async fn read_log(
+    State(stub): State<Stub>,
+    Path((_ns, pod)): Path<(String, String)>,
+) -> impl IntoResponse {
     stub.record(format!("pod:log:{pod}"));
     stub.log.lock().expect("log").clone()
 }
 
-async fn delete_job(State(stub): State<Stub>, Path(name): Path<String>) -> impl IntoResponse {
+async fn delete_job(
+    State(stub): State<Stub>,
+    Path((_ns, name)): Path<(String, String)>,
+) -> impl IntoResponse {
     stub.record(format!("job:delete:{name}"));
     StatusCode::OK
 }
 
-async fn delete_configmap(State(stub): State<Stub>, Path(name): Path<String>) -> impl IntoResponse {
+async fn delete_configmap(
+    State(stub): State<Stub>,
+    Path((_ns, name)): Path<(String, String)>,
+) -> impl IntoResponse {
     stub.record(format!("configmap:delete:{name}"));
     StatusCode::OK
 }
