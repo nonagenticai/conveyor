@@ -24,7 +24,10 @@ and any source file with no row mapping.
 
 ``--apply`` speaks ``POST /api/actions/<name>/invocations``.  ``scripts/programme-record.py``
 exposes a CLI/ssh transport, not an HTTP client, so this script carries its own minimal
-``urllib`` client.  Credentials come from ``--url``/``--token``/``--app-key`` or
+``urllib`` client.  ``--local-bin PATH`` instead runs the branch-built binary's
+``admin action invoke`` against the database its ``DATABASE_MIGRATE_URL`` names, recording
+``--actor-id`` as the principal; stdin carries the action input and stdout its JSON output.
+Credentials come from ``--url``/``--token``/``--app-key`` or
 ``CONVEYOR_URL``/``CONVEYOR_TOKEN``/``CONVEYOR_APP_KEY``.  An approval id is recorded in
 ``meta`` only when supplied; the ``decisions.*`` actions have no approval gate and this script
 never invents one.  A row whose ``meta.content_sha256`` is unchanged is never updated.
@@ -41,16 +44,19 @@ import hashlib
 import json
 import os
 import re
+import subprocess
 import sys
 import tempfile
 import urllib.error
 import urllib.request
+import uuid
 from dataclasses import dataclass, field
 from pathlib import Path
 
 ADR_DIR = Path("docs/decisions")
 SPEC_FILE = Path("docs/SPEC_V2.md")
 REPO_ROOT = Path(__file__).resolve().parent.parent
+DEFAULT_TENANT = "nonagentic"
 
 # D106/D115 are the agent platform's KH concepts, cited as references rather than adopted as
 # conveyor decisions.  Every other D## in SPEC_V2 must resolve to a disposition.
@@ -742,11 +748,36 @@ def summary_lines(register: Register) -> list[str]:
     ]
 
 
-# ── HTTP action client ───────────────────────────────────────────────────────────────────
+# ── action clients ──────────────────────────────────────────────────────────────────────
 
 
-class ActionClient:
-    """The one action endpoint: ``POST /api/actions/<name>/invocations``."""
+class ActionTransport:
+    """Paging shared by every transport: one ``invoke``, ``decisions.list`` for the rest."""
+
+    def invoke(
+        self,
+        action: str,
+        payload: dict,
+        if_match: int | None = None,
+    ) -> dict:
+        raise NotImplementedError
+
+    def list_all(self) -> list[dict]:
+        items: list[dict] = []
+        cursor = None
+        while True:
+            payload: dict = {"limit": 200}
+            if cursor:
+                payload["cursor"] = cursor
+            page = self.invoke("decisions.list", payload)
+            items.extend(page.get("items", []))
+            cursor = page.get("next_cursor")
+            if not cursor:
+                return items
+
+
+class ActionClient(ActionTransport):
+    """The one HTTP action endpoint: ``POST /api/actions/<name>/invocations``."""
 
     def __init__(
         self,
@@ -806,18 +837,92 @@ class ActionClient:
             return envelope["output"]
         return envelope
 
-    def list_all(self) -> list[dict]:
-        items: list[dict] = []
-        cursor = None
-        while True:
-            payload: dict = {"limit": 200}
-            if cursor:
-                payload["cursor"] = cursor
-            page = self.invoke("decisions.list", payload)
-            items.extend(page.get("items", []))
-            cursor = page.get("next_cursor")
-            if not cursor:
-                return items
+
+class LocalBinClient(ActionTransport):
+    """Runs ``admin action invoke`` on a branch-built binary over stdin/stdout.
+
+    The binary reads ``DATABASE_MIGRATE_URL`` and ``APP_KEY`` from the inherited environment, so
+    the writes land in whatever database the caller points the binary at; ``RUST_LOG`` is pinned
+    to ``error`` so logs cannot corrupt the single JSON document on stdout.  ``actor_id`` is the
+    real principal the action records — the reason this transport exists where the deployed
+    server has no seeded dev principal.
+    """
+
+    def __init__(
+        self,
+        binary: str,
+        tenant: str | None = None,
+        actor_id: str | None = None,
+        timeout: float = 120.0,
+    ) -> None:
+        if not binary:
+            raise SeedError("--local-bin requires a binary path")
+        if actor_id is not None:
+            try:
+                uuid.UUID(actor_id)
+            except ValueError:
+                raise SeedError(f"--actor-id is not a UUID: {actor_id!r}") from None
+        self.binary = binary
+        self.tenant = tenant or os.environ.get("TENANT") or DEFAULT_TENANT
+        self.actor_id = actor_id
+        self.timeout = timeout
+
+    def build_argv(self, action: str, if_match: int | None = None) -> list[str]:
+        argv = [
+            self.binary,
+            "admin", "action", "invoke",
+            "--tenant", self.tenant,
+            "--name", action,
+            "--input", "/dev/stdin",
+        ]
+        if self.actor_id:
+            argv += ["--actor-id", self.actor_id]
+        if if_match is not None:
+            argv += ["--if-match", str(if_match)]
+        return argv
+
+    def invoke(
+        self,
+        action: str,
+        payload: dict,
+        if_match: int | None = None,
+    ) -> dict:
+        stdin = json.dumps(payload, separators=(",", ":"), ensure_ascii=False) + "\n"
+        env = dict(os.environ)
+        env.setdefault("RUST_LOG", "error")
+        try:
+            completed = subprocess.run(
+                self.build_argv(action, if_match),
+                input=stdin,
+                capture_output=True,
+                text=True,
+                encoding="utf-8",
+                errors="replace",
+                timeout=self.timeout,
+                env=env,
+            )
+        except subprocess.TimeoutExpired:
+            raise SeedError(
+                f"{action}: local binary timed out after {self.timeout:g}s"
+            ) from None
+        except OSError as error:
+            raise SeedError(
+                f"{action}: cannot run local binary {self.binary}: {error}"
+            ) from None
+        if completed.returncode != 0:
+            detail = completed.stderr.strip() or completed.stdout.strip()
+            raise SeedError(
+                f"{action}: local binary exited {completed.returncode}: {detail[:2000]}"
+            )
+        try:
+            output = json.loads(completed.stdout)
+        except ValueError:
+            raise SeedError(
+                f"{action}: local binary output is not JSON: {completed.stdout[:500]!r}"
+            ) from None
+        if not isinstance(output, dict):
+            raise SeedError(f"{action}: local binary output is not a JSON object: {output!r}")
+        return output
 
 
 # ── apply ───────────────────────────────────────────────────────────────────────────────
@@ -1158,6 +1263,72 @@ def run_self_test() -> None:
         assert client.writes() == 0, client.calls
         checks += 1
 
+        # 11. The local-binary transport builds the admin argv and round-trips JSON.
+        local = base / "local-bin"
+        local.mkdir()
+        stub = local / "stub.py"
+        stub.write_text(
+            "#!/usr/bin/env python3\n"
+            "import json, sys\n"
+            "from pathlib import Path\n"
+            "here = Path(__file__).resolve().parent\n"
+            "(here / 'argv.json').write_text(json.dumps(sys.argv[1:]), encoding='utf-8')\n"
+            "data = json.loads(sys.stdin.read())\n"
+            "(here / 'stdin.json').write_text(json.dumps(data), encoding='utf-8')\n"
+            "print(json.dumps({'echo': data}))\n",
+            encoding="utf-8",
+        )
+        stub.chmod(0o755)
+        actor = "3f2b1c4d-5e6f-4a7b-8c9d-0e1f2a3b4c5d"
+        client = LocalBinClient(str(stub), tenant="tenant-x", actor_id=actor)
+        output = client.invoke("decisions.list", {"limit": 7}, if_match=3)
+        assert output == {"echo": {"limit": 7}}, output
+        argv = json.loads((local / "argv.json").read_text(encoding="utf-8"))
+        assert argv == [
+            "admin", "action", "invoke",
+            "--tenant", "tenant-x",
+            "--name", "decisions.list",
+            "--input", "/dev/stdin",
+            "--actor-id", actor,
+            "--if-match", "3",
+        ], argv
+        assert json.loads((local / "stdin.json").read_text(encoding="utf-8")) == {"limit": 7}
+        checks += 1
+
+        # 12. A non-zero binary exit is a SeedError naming the code and the stderr.
+        failing = local / "fail.py"
+        failing.write_text(
+            "#!/usr/bin/env python3\n"
+            "import sys\n"
+            "print('no seeded principal', file=sys.stderr)\n"
+            "sys.exit(3)\n",
+            encoding="utf-8",
+        )
+        failing.chmod(0o755)
+        try:
+            LocalBinClient(str(failing), actor_id=actor).invoke("decisions.list", {})
+        except SeedError as error:
+            assert "exited 3" in str(error), error
+            assert "no seeded principal" in str(error), error
+        else:
+            raise AssertionError("a non-zero local binary must raise SeedError")
+        checks += 1
+
+        # 13. A binary that prints anything but a JSON object is refused.
+        garbage = local / "garbage.py"
+        garbage.write_text(
+            "#!/usr/bin/env python3\nprint('hello from a log line')\n",
+            encoding="utf-8",
+        )
+        garbage.chmod(0o755)
+        try:
+            LocalBinClient(str(garbage), actor_id=actor).invoke("decisions.list", {})
+        except SeedError as error:
+            assert "not JSON" in str(error), error
+        else:
+            raise AssertionError("non-JSON local binary output must raise SeedError")
+        checks += 1
+
     print(f"self-test: {checks} checks passed")
 
 
@@ -1177,6 +1348,18 @@ def cli(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--token", default=os.environ.get("CONVEYOR_TOKEN"))
     parser.add_argument("--app-key", default=os.environ.get("CONVEYOR_APP_KEY"))
     parser.add_argument("--tenant", default=os.environ.get("CONVEYOR_TENANT"))
+    parser.add_argument(
+        "--local-bin",
+        default=os.environ.get("CONVEYOR_LOCAL_BIN"),
+        metavar="PATH",
+        help="run the branch-built binary's `admin action invoke` instead of HTTP",
+    )
+    parser.add_argument(
+        "--actor-id",
+        default=os.environ.get("CONVEYOR_ACTOR_ID"),
+        metavar="UUID",
+        help="principal recorded by --local-bin",
+    )
     parser.add_argument(
         "--approval-id",
         default=os.environ.get("CONVEYOR_APPROVAL_ID"),
@@ -1216,12 +1399,23 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     try:
-        client = ActionClient(
-            url=args.url,
-            token=args.token,
-            app_key=args.app_key,
-            tenant=args.tenant,
-        )
+        if args.local_bin:
+            client = LocalBinClient(
+                args.local_bin,
+                tenant=args.tenant,
+                actor_id=args.actor_id,
+            )
+        else:
+            if args.actor_id:
+                raise SeedError(
+                    "--actor-id requires --local-bin; the HTTP transport has no actor id"
+                )
+            client = ActionClient(
+                url=args.url,
+                token=args.token,
+                app_key=args.app_key,
+                tenant=args.tenant,
+            )
         writes = apply_register(register, client, approval_id=args.approval_id)
     except SeedError as error:
         print(f"apply: FAILED: {error}", file=sys.stderr)

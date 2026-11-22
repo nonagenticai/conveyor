@@ -1,0 +1,20 @@
+{
+  "actual_value": 18.0,
+  "benefit_id": "01a1e9df-0308-7fdc-8492-32db1e582a2d",
+  "evidence": {
+    "detail": {
+      "tool_calls": 18
+    },
+    "instrument": "count tool_call rows",
+    "reference": "B2",
+    "value": 18.0
+  },
+  "id": "01a204d3-87fa-7cfa-bd23-58cc06bfbe1a",
+  "kind": "baseline",
+  "measured_at": "2026-11-22T20:00:00Z",
+  "method": "count tool_call rows",
+  "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+  "target_value": null,
+  "tranche_id": null,
+  "unit": "tool_call rows"
+}
