@@ -2326,7 +2326,12 @@
       ],
       "failure_scenario": "coach.escalate opens a kata process run, but no kata.observe/measure/adopt action exists: an MCP client or the Improve screen cannot query the kata queue, record an observation/measurement or adopt the improvement, and the only way to advance it is the generic process_runs.start with a process key that must already be seeded. The systemic-improvement loop is not a discoverable API.",
       "acceptance": "Either the eight kata verbs are registered as ActionSpecs (list/read state included) or SPEC §10.4 replaces the family with the process-key design and documents how observe/measure/adopt are expressed; a registry or process-catalogue test covers the chosen contract.",
-      "owner_project": "PLATFORM"
+      "owner_project": "PLATFORM",
+      "resolved_by": {
+        "commit": "415a9e440d321c863615c20a130106e6212245fd",
+        "test": "crates/actions/tests/kata_gate.rs",
+        "evidence": "The kata family is now real: `kata.open|observe|analyse|propose|measure|adopt|propagate|close` plus the `kata.get|list` reads are registered ActionSpecs (registry 12/12 at 527, 504->514 internal; the served-spec lock carries all ten operations and --check-lock is 0), backed by migration 0067 (kata, kata_candidate, kata_measurement, kata_propagation). The Improve destination reads `kata.list` into its live queue. The five §12 T5 gates are proven through the action surface in crates/actions/tests/kata_gate.rs (9/9): unmeasurable kata refused, one open kata per signature, held-out split only, prediction before measurement, and a person other than the kata's opener or measurer decides adoption. The seeded process key `kata.open` and the action now coexist (different registries)."
+      }
     },
     {
       "id": "v1-w3b-6",
