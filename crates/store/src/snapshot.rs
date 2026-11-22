@@ -198,7 +198,7 @@ pub async fn snapshot_tx(
         &mut *conn,
         "SELECT COALESCE(jsonb_agg(to_jsonb(t) ORDER BY t.created_at, t.id), '[]'::jsonb) FROM (
              SELECT id, run_id, card_id, project_id, gate, kind, status, required_decisions,
-                    requested_by, expires_at, version, created_at, updated_at
+                    requested_by, expires_at, meta, version, created_at, updated_at
                FROM approval WHERE tenant_id = $1
          ) t",
         tenant_id,
@@ -792,7 +792,20 @@ pub async fn snapshot_tx(
     retain_ids(&mut run_steps, "run_id", &bound_runs);
     retain_ids(&mut comments, "card_id", &bound_cards);
     // An approval belongs to the programme when it names a bound project or hangs from a card
-    // of one; a gate with neither parent is an orphan and is not public.
+    // of one; a gate with neither parent is an orphan and is not public. The one exception is a
+    // gate a public record CITES: a contract's approval is an `architecture_board` decision with
+    // no project or card parent, and it is the contract's evidence — dropping it made every
+    // contract unprovable from the public record. It is kept because it is cited, never because
+    // it is parented, and its decisions follow through `bound_approvals`.
+    let cited_approvals: std::collections::HashSet<String> = architecture_contracts
+        .as_array()
+        .map(|rows| {
+            rows.iter()
+                .filter_map(|row| row.get("approval_id").and_then(Value::as_str))
+                .map(str::to_owned)
+                .collect()
+        })
+        .unwrap_or_default();
     if let Some(rows) = approvals.as_array_mut() {
         rows.retain(|row| {
             row.get("project_id")
@@ -802,6 +815,10 @@ pub async fn snapshot_tx(
                     .get("card_id")
                     .and_then(Value::as_str)
                     .is_some_and(|id| bound_cards.contains(id))
+                || row
+                    .get("id")
+                    .and_then(Value::as_str)
+                    .is_some_and(|id| cited_approvals.contains(id))
         });
     }
     let bound_approvals = ids_where(&approvals, "id", |_| true);
