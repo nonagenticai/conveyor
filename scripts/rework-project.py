@@ -769,10 +769,25 @@ class Runner:
             )
         print(f"  {category} output: body corrected and republished")
 
+    def decision_payload(self, approval_id: str, note: str) -> dict:
+        """The approvals.decide input, citing the published delegation.
+
+        Without `delegation_ref` the decision writer records the admin CLI's
+        actor kind (`service`) — the machine approving its own record. Every
+        gate this recorder decides is the assistant's rule decision under the
+        owner's published delegation, so the reference is not optional here.
+        """
+        return {
+            "approval_id": approval_id,
+            "decision": "approve",
+            "note": note,
+            "delegation_ref": self.delegation,
+        }
+
     def decide(self, approval_id: str, note: str, close_gate: bool = False) -> dict:
         self.invoke(
             "approvals.decide",
-            {"approval_id": approval_id, "decision": "approve", "note": note},
+            self.decision_payload(approval_id, note),
             actor=APPROVER,
             read_match=[f"id={approval_id}"],
         )
@@ -843,6 +858,13 @@ def self_test() -> None:
         raise SystemExit("self-test: a project without --keep-active must close")
     if runner(keep_active=True).closes_project():
         raise SystemExit("self-test: --keep-active did not stop the closure")
+    payload = default.decision_payload("01a2", "approved in the self-test")
+    if payload.get("delegation_ref") != default.delegation:
+        raise SystemExit(
+            "self-test: a gate decision must cite the published delegation, not decide as service"
+        )
+    if payload.get("decision") != "approve" or payload.get("approval_id") != "01a2":
+        raise SystemExit(f"self-test: the decision payload lost its shape: {payload}")
     print("rework-project: self-test ok")
 
 
