@@ -221,7 +221,12 @@ pub fn Organisation() -> impl IntoView {
     view! {
         <section class="screen">
             {move || {
-                let missing: Vec<&str> = ["industries.list", "job_catalogue.list"]
+                let missing: Vec<&str> = [
+                    "industries.list",
+                    "departments.list",
+                    "job_catalogue.list",
+                    "job_bindings.list",
+                ]
                     .into_iter()
                     .filter(|name| !ctx.has_action(name))
                     .collect();
