@@ -1692,8 +1692,6 @@ async fn record_bookkeeping(
     Ok(invocation_id)
 }
 
-/// Record a refused/error/timeout invocation in its own short transaction.
-#[allow(clippy::too_many_arguments)]
 /// Releases an un-settled idempotency claim when the invocation future is dropped (#577).
 ///
 /// An external claim is committed BEFORE the call, so a concurrent replay sees it — and that is
@@ -1773,6 +1771,8 @@ async fn release_claim(
     Ok(())
 }
 
+/// Record a refused/error/timeout invocation in its own short transaction.
+#[allow(clippy::too_many_arguments)]
 async fn record_failure(
     pool: &PgPool,
     spec: &crate::spec::ActionSpec,
