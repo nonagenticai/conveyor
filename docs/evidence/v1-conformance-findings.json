@@ -3881,7 +3881,12 @@
       "failure_scenario": "The acceptance map classifies built stages as absent, so scenarios and seams are designed against nonexistent gaps.",
       "acceptance": "Relabel every stage from the tree and re-cite actions.json.",
       "owner_project": "T12",
-      "disposition": "correct-the-claim"
+      "disposition": "correct-the-claim",
+      "resolved_by": {
+        "commit": "a151ef97d9c4ac556e78826f638c80538b2d9706",
+        "test": "docs/plans/inception/T12/01-inception-analysis.md",
+        "evidence": "The stage rows now read the tree: the lesson table (0056:10) and lessons actions, the architecture capability (0054:144 plus registered architecture.*), the incident lifecycle as card-backed; the stale grep citations are gone."
+      }
     },
     {
       "id": "v1-t15-1",
@@ -3911,7 +3916,12 @@
       "failure_scenario": "T15 plans aggregates and migrations 0055 already provides, risking conflicting or duplicate tool tables.",
       "acceptance": "Re-base on 0055 and correct the governed_asset kind set.",
       "owner_project": "T15",
-      "disposition": "correct-the-claim"
+      "disposition": "correct-the-claim",
+      "resolved_by": {
+        "commit": "a151ef97d9c4ac556e78826f638c80538b2d9706",
+        "test": "docs/plans/inception/T15/01-inception-analysis.md",
+        "evidence": "The tool-estate row now names 0055:102 and the registered tools.* actions, and the seed bindings are rows held by tool_binding; T15 is re-based on the BYO surface (v1-w4a-6), not on missing tables."
+      }
     },
     {
       "id": "v1-t17-1",
@@ -3946,7 +3956,12 @@
       "failure_scenario": "Scenario 3's precondition cannot hold, and the T16/T13 blockers overstate what is missing.",
       "acceptance": "Re-base on 0055, delete the false precondition, and keep only the procedures.draft/PDDL/PKO gaps.",
       "owner_project": "T17",
-      "disposition": "correct-the-claim"
+      "disposition": "correct-the-claim",
+      "resolved_by": {
+        "commit": "a151ef97d9c4ac556e78826f638c80538b2d9706",
+        "test": "docs/plans/inception/T17/01-inception-analysis.md",
+        "evidence": "The dependency block now records the built SOP actions and tool estate, keeps T16's PKO surface as the blocker, and retires the grep precondition 0055 satisfies."
+      }
     },
     {
       "id": "v1-u5a-budget-1",
