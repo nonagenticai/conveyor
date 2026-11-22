@@ -149,6 +149,11 @@ async fn projects_create(
             meta.insert(member.to_owned(), serde_json::Value::String(value.clone()));
         }
     }
+    // A test-created project says so at creation (v1-e2e-1); the public snapshot and the audit
+    // exclude the row and list it, rather than counting a proof fixture as programme work.
+    if input.test_row == Some(true) {
+        meta.insert("test_row".to_owned(), serde_json::Value::Bool(true));
+    }
 
     // An architecture project is born with its ADM phase nodes (T9): a phase gate with no
     // nodes to advance can never pass, so the rows are part of creating the project.

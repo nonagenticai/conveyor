@@ -103,6 +103,10 @@ pub struct ProjectCreateIn {
     /// An explicit key; absent means derived (`slug(title)`, uppercased, collision-suffixed).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub key: Option<String>,
+    /// Mark this row as test residue: the public pack excludes it and lists it under
+    /// `programme.test_projects` (v1-e2e-1). A real project never sets this.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub test_row: Option<bool>,
 }
 
 /// `projects.programme_meta` — the programme-owned keys, written under `portfolio:write`.

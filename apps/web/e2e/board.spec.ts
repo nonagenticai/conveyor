@@ -218,7 +218,11 @@ test("a board beyond 200 cards pages instead of hiding the tail", async ({ page,
 test("more than 50 projects page instead of hiding the tail", async ({ page, request }) => {
   const stamp = Date.now();
   for (let index = 0; index < 51; index += 1) {
-    await invoke(request, "projects.create", { title: `e2e paging project ${stamp} ${index}` });
+    await invoke(request, "projects.create", {
+      title: `e2e paging project ${stamp} ${index}`,
+      // v1-e2e-1: the 51 paging rows are fixtures, not programme work.
+      test_row: true,
+    });
   }
 
   await page.goto("/boards");

@@ -181,6 +181,8 @@ export async function createBoardCard(
     {
       title,
       project_type_code: "delivery",
+      // v1-e2e-1: a fixture is not programme work. The public pack excludes and lists it.
+      test_row: true,
     },
     undefined,
     login,
