@@ -5330,6 +5330,50 @@
       "failure_scenario": "An operator confirms a destructive action in the console; the request is refused 422 for missing evidence, and the UI shows a failure with no way to supply evidence or a waiver.",
       "acceptance": "The console's destructive gate request sends the gate's evidence or an explicit operator-entered evidence waiver reason, and a test asserts the payload plus a refused-without / accepted-with path; no silent hard-coded waiver.",
       "owner_project": "PLATFORM"
+    },
+    {
+      "id": "v1-manif-2",
+      "area": "acceptance manifest checks",
+      "standard": "SPEC",
+      "spec": "§12",
+      "severity": "P1",
+      "title": "Six acceptance checks pass rows that do not prove their property",
+      "problem": "A line audit of verify-project.py against the manifests' descriptions finds six checks that accept a false green: project_baseline accepts any row with a non-empty approved_by (no distinctness from taken_by, no frozen snapshot); contract trusts the contract's own approval_id/requested_by/approved_by without resolving the approval or a decision; review accepts any published delegation_ref from a review of a superseded contract and ignores the compliance level; closure_gate accepts any historical approved gate, not the latest, and ignores its target; pi_cadence and lessons assert existence only (a cadence row or any lesson linked by cadence_id), with no statement or evidence. A project can therefore pass its P0 manifest on rows that prove nothing.",
+      "evidence": [
+        {
+          "path": "scripts/verify-project.py",
+          "line": 214,
+          "quote": "    approved = [baseline for baseline in baselines if baseline.get(\"approved_by\")]"
+        },
+        {
+          "path": "scripts/verify-project.py",
+          "line": 233,
+          "quote": "        if approval and requester and approver and requester != approver:"
+        },
+        {
+          "path": "scripts/verify-project.py",
+          "line": 250,
+          "quote": "        if reference and snapshot.published_id(str(reference)):"
+        },
+        {
+          "path": "scripts/verify-project.py",
+          "line": 275,
+          "quote": "            if decision.get(\"approver_id\") and decision.get(\"approver_id\") != gate.get(\"requested_by\")"
+        },
+        {
+          "path": "scripts/verify-project.py",
+          "line": 398,
+          "quote": "    if not pi:"
+        },
+        {
+          "path": "scripts/verify-project.py",
+          "line": 457,
+          "quote": "        if lesson.get(\"cadence_id\") in retro_ids"
+        }
+      ],
+      "failure_scenario": "A self-approved or stale baseline, a pasted approval id, a review of a superseded contract, any old closure gate, a sibling's cadence or a content-free lesson all satisfy a P0 manifest; the programme accepts a red record as done.",
+      "acceptance": "Each check proves its property: a baseline's approver is distinct from its taker and its snapshot is frozen; a contract's approval_id resolves to an approved gate with a distinct decision; a review belongs to the project's live contract and is compliant (or actively waived); the closure gate is the latest and names project/<id>/close; the PI and refinement cadences are the tranche's; a lesson carries a statement and evidence. Each rule has a self-test case that fails on a crafted weak row.",
+      "owner_project": "PLATFORM"
     }
   ]
 }
