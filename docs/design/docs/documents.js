@@ -1041,8 +1041,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/slices/S04-action-registry.html",
       "source": "docs/plans/slices/S04-action-registry.md",
       "section": "Plans",
-      "sha256": "4721e81552ac49eb099c635c1e3163ccad3ba7d36d35139df75c783494f7d85d",
-      "bytes": 16539,
+      "sha256": "e1f3896cecea77e4238ddddfb91d73829499c9ad358f7fd124699eaed9be6672",
+      "bytes": 17629,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S04-action-registry.md"
     },
     {
