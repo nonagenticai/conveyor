@@ -42,8 +42,8 @@
       "path": "docs/SPEC_V2.html",
       "source": "docs/SPEC_V2.md",
       "section": "Spec",
-      "sha256": "e7b6a666c2b3a57294cf9517404d4e26fbd6745febeafe0a243c3a597233a663",
-      "bytes": 170681,
+      "sha256": "b89373353090539673c6115060d4cec3ea0c1a804e87b8d673cebd2c39cbc270",
+      "bytes": 170686,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/SPEC_V2.md"
     },
     {
@@ -398,6 +398,15 @@
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/analysis-capture-2026-11-15.md"
     },
     {
+      "title": "Token spend per accepted deliverable — pre-transition baseline",
+      "path": "docs/evidence/benefits/token-spend-baseline.html",
+      "source": "docs/evidence/benefits/token-spend-baseline.md",
+      "section": "Evidence",
+      "sha256": "ab5219fe8f61cc74ed63eff6d44c2ffa0492d6e2ae4cabb898c54614c0198f24",
+      "bytes": 2927,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/benefits/token-spend-baseline.md"
+    },
+    {
       "title": "MSP/TOGAF conformance gap register",
       "path": "docs/evidence/conformance-gap-register.html",
       "source": "docs/evidence/conformance-gap-register.md",
@@ -717,8 +726,8 @@
       "path": "docs/plans/00-INDEX.html",
       "source": "docs/plans/00-INDEX.md",
       "section": "Plans",
-      "sha256": "aef99a3088bc2666a6598df665221afb32c6abbd9e6a93c893b6176000ffcbda",
-      "bytes": 250980,
+      "sha256": "786145e9cfcb9b70a49555ec245d4c423f94319d8c977f7518a47213cd04dffc",
+      "bytes": 251347,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/00-INDEX.md"
     },
     {
@@ -726,8 +735,8 @@
       "path": "docs/plans/01-CONTRACT.html",
       "source": "docs/plans/01-CONTRACT.md",
       "section": "Plans",
-      "sha256": "4327b4c9dc6cfa6526995d70ea2d6c423f3878ef62ad115b37bb287d9ddb3080",
-      "bytes": 65664,
+      "sha256": "9ca19a82b56c4002f19e6f38bbc8c8a0a67cd68f12608cc5e96dcb50af62860e",
+      "bytes": 65869,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/01-CONTRACT.md"
     },
     {
@@ -1086,8 +1095,8 @@
       "path": "docs/plans/slices/S06d-connector-standard.html",
       "source": "docs/plans/slices/S06d-connector-standard.md",
       "section": "Plans",
-      "sha256": "525f40e88ca51ace2068e7d32f3241ab0abb3fbf422fd49c9ae1e4c6038174ef",
-      "bytes": 7009,
+      "sha256": "fd5af704226ac75fca1f845e2931bce976c2a1aff7f08a2fc9f55744540fffb4",
+      "bytes": 7402,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S06d-connector-standard.md"
     },
     {
@@ -1167,8 +1176,8 @@
       "path": "docs/plans/slices/S15-capability-knowledge-memory.html",
       "source": "docs/plans/slices/S15-capability-knowledge-memory.md",
       "section": "Plans",
-      "sha256": "0ba000f093af78ea5f68c75cc2ee5103544d0968fc0681849fc640ae3fe5e3c6",
-      "bytes": 29889,
+      "sha256": "9067a85b1b1d9537a588c523d3e41d3ec6ffa23aaf0b96b1cc2a4956e30ec3cd",
+      "bytes": 30282,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S15-capability-knowledge-memory.md"
     },
     {
@@ -1176,8 +1185,8 @@
       "path": "docs/plans/slices/S16-inference-audit.html",
       "source": "docs/plans/slices/S16-inference-audit.md",
       "section": "Plans",
-      "sha256": "146208d26ae8f684b7ff9eb47623a0096b53c94ce5969534c90df7e7693d85c4",
-      "bytes": 24131,
+      "sha256": "12069dba85c8f59e3823ffbd23d0cad329ab8c56791a645fd451f8cfd177b695",
+      "bytes": 24524,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S16-inference-audit.md"
     },
     {
@@ -1185,8 +1194,8 @@
       "path": "docs/plans/slices/S17-benchmark-harness.html",
       "source": "docs/plans/slices/S17-benchmark-harness.md",
       "section": "Plans",
-      "sha256": "3bb7c054ffddab33ba62163d7969a4832313adedced8c8ba7387b8ca81c52b65",
-      "bytes": 16386,
+      "sha256": "457a40697cf3216490bcf0bf718616cfa94c79105495b127a431bb3a08f8d523",
+      "bytes": 16779,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S17-benchmark-harness.md"
     },
     {
@@ -1203,8 +1212,8 @@
       "path": "docs/plans/slices/S19-eval-builder.html",
       "source": "docs/plans/slices/S19-eval-builder.md",
       "section": "Plans",
-      "sha256": "a301bf697c50acd70e23ea6ee309f91839b5bc95b60c5083a59ae1d863453043",
-      "bytes": 22557,
+      "sha256": "bc3ae71d4d2be786a099497e55a6c81cb31c34969f193bcda8a25c3b899510c9",
+      "bytes": 22950,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S19-eval-builder.md"
     },
     {
@@ -1212,8 +1221,8 @@
       "path": "docs/plans/slices/S20-eval-hillclimb.html",
       "source": "docs/plans/slices/S20-eval-hillclimb.md",
       "section": "Plans",
-      "sha256": "b3fa237121c8a38186c333f826f94e8ee9d21b7ac8774a7c5f933b1bb397e038",
-      "bytes": 15685,
+      "sha256": "d27a21c0cf30bc3d5fe25b4a06f27d39bf94d1f3c7093a7acfcbbc0df7731191",
+      "bytes": 16078,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S20-eval-hillclimb.md"
     },
     {
@@ -1221,8 +1230,8 @@
       "path": "docs/plans/slices/S21-message-construction.html",
       "source": "docs/plans/slices/S21-message-construction.md",
       "section": "Plans",
-      "sha256": "a78024dd459c2aa659cecf9791e8c3aee8f844161bae993d97e5c827431aa021",
-      "bytes": 19218,
+      "sha256": "3db41eba341f3983658b865578ed21a1cf6550f09179b8541d2c4a8dd074ca05",
+      "bytes": 19611,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S21-message-construction.md"
     }
   ]

@@ -3568,6 +3568,9 @@ pub async fn credit_demo_tx(
     if evidence.as_array().is_none_or(|refs| refs.is_empty()) {
         return Err(PlanStoreError::Illegal(PlanError::DemoEvidenceMissing));
     }
+    if !typed_evidence(&evidence) {
+        return Err(PlanStoreError::Illegal(PlanError::DemoEvidenceUntyped));
+    }
     let inserted: Option<Uuid> = sqlx::query_scalar(
         "INSERT INTO programme_demo_credit (tenant_id, cadence_id, deliverable_id, evidence)
          VALUES ($1, $2, $3, $4)
@@ -3593,6 +3596,22 @@ pub async fn credit_demo_tx(
         .await
         .map_err(PlanStoreError::Database),
     }
+}
+
+/// Whether an evidence array carries typed refs: every item is a non-empty string or an object
+/// with at least one non-empty string value. The live rework refs are path strings; a blank
+/// string, null or an empty object is not something a demo can exhibit.
+fn typed_evidence(evidence: &Value) -> bool {
+    evidence.as_array().is_some_and(|refs| {
+        !refs.is_empty()
+            && refs.iter().all(|item| match item {
+                Value::String(text) => !text.trim().is_empty(),
+                Value::Object(fields) => fields
+                    .values()
+                    .any(|value| value.as_str().is_some_and(|text| !text.trim().is_empty())),
+                _ => false,
+            })
+    })
 }
 
 /// A demo credit row.
@@ -3894,6 +3913,17 @@ pub async fn close_retro_tx(
     tenant: TenantId,
     cadence_id: Uuid,
 ) -> Result<(), PlanStoreError> {
+    let cadence = get_cadence_tx(&mut *conn, tenant, cadence_id)
+        .await?
+        .ok_or(PlanStoreError::NotFound {
+            what: "cadence row",
+        })?;
+    if cadence.kind != "retro" {
+        return Err(PlanStoreError::Illegal(PlanError::CadenceWrongKind {
+            expected: "retro",
+            actual: cadence.kind.clone(),
+        }));
+    }
     let card: Option<(Uuid, Value)> = sqlx::query_as(
         "SELECT id, meta FROM card WHERE tenant_id = $1 AND meta->>'cadence_id' = $2 LIMIT 1",
     )
@@ -3924,11 +3954,90 @@ pub async fn close_retro_tx(
         .bind(&key)
         .fetch_one(&mut *conn)
         .await?;
-        if !present {
-            return Err(PlanStoreError::Illegal(
-                PlanError::RetroFindingWithoutLesson(key),
-            ));
+        if present {
+            continue;
         }
+        // A finding carries its lesson: the statement and the evidence refs. A close with no
+        // lesson content is refused, and the whole transaction writes nothing.
+        let statement = finding
+            .get("statement")
+            .and_then(Value::as_str)
+            .unwrap_or_default()
+            .trim()
+            .to_owned();
+        let evidence = finding.get("evidence").cloned().unwrap_or(Value::Null);
+        if statement.is_empty() || !evidence.as_array().is_some_and(|refs| !refs.is_empty()) {
+            return Err(PlanStoreError::Illegal(PlanError::RetroFindingIncomplete(
+                key,
+            )));
+        }
+        let systemic = finding
+            .get("systemic")
+            .and_then(Value::as_bool)
+            .unwrap_or(false)
+            || finding.get("kind").and_then(Value::as_str) == Some("systemic");
+        let lesson_meta = if systemic {
+            // A systemic finding names the improvement it believes is worth opening; the kata
+            // gate (`kata.open`) validates measurability and refuses an unmeasurable one. The
+            // close never opens a kata itself (T5's gate is the only opener).
+            let kata = finding.get("kata").cloned().unwrap_or(Value::Null);
+            let signature = kata
+                .get("signature")
+                .and_then(Value::as_str)
+                .unwrap_or_default()
+                .trim()
+                .to_owned();
+            let title = kata
+                .get("title")
+                .and_then(Value::as_str)
+                .unwrap_or_default()
+                .trim()
+                .to_owned();
+            let rationale = kata
+                .get("rationale")
+                .and_then(Value::as_str)
+                .unwrap_or_default()
+                .to_owned();
+            let target_ref = kata.get("target_ref").cloned().unwrap_or(Value::Null);
+            if signature.is_empty() || title.is_empty() || !target_ref.is_object() {
+                return Err(PlanStoreError::Illegal(PlanError::RetroFindingIncomplete(
+                    key,
+                )));
+            }
+            serde_json::json!({
+                "kata_candidate": {
+                    "signature": signature,
+                    "title": title,
+                    "rationale": rationale,
+                    "target_ref": target_ref,
+                    "prediction": Value::Null,
+                }
+            })
+        } else {
+            serde_json::json!({})
+        };
+        let independent_count = i32::try_from(
+            evidence
+                .as_array()
+                .map(|refs| refs.len())
+                .unwrap_or_default(),
+        )
+        .unwrap_or(i32::MAX);
+        sqlx::query(
+            "INSERT INTO lesson (tenant_id, programme_id, cadence_id, finding_key, statement,
+                                 evidence, independent_count, state, source, meta)
+             VALUES ($1, $2, $3, $4, $5, $6, $7, 'proposed', 'retro', $8)",
+        )
+        .bind(tenant.as_uuid())
+        .bind(cadence.programme_id)
+        .bind(cadence_id)
+        .bind(&key)
+        .bind(&statement)
+        .bind(&evidence)
+        .bind(independent_count)
+        .bind(&lesson_meta)
+        .execute(&mut *conn)
+        .await?;
     }
     sqlx::query(
         "UPDATE card
