@@ -1,0 +1,22 @@
+{
+ "project_id": "01a1d039-0d28-7eb6-a62a-f420e742595c",
+ "contract_id": "01a2054c-4cab-752d-a62d-9446c9274d70",
+ "level": "conformant",
+ "findings": [
+  {
+   "finding": "One registry serves every transport; the parity test proves HTTP and MCP from the same declaration.",
+   "status": "met"
+  }
+ ],
+ "evidence": [
+  {
+   "kind": "lock",
+   "ref": "served-spec.lock.json at a9a5f20a"
+  },
+  {
+   "kind": "test",
+   "ref": "crates/actions/tests/parity_http_mcp.rs"
+  }
+ ],
+ "delegation_ref": "01a2021d-cca2-757c-bfc2-21bd4e4b6d85"
+}

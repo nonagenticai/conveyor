@@ -1,0 +1,16 @@
+{
+ "id": "01a1d039-0d28-7eb6-a62a-f420e742595c",
+ "closure": "# S04 \u2014 Closure review (2026-11-22)\n\nPublished closure review: `01a2054b-77a8-75e8-919c-bf0a41dc6aaa`.\n\n## Outcome vs acceptance\n\nThe S04 gate is met by the live rows: both deliverables accepted with evidence under change\n`01a2054b-3f86\u2026`, the registry at 549 actions and 580 served operations, the contract live and\nreviewed compliant.\n\n## Evidence\n\nThe published closure review `01a2054b-77a8-75e8-919c-bf0a41dc6aaa` carries the full evidence; `acceptance/programme/S04.toml`\nexecuted against this record is the gate.\n\n## Open items\n\nThe work packages are the deliverables' decomposition, not outstanding scope; the programme's v1\nbacklog is carried on the rework board.\n\n## Decision\n\nClose.\n",
+ "delegation_ref": "01a2021d-cca2-757c-bfc2-21bd4e4b6d85",
+ "evidence": [
+  {
+   "kind": "document",
+   "ref": "01a2054b-77a8-75e8-919c-bf0a41dc6aaa"
+  },
+  {
+   "kind": "baseline",
+   "ref": "01a20256-44d0-731d-b345-fffc5f3ac9e8"
+  }
+ ],
+ "reason": "The record is complete against the manifest; the closure review is published and nothing is waived."
+}
