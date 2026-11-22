@@ -111,7 +111,7 @@ async fn run(request: RunRequest<'_>) -> Result<(), ExecutorFailure> {
     let mut tx = store::begin_scoped(pool, tenant)
         .await
         .map_err(|error| ExecutorFailure::retryable(format!("database: {error}")))?;
-    let agent = store::capability::get_agent_tx(&mut *tx, tenant, agent_id)
+    let agent = store::capability::get_agent_tx(&mut tx, tenant, agent_id)
         .await
         .map_err(|error| ExecutorFailure::retryable(format!("database: {error}")))?
         .ok_or_else(|| ExecutorFailure::permanent("the binding's capability agent is gone"))?;
@@ -169,13 +169,13 @@ async fn run(request: RunRequest<'_>) -> Result<(), ExecutorFailure> {
     }
     // The prompt facts read the run's capability; a `runs.create` run has none until now.
     let capability_id = binding.capability_id.or(Some(agent.capability_id));
-    store::run::bind_executor_tx(&mut *tx, tenant, run_id, capability_id, Some(agent_id))
+    store::run::bind_executor_tx(&mut tx, tenant, run_id, capability_id, Some(agent_id))
         .await
         .map_err(|error| ExecutorFailure::retryable(format!("database: {error}")))?;
 
     // A configured gate that cannot decide must refuse before the run spends a model call.
     let policy =
-        store::ladder::effective_policy_tx(&mut *tx, tenant, GATE_KIND, anatomy.gate.as_deref())
+        store::ladder::effective_policy_tx(&mut tx, tenant, GATE_KIND, anatomy.gate.as_deref())
             .await
             .map_err(|error| ExecutorFailure::retryable(format!("database: {error}")))?;
     if let Some(policy) = &policy {
@@ -295,7 +295,7 @@ async fn run(request: RunRequest<'_>) -> Result<(), ExecutorFailure> {
         }
         Err(error) => {
             let detail = format!("{}: {}", error.code, error.detail);
-            finish_step_failed(pool, tenant, run_id, step_id, &detail).await?;
+            finish_step_failed(pool, tenant, run_id, &detail).await?;
             let mut tx = store::begin_scoped(pool, tenant)
                 .await
                 .map_err(|error| ExecutorFailure::retryable(format!("database: {error}")))?;
@@ -319,7 +319,7 @@ async fn run(request: RunRequest<'_>) -> Result<(), ExecutorFailure> {
     let meta = draft_meta(run_id, binding.id, &binding.release_hash, &model_ref, &out);
     let Some(actor_id) = actor_id else {
         let detail = "the tenant has no active member for an agent run to act as".to_owned();
-        finish_step_failed(pool, tenant, run_id, step_id, &detail).await?;
+        finish_step_failed(pool, tenant, run_id, &detail).await?;
         let mut tx = store::begin_scoped(pool, tenant)
             .await
             .map_err(|error| ExecutorFailure::retryable(format!("database: {error}")))?;
@@ -390,7 +390,7 @@ async fn run(request: RunRequest<'_>) -> Result<(), ExecutorFailure> {
                 "internal_agent.empty_output"
             };
             let detail = format!("documents.compose: {}: {}", error.code, error.detail);
-            finish_step_failed(pool, tenant, run_id, step_id, &detail).await?;
+            finish_step_failed(pool, tenant, run_id, &detail).await?;
             let mut tx = store::begin_scoped(pool, tenant)
                 .await
                 .map_err(|error| ExecutorFailure::retryable(format!("database: {error}")))?;
@@ -431,7 +431,7 @@ async fn run(request: RunRequest<'_>) -> Result<(), ExecutorFailure> {
     });
     let duration_ms = i32::try_from(started.elapsed().as_millis()).ok();
     store::workflow::run::finish_step_tx(
-        &mut *tx,
+        &mut tx,
         tenant,
         run_id,
         1,
@@ -444,7 +444,7 @@ async fn run(request: RunRequest<'_>) -> Result<(), ExecutorFailure> {
     )
     .await
     .map_err(|error| ExecutorFailure::retryable(format!("database: {error}")))?;
-    store::process::record_run_step_judge_tx(&mut *tx, tenant, step_id, &gate.judge)
+    store::process::record_run_step_judge_tx(&mut tx, tenant, step_id, &gate.judge)
         .await
         .map_err(|error| ExecutorFailure::retryable(format!("database: {error}")))?;
     match gate.refusal {
@@ -459,7 +459,7 @@ async fn run(request: RunRequest<'_>) -> Result<(), ExecutorFailure> {
             )
             .await?;
         }
-        None => finish_succeeded(&mut *tx, tenant, app_key, run_id).await?,
+        None => finish_succeeded(&mut tx, tenant, app_key, run_id).await?,
     }
     tx.commit()
         .await
@@ -484,15 +484,13 @@ async fn finish_step_failed(
     pool: &PgPool,
     tenant: TenantId,
     run_id: Uuid,
-    step_id: Uuid,
     detail: &str,
 ) -> Result<(), ExecutorFailure> {
-    let _ = step_id;
     let mut tx = store::begin_scoped(pool, tenant)
         .await
         .map_err(|error| ExecutorFailure::retryable(format!("database: {error}")))?;
     store::workflow::run::finish_step_tx(
-        &mut *tx,
+        &mut tx,
         tenant,
         run_id,
         1,
@@ -532,7 +530,7 @@ async fn decide(
         .await
         .map_err(|error| ExecutorFailure::retryable(format!("database: {error}")))?;
     let policy =
-        store::ladder::effective_policy_tx(&mut *tx, tenant, GATE_KIND, anatomy.gate.as_deref())
+        store::ladder::effective_policy_tx(&mut tx, tenant, GATE_KIND, anatomy.gate.as_deref())
             .await
             .map_err(|error| ExecutorFailure::retryable(format!("database: {error}")))?;
     tx.commit()
@@ -772,7 +770,7 @@ async fn open_handover(
         .map_err(|error| ExecutorFailure::retryable(format!("database: {error}")))?;
     let ctx = service_ctx(tenant, Some(actor_id), app_key, "run.execute");
     store::approval::open_gate_tx(
-        &mut *tx,
+        &mut tx,
         tenant,
         run.id,
         "gate.precheck",
@@ -784,7 +782,7 @@ async fn open_handover(
     .await
     .map_err(|error| ExecutorFailure::retryable(format!("database: {error}")))?;
     crate::board::events::append_raw_event(
-        &mut *tx,
+        &mut tx,
         &ctx,
         &crate::board::events::RawEvent {
             topic: format!("run:{}", run.id),

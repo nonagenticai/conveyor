@@ -207,39 +207,6 @@ async fn seed_job(
     (job.id, release.id)
 }
 
-/// Pin the release to one executor through the store's own validation.
-async fn bind(
-    pg: &support::Pg,
-    seeded: &support::Seeded,
-    job: Uuid,
-    release: Uuid,
-    kind: ExecutorKind,
-    agent: Uuid,
-) -> Uuid {
-    let mut tx = begin_scoped(&pg.runtime, seeded.tenant)
-        .await
-        .expect("scope");
-    let binding = job_binding_create_tx(
-        &mut tx,
-        seeded.tenant,
-        &store::organisation::NewBinding {
-            job_id: job,
-            release_id: release,
-            executor_kind: kind,
-            process_id: None,
-            capability_agent_id: Some(agent),
-            capability_id: None,
-            meta: json!({}),
-            status: conveyor_domain::organisation::BindingStatus::Active,
-        },
-        &conveyor_domain::executor::Registry::builtin(),
-    )
-    .await
-    .expect("binding");
-    tx.commit().await.expect("commit");
-    binding.id
-}
-
 /// Pin the release to a kind the built-in registry refuses, bypassing `job_bindings.create`
 /// (the raw row is the superuser-level fixture for the refusal itself).
 async fn bind_raw(

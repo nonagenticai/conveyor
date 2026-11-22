@@ -1032,13 +1032,14 @@ async fn a_granted_tool_above_the_grant_ceiling_is_not_offered() {
 
     execute(&pg, &seeded, run).await;
 
-    let bodies = bodies.lock().expect("bodies");
-    assert!(
-        bodies[0].get("tools").is_none(),
-        "a tool above the grant ceiling is not offered: {}",
-        bodies[0]
-    );
-    drop(bodies);
+    {
+        let bodies = bodies.lock().expect("bodies");
+        assert!(
+            bodies[0].get("tools").is_none(),
+            "a tool above the grant ceiling is not offered: {}",
+            bodies[0]
+        );
+    }
     let calls: i64 = scalar(
         &pg,
         seeded.tenant,

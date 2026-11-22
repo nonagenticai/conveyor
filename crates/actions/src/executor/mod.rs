@@ -237,7 +237,7 @@ pub async fn execute_run(
     let mut tx = store::begin_scoped(pool, tenant)
         .await
         .map_err(|error| ExecutorFailure::retryable(format!("database: {error}")))?;
-    let Some(run) = store::run::get_run_context_tx(&mut *tx, tenant, run_id)
+    let Some(run) = store::run::get_run_context_tx(&mut tx, tenant, run_id)
         .await
         .map_err(|error| ExecutorFailure::retryable(format!("database: {error}")))?
     else {
@@ -263,10 +263,10 @@ pub async fn execute_run(
     // is what `projects.execute` creates. It keeps working exactly as before this unit.
     let Some(binding_id) = run.job_binding_id else {
         let ctx = service_ctx(tenant, None, app_key, "run.execute");
-        match store::run::transition_run_tx(&mut *tx, tenant, run_id, RunStatus::Running).await {
+        match store::run::transition_run_tx(&mut tx, tenant, run_id, RunStatus::Running).await {
             Ok(started) => {
                 emit_run_event(
-                    &mut *tx,
+                    &mut tx,
                     &ctx,
                     run_id,
                     "run.started",
@@ -479,10 +479,10 @@ pub async fn execute_run(
 
     // The run is valid: start it, then dispatch outside the resolution transaction.
     let ctx = service_ctx(tenant, None, app_key, "run.execute");
-    match store::run::transition_run_tx(&mut *tx, tenant, run_id, RunStatus::Running).await {
+    match store::run::transition_run_tx(&mut tx, tenant, run_id, RunStatus::Running).await {
         Ok(started) => {
             emit_run_event(
-                &mut *tx,
+                &mut tx,
                 &ctx,
                 run_id,
                 "run.started",
