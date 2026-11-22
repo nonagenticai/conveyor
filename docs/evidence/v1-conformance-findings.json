@@ -44,12 +44,12 @@
       "evidence": [
         {
           "path": "crates/actions/src/spine/mod.rs",
-          "line": 1370,
+          "line": 1377,
           "quote": "        && !matches!(status, \"open\" | \"accepted\" | \"cancelled\")"
         },
         {
           "path": "crates/actions/src/spine/mod.rs",
-          "line": 1391,
+          "line": 1398,
           "quote": "        status: input.status,"
         },
         {
@@ -102,7 +102,7 @@
       "evidence": [
         {
           "path": "crates/actions/src/spine/mod.rs",
-          "line": 1370,
+          "line": 1377,
           "quote": "        && !matches!(status, \"open\" | \"accepted\" | \"cancelled\")"
         },
         {
@@ -112,7 +112,7 @@
         },
         {
           "path": "crates/actions/src/spine/mod.rs",
-          "line": 1565,
+          "line": 1572,
           "quote": "                \"change_request_required\","
         }
       ],
@@ -894,7 +894,7 @@
       "evidence": [
         {
           "path": "crates/actions/src/spine/mod.rs",
-          "line": 3255,
+          "line": 3262,
           "quote": "            state: input.state,"
         },
         {
@@ -1546,7 +1546,7 @@
       "evidence": [
         {
           "path": "crates/actions/src/spine/mod.rs",
-          "line": 1773,
+          "line": 1780,
           "quote": "        input.status.as_deref(),"
         },
         {
@@ -1652,12 +1652,12 @@
       "evidence": [
         {
           "path": "crates/actions/src/control/approvals.rs",
-          "line": 464,
+          "line": 467,
           "quote": "/// SPEC_V2 §11.4: `destructive` = approval + dry-run + dual control. The approval row is the"
         },
         {
           "path": "crates/actions/src/control/approvals.rs",
-          "line": 499,
+          "line": 502,
           "quote": "    if record.approval.status != ApprovalStatus::Approved {"
         },
         {
@@ -2005,12 +2005,12 @@
       "evidence": [
         {
           "path": "crates/actions/src/spine/mod.rs",
-          "line": 2414,
+          "line": 2421,
           "quote": "            capabilities: input.capabilities.unwrap_or_else(|| serde_json::json!([])),"
         },
         {
           "path": "crates/actions/src/spine/mod.rs",
-          "line": 2419,
+          "line": 2426,
           "quote": "            operational_area: input.operational_area.unwrap_or_default(),"
         },
         {
@@ -2049,7 +2049,7 @@
         },
         {
           "path": "crates/actions/src/spine/mod.rs",
-          "line": 2514,
+          "line": 2521,
           "quote": "            output_ref: input.output_ref,"
         }
       ],
@@ -2073,7 +2073,7 @@
       "evidence": [
         {
           "path": "crates/actions/src/spine/mod.rs",
-          "line": 3255,
+          "line": 3262,
           "quote": "            state: input.state,"
         },
         {
@@ -2112,7 +2112,7 @@
         },
         {
           "path": "crates/actions/src/spine/mod.rs",
-          "line": 1773,
+          "line": 1780,
           "quote": "        input.status.as_deref(),"
         },
         {
@@ -2170,7 +2170,7 @@
         },
         {
           "path": "crates/actions/src/spine/mod.rs",
-          "line": 1250,
+          "line": 1257,
           "quote": "    name = \"wbs.create\","
         }
       ],
@@ -2636,7 +2636,7 @@
         },
         {
           "path": "crates/store/src/approval.rs",
-          "line": 850,
+          "line": 853,
           "quote": "            match approval_policy::allows_self_approval(&mut *conn, tenant, &row.gate).await {"
         }
       ],
@@ -3189,12 +3189,12 @@
       "evidence": [
         {
           "path": "crates/actions/src/control/views.rs",
-          "line": 360,
+          "line": 366,
           "quote": "    pub require_evidence: bool,"
         },
         {
           "path": "crates/actions/src/control/approvals.rs",
-          "line": 426,
+          "line": 429,
           "quote": "        input.require_evidence,"
         }
       ],
@@ -4416,7 +4416,7 @@
         },
         {
           "path": "crates/actions/src/spine/mod.rs",
-          "line": 1715,
+          "line": 1722,
           "quote": "            links: input.links.unwrap_or_else(|| serde_json::json!([])),"
         },
         {
@@ -4618,7 +4618,7 @@
         },
         {
           "path": "crates/actions/src/spine/mod.rs",
-          "line": 1567,
+          "line": 1574,
           "quote": "                    \"project {project_id} already holds an approved {kind} baseline ({}); a new \\"
         },
         {
@@ -5130,12 +5130,12 @@
       "evidence": [
         {
           "path": "crates/store/src/approval.rs",
-          "line": 873,
+          "line": 891,
           "quote": "    if eval_gate.is_some() {"
         },
         {
           "path": "crates/store/src/approval.rs",
-          "line": 874,
+          "line": 892,
           "quote": "        if decision.decided_by_kind != DeciderKind::Human {"
         },
         {
