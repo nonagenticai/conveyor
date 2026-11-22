@@ -5427,7 +5427,12 @@
       ],
       "failure_scenario": "An unmeasured benefit profile, two absent WSJF inputs, a 'TBD' demo credit, an unpublished PI plan titled for another tranche, or an open P0 package with no owner all pass a manifest that claims them.",
       "acceptance": "benefit_baseline requires every profile's baseline to be a structured measurement with value, unit, measured_at, method and evidence (a string never passes); wsjf requires all four typed inputs present, job_size >= 1 and not all value inputs zero; demo_credits rejects placeholder evidence; _published_for_period requires published_at and a whole-token period match; product_findings fails when the register lacks packages or an open P0 has no owner, and matches an owner by key or project id. Each rule has a crafted self-test that fails the weak row.",
-      "owner_project": "PLATFORM"
+      "owner_project": "PLATFORM",
+      "resolved_by": {
+        "commit": "2d3c050684a282fbf745734b9b2b1a3972ac65fc",
+        "test": "scripts/verify-project.py",
+        "evidence": "The five checks now resolve their property: benefit_baseline requires a structured measurement (value, unit, measured_at, method, evidence) and refuses strings; wsjf requires all four inputs present as JSON integers with job_size >= 1 and not all values zero; demo_credits refuses placeholder evidence; _published_for_period requires published_at and a whole-token tranche match; product_findings fails a register without packages, fails an ownerless open P0, and matches the owner by key or project id. Self-test green with one crafted failing case per rule (benefit-string-baseline, wsjf-missing-input, credit-placeholder-evidence, pi-plan-draft-tranche-40, no-packages). On the branch-built snapshot the programme stays 12 green / 35 red — the rigour binds as records arrive."
+      }
     }
   ]
 }
