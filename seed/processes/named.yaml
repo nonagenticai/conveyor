@@ -1,7 +1,7 @@
 # named.yaml — the catalogue's NAMED processes (schema + rules: seed/processes/README.md).
 #
 # The 53 processes that are not a card type's four list stages: the 51 `cap.<family>.<fn>` capability
-# processes measured in `parity/n8n-dispositions.tsv` (`procedure:` rows), `ask_fr`, and `kata.open`
+# processes measured in `parity/flow-dispositions.tsv` (`procedure:` rows), `ask_fr`, and `kata.open`
 # (SPEC D20, S13). A named process has no card type and no list stage (`list` is absent — `ProcessSpec`
 # reads a missing `list` as null), so nothing here moves a card: each process runs one agent step
 # against one SOP and returns its answer to the caller, which writes.

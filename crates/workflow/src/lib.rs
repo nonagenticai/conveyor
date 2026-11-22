@@ -17,8 +17,8 @@ pub mod agent;
 pub mod definition;
 pub mod engine;
 pub mod expect;
-pub mod n8n;
 pub mod nodes;
+pub mod recorded_flow;
 pub mod scheduler;
 pub mod trace;
 

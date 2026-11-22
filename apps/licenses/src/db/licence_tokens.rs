@@ -220,7 +220,7 @@ impl RefusalCode {
                 "a long-lived token is perpetual: drop expires_days or long_lived"
             }
             Self::LongLivedNotPermitted => {
-                "long-lived is allowed for internal/node, and for api only on the n8n \
+                "long-lived is allowed for internal/node, and for api only on the legacy \
                  licence-token tenants; pass expires_days instead"
             }
             Self::PerpetualTokenNotRegistered => {
@@ -455,7 +455,7 @@ pub async fn create_token(
     Ok((row, raw_token))
 }
 
-/// The n8n path is decided by the LICENCE's tenant row, never a header: `{id, name}`.
+/// The legacy tenant path is decided by the LICENCE's tenant row, never a header: `{id, name}`.
 async fn tenant_keys_for_licence(
     pool: &PgPool,
     license_id: Uuid,

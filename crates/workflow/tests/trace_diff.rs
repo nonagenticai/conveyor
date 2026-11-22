@@ -135,7 +135,7 @@ fn a_migration_ignores_a_hash_difference() {
 
 #[test]
 fn a_migration_compares_normalised_node_ids() {
-    // An n8n node name carries spaces; a conveyor definition id may not. `Agent consult` and
+    // A recorded-flow node name carries spaces; a conveyor definition id may not. `Agent consult` and
     // `agent_consult` are the same node.
     let older = vec![record(
         1,

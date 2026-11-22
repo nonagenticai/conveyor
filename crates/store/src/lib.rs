@@ -54,6 +54,7 @@
 pub mod actions;
 pub mod andon;
 pub mod approval;
+pub mod async_invocation;
 // T9 (SPEC_V2 §8.1, §10.3, D63): the TOGAF ADM store — the artefact repository, the tailored
 // profile, the board, the four contract kinds, the phase gate, compliance and assessments.
 pub mod architecture;

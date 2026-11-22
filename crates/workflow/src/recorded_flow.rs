@@ -1,11 +1,12 @@
 #![forbid(unsafe_code)]
-//! Projection of a recorded n8n execution into the S13 §5.4 trace (step 10).
+//! Projection of a recorded flow execution into the S13 §5.4 trace (step 10).
 //!
-//! The old side of the trace gate is a real execution recorded from the live n8n. A fixture was
-//! an `<x>.old.jsonl` recording plus its `<x>.workflow.json` snapshot. **The recorded `.old.jsonl`
-//! files and their trace-diff tests were removed from the public tree at the 2026-11-12 flip** —
-//! the n8n flows never ran successfully and the proof is retired. The projection code is retained
-//! for the recorded workflow/trace executor; `--old` still reads a recording supplied locally.
+//! The old side of the trace gate is a real execution recorded from the legacy flow engine. A
+//! fixture was an `<x>.old.jsonl` recording plus its `<x>.workflow.json` snapshot. **The recorded
+//! `.old.jsonl` files and their trace-diff tests were removed from the public tree at the
+//! 2026-11-12 flip** — the recorded flows never ran successfully and the proof is retired. The
+//! projection code is retained for the recorded workflow/trace executor; `--old` still reads a
+//! recording supplied locally.
 //!
 //! What is an effect (§5.4): an action, a procedure, a condition's verdict, a loop's `each`/`done`,
 //! a gate's decision. `code`, `noOp`, `stickyNote`, `wait`, triggers and the langchain model/tool
@@ -21,6 +22,16 @@ use crate::trace::{
 
 /// The deepest flatted indirection accepted before the document is called malformed.
 const MAX_DEPTH: usize = 64;
+
+/// The recorded wire package name of the board application. A value in historical input, never an
+/// identity: every code symbol uses a role name.
+const RECORDED_BOARD_PACKAGE: &str = "planka";
+
+/// The recorded wire operation that looks a project up by its board. A historical value, as above.
+const RECORDED_PROJECT_BY_BOARD: &str = "getProjectByPlankaBoard";
+
+/// The fallback workflow key when a recorded snapshot carries no name.
+const RECORDED_SOURCE: &str = "n8n";
 
 /// Node types (the segment after the last `.`) that execute but are **not** effects.
 const NOT_AN_EFFECT: [&str; 13] = [
@@ -54,13 +65,13 @@ pub struct Projected {
 pub struct Unmapped {
     /// The node's name in the flow (its trace id).
     pub node_id: String,
-    /// Its n8n type.
+    /// Its recorded type.
     pub node_type: String,
     /// Why it has no effect.
     pub detail: String,
 }
 
-/// Resolve n8n's flatted serialization into ordinary JSON.
+/// Resolve the recorded flow's flatted serialization into ordinary JSON.
 ///
 /// The document is an array; index 0 is the root. A string member that parses as an index into
 /// the same array is a reference. A numeric string that addresses nothing is ordinary data, not a
@@ -158,7 +169,7 @@ pub fn project_execution(
     let workflow_key = snapshot
         .get("name")
         .and_then(Value::as_str)
-        .unwrap_or("n8n")
+        .unwrap_or(RECORDED_SOURCE)
         .to_owned();
 
     let mut definitions: std::collections::BTreeMap<&str, &Value> =
@@ -288,7 +299,7 @@ fn effect_of(suffix: &str, node: &Value) -> Option<String> {
     };
     let effect = match suffix {
         "agent" => "agent.run",
-        "planka" => match (text("resource"), text("operation")) {
+        s if s == RECORDED_BOARD_PACKAGE => match (text("resource"), text("operation")) {
             ("board", "get") => "boards.get",
             ("card", "get") => "cards.get",
             ("comment", "create") => "cards.comment",
@@ -297,7 +308,9 @@ fn effect_of(suffix: &str, node: &Value) -> Option<String> {
             _ => return None,
         },
         "requirements" => match (text("resource"), text("operation")) {
-            ("pmProjects", "getProject") | ("pmProjects", "getProjectByPlankaBoard") => {
+            ("pmProjects", operation)
+                if operation == "getProject" || operation == RECORDED_PROJECT_BY_BOARD =>
+            {
                 "projects.get"
             }
             ("pmProjects", "getProjectBriefVersion") => "requirements.get",
@@ -327,7 +340,7 @@ fn describe_missing(suffix: &str, node: &Value) -> String {
     )
 }
 
-/// Whether a `card` update touches nothing but the list — the successor of a n8n card move.
+/// Whether a `card` update touches nothing but the list — the successor of a recorded card move.
 fn moves_only(parameters: Option<&Value>) -> bool {
     match parameters
         .and_then(|value| value.get("updateFields"))
@@ -360,7 +373,7 @@ fn run_output(run: &Value) -> Value {
 
 /// The input a node received: the first item of the node that fed it.
 ///
-/// n8n records results, not inputs; `source` names the producing node, output slot and run, which
+/// The recorded flow stores results, not inputs; `source` names the producing node, output slot and run, which
 /// is the same item the engine passed downstream. Measured shapes in recorded payloads:
 /// `[{previousNode, previousNodeOutput, previousNodeRun}]` (an ARRAY wrapping the object) and, on
 /// older payloads, `[[name, output, run]]`. Both are unwrapped; anything else means "no input".
