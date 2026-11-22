@@ -18,6 +18,7 @@
 //! model names but the executor did not declare is refused **before** execution
 //! (`action-not-found`) and fed back to the model, never audited after the fact (CONTRACT §17).
 
+use std::collections::{BTreeMap, BTreeSet};
 use std::time::{Duration, Instant};
 
 use conveyor_auth::Role;
@@ -36,7 +37,7 @@ use uuid::Uuid;
 
 use crate::invoke::{ActionError, Authority, HandlerCtx, InvokeRequest, UsageContext, invoke};
 use crate::registry::registry;
-use crate::spec::{FieldError, HandlerOutput};
+use crate::spec::{Effect, FieldError, HandlerOutput};
 
 /// The external action the loop calls for the model.
 pub const MODEL_ACTION: &str = "inference.chat";
@@ -133,6 +134,7 @@ impl AgentRunIn {
                 })
                 .collect(),
             tools: self.tools,
+            broker_tools: BTreeMap::new(),
             max_turns: self.max_turns,
             max_tool_calls: self.max_tool_calls,
             timeout_ms: self.timeout_ms,
@@ -426,7 +428,13 @@ async fn resolve_bound(
     };
 
     let mut tools = Vec::with_capacity(record.allowed_actions.len());
+    let mut projected: BTreeSet<String> = BTreeSet::new();
     for name in &record.allowed_actions {
+        // `tools.call` is the broker's dispatch action, never a model-facing tool. When it is in
+        // the allowlist, the run's bound tools are projected below in its place (#556).
+        if name.as_str() == crate::tools::TOOLS_CALL {
+            continue;
+        }
         let Some(spec) = registry().get(name) else {
             return Err(capability_not_ready(
                 "allowed_actions",
@@ -436,10 +444,85 @@ async fn resolve_bound(
         };
         let parameters = serde_json::to_value((spec.input)())
             .unwrap_or_else(|_| json!({"type": "object", "additionalProperties": true}));
+        projected.insert(spec.name.to_owned());
         tools.push(json!({
             "type": "function",
             "function": {"name": spec.name, "parameters": parameters}
         }));
+    }
+
+    // SPEC_V2 §4.5: the agent's Tools source is "the curated list of tools bound to this job,
+    // with their closed schemas". `tools.call` in `allowed_actions` is the permission gate
+    // (CONTRACT §17: the row remains the allowlist); the binding pins which tools exist. The set
+    // is resolved once, here, and pinned for the step — a mid-run binding change is a new step.
+    let mut broker_tools = BTreeMap::new();
+    if record
+        .allowed_actions
+        .iter()
+        .any(|name| name.as_str() == crate::tools::TOOLS_CALL)
+    {
+        let mut tx = store::begin_scoped(pool, tenant).await.map_err(|error| {
+            tracing::error!(%error, "agent.run: begin the tool-binding read");
+            ActionError::internal()
+        })?;
+        let run_ctx = store::tool::run_context(&mut tx, tenant, run_id)
+            .await
+            .map_err(|error| {
+                tracing::error!(%error, "agent.run: read the run's tool context");
+                ActionError::internal()
+            })?
+            .ok_or_else(|| {
+                ActionError::new(
+                    409,
+                    "tool_not_ready",
+                    format!("run {run_id} is not in this tenant"),
+                )
+            })?;
+        let bound = store::tool::bound_tools(&mut tx, tenant, &run_ctx)
+            .await
+            .map_err(|error| {
+                tracing::error!(%error, "agent.run: read the run's bound tools");
+                ActionError::internal()
+            })?;
+        tx.commit().await.map_err(|error| {
+            tracing::error!(%error, "agent.run: commit the tool-binding read");
+            ActionError::internal()
+        })?;
+
+        for tool in bound {
+            let Some(effect) = Effect::parse(&tool.effect) else {
+                tracing::error!(tool = %tool.tool_key, effect = %tool.effect, "agent.run: unknown tool effect");
+                return Err(ActionError::internal());
+            };
+            let Some(ceiling) = Effect::parse(&tool.effect_ceiling) else {
+                tracing::error!(tool = %tool.tool_key, ceiling = %tool.effect_ceiling, "agent.run: unknown binding ceiling");
+                return Err(ActionError::internal());
+            };
+            // A binding narrows: a tool above the ceiling is not offered to the model. The broker
+            // re-checks at call time if the model names it by another route.
+            if effect.rank() > ceiling.rank() {
+                continue;
+            }
+            let canonical = format!("{}.{}", tool.toolkit_key, tool.tool_key);
+            let wire = format!("{}_{}", tool.toolkit_key, tool.tool_key.replace('.', "_"));
+            if !projected.insert(wire.clone()) {
+                return Err(capability_not_ready(
+                    "allowed_actions",
+                    "tool_name_conflict",
+                    format!("the projected tool {wire:?} collides with an allowed action"),
+                ));
+            }
+            let parameters = tool.input_schema.clone();
+            tools.push(json!({
+                "type": "function",
+                "function": {
+                    "name": wire,
+                    "description": format!("Bound tool {canonical}"),
+                    "parameters": parameters,
+                }
+            }));
+            broker_tools.insert(wire, canonical);
+        }
     }
 
     let mut messages: Vec<AgentMessage> = node_input
@@ -501,6 +584,7 @@ async fn resolve_bound(
         depth: Some(0),
     };
     let mut config = input.into_config();
+    config.broker_tools = broker_tools;
     if let Some((version, sha256)) = compiled_identity {
         config.prompt_version = Some(version);
         config.prompt_sha256 = Some(sha256);
@@ -680,13 +764,29 @@ pub(crate) async fn drive(
             Plan::CallTool(call) => {
                 let reply = if allowed.iter().any(|name| name == &call.name) {
                     let index = agent.tool_calls();
+                    // A projected bound tool goes through the one broker action; an ordinary
+                    // registry action keeps its own name. The map was resolved once, before the
+                    // loop, so the step's tool surface cannot widen mid-run.
+                    let broker = agent.broker_tool(&call.name).map(str::to_owned);
+                    let (action, tool_input) = match broker {
+                        Some(canonical) => (
+                            crate::tools::TOOLS_CALL.to_owned(),
+                            json!({
+                                "run_id": run.run_id,
+                                "step_id": run.run_step_id,
+                                "tool": canonical,
+                                "input": call.arguments.clone(),
+                            }),
+                        ),
+                        None => (call.name.clone(), call.arguments.clone()),
+                    };
                     let invocation = invoke(
                         pool,
                         registry(),
                         tenant,
                         InvokeRequest {
-                            action: call.name.clone(),
-                            input: call.arguments.clone(),
+                            action,
+                            input: tool_input,
                             precondition: None,
                             idempotency_key: run
                                 .idempotency_prefix
