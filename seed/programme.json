@@ -367,7 +367,7 @@
       "key": "S09",
       "name": "Documents, repositories, secrets, workers UI, reports/metrics, billing display",
       "description": "Plan: docs/plans/slices/S09-documents-integrations.md",
-      "status": "closed",
+      "status": "active",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/plans/slices/S09-documents-integrations.md",
@@ -378,7 +378,10 @@
           183,
           195,
           231,
-          245
+          245,
+          571,
+          577,
+          579
         ],
         "depends_on": [
           "S03",
@@ -777,16 +780,19 @@
         "plan": "docs/plans/slices/S21-message-construction.md",
         "track": "v1",
         "issues": [
-          15
+          15,
+          581
         ],
         "depends_on": [
           "S09",
           "S11",
           "S13",
           "S15",
-          "S16"
+          "S16",
+          "T2",
+          "T13"
         ],
-        "plan_status": "partial",
+        "plan_status": "built",
         "status_source": "github issue state > measured coverage > plan frontmatter",
         "measured_status": "built",
         "tranche": 9,
@@ -1264,13 +1270,15 @@
       "key": "T13",
       "name": "Tool platform",
       "description": "SPEC_V2 slice T13 (docs/SPEC_V2.md §12)",
-      "status": "closed",
+      "status": "active",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/SPEC_V2.md#12",
         "track": "v2",
         "issues": [
-          76
+          76,
+          556,
+          557
         ],
         "depends_on": [
           "T2",
@@ -1296,13 +1304,16 @@
       "key": "T14",
       "name": "Estate toolkits",
       "description": "SPEC_V2 slice T14 (docs/SPEC_V2.md §12)",
-      "status": "closed",
+      "status": "active",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/SPEC_V2.md#12",
         "track": "v2",
         "issues": [
-          83
+          83,
+          558,
+          560,
+          561
         ],
         "depends_on": [
           "T13",
@@ -1543,7 +1554,16 @@
           435,
           476,
           526,
-          545
+          545,
+          559,
+          562,
+          563,
+          564,
+          565,
+          566,
+          569,
+          572,
+          582
         ],
         "depends_on": [],
         "plan_status": "active",
