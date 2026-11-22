@@ -668,6 +668,15 @@
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/full-fidelity-snapshot.md"
     },
     {
+      "title": "Tranche-3 SAFe cadences — evidence",
+      "path": "docs/evidence/rework/tr3-cadences.html",
+      "source": "docs/evidence/rework/tr3-cadences.md",
+      "section": "Evidence",
+      "sha256": "bc971218428530a4924787e059f58fccce3194b8a8d2dea4093320aeb2c9ad07",
+      "bytes": 1564,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/tr3-cadences.md"
+    },
+    {
       "title": "Tranche 0 / PI 0 — the SAFe cadence record (retrospective, 2026-11-21)",
       "path": "docs/evidence/rework/tranche-0/acts.html",
       "source": "docs/evidence/rework/tranche-0/acts.md",
