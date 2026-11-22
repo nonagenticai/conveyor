@@ -39,6 +39,26 @@ REGISTER_STANDARDS = ("MSP", "TOGAF", "SAFe", "PMP", "SPEC")
 REGISTER_SCOPES = ("project", "tranche", "programme")
 REGISTER_MAX_SUBJECTS = 20
 REGISTER_SUPPRESSED = ("waiver", "unprovable")
+
+# A test row is not a programme project. The marker is `meta.test_row = true`; the two known
+# keys predate the marker and are named explicitly rather than matched by prefix, so a future
+# unmarked row stays visible as a finding (`v1-e2e-1`) instead of disappearing silently.
+TEST_ROW_MARKER = "test_row"
+LEGACY_TEST_PROJECT_KEYS = (
+    "AAA-UI-PROOF-285-2026-11-19T07-3-2",
+    "AAA-UI-PROOF-285-2026-11-19T07-4",
+)
+
+
+def test_row_reason(row: dict[str, Any]) -> str | None:
+    """Why this project row is test residue, or None when it is a real project."""
+    meta = row.get("meta")
+    if isinstance(meta, dict) and meta.get(TEST_ROW_MARKER) is True:
+        return f"meta.{TEST_ROW_MARKER} is true"
+    key = str(row.get("key") or "")
+    if key in LEGACY_TEST_PROJECT_KEYS:
+        return "a known pre-marker e2e project key"
+    return None
 def register_acceptance(key: str) -> str:
     """The command that proves one package is closed, not a whole-programme report.
 
@@ -151,9 +171,17 @@ class Dataset:
         self.output_standard = output_standard
         self.standard = standard
         self.repo_root = repo_root
-        self.projects = [
+        all_projects = [
             row for row in programme.get("projects", []) if isinstance(row, dict)
         ]
+        # Test residue is excluded from every rule's subject set, and named in the report, so
+        # the exclusion is visible rather than a silent filter.
+        self.excluded_test_projects = [
+            {"key": row.get("key"), "reason": test_row_reason(row)}
+            for row in all_projects
+            if test_row_reason(row)
+        ]
+        self.projects = [row for row in all_projects if not test_row_reason(row)]
         self.by_key = {row.get("key"): row for row in self.projects if row.get("key")}
         self.by_id = {row.get("id"): row for row in self.projects if row.get("id")}
         self.seed_by_key = {
@@ -1440,6 +1468,21 @@ def render_markdown(
         lines.append(
             f"| `{gap['rule']}` | `{gap['subject']}` | {gap['severity']} | {detail} |"
         )
+    if dataset.excluded_test_projects:
+        lines.extend(
+            [
+                "",
+                "## Excluded test rows",
+                "",
+                "These rows are test residue, not programme projects. They are excluded by the",
+                "predicate in `test_row_reason` and are listed here so the exclusion is visible.",
+                "",
+                "| Key | Reason |",
+                "|---|---|",
+            ]
+        )
+        for row in dataset.excluded_test_projects:
+            lines.append(f"| `{row.get('key')}` | {row.get('reason')} |")
     lines.extend(
         [
             "",
@@ -2300,6 +2343,14 @@ def self_test() -> None:
         ).hexdigest():
             fail("the accepted ledger does not pin the manifest it was taken from")
 
+    # Test residue is excluded by a named predicate and stays visible in the report.
+    if not test_row_reason({"key": "AAA-UI-PROOF-285-2026-11-19T07-3-2"}):
+        fail("a known pre-marker e2e project was not recognised as test residue")
+    if not test_row_reason({"key": "X", "meta": {"test_row": True}}):
+        fail("meta.test_row was not recognised")
+    if test_row_reason({"key": "PLATFORM", "meta": {"test_row": False}}):
+        fail("a real project was excluded as test residue")
+
     def expect(mutate, rule: str, severity: str | None = None) -> None:
         data = base()
         mutate(data)
@@ -2903,6 +2954,7 @@ def main() -> None:
                 severity: sum(1 for gap in gaps if gap["severity"] == severity)
                 for severity in SEVERITY_ORDER
             },
+            "excluded_test_projects": dataset.excluded_test_projects,
             "gaps": gaps,
         }
         (args.out / "conformance-gap-register.json").write_text(
