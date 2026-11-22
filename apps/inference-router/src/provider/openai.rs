@@ -434,6 +434,15 @@ fn parse_openai_chunk(
                                 .get("content")
                                 .and_then(Value::as_str)
                                 .map(str::to_owned),
+                            // vLLM's Inkling build streams the trace under `reasoning`; the
+                            // OpenAI-compatible spelling is `reasoning_content`. Both land on
+                            // one field, exactly as `parse_openai_response` already does for
+                            // the non-streamed message.
+                            reasoning_content: delta
+                                .get("reasoning_content")
+                                .or_else(|| delta.get("reasoning"))
+                                .and_then(Value::as_str)
+                                .map(str::to_owned),
                             tool_calls: delta.get("tool_calls").and_then(Value::as_array).map(
                                 |calls| {
                                     calls
@@ -1160,5 +1169,57 @@ mod tests {
         // The payload contract is "always present, null when unset" — asserting only `is_null`
         // would also pass on a MISSING key, which is a different body.
         assert!(payload.get("max_tokens").is_some_and(Value::is_null));
+    }
+
+    #[test]
+    fn an_upstream_reasoning_delta_surfaces_as_reasoning_content() {
+        let chunk = parse_openai_chunk(
+            &json!({
+                "id": "chatcmpl-1",
+                "created": 5,
+                "choices": [{"index": 0, "delta": {"reasoning": "The user asks"}}],
+            }),
+            "alias",
+            "local-llm",
+        )
+        .expect("parses");
+        assert_eq!(
+            chunk.choices[0].delta.reasoning_content.as_deref(),
+            Some("The user asks")
+        );
+        let frame = chunk.to_sse();
+        let body: Value =
+            serde_json::from_str(frame.trim_start_matches("data: ").trim()).expect("json frame");
+        assert_eq!(
+            body["choices"][0]["delta"]["reasoning_content"],
+            "The user asks"
+        );
+        // The upstream's own spelling must not leak into the contract.
+        assert!(body["choices"][0]["delta"].get("reasoning").is_none());
+    }
+
+    #[test]
+    fn a_content_only_frame_omits_the_reasoning_key() {
+        let chunk = parse_openai_chunk(
+            &json!({
+                "id": "chatcmpl-1",
+                "created": 5,
+                "choices": [{"index": 0, "delta": {"role": "assistant", "content": ""}}],
+            }),
+            "alias",
+            "local-llm",
+        )
+        .expect("parses");
+        let frame = chunk.to_sse();
+        let body: Value =
+            serde_json::from_str(frame.trim_start_matches("data: ").trim()).expect("json frame");
+        // Parity: the oracle's captured stream has no such key, so an inert chunk must not
+        // gain one. Presence here would diff every frame of every non-reasoning stream.
+        assert!(
+            body["choices"][0]["delta"]
+                .get("reasoning_content")
+                .is_none()
+        );
+        assert_eq!(body["choices"][0]["delta"]["content"], "");
     }
 }

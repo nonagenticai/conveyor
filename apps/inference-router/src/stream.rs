@@ -111,6 +111,10 @@ impl StreamCapture {
                         .push_str(content);
                 }
             }
+            // `delta.reasoning_content` is relayed to the client but deliberately NOT folded
+            // into the capture: the row records the answer, and the parity oracle's stream
+            // predates the channel, so including it would change hashes for a comparison it
+            // never made. A reasoning-bearing stream still hashes on the answer alone.
             if let Some(calls) = &choice.delta.tool_calls {
                 for call in calls {
                     let call_parts = parts.tool_calls.entry(call.index).or_default();
