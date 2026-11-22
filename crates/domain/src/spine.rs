@@ -90,7 +90,7 @@ pub enum PlanError {
         /// The offending field.
         field: &'static str,
     },
-    /// A change request is missing its impact block or its baseline reference.
+    /// A change request is missing its impact analysis or its baseline reference.
     #[error("a change request needs an impact block and the baseline it changes")]
     ChangeImpactMissing,
     /// A benefit profile is missing one of its mandatory measurement fields.
@@ -256,13 +256,27 @@ pub fn wsjf(inputs: WsjfInputs) -> Result<f64, PlanError> {
     Ok(sum as f64 / f64::from(inputs.job_size))
 }
 
-/// Refuse a change request that has no impact block or no baseline.
+/// The top-level keys a change's §5.5 impact block may carry.
+const CHANGE_IMPACT_KEYS: [&str; 4] = ["scope", "schedule", "cost", "risk"];
+
+/// Refuse a change request that has no impact analysis or no baseline.
+///
+/// SPEC_V2 §5.5's impact block is a real scope/schedule/cost/risk analysis, not a placeholder:
+/// a JSON object carrying at least one of those top-level keys with a non-null value. `{}`, a
+/// bare number, a string, an array and `null` are all "no analysis" — an approver reading them
+/// sees no delta to weigh.
 pub fn validate_change(
     impact: Option<&Value>,
     baseline_ref: Option<Uuid>,
 ) -> Result<(), PlanError> {
-    let has_impact = impact.is_some_and(|value| !value.is_null());
-    if !has_impact || baseline_ref.is_none() {
+    let has_analysis = impact.is_some_and(|value| {
+        value.as_object().is_some_and(|block| {
+            CHANGE_IMPACT_KEYS
+                .iter()
+                .any(|key| block.get(*key).is_some_and(|delta| !delta.is_null()))
+        })
+    });
+    if !has_analysis || baseline_ref.is_none() {
         return Err(PlanError::ChangeImpactMissing);
     }
     Ok(())

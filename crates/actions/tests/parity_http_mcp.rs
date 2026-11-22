@@ -1770,13 +1770,15 @@ async fn seed_parity_tranche(pg: &support::Pg, ctx: &Ctx, programme: Uuid) -> Uu
 /// here the sample needs the surface both transports share.
 async fn seed_parity_paused_tranche_resume(pg: &support::Pg, ctx: &Ctx) -> (Uuid, Uuid) {
     let mut tx = begin_scoped(&pg.owner, ctx.tenant).await.expect("scope");
-    let programme: Uuid = sqlx::query_scalar(
-        "INSERT INTO programme (tenant_id, name) VALUES ($1, 'Parity resume') RETURNING id",
-    )
-    .bind(ctx.tenant_id)
-    .fetch_one(&mut *tx)
-    .await
-    .expect("insert programme");
+    // The programme name is unique per (tenant, name), and `prepare` runs once per round, so
+    // each round seeds its own row.
+    let programme: Uuid =
+        sqlx::query_scalar("INSERT INTO programme (tenant_id, name) VALUES ($1, $2) RETURNING id")
+            .bind(ctx.tenant_id)
+            .bind(format!("Parity resume {}", Uuid::now_v7().simple()))
+            .fetch_one(&mut *tx)
+            .await
+            .expect("insert programme");
     let tranche: Uuid = sqlx::query_scalar(
         "INSERT INTO programme_tranche (tenant_id, programme_id, number, state)
          VALUES ($1, $2, 0, 'paused') RETURNING id",
@@ -6566,7 +6568,7 @@ fn pm_samples() -> Vec<Sample> {
                     "project_id": ctx.pop("changes.request"),
                     "baseline_id": ctx.pop("changes.request.baseline"),
                     "title": "Parity change",
-                    "impact": 3,
+                    "impact": {"scope": "the parity change moves one deliverable"},
                 })
             });
             expecting(sample, 201)
