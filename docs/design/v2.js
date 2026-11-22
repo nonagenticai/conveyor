@@ -766,7 +766,7 @@ window.installV2 = function (api, enterprise) {
           view.artefacts,
         )}${D.reworkRail(data.rework, view.projects)}${D.artefactRail(data.standards, {
           programmeId: view.programme ? view.programme.id : "",
-        })}${D.governanceLine(
+        })}${D.projectArtefactRollup(data.standards, view.projects)}${D.governanceLine(
           view.artefacts,
           data.architecture,
         )}`

@@ -31,6 +31,7 @@ snapshot="docs/design/data"
 outputs="docs/design/docs"
 findings_ledger="docs/evidence/standards-findings.json"
 register_ledger="docs/evidence/rework-register.json"
+gap_ledger="docs/evidence/conformance-gap-register.json"
 
 # The record's provenance comes from the snapshot manifest; without it the generator would fall
 # back to an epoch timestamp and an empty commit and publish a record that names no snapshot.
@@ -69,6 +70,11 @@ test -f "$tmp/rework.json" || {
   exit 1
 }
 
+# The register's evidence quotes code and plans; the public pack must never carry a private
+# address. Redact at the one point every consumer reads, so the committed register, the pages'
+# package keys and the console's `rework.js` are the same document.
+python3 scripts/redact-public-register.py "$tmp/rework.json"
+
 # 4. Pass 2: the record, one page per artefact and the register global. The generator writes
 #    `standards.json`, `standards.js` and `rework.js`; the canonical register stays JSON.
 python3 scripts/generate-standards.py \
@@ -95,6 +101,7 @@ if [ "$mode" = "--check" ]; then
     echo "publish-standards: $1 is stale or missing; run docs/design/scripts/publish-standards.sh" >&2
     exit 1
   }
+  cmp -s "$tmp/audit/conformance-gap-register.json" "$gap_ledger" || stale "$gap_ledger"
   cmp -s "$tmp/data/standards.json" "$pack/data/standards.json" || stale "$pack/data/standards.json"
   cmp -s "$tmp/data/standards.js" "$pack/data/standards.js" || stale "$pack/data/standards.js"
   cmp -s "$tmp/data/rework.js" "$pack/data/rework.js" || stale "$pack/data/rework.js"
@@ -113,5 +120,11 @@ mkdir -p "$pack/data" "$pack/docs/standards" "$(dirname "$register_ledger")"
 cp "$tmp/data/standards.json" "$tmp/data/standards.js" "$tmp/data/rework.js" "$pack/data/"
 cp "$tmp/rework.json" "$register_ledger"
 cp "$tmp/standards-findings.json" "$findings_ledger"
+# The gap register is an INPUT to the record (`--gaps`): the committed copy must be the one the
+# record was built from, or `generate-standards.py --check` reads a stale register and can never
+# reproduce the record. The baseline stays the human-owned authorization ledger; this is its
+# generated report, not a waiver.
+cp "$tmp/audit/conformance-gap-register.json" "$gap_ledger"
+cp "$tmp/audit/conformance-gap-register.md" "${gap_ledger%.json}.md"
 rsync -a --delete "$tmp/standards/" "$pack/docs/standards/"
 echo "publish-standards: record, pages and register published from $snapshot"
