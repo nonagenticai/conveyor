@@ -76,10 +76,6 @@ async fn answer(
 }
 
 impl Stub {
-    async fn start() -> Stub {
-        Stub::start_with_reply(None, 0).await
-    }
-
     /// A stub that answers every request with the same document: the destination's half of a
     /// write-verification test, where the answer itself is what the broker judges.
     async fn start_with(reply: Value) -> Stub {
@@ -518,15 +514,6 @@ fn echo_schema() -> Value {
         "type": "object",
         "properties": {"message": {"type": "string"}},
         "required": ["message"],
-        "additionalProperties": false
-    })
-}
-
-fn slow_schema() -> Value {
-    json!({
-        "type": "object",
-        "properties": {"delay_ms": {"type": "integer", "minimum": 0}},
-        "required": ["delay_ms"],
         "additionalProperties": false
     })
 }
