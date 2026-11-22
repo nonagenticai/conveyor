@@ -3697,7 +3697,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             "kind": "rows",
             "file": "msp.json",
             "pointer": "/demo_credits",
-            "severity": "P1"
+            "severity": "P1",
+            "projection": "live"
           }
         ],
         "Evidence": [
@@ -3714,7 +3715,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             "kind": "rows",
             "file": "msp.json",
             "pointer": "/demo_credits",
-            "severity": "P1"
+            "severity": "P1",
+            "projection": "live"
           }
         ]
       }
@@ -3752,7 +3754,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             "kind": "rows",
             "file": "msp.json",
             "pointer": "/demo_credits",
-            "severity": "P1"
+            "severity": "P1",
+            "projection": "live"
           }
         ],
         "Credits": [
@@ -3760,7 +3763,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             "kind": "rows",
             "file": "msp.json",
             "pointer": "/demo_credits",
-            "severity": "P1"
+            "severity": "P1",
+            "projection": "live"
           }
         ],
         "Findings": [
@@ -3822,7 +3826,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             "kind": "rows",
             "file": "msp.json",
             "pointer": "/lessons",
-            "severity": "P1"
+            "severity": "P1",
+            "projection": "live"
           }
         ],
         "Actions": [
@@ -3830,7 +3835,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             "kind": "rows",
             "file": "msp.json",
             "pointer": "/lessons",
-            "severity": "P1"
+            "severity": "P1",
+            "projection": "live"
           }
         ],
         "Kata candidates": [
