@@ -1007,6 +1007,38 @@ pub fn mcp_collisions<'a>(
 mod tests {
     use super::*;
 
+    /// A `serde_json::Value` field is ANY JSON: an object, an array, a scalar. The served
+    /// schema must admit all of them — a typeless schema with only a `default` must not be
+    /// read as "object or nothing" (v1-value-1: `architecture.reviews_record` refused a
+    /// findings array, the designed payload shape).
+    #[test]
+    fn a_value_typed_field_accepts_any_json() {
+        let spec = crate::registry::registry()
+            .get("architecture.reviews_record")
+            .expect("the review action is registered");
+        let schema = spec.input_schema();
+        let base = serde_json::json!({
+            "project_id": "01a1d039-0d37-730f-8f8a-2f50e5a0933d",
+            "contract_id": "01a20271-2a37-7329-b159-28031ddcb966",
+            "level": "compliant",
+            "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+        });
+        for findings in [
+            serde_json::json!([]),
+            serde_json::json!([{"finding": "a", "evidence": ["x"]}]),
+            serde_json::json!({"a": 1}),
+            serde_json::json!("a string"),
+        ] {
+            let mut input = base.clone();
+            input["findings"] = findings.clone();
+            let errors = validate_input(&schema, &input);
+            assert!(
+                errors.is_empty(),
+                "findings {findings} must validate: {errors:?}"
+            );
+        }
+    }
+
     #[test]
     fn vocabularies_are_the_contract_spelling() {
         assert_eq!(ActionKind::External.as_str(), "external");
