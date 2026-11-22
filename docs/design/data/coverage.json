@@ -1,31 +1,31 @@
 {
   "actions_invoked": [
     {
-      "line": 1695,
+      "line": 1697,
       "name": "approvals.decide"
     },
     {
-      "line": 6470,
+      "line": 6472,
       "name": "approvals.decide"
     },
     {
-      "line": 6257,
+      "line": 6259,
       "name": "approvals.list"
     },
     {
-      "line": 6258,
+      "line": 6260,
       "name": "approvals.list"
     },
     {
-      "line": 6430,
+      "line": 6432,
       "name": "approvals.request"
     },
     {
-      "line": 1595,
+      "line": 1597,
       "name": "architecture.artifacts_entries"
     },
     {
-      "line": 1596,
+      "line": 1598,
       "name": "architecture.artifacts_links"
     },
     {
@@ -53,111 +53,111 @@
       "name": "cards.release"
     },
     {
-      "line": 2932,
+      "line": 2934,
       "name": "documents.compose"
     },
     {
-      "line": 3419,
+      "line": 3421,
       "name": "documents.compose"
     },
     {
-      "line": 3214,
+      "line": 3216,
       "name": "documents.create"
     },
     {
-      "line": 3285,
+      "line": 3287,
       "name": "documents.delete"
     },
     {
-      "line": 3231,
+      "line": 3233,
       "name": "documents.download"
     },
     {
-      "line": 3264,
+      "line": 3266,
       "name": "documents.download"
     },
     {
-      "line": 2954,
+      "line": 2956,
       "name": "documents.get"
     },
     {
-      "line": 3249,
+      "line": 3251,
       "name": "documents.get"
     },
     {
-      "line": 1454,
+      "line": 1456,
       "name": "documents.list"
     },
     {
-      "line": 1477,
+      "line": 1479,
       "name": "documents.list"
     },
     {
-      "line": 1504,
+      "line": 1506,
       "name": "documents.list"
     },
     {
-      "line": 3182,
+      "line": 3184,
       "name": "documents.list"
     },
     {
-      "line": 3316,
+      "line": 3318,
       "name": "documents.preview"
     },
     {
-      "line": 3362,
+      "line": 3364,
       "name": "documents.return"
     },
     {
-      "line": 3103,
+      "line": 3105,
       "name": "documents.revision_get"
     },
     {
-      "line": 3064,
+      "line": 3066,
       "name": "documents.revision_list"
     },
     {
-      "line": 6338,
+      "line": 6340,
       "name": "procedures.ingest_process"
     },
     {
-      "line": 6330,
+      "line": 6332,
       "name": "procedures.ingest_rdf"
     },
     {
-      "line": 6346,
+      "line": 6348,
       "name": "procedures.ingest_sop"
     },
     {
-      "line": 6214,
+      "line": 6216,
       "name": "procedures.list"
     },
     {
-      "line": 6543,
+      "line": 6545,
       "name": "procedures.publish"
     },
     {
-      "line": 6391,
+      "line": 6393,
       "name": "procedures.review_source"
     },
     {
-      "line": 6373,
+      "line": 6375,
       "name": "procedures.validate"
     },
     {
-      "line": 1718,
+      "line": 1720,
       "name": "process_runs.start"
     },
     {
-      "line": 6237,
+      "line": 6239,
       "name": "processes.get"
     },
     {
-      "line": 6217,
+      "line": 6219,
       "name": "processes.list"
     },
     {
-      "line": 6545,
+      "line": 6547,
       "name": "processes.publish"
     },
     {
@@ -165,31 +165,31 @@
       "name": "programmes.list"
     },
     {
-      "line": 1011,
+      "line": 1013,
       "name": "programmes.list"
     },
     {
-      "line": 1079,
+      "line": 1081,
       "name": "programmes.refresh"
     },
     {
-      "line": 2863,
+      "line": 2865,
       "name": "projects.close"
     },
     {
-      "line": 2724,
+      "line": 2726,
       "name": "projects.create"
     },
     {
-      "line": 1668,
+      "line": 1670,
       "name": "runs.cancel"
     },
     {
-      "line": 1646,
+      "line": 1648,
       "name": "runs.get"
     },
     {
-      "line": 1623,
+      "line": 1625,
       "name": "runs.list"
     }
   ],
@@ -333,7 +333,7 @@
       "track": "programme",
       "tranche": 0,
       "units": {
-        "blocked": 1,
+        "blocked": 2,
         "claimed": 2,
         "numbers": [
           17,
@@ -358,9 +358,10 @@
           426,
           435,
           476,
-          526
+          526,
+          545
         ],
-        "open": 13,
+        "open": 14,
         "ready": 5,
         "unknown": 0
       }

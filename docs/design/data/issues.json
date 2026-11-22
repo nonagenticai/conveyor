@@ -1,6 +1,65 @@
 {
   "issues": [
     {
+      "number": 546,
+      "title": "design: publish the artefact record and the rework register in the committed pack, and deepen the audit",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/546",
+      "updatedAt": "2026-11-21T22:07:31Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        },
+        {
+          "name": "programme",
+          "color": "5319E7"
+        }
+      ]
+    },
+    {
+      "number": 545,
+      "title": "ops: publish the standards record and materialise the register after the live tranche closes",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/545",
+      "updatedAt": "2026-11-21T20:08:10Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:blocked",
+          "color": "D93F0B"
+        }
+      ]
+    },
+    {
+      "number": 542,
+      "title": "design: generate and publish the MSP/TOGAF/SAFe artefact set and land the deep audit",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/542",
+      "updatedAt": "2026-11-21T20:36:47Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        },
+        {
+          "name": "programme",
+          "color": "5319E7"
+        }
+      ]
+    },
+    {
       "number": 537,
       "title": "documents: the public window is published_at in every reader and writer",
       "state": "CLOSED",
@@ -43,7 +102,7 @@
       "title": "design: the delivery view \u2014 portfolio and programme Gantt, project and work-package kanban",
       "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/528",
-      "updatedAt": "2026-11-21T19:15:21Z",
+      "updatedAt": "2026-11-21T19:17:07Z",
       "labels": [
         {
           "name": "unit",
@@ -85,7 +144,7 @@
       "title": "#526 programme: the retrospective rework \u2014 tranche 0, all remaining tranches, benefits and the viability gate (U5a\u2013U5h, U6, U7)",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/526",
-      "updatedAt": "2026-11-21T18:36:48Z",
+      "updatedAt": "2026-11-21T22:28:04Z",
       "labels": [
         {
           "name": "unit",
@@ -591,7 +650,7 @@
       "title": "conveyor-buildout \u2014 the SPEC_V2 programme",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/435",
-      "updatedAt": "2026-11-21T19:03:36Z",
+      "updatedAt": "2026-11-21T23:21:06Z",
       "labels": [
         {
           "name": "programme",
