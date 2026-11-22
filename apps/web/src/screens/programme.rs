@@ -261,7 +261,13 @@ pub fn Programme() -> impl IntoView {
     view! {
         <section class="screen">
             {move || {
-                let missing = ["programmes.list", "tranches.list", "benefits.list"]
+                let missing = [
+                    "programmes.list",
+                    "tranches.list",
+                    "cadences.list",
+                    "benefits.list",
+                    "lessons.list",
+                ]
                     .into_iter()
                     .filter(|action| !ctx.has_action(action))
                     .collect::<Vec<_>>()
