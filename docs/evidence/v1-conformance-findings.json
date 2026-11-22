@@ -4312,12 +4312,7 @@
       ],
       "failure_scenario": "Create an internal_agent binding that pins agent A. Start a run of a process whose step names agent B, or whose capability has one active agent B. The run executes B and records A's binding and release hash; nothing refuses or flags the divergence, and readiness checks the process's agents rather than the binding's.",
       "acceptance": "Execution resolves the capability agent through the run's job binding, or refuses a step agent that differs from the binding with a 409; a test pins A and resolves B and asserts the refusal, and every run's recorded agent equals its binding's.",
-      "owner_project": "T0",
-      "resolved_by": {
-        "commit": "965e22294da68b395ef29c95075cda3f73d85235",
-        "test": "crates/actions/tests/process_start.rs::a_job_binding_whose_executor_differs_from_the_process_is_refused",
-        "evidence": "process_start 14 passed at the merged lane, including both binding tests: a job binding whose executor differs from the process is refused, and a binding's pinned agent is the agent that dispatches."
-      }
+      "owner_project": "T0"
     },
     {
       "id": "v1-p44-2",
@@ -5393,6 +5388,50 @@
         "commit": "1bf095334926af387b8585b2fc7aa609aa9d155f",
         "test": "scripts/verify-project.py",
         "evidence": "The six checks now resolve their property, mirroring the actions: baseline distinct approver + frozen snapshot; a contract's approval_id resolves to an approved architecture_board decision about THAT contract (decide_board_tx writes an approved row with no separate decision) with the contract's requester and approver distinct, plus the lawful direct path for non-delivery contracts; a review of the project's live contract that is compliant or actively waived; the latest closure gate targeting this project; a lesson with statement and evidence. `verify-project.py --self-test` is green with a crafted failing case per rule; the same commit projects approval.meta and keeps the contract-cited board decision the parent filter was dropping. Proven on a fresh branch-built snapshot: 12 green / 35 red, with the seven contract projects restored to green and S03/T2/T1/T11 green; T9's contract gap closed by the forward-only re-issue."
+      }
+    },
+    {
+      "id": "v1-manif-3",
+      "area": "acceptance manifest checks",
+      "standard": "SPEC",
+      "spec": "§12",
+      "severity": "P1",
+      "title": "Five more acceptance checks accept rows that do not prove their property",
+      "problem": "A second line audit finds: benefit_baseline greens on one structured profile and accepts any non-placeholder STRING, skipping every measurement field; wsjf rejects only when all three value inputs are zero, so a missing or zero input passes as long as one is non-zero; demo_credits accepts any truthy evidence, including 'TBD' or 'not measured'; _published_for_period never checks published_at and matches the period as a substring, so an unpublished draft titled 'tranche-30' greens a tranche-3 check; product_findings matches only owner_project == key, silently dropping an open P0 package whose owner is missing or recorded as an id, and a register without packages reads as no P0.",
+      "evidence": [
+        {
+          "path": "scripts/verify-project.py",
+          "line": 414,
+          "quote": "    profiles = snapshot.msp.get(\"benefit_profiles\", [])"
+        },
+        {
+          "path": "scripts/verify-project.py",
+          "line": 522,
+          "quote": "        if all(int(node.get(field) or 0) == 0 for field in (\"business_value\", \"time_criticality\", \"risk_reduction\")):"
+        },
+        {
+          "path": "scripts/verify-project.py",
+          "line": 543,
+          "quote": "        if not (credits.get(node.get(\"id\")) or {}).get(\"evidence\")"
+        },
+        {
+          "path": "scripts/verify-project.py",
+          "line": 590,
+          "quote": "        if needle in label:"
+        },
+        {
+          "path": "scripts/verify-project.py",
+          "line": 725,
+          "quote": "        and package.get(\"owner_project\") == key"
+        }
+      ],
+      "failure_scenario": "An unmeasured benefit profile, two absent WSJF inputs, a 'TBD' demo credit, an unpublished PI plan titled for another tranche, or an open P0 package with no owner all pass a manifest that claims them.",
+      "acceptance": "benefit_baseline requires every profile's baseline to be a structured measurement with value, unit, measured_at, method and evidence (a string never passes); wsjf requires all four typed inputs present, job_size >= 1 and not all value inputs zero; demo_credits rejects placeholder evidence; _published_for_period requires published_at and a whole-token period match; product_findings fails when the register lacks packages or an open P0 has no owner, and matches an owner by key or project id. Each rule has a crafted self-test that fails the weak row.",
+      "owner_project": "PLATFORM",
+      "resolved_by": {
+        "commit": "2d3c050684a282fbf745734b9b2b1a3972ac65fc",
+        "test": "scripts/verify-project.py",
+        "evidence": "The five checks now resolve their property: benefit_baseline requires a structured measurement (value, unit, measured_at, method, evidence) and refuses strings; wsjf requires all four inputs present as JSON integers with job_size >= 1 and not all values zero; demo_credits refuses placeholder evidence; _published_for_period requires published_at and a whole-token tranche match; product_findings fails a register without packages, fails an ownerless open P0, and matches the owner by key or project id. Self-test green with one crafted failing case per rule (benefit-string-baseline, wsjf-missing-input, credit-placeholder-evidence, pi-plan-draft-tranche-40, no-packages). On the branch-built snapshot the programme stays 12 green / 35 red — the rigour binds as records arrive."
       }
     }
   ]

@@ -416,22 +416,21 @@ def check_benefit_baseline(
         return False, "the programme has no benefit profiles"
     for profile in profiles:
         baseline = profile.get("baseline")
-        if not baseline:
-            return False, f"benefit {profile.get('id')} has no baseline"
-        if isinstance(baseline, str):
-            if PLACEHOLDER.search(baseline):
-                return False, f"benefit {profile.get('id')} has a placeholder baseline: {baseline!r}"
-            continue
-        if isinstance(baseline, dict):
-            missing = [
-                field
-                for field in ("value", "unit", "measured_at", "method", "evidence")
-                if not baseline.get(field)
-            ]
-            if missing:
-                return False, f"benefit {profile.get('id')} baseline is missing {', '.join(missing)}"
-            continue
-        return False, f"benefit {profile.get('id')} baseline has an unexpected type"
+        # A baseline is a measurement, not a sentence: a string carries no value, unit,
+        # date, method or evidence, so it cannot prove the benefit was measured — whether
+        # or not it happens to read like a placeholder.
+        if not isinstance(baseline, dict):
+            return False, (
+                f"benefit {profile.get('id')} baseline is not a structured measurement: "
+                f"{baseline!r}"
+            )
+        missing = [
+            field
+            for field in ("value", "unit", "measured_at", "method", "evidence")
+            if not baseline.get(field)
+        ]
+        if missing:
+            return False, f"benefit {profile.get('id')} baseline is missing {', '.join(missing)}"
     return True, f"{len(profiles)} benefit baselines are measured"
 
 
@@ -507,6 +506,16 @@ def check_pi_cadence(
     return True, f"PI cadence {pi[0].get('id')} and refinement {refinement[0].get('id')} for {period}"
 
 
+WSJF_INPUTS = ("business_value", "time_criticality", "risk_reduction", "job_size")
+
+
+def _wsjf_integer(value: Any) -> int | None:
+    """The value when it is a JSON integer, else None (a bool or float is not an input)."""
+    if isinstance(value, bool) or not isinstance(value, int):
+        return None
+    return value
+
+
 def check_wsjf(
     snapshot: Snapshot, key: str, params: dict[str, Any]
 ) -> tuple[bool, str]:
@@ -516,14 +525,35 @@ def check_wsjf(
         return False, "no WBS deliverable carries the plan"
     bad = []
     for node in nodes:
-        if int(node.get("job_size") or 0) < 1:
+        values = {field: _wsjf_integer(node.get(field)) for field in WSJF_INPUTS}
+        absent = [field for field in WSJF_INPUTS if values[field] is None]
+        if absent:
+            bad.extend(f"{node.get('id')}: {field}" for field in absent)
+            continue
+        if values["job_size"] < 1:
             bad.append(f"{node.get('id')}: job_size")
             continue
-        if all(int(node.get(field) or 0) == 0 for field in ("business_value", "time_criticality", "risk_reduction")):
+        if all(
+            values[field] == 0
+            for field in ("business_value", "time_criticality", "risk_reduction")
+        ):
             bad.append(f"{node.get('id')}: every value input is zero")
     if bad:
         return False, "WBS nodes without WSJF inputs: " + ", ".join(bad)
     return True, f"{len(nodes)} WBS node(s) carry the four WSJF inputs"
+
+
+def _evidence_text(evidence: Any) -> str:
+    """The credit's evidence as text, for the placeholder guard.
+
+    The store copies the WBS node's evidence array onto the credit, but a snapshot may carry a
+    single string; both shapes (and a stray object) are read so a placeholder cannot hide.
+    """
+    if isinstance(evidence, dict):
+        return " ".join(str(value) for value in evidence.values())
+    if isinstance(evidence, (list, tuple)):
+        return " ".join(_evidence_text(item) for item in evidence)
+    return str(evidence)
 
 
 def check_demo_credits(
@@ -537,13 +567,20 @@ def check_demo_credits(
         credit.get("deliverable_id"): credit
         for credit in snapshot.msp.get("demo_credits", [])
     }
-    missing = [
-        node.get("id")
-        for node in accepted
-        if not (credits.get(node.get("id")) or {}).get("evidence")
-    ]
-    if missing:
-        return False, f"{len(missing)} accepted deliverable(s) have no demo credit with evidence"
+    problems = []
+    for node in accepted:
+        evidence = (credits.get(node.get("id")) or {}).get("evidence")
+        if not evidence:
+            problems.append(f"{node.get('id')}: no evidence")
+            continue
+        text = _evidence_text(evidence)
+        if PLACEHOLDER.search(text):
+            problems.append(f"{node.get('id')}: placeholder evidence {text!r}")
+    if problems:
+        return False, (
+            f"{len(problems)} accepted deliverable(s) have no demo credit with real evidence: "
+            + ", ".join(problems)
+        )
     return True, f"{len(accepted)} accepted deliverable(s), each with a demo credit"
 
 
@@ -577,17 +614,21 @@ def check_lessons(
 def _published_for_period(
     snapshot: Snapshot, category: str, period: str, programme_key: str
 ) -> bool:
-    """The PI artefact names its tranche in the title or unit (`tranche-N`).
+    """The published PI artefact names its tranche in the title or unit (`tranche-N`).
 
     `unit` is the output's programme unit (see `documents.compose`); the retrospective batch
-    writes the planning period there, and the title repeats it for a human reader.
+    writes the planning period there, and the title repeats it for a human reader. Only a row
+    with `published_at` is published, and the period must be a whole token: `tranche-30` does
+    not name `tranche-3`.
     """
-    needle = period.lower()
+    pattern = re.compile(rf"(?<![0-9]){re.escape(period.lower())}(?![0-9])")
     for row in snapshot.outputs:
         if row.get("category") != category or row.get("project_key") != programme_key:
             continue
+        if not str(row.get("published_at") or "").strip():
+            continue
         label = f"{row.get('title') or ''} {row.get('unit') or ''}".lower()
-        if needle in label:
+        if pattern.search(label):
             return True
     return False
 
@@ -717,13 +758,28 @@ def check_product_findings(
     register, error = rework_register(snapshot)
     if error:
         return False, error
-    open_p0 = [
-        package.get("key")
-        for package in (register or {}).get("packages", [])
-        if package.get("status") == "open"
-        and package.get("severity") == "P0"
-        and package.get("owner_project") == key
-    ]
+    # A register without packages is a derivation failure, not a clean bill; reading the
+    # missing key as "no P0" is the false green this guard closes.
+    if not isinstance(register, dict) or "packages" not in register:
+        return False, "the register carries no packages"
+    row = snapshot.project(key)
+    owners = {key, str(row["id"])}
+    unowned: list[str] = []
+    open_p0: list[str] = []
+    for package in register.get("packages") or []:
+        if package.get("status") != "open" or package.get("severity") != "P0":
+            continue
+        owner = package.get("owner_project")
+        # An open P0 with no owner at all is not attributable to another project; it must not
+        # disappear from every project's manifest.
+        if not str(owner or "").strip():
+            unowned.append(str(package.get("key")))
+            continue
+        # The register may name the owner by project key or by project id; both are this row.
+        if str(owner) in owners:
+            open_p0.append(str(package.get("key")))
+    if unowned:
+        return False, "an open P0 package has no owner: " + ", ".join(unowned)
     if open_p0:
         return False, f"{len(open_p0)} open P0 package(s): " + ", ".join(open_p0)
     return True, "no open P0 package for this project"
@@ -968,7 +1024,18 @@ def self_test() -> int:
     (snapshot / "data" / "msp.json").write_text(
         json.dumps(
             {
-                "benefit_profiles": [],
+                "benefit_profiles": [
+                    {
+                        "id": "bp1",
+                        "baseline": {
+                            "value": 5,
+                            "unit": "decisions/week",
+                            "measured_at": "2026-11-01",
+                            "method": "action ledger count",
+                            "evidence": "o1",
+                        },
+                    }
+                ],
                 "tranches": [{"id": "tr-4", "number": 4, "state": "closed"}],
                 "cadences": [
                     {"id": "c-pi", "programme_id": "prog-1", "kind": "pi",
@@ -1008,9 +1075,11 @@ def self_test() -> int:
                 "schema": "v1",
                 "outputs": [
                     {"id": "o1", "project_key": "P0", "category": "pi-plan",
-                     "title": "PI plan — tranche 4", "unit": "tranche-4"},
+                     "title": "PI plan — tranche 4", "unit": "tranche-4",
+                     "published_at": "2026-11-01T00:00:00+00:00"},
                     {"id": "o2", "project_key": "P0", "category": "pi-objectives",
-                     "title": "PI objectives — tranche 4", "unit": "tranche-4"},
+                     "title": "PI objectives — tranche 4", "unit": "tranche-4",
+                     "published_at": "2026-11-01T00:00:00+00:00"},
                 ],
             }
         )
@@ -1143,6 +1212,11 @@ check = "pi_cadence"
 severity = "P0"
 
 [[check]]
+id = "benefit-baseline"
+check = "benefit_baseline"
+severity = "P0"
+
+[[check]]
 id = "wsjf"
 check = "wsjf"
 severity = "P0"
@@ -1233,6 +1307,75 @@ severity = "P0"
             slice(None), [row for row in o if row["category"] != "pi-objectives"]
         ),
     )
+
+    # ── the tightened manifest rules: each crafted case greens under the old rule and reds now ─
+    mutate(
+        "benefit-string-baseline",
+        lambda m, o: m["benefit_profiles"][0].__setitem__(
+            "baseline", "five decisions a week, counted from the action ledger"
+        ),
+    )
+    mutate(
+        "wsjf-missing-input",
+        lambda m, o: m["wbs_nodes"][0].pop("risk_reduction"),
+    )
+    mutate(
+        "credit-placeholder-evidence",
+        lambda m, o: m["demo_credits"][0].__setitem__("evidence", "TBD"),
+    )
+
+    def draft_other_tranche(msp, outputs) -> None:
+        plan = next(row for row in outputs if row["category"] == "pi-plan")
+        plan["title"] = "PI plan — tranche 40"
+        plan["unit"] = "tranche-40"
+        plan.pop("published_at", None)
+
+    mutate("pi-plan-draft-tranche-40", draft_other_tranche)
+
+    # product_findings reads a derived register; craft the register directly so the rule is
+    # tested at its exact shapes without building one from the synthetic snapshot.
+    product_manifest = workdir / "TEST-product.toml"
+    product_manifest.write_text(
+        """
+[project]
+key = "TEST"
+name = "Self-test product findings"
+gate = "no open P0 product finding remains for the project"
+
+[[check]]
+id = "product"
+check = "product_findings"
+severity = "P0"
+"""
+    )
+
+    def product_case(name: str, register: Any, expect_green: bool) -> None:
+        original = globals()["rework_register"]
+        globals()["rework_register"] = lambda snapshot: (copy.deepcopy(register), None)
+        try:
+            result = run_project(
+                "TEST", snapshot / "data", product_manifest,
+                workdir / f"evidence-product-{name}", quiet=True,
+            )
+        finally:
+            globals()["rework_register"] = original
+        if (result["verdict"] == "green") != expect_green:
+            failures.append(
+                f"product case {name}: verdict {result['verdict']}, "
+                f"expected {'green' if expect_green else 'red'}"
+            )
+
+    product_case(
+        "ok",
+        {
+            "packages": [
+                {"key": "p1", "status": "open", "severity": "P1", "owner_project": "TEST"},
+                {"key": "p2", "status": "open", "severity": "P0", "owner_project": "OTHER"},
+            ]
+        },
+        True,
+    )
+    product_case("no-packages", {}, False)
 
     # ── the hardened rules: every crafted case passes under the old rule and fails now ─
     hardening_manifest = workdir / "TEST-hardening.toml"
