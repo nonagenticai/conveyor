@@ -723,7 +723,7 @@ async fn bound_tools_reach_the_model() {
     tx.commit().await.expect("commit");
     assert_eq!(rows.len(), 1, "one ledgered tool call");
     assert_eq!(rows[0].toolkit_key, "fixtures");
-    assert_eq!(rows[0].tool_key, "echo");
+    assert_eq!(rows[0].tool_key, "fixtures.echo");
     assert_eq!(rows[0].status, "ok");
 }
 
