@@ -1082,6 +1082,7 @@ def resolve_section(
     outputs_dir: Path,
     programme_projects: dict[str, set[str]],
     register: dict[str, Any] | None = None,
+    item_limit: int | None = 12,
 ) -> dict[str, Any]:
     sources = template.get("sources") or {}
     declared = sources.get(heading)
@@ -1104,11 +1105,16 @@ def resolve_section(
             kind = source["kind"]
             if kind == "rows":
                 rows = rows_for(snapshot, source, subject, category, subject.get("phase"))
-                resolved.append({
+                entry = {
                     "kind": "rows", "file": source.get("file", ""),
                     "pointer": source.get("pointer", ""), "count": len(rows),
-                    "items": [row_summary(row) for row in rows[:12]],
-                })
+                    "items": [row_summary(row) for row in rows[:item_limit]],
+                }
+                if item_limit is None:
+                    # The publisher authors a document from the whole record; the pack page keeps
+                    # its bounded excerpt.
+                    entry["rows"] = rows
+                resolved.append(entry)
             elif kind == "documents":
                 wanted_category = str(substitute(
                     (source.get("match") or {}).get("category", "$category"),
@@ -1128,10 +1134,13 @@ def resolve_section(
                     str(source.get("name")), source, snapshot, subject, programme_projects,
                     category, subject.get("phase"), register=register,
                 )
-                resolved.append({
+                entry = {
                     "kind": "computed", "name": str(source.get("name")),
-                    "count": len(rows), "items": [row_summary(row) for row in rows[:12]],
-                })
+                    "count": len(rows), "items": [row_summary(row) for row in rows[:item_limit]],
+                }
+                if item_limit is None:
+                    entry["rows"] = rows
+                resolved.append(entry)
             elif kind == "register":
                 resolved.append({"kind": "register", "count": 0, "items": []})
 

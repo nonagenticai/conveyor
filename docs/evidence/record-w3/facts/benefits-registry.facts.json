@@ -1,0 +1,706 @@
+{
+  "category": "benefits-registry",
+  "standard": "MSP",
+  "spec": "\u00a78.3",
+  "subject": {
+    "kind": "programme",
+    "id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+    "key": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+    "title": "conveyor buildout",
+    "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+    "project_key": ""
+  },
+  "template_skeleton": "# Benefits Registry\n\nThe programme's benefits, indexed to their profiles and linked through the benefits map. A benefit with no profile is a wish, not a benefit.\n\n## Benefit profiles\n\nEvery benefit profile, with its reference, measurable improvement and owner.\n\n## Map\n\nThe output, capability, operational outcome and strategic objective each benefit links through.\n\n## Ownership\n\nThe benefit owner, the operational area the improvement is attributed to, and who realizes it.\n\n## Links\n\nThe projects and tranches the benefits depend on.\n",
+  "headings": [
+    {
+      "heading": "Benefit profiles",
+      "status": "evidenced",
+      "sources": [
+        {
+          "kind": "rows",
+          "file": "msp.json",
+          "pointer": "/benefit_profiles",
+          "category": null,
+          "count": 7
+        }
+      ],
+      "items": [
+        {
+          "baseline": {
+            "definition": "105 approval_decision / 662 run at 2026-11-22",
+            "unit": "decisions per run",
+            "value": 0.15861
+          },
+          "benefit_owner_job_id": "01a1db6b-4f17-7e76-838d-590d71578ad1",
+          "capabilities": [
+            "the approval and decision ledger"
+          ],
+          "category": "governance",
+          "cost": {
+            "realization": "the approval path already exists"
+          },
+          "created_at": "2026-11-17T14:17:02.511509+00:00",
+          "description": "Auditable decisions",
+          "financial_value": "",
+          "id": "01a1e9de-4e4f-757e-a8c8-bf3522e5adcf",
+          "kpis": [
+            {
+              "name": "decisions per run",
+              "value": 0.15861
+            }
+          ],
+          "measurement_method": "Count decision rows per run from the action ledger.",
+          "objectives": [
+            {
+              "objective": "every choice has a decision row"
+            }
+          ],
+          "observable_outcome": "",
+          "operational_area": "the conveyor programme",
+          "owner_job_id": "01a1db6b-4f17-7e76-838d-590d71578ad1",
+          "preconditions": [],
+          "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "project_id": null,
+          "reference": "B1",
+          "register_item_id": null,
+          "risks": [
+            {
+              "risk": "R7"
+            }
+          ],
+          "status": "active",
+          "target": "every choice has a decision row",
+          "updated_at": "2026-11-22T19:59:09.615081+00:00",
+          "version": 4
+        },
+        {
+          "baseline": "not measured - no instrument exists (recorded as a kata on the kata project)",
+          "benefit_owner_job_id": "01a1db6b-4f17-7e76-838d-590d71578ad1",
+          "capabilities": "Tool platform (version, probe, binding, effect ceiling, ledger)",
+          "category": "programme benefit",
+          "cost": "T13 plus the absorption of the remaining services",
+          "created_at": "2026-11-17T14:17:48.712922+00:00",
+          "description": "Less bespoke tooling",
+          "financial_value": "",
+          "id": "01a1e9df-0308-7fdc-8492-32db1e582a2d",
+          "kpis": [
+            "zero-use toolkits retired after a programme cycle (P10)"
+          ],
+          "measurement_method": "The tool_call ledger's per-toolkit counts, read at the tranche review; retirement is a decision.",
+          "objectives": [
+            "O4 Every tool is governed"
+          ],
+          "observable_outcome": "Every cluster service a job may call is a versioned, bound, audited toolkit with a ledger.",
+          "operational_area": "the conveyor programme",
+          "owner_job_id": "01a1db6b-4f17-7e76-838d-590d71578ad1",
+          "preconditions": [
+            "the absorption sequence's deployed services"
+          ],
+          "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "project_id": "01a1d039-0d37-730f-8f8a-2f50e5a0933d",
+          "reference": "B2",
+          "register_item_id": null,
+          "risks": "the unowned fleet keeps growing while toolkits wait",
+          "status": "draft",
+          "target": "every service a job uses is a toolkit; a toolkit with no calls in a cycle is retired or justified",
+          "updated_at": "2026-11-17T14:17:48.712922+00:00",
+          "version": 1
+        },
+        {
+          "baseline": "not measured - no instrument exists (recorded as a kata on the kata project)",
+          "benefit_owner_job_id": "01a1db6b-4f17-7e76-838d-590d71578ad1",
+          "capabilities": "Development project (T6) on the PM job (T3) and the plan spine (T1)",
+          "category": "programme benefit",
+          "cost": "T6's tranche-11 build plus the CI budget",
+          "created_at": "2026-11-17T14:17:51.089852+00:00",
+          "description": "Self-development",
+          "financial_value": "",
+          "id": "01a1e9df-0c4b-7807-b35c-5810ec418d45",
+          "kpis": [
+            "a development run reaches live verification with a recorded rollback"
+          ],
+          "measurement_method": "The development project's run, CI and deploy records; the lane and PR are the evidence.",
+          "objectives": [
+            "O5 The conveyor develops and operates itself under its own gates"
+          ],
+          "observable_outcome": "A development project runs lane -> PR -> CI -> merge -> deploy -> live verify, with rollback, through the conveyor.",
+          "operational_area": "the conveyor programme",
+          "owner_job_id": "01a1db6b-4f17-7e76-838d-590d71578ad1",
+          "preconditions": [
+            "CI runners and the deploy path"
+          ],
+          "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "project_id": "01a1d039-0d34-7973-8989-0b83246fc888",
+          "reference": "B3",
+          "register_item_id": null,
+          "risks": "the CI queue or a flaky gate makes the loop unusable",
+          "status": "draft",
+          "target": "one self-development run reaches live verification on evidence; a second is repeatable",
+          "updated_at": "2026-11-17T14:17:51.089852+00:00",
+          "version": 1
+        },
+        {
+          "baseline": "not measured - no instrument exists (recorded as a kata on the kata project)",
+          "benefit_owner_job_id": "01a1db6b-4f17-7e76-838d-590d71578ad1",
+          "capabilities": "The public design site and the contribution path (issue forms, DCO, CONTRIBUTING)",
+          "category": "programme benefit",
+          "cost": "the site's maintenance and review time",
+          "created_at": "2026-11-17T14:17:53.465156+00:00",
+          "description": "Public collaboration",
+          "financial_value": "",
+          "id": "01a1e9df-1592-79a5-839e-037d8fe4251b",
+          "kpis": [
+            "an outside issue or PR that changes a published output"
+          ],
+          "measurement_method": "The GitHub issue registry and merged PR authors; the publications are recorded on the programme issues.",
+          "objectives": [
+            "O6 The public can see and challenge the design"
+          ],
+          "observable_outcome": "An outside reader can read every published output, and an outside issue or PR changes the design.",
+          "operational_area": "the conveyor programme",
+          "owner_job_id": "01a1db6b-4f17-7e76-838d-590d71578ad1",
+          "preconditions": [
+            "the public repository"
+          ],
+          "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "project_id": "01a1d039-0d39-7414-b43c-450de170ffe1",
+          "reference": "B4",
+          "register_item_id": null,
+          "risks": "unreviewed public input or spam",
+          "status": "draft",
+          "target": "at least one outside contribution changes a published output; every output is reachable",
+          "updated_at": "2026-11-17T14:17:53.465156+00:00",
+          "version": 1
+        },
+        {
+          "baseline": "not measured - no instrument exists (recorded as a kata on the kata project)",
+          "benefit_owner_job_id": "01a1db6b-4f17-7e76-838d-590d71578ad1",
+          "capabilities": "The T0 model and contracts",
+          "category": "programme benefit",
+          "cost": "T0 plus the absorption migrations",
+          "created_at": "2026-11-17T14:17:55.687464+00:00",
+          "description": "One model",
+          "financial_value": "",
+          "id": "01a1e9df-1e42-7199-87e1-23c577c62f8e",
+          "kpis": [
+            "no concept with two stores (the T0 gate)"
+          ],
+          "measurement_method": "The T0 gate test and the absorption inventory; a second store is a defect.",
+          "objectives": [
+            "O1 One model, one store"
+          ],
+          "observable_outcome": "A concept has one table and one action registry; no concept has two stores.",
+          "operational_area": "the conveyor programme",
+          "owner_job_id": "01a1db6b-4f17-7e76-838d-590d71578ad1",
+          "preconditions": [
+            "ADR 0005's absorption sequence"
+          ],
+          "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "project_id": "01a1d039-0d32-7734-98da-fb7f1e2386c7",
+          "reference": "B5",
+          "register_item_id": null,
+          "risks": "a parallel store appears as a convenience",
+          "status": "draft",
+          "target": "the T0 gate exists and refuses a second store; the registry has one home",
+          "updated_at": "2026-11-17T14:17:55.687464+00:00",
+          "version": 1
+        },
+        {
+          "baseline": {
+            "definition": "check-registers at /tmp/conveyor-526-reg-snap",
+            "unit": "open register findings",
+            "value": 28.0
+          },
+          "benefit_owner_job_id": "01a1db6b-4f17-7e76-838d-590d71578ad1",
+          "capabilities": [
+            "the plan spine (T1)",
+            "the programme definition (P0)"
+          ],
+          "category": "delivery",
+          "cost": {
+            "realization": "no new spend; the existing programme roles and records"
+          },
+          "created_at": "2026-11-17T14:17:58.111551+00:00",
+          "description": "Predictable delivery",
+          "financial_value": "",
+          "id": "01a1e9df-27b8-7827-ae4e-6d48ca5904e8",
+          "kpis": [
+            {
+              "name": "open register findings",
+              "value": 28.0
+            }
+          ],
+          "measurement_method": "coverage.json and seed/programme.json regenerated and checked in CI; the P0 checklist counts the published set.",
+          "objectives": [
+            {
+              "objective": "the seed, coverage and published checklist agree"
+            }
+          ],
+          "observable_outcome": "The programme plan's tranches, projects and expected outputs agree with the measured coverage and the published checklist.",
+          "operational_area": "the conveyor programme",
+          "owner_job_id": "01a1db6b-4f17-7e76-838d-590d71578ad1",
+          "preconditions": [],
+          "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "project_id": "01a1dcb8-d24b-76de-b901-56fd56e001bc",
+          "reference": "B6",
+          "register_item_id": null,
+          "risks": [
+            {
+              "risk": "R2"
+            }
+          ],
+          "status": "active",
+          "target": "the seed, coverage and published checklist agree at every tranche review",
+          "updated_at": "2026-11-22T19:59:09.728338+00:00",
+          "version": 3
+        },
+        {
+          "baseline": {
+            "definition": "9,458,468 inference tokens / 15 demo-credited deliverables at 2026-11-22",
+            "unit": "tokens per demo-credited deliverable",
+            "value": 630565
+          },
+          "benefit_owner_job_id": "01a1db6b-4f17-7e76-838d-590d71578ad1",
+          "capabilities": [
+            "the inference ledger",
+            "the demo credit record",
+            "the accepted output index"
+          ],
+          "category": "efficiency",
+          "cost": {},
+          "created_at": "2026-11-22T19:54:17.431769+00:00",
+          "description": "Tokens per accepted deliverable",
+          "financial_value": "",
+          "id": "01a204d2-dbf6-750a-a031-9f00f5fe7754",
+          "kpis": [
+            {
+              "baseline": 630565,
+              "name": "tokens per demo-credited deliverable",
+              "target": 504452
+            },
+            {
+              "ceiling": "baseline + 0.5pp",
+              "name": "run failure rate"
+            }
+          ],
+          "measurement_method": "inference ledger total tokens / demo-credited deliverables",
+          "objectives": [
+            {
+              "objective": "reduce the token spend per accepted deliverable"
+            }
+          ],
+          "observable_outcome": "fewer inference tokens per demo-credited deliverable without a higher run-failure rate",
+          "operational_area": "the conveyor programme",
+          "owner_job_id": "01a1db6b-4f17-7e76-838d-590d71578ad1",
+          "preconditions": [],
+          "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "project_id": null,
+          "reference": "B7",
+          "register_item_id": null,
+          "risks": [
+            {
+              "risk": "R10"
+            }
+          ],
+          "status": "active",
+          "target": {
+            "definition": "20% reduction on the primary denominator",
+            "unit": "tokens per demo-credited deliverable",
+            "value": 504452
+          },
+          "updated_at": "2026-11-22T19:54:17.431769+00:00",
+          "version": 1
+        }
+      ]
+    },
+    {
+      "heading": "Map",
+      "status": "evidenced",
+      "sources": [
+        {
+          "kind": "rows",
+          "file": "msp.json",
+          "pointer": "/benefit_links",
+          "category": null,
+          "count": 6
+        }
+      ],
+      "items": [
+        {
+          "benefit_id": "01a1e9de-4e4f-757e-a8c8-bf3522e5adcf",
+          "capability_ref": "every choice is traceable to a policy and a person",
+          "created_at": "2026-11-17T14:18:12.693427+00:00",
+          "id": "01a1e9df-6063-783c-a130-075067d33a17",
+          "kind": "benefit",
+          "operational_outcome": "O3 Every decision is auditable",
+          "output_ref": "T2 decision ladder",
+          "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "strategic_objective": "decision ladder (rule -> laya -> generation -> human)",
+          "version": 1
+        },
+        {
+          "benefit_id": "01a1e9df-0308-7fdc-8492-32db1e582a2d",
+          "capability_ref": "services with no calls are retired",
+          "created_at": "2026-11-17T14:18:15.299102+00:00",
+          "id": "01a1e9df-6a8a-7e0c-bf4b-022848d53774",
+          "kind": "benefit",
+          "operational_outcome": "O4 Every tool is governed",
+          "output_ref": "T13 tool platform",
+          "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "strategic_objective": "versioned toolkit with a probe, binding and ledger",
+          "version": 1
+        },
+        {
+          "benefit_id": "01a1e9df-0c4b-7807-b35c-5810ec418d45",
+          "capability_ref": "the conveyor changes itself with rollback",
+          "created_at": "2026-11-17T14:18:17.502606+00:00",
+          "id": "01a1e9df-732b-78a5-9b34-779be11092c5",
+          "kind": "benefit",
+          "operational_outcome": "O5 The conveyor develops and operates itself",
+          "output_ref": "T6 development project",
+          "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "strategic_objective": "development projects under gates",
+          "version": 1
+        },
+        {
+          "benefit_id": "01a1e9df-1592-79a5-839e-037d8fe4251b",
+          "capability_ref": "an outside review changes a published output",
+          "created_at": "2026-11-17T14:18:20.569102+00:00",
+          "id": "01a1e9df-7f1f-769c-bd17-8f71322cc505",
+          "kind": "benefit",
+          "operational_outcome": "O6 The public can see and challenge the design",
+          "output_ref": "DESIGN-PUBLISH public site",
+          "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "strategic_objective": "public repository and published outputs",
+          "version": 1
+        },
+        {
+          "benefit_id": "01a1e9df-1e42-7199-87e1-23c577c62f8e",
+          "capability_ref": "a concept has one table",
+          "created_at": "2026-11-17T14:18:22.767809+00:00",
+          "id": "01a1e9df-87b8-7761-ae0d-f5bb03c66628",
+          "kind": "benefit",
+          "operational_outcome": "O1 One model, one store",
+          "output_ref": "T0 model and contracts",
+          "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "strategic_objective": "one store and one action registry",
+          "version": 1
+        },
+        {
+          "benefit_id": "01a1e9df-27b8-7827-ae4e-6d48ca5904e8",
+          "capability_ref": "the plan and the measurement agree",
+          "created_at": "2026-11-17T14:18:24.995037+00:00",
+          "id": "01a1e9df-9066-70a9-8050-e86503fb1b7e",
+          "kind": "benefit",
+          "operational_outcome": "O2 Jobs, not code paths",
+          "output_ref": "P0 + T1 plan spine",
+          "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "strategic_objective": "programme plan and coverage instrument",
+          "version": 1
+        }
+      ]
+    },
+    {
+      "heading": "Ownership",
+      "status": "evidenced",
+      "sources": [
+        {
+          "kind": "rows",
+          "file": "msp.json",
+          "pointer": "/benefit_profiles",
+          "category": null,
+          "count": 7
+        }
+      ],
+      "items": [
+        {
+          "baseline": {
+            "definition": "105 approval_decision / 662 run at 2026-11-22",
+            "unit": "decisions per run",
+            "value": 0.15861
+          },
+          "benefit_owner_job_id": "01a1db6b-4f17-7e76-838d-590d71578ad1",
+          "capabilities": [
+            "the approval and decision ledger"
+          ],
+          "category": "governance",
+          "cost": {
+            "realization": "the approval path already exists"
+          },
+          "created_at": "2026-11-17T14:17:02.511509+00:00",
+          "description": "Auditable decisions",
+          "financial_value": "",
+          "id": "01a1e9de-4e4f-757e-a8c8-bf3522e5adcf",
+          "kpis": [
+            {
+              "name": "decisions per run",
+              "value": 0.15861
+            }
+          ],
+          "measurement_method": "Count decision rows per run from the action ledger.",
+          "objectives": [
+            {
+              "objective": "every choice has a decision row"
+            }
+          ],
+          "observable_outcome": "",
+          "operational_area": "the conveyor programme",
+          "owner_job_id": "01a1db6b-4f17-7e76-838d-590d71578ad1",
+          "preconditions": [],
+          "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "project_id": null,
+          "reference": "B1",
+          "register_item_id": null,
+          "risks": [
+            {
+              "risk": "R7"
+            }
+          ],
+          "status": "active",
+          "target": "every choice has a decision row",
+          "updated_at": "2026-11-22T19:59:09.615081+00:00",
+          "version": 4
+        },
+        {
+          "baseline": "not measured - no instrument exists (recorded as a kata on the kata project)",
+          "benefit_owner_job_id": "01a1db6b-4f17-7e76-838d-590d71578ad1",
+          "capabilities": "Tool platform (version, probe, binding, effect ceiling, ledger)",
+          "category": "programme benefit",
+          "cost": "T13 plus the absorption of the remaining services",
+          "created_at": "2026-11-17T14:17:48.712922+00:00",
+          "description": "Less bespoke tooling",
+          "financial_value": "",
+          "id": "01a1e9df-0308-7fdc-8492-32db1e582a2d",
+          "kpis": [
+            "zero-use toolkits retired after a programme cycle (P10)"
+          ],
+          "measurement_method": "The tool_call ledger's per-toolkit counts, read at the tranche review; retirement is a decision.",
+          "objectives": [
+            "O4 Every tool is governed"
+          ],
+          "observable_outcome": "Every cluster service a job may call is a versioned, bound, audited toolkit with a ledger.",
+          "operational_area": "the conveyor programme",
+          "owner_job_id": "01a1db6b-4f17-7e76-838d-590d71578ad1",
+          "preconditions": [
+            "the absorption sequence's deployed services"
+          ],
+          "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "project_id": "01a1d039-0d37-730f-8f8a-2f50e5a0933d",
+          "reference": "B2",
+          "register_item_id": null,
+          "risks": "the unowned fleet keeps growing while toolkits wait",
+          "status": "draft",
+          "target": "every service a job uses is a toolkit; a toolkit with no calls in a cycle is retired or justified",
+          "updated_at": "2026-11-17T14:17:48.712922+00:00",
+          "version": 1
+        },
+        {
+          "baseline": "not measured - no instrument exists (recorded as a kata on the kata project)",
+          "benefit_owner_job_id": "01a1db6b-4f17-7e76-838d-590d71578ad1",
+          "capabilities": "Development project (T6) on the PM job (T3) and the plan spine (T1)",
+          "category": "programme benefit",
+          "cost": "T6's tranche-11 build plus the CI budget",
+          "created_at": "2026-11-17T14:17:51.089852+00:00",
+          "description": "Self-development",
+          "financial_value": "",
+          "id": "01a1e9df-0c4b-7807-b35c-5810ec418d45",
+          "kpis": [
+            "a development run reaches live verification with a recorded rollback"
+          ],
+          "measurement_method": "The development project's run, CI and deploy records; the lane and PR are the evidence.",
+          "objectives": [
+            "O5 The conveyor develops and operates itself under its own gates"
+          ],
+          "observable_outcome": "A development project runs lane -> PR -> CI -> merge -> deploy -> live verify, with rollback, through the conveyor.",
+          "operational_area": "the conveyor programme",
+          "owner_job_id": "01a1db6b-4f17-7e76-838d-590d71578ad1",
+          "preconditions": [
+            "CI runners and the deploy path"
+          ],
+          "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "project_id": "01a1d039-0d34-7973-8989-0b83246fc888",
+          "reference": "B3",
+          "register_item_id": null,
+          "risks": "the CI queue or a flaky gate makes the loop unusable",
+          "status": "draft",
+          "target": "one self-development run reaches live verification on evidence; a second is repeatable",
+          "updated_at": "2026-11-17T14:17:51.089852+00:00",
+          "version": 1
+        },
+        {
+          "baseline": "not measured - no instrument exists (recorded as a kata on the kata project)",
+          "benefit_owner_job_id": "01a1db6b-4f17-7e76-838d-590d71578ad1",
+          "capabilities": "The public design site and the contribution path (issue forms, DCO, CONTRIBUTING)",
+          "category": "programme benefit",
+          "cost": "the site's maintenance and review time",
+          "created_at": "2026-11-17T14:17:53.465156+00:00",
+          "description": "Public collaboration",
+          "financial_value": "",
+          "id": "01a1e9df-1592-79a5-839e-037d8fe4251b",
+          "kpis": [
+            "an outside issue or PR that changes a published output"
+          ],
+          "measurement_method": "The GitHub issue registry and merged PR authors; the publications are recorded on the programme issues.",
+          "objectives": [
+            "O6 The public can see and challenge the design"
+          ],
+          "observable_outcome": "An outside reader can read every published output, and an outside issue or PR changes the design.",
+          "operational_area": "the conveyor programme",
+          "owner_job_id": "01a1db6b-4f17-7e76-838d-590d71578ad1",
+          "preconditions": [
+            "the public repository"
+          ],
+          "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "project_id": "01a1d039-0d39-7414-b43c-450de170ffe1",
+          "reference": "B4",
+          "register_item_id": null,
+          "risks": "unreviewed public input or spam",
+          "status": "draft",
+          "target": "at least one outside contribution changes a published output; every output is reachable",
+          "updated_at": "2026-11-17T14:17:53.465156+00:00",
+          "version": 1
+        },
+        {
+          "baseline": "not measured - no instrument exists (recorded as a kata on the kata project)",
+          "benefit_owner_job_id": "01a1db6b-4f17-7e76-838d-590d71578ad1",
+          "capabilities": "The T0 model and contracts",
+          "category": "programme benefit",
+          "cost": "T0 plus the absorption migrations",
+          "created_at": "2026-11-17T14:17:55.687464+00:00",
+          "description": "One model",
+          "financial_value": "",
+          "id": "01a1e9df-1e42-7199-87e1-23c577c62f8e",
+          "kpis": [
+            "no concept with two stores (the T0 gate)"
+          ],
+          "measurement_method": "The T0 gate test and the absorption inventory; a second store is a defect.",
+          "objectives": [
+            "O1 One model, one store"
+          ],
+          "observable_outcome": "A concept has one table and one action registry; no concept has two stores.",
+          "operational_area": "the conveyor programme",
+          "owner_job_id": "01a1db6b-4f17-7e76-838d-590d71578ad1",
+          "preconditions": [
+            "ADR 0005's absorption sequence"
+          ],
+          "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "project_id": "01a1d039-0d32-7734-98da-fb7f1e2386c7",
+          "reference": "B5",
+          "register_item_id": null,
+          "risks": "a parallel store appears as a convenience",
+          "status": "draft",
+          "target": "the T0 gate exists and refuses a second store; the registry has one home",
+          "updated_at": "2026-11-17T14:17:55.687464+00:00",
+          "version": 1
+        },
+        {
+          "baseline": {
+            "definition": "check-registers at /tmp/conveyor-526-reg-snap",
+            "unit": "open register findings",
+            "value": 28.0
+          },
+          "benefit_owner_job_id": "01a1db6b-4f17-7e76-838d-590d71578ad1",
+          "capabilities": [
+            "the plan spine (T1)",
+            "the programme definition (P0)"
+          ],
+          "category": "delivery",
+          "cost": {
+            "realization": "no new spend; the existing programme roles and records"
+          },
+          "created_at": "2026-11-17T14:17:58.111551+00:00",
+          "description": "Predictable delivery",
+          "financial_value": "",
+          "id": "01a1e9df-27b8-7827-ae4e-6d48ca5904e8",
+          "kpis": [
+            {
+              "name": "open register findings",
+              "value": 28.0
+            }
+          ],
+          "measurement_method": "coverage.json and seed/programme.json regenerated and checked in CI; the P0 checklist counts the published set.",
+          "objectives": [
+            {
+              "objective": "the seed, coverage and published checklist agree"
+            }
+          ],
+          "observable_outcome": "The programme plan's tranches, projects and expected outputs agree with the measured coverage and the published checklist.",
+          "operational_area": "the conveyor programme",
+          "owner_job_id": "01a1db6b-4f17-7e76-838d-590d71578ad1",
+          "preconditions": [],
+          "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "project_id": "01a1dcb8-d24b-76de-b901-56fd56e001bc",
+          "reference": "B6",
+          "register_item_id": null,
+          "risks": [
+            {
+              "risk": "R2"
+            }
+          ],
+          "status": "active",
+          "target": "the seed, coverage and published checklist agree at every tranche review",
+          "updated_at": "2026-11-22T19:59:09.728338+00:00",
+          "version": 3
+        },
+        {
+          "baseline": {
+            "definition": "9,458,468 inference tokens / 15 demo-credited deliverables at 2026-11-22",
+            "unit": "tokens per demo-credited deliverable",
+            "value": 630565
+          },
+          "benefit_owner_job_id": "01a1db6b-4f17-7e76-838d-590d71578ad1",
+          "capabilities": [
+            "the inference ledger",
+            "the demo credit record",
+            "the accepted output index"
+          ],
+          "category": "efficiency",
+          "cost": {},
+          "created_at": "2026-11-22T19:54:17.431769+00:00",
+          "description": "Tokens per accepted deliverable",
+          "financial_value": "",
+          "id": "01a204d2-dbf6-750a-a031-9f00f5fe7754",
+          "kpis": [
+            {
+              "baseline": 630565,
+              "name": "tokens per demo-credited deliverable",
+              "target": 504452
+            },
+            {
+              "ceiling": "baseline + 0.5pp",
+              "name": "run failure rate"
+            }
+          ],
+          "measurement_method": "inference ledger total tokens / demo-credited deliverables",
+          "objectives": [
+            {
+              "objective": "reduce the token spend per accepted deliverable"
+            }
+          ],
+          "observable_outcome": "fewer inference tokens per demo-credited deliverable without a higher run-failure rate",
+          "operational_area": "the conveyor programme",
+          "owner_job_id": "01a1db6b-4f17-7e76-838d-590d71578ad1",
+          "preconditions": [],
+          "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "project_id": null,
+          "reference": "B7",
+          "register_item_id": null,
+          "risks": [
+            {
+              "risk": "R10"
+            }
+          ],
+          "status": "active",
+          "target": {
+            "definition": "20% reduction on the primary denominator",
+            "unit": "tokens per demo-credited deliverable",
+            "value": 504452
+          },
+          "updated_at": "2026-11-22T19:54:17.431769+00:00",
+          "version": 1
+        }
+      ]
+    }
+  ],
+  "definition_project_id": "01a1dcb8-d24b-76de-b901-56fd56e001bc"
+}
