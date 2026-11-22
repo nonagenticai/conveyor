@@ -150,6 +150,12 @@ class Snapshot:
             if row.get("approval_id") == approval_id
         ]
 
+    def approval_by_id(self, approval_id: str) -> dict[str, Any] | None:
+        for row in self.work.get("approvals", []):
+            if row.get("id") == approval_id:
+                return row
+        return None
+
     def waivers(self, project_id: str) -> list[dict[str, Any]]:
         review_ids = {row.get("id") for row in self.reviews(project_id)}
         return [
@@ -212,9 +218,21 @@ def check_project_baseline(
     if not baselines:
         return False, "no project baseline"
     approved = [baseline for baseline in baselines if baseline.get("approved_by")]
-    if params.get("require_approved", False) and not approved:
-        return False, "the project baseline has no distinct approver"
-    return True, f"{len(baselines)} project baseline(s); {len(approved)} approved"
+    if not params.get("require_approved", False):
+        return True, f"{len(baselines)} project baseline(s); {len(approved)} approved"
+    for baseline in approved:
+        taken_by = baseline.get("taken_by")
+        if taken_by and baseline.get("approved_by") == taken_by:
+            continue
+        if not (baseline.get("snapshot") or {}).get("frozen"):
+            continue
+        return True, (
+            f"baseline {baseline.get('id')} approved by {baseline.get('approved_by')}, "
+            f"taken by {taken_by or 'no recorded taker'}, snapshot frozen"
+        )
+    return False, (
+        "no approved baseline is a frozen snapshot approved by someone other than its taker"
+    )
 
 
 def check_contract(
@@ -227,29 +245,111 @@ def check_contract(
             return False, "no live board-approved delivery contract"
         return True, "no delivery contract required for this row"
     for contract in live:
-        approval = contract.get("approval_id")
+        approval_id = contract.get("approval_id")
         requester = contract.get("requested_by")
         approver = contract.get("approved_by")
-        if approval and requester and approver and requester != approver:
-            return True, f"contract {contract['id']} approved by {approver}, requested by {requester}"
-    return False, "the live contract lacks an approval or a distinct requester/approver"
+        if approval_id:
+            approval = snapshot.approval_by_id(str(approval_id))
+            if approval is None or approval.get("status") != "approved":
+                continue
+            # `architecture.contracts_approve` accepts only an approved `architecture_board`
+            # decision ABOUT THIS CONTRACT (meta subject_kind/subject_id). The check mirrors the
+            # action, so a pasted id or another contract's decision cannot pass.
+            meta = approval.get("meta") or {}
+            if approval.get("gate") != "architecture_board":
+                continue
+            if meta.get("subject_kind") != "contract":
+                continue
+            if str(meta.get("subject_id")) != str(contract.get("id")):
+                continue
+            distinct = [
+                decision
+                for decision in snapshot.decisions(str(approval_id))
+                if decision.get("decision") == "approve"
+                and decision.get("approver_id")
+                and decision.get("approver_id") != requester
+            ]
+            if distinct:
+                return True, (
+                    f"contract {contract.get('id')} approved by board decision {approval_id}; "
+                    f"decision by {distinct[0].get('approver_id')} distinct from requester {requester}"
+                )
+            continue
+        # Mirrors the action's other lawful path: a contract with a recorded requester and a kind
+        # other than `delivery_contract` may be approved directly by a distinct actor.
+        if (
+            contract.get("kind") != "delivery_contract"
+            and requester
+            and approver
+            and requester != approver
+        ):
+            return True, (
+                f"contract {contract.get('id')} approved by {approver}, "
+                f"requested by {requester} (a distinct actor)"
+            )
+    return False, (
+        "the live contract has no approved board decision about this contract and no distinct "
+        "requester/approver pair"
+    )
+
+
+def _timestamp(value: Any) -> datetime:
+    """Parse an ISO-8601 column for ordering; an unparseable value sorts first."""
+    try:
+        parsed = datetime.fromisoformat(str(value).replace("Z", "+00:00"))
+    except (TypeError, ValueError):
+        return datetime.min.replace(tzinfo=timezone.utc)
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=timezone.utc)
+    return parsed
+
+
+def _active_waiver(snapshot: Snapshot, project_id: str) -> dict[str, Any] | None:
+    now = datetime.now(timezone.utc)
+    for waiver in snapshot.waivers(project_id):
+        if waiver.get("status") != "active":
+            continue
+        if _timestamp(waiver.get("reassessment_at")) <= now:
+            continue
+        return waiver
+    return None
 
 
 def check_review(
     snapshot: Snapshot, key: str, params: dict[str, Any]
 ) -> tuple[bool, str]:
     row = snapshot.project(key)
-    reviews = snapshot.reviews(row["id"])
+    live = {
+        contract.get("id")
+        for contract in snapshot.contracts(row["id"])
+        if contract.get("status") == "live"
+    }
+    reviews = [
+        review
+        for review in snapshot.architecture.get("compliance_reviews", [])
+        if review.get("contract_id") in live
+    ]
     if not reviews:
         if params.get("required", True):
-            return False, "no Phase-G compliance review for the project's contract"
+            return False, "no Phase-G compliance review for the project's live contract"
         return True, "no compliance review required for this row"
+    waiver = _active_waiver(snapshot, row["id"])
     for review in reviews:
         evidence = review.get("evidence") or {}
         reference = evidence.get("delegation_ref")
-        if reference and snapshot.published_id(str(reference)):
-            return True, f"review {review['id']} cites the published delegation {reference}"
-    return False, "the review's delegation_ref is missing or does not resolve to a published output"
+        if not reference or not snapshot.published_id(str(reference)):
+            continue
+        level = review.get("level")
+        if level in ("non_conformant", "irrelevant") and waiver is None:
+            continue
+        return True, (
+            f"review {review.get('id')} ({level}) of the live contract cites "
+            f"the published delegation {reference}"
+        )
+    return False, (
+        "the live contract's review's delegation_ref is missing or unpublished, "
+        "or its level is non-conformant/irrelevant without an active waiver"
+    )
 
 
 def check_closure_gate(
@@ -263,20 +363,27 @@ def check_closure_gate(
     ]
     if not gates:
         return False, "no approved closure gate for the project"
-    for gate in gates:
-        decisions = [
-            decision
-            for decision in snapshot.decisions(str(gate["id"]))
-            if decision.get("decision") == "approve"
-        ]
-        distinct = [
-            decision
-            for decision in decisions
-            if decision.get("approver_id") and decision.get("approver_id") != gate.get("requested_by")
-        ]
-        if distinct:
-            return True, f"closure gate {gate['id']} decided by a distinct approver"
-    return False, "the closure gate was approved only by its requester"
+    gate = max(gates, key=lambda gate_row: _timestamp(gate_row.get("created_at")))
+    distinct = [
+        decision
+        for decision in snapshot.decisions(str(gate["id"]))
+        if decision.get("decision") == "approve"
+        and decision.get("approver_id")
+        and decision.get("approver_id") != gate.get("requested_by")
+    ]
+    if not distinct:
+        return False, (
+            f"the latest approved closure gate {gate.get('id')} carries no approve "
+            "decision by an approver other than its requester"
+        )
+    # The gate must authorise THIS project's close, not another row's. The action computes the
+    # target; the projection now carries meta, so the claim is checkable.
+    target = (gate.get("meta") or {}).get("target")
+    if target and str(target) != f"project/{row['id']}/close":
+        return False, (
+            f"the latest approved closure gate {gate.get('id')} targets {target}, not this project"
+        )
+    return True, f"latest closure gate {gate.get('id')} decided by a distinct approver"
 
 
 def check_waivers(
@@ -458,7 +565,15 @@ def check_lessons(
     ]
     if not lessons:
         return False, f"the {period} retro produced no lesson"
-    return True, f"{len(lessons)} lesson(s) from the {period} retro"
+    for lesson in lessons:
+        statement = str(lesson.get("statement") or "").strip()
+        evidence = lesson.get("evidence")
+        if statement and isinstance(evidence, list) and evidence:
+            return True, (
+                f"lesson {lesson.get('id')} carries a statement and evidence "
+                f"from the {period} retro"
+            )
+    return False, f"the {period} retro's lessons carry no statement with evidence"
 
 
 def _published_for_period(
@@ -878,7 +993,8 @@ def self_test() -> int:
                 ],
                 "lessons": [
                     {"id": "l1", "cadence_id": "c-retro",
-                     "statement": "the plan preceded the demo"}
+                     "statement": "the plan preceded the demo",
+                     "evidence": ["manifest-run"]}
                 ],
             }
         )
@@ -1118,6 +1234,163 @@ severity = "P0"
         lambda m, o: o.__setitem__(
             slice(None), [row for row in o if row["category"] != "pi-objectives"]
         ),
+    )
+
+    # ── the hardened rules: every crafted case passes under the old rule and fails now ─
+    hardening_manifest = workdir / "TEST-hardening.toml"
+    hardening_manifest.write_text(
+        """
+[project]
+key = "TEST"
+name = "Self-test hardening"
+gate = "each check proves its TOML description"
+
+[[check]]
+id = "baseline"
+check = "project_baseline"
+severity = "P0"
+require_approved = true
+
+[[check]]
+id = "contract"
+check = "contract"
+severity = "P0"
+
+[[check]]
+id = "review"
+check = "review"
+severity = "P0"
+
+[[check]]
+id = "closure-gate"
+check = "closure_gate"
+severity = "P0"
+
+[[check]]
+id = "lessons"
+check = "lessons"
+severity = "P0"
+"""
+    )
+    hard_arch = {
+        "contracts": [
+            {"id": "ct-live", "project_id": "project-1", "status": "live",
+             "approval_id": "ap-contract", "requested_by": "u-requester",
+             "approved_by": "u-approver"},
+            {"id": "ct-old", "project_id": "project-1", "status": "superseded",
+             "approval_id": "ap-contract-old", "requested_by": "u-requester",
+             "approved_by": "u-approver"},
+        ],
+        "compliance_reviews": [
+            {"id": "rv-live", "project_id": "project-1", "contract_id": "ct-live",
+             "level": "compliant", "evidence": {"delegation_ref": "o-review"}},
+        ],
+        "waivers": [],
+    }
+    hard_work = {
+        "approvals": [
+            {"id": "ap-contract", "project_id": "project-1", "gate": "architecture_board",
+             "status": "approved", "requested_by": "u-requester",
+             "meta": {"subject_kind": "contract", "subject_id": "ct-live"},
+             "created_at": "2026-11-01T00:00:00+00:00"},
+            {"id": "ap-contract-old", "project_id": "project-1", "gate": "contract",
+             "status": "approved", "requested_by": "u-requester",
+             "created_at": "2026-11-01T00:00:00+00:00"},
+            {"id": "ap-close-1", "project_id": "project-1", "gate": "closure",
+             "status": "approved", "requested_by": "u-requester",
+             "created_at": "2026-11-02T00:00:00+00:00"},
+        ],
+        "approval_decisions": [
+            {"approval_id": "ap-contract", "decision": "approve",
+             "approver_id": "u-approver"},
+            {"approval_id": "ap-contract-old", "decision": "approve",
+             "approver_id": "u-approver"},
+            {"approval_id": "ap-close-1", "decision": "approve",
+             "approver_id": "u-approver"},
+        ],
+    }
+    hard_msp = copy.deepcopy(base_msp)
+    hard_msp["project_baselines"] = [
+        {"id": "b1", "project_id": "project-1", "kind": "scope",
+         "taken_by": "u-taker", "approved_by": "u-approver",
+         "snapshot": {"frozen": True}}
+    ]
+    hard_outputs = copy.deepcopy(base_outputs) + [
+        {"id": "o-review", "project_key": "P0", "category": "closure-review",
+         "title": "close review", "unit": "tranche-4",
+         "published_at": "2026-11-01T00:00:00+00:00"}
+    ]
+
+    def hardening_case(name: str, change, expect_green: bool) -> None:
+        case = workdir / f"hardening-{name}"
+        (case / "data").mkdir(parents=True)
+        (case / "docs").mkdir()
+        for filename in ("programme.json", "artefacts.json", "manifest.json"):
+            shutil.copy(snapshot / "data" / filename, case / "data" / filename)
+        arch = copy.deepcopy(hard_arch)
+        work = copy.deepcopy(hard_work)
+        msp = copy.deepcopy(hard_msp)
+        outputs = copy.deepcopy(hard_outputs)
+        change(arch, work, msp, outputs)
+        (case / "data" / "architecture.json").write_text(json.dumps(arch))
+        (case / "data" / "work.json").write_text(json.dumps(work))
+        (case / "data" / "msp.json").write_text(json.dumps(msp))
+        (case / "docs" / "outputs.js").write_text(
+            "window.CONVEYOR_OUTPUTS = "
+            + json.dumps({"schema": "v1", "outputs": outputs})
+            + ";\n"
+        )
+        result = run_project(
+            "TEST", case / "data", hardening_manifest,
+            workdir / f"evidence-hardening-{name}", quiet=True,
+        )
+        if (result["verdict"] == "green") != expect_green:
+            failures.append(
+                f"hardening case {name}: verdict {result['verdict']}, "
+                f"expected {'green' if expect_green else 'red'}"
+            )
+
+    hardening_case("ok", lambda a, w, m, o: None, True)
+    hardening_case(
+        "baseline-self-approved",
+        lambda a, w, m, o: m["project_baselines"][0].update({"approved_by": "u-taker"}),
+        False,
+    )
+    hardening_case(
+        "contract-no-decision",
+        lambda a, w, m, o: w.__setitem__(
+            "approval_decisions",
+            [d for d in w["approval_decisions"] if d["approval_id"] != "ap-contract"],
+        ),
+        False,
+    )
+    hardening_case(
+        "review-non-conformant",
+        lambda a, w, m, o: a["compliance_reviews"][0].update({"level": "non_conformant"}),
+        False,
+    )
+    hardening_case(
+        "review-superseded-contract",
+        lambda a, w, m, o: a["compliance_reviews"][0].update({"contract_id": "ct-old"}),
+        False,
+    )
+
+    def closure_latest_self_approved(arch, work, msp, outputs) -> None:
+        work["approvals"].append(
+            {"id": "ap-close-2", "project_id": "project-1", "gate": "closure",
+             "status": "approved", "requested_by": "u-requester",
+             "created_at": "2026-11-03T00:00:00+00:00"}
+        )
+        work["approval_decisions"].append(
+            {"approval_id": "ap-close-2", "decision": "approve",
+             "approver_id": "u-requester"}
+        )
+
+    hardening_case("closure-latest-self-approved", closure_latest_self_approved, False)
+    hardening_case(
+        "lesson-without-evidence",
+        lambda a, w, m, o: m["lessons"][0].update({"evidence": []}),
+        False,
     )
 
     if failures:
