@@ -194,9 +194,9 @@ enum AdminCommand {
         /// read out of the recording. Replaces `--old`; shares the migration comparison.
         #[arg(long)]
         expect: Option<PathBuf>,
-        /// The recorded n8n workflow snapshot (`workflow_entity` id/name/versionId/nodes).
+        /// The recorded flow snapshot (`workflow_entity` id/name/versionId/nodes).
         ///
-        /// With this flag `--old` is a raw recorded n8n execution (`execution_data.data`) and is
+        /// With this flag `--old` is a raw recorded flow execution (`execution_data.data`) and is
         /// projected into a trace first; without it `--old` is JSONL, like `--new`.
         #[arg(long, requires = "old")]
         old_workflow: Option<PathBuf>,

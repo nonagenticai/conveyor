@@ -26,6 +26,7 @@ use conveyor_actions::views::ActionManifest;
 use conveyor_actions::{ActionError, Authority, InvokeRequest, Precondition, UsageContext};
 use serde_json::Value;
 
+use crate::error::ApiError;
 use crate::extract::{Caller, RequireLicence};
 use crate::request_id::RequestId;
 use crate::state::AppState;
@@ -246,6 +247,76 @@ pub async fn invoke_http(
             correlation_id: Some(request_id.clone()),
         }),
     };
+    // ── async submit (#579) ──────────────────────────────────────────────────────────────────
+    // A caller behind Cloudflare cannot hold one response open past ~100 s, and this estate's
+    // answer is submit → 202 + id → poll (w2v, agent, mcp, coding all do it). `precheck` is the
+    // SAME first stage `invoke` runs, so an invalid input or a forbidden caller still fails
+    // HERE, synchronously: the work is never queued and nobody polls to learn their request was
+    // bad.
+    if wants_async(&headers) {
+        if let Err(error) = conveyor_actions::invoke::precheck(registry(), &request) {
+            return problem(&error, &instance, &request_id);
+        }
+        let input_hash = conveyor_store::idempotency::request_hash(&request.input);
+        let reserved = conveyor_store::async_invocation::start(
+            &state.pool,
+            caller.tenant,
+            &name,
+            request.actor_id,
+            &input_hash,
+            request.idempotency_key.as_deref(),
+        )
+        .await;
+        let invocation_id = match reserved {
+            Ok((id, _created)) => id,
+            Err(error) => {
+                tracing::error!(%error, action = %name, "reserve an async invocation");
+                return ApiError::new(
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    "internal",
+                    "the invocation could not be started",
+                )
+                .into_response();
+            }
+        };
+        let pool = state.pool.clone();
+        let tenant = caller.tenant;
+        let job = request.clone();
+        tokio::spawn(async move {
+            let settled = conveyor_actions::invoke(&pool, registry(), tenant, job).await;
+            let (outcome, status, body) = match settled {
+                Ok(outcome) => ("done", outcome.status as i32, outcome.body),
+                Err(error) => ("failed", error.status as i32, error.problem(None, None)),
+            };
+            if let Err(error) = conveyor_store::async_invocation::finish(
+                &pool,
+                tenant,
+                invocation_id,
+                outcome,
+                status,
+                &body,
+            )
+            .await
+            {
+                // The caller will keep seeing `202` until the sweep removes the row. Loud,
+                // because the only way out of that state is an operator.
+                tracing::error!(%error, %invocation_id, "record an async invocation");
+            }
+        });
+        return (
+            StatusCode::ACCEPTED,
+            [(
+                header::LOCATION,
+                format!("/api/invocations/{invocation_id}"),
+            )],
+            Json(serde_json::json!({
+                "invocation_id": invocation_id,
+                "status": "running",
+            })),
+        )
+            .into_response();
+    }
+
     let started = Instant::now();
     match conveyor_actions::invoke(&state.pool, registry(), caller.tenant, request).await {
         Ok(outcome) => {
@@ -274,4 +345,17 @@ pub async fn invoke_http(
             problem(&error, &instance, &request_id)
         }
     }
+}
+
+/// Does the caller want the work queued rather than waited for?
+///
+/// `Prefer: respond-async` (RFC 7240), matched per preference token and case-insensitively, so
+/// `Prefer: wait=30, respond-async` counts and `respond-asyncs` does not.
+fn wants_async(headers: &HeaderMap) -> bool {
+    headers
+        .get_all("prefer")
+        .iter()
+        .filter_map(|value| value.to_str().ok())
+        .flat_map(|value| value.split(','))
+        .any(|token| token.trim().eq_ignore_ascii_case("respond-async"))
 }

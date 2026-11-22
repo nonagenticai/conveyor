@@ -229,7 +229,7 @@ impl Pg {
             .expect("connect as conveyor_migrate");
         conveyor_store::migrate(&owner)
             .await
-            .expect("migrate as the schema owner");
+            .unwrap_or_else(|error| panic!("migrate as the schema owner ({name}): {error:?}"));
 
         let runtime_url =
             with_credentials(&server.base, "conveyor_runtime", RUNTIME_PASSWORD, &name);

@@ -1,4 +1,4 @@
-SdtuWREqGgFwublv	PROBE security scan facts (movies-f0, delete me)	dead	retire	n8n-retire
+SdtuWREqGgFwublv	PROBE security scan facts (movies-f0, delete me)	dead	retire	flow-retire
 k4ioocPrIC06ct1w	architecture_baseline_harvest.DOING	matrix	matrix	process:architecture_baseline_harvest.DOING
 BninE4NnyTjGAN7J	architecture_baseline_harvest.DONE	matrix	matrix	process:architecture_baseline_harvest.DONE
 sENynBa7vi4TQ2uS	architecture_baseline_harvest.QA	matrix	matrix	process:architecture_baseline_harvest.QA
@@ -180,7 +180,7 @@ sqE3NZDhwgdoZ0CO	diagram_design.DOING	matrix	matrix	process:diagram_design.DOING
 6gQC32gAmr7kFAEJ	diagram_design.DONE	matrix	matrix	process:diagram_design.DONE
 ByC2lNn3qQvUNRpN	diagram_design.QA	matrix	matrix	process:diagram_design.QA
 RxDoIP4n7cEyw2Wx	diagram_design.READY	matrix	matrix	process:diagram_design.READY
-0kTlUjre9GsATWx8	dispatcher	dead	retire	n8n-retire
+0kTlUjre9GsATWx8	dispatcher	dead	retire	flow-retire
 JbJceBSnPRAmBlRk	domain_analysis.DOING	matrix	matrix	process:domain_analysis.DOING
 1vV2xcpHMUf62ef4	domain_analysis.DONE	matrix	matrix	process:domain_analysis.DONE
 tEUoHmmo4HxqZ5tF	domain_analysis.QA	matrix	matrix	process:domain_analysis.QA
@@ -336,13 +336,13 @@ nmgCMlDQpQFT704x	testing_strategy.DONE	matrix	matrix	process:testing_strategy.DO
 irIemgAxPf3pt4F4	testing_strategy.QA	matrix	matrix	process:testing_strategy.QA
 fMiuqfcGKLtcOpqF	testing_strategy.READY	matrix	matrix	process:testing_strategy.READY
 rAwDtIctiVtjhvFI	wip.pull	named	platform-job	absorbed:wip.pull
-k2c7B0bLRG7g99EV	zz.probe.envelope.enum	dead	retire	n8n-retire
-jbSvqDGtuDCOlE7k	zz.probe.extraBody.json_schema	dead	retire	n8n-retire
-YOH0hUBd7KHScmLN	zz.probe.toolcall	dead	retire	n8n-retire
-3muwsYCxMxL5Pd7r	zz.proof.ask_timeout	dead	retire	n8n-retire
-dr5B0YLZGSrEoFu5	zz.test.ask	dead	retire	n8n-retire
-lMBoDAvlEmFIqckc	zz.test.create-project	dead	retire	n8n-retire
-qMc1fkdIxY3DLq89	zz.test.inspect	dead	retire	n8n-retire
-RwLKQXo0gku8nWyg	zz.tmp.coach_proof	dead	retire	n8n-retire
-sWVspGfox3XAa6Ry	zz.tmp.coach_release	dead	retire	n8n-retire
-uF0cOk1K43DV8AGn	zz.tmp.pv-migration-worker-proof	dead	retire	n8n-retire
+k2c7B0bLRG7g99EV	zz.probe.envelope.enum	dead	retire	flow-retire
+jbSvqDGtuDCOlE7k	zz.probe.extraBody.json_schema	dead	retire	flow-retire
+YOH0hUBd7KHScmLN	zz.probe.toolcall	dead	retire	flow-retire
+3muwsYCxMxL5Pd7r	zz.proof.ask_timeout	dead	retire	flow-retire
+dr5B0YLZGSrEoFu5	zz.test.ask	dead	retire	flow-retire
+lMBoDAvlEmFIqckc	zz.test.create-project	dead	retire	flow-retire
+qMc1fkdIxY3DLq89	zz.test.inspect	dead	retire	flow-retire
+RwLKQXo0gku8nWyg	zz.tmp.coach_proof	dead	retire	flow-retire
+sWVspGfox3XAa6Ry	zz.tmp.coach_release	dead	retire	flow-retire
+uF0cOk1K43DV8AGn	zz.tmp.pv-migration-worker-proof	dead	retire	flow-retire

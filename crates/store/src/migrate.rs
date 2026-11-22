@@ -288,7 +288,11 @@ mod tests {
                 // (0073): the baseline/interim/post readings a benefit's evaluation reads, and
                 // the seven programme strategy/plan asset kinds
                 // (0073_benefit_measurement.sql, SPEC_V2 §8.3).
-                (73, "benefit measurement".to_owned())
+                (73, "benefit measurement".to_owned()),
+                // #579: the async invocation record, so a caller behind the CDN's ~100 s cap
+                // can submit and poll instead of holding one response open
+                // (0074_async_invocation.sql).
+                (74, "async invocation".to_owned())
             ],
             "the embedded migration set is {embedded:?}; a wrong sqlx::migrate! path or a \
              file outside the set changes it"

@@ -710,7 +710,7 @@ async fn update_is_guarded_by_if_match_and_get_returns_the_row() {
         .invoke(
             "project_requests.update",
             "dev:alice",
-            json!({"id": id, "external_origin": "planka"}),
+            json!({"id": id, "external_origin": "board-application"}),
             None,
             None,
             None,
@@ -727,7 +727,7 @@ async fn update_is_guarded_by_if_match_and_get_returns_the_row() {
             "dev:alice",
             json!({
                 "id": id,
-                "external_origin": "planka",
+                "external_origin": "board-application",
                 "payload": {"title": "Edited"},
             }),
             Some("\"1\""),
@@ -737,7 +737,7 @@ async fn update_is_guarded_by_if_match_and_get_returns_the_row() {
         .await;
     assert_eq!(status, 200, "{updated}");
     assert_eq!(headers.get("etag").map(String::as_str), Some("\"2\""));
-    assert_eq!(output(&updated)["external_origin"], "planka");
+    assert_eq!(output(&updated)["external_origin"], "board-application");
     assert_eq!(output(&updated)["payload"]["title"], "Edited");
 
     // The same If-Match again is stale: 412 with the row as it now stands.
@@ -745,7 +745,7 @@ async fn update_is_guarded_by_if_match_and_get_returns_the_row() {
         .invoke(
             "project_requests.update",
             "dev:alice",
-            json!({"id": id, "external_origin": "planka"}),
+            json!({"id": id, "external_origin": "board-application"}),
             Some("\"1\""),
             None,
             None,
@@ -766,7 +766,7 @@ async fn update_is_guarded_by_if_match_and_get_returns_the_row() {
         )
         .await;
     assert_eq!(status, 200, "{fetched}");
-    assert_eq!(output(&fetched)["external_origin"], "planka");
+    assert_eq!(output(&fetched)["external_origin"], "board-application");
     assert_eq!(output(&fetched)["version"], 2);
 }
 
@@ -843,7 +843,7 @@ async fn every_request_mutation_announces_itself() {
         .invoke(
             "project_requests.update",
             "dev:alice",
-            json!({"id": first_id, "external_origin": "planka"}),
+            json!({"id": first_id, "external_origin": "board-application"}),
             Some("\"1\""),
             None,
             None,
@@ -878,7 +878,7 @@ async fn every_request_mutation_announces_itself() {
         .invoke(
             "project_requests.update",
             "dev:alice",
-            json!({"id": second_id, "external_origin": "planka"}),
+            json!({"id": second_id, "external_origin": "board-application"}),
             None,
             None,
             None,

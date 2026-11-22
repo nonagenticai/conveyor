@@ -588,7 +588,7 @@ pub async fn get_board_member_tx(
 
 /// Add a member to a board, or change the one membership that already exists.
 ///
-/// One row per `(board, user)` — the table's unique key is the contract (S05 §5: Planka's
+/// One row per `(board, user)` — the table's unique key is the contract (S05 §5: the board application's
 /// `board_membership` + `project_manager` + `board_subscription` fold into this one row).
 /// `can_comment`/`watching` present mean "set"; absent means "keep the stored value" on an
 /// update and the column default on an insert.
