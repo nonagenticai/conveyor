@@ -1,7 +1,7 @@
 {
   "version": 1,
   "operations": {
-    "GET /api/actions": "5fde2caec41a2839689d5eef2067c1e22a3c009ab8c57816ca667f2b38f36c0e",
+    "GET /api/actions": "06743388d70c028688ad550e0abfe91af2aa6e7efa26129c1e33c09014428a39",
     "GET /api/boards/{id}": "e1a5ad504ea61c9f6f4c9940f6bce0a13a06587c4545d9d52616852f0e67fa5b",
     "GET /api/boards/{id}/cards": "be3ca9f8fea011aa8b097206310d24ba4641698d2a8d239c5b2df6c48b784502",
     "GET /api/boards/{id}/webhooks": "5b77b802ff044156108b56072acb99bed0e2f9dfb5f2dc667b000af191cffd1b",
@@ -505,6 +505,8 @@
     "POST /api/actions/stakeholders.profile_list/invocations": "0c4f1f27c64d00982bf4f9dc2d0ddc9a1e5e441b699d99128097e226d714c553",
     "POST /api/actions/stakeholders.profile_update/invocations": "ffffd28ddd880ee4223a9af40da50e8c0e9d311bb72a10d83887da66dc3e93b9",
     "POST /api/actions/stakeholders.update/invocations": "f504e3e98b283cd9b668d9a8a7dcc57c63ed3c9cb09ca1a82ac3500cb03161be",
+    "POST /api/actions/storage.get/invocations": "422772f44e89eba8b8d571667903887d65e590ac6f6ab668b96698c6fbf1126b",
+    "POST /api/actions/storage.put/invocations": "8649c1d5169a840ee941336f38dff3a5fee1f9a356e43e1b75b0d2e613ca5cbd",
     "POST /api/actions/task_lists.create/invocations": "8454d09770bd52c3946bca7bb35c05c3fef8ceb208c33fa739c03c0ca3238c0d",
     "POST /api/actions/task_lists.delete/invocations": "f78b4dda959bc731cd2f80fb4a630529aaf1ebeaca9c475cfa727faa53bfcb60",
     "POST /api/actions/task_lists.update/invocations": "22da90a5dbaa50276b75fcdc974b126b7c09cd06f12dc95de94da08d2acc8e1d",
@@ -521,6 +523,7 @@
     "POST /api/actions/toolkits.publish/invocations": "d56a4419e97cb96dbe608c44aefcae0de33e8a36713e42050fbc4665cdb80d0b",
     "POST /api/actions/tools.call/invocations": "e3dd8b2bec33780a1c04168f96ea0d4465433398fd0172d6f24207bf20c0b016",
     "POST /api/actions/tools.probe/invocations": "e831a20b263e16d0b00bb89e466b3984525f2db804606599f34bd0805a30df37",
+    "POST /api/actions/tools.retire/invocations": "a0897bc514803d86bf6706e4c151f87efd32aa410ba6eedcf9290d8ae251f091",
     "POST /api/actions/tools.usage/invocations": "6f659c5d7ef220fbfe1b03b560e59c0376b6f4c1e3e04bda382ff0b7e9e055b5",
     "POST /api/actions/trace_links.create/invocations": "81c574e5c44cd253f3dadfb900d45af373ec386a92f0810015b7a8c7806d1954",
     "POST /api/actions/trace_links.delete/invocations": "7bd39285451b996c50b049f484c52facb4a9949d5f443e2cc83c6e3ed80743cf",
