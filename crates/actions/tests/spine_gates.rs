@@ -434,33 +434,43 @@ fn assert_impact_missing(error: &conveyor_actions::ActionError) {
     );
 }
 
-/// v1-p5-3 — `{}` is not an impact block: a change created with an empty (or absent, or
-/// non-object) impact is refused, and the same change with a scope delta is created.
+/// v1-p5-3 — an impact block carrying no non-null scope/schedule/cost/risk analysis is refused:
+/// `{}`, a JSON null block, a scalar, an array, a null-valued key and a missing block all fail,
+/// and the same change with a scope delta is created.
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn a_change_with_no_impact_analysis_is_refused() {
     let (pg, seeded) = fixture().await;
     let project = project(&pg, seeded.tenant_id, None, json!({})).await;
     let baseline = approved_baseline(&pg, seeded.tenant_id, project, seeded.user_id).await;
 
-    let error = invoke(
-        &pg.runtime,
-        registry(),
-        seeded.tenant,
-        request(
-            seeded.user_id,
-            "registers.create",
-            json!({
-                "project_id": project,
-                "kind": "change",
-                "title": "Move the gate",
-                "baseline_ref": baseline,
-                "meta": {"impact": {}},
-            }),
-        ),
-    )
-    .await
-    .expect_err("an empty impact block is not an impact analysis");
-    assert_impact_missing(&error);
+    for (label, meta) in [
+        ("empty object", json!({"impact": {}})),
+        ("JSON null block", json!({"impact": null})),
+        ("scalar block", json!({"impact": 3})),
+        ("array block", json!({"impact": [1]})),
+        ("null-valued key", json!({"impact": {"scope": null}})),
+        ("no block at all", json!({})),
+    ] {
+        let error = invoke(
+            &pg.runtime,
+            registry(),
+            seeded.tenant,
+            request(
+                seeded.user_id,
+                "registers.create",
+                json!({
+                    "project_id": project,
+                    "kind": "change",
+                    "title": "Move the gate",
+                    "baseline_ref": baseline,
+                    "meta": meta,
+                }),
+            ),
+        )
+        .await
+        .expect_err(label);
+        assert_impact_missing(&error);
+    }
     let rows: i64 = sqlx::query_scalar(
         "SELECT count(*) FROM project_register_item WHERE tenant_id = $1 AND kind = 'change'",
     )
@@ -471,21 +481,25 @@ async fn a_change_with_no_impact_analysis_is_refused() {
     assert_eq!(rows, 0, "the refused create wrote a change row");
 
     // The second lock is the DB CHECK: a raw insert that bypasses the store is refused too, so
-    // the schema itself cannot hold a change with an empty impact block.
-    let direct = sqlx::query(
-        "INSERT INTO project_register_item
-             (tenant_id, project_id, kind, title, baseline_ref, meta)
-         VALUES ($1, $2, 'change', 'Bypass the store', $3, '{\"impact\": {}}'::jsonb)",
-    )
-    .bind(seeded.tenant_id)
-    .bind(project)
-    .bind(baseline)
-    .execute(&pg.super_pool)
-    .await;
-    assert!(
-        direct.is_err(),
-        "the DB CHECK accepted an empty impact block: {direct:?}"
-    );
+    // the schema itself cannot hold a change whose block is empty or whose only key is null.
+    for block in ["{}", "{\"scope\": null}"] {
+        let direct = sqlx::query(
+            "INSERT INTO project_register_item
+                 (tenant_id, project_id, kind, title, baseline_ref, meta)
+             VALUES ($1, $2, 'change', 'Bypass the store', $3,
+                     jsonb_build_object('impact', $4::jsonb))",
+        )
+        .bind(seeded.tenant_id)
+        .bind(project)
+        .bind(baseline)
+        .bind(block)
+        .execute(&pg.super_pool)
+        .await;
+        assert!(
+            direct.is_err(),
+            "the DB CHECK accepted impact {block}: {direct:?}"
+        );
+    }
 
     let outcome = invoke(
         &pg.runtime,

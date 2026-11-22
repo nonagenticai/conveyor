@@ -402,7 +402,7 @@ pub(crate) async fn invoke_broker(
     // Non-spend tools keep the caller's own context: they write no priced row.
     let mut usage = request.usage.clone();
     if effect == Effect::Spend {
-        let usage = usage.get_or_insert_with(|| UsageContext {
+        let usage = usage.get_or_insert(UsageContext {
             caller_kind: conveyor_domain::inference::CallerKind::Other,
             run_id: None,
             run_step_id: None,
