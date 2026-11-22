@@ -650,6 +650,15 @@ window.CONVEYOR_DOCUMENTS = {
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/T2/acts.md"
     },
     {
+      "title": "The full-fidelity snapshot loop",
+      "path": "docs/evidence/rework/full-fidelity-snapshot.html",
+      "source": "docs/evidence/rework/full-fidelity-snapshot.md",
+      "section": "Evidence",
+      "sha256": "e9dfa4530366c0d1bbd8bc3097577c5e4850113c8e7a9ae740c76e1d2e99826d",
+      "bytes": 6288,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/full-fidelity-snapshot.md"
+    },
+    {
       "title": "Tranche 0 / PI 0 — the SAFe cadence record (retrospective, 2026-11-21)",
       "path": "docs/evidence/rework/tranche-0/acts.html",
       "source": "docs/evidence/rework/tranche-0/acts.md",
@@ -675,6 +684,15 @@ window.CONVEYOR_DOCUMENTS = {
       "sha256": "c8b13408b88c8b3fef68d8d71cd34307ce27ccdb2b5d7d4c8a1451cd925ce83f",
       "bytes": 7532,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/tranche-2/acts.md"
+    },
+    {
+      "title": "Tranche 2 — the retro lessons, one per finding",
+      "path": "docs/evidence/rework/tranche-2/lessons.html",
+      "source": "docs/evidence/rework/tranche-2/lessons.md",
+      "section": "Evidence",
+      "sha256": "a63136f8953dd645d439f5b438ee4c0e00d2281c154b4ae149e243e2098228fc",
+      "bytes": 4576,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/tranche-2/lessons.md"
     },
     {
       "title": "V1 → SPECV2 coverage",
