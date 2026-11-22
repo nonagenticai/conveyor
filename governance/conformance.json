@@ -330,7 +330,7 @@
     "waiver_not_permitted": {
       "severity": "P1",
       "standard": "MSP",
-      "spec": "ADR 0010 \u00a7Decision 1",
+      "spec": "ADR 0012 \u00a7Decision 1",
       "artefact": "waiver",
       "scope": "programme",
       "owner_project": "P0",

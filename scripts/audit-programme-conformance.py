@@ -39,7 +39,7 @@ REGISTER_SCHEMA = "conveyor-rework/v1"
 REGISTER_STANDARDS = ("MSP", "TOGAF", "SAFe", "PMP", "SPEC")
 REGISTER_SCOPES = ("project", "tranche", "programme")
 REGISTER_MAX_SUBJECTS = 20
-# No disposition suppresses a package (ADR 0010): a baseline row recorded as a waiver is
+# No disposition suppresses a package (ADR 0012): a baseline row recorded as a waiver is
 # still an open gap. The tuple is kept as the one extension point so a future legal
 # suppression has a single place to be declared.
 REGISTER_SUPPRESSED = ()
@@ -1884,7 +1884,7 @@ def build_register(
 
     P0 is never grouped (one package per rule and subject). P1–P3 are grouped by the rule's
     scope (project / tranche / programme) and split at [`REGISTER_MAX_SUBJECTS`]. No
-    disposition suppresses a package: every open row computes as an open gap (ADR 0010). A
+    disposition suppresses a package: every open row computes as an open gap (ADR 0012). A
     checked-in v1 finding is dropped only when it names the data gap it duplicates with
     `duplicate_of`.
     """
@@ -1943,7 +1943,7 @@ def build_register(
             continue
         # The residual-waiver legality check survives: a waiver names who accepted it, the
         # decision that records it, why, and when it must be reassessed, and anything less is
-        # refused. A legal programme waiver is still not a disposition (ADR 0010): the finding
+        # refused. A legal programme waiver is still not a disposition (ADR 0012): the finding
         # stays open and the waiver itself becomes a `waiver_not_permitted` finding.
         disposition = "rework"
         waiver = finding.get("waiver")
