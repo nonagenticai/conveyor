@@ -1,0 +1,20 @@
+{
+  "actual_value": 0.0,
+  "benefit_id": "01a1e9df-0c4b-7807-b35c-5810ec418d45",
+  "evidence": {
+    "detail": {
+      "T6": "absent at the head; the baseline is the honest zero"
+    },
+    "instrument": "T6 development project runs reaching live verification",
+    "reference": "B3",
+    "value": 0.0
+  },
+  "id": "01a204d3-8847-79e9-84ac-1b387dc6664c",
+  "kind": "baseline",
+  "measured_at": "2026-11-22T20:00:00Z",
+  "method": "T6 development project runs reaching live verification",
+  "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+  "target_value": null,
+  "tranche_id": null,
+  "unit": "self-development runs"
+}
