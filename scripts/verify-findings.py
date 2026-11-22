@@ -8,7 +8,7 @@ true. Either way it must not reach the rework register.
 
 Usage:
     python3 scripts/verify-findings.py [docs/evidence/v1-conformance-findings.json]
-    python3 scripts/verify-findings.py --stdout      # verify, print a summary, write nothing
+    python3 scripts/verify-findings.py --stdout      # print failures to stdout, write nothing
 
 Exit 0 = every finding verified; exit 1 = at least one defect (listed on stderr).
 """
@@ -168,9 +168,21 @@ def verify(path: Path) -> list[str]:
     return errors
 
 
+def head_sha() -> str:
+    """The commit HEAD points at; always an ancestor of itself, so the test never pins history."""
+    result = subprocess.run(
+        ["git", "-C", str(ROOT), "rev-parse", "HEAD"],
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    return result.stdout.strip()
+
+
 def self_test() -> None:
     """The gate refuses prose, a non-ancestor commit, a missing test and empty evidence."""
     first_line = (ROOT / "scripts" / "verify-findings.py").read_text(encoding="utf-8").splitlines()[0]
+    at_head = head_sha()
     base = {
         "id": "v1-self-1",
         "area": "§1",
@@ -184,7 +196,7 @@ def self_test() -> None:
         "acceptance": "self test",
         "owner_project": "PLATFORM",
         "resolved_by": {
-            "commit": "92e6b223e2b6de6a005e8e8ec1e984abbbc3071b",
+            "commit": at_head,
             "test": "scripts/verify-findings.py",
             "evidence": "self test",
         },
@@ -195,7 +207,7 @@ def self_test() -> None:
         mutate(finding)
         document = {
             "schema": SCHEMA,
-            "audited_sha": "92e6b223e2b6de6a005e8e8ec1e984abbbc3071b",
+            "audited_sha": at_head,
             "audited_at": "2026-11-21",
             "findings": [finding],
         }
@@ -230,15 +242,17 @@ def main(argv: list[str]) -> int:
     if "--self-test" in argv:
         self_test()
         return 0
+    to_stdout = "--stdout" in argv
     arguments = [item for item in argv if item != "--stdout"]
     if len(arguments) > 1:
-        print("usage: verify-findings.py [ledger.json]", file=sys.stderr)
+        print("usage: verify-findings.py [ledger.json] [--stdout]", file=sys.stderr)
         return 2
     path = Path(arguments[0]) if arguments else DEFAULT
     errors = verify(path)
     if errors:
+        stream = sys.stdout if to_stdout else sys.stderr
         for error in errors:
-            print(f"FAIL {error}", file=sys.stderr)
+            print(f"FAIL {error}", file=stream)
         return 1
     document = json.loads(path.read_text(encoding="utf-8"))
     findings = document["findings"]
