@@ -152,6 +152,10 @@ pub enum PlanError {
     /// A benefit has no measured baseline, so it cannot claim a realized improvement.
     #[error("benefit_baseline_missing")]
     BenefitBaselineMissing,
+    /// A benefit has no `post` measurement after the transition was enacted, so a realization
+    /// claim or a post-transition timestamp is an assertion without a reading.
+    #[error("benefit_post_measurement_missing")]
+    BenefitPostMeasurementMissing,
     /// An approved benefit profile's measurement fields change only through an approved change.
     #[error("benefit_change_required")]
     BenefitChangeRequired,

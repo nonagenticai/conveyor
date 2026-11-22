@@ -68,6 +68,7 @@
     "benefits.link",
     "benefits.link_list",
     "benefits.list",
+    "benefits.measure",
     "benefits.retire",
     "benefits.transition_list",
     "benefits.transition_upsert",

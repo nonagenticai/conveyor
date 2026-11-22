@@ -1,0 +1,300 @@
+//! The programme risk register (0070) — a risk belongs to a programme as well as a project, and
+//! a risk that is missing its review fields is refused.
+//!
+//! `registers.create` takes exactly one of `project_id` / `programme_id`; a programme-level row
+//! carries a null `project_id` and must not be dropped by either read. A `kind='risk'` row is
+//! probability + impact + owner + review date + at least one link; the same rule holds on edit.
+//!
+//! `cargo-guard.py check -p conveyor-actions --tests` compiles these; run with
+//! `cargo-guard.py test -p conveyor-actions --test risk_register` for the behavioural gate.
+
+mod support;
+
+use serde_json::{Value, json};
+
+const TOKEN: &str = "dev:alice";
+
+fn output(body: &Value) -> &Value {
+    body.get("output").unwrap_or(body)
+}
+
+fn text(value: &Value, field: &str) -> String {
+    value[field]
+        .as_str()
+        .unwrap_or_else(|| panic!("{field} is not a string in {value}"))
+        .to_owned()
+}
+
+async fn fixture() -> (support::Pg, support::Running, support::Seeded) {
+    let pg = support::Pg::fresh().await;
+    let seeded = support::seed(&pg, "dev-a", "alice", "Alice").await;
+    conveyor_store::seed::catalogue(&pg.owner)
+        .await
+        .expect("the catalogue seed");
+    let running = support::Running::start(&pg).await;
+    (pg, running, seeded)
+}
+
+async fn create_programme(running: &support::Running, name: &str) -> String {
+    let (status, body) = running
+        .invoke(
+            "programmes.create",
+            TOKEN,
+            json!({"name": name}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "{body}");
+    text(output(&body), "id")
+}
+
+async fn create_project(running: &support::Running, title: &str) -> String {
+    let (status, body) = running
+        .invoke(
+            "projects.create",
+            TOKEN,
+            json!({"title": title, "project_type_code": "delivery"}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "{body}");
+    text(output(&body), "id")
+}
+
+/// A real `job_catalogue` row: a risk without an owner is refused (§8.4).
+async fn owner_job(pg: &support::Pg, seeded: &support::Seeded) -> uuid::Uuid {
+    let industry: uuid::Uuid = sqlx::query_scalar(
+        "INSERT INTO industry (tenant_id, key, name) VALUES ($1, 'software', 'Software')
+         RETURNING id",
+    )
+    .bind(seeded.tenant_id)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("industry");
+    sqlx::query_scalar(
+        "INSERT INTO job_catalogue (tenant_id, job_key, industry_id, title)
+         VALUES ($1, 'pm', $2, 'Programme manager') RETURNING id",
+    )
+    .bind(seeded.tenant_id)
+    .bind(industry)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("job")
+}
+
+/// A complete programme risk. `review_at` is omitted when `review` is false, which is the
+/// refusal under test.
+async fn create_risk(
+    running: &support::Running,
+    programme: &str,
+    owner: uuid::Uuid,
+    review: bool,
+) -> (u16, Value) {
+    let mut input = json!({
+        "programme_id": programme,
+        "kind": "risk",
+        "code": "R-01",
+        "title": "Vendor delay on the shared platform",
+        "probability": "medium",
+        "impact": 4,
+        "owner_job_id": owner,
+        "response": "Weekly vendor checkpoint and a fallback supplier",
+        "links": [{"kind": "objective", "ref": "reduce cycle time"}]
+    });
+    if review {
+        input["review_at"] = json!("2026-12-01");
+    }
+    running
+        .invoke("registers.create", TOKEN, input, None, None, None)
+        .await
+}
+
+/// P1 — a programme risk has no project and is returned with its programme scope.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_programme_risk_has_no_project() {
+    let (pg, running, seeded) = fixture().await;
+    let programme = create_programme(&running, "Risk programme").await;
+    let owner = owner_job(&pg, &seeded).await;
+
+    let (status, body) = create_risk(&running, &programme, owner, true).await;
+    assert_eq!(status, 201, "{body}");
+    let risk = output(&body);
+    assert_eq!(risk["programme_id"], json!(programme), "{body}");
+    assert_eq!(risk["project_id"], Value::Null, "{body}");
+    assert_eq!(risk["kind"], "risk", "{body}");
+    assert_eq!(risk["review_at"], "2026-12-01", "{body}");
+    assert_eq!(risk["probability"], "medium", "{body}");
+    assert_eq!(risk["impact"], 4, "{body}");
+    assert_eq!(risk["owner_job_id"], json!(owner.to_string()), "{body}");
+    assert_eq!(
+        risk["response"], "Weekly vendor checkpoint and a fallback supplier",
+        "{body}"
+    );
+    assert!(
+        risk["links"]
+            .as_array()
+            .is_some_and(|links| !links.is_empty()),
+        "a risk keeps its links: {body}"
+    );
+
+    let (status, listed) = running
+        .invoke(
+            "registers.list",
+            TOKEN,
+            json!({"programme_id": programme}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{listed}");
+    let items = output(&listed)["items"].as_array().expect("a page");
+    assert!(
+        items.iter().any(|item| item["id"] == risk["id"]),
+        "the programme read must return the risk: {listed}"
+    );
+}
+
+/// P2 — a risk without its review date is refused, and the refusal names the gap. No row is
+/// written.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_risk_without_review_at_is_refused() {
+    let (pg, running, seeded) = fixture().await;
+    let programme = create_programme(&running, "Incomplete risk programme").await;
+    let owner = owner_job(&pg, &seeded).await;
+
+    let (status, body) = create_risk(&running, &programme, owner, false).await;
+    assert_eq!(status, 422, "{body}");
+    assert_eq!(body["errors"][0]["code"], "risk_incomplete", "{body}");
+    let detail = text(&body["errors"][0], "detail");
+    assert!(detail.contains("review_at"), "{body}");
+
+    let (status, listed) = running
+        .invoke(
+            "registers.list",
+            TOKEN,
+            json!({"programme_id": programme}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{listed}");
+    assert!(
+        output(&listed)["items"]
+            .as_array()
+            .is_some_and(Vec::is_empty),
+        "a refused risk left a row: {listed}"
+    );
+}
+
+/// P3 — both parents at once is refused; a project's read does not return programme rows.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_register_row_has_exactly_one_parent() {
+    let (pg, running, seeded) = fixture().await;
+    let programme = create_programme(&running, "Scope programme").await;
+    let project = create_project(&running, "Scope project").await;
+    let owner = owner_job(&pg, &seeded).await;
+
+    let (status, body) = running
+        .invoke(
+            "registers.create",
+            TOKEN,
+            json!({
+                "project_id": project,
+                "programme_id": programme,
+                "kind": "risk",
+                "title": "Doubly-owned risk",
+                "probability": "high",
+                "impact": 5,
+                "owner_job_id": owner,
+                "review_at": "2026-12-01",
+                "links": [{"kind": "objective", "ref": "x"}]
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 422, "{body}");
+    assert_eq!(
+        body["errors"][0]["code"], "register_scope_invalid",
+        "{body}"
+    );
+
+    let (status, listed) = running
+        .invoke(
+            "registers.list",
+            TOKEN,
+            json!({"project_id": project}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{listed}");
+    assert!(
+        output(&listed)["items"]
+            .as_array()
+            .is_some_and(Vec::is_empty),
+        "the project read must not drop in or invent a programme row: {listed}"
+    );
+}
+
+/// P4 — the create rule holds on edit: an update that would leave a risk without its review
+/// date is refused.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_risk_update_keeps_the_risk_complete() {
+    let (pg, running, seeded) = fixture().await;
+    let programme = create_programme(&running, "Edit programme").await;
+    let owner = owner_job(&pg, &seeded).await;
+    let (status, body) = create_risk(&running, &programme, owner, true).await;
+    assert_eq!(status, 201, "{body}");
+    let risk = text(output(&body), "id");
+
+    // The row is complete, so a plain edit is accepted and the review date survives.
+    let (status, body) = running
+        .invoke(
+            "registers.update",
+            TOKEN,
+            json!({"id": risk, "title": "Vendor delay, narrowed"}),
+            Some("\"1\""),
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{body}");
+    assert_eq!(output(&body)["review_at"], "2026-12-01", "{body}");
+
+    // A row seeded without a review date (a legacy row) cannot be edited while still incomplete:
+    // the update re-runs the create rule.
+    let raw: uuid::Uuid = sqlx::query_scalar(
+        "INSERT INTO project_register_item
+            (tenant_id, programme_id, kind, title, probability, impact, owner_job_id, links)
+         VALUES ($1, $2::uuid, 'risk', 'Legacy incomplete risk', 'low', 1, $3::uuid,
+                 '[{\"kind\":\"objective\",\"ref\":\"y\"}]'::jsonb)
+         RETURNING id",
+    )
+    .bind(seeded.tenant_id)
+    .bind(&programme)
+    .bind(owner)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("legacy risk");
+    let (status, body) = running
+        .invoke(
+            "registers.update",
+            TOKEN,
+            json!({"id": raw, "title": "Still incomplete"}),
+            Some("\"1\""),
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 422, "{body}");
+    assert_eq!(body["errors"][0]["code"], "risk_incomplete", "{body}");
+}

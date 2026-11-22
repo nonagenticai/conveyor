@@ -612,7 +612,16 @@ async fn msp_deletes_and_refusals() {
         .invoke_full(
             "registers.create",
             "dev:alice",
-            json!({"project_id": project, "kind": "risk", "title": "Indexed risk"}),
+            json!({
+                "project_id": project,
+                "kind": "risk",
+                "title": "Indexed risk",
+                "probability": "medium",
+                "impact": 3,
+                "owner_job_id": job,
+                "review_at": "2026-12-01",
+                "links": [{"kind": "objective", "ref": "reduce cycle time"}]
+            }),
             None,
             None,
             None,

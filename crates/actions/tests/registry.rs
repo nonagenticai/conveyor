@@ -130,7 +130,9 @@ use serde_json::{Value, json};
 /// `adopt|propagate|close` and the `kata.get|list` reads. 517 → **527**.
 /// **v1-w1c-3 adds 2**: `ladder.prepare` (internal read) and `laya.classify` (external) —
 /// the L1 path's own laya call, whose verified invocation a laya decision cites. 527 → **529**.
-const EXPECTED: [&str; 529] = [
+/// **#526 (tr2) adds 1 internal**: `benefits.measure` — the baseline/interim/post reading a
+/// realization cites. 529 → **530**.
+const EXPECTED: [&str; 530] = [
     "actions.describe",
     "actions.list",
     "analyse.site",
@@ -202,6 +204,7 @@ const EXPECTED: [&str; 529] = [
     "benefits.link",
     "benefits.link_list",
     "benefits.list",
+    "benefits.measure",
     "benefits.retire",
     "benefits.transition_list",
     "benefits.transition_upsert",
@@ -760,7 +763,8 @@ fn the_registry_is_exactly_the_declared_set() {
     // 495 -> 514; external stays 13.
     // v1-w1c-3 adds `ladder.prepare` (internal read) and `laya.classify` (external): internal
     // 514 -> 515, external 13 -> 14 — the L1 decision's own laya call.
-    assert_eq!((internal, external), (515, 14));
+    // #526 (tr2) adds `benefits.measure` (internal write): internal 515 -> 516, external stays 14.
+    assert_eq!((internal, external), (516, 14));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),
