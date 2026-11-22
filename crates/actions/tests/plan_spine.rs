@@ -162,6 +162,26 @@ async fn create_wbs(running: &support::Running, project: &str, title: &str) -> S
     id_of(output(&body), "id")
 }
 
+/// A baseline row as `baselines.take` writes it: unapproved until a second principal decides.
+async fn create_unapproved_baseline(
+    running: &support::Running,
+    project: &str,
+    kind: &str,
+) -> String {
+    let (status, body) = running
+        .invoke(
+            "baselines.take",
+            "dev:alice",
+            json!({"project_id": project, "kind": kind}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "{body}");
+    id_of(output(&body), "id")
+}
+
 /// An approved scope baseline: `baselines.take` creates the row and the `baseline` gate's
 /// decision is what `approved_by` records, so the fixture writes that decision directly (the
 /// same shape `spine_gates.rs` builds).
@@ -171,18 +191,7 @@ async fn create_approved_baseline(
     seeded: &support::Seeded,
     project: &str,
 ) -> String {
-    let (status, body) = running
-        .invoke(
-            "baselines.take",
-            "dev:alice",
-            json!({"project_id": project, "kind": "scope"}),
-            None,
-            None,
-            None,
-        )
-        .await;
-    assert_eq!(status, 201, "{body}");
-    let baseline = id_of(output(&body), "id");
+    let baseline = create_unapproved_baseline(running, project, "scope").await;
     sqlx::query("UPDATE project_baseline SET approved_by = $2 WHERE id = $1::uuid")
         .bind(&baseline)
         .bind(seeded.user_id)
@@ -551,6 +560,235 @@ async fn a_wbs_create_after_a_baseline_requires_an_approved_change() {
         )
         .await;
     assert_eq!(status, 204, "{deleted}");
+}
+
+/// v1-change-1 — a tenant with no PM process authorises the change by the approved scope
+/// baseline itself. The WBS acceptance the guard refused is then accepted end to end: request
+/// (direct route), the second principal's decision, then `wbs.update` with the change id.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_direct_change_request_authorises_a_post_baseline_wbs_acceptance() {
+    let (pg, running, seeded) = fixture().await;
+    let project = create_project(&running, "Direct change route").await;
+    let node = create_wbs(&running, &project, "The promised deliverable").await;
+    let baseline = create_approved_baseline(&pg, &running, &seeded, &project).await;
+
+    // No `job_binding_id`: the approved scope baseline is the authority.
+    let (status, body) = running
+        .invoke(
+            "changes.request",
+            "dev:alice",
+            json!({
+                "project_id": project,
+                "baseline_id": baseline,
+                "title": "Accept the delivered scope",
+                "impact": {"scope": "the promised deliverable is accepted"}
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "{body}");
+    let change = id_of(output(&body), "change_id");
+    let gate = id_of(output(&body), "approval_id");
+
+    // The change row cites the baseline the WBS guard resolves.
+    let (status, read) = running
+        .invoke(
+            "registers.get",
+            "dev:alice",
+            json!({"id": change}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{read}");
+    assert_eq!(output(&read)["kind"], "change", "{read}");
+    assert_eq!(output(&read)["baseline_ref"], baseline, "{read}");
+
+    // The second principal approves the gate; the gate effect approves the change row.
+    let (status, decided) = running
+        .invoke(
+            "approvals.decide",
+            "dev:reviewer",
+            json!({"approval_id": gate, "decision": "approve"}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{decided}");
+
+    let (_, headers, _) = running
+        .invoke_full(
+            "wbs.get",
+            "dev:alice",
+            json!({"id": node}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    let etag = headers
+        .get("etag")
+        .cloned()
+        .expect("the node carries an ETag");
+
+    let (status, accepted) = running
+        .invoke(
+            "wbs.update",
+            "dev:alice",
+            json!({
+                "id": node,
+                "status": "accepted",
+                "evidence": [{"manifest": "acceptance/programme/T1.toml", "result": "pass"}],
+                "change_id": change
+            }),
+            Some(etag.as_str()),
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{accepted}");
+    assert_eq!(output(&accepted)["status"], "accepted", "{accepted}");
+}
+
+/// v1-change-1 — the direct route refuses everything but the project's current approved scope
+/// baseline: no authority at all, another project's row, an unapproved row, a non-scope row and
+/// a superseded row all stop before a change row or a gate exists.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_direct_change_request_refuses_an_invalid_baseline() {
+    let (pg, running, seeded) = fixture().await;
+    let project = create_project(&running, "Direct authority").await;
+    let _baseline = create_approved_baseline(&pg, &running, &seeded, &project).await;
+
+    // Neither a binding nor a baseline.
+    let (status, body) = running
+        .invoke(
+            "changes.request",
+            "dev:alice",
+            json!({"project_id": project, "title": "No authority", "impact": {"scope": "x"}}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 422, "{body}");
+    assert_eq!(body["type"], "action-invalid-input", "{body}");
+    assert_eq!(body["errors"][0]["field"], "job_binding_id", "{body}");
+    assert_eq!(
+        body["errors"][0]["code"], "change_authority_missing",
+        "{body}"
+    );
+
+    // Another project's approved baseline.
+    let other = create_project(&running, "Foreign authority").await;
+    let foreign = create_approved_baseline(&pg, &running, &seeded, &other).await;
+    let (status, body) = running
+        .invoke(
+            "changes.request",
+            "dev:alice",
+            json!({
+                "project_id": project,
+                "baseline_id": foreign,
+                "title": "Foreign baseline",
+                "impact": {"scope": "x"}
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 422, "{body}");
+    assert_eq!(body["errors"][0]["field"], "baseline_id", "{body}");
+    assert_eq!(
+        body["errors"][0]["code"], "baseline_project_mismatch",
+        "{body}"
+    );
+
+    // This project's unapproved scope baseline.
+    let unapproved_project = create_project(&running, "Unapproved authority").await;
+    let unapproved = create_unapproved_baseline(&running, &unapproved_project, "scope").await;
+    let (status, body) = running
+        .invoke(
+            "changes.request",
+            "dev:alice",
+            json!({
+                "project_id": unapproved_project,
+                "baseline_id": unapproved,
+                "title": "Unapproved baseline",
+                "impact": {"scope": "x"}
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 422, "{body}");
+    assert_eq!(body["errors"][0]["code"], "baseline_not_approved", "{body}");
+
+    // A schedule baseline is not the scope authority.
+    let schedule_project = create_project(&running, "Schedule authority").await;
+    let schedule = create_unapproved_baseline(&running, &schedule_project, "schedule").await;
+    let (status, body) = running
+        .invoke(
+            "changes.request",
+            "dev:alice",
+            json!({
+                "project_id": schedule_project,
+                "baseline_id": schedule,
+                "title": "Schedule baseline",
+                "impact": {"scope": "x"}
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 422, "{body}");
+    assert_eq!(body["errors"][0]["code"], "baseline_not_scope", "{body}");
+
+    // An approved scope baseline that a newer one has superseded: the WBS guard reads the
+    // latest, so a change citing the older one authorises nothing.
+    let superseded_project = create_project(&running, "Superseded authority").await;
+    let superseded = create_unapproved_baseline(&running, &superseded_project, "scope").await;
+    let current = create_unapproved_baseline(&running, &superseded_project, "scope").await;
+    for baseline in [&superseded, &current] {
+        sqlx::query("UPDATE project_baseline SET approved_by = $2 WHERE id = $1::uuid")
+            .bind(baseline)
+            .bind(seeded.user_id)
+            .execute(&pg.super_pool)
+            .await
+            .expect("approve the baseline");
+    }
+    let (status, body) = running
+        .invoke(
+            "changes.request",
+            "dev:alice",
+            json!({
+                "project_id": superseded_project,
+                "baseline_id": superseded,
+                "title": "Superseded baseline",
+                "impact": {"scope": "x"}
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 422, "{body}");
+    assert_eq!(body["errors"][0]["code"], "baseline_not_current", "{body}");
+
+    // Every refusal wrote nothing: no change row exists in the tenant.
+    let written: i64 = sqlx::query_scalar(
+        "SELECT count(*) FROM project_register_item WHERE tenant_id = $1 AND kind = 'change'",
+    )
+    .bind(seeded.tenant_id)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("count the tenant's changes");
+    assert_eq!(written, 0, "a refused direct request wrote a change row");
 }
 
 /// P2.1 — WSJF is computed on read from the four inputs; no score column exists.

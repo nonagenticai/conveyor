@@ -245,35 +245,42 @@ mod tests {
                 // #508: the contract's requester, recorded at request time and never rewritten
                 // (0061_contract_requester.sql, SPEC_V2 §8.1 — the approver must differ).
                 (61, "contract requester".to_owned()),
+                // S21 step 3 (#15): the draft recipe lifecycle, the section selector and the
+                // memory source kind (0062_s21_prompt_selection.sql, ADR 0009).
+                (62, "s21 prompt selection".to_owned()),
                 // v1-w1a-2 (#526): the release's layered kind store — base → industry →
                 // department archetype → department → job — and `department.archetype`
-                // (0062_release_layers.sql, SPEC_V2 §4.1).
-                (62, "release layers".to_owned()),
+                // (0063_release_layers.sql, SPEC_V2 §4.1).
+                (63, "release layers".to_owned()),
                 // v1-w4a-2 (#526): the write tool's declared verification path on the version
-                // it was published with (0063_tool_verify.sql, SPEC_V2 §11.3).
-                (63, "tool verify".to_owned()),
+                // it was published with (0064_tool_verify.sql, SPEC_V2 §11.3).
+                (64, "tool verify".to_owned()),
                 // v1-p82-2 (#526): `programme_cadence.state` becomes a closed set
-                // (0064_cadence_state.sql, SPEC_V2 §8.2).
-                (64, "cadence state".to_owned()),
+                // (0065_cadence_state.sql, SPEC_V2 §8.2).
+                (65, "cadence state".to_owned()),
                 // v1-p5-3 (#526): a change's impact block is an object carrying at least one of
-                // scope/schedule/cost/risk (0065_change_impact_keys.sql, SPEC_V2 §5.5).
-                (65, "change impact keys".to_owned()),
+                // scope/schedule/cost/risk (0066_change_impact_keys.sql, SPEC_V2 §5.5).
+                (66, "change impact keys".to_owned()),
                 // v1-w3b-3 (#526): the tenant-asset authoring family — the intake brief, the
                 // asset drafts, the human review gate and one published row per (kind, key)
-                // (0066_authoring.sql, SPEC_V2 §5.7, §10.4).
-                (66, "authoring".to_owned()),
+                // (0067_authoring.sql, SPEC_V2 §5.7, §10.4).
+                (67, "authoring".to_owned()),
                 // #77 (T5): the kata loop — the pinned hypothesis, the candidates, the immutable
                 // held-out measurement and the per-target propagation rows
-                // (0067_kata.sql, SPEC_V2 §6.3, §9.3–§9.4, §12 T5).
-                (67, "kata".to_owned()),
+                // (0068_kata.sql, SPEC_V2 §6.3, §9.3–§9.4, §12 T5).
+                (68, "kata".to_owned()),
                 // v1-p82-3 (#526): `programme.shared_config` — the programme's shared values and
                 // the keys it locks against per-project override
-                // (0068_programme_shared_config.sql, SPEC_V2 §8.2).
-                (68, "programme shared config".to_owned()),
+                // (0069_programme_shared_config.sql, SPEC_V2 §8.2).
+                (69, "programme shared config".to_owned()),
                 // v1-w1c-3 (#526): an L1 decision names the verified `laya.classify`
                 // invocation behind its answer and the request/response hashes it was
-                // verified against (0069_ladder_laya_provenance.sql, SPEC_V2 §7.2).
-                (69, "ladder laya provenance".to_owned())
+                // verified against (0070_ladder_laya_provenance.sql, SPEC_V2 §7.2).
+                (70, "ladder laya provenance".to_owned()),
+                // v1-w1c-4 (#526): the authored option set, its per-option tenant
+                // refinement and the decision's set pins — options are rows, never a
+                // caller's list (0071_ladder_option_sets.sql, SPEC_V2 §7.2).
+                (71, "ladder option sets".to_owned())
             ],
             "the embedded migration set is {embedded:?}; a wrong sqlx::migrate! path or a \
              file outside the set changes it"

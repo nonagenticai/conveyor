@@ -1,4 +1,4 @@
--- 0067_kata.sql — T5 (#77): the kata loop (SPEC_V2 §6.3, §9.3–§9.4, §12 T5;
+-- 0068_kata.sql — T5 (#77): the kata loop (SPEC_V2 §6.3, §9.3–§9.4, §12 T5;
 -- docs/plans/inception/T5/02-architecture-design.md, D-T5-1…D-T5-8).
 --
 -- Four tables, one aggregate each (D-T5-1: a kata is a project type, never a second runtime):

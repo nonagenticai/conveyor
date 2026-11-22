@@ -21,6 +21,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Identification and purpose",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 1,
@@ -41,6 +43,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Performance",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 1,
@@ -61,6 +65,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Cost",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 1,
@@ -81,6 +87,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Conditions",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 1,
@@ -101,6 +109,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Uncertainty and dependencies",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 1,
@@ -121,6 +131,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Responsibility and attribution",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 1,
@@ -174,6 +186,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Identification and purpose",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 1,
@@ -194,6 +208,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Performance",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 1,
@@ -214,6 +230,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Cost",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 1,
@@ -234,6 +252,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Conditions",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 1,
@@ -254,6 +274,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Uncertainty and dependencies",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 1,
@@ -274,6 +296,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Responsibility and attribution",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 1,
@@ -327,6 +351,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Identification and purpose",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 1,
@@ -347,6 +373,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Performance",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 1,
@@ -367,6 +395,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Cost",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 1,
@@ -387,6 +417,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Conditions",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 1,
@@ -407,6 +439,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Uncertainty and dependencies",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 1,
@@ -427,6 +461,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Responsibility and attribution",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 1,
@@ -480,6 +516,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Identification and purpose",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 1,
@@ -500,6 +538,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Performance",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 1,
@@ -520,6 +560,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Cost",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 1,
@@ -540,6 +582,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Conditions",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 1,
@@ -560,6 +604,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Uncertainty and dependencies",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 1,
@@ -580,6 +626,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Responsibility and attribution",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 1,
@@ -633,6 +681,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Identification and purpose",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 1,
@@ -653,6 +703,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Performance",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 1,
@@ -673,6 +725,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Cost",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 1,
@@ -693,6 +747,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Conditions",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 1,
@@ -713,6 +769,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Uncertainty and dependencies",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 1,
@@ -733,6 +791,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Responsibility and attribution",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 1,
@@ -786,6 +846,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Identification and purpose",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 1,
@@ -806,6 +868,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Performance",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 1,
@@ -826,6 +890,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Cost",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 1,
@@ -846,6 +912,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Conditions",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 1,
@@ -866,6 +934,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Uncertainty and dependencies",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 1,
@@ -886,6 +956,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Responsibility and attribution",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 1,
@@ -943,6 +1015,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Baseline measurement'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -959,6 +1033,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Readiness'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -975,6 +1051,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Transition'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -991,6 +1069,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Post-transition measurement'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -1007,6 +1087,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Legacy retirement'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -1058,6 +1140,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Baseline measurement'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -1074,6 +1158,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Readiness'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -1090,6 +1176,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Transition'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -1106,6 +1194,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Post-transition measurement'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -1122,6 +1212,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Legacy retirement'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -1173,6 +1265,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Baseline measurement'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -1189,6 +1283,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Readiness'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -1205,6 +1301,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Transition'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -1221,6 +1319,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Post-transition measurement'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -1237,6 +1337,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Legacy retirement'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -1288,6 +1390,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Baseline measurement'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -1304,6 +1408,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Readiness'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -1320,6 +1426,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Transition'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -1336,6 +1444,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Post-transition measurement'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -1352,6 +1462,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Legacy retirement'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -1403,6 +1515,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Baseline measurement'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -1419,6 +1533,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Readiness'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -1435,6 +1551,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Transition'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -1451,6 +1569,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Post-transition measurement'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -1467,6 +1587,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Legacy retirement'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -1518,6 +1640,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Baseline measurement'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -1534,6 +1658,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Readiness'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -1550,6 +1676,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Transition'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -1566,6 +1694,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Post-transition measurement'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -1582,6 +1712,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Legacy retirement'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -1629,6 +1761,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Benefit paths",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 6,
@@ -1673,6 +1807,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Dependencies",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 6,
@@ -1718,6 +1854,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Benefits at risk",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 6,
@@ -1795,6 +1933,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Measurement methods",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "benefits-strategy",
@@ -1816,6 +1956,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Review cycle",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "benefits-strategy",
@@ -1837,6 +1979,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Roles and assessment",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "benefits-strategy",
@@ -1858,6 +2002,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Realization process",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "benefits-strategy",
@@ -1897,7 +2043,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-blueprint-01a1d039-0d24-7d16-ae52-4841e96ccfac.html",
-        "sha256": "17489ddcac9d8ac348fd7755fb9e59ceabab61dd0e8470e9c99a43ecdaa20e0e"
+        "sha256": "a2a2445f4d6340af32765551de2594d291e2b84770023f97a05aae527a23798a"
       },
       "gate": {
         "approval_id": "",
@@ -1916,6 +2062,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Aggregates and services'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -1924,6 +2072,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Action registry and data model'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -1932,6 +2082,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Deployment estate'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -1940,6 +2092,28 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'The to-be the projects deliver'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
+          "sources": [],
+          "status": "partial"
+        },
+        {
+          "heading": "Organisation and skills",
+          "missing": [
+            "No row or document satisfies 'Organisation and skills'; a document exists but lacks the heading"
+          ],
+          "required": true,
+          "severity": "",
+          "sources": [],
+          "status": "partial"
+        },
+        {
+          "heading": "Current, intermediate and target states",
+          "missing": [
+            "No row or document satisfies 'Current, intermediate and target states'; a document exists but lacks the heading"
+          ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         }
@@ -1982,6 +2156,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Mandatory fields'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -1990,6 +2166,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Inception units'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -1998,6 +2176,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Plan'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         }
@@ -2022,7 +2202,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-business-case-01a1d039-0d24-7d16-ae52-4841e96ccfac.html",
-        "sha256": "0ea62c0027718d32deaedf20b6f5d858c79a75cd7503d12705c5e5c8b3aea8c7"
+        "sha256": "d8f638fa3f5daabe6dc84fa3512c7e433a5c877aca43af104156cc206135f579"
       },
       "gate": {
         "approval_id": "",
@@ -2039,6 +2219,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Why now",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "business-case",
@@ -2060,6 +2242,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Benefit map",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "business-case",
@@ -2081,6 +2265,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Cost and risk posture",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "business-case",
@@ -2104,6 +2290,38 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Licensing frame'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
+          "sources": [],
+          "status": "partial"
+        },
+        {
+          "heading": "Options, including doing nothing",
+          "missing": [
+            "No row or document satisfies 'Options, including doing nothing'; a document exists but lacks the heading"
+          ],
+          "required": true,
+          "severity": "",
+          "sources": [],
+          "status": "partial"
+        },
+        {
+          "heading": "Investment appraisal and cash flow",
+          "missing": [
+            "No row or document satisfies 'Investment appraisal and cash flow'; a document exists but lacks the heading"
+          ],
+          "required": true,
+          "severity": "",
+          "sources": [],
+          "status": "partial"
+        },
+        {
+          "heading": "Capabilities the benefits depend on",
+          "missing": [
+            "No row or document satisfies 'Capabilities the benefits depend on'; a document exists but lacks the heading"
+          ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         }
@@ -2147,6 +2365,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Roles'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -2155,6 +2375,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decision ladder'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -2163,6 +2385,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Assurance'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -2171,6 +2395,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'The unit protocol'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         }
@@ -2214,6 +2440,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Management baseline'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -2230,6 +2458,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Governance baseline'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -2246,6 +2476,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Boundary baseline'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -2297,6 +2529,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Vision and outcomes'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -2305,6 +2539,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Benefit categories'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -2313,6 +2549,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Cost, timescale and effort'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -2321,6 +2559,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Risks and support'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -2329,12 +2569,16 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Delivery options'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
         {
           "heading": "Candidate projects and timing",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 48,
@@ -2447,6 +2691,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Tranches'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -2455,6 +2701,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Projects and sequencing'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -2463,6 +2711,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Gates'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -2471,6 +2721,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'First three months'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         }
@@ -2510,6 +2762,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Status",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 1,
@@ -2529,6 +2783,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Tranche decisions",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 1,
@@ -2549,6 +2805,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Benefits",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 6,
@@ -2594,6 +2852,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Cost",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 1,
@@ -2650,6 +2910,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Information strategy'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -2666,6 +2928,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Risk strategy'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -2682,6 +2946,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Issue strategy'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -2698,6 +2964,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Monitoring strategy'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -2714,6 +2982,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Communications strategy'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -2730,6 +3000,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Quality strategy'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -2746,6 +3018,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Resource strategy'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -2795,6 +3069,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Projects",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 48,
@@ -2870,6 +3146,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Tranches and dependencies",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 48,
@@ -2952,6 +3230,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Resources and budget",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 1,
@@ -2973,6 +3253,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Delivery risks'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -3020,6 +3302,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Transition",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "realization-plan",
@@ -3041,6 +3325,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Embedding",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "realization-plan",
@@ -3062,6 +3348,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Post-closure measurement",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "realization-plan",
@@ -3083,6 +3371,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Ownership",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "realization-plan",
@@ -3141,6 +3431,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Refined vision'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -3149,6 +3441,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Changes from the mandate'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         }
@@ -3188,6 +3482,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Stakeholders",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 6,
@@ -3233,6 +3529,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Concerns and sensitivities",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 6,
@@ -3278,6 +3576,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Influence and interest",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 6,
@@ -3323,6 +3623,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Support and engagement",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 6,
@@ -3368,6 +3670,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Benefits and disbenefits",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 6,
@@ -3446,6 +3750,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Tranches",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 14,
@@ -3521,6 +3827,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Entry and exit criteria",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 14,
@@ -3596,6 +3904,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Review dates",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 14,
@@ -3671,6 +3981,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Sequencing",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 14,
@@ -3779,6 +4091,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Evidence",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 1,
@@ -3799,6 +4113,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Benefit status",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 6,
@@ -3844,6 +4160,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Risk and issue register",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -3872,6 +4190,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Decision",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 1,
@@ -3925,6 +4245,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Evidence",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -3953,6 +4275,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Benefit status",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 6,
@@ -3998,6 +4322,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Risk and issue register",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -4026,6 +4352,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Decision",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -4087,6 +4415,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Evidence",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -4115,6 +4445,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Benefit status",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 6,
@@ -4160,6 +4492,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Risk and issue register",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -4188,6 +4522,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Decision",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -4249,6 +4585,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Evidence",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -4277,6 +4615,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Benefit status",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 6,
@@ -4322,6 +4662,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Risk and issue register",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -4350,6 +4692,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Decision",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -4411,6 +4755,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Evidence",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -4439,6 +4785,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Benefit status",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 6,
@@ -4484,6 +4832,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Risk and issue register",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -4512,6 +4862,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Decision",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -4573,6 +4925,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Evidence",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -4601,6 +4955,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Benefit status",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 6,
@@ -4646,6 +5002,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Risk and issue register",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -4674,6 +5032,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Decision",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -4735,6 +5095,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Evidence",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -4763,6 +5125,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Benefit status",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 6,
@@ -4808,6 +5172,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Risk and issue register",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -4836,6 +5202,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Decision",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -4897,6 +5265,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Evidence",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -4925,6 +5295,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Benefit status",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 6,
@@ -4970,6 +5342,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Risk and issue register",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -4998,6 +5372,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Decision",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -5059,6 +5435,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Evidence",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -5087,6 +5465,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Benefit status",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 6,
@@ -5132,6 +5512,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Risk and issue register",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -5160,6 +5542,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Decision",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -5221,6 +5605,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Evidence",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -5249,6 +5635,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Benefit status",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 6,
@@ -5294,6 +5682,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Risk and issue register",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -5322,6 +5712,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Decision",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -5383,6 +5775,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Evidence",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -5411,6 +5805,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Benefit status",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 6,
@@ -5456,6 +5852,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Risk and issue register",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -5484,6 +5882,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Decision",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -5545,6 +5945,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Evidence",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -5573,6 +5975,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Benefit status",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 6,
@@ -5618,6 +6022,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Risk and issue register",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -5646,6 +6052,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Decision",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -5707,6 +6115,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Evidence",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -5735,6 +6145,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Benefit status",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 6,
@@ -5780,6 +6192,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Risk and issue register",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -5808,6 +6222,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Decision",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -5869,6 +6285,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Evidence",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -5897,6 +6315,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Benefit status",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 6,
@@ -5942,6 +6362,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Risk and issue register",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -5970,6 +6392,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Decision",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -6031,6 +6455,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Purpose",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "vision",
@@ -6052,6 +6478,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Outcomes",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "vision",
@@ -6073,6 +6501,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Boundary",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "vision",
@@ -6094,6 +6524,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Who it serves",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "vision",
@@ -6152,6 +6584,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Change requests'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -6168,6 +6602,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Impact'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -6184,6 +6620,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decisions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -6235,6 +6673,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Change requests'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -6251,6 +6691,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Impact'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -6267,6 +6709,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decisions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -6318,6 +6762,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Change requests'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -6334,6 +6780,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Impact'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -6350,6 +6798,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decisions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -6401,6 +6851,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Change requests'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -6417,6 +6869,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Impact'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -6433,6 +6887,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decisions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -6484,6 +6940,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Change requests'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -6500,6 +6958,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Impact'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -6516,6 +6976,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decisions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -6567,6 +7029,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Change requests'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -6583,6 +7047,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Impact'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -6599,6 +7065,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decisions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -6650,6 +7118,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Change requests'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -6666,6 +7136,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Impact'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -6682,6 +7154,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decisions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -6733,6 +7207,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Change requests'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -6749,6 +7225,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Impact'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -6765,6 +7243,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decisions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -6816,6 +7296,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Change requests'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -6832,6 +7314,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Impact'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -6848,6 +7332,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decisions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -6899,6 +7385,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Change requests'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -6915,6 +7403,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Impact'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -6931,6 +7421,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decisions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -6982,6 +7474,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Change requests'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -6998,6 +7492,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Impact'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -7014,6 +7510,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decisions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -7065,6 +7563,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Change requests'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -7081,6 +7581,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Impact'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -7097,6 +7599,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decisions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -7148,6 +7652,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Change requests'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -7164,6 +7670,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Impact'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -7180,6 +7688,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decisions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -7231,6 +7741,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Change requests'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -7247,6 +7759,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Impact'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -7263,6 +7777,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decisions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -7314,6 +7830,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Change requests'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -7330,6 +7848,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Impact'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -7346,6 +7866,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decisions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -7397,6 +7919,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Change requests'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -7413,6 +7937,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Impact'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -7429,6 +7955,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decisions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -7480,6 +8008,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Change requests'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -7496,6 +8026,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Impact'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -7512,6 +8044,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decisions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -7563,6 +8097,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Change requests'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -7579,6 +8115,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Impact'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -7595,6 +8133,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decisions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -7646,6 +8186,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Change requests'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -7662,6 +8204,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Impact'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -7678,6 +8222,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decisions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -7729,6 +8275,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Change requests'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -7745,6 +8293,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Impact'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -7761,6 +8311,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decisions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -7812,6 +8364,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Change requests'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -7828,6 +8382,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Impact'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -7844,6 +8400,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decisions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -7895,6 +8453,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Change requests'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -7911,6 +8471,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Impact'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -7927,6 +8489,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decisions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -7978,6 +8542,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Change requests'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -7994,6 +8560,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Impact'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -8010,6 +8578,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decisions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -8061,6 +8631,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Change requests'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -8077,6 +8649,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Impact'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -8093,6 +8667,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decisions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -8144,6 +8720,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Change requests'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -8160,6 +8738,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Impact'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -8176,6 +8756,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decisions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -8227,6 +8809,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Change requests'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -8243,6 +8827,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Impact'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -8259,6 +8845,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decisions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -8310,6 +8898,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Change requests'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -8326,6 +8916,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Impact'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -8342,6 +8934,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decisions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -8393,6 +8987,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Change requests'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -8409,6 +9005,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Impact'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -8425,6 +9023,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decisions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -8476,6 +9076,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Change requests'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -8492,6 +9094,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Impact'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -8508,6 +9112,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decisions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -8559,6 +9165,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Change requests'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -8575,6 +9183,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Impact'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -8591,6 +9201,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decisions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -8642,6 +9254,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Change requests'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -8658,6 +9272,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Impact'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -8674,6 +9290,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decisions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -8725,6 +9343,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Change requests'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -8741,6 +9361,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Impact'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -8757,6 +9379,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decisions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -8808,6 +9432,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Change requests'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -8824,6 +9450,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Impact'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -8840,6 +9468,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decisions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -8891,6 +9521,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Change requests'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -8907,6 +9539,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Impact'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -8923,6 +9557,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decisions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -8974,6 +9610,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Change requests'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -8990,6 +9628,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Impact'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -9006,6 +9646,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decisions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -9057,6 +9699,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Change requests'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -9073,6 +9717,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Impact'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -9089,6 +9735,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decisions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -9140,6 +9788,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Change requests'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -9156,6 +9806,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Impact'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -9172,6 +9824,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decisions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -9223,6 +9877,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Change requests'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -9239,6 +9895,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Impact'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -9255,6 +9913,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decisions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -9306,6 +9966,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Change requests'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -9322,6 +9984,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Impact'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -9338,6 +10002,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decisions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -9389,6 +10055,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Change requests'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -9405,6 +10073,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Impact'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -9421,6 +10091,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decisions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -9472,6 +10144,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Change requests'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -9488,6 +10162,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Impact'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -9504,6 +10180,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decisions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -9555,6 +10233,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Change requests'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -9571,6 +10251,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Impact'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -9587,6 +10269,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decisions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -9638,6 +10322,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Change requests'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -9654,6 +10340,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Impact'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -9670,6 +10358,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decisions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -9721,6 +10411,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Change requests'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -9737,6 +10429,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Impact'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -9753,6 +10447,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decisions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -9804,6 +10500,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Change requests'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -9820,6 +10518,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Impact'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -9836,6 +10536,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decisions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -9887,6 +10589,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Change requests'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -9903,6 +10607,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Impact'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -9919,6 +10625,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decisions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -9970,6 +10678,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Change requests'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -9986,6 +10696,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Impact'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -10002,6 +10714,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decisions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -10053,6 +10767,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Outcome vs acceptance'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -10061,6 +10777,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -10069,6 +10787,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Open items'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -10077,6 +10797,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decision'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         }
@@ -10120,6 +10842,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Outcome vs acceptance'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -10128,6 +10852,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -10136,6 +10862,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Open items'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -10144,6 +10872,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decision'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         }
@@ -10187,6 +10917,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Outcome vs acceptance'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -10195,6 +10927,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -10203,6 +10937,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Open items'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -10211,6 +10947,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decision'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         }
@@ -10254,6 +10992,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Outcome vs acceptance'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -10262,6 +11002,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -10270,6 +11012,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Open items'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -10278,6 +11022,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decision'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         }
@@ -10321,6 +11067,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Outcome vs acceptance'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -10329,6 +11077,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -10337,6 +11087,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Open items'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -10345,6 +11097,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decision'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         }
@@ -10388,6 +11142,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Outcome vs acceptance'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -10396,6 +11152,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -10404,6 +11162,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Open items'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -10412,6 +11172,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decision'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         }
@@ -10455,6 +11217,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Outcome vs acceptance'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -10463,6 +11227,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -10471,6 +11237,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Open items'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -10479,6 +11247,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decision'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         }
@@ -10522,6 +11292,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Outcome vs acceptance'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -10530,6 +11302,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -10538,6 +11312,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Open items'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -10546,6 +11322,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decision'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         }
@@ -10589,6 +11367,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Outcome vs acceptance'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -10597,6 +11377,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -10605,6 +11387,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Open items'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -10613,6 +11397,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decision'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         }
@@ -10656,6 +11442,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Outcome vs acceptance'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -10664,6 +11452,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -10672,6 +11462,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Open items'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -10680,6 +11472,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decision'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         }
@@ -10723,6 +11517,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Outcome vs acceptance'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -10731,6 +11527,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -10739,6 +11537,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Open items'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -10747,6 +11547,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decision'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         }
@@ -10790,6 +11592,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Outcome vs acceptance'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -10798,6 +11602,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -10806,6 +11612,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Open items'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -10814,6 +11622,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decision'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         }
@@ -10857,6 +11667,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Outcome vs acceptance'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -10865,6 +11677,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -10873,6 +11687,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Open items'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -10881,6 +11697,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decision'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         }
@@ -10924,6 +11742,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Outcome vs acceptance'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -10932,6 +11752,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -10940,6 +11762,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Open items'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -10948,6 +11772,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decision'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         }
@@ -10991,6 +11817,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Outcome vs acceptance'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -10999,6 +11827,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -11007,6 +11837,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Open items'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -11015,6 +11847,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decision'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         }
@@ -11058,6 +11892,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Outcome vs acceptance'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -11066,6 +11902,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -11074,6 +11912,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Open items'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -11082,6 +11922,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decision'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         }
@@ -11121,6 +11963,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Outcome vs acceptance",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "closure-review",
@@ -11142,6 +11986,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Evidence",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "closure-review",
@@ -11163,6 +12009,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Open items",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "closure-review",
@@ -11184,6 +12032,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Decision",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "closure-review",
@@ -11238,6 +12088,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Outcome vs acceptance",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "closure-review",
@@ -11259,6 +12111,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Evidence",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "closure-review",
@@ -11280,6 +12134,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Open items",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "closure-review",
@@ -11301,6 +12157,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Decision",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "closure-review",
@@ -11355,6 +12213,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Outcome vs acceptance",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "closure-review",
@@ -11376,6 +12236,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Evidence",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "closure-review",
@@ -11397,6 +12259,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Open items",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "closure-review",
@@ -11418,6 +12282,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Decision",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "closure-review",
@@ -11472,6 +12338,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Outcome vs acceptance",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "closure-review",
@@ -11493,6 +12361,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Evidence",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "closure-review",
@@ -11514,6 +12384,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Open items",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "closure-review",
@@ -11535,6 +12407,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Decision",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "closure-review",
@@ -11593,6 +12467,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Outcome vs acceptance'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -11601,6 +12477,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -11609,6 +12487,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Open items'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -11617,6 +12497,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decision'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         }
@@ -11656,6 +12538,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Outcome vs acceptance",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "closure-review",
@@ -11677,6 +12561,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Evidence",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "closure-review",
@@ -11698,6 +12584,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Open items",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "closure-review",
@@ -11719,6 +12607,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Decision",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "closure-review",
@@ -11773,6 +12663,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Outcome vs acceptance",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "closure-review",
@@ -11794,6 +12686,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Evidence",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "closure-review",
@@ -11815,6 +12709,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Open items",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "closure-review",
@@ -11836,6 +12732,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Decision",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "closure-review",
@@ -11890,6 +12788,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Outcome vs acceptance",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "closure-review",
@@ -11911,6 +12811,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Evidence",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "closure-review",
@@ -11932,6 +12834,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Open items",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "closure-review",
@@ -11953,6 +12857,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Decision",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "closure-review",
@@ -12007,6 +12913,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Outcome vs acceptance",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "closure-review",
@@ -12028,6 +12936,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Evidence",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "closure-review",
@@ -12049,6 +12959,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Open items",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "closure-review",
@@ -12070,6 +12982,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Decision",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "closure-review",
@@ -12124,6 +13038,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Current state",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "inception-analysis",
@@ -12145,6 +13061,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Reuse sources",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "inception-analysis",
@@ -12166,6 +13084,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Build vs reuse",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "inception-analysis",
@@ -12187,6 +13107,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Risks",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "inception-analysis",
@@ -12241,6 +13163,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Current state",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "inception-analysis",
@@ -12262,6 +13186,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Reuse sources",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "inception-analysis",
@@ -12283,6 +13209,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Build vs reuse",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "inception-analysis",
@@ -12304,6 +13232,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Risks",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "inception-analysis",
@@ -12358,6 +13288,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Current state",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "inception-analysis",
@@ -12379,6 +13311,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Reuse sources",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "inception-analysis",
@@ -12400,6 +13334,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Build vs reuse",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "inception-analysis",
@@ -12421,6 +13357,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Risks",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "inception-analysis",
@@ -12475,6 +13413,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Current state",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "inception-analysis",
@@ -12496,6 +13436,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Reuse sources",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "inception-analysis",
@@ -12517,6 +13459,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Build vs reuse",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "inception-analysis",
@@ -12538,6 +13482,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Risks",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "inception-analysis",
@@ -12592,6 +13538,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Current state",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "inception-analysis",
@@ -12613,6 +13561,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Reuse sources",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "inception-analysis",
@@ -12634,6 +13584,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Build vs reuse",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "inception-analysis",
@@ -12655,6 +13607,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Risks",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "inception-analysis",
@@ -12709,6 +13663,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Current state",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "inception-analysis",
@@ -12730,6 +13686,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Reuse sources",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "inception-analysis",
@@ -12751,6 +13709,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Build vs reuse",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "inception-analysis",
@@ -12772,6 +13732,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Risks",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "inception-analysis",
@@ -12826,6 +13788,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Current state",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "inception-analysis",
@@ -12847,6 +13811,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Reuse sources",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "inception-analysis",
@@ -12868,6 +13834,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Build vs reuse",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "inception-analysis",
@@ -12889,6 +13857,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Risks",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "inception-analysis",
@@ -12943,6 +13913,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Current state",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "inception-analysis",
@@ -12964,6 +13936,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Reuse sources",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "inception-analysis",
@@ -12985,6 +13959,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Build vs reuse",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "inception-analysis",
@@ -13006,6 +13982,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Risks",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "inception-analysis",
@@ -13060,6 +14038,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Current state",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "inception-analysis",
@@ -13081,6 +14061,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Reuse sources",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "inception-analysis",
@@ -13102,6 +14084,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Build vs reuse",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "inception-analysis",
@@ -13123,6 +14107,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Risks",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "inception-analysis",
@@ -13177,6 +14163,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Current state",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "inception-analysis",
@@ -13198,6 +14186,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Reuse sources",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "inception-analysis",
@@ -13219,6 +14209,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Build vs reuse",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "inception-analysis",
@@ -13240,6 +14232,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Risks",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "inception-analysis",
@@ -13294,6 +14288,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Current state",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "inception-analysis",
@@ -13315,6 +14311,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Reuse sources",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "inception-analysis",
@@ -13336,6 +14334,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Build vs reuse",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "inception-analysis",
@@ -13357,6 +14357,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Risks",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "inception-analysis",
@@ -13411,6 +14413,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Current state",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "inception-analysis",
@@ -13432,6 +14436,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Reuse sources",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "inception-analysis",
@@ -13453,6 +14459,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Build vs reuse",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "inception-analysis",
@@ -13474,6 +14482,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Risks",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "inception-analysis",
@@ -13528,6 +14538,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Current state",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "inception-analysis",
@@ -13549,6 +14561,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Reuse sources",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "inception-analysis",
@@ -13570,6 +14584,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Build vs reuse",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "inception-analysis",
@@ -13591,6 +14607,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Risks",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "inception-analysis",
@@ -13645,6 +14663,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Current state",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "inception-analysis",
@@ -13666,6 +14686,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Reuse sources",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "inception-analysis",
@@ -13687,6 +14709,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Build vs reuse",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "inception-analysis",
@@ -13708,6 +14732,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Risks",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "inception-analysis",
@@ -13762,6 +14788,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Current state",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "inception-analysis",
@@ -13783,6 +14811,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Reuse sources",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "inception-analysis",
@@ -13804,6 +14834,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Build vs reuse",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "inception-analysis",
@@ -13825,6 +14857,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Risks",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "inception-analysis",
@@ -13883,6 +14917,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Scope'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -13899,6 +14935,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Schedule'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -13915,6 +14953,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Cost'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -13931,6 +14971,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -13982,6 +15024,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Scope'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -13998,6 +15042,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Schedule'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -14014,6 +15060,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Cost'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -14030,6 +15078,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -14081,6 +15131,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Scope'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -14097,6 +15149,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Schedule'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -14113,6 +15167,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Cost'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -14129,6 +15185,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -14180,6 +15238,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Scope'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -14196,6 +15256,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Schedule'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -14212,6 +15274,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Cost'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -14228,6 +15292,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -14279,6 +15345,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Scope'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -14295,6 +15363,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Schedule'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -14311,6 +15381,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Cost'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -14327,6 +15399,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -14378,6 +15452,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Scope'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -14394,6 +15470,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Schedule'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -14410,6 +15488,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Cost'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -14426,6 +15506,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -14477,6 +15559,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Scope'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -14493,6 +15577,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Schedule'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -14509,6 +15595,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Cost'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -14525,6 +15613,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -14576,6 +15666,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Scope'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -14592,6 +15684,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Schedule'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -14608,6 +15702,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Cost'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -14624,6 +15720,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -14675,6 +15773,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Scope'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -14691,6 +15791,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Schedule'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -14707,6 +15809,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Cost'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -14723,6 +15827,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -14774,6 +15880,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Scope'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -14790,6 +15898,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Schedule'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -14806,6 +15916,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Cost'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -14822,6 +15934,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -14873,6 +15987,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Scope'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -14889,6 +16005,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Schedule'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -14905,6 +16023,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Cost'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -14921,6 +16041,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -14972,6 +16094,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Scope'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -14988,6 +16112,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Schedule'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -15004,6 +16130,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Cost'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -15020,6 +16148,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -15071,6 +16201,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Scope'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -15087,6 +16219,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Schedule'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -15103,6 +16237,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Cost'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -15119,6 +16255,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -15170,6 +16308,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Scope'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -15186,6 +16326,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Schedule'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -15202,6 +16344,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Cost'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -15218,6 +16362,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -15269,6 +16415,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Scope'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -15285,6 +16433,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Schedule'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -15301,6 +16451,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Cost'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -15317,6 +16469,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -15368,6 +16522,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Scope'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -15384,6 +16540,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Schedule'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -15400,6 +16558,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Cost'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -15416,6 +16576,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -15467,6 +16629,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Scope'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -15483,6 +16647,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Schedule'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -15499,6 +16665,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Cost'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -15515,6 +16683,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -15566,6 +16736,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Scope'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -15582,6 +16754,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Schedule'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -15598,6 +16772,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Cost'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -15614,6 +16790,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -15665,6 +16843,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Scope'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -15681,6 +16861,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Schedule'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -15697,6 +16879,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Cost'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -15713,6 +16897,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -15764,6 +16950,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Scope'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -15780,6 +16968,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Schedule'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -15796,6 +16986,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Cost'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -15812,6 +17004,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -15863,6 +17057,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Scope'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -15879,6 +17075,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Schedule'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -15895,6 +17093,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Cost'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -15911,6 +17111,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -15962,6 +17164,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Scope'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -15978,6 +17182,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Schedule'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -15994,6 +17200,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Cost'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -16010,6 +17218,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -16061,6 +17271,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Scope'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -16077,6 +17289,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Schedule'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -16093,6 +17307,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Cost'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -16109,6 +17325,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -16160,6 +17378,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Scope'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -16176,6 +17396,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Schedule'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -16192,6 +17414,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Cost'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -16208,6 +17432,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -16259,6 +17485,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Scope'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -16275,6 +17503,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Schedule'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -16291,6 +17521,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Cost'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -16307,6 +17539,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -16358,6 +17592,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Scope'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -16374,6 +17610,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Schedule'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -16390,6 +17628,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Cost'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -16406,6 +17646,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -16457,6 +17699,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Scope'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -16473,6 +17717,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Schedule'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -16489,6 +17735,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Cost'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -16505,6 +17753,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -16556,6 +17806,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Scope'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -16572,6 +17824,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Schedule'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -16588,6 +17842,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Cost'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -16604,6 +17860,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -16655,6 +17913,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Scope'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -16671,6 +17931,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Schedule'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -16687,6 +17949,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Cost'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -16703,6 +17967,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -16754,6 +18020,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Scope'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -16770,6 +18038,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Schedule'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -16786,6 +18056,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Cost'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -16802,6 +18074,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -16853,6 +18127,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Scope'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -16869,6 +18145,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Schedule'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -16885,6 +18163,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Cost'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -16901,6 +18181,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -16952,6 +18234,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Scope'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -16968,6 +18252,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Schedule'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -16984,6 +18270,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Cost'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -17000,6 +18288,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -17051,6 +18341,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Scope'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -17067,6 +18359,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Schedule'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -17083,6 +18377,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Cost'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -17099,6 +18395,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -17150,6 +18448,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Scope'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -17166,6 +18466,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Schedule'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -17182,6 +18484,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Cost'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -17198,6 +18502,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -17249,6 +18555,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Scope'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -17265,6 +18573,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Schedule'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -17281,6 +18591,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Cost'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -17297,6 +18609,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -17348,6 +18662,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Scope'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -17364,6 +18680,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Schedule'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -17380,6 +18698,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Cost'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -17396,6 +18716,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -17447,6 +18769,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Scope'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -17463,6 +18787,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Schedule'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -17479,6 +18805,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Cost'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -17495,6 +18823,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -17546,6 +18876,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Scope'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -17562,6 +18894,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Schedule'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -17578,6 +18912,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Cost'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -17594,6 +18930,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -17645,6 +18983,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Scope'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -17661,6 +19001,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Schedule'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -17677,6 +19019,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Cost'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -17693,6 +19037,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -17744,6 +19090,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Scope'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -17760,6 +19108,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Schedule'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -17776,6 +19126,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Cost'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -17792,6 +19144,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -17843,6 +19197,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Scope'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -17859,6 +19215,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Schedule'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -17875,6 +19233,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Cost'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -17891,6 +19251,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -17942,6 +19304,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Scope'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -17958,6 +19322,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Schedule'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -17974,6 +19340,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Cost'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -17990,6 +19358,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -18041,6 +19411,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Scope'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -18057,6 +19429,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Schedule'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -18073,6 +19447,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Cost'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -18089,6 +19465,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -18140,6 +19518,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Scope'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -18156,6 +19536,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Schedule'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -18172,6 +19554,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Cost'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -18188,6 +19572,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -18239,6 +19625,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Scope'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -18255,6 +19643,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Schedule'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -18271,6 +19661,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Cost'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -18287,6 +19679,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -18338,6 +19732,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Scope'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -18354,6 +19750,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Schedule'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -18370,6 +19768,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Cost'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -18386,6 +19786,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -18437,6 +19839,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Scope'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -18453,6 +19857,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Schedule'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -18469,6 +19875,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Cost'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -18485,6 +19893,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -18534,6 +19944,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Outcome",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -18555,6 +19967,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Boundary",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -18576,6 +19990,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Reuse sources",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -18597,6 +20013,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Inception units",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -18618,6 +20036,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Dependencies",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -18639,6 +20059,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Acceptance",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -18660,6 +20082,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Capabilities",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -18683,6 +20107,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Plan'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         }
@@ -18726,6 +20152,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Outcome'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -18734,6 +20162,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Boundary'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -18742,6 +20172,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Reuse sources'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -18750,6 +20182,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Inception units'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -18758,6 +20192,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Dependencies'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -18766,6 +20202,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Acceptance'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -18774,6 +20212,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Capabilities'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -18782,6 +20222,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Plan'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         }
@@ -18823,6 +20265,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Outcome",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -18844,6 +20288,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Boundary",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -18865,6 +20311,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Reuse sources",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -18886,6 +20334,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Inception units",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -18907,6 +20357,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Dependencies",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -18928,6 +20380,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Acceptance",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -18949,6 +20403,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Capabilities",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -18972,6 +20428,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Plan'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         }
@@ -19013,6 +20471,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Outcome",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -19034,6 +20494,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Boundary",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -19055,6 +20517,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Reuse sources",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -19076,6 +20540,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Inception units",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -19097,6 +20563,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Dependencies",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -19118,6 +20586,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Acceptance",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -19141,6 +20611,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Capabilities'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -19149,6 +20621,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Plan'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         }
@@ -19190,6 +20664,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Outcome",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -19211,6 +20687,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Boundary",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -19232,6 +20710,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Reuse sources",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -19253,6 +20733,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Inception units",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -19274,6 +20756,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Dependencies",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -19295,6 +20779,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Acceptance",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -19316,6 +20802,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Capabilities",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -19339,6 +20827,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Plan'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         }
@@ -19380,6 +20870,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Outcome",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -19401,6 +20893,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Boundary",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -19422,6 +20916,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Reuse sources",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -19443,6 +20939,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Inception units",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -19464,6 +20962,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Dependencies",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -19485,6 +20985,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Acceptance",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -19506,6 +21008,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Capabilities",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -19529,6 +21033,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Plan'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         }
@@ -19570,6 +21076,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Outcome",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -19591,6 +21099,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Boundary",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -19612,6 +21122,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Reuse sources",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -19633,6 +21145,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Inception units",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -19654,6 +21168,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Dependencies",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -19675,6 +21191,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Acceptance",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -19698,6 +21216,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Capabilities'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -19706,6 +21226,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Plan'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         }
@@ -19747,6 +21269,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Outcome",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -19768,6 +21292,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Boundary",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -19789,6 +21315,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Reuse sources",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -19810,6 +21338,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Inception units",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -19831,6 +21361,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Dependencies",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -19852,6 +21384,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Acceptance",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -19875,6 +21409,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Capabilities'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -19883,6 +21419,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Plan'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         }
@@ -19924,6 +21462,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Outcome",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -19945,6 +21485,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Boundary",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -19966,6 +21508,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Reuse sources",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -19987,6 +21531,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Inception units",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -20008,6 +21554,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Dependencies",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -20029,6 +21577,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Acceptance",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -20052,6 +21602,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Capabilities'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -20060,6 +21612,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Plan'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         }
@@ -20101,6 +21655,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Outcome",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -20122,6 +21678,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Boundary",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -20143,6 +21701,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Reuse sources",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -20164,6 +21724,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Inception units",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -20185,6 +21747,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Dependencies",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -20206,6 +21770,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Acceptance",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -20227,6 +21793,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Capabilities",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -20250,6 +21818,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Plan'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         }
@@ -20291,6 +21861,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Outcome",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -20312,6 +21884,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Boundary",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -20333,6 +21907,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Reuse sources",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -20354,6 +21930,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Inception units",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -20375,6 +21953,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Dependencies",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -20396,6 +21976,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Acceptance",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -20417,6 +21999,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Capabilities",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -20440,6 +22024,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Plan'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         }
@@ -20481,6 +22067,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Outcome",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -20502,6 +22090,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Boundary",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -20523,6 +22113,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Reuse sources",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -20544,6 +22136,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Inception units",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -20565,6 +22159,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Dependencies",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -20586,6 +22182,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Acceptance",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -20609,6 +22207,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Capabilities'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -20617,6 +22217,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Plan'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         }
@@ -20658,6 +22260,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Outcome",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -20679,6 +22283,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Boundary",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -20700,6 +22306,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Reuse sources",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -20723,6 +22331,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Inception units'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -20731,6 +22341,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Dependencies'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -20739,12 +22351,16 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Acceptance'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
         {
           "heading": "Capabilities",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -20768,6 +22384,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Plan'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         }
@@ -20809,6 +22427,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Outcome",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -20830,6 +22450,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Boundary",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -20851,6 +22473,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Reuse sources",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -20872,6 +22496,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Inception units",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -20893,6 +22519,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Dependencies",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -20914,6 +22542,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Acceptance",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -20937,6 +22567,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Capabilities'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -20945,6 +22577,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Plan'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         }
@@ -20986,6 +22620,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Outcome",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -21007,6 +22643,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Boundary",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -21028,6 +22666,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Reuse sources",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -21049,6 +22689,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Inception units",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -21070,6 +22712,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Dependencies",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -21091,6 +22735,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Acceptance",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -21114,6 +22760,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Capabilities'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -21122,6 +22770,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Plan'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         }
@@ -21163,6 +22813,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Outcome",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -21184,6 +22836,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Boundary",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -21205,6 +22859,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Reuse sources",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -21226,6 +22882,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Inception units",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -21247,6 +22905,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Dependencies",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -21268,6 +22928,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Acceptance",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -21291,6 +22953,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Capabilities'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -21299,6 +22963,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Plan'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         }
@@ -21340,6 +23006,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Outcome",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -21361,6 +23029,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Boundary",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -21382,6 +23052,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Reuse sources",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -21403,6 +23075,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Inception units",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -21424,6 +23098,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Dependencies",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -21445,6 +23121,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Acceptance",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -21466,6 +23144,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Capabilities",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -21489,6 +23169,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Plan'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         }
@@ -21530,6 +23212,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Outcome",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -21551,6 +23235,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Boundary",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -21572,6 +23258,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Reuse sources",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -21593,6 +23281,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Inception units",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -21614,6 +23304,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Dependencies",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -21635,6 +23327,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Acceptance",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -21658,6 +23352,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Capabilities'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -21666,6 +23362,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Plan'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         }
@@ -21707,6 +23405,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Outcome",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -21728,6 +23428,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Boundary",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -21749,6 +23451,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Reuse sources",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -21770,6 +23474,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Inception units",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -21791,6 +23497,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Dependencies",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -21812,6 +23520,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Acceptance",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -21835,6 +23545,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Capabilities'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -21843,6 +23555,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Plan'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         }
@@ -21884,6 +23598,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Outcome",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -21905,6 +23621,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Boundary",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -21926,6 +23644,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Reuse sources",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -21947,6 +23667,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Inception units",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -21968,6 +23690,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Dependencies",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -21989,6 +23713,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Acceptance",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -22012,6 +23738,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Capabilities'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -22020,6 +23748,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Plan'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         }
@@ -22061,6 +23791,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Outcome",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -22082,6 +23814,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Boundary",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -22103,6 +23837,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Reuse sources",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -22124,6 +23860,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Inception units",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -22145,6 +23883,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Dependencies",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -22166,6 +23906,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Acceptance",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -22189,6 +23931,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Capabilities'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -22197,6 +23941,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Plan'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         }
@@ -22238,6 +23984,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Outcome",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -22259,6 +24007,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Boundary",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -22280,6 +24030,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Reuse sources",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -22301,6 +24053,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Inception units",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -22322,6 +24076,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Dependencies",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -22343,6 +24099,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Acceptance",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -22366,6 +24124,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Capabilities'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -22374,6 +24134,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Plan'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         }
@@ -22415,6 +24177,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Outcome",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -22436,6 +24200,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Boundary",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -22457,6 +24223,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Reuse sources",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -22478,6 +24246,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Inception units",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -22499,6 +24269,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Dependencies",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -22520,6 +24292,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Acceptance",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -22543,6 +24317,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Capabilities'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -22551,6 +24327,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Plan'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         }
@@ -22592,6 +24370,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Outcome",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -22613,6 +24393,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Boundary",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -22634,6 +24416,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Reuse sources",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -22655,6 +24439,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Inception units",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -22676,6 +24462,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Dependencies",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -22697,6 +24485,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Acceptance",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -22720,6 +24510,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Capabilities'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -22728,6 +24520,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Plan'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         }
@@ -22769,6 +24563,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Outcome",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -22790,6 +24586,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Boundary",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -22811,6 +24609,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Reuse sources",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -22832,6 +24632,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Inception units",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -22853,6 +24655,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Dependencies",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -22874,6 +24678,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Acceptance",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -22897,6 +24703,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Capabilities'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -22905,6 +24713,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Plan'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         }
@@ -22946,6 +24756,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Outcome",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -22967,6 +24779,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Boundary",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -22988,6 +24802,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Reuse sources",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -23009,6 +24825,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Inception units",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -23030,6 +24848,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Dependencies",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -23051,6 +24871,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Acceptance",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -23072,6 +24894,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Capabilities",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -23095,6 +24919,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Plan'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         }
@@ -23136,6 +24962,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Outcome",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -23157,6 +24985,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Boundary",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -23178,6 +25008,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Reuse sources",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -23199,6 +25031,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Inception units",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -23220,6 +25054,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Dependencies",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -23241,6 +25077,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Acceptance",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -23262,6 +25100,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Capabilities",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -23285,6 +25125,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Plan'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         }
@@ -23326,6 +25168,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Outcome",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -23347,6 +25191,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Boundary",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -23368,6 +25214,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Reuse sources",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -23389,6 +25237,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Inception units",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -23410,6 +25260,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Dependencies",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -23431,6 +25283,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Acceptance",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -23452,6 +25306,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Capabilities",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -23475,6 +25331,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Plan'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         }
@@ -23516,6 +25374,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Outcome",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -23537,6 +25397,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Boundary",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -23558,6 +25420,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Reuse sources",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -23579,6 +25443,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Inception units",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -23600,6 +25466,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Dependencies",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -23621,6 +25489,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Acceptance",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -23642,6 +25512,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Capabilities",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -23665,6 +25537,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Plan'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         }
@@ -23706,6 +25580,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Outcome",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -23727,6 +25603,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Boundary",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -23748,6 +25626,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Reuse sources",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -23769,6 +25649,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Inception units",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -23790,6 +25672,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Dependencies",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -23811,6 +25695,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Acceptance",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -23832,6 +25718,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Capabilities",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -23855,6 +25743,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Plan'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         }
@@ -23896,6 +25786,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Outcome",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -23917,6 +25809,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Boundary",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -23938,6 +25832,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Reuse sources",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -23959,6 +25855,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Inception units",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -23980,6 +25878,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Dependencies",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -24001,6 +25901,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Acceptance",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -24022,6 +25924,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Capabilities",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -24045,6 +25949,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Plan'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         }
@@ -24086,6 +25992,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Outcome",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -24107,6 +26015,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Boundary",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -24128,6 +26038,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Reuse sources",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -24149,6 +26061,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Inception units",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -24170,6 +26084,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Dependencies",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -24191,6 +26107,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Acceptance",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -24212,6 +26130,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Capabilities",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -24235,6 +26155,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Plan'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         }
@@ -24276,6 +26198,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Outcome",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -24297,6 +26221,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Boundary",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -24318,6 +26244,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Reuse sources",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -24339,6 +26267,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Inception units",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -24360,6 +26290,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Dependencies",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -24381,6 +26313,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Acceptance",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -24402,6 +26336,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Capabilities",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -24425,6 +26361,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Plan'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         }
@@ -24466,6 +26404,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Outcome",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -24487,6 +26427,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Boundary",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -24508,6 +26450,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Reuse sources",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -24529,6 +26473,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Inception units",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -24550,6 +26496,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Dependencies",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -24571,6 +26519,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Acceptance",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -24592,6 +26542,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Capabilities",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -24615,6 +26567,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Plan'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         }
@@ -24656,6 +26610,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Outcome",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -24677,6 +26633,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Boundary",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -24698,6 +26656,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Reuse sources",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -24719,6 +26679,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Inception units",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -24740,6 +26702,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Dependencies",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -24761,6 +26725,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Acceptance",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -24782,6 +26748,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Capabilities",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -24805,6 +26773,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Plan'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         }
@@ -24846,6 +26816,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Outcome",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -24867,6 +26839,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Boundary",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -24888,6 +26862,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Reuse sources",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -24909,6 +26885,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Inception units",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -24930,6 +26908,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Dependencies",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -24951,6 +26931,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Acceptance",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -24972,6 +26954,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Capabilities",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -24995,6 +26979,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Plan'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         }
@@ -25036,6 +27022,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Outcome",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -25057,6 +27045,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Boundary",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -25078,6 +27068,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Reuse sources",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -25099,6 +27091,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Inception units",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -25120,6 +27114,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Dependencies",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -25141,6 +27137,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Acceptance",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -25162,6 +27160,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Capabilities",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -25185,6 +27185,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Plan'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         }
@@ -25226,6 +27228,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Outcome",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -25247,6 +27251,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Boundary",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -25268,6 +27274,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Reuse sources",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -25289,6 +27297,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Inception units",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -25310,6 +27320,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Dependencies",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -25331,6 +27343,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Acceptance",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -25352,6 +27366,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Capabilities",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -25375,6 +27391,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Plan'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         }
@@ -25416,6 +27434,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Outcome",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -25437,6 +27457,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Boundary",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -25458,6 +27480,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Reuse sources",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -25479,6 +27503,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Inception units",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -25500,6 +27526,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Dependencies",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -25521,6 +27549,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Acceptance",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -25542,6 +27572,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Capabilities",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -25565,6 +27597,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Plan'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         }
@@ -25606,6 +27640,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Outcome",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -25627,6 +27663,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Boundary",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -25648,6 +27686,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Reuse sources",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -25669,6 +27709,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Inception units",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -25690,6 +27732,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Dependencies",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -25711,6 +27755,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Acceptance",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -25732,6 +27778,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Capabilities",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -25755,6 +27803,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Plan'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         }
@@ -25796,6 +27846,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Outcome",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -25817,6 +27869,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Boundary",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -25838,6 +27892,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Reuse sources",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -25859,6 +27915,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Inception units",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -25880,6 +27938,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Dependencies",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -25901,6 +27961,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Acceptance",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -25922,6 +27984,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Capabilities",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -25945,6 +28009,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Plan'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         }
@@ -25986,6 +28052,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Outcome",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -26007,6 +28075,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Boundary",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -26028,6 +28098,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Reuse sources",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -26049,6 +28121,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Inception units",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -26070,6 +28144,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Dependencies",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -26091,6 +28167,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Acceptance",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -26112,6 +28190,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Capabilities",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -26135,6 +28215,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Plan'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         }
@@ -26176,6 +28258,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Outcome",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -26197,6 +28281,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Boundary",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -26218,6 +28304,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Reuse sources",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -26239,6 +28327,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Inception units",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -26260,6 +28350,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Dependencies",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -26281,6 +28373,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Acceptance",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -26302,6 +28396,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Capabilities",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -26325,6 +28421,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Plan'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         }
@@ -26366,6 +28464,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Outcome",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -26387,6 +28487,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Boundary",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -26408,6 +28510,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Reuse sources",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -26429,6 +28533,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Inception units",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -26450,6 +28556,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Dependencies",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -26471,6 +28579,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Acceptance",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -26492,6 +28602,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Capabilities",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -26515,6 +28627,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Plan'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         }
@@ -26556,6 +28670,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Outcome",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -26577,6 +28693,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Boundary",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -26598,6 +28716,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Reuse sources",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -26619,6 +28739,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Inception units",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -26640,6 +28762,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Dependencies",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -26661,6 +28785,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Acceptance",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -26682,6 +28808,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Capabilities",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -26705,6 +28833,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Plan'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         }
@@ -26746,6 +28876,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Outcome",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -26767,6 +28899,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Boundary",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -26788,6 +28922,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Reuse sources",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -26809,6 +28945,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Inception units",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -26830,6 +28968,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Dependencies",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -26851,6 +28991,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Acceptance",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -26872,6 +29014,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Capabilities",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -26895,6 +29039,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Plan'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         }
@@ -26936,6 +29082,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Outcome",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -26957,6 +29105,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Boundary",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -26978,6 +29128,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Reuse sources",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -26999,6 +29151,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Inception units",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -27020,6 +29174,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Dependencies",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -27041,6 +29197,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Acceptance",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -27062,6 +29220,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Capabilities",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "project-brief",
@@ -27085,6 +29245,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Plan'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         }
@@ -27128,6 +29290,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Risks'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -27144,6 +29308,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Issues'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -27160,6 +29326,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Assumptions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -27176,6 +29344,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Dependencies'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -27192,6 +29362,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Benefits'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -27208,6 +29380,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Changes'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -27259,6 +29433,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Risks'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -27275,6 +29451,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Issues'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -27291,6 +29469,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Assumptions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -27307,6 +29487,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Dependencies'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -27323,6 +29505,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Benefits'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -27339,6 +29523,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Changes'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -27390,6 +29576,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Risks'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -27406,6 +29594,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Issues'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -27422,6 +29612,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Assumptions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -27438,6 +29630,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Dependencies'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -27454,6 +29648,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Benefits'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -27470,6 +29666,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Changes'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -27521,6 +29719,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Risks'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -27537,6 +29737,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Issues'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -27553,6 +29755,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Assumptions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -27569,6 +29773,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Dependencies'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -27585,6 +29791,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Benefits'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -27601,6 +29809,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Changes'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -27652,6 +29862,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Risks'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -27668,6 +29880,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Issues'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -27684,6 +29898,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Assumptions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -27700,6 +29916,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Dependencies'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -27716,6 +29934,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Benefits'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -27732,6 +29952,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Changes'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -27783,6 +30005,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Risks'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -27799,6 +30023,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Issues'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -27815,6 +30041,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Assumptions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -27831,6 +30059,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Dependencies'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -27847,6 +30077,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Benefits'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -27863,6 +30095,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Changes'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -27914,6 +30148,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Risks'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -27930,6 +30166,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Issues'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -27946,6 +30184,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Assumptions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -27962,6 +30202,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Dependencies'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -27978,6 +30220,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Benefits'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -27994,6 +30238,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Changes'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -28045,6 +30291,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Risks'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -28061,6 +30309,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Issues'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -28077,6 +30327,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Assumptions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -28093,6 +30345,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Dependencies'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -28109,6 +30363,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Benefits'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -28125,6 +30381,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Changes'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -28176,6 +30434,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Risks'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -28192,6 +30452,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Issues'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -28208,6 +30470,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Assumptions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -28224,6 +30488,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Dependencies'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -28240,6 +30506,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Benefits'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -28256,6 +30524,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Changes'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -28307,6 +30577,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Risks'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -28323,6 +30595,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Issues'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -28339,6 +30613,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Assumptions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -28355,6 +30631,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Dependencies'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -28371,6 +30649,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Benefits'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -28387,6 +30667,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Changes'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -28438,6 +30720,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Risks'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -28454,6 +30738,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Issues'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -28470,6 +30756,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Assumptions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -28486,6 +30774,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Dependencies'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -28502,6 +30792,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Benefits'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -28518,6 +30810,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Changes'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -28569,6 +30863,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Risks'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -28585,6 +30881,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Issues'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -28601,6 +30899,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Assumptions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -28617,6 +30917,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Dependencies'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -28633,6 +30935,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Benefits'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -28649,6 +30953,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Changes'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -28700,6 +31006,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Risks'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -28716,6 +31024,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Issues'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -28732,6 +31042,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Assumptions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -28748,6 +31060,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Dependencies'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -28764,6 +31078,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Benefits'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -28780,6 +31096,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Changes'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -28831,6 +31149,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Risks'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -28847,6 +31167,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Issues'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -28863,6 +31185,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Assumptions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -28879,6 +31203,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Dependencies'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -28895,6 +31221,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Benefits'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -28911,6 +31239,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Changes'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -28962,6 +31292,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Risks'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -28978,6 +31310,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Issues'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -28994,6 +31328,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Assumptions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -29010,6 +31346,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Dependencies'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -29026,6 +31364,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Benefits'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -29042,6 +31382,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Changes'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -29093,6 +31435,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Risks'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -29109,6 +31453,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Issues'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -29125,6 +31471,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Assumptions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -29141,6 +31489,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Dependencies'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -29157,6 +31507,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Benefits'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -29173,6 +31525,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Changes'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -29224,6 +31578,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Risks'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -29240,6 +31596,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Issues'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -29256,6 +31614,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Assumptions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -29272,6 +31632,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Dependencies'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -29288,6 +31650,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Benefits'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -29304,6 +31668,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Changes'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -29355,6 +31721,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Risks'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -29371,6 +31739,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Issues'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -29387,6 +31757,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Assumptions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -29403,6 +31775,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Dependencies'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -29419,6 +31793,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Benefits'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -29435,6 +31811,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Changes'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -29486,6 +31864,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Risks'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -29502,6 +31882,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Issues'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -29518,6 +31900,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Assumptions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -29534,6 +31918,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Dependencies'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -29550,6 +31936,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Benefits'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -29566,6 +31954,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Changes'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -29617,6 +32007,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Risks'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -29633,6 +32025,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Issues'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -29649,6 +32043,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Assumptions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -29665,6 +32061,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Dependencies'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -29681,6 +32079,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Benefits'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -29697,6 +32097,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Changes'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -29748,6 +32150,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Risks'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -29764,6 +32168,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Issues'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -29780,6 +32186,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Assumptions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -29796,6 +32204,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Dependencies'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -29812,6 +32222,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Benefits'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -29828,6 +32240,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Changes'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -29879,6 +32293,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Risks'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -29895,6 +32311,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Issues'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -29911,6 +32329,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Assumptions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -29927,6 +32347,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Dependencies'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -29943,6 +32365,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Benefits'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -29959,6 +32383,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Changes'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -30010,6 +32436,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Risks'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -30026,6 +32454,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Issues'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -30042,6 +32472,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Assumptions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -30058,6 +32490,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Dependencies'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -30074,6 +32508,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Benefits'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -30090,6 +32526,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Changes'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -30141,6 +32579,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Risks'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -30157,6 +32597,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Issues'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -30173,6 +32615,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Assumptions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -30189,6 +32633,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Dependencies'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -30205,6 +32651,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Benefits'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -30221,6 +32669,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Changes'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -30272,6 +32722,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Risks'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -30288,6 +32740,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Issues'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -30304,6 +32758,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Assumptions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -30320,6 +32776,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Dependencies'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -30336,6 +32794,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Benefits'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -30352,6 +32812,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Changes'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -30403,6 +32865,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Risks'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -30419,6 +32883,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Issues'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -30435,6 +32901,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Assumptions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -30451,6 +32919,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Dependencies'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -30467,6 +32937,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Benefits'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -30483,6 +32955,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Changes'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -30534,6 +33008,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Risks'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -30550,6 +33026,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Issues'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -30566,6 +33044,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Assumptions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -30582,6 +33062,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Dependencies'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -30598,6 +33080,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Benefits'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -30614,6 +33098,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Changes'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -30665,6 +33151,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Risks'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -30681,6 +33169,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Issues'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -30697,6 +33187,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Assumptions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -30713,6 +33205,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Dependencies'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -30729,6 +33223,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Benefits'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -30745,6 +33241,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Changes'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -30796,6 +33294,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Risks'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -30812,6 +33312,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Issues'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -30828,6 +33330,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Assumptions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -30844,6 +33348,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Dependencies'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -30860,6 +33366,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Benefits'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -30876,6 +33384,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Changes'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -30927,6 +33437,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Risks'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -30943,6 +33455,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Issues'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -30959,6 +33473,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Assumptions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -30975,6 +33491,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Dependencies'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -30991,6 +33509,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Benefits'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -31007,6 +33527,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Changes'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -31058,6 +33580,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Risks'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -31074,6 +33598,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Issues'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -31090,6 +33616,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Assumptions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -31106,6 +33634,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Dependencies'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -31122,6 +33652,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Benefits'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -31138,6 +33670,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Changes'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -31189,6 +33723,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Risks'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -31205,6 +33741,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Issues'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -31221,6 +33759,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Assumptions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -31237,6 +33777,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Dependencies'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -31253,6 +33795,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Benefits'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -31269,6 +33813,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Changes'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -31320,6 +33866,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Risks'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -31336,6 +33884,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Issues'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -31352,6 +33902,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Assumptions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -31368,6 +33920,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Dependencies'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -31384,6 +33938,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Benefits'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -31400,6 +33956,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Changes'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -31451,6 +34009,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Risks'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -31467,6 +34027,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Issues'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -31483,6 +34045,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Assumptions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -31499,6 +34063,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Dependencies'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -31515,6 +34081,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Benefits'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -31531,6 +34099,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Changes'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -31582,6 +34152,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Risks'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -31598,6 +34170,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Issues'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -31614,6 +34188,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Assumptions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -31630,6 +34206,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Dependencies'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -31646,6 +34224,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Benefits'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -31662,6 +34242,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Changes'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -31713,6 +34295,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Risks'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -31729,6 +34313,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Issues'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -31745,6 +34331,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Assumptions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -31761,6 +34349,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Dependencies'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -31777,6 +34367,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Benefits'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -31793,6 +34385,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Changes'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -31844,6 +34438,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Risks'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -31860,6 +34456,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Issues'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -31876,6 +34474,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Assumptions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -31892,6 +34492,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Dependencies'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -31908,6 +34510,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Benefits'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -31924,6 +34528,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Changes'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -31975,6 +34581,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Risks'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -31991,6 +34599,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Issues'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -32007,6 +34617,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Assumptions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -32023,6 +34635,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Dependencies'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -32039,6 +34653,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Benefits'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -32055,6 +34671,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Changes'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -32106,6 +34724,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Risks'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -32122,6 +34742,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Issues'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -32138,6 +34760,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Assumptions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -32154,6 +34778,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Dependencies'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -32170,6 +34796,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Benefits'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -32186,6 +34814,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Changes'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -32237,6 +34867,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Risks'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -32253,6 +34885,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Issues'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -32269,6 +34903,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Assumptions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -32285,6 +34921,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Dependencies'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -32301,6 +34939,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Benefits'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -32317,6 +34957,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Changes'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -32368,6 +35010,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Risks'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -32384,6 +35028,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Issues'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -32400,6 +35046,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Assumptions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -32416,6 +35064,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Dependencies'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -32432,6 +35082,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Benefits'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -32448,6 +35100,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Changes'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -32499,6 +35153,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Risks'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -32515,6 +35171,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Issues'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -32531,6 +35189,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Assumptions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -32547,6 +35207,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Dependencies'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -32563,6 +35225,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Benefits'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -32579,6 +35243,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Changes'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -32630,6 +35296,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Risks'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -32646,6 +35314,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Issues'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -32662,6 +35332,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Assumptions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -32678,6 +35350,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Dependencies'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -32694,6 +35368,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Benefits'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -32710,6 +35386,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Changes'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -32761,6 +35439,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Risks'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -32777,6 +35457,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Issues'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -32793,6 +35475,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Assumptions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -32809,6 +35493,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Dependencies'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -32825,6 +35511,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Benefits'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -32841,6 +35529,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Changes'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -32892,6 +35582,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Risks'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -32908,6 +35600,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Issues'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -32924,6 +35618,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Assumptions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -32940,6 +35636,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Dependencies'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -32956,6 +35654,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Benefits'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -32972,6 +35672,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Changes'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -33023,6 +35725,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Risks'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -33039,6 +35743,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Issues'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -33055,6 +35761,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Assumptions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -33071,6 +35779,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Dependencies'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -33087,6 +35797,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Benefits'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -33103,6 +35815,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Changes'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -33154,6 +35868,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Risks'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -33170,6 +35886,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Issues'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -33186,6 +35904,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Assumptions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -33202,6 +35922,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Dependencies'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -33218,6 +35940,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Benefits'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -33234,6 +35958,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Changes'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -33285,6 +36011,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Work packages'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -33301,6 +36029,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Acceptance'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -33317,6 +36047,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Status'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -33368,6 +36100,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Work packages'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -33384,6 +36118,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Acceptance'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -33400,6 +36136,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Status'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -33451,6 +36189,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Work packages'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -33467,6 +36207,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Acceptance'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -33483,6 +36225,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Status'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -33534,6 +36278,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Work packages'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -33550,6 +36296,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Acceptance'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -33566,6 +36314,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Status'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -33617,6 +36367,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Work packages'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -33633,6 +36385,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Acceptance'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -33649,6 +36403,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Status'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -33700,6 +36456,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Work packages'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -33716,6 +36474,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Acceptance'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -33732,6 +36492,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Status'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -33783,6 +36545,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Work packages'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -33799,6 +36563,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Acceptance'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -33815,6 +36581,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Status'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -33866,6 +36634,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Work packages'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -33882,6 +36652,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Acceptance'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -33898,6 +36670,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Status'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -33949,6 +36723,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Work packages'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -33965,6 +36741,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Acceptance'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -33981,6 +36759,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Status'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -34032,6 +36812,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Work packages'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -34048,6 +36830,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Acceptance'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -34064,6 +36848,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Status'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -34115,6 +36901,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Work packages'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -34131,6 +36919,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Acceptance'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -34147,6 +36937,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Status'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -34198,6 +36990,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Work packages'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -34214,6 +37008,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Acceptance'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -34230,6 +37026,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Status'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -34281,6 +37079,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Work packages'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -34297,6 +37097,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Acceptance'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -34313,6 +37115,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Status'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -34364,6 +37168,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Work packages'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -34380,6 +37186,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Acceptance'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -34396,6 +37204,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Status'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -34447,6 +37257,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Work packages'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -34463,6 +37275,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Acceptance'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -34479,6 +37293,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Status'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -34530,6 +37346,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Work packages'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -34546,6 +37364,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Acceptance'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -34562,6 +37382,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Status'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -34613,6 +37435,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Work packages'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -34629,6 +37453,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Acceptance'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -34645,6 +37471,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Status'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -34696,6 +37524,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Work packages'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -34712,6 +37542,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Acceptance'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -34728,6 +37560,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Status'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -34779,6 +37613,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Work packages'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -34795,6 +37631,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Acceptance'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -34811,6 +37649,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Status'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -34862,6 +37702,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Work packages'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -34878,6 +37720,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Acceptance'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -34894,6 +37738,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Status'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -34945,6 +37791,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Work packages'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -34961,6 +37809,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Acceptance'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -34977,6 +37827,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Status'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -35028,6 +37880,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Work packages'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -35044,6 +37898,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Acceptance'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -35060,6 +37916,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Status'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -35111,6 +37969,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Work packages'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -35127,6 +37987,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Acceptance'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -35143,6 +38005,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Status'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -35194,6 +38058,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Work packages'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -35210,6 +38076,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Acceptance'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -35226,6 +38094,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Status'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -35277,6 +38147,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Work packages'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -35293,6 +38165,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Acceptance'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -35309,6 +38183,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Status'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -35360,6 +38236,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Work packages'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -35376,6 +38254,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Acceptance'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -35392,6 +38272,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Status'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -35443,6 +38325,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Work packages'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -35459,6 +38343,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Acceptance'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -35475,6 +38361,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Status'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -35526,6 +38414,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Work packages'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -35542,6 +38432,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Acceptance'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -35558,6 +38450,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Status'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -35609,6 +38503,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Work packages'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -35625,6 +38521,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Acceptance'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -35641,6 +38539,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Status'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -35692,6 +38592,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Work packages'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -35708,6 +38610,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Acceptance'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -35724,6 +38628,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Status'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -35775,6 +38681,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Work packages'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -35791,6 +38699,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Acceptance'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -35807,6 +38717,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Status'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -35858,6 +38770,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Work packages'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -35874,6 +38788,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Acceptance'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -35890,6 +38806,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Status'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -35941,6 +38859,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Work packages'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -35957,6 +38877,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Acceptance'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -35973,6 +38895,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Status'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -36024,6 +38948,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Work packages'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -36040,6 +38966,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Acceptance'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -36056,6 +38984,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Status'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -36107,6 +39037,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Work packages'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -36123,6 +39055,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Acceptance'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -36139,6 +39073,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Status'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -36190,6 +39126,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Work packages'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -36206,6 +39144,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Acceptance'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -36222,6 +39162,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Status'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -36273,6 +39215,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Work packages'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -36289,6 +39233,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Acceptance'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -36305,6 +39251,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Status'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -36356,6 +39304,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Work packages'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -36372,6 +39322,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Acceptance'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -36388,6 +39340,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Status'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -36439,6 +39393,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Work packages'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -36455,6 +39411,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Acceptance'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -36471,6 +39429,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Status'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -36522,6 +39482,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Work packages'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -36538,6 +39500,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Acceptance'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -36554,6 +39518,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Status'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -36605,6 +39571,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Work packages'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -36621,6 +39589,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Acceptance'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -36637,6 +39607,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Status'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -36688,6 +39660,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Work packages'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -36704,6 +39678,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Acceptance'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -36720,6 +39696,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Status'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -36771,6 +39749,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Work packages'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -36787,6 +39767,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Acceptance'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -36803,6 +39785,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Status'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -36854,6 +39838,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Work packages'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -36870,6 +39856,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Acceptance'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -36886,6 +39874,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Status'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -36937,6 +39927,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Work packages'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -36953,6 +39945,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Acceptance'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -36969,6 +39963,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Status'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -37020,6 +40016,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Work packages'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -37036,6 +40034,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Acceptance'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -37052,6 +40052,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Status'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -37103,6 +40105,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Work packages'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -37119,6 +40123,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Acceptance'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -37135,6 +40141,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Status'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -37186,6 +40194,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'What went well'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "inspect-adapt",
@@ -37204,6 +40214,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'What did not'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "inspect-adapt",
@@ -37222,6 +40234,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Lessons'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -37238,6 +40252,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Actions'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -37289,6 +40305,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Objectives'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "pi-objectives",
@@ -37307,6 +40325,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Business value'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -37323,6 +40343,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Measurement'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -37339,6 +40361,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "pi-objectives",
@@ -37399,6 +40423,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Objectives'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "pi-plan",
@@ -37417,6 +40443,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Plan'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -37433,6 +40461,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'WSJF order'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -37449,6 +40479,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Capacity and WIP'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -37465,6 +40497,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "pi-plan",
@@ -37523,6 +40557,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "ART charter",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 1,
@@ -37543,6 +40579,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Solution intent",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 1,
@@ -37564,6 +40602,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Backlog with WSJF'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -37615,6 +40655,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'PI plan'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -37631,6 +40673,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'System demo'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -37647,6 +40691,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Inspect and adapt'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -37663,6 +40709,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Lean governance'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -37710,6 +40758,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Portfolio canvas",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 1,
@@ -37729,6 +40779,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Strategic themes",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 6,
@@ -37774,6 +40826,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Value streams",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 6,
@@ -37856,6 +40910,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Demonstrated'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -37872,6 +40928,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Evidence'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -37888,6 +40946,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Credits'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -37904,6 +40964,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Findings'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "system-demo",
@@ -37953,6 +41015,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Context",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "spec",
@@ -37974,6 +41038,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Requirements",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "spec",
@@ -37995,6 +41061,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Design",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "spec",
@@ -38016,6 +41084,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Acceptance",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "spec",
@@ -38070,6 +41140,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Phases",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 73,
@@ -38144,6 +41216,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Artefacts by phase and plateau",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 73,
@@ -38218,6 +41292,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Contracts",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 73,
@@ -38292,6 +41368,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Adoption",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 73,
@@ -38399,6 +41477,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Principles",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 3,
@@ -38428,6 +41508,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Tailored ADM",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 1,
@@ -38447,6 +41529,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Artefact standard",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 10,
@@ -38511,6 +41595,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Architecture Board",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 1,
@@ -38530,6 +41616,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Governance and contracts",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 1,
@@ -38549,6 +41637,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Maturity and skills",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 60,
@@ -38657,6 +41747,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Decisions",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 1,
@@ -38679,6 +41771,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Reviews'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -38695,6 +41789,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Waivers'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -38742,6 +41838,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Principles",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 73,
@@ -38816,6 +41914,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Approval",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "architecture-principles",
@@ -38841,6 +41941,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Application",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "architecture-principles",
@@ -38899,6 +42001,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Common metadata",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 73,
@@ -38973,6 +42077,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Catalogues",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 73,
@@ -39047,6 +42153,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Matrices",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 73,
@@ -39121,6 +42229,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Diagrams",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 73,
@@ -39195,6 +42305,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Links",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 2,
@@ -39220,6 +42332,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Repository",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 3,
@@ -39283,6 +42397,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Dimensions",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 18,
@@ -39358,6 +42474,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Scores",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 18,
@@ -39433,6 +42551,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Baseline",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 18,
@@ -39508,6 +42628,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Milestones",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 18,
@@ -39616,6 +42738,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Mandatory artefacts",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 3,
@@ -39645,6 +42769,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Contract and gate",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 1,
@@ -39665,6 +42791,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Evidence",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 3,
@@ -39745,6 +42873,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Requirements'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -39760,6 +42890,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Types'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -39775,6 +42907,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Trace links'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -39825,6 +42959,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Reuse candidates'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -39833,6 +42969,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Boundary'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -39841,6 +42979,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Licence and contract constraints'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         }
@@ -39880,6 +43020,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Categories",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 42,
@@ -39955,6 +43097,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Proficiency by role",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 42,
@@ -40030,6 +43174,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Baseline",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 42,
@@ -40105,6 +43251,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Development milestones",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 42,
@@ -40216,6 +43364,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Current state'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -40224,6 +43374,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Options considered'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -40232,6 +43384,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Risks'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -40240,6 +43394,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Dependency map'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         }
@@ -40282,6 +43438,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Current state'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -40290,6 +43448,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Options considered'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -40298,6 +43458,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Risks'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
@@ -40306,6 +43468,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Dependency map'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         }
@@ -40349,6 +43513,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Metadata'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -40365,6 +43531,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Entries'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -40381,6 +43549,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Links'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -40394,6 +43564,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Document",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "architecture-artifact",
@@ -40450,6 +43622,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Metadata",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 1,
@@ -40469,6 +43643,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Entries",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 10,
@@ -40533,6 +43709,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Links",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 2,
@@ -40559,6 +43737,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Document'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -40607,6 +43787,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Metadata",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 1,
@@ -40626,6 +43808,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Entries",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 7,
@@ -40675,6 +43859,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Links",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 1,
@@ -40696,6 +43882,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Document'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -40744,6 +43932,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Metadata",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 1,
@@ -40763,6 +43953,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Entries",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 10,
@@ -40827,6 +44019,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Links",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 1,
@@ -40848,6 +44042,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Document'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -40895,6 +44091,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Context and boundary",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "architecture-design",
@@ -40918,12 +44116,16 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Aggregates, tables and actions'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [],
           "status": "partial"
         },
         {
           "heading": "Decisions",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "architecture-design",
@@ -40945,6 +44147,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Acceptance",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "architecture-design",
@@ -40966,6 +44170,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Architecture artefacts",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "architecture-design",
@@ -41020,6 +44226,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Context and boundary",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "architecture-design",
@@ -41041,6 +44249,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Aggregates, tables and actions",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "architecture-design",
@@ -41062,6 +44272,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Decisions",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "architecture-design",
@@ -41083,6 +44295,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Acceptance",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "architecture-design",
@@ -41104,6 +44318,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Architecture artefacts",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "architecture-design",
@@ -41158,6 +44374,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Context and boundary",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "architecture-design",
@@ -41179,6 +44397,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Aggregates, tables and actions",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "architecture-design",
@@ -41200,6 +44420,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Decisions",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "architecture-design",
@@ -41221,6 +44443,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Acceptance",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "architecture-design",
@@ -41242,6 +44466,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Architecture artefacts",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "architecture-design",
@@ -41296,6 +44522,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Context and boundary",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "architecture-design",
@@ -41317,6 +44545,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Aggregates, tables and actions",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "architecture-design",
@@ -41338,6 +44568,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Decisions",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "architecture-design",
@@ -41359,6 +44591,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Acceptance",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "architecture-design",
@@ -41380,6 +44614,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Architecture artefacts",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "architecture-design",
@@ -41434,6 +44670,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Context and boundary",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "architecture-design",
@@ -41455,6 +44693,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Aggregates, tables and actions",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "architecture-design",
@@ -41476,6 +44716,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Decisions",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "architecture-design",
@@ -41497,6 +44739,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Acceptance",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "architecture-design",
@@ -41518,6 +44762,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Architecture artefacts",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "architecture-design",
@@ -41572,6 +44818,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Context and boundary",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "architecture-design",
@@ -41593,6 +44841,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Aggregates, tables and actions",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "architecture-design",
@@ -41614,6 +44864,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Decisions",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "architecture-design",
@@ -41635,6 +44887,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Acceptance",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "architecture-design",
@@ -41656,6 +44910,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Architecture artefacts",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "architecture-design",
@@ -41710,6 +44966,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Context and boundary",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "architecture-design",
@@ -41731,6 +44989,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Aggregates, tables and actions",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "architecture-design",
@@ -41752,6 +45012,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Decisions",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "architecture-design",
@@ -41773,6 +45035,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Acceptance",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "architecture-design",
@@ -41794,6 +45058,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Architecture artefacts",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "architecture-design",
@@ -41848,6 +45114,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Context and boundary",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "architecture-design",
@@ -41869,6 +45137,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Aggregates, tables and actions",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "architecture-design",
@@ -41890,6 +45160,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Decisions",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "architecture-design",
@@ -41911,6 +45183,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Acceptance",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "architecture-design",
@@ -41932,6 +45206,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Architecture artefacts",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "architecture-design",
@@ -41986,6 +45262,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Context and boundary",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "architecture-design",
@@ -42007,6 +45285,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Aggregates, tables and actions",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "architecture-design",
@@ -42028,6 +45308,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Decisions",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "architecture-design",
@@ -42049,6 +45331,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Acceptance",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "architecture-design",
@@ -42070,6 +45354,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Architecture artefacts",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "architecture-design",
@@ -42124,6 +45410,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Context and boundary",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "architecture-design",
@@ -42145,6 +45433,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Aggregates, tables and actions",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "architecture-design",
@@ -42166,6 +45456,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Decisions",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "architecture-design",
@@ -42187,6 +45479,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Acceptance",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "architecture-design",
@@ -42208,6 +45502,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Architecture artefacts",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "architecture-design",
@@ -42262,6 +45558,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Context and boundary",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "architecture-design",
@@ -42283,6 +45581,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Aggregates, tables and actions",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "architecture-design",
@@ -42304,6 +45604,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Decisions",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "architecture-design",
@@ -42325,6 +45627,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Acceptance",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "architecture-design",
@@ -42346,6 +45650,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Architecture artefacts",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "architecture-design",
@@ -42400,6 +45706,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Context and boundary",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "architecture-design",
@@ -42421,6 +45729,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Aggregates, tables and actions",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "architecture-design",
@@ -42442,6 +45752,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Decisions",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "architecture-design",
@@ -42463,6 +45775,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Acceptance",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "architecture-design",
@@ -42484,6 +45798,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Architecture artefacts",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "architecture-design",
@@ -42538,6 +45854,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Context and boundary",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "architecture-design",
@@ -42559,6 +45877,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Aggregates, tables and actions",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "architecture-design",
@@ -42580,6 +45900,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Decisions",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "architecture-design",
@@ -42601,6 +45923,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Acceptance",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "architecture-design",
@@ -42622,6 +45946,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Architecture artefacts",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "architecture-design",
@@ -42676,6 +46002,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Context and boundary",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "architecture-design",
@@ -42697,6 +46025,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Aggregates, tables and actions",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "architecture-design",
@@ -42718,6 +46048,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Decisions",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "architecture-design",
@@ -42739,6 +46071,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Acceptance",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "architecture-design",
@@ -42760,6 +46094,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Architecture artefacts",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "architecture-design",
@@ -42814,6 +46150,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Context and boundary",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "architecture-design",
@@ -42835,6 +46173,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Aggregates, tables and actions",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "architecture-design",
@@ -42856,6 +46196,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Decisions",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "architecture-design",
@@ -42877,6 +46219,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Acceptance",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "architecture-design",
@@ -42898,6 +46242,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Architecture artefacts",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "category": "architecture-design",
@@ -42956,6 +46302,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Relationship'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -42972,6 +46320,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Findings'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -42988,6 +46338,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Waivers'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -43004,6 +46356,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decision'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -43055,6 +46409,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Relationship'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -43071,6 +46427,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Findings'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -43087,6 +46445,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Waivers'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -43103,6 +46463,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decision'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -43154,6 +46516,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Relationship'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -43170,6 +46534,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Findings'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -43186,6 +46552,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Waivers'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -43202,6 +46570,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decision'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -43253,6 +46623,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Relationship'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -43269,6 +46641,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Findings'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -43285,6 +46659,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Waivers'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -43301,6 +46677,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decision'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -43352,6 +46730,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Relationship'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -43368,6 +46748,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Findings'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -43384,6 +46766,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Waivers'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -43400,6 +46784,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decision'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -43451,6 +46837,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Relationship'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -43467,6 +46855,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Findings'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -43483,6 +46873,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Waivers'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -43499,6 +46891,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decision'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -43550,6 +46944,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Relationship'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -43566,6 +46962,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Findings'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -43582,6 +46980,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Waivers'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -43598,6 +46998,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decision'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -43649,6 +47051,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Relationship'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -43665,6 +47069,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Findings'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -43681,6 +47087,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Waivers'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -43697,6 +47105,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decision'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -43748,6 +47158,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Relationship'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -43764,6 +47176,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Findings'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -43780,6 +47194,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Waivers'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -43796,6 +47212,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decision'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -43847,6 +47265,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Relationship'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -43863,6 +47283,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Findings'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -43879,6 +47301,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Waivers'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -43895,6 +47319,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decision'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -43946,6 +47372,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Relationship'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -43962,6 +47390,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Findings'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -43978,6 +47408,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Waivers'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -43994,6 +47426,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decision'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -44045,6 +47479,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Relationship'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -44061,6 +47497,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Findings'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -44077,6 +47515,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Waivers'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -44093,6 +47533,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decision'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -44144,6 +47586,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Relationship'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -44160,6 +47604,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Findings'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -44176,6 +47622,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Waivers'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -44192,6 +47640,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decision'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -44243,6 +47693,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Relationship'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -44259,6 +47711,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Findings'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -44275,6 +47729,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Waivers'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -44291,6 +47747,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decision'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -44342,6 +47800,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Relationship'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -44358,6 +47818,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Findings'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -44374,6 +47836,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Waivers'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -44390,6 +47854,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decision'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -44441,6 +47907,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Relationship'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -44457,6 +47925,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Findings'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -44473,6 +47943,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Waivers'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -44489,6 +47961,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decision'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -44540,6 +48014,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Relationship'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -44556,6 +48032,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Findings'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -44572,6 +48050,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Waivers'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -44588,6 +48068,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decision'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -44639,6 +48121,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Relationship'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -44655,6 +48139,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Findings'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -44671,6 +48157,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Waivers'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -44687,6 +48175,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decision'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -44738,6 +48228,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Relationship'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -44754,6 +48246,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Findings'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -44770,6 +48264,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Waivers'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -44786,6 +48282,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decision'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -44837,6 +48335,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Relationship'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -44853,6 +48353,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Findings'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -44869,6 +48371,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Waivers'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -44885,6 +48389,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decision'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -44936,6 +48442,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Relationship'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -44952,6 +48460,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Findings'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -44968,6 +48478,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Waivers'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -44984,6 +48496,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decision'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -45035,6 +48549,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Relationship'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -45051,6 +48567,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Findings'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -45067,6 +48585,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Waivers'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -45083,6 +48603,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decision'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -45134,6 +48656,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Relationship'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -45150,6 +48674,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Findings'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -45166,6 +48692,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Waivers'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -45182,6 +48710,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decision'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -45233,6 +48763,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Relationship'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -45249,6 +48781,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Findings'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -45265,6 +48799,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Waivers'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -45281,6 +48817,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decision'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -45332,6 +48870,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Relationship'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -45348,6 +48888,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Findings'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -45364,6 +48906,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Waivers'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -45380,6 +48924,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decision'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -45431,6 +48977,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Relationship'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -45447,6 +48995,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Findings'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -45463,6 +49013,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Waivers'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -45479,6 +49031,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decision'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -45530,6 +49084,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Relationship'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -45546,6 +49102,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Findings'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -45562,6 +49120,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Waivers'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -45578,6 +49138,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decision'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -45629,6 +49191,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Relationship'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -45645,6 +49209,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Findings'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -45661,6 +49227,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Waivers'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -45677,6 +49245,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decision'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -45728,6 +49298,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Relationship'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -45744,6 +49316,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Findings'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -45760,6 +49334,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Waivers'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -45776,6 +49352,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decision'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -45827,6 +49405,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Relationship'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -45843,6 +49423,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Findings'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -45859,6 +49441,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Waivers'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -45875,6 +49459,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decision'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -45926,6 +49512,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Relationship'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -45942,6 +49530,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Findings'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -45958,6 +49548,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Waivers'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -45974,6 +49566,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decision'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -46025,6 +49619,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Relationship'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -46041,6 +49637,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Findings'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -46057,6 +49655,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Waivers'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -46073,6 +49673,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decision'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -46124,6 +49726,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Relationship'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -46140,6 +49744,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Findings'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -46156,6 +49762,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Waivers'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -46172,6 +49780,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decision'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -46223,6 +49833,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Relationship'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -46239,6 +49851,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Findings'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -46255,6 +49869,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Waivers'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -46271,6 +49887,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decision'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -46322,6 +49940,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Relationship'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -46338,6 +49958,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Findings'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -46354,6 +49976,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Waivers'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -46370,6 +49994,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decision'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -46421,6 +50047,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Relationship'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -46437,6 +50065,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Findings'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -46453,6 +50083,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Waivers'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -46469,6 +50101,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decision'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -46520,6 +50154,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Relationship'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -46536,6 +50172,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Findings'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -46552,6 +50190,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Waivers'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -46568,6 +50208,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decision'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -46619,6 +50261,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Relationship'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -46635,6 +50279,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Findings'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -46651,6 +50297,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Waivers'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -46667,6 +50315,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decision'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -46718,6 +50368,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Relationship'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -46734,6 +50386,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Findings'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -46750,6 +50404,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Waivers'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -46766,6 +50422,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decision'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -46817,6 +50475,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Relationship'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -46833,6 +50493,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Findings'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -46849,6 +50511,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Waivers'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -46865,6 +50529,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decision'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -46916,6 +50582,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Relationship'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -46932,6 +50600,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Findings'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -46948,6 +50618,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Waivers'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -46964,6 +50636,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decision'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -47015,6 +50689,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Relationship'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -47031,6 +50707,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Findings'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -47047,6 +50725,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Waivers'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -47063,6 +50743,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decision'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -47114,6 +50796,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Relationship'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -47130,6 +50814,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Findings'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -47146,6 +50832,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Waivers'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -47162,6 +50850,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decision'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -47213,6 +50903,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Relationship'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -47229,6 +50921,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Findings'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -47245,6 +50939,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Waivers'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -47261,6 +50957,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decision'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -47312,6 +51010,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Relationship'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -47328,6 +51028,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Findings'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -47344,6 +51046,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Waivers'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -47360,6 +51064,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decision'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -47411,6 +51117,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Relationship'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -47427,6 +51135,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Findings'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -47443,6 +51153,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Waivers'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -47459,6 +51171,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decision'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -47506,6 +51220,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Relationship",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -47534,6 +51250,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Findings",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -47562,6 +51280,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Waivers",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -47590,6 +51310,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Decision",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -47655,6 +51377,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Commitments'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -47671,6 +51395,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Compliance method'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -47687,6 +51413,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -47738,6 +51466,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Commitments'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -47754,6 +51484,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Compliance method'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -47770,6 +51502,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -47821,6 +51555,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Commitments'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -47837,6 +51573,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Compliance method'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -47853,6 +51591,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -47904,6 +51644,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Commitments'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -47920,6 +51662,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Compliance method'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -47936,6 +51680,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -47987,6 +51733,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Commitments'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -48003,6 +51751,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Compliance method'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -48019,6 +51769,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -48070,6 +51822,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Commitments'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -48086,6 +51840,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Compliance method'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -48102,6 +51858,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -48153,6 +51911,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Commitments'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -48169,6 +51929,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Compliance method'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -48185,6 +51947,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -48236,6 +52000,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Commitments'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -48252,6 +52018,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Compliance method'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -48268,6 +52036,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -48319,6 +52089,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Commitments'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -48335,6 +52107,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Compliance method'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -48351,6 +52125,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -48402,6 +52178,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Commitments'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -48418,6 +52196,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Compliance method'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -48434,6 +52214,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -48485,6 +52267,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Commitments'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -48501,6 +52285,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Compliance method'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -48517,6 +52303,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -48568,6 +52356,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Commitments'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -48584,6 +52374,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Compliance method'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -48600,6 +52392,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -48651,6 +52445,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Commitments'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -48667,6 +52463,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Compliance method'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -48683,6 +52481,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -48734,6 +52534,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Commitments'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -48750,6 +52552,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Compliance method'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -48766,6 +52570,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -48817,6 +52623,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Commitments'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -48833,6 +52641,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Compliance method'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -48849,6 +52659,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -48900,6 +52712,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Commitments'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -48916,6 +52730,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Compliance method'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -48932,6 +52748,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -48983,6 +52801,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Commitments'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -48999,6 +52819,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Compliance method'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -49015,6 +52837,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -49066,6 +52890,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Commitments'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -49082,6 +52908,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Compliance method'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -49098,6 +52926,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -49149,6 +52979,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Commitments'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -49165,6 +52997,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Compliance method'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -49181,6 +53015,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -49232,6 +53068,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Commitments'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -49248,6 +53086,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Compliance method'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -49264,6 +53104,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -49315,6 +53157,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Commitments'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -49331,6 +53175,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Compliance method'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -49347,6 +53193,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -49398,6 +53246,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Commitments'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -49414,6 +53264,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Compliance method'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -49430,6 +53282,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -49481,6 +53335,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Commitments'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -49497,6 +53353,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Compliance method'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -49513,6 +53371,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -49564,6 +53424,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Commitments'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -49580,6 +53442,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Compliance method'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -49596,6 +53460,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -49647,6 +53513,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Commitments'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -49663,6 +53531,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Compliance method'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -49679,6 +53549,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -49730,6 +53602,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Commitments'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -49746,6 +53620,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Compliance method'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -49762,6 +53638,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -49813,6 +53691,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Commitments'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -49829,6 +53709,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Compliance method'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -49845,6 +53727,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -49896,6 +53780,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Commitments'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -49912,6 +53798,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Compliance method'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -49928,6 +53816,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -49979,6 +53869,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Commitments'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -49995,6 +53887,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Compliance method'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -50011,6 +53905,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -50062,6 +53958,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Commitments'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -50078,6 +53976,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Compliance method'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -50094,6 +53994,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -50145,6 +54047,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Commitments'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -50161,6 +54065,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Compliance method'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -50177,6 +54083,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -50228,6 +54136,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Commitments'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -50244,6 +54154,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Compliance method'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -50260,6 +54172,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -50311,6 +54225,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Commitments'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -50327,6 +54243,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Compliance method'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -50343,6 +54261,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -50394,6 +54314,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Commitments'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -50410,6 +54332,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Compliance method'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -50426,6 +54350,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -50477,6 +54403,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Commitments'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -50493,6 +54421,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Compliance method'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -50509,6 +54439,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -50560,6 +54492,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Commitments'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -50576,6 +54510,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Compliance method'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -50592,6 +54528,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -50643,6 +54581,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Commitments'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -50659,6 +54599,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Compliance method'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -50675,6 +54617,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -50726,6 +54670,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Commitments'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -50742,6 +54688,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Compliance method'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -50758,6 +54706,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -50809,6 +54759,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Commitments'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -50825,6 +54777,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Compliance method'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -50841,6 +54795,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -50892,6 +54848,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Commitments'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -50908,6 +54866,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Compliance method'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -50924,6 +54884,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -50975,6 +54937,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Commitments'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -50991,6 +54955,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Compliance method'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -51007,6 +54973,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -51058,6 +55026,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Commitments'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -51074,6 +55044,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Compliance method'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -51090,6 +55062,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -51141,6 +55115,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Commitments'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -51157,6 +55133,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Compliance method'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -51173,6 +55151,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -51224,6 +55204,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Commitments'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -51240,6 +55222,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Compliance method'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -51256,6 +55240,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -51307,6 +55293,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Commitments'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -51323,6 +55311,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Compliance method'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -51339,6 +55329,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -51390,6 +55382,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Commitments'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -51406,6 +55400,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Compliance method'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -51422,6 +55418,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -51473,6 +55471,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Commitments'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -51489,6 +55489,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Compliance method'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -51505,6 +55507,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Approval'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -51556,6 +55560,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Mandatory artefacts'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -51569,6 +55575,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Contract and gate",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 1,
@@ -51591,6 +55599,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -51651,6 +55661,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Mandatory artefacts'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -51666,6 +55678,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Contract and gate'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -51682,6 +55696,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -51742,6 +55758,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Mandatory artefacts'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -51757,6 +55775,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Contract and gate'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -51773,6 +55793,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -51833,6 +55855,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Mandatory artefacts'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -51848,6 +55872,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Contract and gate'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -51864,6 +55890,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -51924,6 +55952,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Mandatory artefacts'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -51939,6 +55969,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Contract and gate'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -51955,6 +55987,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -52015,6 +56049,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Mandatory artefacts'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -52030,6 +56066,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Contract and gate'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -52046,6 +56084,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -52106,6 +56146,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Mandatory artefacts'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -52121,6 +56163,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Contract and gate'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -52137,6 +56181,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -52197,6 +56243,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Mandatory artefacts'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -52212,6 +56260,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Contract and gate'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -52228,6 +56278,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -52288,6 +56340,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Mandatory artefacts'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -52303,6 +56357,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Contract and gate'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -52319,6 +56375,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -52379,6 +56437,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Mandatory artefacts'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -52394,6 +56454,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Contract and gate'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -52410,6 +56472,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -52470,6 +56534,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Mandatory artefacts'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -52485,6 +56551,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Contract and gate'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -52501,6 +56569,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -52561,6 +56631,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Mandatory artefacts'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -52576,6 +56648,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Contract and gate'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -52592,6 +56666,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -52652,6 +56728,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Mandatory artefacts'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -52667,6 +56745,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Contract and gate'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -52683,6 +56763,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -52743,6 +56825,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Mandatory artefacts'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -52758,6 +56842,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Contract and gate'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -52774,6 +56860,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -52834,6 +56922,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Mandatory artefacts'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -52849,6 +56939,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Contract and gate'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -52865,6 +56957,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -52925,6 +57019,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Mandatory artefacts'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -52940,6 +57036,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Contract and gate'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -52956,6 +57054,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -53016,6 +57116,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Mandatory artefacts'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -53031,6 +57133,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Contract and gate'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -53047,6 +57151,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -53107,6 +57213,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Mandatory artefacts'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -53122,6 +57230,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Contract and gate'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -53138,6 +57248,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -53198,6 +57310,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Mandatory artefacts'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -53213,6 +57327,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Contract and gate'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -53229,6 +57345,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -53289,6 +57407,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Mandatory artefacts'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -53304,6 +57424,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Contract and gate'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -53320,6 +57442,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -53380,6 +57504,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Mandatory artefacts'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -53395,6 +57521,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Contract and gate'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -53411,6 +57539,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -53471,6 +57601,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Mandatory artefacts'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -53486,6 +57618,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Contract and gate'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -53502,6 +57636,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -53562,6 +57698,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Mandatory artefacts'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -53577,6 +57715,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Contract and gate'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -53593,6 +57733,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -53653,6 +57795,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Mandatory artefacts'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -53668,6 +57812,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Contract and gate'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -53684,6 +57830,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -53744,6 +57892,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Mandatory artefacts'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -53759,6 +57909,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Contract and gate'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -53775,6 +57927,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -53835,6 +57989,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Mandatory artefacts'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -53850,6 +58006,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Contract and gate'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -53866,6 +58024,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -53926,6 +58086,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Mandatory artefacts'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -53941,6 +58103,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Contract and gate'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -53957,6 +58121,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -54017,6 +58183,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Mandatory artefacts'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -54032,6 +58200,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Contract and gate'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -54048,6 +58218,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -54108,6 +58280,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Mandatory artefacts'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -54123,6 +58297,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Contract and gate'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -54139,6 +58315,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -54199,6 +58377,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Mandatory artefacts'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -54214,6 +58394,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Contract and gate'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -54230,6 +58412,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -54290,6 +58474,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Mandatory artefacts'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -54305,6 +58491,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Contract and gate'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -54321,6 +58509,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -54381,6 +58571,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Mandatory artefacts'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -54396,6 +58588,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Contract and gate'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -54412,6 +58606,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -54472,6 +58668,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Mandatory artefacts'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -54487,6 +58685,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Contract and gate'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -54503,6 +58703,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -54563,6 +58765,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Mandatory artefacts'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -54578,6 +58782,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Contract and gate'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -54594,6 +58800,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -54654,6 +58862,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Mandatory artefacts'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -54669,6 +58879,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Contract and gate'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -54685,6 +58897,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -54745,6 +58959,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Mandatory artefacts'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -54760,6 +58976,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Contract and gate'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -54776,6 +58994,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -54836,6 +59056,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Mandatory artefacts'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -54851,6 +59073,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Contract and gate'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -54867,6 +59091,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -54927,6 +59153,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Mandatory artefacts'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -54942,6 +59170,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Contract and gate'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -54958,6 +59188,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -55018,6 +59250,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Mandatory artefacts'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -55033,6 +59267,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Contract and gate'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -55049,6 +59285,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -55109,6 +59347,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Mandatory artefacts'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -55124,6 +59364,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Contract and gate'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -55140,6 +59382,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -55200,6 +59444,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Mandatory artefacts'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -55215,6 +59461,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Contract and gate'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -55231,6 +59479,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -55291,6 +59541,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Mandatory artefacts'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -55306,6 +59558,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Contract and gate'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -55322,6 +59576,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -55382,6 +59638,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Mandatory artefacts'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -55397,6 +59655,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Contract and gate'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -55413,6 +59673,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -55473,6 +59735,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Mandatory artefacts'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -55488,6 +59752,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Contract and gate'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -55504,6 +59770,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -55564,6 +59832,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Mandatory artefacts'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -55579,6 +59849,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Contract and gate'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -55595,6 +59867,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -55655,6 +59929,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Mandatory artefacts'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -55670,6 +59946,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Contract and gate'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -55686,6 +59964,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -55746,6 +60026,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Mandatory artefacts'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -55761,6 +60043,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Contract and gate'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -55777,6 +60061,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -55837,6 +60123,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Mandatory artefacts'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -55852,6 +60140,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Contract and gate'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -55868,6 +60158,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -55928,6 +60220,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Mandatory artefacts'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -55943,6 +60237,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Contract and gate'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -55959,6 +60255,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -56019,6 +60317,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Mandatory artefacts'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -56034,6 +60334,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Contract and gate'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -56050,6 +60352,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -56109,6 +60413,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Purpose'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -56125,6 +60431,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Scope'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -56141,6 +60449,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Decision'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -56188,6 +60498,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Assignment",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 1,
@@ -56208,6 +60520,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Scope",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 1,
@@ -56228,6 +60542,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Responsibilities",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 1,
@@ -56248,6 +60564,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Acceptance criteria",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 1,
@@ -56268,6 +60586,8 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Contract",
           "missing": [],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 1,
@@ -56324,6 +60644,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Intended use'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -56340,6 +60662,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Ownership'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -56356,6 +60680,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Measures of effectiveness'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -56406,6 +60732,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Deviation'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -56422,6 +60750,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Accepting owner'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -56438,6 +60768,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Reason and impact'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -56454,6 +60786,8 @@ window.CONVEYOR_STANDARDS = {
           "missing": [
             "No row or document satisfies 'Reassessment'"
           ],
+          "required": true,
+          "severity": "",
           "sources": [
             {
               "count": 0,
@@ -56515,7 +60849,7 @@ window.CONVEYOR_STANDARDS = {
   },
   "generated_at": "2026-11-20T11:50:50.848127361+00:00",
   "git_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
-  "payload_sha256": "517e896d8406516c39a935768e8fb6125c8e6a282c17f6846a509c72a3bd0a6d",
+  "payload_sha256": "c49a71b057a360c2102a9461714d341b5f56a2d8b9a27280fcc5df300e0c9a92",
   "schema": "design-standards/v1",
   "summary": {
     "absent": 373,

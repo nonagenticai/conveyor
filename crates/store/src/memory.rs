@@ -10,6 +10,7 @@
 
 use chrono::{DateTime, Utc};
 use conveyor_domain::memory::{Digest, MemoryKind, MemoryLine, MemorySource};
+use conveyor_domain::prompt::MemorySelector;
 use conveyor_domain::{IdError, TenantId};
 use serde_json::{Value, json};
 use sqlx::{FromRow, PgConnection};
@@ -237,6 +238,97 @@ pub async fn hot_for_card_tx(
         .fetch_all(&mut *conn)
         .await?;
     rows.into_iter().map(TryInto::try_into).collect()
+}
+
+/// The memory a prompt section selects: newest un-consolidated hot rows first, then at most one
+/// digest, rendered oldest first.
+///
+/// Hot rows are the record and the digest is derived, so a digest is appended only when the hot
+/// selection leaves room — it never displaces a hot row. The selection is bounded by the recipe's
+/// `selector` (default 8, maximum 32) and by the `kinds` filter; an empty filter means every hot
+/// kind. The outer ordering is chronological so the prompt reads in the order the work happened.
+pub async fn select_for_prompt_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    card_id: Uuid,
+    selector: &MemorySelector,
+) -> Result<Vec<MemoryLine>, MemoryStoreError> {
+    let kinds: Option<Vec<String>> = if selector.kinds.is_empty() {
+        None
+    } else {
+        Some(
+            selector
+                .kinds
+                .iter()
+                .map(|kind| kind.as_str().to_owned())
+                .collect(),
+        )
+    };
+    let limit = i64::from(selector.limit);
+    let hot: Vec<(Uuid, String, String, String, DateTime<Utc>)> = sqlx::query_as(
+        "SELECT id, kind, source, body, created_at
+           FROM (
+                 SELECT id, kind, source, body, created_at
+                   FROM work_package_memory
+                  WHERE tenant_id = $1 AND card_id = $2
+                    AND kind <> 'digest' AND consolidated_at IS NULL
+                    AND ($3::text[] IS NULL OR kind = ANY($3))
+                  ORDER BY created_at DESC, id DESC
+                  LIMIT $4
+                ) recent
+          ORDER BY created_at, id",
+    )
+    .bind(tenant.as_uuid())
+    .bind(card_id)
+    .bind(kinds)
+    .bind(limit)
+    .fetch_all(&mut *conn)
+    .await?;
+
+    let mut lines: Vec<MemoryLine> = hot
+        .into_iter()
+        .map(|(id, kind, source, body, created_at)| {
+            let kind = MemoryKind::parse(&kind)
+                .ok_or_else(|| MemoryStoreError::UnknownKind(kind.clone()))?;
+            let source = MemorySource::parse(&source)
+                .ok_or_else(|| MemoryStoreError::UnknownSource(source.clone()))?;
+            Ok(MemoryLine {
+                id,
+                kind,
+                source,
+                body,
+                created_at,
+            })
+        })
+        .collect::<Result<_, MemoryStoreError>>()?;
+
+    if selector.include_digest && (lines.len() as u32) < selector.limit {
+        let digest: Option<(Uuid, String, String, String, DateTime<Utc>)> = sqlx::query_as(
+            "SELECT id, kind, source, body, created_at
+               FROM work_package_memory
+              WHERE tenant_id = $1 AND card_id = $2 AND kind = 'digest'
+              ORDER BY created_at DESC, id DESC
+              LIMIT 1",
+        )
+        .bind(tenant.as_uuid())
+        .bind(card_id)
+        .fetch_optional(&mut *conn)
+        .await?;
+        if let Some((id, kind, source, body, created_at)) = digest {
+            let kind = MemoryKind::parse(&kind)
+                .ok_or_else(|| MemoryStoreError::UnknownKind(kind.clone()))?;
+            let source = MemorySource::parse(&source)
+                .ok_or_else(|| MemoryStoreError::UnknownSource(source.clone()))?;
+            lines.push(MemoryLine {
+                id,
+                kind,
+                source,
+                body,
+                created_at,
+            });
+        }
+    }
+    Ok(lines)
 }
 
 /// The rows a consolidation has not yet covered, oldest first. Digest rows are excluded: they

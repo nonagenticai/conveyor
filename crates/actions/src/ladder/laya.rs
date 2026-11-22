@@ -76,8 +76,7 @@ pub fn request(
         json!({
             "type": "score",
             "instructions": "Score the answer to the question in `state` on the ordered scale in \
-                 `criteria`."
-                .to_owned(),
+                             `criteria`.",
             "criteria": SCORE_LEVELS,
         })
     } else {
@@ -97,9 +96,8 @@ pub fn request(
             .collect();
         json!({
             "type": "choice",
-            "instructions": "Choose exactly one option key from `criteria` to answer the question in \
-                 `state`."
-                .to_owned(),
+            "instructions": "Choose exactly one option key from `criteria` to answer the \
+                             question in `state`.",
             "criteria": criteria,
         })
     };
@@ -127,19 +125,29 @@ pub struct LayaAnswer {
 ///
 /// Every shape below is an **outage**, never a rejection: an unreadable answer must not be
 /// turned into a low confidence that spends a threshold.
-#[derive(Clone, Copy, Debug, PartialEq, Eq, thiserror::Error)]
+#[derive(Clone, Debug, PartialEq, Eq, thiserror::Error)]
 pub enum LayaError {
     /// The document carries no answer the question type recognises.
     #[error("the laya response has no readable answer")]
     Unreadable,
+    /// A choice names a key outside the authored option set.
+    ///
+    /// This is the caller's answer being wrong, not an outage: the ladder returns `422` so
+    /// the authored set is enforced rather than hidden behind `503 gate_unavailable`.
+    #[error("the answer {answer:?} is not a key of the authored option set")]
+    AnswerOutsideSet {
+        /// The key the response named.
+        answer: String,
+    },
 }
 
 /// Read the answer for the one question [`request`] built.
 ///
 /// A `choice` must name one of the authored option keys and carry a confidence; a `score`
 /// must be a number in `[0, 1]` and is itself the confidence. A document that reports its own
-/// error, a missing answer, a placeholder `null` score or a label outside the authored set is
-/// [`LayaError::Unreadable`].
+/// error, a missing answer or a placeholder `null` score is [`LayaError::Unreadable`]; a choice
+/// naming a key outside the authored set is [`LayaError::AnswerOutsideSet`] — a refusal
+/// (`422`), not an outage.
 pub fn parse_answer(request: &Value, response: &Value) -> Result<LayaAnswer, LayaError> {
     let answer = response
         .get("answers")
@@ -171,7 +179,9 @@ pub fn parse_answer(request: &Value, response: &Value) -> Result<LayaAnswer, Lay
                 .and_then(Value::as_object)
                 .ok_or(LayaError::Unreadable)?;
             if !criteria.contains_key(choice) {
-                return Err(LayaError::Unreadable);
+                return Err(LayaError::AnswerOutsideSet {
+                    answer: choice.to_owned(),
+                });
             }
             let confidence = answer
                 .get("confidence")
@@ -365,12 +375,18 @@ mod tests {
         assert_eq!(parsed.confidence, 0.93);
         assert_eq!(parsed.probabilities, json!({"bug": 0.93, "feature": 0.07}));
 
-        // A label outside the authored set is not this decision's answer.
+        // A label outside the authored set is not this decision's answer, and it is a
+        // refusal (422) rather than an outage (503).
         let outside = json!({"answers": {"decision": {
             "choice": "incident",
             "confidence": 0.99,
         }}});
-        assert_eq!(parse_answer(&request, &outside), Err(LayaError::Unreadable));
+        assert_eq!(
+            parse_answer(&request, &outside),
+            Err(LayaError::AnswerOutsideSet {
+                answer: "incident".to_owned()
+            })
+        );
 
         // A choice without a confidence cannot be compared to a threshold.
         let no_confidence = json!({"answers": {"decision": {"choice": "bug"}}});

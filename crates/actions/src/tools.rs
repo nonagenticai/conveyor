@@ -22,6 +22,10 @@ use crate::spec::{
     Tenancy,
 };
 
+/// The one action a job uses to reach a tool (SPEC_V2 §11.3). It is a dispatch mechanism, not a
+/// model-facing tool: an agent's bound tools replace it in the projected surface (#556).
+pub const TOOLS_CALL: &str = "tools.call";
+
 /// The broker's input.
 #[derive(schemars::JsonSchema)]
 #[allow(dead_code)]
@@ -54,7 +58,7 @@ fn broker_output() -> Schema {
 /// `tools.call` — resolve, check, validate, call and ledger one tool call (§11.3).
 fn tools_call() -> ActionSpec {
     ActionSpec {
-        name: "tools.call",
+        name: TOOLS_CALL,
         version: 1,
         kind: ActionKind::Internal,
         input: tool_call_input,

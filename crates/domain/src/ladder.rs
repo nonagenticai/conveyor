@@ -154,6 +154,131 @@ impl Outcome {
     }
 }
 
+/// The smallest and largest authored option set laya accepts (§7.2: a choice is 2–255
+/// labelled options).
+pub const MIN_OPTIONS: usize = 2;
+/// The largest authored option set laya accepts.
+pub const MAX_OPTIONS: usize = 255;
+
+/// Where an authored option set came from.
+///
+/// The platform library is the base set; a tenant's own set for the same case shadows it
+/// (the agent platform's library-first, tenant-key-shadow fold). Both origins live in the
+/// tenant-scoped `decision_option_set` because every conveyor table is RLS-isolated; the
+/// library rows are written by the platform seed, never by a tenant action.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum OptionOrigin {
+    /// The platform's base option set.
+    Library,
+    /// The tenant's authored set; it shadows the library for the same `(kind, gate)`.
+    Tenant,
+}
+
+impl OptionOrigin {
+    /// The stored spelling.
+    pub fn as_str(self) -> &'static str {
+        match self {
+            Self::Library => "library",
+            Self::Tenant => "tenant",
+        }
+    }
+
+    /// Parse a stored or posted spelling.
+    pub fn parse(value: &str) -> Option<Self> {
+        match value {
+            "library" => Some(Self::Library),
+            "tenant" => Some(Self::Tenant),
+            _ => None,
+        }
+    }
+}
+
+/// One effective option as the set hash pins it.
+#[derive(Clone, Copy, Debug)]
+pub struct OptionPin<'a> {
+    /// The option key the answer must equal.
+    pub key: &'a str,
+    /// The effective human label.
+    pub label: &'a str,
+    /// The effective description the laya wire reads.
+    pub criteria: &'a str,
+    /// The effective authored order.
+    pub position: i32,
+    /// The refinement's `base_hash`, or the base entry's own hash when unrefined.
+    pub base_hash: &'a str,
+}
+
+/// The canonical hash of one library option's base content.
+///
+/// A refinement stores this value when it is published; the resolver recomputes it from the
+/// entry it read and refuses a mismatch. `kind` and `gate` are part of the basis so a
+/// refinement cannot be replayed across cases.
+pub fn option_base_hash(
+    kind: &str,
+    gate: Option<&str>,
+    key: &str,
+    label: &str,
+    criteria: &str,
+    position: i32,
+) -> String {
+    crate::compare::content_hash(&serde_json::json!({
+        "kind": kind,
+        "gate": gate,
+        "key": key,
+        "label": label,
+        "criteria": criteria,
+        "position": position,
+    }))
+}
+
+/// The canonical hash of the effective option set a decision was constrained to.
+///
+/// The decision row stores this value next to the set id and version; a later edit of the
+/// set cannot rewrite what the decision actually offered.
+pub fn option_set_hash(kind: &str, gate: Option<&str>, options: &[OptionPin<'_>]) -> String {
+    let options: Vec<serde_json::Value> = options
+        .iter()
+        .map(|option| {
+            serde_json::json!({
+                "key": option.key,
+                "label": option.label,
+                "criteria": option.criteria,
+                "position": option.position,
+                "base_hash": option.base_hash,
+            })
+        })
+        .collect();
+    crate::compare::content_hash(&serde_json::json!({
+        "kind": kind,
+        "gate": gate,
+        "options": options,
+    }))
+}
+
+/// The canonical hash of a policy's base content.
+///
+/// A tenant refinement stores this when it is published; `effective_policy_tx` recomputes it
+/// and refuses a refinement whose base changed. The basis deliberately excludes `version`:
+/// republishing identical content does not invalidate a refinement.
+pub fn policy_base_hash(
+    kind: &str,
+    gate: Option<&str>,
+    threshold: Option<f64>,
+    fail_policy: &str,
+    action: &str,
+    meta: &serde_json::Value,
+) -> String {
+    crate::compare::content_hash(&serde_json::json!({
+        "kind": kind,
+        "gate": gate,
+        "threshold": threshold,
+        "fail_policy": fail_policy,
+        "action": action,
+        "meta": meta,
+    }))
+}
+
 /// The version pins a decision row carries (§7.2).
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub struct Pins {
@@ -233,6 +358,45 @@ pub enum LadderError {
         kind: String,
         /// The gate, when the policy is gate-specific.
         gate: Option<String>,
+    },
+    /// An authored option set is outside laya's 2–255 range.
+    #[error("a choice question needs between 2 and 255 options, got {count}")]
+    OptionSetSize {
+        /// The number the caller supplied or the effective set holds.
+        count: usize,
+    },
+    /// An option key is repeated inside one set.
+    #[error("the option key {key:?} is repeated")]
+    DuplicateOption {
+        /// The repeated key.
+        key: String,
+    },
+    /// Two options claim one position inside a set.
+    #[error("the option position {position} is repeated")]
+    DuplicatePosition {
+        /// The repeated position.
+        position: i32,
+    },
+    /// An option position is below 1.
+    #[error("the option position must be at least 1")]
+    InvalidPosition,
+    /// An option origin spelling the domain does not know.
+    #[error("{value:?} is not an option origin (library|tenant)")]
+    UnknownOptionOrigin {
+        /// The posted value.
+        value: String,
+    },
+    /// A decision's answer is not one of the authored option keys.
+    #[error("the answer {answer:?} is not a key of the authored option set")]
+    AnswerNotInSet {
+        /// The answer the rung produced.
+        answer: String,
+    },
+    /// Hiding an option would leave fewer than two visible choices.
+    #[error("a question keeps at least two visible options; {visible} would remain")]
+    TooFewOptions {
+        /// The visible options that would remain.
+        visible: usize,
     },
 }
 

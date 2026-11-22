@@ -227,6 +227,10 @@ fn variant_path(kind: &str, value: &str) -> syn::Result<String> {
         ("scope", "ops:write") => "OpsWrite",
         ("scope", "processes:read") => "ProcessesRead",
         ("scope", "processes:write") => "ProcessesWrite",
+        // S21 step 3 (#15). The prompt recipe catalogue: a read is open, authoring is admin-only
+        // because a system section is an operator instruction.
+        ("scope", "prompts:read") => "PromptsRead",
+        ("scope", "prompts:write") => "PromptsWrite",
         // S17. The benchmark harness's two scopes; no benchmark action is agent-reachable.
         ("scope", "benchmarks:read") => "BenchmarksRead",
         ("scope", "benchmarks:write") => "BenchmarksWrite",
