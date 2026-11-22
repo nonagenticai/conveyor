@@ -141,8 +141,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/design/STUDIO-SPEC.html",
       "source": "docs/design/STUDIO-SPEC.md",
       "section": "Design",
-      "sha256": "a005fc502a781ad3e3d556df74e52db758aa32c5d9adb96a19f0ba9f69c439b6",
-      "bytes": 82501,
+      "sha256": "ec86aa608d7319aa0455fef75343a545acbfbe3079c31e541ff6c20178b5611e",
+      "bytes": 82514,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/design/STUDIO-SPEC.md"
     },
     {

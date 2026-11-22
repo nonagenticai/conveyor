@@ -53,6 +53,9 @@ pub mod inference;
 pub mod ingest;
 pub mod integrations;
 pub mod invoke;
+// T5 (#77, SPEC_V2 §6.3, §9.3–§9.4, §12 T5): the kata loop — the pinned hypothesis, the
+// held-out measurement, the human adoption gate, propagation and the revert outcome.
+pub mod kata;
 // S15: capability-bound retrieval from strata platform packs.
 pub mod knowledge;
 pub mod lock;
