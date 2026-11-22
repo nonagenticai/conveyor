@@ -1,0 +1,10 @@
+{
+ "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+ "cadence_id": "01a20281-09ba-709a-b61e-51a22f2ed172",
+ "finding_key": "k5",
+ "statement": "A defect with no instrument cannot open a kata: the schema-drift half is re-anchored to T5 with a contract-test instrument class rather than fabricating a measurement.",
+ "evidence": [
+  "docs/SPEC_V2.md 11.9",
+  "docs/evidence/v1-conformance-findings.json v1-p119-1"
+ ]
+}

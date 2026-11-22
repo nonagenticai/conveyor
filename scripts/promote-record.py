@@ -1450,8 +1450,26 @@ def tranche_review_target(tranche_id: str) -> str:
     return f"tranche/{tranche_id}/review"
 
 
-def expected_cadence_meta(state: State, entry: Entry) -> dict | None:
-    """The meta the cadence will carry: the journal's, with the tranche link made production."""
+def map_ids(value: Any, id_map: dict[str, str]) -> Any:
+    """Deep-replace a staging id with its production id, wherever it is embedded.
+
+    A cadence's meta carries links (its own id in the plan's evidence, the refinement's id);
+    those are staging ids like any other journal output, and a meta that keeps them would point
+    at rows production does not have.
+    """
+    if isinstance(value, str):
+        return id_map.get(value, value)
+    if isinstance(value, dict):
+        return {key: map_ids(item, id_map) for key, item in value.items()}
+    if isinstance(value, list):
+        return [map_ids(item, id_map) for item in value]
+    return value
+
+
+def expected_cadence_meta(
+    state: State, entry: Entry, id_map: dict[str, str] | None = None
+) -> dict | None:
+    """The meta the cadence will carry: the journal's, with every staging id made production."""
     meta = entry.payload.get("meta")
     if not isinstance(meta, dict):
         return None
@@ -1460,7 +1478,7 @@ def expected_cadence_meta(state: State, entry: Entry) -> dict | None:
         tranche = tranche_by_number(state, expected["tranche_number"])
         if tranche is not None:
             expected["tranche_id"] = tranche["id"]
-    return expected
+    return map_ids(expected, id_map or {})
 
 
 def tranche_review_gate(state: State, tranche_id: str | None) -> dict | None:
@@ -1595,6 +1613,7 @@ def existing_for(
     entry: Entry,
     state: State,
     change_index: dict[str, dict],
+    id_map: dict[str, str] | None = None,
 ) -> dict | None:
     """The production row that already carries this entry's natural key, if any."""
     key = entry.key
@@ -1604,7 +1623,9 @@ def existing_for(
         return cadence_row(state, key.first, key.second or "")
     if entry.action == "cadences.update":
         row = cadence_row(state, key.first, key.second or "")
-        if row is not None and row.get("meta") == expected_cadence_meta(state, entry):
+        if row is not None and row.get("meta") == expected_cadence_meta(
+            state, entry, id_map
+        ):
             return row
         return None
     if entry.action == "cadences.approve_plan":
@@ -2064,6 +2085,8 @@ def remap_payload(
                     f"{meta.get('tranche_number')!r}"
                 )
             meta["tranche_id"] = tranche["id"]
+        if isinstance(meta, dict):
+            payload["meta"] = map_ids(meta, id_map)
     elif entry.action == "cadences.update":
         row = cadence_row(state, key.first, key.second or "")
         if row is None:
@@ -2076,6 +2099,8 @@ def remap_payload(
             tranche = tranche_by_number(state, meta["tranche_number"])
             if tranche is not None:
                 meta["tranche_id"] = tranche["id"]
+        if isinstance(meta, dict):
+            payload["meta"] = map_ids(meta, id_map)
     elif entry.action == "cadences.approve_plan":
         cadence = cadence_row(state, key.first, "pi")
         if cadence is None:
@@ -2180,6 +2205,7 @@ def readback_entry(
     production_id: str,
     gate_id: str | None,
     snapshot: str | None,
+    id_map: dict[str, str] | None = None,
 ) -> dict | None:
     """Read the created row back.  Raises PromoteError when it cannot be read."""
     key = entry.key
@@ -2367,7 +2393,7 @@ def readback_entry(
                     raise ReadbackError(
                         "cadences.list: the row is not the kind/period the key names"
                     )
-            elif row.get("meta") != expected_cadence_meta(state, entry):
+            elif row.get("meta") != expected_cadence_meta(state, entry, id_map):
                 raise ReadbackError("cadences.list: the cadence meta is not the input's")
             return row
         raise ReadbackError("cadences.list: the cadence is not readable")
@@ -2466,7 +2492,7 @@ def apply_entries(
         key = entry.key
         assert key is not None
         try:
-            existing = existing_for(entry, state, change_index)
+            existing = existing_for(entry, state, change_index, id_map)
             if existing is not None:
                 production_id = str(existing["id"])
                 id_map[entry.output_id] = production_id
@@ -2581,7 +2607,7 @@ def apply_entries(
                     id_map[entry.raw["approval_id"]] = gate_id
 
             row = readback_entry(
-                entry, client, state, production_id, gate_id, snapshot
+                entry, client, state, production_id, gate_id, snapshot, id_map
             )
             if row is not None:
                 if entry.action == "registers.create":
@@ -3717,9 +3743,16 @@ def self_test() -> int:
                 {"programme_id": programme, "kind": "retro", "period": "tranche-9",
                  "meta": {**link, "board_id": board}},
             ),
+            "create_refinement": cadence_input(
+                "create_refinement",
+                {"programme_id": programme, "kind": "refinement", "period": "tranche-9",
+                 "meta": dict(link)},
+            ),
             "update_pi": cadence_input(
                 "update_pi",
-                {"id": "staging-pi", "meta": {**link, "plan": "fixture"}},
+                {"id": "staging-pi",
+                 "meta": {**link, "plan": "fixture",
+                          "refinement_cadence_id": "staging-refinement"}},
             ),
             "plan": cadence_input(
                 "plan",
@@ -3763,7 +3796,7 @@ def self_test() -> int:
         scope = {"programme_id": programme}
         raw_new = [
             {"action": "cadences.create", "input": paths_new["create_pi"],
-             "natural_key": "cadence:tranche-9/pi", "output_id": "staging-pi-cadence",
+             "natural_key": "cadence:tranche-9/pi", "output_id": "staging-pi",
              "meta": scope},
             {"action": "cadences.create", "input": paths_new["create_demo"],
              "natural_key": "cadence:tranche-9/demo", "output_id": "staging-demo-cadence",
@@ -3771,6 +3804,9 @@ def self_test() -> int:
             {"action": "cadences.create", "input": paths_new["create_retro"],
              "natural_key": "cadence:tranche-9/retro", "output_id": "staging-retro-cadence",
              "meta": scope},
+            {"action": "cadences.create", "input": paths_new["create_refinement"],
+             "natural_key": "cadence:tranche-9/refinement",
+             "output_id": "staging-refinement", "meta": scope},
             {"action": "cadences.update", "input": paths_new["update_pi"],
              "natural_key": "cadence:tranche-9/pi/meta", "output_id": "staging-pi-updated",
              "meta": scope},
@@ -3828,7 +3864,7 @@ def self_test() -> int:
         id_map, outcomes = apply_entries(client, entries, state, None)
         ok(
             [outcome.verdict for outcome in outcomes]
-            == ["created"] * 12 + ["skipped"],
+            == ["created"] * 13 + ["skipped"],
             f"the cadence run creates the record, then skips the review it already "
             f"authorised: {[(o.entry.natural_key, o.verdict, o.detail) for o in outcomes]}",
         )
@@ -3853,10 +3889,15 @@ def self_test() -> int:
             "the demo credit resolves its deliverable by title",
         )
         pi_cadence = cadence_row(state, "tranche-9", "pi")
+        pi_meta = (pi_cadence or {}).get("meta") or {}
         ok(
-            pi_cadence is not None
-            and (pi_cadence.get("meta") or {}).get("tranche_id") == tranche_nine,
+            pi_cadence is not None and pi_meta.get("tranche_id") == tranche_nine,
             "the cadence meta names the production tranche, not the staging id",
+        )
+        ok(
+            pi_meta.get("refinement_cadence_id")
+            == id_map["staging-refinement"],
+            "a cadence id embedded in another cadence's meta is remapped too",
         )
         ok(
             (cadence_row(state, "tranche-9", "retro") or {}).get("state") == "closed",
@@ -3889,7 +3930,9 @@ def self_test() -> int:
         ok(any("malformed natural key" in error for error in errors),
            "a malformed cadence key is refused")
         broken = [dict(raw) for raw in raw_new]
-        broken[11] = {**broken[11], "approval_id": "some-other-gate"}
+        for index, raw in enumerate(broken):
+            if raw["action"] == "tranches.review":
+                broken[index] = {**raw, "approval_id": "some-other-gate"}
         entries, errors = build_entries(
             [(index + 2, raw) for index, raw in enumerate(broken)]
         )
