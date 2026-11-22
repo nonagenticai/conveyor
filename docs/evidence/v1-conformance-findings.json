@@ -1386,12 +1386,12 @@
         },
         {
           "path": "docs/design/delivery.js",
-          "line": 1263,
+          "line": 1341,
           "quote": "      unattributed: tenantSpend(measure),"
         },
         {
           "path": "docs/design/delivery.js",
-          "line": 1496,
+          "line": 1574,
           "quote": "      unattributed: tenantSpend(measure),"
         }
       ],
@@ -1415,12 +1415,12 @@
       "evidence": [
         {
           "path": "docs/design/delivery.js",
-          "line": 909,
+          "line": 921,
           "quote": "    // A standalone project is public only when it is active/paused AND carries a board or a card"
         },
         {
           "path": "docs/design/delivery.js",
-          "line": 911,
+          "line": 923,
           "quote": "    const standalone = [...index.values()].filter("
         },
         {
@@ -1652,12 +1652,12 @@
       "evidence": [
         {
           "path": "crates/actions/src/control/approvals.rs",
-          "line": 467,
+          "line": 494,
           "quote": "/// SPEC_V2 §11.4: `destructive` = approval + dry-run + dual control. The approval row is the"
         },
         {
           "path": "crates/actions/src/control/approvals.rs",
-          "line": 502,
+          "line": 529,
           "quote": "    if record.approval.status != ApprovalStatus::Approved {"
         },
         {
@@ -1942,17 +1942,17 @@
       "evidence": [
         {
           "path": "crates/store/src/snapshot.rs",
-          "line": 1509,
+          "line": 1526,
           "quote": "            artifact_phases.insert((project.to_owned(), phase.to_owned()));"
         },
         {
           "path": "crates/store/src/snapshot.rs",
-          "line": 1523,
+          "line": 1540,
           "quote": "            .is_none_or(|current| row_is_later(contract, current, \"created_at\"));"
         },
         {
           "path": "crates/store/src/snapshot.rs",
-          "line": 1578,
+          "line": 1595,
           "quote": "                artifact_phases.contains(&phase_key) || contract.is_some() || compliance.is_some();"
         }
       ],
@@ -2587,27 +2587,27 @@
       "evidence": [
         {
           "path": "crates/store/src/approval_policy.rs",
-          "line": 46,
+          "line": 58,
           "quote": "    /// This tenant has opted out for this action; the call runs without one."
         },
         {
           "path": "crates/store/src/approval_policy.rs",
-          "line": 47,
+          "line": 59,
           "quote": "    Waived,"
         },
         {
           "path": "crates/store/src/approval_policy.rs",
-          "line": 115,
+          "line": 130,
           "quote": "    pub approval: ApprovalRequirement,"
         },
         {
           "path": "crates/store/src/approval_policy.rs",
-          "line": 217,
+          "line": 239,
           "quote": "        Ok(Some(policy)) => Ok(policy.approval == ApprovalRequirement::Waived),"
         },
         {
           "path": "crates/actions/src/control/policies.rs",
-          "line": 109,
+          "line": 115,
           "quote": "    effect = \"write\","
         }
       ],
@@ -2626,12 +2626,12 @@
       "evidence": [
         {
           "path": "crates/store/src/approval_policy.rs",
-          "line": 81,
+          "line": 96,
           "quote": "    Allowed,"
         },
         {
           "path": "crates/store/src/approval_policy.rs",
-          "line": 117,
+          "line": 132,
           "quote": "    pub self_approval: SelfApproval,"
         },
         {
@@ -2642,7 +2642,12 @@
       ],
       "failure_scenario": "The only holder of `approvals:write` sets self_approval=allowed for ops.scale, then requests a scale gate and approves it themselves. The audit records one human decision by the requester and the gate resolves; no second person ever saw the action, and nothing flags the self-approval as an exception.",
       "acceptance": "Self-approval is unconditional: the decision writer refuses a decision whose approver is the gate's requester/executor, with no policy row able to relax it. Any historical exception is an explicit, audited override rather than a stored permission.",
-      "owner_project": "T11"
+      "owner_project": "T11",
+      "resolved_by": {
+        "commit": "bec2f3f41458379adf4a3472577f696a9aa2276b",
+        "test": "crates/actions/tests/approval_policies.rs::allowed_self_approval_cannot_be_stored",
+        "evidence": "approval_policies 9 passed and retire_plan_seed 2 passed at the merged lane: `allowed` cannot be stored (422), the decision writer never consults a policy for self-approval, a requester cannot decide its own gate even with a historical allowed row, and a tenant with no distinct approver is refused."
+      }
     },
     {
       "id": "v1-w4b-5",
@@ -3189,7 +3194,7 @@
       "evidence": [
         {
           "path": "crates/actions/src/control/views.rs",
-          "line": 366,
+          "line": 369,
           "quote": "    pub require_evidence: bool,"
         },
         {
@@ -3200,7 +3205,12 @@
       ],
       "failure_scenario": "A destructive action requests its gate with require_evidence=false and no evidence; the approval row opens and can be decided with nothing to read.",
       "acceptance": "A tenant policy or gate declares evidence mandatory; approvals.request refuses an empty evidence set unless an explicit waiver reason is recorded, and tests prove both the refusal and the waiver.",
-      "owner_project": "PLATFORM"
+      "owner_project": "PLATFORM",
+      "resolved_by": {
+        "commit": "1059dd7edcbeeead48b75ae3ea0bea5843171017",
+        "test": "crates/actions/tests/spine_gates.rs::an_evidence_less_gate_is_refused",
+        "evidence": "approval_evidence 7 passed and spine_gates 18 passed on the merged lane: an evidence-less destructive gate is refused, an explicit evidence_waiver_reason is recorded, and the admin CLI carries its own waiver (3efc0879)."
+      }
     },
     {
       "id": "v1-s06-1",
@@ -4302,7 +4312,12 @@
       ],
       "failure_scenario": "Create an internal_agent binding that pins agent A. Start a run of a process whose step names agent B, or whose capability has one active agent B. The run executes B and records A's binding and release hash; nothing refuses or flags the divergence, and readiness checks the process's agents rather than the binding's.",
       "acceptance": "Execution resolves the capability agent through the run's job binding, or refuses a step agent that differs from the binding with a 409; a test pins A and resolves B and asserts the refusal, and every run's recorded agent equals its binding's.",
-      "owner_project": "T0"
+      "owner_project": "T0",
+      "resolved_by": {
+        "commit": "965e22294da68b395ef29c95075cda3f73d85235",
+        "test": "crates/actions/tests/process_start.rs::a_job_binding_whose_executor_differs_from_the_process_is_refused",
+        "evidence": "process_start 14 passed at the merged lane, including both binding tests: a job binding whose executor differs from the process is refused, and a binding's pinned agent is the agent that dispatches."
+      }
     },
     {
       "id": "v1-p44-2",
@@ -4787,7 +4802,7 @@
         },
         {
           "path": "crates/actions/src/process/runs.rs",
-          "line": 184,
+          "line": 246,
           "quote": "    let readiness = crate::capability::readiness::capability_readiness_tx("
         },
         {
@@ -5130,17 +5145,17 @@
       "evidence": [
         {
           "path": "crates/store/src/approval.rs",
-          "line": 891,
+          "line": 878,
           "quote": "    if eval_gate.is_some() {"
         },
         {
           "path": "crates/store/src/approval.rs",
-          "line": 892,
+          "line": 879,
           "quote": "        if decision.decided_by_kind != DeciderKind::Human {"
         },
         {
           "path": "crates/store/src/approval_policy.rs",
-          "line": 117,
+          "line": 132,
           "quote": "    pub self_approval: SelfApproval,"
         }
       ],
@@ -5314,17 +5329,17 @@
       "spec": "§5.4",
       "severity": "P1",
       "title": "The console's destructive-request flow sends no evidence and no waiver",
-      "problem": "apps/web/src/approvals.rs requests a gate for every destructive console action with only gate, kind, action, input, proposed_input and description. When a destructive gate's evidence becomes mandatory (v1-u5a-approvals-1), every console-initiated restart/scale/rollback will be refused 422: the UI has no evidence or waiver path, so the live flow breaks at the moment the rule lands.",
+      "problem": "apps/web/src/approvals.rs requested a destructive gate with no evidence and no waiver. The console bridge landed at cca52774: on a 422 gate_evidence_missing it asks the operator for a reason, rejects blanks, retries once with evidence_waiver_reason, and never hard-codes a waiver. The remaining acceptance is the test that asserts the payload and the refused-without/accepted-with path (e2e in flight); #572 replaces the wording-coupled detection with a typed picker.",
       "evidence": [
         {
           "path": "apps/web/src/approvals.rs",
-          "line": 119,
+          "line": 130,
           "quote": "            \"approvals.request\","
         },
         {
           "path": "apps/web/src/approvals.rs",
-          "line": 129,
-          "quote": "                \"description\": format!(\"{action} from the console\"),"
+          "line": 150,
+          "quote": "            object.insert(\"evidence_waiver_reason\".to_owned(), json!(reason));"
         }
       ],
       "failure_scenario": "An operator confirms a destructive action in the console; the request is refused 422 for missing evidence, and the UI shows a failure with no way to supply evidence or a waiver.",
@@ -5342,7 +5357,7 @@
       "evidence": [
         {
           "path": "scripts/verify-project.py",
-          "line": 214,
+          "line": 220,
           "quote": "    approved = [baseline for baseline in baselines if baseline.get(\"approved_by\")]"
         },
         {
@@ -5362,18 +5377,23 @@
         },
         {
           "path": "scripts/verify-project.py",
-          "line": 398,
+          "line": 505,
           "quote": "    if not pi:"
         },
         {
           "path": "scripts/verify-project.py",
-          "line": 457,
+          "line": 564,
           "quote": "        if lesson.get(\"cadence_id\") in retro_ids"
         }
       ],
       "failure_scenario": "A self-approved or stale baseline, a pasted approval id, a review of a superseded contract, any old closure gate, a sibling's cadence or a content-free lesson all satisfy a P0 manifest; the programme accepts a red record as done.",
       "acceptance": "Each check proves its property: a baseline's approver is distinct from its taker and its snapshot is frozen; a contract's approval_id resolves to an approved gate with a distinct decision; a review belongs to the project's live contract and is compliant (or actively waived); the closure gate is the latest and names project/<id>/close; the PI and refinement cadences are the tranche's; a lesson carries a statement and evidence. Each rule has a self-test case that fails on a crafted weak row.",
-      "owner_project": "PLATFORM"
+      "owner_project": "PLATFORM",
+      "resolved_by": {
+        "commit": "1bf095334926af387b8585b2fc7aa609aa9d155f",
+        "test": "scripts/verify-project.py",
+        "evidence": "The six checks now resolve their property (baseline distinct approver + frozen snapshot; contract board decision about THAT contract or its lawful requester/approver path; live-contract compliant review or active waiver; latest closure gate targeting this project; lesson with statement and evidence). `verify-project.py --self-test` is green with one crafted failing case per rule, and the pre-hardening verifier fails exactly those cases. The same commit projects approval.meta and keeps a contract-cited board decision that has no project parent. T9 SoAW 01a1f2c2 remains a real record gap (requester-less, no board decision) recorded for the records session."
+      }
     }
   ]
 }
