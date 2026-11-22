@@ -9,12 +9,32 @@
 //! * P3.1 — every decision pins the policy, refinement and laya-config versions it read, and a
 //!   later change does not rewrite the earlier row.
 //!
+//! The L1 path is the three calls the finding v1-w1c-3 settled: `ladder.prepare` builds the
+//! laya document, `laya.classify` runs the engine-owned call, and `ladder.evaluate` records the
+//! verified answer. Every laya test takes [`LAYA_ENV`] because the external base URL is
+//! process-wide.
+//!
 //! The superuser pool (`pg.super_pool`) is used only to prove a row's stored pins directly;
 //! every behaviour under test goes through an action.
 
 mod support;
 
 use serde_json::{Value, json};
+
+const LAYA_URL_ENV: &str = "CONVEYOR_EXTERNAL_LAYA_URL";
+
+/// `CONVEYOR_EXTERNAL_LAYA_URL` is process-wide and each test needs its own answer document,
+/// so the laya tests hold this lock for their whole body. The refusals that never reach the
+/// external call (a direct confidence, a missing config) do not take it.
+static LAYA_ENV: tokio::sync::Mutex<()> = tokio::sync::Mutex::const_new(());
+
+const KIND: &str = "gate.precheck";
+const GATE: &str = "capability_ready";
+const QUESTION: &str = "Is the capability ready for the gate?";
+
+fn facts() -> Value {
+    json!({"card": "card-1", "pin": "knowledge@7"})
+}
 
 async fn fixture() -> (support::Pg, support::Running, support::Seeded) {
     let pg = support::Pg::fresh().await;
@@ -82,25 +102,113 @@ async fn create_laya_config(running: &support::Running) -> String {
     id_of(output(&body), "id")
 }
 
-async fn evaluate(running: &support::Running, confidence: f64) -> (u16, Value) {
-    running
-        .invoke(
-            "ladder.evaluate",
-            "dev:alice",
-            json!({
-                "kind": "gate.precheck",
-                "gate": "capability_ready",
-                "question": "Is the capability ready for the gate?",
-                "answer": "pass",
-                "confidence": confidence,
-                "latency_ms": 17,
-                "input": {"card": "card-1", "pin": "knowledge@7"}
-            }),
-            None,
-            None,
-            None,
-        )
+/// Seal the tenant's `laya.token`, so `laya.classify` reaches its service.
+async fn seal_laya_token(pg: &support::Pg, seeded: &support::Seeded) {
+    let mut tx = conveyor_store::begin_scoped(&pg.runtime, seeded.tenant)
         .await
+        .expect("scope the laya token");
+    conveyor_store::secret::create_secret_tx(
+        &mut tx,
+        seeded.tenant,
+        "laya.token",
+        b"test-laya-token",
+        "tenant",
+    )
+    .await
+    .expect("seal the laya token");
+    tx.commit().await.expect("commit the laya token");
+}
+
+/// Point the process at a stub answering `answer` for the ladder's one question.
+async fn laya_stub(answer: Value) -> support::LayaStub {
+    let stub = support::LayaStub::start(json!({"answers": {"decision": answer}})).await;
+    support::set_env(LAYA_URL_ENV, &stub.base);
+    stub
+}
+
+/// `ladder.prepare`: the wire document and its idempotency hash.
+async fn prepare(
+    running: &support::Running,
+    kind: &str,
+    options: Option<&Value>,
+    laya_config_id: Option<&str>,
+) -> (u16, Value) {
+    let mut input = json!({
+        "kind": kind,
+        "gate": GATE,
+        "question": QUESTION,
+        "input": facts(),
+    });
+    if let Some(options) = options {
+        input["options"] = options.clone();
+    }
+    if let Some(id) = laya_config_id {
+        input["laya_config_id"] = json!(id);
+    }
+    running
+        .invoke("ladder.prepare", "dev:alice", input, None, None, None)
+        .await
+}
+
+/// `laya.classify` with the cited idempotency key.
+async fn classify(running: &support::Running, request: Value, key: &str) -> (u16, Value) {
+    running
+        .invoke("laya.classify", "dev:alice", request, None, Some(key), None)
+        .await
+}
+
+/// `ladder.evaluate` citing the key its `laya.classify` call used.
+async fn evaluate(
+    running: &support::Running,
+    kind: &str,
+    options: Option<&Value>,
+    laya_config_id: Option<&str>,
+    laya_key: &str,
+) -> (u16, Value) {
+    let mut input = json!({
+        "kind": kind,
+        "gate": GATE,
+        "question": QUESTION,
+        "input": facts(),
+        "laya_key": laya_key,
+    });
+    if let Some(options) = options {
+        input["options"] = options.clone();
+    }
+    if let Some(id) = laya_config_id {
+        input["laya_config_id"] = json!(id);
+    }
+    running
+        .invoke("ladder.evaluate", "dev:alice", input, None, None, None)
+        .await
+}
+
+/// The settled three-call L1 path for one case.
+async fn laya_decision(
+    running: &support::Running,
+    kind: &str,
+    laya_config_id: &str,
+    options: Option<&Value>,
+    key: &str,
+) -> (u16, Value) {
+    let (status, prepared) = prepare(running, kind, options, Some(laya_config_id)).await;
+    if status != 200 {
+        return (status, prepared);
+    }
+    let request = output(&prepared)["request"].clone();
+    let (status, classified) = classify(running, request, key).await;
+    if status != 200 {
+        return (status, classified);
+    }
+    evaluate(running, kind, options, Some(laya_config_id), key).await
+}
+
+async fn laya_rows(pg: &support::Pg, seeded: &support::Seeded) -> i64 {
+    sqlx::query_scalar("SELECT count(*) FROM decision WHERE tenant_id = $1 AND rung = 'laya'")
+        .bind(seeded.tenant.as_uuid())
+        .fetch_one(&pg.super_pool)
+        .await
+        .expect("count the laya decisions")
 }
 
 /// An approved `draft.apply` gate on `card_id`, decided by `approver` through the store.
@@ -189,17 +297,12 @@ async fn approved_refinement_gate(running: &support::Running, policy_id: &str) -
 /// P1.1 — a rule, a laya and a human decision share one audit shape.
 #[tokio::test(flavor = "multi_thread")]
 async fn a_rule_a_laya_and_a_human_decision_share_one_audit_shape() {
-    let (_pg, running, _seeded) = fixture().await;
-    create_policy(
-        &running,
-        "gate.precheck",
-        Some("capability_ready"),
-        0.8,
-        "closed",
-        "handover",
-    )
-    .await;
-    create_laya_config(&running).await;
+    let _env = LAYA_ENV.lock().await;
+    let (pg, running, seeded) = fixture().await;
+    create_policy(&running, KIND, Some(GATE), 0.8, "closed", "handover").await;
+    let laya_config_id = create_laya_config(&running).await;
+    seal_laya_token(&pg, &seeded).await;
+    let _stub = laya_stub(json!({"score": 0.9})).await;
 
     // L0 — a deterministic rule outcome.
     let (status, rule) = running
@@ -208,8 +311,8 @@ async fn a_rule_a_laya_and_a_human_decision_share_one_audit_shape() {
             "dev:alice",
             json!({
                 "rung": "rule",
-                "kind": "gate.precheck",
-                "gate": "capability_ready",
+                "kind": KIND,
+                "gate": GATE,
                 "answer": "pass",
                 "outcome": "accepted",
                 "confidence": 1.0,
@@ -222,8 +325,8 @@ async fn a_rule_a_laya_and_a_human_decision_share_one_audit_shape() {
         .await;
     assert_eq!(status, 201, "{rule}");
 
-    // L1 — an evaluated laya choice.
-    let (status, laya) = evaluate(&running, 0.9).await;
+    // L1 — the verified laya choice.
+    let (status, laya) = laya_decision(&running, KIND, &laya_config_id, None, "key-shape").await;
     assert_eq!(status, 201, "{laya}");
 
     // L3 — a human decision, recorded against its approval.
@@ -245,7 +348,7 @@ async fn a_rule_a_laya_and_a_human_decision_share_one_audit_shape() {
             "dev:alice",
             json!({
                 "project_id": project_id,
-                "gate": "capability_ready",
+                "gate": GATE,
                 "kind": "decision",
                 "description": "Confirm the gate"
             }),
@@ -275,8 +378,8 @@ async fn a_rule_a_laya_and_a_human_decision_share_one_audit_shape() {
             "dev:alice",
             json!({
                 "rung": "human",
-                "kind": "gate.precheck",
-                "gate": "capability_ready",
+                "kind": KIND,
+                "gate": GATE,
                 "project_id": project_id,
                 "answer": "approve",
                 "outcome": "accepted",
@@ -296,7 +399,7 @@ async fn a_rule_a_laya_and_a_human_decision_share_one_audit_shape() {
         .invoke(
             "ladder.list",
             "dev:alice",
-            json!({"kind": "gate.precheck"}),
+            json!({"kind": KIND}),
             None,
             None,
             None,
@@ -337,7 +440,7 @@ async fn a_rule_a_laya_and_a_human_decision_share_one_audit_shape() {
     );
 
     for row in items {
-        assert_eq!(row["kind"], "gate.precheck", "{row}");
+        assert_eq!(row["kind"], KIND, "{row}");
         assert!(
             row["policy_id"].is_string(),
             "every rung names its policy: {row}"
@@ -359,27 +462,28 @@ async fn a_rule_a_laya_and_a_human_decision_share_one_audit_shape() {
         .find(|row| row["rung"] == "laya")
         .expect("the laya row");
     assert_eq!(laya_row["outcome"], "accepted", "{laya_row}");
+    assert!(
+        laya_row["laya_invocation_id"].is_string(),
+        "the laya row names its verified invocation: {laya_row}"
+    );
 }
 
 /// P2.1 — a tenant refinement changes the threshold with no code change.
 #[tokio::test(flavor = "multi_thread")]
 async fn a_refinement_changes_a_threshold_without_a_code_change() {
-    let (_pg, running, _seeded) = fixture().await;
-    let (policy_id, _etag) = create_policy(
-        &running,
-        "gate.precheck",
-        Some("capability_ready"),
-        0.8,
-        "closed",
-        "block",
-    )
-    .await;
+    let _env = LAYA_ENV.lock().await;
+    let (pg, running, seeded) = fixture().await;
+    let (policy_id, _etag) =
+        create_policy(&running, KIND, Some(GATE), 0.8, "closed", "block").await;
 
     // An L1 decision pins the laya config it used, so one must exist.
-    create_laya_config(&running).await;
+    let laya_config_id = create_laya_config(&running).await;
+    seal_laya_token(&pg, &seeded).await;
+    let _stub = laya_stub(json!({"score": 0.7})).await;
 
-    // The platform policy at 0.8 refuses an 0.7 answer.
-    let (status, refused) = evaluate(&running, 0.7).await;
+    // The platform policy at 0.8 refuses a 0.7 answer.
+    let (status, refused) =
+        laya_decision(&running, KIND, &laya_config_id, None, "key-before").await;
     assert_eq!(status, 201, "{refused}");
     assert_eq!(output(&refused)["outcome"], "refused", "{refused}");
     assert_eq!(output(&refused)["policy_version"], 1, "{refused}");
@@ -404,8 +508,9 @@ async fn a_refinement_changes_a_threshold_without_a_code_change() {
     assert_eq!(status, 200, "{published}");
     assert_eq!(output(&published)["version"], 1, "{published}");
 
-    // The identical input is now accepted, and the row pins the refinement it applied.
-    let (status, accepted) = evaluate(&running, 0.7).await;
+    // The identical request is now accepted, and the row pins the refinement it applied.
+    let (status, accepted) =
+        laya_decision(&running, KIND, &laya_config_id, None, "key-after").await;
     assert_eq!(status, 201, "{accepted}");
     assert_eq!(output(&accepted)["outcome"], "accepted", "{accepted}");
     assert_eq!(output(&accepted)["refinement_version"], 1, "{accepted}");
@@ -422,15 +527,8 @@ async fn a_refinement_changes_a_threshold_without_a_code_change() {
 #[tokio::test(flavor = "multi_thread")]
 async fn a_refinement_cannot_publish_without_its_gate() {
     let (_pg, running, _seeded) = fixture().await;
-    let (policy_id, _etag) = create_policy(
-        &running,
-        "gate.precheck",
-        Some("capability_ready"),
-        0.8,
-        "closed",
-        "block",
-    )
-    .await;
+    let (policy_id, _etag) =
+        create_policy(&running, KIND, Some(GATE), 0.8, "closed", "block").await;
 
     let (status, refused) = running
         .invoke(
@@ -478,19 +576,12 @@ async fn a_refinement_cannot_publish_without_its_gate() {
 #[tokio::test(flavor = "multi_thread")]
 async fn a_refinement_gate_for_another_policy_cannot_authorise_this_one() {
     let (_pg, running, _seeded) = fixture().await;
-    let (policy_id, _etag) = create_policy(
-        &running,
-        "gate.precheck",
-        Some("capability_ready"),
-        0.8,
-        "closed",
-        "block",
-    )
-    .await;
+    let (policy_id, _etag) =
+        create_policy(&running, KIND, Some(GATE), 0.8, "closed", "block").await;
     let (other_policy_id, _other_etag) = create_policy(
         &running,
         "gate.precheck.other",
-        Some("capability_ready"),
+        Some(GATE),
         0.8,
         "closed",
         "block",
@@ -548,15 +639,8 @@ async fn a_refinement_gate_for_another_policy_cannot_authorise_this_one() {
 #[tokio::test(flavor = "multi_thread")]
 async fn a_human_approved_refinement_gate_publishes() {
     let (_pg, running, _seeded) = fixture().await;
-    let (policy_id, _etag) = create_policy(
-        &running,
-        "gate.precheck",
-        Some("capability_ready"),
-        0.8,
-        "closed",
-        "block",
-    )
-    .await;
+    let (policy_id, _etag) =
+        create_policy(&running, KIND, Some(GATE), 0.8, "closed", "block").await;
 
     let first_gate = approved_refinement_gate(&running, &policy_id).await;
     let (status, published) = running
@@ -604,16 +688,9 @@ async fn a_human_approved_refinement_gate_publishes() {
 /// P3.1 — every decision pins the versions it read; a later change does not rewrite the row.
 #[tokio::test(flavor = "multi_thread")]
 async fn every_decision_pins_the_refinement_and_laya_config_versions() {
-    let (pg, running, _seeded) = fixture().await;
-    let (policy_id, etag) = create_policy(
-        &running,
-        "gate.precheck",
-        Some("capability_ready"),
-        0.8,
-        "closed",
-        "block",
-    )
-    .await;
+    let _env = LAYA_ENV.lock().await;
+    let (pg, running, seeded) = fixture().await;
+    let (policy_id, etag) = create_policy(&running, KIND, Some(GATE), 0.8, "closed", "block").await;
     let approval_id = approved_refinement_gate(&running, &policy_id).await;
     let (status, published) = running
         .invoke(
@@ -631,8 +708,9 @@ async fn every_decision_pins_the_refinement_and_laya_config_versions() {
         .await;
     assert_eq!(status, 200, "{published}");
 
-    // A laya decision with no laya config to pin is refused: the pin is mandatory, not a default.
-    let (status, unpinned) = evaluate(&running, 0.9).await;
+    // A laya decision with no laya config to pin is refused before any external call: the pin
+    // is mandatory, not a default.
+    let (status, unpinned) = prepare(&running, KIND, None, None).await;
     assert_eq!(status, 422, "{unpinned}");
     assert_eq!(
         output(&unpinned)["errors"][0]["code"],
@@ -640,9 +718,11 @@ async fn every_decision_pins_the_refinement_and_laya_config_versions() {
         "{unpinned}"
     );
 
-    create_laya_config(&running).await;
+    let laya_config_id = create_laya_config(&running).await;
+    seal_laya_token(&pg, &seeded).await;
+    let _stub = laya_stub(json!({"score": 0.9})).await;
 
-    let (status, first) = evaluate(&running, 0.9).await;
+    let (status, first) = laya_decision(&running, KIND, &laya_config_id, None, "key-v1").await;
     assert_eq!(status, 201, "{first}");
     assert_eq!(output(&first)["policy_version"], 1, "{first}");
     assert_eq!(output(&first)["refinement_version"], 1, "{first}");
@@ -662,7 +742,7 @@ async fn every_decision_pins_the_refinement_and_laya_config_versions() {
     assert_eq!(status, 200, "{updated}");
     assert_eq!(output(&updated)["version"], 2, "{updated}");
 
-    let (status, second) = evaluate(&running, 0.9).await;
+    let (status, second) = laya_decision(&running, KIND, &laya_config_id, None, "key-v2").await;
     assert_eq!(status, 201, "{second}");
     assert_eq!(output(&second)["policy_version"], 2, "{second}");
 
@@ -687,17 +767,12 @@ async fn every_decision_pins_the_refinement_and_laya_config_versions() {
 /// the generated class outright.
 #[tokio::test(flavor = "multi_thread")]
 async fn a_generated_draft_cannot_transition_a_card() {
+    let _env = LAYA_ENV.lock().await;
     let (pg, running, seeded) = fixture().await;
-    create_policy(
-        &running,
-        "gate.precheck",
-        Some("capability_ready"),
-        0.8,
-        "closed",
-        "block",
-    )
-    .await;
-    create_laya_config(&running).await;
+    create_policy(&running, KIND, Some(GATE), 0.8, "closed", "block").await;
+    let laya_config_id = create_laya_config(&running).await;
+    seal_laya_token(&pg, &seeded).await;
+    let low = laya_stub(json!({"score": 0.4})).await;
 
     // A project, its board, an active lane and a card to apply to.
     let (status, project) = running
@@ -761,25 +836,11 @@ async fn a_generated_draft_cannot_transition_a_card() {
     let card_id = id_of(output(&card), "id");
 
     // A below-threshold decision: the gate refuses, and it cannot apply a draft.
-    let (status, refused) = running
-        .invoke(
-            "ladder.evaluate",
-            "dev:alice",
-            json!({
-                "kind": "gate.precheck",
-                "gate": "capability_ready",
-                "card_id": card_id,
-                "answer": "pass",
-                "confidence": 0.4,
-                "latency_ms": 5
-            }),
-            None,
-            None,
-            None,
-        )
-        .await;
+    let (status, refused) =
+        laya_decision(&running, KIND, &laya_config_id, None, "key-refused").await;
     assert_eq!(status, 201, "{refused}");
     assert_eq!(output(&refused)["outcome"], "refused", "{refused}");
+    drop(low);
 
     // A generated draft artefact.
     let (status, draft) = running
@@ -819,23 +880,9 @@ async fn a_generated_draft_cannot_transition_a_card() {
 
     // An accepted L1 decision is NOT the gate: a routine accepted decision on the card cannot
     // apply a generated draft (§7.4).
-    let (status, accepted) = running
-        .invoke(
-            "ladder.evaluate",
-            "dev:alice",
-            json!({
-                "kind": "gate.precheck",
-                "gate": "capability_ready",
-                "card_id": card_id,
-                "answer": "pass",
-                "confidence": 0.9,
-                "latency_ms": 5
-            }),
-            None,
-            None,
-            None,
-        )
-        .await;
+    let _high = laya_stub(json!({"score": 0.9})).await;
+    let (status, accepted) =
+        laya_decision(&running, KIND, &laya_config_id, None, "key-accepted").await;
     assert_eq!(status, 201, "{accepted}");
     assert_eq!(output(&accepted)["outcome"], "accepted", "{accepted}");
     let (status, refused_l1) = running
@@ -942,4 +989,300 @@ async fn a_generated_draft_cannot_transition_a_card() {
         "the generated draft was attached by an edit: {bypass}"
     );
     assert_eq!(output(&bypass)["type"], "draft_requires_gate", "{bypass}");
+}
+
+// ── v1-w1c-3: the L1 answer has provenance ──────────────────────────────────────────────
+
+/// The acceptance's first half: the old request shape — a confidence the caller supplies — is
+/// no longer a valid `ladder.evaluate` input, and it writes nothing.
+#[tokio::test(flavor = "multi_thread")]
+async fn a_confidence_posted_directly_cannot_produce_a_laya_decision() {
+    let (pg, running, seeded) = fixture().await;
+    create_policy(&running, KIND, Some(GATE), 0.8, "closed", "block").await;
+    let _config = create_laya_config(&running).await;
+
+    let (status, refused) = running
+        .invoke(
+            "ladder.evaluate",
+            "dev:alice",
+            json!({
+                "kind": KIND,
+                "gate": GATE,
+                "input": facts(),
+                "answer": "pass",
+                "confidence": 0.99,
+                "probabilities": {"pass": 0.99},
+                "latency_ms": 4,
+                "laya_key": "never-called"
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 422, "{refused}");
+    assert_eq!(laya_rows(&pg, &seeded).await, 0);
+
+    let invoked: i64 = sqlx::query_scalar(
+        "SELECT count(*) FROM action_invocation
+          WHERE tenant_id = $1 AND action = 'ladder.evaluate' AND outcome = 'ok'",
+    )
+    .bind(seeded.tenant.as_uuid())
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("count the evaluate invocations");
+    assert_eq!(invoked, 0, "a refused evaluate recorded a successful call");
+}
+
+/// The Jev bridge refuses a choice with fewer than two options (and more than 255), so
+/// `ladder.prepare` refuses it before any call: a one-option "choice" is not a choice.
+#[tokio::test(flavor = "multi_thread")]
+async fn a_choice_needs_between_two_and_255_options() {
+    let (_pg, running, _seeded) = fixture().await;
+    create_policy(&running, KIND, Some(GATE), 0.8, "closed", "block").await;
+    let _config = create_laya_config(&running).await;
+
+    let single = json!([{"key": "only", "label": "The only option"}]);
+    let (status, refused) = prepare(&running, KIND, Some(&single), None).await;
+    assert_eq!(status, 422, "{refused}");
+    assert_eq!(
+        output(&refused)["errors"][0]["code"],
+        "option_set_size",
+        "{refused}"
+    );
+
+    let many: Vec<Value> = (0..256)
+        .map(|n| json!({"key": format!("option_{n}")}))
+        .collect();
+    let (status, refused) = prepare(&running, KIND, Some(&json!(many)), None).await;
+    assert_eq!(status, 422, "{refused}");
+    assert_eq!(
+        output(&refused)["errors"][0]["code"],
+        "option_set_size",
+        "{refused}"
+    );
+}
+
+/// A key no successful `laya.classify` call carries — forged, or the key of a call that was
+/// made with a different document — cannot be cited.
+#[tokio::test(flavor = "multi_thread")]
+async fn a_forged_laya_key_is_refused() {
+    let _env = LAYA_ENV.lock().await;
+    let (pg, running, seeded) = fixture().await;
+    create_policy(&running, KIND, Some(GATE), 0.8, "closed", "block").await;
+    let laya_config_id = create_laya_config(&running).await;
+    seal_laya_token(&pg, &seeded).await;
+    let stub = laya_stub(json!({"score": 0.9})).await;
+
+    // A key nothing ever ran under.
+    let (status, forged) =
+        evaluate(&running, KIND, None, Some(&laya_config_id), "forged-key").await;
+    assert_eq!(status, 503, "{forged}");
+    assert_eq!(output(&forged)["type"], "gate_unavailable", "{forged}");
+
+    // A real, successful call — cited by a key that names a different one.
+    let (status, prepared) = prepare(&running, KIND, None, Some(&laya_config_id)).await;
+    assert_eq!(status, 200, "{prepared}");
+    let request = output(&prepared)["request"].clone();
+    let (status, classified) = classify(&running, request, "used-key").await;
+    assert_eq!(status, 200, "{classified}");
+    let (status, mismatched) =
+        evaluate(&running, KIND, None, Some(&laya_config_id), "other-key").await;
+    assert_eq!(status, 503, "{mismatched}");
+    assert_eq!(
+        output(&mismatched)["type"],
+        "gate_unavailable",
+        "{mismatched}"
+    );
+    assert_eq!(laya_rows(&pg, &seeded).await, 0);
+    assert_eq!(stub.hits.get(), 1, "only the cited call reached laya");
+}
+
+/// A wire body that differs from the one `ladder.evaluate` rebuilds is a different request: the
+/// idempotency hash stops matching, so the tampered answer cannot be recorded.
+#[tokio::test(flavor = "multi_thread")]
+async fn a_tampered_laya_request_does_not_verify() {
+    let _env = LAYA_ENV.lock().await;
+    let (pg, running, seeded) = fixture().await;
+    create_policy(&running, KIND, Some(GATE), 0.8, "closed", "block").await;
+    let laya_config_id = create_laya_config(&running).await;
+    seal_laya_token(&pg, &seeded).await;
+    let stub = laya_stub(json!({"score": 0.99})).await;
+
+    let (status, prepared) = prepare(&running, KIND, None, Some(&laya_config_id)).await;
+    assert_eq!(status, 200, "{prepared}");
+    let mut request = output(&prepared)["request"].clone();
+    request["state"] = json!("a different question with a friendlier answer");
+    let (status, classified) = classify(&running, request, "tampered-key").await;
+    assert_eq!(status, 200, "{classified}");
+
+    let (status, refused) =
+        evaluate(&running, KIND, None, Some(&laya_config_id), "tampered-key").await;
+    assert_eq!(status, 503, "{refused}");
+    assert_eq!(output(&refused)["type"], "gate_unavailable", "{refused}");
+    assert!(
+        output(&refused)["detail"]
+            .as_str()
+            .unwrap_or_default()
+            .contains("not this decision's request"),
+        "{refused}"
+    );
+    assert_eq!(laya_rows(&pg, &seeded).await, 0);
+    assert_eq!(stub.hits.get(), 1);
+}
+
+/// The acceptance's success half: the answer, confidence, probabilities, latency and every
+/// provenance pin come from the verified response and its invocation.
+#[tokio::test(flavor = "multi_thread")]
+async fn a_laya_decision_derives_its_fields_latency_and_provenance_from_the_response() {
+    let _env = LAYA_ENV.lock().await;
+    let (pg, running, seeded) = fixture().await;
+    create_policy(&running, KIND, Some(GATE), 0.8, "closed", "block").await;
+    let laya_config_id = create_laya_config(&running).await;
+    seal_laya_token(&pg, &seeded).await;
+    let answer = json!({
+        "choice": "bug",
+        "confidence": 0.93,
+        "probabilities": {"bug": 0.93, "feature": 0.07}
+    });
+    let stub = laya_stub(answer.clone()).await;
+    let options = json!([
+        {"key": "bug", "label": "A bug"},
+        {"key": "feature", "label": "A feature"}
+    ]);
+
+    let (status, prepared) = prepare(&running, KIND, Some(&options), Some(&laya_config_id)).await;
+    assert_eq!(status, 200, "{prepared}");
+    let request = output(&prepared)["request"].clone();
+    assert_eq!(request["model"], "jev-latest", "{request}");
+    assert_eq!(
+        request["questions"]["decision"]["type"], "choice",
+        "{request}"
+    );
+    assert_eq!(
+        request["questions"]["decision"]["criteria"],
+        json!({"bug": "A bug", "feature": "A feature"}),
+        "the bridge reads a choice's criteria as a map of option -> description: {request}"
+    );
+    let state = request["state"].as_str().expect("state is a string");
+    assert!(state.contains(QUESTION), "{state}");
+    assert!(state.contains("knowledge@7"), "{state}");
+    let request_hash = output(&prepared)["request_hash"]
+        .as_str()
+        .expect("a request hash")
+        .to_owned();
+    assert!(request_hash.starts_with("fnv1a64:"), "{request_hash}");
+
+    let (status, classified) = classify(&running, request, "key-provenance").await;
+    assert_eq!(status, 200, "{classified}");
+
+    let (status, decided) = evaluate(
+        &running,
+        KIND,
+        Some(&options),
+        Some(&laya_config_id),
+        "key-provenance",
+    )
+    .await;
+    assert_eq!(status, 201, "{decided}");
+    let decision = output(&decided);
+    assert_eq!(decision["rung"], "laya", "{decision}");
+    assert_eq!(decision["answer"], "bug", "{decision}");
+    assert_eq!(decision["confidence"], 0.93, "{decision}");
+    assert_eq!(
+        decision["probabilities"],
+        json!({"bug": 0.93, "feature": 0.07}),
+        "{decision}"
+    );
+    assert_eq!(decision["outcome"], "accepted", "{decision}");
+    assert_eq!(decision["laya_request_hash"], request_hash, "{decision}");
+    // The decision hashes the whole answer document the parser consumes (`{"answers": …}`),
+    // not the inner choice; the stub's body is that document.
+    let expected_response_hash = conveyor_actions::spec::sha256_hex(
+        &serde_json::to_vec(&json!({"answers": {"decision": answer.clone()}}))
+            .expect("the answer document"),
+    );
+    assert_eq!(
+        decision["laya_response_hash"], expected_response_hash,
+        "{decision}"
+    );
+
+    // The latency is the engine's own measurement of the external call, and the invocation id
+    // names the row the call recorded — not anything the caller posted.
+    let invocation_id = decision["laya_invocation_id"]
+        .as_str()
+        .expect("the invocation id");
+    let (action, duration_ms, key): (String, i32, Option<String>) = sqlx::query_as(
+        "SELECT action, duration_ms, idempotency_key
+           FROM action_invocation WHERE id = $1::uuid",
+    )
+    .bind(invocation_id)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("read the cited invocation");
+    assert_eq!(action, "laya.classify");
+    assert_eq!(key.as_deref(), Some("key-provenance"));
+    assert_eq!(
+        decision["latency_ms"].as_i64(),
+        Some(i64::from(duration_ms)),
+        "{decision}"
+    );
+    assert_eq!(stub.hits.get(), 1);
+    assert_eq!(laya_rows(&pg, &seeded).await, 1);
+}
+
+/// A laya outage — no token, a refused call or an unreadable answer — is `gate_unavailable`
+/// and writes no decision. The policy's fail behaviour is carried in the refusal; it is never
+/// silently a pass.
+#[tokio::test(flavor = "multi_thread")]
+async fn a_laya_outage_is_gate_unavailable_and_writes_nothing() {
+    let (pg, running, seeded) = fixture().await;
+    create_policy(&running, KIND, Some(GATE), 0.8, "closed", "block").await;
+    let laya_config_id = create_laya_config(&running).await;
+    // Deliberately no `laya.token`: the classify call answers 503.
+
+    let (status, prepared) = prepare(&running, KIND, None, Some(&laya_config_id)).await;
+    assert_eq!(status, 200, "{prepared}");
+    let request = output(&prepared)["request"].clone();
+    let (status, classified) = classify(&running, request, "key-outage").await;
+    assert_eq!(status, 503, "{classified}");
+    let (status, refused) =
+        evaluate(&running, KIND, None, Some(&laya_config_id), "key-outage").await;
+    assert_eq!(status, 503, "{refused}");
+    assert_eq!(output(&refused)["type"], "gate_unavailable", "{refused}");
+    assert!(
+        output(&refused)["detail"]
+            .as_str()
+            .unwrap_or_default()
+            .contains("fail_policy=closed outcome=refused"),
+        "{refused}"
+    );
+
+    // An open routing gate carries its configured action instead of refusing.
+    let open_kind = "gate.precheck.open";
+    create_policy(&running, open_kind, Some(GATE), 0.8, "open", "handover").await;
+    let (status, prepared) = prepare(&running, open_kind, None, Some(&laya_config_id)).await;
+    assert_eq!(status, 200, "{prepared}");
+    let request = output(&prepared)["request"].clone();
+    let (status, classified) = classify(&running, request, "key-open-outage").await;
+    assert_eq!(status, 503, "{classified}");
+    let (status, open) = evaluate(
+        &running,
+        open_kind,
+        None,
+        Some(&laya_config_id),
+        "key-open-outage",
+    )
+    .await;
+    assert_eq!(status, 503, "{open}");
+    assert_eq!(output(&open)["type"], "gate_unavailable", "{open}");
+    assert!(
+        output(&open)["detail"]
+            .as_str()
+            .unwrap_or_default()
+            .contains("fail_policy=open outcome=escalated"),
+        "{open}"
+    );
+
+    assert_eq!(laya_rows(&pg, &seeded).await, 0, "an outage wrote a row");
 }

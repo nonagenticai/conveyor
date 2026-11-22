@@ -16,11 +16,20 @@
 //! values differ. L2 generation is not a rung: it is an `inference_call` plus a
 //! [`GeneratedDraft`](conveyor_domain::ladder::GeneratedDraft), and no transition accepts it.
 //!
+//! **The L1 path is three calls.** `ladder.prepare` builds the laya wire document from the
+//! effective policy's rows, `laya.classify` runs the engine-owned external call outside every
+//! decision transaction, and `ladder.evaluate` rebuilds the same document, requires the
+//! successful invocation for that exact request hash, and only then writes the `laya` row.
+//! The answer, confidence, probabilities and latency come from the response and the
+//! invocation — never from the caller (finding v1-w1c-3).
+//!
 //! Events: every mutation appends one `decision.changed` row in its own transaction, with the
 //! payload `{entity, id, op}` and the topic `<entity>:<id>`.
 
 use chrono::{DateTime, Utc};
-use conveyor_domain::ladder::{LadderError, Outcome, Rung, evaluate};
+use conveyor_domain::ladder::{
+    FailAction, FailPolicy, LadderError, Outcome, Rung, evaluate, unavailable,
+};
 use conveyor_domain::{ApprovalStatus, TenantId};
 use conveyor_store as store;
 use schemars::JsonSchema;
@@ -33,6 +42,8 @@ use crate::control::{etag_of, invalid, parent_error, require_precondition_with, 
 use crate::invoke::{ActionError, HandlerCtx};
 use crate::spec::HandlerOutput;
 use crate::views::Page;
+
+mod laya;
 
 pub use store::ladder::{
     DecisionRecord, EffectivePolicy, LadderStoreError, LayaConfigRecord, NewDecision,
@@ -707,6 +718,12 @@ pub struct DecisionOut {
     pub laya_config_id: Option<String>,
     /// The laya config version pinned.
     pub laya_config_version: Option<i64>,
+    /// The verified `laya.classify` invocation behind a laya answer.
+    pub laya_invocation_id: Option<String>,
+    /// The idempotency request hash the verified answer was produced for.
+    pub laya_request_hash: Option<String>,
+    /// The sha256 of the laya answer document.
+    pub laya_response_hash: Option<String>,
     /// `system | user | agent | service`.
     pub actor_kind: String,
     /// The acting principal.
@@ -747,6 +764,9 @@ fn decision_out(record: &DecisionRecord) -> DecisionOut {
         refinement_version: record.refinement_version,
         laya_config_id: record.laya_config_id.map(|id| id.to_string()),
         laya_config_version: record.laya_config_version,
+        laya_invocation_id: record.laya_invocation_id.map(|id| id.to_string()),
+        laya_request_hash: record.laya_request_hash.clone(),
+        laya_response_hash: record.laya_response_hash.clone(),
         actor_kind: record.actor_kind.clone(),
         actor_id: record.actor_id.map(|id| id.to_string()),
         approval_id: record.approval_id.map(|id| id.to_string()),
@@ -760,8 +780,222 @@ fn decision_out(record: &DecisionRecord) -> DecisionOut {
     }
 }
 
+// ── the verified L1 path ─────────────────────────────────────────────────────────────────
+
+/// The request one case resolves to, built from the same rows by `ladder.prepare` and
+/// `ladder.evaluate`.
+///
+/// The two calls share this builder on purpose: a caller that tampers with the wire body it
+/// sends to `laya.classify` cannot make `ladder.evaluate` rebuild the tampered document, so the
+/// idempotency request hash — the value the replay was stored under — stops matching.
+struct LayaPlan {
+    effective: EffectivePolicy,
+    config: LayaConfigRecord,
+    request: Value,
+    request_hash: String,
+    options: Vec<NewOption>,
+    option_set_version: Option<i64>,
+}
+
+/// Refuse an option set that cannot be a finite authored choice.
+///
+/// The Jev bridge validates a `choice` question's criteria as a map of 2–255 option keys (the
+/// agent platform's `CHOICE_OPTIONS` limits); a one-option choice is a live `422` at the
+/// service, so it is refused here — before any call — rather than at the wire.
+fn validate_option_keys(options: &[NewOption]) -> Result<(), ActionError> {
+    if !options.is_empty() && !(2..=255).contains(&options.len()) {
+        return Err(invalid(
+            "options",
+            "option_set_size",
+            "a choice question needs between 2 and 255 options",
+        ));
+    }
+    let mut seen = std::collections::BTreeSet::new();
+    for option in options {
+        if option.key.trim().is_empty() {
+            return Err(invalid(
+                "options",
+                "option_key_missing",
+                "every authored option needs a key",
+            ));
+        }
+        if !seen.insert(option.key.as_str()) {
+            return Err(invalid(
+                "options",
+                "option_key_duplicate",
+                format!("the option key {:?} is repeated", option.key),
+            ));
+        }
+    }
+    Ok(())
+}
+
+/// The case inputs `ladder.prepare` and `ladder.evaluate` resolve into one wire document.
+struct LayaCase<'a> {
+    kind: &'a str,
+    gate: Option<&'a str>,
+    question: &'a str,
+    facts: Option<&'a Value>,
+    options: Vec<NewOption>,
+    laya_config_id: Option<Uuid>,
+}
+
+/// Resolve the policy, the laya config and the wire document for one case.
+async fn laya_plan_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    action: &str,
+    case: LayaCase<'_>,
+) -> Result<LayaPlan, ActionError> {
+    let LayaCase {
+        kind,
+        gate,
+        question,
+        facts,
+        options,
+        laya_config_id,
+    } = case;
+    let effective = store::ladder::effective_policy_tx(&mut *conn, tenant, kind, gate)
+        .await
+        .map_err(|error| ladder_error(error, action))?
+        .ok_or_else(|| ladder_error(LadderError::PolicyMissing.into(), action))?;
+    let config = match laya_config_id {
+        Some(id) => store::ladder::get_laya_config_tx(&mut *conn, tenant, id)
+            .await
+            .map_err(|error| ladder_error(error, action))?
+            .ok_or_else(|| ActionError::resource_not_found("laya_inference_config"))?,
+        None => effective.laya_config.clone().ok_or_else(|| {
+            ladder_error(
+                LadderError::PinsIncomplete {
+                    rung: Rung::Laya.as_str(),
+                    missing: vec!["laya_config_version"],
+                }
+                .into(),
+                action,
+            )
+        })?,
+    };
+    validate_option_keys(&options)?;
+    let wire: Vec<laya::OptionWire<'_>> = options
+        .iter()
+        .map(|option| laya::OptionWire {
+            key: &option.key,
+            label: &option.label,
+        })
+        .collect();
+    let request = laya::request(&config.model_ref, question, facts, &wire);
+    let request_hash = store::idempotency::request_hash(&request);
+    let option_set_version = (!options.is_empty()).then_some(1);
+    Ok(LayaPlan {
+        effective,
+        config,
+        request,
+        request_hash,
+        options,
+        option_set_version,
+    })
+}
+
+/// The `503 gate_unavailable` both halves of the unavailable path answer.
+///
+/// The design applies the policy's fail behaviour without ever treating the outage as a pass:
+/// a closed policy's outcome is `refused`; an open policy's is its configured action's
+/// (`escalated`, `refused` or the annotated `accepted` the caller must apply itself). The
+/// response carries that outcome; no `decision` row is written, because there is no answer to
+/// record. Recording the outage is v1-w1c-5's own card.
+fn gate_unavailable(
+    fail_policy: FailPolicy,
+    fail_action: FailAction,
+    reason: impl std::fmt::Display,
+) -> ActionError {
+    let outcome = unavailable(fail_policy, fail_action);
+    ActionError::new(
+        503,
+        "gate_unavailable",
+        format!(
+            "no verified laya answer for this decision: {reason}; fail_policy={} outcome={}",
+            fail_policy.as_str(),
+            outcome.as_str()
+        ),
+    )
+}
+
+/// The request `ladder.prepare` returns.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct PrepareOut {
+    /// The laya System-1 document to post as `laya.classify`'s input.
+    pub request: Value,
+    /// The idempotency request hash the verified call will be looked up by.
+    pub request_hash: String,
+}
+
+/// `ladder.prepare`.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct PrepareIn {
+    /// The case kind the policy is keyed by.
+    pub kind: String,
+    /// The gate, when the policy is gate-specific.
+    pub gate: Option<String>,
+    /// The question, in the case's terms.
+    pub question: Option<String>,
+    /// The facts the answer consumes.
+    pub input: Option<Value>,
+    /// The authored options a choice question picks between.
+    pub options: Option<Vec<OptionIn>>,
+    /// A laya config override; the effective policy's config is used otherwise.
+    pub laya_config_id: Option<Uuid>,
+}
+
+/// Build the laya document for one case, from the same rows `ladder.evaluate` will rebuild.
+///
+/// This is a **read**: it runs outside the decision transaction, returns nothing but the
+/// request and its hash, and writes no row. The caller then invokes `laya.classify` with that
+/// document, and only then calls `ladder.evaluate` with the idempotency key it used.
+#[crate::action(
+    name = "ladder.prepare",
+    version = 1,
+    kind = "internal",
+    scopes = ["governance:read"],
+    idempotent = true,
+    timeout_ms = 30000,
+    effect = "read",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn ladder_prepare(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: PrepareIn,
+) -> Result<HandlerOutput<PrepareOut>, ActionError> {
+    let kind = input.kind.trim();
+    if kind.is_empty() {
+        return Err(invalid("kind", "missing", "a case kind is required"));
+    }
+    let gate = trimmed(input.gate);
+    let question = input.question.clone().unwrap_or_else(|| kind.to_owned());
+    let plan = laya_plan_tx(
+        &mut *tx,
+        ctx.tenant,
+        ctx.action,
+        LayaCase {
+            kind,
+            gate: gate.as_deref(),
+            question: &question,
+            facts: input.input.as_ref(),
+            options: options_of(input.options),
+            laya_config_id: input.laya_config_id,
+        },
+    )
+    .await?;
+    Ok(HandlerOutput::ok(PrepareOut {
+        request: plan.request,
+        request_hash: plan.request_hash,
+    }))
+}
+
 /// `ladder.evaluate`.
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+#[serde(deny_unknown_fields)]
 pub struct EvaluateIn {
     /// The case kind the policy is keyed by.
     pub kind: String,
@@ -773,12 +1007,6 @@ pub struct EvaluateIn {
     pub card_id: Option<Uuid>,
     /// The question, in the case's terms.
     pub question: Option<String>,
-    /// The answer the rung proposes.
-    pub answer: String,
-    /// The confidence in 0–1 (the L1 path supplies laya's; a test injects it).
-    pub confidence: Option<f64>,
-    /// The probabilities, where the question type provides them.
-    pub probabilities: Option<Value>,
     /// The facts the answer consumed; hashed with the case into `input_hash`.
     pub input: Option<Value>,
     /// An explicit input hash; computed from the basis when absent.
@@ -789,13 +1017,22 @@ pub struct EvaluateIn {
     pub option_set_version: Option<i64>,
     /// A laya config override; the effective policy's config is used otherwise.
     pub laya_config_id: Option<Uuid>,
-    /// The evaluation latency.
-    pub latency_ms: Option<i32>,
+    /// The `Idempotency-Key` of the verified `laya.classify` call behind this answer.
+    ///
+    /// There is deliberately no `answer`, `confidence`, `probabilities` or `latency_ms`: those
+    /// are read from the verified response and its invocation, never from the caller.
+    pub laya_key: String,
     /// Free-form metadata.
     pub meta: Option<Value>,
 }
 
-/// Evaluate one answer against the effective policy and record the decision.
+/// Record the verified L1 decision for one case.
+///
+/// The answer, confidence, probabilities and latency are **not** inputs: this action rebuilds
+/// the `ladder.prepare` document from the same rows, requires a successful `laya.classify`
+/// replay for that exact request hash, and reads the answer from the stored response and the
+/// latency from the invocation's own `duration_ms`. A missing, forged, tampered or unreadable
+/// call is `503 gate_unavailable` and writes nothing.
 #[crate::action(
     name = "ladder.evaluate",
     version = 1,
@@ -816,60 +1053,153 @@ async fn ladder_evaluate(
     if kind.is_empty() {
         return Err(invalid("kind", "missing", "a case kind is required"));
     }
+    let key = input.laya_key.trim();
+    if key.is_empty() {
+        return Err(invalid(
+            "laya_key",
+            "laya_key_missing",
+            "a verified laya.classify call must be cited by its Idempotency-Key",
+        ));
+    }
     let gate = trimmed(input.gate);
-    let effective = store::ladder::effective_policy_tx(&mut *tx, ctx.tenant, kind, gate.as_deref())
-        .await
-        .map_err(|error| ladder_error(error, ctx.action))?
-        .ok_or_else(|| ladder_error(LadderError::PolicyMissing.into(), ctx.action))?;
-    let threshold = effective.threshold().ok_or_else(|| {
+    let question = input.question.clone().unwrap_or_else(|| kind.to_owned());
+    let plan = laya_plan_tx(
+        &mut *tx,
+        ctx.tenant,
+        ctx.action,
+        LayaCase {
+            kind,
+            gate: gate.as_deref(),
+            question: &question,
+            facts: input.input.as_ref(),
+            options: options_of(input.options.clone()),
+            laya_config_id: input.laya_config_id,
+        },
+    )
+    .await?;
+    let threshold = plan.effective.threshold().ok_or_else(|| {
         invalid(
             "threshold",
             "threshold_missing",
             "the decision policy has no threshold",
         )
     })?;
-    let confidence = input.confidence.ok_or_else(|| {
-        invalid(
-            "confidence",
-            "confidence_missing",
-            "an evaluated decision needs the confidence it evaluated",
-        )
-    })?;
-    let action = effective
+    let fail_action = plan
+        .effective
         .action()
         .map_err(|error| ladder_error(error, ctx.action))?;
-    let outcome = evaluate(confidence, threshold, action)
+    let fail_policy = plan
+        .effective
+        .fail_policy()
+        .map_err(|error| ladder_error(error, ctx.action))?;
+
+    // The answer exists only if this exact request body was answered by a successful
+    // `laya.classify` call. The replay store is the hash witness; the invocation row is the
+    // proof the call happened (and carries the engine-measured latency).
+    let replay = store::idempotency::lookup(
+        &mut *tx,
+        ctx.tenant,
+        laya::LAYA_CLASSIFY,
+        key,
+        &plan.request_hash,
+    )
+    .await
+    .map_err(|error| {
+        tracing::error!(%error, action = ctx.action, "read the laya replay");
+        ActionError::internal()
+    })?;
+    let response = match replay {
+        store::idempotency::Lookup::Replay {
+            status_code: 200,
+            response,
+        } => response,
+        store::idempotency::Lookup::Replay { status_code, .. } => {
+            return Err(gate_unavailable(
+                fail_policy,
+                fail_action,
+                format!("the verified call answered {status_code}"),
+            ));
+        }
+        store::idempotency::Lookup::Miss => {
+            return Err(gate_unavailable(
+                fail_policy,
+                fail_action,
+                "no successful laya.classify call carries this key",
+            ));
+        }
+        store::idempotency::Lookup::ConflictHash => {
+            return Err(gate_unavailable(
+                fail_policy,
+                fail_action,
+                "the key's request body is not this decision's request",
+            ));
+        }
+        store::idempotency::Lookup::InFlight => {
+            return Err(gate_unavailable(
+                fail_policy,
+                fail_action,
+                "the laya.classify call is still running",
+            ));
+        }
+    };
+    let invocation = store::actions::successful_invocation_by_key(
+        &mut *tx,
+        ctx.tenant,
+        laya::LAYA_CLASSIFY,
+        key,
+    )
+    .await
+    .map_err(|error| {
+        tracing::error!(%error, action = ctx.action, "read the laya invocation");
+        ActionError::internal()
+    })?
+    .ok_or_else(|| {
+        gate_unavailable(
+            fail_policy,
+            fail_action,
+            "no successful laya.classify invocation carries this key",
+        )
+    })?;
+    if invocation.input_hash != plan.request_hash {
+        return Err(gate_unavailable(
+            fail_policy,
+            fail_action,
+            "the invocation hashed a different request body",
+        ));
+    }
+    let output = response.get("output").ok_or_else(|| {
+        gate_unavailable(
+            fail_policy,
+            fail_action,
+            "the stored replay carries no answer document",
+        )
+    })?;
+    let parsed = laya::parse_answer(&plan.request, output).map_err(|_| {
+        gate_unavailable(
+            fail_policy,
+            fail_action,
+            "the answer document is unreadable for this question",
+        )
+    })?;
+    let outcome = evaluate(parsed.confidence, threshold, fail_action)
         .map_err(|error| ladder_error(error.into(), ctx.action))?;
-    let question = input.question.clone().unwrap_or_else(|| kind.to_owned());
     let hash = match input.input_hash.clone() {
         Some(hash) => hash,
         None => input_hash_of(
             kind,
             gate.as_deref(),
             &question,
-            &input.answer,
-            Some(confidence),
+            &parsed.answer,
+            Some(parsed.confidence),
             input.input.as_ref(),
         )?,
     };
-    let pins = effective.pins();
-    let laya_config_id = input
-        .laya_config_id
-        .or(effective.laya_config.as_ref().map(|row| row.id));
-    let laya_config_version = match input.laya_config_id {
-        Some(id) => {
-            let config = store::ladder::get_laya_config_tx(&mut *tx, ctx.tenant, id)
-                .await
-                .map_err(|error| ladder_error(error, ctx.action))?
-                .ok_or_else(|| ActionError::resource_not_found("laya_inference_config"))?;
-            Some(config.version)
-        }
-        None => pins.laya_config_version,
-    };
-    let options = options_of(input.options.clone());
-    let option_set_version = input
-        .option_set_version
-        .or_else(|| (!options.is_empty()).then_some(1));
+    let response_hash = crate::spec::sha256_hex(&serde_json::to_vec(output).map_err(|error| {
+        tracing::error!(%error, action = ctx.action, "serialize the laya answer");
+        ActionError::internal()
+    })?);
+    let pins = plan.effective.pins();
+    let option_set_version = input.option_set_version.or(plan.option_set_version);
     let decided_at = if matches!(outcome, Outcome::Escalated) {
         None
     } else {
@@ -884,25 +1214,28 @@ async fn ladder_evaluate(
             project_id: input.project_id,
             card_id: input.card_id,
             question,
-            answer: input.answer.clone(),
+            answer: parsed.answer,
             option_set_version,
-            probabilities: input.probabilities.unwrap_or_else(|| serde_json::json!({})),
-            confidence: Some(confidence),
+            probabilities: parsed.probabilities,
+            confidence: Some(parsed.confidence),
             input_hash: Some(hash),
-            policy_id: Some(effective.policy.id),
+            policy_id: Some(plan.effective.policy.id),
             policy_version: pins.policy_version,
-            policy_refinement_id: effective.refinement.as_ref().map(|row| row.id),
+            policy_refinement_id: plan.effective.refinement.as_ref().map(|row| row.id),
             refinement_version: pins.refinement_version,
-            laya_config_id,
-            laya_config_version,
+            laya_config_id: Some(plan.config.id),
+            laya_config_version: Some(plan.config.version),
+            laya_invocation_id: Some(invocation.id),
+            laya_request_hash: Some(plan.request_hash),
+            laya_response_hash: Some(response_hash),
             actor_kind: ctx.actor_kind.clone(),
             actor_id: Some(ctx.actor_id),
             approval_id: None,
-            latency_ms: input.latency_ms,
+            latency_ms: Some(invocation.duration_ms),
             outcome,
             decided_at,
             meta: input.meta.unwrap_or_else(|| serde_json::json!({})),
-            options,
+            options: plan.options,
         },
     )
     .await
@@ -1202,6 +1535,9 @@ async fn ladder_record(
             refinement_version,
             laya_config_id: None,
             laya_config_version: None,
+            laya_invocation_id: None,
+            laya_request_hash: None,
+            laya_response_hash: None,
             actor_kind: ctx.actor_kind.clone(),
             actor_id: Some(ctx.actor_id),
             approval_id: input.approval_id,

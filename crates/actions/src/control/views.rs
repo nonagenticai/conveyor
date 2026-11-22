@@ -438,6 +438,12 @@ pub struct ApprovalOut {
     /// The answer the requester proposed (`meta.proposed_answer`).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub proposed_answer: Option<String>,
+    /// Whether a decision must carry an answer in its note (`meta.requires_answer`).
+    ///
+    /// A free-text question sets it, and the decision writer refuses an empty note on such a
+    /// gate, so the approvals screen renders an answer box instead of a bare approve/reject.
+    #[serde(default)]
+    pub requires_answer: bool,
     /// The decisions a responder may give (`meta.allowed_decisions`).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub allowed_decisions: Option<Value>,

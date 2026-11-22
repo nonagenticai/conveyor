@@ -30,6 +30,12 @@ pub struct PendingApproval {
     pub description: Option<String>,
     /// What the requester proposed, when recorded.
     pub proposed_answer: Option<String>,
+    /// Whether the gate demands an answer in the decision's note (`meta.requires_answer`).
+    ///
+    /// A free-text question sets it, and the one decision writer refuses an empty note on such
+    /// a gate on every channel. The offer must therefore advertise `answer <id> <text>`; a bare
+    /// approve/reject line would invite a decision the writer then refuses.
+    pub requires_answer: bool,
 }
 
 /// One dispatch row to close.
@@ -58,7 +64,8 @@ pub async fn pending_approvals_tx(
     sqlx::query_as(
         "SELECT id, gate, kind, eval_id,
                 coalesce(meta->>'description', meta->>'ask') AS description,
-                meta->>'proposed_answer' AS proposed_answer
+                meta->>'proposed_answer' AS proposed_answer,
+                coalesce(meta->>'requires_answer' = 'true', false) AS requires_answer
            FROM approval
           WHERE tenant_id = $1 AND status = 'pending'
           ORDER BY created_at, id
@@ -239,10 +246,20 @@ pub fn interaction_text(approval: &PendingApproval) -> String {
         text.push_str("\nproposed: ");
         text.push_str(proposed.trim());
     }
-    text.push_str(&format!(
-        "\nreply: approve {} [note] | reject {} [note]",
-        approval.id, approval.id
-    ));
+    // A question and a yes/no gate are answered differently. `answer` is the inbound grammar's
+    // word for "record this text as the response" (the decision writer treats an empty note on
+    // a requires-answer gate as no answer at all); a normal gate keeps approve/reject.
+    if approval.requires_answer {
+        text.push_str(&format!(
+            "\nanswer required: answer {} <text> | reject {} [note]",
+            approval.id, approval.id
+        ));
+    } else {
+        text.push_str(&format!(
+            "\nreply: approve {} [note] | reject {} [note]",
+            approval.id, approval.id
+        ));
+    }
     text
 }
 
@@ -277,4 +294,51 @@ pub async fn begin(
     tenant: TenantId,
 ) -> Result<sqlx::Transaction<'static, sqlx::Postgres>, sqlx::Error> {
     begin_scoped(db, tenant).await
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn pending(requires_answer: bool) -> PendingApproval {
+        PendingApproval {
+            id: Uuid::nil(),
+            gate: "hr.start_date".to_owned(),
+            kind: "gate".to_owned(),
+            eval_id: None,
+            description: Some("Which start date did you agree?".to_owned()),
+            proposed_answer: None,
+            requires_answer,
+        }
+    }
+
+    /// WP17b: a question that demands an answer tells the reader how to answer it. The inbound
+    /// grammar already parses `answer <id> <text>`; an offer that only names approve/reject
+    /// invites a decision the writer refuses, so the answer never reaches the gate.
+    #[test]
+    fn a_requires_answer_gate_advertises_the_answer_command() {
+        let text = interaction_text(&pending(true));
+        assert!(
+            text.contains(&format!("answer {} <text>", Uuid::nil())),
+            "{text}"
+        );
+        assert!(text.contains("answer required"), "{text}");
+        assert!(!text.contains("approve"), "{text}");
+    }
+
+    /// A yes/no gate is unchanged: its reply line still names approve and reject, and nothing
+    /// suggests an answer is owed.
+    #[test]
+    fn an_ordinary_gate_keeps_the_approve_and_reject_reply_line() {
+        let text = interaction_text(&pending(false));
+        assert!(
+            text.contains(&format!("approve {} [note]", Uuid::nil())),
+            "{text}"
+        );
+        assert!(
+            text.contains(&format!("reject {} [note]", Uuid::nil())),
+            "{text}"
+        );
+        assert!(!text.contains("answer required"), "{text}");
+    }
 }
