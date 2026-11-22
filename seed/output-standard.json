@@ -2460,12 +2460,13 @@
       "required": [
         "ART charter",
         "Solution intent",
-        "Backlog with WSJF"
+        "Backlog with WSJF",
+        "Shared configuration"
       ],
       "optional": [
         "Links"
       ],
-      "skeleton": "# Safe Art\n\nOne standards artefact, derived from the record or explicitly absent.\n\n## ART charter\n\nThe record the section derives from, or an explicit absence.\n\n## Solution intent\n\nThe record the section derives from, or an explicit absence.\n\n## Backlog with WSJF\n\nThe record the section derives from, or an explicit absence.\n",
+      "skeleton": "# Safe Art\n\nOne standards artefact, derived from the record or explicitly absent.\n\n## ART charter\n\nThe record the section derives from, or an explicit absence.\n\n## Solution intent\n\nThe record the section derives from, or an explicit absence.\n\n## Backlog with WSJF\n\nThe record the section derives from, or an explicit absence.\n\n## Shared configuration\n\nThe programme values every project inherits and the keys it locks against override.\n",
       "standard": "SAFe",
       "level": "programme",
       "subject_kind": "programme",
@@ -2488,9 +2489,19 @@
         ],
         "Backlog with WSJF": [
           {
-            "kind": "rows",
-            "file": "msp.json",
-            "pointer": "/wbs_nodes"
+            "kind": "computed",
+            "name": "wsjf_order",
+            "severity": "P1",
+            "match": {
+              "status": "accepted"
+            }
+          }
+        ],
+        "Shared configuration": [
+          {
+            "kind": "computed",
+            "name": "shared_config",
+            "severity": "P1"
           }
         ]
       }
@@ -3559,13 +3570,14 @@
         "Plan",
         "WSJF order",
         "Capacity and WIP",
-        "Evidence"
+        "Evidence",
+        "Dependencies",
+        "Backlog refinement"
       ],
       "optional": [
-        "Dependencies",
         "Links"
       ],
-      "skeleton": "# PI plan\n\nThe plan for one programme increment: the deliverables selected from the backlog, ordered by WSJF, within the WIP limit.\n\n## Objectives\n\nThe PI objectives this plan is judged against, with their planned business value.\n\n## Plan\n\nThe deliverables materialised for this increment, one per WBS node, with their project and acceptance.\n\n## WSJF order\n\nThe four typed inputs per candidate — business value, time criticality, risk reduction and job size — in the order the plan takes them. The score is computed, never stored.\n\n## Capacity and WIP\n\nThe capacity the plan is bounded by and the WIP limit it respects.\n\n## Evidence\n\nThe backlog rows, the cadence row and the approval that made this the plan.\n\n## Dependencies\n\nThe cross-project dependencies the order is constrained by.\n\n## Links\n\nThe cadence, the objectives and the tranche this plan belongs to.\n",
+      "skeleton": "# PI plan\n\nThe plan for one programme increment: the deliverables selected from the backlog, ordered by WSJF, within the WIP limit.\n\n## Objectives\n\nThe PI objectives this plan is judged against, with their planned business value.\n\n## Plan\n\nThe deliverables materialised for this increment, one per WBS node, with their project and acceptance.\n\n## WSJF order\n\nThe four typed inputs per candidate — business value, time criticality, risk reduction and job size — in the order the plan takes them. The score is computed, never stored.\n\n## Capacity and WIP\n\nThe capacity the plan is bounded by and the WIP limit it respects.\n\n## Evidence\n\nThe backlog rows, the cadence row and the approval that made this the plan.\n\n## Dependencies\n\nThe cross-project dependencies the order is constrained by.\n\n## Links\n\nThe cadence, the objectives and the tranche this plan belongs to.\n\n## Backlog refinement\n\nThe refinement cadence that re-scored the backlog before this plan was taken.\n",
       "standard": "SAFe",
       "level": "programme",
       "subject_kind": "programme",
@@ -3593,9 +3605,12 @@
         ],
         "WSJF order": [
           {
-            "kind": "rows",
-            "file": "msp.json",
-            "pointer": "/wbs_nodes"
+            "kind": "computed",
+            "name": "wsjf_order",
+            "severity": "P1",
+            "match": {
+              "status": "accepted"
+            }
           }
         ],
         "Capacity and WIP": [
@@ -3622,6 +3637,20 @@
             "kind": "rows",
             "file": "msp.json",
             "pointer": "/cadences"
+          }
+        ],
+        "Dependencies": [
+          {
+            "kind": "computed",
+            "name": "dependency_graph",
+            "severity": "P1"
+          }
+        ],
+        "Backlog refinement": [
+          {
+            "kind": "computed",
+            "name": "refinement_cadence",
+            "severity": "P1"
           }
         ]
       }
@@ -3668,7 +3697,7 @@
             "kind": "rows",
             "file": "msp.json",
             "pointer": "/demo_credits",
-            "optional": true
+            "severity": "P1"
           }
         ],
         "Evidence": [
@@ -3685,7 +3714,7 @@
             "kind": "rows",
             "file": "msp.json",
             "pointer": "/demo_credits",
-            "optional": true
+            "severity": "P1"
           }
         ]
       }
@@ -3723,7 +3752,7 @@
             "kind": "rows",
             "file": "msp.json",
             "pointer": "/demo_credits",
-            "optional": true
+            "severity": "P1"
           }
         ],
         "Credits": [
@@ -3731,7 +3760,7 @@
             "kind": "rows",
             "file": "msp.json",
             "pointer": "/demo_credits",
-            "optional": true
+            "severity": "P1"
           }
         ],
         "Findings": [
@@ -3752,12 +3781,13 @@
         "What went well",
         "What did not",
         "Lessons",
-        "Actions"
+        "Actions",
+        "Kata candidates"
       ],
       "optional": [
         "Links"
       ],
-      "skeleton": "# Inspect and adapt\n\nThe retro record for one programme increment: what the evidence showed, the lessons it produced and the actions it set.\n\n## What went well\n\nThe practices and decisions the evidence supports keeping.\n\n## What did not\n\nThe failures, delays and bypasses the evidence exposed, named plainly.\n\n## Lessons\n\nOne lesson per finding, as the organisational-memory record; a retro with no lessons is refused.\n\n## Actions\n\nThe actions, owners and dates that follow from the lessons.\n\n## Links\n\nThe retro cadence, the lessons and the tranche review.\n",
+      "skeleton": "# Inspect and adapt\n\nThe retro record for one programme increment: what the evidence showed, the lessons it produced and the actions it set.\n\n## What went well\n\nThe practices and decisions the evidence supports keeping.\n\n## What did not\n\nThe failures, delays and bypasses the evidence exposed, named plainly.\n\n## Lessons\n\nOne lesson per finding, as the organisational-memory record; a retro with no lessons is refused.\n\n## Actions\n\nThe actions, owners and dates that follow from the lessons.\n\n## Links\n\nThe retro cadence, the lessons and the tranche review.\n\n## Kata candidates\n\nThe systemic classes the retro raises as kata candidates, each with its evidence.\n",
       "standard": "SAFe",
       "level": "programme",
       "subject_kind": "programme",
@@ -3792,7 +3822,7 @@
             "kind": "rows",
             "file": "msp.json",
             "pointer": "/lessons",
-            "optional": true
+            "severity": "P1"
           }
         ],
         "Actions": [
@@ -3800,7 +3830,14 @@
             "kind": "rows",
             "file": "msp.json",
             "pointer": "/lessons",
-            "optional": true
+            "severity": "P1"
+          }
+        ],
+        "Kata candidates": [
+          {
+            "kind": "computed",
+            "name": "kata_candidates",
+            "severity": "P1"
           }
         ]
       }

@@ -1,6 +1,696 @@
 window.CONVEYOR_STANDARDS = {
   "artefacts": [
     {
+      "category": "benefit-evaluation",
+      "covered_key": "",
+      "covered_rule": "",
+      "document": {
+        "path": "docs/standards/std-msp-benefit-evaluation-b1.html",
+        "sha256": "3ec47c658bb061b3d62656bfe8b7c6ae525685081060af04af53768cd26e6a4d"
+      },
+      "gate": {
+        "approval_id": "",
+        "kind": "",
+        "state": "not recorded"
+      },
+      "id": "std-msp-benefit-evaluation-b1",
+      "level": "programme",
+      "mandatory": true,
+      "owner_project": "PLATFORM",
+      "package_key": "std-msp-benefit-evaluation-b1:PLATFORM",
+      "package_published": true,
+      "sections": [
+        {
+          "heading": "Baseline and target",
+          "missing": [],
+          "required": true,
+          "severity": "",
+          "sources": [
+            {
+              "count": 1,
+              "file": "msp.json",
+              "items": [
+                {
+                  "id": "01a1e9de-4e4f-757e-a8c8-bf3522e5adcf",
+                  "status": "draft",
+                  "title": "Auditable decisions"
+                }
+              ],
+              "kind": "rows",
+              "pointer": "/benefit_profiles"
+            }
+          ],
+          "status": "evidenced"
+        },
+        {
+          "heading": "Measurement method",
+          "missing": [],
+          "required": true,
+          "severity": "",
+          "sources": [
+            {
+              "count": 1,
+              "file": "msp.json",
+              "items": [
+                {
+                  "id": "01a1e9de-4e4f-757e-a8c8-bf3522e5adcf",
+                  "status": "draft",
+                  "title": "Auditable decisions"
+                }
+              ],
+              "kind": "rows",
+              "pointer": "/benefit_profiles"
+            }
+          ],
+          "status": "evidenced"
+        },
+        {
+          "heading": "Actuals and variance",
+          "missing": [
+            "No row or document satisfies 'Actuals and variance'; a document exists but lacks the heading"
+          ],
+          "required": true,
+          "severity": "",
+          "sources": [
+            {
+              "count": 0,
+              "file": "msp.json",
+              "items": [],
+              "kind": "rows",
+              "pointer": "/benefit_transitions"
+            }
+          ],
+          "status": "partial"
+        },
+        {
+          "heading": "Decision",
+          "missing": [
+            "No row or document satisfies 'Decision'; a document exists but lacks the heading"
+          ],
+          "required": true,
+          "severity": "",
+          "sources": [
+            {
+              "count": 0,
+              "file": "msp.json",
+              "items": [],
+              "kind": "rows",
+              "pointer": "/benefit_transitions"
+            }
+          ],
+          "status": "partial"
+        }
+      ],
+      "spec": "§8.3",
+      "standard": "MSP",
+      "status": "partial",
+      "subject": {
+        "id": "01a1e9de-4e4f-757e-a8c8-bf3522e5adcf",
+        "key": "B1",
+        "kind": "benefit",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "",
+        "title": "Auditable decisions"
+      },
+      "subject_kind": "benefit",
+      "title": "Benefit Evaluation — Auditable decisions"
+    },
+    {
+      "category": "benefit-evaluation",
+      "covered_key": "",
+      "covered_rule": "",
+      "document": {
+        "path": "docs/standards/std-msp-benefit-evaluation-b2.html",
+        "sha256": "18199ac5091254f7a576de9f04c05bbe44874dfd6b8f002df50af105c34d3c12"
+      },
+      "gate": {
+        "approval_id": "",
+        "kind": "",
+        "state": "not recorded"
+      },
+      "id": "std-msp-benefit-evaluation-b2",
+      "level": "programme",
+      "mandatory": true,
+      "owner_project": "PLATFORM",
+      "package_key": "std-msp-benefit-evaluation-b2:PLATFORM",
+      "package_published": true,
+      "sections": [
+        {
+          "heading": "Baseline and target",
+          "missing": [],
+          "required": true,
+          "severity": "",
+          "sources": [
+            {
+              "count": 1,
+              "file": "msp.json",
+              "items": [
+                {
+                  "id": "01a1e9df-0308-7fdc-8492-32db1e582a2d",
+                  "status": "draft",
+                  "title": "Less bespoke tooling"
+                }
+              ],
+              "kind": "rows",
+              "pointer": "/benefit_profiles"
+            }
+          ],
+          "status": "evidenced"
+        },
+        {
+          "heading": "Measurement method",
+          "missing": [],
+          "required": true,
+          "severity": "",
+          "sources": [
+            {
+              "count": 1,
+              "file": "msp.json",
+              "items": [
+                {
+                  "id": "01a1e9df-0308-7fdc-8492-32db1e582a2d",
+                  "status": "draft",
+                  "title": "Less bespoke tooling"
+                }
+              ],
+              "kind": "rows",
+              "pointer": "/benefit_profiles"
+            }
+          ],
+          "status": "evidenced"
+        },
+        {
+          "heading": "Actuals and variance",
+          "missing": [
+            "No row or document satisfies 'Actuals and variance'; a document exists but lacks the heading"
+          ],
+          "required": true,
+          "severity": "",
+          "sources": [
+            {
+              "count": 0,
+              "file": "msp.json",
+              "items": [],
+              "kind": "rows",
+              "pointer": "/benefit_transitions"
+            }
+          ],
+          "status": "partial"
+        },
+        {
+          "heading": "Decision",
+          "missing": [
+            "No row or document satisfies 'Decision'; a document exists but lacks the heading"
+          ],
+          "required": true,
+          "severity": "",
+          "sources": [
+            {
+              "count": 0,
+              "file": "msp.json",
+              "items": [],
+              "kind": "rows",
+              "pointer": "/benefit_transitions"
+            }
+          ],
+          "status": "partial"
+        }
+      ],
+      "spec": "§8.3",
+      "standard": "MSP",
+      "status": "partial",
+      "subject": {
+        "id": "01a1e9df-0308-7fdc-8492-32db1e582a2d",
+        "key": "B2",
+        "kind": "benefit",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "",
+        "title": "Less bespoke tooling"
+      },
+      "subject_kind": "benefit",
+      "title": "Benefit Evaluation — Less bespoke tooling"
+    },
+    {
+      "category": "benefit-evaluation",
+      "covered_key": "",
+      "covered_rule": "",
+      "document": {
+        "path": "docs/standards/std-msp-benefit-evaluation-b3.html",
+        "sha256": "7f3bb41cf37ed302bc31145349bc22245f26bff1717ee8e6f96573cab1abaee0"
+      },
+      "gate": {
+        "approval_id": "",
+        "kind": "",
+        "state": "not recorded"
+      },
+      "id": "std-msp-benefit-evaluation-b3",
+      "level": "programme",
+      "mandatory": true,
+      "owner_project": "PLATFORM",
+      "package_key": "std-msp-benefit-evaluation-b3:PLATFORM",
+      "package_published": true,
+      "sections": [
+        {
+          "heading": "Baseline and target",
+          "missing": [],
+          "required": true,
+          "severity": "",
+          "sources": [
+            {
+              "count": 1,
+              "file": "msp.json",
+              "items": [
+                {
+                  "id": "01a1e9df-0c4b-7807-b35c-5810ec418d45",
+                  "status": "draft",
+                  "title": "Self-development"
+                }
+              ],
+              "kind": "rows",
+              "pointer": "/benefit_profiles"
+            }
+          ],
+          "status": "evidenced"
+        },
+        {
+          "heading": "Measurement method",
+          "missing": [],
+          "required": true,
+          "severity": "",
+          "sources": [
+            {
+              "count": 1,
+              "file": "msp.json",
+              "items": [
+                {
+                  "id": "01a1e9df-0c4b-7807-b35c-5810ec418d45",
+                  "status": "draft",
+                  "title": "Self-development"
+                }
+              ],
+              "kind": "rows",
+              "pointer": "/benefit_profiles"
+            }
+          ],
+          "status": "evidenced"
+        },
+        {
+          "heading": "Actuals and variance",
+          "missing": [
+            "No row or document satisfies 'Actuals and variance'; a document exists but lacks the heading"
+          ],
+          "required": true,
+          "severity": "",
+          "sources": [
+            {
+              "count": 0,
+              "file": "msp.json",
+              "items": [],
+              "kind": "rows",
+              "pointer": "/benefit_transitions"
+            }
+          ],
+          "status": "partial"
+        },
+        {
+          "heading": "Decision",
+          "missing": [
+            "No row or document satisfies 'Decision'; a document exists but lacks the heading"
+          ],
+          "required": true,
+          "severity": "",
+          "sources": [
+            {
+              "count": 0,
+              "file": "msp.json",
+              "items": [],
+              "kind": "rows",
+              "pointer": "/benefit_transitions"
+            }
+          ],
+          "status": "partial"
+        }
+      ],
+      "spec": "§8.3",
+      "standard": "MSP",
+      "status": "partial",
+      "subject": {
+        "id": "01a1e9df-0c4b-7807-b35c-5810ec418d45",
+        "key": "B3",
+        "kind": "benefit",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "",
+        "title": "Self-development"
+      },
+      "subject_kind": "benefit",
+      "title": "Benefit Evaluation — Self-development"
+    },
+    {
+      "category": "benefit-evaluation",
+      "covered_key": "",
+      "covered_rule": "",
+      "document": {
+        "path": "docs/standards/std-msp-benefit-evaluation-b4.html",
+        "sha256": "0a2d34e3971d03ef74a8ca94b6921c2aa581d06705630904f64c3ac8630c3247"
+      },
+      "gate": {
+        "approval_id": "",
+        "kind": "",
+        "state": "not recorded"
+      },
+      "id": "std-msp-benefit-evaluation-b4",
+      "level": "programme",
+      "mandatory": true,
+      "owner_project": "PLATFORM",
+      "package_key": "std-msp-benefit-evaluation-b4:PLATFORM",
+      "package_published": true,
+      "sections": [
+        {
+          "heading": "Baseline and target",
+          "missing": [],
+          "required": true,
+          "severity": "",
+          "sources": [
+            {
+              "count": 1,
+              "file": "msp.json",
+              "items": [
+                {
+                  "id": "01a1e9df-1592-79a5-839e-037d8fe4251b",
+                  "status": "draft",
+                  "title": "Public collaboration"
+                }
+              ],
+              "kind": "rows",
+              "pointer": "/benefit_profiles"
+            }
+          ],
+          "status": "evidenced"
+        },
+        {
+          "heading": "Measurement method",
+          "missing": [],
+          "required": true,
+          "severity": "",
+          "sources": [
+            {
+              "count": 1,
+              "file": "msp.json",
+              "items": [
+                {
+                  "id": "01a1e9df-1592-79a5-839e-037d8fe4251b",
+                  "status": "draft",
+                  "title": "Public collaboration"
+                }
+              ],
+              "kind": "rows",
+              "pointer": "/benefit_profiles"
+            }
+          ],
+          "status": "evidenced"
+        },
+        {
+          "heading": "Actuals and variance",
+          "missing": [
+            "No row or document satisfies 'Actuals and variance'; a document exists but lacks the heading"
+          ],
+          "required": true,
+          "severity": "",
+          "sources": [
+            {
+              "count": 0,
+              "file": "msp.json",
+              "items": [],
+              "kind": "rows",
+              "pointer": "/benefit_transitions"
+            }
+          ],
+          "status": "partial"
+        },
+        {
+          "heading": "Decision",
+          "missing": [
+            "No row or document satisfies 'Decision'; a document exists but lacks the heading"
+          ],
+          "required": true,
+          "severity": "",
+          "sources": [
+            {
+              "count": 0,
+              "file": "msp.json",
+              "items": [],
+              "kind": "rows",
+              "pointer": "/benefit_transitions"
+            }
+          ],
+          "status": "partial"
+        }
+      ],
+      "spec": "§8.3",
+      "standard": "MSP",
+      "status": "partial",
+      "subject": {
+        "id": "01a1e9df-1592-79a5-839e-037d8fe4251b",
+        "key": "B4",
+        "kind": "benefit",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "",
+        "title": "Public collaboration"
+      },
+      "subject_kind": "benefit",
+      "title": "Benefit Evaluation — Public collaboration"
+    },
+    {
+      "category": "benefit-evaluation",
+      "covered_key": "",
+      "covered_rule": "",
+      "document": {
+        "path": "docs/standards/std-msp-benefit-evaluation-b5.html",
+        "sha256": "83c74aefc4937928e8da4d5e7ead6dd5b8474b31cf216758c62f33e14b432ec1"
+      },
+      "gate": {
+        "approval_id": "",
+        "kind": "",
+        "state": "not recorded"
+      },
+      "id": "std-msp-benefit-evaluation-b5",
+      "level": "programme",
+      "mandatory": true,
+      "owner_project": "PLATFORM",
+      "package_key": "std-msp-benefit-evaluation-b5:PLATFORM",
+      "package_published": true,
+      "sections": [
+        {
+          "heading": "Baseline and target",
+          "missing": [],
+          "required": true,
+          "severity": "",
+          "sources": [
+            {
+              "count": 1,
+              "file": "msp.json",
+              "items": [
+                {
+                  "id": "01a1e9df-1e42-7199-87e1-23c577c62f8e",
+                  "status": "draft",
+                  "title": "One model"
+                }
+              ],
+              "kind": "rows",
+              "pointer": "/benefit_profiles"
+            }
+          ],
+          "status": "evidenced"
+        },
+        {
+          "heading": "Measurement method",
+          "missing": [],
+          "required": true,
+          "severity": "",
+          "sources": [
+            {
+              "count": 1,
+              "file": "msp.json",
+              "items": [
+                {
+                  "id": "01a1e9df-1e42-7199-87e1-23c577c62f8e",
+                  "status": "draft",
+                  "title": "One model"
+                }
+              ],
+              "kind": "rows",
+              "pointer": "/benefit_profiles"
+            }
+          ],
+          "status": "evidenced"
+        },
+        {
+          "heading": "Actuals and variance",
+          "missing": [
+            "No row or document satisfies 'Actuals and variance'; a document exists but lacks the heading"
+          ],
+          "required": true,
+          "severity": "",
+          "sources": [
+            {
+              "count": 0,
+              "file": "msp.json",
+              "items": [],
+              "kind": "rows",
+              "pointer": "/benefit_transitions"
+            }
+          ],
+          "status": "partial"
+        },
+        {
+          "heading": "Decision",
+          "missing": [
+            "No row or document satisfies 'Decision'; a document exists but lacks the heading"
+          ],
+          "required": true,
+          "severity": "",
+          "sources": [
+            {
+              "count": 0,
+              "file": "msp.json",
+              "items": [],
+              "kind": "rows",
+              "pointer": "/benefit_transitions"
+            }
+          ],
+          "status": "partial"
+        }
+      ],
+      "spec": "§8.3",
+      "standard": "MSP",
+      "status": "partial",
+      "subject": {
+        "id": "01a1e9df-1e42-7199-87e1-23c577c62f8e",
+        "key": "B5",
+        "kind": "benefit",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "",
+        "title": "One model"
+      },
+      "subject_kind": "benefit",
+      "title": "Benefit Evaluation — One model"
+    },
+    {
+      "category": "benefit-evaluation",
+      "covered_key": "",
+      "covered_rule": "",
+      "document": {
+        "path": "docs/standards/std-msp-benefit-evaluation-b6.html",
+        "sha256": "ce9f141b4330b8c69b4db76d4be73715326f8d98cf7bc5cae3b18b0fc334e8b9"
+      },
+      "gate": {
+        "approval_id": "",
+        "kind": "",
+        "state": "not recorded"
+      },
+      "id": "std-msp-benefit-evaluation-b6",
+      "level": "programme",
+      "mandatory": true,
+      "owner_project": "PLATFORM",
+      "package_key": "std-msp-benefit-evaluation-b6:PLATFORM",
+      "package_published": true,
+      "sections": [
+        {
+          "heading": "Baseline and target",
+          "missing": [],
+          "required": true,
+          "severity": "",
+          "sources": [
+            {
+              "count": 1,
+              "file": "msp.json",
+              "items": [
+                {
+                  "id": "01a1e9df-27b8-7827-ae4e-6d48ca5904e8",
+                  "status": "draft",
+                  "title": "Predictable delivery"
+                }
+              ],
+              "kind": "rows",
+              "pointer": "/benefit_profiles"
+            }
+          ],
+          "status": "evidenced"
+        },
+        {
+          "heading": "Measurement method",
+          "missing": [],
+          "required": true,
+          "severity": "",
+          "sources": [
+            {
+              "count": 1,
+              "file": "msp.json",
+              "items": [
+                {
+                  "id": "01a1e9df-27b8-7827-ae4e-6d48ca5904e8",
+                  "status": "draft",
+                  "title": "Predictable delivery"
+                }
+              ],
+              "kind": "rows",
+              "pointer": "/benefit_profiles"
+            }
+          ],
+          "status": "evidenced"
+        },
+        {
+          "heading": "Actuals and variance",
+          "missing": [
+            "No row or document satisfies 'Actuals and variance'; a document exists but lacks the heading"
+          ],
+          "required": true,
+          "severity": "",
+          "sources": [
+            {
+              "count": 0,
+              "file": "msp.json",
+              "items": [],
+              "kind": "rows",
+              "pointer": "/benefit_transitions"
+            }
+          ],
+          "status": "partial"
+        },
+        {
+          "heading": "Decision",
+          "missing": [
+            "No row or document satisfies 'Decision'; a document exists but lacks the heading"
+          ],
+          "required": true,
+          "severity": "",
+          "sources": [
+            {
+              "count": 0,
+              "file": "msp.json",
+              "items": [],
+              "kind": "rows",
+              "pointer": "/benefit_transitions"
+            }
+          ],
+          "status": "partial"
+        }
+      ],
+      "spec": "§8.3",
+      "standard": "MSP",
+      "status": "partial",
+      "subject": {
+        "id": "01a1e9df-27b8-7827-ae4e-6d48ca5904e8",
+        "key": "B6",
+        "kind": "benefit",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "",
+        "title": "Predictable delivery"
+      },
+      "subject_kind": "benefit",
+      "title": "Benefit Evaluation — Predictable delivery"
+    },
+    {
       "category": "benefit-profile",
       "covered_rule": "",
       "document": {
@@ -996,7 +1686,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-benefit-transition-b1.html",
-        "sha256": "991f80b1463725ab05c6a31b7738b0ea12079e5d31a45c1152babd1b4cac2bb4"
+        "sha256": "e7bee1da4837c7680087c13083a1fe3b223ee75eff99ccbcc0e86dc14c1e1057"
       },
       "gate": {
         "approval_id": "",
@@ -1013,7 +1703,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Baseline measurement",
           "missing": [
-            "No row or document satisfies 'Baseline measurement'"
+            "No row or document satisfies 'Baseline measurement'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -1026,12 +1716,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/benefit_transitions"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Readiness",
           "missing": [
-            "No row or document satisfies 'Readiness'"
+            "No row or document satisfies 'Readiness'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -1044,12 +1734,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/benefit_transitions"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Transition",
           "missing": [
-            "No row or document satisfies 'Transition'"
+            "No row or document satisfies 'Transition'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -1062,12 +1752,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/benefit_transitions"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Post-transition measurement",
           "missing": [
-            "No row or document satisfies 'Post-transition measurement'"
+            "No row or document satisfies 'Post-transition measurement'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -1080,12 +1770,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/benefit_transitions"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Legacy retirement",
           "missing": [
-            "No row or document satisfies 'Legacy retirement'"
+            "No row or document satisfies 'Legacy retirement'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -1098,7 +1788,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/benefit_transitions"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.3",
@@ -1121,7 +1811,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-benefit-transition-b2.html",
-        "sha256": "785c0a0b62a11bfcff277e26df1e936675e5bab4cc095bc8b7bd28ceaca3fef3"
+        "sha256": "b7ae78b7fc43fef1ec1ecfb63450ea00cacc912d10b006476eea123fafb7ace4"
       },
       "gate": {
         "approval_id": "",
@@ -1138,7 +1828,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Baseline measurement",
           "missing": [
-            "No row or document satisfies 'Baseline measurement'"
+            "No row or document satisfies 'Baseline measurement'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -1151,12 +1841,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/benefit_transitions"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Readiness",
           "missing": [
-            "No row or document satisfies 'Readiness'"
+            "No row or document satisfies 'Readiness'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -1169,12 +1859,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/benefit_transitions"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Transition",
           "missing": [
-            "No row or document satisfies 'Transition'"
+            "No row or document satisfies 'Transition'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -1187,12 +1877,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/benefit_transitions"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Post-transition measurement",
           "missing": [
-            "No row or document satisfies 'Post-transition measurement'"
+            "No row or document satisfies 'Post-transition measurement'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -1205,12 +1895,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/benefit_transitions"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Legacy retirement",
           "missing": [
-            "No row or document satisfies 'Legacy retirement'"
+            "No row or document satisfies 'Legacy retirement'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -1223,7 +1913,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/benefit_transitions"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.3",
@@ -1246,7 +1936,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-benefit-transition-b3.html",
-        "sha256": "f0a8ffaf1f0e11c4fd66e701a5ebdd1cc60169bcf9d5734f38bd73aab5cd7621"
+        "sha256": "07a51002ddb01bd0782509712c8ecc6129c062070036f65cefe4845f08de97db"
       },
       "gate": {
         "approval_id": "",
@@ -1263,7 +1953,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Baseline measurement",
           "missing": [
-            "No row or document satisfies 'Baseline measurement'"
+            "No row or document satisfies 'Baseline measurement'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -1276,12 +1966,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/benefit_transitions"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Readiness",
           "missing": [
-            "No row or document satisfies 'Readiness'"
+            "No row or document satisfies 'Readiness'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -1294,12 +1984,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/benefit_transitions"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Transition",
           "missing": [
-            "No row or document satisfies 'Transition'"
+            "No row or document satisfies 'Transition'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -1312,12 +2002,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/benefit_transitions"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Post-transition measurement",
           "missing": [
-            "No row or document satisfies 'Post-transition measurement'"
+            "No row or document satisfies 'Post-transition measurement'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -1330,12 +2020,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/benefit_transitions"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Legacy retirement",
           "missing": [
-            "No row or document satisfies 'Legacy retirement'"
+            "No row or document satisfies 'Legacy retirement'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -1348,7 +2038,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/benefit_transitions"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.3",
@@ -1371,7 +2061,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-benefit-transition-b4.html",
-        "sha256": "a640fac19444312485b46d70b0c0b38aa9f4bf070ebd7f8fadb2152cfcf0b776"
+        "sha256": "45764d7ec9378859fd7125f59b766d8ab1f79a8723d9bd3ddd7f15b2c5a66e16"
       },
       "gate": {
         "approval_id": "",
@@ -1388,7 +2078,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Baseline measurement",
           "missing": [
-            "No row or document satisfies 'Baseline measurement'"
+            "No row or document satisfies 'Baseline measurement'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -1401,12 +2091,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/benefit_transitions"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Readiness",
           "missing": [
-            "No row or document satisfies 'Readiness'"
+            "No row or document satisfies 'Readiness'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -1419,12 +2109,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/benefit_transitions"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Transition",
           "missing": [
-            "No row or document satisfies 'Transition'"
+            "No row or document satisfies 'Transition'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -1437,12 +2127,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/benefit_transitions"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Post-transition measurement",
           "missing": [
-            "No row or document satisfies 'Post-transition measurement'"
+            "No row or document satisfies 'Post-transition measurement'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -1455,12 +2145,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/benefit_transitions"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Legacy retirement",
           "missing": [
-            "No row or document satisfies 'Legacy retirement'"
+            "No row or document satisfies 'Legacy retirement'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -1473,7 +2163,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/benefit_transitions"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.3",
@@ -1496,7 +2186,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-benefit-transition-b5.html",
-        "sha256": "e7562ce323a0efe97e1fdd2cb342c3b9aa7ea3f465026d110974c2dfa9501819"
+        "sha256": "1a89bbb9ed3b2689703ff9b0a304b42cfdcafeec432de9c07de9129ef5d59389"
       },
       "gate": {
         "approval_id": "",
@@ -1513,7 +2203,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Baseline measurement",
           "missing": [
-            "No row or document satisfies 'Baseline measurement'"
+            "No row or document satisfies 'Baseline measurement'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -1526,12 +2216,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/benefit_transitions"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Readiness",
           "missing": [
-            "No row or document satisfies 'Readiness'"
+            "No row or document satisfies 'Readiness'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -1544,12 +2234,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/benefit_transitions"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Transition",
           "missing": [
-            "No row or document satisfies 'Transition'"
+            "No row or document satisfies 'Transition'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -1562,12 +2252,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/benefit_transitions"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Post-transition measurement",
           "missing": [
-            "No row or document satisfies 'Post-transition measurement'"
+            "No row or document satisfies 'Post-transition measurement'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -1580,12 +2270,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/benefit_transitions"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Legacy retirement",
           "missing": [
-            "No row or document satisfies 'Legacy retirement'"
+            "No row or document satisfies 'Legacy retirement'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -1598,7 +2288,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/benefit_transitions"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.3",
@@ -1621,7 +2311,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-benefit-transition-b6.html",
-        "sha256": "fbd45dce5d3d000a603c61731f851a0e49aa9f2759ce1762ef0539e5af78c80e"
+        "sha256": "4d703306918f641da79cb5fef86c33299ea97acccb6d7c4ba73005aa19529a1a"
       },
       "gate": {
         "approval_id": "",
@@ -1638,7 +2328,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Baseline measurement",
           "missing": [
-            "No row or document satisfies 'Baseline measurement'"
+            "No row or document satisfies 'Baseline measurement'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -1651,12 +2341,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/benefit_transitions"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Readiness",
           "missing": [
-            "No row or document satisfies 'Readiness'"
+            "No row or document satisfies 'Readiness'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -1669,12 +2359,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/benefit_transitions"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Transition",
           "missing": [
-            "No row or document satisfies 'Transition'"
+            "No row or document satisfies 'Transition'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -1687,12 +2377,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/benefit_transitions"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Post-transition measurement",
           "missing": [
-            "No row or document satisfies 'Post-transition measurement'"
+            "No row or document satisfies 'Post-transition measurement'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -1705,12 +2395,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/benefit_transitions"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Legacy retirement",
           "missing": [
-            "No row or document satisfies 'Legacy retirement'"
+            "No row or document satisfies 'Legacy retirement'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -1723,7 +2413,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/benefit_transitions"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.3",
@@ -1913,6 +2603,180 @@ window.CONVEYOR_STANDARDS = {
       "title": "Benefits Map — conveyor buildout"
     },
     {
+      "category": "benefits-registry",
+      "covered_rule": "",
+      "document": {
+        "path": "docs/standards/std-msp-benefits-registry-01a1d039-0d24-7d16-ae52-4841e96ccfac.html",
+        "sha256": "9781faa3ef5a8ef156ca1f167c94df66b7dbb30f5c3a24afc82d87981fb17e6b"
+      },
+      "gate": {
+        "approval_id": "",
+        "kind": "",
+        "state": "not recorded"
+      },
+      "id": "std-msp-benefits-registry-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+      "level": "programme",
+      "mandatory": true,
+      "owner_project": "PLATFORM",
+      "package_key": "std-msp-benefits-registry-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM",
+      "sections": [
+        {
+          "heading": "Benefit profiles",
+          "missing": [],
+          "required": true,
+          "severity": "",
+          "sources": [
+            {
+              "count": 6,
+              "file": "msp.json",
+              "items": [
+                {
+                  "id": "01a1e9de-4e4f-757e-a8c8-bf3522e5adcf",
+                  "status": "draft",
+                  "title": "Auditable decisions"
+                },
+                {
+                  "id": "01a1e9df-0308-7fdc-8492-32db1e582a2d",
+                  "status": "draft",
+                  "title": "Less bespoke tooling"
+                },
+                {
+                  "id": "01a1e9df-0c4b-7807-b35c-5810ec418d45",
+                  "status": "draft",
+                  "title": "Self-development"
+                },
+                {
+                  "id": "01a1e9df-1592-79a5-839e-037d8fe4251b",
+                  "status": "draft",
+                  "title": "Public collaboration"
+                },
+                {
+                  "id": "01a1e9df-1e42-7199-87e1-23c577c62f8e",
+                  "status": "draft",
+                  "title": "One model"
+                },
+                {
+                  "id": "01a1e9df-27b8-7827-ae4e-6d48ca5904e8",
+                  "status": "draft",
+                  "title": "Predictable delivery"
+                }
+              ],
+              "kind": "rows",
+              "pointer": "/benefit_profiles"
+            }
+          ],
+          "status": "evidenced"
+        },
+        {
+          "heading": "Map",
+          "missing": [],
+          "required": true,
+          "severity": "",
+          "sources": [
+            {
+              "count": 6,
+              "file": "msp.json",
+              "items": [
+                {
+                  "id": "01a1e9df-6063-783c-a130-075067d33a17",
+                  "status": "",
+                  "title": "01a1e9df-6063-783c-a130-075067d33a17"
+                },
+                {
+                  "id": "01a1e9df-6a8a-7e0c-bf4b-022848d53774",
+                  "status": "",
+                  "title": "01a1e9df-6a8a-7e0c-bf4b-022848d53774"
+                },
+                {
+                  "id": "01a1e9df-732b-78a5-9b34-779be11092c5",
+                  "status": "",
+                  "title": "01a1e9df-732b-78a5-9b34-779be11092c5"
+                },
+                {
+                  "id": "01a1e9df-7f1f-769c-bd17-8f71322cc505",
+                  "status": "",
+                  "title": "01a1e9df-7f1f-769c-bd17-8f71322cc505"
+                },
+                {
+                  "id": "01a1e9df-87b8-7761-ae0d-f5bb03c66628",
+                  "status": "",
+                  "title": "01a1e9df-87b8-7761-ae0d-f5bb03c66628"
+                },
+                {
+                  "id": "01a1e9df-9066-70a9-8050-e86503fb1b7e",
+                  "status": "",
+                  "title": "01a1e9df-9066-70a9-8050-e86503fb1b7e"
+                }
+              ],
+              "kind": "rows",
+              "pointer": "/benefit_links"
+            }
+          ],
+          "status": "evidenced"
+        },
+        {
+          "heading": "Ownership",
+          "missing": [],
+          "required": true,
+          "severity": "",
+          "sources": [
+            {
+              "count": 6,
+              "file": "msp.json",
+              "items": [
+                {
+                  "id": "01a1e9de-4e4f-757e-a8c8-bf3522e5adcf",
+                  "status": "draft",
+                  "title": "Auditable decisions"
+                },
+                {
+                  "id": "01a1e9df-0308-7fdc-8492-32db1e582a2d",
+                  "status": "draft",
+                  "title": "Less bespoke tooling"
+                },
+                {
+                  "id": "01a1e9df-0c4b-7807-b35c-5810ec418d45",
+                  "status": "draft",
+                  "title": "Self-development"
+                },
+                {
+                  "id": "01a1e9df-1592-79a5-839e-037d8fe4251b",
+                  "status": "draft",
+                  "title": "Public collaboration"
+                },
+                {
+                  "id": "01a1e9df-1e42-7199-87e1-23c577c62f8e",
+                  "status": "draft",
+                  "title": "One model"
+                },
+                {
+                  "id": "01a1e9df-27b8-7827-ae4e-6d48ca5904e8",
+                  "status": "draft",
+                  "title": "Predictable delivery"
+                }
+              ],
+              "kind": "rows",
+              "pointer": "/benefit_profiles"
+            }
+          ],
+          "status": "evidenced"
+        }
+      ],
+      "spec": "§8.3",
+      "standard": "MSP",
+      "status": "evidenced",
+      "subject": {
+        "id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "key": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "kind": "programme",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "",
+        "title": "conveyor buildout"
+      },
+      "subject_kind": "programme",
+      "title": "Benefits Registry — conveyor buildout"
+    },
+    {
       "category": "benefits-strategy",
       "covered_rule": "",
       "document": {
@@ -2064,7 +2928,17 @@ window.CONVEYOR_STANDARDS = {
           ],
           "required": true,
           "severity": "",
-          "sources": [],
+          "sources": [
+            {
+              "category": "blueprint",
+              "count": 0,
+              "file": "artefacts.json",
+              "items": [],
+              "kind": "documents",
+              "pointer": "/documents",
+              "scope": "programme"
+            }
+          ],
           "status": "partial"
         },
         {
@@ -2367,7 +3241,17 @@ window.CONVEYOR_STANDARDS = {
           ],
           "required": true,
           "severity": "",
-          "sources": [],
+          "sources": [
+            {
+              "category": "governance",
+              "count": 0,
+              "file": "artefacts.json",
+              "items": [],
+              "kind": "documents",
+              "pointer": "/documents",
+              "scope": "programme"
+            }
+          ],
           "status": "partial"
         },
         {
@@ -2416,12 +3300,119 @@ window.CONVEYOR_STANDARDS = {
       "title": "Governance — conveyor buildout"
     },
     {
+      "category": "mandate",
+      "covered_key": "",
+      "covered_rule": "",
+      "document": {
+        "path": "docs/standards/std-msp-mandate-01a1d039-0d24-7d16-ae52-4841e96ccfac.html",
+        "sha256": "833d3dc046a7cac9128e3609d5732e0d1f4ba9c109ae470db84b19c8d591abc0"
+      },
+      "gate": {
+        "approval_id": "",
+        "kind": "",
+        "state": "not recorded"
+      },
+      "id": "std-msp-mandate-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+      "level": "programme",
+      "mandatory": true,
+      "owner_project": "PLATFORM",
+      "package_key": "std-msp-mandate-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM",
+      "package_published": true,
+      "sections": [
+        {
+          "heading": "Strategic fit",
+          "missing": [
+            "No row or document satisfies 'Strategic fit'; a document exists but lacks the heading"
+          ],
+          "required": true,
+          "severity": "",
+          "sources": [
+            {
+              "count": 0,
+              "file": "artefacts.json",
+              "items": [],
+              "kind": "rows",
+              "pointer": "/governed_assets"
+            }
+          ],
+          "status": "partial"
+        },
+        {
+          "heading": "Drivers",
+          "missing": [
+            "No row or document satisfies 'Drivers'; a document exists but lacks the heading"
+          ],
+          "required": true,
+          "severity": "",
+          "sources": [
+            {
+              "count": 0,
+              "file": "artefacts.json",
+              "items": [],
+              "kind": "rows",
+              "pointer": "/governed_assets"
+            }
+          ],
+          "status": "partial"
+        },
+        {
+          "heading": "Deliverables and boundaries",
+          "missing": [
+            "No row or document satisfies 'Deliverables and boundaries'; a document exists but lacks the heading"
+          ],
+          "required": true,
+          "severity": "",
+          "sources": [
+            {
+              "count": 0,
+              "file": "artefacts.json",
+              "items": [],
+              "kind": "rows",
+              "pointer": "/governed_assets"
+            }
+          ],
+          "status": "partial"
+        },
+        {
+          "heading": "Success and constraints",
+          "missing": [
+            "No row or document satisfies 'Success and constraints'; a document exists but lacks the heading"
+          ],
+          "required": true,
+          "severity": "",
+          "sources": [
+            {
+              "count": 0,
+              "file": "artefacts.json",
+              "items": [],
+              "kind": "rows",
+              "pointer": "/governed_assets"
+            }
+          ],
+          "status": "partial"
+        }
+      ],
+      "spec": "§8.3",
+      "standard": "MSP",
+      "status": "absent",
+      "subject": {
+        "id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "key": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "kind": "programme",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "",
+        "title": "conveyor buildout"
+      },
+      "subject_kind": "programme",
+      "title": "Mandate — conveyor buildout"
+    },
+    {
       "category": "programme-baselines",
       "covered_key": "programme_baselines:management",
       "covered_rule": "programme_baselines",
       "document": {
         "path": "docs/standards/std-msp-programme-baselines-01a1d039-0d24-7d16-ae52-4841e96ccfac.html",
-        "sha256": "47ee7a369e577ca2affc14cbc2f92935bea1e68f6f48817e32c7646cb3a15b01"
+        "sha256": "2e7fd7dab3fc5e66c20c033d985793cf39ff08dffd95ed23f6a546ead8c11801"
       },
       "gate": {
         "approval_id": "",
@@ -2438,7 +3429,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Management baseline",
           "missing": [
-            "No row or document satisfies 'Management baseline'"
+            "No row or document satisfies 'Management baseline'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -2451,12 +3442,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/programme_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Governance baseline",
           "missing": [
-            "No row or document satisfies 'Governance baseline'"
+            "No row or document satisfies 'Governance baseline'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -2469,12 +3460,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/programme_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Boundary baseline",
           "missing": [
-            "No row or document satisfies 'Boundary baseline'"
+            "No row or document satisfies 'Boundary baseline'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -2487,7 +3478,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/programme_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.3",
@@ -2693,7 +3684,17 @@ window.CONVEYOR_STANDARDS = {
           ],
           "required": true,
           "severity": "",
-          "sources": [],
+          "sources": [
+            {
+              "category": "programme-plan",
+              "count": 0,
+              "file": "artefacts.json",
+              "items": [],
+              "kind": "documents",
+              "pointer": "/documents",
+              "scope": "programme"
+            }
+          ],
           "status": "partial"
         },
         {
@@ -2886,6 +3887,113 @@ window.CONVEYOR_STANDARDS = {
       "title": "Programme Report — conveyor buildout"
     },
     {
+      "category": "programme-risk-register",
+      "covered_key": "",
+      "covered_rule": "",
+      "document": {
+        "path": "docs/standards/std-msp-programme-risk-register-01a1d039-0d24-7d16-ae52-4841e96ccfac.html",
+        "sha256": "201ba977d7de4b7bcda1c2d47da77cae8091bde7b37d0366f0238ef2569972f3"
+      },
+      "gate": {
+        "approval_id": "",
+        "kind": "",
+        "state": "not recorded"
+      },
+      "id": "std-msp-programme-risk-register-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+      "level": "programme",
+      "mandatory": true,
+      "owner_project": "PLATFORM",
+      "package_key": "std-msp-programme-risk-register-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM",
+      "package_published": true,
+      "sections": [
+        {
+          "heading": "Register",
+          "missing": [
+            "No row or document satisfies 'Register'; a document exists but lacks the heading"
+          ],
+          "required": true,
+          "severity": "",
+          "sources": [
+            {
+              "count": 0,
+              "file": "msp.json",
+              "items": [],
+              "kind": "rows",
+              "pointer": "/register_items"
+            }
+          ],
+          "status": "partial"
+        },
+        {
+          "heading": "Categories",
+          "missing": [
+            "No row or document satisfies 'Categories'; a document exists but lacks the heading"
+          ],
+          "required": true,
+          "severity": "",
+          "sources": [
+            {
+              "count": 0,
+              "file": "msp.json",
+              "items": [],
+              "kind": "rows",
+              "pointer": "/register_items"
+            }
+          ],
+          "status": "partial"
+        },
+        {
+          "heading": "Owners and review dates",
+          "missing": [
+            "No row or document satisfies 'Owners and review dates'; a document exists but lacks the heading"
+          ],
+          "required": true,
+          "severity": "",
+          "sources": [
+            {
+              "count": 0,
+              "file": "msp.json",
+              "items": [],
+              "kind": "rows",
+              "pointer": "/register_items"
+            }
+          ],
+          "status": "partial"
+        },
+        {
+          "heading": "Escalations",
+          "missing": [
+            "No row or document satisfies 'Escalations'; a document exists but lacks the heading"
+          ],
+          "required": true,
+          "severity": "",
+          "sources": [
+            {
+              "count": 0,
+              "file": "msp.json",
+              "items": [],
+              "kind": "rows",
+              "pointer": "/register_items"
+            }
+          ],
+          "status": "partial"
+        }
+      ],
+      "spec": "§8.3",
+      "standard": "MSP",
+      "status": "absent",
+      "subject": {
+        "id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "key": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "kind": "programme",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "",
+        "title": "conveyor buildout"
+      },
+      "subject_kind": "programme",
+      "title": "Programme Risk Register — conveyor buildout"
+    },
+    {
       "category": "programme-strategies",
       "covered_key": "",
       "covered_rule": "",
@@ -3048,11 +4156,10 @@ window.CONVEYOR_STANDARDS = {
     },
     {
       "category": "projects-dossier",
-      "covered_key": "",
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-projects-dossier-01a1d039-0d24-7d16-ae52-4841e96ccfac.html",
-        "sha256": "2b2eb96e1f1ab306ad8e8197c69084c06ce8814514000bc07fe7853f1a5aa605"
+        "sha256": "ee131e5058e493f3740bf229063ee0e8472667097eed07cda49667ef8f020603"
       },
       "gate": {
         "approval_id": "",
@@ -3064,7 +4171,6 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "PLATFORM",
       "package_key": "std-msp-projects-dossier-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM",
-      "package_published": true,
       "sections": [
         {
           "heading": "Projects",
@@ -3250,9 +4356,7 @@ window.CONVEYOR_STANDARDS = {
         },
         {
           "heading": "Delivery risks",
-          "missing": [
-            "No row or document satisfies 'Delivery risks'"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
@@ -3262,14 +4366,28 @@ window.CONVEYOR_STANDARDS = {
               "items": [],
               "kind": "rows",
               "pointer": "/register_items"
+            },
+            {
+              "category": "projects-dossier",
+              "count": 1,
+              "file": "artefacts.json",
+              "items": [
+                {
+                  "id": "01a1e9e0-b03b-74e4-a6ff-1dd89a76ecc9",
+                  "title": "Projects dossier — the 48 projects, their tranches and dependencies"
+                }
+              ],
+              "kind": "documents",
+              "pointer": "/documents",
+              "scope": "programme"
             }
           ],
-          "status": "absent"
+          "status": "evidenced"
         }
       ],
       "spec": "§8.3",
       "standard": "MSP",
-      "status": "partial",
+      "status": "evidenced",
       "subject": {
         "id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
         "key": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
@@ -3433,7 +4551,17 @@ window.CONVEYOR_STANDARDS = {
           ],
           "required": true,
           "severity": "",
-          "sources": [],
+          "sources": [
+            {
+              "category": "refined-vision",
+              "count": 0,
+              "file": "artefacts.json",
+              "items": [],
+              "kind": "documents",
+              "pointer": "/documents",
+              "scope": "programme"
+            }
+          ],
           "status": "partial"
         },
         {
@@ -6565,7 +7693,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-design-publish.html",
-        "sha256": "b6bf39dbebfd3e9140f8d8e58b0825136e409af05ecb5118d3723a55e3237109"
+        "sha256": "c5ab5c7cd092224da66001492b514d27e2883a2aaa6c14db0a2f9c38aae840ef"
       },
       "gate": {
         "approval_id": "",
@@ -6582,7 +7710,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Change requests",
           "missing": [
-            "No row or document satisfies 'Change requests'"
+            "No row or document satisfies 'Change requests'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -6595,12 +7723,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Impact",
           "missing": [
-            "No row or document satisfies 'Impact'"
+            "No row or document satisfies 'Impact'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -6613,12 +7741,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Decisions",
           "missing": [
-            "No row or document satisfies 'Decisions'"
+            "No row or document satisfies 'Decisions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -6631,7 +7759,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -6654,7 +7782,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-p0.html",
-        "sha256": "6cf9ad468489a43aea554ff494cc1d393d2ccfcbf4f418595955d9e308b9fdce"
+        "sha256": "f0d77bac88614dff162319d81ce3175514a3aa251d9f13dbd3ecc471452f8bd8"
       },
       "gate": {
         "approval_id": "",
@@ -6671,7 +7799,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Change requests",
           "missing": [
-            "No row or document satisfies 'Change requests'"
+            "No row or document satisfies 'Change requests'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -6684,12 +7812,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Impact",
           "missing": [
-            "No row or document satisfies 'Impact'"
+            "No row or document satisfies 'Impact'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -6702,12 +7830,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Decisions",
           "missing": [
-            "No row or document satisfies 'Decisions'"
+            "No row or document satisfies 'Decisions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -6720,7 +7848,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -6743,7 +7871,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-platform.html",
-        "sha256": "926b5953fd66eb9e8c76c018cb9749db3aa948ce099f83053777817d3c97e5d8"
+        "sha256": "375692cc4b916ac7b3f1683826fbbbcfbf11b4a19212c5e54d33825a17c09456"
       },
       "gate": {
         "approval_id": "",
@@ -6760,7 +7888,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Change requests",
           "missing": [
-            "No row or document satisfies 'Change requests'"
+            "No row or document satisfies 'Change requests'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -6773,12 +7901,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Impact",
           "missing": [
-            "No row or document satisfies 'Impact'"
+            "No row or document satisfies 'Impact'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -6791,12 +7919,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Decisions",
           "missing": [
-            "No row or document satisfies 'Decisions'"
+            "No row or document satisfies 'Decisions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -6809,7 +7937,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -6832,7 +7960,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-s00.html",
-        "sha256": "17900e018b8eb69827ce818590fb93e5afbc199ab4fb39a1f20efada922673fd"
+        "sha256": "72bfaa742a84297e55abb4eed8c77e4d83d2edcca5c97baf0e946d5df8dc65ef"
       },
       "gate": {
         "approval_id": "",
@@ -6849,7 +7977,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Change requests",
           "missing": [
-            "No row or document satisfies 'Change requests'"
+            "No row or document satisfies 'Change requests'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -6862,12 +7990,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Impact",
           "missing": [
-            "No row or document satisfies 'Impact'"
+            "No row or document satisfies 'Impact'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -6880,12 +8008,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Decisions",
           "missing": [
-            "No row or document satisfies 'Decisions'"
+            "No row or document satisfies 'Decisions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -6898,7 +8026,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -6921,7 +8049,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-s01.html",
-        "sha256": "9931b5937928493fc41d53c52a343a2e8d668634b7b7166ae4554124f5555d70"
+        "sha256": "851c2cbf0e4c7564806c760c23ee9751414f14299c8daaed80566c6927e44d9c"
       },
       "gate": {
         "approval_id": "",
@@ -6938,7 +8066,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Change requests",
           "missing": [
-            "No row or document satisfies 'Change requests'"
+            "No row or document satisfies 'Change requests'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -6951,12 +8079,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Impact",
           "missing": [
-            "No row or document satisfies 'Impact'"
+            "No row or document satisfies 'Impact'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -6969,12 +8097,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Decisions",
           "missing": [
-            "No row or document satisfies 'Decisions'"
+            "No row or document satisfies 'Decisions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -6987,7 +8115,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -7010,7 +8138,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-s02.html",
-        "sha256": "53146558d29e5d6e916e9c06a5f0a9e491252dd7c42e4b8fc95be555e1329a08"
+        "sha256": "b766ace5f84fa831907d35e3d2505c2d26ea638881d58d5938b331cbc8e98d68"
       },
       "gate": {
         "approval_id": "",
@@ -7027,7 +8155,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Change requests",
           "missing": [
-            "No row or document satisfies 'Change requests'"
+            "No row or document satisfies 'Change requests'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -7040,12 +8168,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Impact",
           "missing": [
-            "No row or document satisfies 'Impact'"
+            "No row or document satisfies 'Impact'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -7058,12 +8186,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Decisions",
           "missing": [
-            "No row or document satisfies 'Decisions'"
+            "No row or document satisfies 'Decisions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -7076,7 +8204,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -7099,7 +8227,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-s03.html",
-        "sha256": "44f2dfdc59c3c777a3ca602dfeca724ca83e344d5f7a975d234aa48e167106b7"
+        "sha256": "4eef9ac8cd899976f68b28313e1bb6f2968c91800ecfbcd7d2dd59de2cea3d08"
       },
       "gate": {
         "approval_id": "",
@@ -7116,7 +8244,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Change requests",
           "missing": [
-            "No row or document satisfies 'Change requests'"
+            "No row or document satisfies 'Change requests'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -7129,12 +8257,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Impact",
           "missing": [
-            "No row or document satisfies 'Impact'"
+            "No row or document satisfies 'Impact'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -7147,12 +8275,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Decisions",
           "missing": [
-            "No row or document satisfies 'Decisions'"
+            "No row or document satisfies 'Decisions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -7165,7 +8293,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -7188,7 +8316,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-s04.html",
-        "sha256": "0b5b1039cf2797d22ac4e7201b59056d8bf8ce03e3c36038e2237396def30d52"
+        "sha256": "6254681028b6667fbbd77bd1ef2db04c42ef0fcb2c8f0ea2b13007861b0924e5"
       },
       "gate": {
         "approval_id": "",
@@ -7205,7 +8333,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Change requests",
           "missing": [
-            "No row or document satisfies 'Change requests'"
+            "No row or document satisfies 'Change requests'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -7218,12 +8346,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Impact",
           "missing": [
-            "No row or document satisfies 'Impact'"
+            "No row or document satisfies 'Impact'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -7236,12 +8364,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Decisions",
           "missing": [
-            "No row or document satisfies 'Decisions'"
+            "No row or document satisfies 'Decisions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -7254,7 +8382,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -7277,7 +8405,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-s05.html",
-        "sha256": "54e0fc198c45011b70e681fc599314b22584ee3b76c196aeadda16222e1eaa1b"
+        "sha256": "53bbfb44ef809f4d55c0e1bcb0ddb9e85f2af6373bc97491d836477cd6d70508"
       },
       "gate": {
         "approval_id": "",
@@ -7294,7 +8422,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Change requests",
           "missing": [
-            "No row or document satisfies 'Change requests'"
+            "No row or document satisfies 'Change requests'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -7307,12 +8435,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Impact",
           "missing": [
-            "No row or document satisfies 'Impact'"
+            "No row or document satisfies 'Impact'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -7325,12 +8453,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Decisions",
           "missing": [
-            "No row or document satisfies 'Decisions'"
+            "No row or document satisfies 'Decisions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -7343,7 +8471,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -7366,7 +8494,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-s06.html",
-        "sha256": "6bf6a126d288766546f6995601b5a3e31025ba17bbbe8436f462ae920c6278c1"
+        "sha256": "468817d52feba4f78badc41d58256d6dcc1b7ea3e6261907eb791d6dc27419c2"
       },
       "gate": {
         "approval_id": "",
@@ -7383,7 +8511,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Change requests",
           "missing": [
-            "No row or document satisfies 'Change requests'"
+            "No row or document satisfies 'Change requests'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -7396,12 +8524,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Impact",
           "missing": [
-            "No row or document satisfies 'Impact'"
+            "No row or document satisfies 'Impact'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -7414,12 +8542,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Decisions",
           "missing": [
-            "No row or document satisfies 'Decisions'"
+            "No row or document satisfies 'Decisions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -7432,7 +8560,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -7455,7 +8583,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-s06b.html",
-        "sha256": "b4f0ef509a3621170288cc254f49cad7b28a81b429c731e0e4254f230611103f"
+        "sha256": "61e0a2a5b7ce4c65114633f0d9c5a77d329d34df017ec35aacf2cc3f586b506e"
       },
       "gate": {
         "approval_id": "",
@@ -7472,7 +8600,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Change requests",
           "missing": [
-            "No row or document satisfies 'Change requests'"
+            "No row or document satisfies 'Change requests'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -7485,12 +8613,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Impact",
           "missing": [
-            "No row or document satisfies 'Impact'"
+            "No row or document satisfies 'Impact'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -7503,12 +8631,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Decisions",
           "missing": [
-            "No row or document satisfies 'Decisions'"
+            "No row or document satisfies 'Decisions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -7521,7 +8649,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -7544,7 +8672,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-s06c.html",
-        "sha256": "50d7f5015bb3f45d7e0e78b825620db6a855aa39123110c6183dab44b0568fdd"
+        "sha256": "454897cc1ea55303e72760e1bcfeb97013a1b7e6289c2ce979abc8857d0f88f6"
       },
       "gate": {
         "approval_id": "",
@@ -7561,7 +8689,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Change requests",
           "missing": [
-            "No row or document satisfies 'Change requests'"
+            "No row or document satisfies 'Change requests'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -7574,12 +8702,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Impact",
           "missing": [
-            "No row or document satisfies 'Impact'"
+            "No row or document satisfies 'Impact'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -7592,12 +8720,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Decisions",
           "missing": [
-            "No row or document satisfies 'Decisions'"
+            "No row or document satisfies 'Decisions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -7610,7 +8738,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -7633,7 +8761,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-s06d.html",
-        "sha256": "e0d0dcf2b0d6353a80f7002f5292dfb83f90a1e564d467d58a43b06027822d56"
+        "sha256": "31bf4388e10abb7277e9b07f5e3375533c4c59cc62a919ef16785e0894cdbd3f"
       },
       "gate": {
         "approval_id": "",
@@ -7650,7 +8778,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Change requests",
           "missing": [
-            "No row or document satisfies 'Change requests'"
+            "No row or document satisfies 'Change requests'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -7663,12 +8791,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Impact",
           "missing": [
-            "No row or document satisfies 'Impact'"
+            "No row or document satisfies 'Impact'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -7681,12 +8809,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Decisions",
           "missing": [
-            "No row or document satisfies 'Decisions'"
+            "No row or document satisfies 'Decisions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -7699,7 +8827,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -7722,7 +8850,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-s07.html",
-        "sha256": "8e95fbc885ec4ce539026c918555644d701c4db2c27ea77331581cee58688d15"
+        "sha256": "2980cc50ccf77d327411b5c809a6d905cce24ad0847dc2ebf54ec99a54b3a0cb"
       },
       "gate": {
         "approval_id": "",
@@ -7739,7 +8867,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Change requests",
           "missing": [
-            "No row or document satisfies 'Change requests'"
+            "No row or document satisfies 'Change requests'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -7752,12 +8880,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Impact",
           "missing": [
-            "No row or document satisfies 'Impact'"
+            "No row or document satisfies 'Impact'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -7770,12 +8898,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Decisions",
           "missing": [
-            "No row or document satisfies 'Decisions'"
+            "No row or document satisfies 'Decisions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -7788,7 +8916,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -7811,7 +8939,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-s08.html",
-        "sha256": "ccf483c37334153bbad3b4abefc459ac732cbcbd4218e8716f8333a5ef0892a9"
+        "sha256": "ab1f16eb5054cb767803bd200c475f420e8b8029932dd3be4a81d0d1b803aebf"
       },
       "gate": {
         "approval_id": "",
@@ -7828,7 +8956,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Change requests",
           "missing": [
-            "No row or document satisfies 'Change requests'"
+            "No row or document satisfies 'Change requests'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -7841,12 +8969,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Impact",
           "missing": [
-            "No row or document satisfies 'Impact'"
+            "No row or document satisfies 'Impact'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -7859,12 +8987,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Decisions",
           "missing": [
-            "No row or document satisfies 'Decisions'"
+            "No row or document satisfies 'Decisions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -7877,7 +9005,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -7900,7 +9028,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-s09.html",
-        "sha256": "c355bd937486f4081528b72658613efc1119d9abdf461d2bae7f3c40248094cd"
+        "sha256": "9fd63d4782ec107c920cdc5172de19884d92d9550fca906406dd588dee65ce04"
       },
       "gate": {
         "approval_id": "",
@@ -7917,7 +9045,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Change requests",
           "missing": [
-            "No row or document satisfies 'Change requests'"
+            "No row or document satisfies 'Change requests'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -7930,12 +9058,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Impact",
           "missing": [
-            "No row or document satisfies 'Impact'"
+            "No row or document satisfies 'Impact'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -7948,12 +9076,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Decisions",
           "missing": [
-            "No row or document satisfies 'Decisions'"
+            "No row or document satisfies 'Decisions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -7966,7 +9094,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -7989,7 +9117,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-s10.html",
-        "sha256": "7edd90145cf53cf08dd3c42b934081de30025b2df93c42087fdc273b183abed9"
+        "sha256": "96d62efbb7ef8e3c942f4d3008d84607e295f758ba7310b3a21a0641310fa3a6"
       },
       "gate": {
         "approval_id": "",
@@ -8006,7 +9134,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Change requests",
           "missing": [
-            "No row or document satisfies 'Change requests'"
+            "No row or document satisfies 'Change requests'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -8019,12 +9147,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Impact",
           "missing": [
-            "No row or document satisfies 'Impact'"
+            "No row or document satisfies 'Impact'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -8037,12 +9165,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Decisions",
           "missing": [
-            "No row or document satisfies 'Decisions'"
+            "No row or document satisfies 'Decisions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -8055,7 +9183,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -8078,7 +9206,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-s11.html",
-        "sha256": "5d8f1b4ab602748af9b60267151f1d9a7a8d1e1f1a26dfb5897fac518f19c48a"
+        "sha256": "16e8b0038b5aaf986c16b12dfdcef036370a5c18aa57aafb405d92bc34a88e1a"
       },
       "gate": {
         "approval_id": "",
@@ -8095,7 +9223,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Change requests",
           "missing": [
-            "No row or document satisfies 'Change requests'"
+            "No row or document satisfies 'Change requests'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -8108,12 +9236,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Impact",
           "missing": [
-            "No row or document satisfies 'Impact'"
+            "No row or document satisfies 'Impact'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -8126,12 +9254,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Decisions",
           "missing": [
-            "No row or document satisfies 'Decisions'"
+            "No row or document satisfies 'Decisions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -8144,7 +9272,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -8167,7 +9295,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-s12.html",
-        "sha256": "dd75143a8f3a2486fc7b5a3c8e810f488f878f4ac7f8b6e4fdab9f830c333d79"
+        "sha256": "a9a0fad2c9386fbddb41baa3569b031a5b3257746eafac699e6cd12d0eaf9237"
       },
       "gate": {
         "approval_id": "",
@@ -8184,7 +9312,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Change requests",
           "missing": [
-            "No row or document satisfies 'Change requests'"
+            "No row or document satisfies 'Change requests'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -8197,12 +9325,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Impact",
           "missing": [
-            "No row or document satisfies 'Impact'"
+            "No row or document satisfies 'Impact'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -8215,12 +9343,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Decisions",
           "missing": [
-            "No row or document satisfies 'Decisions'"
+            "No row or document satisfies 'Decisions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -8233,7 +9361,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -8256,7 +9384,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-s13.html",
-        "sha256": "b31e4eef5404ad1b775543b2432caf816a239bfd4931107cefa7adfe1b20273c"
+        "sha256": "37d31c57abc001d127a24d2c218f3f07a4954a7abf3b1c1756cb7d17c5a7219b"
       },
       "gate": {
         "approval_id": "",
@@ -8273,7 +9401,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Change requests",
           "missing": [
-            "No row or document satisfies 'Change requests'"
+            "No row or document satisfies 'Change requests'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -8286,12 +9414,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Impact",
           "missing": [
-            "No row or document satisfies 'Impact'"
+            "No row or document satisfies 'Impact'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -8304,12 +9432,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Decisions",
           "missing": [
-            "No row or document satisfies 'Decisions'"
+            "No row or document satisfies 'Decisions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -8322,7 +9450,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -8345,7 +9473,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-s14.html",
-        "sha256": "8f00569f2ad992c18acac0e84c2505500a21f71e91b2ed530c20db201bc1a1de"
+        "sha256": "6dba2aba6a41847b3731b6704c6a87d9fa58e741a2729f97cea7f9dc793c1a71"
       },
       "gate": {
         "approval_id": "",
@@ -8362,7 +9490,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Change requests",
           "missing": [
-            "No row or document satisfies 'Change requests'"
+            "No row or document satisfies 'Change requests'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -8375,12 +9503,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Impact",
           "missing": [
-            "No row or document satisfies 'Impact'"
+            "No row or document satisfies 'Impact'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -8393,12 +9521,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Decisions",
           "missing": [
-            "No row or document satisfies 'Decisions'"
+            "No row or document satisfies 'Decisions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -8411,7 +9539,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -8434,7 +9562,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-s15.html",
-        "sha256": "5204d6e305fa4d6a6e4fc138d7de117d6592bd098680992dda50bc2399b45218"
+        "sha256": "d67a9e9a7b0e8a69c8133ddb0b5a2bc03f02d48577bc9cbe1d3ff1054ab79438"
       },
       "gate": {
         "approval_id": "",
@@ -8451,7 +9579,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Change requests",
           "missing": [
-            "No row or document satisfies 'Change requests'"
+            "No row or document satisfies 'Change requests'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -8464,12 +9592,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Impact",
           "missing": [
-            "No row or document satisfies 'Impact'"
+            "No row or document satisfies 'Impact'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -8482,12 +9610,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Decisions",
           "missing": [
-            "No row or document satisfies 'Decisions'"
+            "No row or document satisfies 'Decisions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -8500,7 +9628,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -8523,7 +9651,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-s16.html",
-        "sha256": "220f3b9803fa5b9cec10417f6b035def10f69f3b7f45b06a81dbc75b9641807d"
+        "sha256": "ed85c667d8469cf66d095ca3cb0c56afb850d438fb5eab6c2caf72e2c21d59f6"
       },
       "gate": {
         "approval_id": "",
@@ -8540,7 +9668,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Change requests",
           "missing": [
-            "No row or document satisfies 'Change requests'"
+            "No row or document satisfies 'Change requests'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -8553,12 +9681,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Impact",
           "missing": [
-            "No row or document satisfies 'Impact'"
+            "No row or document satisfies 'Impact'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -8571,12 +9699,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Decisions",
           "missing": [
-            "No row or document satisfies 'Decisions'"
+            "No row or document satisfies 'Decisions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -8589,7 +9717,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -8612,7 +9740,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-s17.html",
-        "sha256": "695508a62294e529aa4da0a25e2932370802a659d7ad933f630ac403d28c152e"
+        "sha256": "6eb98fd21831b72fb55f1f28f01e8f4053ae17cf5b74f6159b58313f9c7a242e"
       },
       "gate": {
         "approval_id": "",
@@ -8629,7 +9757,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Change requests",
           "missing": [
-            "No row or document satisfies 'Change requests'"
+            "No row or document satisfies 'Change requests'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -8642,12 +9770,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Impact",
           "missing": [
-            "No row or document satisfies 'Impact'"
+            "No row or document satisfies 'Impact'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -8660,12 +9788,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Decisions",
           "missing": [
-            "No row or document satisfies 'Decisions'"
+            "No row or document satisfies 'Decisions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -8678,7 +9806,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -8701,7 +9829,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-s18.html",
-        "sha256": "e57f1053af479cf28a2ce5c39b3b5568474160c13a35702911d11546269d10fd"
+        "sha256": "ae3ee141249cd90b6d7c1d3c76718da2457d6b7aa171ab3a669bf08f5b52f959"
       },
       "gate": {
         "approval_id": "",
@@ -8718,7 +9846,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Change requests",
           "missing": [
-            "No row or document satisfies 'Change requests'"
+            "No row or document satisfies 'Change requests'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -8731,12 +9859,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Impact",
           "missing": [
-            "No row or document satisfies 'Impact'"
+            "No row or document satisfies 'Impact'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -8749,12 +9877,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Decisions",
           "missing": [
-            "No row or document satisfies 'Decisions'"
+            "No row or document satisfies 'Decisions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -8767,7 +9895,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -8790,7 +9918,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-s19.html",
-        "sha256": "6fcd729190b10fb64485902261785a8c49fffcd1838b4acfaf4fab4884393e79"
+        "sha256": "b038d56b538590f4affe937d6c79f38d7ff1e7340b2beac71838ed6cb9ea0a68"
       },
       "gate": {
         "approval_id": "",
@@ -8807,7 +9935,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Change requests",
           "missing": [
-            "No row or document satisfies 'Change requests'"
+            "No row or document satisfies 'Change requests'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -8820,12 +9948,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Impact",
           "missing": [
-            "No row or document satisfies 'Impact'"
+            "No row or document satisfies 'Impact'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -8838,12 +9966,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Decisions",
           "missing": [
-            "No row or document satisfies 'Decisions'"
+            "No row or document satisfies 'Decisions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -8856,7 +9984,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -8879,7 +10007,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-s20.html",
-        "sha256": "05aeb1cddc9065769f80303066e6369ecc6c0cbcef97756b50ec8ff5cd3ed8d1"
+        "sha256": "5f1bf1ad42844875a2f4236353e434d417627863139afcd6103826a95190f164"
       },
       "gate": {
         "approval_id": "",
@@ -8896,7 +10024,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Change requests",
           "missing": [
-            "No row or document satisfies 'Change requests'"
+            "No row or document satisfies 'Change requests'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -8909,12 +10037,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Impact",
           "missing": [
-            "No row or document satisfies 'Impact'"
+            "No row or document satisfies 'Impact'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -8927,12 +10055,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Decisions",
           "missing": [
-            "No row or document satisfies 'Decisions'"
+            "No row or document satisfies 'Decisions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -8945,7 +10073,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -8968,7 +10096,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-s21.html",
-        "sha256": "89e9cc624a2ddabc07da18103057c8796f18d68e3f330a2b0b2227784b85ce60"
+        "sha256": "cd6cbbcc09a3200e5f7e7ebae1d921a05dbd671cc412fb8ffbd313fdd0f90fa4"
       },
       "gate": {
         "approval_id": "",
@@ -8985,7 +10113,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Change requests",
           "missing": [
-            "No row or document satisfies 'Change requests'"
+            "No row or document satisfies 'Change requests'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -8998,12 +10126,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Impact",
           "missing": [
-            "No row or document satisfies 'Impact'"
+            "No row or document satisfies 'Impact'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -9016,12 +10144,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Decisions",
           "missing": [
-            "No row or document satisfies 'Decisions'"
+            "No row or document satisfies 'Decisions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -9034,7 +10162,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -9057,7 +10185,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-spec-v2.html",
-        "sha256": "35d5df11f4661d615283c8893726f5fa3cb840a9c347536f54431cc118fc4925"
+        "sha256": "99611afb887a1ef6c078cfc2c091f6282645209ad8d1cf5dd0fd6ee909247578"
       },
       "gate": {
         "approval_id": "",
@@ -9074,7 +10202,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Change requests",
           "missing": [
-            "No row or document satisfies 'Change requests'"
+            "No row or document satisfies 'Change requests'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -9087,12 +10215,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Impact",
           "missing": [
-            "No row or document satisfies 'Impact'"
+            "No row or document satisfies 'Impact'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -9105,12 +10233,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Decisions",
           "missing": [
-            "No row or document satisfies 'Decisions'"
+            "No row or document satisfies 'Decisions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -9123,7 +10251,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -9146,7 +10274,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-t0.html",
-        "sha256": "521d599c7603da2063411288a129ecb52e669b6fb2f57d054471f113a297c938"
+        "sha256": "28aaabffac1f91d324e99f744c05bc0aa89fe6f8a892e5ed7065eabc1e77dbef"
       },
       "gate": {
         "approval_id": "",
@@ -9163,7 +10291,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Change requests",
           "missing": [
-            "No row or document satisfies 'Change requests'"
+            "No row or document satisfies 'Change requests'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -9176,12 +10304,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Impact",
           "missing": [
-            "No row or document satisfies 'Impact'"
+            "No row or document satisfies 'Impact'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -9194,12 +10322,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Decisions",
           "missing": [
-            "No row or document satisfies 'Decisions'"
+            "No row or document satisfies 'Decisions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -9212,7 +10340,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -9235,7 +10363,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-t1.html",
-        "sha256": "40837337b7f044397c6ec5e8c68bf74f8831022d2c0e4df623db382f1ead86e9"
+        "sha256": "19c3049dcee6149ec6c89997339c77ffcb2d5251ee9ead1a2ac4c80c5d4bb466"
       },
       "gate": {
         "approval_id": "",
@@ -9252,7 +10380,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Change requests",
           "missing": [
-            "No row or document satisfies 'Change requests'"
+            "No row or document satisfies 'Change requests'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -9265,12 +10393,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Impact",
           "missing": [
-            "No row or document satisfies 'Impact'"
+            "No row or document satisfies 'Impact'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -9283,12 +10411,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Decisions",
           "missing": [
-            "No row or document satisfies 'Decisions'"
+            "No row or document satisfies 'Decisions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -9301,7 +10429,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -9324,7 +10452,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-t10.html",
-        "sha256": "f3862b8063848ca5743f3fe1ed2e0dbc20311c623cd07d6bef631199357ef880"
+        "sha256": "07a6770e9bc6dc045bba4c798ed9fdd27a2e579cde6dd52433536fca7b8c8a52"
       },
       "gate": {
         "approval_id": "",
@@ -9341,7 +10469,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Change requests",
           "missing": [
-            "No row or document satisfies 'Change requests'"
+            "No row or document satisfies 'Change requests'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -9354,12 +10482,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Impact",
           "missing": [
-            "No row or document satisfies 'Impact'"
+            "No row or document satisfies 'Impact'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -9372,12 +10500,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Decisions",
           "missing": [
-            "No row or document satisfies 'Decisions'"
+            "No row or document satisfies 'Decisions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -9390,7 +10518,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -9413,7 +10541,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-t11.html",
-        "sha256": "b83e5d90257220a1b5fd6d63e8dfbc937b810c265347f538df23d9a5f8c2f0f9"
+        "sha256": "521e7289980f434bc24cd145a09ede32c904bcb0488cae773af45925145857c5"
       },
       "gate": {
         "approval_id": "",
@@ -9430,7 +10558,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Change requests",
           "missing": [
-            "No row or document satisfies 'Change requests'"
+            "No row or document satisfies 'Change requests'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -9443,12 +10571,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Impact",
           "missing": [
-            "No row or document satisfies 'Impact'"
+            "No row or document satisfies 'Impact'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -9461,12 +10589,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Decisions",
           "missing": [
-            "No row or document satisfies 'Decisions'"
+            "No row or document satisfies 'Decisions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -9479,7 +10607,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -9502,7 +10630,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-t12.html",
-        "sha256": "5662f538c867e5d86fff50f53912d6dbbc826ae0a0f118559093b411e18d9aca"
+        "sha256": "b845d6ea701f080d85c505ab50f290ae088134b116aa635c006fb41138f11634"
       },
       "gate": {
         "approval_id": "",
@@ -9519,7 +10647,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Change requests",
           "missing": [
-            "No row or document satisfies 'Change requests'"
+            "No row or document satisfies 'Change requests'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -9532,12 +10660,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Impact",
           "missing": [
-            "No row or document satisfies 'Impact'"
+            "No row or document satisfies 'Impact'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -9550,12 +10678,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Decisions",
           "missing": [
-            "No row or document satisfies 'Decisions'"
+            "No row or document satisfies 'Decisions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -9568,7 +10696,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -9591,7 +10719,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-t13.html",
-        "sha256": "073ffdbcd883f581c912dd6a1d6710055123c5ce917aa3d1b364f99c91dd88ec"
+        "sha256": "3d5ac0a69b4a77e219e5551e7edfe82e772c5036e92dacac65d120e17962355c"
       },
       "gate": {
         "approval_id": "",
@@ -9608,7 +10736,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Change requests",
           "missing": [
-            "No row or document satisfies 'Change requests'"
+            "No row or document satisfies 'Change requests'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -9621,12 +10749,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Impact",
           "missing": [
-            "No row or document satisfies 'Impact'"
+            "No row or document satisfies 'Impact'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -9639,12 +10767,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Decisions",
           "missing": [
-            "No row or document satisfies 'Decisions'"
+            "No row or document satisfies 'Decisions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -9657,7 +10785,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -9680,7 +10808,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-t14.html",
-        "sha256": "9199a85a1dfe10f3927d34f20623ae5ecdf5fdc810adbd2d3d74e4b542c46711"
+        "sha256": "561621448992d20ce34af91a461ec94fbc3093f20d38e2d07e8d3fe66be20f6a"
       },
       "gate": {
         "approval_id": "",
@@ -9697,7 +10825,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Change requests",
           "missing": [
-            "No row or document satisfies 'Change requests'"
+            "No row or document satisfies 'Change requests'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -9710,12 +10838,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Impact",
           "missing": [
-            "No row or document satisfies 'Impact'"
+            "No row or document satisfies 'Impact'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -9728,12 +10856,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Decisions",
           "missing": [
-            "No row or document satisfies 'Decisions'"
+            "No row or document satisfies 'Decisions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -9746,7 +10874,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -9769,7 +10897,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-t15.html",
-        "sha256": "0fab5676ec02946db4820f1cb0ca18604b79ca77f8ca06947e400528963e17d6"
+        "sha256": "5edc9d8b82c008cb17c91fc91a9d2da5236e9e6eadd4dbc989b47154db160528"
       },
       "gate": {
         "approval_id": "",
@@ -9786,7 +10914,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Change requests",
           "missing": [
-            "No row or document satisfies 'Change requests'"
+            "No row or document satisfies 'Change requests'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -9799,12 +10927,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Impact",
           "missing": [
-            "No row or document satisfies 'Impact'"
+            "No row or document satisfies 'Impact'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -9817,12 +10945,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Decisions",
           "missing": [
-            "No row or document satisfies 'Decisions'"
+            "No row or document satisfies 'Decisions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -9835,7 +10963,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -9858,7 +10986,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-t16.html",
-        "sha256": "89818e29c14de17112ab7bede8fc85e51a8364518eed11e30161397a27762aad"
+        "sha256": "0a2365cee126a933abdb938a767aa714b079481d0f2ba5f4889aedab7a78416a"
       },
       "gate": {
         "approval_id": "",
@@ -9875,7 +11003,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Change requests",
           "missing": [
-            "No row or document satisfies 'Change requests'"
+            "No row or document satisfies 'Change requests'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -9888,12 +11016,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Impact",
           "missing": [
-            "No row or document satisfies 'Impact'"
+            "No row or document satisfies 'Impact'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -9906,12 +11034,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Decisions",
           "missing": [
-            "No row or document satisfies 'Decisions'"
+            "No row or document satisfies 'Decisions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -9924,7 +11052,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -9947,7 +11075,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-t17.html",
-        "sha256": "948f7058924ba4e9024bb9d02698360fc6bb7bc8b61bd7001fae4ecda4bed8fb"
+        "sha256": "af0c99595f956b8d975d358b9c44989cdaae45f25f54bbcc7b5307e9c5afaec7"
       },
       "gate": {
         "approval_id": "",
@@ -9964,7 +11092,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Change requests",
           "missing": [
-            "No row or document satisfies 'Change requests'"
+            "No row or document satisfies 'Change requests'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -9977,12 +11105,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Impact",
           "missing": [
-            "No row or document satisfies 'Impact'"
+            "No row or document satisfies 'Impact'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -9995,12 +11123,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Decisions",
           "missing": [
-            "No row or document satisfies 'Decisions'"
+            "No row or document satisfies 'Decisions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -10013,7 +11141,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -10036,7 +11164,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-t2.html",
-        "sha256": "0d3ff8ad46046ea4b995ec3bbeebeae88a1a5d7e40bbd75f1bf41f257c48f076"
+        "sha256": "bd44d7efe3624a5bdbe3143c0ce041aab84539a5827df653566721711d10536b"
       },
       "gate": {
         "approval_id": "",
@@ -10053,7 +11181,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Change requests",
           "missing": [
-            "No row or document satisfies 'Change requests'"
+            "No row or document satisfies 'Change requests'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -10066,12 +11194,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Impact",
           "missing": [
-            "No row or document satisfies 'Impact'"
+            "No row or document satisfies 'Impact'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -10084,12 +11212,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Decisions",
           "missing": [
-            "No row or document satisfies 'Decisions'"
+            "No row or document satisfies 'Decisions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -10102,7 +11230,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -10125,7 +11253,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-t3.html",
-        "sha256": "5089e2913fafcaa4677390e4c93a3dbe9f676974d308fd5aa6e400072cae22bb"
+        "sha256": "cb504e2ff4659674986a2c6892e976ba2dace96555ba2f291d7d24a9729f122d"
       },
       "gate": {
         "approval_id": "",
@@ -10142,7 +11270,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Change requests",
           "missing": [
-            "No row or document satisfies 'Change requests'"
+            "No row or document satisfies 'Change requests'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -10155,12 +11283,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Impact",
           "missing": [
-            "No row or document satisfies 'Impact'"
+            "No row or document satisfies 'Impact'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -10173,12 +11301,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Decisions",
           "missing": [
-            "No row or document satisfies 'Decisions'"
+            "No row or document satisfies 'Decisions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -10191,7 +11319,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -10214,7 +11342,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-t4.html",
-        "sha256": "23d3d092967d801de35354df06eab75d0d09e3a46f789cd458d96c22bafa13d3"
+        "sha256": "7d62a6233fc3c4a8d2883050127bde661a97421b946c1f4b1c027add9fef700e"
       },
       "gate": {
         "approval_id": "",
@@ -10231,7 +11359,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Change requests",
           "missing": [
-            "No row or document satisfies 'Change requests'"
+            "No row or document satisfies 'Change requests'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -10244,12 +11372,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Impact",
           "missing": [
-            "No row or document satisfies 'Impact'"
+            "No row or document satisfies 'Impact'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -10262,12 +11390,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Decisions",
           "missing": [
-            "No row or document satisfies 'Decisions'"
+            "No row or document satisfies 'Decisions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -10280,7 +11408,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -10303,7 +11431,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-t5.html",
-        "sha256": "19a4b55645e374c66ec87bf43f81f83356b905ecfa769744a847ba3ec35b994c"
+        "sha256": "df041b2464de79fb18e46cfbcbd8acb97b0f04ae8f5a331eefb2d637a974eaf6"
       },
       "gate": {
         "approval_id": "",
@@ -10320,7 +11448,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Change requests",
           "missing": [
-            "No row or document satisfies 'Change requests'"
+            "No row or document satisfies 'Change requests'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -10333,12 +11461,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Impact",
           "missing": [
-            "No row or document satisfies 'Impact'"
+            "No row or document satisfies 'Impact'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -10351,12 +11479,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Decisions",
           "missing": [
-            "No row or document satisfies 'Decisions'"
+            "No row or document satisfies 'Decisions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -10369,7 +11497,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -10392,7 +11520,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-t6.html",
-        "sha256": "297c3bcdf736e70b55bc9bd7c1c74b41189122ff287d394ca6ead313608842df"
+        "sha256": "fd457cf05a624f92a6a6f5bb8d0cccc453c5cba61b0daf7fc53e1126502003c9"
       },
       "gate": {
         "approval_id": "",
@@ -10409,7 +11537,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Change requests",
           "missing": [
-            "No row or document satisfies 'Change requests'"
+            "No row or document satisfies 'Change requests'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -10422,12 +11550,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Impact",
           "missing": [
-            "No row or document satisfies 'Impact'"
+            "No row or document satisfies 'Impact'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -10440,12 +11568,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Decisions",
           "missing": [
-            "No row or document satisfies 'Decisions'"
+            "No row or document satisfies 'Decisions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -10458,7 +11586,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -10481,7 +11609,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-t7.html",
-        "sha256": "76e27ab7188f7bc5a9a0d1841246346ee640907d46f159034a3101815a682c73"
+        "sha256": "e14591a7fae83f563128a65ec33db90cb2184e8d88866bacffb23cdfd7100a20"
       },
       "gate": {
         "approval_id": "",
@@ -10498,7 +11626,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Change requests",
           "missing": [
-            "No row or document satisfies 'Change requests'"
+            "No row or document satisfies 'Change requests'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -10511,12 +11639,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Impact",
           "missing": [
-            "No row or document satisfies 'Impact'"
+            "No row or document satisfies 'Impact'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -10529,12 +11657,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Decisions",
           "missing": [
-            "No row or document satisfies 'Decisions'"
+            "No row or document satisfies 'Decisions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -10547,7 +11675,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -10570,7 +11698,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-t8.html",
-        "sha256": "bf1c57a3276d5fdf69c418512df955f9e1f00e44682ec88f0549162053793999"
+        "sha256": "5414986ae3f3e5a84df60d868e7d97ca7b990789c2cf62cfdb4ceb4cbdaa5d91"
       },
       "gate": {
         "approval_id": "",
@@ -10587,7 +11715,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Change requests",
           "missing": [
-            "No row or document satisfies 'Change requests'"
+            "No row or document satisfies 'Change requests'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -10600,12 +11728,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Impact",
           "missing": [
-            "No row or document satisfies 'Impact'"
+            "No row or document satisfies 'Impact'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -10618,12 +11746,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Decisions",
           "missing": [
-            "No row or document satisfies 'Decisions'"
+            "No row or document satisfies 'Decisions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -10636,7 +11764,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -10659,7 +11787,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-change-control-t9.html",
-        "sha256": "dd8a499f1c8de9d454e0c8253dea62f3f021878c56e4193a44771b2ac9f8e6f7"
+        "sha256": "7773fda2c4811335b7971d8b873e2d6077a5e38ec2fd35954d7e5323f7e02a2e"
       },
       "gate": {
         "approval_id": "",
@@ -10676,7 +11804,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Change requests",
           "missing": [
-            "No row or document satisfies 'Change requests'"
+            "No row or document satisfies 'Change requests'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -10689,12 +11817,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Impact",
           "missing": [
-            "No row or document satisfies 'Impact'"
+            "No row or document satisfies 'Impact'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -10707,12 +11835,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Decisions",
           "missing": [
-            "No row or document satisfies 'Decisions'"
+            "No row or document satisfies 'Decisions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -10725,7 +11853,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -10769,7 +11897,17 @@ window.CONVEYOR_STANDARDS = {
           ],
           "required": true,
           "severity": "",
-          "sources": [],
+          "sources": [
+            {
+              "category": "closure-review",
+              "count": 0,
+              "file": "artefacts.json",
+              "items": [],
+              "kind": "documents",
+              "pointer": "/documents",
+              "scope": "subject"
+            }
+          ],
           "status": "partial"
         },
         {
@@ -10844,7 +11982,17 @@ window.CONVEYOR_STANDARDS = {
           ],
           "required": true,
           "severity": "",
-          "sources": [],
+          "sources": [
+            {
+              "category": "closure-review",
+              "count": 0,
+              "file": "artefacts.json",
+              "items": [],
+              "kind": "documents",
+              "pointer": "/documents",
+              "scope": "subject"
+            }
+          ],
           "status": "partial"
         },
         {
@@ -10919,7 +12067,17 @@ window.CONVEYOR_STANDARDS = {
           ],
           "required": true,
           "severity": "",
-          "sources": [],
+          "sources": [
+            {
+              "category": "closure-review",
+              "count": 0,
+              "file": "artefacts.json",
+              "items": [],
+              "kind": "documents",
+              "pointer": "/documents",
+              "scope": "subject"
+            }
+          ],
           "status": "partial"
         },
         {
@@ -10994,7 +12152,17 @@ window.CONVEYOR_STANDARDS = {
           ],
           "required": true,
           "severity": "",
-          "sources": [],
+          "sources": [
+            {
+              "category": "closure-review",
+              "count": 0,
+              "file": "artefacts.json",
+              "items": [],
+              "kind": "documents",
+              "pointer": "/documents",
+              "scope": "subject"
+            }
+          ],
           "status": "partial"
         },
         {
@@ -11069,7 +12237,17 @@ window.CONVEYOR_STANDARDS = {
           ],
           "required": true,
           "severity": "",
-          "sources": [],
+          "sources": [
+            {
+              "category": "closure-review",
+              "count": 0,
+              "file": "artefacts.json",
+              "items": [],
+              "kind": "documents",
+              "pointer": "/documents",
+              "scope": "subject"
+            }
+          ],
           "status": "partial"
         },
         {
@@ -11144,7 +12322,17 @@ window.CONVEYOR_STANDARDS = {
           ],
           "required": true,
           "severity": "",
-          "sources": [],
+          "sources": [
+            {
+              "category": "closure-review",
+              "count": 0,
+              "file": "artefacts.json",
+              "items": [],
+              "kind": "documents",
+              "pointer": "/documents",
+              "scope": "subject"
+            }
+          ],
           "status": "partial"
         },
         {
@@ -11219,7 +12407,17 @@ window.CONVEYOR_STANDARDS = {
           ],
           "required": true,
           "severity": "",
-          "sources": [],
+          "sources": [
+            {
+              "category": "closure-review",
+              "count": 0,
+              "file": "artefacts.json",
+              "items": [],
+              "kind": "documents",
+              "pointer": "/documents",
+              "scope": "subject"
+            }
+          ],
           "status": "partial"
         },
         {
@@ -11294,7 +12492,17 @@ window.CONVEYOR_STANDARDS = {
           ],
           "required": true,
           "severity": "",
-          "sources": [],
+          "sources": [
+            {
+              "category": "closure-review",
+              "count": 0,
+              "file": "artefacts.json",
+              "items": [],
+              "kind": "documents",
+              "pointer": "/documents",
+              "scope": "subject"
+            }
+          ],
           "status": "partial"
         },
         {
@@ -11369,7 +12577,17 @@ window.CONVEYOR_STANDARDS = {
           ],
           "required": true,
           "severity": "",
-          "sources": [],
+          "sources": [
+            {
+              "category": "closure-review",
+              "count": 0,
+              "file": "artefacts.json",
+              "items": [],
+              "kind": "documents",
+              "pointer": "/documents",
+              "scope": "subject"
+            }
+          ],
           "status": "partial"
         },
         {
@@ -11444,7 +12662,17 @@ window.CONVEYOR_STANDARDS = {
           ],
           "required": true,
           "severity": "",
-          "sources": [],
+          "sources": [
+            {
+              "category": "closure-review",
+              "count": 0,
+              "file": "artefacts.json",
+              "items": [],
+              "kind": "documents",
+              "pointer": "/documents",
+              "scope": "subject"
+            }
+          ],
           "status": "partial"
         },
         {
@@ -11519,7 +12747,17 @@ window.CONVEYOR_STANDARDS = {
           ],
           "required": true,
           "severity": "",
-          "sources": [],
+          "sources": [
+            {
+              "category": "closure-review",
+              "count": 0,
+              "file": "artefacts.json",
+              "items": [],
+              "kind": "documents",
+              "pointer": "/documents",
+              "scope": "subject"
+            }
+          ],
           "status": "partial"
         },
         {
@@ -11594,7 +12832,17 @@ window.CONVEYOR_STANDARDS = {
           ],
           "required": true,
           "severity": "",
-          "sources": [],
+          "sources": [
+            {
+              "category": "closure-review",
+              "count": 0,
+              "file": "artefacts.json",
+              "items": [],
+              "kind": "documents",
+              "pointer": "/documents",
+              "scope": "subject"
+            }
+          ],
           "status": "partial"
         },
         {
@@ -11669,7 +12917,17 @@ window.CONVEYOR_STANDARDS = {
           ],
           "required": true,
           "severity": "",
-          "sources": [],
+          "sources": [
+            {
+              "category": "closure-review",
+              "count": 0,
+              "file": "artefacts.json",
+              "items": [],
+              "kind": "documents",
+              "pointer": "/documents",
+              "scope": "subject"
+            }
+          ],
           "status": "partial"
         },
         {
@@ -11744,7 +13002,17 @@ window.CONVEYOR_STANDARDS = {
           ],
           "required": true,
           "severity": "",
-          "sources": [],
+          "sources": [
+            {
+              "category": "closure-review",
+              "count": 0,
+              "file": "artefacts.json",
+              "items": [],
+              "kind": "documents",
+              "pointer": "/documents",
+              "scope": "subject"
+            }
+          ],
           "status": "partial"
         },
         {
@@ -11819,7 +13087,17 @@ window.CONVEYOR_STANDARDS = {
           ],
           "required": true,
           "severity": "",
-          "sources": [],
+          "sources": [
+            {
+              "category": "closure-review",
+              "count": 0,
+              "file": "artefacts.json",
+              "items": [],
+              "kind": "documents",
+              "pointer": "/documents",
+              "scope": "subject"
+            }
+          ],
           "status": "partial"
         },
         {
@@ -11894,7 +13172,17 @@ window.CONVEYOR_STANDARDS = {
           ],
           "required": true,
           "severity": "",
-          "sources": [],
+          "sources": [
+            {
+              "category": "closure-review",
+              "count": 0,
+              "file": "artefacts.json",
+              "items": [],
+              "kind": "documents",
+              "pointer": "/documents",
+              "scope": "subject"
+            }
+          ],
           "status": "partial"
         },
         {
@@ -12469,7 +13757,17 @@ window.CONVEYOR_STANDARDS = {
           ],
           "required": true,
           "severity": "",
-          "sources": [],
+          "sources": [
+            {
+              "category": "closure-review",
+              "count": 0,
+              "file": "artefacts.json",
+              "items": [],
+              "kind": "documents",
+              "pointer": "/documents",
+              "scope": "subject"
+            }
+          ],
           "status": "partial"
         },
         {
@@ -14898,7 +16196,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-design-publish.html",
-        "sha256": "e47a826d350279005b64e7b4877059fe44c8c33dacd1993cbb2f19d4f0ed37ae"
+        "sha256": "2adf81df5bd3e241781a863ab04584b421984c2de590b7e0c6e1cf9c65904320"
       },
       "gate": {
         "approval_id": "",
@@ -14915,7 +16213,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Scope",
           "missing": [
-            "No row or document satisfies 'Scope'"
+            "No row or document satisfies 'Scope'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -14928,12 +16226,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Schedule",
           "missing": [
-            "No row or document satisfies 'Schedule'"
+            "No row or document satisfies 'Schedule'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -14946,12 +16244,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Cost",
           "missing": [
-            "No row or document satisfies 'Cost'"
+            "No row or document satisfies 'Cost'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -14964,12 +16262,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -14982,7 +16280,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -15005,7 +16303,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-p0.html",
-        "sha256": "87e8b123a0c84f57ede0f3309e2a2f5b3d8a1db04317c516c48705bd46697ebb"
+        "sha256": "51d293330402e46fcc4dbb28b48e06769bf082ea08f3291e1a76fc84e79cc83f"
       },
       "gate": {
         "approval_id": "",
@@ -15022,7 +16320,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Scope",
           "missing": [
-            "No row or document satisfies 'Scope'"
+            "No row or document satisfies 'Scope'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -15035,12 +16333,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Schedule",
           "missing": [
-            "No row or document satisfies 'Schedule'"
+            "No row or document satisfies 'Schedule'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -15053,12 +16351,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Cost",
           "missing": [
-            "No row or document satisfies 'Cost'"
+            "No row or document satisfies 'Cost'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -15071,12 +16369,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -15089,7 +16387,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -15112,7 +16410,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-platform.html",
-        "sha256": "9e1297570de4175a8bd3e59f796e23ffa0a51d39b517c34e1b847c02ec2345ad"
+        "sha256": "5b142398b9ee291ff3f6c354ad797564cd21c83a9babaf36aa0cf420459c4ec1"
       },
       "gate": {
         "approval_id": "",
@@ -15129,7 +16427,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Scope",
           "missing": [
-            "No row or document satisfies 'Scope'"
+            "No row or document satisfies 'Scope'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -15142,12 +16440,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Schedule",
           "missing": [
-            "No row or document satisfies 'Schedule'"
+            "No row or document satisfies 'Schedule'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -15160,12 +16458,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Cost",
           "missing": [
-            "No row or document satisfies 'Cost'"
+            "No row or document satisfies 'Cost'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -15178,12 +16476,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -15196,7 +16494,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -15219,7 +16517,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-s00.html",
-        "sha256": "62cb1b72f4d757af5068f1e4065d2362b3d8bf04693e52d1b23168512b20bea0"
+        "sha256": "49b06d61125cfb0e56e42b6c97d676226ff4e0619c277c524d6559fb8933ae7c"
       },
       "gate": {
         "approval_id": "",
@@ -15236,7 +16534,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Scope",
           "missing": [
-            "No row or document satisfies 'Scope'"
+            "No row or document satisfies 'Scope'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -15249,12 +16547,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Schedule",
           "missing": [
-            "No row or document satisfies 'Schedule'"
+            "No row or document satisfies 'Schedule'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -15267,12 +16565,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Cost",
           "missing": [
-            "No row or document satisfies 'Cost'"
+            "No row or document satisfies 'Cost'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -15285,12 +16583,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -15303,7 +16601,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -15326,7 +16624,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-s01.html",
-        "sha256": "796861e0acf66d48efbd91fe14e64fb8e734f9400691a4a637c62308a0d9e5ba"
+        "sha256": "a2f1f14d914ab520f718d7e55043aa8e52d3a731e506bf6574bbd22438a403fa"
       },
       "gate": {
         "approval_id": "",
@@ -15343,7 +16641,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Scope",
           "missing": [
-            "No row or document satisfies 'Scope'"
+            "No row or document satisfies 'Scope'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -15356,12 +16654,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Schedule",
           "missing": [
-            "No row or document satisfies 'Schedule'"
+            "No row or document satisfies 'Schedule'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -15374,12 +16672,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Cost",
           "missing": [
-            "No row or document satisfies 'Cost'"
+            "No row or document satisfies 'Cost'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -15392,12 +16690,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -15410,7 +16708,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -15433,7 +16731,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-s02.html",
-        "sha256": "47dbb73424315b29c1150b8e32501e8b2fa5e1685070c6e29b837ef6131987ef"
+        "sha256": "36ee1f26891f8a488f0ae98d7a487acdff4cdef287412ec81d45e011feb4ef08"
       },
       "gate": {
         "approval_id": "",
@@ -15450,7 +16748,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Scope",
           "missing": [
-            "No row or document satisfies 'Scope'"
+            "No row or document satisfies 'Scope'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -15463,12 +16761,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Schedule",
           "missing": [
-            "No row or document satisfies 'Schedule'"
+            "No row or document satisfies 'Schedule'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -15481,12 +16779,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Cost",
           "missing": [
-            "No row or document satisfies 'Cost'"
+            "No row or document satisfies 'Cost'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -15499,12 +16797,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -15517,7 +16815,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -15540,7 +16838,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-s03.html",
-        "sha256": "48b4dc9b153a5003fddeaef76a05e7096679b59377eb78072cab04d2f442f776"
+        "sha256": "0cea8305993e465fe5374398411d716897fcee0fe5696092199905430d787966"
       },
       "gate": {
         "approval_id": "",
@@ -15557,7 +16855,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Scope",
           "missing": [
-            "No row or document satisfies 'Scope'"
+            "No row or document satisfies 'Scope'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -15570,12 +16868,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Schedule",
           "missing": [
-            "No row or document satisfies 'Schedule'"
+            "No row or document satisfies 'Schedule'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -15588,12 +16886,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Cost",
           "missing": [
-            "No row or document satisfies 'Cost'"
+            "No row or document satisfies 'Cost'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -15606,12 +16904,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -15624,7 +16922,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -15647,7 +16945,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-s04.html",
-        "sha256": "feb6d29b1ef6223fe3d27fd77c971d7b5bdd53042c5580b18dd9317c12fbd00b"
+        "sha256": "fd8752c4d0c141287e52ccd171190c90319c4be5a0d142f47c7f087e7740efe0"
       },
       "gate": {
         "approval_id": "",
@@ -15664,7 +16962,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Scope",
           "missing": [
-            "No row or document satisfies 'Scope'"
+            "No row or document satisfies 'Scope'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -15677,12 +16975,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Schedule",
           "missing": [
-            "No row or document satisfies 'Schedule'"
+            "No row or document satisfies 'Schedule'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -15695,12 +16993,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Cost",
           "missing": [
-            "No row or document satisfies 'Cost'"
+            "No row or document satisfies 'Cost'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -15713,12 +17011,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -15731,7 +17029,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -15754,7 +17052,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-s05.html",
-        "sha256": "3a26d474fc1905a31605e618127dbab5ec2b14eedd8e3bef1ce3647feefaadba"
+        "sha256": "3fd7af7d9832c531c66424e4cb03f5f2d5d369636bbad5bc2fe4a0223cb83e2d"
       },
       "gate": {
         "approval_id": "",
@@ -15771,7 +17069,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Scope",
           "missing": [
-            "No row or document satisfies 'Scope'"
+            "No row or document satisfies 'Scope'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -15784,12 +17082,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Schedule",
           "missing": [
-            "No row or document satisfies 'Schedule'"
+            "No row or document satisfies 'Schedule'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -15802,12 +17100,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Cost",
           "missing": [
-            "No row or document satisfies 'Cost'"
+            "No row or document satisfies 'Cost'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -15820,12 +17118,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -15838,7 +17136,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -15861,7 +17159,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-s06.html",
-        "sha256": "4f9da69c40b1c30be8e4b3f4c6c0753f26a5a41611625fee3a6f23557083c2c1"
+        "sha256": "ca689d135725873ab33fd29987c41e79933c4693f2bf0069e99a88761ea92001"
       },
       "gate": {
         "approval_id": "",
@@ -15878,7 +17176,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Scope",
           "missing": [
-            "No row or document satisfies 'Scope'"
+            "No row or document satisfies 'Scope'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -15891,12 +17189,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Schedule",
           "missing": [
-            "No row or document satisfies 'Schedule'"
+            "No row or document satisfies 'Schedule'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -15909,12 +17207,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Cost",
           "missing": [
-            "No row or document satisfies 'Cost'"
+            "No row or document satisfies 'Cost'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -15927,12 +17225,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -15945,7 +17243,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -15968,7 +17266,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-s06b.html",
-        "sha256": "1e54fcfe792972930128fc73588b9a8457e6861dfb3e2bb1c1d6128ea2d52727"
+        "sha256": "308d3f3012e66d227d23e560b854f262f33451d41d1b7b900241f1cea782f390"
       },
       "gate": {
         "approval_id": "",
@@ -15985,7 +17283,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Scope",
           "missing": [
-            "No row or document satisfies 'Scope'"
+            "No row or document satisfies 'Scope'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -15998,12 +17296,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Schedule",
           "missing": [
-            "No row or document satisfies 'Schedule'"
+            "No row or document satisfies 'Schedule'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -16016,12 +17314,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Cost",
           "missing": [
-            "No row or document satisfies 'Cost'"
+            "No row or document satisfies 'Cost'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -16034,12 +17332,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -16052,7 +17350,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -16075,7 +17373,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-s06c.html",
-        "sha256": "9511b7883cdf8da99b4091af9fa2f233edd23a68b30b60b18989782c01b37917"
+        "sha256": "a43e611ee8d98fa825a025379fa128d0233339c131020fa8dff518b78d2bfbf8"
       },
       "gate": {
         "approval_id": "",
@@ -16092,7 +17390,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Scope",
           "missing": [
-            "No row or document satisfies 'Scope'"
+            "No row or document satisfies 'Scope'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -16105,12 +17403,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Schedule",
           "missing": [
-            "No row or document satisfies 'Schedule'"
+            "No row or document satisfies 'Schedule'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -16123,12 +17421,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Cost",
           "missing": [
-            "No row or document satisfies 'Cost'"
+            "No row or document satisfies 'Cost'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -16141,12 +17439,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -16159,7 +17457,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -16182,7 +17480,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-s06d.html",
-        "sha256": "277483bccfd72a81143276cc723ffdfb62281c9a0ae265fa255ac46325a2d9b6"
+        "sha256": "7965ed8056b50856e6f3ca4cc2f2802244995fec7a43adba40e0065d50bbfa4f"
       },
       "gate": {
         "approval_id": "",
@@ -16199,7 +17497,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Scope",
           "missing": [
-            "No row or document satisfies 'Scope'"
+            "No row or document satisfies 'Scope'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -16212,12 +17510,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Schedule",
           "missing": [
-            "No row or document satisfies 'Schedule'"
+            "No row or document satisfies 'Schedule'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -16230,12 +17528,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Cost",
           "missing": [
-            "No row or document satisfies 'Cost'"
+            "No row or document satisfies 'Cost'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -16248,12 +17546,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -16266,7 +17564,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -16289,7 +17587,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-s07.html",
-        "sha256": "453c52eb0dc7dc4a28ffbdb7c879d21a734e672c5bf0c522f3c2ea181546a90c"
+        "sha256": "56bbc6568e457283ae74bb3d82ffbca5322a677edee0eb9b5dba66d6c8204f1e"
       },
       "gate": {
         "approval_id": "",
@@ -16306,7 +17604,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Scope",
           "missing": [
-            "No row or document satisfies 'Scope'"
+            "No row or document satisfies 'Scope'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -16319,12 +17617,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Schedule",
           "missing": [
-            "No row or document satisfies 'Schedule'"
+            "No row or document satisfies 'Schedule'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -16337,12 +17635,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Cost",
           "missing": [
-            "No row or document satisfies 'Cost'"
+            "No row or document satisfies 'Cost'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -16355,12 +17653,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -16373,7 +17671,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -16396,7 +17694,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-s08.html",
-        "sha256": "976fc01ff66a91de6faafd98755bf8143d13e38458e08036b6ef958a863c1f09"
+        "sha256": "188ea94a92da86c92e4550788697f2a6f7fa0cd8d160a76baeedb65444992222"
       },
       "gate": {
         "approval_id": "",
@@ -16413,7 +17711,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Scope",
           "missing": [
-            "No row or document satisfies 'Scope'"
+            "No row or document satisfies 'Scope'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -16426,12 +17724,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Schedule",
           "missing": [
-            "No row or document satisfies 'Schedule'"
+            "No row or document satisfies 'Schedule'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -16444,12 +17742,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Cost",
           "missing": [
-            "No row or document satisfies 'Cost'"
+            "No row or document satisfies 'Cost'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -16462,12 +17760,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -16480,7 +17778,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -16503,7 +17801,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-s09.html",
-        "sha256": "d0b2a306aa0717bda8798523d9702cb8bb03afc1411bde62a6eadb0950fdbf23"
+        "sha256": "71fc98ab5cb5d9dd38e898f4c2fa9a3488e7d5bbbd9f285ef47a963418a9c3bd"
       },
       "gate": {
         "approval_id": "",
@@ -16520,7 +17818,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Scope",
           "missing": [
-            "No row or document satisfies 'Scope'"
+            "No row or document satisfies 'Scope'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -16533,12 +17831,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Schedule",
           "missing": [
-            "No row or document satisfies 'Schedule'"
+            "No row or document satisfies 'Schedule'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -16551,12 +17849,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Cost",
           "missing": [
-            "No row or document satisfies 'Cost'"
+            "No row or document satisfies 'Cost'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -16569,12 +17867,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -16587,7 +17885,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -16610,7 +17908,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-s10.html",
-        "sha256": "a6c454b7fa94f5b671d8a5dc173dd186d15e83e794e350581067e81c0b4106fb"
+        "sha256": "5e869055e2d5341c3fbd0115da0c736cc50c3da5ca8be7fa75c988f7dd5f2935"
       },
       "gate": {
         "approval_id": "",
@@ -16627,7 +17925,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Scope",
           "missing": [
-            "No row or document satisfies 'Scope'"
+            "No row or document satisfies 'Scope'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -16640,12 +17938,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Schedule",
           "missing": [
-            "No row or document satisfies 'Schedule'"
+            "No row or document satisfies 'Schedule'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -16658,12 +17956,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Cost",
           "missing": [
-            "No row or document satisfies 'Cost'"
+            "No row or document satisfies 'Cost'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -16676,12 +17974,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -16694,7 +17992,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -16717,7 +18015,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-s11.html",
-        "sha256": "6bebdd933602f0cec32cca52b223af3415c2b8b6e2b44d20e08e023be4676ad7"
+        "sha256": "7f292cbdf74048b6dce9e95707b04e5acc2784ff74cb92d138ff0dcbda56776a"
       },
       "gate": {
         "approval_id": "",
@@ -16734,7 +18032,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Scope",
           "missing": [
-            "No row or document satisfies 'Scope'"
+            "No row or document satisfies 'Scope'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -16747,12 +18045,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Schedule",
           "missing": [
-            "No row or document satisfies 'Schedule'"
+            "No row or document satisfies 'Schedule'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -16765,12 +18063,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Cost",
           "missing": [
-            "No row or document satisfies 'Cost'"
+            "No row or document satisfies 'Cost'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -16783,12 +18081,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -16801,7 +18099,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -16824,7 +18122,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-s12.html",
-        "sha256": "c99c9219367e4553d09a75d1b4fe2f6e0c5274f598146663619524ea206e0fd8"
+        "sha256": "fbe4c0403de2efa11a4f51be2d0100ef536d214281503b2cbb1e918beecdec86"
       },
       "gate": {
         "approval_id": "",
@@ -16841,7 +18139,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Scope",
           "missing": [
-            "No row or document satisfies 'Scope'"
+            "No row or document satisfies 'Scope'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -16854,12 +18152,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Schedule",
           "missing": [
-            "No row or document satisfies 'Schedule'"
+            "No row or document satisfies 'Schedule'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -16872,12 +18170,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Cost",
           "missing": [
-            "No row or document satisfies 'Cost'"
+            "No row or document satisfies 'Cost'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -16890,12 +18188,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -16908,7 +18206,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -16931,7 +18229,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-s13.html",
-        "sha256": "d9c062866de1af5ec4c9818a6e8e71888dc484eb16df9d75a515485e4b43a109"
+        "sha256": "d392dc6aae69baa38afcc43028fe318b5a1b918d7cfd570d8a4442d5d49a6bda"
       },
       "gate": {
         "approval_id": "",
@@ -16948,7 +18246,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Scope",
           "missing": [
-            "No row or document satisfies 'Scope'"
+            "No row or document satisfies 'Scope'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -16961,12 +18259,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Schedule",
           "missing": [
-            "No row or document satisfies 'Schedule'"
+            "No row or document satisfies 'Schedule'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -16979,12 +18277,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Cost",
           "missing": [
-            "No row or document satisfies 'Cost'"
+            "No row or document satisfies 'Cost'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -16997,12 +18295,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -17015,7 +18313,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -17038,7 +18336,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-s14.html",
-        "sha256": "5864e369ae68f75c62c57c8154fc9624a1bedd31315b85b43d0823a9e53d4eb1"
+        "sha256": "801562959e723db987e7ebbc94a00936e6f94dde5d9e7210ab55d70a26332ff1"
       },
       "gate": {
         "approval_id": "",
@@ -17055,7 +18353,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Scope",
           "missing": [
-            "No row or document satisfies 'Scope'"
+            "No row or document satisfies 'Scope'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -17068,12 +18366,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Schedule",
           "missing": [
-            "No row or document satisfies 'Schedule'"
+            "No row or document satisfies 'Schedule'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -17086,12 +18384,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Cost",
           "missing": [
-            "No row or document satisfies 'Cost'"
+            "No row or document satisfies 'Cost'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -17104,12 +18402,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -17122,7 +18420,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -17145,7 +18443,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-s15.html",
-        "sha256": "0fd22422c4c9592a5160d397f55e93139ceef0b221f9b88eea368cd17bcf9af7"
+        "sha256": "4f01f3767f58dfa65ae14506c758672fe80db056c53efc34d180f2d678bb7c9c"
       },
       "gate": {
         "approval_id": "",
@@ -17162,7 +18460,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Scope",
           "missing": [
-            "No row or document satisfies 'Scope'"
+            "No row or document satisfies 'Scope'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -17175,12 +18473,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Schedule",
           "missing": [
-            "No row or document satisfies 'Schedule'"
+            "No row or document satisfies 'Schedule'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -17193,12 +18491,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Cost",
           "missing": [
-            "No row or document satisfies 'Cost'"
+            "No row or document satisfies 'Cost'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -17211,12 +18509,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -17229,7 +18527,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -17252,7 +18550,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-s16.html",
-        "sha256": "0b424dc6952210366b8dc761bc39ee2b20b88105260e145fce3c11cc07e1e886"
+        "sha256": "76f67fa8780981fcfad1429e25163d51b39602f45de6bea9104bb7f4cd759d81"
       },
       "gate": {
         "approval_id": "",
@@ -17269,7 +18567,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Scope",
           "missing": [
-            "No row or document satisfies 'Scope'"
+            "No row or document satisfies 'Scope'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -17282,12 +18580,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Schedule",
           "missing": [
-            "No row or document satisfies 'Schedule'"
+            "No row or document satisfies 'Schedule'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -17300,12 +18598,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Cost",
           "missing": [
-            "No row or document satisfies 'Cost'"
+            "No row or document satisfies 'Cost'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -17318,12 +18616,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -17336,7 +18634,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -17359,7 +18657,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-s17.html",
-        "sha256": "a96301021d033817fd7ad710c88b40067167e07d3da3fb3d1d45c2e28fbc8837"
+        "sha256": "0ac0d5459e9216d1cf9a7625cef754dfc6db19b4986f3733dae3eee2147b9fe1"
       },
       "gate": {
         "approval_id": "",
@@ -17376,7 +18674,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Scope",
           "missing": [
-            "No row or document satisfies 'Scope'"
+            "No row or document satisfies 'Scope'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -17389,12 +18687,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Schedule",
           "missing": [
-            "No row or document satisfies 'Schedule'"
+            "No row or document satisfies 'Schedule'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -17407,12 +18705,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Cost",
           "missing": [
-            "No row or document satisfies 'Cost'"
+            "No row or document satisfies 'Cost'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -17425,12 +18723,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -17443,7 +18741,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -17466,7 +18764,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-s18.html",
-        "sha256": "e15284c542a70e3b08740558b4751413d6ef95185fe4bfdac9cefb3188b0ceb6"
+        "sha256": "1a596f4fd0546faa9cff0ad24cc0b0013a5776f29b462e7599558a9afcd44744"
       },
       "gate": {
         "approval_id": "",
@@ -17483,7 +18781,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Scope",
           "missing": [
-            "No row or document satisfies 'Scope'"
+            "No row or document satisfies 'Scope'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -17496,12 +18794,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Schedule",
           "missing": [
-            "No row or document satisfies 'Schedule'"
+            "No row or document satisfies 'Schedule'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -17514,12 +18812,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Cost",
           "missing": [
-            "No row or document satisfies 'Cost'"
+            "No row or document satisfies 'Cost'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -17532,12 +18830,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -17550,7 +18848,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -17573,7 +18871,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-s19.html",
-        "sha256": "016c5e882d7ff451cb534bbd7246bea20b18fe75ece57b1e676f47fbd5aa75f8"
+        "sha256": "8ed88ca54a34c7c0fcc9db6a2a63e822d114e1bfd2b5cda79434391037515a22"
       },
       "gate": {
         "approval_id": "",
@@ -17590,7 +18888,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Scope",
           "missing": [
-            "No row or document satisfies 'Scope'"
+            "No row or document satisfies 'Scope'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -17603,12 +18901,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Schedule",
           "missing": [
-            "No row or document satisfies 'Schedule'"
+            "No row or document satisfies 'Schedule'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -17621,12 +18919,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Cost",
           "missing": [
-            "No row or document satisfies 'Cost'"
+            "No row or document satisfies 'Cost'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -17639,12 +18937,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -17657,7 +18955,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -17680,7 +18978,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-s20.html",
-        "sha256": "71cb07370de7c63143fae50eaea402a7a8e436a4335dc5e120b11f411cdcf12e"
+        "sha256": "dfd876448deaa120fbe56d352deb066bc1dc19ffb667220ab839b3b00a8644fc"
       },
       "gate": {
         "approval_id": "",
@@ -17697,7 +18995,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Scope",
           "missing": [
-            "No row or document satisfies 'Scope'"
+            "No row or document satisfies 'Scope'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -17710,12 +19008,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Schedule",
           "missing": [
-            "No row or document satisfies 'Schedule'"
+            "No row or document satisfies 'Schedule'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -17728,12 +19026,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Cost",
           "missing": [
-            "No row or document satisfies 'Cost'"
+            "No row or document satisfies 'Cost'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -17746,12 +19044,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -17764,7 +19062,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -17787,7 +19085,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-s21.html",
-        "sha256": "2f6ca4fae7e6043fa03252f2f327c20bdd8628d7e96acf556887eeaddcb4d897"
+        "sha256": "aafc94de76b9f6d23e94a4811e21f121b79a6fbe6b49520fb9f2aaaa03ba00e7"
       },
       "gate": {
         "approval_id": "",
@@ -17804,7 +19102,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Scope",
           "missing": [
-            "No row or document satisfies 'Scope'"
+            "No row or document satisfies 'Scope'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -17817,12 +19115,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Schedule",
           "missing": [
-            "No row or document satisfies 'Schedule'"
+            "No row or document satisfies 'Schedule'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -17835,12 +19133,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Cost",
           "missing": [
-            "No row or document satisfies 'Cost'"
+            "No row or document satisfies 'Cost'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -17853,12 +19151,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -17871,7 +19169,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -17894,7 +19192,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-spec-v2.html",
-        "sha256": "ff4acf9ced38ac9b2fb20d85fa2bdbc673b291b744d9954dc39a97e4db16ef41"
+        "sha256": "8f3907541a9a2b02c5e2233a419351910efc80cec730fdb94e971ef89bf67b72"
       },
       "gate": {
         "approval_id": "",
@@ -17911,7 +19209,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Scope",
           "missing": [
-            "No row or document satisfies 'Scope'"
+            "No row or document satisfies 'Scope'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -17924,12 +19222,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Schedule",
           "missing": [
-            "No row or document satisfies 'Schedule'"
+            "No row or document satisfies 'Schedule'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -17942,12 +19240,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Cost",
           "missing": [
-            "No row or document satisfies 'Cost'"
+            "No row or document satisfies 'Cost'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -17960,12 +19258,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -17978,7 +19276,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -18001,7 +19299,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-t0.html",
-        "sha256": "58cccb3ba64bfb69a3022984ae830535676bb9ef23e3cd0b2922c195822b5876"
+        "sha256": "324b6c2a1eeef1cff017275a5bdcf09cc036bd5856919531924789c473a40fa3"
       },
       "gate": {
         "approval_id": "",
@@ -18018,7 +19316,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Scope",
           "missing": [
-            "No row or document satisfies 'Scope'"
+            "No row or document satisfies 'Scope'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -18031,12 +19329,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Schedule",
           "missing": [
-            "No row or document satisfies 'Schedule'"
+            "No row or document satisfies 'Schedule'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -18049,12 +19347,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Cost",
           "missing": [
-            "No row or document satisfies 'Cost'"
+            "No row or document satisfies 'Cost'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -18067,12 +19365,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -18085,7 +19383,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -18108,7 +19406,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-t1.html",
-        "sha256": "6f1b906d1b7efecb4639f79caa8af9405c0d3cd1d59b16031cb5453035dee533"
+        "sha256": "a3e868bbb9097d6a1dad76bfa51ccfc5e17b9147f85b7652a370214037ee6ec3"
       },
       "gate": {
         "approval_id": "",
@@ -18125,7 +19423,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Scope",
           "missing": [
-            "No row or document satisfies 'Scope'"
+            "No row or document satisfies 'Scope'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -18138,12 +19436,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Schedule",
           "missing": [
-            "No row or document satisfies 'Schedule'"
+            "No row or document satisfies 'Schedule'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -18156,12 +19454,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Cost",
           "missing": [
-            "No row or document satisfies 'Cost'"
+            "No row or document satisfies 'Cost'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -18174,12 +19472,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -18192,7 +19490,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -18215,7 +19513,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-t10.html",
-        "sha256": "8857192f1b1129de0b10a315651283ad2d5b12c1155dd38f6d5de5826c7fea86"
+        "sha256": "714dea7ec75914dfc8c94f71a4a3c1b92e9395af568c34b634aaecabd9832aec"
       },
       "gate": {
         "approval_id": "",
@@ -18232,7 +19530,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Scope",
           "missing": [
-            "No row or document satisfies 'Scope'"
+            "No row or document satisfies 'Scope'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -18245,12 +19543,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Schedule",
           "missing": [
-            "No row or document satisfies 'Schedule'"
+            "No row or document satisfies 'Schedule'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -18263,12 +19561,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Cost",
           "missing": [
-            "No row or document satisfies 'Cost'"
+            "No row or document satisfies 'Cost'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -18281,12 +19579,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -18299,7 +19597,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -18322,7 +19620,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-t11.html",
-        "sha256": "89883377b37a9f8f091c274890f47e47e43e501a326428190a20c3f0dcfd2ccc"
+        "sha256": "18e7de88871847c65a76504665c90369fa8a5cc12a5f81f5b9175b8ef82c188d"
       },
       "gate": {
         "approval_id": "",
@@ -18339,7 +19637,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Scope",
           "missing": [
-            "No row or document satisfies 'Scope'"
+            "No row or document satisfies 'Scope'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -18352,12 +19650,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Schedule",
           "missing": [
-            "No row or document satisfies 'Schedule'"
+            "No row or document satisfies 'Schedule'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -18370,12 +19668,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Cost",
           "missing": [
-            "No row or document satisfies 'Cost'"
+            "No row or document satisfies 'Cost'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -18388,12 +19686,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -18406,7 +19704,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -18429,7 +19727,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-t12.html",
-        "sha256": "4711c57c9ad3c92ea5c54ce9fcc6d7d3e63d8ea80d1e5021136e65fe67cd1963"
+        "sha256": "6e4c34bbf5fb543563aa77451c01e68c77d1b284bd80d508d508612a91123352"
       },
       "gate": {
         "approval_id": "",
@@ -18446,7 +19744,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Scope",
           "missing": [
-            "No row or document satisfies 'Scope'"
+            "No row or document satisfies 'Scope'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -18459,12 +19757,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Schedule",
           "missing": [
-            "No row or document satisfies 'Schedule'"
+            "No row or document satisfies 'Schedule'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -18477,12 +19775,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Cost",
           "missing": [
-            "No row or document satisfies 'Cost'"
+            "No row or document satisfies 'Cost'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -18495,12 +19793,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -18513,7 +19811,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -18536,7 +19834,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-t13.html",
-        "sha256": "8160eb8cb687e2c7ff4b0844570f61445839f4464a60ca740a66f653a5f9d9d4"
+        "sha256": "c64370b9fa219676b680ffe6339d8c65fd463aef0db338f740eff6b8a58fa6aa"
       },
       "gate": {
         "approval_id": "",
@@ -18553,7 +19851,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Scope",
           "missing": [
-            "No row or document satisfies 'Scope'"
+            "No row or document satisfies 'Scope'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -18566,12 +19864,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Schedule",
           "missing": [
-            "No row or document satisfies 'Schedule'"
+            "No row or document satisfies 'Schedule'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -18584,12 +19882,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Cost",
           "missing": [
-            "No row or document satisfies 'Cost'"
+            "No row or document satisfies 'Cost'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -18602,12 +19900,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -18620,7 +19918,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -18643,7 +19941,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-t14.html",
-        "sha256": "aa950b19b6c5f59b87ad1fb1ca8cfc60eae4bcc5121c53447d97b858ef65903d"
+        "sha256": "bd0d47b31d4e707abd3482980b5df9b78c4962e1c9a515d9103579c2e6a74380"
       },
       "gate": {
         "approval_id": "",
@@ -18660,7 +19958,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Scope",
           "missing": [
-            "No row or document satisfies 'Scope'"
+            "No row or document satisfies 'Scope'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -18673,12 +19971,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Schedule",
           "missing": [
-            "No row or document satisfies 'Schedule'"
+            "No row or document satisfies 'Schedule'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -18691,12 +19989,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Cost",
           "missing": [
-            "No row or document satisfies 'Cost'"
+            "No row or document satisfies 'Cost'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -18709,12 +20007,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -18727,7 +20025,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -18750,7 +20048,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-t15.html",
-        "sha256": "ac6c7835b24b635cbf95eef2cbe754054851eb3eb72a9d9182b10c05a63a8091"
+        "sha256": "37810c7ca97026278a2b73303d4a08030be2707d0fb61d722f885bd9be6e1d95"
       },
       "gate": {
         "approval_id": "",
@@ -18767,7 +20065,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Scope",
           "missing": [
-            "No row or document satisfies 'Scope'"
+            "No row or document satisfies 'Scope'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -18780,12 +20078,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Schedule",
           "missing": [
-            "No row or document satisfies 'Schedule'"
+            "No row or document satisfies 'Schedule'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -18798,12 +20096,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Cost",
           "missing": [
-            "No row or document satisfies 'Cost'"
+            "No row or document satisfies 'Cost'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -18816,12 +20114,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -18834,7 +20132,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -18857,7 +20155,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-t16.html",
-        "sha256": "bc35729afd9283879e8dcd24d8ac485a814f83099548d1de78d08a78fa5ed311"
+        "sha256": "ba741f38d801a515a432de0fa3e4a3897fc778353eab42199c8df0b47373ae68"
       },
       "gate": {
         "approval_id": "",
@@ -18874,7 +20172,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Scope",
           "missing": [
-            "No row or document satisfies 'Scope'"
+            "No row or document satisfies 'Scope'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -18887,12 +20185,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Schedule",
           "missing": [
-            "No row or document satisfies 'Schedule'"
+            "No row or document satisfies 'Schedule'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -18905,12 +20203,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Cost",
           "missing": [
-            "No row or document satisfies 'Cost'"
+            "No row or document satisfies 'Cost'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -18923,12 +20221,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -18941,7 +20239,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -18964,7 +20262,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-t17.html",
-        "sha256": "f7d772ad5b73c8f50199e4a42534d98bd110ca1dc6a16376e5c87d8bfc15c354"
+        "sha256": "188e1c391e9719ba29024f1df9058fda1834463bb21de183b76cb456b46f7ca6"
       },
       "gate": {
         "approval_id": "",
@@ -18981,7 +20279,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Scope",
           "missing": [
-            "No row or document satisfies 'Scope'"
+            "No row or document satisfies 'Scope'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -18994,12 +20292,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Schedule",
           "missing": [
-            "No row or document satisfies 'Schedule'"
+            "No row or document satisfies 'Schedule'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -19012,12 +20310,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Cost",
           "missing": [
-            "No row or document satisfies 'Cost'"
+            "No row or document satisfies 'Cost'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -19030,12 +20328,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -19048,7 +20346,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -19071,7 +20369,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-t2.html",
-        "sha256": "9d8639445544da4ccbdf0b6d38f16ee21f5ae84781b619ed5e7914e600596040"
+        "sha256": "eddad80660da56fd09eed204faea69bbfd37b980b1583dcc89fed90a2b3b5ab6"
       },
       "gate": {
         "approval_id": "",
@@ -19088,7 +20386,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Scope",
           "missing": [
-            "No row or document satisfies 'Scope'"
+            "No row or document satisfies 'Scope'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -19101,12 +20399,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Schedule",
           "missing": [
-            "No row or document satisfies 'Schedule'"
+            "No row or document satisfies 'Schedule'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -19119,12 +20417,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Cost",
           "missing": [
-            "No row or document satisfies 'Cost'"
+            "No row or document satisfies 'Cost'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -19137,12 +20435,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -19155,7 +20453,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -19178,7 +20476,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-t3.html",
-        "sha256": "d07000d51e043e733ac2cf6c1a53c735618b09f4bd994c2c45ec6159c71c2d56"
+        "sha256": "f7e3795657749337752e3dc851c5368f7a8a12a9654bb4fdacb4cda9be4222f0"
       },
       "gate": {
         "approval_id": "",
@@ -19195,7 +20493,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Scope",
           "missing": [
-            "No row or document satisfies 'Scope'"
+            "No row or document satisfies 'Scope'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -19208,12 +20506,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Schedule",
           "missing": [
-            "No row or document satisfies 'Schedule'"
+            "No row or document satisfies 'Schedule'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -19226,12 +20524,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Cost",
           "missing": [
-            "No row or document satisfies 'Cost'"
+            "No row or document satisfies 'Cost'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -19244,12 +20542,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -19262,7 +20560,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -19285,7 +20583,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-t4.html",
-        "sha256": "d5f0b9e02ef7b9c0053c682c347cf807487e4842d463d70a9849c4d33201dc61"
+        "sha256": "063e999c11376e5aa13b11be6694d78258596a4cd3dd7112fbef13c457df228e"
       },
       "gate": {
         "approval_id": "",
@@ -19302,7 +20600,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Scope",
           "missing": [
-            "No row or document satisfies 'Scope'"
+            "No row or document satisfies 'Scope'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -19315,12 +20613,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Schedule",
           "missing": [
-            "No row or document satisfies 'Schedule'"
+            "No row or document satisfies 'Schedule'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -19333,12 +20631,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Cost",
           "missing": [
-            "No row or document satisfies 'Cost'"
+            "No row or document satisfies 'Cost'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -19351,12 +20649,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -19369,7 +20667,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -19392,7 +20690,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-t5.html",
-        "sha256": "4ebd4efd4dc12f7eeba934452bd8a55baff333037e4513f25743f59a0ed1de12"
+        "sha256": "347257ee656a85700fd455eadb087f953a00f1d838b81afb58b3865ec132de1b"
       },
       "gate": {
         "approval_id": "",
@@ -19409,7 +20707,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Scope",
           "missing": [
-            "No row or document satisfies 'Scope'"
+            "No row or document satisfies 'Scope'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -19422,12 +20720,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Schedule",
           "missing": [
-            "No row or document satisfies 'Schedule'"
+            "No row or document satisfies 'Schedule'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -19440,12 +20738,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Cost",
           "missing": [
-            "No row or document satisfies 'Cost'"
+            "No row or document satisfies 'Cost'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -19458,12 +20756,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -19476,7 +20774,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -19499,7 +20797,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-t6.html",
-        "sha256": "a5682696845257e72e218569f14d0b2afb08527b308b30684c8cfdb38a22cead"
+        "sha256": "105095b3db0342671d1a93349254589b02caf870da410c393abb27b135417df7"
       },
       "gate": {
         "approval_id": "",
@@ -19516,7 +20814,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Scope",
           "missing": [
-            "No row or document satisfies 'Scope'"
+            "No row or document satisfies 'Scope'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -19529,12 +20827,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Schedule",
           "missing": [
-            "No row or document satisfies 'Schedule'"
+            "No row or document satisfies 'Schedule'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -19547,12 +20845,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Cost",
           "missing": [
-            "No row or document satisfies 'Cost'"
+            "No row or document satisfies 'Cost'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -19565,12 +20863,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -19583,7 +20881,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -19606,7 +20904,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-t7.html",
-        "sha256": "f3a7a140ae47e35b8a8d705b245b697b164073878791a787027c2e947cb109e5"
+        "sha256": "ece9c37ac91c31f4351fb2642208a0b0ec9bcea5a3069ba7cebad1445d513177"
       },
       "gate": {
         "approval_id": "",
@@ -19623,7 +20921,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Scope",
           "missing": [
-            "No row or document satisfies 'Scope'"
+            "No row or document satisfies 'Scope'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -19636,12 +20934,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Schedule",
           "missing": [
-            "No row or document satisfies 'Schedule'"
+            "No row or document satisfies 'Schedule'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -19654,12 +20952,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Cost",
           "missing": [
-            "No row or document satisfies 'Cost'"
+            "No row or document satisfies 'Cost'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -19672,12 +20970,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -19690,7 +20988,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -19713,7 +21011,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-t8.html",
-        "sha256": "1391c75d54f624dc41bacccbcd7e2e9010904dfe913598de93252c8b81867138"
+        "sha256": "1e730c31762e738e6d9e6324ac0c4ac66f3fb3cde2ebd42721ff722414512b55"
       },
       "gate": {
         "approval_id": "",
@@ -19730,7 +21028,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Scope",
           "missing": [
-            "No row or document satisfies 'Scope'"
+            "No row or document satisfies 'Scope'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -19743,12 +21041,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Schedule",
           "missing": [
-            "No row or document satisfies 'Schedule'"
+            "No row or document satisfies 'Schedule'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -19761,12 +21059,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Cost",
           "missing": [
-            "No row or document satisfies 'Cost'"
+            "No row or document satisfies 'Cost'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -19779,12 +21077,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -19797,7 +21095,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -19820,7 +21118,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-baseline-t9.html",
-        "sha256": "62c722dee7936ac72eaf40829717b8e14de84ad074996b764ba345832a225c0f"
+        "sha256": "606486f6ad65687a2d5de82a050934a846c9c527e0726f05d2a2a18c671fea37"
       },
       "gate": {
         "approval_id": "",
@@ -19837,7 +21135,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Scope",
           "missing": [
-            "No row or document satisfies 'Scope'"
+            "No row or document satisfies 'Scope'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -19850,12 +21148,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Schedule",
           "missing": [
-            "No row or document satisfies 'Schedule'"
+            "No row or document satisfies 'Schedule'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -19868,12 +21166,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Cost",
           "missing": [
-            "No row or document satisfies 'Cost'"
+            "No row or document satisfies 'Cost'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -19886,12 +21184,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -19904,7 +21202,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/project_baselines"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -20154,7 +21452,17 @@ window.CONVEYOR_STANDARDS = {
           ],
           "required": true,
           "severity": "",
-          "sources": [],
+          "sources": [
+            {
+              "category": "project-brief",
+              "count": 0,
+              "file": "artefacts.json",
+              "items": [],
+              "kind": "documents",
+              "pointer": "/documents",
+              "scope": "subject"
+            }
+          ],
           "status": "partial"
         },
         {
@@ -29271,7 +30579,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-design-publish.html",
-        "sha256": "97e2b119bea9bfac651de2bf6791d060b142aa9a2b8b5293b80b9f0ab6b15981"
+        "sha256": "d7d1ec50e45034637ae16d8d72bdd7ac18864035fc975d5ac69b924e4a6ca2f2"
       },
       "gate": {
         "approval_id": "",
@@ -29288,7 +30596,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Risks",
           "missing": [
-            "No row or document satisfies 'Risks'"
+            "No row or document satisfies 'Risks'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -29301,12 +30609,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Issues",
           "missing": [
-            "No row or document satisfies 'Issues'"
+            "No row or document satisfies 'Issues'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -29319,12 +30627,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Assumptions",
           "missing": [
-            "No row or document satisfies 'Assumptions'"
+            "No row or document satisfies 'Assumptions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -29337,12 +30645,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Dependencies",
           "missing": [
-            "No row or document satisfies 'Dependencies'"
+            "No row or document satisfies 'Dependencies'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -29355,12 +30663,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Benefits",
           "missing": [
-            "No row or document satisfies 'Benefits'"
+            "No row or document satisfies 'Benefits'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -29373,12 +30681,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Changes",
           "missing": [
-            "No row or document satisfies 'Changes'"
+            "No row or document satisfies 'Changes'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -29391,7 +30699,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -29414,7 +30722,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-p0.html",
-        "sha256": "c47bbca9e2001ecba5e4238cc7763e3d2ec443dec0e940de216d24772d461282"
+        "sha256": "a4844ab68e8682156999e21958341da7c08dd37f675394ba7d82ee6b6a4d3a44"
       },
       "gate": {
         "approval_id": "",
@@ -29431,7 +30739,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Risks",
           "missing": [
-            "No row or document satisfies 'Risks'"
+            "No row or document satisfies 'Risks'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -29444,12 +30752,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Issues",
           "missing": [
-            "No row or document satisfies 'Issues'"
+            "No row or document satisfies 'Issues'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -29462,12 +30770,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Assumptions",
           "missing": [
-            "No row or document satisfies 'Assumptions'"
+            "No row or document satisfies 'Assumptions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -29480,12 +30788,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Dependencies",
           "missing": [
-            "No row or document satisfies 'Dependencies'"
+            "No row or document satisfies 'Dependencies'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -29498,12 +30806,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Benefits",
           "missing": [
-            "No row or document satisfies 'Benefits'"
+            "No row or document satisfies 'Benefits'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -29516,12 +30824,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Changes",
           "missing": [
-            "No row or document satisfies 'Changes'"
+            "No row or document satisfies 'Changes'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -29534,7 +30842,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -29557,7 +30865,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-platform.html",
-        "sha256": "b7d4892862a6661d6e09776733149fdcef109e19fc5dfc893a350172027540e2"
+        "sha256": "bcd4da9a6f2746c49ade690c4f2258370ec0966a615a71022e529cf11c1a5563"
       },
       "gate": {
         "approval_id": "",
@@ -29574,7 +30882,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Risks",
           "missing": [
-            "No row or document satisfies 'Risks'"
+            "No row or document satisfies 'Risks'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -29587,12 +30895,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Issues",
           "missing": [
-            "No row or document satisfies 'Issues'"
+            "No row or document satisfies 'Issues'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -29605,12 +30913,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Assumptions",
           "missing": [
-            "No row or document satisfies 'Assumptions'"
+            "No row or document satisfies 'Assumptions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -29623,12 +30931,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Dependencies",
           "missing": [
-            "No row or document satisfies 'Dependencies'"
+            "No row or document satisfies 'Dependencies'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -29641,12 +30949,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Benefits",
           "missing": [
-            "No row or document satisfies 'Benefits'"
+            "No row or document satisfies 'Benefits'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -29659,12 +30967,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Changes",
           "missing": [
-            "No row or document satisfies 'Changes'"
+            "No row or document satisfies 'Changes'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -29677,7 +30985,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -29700,7 +31008,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-s00.html",
-        "sha256": "e88409ca7fb6613172b510e08adb219b753ba948ae7ace006001dda69bafe34f"
+        "sha256": "b6057811b30c7c567b5275b321a065802187b6fcefa629d3415b4a0fb1b1d16a"
       },
       "gate": {
         "approval_id": "",
@@ -29717,7 +31025,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Risks",
           "missing": [
-            "No row or document satisfies 'Risks'"
+            "No row or document satisfies 'Risks'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -29730,12 +31038,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Issues",
           "missing": [
-            "No row or document satisfies 'Issues'"
+            "No row or document satisfies 'Issues'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -29748,12 +31056,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Assumptions",
           "missing": [
-            "No row or document satisfies 'Assumptions'"
+            "No row or document satisfies 'Assumptions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -29766,12 +31074,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Dependencies",
           "missing": [
-            "No row or document satisfies 'Dependencies'"
+            "No row or document satisfies 'Dependencies'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -29784,12 +31092,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Benefits",
           "missing": [
-            "No row or document satisfies 'Benefits'"
+            "No row or document satisfies 'Benefits'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -29802,12 +31110,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Changes",
           "missing": [
-            "No row or document satisfies 'Changes'"
+            "No row or document satisfies 'Changes'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -29820,7 +31128,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -29843,7 +31151,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-s01.html",
-        "sha256": "55f6b032b7d652c864230443ce3fffce4491e1bce03775b938a5fef2f0d1502c"
+        "sha256": "3feebaa30495bc76f796d60cd9d7d293b6535bdeceede6fbc971930212ad7068"
       },
       "gate": {
         "approval_id": "",
@@ -29860,7 +31168,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Risks",
           "missing": [
-            "No row or document satisfies 'Risks'"
+            "No row or document satisfies 'Risks'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -29873,12 +31181,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Issues",
           "missing": [
-            "No row or document satisfies 'Issues'"
+            "No row or document satisfies 'Issues'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -29891,12 +31199,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Assumptions",
           "missing": [
-            "No row or document satisfies 'Assumptions'"
+            "No row or document satisfies 'Assumptions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -29909,12 +31217,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Dependencies",
           "missing": [
-            "No row or document satisfies 'Dependencies'"
+            "No row or document satisfies 'Dependencies'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -29927,12 +31235,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Benefits",
           "missing": [
-            "No row or document satisfies 'Benefits'"
+            "No row or document satisfies 'Benefits'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -29945,12 +31253,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Changes",
           "missing": [
-            "No row or document satisfies 'Changes'"
+            "No row or document satisfies 'Changes'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -29963,7 +31271,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -29986,7 +31294,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-s02.html",
-        "sha256": "288dcab71bb3bbf177932e251a52b2681b36598952c21db50666bdff88f7cfd5"
+        "sha256": "f3da55b47803c8437560afd59a2f0a3599f3fb13329c4ee7a317a85550de3497"
       },
       "gate": {
         "approval_id": "",
@@ -30003,7 +31311,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Risks",
           "missing": [
-            "No row or document satisfies 'Risks'"
+            "No row or document satisfies 'Risks'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -30016,12 +31324,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Issues",
           "missing": [
-            "No row or document satisfies 'Issues'"
+            "No row or document satisfies 'Issues'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -30034,12 +31342,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Assumptions",
           "missing": [
-            "No row or document satisfies 'Assumptions'"
+            "No row or document satisfies 'Assumptions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -30052,12 +31360,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Dependencies",
           "missing": [
-            "No row or document satisfies 'Dependencies'"
+            "No row or document satisfies 'Dependencies'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -30070,12 +31378,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Benefits",
           "missing": [
-            "No row or document satisfies 'Benefits'"
+            "No row or document satisfies 'Benefits'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -30088,12 +31396,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Changes",
           "missing": [
-            "No row or document satisfies 'Changes'"
+            "No row or document satisfies 'Changes'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -30106,7 +31414,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -30129,7 +31437,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-s03.html",
-        "sha256": "2f3626352875d5fc43613d0e9e96824a503ed822c62d61247359f69a72e62d9b"
+        "sha256": "29a2c3ec5ecab06810556b7c3364f4335839b96373c21b91269bdd6f4a266c34"
       },
       "gate": {
         "approval_id": "",
@@ -30146,7 +31454,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Risks",
           "missing": [
-            "No row or document satisfies 'Risks'"
+            "No row or document satisfies 'Risks'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -30159,12 +31467,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Issues",
           "missing": [
-            "No row or document satisfies 'Issues'"
+            "No row or document satisfies 'Issues'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -30177,12 +31485,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Assumptions",
           "missing": [
-            "No row or document satisfies 'Assumptions'"
+            "No row or document satisfies 'Assumptions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -30195,12 +31503,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Dependencies",
           "missing": [
-            "No row or document satisfies 'Dependencies'"
+            "No row or document satisfies 'Dependencies'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -30213,12 +31521,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Benefits",
           "missing": [
-            "No row or document satisfies 'Benefits'"
+            "No row or document satisfies 'Benefits'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -30231,12 +31539,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Changes",
           "missing": [
-            "No row or document satisfies 'Changes'"
+            "No row or document satisfies 'Changes'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -30249,7 +31557,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -30272,7 +31580,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-s04.html",
-        "sha256": "162623f352d024bc4f3f850eee150b1c7f338c8c24b919dc8ef1cd7e24574527"
+        "sha256": "fdeb93f2c7d9161328bb9d805eb19455ceeff8e895553751b567427672ce0e2f"
       },
       "gate": {
         "approval_id": "",
@@ -30289,7 +31597,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Risks",
           "missing": [
-            "No row or document satisfies 'Risks'"
+            "No row or document satisfies 'Risks'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -30302,12 +31610,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Issues",
           "missing": [
-            "No row or document satisfies 'Issues'"
+            "No row or document satisfies 'Issues'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -30320,12 +31628,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Assumptions",
           "missing": [
-            "No row or document satisfies 'Assumptions'"
+            "No row or document satisfies 'Assumptions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -30338,12 +31646,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Dependencies",
           "missing": [
-            "No row or document satisfies 'Dependencies'"
+            "No row or document satisfies 'Dependencies'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -30356,12 +31664,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Benefits",
           "missing": [
-            "No row or document satisfies 'Benefits'"
+            "No row or document satisfies 'Benefits'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -30374,12 +31682,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Changes",
           "missing": [
-            "No row or document satisfies 'Changes'"
+            "No row or document satisfies 'Changes'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -30392,7 +31700,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -30415,7 +31723,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-s05.html",
-        "sha256": "adc472215b8757c49300d552076d80fae1c668cb2eeff8bc9da5aa2917256ad2"
+        "sha256": "c4db0fd3025d9d3113d55bde63249df499569480fadf2efe98d5f26307ae6e90"
       },
       "gate": {
         "approval_id": "",
@@ -30432,7 +31740,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Risks",
           "missing": [
-            "No row or document satisfies 'Risks'"
+            "No row or document satisfies 'Risks'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -30445,12 +31753,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Issues",
           "missing": [
-            "No row or document satisfies 'Issues'"
+            "No row or document satisfies 'Issues'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -30463,12 +31771,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Assumptions",
           "missing": [
-            "No row or document satisfies 'Assumptions'"
+            "No row or document satisfies 'Assumptions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -30481,12 +31789,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Dependencies",
           "missing": [
-            "No row or document satisfies 'Dependencies'"
+            "No row or document satisfies 'Dependencies'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -30499,12 +31807,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Benefits",
           "missing": [
-            "No row or document satisfies 'Benefits'"
+            "No row or document satisfies 'Benefits'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -30517,12 +31825,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Changes",
           "missing": [
-            "No row or document satisfies 'Changes'"
+            "No row or document satisfies 'Changes'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -30535,7 +31843,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -30558,7 +31866,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-s06.html",
-        "sha256": "1534e3e07cce2b15d4d690601b111650ec3d7a9cfcdc59e7ed97a4131d80df50"
+        "sha256": "84926ed6e31ac6f09fe028210cf026be2dc79b71be01c0607773949a022e9a6b"
       },
       "gate": {
         "approval_id": "",
@@ -30575,7 +31883,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Risks",
           "missing": [
-            "No row or document satisfies 'Risks'"
+            "No row or document satisfies 'Risks'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -30588,12 +31896,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Issues",
           "missing": [
-            "No row or document satisfies 'Issues'"
+            "No row or document satisfies 'Issues'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -30606,12 +31914,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Assumptions",
           "missing": [
-            "No row or document satisfies 'Assumptions'"
+            "No row or document satisfies 'Assumptions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -30624,12 +31932,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Dependencies",
           "missing": [
-            "No row or document satisfies 'Dependencies'"
+            "No row or document satisfies 'Dependencies'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -30642,12 +31950,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Benefits",
           "missing": [
-            "No row or document satisfies 'Benefits'"
+            "No row or document satisfies 'Benefits'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -30660,12 +31968,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Changes",
           "missing": [
-            "No row or document satisfies 'Changes'"
+            "No row or document satisfies 'Changes'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -30678,7 +31986,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -30701,7 +32009,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-s06b.html",
-        "sha256": "f0a37a7afcfed79822f27c8e2fe0c2b660387af23715b8fd757db3448da49f88"
+        "sha256": "d56a8228c0e9406d47bdb6b87fa1bd2cf9dfd115bb6438a1eccf033a7f8395a1"
       },
       "gate": {
         "approval_id": "",
@@ -30718,7 +32026,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Risks",
           "missing": [
-            "No row or document satisfies 'Risks'"
+            "No row or document satisfies 'Risks'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -30731,12 +32039,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Issues",
           "missing": [
-            "No row or document satisfies 'Issues'"
+            "No row or document satisfies 'Issues'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -30749,12 +32057,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Assumptions",
           "missing": [
-            "No row or document satisfies 'Assumptions'"
+            "No row or document satisfies 'Assumptions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -30767,12 +32075,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Dependencies",
           "missing": [
-            "No row or document satisfies 'Dependencies'"
+            "No row or document satisfies 'Dependencies'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -30785,12 +32093,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Benefits",
           "missing": [
-            "No row or document satisfies 'Benefits'"
+            "No row or document satisfies 'Benefits'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -30803,12 +32111,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Changes",
           "missing": [
-            "No row or document satisfies 'Changes'"
+            "No row or document satisfies 'Changes'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -30821,7 +32129,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -30844,7 +32152,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-s06c.html",
-        "sha256": "ba77e7500b1159a61e9bda24fca453cea616e5ddec04d6a5d8a30f3b5875a2f0"
+        "sha256": "c82e306a28f6dfed3bdc4a20deaff22562f754ff4204ab1cea39cca3451d8cb0"
       },
       "gate": {
         "approval_id": "",
@@ -30861,7 +32169,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Risks",
           "missing": [
-            "No row or document satisfies 'Risks'"
+            "No row or document satisfies 'Risks'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -30874,12 +32182,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Issues",
           "missing": [
-            "No row or document satisfies 'Issues'"
+            "No row or document satisfies 'Issues'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -30892,12 +32200,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Assumptions",
           "missing": [
-            "No row or document satisfies 'Assumptions'"
+            "No row or document satisfies 'Assumptions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -30910,12 +32218,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Dependencies",
           "missing": [
-            "No row or document satisfies 'Dependencies'"
+            "No row or document satisfies 'Dependencies'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -30928,12 +32236,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Benefits",
           "missing": [
-            "No row or document satisfies 'Benefits'"
+            "No row or document satisfies 'Benefits'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -30946,12 +32254,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Changes",
           "missing": [
-            "No row or document satisfies 'Changes'"
+            "No row or document satisfies 'Changes'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -30964,7 +32272,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -30987,7 +32295,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-s06d.html",
-        "sha256": "80d5d750cdad5b987a25aab446ef576afad860c4089e436b9e25e23e969cf732"
+        "sha256": "bcd57470648e72245265423d132c156ec5cf33723685d195b352b7c4813d5e92"
       },
       "gate": {
         "approval_id": "",
@@ -31004,7 +32312,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Risks",
           "missing": [
-            "No row or document satisfies 'Risks'"
+            "No row or document satisfies 'Risks'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -31017,12 +32325,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Issues",
           "missing": [
-            "No row or document satisfies 'Issues'"
+            "No row or document satisfies 'Issues'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -31035,12 +32343,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Assumptions",
           "missing": [
-            "No row or document satisfies 'Assumptions'"
+            "No row or document satisfies 'Assumptions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -31053,12 +32361,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Dependencies",
           "missing": [
-            "No row or document satisfies 'Dependencies'"
+            "No row or document satisfies 'Dependencies'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -31071,12 +32379,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Benefits",
           "missing": [
-            "No row or document satisfies 'Benefits'"
+            "No row or document satisfies 'Benefits'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -31089,12 +32397,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Changes",
           "missing": [
-            "No row or document satisfies 'Changes'"
+            "No row or document satisfies 'Changes'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -31107,7 +32415,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -31130,7 +32438,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-s07.html",
-        "sha256": "231d2a90a18845d42cba4b33838ef94e30e24e147eb034a712e5f5f6884de51c"
+        "sha256": "5859acb511205f9e3061caa18cbd37babdc64de035cd17d50c693cbd859ccfac"
       },
       "gate": {
         "approval_id": "",
@@ -31147,7 +32455,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Risks",
           "missing": [
-            "No row or document satisfies 'Risks'"
+            "No row or document satisfies 'Risks'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -31160,12 +32468,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Issues",
           "missing": [
-            "No row or document satisfies 'Issues'"
+            "No row or document satisfies 'Issues'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -31178,12 +32486,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Assumptions",
           "missing": [
-            "No row or document satisfies 'Assumptions'"
+            "No row or document satisfies 'Assumptions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -31196,12 +32504,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Dependencies",
           "missing": [
-            "No row or document satisfies 'Dependencies'"
+            "No row or document satisfies 'Dependencies'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -31214,12 +32522,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Benefits",
           "missing": [
-            "No row or document satisfies 'Benefits'"
+            "No row or document satisfies 'Benefits'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -31232,12 +32540,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Changes",
           "missing": [
-            "No row or document satisfies 'Changes'"
+            "No row or document satisfies 'Changes'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -31250,7 +32558,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -31273,7 +32581,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-s08.html",
-        "sha256": "49110686b4f8aa660f33121d11e38109ca6cceb72404e5fd66fc9e565565ae8f"
+        "sha256": "16d424cf2bc9e9af7686b5429bed1005c13b3fe0e75397f42fcac96f76f15a3d"
       },
       "gate": {
         "approval_id": "",
@@ -31290,7 +32598,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Risks",
           "missing": [
-            "No row or document satisfies 'Risks'"
+            "No row or document satisfies 'Risks'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -31303,12 +32611,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Issues",
           "missing": [
-            "No row or document satisfies 'Issues'"
+            "No row or document satisfies 'Issues'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -31321,12 +32629,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Assumptions",
           "missing": [
-            "No row or document satisfies 'Assumptions'"
+            "No row or document satisfies 'Assumptions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -31339,12 +32647,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Dependencies",
           "missing": [
-            "No row or document satisfies 'Dependencies'"
+            "No row or document satisfies 'Dependencies'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -31357,12 +32665,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Benefits",
           "missing": [
-            "No row or document satisfies 'Benefits'"
+            "No row or document satisfies 'Benefits'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -31375,12 +32683,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Changes",
           "missing": [
-            "No row or document satisfies 'Changes'"
+            "No row or document satisfies 'Changes'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -31393,7 +32701,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -31416,7 +32724,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-s09.html",
-        "sha256": "93728396f9b1b72180e8039eb6b250e13bbfa8116a3b5ce86c0b06ecf5a49170"
+        "sha256": "2916ee5c19b5d6f673eb0e570387231f924886deacdbc642612eab7c62cb7abf"
       },
       "gate": {
         "approval_id": "",
@@ -31433,7 +32741,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Risks",
           "missing": [
-            "No row or document satisfies 'Risks'"
+            "No row or document satisfies 'Risks'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -31446,12 +32754,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Issues",
           "missing": [
-            "No row or document satisfies 'Issues'"
+            "No row or document satisfies 'Issues'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -31464,12 +32772,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Assumptions",
           "missing": [
-            "No row or document satisfies 'Assumptions'"
+            "No row or document satisfies 'Assumptions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -31482,12 +32790,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Dependencies",
           "missing": [
-            "No row or document satisfies 'Dependencies'"
+            "No row or document satisfies 'Dependencies'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -31500,12 +32808,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Benefits",
           "missing": [
-            "No row or document satisfies 'Benefits'"
+            "No row or document satisfies 'Benefits'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -31518,12 +32826,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Changes",
           "missing": [
-            "No row or document satisfies 'Changes'"
+            "No row or document satisfies 'Changes'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -31536,7 +32844,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -31559,7 +32867,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-s10.html",
-        "sha256": "4f695e73fec42b0e7b69d41036a10a3cf125803317b9a1e5d1b2de71869d3b14"
+        "sha256": "fc6dacf2bae853ae64f561513df293d0076ab906ce20d1f1a16ac6c1f44aee29"
       },
       "gate": {
         "approval_id": "",
@@ -31576,7 +32884,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Risks",
           "missing": [
-            "No row or document satisfies 'Risks'"
+            "No row or document satisfies 'Risks'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -31589,12 +32897,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Issues",
           "missing": [
-            "No row or document satisfies 'Issues'"
+            "No row or document satisfies 'Issues'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -31607,12 +32915,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Assumptions",
           "missing": [
-            "No row or document satisfies 'Assumptions'"
+            "No row or document satisfies 'Assumptions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -31625,12 +32933,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Dependencies",
           "missing": [
-            "No row or document satisfies 'Dependencies'"
+            "No row or document satisfies 'Dependencies'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -31643,12 +32951,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Benefits",
           "missing": [
-            "No row or document satisfies 'Benefits'"
+            "No row or document satisfies 'Benefits'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -31661,12 +32969,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Changes",
           "missing": [
-            "No row or document satisfies 'Changes'"
+            "No row or document satisfies 'Changes'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -31679,7 +32987,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -31702,7 +33010,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-s11.html",
-        "sha256": "598ad7d13bbb63983303c76fccbe6b400b5e7ed3c0120f25da6cd7d5bd7dc48c"
+        "sha256": "346a1dfc77bb5e4ddaeaeb95001b780f2f263cfcb1fee5a03815f6ab1a3cc236"
       },
       "gate": {
         "approval_id": "",
@@ -31719,7 +33027,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Risks",
           "missing": [
-            "No row or document satisfies 'Risks'"
+            "No row or document satisfies 'Risks'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -31732,12 +33040,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Issues",
           "missing": [
-            "No row or document satisfies 'Issues'"
+            "No row or document satisfies 'Issues'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -31750,12 +33058,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Assumptions",
           "missing": [
-            "No row or document satisfies 'Assumptions'"
+            "No row or document satisfies 'Assumptions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -31768,12 +33076,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Dependencies",
           "missing": [
-            "No row or document satisfies 'Dependencies'"
+            "No row or document satisfies 'Dependencies'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -31786,12 +33094,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Benefits",
           "missing": [
-            "No row or document satisfies 'Benefits'"
+            "No row or document satisfies 'Benefits'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -31804,12 +33112,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Changes",
           "missing": [
-            "No row or document satisfies 'Changes'"
+            "No row or document satisfies 'Changes'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -31822,7 +33130,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -31845,7 +33153,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-s12.html",
-        "sha256": "637f9ea5a513f7567de79a0f896a9589e270251459e7c2b186e4f60b64fbab01"
+        "sha256": "10d16e70ed4fbb0f5568b0343e5b6edbec73b503e2cfce10093d5f0b85d4301a"
       },
       "gate": {
         "approval_id": "",
@@ -31862,7 +33170,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Risks",
           "missing": [
-            "No row or document satisfies 'Risks'"
+            "No row or document satisfies 'Risks'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -31875,12 +33183,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Issues",
           "missing": [
-            "No row or document satisfies 'Issues'"
+            "No row or document satisfies 'Issues'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -31893,12 +33201,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Assumptions",
           "missing": [
-            "No row or document satisfies 'Assumptions'"
+            "No row or document satisfies 'Assumptions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -31911,12 +33219,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Dependencies",
           "missing": [
-            "No row or document satisfies 'Dependencies'"
+            "No row or document satisfies 'Dependencies'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -31929,12 +33237,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Benefits",
           "missing": [
-            "No row or document satisfies 'Benefits'"
+            "No row or document satisfies 'Benefits'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -31947,12 +33255,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Changes",
           "missing": [
-            "No row or document satisfies 'Changes'"
+            "No row or document satisfies 'Changes'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -31965,7 +33273,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -31988,7 +33296,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-s13.html",
-        "sha256": "727c471ddbb2917ec7c28c9f7123c33f927094ab6169f26373fbf430e5f573b6"
+        "sha256": "9450b32da4819265f96a259206d8f25772ecfc0b9b29aaeb5dd424b5479c3dba"
       },
       "gate": {
         "approval_id": "",
@@ -32005,7 +33313,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Risks",
           "missing": [
-            "No row or document satisfies 'Risks'"
+            "No row or document satisfies 'Risks'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -32018,12 +33326,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Issues",
           "missing": [
-            "No row or document satisfies 'Issues'"
+            "No row or document satisfies 'Issues'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -32036,12 +33344,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Assumptions",
           "missing": [
-            "No row or document satisfies 'Assumptions'"
+            "No row or document satisfies 'Assumptions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -32054,12 +33362,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Dependencies",
           "missing": [
-            "No row or document satisfies 'Dependencies'"
+            "No row or document satisfies 'Dependencies'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -32072,12 +33380,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Benefits",
           "missing": [
-            "No row or document satisfies 'Benefits'"
+            "No row or document satisfies 'Benefits'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -32090,12 +33398,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Changes",
           "missing": [
-            "No row or document satisfies 'Changes'"
+            "No row or document satisfies 'Changes'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -32108,7 +33416,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -32131,7 +33439,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-s14.html",
-        "sha256": "d533c9bb3be38c584eb4f969f0aa55b480cdf55348ada4b58f076be8490bc5ea"
+        "sha256": "ca849028c7dad456fea05b48f69fe8a085b91c27f706764382b1577366542592"
       },
       "gate": {
         "approval_id": "",
@@ -32148,7 +33456,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Risks",
           "missing": [
-            "No row or document satisfies 'Risks'"
+            "No row or document satisfies 'Risks'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -32161,12 +33469,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Issues",
           "missing": [
-            "No row or document satisfies 'Issues'"
+            "No row or document satisfies 'Issues'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -32179,12 +33487,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Assumptions",
           "missing": [
-            "No row or document satisfies 'Assumptions'"
+            "No row or document satisfies 'Assumptions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -32197,12 +33505,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Dependencies",
           "missing": [
-            "No row or document satisfies 'Dependencies'"
+            "No row or document satisfies 'Dependencies'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -32215,12 +33523,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Benefits",
           "missing": [
-            "No row or document satisfies 'Benefits'"
+            "No row or document satisfies 'Benefits'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -32233,12 +33541,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Changes",
           "missing": [
-            "No row or document satisfies 'Changes'"
+            "No row or document satisfies 'Changes'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -32251,7 +33559,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -32274,7 +33582,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-s15.html",
-        "sha256": "3da12e2f2b55aa5d83aa60cbf6e709ae8282090bc08a1562074dc6e9c01993aa"
+        "sha256": "c1debe4e776dc1ad175f42b2a867cd54e5aaaa00e6be51076ce8cab902c06aea"
       },
       "gate": {
         "approval_id": "",
@@ -32291,7 +33599,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Risks",
           "missing": [
-            "No row or document satisfies 'Risks'"
+            "No row or document satisfies 'Risks'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -32304,12 +33612,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Issues",
           "missing": [
-            "No row or document satisfies 'Issues'"
+            "No row or document satisfies 'Issues'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -32322,12 +33630,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Assumptions",
           "missing": [
-            "No row or document satisfies 'Assumptions'"
+            "No row or document satisfies 'Assumptions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -32340,12 +33648,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Dependencies",
           "missing": [
-            "No row or document satisfies 'Dependencies'"
+            "No row or document satisfies 'Dependencies'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -32358,12 +33666,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Benefits",
           "missing": [
-            "No row or document satisfies 'Benefits'"
+            "No row or document satisfies 'Benefits'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -32376,12 +33684,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Changes",
           "missing": [
-            "No row or document satisfies 'Changes'"
+            "No row or document satisfies 'Changes'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -32394,7 +33702,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -32417,7 +33725,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-s16.html",
-        "sha256": "0d0c8dca4bb409027c78f46d85418e5353834040910097844f1cd749f06b2710"
+        "sha256": "2f082c6f0004d0f3b093af0e615e0af9a2660ac7cd2971ebe3ed32108acb0708"
       },
       "gate": {
         "approval_id": "",
@@ -32434,7 +33742,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Risks",
           "missing": [
-            "No row or document satisfies 'Risks'"
+            "No row or document satisfies 'Risks'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -32447,12 +33755,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Issues",
           "missing": [
-            "No row or document satisfies 'Issues'"
+            "No row or document satisfies 'Issues'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -32465,12 +33773,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Assumptions",
           "missing": [
-            "No row or document satisfies 'Assumptions'"
+            "No row or document satisfies 'Assumptions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -32483,12 +33791,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Dependencies",
           "missing": [
-            "No row or document satisfies 'Dependencies'"
+            "No row or document satisfies 'Dependencies'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -32501,12 +33809,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Benefits",
           "missing": [
-            "No row or document satisfies 'Benefits'"
+            "No row or document satisfies 'Benefits'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -32519,12 +33827,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Changes",
           "missing": [
-            "No row or document satisfies 'Changes'"
+            "No row or document satisfies 'Changes'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -32537,7 +33845,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -32560,7 +33868,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-s17.html",
-        "sha256": "a7a0a2345a8f3c2ad01d76707aa90c3a6141c14164563477b34799a4b7dec3d1"
+        "sha256": "6e8c7af5413ae75e416b171883eca841e8b614cbdccf4f970184b5f36a7ef94c"
       },
       "gate": {
         "approval_id": "",
@@ -32577,7 +33885,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Risks",
           "missing": [
-            "No row or document satisfies 'Risks'"
+            "No row or document satisfies 'Risks'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -32590,12 +33898,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Issues",
           "missing": [
-            "No row or document satisfies 'Issues'"
+            "No row or document satisfies 'Issues'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -32608,12 +33916,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Assumptions",
           "missing": [
-            "No row or document satisfies 'Assumptions'"
+            "No row or document satisfies 'Assumptions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -32626,12 +33934,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Dependencies",
           "missing": [
-            "No row or document satisfies 'Dependencies'"
+            "No row or document satisfies 'Dependencies'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -32644,12 +33952,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Benefits",
           "missing": [
-            "No row or document satisfies 'Benefits'"
+            "No row or document satisfies 'Benefits'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -32662,12 +33970,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Changes",
           "missing": [
-            "No row or document satisfies 'Changes'"
+            "No row or document satisfies 'Changes'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -32680,7 +33988,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -32703,7 +34011,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-s18.html",
-        "sha256": "2ef20d4a5c7878fdb84577b8fb94cc5305dae438dbb14769c4c89feb06458ffd"
+        "sha256": "3947ff357f4ef6d11f2a9f51e625471ab8c5dbd4432d69179c19117a7779036e"
       },
       "gate": {
         "approval_id": "",
@@ -32720,7 +34028,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Risks",
           "missing": [
-            "No row or document satisfies 'Risks'"
+            "No row or document satisfies 'Risks'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -32733,12 +34041,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Issues",
           "missing": [
-            "No row or document satisfies 'Issues'"
+            "No row or document satisfies 'Issues'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -32751,12 +34059,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Assumptions",
           "missing": [
-            "No row or document satisfies 'Assumptions'"
+            "No row or document satisfies 'Assumptions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -32769,12 +34077,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Dependencies",
           "missing": [
-            "No row or document satisfies 'Dependencies'"
+            "No row or document satisfies 'Dependencies'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -32787,12 +34095,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Benefits",
           "missing": [
-            "No row or document satisfies 'Benefits'"
+            "No row or document satisfies 'Benefits'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -32805,12 +34113,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Changes",
           "missing": [
-            "No row or document satisfies 'Changes'"
+            "No row or document satisfies 'Changes'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -32823,7 +34131,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -32846,7 +34154,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-s19.html",
-        "sha256": "512e27ef1d5e8ee1613c5fa880a128afc1a4e329dfc7d61216a07b008f93e1c5"
+        "sha256": "0fc6a35c011ef5439cf904756438e9834ee6194baf9d4953b870e5f2706a19b5"
       },
       "gate": {
         "approval_id": "",
@@ -32863,7 +34171,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Risks",
           "missing": [
-            "No row or document satisfies 'Risks'"
+            "No row or document satisfies 'Risks'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -32876,12 +34184,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Issues",
           "missing": [
-            "No row or document satisfies 'Issues'"
+            "No row or document satisfies 'Issues'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -32894,12 +34202,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Assumptions",
           "missing": [
-            "No row or document satisfies 'Assumptions'"
+            "No row or document satisfies 'Assumptions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -32912,12 +34220,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Dependencies",
           "missing": [
-            "No row or document satisfies 'Dependencies'"
+            "No row or document satisfies 'Dependencies'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -32930,12 +34238,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Benefits",
           "missing": [
-            "No row or document satisfies 'Benefits'"
+            "No row or document satisfies 'Benefits'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -32948,12 +34256,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Changes",
           "missing": [
-            "No row or document satisfies 'Changes'"
+            "No row or document satisfies 'Changes'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -32966,7 +34274,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -32989,7 +34297,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-s20.html",
-        "sha256": "51f371c8b8c6a9598ee2e8b6cabd6e7b54ea787a3261b56f6d3a8a6af595799b"
+        "sha256": "be58c240fe0c940e22b40950b40ec4249bbaa6063bbf1efa6ab83c8b937c3592"
       },
       "gate": {
         "approval_id": "",
@@ -33006,7 +34314,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Risks",
           "missing": [
-            "No row or document satisfies 'Risks'"
+            "No row or document satisfies 'Risks'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -33019,12 +34327,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Issues",
           "missing": [
-            "No row or document satisfies 'Issues'"
+            "No row or document satisfies 'Issues'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -33037,12 +34345,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Assumptions",
           "missing": [
-            "No row or document satisfies 'Assumptions'"
+            "No row or document satisfies 'Assumptions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -33055,12 +34363,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Dependencies",
           "missing": [
-            "No row or document satisfies 'Dependencies'"
+            "No row or document satisfies 'Dependencies'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -33073,12 +34381,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Benefits",
           "missing": [
-            "No row or document satisfies 'Benefits'"
+            "No row or document satisfies 'Benefits'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -33091,12 +34399,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Changes",
           "missing": [
-            "No row or document satisfies 'Changes'"
+            "No row or document satisfies 'Changes'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -33109,7 +34417,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -33132,7 +34440,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-s21.html",
-        "sha256": "40cd19fba0bee75e2c5ade4f3c81845d9fd2fb2dcbb606f2c3c67e14bf8d2e5f"
+        "sha256": "9c499f0fd800029d8146b313c1a0068be612519ce769691472f6db8f580b893f"
       },
       "gate": {
         "approval_id": "",
@@ -33149,7 +34457,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Risks",
           "missing": [
-            "No row or document satisfies 'Risks'"
+            "No row or document satisfies 'Risks'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -33162,12 +34470,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Issues",
           "missing": [
-            "No row or document satisfies 'Issues'"
+            "No row or document satisfies 'Issues'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -33180,12 +34488,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Assumptions",
           "missing": [
-            "No row or document satisfies 'Assumptions'"
+            "No row or document satisfies 'Assumptions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -33198,12 +34506,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Dependencies",
           "missing": [
-            "No row or document satisfies 'Dependencies'"
+            "No row or document satisfies 'Dependencies'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -33216,12 +34524,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Benefits",
           "missing": [
-            "No row or document satisfies 'Benefits'"
+            "No row or document satisfies 'Benefits'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -33234,12 +34542,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Changes",
           "missing": [
-            "No row or document satisfies 'Changes'"
+            "No row or document satisfies 'Changes'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -33252,7 +34560,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -33275,7 +34583,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-spec-v2.html",
-        "sha256": "fcd102efb85506bc427617e9e28c71bdaf4cbc713d5686bb17d12068bfe2c9b3"
+        "sha256": "849233f6b077fdc99e134d051a721bf9becd93d215a6b7ccf5eacb9d55bbe20d"
       },
       "gate": {
         "approval_id": "",
@@ -33292,7 +34600,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Risks",
           "missing": [
-            "No row or document satisfies 'Risks'"
+            "No row or document satisfies 'Risks'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -33305,12 +34613,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Issues",
           "missing": [
-            "No row or document satisfies 'Issues'"
+            "No row or document satisfies 'Issues'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -33323,12 +34631,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Assumptions",
           "missing": [
-            "No row or document satisfies 'Assumptions'"
+            "No row or document satisfies 'Assumptions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -33341,12 +34649,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Dependencies",
           "missing": [
-            "No row or document satisfies 'Dependencies'"
+            "No row or document satisfies 'Dependencies'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -33359,12 +34667,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Benefits",
           "missing": [
-            "No row or document satisfies 'Benefits'"
+            "No row or document satisfies 'Benefits'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -33377,12 +34685,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Changes",
           "missing": [
-            "No row or document satisfies 'Changes'"
+            "No row or document satisfies 'Changes'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -33395,7 +34703,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -33418,7 +34726,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-t0.html",
-        "sha256": "0936ab48022ad1edec3ac04f85634967eda8cf6783d78765b36e3bcfba079a5f"
+        "sha256": "537a306dab546cd14061410e2a8b80fc532307f279b6375721132c494b722582"
       },
       "gate": {
         "approval_id": "",
@@ -33435,7 +34743,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Risks",
           "missing": [
-            "No row or document satisfies 'Risks'"
+            "No row or document satisfies 'Risks'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -33448,12 +34756,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Issues",
           "missing": [
-            "No row or document satisfies 'Issues'"
+            "No row or document satisfies 'Issues'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -33466,12 +34774,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Assumptions",
           "missing": [
-            "No row or document satisfies 'Assumptions'"
+            "No row or document satisfies 'Assumptions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -33484,12 +34792,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Dependencies",
           "missing": [
-            "No row or document satisfies 'Dependencies'"
+            "No row or document satisfies 'Dependencies'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -33502,12 +34810,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Benefits",
           "missing": [
-            "No row or document satisfies 'Benefits'"
+            "No row or document satisfies 'Benefits'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -33520,12 +34828,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Changes",
           "missing": [
-            "No row or document satisfies 'Changes'"
+            "No row or document satisfies 'Changes'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -33538,7 +34846,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -33561,7 +34869,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-t1.html",
-        "sha256": "eb3336ddd5312a8db3ef9ade3a30fd10a480afd7b45454482a1bfb3493ad38ed"
+        "sha256": "daf558ae08270364114bfb190111c718db04f0da79116e5f99babb0639b1011c"
       },
       "gate": {
         "approval_id": "",
@@ -33578,7 +34886,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Risks",
           "missing": [
-            "No row or document satisfies 'Risks'"
+            "No row or document satisfies 'Risks'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -33591,12 +34899,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Issues",
           "missing": [
-            "No row or document satisfies 'Issues'"
+            "No row or document satisfies 'Issues'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -33609,12 +34917,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Assumptions",
           "missing": [
-            "No row or document satisfies 'Assumptions'"
+            "No row or document satisfies 'Assumptions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -33627,12 +34935,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Dependencies",
           "missing": [
-            "No row or document satisfies 'Dependencies'"
+            "No row or document satisfies 'Dependencies'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -33645,12 +34953,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Benefits",
           "missing": [
-            "No row or document satisfies 'Benefits'"
+            "No row or document satisfies 'Benefits'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -33663,12 +34971,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Changes",
           "missing": [
-            "No row or document satisfies 'Changes'"
+            "No row or document satisfies 'Changes'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -33681,7 +34989,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -33704,7 +35012,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-t10.html",
-        "sha256": "b99f67d928465f9036a678bf325525a47cc2fe0da7d0ed3f11ce0b30e864aedd"
+        "sha256": "eaec52fa5d4b7cbf3072b081b072d53c13660dafd956fcc87b046292501e0523"
       },
       "gate": {
         "approval_id": "",
@@ -33721,7 +35029,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Risks",
           "missing": [
-            "No row or document satisfies 'Risks'"
+            "No row or document satisfies 'Risks'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -33734,12 +35042,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Issues",
           "missing": [
-            "No row or document satisfies 'Issues'"
+            "No row or document satisfies 'Issues'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -33752,12 +35060,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Assumptions",
           "missing": [
-            "No row or document satisfies 'Assumptions'"
+            "No row or document satisfies 'Assumptions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -33770,12 +35078,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Dependencies",
           "missing": [
-            "No row or document satisfies 'Dependencies'"
+            "No row or document satisfies 'Dependencies'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -33788,12 +35096,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Benefits",
           "missing": [
-            "No row or document satisfies 'Benefits'"
+            "No row or document satisfies 'Benefits'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -33806,12 +35114,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Changes",
           "missing": [
-            "No row or document satisfies 'Changes'"
+            "No row or document satisfies 'Changes'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -33824,7 +35132,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -33847,7 +35155,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-t11.html",
-        "sha256": "655bf9bee359392a429f86c5a0b88c87f28daab2221fcf4e7e19de52477c0cc4"
+        "sha256": "c8995ea2ddb4779703631b6eae36216945788c00f88cd4d97c82dbcad8b07255"
       },
       "gate": {
         "approval_id": "",
@@ -33864,7 +35172,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Risks",
           "missing": [
-            "No row or document satisfies 'Risks'"
+            "No row or document satisfies 'Risks'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -33877,12 +35185,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Issues",
           "missing": [
-            "No row or document satisfies 'Issues'"
+            "No row or document satisfies 'Issues'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -33895,12 +35203,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Assumptions",
           "missing": [
-            "No row or document satisfies 'Assumptions'"
+            "No row or document satisfies 'Assumptions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -33913,12 +35221,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Dependencies",
           "missing": [
-            "No row or document satisfies 'Dependencies'"
+            "No row or document satisfies 'Dependencies'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -33931,12 +35239,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Benefits",
           "missing": [
-            "No row or document satisfies 'Benefits'"
+            "No row or document satisfies 'Benefits'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -33949,12 +35257,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Changes",
           "missing": [
-            "No row or document satisfies 'Changes'"
+            "No row or document satisfies 'Changes'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -33967,7 +35275,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -33990,7 +35298,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-t12.html",
-        "sha256": "69f23c440a0a84fdc482cbaa549aa86bd929844b4aa7fb2b4a3efc423ed99663"
+        "sha256": "0ce5e0c7c85a5b650fc6dfa19ce0a3838431a46ec492bc18c24fd73e8438fb3e"
       },
       "gate": {
         "approval_id": "",
@@ -34007,7 +35315,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Risks",
           "missing": [
-            "No row or document satisfies 'Risks'"
+            "No row or document satisfies 'Risks'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -34020,12 +35328,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Issues",
           "missing": [
-            "No row or document satisfies 'Issues'"
+            "No row or document satisfies 'Issues'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -34038,12 +35346,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Assumptions",
           "missing": [
-            "No row or document satisfies 'Assumptions'"
+            "No row or document satisfies 'Assumptions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -34056,12 +35364,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Dependencies",
           "missing": [
-            "No row or document satisfies 'Dependencies'"
+            "No row or document satisfies 'Dependencies'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -34074,12 +35382,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Benefits",
           "missing": [
-            "No row or document satisfies 'Benefits'"
+            "No row or document satisfies 'Benefits'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -34092,12 +35400,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Changes",
           "missing": [
-            "No row or document satisfies 'Changes'"
+            "No row or document satisfies 'Changes'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -34110,7 +35418,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -34133,7 +35441,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-t13.html",
-        "sha256": "898f1f300a576723f335cfc78437ab8951813aee66ae3b97d04cf031d78660ae"
+        "sha256": "05e066ac1059692a5f2cb178b096babe6a16821a65dbf53bf9f096ec021ce45b"
       },
       "gate": {
         "approval_id": "",
@@ -34150,7 +35458,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Risks",
           "missing": [
-            "No row or document satisfies 'Risks'"
+            "No row or document satisfies 'Risks'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -34163,12 +35471,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Issues",
           "missing": [
-            "No row or document satisfies 'Issues'"
+            "No row or document satisfies 'Issues'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -34181,12 +35489,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Assumptions",
           "missing": [
-            "No row or document satisfies 'Assumptions'"
+            "No row or document satisfies 'Assumptions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -34199,12 +35507,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Dependencies",
           "missing": [
-            "No row or document satisfies 'Dependencies'"
+            "No row or document satisfies 'Dependencies'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -34217,12 +35525,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Benefits",
           "missing": [
-            "No row or document satisfies 'Benefits'"
+            "No row or document satisfies 'Benefits'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -34235,12 +35543,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Changes",
           "missing": [
-            "No row or document satisfies 'Changes'"
+            "No row or document satisfies 'Changes'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -34253,7 +35561,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -34276,7 +35584,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-t14.html",
-        "sha256": "9b64353807bf4fb73d248623ce8193c3a6e21862dd1e75f79d345e49b5f68646"
+        "sha256": "5aac8f5b90bd9196ee734339f0b0e2a4330126e99e4586894544c11935d99d9f"
       },
       "gate": {
         "approval_id": "",
@@ -34293,7 +35601,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Risks",
           "missing": [
-            "No row or document satisfies 'Risks'"
+            "No row or document satisfies 'Risks'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -34306,12 +35614,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Issues",
           "missing": [
-            "No row or document satisfies 'Issues'"
+            "No row or document satisfies 'Issues'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -34324,12 +35632,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Assumptions",
           "missing": [
-            "No row or document satisfies 'Assumptions'"
+            "No row or document satisfies 'Assumptions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -34342,12 +35650,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Dependencies",
           "missing": [
-            "No row or document satisfies 'Dependencies'"
+            "No row or document satisfies 'Dependencies'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -34360,12 +35668,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Benefits",
           "missing": [
-            "No row or document satisfies 'Benefits'"
+            "No row or document satisfies 'Benefits'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -34378,12 +35686,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Changes",
           "missing": [
-            "No row or document satisfies 'Changes'"
+            "No row or document satisfies 'Changes'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -34396,7 +35704,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -34419,7 +35727,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-t15.html",
-        "sha256": "cf99c2de1f7abf8ee74e4d1023e3a89f5891ef22bee4bc940d86d364ac7e8a94"
+        "sha256": "415511f0ecb6e3df234484a04ff2ed9c36a01ced822e0cc1396539a5f347b0d1"
       },
       "gate": {
         "approval_id": "",
@@ -34436,7 +35744,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Risks",
           "missing": [
-            "No row or document satisfies 'Risks'"
+            "No row or document satisfies 'Risks'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -34449,12 +35757,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Issues",
           "missing": [
-            "No row or document satisfies 'Issues'"
+            "No row or document satisfies 'Issues'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -34467,12 +35775,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Assumptions",
           "missing": [
-            "No row or document satisfies 'Assumptions'"
+            "No row or document satisfies 'Assumptions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -34485,12 +35793,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Dependencies",
           "missing": [
-            "No row or document satisfies 'Dependencies'"
+            "No row or document satisfies 'Dependencies'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -34503,12 +35811,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Benefits",
           "missing": [
-            "No row or document satisfies 'Benefits'"
+            "No row or document satisfies 'Benefits'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -34521,12 +35829,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Changes",
           "missing": [
-            "No row or document satisfies 'Changes'"
+            "No row or document satisfies 'Changes'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -34539,7 +35847,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -34562,7 +35870,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-t16.html",
-        "sha256": "5e171c7cc18104b32baa7fd10e6e2619de4a0510fc1b292636312f5c75e08814"
+        "sha256": "d5763f5bbf04656b5bdbfb395885f60ac886801efa638992aaf82c434c2c2c78"
       },
       "gate": {
         "approval_id": "",
@@ -34579,7 +35887,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Risks",
           "missing": [
-            "No row or document satisfies 'Risks'"
+            "No row or document satisfies 'Risks'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -34592,12 +35900,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Issues",
           "missing": [
-            "No row or document satisfies 'Issues'"
+            "No row or document satisfies 'Issues'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -34610,12 +35918,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Assumptions",
           "missing": [
-            "No row or document satisfies 'Assumptions'"
+            "No row or document satisfies 'Assumptions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -34628,12 +35936,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Dependencies",
           "missing": [
-            "No row or document satisfies 'Dependencies'"
+            "No row or document satisfies 'Dependencies'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -34646,12 +35954,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Benefits",
           "missing": [
-            "No row or document satisfies 'Benefits'"
+            "No row or document satisfies 'Benefits'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -34664,12 +35972,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Changes",
           "missing": [
-            "No row or document satisfies 'Changes'"
+            "No row or document satisfies 'Changes'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -34682,7 +35990,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -34705,7 +36013,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-t17.html",
-        "sha256": "8563f3598d2c50ee27efbfcf67600676c32318e5049bbac904af9654714d894d"
+        "sha256": "8df5bf95ce980488b0a3ca124eb6fa53476686d7478ac07ee7f9465ea64894ad"
       },
       "gate": {
         "approval_id": "",
@@ -34722,7 +36030,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Risks",
           "missing": [
-            "No row or document satisfies 'Risks'"
+            "No row or document satisfies 'Risks'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -34735,12 +36043,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Issues",
           "missing": [
-            "No row or document satisfies 'Issues'"
+            "No row or document satisfies 'Issues'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -34753,12 +36061,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Assumptions",
           "missing": [
-            "No row or document satisfies 'Assumptions'"
+            "No row or document satisfies 'Assumptions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -34771,12 +36079,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Dependencies",
           "missing": [
-            "No row or document satisfies 'Dependencies'"
+            "No row or document satisfies 'Dependencies'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -34789,12 +36097,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Benefits",
           "missing": [
-            "No row or document satisfies 'Benefits'"
+            "No row or document satisfies 'Benefits'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -34807,12 +36115,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Changes",
           "missing": [
-            "No row or document satisfies 'Changes'"
+            "No row or document satisfies 'Changes'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -34825,7 +36133,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -34848,7 +36156,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-t2.html",
-        "sha256": "a5cf9696bb612ea90a5b3770cc01aa980a36a565d563bd602062de1a7ca8fd13"
+        "sha256": "65d461ea6c12f4ad2f7aa04591ef05f18e71add2c2f149fac5b4078a1814f44e"
       },
       "gate": {
         "approval_id": "",
@@ -34865,7 +36173,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Risks",
           "missing": [
-            "No row or document satisfies 'Risks'"
+            "No row or document satisfies 'Risks'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -34878,12 +36186,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Issues",
           "missing": [
-            "No row or document satisfies 'Issues'"
+            "No row or document satisfies 'Issues'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -34896,12 +36204,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Assumptions",
           "missing": [
-            "No row or document satisfies 'Assumptions'"
+            "No row or document satisfies 'Assumptions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -34914,12 +36222,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Dependencies",
           "missing": [
-            "No row or document satisfies 'Dependencies'"
+            "No row or document satisfies 'Dependencies'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -34932,12 +36240,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Benefits",
           "missing": [
-            "No row or document satisfies 'Benefits'"
+            "No row or document satisfies 'Benefits'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -34950,12 +36258,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Changes",
           "missing": [
-            "No row or document satisfies 'Changes'"
+            "No row or document satisfies 'Changes'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -34968,7 +36276,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -34991,7 +36299,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-t3.html",
-        "sha256": "01251ea38cbaf9dee8ae626fa78b523dd822f7c303b633b1f4d2c0718cc3ca87"
+        "sha256": "efe814afd002dcdc8792884b107fe9bdb341202f4477003b29b872ae1bbe018a"
       },
       "gate": {
         "approval_id": "",
@@ -35008,7 +36316,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Risks",
           "missing": [
-            "No row or document satisfies 'Risks'"
+            "No row or document satisfies 'Risks'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -35021,12 +36329,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Issues",
           "missing": [
-            "No row or document satisfies 'Issues'"
+            "No row or document satisfies 'Issues'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -35039,12 +36347,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Assumptions",
           "missing": [
-            "No row or document satisfies 'Assumptions'"
+            "No row or document satisfies 'Assumptions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -35057,12 +36365,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Dependencies",
           "missing": [
-            "No row or document satisfies 'Dependencies'"
+            "No row or document satisfies 'Dependencies'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -35075,12 +36383,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Benefits",
           "missing": [
-            "No row or document satisfies 'Benefits'"
+            "No row or document satisfies 'Benefits'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -35093,12 +36401,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Changes",
           "missing": [
-            "No row or document satisfies 'Changes'"
+            "No row or document satisfies 'Changes'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -35111,7 +36419,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -35134,7 +36442,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-t4.html",
-        "sha256": "a7ced573dec03dc2c536e3b26b2c7b3644721bed9c6c15e4cad5547e50a6d087"
+        "sha256": "044c33b0b123bae1c298e9697817ab1825b575cb5c3f77f015d8ad28797c0361"
       },
       "gate": {
         "approval_id": "",
@@ -35151,7 +36459,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Risks",
           "missing": [
-            "No row or document satisfies 'Risks'"
+            "No row or document satisfies 'Risks'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -35164,12 +36472,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Issues",
           "missing": [
-            "No row or document satisfies 'Issues'"
+            "No row or document satisfies 'Issues'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -35182,12 +36490,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Assumptions",
           "missing": [
-            "No row or document satisfies 'Assumptions'"
+            "No row or document satisfies 'Assumptions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -35200,12 +36508,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Dependencies",
           "missing": [
-            "No row or document satisfies 'Dependencies'"
+            "No row or document satisfies 'Dependencies'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -35218,12 +36526,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Benefits",
           "missing": [
-            "No row or document satisfies 'Benefits'"
+            "No row or document satisfies 'Benefits'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -35236,12 +36544,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Changes",
           "missing": [
-            "No row or document satisfies 'Changes'"
+            "No row or document satisfies 'Changes'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -35254,7 +36562,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -35277,7 +36585,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-t5.html",
-        "sha256": "90065ea297ce91a84be1c4235673acfaf9add9c08234c6e9d8daf36e3dd363aa"
+        "sha256": "9e38ecc6d2a28e5ba821ae2778fc69db47f0fa1388f0a16189583a782ee1dde3"
       },
       "gate": {
         "approval_id": "",
@@ -35294,7 +36602,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Risks",
           "missing": [
-            "No row or document satisfies 'Risks'"
+            "No row or document satisfies 'Risks'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -35307,12 +36615,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Issues",
           "missing": [
-            "No row or document satisfies 'Issues'"
+            "No row or document satisfies 'Issues'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -35325,12 +36633,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Assumptions",
           "missing": [
-            "No row or document satisfies 'Assumptions'"
+            "No row or document satisfies 'Assumptions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -35343,12 +36651,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Dependencies",
           "missing": [
-            "No row or document satisfies 'Dependencies'"
+            "No row or document satisfies 'Dependencies'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -35361,12 +36669,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Benefits",
           "missing": [
-            "No row or document satisfies 'Benefits'"
+            "No row or document satisfies 'Benefits'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -35379,12 +36687,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Changes",
           "missing": [
-            "No row or document satisfies 'Changes'"
+            "No row or document satisfies 'Changes'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -35397,7 +36705,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -35420,7 +36728,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-t6.html",
-        "sha256": "1c86f240ef1a199ae7e4e3eae61d90a3d2e99a5671c468a7be9567cdd85e50d6"
+        "sha256": "c749e5602a90e10a0a1fb0aa22293274ce40a3dd198dfb99e8ec63754d954357"
       },
       "gate": {
         "approval_id": "",
@@ -35437,7 +36745,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Risks",
           "missing": [
-            "No row or document satisfies 'Risks'"
+            "No row or document satisfies 'Risks'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -35450,12 +36758,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Issues",
           "missing": [
-            "No row or document satisfies 'Issues'"
+            "No row or document satisfies 'Issues'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -35468,12 +36776,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Assumptions",
           "missing": [
-            "No row or document satisfies 'Assumptions'"
+            "No row or document satisfies 'Assumptions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -35486,12 +36794,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Dependencies",
           "missing": [
-            "No row or document satisfies 'Dependencies'"
+            "No row or document satisfies 'Dependencies'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -35504,12 +36812,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Benefits",
           "missing": [
-            "No row or document satisfies 'Benefits'"
+            "No row or document satisfies 'Benefits'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -35522,12 +36830,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Changes",
           "missing": [
-            "No row or document satisfies 'Changes'"
+            "No row or document satisfies 'Changes'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -35540,7 +36848,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -35563,7 +36871,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-t7.html",
-        "sha256": "c053a5e33144e9b5a887eac4337ca1011b4f99a168bc8c3dbeda76b3ee19e459"
+        "sha256": "593aefadf25fae70030a6e054cec5131b49b03c67cae35bf2b5bd91ce55b3fd0"
       },
       "gate": {
         "approval_id": "",
@@ -35580,7 +36888,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Risks",
           "missing": [
-            "No row or document satisfies 'Risks'"
+            "No row or document satisfies 'Risks'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -35593,12 +36901,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Issues",
           "missing": [
-            "No row or document satisfies 'Issues'"
+            "No row or document satisfies 'Issues'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -35611,12 +36919,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Assumptions",
           "missing": [
-            "No row or document satisfies 'Assumptions'"
+            "No row or document satisfies 'Assumptions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -35629,12 +36937,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Dependencies",
           "missing": [
-            "No row or document satisfies 'Dependencies'"
+            "No row or document satisfies 'Dependencies'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -35647,12 +36955,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Benefits",
           "missing": [
-            "No row or document satisfies 'Benefits'"
+            "No row or document satisfies 'Benefits'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -35665,12 +36973,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Changes",
           "missing": [
-            "No row or document satisfies 'Changes'"
+            "No row or document satisfies 'Changes'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -35683,7 +36991,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -35706,7 +37014,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-t8.html",
-        "sha256": "941ce453671c0928005af86bf69aa37c6c628c126c3673a2a133f6f59205dbec"
+        "sha256": "670b89085cb7e9482bc3868796a94df867807bc34286cea524942c69291dc4f5"
       },
       "gate": {
         "approval_id": "",
@@ -35723,7 +37031,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Risks",
           "missing": [
-            "No row or document satisfies 'Risks'"
+            "No row or document satisfies 'Risks'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -35736,12 +37044,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Issues",
           "missing": [
-            "No row or document satisfies 'Issues'"
+            "No row or document satisfies 'Issues'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -35754,12 +37062,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Assumptions",
           "missing": [
-            "No row or document satisfies 'Assumptions'"
+            "No row or document satisfies 'Assumptions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -35772,12 +37080,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Dependencies",
           "missing": [
-            "No row or document satisfies 'Dependencies'"
+            "No row or document satisfies 'Dependencies'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -35790,12 +37098,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Benefits",
           "missing": [
-            "No row or document satisfies 'Benefits'"
+            "No row or document satisfies 'Benefits'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -35808,12 +37116,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Changes",
           "missing": [
-            "No row or document satisfies 'Changes'"
+            "No row or document satisfies 'Changes'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -35826,7 +37134,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -35849,7 +37157,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-pmp-project-registers-t9.html",
-        "sha256": "9d9f9bb54626064f0ef83f70f6ff41ef4a21e4f2541fed06f1686294e989cfdf"
+        "sha256": "3f797d88450dc235757efc70d1009642c8a05ab7e201c932efebe69309c7dcd8"
       },
       "gate": {
         "approval_id": "",
@@ -35866,7 +37174,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Risks",
           "missing": [
-            "No row or document satisfies 'Risks'"
+            "No row or document satisfies 'Risks'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -35879,12 +37187,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Issues",
           "missing": [
-            "No row or document satisfies 'Issues'"
+            "No row or document satisfies 'Issues'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -35897,12 +37205,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Assumptions",
           "missing": [
-            "No row or document satisfies 'Assumptions'"
+            "No row or document satisfies 'Assumptions'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -35915,12 +37223,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Dependencies",
           "missing": [
-            "No row or document satisfies 'Dependencies'"
+            "No row or document satisfies 'Dependencies'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -35933,12 +37241,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Benefits",
           "missing": [
-            "No row or document satisfies 'Benefits'"
+            "No row or document satisfies 'Benefits'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -35951,12 +37259,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Changes",
           "missing": [
-            "No row or document satisfies 'Changes'"
+            "No row or document satisfies 'Changes'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -35969,7 +37277,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/register_items"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -35992,7 +37300,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-design-publish.html",
-        "sha256": "0c11f949d12d97b7f8005160c7a34c69ee1a14662fd16100d54e9741445853e0"
+        "sha256": "02184ff6bb8c9b076500df24b0722cd0ac149a75ab6c2df025e7b86eb161696e"
       },
       "gate": {
         "approval_id": "",
@@ -36009,7 +37317,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Work packages",
           "missing": [
-            "No row or document satisfies 'Work packages'"
+            "No row or document satisfies 'Work packages'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -36022,12 +37330,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Acceptance",
           "missing": [
-            "No row or document satisfies 'Acceptance'"
+            "No row or document satisfies 'Acceptance'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -36040,12 +37348,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Status",
           "missing": [
-            "No row or document satisfies 'Status'"
+            "No row or document satisfies 'Status'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -36058,7 +37366,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -36081,7 +37389,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-p0.html",
-        "sha256": "c69a59202ddbe2e3a7ac357c21d1bfb282ea7d9c9cc32c0be894428e11820c72"
+        "sha256": "0b2bd60108b4101413aa1de9e246bcc9322353645c95a71e112a9e77451f490c"
       },
       "gate": {
         "approval_id": "",
@@ -36098,7 +37406,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Work packages",
           "missing": [
-            "No row or document satisfies 'Work packages'"
+            "No row or document satisfies 'Work packages'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -36111,12 +37419,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Acceptance",
           "missing": [
-            "No row or document satisfies 'Acceptance'"
+            "No row or document satisfies 'Acceptance'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -36129,12 +37437,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Status",
           "missing": [
-            "No row or document satisfies 'Status'"
+            "No row or document satisfies 'Status'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -36147,7 +37455,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -36170,7 +37478,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-platform.html",
-        "sha256": "500895fbe471667eaddb7e7c21f5f68598868f53a2980939abdf885f0c240c09"
+        "sha256": "aac68174c849c4bfa566edd9e0e6c1a82977053e2cb276ad1001179b902a62bd"
       },
       "gate": {
         "approval_id": "",
@@ -36187,7 +37495,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Work packages",
           "missing": [
-            "No row or document satisfies 'Work packages'"
+            "No row or document satisfies 'Work packages'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -36200,12 +37508,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Acceptance",
           "missing": [
-            "No row or document satisfies 'Acceptance'"
+            "No row or document satisfies 'Acceptance'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -36218,12 +37526,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Status",
           "missing": [
-            "No row or document satisfies 'Status'"
+            "No row or document satisfies 'Status'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -36236,7 +37544,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -36259,7 +37567,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-s00.html",
-        "sha256": "29c1df07480094e1c29246b12e991c21245d5e2a7b92e9be32b2ebdc8c4819c9"
+        "sha256": "08620b5094f7af4b7e8595b6667a1d5f27c0d8d588f0d00403d73ac9e87d7f59"
       },
       "gate": {
         "approval_id": "",
@@ -36276,7 +37584,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Work packages",
           "missing": [
-            "No row or document satisfies 'Work packages'"
+            "No row or document satisfies 'Work packages'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -36289,12 +37597,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Acceptance",
           "missing": [
-            "No row or document satisfies 'Acceptance'"
+            "No row or document satisfies 'Acceptance'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -36307,12 +37615,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Status",
           "missing": [
-            "No row or document satisfies 'Status'"
+            "No row or document satisfies 'Status'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -36325,7 +37633,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -36348,7 +37656,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-s01.html",
-        "sha256": "e32677eec4880bf33edfee12664729e1bf39728af8c37183ead93372f25882af"
+        "sha256": "1db42033f626ae3aa8fde310aa9efc77c81a78201261f55498d26f26beb0f6b3"
       },
       "gate": {
         "approval_id": "",
@@ -36365,7 +37673,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Work packages",
           "missing": [
-            "No row or document satisfies 'Work packages'"
+            "No row or document satisfies 'Work packages'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -36378,12 +37686,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Acceptance",
           "missing": [
-            "No row or document satisfies 'Acceptance'"
+            "No row or document satisfies 'Acceptance'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -36396,12 +37704,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Status",
           "missing": [
-            "No row or document satisfies 'Status'"
+            "No row or document satisfies 'Status'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -36414,7 +37722,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -36437,7 +37745,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-s02.html",
-        "sha256": "c6cf2f570eefeaf86e7575a60372cd48b1c51e1719295ccec6906622839c561d"
+        "sha256": "50a32fcb3016b530d4018e65b3b8ec21d9b29aa9830d2ba3dbe27b7f8916d5e1"
       },
       "gate": {
         "approval_id": "",
@@ -36454,7 +37762,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Work packages",
           "missing": [
-            "No row or document satisfies 'Work packages'"
+            "No row or document satisfies 'Work packages'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -36467,12 +37775,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Acceptance",
           "missing": [
-            "No row or document satisfies 'Acceptance'"
+            "No row or document satisfies 'Acceptance'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -36485,12 +37793,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Status",
           "missing": [
-            "No row or document satisfies 'Status'"
+            "No row or document satisfies 'Status'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -36503,7 +37811,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -36526,7 +37834,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-s03.html",
-        "sha256": "f3ddcec43ce2a84353534ce2d049a528d8f2264ce1867000124adfc351cb087b"
+        "sha256": "e85523b6e8c5593e4e7343582e57375ed4a1cd06f21d967fb59e3bf77786e1b3"
       },
       "gate": {
         "approval_id": "",
@@ -36543,7 +37851,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Work packages",
           "missing": [
-            "No row or document satisfies 'Work packages'"
+            "No row or document satisfies 'Work packages'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -36556,12 +37864,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Acceptance",
           "missing": [
-            "No row or document satisfies 'Acceptance'"
+            "No row or document satisfies 'Acceptance'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -36574,12 +37882,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Status",
           "missing": [
-            "No row or document satisfies 'Status'"
+            "No row or document satisfies 'Status'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -36592,7 +37900,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -36615,7 +37923,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-s04.html",
-        "sha256": "df5da943bbb93ca13cf3cc41360898ceb4f54e2d17a4f9d8d4f629a473b50cbc"
+        "sha256": "dfc716b651afbd0296b40092019bf7dfcaa113a51afe9411a286a7117725fc0e"
       },
       "gate": {
         "approval_id": "",
@@ -36632,7 +37940,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Work packages",
           "missing": [
-            "No row or document satisfies 'Work packages'"
+            "No row or document satisfies 'Work packages'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -36645,12 +37953,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Acceptance",
           "missing": [
-            "No row or document satisfies 'Acceptance'"
+            "No row or document satisfies 'Acceptance'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -36663,12 +37971,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Status",
           "missing": [
-            "No row or document satisfies 'Status'"
+            "No row or document satisfies 'Status'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -36681,7 +37989,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -36704,7 +38012,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-s05.html",
-        "sha256": "5640ab58757dbf99d48aac8bec520454474bbcc5a660c23e966d2a288c6fe619"
+        "sha256": "68a3ed2df0353d3b5b1bfcd4185fc5192c2fd372765816870df6735eff081973"
       },
       "gate": {
         "approval_id": "",
@@ -36721,7 +38029,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Work packages",
           "missing": [
-            "No row or document satisfies 'Work packages'"
+            "No row or document satisfies 'Work packages'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -36734,12 +38042,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Acceptance",
           "missing": [
-            "No row or document satisfies 'Acceptance'"
+            "No row or document satisfies 'Acceptance'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -36752,12 +38060,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Status",
           "missing": [
-            "No row or document satisfies 'Status'"
+            "No row or document satisfies 'Status'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -36770,7 +38078,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -36793,7 +38101,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-s06.html",
-        "sha256": "f094ee9646ffbb50b0d7eb4c657cb20091e155b6cea386bc9813af99b8e943ba"
+        "sha256": "c7615fc0a0216e5732e1fa2b79a93618f64fce296c82f9fa765167b6440af6a7"
       },
       "gate": {
         "approval_id": "",
@@ -36810,7 +38118,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Work packages",
           "missing": [
-            "No row or document satisfies 'Work packages'"
+            "No row or document satisfies 'Work packages'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -36823,12 +38131,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Acceptance",
           "missing": [
-            "No row or document satisfies 'Acceptance'"
+            "No row or document satisfies 'Acceptance'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -36841,12 +38149,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Status",
           "missing": [
-            "No row or document satisfies 'Status'"
+            "No row or document satisfies 'Status'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -36859,7 +38167,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -36882,7 +38190,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-s06b.html",
-        "sha256": "c9a0e26d1532ceba73e71c2b23782b2bccf95e902c4b9413ccfbe174635c8319"
+        "sha256": "01e1b10569e623a4b8306f367c8a825ad2967deb21d352069455e09769f90310"
       },
       "gate": {
         "approval_id": "",
@@ -36899,7 +38207,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Work packages",
           "missing": [
-            "No row or document satisfies 'Work packages'"
+            "No row or document satisfies 'Work packages'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -36912,12 +38220,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Acceptance",
           "missing": [
-            "No row or document satisfies 'Acceptance'"
+            "No row or document satisfies 'Acceptance'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -36930,12 +38238,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Status",
           "missing": [
-            "No row or document satisfies 'Status'"
+            "No row or document satisfies 'Status'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -36948,7 +38256,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -36971,7 +38279,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-s06c.html",
-        "sha256": "be52f9ae3720d4315ce309c8bcbea9b9ad4783baf3ab157648a647c3e81aebfc"
+        "sha256": "f93ee01b0091c92863bc2cc0bb6da903ebc10d45b42517edf26873d79b38c9a5"
       },
       "gate": {
         "approval_id": "",
@@ -36988,7 +38296,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Work packages",
           "missing": [
-            "No row or document satisfies 'Work packages'"
+            "No row or document satisfies 'Work packages'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -37001,12 +38309,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Acceptance",
           "missing": [
-            "No row or document satisfies 'Acceptance'"
+            "No row or document satisfies 'Acceptance'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -37019,12 +38327,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Status",
           "missing": [
-            "No row or document satisfies 'Status'"
+            "No row or document satisfies 'Status'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -37037,7 +38345,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -37060,7 +38368,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-s06d.html",
-        "sha256": "39e587494f05a0b33a79d9144b616de98476999b8ed907be7fb6f22a50318e9a"
+        "sha256": "abaf9dbcd08f1e24262010035b7a18ca70912fbff332fa9194f8b2a592972184"
       },
       "gate": {
         "approval_id": "",
@@ -37077,7 +38385,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Work packages",
           "missing": [
-            "No row or document satisfies 'Work packages'"
+            "No row or document satisfies 'Work packages'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -37090,12 +38398,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Acceptance",
           "missing": [
-            "No row or document satisfies 'Acceptance'"
+            "No row or document satisfies 'Acceptance'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -37108,12 +38416,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Status",
           "missing": [
-            "No row or document satisfies 'Status'"
+            "No row or document satisfies 'Status'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -37126,7 +38434,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -37149,7 +38457,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-s07.html",
-        "sha256": "5b313ab318c09c898634c3e268e798714136dc70ca2253ca8b021c790ddb28b2"
+        "sha256": "2e1401d9acf3a63204a2d1c79e947de44978511b7cceaaccf9d994a8a986cfe4"
       },
       "gate": {
         "approval_id": "",
@@ -37166,7 +38474,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Work packages",
           "missing": [
-            "No row or document satisfies 'Work packages'"
+            "No row or document satisfies 'Work packages'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -37179,12 +38487,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Acceptance",
           "missing": [
-            "No row or document satisfies 'Acceptance'"
+            "No row or document satisfies 'Acceptance'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -37197,12 +38505,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Status",
           "missing": [
-            "No row or document satisfies 'Status'"
+            "No row or document satisfies 'Status'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -37215,7 +38523,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -37238,7 +38546,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-s08.html",
-        "sha256": "c8bdcfa313ee6158b184876fbd4e646b0e0ed13704fcd06389fa2b87fca97331"
+        "sha256": "fcc3ec6593891cc6794143a3f8d3fb361b8d933cd66a15e708ccdefd0d2afbda"
       },
       "gate": {
         "approval_id": "",
@@ -37255,7 +38563,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Work packages",
           "missing": [
-            "No row or document satisfies 'Work packages'"
+            "No row or document satisfies 'Work packages'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -37268,12 +38576,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Acceptance",
           "missing": [
-            "No row or document satisfies 'Acceptance'"
+            "No row or document satisfies 'Acceptance'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -37286,12 +38594,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Status",
           "missing": [
-            "No row or document satisfies 'Status'"
+            "No row or document satisfies 'Status'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -37304,7 +38612,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -37327,7 +38635,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-s09.html",
-        "sha256": "d4658dc6970d3335254e794f2dcf3fd52a62b0925fae9b514baf7bc083007c4b"
+        "sha256": "8fa2a33fb868d5bc90137f1517f62967ec5f4d6a7b2a232603ba4030b190f72b"
       },
       "gate": {
         "approval_id": "",
@@ -37344,7 +38652,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Work packages",
           "missing": [
-            "No row or document satisfies 'Work packages'"
+            "No row or document satisfies 'Work packages'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -37357,12 +38665,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Acceptance",
           "missing": [
-            "No row or document satisfies 'Acceptance'"
+            "No row or document satisfies 'Acceptance'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -37375,12 +38683,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Status",
           "missing": [
-            "No row or document satisfies 'Status'"
+            "No row or document satisfies 'Status'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -37393,7 +38701,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -37416,7 +38724,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-s10.html",
-        "sha256": "3b2060fb939c9524b3da4d138f01ab0e4fa2ae67d98bd5f095e41288f5d6b1dc"
+        "sha256": "9059ced96087f80f67526633747c55cd4f4275ecd6e4ce5a6aced69258dc35a8"
       },
       "gate": {
         "approval_id": "",
@@ -37433,7 +38741,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Work packages",
           "missing": [
-            "No row or document satisfies 'Work packages'"
+            "No row or document satisfies 'Work packages'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -37446,12 +38754,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Acceptance",
           "missing": [
-            "No row or document satisfies 'Acceptance'"
+            "No row or document satisfies 'Acceptance'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -37464,12 +38772,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Status",
           "missing": [
-            "No row or document satisfies 'Status'"
+            "No row or document satisfies 'Status'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -37482,7 +38790,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -37505,7 +38813,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-s11.html",
-        "sha256": "aef39bf47eaacdef47cc82e5f84bf03e638064eb2a3b9638ba55921cf4ed0858"
+        "sha256": "d31efed11d6a50a25c14c724952ef8a0f5e312359786d5581063211d4b728690"
       },
       "gate": {
         "approval_id": "",
@@ -37522,7 +38830,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Work packages",
           "missing": [
-            "No row or document satisfies 'Work packages'"
+            "No row or document satisfies 'Work packages'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -37535,12 +38843,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Acceptance",
           "missing": [
-            "No row or document satisfies 'Acceptance'"
+            "No row or document satisfies 'Acceptance'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -37553,12 +38861,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Status",
           "missing": [
-            "No row or document satisfies 'Status'"
+            "No row or document satisfies 'Status'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -37571,7 +38879,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -37594,7 +38902,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-s12.html",
-        "sha256": "8ad6097ce7a1080b6a70aa5c51c6319641ef68f2c03b6c54a963350f39114173"
+        "sha256": "ddbd4a911948f67c4d4664d93f32e2c1d10ba8a811b6e08f6ab1374d31c2f403"
       },
       "gate": {
         "approval_id": "",
@@ -37611,7 +38919,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Work packages",
           "missing": [
-            "No row or document satisfies 'Work packages'"
+            "No row or document satisfies 'Work packages'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -37624,12 +38932,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Acceptance",
           "missing": [
-            "No row or document satisfies 'Acceptance'"
+            "No row or document satisfies 'Acceptance'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -37642,12 +38950,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Status",
           "missing": [
-            "No row or document satisfies 'Status'"
+            "No row or document satisfies 'Status'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -37660,7 +38968,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -37683,7 +38991,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-s13.html",
-        "sha256": "9909594c1c0a98ded358798fbc4be56ef42de4f5def809817414da35ee0d7647"
+        "sha256": "0a17e44e442776223226d0c4263dc871fe10b024f942f3e4fff5ed0e1c89442b"
       },
       "gate": {
         "approval_id": "",
@@ -37700,7 +39008,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Work packages",
           "missing": [
-            "No row or document satisfies 'Work packages'"
+            "No row or document satisfies 'Work packages'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -37713,12 +39021,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Acceptance",
           "missing": [
-            "No row or document satisfies 'Acceptance'"
+            "No row or document satisfies 'Acceptance'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -37731,12 +39039,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Status",
           "missing": [
-            "No row or document satisfies 'Status'"
+            "No row or document satisfies 'Status'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -37749,7 +39057,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -37772,7 +39080,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-s14.html",
-        "sha256": "304a907542ce4cc87a6bb5f70393ffb3faf829b91b8bc92996759ecd1d2411e7"
+        "sha256": "f06c009e0b3dbb1e135463220da883dcb040f9a0352265b2cc3d80af65326b8a"
       },
       "gate": {
         "approval_id": "",
@@ -37789,7 +39097,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Work packages",
           "missing": [
-            "No row or document satisfies 'Work packages'"
+            "No row or document satisfies 'Work packages'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -37802,12 +39110,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Acceptance",
           "missing": [
-            "No row or document satisfies 'Acceptance'"
+            "No row or document satisfies 'Acceptance'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -37820,12 +39128,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Status",
           "missing": [
-            "No row or document satisfies 'Status'"
+            "No row or document satisfies 'Status'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -37838,7 +39146,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -37861,7 +39169,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-s15.html",
-        "sha256": "3b17df0801fe5f1b5c5c1464398c04333e5fa1bfa995fd2fa1b436f7947a4eec"
+        "sha256": "3dbdadaaf6f2d35739f99aa32834982532f2da13ef54a932b1ca841b1b4f21b0"
       },
       "gate": {
         "approval_id": "",
@@ -37878,7 +39186,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Work packages",
           "missing": [
-            "No row or document satisfies 'Work packages'"
+            "No row or document satisfies 'Work packages'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -37891,12 +39199,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Acceptance",
           "missing": [
-            "No row or document satisfies 'Acceptance'"
+            "No row or document satisfies 'Acceptance'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -37909,12 +39217,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Status",
           "missing": [
-            "No row or document satisfies 'Status'"
+            "No row or document satisfies 'Status'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -37927,7 +39235,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -37950,7 +39258,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-s16.html",
-        "sha256": "d0666898e483e1acc648dfceb07f62951323d90a6385c7133f6b27e426b781b1"
+        "sha256": "21fb42fe48f3c805bd4251c26915668bfb8cbfe25c45fac29cf53e49d0cbbcbf"
       },
       "gate": {
         "approval_id": "",
@@ -37967,7 +39275,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Work packages",
           "missing": [
-            "No row or document satisfies 'Work packages'"
+            "No row or document satisfies 'Work packages'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -37980,12 +39288,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Acceptance",
           "missing": [
-            "No row or document satisfies 'Acceptance'"
+            "No row or document satisfies 'Acceptance'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -37998,12 +39306,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Status",
           "missing": [
-            "No row or document satisfies 'Status'"
+            "No row or document satisfies 'Status'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -38016,7 +39324,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -38039,7 +39347,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-s17.html",
-        "sha256": "a388140e389c92e7dea2bd37a449d108a40a57c4e9a5ce8752d1e29dd574407f"
+        "sha256": "61267ef150eaeb7831374d94153ee244b1ec9bd3a022b59f7e205fafed011d2f"
       },
       "gate": {
         "approval_id": "",
@@ -38056,7 +39364,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Work packages",
           "missing": [
-            "No row or document satisfies 'Work packages'"
+            "No row or document satisfies 'Work packages'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -38069,12 +39377,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Acceptance",
           "missing": [
-            "No row or document satisfies 'Acceptance'"
+            "No row or document satisfies 'Acceptance'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -38087,12 +39395,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Status",
           "missing": [
-            "No row or document satisfies 'Status'"
+            "No row or document satisfies 'Status'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -38105,7 +39413,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -38128,7 +39436,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-s18.html",
-        "sha256": "0cc96ca4782da013e48a77772e4fe0607de9c0a7e6ec77808f6dfee20c7f815e"
+        "sha256": "411b3b89e1d46a96daafe4a43fc20f001c751ace91061e2a040f6cae757a4ec9"
       },
       "gate": {
         "approval_id": "",
@@ -38145,7 +39453,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Work packages",
           "missing": [
-            "No row or document satisfies 'Work packages'"
+            "No row or document satisfies 'Work packages'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -38158,12 +39466,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Acceptance",
           "missing": [
-            "No row or document satisfies 'Acceptance'"
+            "No row or document satisfies 'Acceptance'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -38176,12 +39484,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Status",
           "missing": [
-            "No row or document satisfies 'Status'"
+            "No row or document satisfies 'Status'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -38194,7 +39502,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -38217,7 +39525,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-s19.html",
-        "sha256": "fcbe2d6311a3b2ef08f153831cd7fe1d07f1f5b6163dec5fe8511a8f04b8af1a"
+        "sha256": "9d8adb8e680922d3fa0e65e0f82e5f89686552951112cb6395c87943eab20a7f"
       },
       "gate": {
         "approval_id": "",
@@ -38234,7 +39542,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Work packages",
           "missing": [
-            "No row or document satisfies 'Work packages'"
+            "No row or document satisfies 'Work packages'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -38247,12 +39555,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Acceptance",
           "missing": [
-            "No row or document satisfies 'Acceptance'"
+            "No row or document satisfies 'Acceptance'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -38265,12 +39573,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Status",
           "missing": [
-            "No row or document satisfies 'Status'"
+            "No row or document satisfies 'Status'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -38283,7 +39591,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -38306,7 +39614,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-s20.html",
-        "sha256": "902ec958a095da82649434565e90203325d6671d57cd41541a73126033b69c57"
+        "sha256": "08b1b9246fa21416a681b30d6ac9ddacc110a7cee41c5a9acf9eb249eb145546"
       },
       "gate": {
         "approval_id": "",
@@ -38323,7 +39631,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Work packages",
           "missing": [
-            "No row or document satisfies 'Work packages'"
+            "No row or document satisfies 'Work packages'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -38336,12 +39644,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Acceptance",
           "missing": [
-            "No row or document satisfies 'Acceptance'"
+            "No row or document satisfies 'Acceptance'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -38354,12 +39662,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Status",
           "missing": [
-            "No row or document satisfies 'Status'"
+            "No row or document satisfies 'Status'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -38372,7 +39680,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -38395,7 +39703,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-s21.html",
-        "sha256": "86d1a7839f6f31d3362f713ba7c8373c4634f5109513f3c5e43a163845cbe3e3"
+        "sha256": "3562e46dd5137d29af4429b9bbecdbf7e8123d936fda4464753e4e97964c1af8"
       },
       "gate": {
         "approval_id": "",
@@ -38412,7 +39720,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Work packages",
           "missing": [
-            "No row or document satisfies 'Work packages'"
+            "No row or document satisfies 'Work packages'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -38425,12 +39733,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Acceptance",
           "missing": [
-            "No row or document satisfies 'Acceptance'"
+            "No row or document satisfies 'Acceptance'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -38443,12 +39751,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Status",
           "missing": [
-            "No row or document satisfies 'Status'"
+            "No row or document satisfies 'Status'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -38461,7 +39769,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -38484,7 +39792,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-spec-v2.html",
-        "sha256": "b98fb1efba9c80ea6640db8bfbbd6ad5f02d3b3be090ca5f6c4b3bb2788df0c6"
+        "sha256": "ef3e4c041984fb0715bf0c78cd3746b6901ffd9b56bc53e6036644792bb3b01f"
       },
       "gate": {
         "approval_id": "",
@@ -38501,7 +39809,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Work packages",
           "missing": [
-            "No row or document satisfies 'Work packages'"
+            "No row or document satisfies 'Work packages'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -38514,12 +39822,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Acceptance",
           "missing": [
-            "No row or document satisfies 'Acceptance'"
+            "No row or document satisfies 'Acceptance'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -38532,12 +39840,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Status",
           "missing": [
-            "No row or document satisfies 'Status'"
+            "No row or document satisfies 'Status'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -38550,7 +39858,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -38573,7 +39881,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-t0.html",
-        "sha256": "193e0f43ef63aecb51ab9a4bd7b036380657656bbe611ebdefa15d317d8c5b97"
+        "sha256": "b5406d2beb1dd4a4a6559d95bd03109ec3fa21af9d2b120d6494bf847a5e8bb9"
       },
       "gate": {
         "approval_id": "",
@@ -38590,7 +39898,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Work packages",
           "missing": [
-            "No row or document satisfies 'Work packages'"
+            "No row or document satisfies 'Work packages'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -38603,12 +39911,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Acceptance",
           "missing": [
-            "No row or document satisfies 'Acceptance'"
+            "No row or document satisfies 'Acceptance'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -38621,12 +39929,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Status",
           "missing": [
-            "No row or document satisfies 'Status'"
+            "No row or document satisfies 'Status'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -38639,7 +39947,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -38662,7 +39970,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-t1.html",
-        "sha256": "4483554837167fc591f03c1e7f87c584627a6dc36e77d2e5e03618a994ee5511"
+        "sha256": "ee02444671b31e41ae10bb496e617df2f2453e52ab3aea1a50cb6252fb00d155"
       },
       "gate": {
         "approval_id": "",
@@ -38679,7 +39987,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Work packages",
           "missing": [
-            "No row or document satisfies 'Work packages'"
+            "No row or document satisfies 'Work packages'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -38692,12 +40000,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Acceptance",
           "missing": [
-            "No row or document satisfies 'Acceptance'"
+            "No row or document satisfies 'Acceptance'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -38710,12 +40018,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Status",
           "missing": [
-            "No row or document satisfies 'Status'"
+            "No row or document satisfies 'Status'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -38728,7 +40036,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -38751,7 +40059,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-t10.html",
-        "sha256": "92dd9d704eb227ee525e20477ccb113c65c1caf8e572f64c71176989eceafbb0"
+        "sha256": "5c2ebe1fb2e4a81d64452a5d540c00469964738b450c13345fc4747acb917345"
       },
       "gate": {
         "approval_id": "",
@@ -38768,7 +40076,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Work packages",
           "missing": [
-            "No row or document satisfies 'Work packages'"
+            "No row or document satisfies 'Work packages'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -38781,12 +40089,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Acceptance",
           "missing": [
-            "No row or document satisfies 'Acceptance'"
+            "No row or document satisfies 'Acceptance'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -38799,12 +40107,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Status",
           "missing": [
-            "No row or document satisfies 'Status'"
+            "No row or document satisfies 'Status'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -38817,7 +40125,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -38840,7 +40148,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-t11.html",
-        "sha256": "cf42ce66ad9bd25100cc34c5d77ee98e0b80de150587883ac536500c6cb0b08e"
+        "sha256": "c0c434d864c7fbd82b95dd5c49406164a032c4c9c30ef343f3214ea44818bc6e"
       },
       "gate": {
         "approval_id": "",
@@ -38857,7 +40165,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Work packages",
           "missing": [
-            "No row or document satisfies 'Work packages'"
+            "No row or document satisfies 'Work packages'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -38870,12 +40178,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Acceptance",
           "missing": [
-            "No row or document satisfies 'Acceptance'"
+            "No row or document satisfies 'Acceptance'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -38888,12 +40196,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Status",
           "missing": [
-            "No row or document satisfies 'Status'"
+            "No row or document satisfies 'Status'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -38906,7 +40214,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -38929,7 +40237,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-t12.html",
-        "sha256": "0c43506ed1f956fc172f11fbe4b916408b78ff21a5956f1232baa5657b572d7c"
+        "sha256": "e53f785fc808126862793f212310ced53d568fab03d09cc8b11b10c8bf620718"
       },
       "gate": {
         "approval_id": "",
@@ -38946,7 +40254,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Work packages",
           "missing": [
-            "No row or document satisfies 'Work packages'"
+            "No row or document satisfies 'Work packages'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -38959,12 +40267,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Acceptance",
           "missing": [
-            "No row or document satisfies 'Acceptance'"
+            "No row or document satisfies 'Acceptance'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -38977,12 +40285,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Status",
           "missing": [
-            "No row or document satisfies 'Status'"
+            "No row or document satisfies 'Status'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -38995,7 +40303,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -39018,7 +40326,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-t13.html",
-        "sha256": "9335e48f3c7c6bb38c0b9c4e4808fb72f4f6a7ec62db7352e59273e4b34b0911"
+        "sha256": "0def8749abcdbd192462252b382a5404980d6180f755b713d7ebe15d4ee3402d"
       },
       "gate": {
         "approval_id": "",
@@ -39035,7 +40343,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Work packages",
           "missing": [
-            "No row or document satisfies 'Work packages'"
+            "No row or document satisfies 'Work packages'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -39048,12 +40356,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Acceptance",
           "missing": [
-            "No row or document satisfies 'Acceptance'"
+            "No row or document satisfies 'Acceptance'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -39066,12 +40374,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Status",
           "missing": [
-            "No row or document satisfies 'Status'"
+            "No row or document satisfies 'Status'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -39084,7 +40392,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -39107,7 +40415,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-t14.html",
-        "sha256": "68f5e9466b49b2de6bb0dbf9930864647a92765a44d8622f0d27fad1c2b87fbf"
+        "sha256": "73d4959f593ffe1def96e972b9d8363533a1aae5246b97b56da8444867f90d5d"
       },
       "gate": {
         "approval_id": "",
@@ -39124,7 +40432,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Work packages",
           "missing": [
-            "No row or document satisfies 'Work packages'"
+            "No row or document satisfies 'Work packages'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -39137,12 +40445,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Acceptance",
           "missing": [
-            "No row or document satisfies 'Acceptance'"
+            "No row or document satisfies 'Acceptance'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -39155,12 +40463,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Status",
           "missing": [
-            "No row or document satisfies 'Status'"
+            "No row or document satisfies 'Status'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -39173,7 +40481,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -39196,7 +40504,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-t15.html",
-        "sha256": "46b8d7e5e22a34c8359719959b256397a825b0d1229d6b8564d22f09fbeb2a89"
+        "sha256": "b5a4c145545baef309e773dfba8c4d69c8d8a98146e9ccedc645c2301668dc79"
       },
       "gate": {
         "approval_id": "",
@@ -39213,7 +40521,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Work packages",
           "missing": [
-            "No row or document satisfies 'Work packages'"
+            "No row or document satisfies 'Work packages'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -39226,12 +40534,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Acceptance",
           "missing": [
-            "No row or document satisfies 'Acceptance'"
+            "No row or document satisfies 'Acceptance'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -39244,12 +40552,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Status",
           "missing": [
-            "No row or document satisfies 'Status'"
+            "No row or document satisfies 'Status'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -39262,7 +40570,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -39285,7 +40593,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-t16.html",
-        "sha256": "1a5fdefe3980a333a98967941891ba73148d4cb2c7412a4c53cb81784c222fac"
+        "sha256": "150023ab35569bca7029aaacb941ce9840ae32058395d8ff576c52c2db857381"
       },
       "gate": {
         "approval_id": "",
@@ -39302,7 +40610,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Work packages",
           "missing": [
-            "No row or document satisfies 'Work packages'"
+            "No row or document satisfies 'Work packages'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -39315,12 +40623,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Acceptance",
           "missing": [
-            "No row or document satisfies 'Acceptance'"
+            "No row or document satisfies 'Acceptance'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -39333,12 +40641,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Status",
           "missing": [
-            "No row or document satisfies 'Status'"
+            "No row or document satisfies 'Status'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -39351,7 +40659,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -39374,7 +40682,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-t17.html",
-        "sha256": "327c1764af557b35cb67094ef82b091746c840273c92ef335ef2fb849ad0e86e"
+        "sha256": "2842bc410e91d4622a612e3696445dc9761a0573568b02a85b96025501b4a12e"
       },
       "gate": {
         "approval_id": "",
@@ -39391,7 +40699,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Work packages",
           "missing": [
-            "No row or document satisfies 'Work packages'"
+            "No row or document satisfies 'Work packages'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -39404,12 +40712,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Acceptance",
           "missing": [
-            "No row or document satisfies 'Acceptance'"
+            "No row or document satisfies 'Acceptance'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -39422,12 +40730,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Status",
           "missing": [
-            "No row or document satisfies 'Status'"
+            "No row or document satisfies 'Status'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -39440,7 +40748,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -39463,7 +40771,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-t2.html",
-        "sha256": "adc63e8f7a8778b606c61032220645ed87b48ecdd1ae194556e11cf0737f836e"
+        "sha256": "e8000a1229288b37bc1b172188a6fc9482f02c461e326683b527f08b1127b25b"
       },
       "gate": {
         "approval_id": "",
@@ -39480,7 +40788,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Work packages",
           "missing": [
-            "No row or document satisfies 'Work packages'"
+            "No row or document satisfies 'Work packages'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -39493,12 +40801,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Acceptance",
           "missing": [
-            "No row or document satisfies 'Acceptance'"
+            "No row or document satisfies 'Acceptance'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -39511,12 +40819,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Status",
           "missing": [
-            "No row or document satisfies 'Status'"
+            "No row or document satisfies 'Status'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -39529,7 +40837,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -39552,7 +40860,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-t3.html",
-        "sha256": "9f84d23c9f55a0468216171f3c81f90d4a30671a17785ff040c75019cb01b0c8"
+        "sha256": "d7d05b47773f2bbbaa190ae7acbfa4f27be8447e946ee2503dac0dccf84fbfcf"
       },
       "gate": {
         "approval_id": "",
@@ -39569,7 +40877,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Work packages",
           "missing": [
-            "No row or document satisfies 'Work packages'"
+            "No row or document satisfies 'Work packages'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -39582,12 +40890,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Acceptance",
           "missing": [
-            "No row or document satisfies 'Acceptance'"
+            "No row or document satisfies 'Acceptance'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -39600,12 +40908,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Status",
           "missing": [
-            "No row or document satisfies 'Status'"
+            "No row or document satisfies 'Status'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -39618,7 +40926,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -39641,7 +40949,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-t4.html",
-        "sha256": "da98a6a9afb2726aedd4b939c098ba3f47c8b94733e900ca2171a353ca3f71e8"
+        "sha256": "23384fc8690f5ea1ed0cfa72508722551fe22f125f38f0a575b64acce78d74eb"
       },
       "gate": {
         "approval_id": "",
@@ -39658,7 +40966,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Work packages",
           "missing": [
-            "No row or document satisfies 'Work packages'"
+            "No row or document satisfies 'Work packages'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -39671,12 +40979,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Acceptance",
           "missing": [
-            "No row or document satisfies 'Acceptance'"
+            "No row or document satisfies 'Acceptance'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -39689,12 +40997,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Status",
           "missing": [
-            "No row or document satisfies 'Status'"
+            "No row or document satisfies 'Status'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -39707,7 +41015,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -39730,7 +41038,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-t5.html",
-        "sha256": "64eebbcd879267949d358bc673f048d5ac031ac068d3fdcb7695b1ccc0b98338"
+        "sha256": "105e04f2108731089314af62e6585e237b9265e801024266d96d72143248c50c"
       },
       "gate": {
         "approval_id": "",
@@ -39747,7 +41055,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Work packages",
           "missing": [
-            "No row or document satisfies 'Work packages'"
+            "No row or document satisfies 'Work packages'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -39760,12 +41068,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Acceptance",
           "missing": [
-            "No row or document satisfies 'Acceptance'"
+            "No row or document satisfies 'Acceptance'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -39778,12 +41086,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Status",
           "missing": [
-            "No row or document satisfies 'Status'"
+            "No row or document satisfies 'Status'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -39796,7 +41104,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -39819,7 +41127,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-t6.html",
-        "sha256": "35811e8fc8d56e167682bf913b5999253107383f807f6febeceb6d88afc11654"
+        "sha256": "18791f9354f193377441c35c930d7fce77434890748957dbaa1ea3a2aa150a3f"
       },
       "gate": {
         "approval_id": "",
@@ -39836,7 +41144,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Work packages",
           "missing": [
-            "No row or document satisfies 'Work packages'"
+            "No row or document satisfies 'Work packages'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -39849,12 +41157,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Acceptance",
           "missing": [
-            "No row or document satisfies 'Acceptance'"
+            "No row or document satisfies 'Acceptance'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -39867,12 +41175,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Status",
           "missing": [
-            "No row or document satisfies 'Status'"
+            "No row or document satisfies 'Status'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -39885,7 +41193,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -39908,7 +41216,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-t7.html",
-        "sha256": "99047906bdf108dd609686c170eca551ad4e62364e1881eeca551cc787e83899"
+        "sha256": "de16a2153ab7fe6315e74fce942ed7268faafe6f0025c10f9ac47e3f5f478101"
       },
       "gate": {
         "approval_id": "",
@@ -39925,7 +41233,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Work packages",
           "missing": [
-            "No row or document satisfies 'Work packages'"
+            "No row or document satisfies 'Work packages'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -39938,12 +41246,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Acceptance",
           "missing": [
-            "No row or document satisfies 'Acceptance'"
+            "No row or document satisfies 'Acceptance'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -39956,12 +41264,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Status",
           "missing": [
-            "No row or document satisfies 'Status'"
+            "No row or document satisfies 'Status'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -39974,7 +41282,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -39997,7 +41305,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-t8.html",
-        "sha256": "16ce941b6d8da9090cd3a9071c0c2e60f7c8fdffeadbe7531135673483b31ae2"
+        "sha256": "c8befb004f516ce498b24c6d861c05c3f161029a14db7e3a92e1c81d4bd80258"
       },
       "gate": {
         "approval_id": "",
@@ -40014,7 +41322,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Work packages",
           "missing": [
-            "No row or document satisfies 'Work packages'"
+            "No row or document satisfies 'Work packages'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -40027,12 +41335,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Acceptance",
           "missing": [
-            "No row or document satisfies 'Acceptance'"
+            "No row or document satisfies 'Acceptance'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -40045,12 +41353,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Status",
           "missing": [
-            "No row or document satisfies 'Status'"
+            "No row or document satisfies 'Status'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -40063,7 +41371,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -40086,7 +41394,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "wbs_absent",
       "document": {
         "path": "docs/standards/std-pmp-project-wbs-t9.html",
-        "sha256": "fe9b9cd60505920eb4f4344aa74b4ea417fbd384131b4e318451dc2efbfc0020"
+        "sha256": "a3df67a7c23ac7500570a59912cec73d13c3db1737f80230677bec29d27bab86"
       },
       "gate": {
         "approval_id": "",
@@ -40103,7 +41411,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Work packages",
           "missing": [
-            "No row or document satisfies 'Work packages'"
+            "No row or document satisfies 'Work packages'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -40116,12 +41424,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Acceptance",
           "missing": [
-            "No row or document satisfies 'Acceptance'"
+            "No row or document satisfies 'Acceptance'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -40134,12 +41442,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Status",
           "missing": [
-            "No row or document satisfies 'Status'"
+            "No row or document satisfies 'Status'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -40152,7 +41460,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.4",
@@ -40175,7 +41483,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-safe-inspect-adapt-01a1d039-0d24-7d16-ae52-4841e96ccfac.html",
-        "sha256": "953b91baecfa88b3b44882b58d350b79366469f261987077e45b53553ff929fd"
+        "sha256": "9a214c3dfaa87717122974db9fea36fb288a6dab29d0dd3514b711577f0fe63c"
       },
       "gate": {
         "approval_id": "",
@@ -40232,10 +41540,10 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Lessons",
           "missing": [
-            "No row or document satisfies 'Lessons'"
+            "No row or document satisfies 'Lessons'; a document exists but lacks the heading"
           ],
           "required": true,
-          "severity": "",
+          "severity": "P1",
           "sources": [
             {
               "count": 0,
@@ -40245,15 +41553,15 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/lessons"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Actions",
           "missing": [
-            "No row or document satisfies 'Actions'"
+            "No row or document satisfies 'Actions'; a document exists but lacks the heading"
           ],
           "required": true,
-          "severity": "",
+          "severity": "P1",
           "sources": [
             {
               "count": 0,
@@ -40263,7 +41571,24 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/lessons"
             }
           ],
-          "status": "absent"
+          "status": "partial"
+        },
+        {
+          "heading": "Kata candidates",
+          "missing": [
+            "No row or document satisfies 'Kata candidates'; a document exists but lacks the heading"
+          ],
+          "required": true,
+          "severity": "P1",
+          "sources": [
+            {
+              "count": 0,
+              "items": [],
+              "kind": "computed",
+              "name": "kata_candidates"
+            }
+          ],
+          "status": "partial"
         }
       ],
       "spec": "§8.2",
@@ -40286,7 +41611,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-safe-pi-objectives-01a1d039-0d24-7d16-ae52-4841e96ccfac.html",
-        "sha256": "10145b434fea8d53be3bb5a4b11b34bccb20eb58ad9f0bfad9e05e820b854d41"
+        "sha256": "b2495cc80b8a54cb39ed47361051d9a5bafcbcfe3c7382b55eb7840b3880caad"
       },
       "gate": {
         "approval_id": "",
@@ -40323,7 +41648,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Business value",
           "missing": [
-            "No row or document satisfies 'Business value'"
+            "No row or document satisfies 'Business value'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -40336,15 +41661,15 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Measurement",
           "missing": [
-            "No row or document satisfies 'Measurement'"
+            "No row or document satisfies 'Measurement'; a document exists but lacks the heading"
           ],
           "required": true,
-          "severity": "",
+          "severity": "P1",
           "sources": [
             {
               "count": 0,
@@ -40354,7 +41679,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/demo_credits"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Evidence",
@@ -40362,7 +41687,7 @@ window.CONVEYOR_STANDARDS = {
             "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
           ],
           "required": true,
-          "severity": "",
+          "severity": "P1",
           "sources": [
             {
               "category": "pi-objectives",
@@ -40404,7 +41729,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-safe-pi-plan-01a1d039-0d24-7d16-ae52-4841e96ccfac.html",
-        "sha256": "25345bbdba7521829b9acc1a886bcf90a45ab3dcb1a14a172e1dea0a31326c10"
+        "sha256": "69afaf99da2310ed32864938593a9077f0eed096b7b71fff924f98f1fd776075"
       },
       "gate": {
         "approval_id": "",
@@ -40441,7 +41766,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Plan",
           "missing": [
-            "No row or document satisfies 'Plan'"
+            "No row or document satisfies 'Plan'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -40454,30 +41779,29 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "WSJF order",
           "missing": [
-            "No row or document satisfies 'WSJF order'"
+            "No row or document satisfies 'WSJF order'; a document exists but lacks the heading"
           ],
           "required": true,
-          "severity": "",
+          "severity": "P1",
           "sources": [
             {
               "count": 0,
-              "file": "msp.json",
               "items": [],
-              "kind": "rows",
-              "pointer": "/wbs_nodes"
+              "kind": "computed",
+              "name": "wsjf_order"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Capacity and WIP",
           "missing": [
-            "No row or document satisfies 'Capacity and WIP'"
+            "No row or document satisfies 'Capacity and WIP'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -40490,7 +41814,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/cadences"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Evidence",
@@ -40518,6 +41842,40 @@ window.CONVEYOR_STANDARDS = {
             }
           ],
           "status": "partial"
+        },
+        {
+          "heading": "Dependencies",
+          "missing": [
+            "No row or document satisfies 'Dependencies'; a document exists but lacks the heading"
+          ],
+          "required": true,
+          "severity": "P1",
+          "sources": [
+            {
+              "count": 0,
+              "items": [],
+              "kind": "computed",
+              "name": "dependency_graph"
+            }
+          ],
+          "status": "partial"
+        },
+        {
+          "heading": "Backlog refinement",
+          "missing": [
+            "No row or document satisfies 'Backlog refinement'; a document exists but lacks the heading"
+          ],
+          "required": true,
+          "severity": "P1",
+          "sources": [
+            {
+              "count": 0,
+              "items": [],
+              "kind": "computed",
+              "name": "refinement_cadence"
+            }
+          ],
+          "status": "partial"
         }
       ],
       "spec": "§8.2",
@@ -40540,7 +41898,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-safe-safe-art-01a1d039-0d24-7d16-ae52-4841e96ccfac.html",
-        "sha256": "8e37a277cabf87f7b8bf3345dcca70e64e34d7a45dbf4453f941bd86cc41dbb8"
+        "sha256": "ed3e7a8144d49cfa7581602d841bcbbe221aabb7f13bf7af735dc9dfdadeca08"
       },
       "gate": {
         "approval_id": "",
@@ -40600,20 +41958,36 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Backlog with WSJF",
           "missing": [
-            "No row or document satisfies 'Backlog with WSJF'"
+            "No row or document satisfies 'Backlog with WSJF'; a document exists but lacks the heading"
           ],
           "required": true,
-          "severity": "",
+          "severity": "P1",
           "sources": [
             {
               "count": 0,
-              "file": "msp.json",
               "items": [],
-              "kind": "rows",
-              "pointer": "/wbs_nodes"
+              "kind": "computed",
+              "name": "wsjf_order"
             }
           ],
-          "status": "absent"
+          "status": "partial"
+        },
+        {
+          "heading": "Shared configuration",
+          "missing": [
+            "No row or document satisfies 'Shared configuration'; a document exists but lacks the heading"
+          ],
+          "required": true,
+          "severity": "P1",
+          "sources": [
+            {
+              "count": 0,
+              "items": [],
+              "kind": "computed",
+              "name": "shared_config"
+            }
+          ],
+          "status": "partial"
         }
       ],
       "spec": "§8.2",
@@ -40636,7 +42010,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-safe-safe-cadence-01a1d039-0d24-7d16-ae52-4841e96ccfac.html",
-        "sha256": "da8a123078281c474a53b7814bb4067389c05b1989ab396284969fdb733363ee"
+        "sha256": "b1c430df3cc42aa11cd0ffe36bda0a92d330273c6c7b9e4d7bf4805973ed0158"
       },
       "gate": {
         "approval_id": "",
@@ -40653,7 +42027,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "PI plan",
           "missing": [
-            "No row or document satisfies 'PI plan'"
+            "No row or document satisfies 'PI plan'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -40666,12 +42040,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/cadences"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "System demo",
           "missing": [
-            "No row or document satisfies 'System demo'"
+            "No row or document satisfies 'System demo'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -40684,12 +42058,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/cadences"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Inspect and adapt",
           "missing": [
-            "No row or document satisfies 'Inspect and adapt'"
+            "No row or document satisfies 'Inspect and adapt'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -40702,12 +42076,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/cadences"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Lean governance",
           "missing": [
-            "No row or document satisfies 'Lean governance'"
+            "No row or document satisfies 'Lean governance'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -40720,7 +42094,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/approvals"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.2",
@@ -40891,7 +42265,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-safe-system-demo-01a1d039-0d24-7d16-ae52-4841e96ccfac.html",
-        "sha256": "d5c896f4689fc7c58fd63748c52da6a6fe56069daf3d5f471e4a940b628b56f0"
+        "sha256": "bb83f46c43db3106acd261afe1cbf52a24b4072e188eb04bdf5706572172d264"
       },
       "gate": {
         "approval_id": "",
@@ -40908,7 +42282,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Demonstrated",
           "missing": [
-            "No row or document satisfies 'Demonstrated'"
+            "No row or document satisfies 'Demonstrated'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -40921,15 +42295,15 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/wbs_nodes"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Evidence",
           "missing": [
-            "No row or document satisfies 'Evidence'"
+            "No row or document satisfies 'Evidence'; a document exists but lacks the heading"
           ],
           "required": true,
-          "severity": "",
+          "severity": "P1",
           "sources": [
             {
               "count": 0,
@@ -40939,15 +42313,15 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/demo_credits"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Credits",
           "missing": [
-            "No row or document satisfies 'Credits'"
+            "No row or document satisfies 'Credits'; a document exists but lacks the heading"
           ],
           "required": true,
-          "severity": "",
+          "severity": "P1",
           "sources": [
             {
               "count": 0,
@@ -40957,7 +42331,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/demo_credits"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Findings",
@@ -41457,6 +42831,95 @@ window.CONVEYOR_STANDARDS = {
       "title": "Adm Profile — Architecture capability — conveyor buildout"
     },
     {
+      "category": "adr-register",
+      "covered_key": "",
+      "covered_rule": "",
+      "document": {
+        "path": "docs/standards/std-togaf-adr-register-01a1d039-0d24-7d16-ae52-4841e96ccfac.html",
+        "sha256": "5be48259cd924c6576ab05d914bbba1fd19bdd0fd2b390c62e6907875564f7d5"
+      },
+      "gate": {
+        "approval_id": "",
+        "kind": "",
+        "state": "not recorded"
+      },
+      "id": "std-togaf-adr-register-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+      "level": "programme",
+      "mandatory": true,
+      "owner_project": "PLATFORM",
+      "package_key": "std-togaf-adr-register-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM",
+      "package_published": true,
+      "sections": [
+        {
+          "heading": "Register",
+          "missing": [
+            "No row or document satisfies 'Register'; a document exists but lacks the heading"
+          ],
+          "required": true,
+          "severity": "",
+          "sources": [
+            {
+              "count": 0,
+              "file": "artefacts.json",
+              "items": [],
+              "kind": "rows",
+              "pointer": "/governed_assets"
+            }
+          ],
+          "status": "partial"
+        },
+        {
+          "heading": "Status and supersession",
+          "missing": [
+            "No row or document satisfies 'Status and supersession'; a document exists but lacks the heading"
+          ],
+          "required": true,
+          "severity": "",
+          "sources": [
+            {
+              "count": 0,
+              "file": "artefacts.json",
+              "items": [],
+              "kind": "rows",
+              "pointer": "/governed_assets"
+            }
+          ],
+          "status": "partial"
+        },
+        {
+          "heading": "Decisions",
+          "missing": [
+            "No row or document satisfies 'Decisions'; a document exists but lacks the heading"
+          ],
+          "required": true,
+          "severity": "",
+          "sources": [
+            {
+              "count": 0,
+              "file": "artefacts.json",
+              "items": [],
+              "kind": "rows",
+              "pointer": "/governed_assets"
+            }
+          ],
+          "status": "partial"
+        }
+      ],
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "absent",
+      "subject": {
+        "id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "key": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "kind": "programme",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "",
+        "title": "conveyor buildout"
+      },
+      "subject_kind": "programme",
+      "title": "Adr Register — conveyor buildout"
+    },
+    {
       "category": "architecture-capability",
       "covered_rule": "",
       "document": {
@@ -41727,10 +43190,11 @@ window.CONVEYOR_STANDARDS = {
     },
     {
       "category": "architecture-governance-log",
+      "covered_key": "",
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-governance-log-01a1d039-0d24-7d16-ae52-4841e96ccfac.html",
-        "sha256": "7ef98642f83f35b4fb0337dbe4b8cd79e0608b8e79269aa5425e66ed00fc6546"
+        "sha256": "9aa6c01554a7425e104366398331ed1a33f6006f81b22e1025798d2831b9718f"
       },
       "gate": {
         "approval_id": "",
@@ -41739,10 +43203,10 @@ window.CONVEYOR_STANDARDS = {
       },
       "id": "std-togaf-architecture-governance-log-01a1d039-0d24-7d16-ae52-4841e96ccfac",
       "level": "programme",
-      "mandatory": false,
+      "mandatory": true,
       "owner_project": "PLATFORM",
       "package_key": "std-togaf-architecture-governance-log-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM",
-      "package_published": false,
+      "package_published": true,
       "sections": [
         {
           "heading": "Decisions",
@@ -41769,7 +43233,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Reviews",
           "missing": [
-            "No row or document satisfies 'Reviews'"
+            "No row or document satisfies 'Reviews'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -41782,12 +43246,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/compliance_reviews"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Waivers",
           "missing": [
-            "No row or document satisfies 'Waivers'"
+            "No row or document satisfies 'Waivers'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -41800,7 +43264,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/waivers"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.1",
@@ -42854,7 +44318,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-requirements-catalog-01a1d039-0d24-7d16-ae52-4841e96ccfac.html",
-        "sha256": "3c16f435dc51bae1845ea63087913f448d2bd01d088a10a16a19b7259f4d19ea"
+        "sha256": "919bcba10329ef5ce652e94e9d9743faba1397d498eeb475f61f30ed7df0a72f"
       },
       "gate": {
         "approval_id": "",
@@ -42871,7 +44335,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Requirements",
           "missing": [
-            "No row or document satisfies 'Requirements'"
+            "No row or document satisfies 'Requirements'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -42883,12 +44347,12 @@ window.CONVEYOR_STANDARDS = {
               "name": "requirements_catalog"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Types",
           "missing": [
-            "No row or document satisfies 'Types'"
+            "No row or document satisfies 'Types'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -42900,12 +44364,12 @@ window.CONVEYOR_STANDARDS = {
               "name": "requirements_catalog"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Trace links",
           "missing": [
-            "No row or document satisfies 'Trace links'"
+            "No row or document satisfies 'Trace links'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -42918,7 +44382,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/links"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.1",
@@ -43490,11 +44954,10 @@ window.CONVEYOR_STANDARDS = {
     },
     {
       "category": "architecture-artifact",
-      "covered_key": "mandatory_artefacts:T9",
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-t9.html",
-        "sha256": "094459ec4a54c31381a5976685e3f2402e51c5dea6be7395487f37ca318de897"
+        "sha256": "351dd2029266cc4fca85b78e2cc9b6d086ae9e092b8194eeed1b321d3f8c3889"
       },
       "gate": {
         "approval_id": "",
@@ -43506,13 +44969,10 @@ window.CONVEYOR_STANDARDS = {
       "mandatory": true,
       "owner_project": "T9",
       "package_key": "std-togaf-architecture-artifact-t9:T9",
-      "package_published": true,
       "sections": [
         {
           "heading": "Metadata",
-          "missing": [
-            "No row or document satisfies 'Metadata'"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
@@ -43522,15 +44982,27 @@ window.CONVEYOR_STANDARDS = {
               "items": [],
               "kind": "rows",
               "pointer": "/artifacts"
+            },
+            {
+              "category": "architecture-artifact",
+              "count": 1,
+              "file": "artefacts.json",
+              "items": [
+                {
+                  "id": "01a1f2dd-3623-701c-b0ba-169d83d7907a",
+                  "title": "Architecture artefact — the principles catalogue (PF-1)"
+                }
+              ],
+              "kind": "documents",
+              "pointer": "/documents",
+              "scope": "subject"
             }
           ],
-          "status": "absent"
+          "status": "evidenced"
         },
         {
           "heading": "Entries",
-          "missing": [
-            "No row or document satisfies 'Entries'"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
@@ -43540,15 +45012,27 @@ window.CONVEYOR_STANDARDS = {
               "items": [],
               "kind": "rows",
               "pointer": "/artifacts"
+            },
+            {
+              "category": "architecture-artifact",
+              "count": 1,
+              "file": "artefacts.json",
+              "items": [
+                {
+                  "id": "01a1f2dd-3623-701c-b0ba-169d83d7907a",
+                  "title": "Architecture artefact — the principles catalogue (PF-1)"
+                }
+              ],
+              "kind": "documents",
+              "pointer": "/documents",
+              "scope": "subject"
             }
           ],
-          "status": "absent"
+          "status": "evidenced"
         },
         {
           "heading": "Links",
-          "missing": [
-            "No row or document satisfies 'Links'"
-          ],
+          "missing": [],
           "required": true,
           "severity": "",
           "sources": [
@@ -43557,9 +45041,23 @@ window.CONVEYOR_STANDARDS = {
               "items": [],
               "kind": "computed",
               "name": "project_artifact_links"
+            },
+            {
+              "category": "architecture-artifact",
+              "count": 1,
+              "file": "artefacts.json",
+              "items": [
+                {
+                  "id": "01a1f2dd-3623-701c-b0ba-169d83d7907a",
+                  "title": "Architecture artefact — the principles catalogue (PF-1)"
+                }
+              ],
+              "kind": "documents",
+              "pointer": "/documents",
+              "scope": "subject"
             }
           ],
-          "status": "absent"
+          "status": "evidenced"
         },
         {
           "heading": "Document",
@@ -43587,7 +45085,7 @@ window.CONVEYOR_STANDARDS = {
       ],
       "spec": "§8.1",
       "standard": "TOGAF",
-      "status": "partial",
+      "status": "evidenced",
       "subject": {
         "id": "01a1d039-0d35-7bd1-945d-cea12c5dfd6d",
         "key": "T9",
@@ -43605,7 +45103,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a1f2c1-5717-75e7-9b3d-1d7707648c09.html",
-        "sha256": "dec9572106e5e48ab118dc04ee615c0ed19c4cc6f4d8158314e9fba5d797df43"
+        "sha256": "c57aed3c4b5e19d67075cf20818e64d6db34fe54edd72ee52025088be209171b"
       },
       "gate": {
         "approval_id": "01a1f7fc-d2ec-7137-b28e-12217dd7618d",
@@ -43735,7 +45233,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Document",
           "missing": [
-            "No row or document satisfies 'Document'"
+            "No row or document satisfies 'Document'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -43747,7 +45245,7 @@ window.CONVEYOR_STANDARDS = {
               "name": "artifact_document"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.1",
@@ -43770,7 +45268,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a1f2c1-94ad-7a92-8aca-57202f48ece9.html",
-        "sha256": "e82dc4e945c6f7508ef4b9a5373d372041bd65bc563f03a282ec1a635cec59ad"
+        "sha256": "f604fac5c119d4aa0908591b93d3eac8e17f282e755a91798751281d5fd20b42"
       },
       "gate": {
         "approval_id": "01a1f7fc-d2ec-7137-b28e-12217dd7618d",
@@ -43880,7 +45378,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Document",
           "missing": [
-            "No row or document satisfies 'Document'"
+            "No row or document satisfies 'Document'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -43892,7 +45390,7 @@ window.CONVEYOR_STANDARDS = {
               "name": "artifact_document"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.1",
@@ -43915,7 +45413,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-togaf-architecture-artifact-instance-01a1f2c1-9c75-78a2-a2a4-647687dfbe10.html",
-        "sha256": "2689dea38a322b7415f8b0edda4b86894a94b6dc43f51019487e5e398b7d06b2"
+        "sha256": "b324055991b24e5f8f500cd93a5331fc47ca94a5e573ebc6011bce95ce4f4cf0"
       },
       "gate": {
         "approval_id": "01a1f7fc-d2ec-7137-b28e-12217dd7618d",
@@ -44040,7 +45538,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Document",
           "missing": [
-            "No row or document satisfies 'Document'"
+            "No row or document satisfies 'Document'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -44052,7 +45550,7 @@ window.CONVEYOR_STANDARDS = {
               "name": "artifact_document"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.1",
@@ -46276,6 +47774,196 @@ window.CONVEYOR_STANDARDS = {
       },
       "subject_kind": "project",
       "title": "Architecture Design — SPEC_V2 slice T9 (docs/SPEC_V2.md §12)"
+    },
+    {
+      "category": "benefits-diagram",
+      "covered_key": "",
+      "covered_rule": "",
+      "document": {
+        "path": "docs/standards/std-togaf-benefits-diagram-t9.html",
+        "sha256": "5c841943dfd07c228ba0653dcb68143e91bccc134466849fdbb16eb92be4e9da"
+      },
+      "gate": {
+        "approval_id": "",
+        "kind": "statement_of_architecture_work",
+        "state": "live"
+      },
+      "id": "std-togaf-benefits-diagram-t9",
+      "level": "project",
+      "mandatory": true,
+      "owner_project": "T9",
+      "package_key": "std-togaf-benefits-diagram-t9:T9",
+      "package_published": true,
+      "sections": [
+        {
+          "heading": "Goals and outcomes",
+          "missing": [
+            "No row or document satisfies 'Goals and outcomes'; a document exists but lacks the heading"
+          ],
+          "required": true,
+          "severity": "",
+          "sources": [
+            {
+              "category": "benefits-diagram",
+              "count": 0,
+              "file": "artefacts.json",
+              "items": [],
+              "kind": "documents",
+              "pointer": "/documents",
+              "scope": "subject"
+            }
+          ],
+          "status": "partial"
+        },
+        {
+          "heading": "Measures",
+          "missing": [
+            "No row or document satisfies 'Measures'; a document exists but lacks the heading"
+          ],
+          "required": true,
+          "severity": "",
+          "sources": [
+            {
+              "category": "benefits-diagram",
+              "count": 0,
+              "file": "artefacts.json",
+              "items": [],
+              "kind": "documents",
+              "pointer": "/documents",
+              "scope": "subject"
+            }
+          ],
+          "status": "partial"
+        },
+        {
+          "heading": "Benefits and sub-benefits",
+          "missing": [
+            "No row or document satisfies 'Benefits and sub-benefits'; a document exists but lacks the heading"
+          ],
+          "required": true,
+          "severity": "",
+          "sources": [
+            {
+              "category": "benefits-diagram",
+              "count": 0,
+              "file": "artefacts.json",
+              "items": [],
+              "kind": "documents",
+              "pointer": "/documents",
+              "scope": "subject"
+            }
+          ],
+          "status": "partial"
+        }
+      ],
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "absent",
+      "subject": {
+        "id": "01a1d039-0d35-7bd1-945d-cea12c5dfd6d",
+        "key": "T9",
+        "kind": "project",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "T9",
+        "title": "SPEC_V2 slice T9 (docs/SPEC_V2.md §12)"
+      },
+      "subject_kind": "project",
+      "title": "Benefits Diagram — SPEC_V2 slice T9 (docs/SPEC_V2.md §12)"
+    },
+    {
+      "category": "candidate-solutions",
+      "covered_key": "",
+      "covered_rule": "",
+      "document": {
+        "path": "docs/standards/std-togaf-candidate-solutions-t9.html",
+        "sha256": "02c422fa8f780d30452ddccbb95b1652036f5c4bc9519f37f6976bf0f46f177e"
+      },
+      "gate": {
+        "approval_id": "",
+        "kind": "statement_of_architecture_work",
+        "state": "live"
+      },
+      "id": "std-togaf-candidate-solutions-t9",
+      "level": "project",
+      "mandatory": true,
+      "owner_project": "T9",
+      "package_key": "std-togaf-candidate-solutions-t9:T9",
+      "package_published": true,
+      "sections": [
+        {
+          "heading": "Candidates",
+          "missing": [
+            "No row or document satisfies 'Candidates'; a document exists but lacks the heading"
+          ],
+          "required": true,
+          "severity": "",
+          "sources": [
+            {
+              "category": "candidate-solutions",
+              "count": 0,
+              "file": "artefacts.json",
+              "items": [],
+              "kind": "documents",
+              "pointer": "/documents",
+              "scope": "subject"
+            }
+          ],
+          "status": "partial"
+        },
+        {
+          "heading": "Criteria",
+          "missing": [
+            "No row or document satisfies 'Criteria'; a document exists but lacks the heading"
+          ],
+          "required": true,
+          "severity": "",
+          "sources": [
+            {
+              "category": "candidate-solutions",
+              "count": 0,
+              "file": "artefacts.json",
+              "items": [],
+              "kind": "documents",
+              "pointer": "/documents",
+              "scope": "subject"
+            }
+          ],
+          "status": "partial"
+        },
+        {
+          "heading": "Options rejected",
+          "missing": [
+            "No row or document satisfies 'Options rejected'; a document exists but lacks the heading"
+          ],
+          "required": true,
+          "severity": "",
+          "sources": [
+            {
+              "category": "candidate-solutions",
+              "count": 0,
+              "file": "artefacts.json",
+              "items": [],
+              "kind": "documents",
+              "pointer": "/documents",
+              "scope": "subject"
+            }
+          ],
+          "status": "partial"
+        }
+      ],
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "absent",
+      "subject": {
+        "id": "01a1d039-0d35-7bd1-945d-cea12c5dfd6d",
+        "key": "T9",
+        "kind": "project",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "T9",
+        "title": "SPEC_V2 slice T9 (docs/SPEC_V2.md §12)"
+      },
+      "subject_kind": "project",
+      "title": "Candidate Solutions — SPEC_V2 slice T9 (docs/SPEC_V2.md §12)"
     },
     {
       "category": "compliance-review",
@@ -51358,7 +53046,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-design-publish.html",
-        "sha256": "27fff068e0ca174950941a054bb78c12936b85c9ab15c62e17305ac8baddc87a"
+        "sha256": "f3183567c625cc8648933c53113d351e59f8b20f29507644e10ad0c7d545a7ef"
       },
       "gate": {
         "approval_id": "",
@@ -51375,7 +53063,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Commitments",
           "missing": [
-            "No row or document satisfies 'Commitments'"
+            "No row or document satisfies 'Commitments'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -51388,12 +53076,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Compliance method",
           "missing": [
-            "No row or document satisfies 'Compliance method'"
+            "No row or document satisfies 'Compliance method'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -51406,12 +53094,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -51424,7 +53112,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.1",
@@ -51447,7 +53135,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-p0.html",
-        "sha256": "16652f84855ee1894b847eb627eb569d9df73024670eea3c3bdf3375a9102396"
+        "sha256": "6c0b5617a9c5de35af16461f72908a046cc19deb09b9e94905aa222b5d3c620b"
       },
       "gate": {
         "approval_id": "",
@@ -51464,7 +53152,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Commitments",
           "missing": [
-            "No row or document satisfies 'Commitments'"
+            "No row or document satisfies 'Commitments'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -51477,12 +53165,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Compliance method",
           "missing": [
-            "No row or document satisfies 'Compliance method'"
+            "No row or document satisfies 'Compliance method'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -51495,12 +53183,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -51513,7 +53201,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.1",
@@ -51536,7 +53224,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-platform.html",
-        "sha256": "74fcfbfe63fe67de837c61be5fe941e3f45e41ae33a675968947770538fa6e5a"
+        "sha256": "3d70f4aed3a084330a5881e79923806d92303ae734885982935bc9503048a3f6"
       },
       "gate": {
         "approval_id": "",
@@ -51553,7 +53241,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Commitments",
           "missing": [
-            "No row or document satisfies 'Commitments'"
+            "No row or document satisfies 'Commitments'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -51566,12 +53254,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Compliance method",
           "missing": [
-            "No row or document satisfies 'Compliance method'"
+            "No row or document satisfies 'Compliance method'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -51584,12 +53272,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -51602,7 +53290,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.1",
@@ -51625,7 +53313,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-s00.html",
-        "sha256": "5e8bb7d28c77d4d5120915d0997c82261a45cc57bf0e949d84bec3579eb0d7a9"
+        "sha256": "3fb1f98427ba939ce2d46bb7d713ed1d770568e8e22ae898400646d85f7d37dc"
       },
       "gate": {
         "approval_id": "",
@@ -51642,7 +53330,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Commitments",
           "missing": [
-            "No row or document satisfies 'Commitments'"
+            "No row or document satisfies 'Commitments'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -51655,12 +53343,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Compliance method",
           "missing": [
-            "No row or document satisfies 'Compliance method'"
+            "No row or document satisfies 'Compliance method'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -51673,12 +53361,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -51691,7 +53379,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.1",
@@ -51714,7 +53402,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-s01.html",
-        "sha256": "7370d5aa4e0ba315b9d4959582191845b26c97e8ad322e697f128cfc60638771"
+        "sha256": "de2e1faff50c547b5c859fe341587d3a7cff68080e4cbabd174f18d6794b1072"
       },
       "gate": {
         "approval_id": "",
@@ -51731,7 +53419,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Commitments",
           "missing": [
-            "No row or document satisfies 'Commitments'"
+            "No row or document satisfies 'Commitments'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -51744,12 +53432,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Compliance method",
           "missing": [
-            "No row or document satisfies 'Compliance method'"
+            "No row or document satisfies 'Compliance method'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -51762,12 +53450,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -51780,7 +53468,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.1",
@@ -51803,7 +53491,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-s02.html",
-        "sha256": "80adef2265d2b7e270525a209208d2a23baf1a35709c0a0d8a079a78b0e371b2"
+        "sha256": "633f039a9228112a2ac662d28ee8a353e2e616e52440f35a799e33d331c9b5f4"
       },
       "gate": {
         "approval_id": "",
@@ -51820,7 +53508,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Commitments",
           "missing": [
-            "No row or document satisfies 'Commitments'"
+            "No row or document satisfies 'Commitments'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -51833,12 +53521,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Compliance method",
           "missing": [
-            "No row or document satisfies 'Compliance method'"
+            "No row or document satisfies 'Compliance method'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -51851,12 +53539,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -51869,7 +53557,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.1",
@@ -51892,7 +53580,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-s03.html",
-        "sha256": "fae459358134f5ebc7a16ef8043ad83aed00948dcb5d1da752418dec9988db62"
+        "sha256": "2fb1fd187e5bb4ede46d332fcb5160b71b5ce0ed994edf894ceb006f5e108500"
       },
       "gate": {
         "approval_id": "",
@@ -51909,7 +53597,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Commitments",
           "missing": [
-            "No row or document satisfies 'Commitments'"
+            "No row or document satisfies 'Commitments'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -51922,12 +53610,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Compliance method",
           "missing": [
-            "No row or document satisfies 'Compliance method'"
+            "No row or document satisfies 'Compliance method'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -51940,12 +53628,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -51958,7 +53646,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.1",
@@ -51981,7 +53669,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-s04.html",
-        "sha256": "20036e42c22b8f12c560dfbd446c74d47f0d7b14c9b6c963255798a065688639"
+        "sha256": "99ce6ec3a38363de6d1eba046c134ce467af2b5faad8d61057bfce164ea97539"
       },
       "gate": {
         "approval_id": "",
@@ -51998,7 +53686,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Commitments",
           "missing": [
-            "No row or document satisfies 'Commitments'"
+            "No row or document satisfies 'Commitments'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -52011,12 +53699,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Compliance method",
           "missing": [
-            "No row or document satisfies 'Compliance method'"
+            "No row or document satisfies 'Compliance method'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -52029,12 +53717,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -52047,7 +53735,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.1",
@@ -52070,7 +53758,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-s05.html",
-        "sha256": "1af60cff71c44e9bdda37ce4fe78d338d31e5c794514deb13b0e056918f1f8d3"
+        "sha256": "2851c4610ae62649bca87d5772d11252ea9971d648a1b985248f4fe34f52fe23"
       },
       "gate": {
         "approval_id": "",
@@ -52087,7 +53775,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Commitments",
           "missing": [
-            "No row or document satisfies 'Commitments'"
+            "No row or document satisfies 'Commitments'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -52100,12 +53788,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Compliance method",
           "missing": [
-            "No row or document satisfies 'Compliance method'"
+            "No row or document satisfies 'Compliance method'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -52118,12 +53806,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -52136,7 +53824,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.1",
@@ -52159,7 +53847,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-s06.html",
-        "sha256": "a89b2ea391d19a90efc0171eb2ea07676a04b1274c43aa29346f8696536096f4"
+        "sha256": "465247dd4d9c3d1aa3506346d4c60713ca1387dd99fe4ecd9fd83f04bf3bf429"
       },
       "gate": {
         "approval_id": "",
@@ -52176,7 +53864,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Commitments",
           "missing": [
-            "No row or document satisfies 'Commitments'"
+            "No row or document satisfies 'Commitments'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -52189,12 +53877,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Compliance method",
           "missing": [
-            "No row or document satisfies 'Compliance method'"
+            "No row or document satisfies 'Compliance method'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -52207,12 +53895,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -52225,7 +53913,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.1",
@@ -52248,7 +53936,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-s06b.html",
-        "sha256": "45c3e7898a3905d382479189bdb84ce6a72c99beba2b74c35b93e62346068513"
+        "sha256": "a15182357e768426eeec184aec56b33b23dcb4b4eee252b994a7e3df3bde1b02"
       },
       "gate": {
         "approval_id": "",
@@ -52265,7 +53953,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Commitments",
           "missing": [
-            "No row or document satisfies 'Commitments'"
+            "No row or document satisfies 'Commitments'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -52278,12 +53966,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Compliance method",
           "missing": [
-            "No row or document satisfies 'Compliance method'"
+            "No row or document satisfies 'Compliance method'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -52296,12 +53984,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -52314,7 +54002,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.1",
@@ -52337,7 +54025,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-s06c.html",
-        "sha256": "44fcc5f216022c69198048e0c4e985aabeaf9e46c1c52746b44b3bcb079394cd"
+        "sha256": "5dec992fba120137750e019892b784da0c05c65a897a3f1aaa38848e477dcdd8"
       },
       "gate": {
         "approval_id": "",
@@ -52354,7 +54042,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Commitments",
           "missing": [
-            "No row or document satisfies 'Commitments'"
+            "No row or document satisfies 'Commitments'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -52367,12 +54055,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Compliance method",
           "missing": [
-            "No row or document satisfies 'Compliance method'"
+            "No row or document satisfies 'Compliance method'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -52385,12 +54073,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -52403,7 +54091,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.1",
@@ -52426,7 +54114,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-s06d.html",
-        "sha256": "3cdcae6600bfe0dfc416e820fa83debc0ca7fb4dcbef0f68a6647c2b2cac6008"
+        "sha256": "a771e782c76041b7189e54bcb997dbafe9bbb02bc7b2939be84de97c4cbde6d3"
       },
       "gate": {
         "approval_id": "",
@@ -52443,7 +54131,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Commitments",
           "missing": [
-            "No row or document satisfies 'Commitments'"
+            "No row or document satisfies 'Commitments'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -52456,12 +54144,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Compliance method",
           "missing": [
-            "No row or document satisfies 'Compliance method'"
+            "No row or document satisfies 'Compliance method'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -52474,12 +54162,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -52492,7 +54180,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.1",
@@ -52515,7 +54203,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-s07.html",
-        "sha256": "39891e528768d0585ed92e6b6acecf103686d4520bba6b1f23cd19b064ff62ff"
+        "sha256": "cba6faf7d3234f99762ca897c0ef1f28f57be8df0e7e2767b1a6be69cb9db119"
       },
       "gate": {
         "approval_id": "",
@@ -52532,7 +54220,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Commitments",
           "missing": [
-            "No row or document satisfies 'Commitments'"
+            "No row or document satisfies 'Commitments'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -52545,12 +54233,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Compliance method",
           "missing": [
-            "No row or document satisfies 'Compliance method'"
+            "No row or document satisfies 'Compliance method'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -52563,12 +54251,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -52581,7 +54269,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.1",
@@ -52604,7 +54292,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-s08.html",
-        "sha256": "a2642604d87986035d7b78a5b681909ece6d52f90b0a7dbf9c5f998397e4e4f0"
+        "sha256": "08f2471248f0d56b8820dea0bd628b2d1b339c74f018d4bd7f3f840831f74cdc"
       },
       "gate": {
         "approval_id": "",
@@ -52621,7 +54309,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Commitments",
           "missing": [
-            "No row or document satisfies 'Commitments'"
+            "No row or document satisfies 'Commitments'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -52634,12 +54322,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Compliance method",
           "missing": [
-            "No row or document satisfies 'Compliance method'"
+            "No row or document satisfies 'Compliance method'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -52652,12 +54340,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -52670,7 +54358,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.1",
@@ -52693,7 +54381,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-s09.html",
-        "sha256": "990960e1676f85275df74224dcd5742009ef5a863c4fdf369e108991c2b36322"
+        "sha256": "5c2172ced41ecbd0021eb3ff008b1610a0c9e01986feb87e010827ec1d2e8508"
       },
       "gate": {
         "approval_id": "",
@@ -52710,7 +54398,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Commitments",
           "missing": [
-            "No row or document satisfies 'Commitments'"
+            "No row or document satisfies 'Commitments'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -52723,12 +54411,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Compliance method",
           "missing": [
-            "No row or document satisfies 'Compliance method'"
+            "No row or document satisfies 'Compliance method'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -52741,12 +54429,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -52759,7 +54447,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.1",
@@ -52782,7 +54470,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-s10.html",
-        "sha256": "ceada926e46a1335c263fe5bc20e91f1beab692938d946ca4bb345bc35c0f3f1"
+        "sha256": "e5550a8cdede77467544e24165af87564439d32a191971c7f5d5dc2c0517b04d"
       },
       "gate": {
         "approval_id": "",
@@ -52799,7 +54487,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Commitments",
           "missing": [
-            "No row or document satisfies 'Commitments'"
+            "No row or document satisfies 'Commitments'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -52812,12 +54500,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Compliance method",
           "missing": [
-            "No row or document satisfies 'Compliance method'"
+            "No row or document satisfies 'Compliance method'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -52830,12 +54518,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -52848,7 +54536,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.1",
@@ -52871,7 +54559,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-s11.html",
-        "sha256": "6a8cc8e47daa6f520e92d2016eee545741d1ab535894488815a4cfd6552d0a51"
+        "sha256": "2e469a052bd27c08bb984b324f052bb4133bdc38c29c0e08e36200dc5dfaf833"
       },
       "gate": {
         "approval_id": "",
@@ -52888,7 +54576,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Commitments",
           "missing": [
-            "No row or document satisfies 'Commitments'"
+            "No row or document satisfies 'Commitments'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -52901,12 +54589,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Compliance method",
           "missing": [
-            "No row or document satisfies 'Compliance method'"
+            "No row or document satisfies 'Compliance method'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -52919,12 +54607,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -52937,7 +54625,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.1",
@@ -52960,7 +54648,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-s12.html",
-        "sha256": "149fd166608641b44b60cf30b952c4e2198ccc76a826b96f865d4988ddacfc7e"
+        "sha256": "b86cedefef042cb0c5ac6d2454cb94d64549fe42f4ace408fc5be64890a6bfa9"
       },
       "gate": {
         "approval_id": "",
@@ -52977,7 +54665,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Commitments",
           "missing": [
-            "No row or document satisfies 'Commitments'"
+            "No row or document satisfies 'Commitments'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -52990,12 +54678,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Compliance method",
           "missing": [
-            "No row or document satisfies 'Compliance method'"
+            "No row or document satisfies 'Compliance method'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -53008,12 +54696,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -53026,7 +54714,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.1",
@@ -53049,7 +54737,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-s13.html",
-        "sha256": "c1a007a545a379f5e3e3b57c92c5a626e499d7ec831cb89500e9920d8bada4dd"
+        "sha256": "b3406acbebe1727fd9dbda256ee1ef9838caf7e1009a70eda91015c7a0e5d306"
       },
       "gate": {
         "approval_id": "",
@@ -53066,7 +54754,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Commitments",
           "missing": [
-            "No row or document satisfies 'Commitments'"
+            "No row or document satisfies 'Commitments'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -53079,12 +54767,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Compliance method",
           "missing": [
-            "No row or document satisfies 'Compliance method'"
+            "No row or document satisfies 'Compliance method'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -53097,12 +54785,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -53115,7 +54803,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.1",
@@ -53138,7 +54826,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-s14.html",
-        "sha256": "bd7ed84e4d548153b3fe0a4e8be1d47f2c53be5b53e427ece64851775a3d0a39"
+        "sha256": "1dcc63b691372968a8dd0ed8acca4b205397d35122754445bc23df99940fd94d"
       },
       "gate": {
         "approval_id": "",
@@ -53155,7 +54843,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Commitments",
           "missing": [
-            "No row or document satisfies 'Commitments'"
+            "No row or document satisfies 'Commitments'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -53168,12 +54856,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Compliance method",
           "missing": [
-            "No row or document satisfies 'Compliance method'"
+            "No row or document satisfies 'Compliance method'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -53186,12 +54874,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -53204,7 +54892,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.1",
@@ -53227,7 +54915,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-s15.html",
-        "sha256": "2a49ce9c8ebdd33967314e31b0a553565d9f1e6967c70d1d76d9fe2584db7d00"
+        "sha256": "158cc8dfe5d8f75439818132e48136fa8f33b5fdfc5effe7392cddf99404b668"
       },
       "gate": {
         "approval_id": "",
@@ -53244,7 +54932,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Commitments",
           "missing": [
-            "No row or document satisfies 'Commitments'"
+            "No row or document satisfies 'Commitments'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -53257,12 +54945,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Compliance method",
           "missing": [
-            "No row or document satisfies 'Compliance method'"
+            "No row or document satisfies 'Compliance method'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -53275,12 +54963,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -53293,7 +54981,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.1",
@@ -53316,7 +55004,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-s16.html",
-        "sha256": "984b4795307d277c55c98ac6cb2452c466694b016f51a910a495dcddf0adb33f"
+        "sha256": "a0594966d0e128c3963f0320926acbaef8fd2fa5d5b8a044f2c584b8ae61e2b1"
       },
       "gate": {
         "approval_id": "",
@@ -53333,7 +55021,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Commitments",
           "missing": [
-            "No row or document satisfies 'Commitments'"
+            "No row or document satisfies 'Commitments'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -53346,12 +55034,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Compliance method",
           "missing": [
-            "No row or document satisfies 'Compliance method'"
+            "No row or document satisfies 'Compliance method'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -53364,12 +55052,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -53382,7 +55070,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.1",
@@ -53405,7 +55093,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-s17.html",
-        "sha256": "b065f35f52140a91d784f1f7db3aa607a996c3d8a3431e3751498c3ef9583e41"
+        "sha256": "f11aade325bbbb7afb1f9ea4fc342a5c228ebc14ceaa1931875e20db3cd2a709"
       },
       "gate": {
         "approval_id": "",
@@ -53422,7 +55110,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Commitments",
           "missing": [
-            "No row or document satisfies 'Commitments'"
+            "No row or document satisfies 'Commitments'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -53435,12 +55123,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Compliance method",
           "missing": [
-            "No row or document satisfies 'Compliance method'"
+            "No row or document satisfies 'Compliance method'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -53453,12 +55141,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -53471,7 +55159,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.1",
@@ -53494,7 +55182,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-s18.html",
-        "sha256": "3d3d2b589bae0df5564c29a883ec3801ada0670417bb9ed02a586cafe081065a"
+        "sha256": "45e595218d8a3591de2b8e42ed865d47fdc15f031d1067986853b06922b6c655"
       },
       "gate": {
         "approval_id": "",
@@ -53511,7 +55199,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Commitments",
           "missing": [
-            "No row or document satisfies 'Commitments'"
+            "No row or document satisfies 'Commitments'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -53524,12 +55212,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Compliance method",
           "missing": [
-            "No row or document satisfies 'Compliance method'"
+            "No row or document satisfies 'Compliance method'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -53542,12 +55230,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -53560,7 +55248,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.1",
@@ -53583,7 +55271,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-s19.html",
-        "sha256": "5ef5f3e67d4b7bd7e56a7f74ca1bb447363db4447b99a523a65ecce813a6b0e6"
+        "sha256": "4ca086b58d63e2a1a2e750cfaa65a3cd49a0f151b565b0e2d9cf299dd9ba22e6"
       },
       "gate": {
         "approval_id": "",
@@ -53600,7 +55288,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Commitments",
           "missing": [
-            "No row or document satisfies 'Commitments'"
+            "No row or document satisfies 'Commitments'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -53613,12 +55301,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Compliance method",
           "missing": [
-            "No row or document satisfies 'Compliance method'"
+            "No row or document satisfies 'Compliance method'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -53631,12 +55319,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -53649,7 +55337,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.1",
@@ -53672,7 +55360,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-s20.html",
-        "sha256": "d6b95e272f29aee90cda6966b1917aabf1f5f05d4a01eca29685c50261ca49f7"
+        "sha256": "666053bdf19d8b40d59032dc30295f6e32dfaf04029b1ab4446afa8b5029d6b7"
       },
       "gate": {
         "approval_id": "",
@@ -53689,7 +55377,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Commitments",
           "missing": [
-            "No row or document satisfies 'Commitments'"
+            "No row or document satisfies 'Commitments'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -53702,12 +55390,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Compliance method",
           "missing": [
-            "No row or document satisfies 'Compliance method'"
+            "No row or document satisfies 'Compliance method'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -53720,12 +55408,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -53738,7 +55426,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.1",
@@ -53761,7 +55449,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-s21.html",
-        "sha256": "a7b65644635f81b43c903af698208d4266ef7fba1120f7c8f912f8b6363987a0"
+        "sha256": "4fa5ee51c31b2c8a6c9cabc7fcf9863249a4ebf19748cd1f270d6c25b21b6ee4"
       },
       "gate": {
         "approval_id": "",
@@ -53778,7 +55466,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Commitments",
           "missing": [
-            "No row or document satisfies 'Commitments'"
+            "No row or document satisfies 'Commitments'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -53791,12 +55479,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Compliance method",
           "missing": [
-            "No row or document satisfies 'Compliance method'"
+            "No row or document satisfies 'Compliance method'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -53809,12 +55497,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -53827,7 +55515,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.1",
@@ -53850,7 +55538,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-spec-v2.html",
-        "sha256": "7e0bae493487d8c0a450d13d66ff9fe921fca6b5e0fb82c0f08642ed06c0dafb"
+        "sha256": "7e57364d816ddaf1cee2d2c55e6d2bdae929f48cf42caaeca75791b5b213809c"
       },
       "gate": {
         "approval_id": "",
@@ -53867,7 +55555,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Commitments",
           "missing": [
-            "No row or document satisfies 'Commitments'"
+            "No row or document satisfies 'Commitments'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -53880,12 +55568,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Compliance method",
           "missing": [
-            "No row or document satisfies 'Compliance method'"
+            "No row or document satisfies 'Compliance method'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -53898,12 +55586,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -53916,7 +55604,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.1",
@@ -53939,7 +55627,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-t0.html",
-        "sha256": "482aed99ec46cfd493502fc00e8ab0fdb03beae6eb71ff513e7b8f492bf23001"
+        "sha256": "8abebfd43a0ca46ffad51c3ae9fc40afec84fb0b51ea8338cebdf1b4033685d2"
       },
       "gate": {
         "approval_id": "",
@@ -53956,7 +55644,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Commitments",
           "missing": [
-            "No row or document satisfies 'Commitments'"
+            "No row or document satisfies 'Commitments'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -53969,12 +55657,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Compliance method",
           "missing": [
-            "No row or document satisfies 'Compliance method'"
+            "No row or document satisfies 'Compliance method'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -53987,12 +55675,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -54005,7 +55693,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.1",
@@ -54028,7 +55716,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-t1.html",
-        "sha256": "970752c17806ec3f35250932e006b9e3d9832153c833cab3e19334abb9c6617d"
+        "sha256": "d3c83551bd42f04e86dce0d82597f48d9ac5452b064aacd23bdba82873d361f2"
       },
       "gate": {
         "approval_id": "",
@@ -54045,7 +55733,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Commitments",
           "missing": [
-            "No row or document satisfies 'Commitments'"
+            "No row or document satisfies 'Commitments'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -54058,12 +55746,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Compliance method",
           "missing": [
-            "No row or document satisfies 'Compliance method'"
+            "No row or document satisfies 'Compliance method'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -54076,12 +55764,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -54094,7 +55782,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.1",
@@ -54117,7 +55805,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-t10.html",
-        "sha256": "f96b218e68ae6ac2a47768743ef455feab7405859ba21500d9dc0baf47f47a8b"
+        "sha256": "edf2bdf40476c60cbf9a17ca95625510b7966c136863a1d8c7c8d14585512ff4"
       },
       "gate": {
         "approval_id": "",
@@ -54134,7 +55822,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Commitments",
           "missing": [
-            "No row or document satisfies 'Commitments'"
+            "No row or document satisfies 'Commitments'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -54147,12 +55835,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Compliance method",
           "missing": [
-            "No row or document satisfies 'Compliance method'"
+            "No row or document satisfies 'Compliance method'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -54165,12 +55853,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -54183,7 +55871,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.1",
@@ -54206,7 +55894,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-t11.html",
-        "sha256": "22130dbee60d4adadc11200241d891396ed5442e26fac1e914d165aa005c4378"
+        "sha256": "55d714e547e5d8471b0cac047f5269be936283dc63fc2043da281e08e2c1dbe8"
       },
       "gate": {
         "approval_id": "",
@@ -54223,7 +55911,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Commitments",
           "missing": [
-            "No row or document satisfies 'Commitments'"
+            "No row or document satisfies 'Commitments'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -54236,12 +55924,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Compliance method",
           "missing": [
-            "No row or document satisfies 'Compliance method'"
+            "No row or document satisfies 'Compliance method'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -54254,12 +55942,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -54272,7 +55960,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.1",
@@ -54295,7 +55983,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-t12.html",
-        "sha256": "29b2f968ee1451029ba5810306598f0cef43447b9aa1693529cda61bc355c93a"
+        "sha256": "9e3befffa68728611be0c181e0e7414960c2f91f76e9264dd4526794eeacf62e"
       },
       "gate": {
         "approval_id": "",
@@ -54312,7 +56000,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Commitments",
           "missing": [
-            "No row or document satisfies 'Commitments'"
+            "No row or document satisfies 'Commitments'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -54325,12 +56013,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Compliance method",
           "missing": [
-            "No row or document satisfies 'Compliance method'"
+            "No row or document satisfies 'Compliance method'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -54343,12 +56031,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -54361,7 +56049,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.1",
@@ -54384,7 +56072,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-t13.html",
-        "sha256": "728450e0dba19cb8b4c115dc78073001f158eb66c3377500d1c86c0c375ff8e4"
+        "sha256": "3c7f7cdf7b0f74cf2b99a15fd76a4f203d5f41e57f9312cbe02d4620cc94bd51"
       },
       "gate": {
         "approval_id": "",
@@ -54401,7 +56089,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Commitments",
           "missing": [
-            "No row or document satisfies 'Commitments'"
+            "No row or document satisfies 'Commitments'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -54414,12 +56102,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Compliance method",
           "missing": [
-            "No row or document satisfies 'Compliance method'"
+            "No row or document satisfies 'Compliance method'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -54432,12 +56120,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -54450,7 +56138,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.1",
@@ -54473,7 +56161,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-t14.html",
-        "sha256": "e2124eb2c2387715724add27f24ffae1b141dfa56df9494a92415938d42a0224"
+        "sha256": "7f327a4b55add3073aac3ba8af63891edfa91f1701168ee67a2ad93725cf1f39"
       },
       "gate": {
         "approval_id": "",
@@ -54490,7 +56178,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Commitments",
           "missing": [
-            "No row or document satisfies 'Commitments'"
+            "No row or document satisfies 'Commitments'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -54503,12 +56191,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Compliance method",
           "missing": [
-            "No row or document satisfies 'Compliance method'"
+            "No row or document satisfies 'Compliance method'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -54521,12 +56209,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -54539,7 +56227,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.1",
@@ -54562,7 +56250,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-t15.html",
-        "sha256": "0eb91971a2b9aeaf95336e61ad92285a6132bcbacf31c3e8404ef645a68cc3c9"
+        "sha256": "922ff8e76f3ae9eacf20d4802733db676c863d2163d082a03f7e0a86804bca77"
       },
       "gate": {
         "approval_id": "",
@@ -54579,7 +56267,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Commitments",
           "missing": [
-            "No row or document satisfies 'Commitments'"
+            "No row or document satisfies 'Commitments'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -54592,12 +56280,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Compliance method",
           "missing": [
-            "No row or document satisfies 'Compliance method'"
+            "No row or document satisfies 'Compliance method'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -54610,12 +56298,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -54628,7 +56316,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.1",
@@ -54651,7 +56339,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-t16.html",
-        "sha256": "19e773a8740fbac5e9d4d2609dceb41733f1c6083a01d68ad57eb085e387a958"
+        "sha256": "edd8bbca09cd942c8c69f577e77938b46c5af83ce0828239d924baf5cad60f3f"
       },
       "gate": {
         "approval_id": "",
@@ -54668,7 +56356,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Commitments",
           "missing": [
-            "No row or document satisfies 'Commitments'"
+            "No row or document satisfies 'Commitments'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -54681,12 +56369,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Compliance method",
           "missing": [
-            "No row or document satisfies 'Compliance method'"
+            "No row or document satisfies 'Compliance method'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -54699,12 +56387,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -54717,7 +56405,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.1",
@@ -54740,7 +56428,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-t17.html",
-        "sha256": "6468649f0a3b40d7fdf30217e393833524106c22eca67fc899b09c401feb1908"
+        "sha256": "55c46c0b04b92069f2e46269a2dffaa3d64de9b53095c4d01db88be80f226f66"
       },
       "gate": {
         "approval_id": "",
@@ -54757,7 +56445,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Commitments",
           "missing": [
-            "No row or document satisfies 'Commitments'"
+            "No row or document satisfies 'Commitments'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -54770,12 +56458,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Compliance method",
           "missing": [
-            "No row or document satisfies 'Compliance method'"
+            "No row or document satisfies 'Compliance method'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -54788,12 +56476,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -54806,7 +56494,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.1",
@@ -54829,7 +56517,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-t2.html",
-        "sha256": "75640917c9ee6d26eaf162d21f1440950e82be107090ece9c4c9ca99335fd905"
+        "sha256": "233d5e9e57833d648c96c86d0a8196a364abff8c2ab76de3c0a08ce0cb8ab616"
       },
       "gate": {
         "approval_id": "",
@@ -54846,7 +56534,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Commitments",
           "missing": [
-            "No row or document satisfies 'Commitments'"
+            "No row or document satisfies 'Commitments'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -54859,12 +56547,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Compliance method",
           "missing": [
-            "No row or document satisfies 'Compliance method'"
+            "No row or document satisfies 'Compliance method'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -54877,12 +56565,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -54895,7 +56583,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.1",
@@ -54918,7 +56606,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-t3.html",
-        "sha256": "e5c8f812f246cacacfb5a3cfe8608ede6f0c670d05dac53436932448d5dfec9c"
+        "sha256": "88ebde154ded2b13e401b4dd806a36cb39c8b5480bf1ea30ae526beda4479940"
       },
       "gate": {
         "approval_id": "",
@@ -54935,7 +56623,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Commitments",
           "missing": [
-            "No row or document satisfies 'Commitments'"
+            "No row or document satisfies 'Commitments'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -54948,12 +56636,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Compliance method",
           "missing": [
-            "No row or document satisfies 'Compliance method'"
+            "No row or document satisfies 'Compliance method'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -54966,12 +56654,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -54984,7 +56672,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.1",
@@ -55007,7 +56695,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-t4.html",
-        "sha256": "b6007b16b3577b61351df9fcc1fd43470e6093b7eccea34dacded746be14215e"
+        "sha256": "1d5411e58d568e5db27fd6a08c49eed8af996017fabd63321a865d00decb79bd"
       },
       "gate": {
         "approval_id": "",
@@ -55024,7 +56712,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Commitments",
           "missing": [
-            "No row or document satisfies 'Commitments'"
+            "No row or document satisfies 'Commitments'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -55037,12 +56725,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Compliance method",
           "missing": [
-            "No row or document satisfies 'Compliance method'"
+            "No row or document satisfies 'Compliance method'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -55055,12 +56743,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -55073,7 +56761,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.1",
@@ -55096,7 +56784,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-t5.html",
-        "sha256": "9f9e510f783e3535c64e2d2c74e1d855f732701678fca48f7fd2141be19dbd6d"
+        "sha256": "1f3906951ef4ce49515c31d69cc8571b6a2515ca3a4fc35ea8d4f10a6bfd6ac3"
       },
       "gate": {
         "approval_id": "",
@@ -55113,7 +56801,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Commitments",
           "missing": [
-            "No row or document satisfies 'Commitments'"
+            "No row or document satisfies 'Commitments'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -55126,12 +56814,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Compliance method",
           "missing": [
-            "No row or document satisfies 'Compliance method'"
+            "No row or document satisfies 'Compliance method'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -55144,12 +56832,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -55162,7 +56850,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.1",
@@ -55185,7 +56873,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-t6.html",
-        "sha256": "798ee238b0d58cced0bccada657536bc8d3aeaf3c90b1e75799fddb1d6228523"
+        "sha256": "3b98bb9dcf83bdc0b57d71f497dac6c13a3a096f07f970ae6dfbc406fb8708f3"
       },
       "gate": {
         "approval_id": "",
@@ -55202,7 +56890,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Commitments",
           "missing": [
-            "No row or document satisfies 'Commitments'"
+            "No row or document satisfies 'Commitments'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -55215,12 +56903,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Compliance method",
           "missing": [
-            "No row or document satisfies 'Compliance method'"
+            "No row or document satisfies 'Compliance method'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -55233,12 +56921,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -55251,7 +56939,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.1",
@@ -55274,7 +56962,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-t7.html",
-        "sha256": "f7c21400d996852cbf7ed21a72619e6e00d3a7d3cf50bade92f103e9d5e3bf08"
+        "sha256": "148b51c0ea2ea819154ce911c7d6330710740fccfe2226a74367877db435cdfb"
       },
       "gate": {
         "approval_id": "",
@@ -55291,7 +56979,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Commitments",
           "missing": [
-            "No row or document satisfies 'Commitments'"
+            "No row or document satisfies 'Commitments'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -55304,12 +56992,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Compliance method",
           "missing": [
-            "No row or document satisfies 'Compliance method'"
+            "No row or document satisfies 'Compliance method'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -55322,12 +57010,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -55340,7 +57028,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.1",
@@ -55363,7 +57051,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-t8.html",
-        "sha256": "8792ca7960c911ca48ca7b36e401caaff74e1b919034a4776e08996dfa2e9792"
+        "sha256": "6add216d56fe0357d56d87c11188a65432fd550bba1385de6c592551e0ac003c"
       },
       "gate": {
         "approval_id": "",
@@ -55380,7 +57068,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Commitments",
           "missing": [
-            "No row or document satisfies 'Commitments'"
+            "No row or document satisfies 'Commitments'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -55393,12 +57081,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Compliance method",
           "missing": [
-            "No row or document satisfies 'Compliance method'"
+            "No row or document satisfies 'Compliance method'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -55411,12 +57099,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -55429,7 +57117,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.1",
@@ -55452,7 +57140,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "contract_missing",
       "document": {
         "path": "docs/standards/std-togaf-delivery-contract-t9.html",
-        "sha256": "4f8ddb92406f0e2aef4c8e3c1202f6881bc55a6d0aa9a8cdb4873f17222a7375"
+        "sha256": "5b235014e4957d31f97dbdaaf5472ee6e12783c6a87278ed549f4f8ea0729af3"
       },
       "gate": {
         "approval_id": "",
@@ -55469,7 +57157,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Commitments",
           "missing": [
-            "No row or document satisfies 'Commitments'"
+            "No row or document satisfies 'Commitments'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -55482,12 +57170,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Compliance method",
           "missing": [
-            "No row or document satisfies 'Compliance method'"
+            "No row or document satisfies 'Compliance method'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -55500,12 +57188,12 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Approval",
           "missing": [
-            "No row or document satisfies 'Approval'"
+            "No row or document satisfies 'Approval'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -55518,7 +57206,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         }
       ],
       "spec": "§8.1",
@@ -55536,12 +57224,107 @@ window.CONVEYOR_STANDARDS = {
       "title": "Delivery Contract — SPEC_V2 slice T9 (docs/SPEC_V2.md §12)"
     },
     {
+      "category": "gap-analysis",
+      "covered_key": "",
+      "covered_rule": "",
+      "document": {
+        "path": "docs/standards/std-togaf-gap-analysis-t9.html",
+        "sha256": "b38ae219595b6993be282759fc1a91d7e10ddfd7b95e8d8aa81ce364982b026a"
+      },
+      "gate": {
+        "approval_id": "",
+        "kind": "statement_of_architecture_work",
+        "state": "live"
+      },
+      "id": "std-togaf-gap-analysis-t9",
+      "level": "project",
+      "mandatory": true,
+      "owner_project": "T9",
+      "package_key": "std-togaf-gap-analysis-t9:T9",
+      "package_published": true,
+      "sections": [
+        {
+          "heading": "Baseline",
+          "missing": [
+            "No row or document satisfies 'Baseline'; a document exists but lacks the heading"
+          ],
+          "required": true,
+          "severity": "",
+          "sources": [
+            {
+              "category": "gap-analysis",
+              "count": 0,
+              "file": "artefacts.json",
+              "items": [],
+              "kind": "documents",
+              "pointer": "/documents",
+              "scope": "subject"
+            }
+          ],
+          "status": "partial"
+        },
+        {
+          "heading": "Target",
+          "missing": [
+            "No row or document satisfies 'Target'; a document exists but lacks the heading"
+          ],
+          "required": true,
+          "severity": "",
+          "sources": [
+            {
+              "category": "gap-analysis",
+              "count": 0,
+              "file": "artefacts.json",
+              "items": [],
+              "kind": "documents",
+              "pointer": "/documents",
+              "scope": "subject"
+            }
+          ],
+          "status": "partial"
+        },
+        {
+          "heading": "Gaps and work packages",
+          "missing": [
+            "No row or document satisfies 'Gaps and work packages'; a document exists but lacks the heading"
+          ],
+          "required": true,
+          "severity": "",
+          "sources": [
+            {
+              "category": "gap-analysis",
+              "count": 0,
+              "file": "artefacts.json",
+              "items": [],
+              "kind": "documents",
+              "pointer": "/documents",
+              "scope": "subject"
+            }
+          ],
+          "status": "partial"
+        }
+      ],
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "absent",
+      "subject": {
+        "id": "01a1d039-0d35-7bd1-945d-cea12c5dfd6d",
+        "key": "T9",
+        "kind": "project",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "T9",
+        "title": "SPEC_V2 slice T9 (docs/SPEC_V2.md §12)"
+      },
+      "subject_kind": "project",
+      "title": "Gap Analysis — SPEC_V2 slice T9 (docs/SPEC_V2.md §12)"
+    },
+    {
       "category": "phase-a",
       "covered_key": "mandatory_artefacts:T9",
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-a-t9-a.html",
-        "sha256": "345cd4ab001e16d056521905c05b9691c5a3e312188d9366625ea1413ade8a73"
+        "sha256": "7c43c36c14c8618a43b467445c5fc8a19c06c793276a734a13f477fdfaeca844"
       },
       "gate": {
         "approval_id": "",
@@ -55558,7 +57341,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Mandatory artefacts",
           "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
+            "No row or document satisfies 'Mandatory artefacts'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -55570,7 +57353,7 @@ window.CONVEYOR_STANDARDS = {
               "name": "phase_artefacts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Contract and gate",
@@ -55642,7 +57425,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-b-t9-b.html",
-        "sha256": "3b9f9dd60703d5252cf6f1e58d2f7b4b7eddec4c4311c5c1e10270b85ddd615a"
+        "sha256": "aab030b6b1fff7f64b7c18cd50ea6694db1097efab8b096b027a45379c8ac153"
       },
       "gate": {
         "approval_id": "",
@@ -55659,7 +57442,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Mandatory artefacts",
           "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
+            "No row or document satisfies 'Mandatory artefacts'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -55671,12 +57454,12 @@ window.CONVEYOR_STANDARDS = {
               "name": "phase_artefacts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Contract and gate",
           "missing": [
-            "No row or document satisfies 'Contract and gate'"
+            "No row or document satisfies 'Contract and gate'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -55689,7 +57472,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Evidence",
@@ -55739,7 +57522,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-c-t9-c.html",
-        "sha256": "83d97315f01d3948ed03006b0e937acb47936c588e179fb5fb119be4b06d8a08"
+        "sha256": "f1a28d73744299adbf2303336325cca72ee9707f4a25f642b65159cef2fa79fb"
       },
       "gate": {
         "approval_id": "",
@@ -55756,7 +57539,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Mandatory artefacts",
           "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
+            "No row or document satisfies 'Mandatory artefacts'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -55768,12 +57551,12 @@ window.CONVEYOR_STANDARDS = {
               "name": "phase_artefacts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Contract and gate",
           "missing": [
-            "No row or document satisfies 'Contract and gate'"
+            "No row or document satisfies 'Contract and gate'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -55786,7 +57569,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Evidence",
@@ -55836,7 +57619,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-d-t9-d.html",
-        "sha256": "bcabe2b38be15de8724088dda9f98c924b202948ca80bac29ef3caf64a545c86"
+        "sha256": "6e14936f4aa79a065312c3e1b48589b56057b668d2042015fbb4d7ae343b36f7"
       },
       "gate": {
         "approval_id": "",
@@ -55853,7 +57636,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Mandatory artefacts",
           "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
+            "No row or document satisfies 'Mandatory artefacts'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -55865,12 +57648,12 @@ window.CONVEYOR_STANDARDS = {
               "name": "phase_artefacts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Contract and gate",
           "missing": [
-            "No row or document satisfies 'Contract and gate'"
+            "No row or document satisfies 'Contract and gate'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -55883,7 +57666,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Evidence",
@@ -55933,7 +57716,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-e-t9-e.html",
-        "sha256": "7025ba0936ea98086d3f242b41c36dee33017017d0ccf15cde513c45635858ff"
+        "sha256": "4aa9c0e6a9c33b92f4bc809aa6e0363409941aaa30ccdedde5947558b2780d4f"
       },
       "gate": {
         "approval_id": "",
@@ -55950,7 +57733,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Mandatory artefacts",
           "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
+            "No row or document satisfies 'Mandatory artefacts'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -55962,12 +57745,12 @@ window.CONVEYOR_STANDARDS = {
               "name": "phase_artefacts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Contract and gate",
           "missing": [
-            "No row or document satisfies 'Contract and gate'"
+            "No row or document satisfies 'Contract and gate'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -55980,7 +57763,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Evidence",
@@ -56008,6 +57791,104 @@ window.CONVEYOR_STANDARDS = {
             }
           ],
           "status": "partial"
+        },
+        {
+          "heading": "Gap analysis",
+          "missing": [
+            "No row or document satisfies 'Gap analysis'; a document exists but lacks the heading"
+          ],
+          "required": true,
+          "severity": "",
+          "sources": [
+            {
+              "category": "gap-analysis",
+              "count": 0,
+              "file": "artefacts.json",
+              "items": [],
+              "kind": "documents",
+              "pointer": "/documents",
+              "scope": "subject"
+            }
+          ],
+          "status": "partial"
+        },
+        {
+          "heading": "Candidate solutions",
+          "missing": [
+            "No row or document satisfies 'Candidate solutions'; a document exists but lacks the heading"
+          ],
+          "required": true,
+          "severity": "",
+          "sources": [
+            {
+              "category": "candidate-solutions",
+              "count": 0,
+              "file": "artefacts.json",
+              "items": [],
+              "kind": "documents",
+              "pointer": "/documents",
+              "scope": "subject"
+            }
+          ],
+          "status": "partial"
+        },
+        {
+          "heading": "Project context diagram",
+          "missing": [
+            "No row or document satisfies 'Project context diagram'; a document exists but lacks the heading"
+          ],
+          "required": true,
+          "severity": "",
+          "sources": [
+            {
+              "category": "project-context-diagram",
+              "count": 0,
+              "file": "artefacts.json",
+              "items": [],
+              "kind": "documents",
+              "pointer": "/documents",
+              "scope": "subject"
+            }
+          ],
+          "status": "partial"
+        },
+        {
+          "heading": "Benefits diagram",
+          "missing": [
+            "No row or document satisfies 'Benefits diagram'; a document exists but lacks the heading"
+          ],
+          "required": true,
+          "severity": "",
+          "sources": [
+            {
+              "category": "benefits-diagram",
+              "count": 0,
+              "file": "artefacts.json",
+              "items": [],
+              "kind": "documents",
+              "pointer": "/documents",
+              "scope": "subject"
+            }
+          ],
+          "status": "partial"
+        },
+        {
+          "heading": "Work packages",
+          "missing": [
+            "No row or document satisfies 'Work packages'; a document exists but lacks the heading"
+          ],
+          "required": true,
+          "severity": "",
+          "sources": [
+            {
+              "count": 0,
+              "file": "msp.json",
+              "items": [],
+              "kind": "rows",
+              "pointer": "/wbs_nodes"
+            }
+          ],
+          "status": "partial"
         }
       ],
       "spec": "§8.1",
@@ -56030,7 +57911,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-f-t9-f.html",
-        "sha256": "d57d252d1719c63c6820269d3a9a084c16b5d5588ffa742ef47b535098f360f8"
+        "sha256": "4c78de3bed2ddf118da15f431e81516e75b0a3e2793d6a405a97915162f13ed4"
       },
       "gate": {
         "approval_id": "",
@@ -56047,7 +57928,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Mandatory artefacts",
           "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
+            "No row or document satisfies 'Mandatory artefacts'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -56059,12 +57940,12 @@ window.CONVEYOR_STANDARDS = {
               "name": "phase_artefacts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Contract and gate",
           "missing": [
-            "No row or document satisfies 'Contract and gate'"
+            "No row or document satisfies 'Contract and gate'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -56077,7 +57958,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Evidence",
@@ -56127,7 +58008,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-s00-g.html",
-        "sha256": "a14bb2c6aec478078ddd82bb0a8767a4bd020638f1e62bc4f1aacec38599d542"
+        "sha256": "4a411b42e215204fc373daac14c4ab47276f98967d0f6d804416809f0a1612e5"
       },
       "gate": {
         "approval_id": "",
@@ -56144,7 +58025,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Mandatory artefacts",
           "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
+            "No row or document satisfies 'Mandatory artefacts'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -56156,12 +58037,12 @@ window.CONVEYOR_STANDARDS = {
               "name": "phase_artefacts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Contract and gate",
           "missing": [
-            "No row or document satisfies 'Contract and gate'"
+            "No row or document satisfies 'Contract and gate'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -56174,7 +58055,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Evidence",
@@ -56224,7 +58105,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-s01-g.html",
-        "sha256": "71d860994e729f8a08189ab8891f2498a1eeb9163d0adb79d8a3bef797ff79a1"
+        "sha256": "1bb2617acdc1c68262c868ad17724e879b6b651b6f581018af68e4ff0ecd8131"
       },
       "gate": {
         "approval_id": "",
@@ -56241,7 +58122,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Mandatory artefacts",
           "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
+            "No row or document satisfies 'Mandatory artefacts'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -56253,12 +58134,12 @@ window.CONVEYOR_STANDARDS = {
               "name": "phase_artefacts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Contract and gate",
           "missing": [
-            "No row or document satisfies 'Contract and gate'"
+            "No row or document satisfies 'Contract and gate'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -56271,7 +58152,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Evidence",
@@ -56321,7 +58202,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-s02-g.html",
-        "sha256": "8e7913a130b9c10f231c471cfedb8a3eaed645d6d110b64e73a4fc335eb6c1e1"
+        "sha256": "640ef5277ea61d22cddc98eeb93ff2388d5d5191e96f55b150a01eadfb0924b4"
       },
       "gate": {
         "approval_id": "",
@@ -56338,7 +58219,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Mandatory artefacts",
           "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
+            "No row or document satisfies 'Mandatory artefacts'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -56350,12 +58231,12 @@ window.CONVEYOR_STANDARDS = {
               "name": "phase_artefacts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Contract and gate",
           "missing": [
-            "No row or document satisfies 'Contract and gate'"
+            "No row or document satisfies 'Contract and gate'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -56368,7 +58249,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Evidence",
@@ -56418,7 +58299,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-s03-g.html",
-        "sha256": "2c97553725ecf410ba58e17ff7568278a3f6cdbdf1476d117d426370c0a36a30"
+        "sha256": "f517d384c449baea51a4b30b6f71c598ea805ac7f545fd7cdc6ef2019838e97a"
       },
       "gate": {
         "approval_id": "",
@@ -56435,7 +58316,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Mandatory artefacts",
           "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
+            "No row or document satisfies 'Mandatory artefacts'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -56447,12 +58328,12 @@ window.CONVEYOR_STANDARDS = {
               "name": "phase_artefacts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Contract and gate",
           "missing": [
-            "No row or document satisfies 'Contract and gate'"
+            "No row or document satisfies 'Contract and gate'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -56465,7 +58346,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Evidence",
@@ -56515,7 +58396,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-s04-g.html",
-        "sha256": "2ebd82a3cfae4247ad2030291dd368723bb86e0abd464618c6539a9e35007dc6"
+        "sha256": "4e1c7c31d44b7d2ff1435d49edc9230f907f91c406c5921ecfaa5a8c1a08e907"
       },
       "gate": {
         "approval_id": "",
@@ -56532,7 +58413,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Mandatory artefacts",
           "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
+            "No row or document satisfies 'Mandatory artefacts'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -56544,12 +58425,12 @@ window.CONVEYOR_STANDARDS = {
               "name": "phase_artefacts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Contract and gate",
           "missing": [
-            "No row or document satisfies 'Contract and gate'"
+            "No row or document satisfies 'Contract and gate'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -56562,7 +58443,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Evidence",
@@ -56612,7 +58493,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-s05-g.html",
-        "sha256": "dfbced81a37588fe95c1057e4722ff9b59075600ae945a9502d5aeb71c56edf2"
+        "sha256": "63c0b5c164327e3629c520662d042cf1f71a420221a077a128050e4a7bbe8531"
       },
       "gate": {
         "approval_id": "",
@@ -56629,7 +58510,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Mandatory artefacts",
           "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
+            "No row or document satisfies 'Mandatory artefacts'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -56641,12 +58522,12 @@ window.CONVEYOR_STANDARDS = {
               "name": "phase_artefacts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Contract and gate",
           "missing": [
-            "No row or document satisfies 'Contract and gate'"
+            "No row or document satisfies 'Contract and gate'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -56659,7 +58540,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Evidence",
@@ -56709,7 +58590,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-s06-g.html",
-        "sha256": "dc037ac0e38b14c54f2e60801c600bf7b5cc824235b93e8d3a880515da87b1ff"
+        "sha256": "658f330f47a7cdd19ddd668bdf3dc3bb263d1590f6d1383af609d07a7c73a4c2"
       },
       "gate": {
         "approval_id": "",
@@ -56726,7 +58607,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Mandatory artefacts",
           "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
+            "No row or document satisfies 'Mandatory artefacts'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -56738,12 +58619,12 @@ window.CONVEYOR_STANDARDS = {
               "name": "phase_artefacts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Contract and gate",
           "missing": [
-            "No row or document satisfies 'Contract and gate'"
+            "No row or document satisfies 'Contract and gate'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -56756,7 +58637,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Evidence",
@@ -56806,7 +58687,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-s06b-g.html",
-        "sha256": "11d1a79d07a1a9abbcad1b2ae6dcf4b3cb524dce8c7d803e875ff1d10ef89f1c"
+        "sha256": "d940ccaf058d84c8d209ecec324bbede63ec919031b8807d0f5bb85b34969b2e"
       },
       "gate": {
         "approval_id": "",
@@ -56823,7 +58704,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Mandatory artefacts",
           "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
+            "No row or document satisfies 'Mandatory artefacts'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -56835,12 +58716,12 @@ window.CONVEYOR_STANDARDS = {
               "name": "phase_artefacts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Contract and gate",
           "missing": [
-            "No row or document satisfies 'Contract and gate'"
+            "No row or document satisfies 'Contract and gate'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -56853,7 +58734,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Evidence",
@@ -56903,7 +58784,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-s06c-g.html",
-        "sha256": "5d94d7c1090c2b1a8df53347c7a1290e2458de2e14bba8e5115b90943c491291"
+        "sha256": "95737baa254480ab453aaffe01dceb741f77c7a18c090181daab9561502118b3"
       },
       "gate": {
         "approval_id": "",
@@ -56920,7 +58801,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Mandatory artefacts",
           "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
+            "No row or document satisfies 'Mandatory artefacts'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -56932,12 +58813,12 @@ window.CONVEYOR_STANDARDS = {
               "name": "phase_artefacts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Contract and gate",
           "missing": [
-            "No row or document satisfies 'Contract and gate'"
+            "No row or document satisfies 'Contract and gate'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -56950,7 +58831,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Evidence",
@@ -57000,7 +58881,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-s06d-g.html",
-        "sha256": "c067fee0121fde8cf832368040cd310fa27d59376a782ba8787738642b88444c"
+        "sha256": "6d46db2f463ab6d610f8e08b29620f71569040844064cbb3559a733b891078e4"
       },
       "gate": {
         "approval_id": "",
@@ -57017,7 +58898,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Mandatory artefacts",
           "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
+            "No row or document satisfies 'Mandatory artefacts'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -57029,12 +58910,12 @@ window.CONVEYOR_STANDARDS = {
               "name": "phase_artefacts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Contract and gate",
           "missing": [
-            "No row or document satisfies 'Contract and gate'"
+            "No row or document satisfies 'Contract and gate'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -57047,7 +58928,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Evidence",
@@ -57097,7 +58978,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-s07-g.html",
-        "sha256": "9938ce29e10822fb506f8264b0eaa3024e26c71bfa72467d209ae828d07d34b0"
+        "sha256": "c284db46e07492c9d0984de09126c50ea364dbec2a6bfdb135137e9db37263bc"
       },
       "gate": {
         "approval_id": "",
@@ -57114,7 +58995,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Mandatory artefacts",
           "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
+            "No row or document satisfies 'Mandatory artefacts'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -57126,12 +59007,12 @@ window.CONVEYOR_STANDARDS = {
               "name": "phase_artefacts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Contract and gate",
           "missing": [
-            "No row or document satisfies 'Contract and gate'"
+            "No row or document satisfies 'Contract and gate'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -57144,7 +59025,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Evidence",
@@ -57194,7 +59075,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-s08-g.html",
-        "sha256": "884cb5e280dca0a503d0d6f87cfcb588d0a5d6b74a0e167383ec0e5b423324f8"
+        "sha256": "0174dd6c60911bd49b0d77f2f610fdfabebb6b5c12dac70494a268fbe258e95d"
       },
       "gate": {
         "approval_id": "",
@@ -57211,7 +59092,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Mandatory artefacts",
           "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
+            "No row or document satisfies 'Mandatory artefacts'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -57223,12 +59104,12 @@ window.CONVEYOR_STANDARDS = {
               "name": "phase_artefacts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Contract and gate",
           "missing": [
-            "No row or document satisfies 'Contract and gate'"
+            "No row or document satisfies 'Contract and gate'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -57241,7 +59122,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Evidence",
@@ -57291,7 +59172,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-s09-g.html",
-        "sha256": "f01c596baece32e544bdbad65c4380d211ce672f0a40cf8ce7571340c2cf967e"
+        "sha256": "f3ebff196c52125f2423c6e2f53aa70af456b210072c50eef9c436d14d2be502"
       },
       "gate": {
         "approval_id": "",
@@ -57308,7 +59189,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Mandatory artefacts",
           "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
+            "No row or document satisfies 'Mandatory artefacts'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -57320,12 +59201,12 @@ window.CONVEYOR_STANDARDS = {
               "name": "phase_artefacts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Contract and gate",
           "missing": [
-            "No row or document satisfies 'Contract and gate'"
+            "No row or document satisfies 'Contract and gate'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -57338,7 +59219,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Evidence",
@@ -57388,7 +59269,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-s10-g.html",
-        "sha256": "a18640357167930aa96c44c6695f62b3bbd2ebfdbf1cde50a1b4bdfb56f9220d"
+        "sha256": "aa2327b32e445e437e6958df1f09d8e0989601f06a865b1374152a4ce3015810"
       },
       "gate": {
         "approval_id": "",
@@ -57405,7 +59286,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Mandatory artefacts",
           "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
+            "No row or document satisfies 'Mandatory artefacts'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -57417,12 +59298,12 @@ window.CONVEYOR_STANDARDS = {
               "name": "phase_artefacts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Contract and gate",
           "missing": [
-            "No row or document satisfies 'Contract and gate'"
+            "No row or document satisfies 'Contract and gate'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -57435,7 +59316,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Evidence",
@@ -57485,7 +59366,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-s11-g.html",
-        "sha256": "046189df68d2b13cb9d7d5829c24ec2d74681f7281dcda02daed71befa9dd983"
+        "sha256": "e523c29b78d7d87c791da120aef60b20dd43a6efef3ae0a1f9705b3fde793d32"
       },
       "gate": {
         "approval_id": "",
@@ -57502,7 +59383,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Mandatory artefacts",
           "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
+            "No row or document satisfies 'Mandatory artefacts'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -57514,12 +59395,12 @@ window.CONVEYOR_STANDARDS = {
               "name": "phase_artefacts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Contract and gate",
           "missing": [
-            "No row or document satisfies 'Contract and gate'"
+            "No row or document satisfies 'Contract and gate'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -57532,7 +59413,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Evidence",
@@ -57582,7 +59463,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-s12-g.html",
-        "sha256": "13ed1ea0d6b13742f9550b3ecb01bfd1817343851c44b4db7e593c27afae0a1a"
+        "sha256": "c02884232ba848ead76bb77654baa33ebc1625b1ca1576750b2d37f909ef6570"
       },
       "gate": {
         "approval_id": "",
@@ -57599,7 +59480,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Mandatory artefacts",
           "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
+            "No row or document satisfies 'Mandatory artefacts'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -57611,12 +59492,12 @@ window.CONVEYOR_STANDARDS = {
               "name": "phase_artefacts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Contract and gate",
           "missing": [
-            "No row or document satisfies 'Contract and gate'"
+            "No row or document satisfies 'Contract and gate'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -57629,7 +59510,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Evidence",
@@ -57679,7 +59560,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-s13-g.html",
-        "sha256": "5d64ec775df7a7a3d9e0b518707b2fe7405f998eba93ddeeea11646b49971301"
+        "sha256": "4197f4f3512190307b8a6d1d7ea446a77d23ffc25896bf788a6ce5016c5614ef"
       },
       "gate": {
         "approval_id": "",
@@ -57696,7 +59577,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Mandatory artefacts",
           "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
+            "No row or document satisfies 'Mandatory artefacts'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -57708,12 +59589,12 @@ window.CONVEYOR_STANDARDS = {
               "name": "phase_artefacts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Contract and gate",
           "missing": [
-            "No row or document satisfies 'Contract and gate'"
+            "No row or document satisfies 'Contract and gate'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -57726,7 +59607,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Evidence",
@@ -57776,7 +59657,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-s14-g.html",
-        "sha256": "190cf2e6219757e781fcda8a37e82830812e6b28bd6e0b20da8f65e9e2def97e"
+        "sha256": "0d10dac66a91cbd42ca282c67dd592e10463b1fbf9a137677a1cfc86e2f50c20"
       },
       "gate": {
         "approval_id": "",
@@ -57793,7 +59674,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Mandatory artefacts",
           "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
+            "No row or document satisfies 'Mandatory artefacts'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -57805,12 +59686,12 @@ window.CONVEYOR_STANDARDS = {
               "name": "phase_artefacts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Contract and gate",
           "missing": [
-            "No row or document satisfies 'Contract and gate'"
+            "No row or document satisfies 'Contract and gate'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -57823,7 +59704,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Evidence",
@@ -57873,7 +59754,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-s15-g.html",
-        "sha256": "a4bde7ab4f25f69714192a87423b154345a0e35d1be52f9ace0cf3400d4f6b66"
+        "sha256": "9c1c09cfc42f2082587c60ba45b9695e495961796f36ea790f59839de680fc6e"
       },
       "gate": {
         "approval_id": "",
@@ -57890,7 +59771,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Mandatory artefacts",
           "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
+            "No row or document satisfies 'Mandatory artefacts'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -57902,12 +59783,12 @@ window.CONVEYOR_STANDARDS = {
               "name": "phase_artefacts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Contract and gate",
           "missing": [
-            "No row or document satisfies 'Contract and gate'"
+            "No row or document satisfies 'Contract and gate'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -57920,7 +59801,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Evidence",
@@ -57970,7 +59851,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-s16-g.html",
-        "sha256": "2f98728491b28bf6589cfb801e8bda780d3d2f0e4331a3d84a1d67f67b20cf8e"
+        "sha256": "252cc9f28a8c859020a2259391ba9e8f704c6d1550ebbd01a87edd46bb57a90c"
       },
       "gate": {
         "approval_id": "",
@@ -57987,7 +59868,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Mandatory artefacts",
           "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
+            "No row or document satisfies 'Mandatory artefacts'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -57999,12 +59880,12 @@ window.CONVEYOR_STANDARDS = {
               "name": "phase_artefacts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Contract and gate",
           "missing": [
-            "No row or document satisfies 'Contract and gate'"
+            "No row or document satisfies 'Contract and gate'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -58017,7 +59898,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Evidence",
@@ -58067,7 +59948,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-s17-g.html",
-        "sha256": "3016b23ef6e99cbfbb69e5d8ab6dad6e56e7b1bc65b682dc38ff96676d6c3985"
+        "sha256": "345a9c73fc4ffe6c5e373a588e882d416746111ec1d3d7872413f64dfd2450aa"
       },
       "gate": {
         "approval_id": "",
@@ -58084,7 +59965,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Mandatory artefacts",
           "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
+            "No row or document satisfies 'Mandatory artefacts'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -58096,12 +59977,12 @@ window.CONVEYOR_STANDARDS = {
               "name": "phase_artefacts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Contract and gate",
           "missing": [
-            "No row or document satisfies 'Contract and gate'"
+            "No row or document satisfies 'Contract and gate'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -58114,7 +59995,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Evidence",
@@ -58164,7 +60045,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-s18-g.html",
-        "sha256": "7485c3003fb16ce9d25d1edfe8733b0e59e1d31ab6adb679cc8e9d12513f09df"
+        "sha256": "154190d351d7768889a38cdc39b3a89ffbf02fc9dd7fb0a5a50740c394e13a88"
       },
       "gate": {
         "approval_id": "",
@@ -58181,7 +60062,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Mandatory artefacts",
           "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
+            "No row or document satisfies 'Mandatory artefacts'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -58193,12 +60074,12 @@ window.CONVEYOR_STANDARDS = {
               "name": "phase_artefacts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Contract and gate",
           "missing": [
-            "No row or document satisfies 'Contract and gate'"
+            "No row or document satisfies 'Contract and gate'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -58211,7 +60092,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Evidence",
@@ -58261,7 +60142,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-s19-g.html",
-        "sha256": "c5aaa016a5ad36a47638d984742fa8e6acdc90ddcb1130ba48cf35c56727cd09"
+        "sha256": "56936b3f3304a8e151aa0b08e05f9503c68352fcb4dcac763ab2c4abac6845ea"
       },
       "gate": {
         "approval_id": "",
@@ -58278,7 +60159,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Mandatory artefacts",
           "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
+            "No row or document satisfies 'Mandatory artefacts'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -58290,12 +60171,12 @@ window.CONVEYOR_STANDARDS = {
               "name": "phase_artefacts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Contract and gate",
           "missing": [
-            "No row or document satisfies 'Contract and gate'"
+            "No row or document satisfies 'Contract and gate'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -58308,7 +60189,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Evidence",
@@ -58358,7 +60239,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-s20-g.html",
-        "sha256": "188650f811eaff5b511e8b5f66e4132a57be10322a2e780897ded14b6d4f88a0"
+        "sha256": "e0e4ecfea054b492da428b4131d6ce980db1594d62b02a515344f9378287cf7b"
       },
       "gate": {
         "approval_id": "",
@@ -58375,7 +60256,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Mandatory artefacts",
           "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
+            "No row or document satisfies 'Mandatory artefacts'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -58387,12 +60268,12 @@ window.CONVEYOR_STANDARDS = {
               "name": "phase_artefacts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Contract and gate",
           "missing": [
-            "No row or document satisfies 'Contract and gate'"
+            "No row or document satisfies 'Contract and gate'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -58405,7 +60286,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Evidence",
@@ -58455,7 +60336,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-s21-g.html",
-        "sha256": "41d34b528d0181e2ed96d6983bfff9bcad0870ca5e33375039a27407c1baafc1"
+        "sha256": "7a0748ad73e2d23e5c2631dbfb99d78edea2584edd697401f4395cdc83afe6ca"
       },
       "gate": {
         "approval_id": "",
@@ -58472,7 +60353,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Mandatory artefacts",
           "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
+            "No row or document satisfies 'Mandatory artefacts'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -58484,12 +60365,12 @@ window.CONVEYOR_STANDARDS = {
               "name": "phase_artefacts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Contract and gate",
           "missing": [
-            "No row or document satisfies 'Contract and gate'"
+            "No row or document satisfies 'Contract and gate'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -58502,7 +60383,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Evidence",
@@ -58552,7 +60433,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-t0-g.html",
-        "sha256": "cb82ace9f7fcde0fb92fbc12e9c9b6bd3822f2c9e36cd4b5a7ed52030173c018"
+        "sha256": "f1dfd504fc3248fa229b20f9be6cd64ad10b9ebe109a9fe4d28016bd07b3553c"
       },
       "gate": {
         "approval_id": "",
@@ -58569,7 +60450,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Mandatory artefacts",
           "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
+            "No row or document satisfies 'Mandatory artefacts'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -58581,12 +60462,12 @@ window.CONVEYOR_STANDARDS = {
               "name": "phase_artefacts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Contract and gate",
           "missing": [
-            "No row or document satisfies 'Contract and gate'"
+            "No row or document satisfies 'Contract and gate'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -58599,7 +60480,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Evidence",
@@ -58649,7 +60530,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-t1-g.html",
-        "sha256": "e253b9a90ff4f9b38896f16121c02dc83cf9245c857a53d8c558315af909bcd8"
+        "sha256": "7c0d3a5ec2056dbfc83917df970ef888b5c0392f4b329e2b2ebb792f2bf72137"
       },
       "gate": {
         "approval_id": "",
@@ -58666,7 +60547,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Mandatory artefacts",
           "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
+            "No row or document satisfies 'Mandatory artefacts'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -58678,12 +60559,12 @@ window.CONVEYOR_STANDARDS = {
               "name": "phase_artefacts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Contract and gate",
           "missing": [
-            "No row or document satisfies 'Contract and gate'"
+            "No row or document satisfies 'Contract and gate'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -58696,7 +60577,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Evidence",
@@ -58746,7 +60627,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-t10-g.html",
-        "sha256": "38ce8468cc1845dee25c44c6e4eea4c7f65261badde65807a68cf1e6f84517d1"
+        "sha256": "14adbb3ab1080629bcf6d209f9140e4302ac6ec2a22486d884060a2087f2241c"
       },
       "gate": {
         "approval_id": "",
@@ -58763,7 +60644,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Mandatory artefacts",
           "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
+            "No row or document satisfies 'Mandatory artefacts'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -58775,12 +60656,12 @@ window.CONVEYOR_STANDARDS = {
               "name": "phase_artefacts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Contract and gate",
           "missing": [
-            "No row or document satisfies 'Contract and gate'"
+            "No row or document satisfies 'Contract and gate'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -58793,7 +60674,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Evidence",
@@ -58843,7 +60724,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-t11-g.html",
-        "sha256": "96b2cb5edbdc691d18ea07b4b9795d66a283fcaa2c6bf02563d4866746d2fbc8"
+        "sha256": "ef13d33dc5597c3de4abaad8d0007ca499960842c3e358169f462a3de7c594ff"
       },
       "gate": {
         "approval_id": "",
@@ -58860,7 +60741,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Mandatory artefacts",
           "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
+            "No row or document satisfies 'Mandatory artefacts'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -58872,12 +60753,12 @@ window.CONVEYOR_STANDARDS = {
               "name": "phase_artefacts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Contract and gate",
           "missing": [
-            "No row or document satisfies 'Contract and gate'"
+            "No row or document satisfies 'Contract and gate'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -58890,7 +60771,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Evidence",
@@ -58940,7 +60821,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-t12-g.html",
-        "sha256": "d0fb76d0f78bdf9a8c6d58580522f4ef0017d315fa94a2e80685b848a9c49b80"
+        "sha256": "1a62f865d3183ca87ec3bcc2c7ba8ce8191fa88b55b39a3888be51b076ac8f04"
       },
       "gate": {
         "approval_id": "",
@@ -58957,7 +60838,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Mandatory artefacts",
           "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
+            "No row or document satisfies 'Mandatory artefacts'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -58969,12 +60850,12 @@ window.CONVEYOR_STANDARDS = {
               "name": "phase_artefacts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Contract and gate",
           "missing": [
-            "No row or document satisfies 'Contract and gate'"
+            "No row or document satisfies 'Contract and gate'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -58987,7 +60868,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Evidence",
@@ -59037,7 +60918,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-t13-g.html",
-        "sha256": "da427b3e17959e08aa1c73876c8254a4b4089e1b65e28d2d1688f1acabd3b6b0"
+        "sha256": "cc4c8f6aa2fb13ce19060158696398b4985f7cc6cb362c6033483ae11833c733"
       },
       "gate": {
         "approval_id": "",
@@ -59054,7 +60935,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Mandatory artefacts",
           "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
+            "No row or document satisfies 'Mandatory artefacts'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -59066,12 +60947,12 @@ window.CONVEYOR_STANDARDS = {
               "name": "phase_artefacts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Contract and gate",
           "missing": [
-            "No row or document satisfies 'Contract and gate'"
+            "No row or document satisfies 'Contract and gate'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -59084,7 +60965,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Evidence",
@@ -59134,7 +61015,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-t14-g.html",
-        "sha256": "5bd6e4c31e8d4e8f6799dc5427ecf76bb6f7399e3bbdf4339c488a6e2c68fe16"
+        "sha256": "99238b9cf8f0d0d3dcd72c75b491cc41a463f296efa9cf09674e0ba05155c8e5"
       },
       "gate": {
         "approval_id": "",
@@ -59151,7 +61032,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Mandatory artefacts",
           "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
+            "No row or document satisfies 'Mandatory artefacts'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -59163,12 +61044,12 @@ window.CONVEYOR_STANDARDS = {
               "name": "phase_artefacts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Contract and gate",
           "missing": [
-            "No row or document satisfies 'Contract and gate'"
+            "No row or document satisfies 'Contract and gate'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -59181,7 +61062,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Evidence",
@@ -59231,7 +61112,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-t15-g.html",
-        "sha256": "fde6c505815a3eda201fa59b97dda1ae09bc9c37c6f90ae08db410a233de95e8"
+        "sha256": "018b291026d6784afbee5b339f9af7fc76d79892478e9175e160eea7680e9d53"
       },
       "gate": {
         "approval_id": "",
@@ -59248,7 +61129,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Mandatory artefacts",
           "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
+            "No row or document satisfies 'Mandatory artefacts'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -59260,12 +61141,12 @@ window.CONVEYOR_STANDARDS = {
               "name": "phase_artefacts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Contract and gate",
           "missing": [
-            "No row or document satisfies 'Contract and gate'"
+            "No row or document satisfies 'Contract and gate'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -59278,7 +61159,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Evidence",
@@ -59328,7 +61209,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-t16-g.html",
-        "sha256": "fa0a2fc099b7f6cb33810434b98c98dfd73b11ad2b81e5d3325a0a8d7961fc1d"
+        "sha256": "cdab1808165e24916f7c09abc3c93b3f4133eefe07240886b4b4e2361ca8734d"
       },
       "gate": {
         "approval_id": "",
@@ -59345,7 +61226,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Mandatory artefacts",
           "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
+            "No row or document satisfies 'Mandatory artefacts'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -59357,12 +61238,12 @@ window.CONVEYOR_STANDARDS = {
               "name": "phase_artefacts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Contract and gate",
           "missing": [
-            "No row or document satisfies 'Contract and gate'"
+            "No row or document satisfies 'Contract and gate'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -59375,7 +61256,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Evidence",
@@ -59425,7 +61306,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-t17-g.html",
-        "sha256": "769a1094c7c55be85e9f2528bb47de3244d6ff17068fec1a42be09f37f63c634"
+        "sha256": "32824c2c409062af840f4a44bd330fcbf4a15b723810dc6b2959f00f03f0ac56"
       },
       "gate": {
         "approval_id": "",
@@ -59442,7 +61323,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Mandatory artefacts",
           "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
+            "No row or document satisfies 'Mandatory artefacts'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -59454,12 +61335,12 @@ window.CONVEYOR_STANDARDS = {
               "name": "phase_artefacts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Contract and gate",
           "missing": [
-            "No row or document satisfies 'Contract and gate'"
+            "No row or document satisfies 'Contract and gate'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -59472,7 +61353,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Evidence",
@@ -59522,7 +61403,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-t2-g.html",
-        "sha256": "27bc788898fb3331777608e9c31d89c4dabddda673b5e8b06380b14d0ed41ba4"
+        "sha256": "0e34af8716081f997620a1daefdd8cc37f787f86273041005e47458f975972a2"
       },
       "gate": {
         "approval_id": "",
@@ -59539,7 +61420,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Mandatory artefacts",
           "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
+            "No row or document satisfies 'Mandatory artefacts'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -59551,12 +61432,12 @@ window.CONVEYOR_STANDARDS = {
               "name": "phase_artefacts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Contract and gate",
           "missing": [
-            "No row or document satisfies 'Contract and gate'"
+            "No row or document satisfies 'Contract and gate'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -59569,7 +61450,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Evidence",
@@ -59619,7 +61500,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-t3-g.html",
-        "sha256": "dc5e94244d91a01d96ff4eabc1987c3fb7ee2da2fd44f05fa2c74e82c942f0db"
+        "sha256": "d8c2e076c3f613e3ed6c08a697da2878b8ed1f0f0ab8d69ffddfaa73feec555b"
       },
       "gate": {
         "approval_id": "",
@@ -59636,7 +61517,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Mandatory artefacts",
           "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
+            "No row or document satisfies 'Mandatory artefacts'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -59648,12 +61529,12 @@ window.CONVEYOR_STANDARDS = {
               "name": "phase_artefacts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Contract and gate",
           "missing": [
-            "No row or document satisfies 'Contract and gate'"
+            "No row or document satisfies 'Contract and gate'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -59666,7 +61547,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Evidence",
@@ -59716,7 +61597,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-t4-g.html",
-        "sha256": "e41c51f216a7f829304da5f8da38c6bcaa8e84e793622f8b9f38e31e10621982"
+        "sha256": "00cff8178e612048157a8f996c1d49b3fe9d375e5fb8fe009e17e53de0c4e1fe"
       },
       "gate": {
         "approval_id": "",
@@ -59733,7 +61614,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Mandatory artefacts",
           "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
+            "No row or document satisfies 'Mandatory artefacts'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -59745,12 +61626,12 @@ window.CONVEYOR_STANDARDS = {
               "name": "phase_artefacts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Contract and gate",
           "missing": [
-            "No row or document satisfies 'Contract and gate'"
+            "No row or document satisfies 'Contract and gate'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -59763,7 +61644,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Evidence",
@@ -59813,7 +61694,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-t5-g.html",
-        "sha256": "14fd3bddd447c13b47131e20509193fb0b3c21d37fa1f9e844df4596618c7116"
+        "sha256": "ed6442a2db9190c915917e78b24bd2f652d883205830fcd6686d02d6c808bc48"
       },
       "gate": {
         "approval_id": "",
@@ -59830,7 +61711,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Mandatory artefacts",
           "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
+            "No row or document satisfies 'Mandatory artefacts'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -59842,12 +61723,12 @@ window.CONVEYOR_STANDARDS = {
               "name": "phase_artefacts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Contract and gate",
           "missing": [
-            "No row or document satisfies 'Contract and gate'"
+            "No row or document satisfies 'Contract and gate'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -59860,7 +61741,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Evidence",
@@ -59910,7 +61791,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-t6-g.html",
-        "sha256": "a65b88fbbc5a41eecd13168fe683551dc83c0f93a86887213599770ec3a99563"
+        "sha256": "58a92fc91e33107357ab47d81b93f114f3f16408305cf83b6e9825cd44db0a3f"
       },
       "gate": {
         "approval_id": "",
@@ -59927,7 +61808,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Mandatory artefacts",
           "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
+            "No row or document satisfies 'Mandatory artefacts'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -59939,12 +61820,12 @@ window.CONVEYOR_STANDARDS = {
               "name": "phase_artefacts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Contract and gate",
           "missing": [
-            "No row or document satisfies 'Contract and gate'"
+            "No row or document satisfies 'Contract and gate'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -59957,7 +61838,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Evidence",
@@ -60007,7 +61888,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-t7-g.html",
-        "sha256": "fe4b89eaa29c242a3897313eb25ac5ad79342f8a17092da28162416976729910"
+        "sha256": "77e9b1358590cd22ba1a3e629ddee640360f954996ed42986afd24668a39c36f"
       },
       "gate": {
         "approval_id": "",
@@ -60024,7 +61905,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Mandatory artefacts",
           "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
+            "No row or document satisfies 'Mandatory artefacts'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -60036,12 +61917,12 @@ window.CONVEYOR_STANDARDS = {
               "name": "phase_artefacts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Contract and gate",
           "missing": [
-            "No row or document satisfies 'Contract and gate'"
+            "No row or document satisfies 'Contract and gate'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -60054,7 +61935,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Evidence",
@@ -60104,7 +61985,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-t8-g.html",
-        "sha256": "9a5f5c58238f46aaafc76297f2a86000e88245939f378e56666c68af5d44c7c3"
+        "sha256": "85f04bf848a5ccbf23f8b550847c425c57598968e8ce7e528343d84c7b59337a"
       },
       "gate": {
         "approval_id": "",
@@ -60121,7 +62002,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Mandatory artefacts",
           "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
+            "No row or document satisfies 'Mandatory artefacts'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -60133,12 +62014,12 @@ window.CONVEYOR_STANDARDS = {
               "name": "phase_artefacts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Contract and gate",
           "missing": [
-            "No row or document satisfies 'Contract and gate'"
+            "No row or document satisfies 'Contract and gate'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -60151,7 +62032,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Evidence",
@@ -60201,7 +62082,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-g-t9-g.html",
-        "sha256": "9a87c7cbfb3cf3bda3b5118f831728713df015fb0fd75d7dde36cfaf91fcdf0e"
+        "sha256": "d3411271455a451edb98ccaf8f8c2dda376d78bf5d95d57d5ef3a511043a9897"
       },
       "gate": {
         "approval_id": "",
@@ -60218,7 +62099,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Mandatory artefacts",
           "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
+            "No row or document satisfies 'Mandatory artefacts'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -60230,12 +62111,12 @@ window.CONVEYOR_STANDARDS = {
               "name": "phase_artefacts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Contract and gate",
           "missing": [
-            "No row or document satisfies 'Contract and gate'"
+            "No row or document satisfies 'Contract and gate'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -60248,7 +62129,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Evidence",
@@ -60298,7 +62179,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "mandatory_artefacts",
       "document": {
         "path": "docs/standards/std-togaf-phase-h-t9-h.html",
-        "sha256": "5275d72bc764fc85c8c04ac21483d2fd02de9537266b6255ca9610d3eb70d4ba"
+        "sha256": "c96bc81ca4ecbb703c94255a8dc8a8478b094af578fba4ad4c1f765ce4c20188"
       },
       "gate": {
         "approval_id": "",
@@ -60315,7 +62196,7 @@ window.CONVEYOR_STANDARDS = {
         {
           "heading": "Mandatory artefacts",
           "missing": [
-            "No row or document satisfies 'Mandatory artefacts'"
+            "No row or document satisfies 'Mandatory artefacts'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -60327,12 +62208,12 @@ window.CONVEYOR_STANDARDS = {
               "name": "phase_artefacts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Contract and gate",
           "missing": [
-            "No row or document satisfies 'Contract and gate'"
+            "No row or document satisfies 'Contract and gate'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -60345,7 +62226,7 @@ window.CONVEYOR_STANDARDS = {
               "pointer": "/contracts"
             }
           ],
-          "status": "absent"
+          "status": "partial"
         },
         {
           "heading": "Evidence",
@@ -60388,6 +62269,101 @@ window.CONVEYOR_STANDARDS = {
       },
       "subject_kind": "phase",
       "title": "Phase H — T9 — H"
+    },
+    {
+      "category": "project-context-diagram",
+      "covered_key": "",
+      "covered_rule": "",
+      "document": {
+        "path": "docs/standards/std-togaf-project-context-diagram-t9.html",
+        "sha256": "90a13e72f22bf71eb49f0a4ffa73df4deac2f2d1d8c15fb410c2a76b5fde8520"
+      },
+      "gate": {
+        "approval_id": "",
+        "kind": "statement_of_architecture_work",
+        "state": "live"
+      },
+      "id": "std-togaf-project-context-diagram-t9",
+      "level": "project",
+      "mandatory": true,
+      "owner_project": "T9",
+      "package_key": "std-togaf-project-context-diagram-t9:T9",
+      "package_published": true,
+      "sections": [
+        {
+          "heading": "Context",
+          "missing": [
+            "No row or document satisfies 'Context'; a document exists but lacks the heading"
+          ],
+          "required": true,
+          "severity": "",
+          "sources": [
+            {
+              "category": "project-context-diagram",
+              "count": 0,
+              "file": "artefacts.json",
+              "items": [],
+              "kind": "documents",
+              "pointer": "/documents",
+              "scope": "subject"
+            }
+          ],
+          "status": "partial"
+        },
+        {
+          "heading": "Affected organisation",
+          "missing": [
+            "No row or document satisfies 'Affected organisation'; a document exists but lacks the heading"
+          ],
+          "required": true,
+          "severity": "",
+          "sources": [
+            {
+              "category": "project-context-diagram",
+              "count": 0,
+              "file": "artefacts.json",
+              "items": [],
+              "kind": "documents",
+              "pointer": "/documents",
+              "scope": "subject"
+            }
+          ],
+          "status": "partial"
+        },
+        {
+          "heading": "Affected systems",
+          "missing": [
+            "No row or document satisfies 'Affected systems'; a document exists but lacks the heading"
+          ],
+          "required": true,
+          "severity": "",
+          "sources": [
+            {
+              "category": "project-context-diagram",
+              "count": 0,
+              "file": "artefacts.json",
+              "items": [],
+              "kind": "documents",
+              "pointer": "/documents",
+              "scope": "subject"
+            }
+          ],
+          "status": "partial"
+        }
+      ],
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "absent",
+      "subject": {
+        "id": "01a1d039-0d35-7bd1-945d-cea12c5dfd6d",
+        "key": "T9",
+        "kind": "project",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "T9",
+        "title": "SPEC_V2 slice T9 (docs/SPEC_V2.md §12)"
+      },
+      "subject_kind": "project",
+      "title": "Project Context Diagram — SPEC_V2 slice T9 (docs/SPEC_V2.md §12)"
     },
     {
       "category": "request-for-architecture-work",
@@ -60817,10 +62793,10 @@ window.CONVEYOR_STANDARDS = {
   ],
   "by_standard": {
     "MSP": {
-      "absent": 13,
-      "artefacts": 43,
-      "evidenced": 27,
-      "partial": 3
+      "absent": 15,
+      "artefacts": 52,
+      "evidenced": 29,
+      "partial": 8
     },
     "PMP": {
       "absent": 206,
@@ -60841,22 +62817,22 @@ window.CONVEYOR_STANDARDS = {
       "partial": 0
     },
     "TOGAF": {
-      "absent": 149,
-      "artefacts": 179,
-      "evidenced": 23,
-      "partial": 7
+      "absent": 154,
+      "artefacts": 184,
+      "evidenced": 24,
+      "partial": 6
     }
   },
   "generated_at": "2026-11-20T11:50:50.848127361+00:00",
   "git_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
-  "payload_sha256": "c49a71b057a360c2102a9461714d341b5f56a2d8b9a27280fcc5df300e0c9a92",
+  "payload_sha256": "95ddd9569c424be362454e9b5c56d5999492dcbb5f254d8b090c393be6784854",
   "schema": "design-standards/v1",
   "summary": {
-    "absent": 373,
-    "artefacts": 505,
-    "evidenced": 75,
-    "findings": 315,
-    "mandatory": 465,
-    "partial": 57
+    "absent": 380,
+    "artefacts": 519,
+    "evidenced": 78,
+    "findings": 327,
+    "mandatory": 480,
+    "partial": 61
   }
 };
