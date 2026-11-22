@@ -1,0 +1,9 @@
+{
+ "project_id": "01a1d039-0d28-7eb6-a62a-f420e742595c",
+ "baseline_id": "01a20256-44d0-731d-b345-fffc5f3ac9e8",
+ "title": "Accept the S04 deliverables with their evidence",
+ "body": "The ActionSpec derive crate and the registry and spec vocabularies are complete (crates/actions-derive, the 549-action registry and the served-spec lock). This change authorises recording their acceptance and evidence on the WBS rows under the frozen scope baseline.",
+ "impact": {
+  "scope": "S04 deliverables 1-2: status accepted, evidence refs; no scope change"
+ }
+}
