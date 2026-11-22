@@ -54,6 +54,10 @@ TOGAF_PROJECT_CATEGORIES = {
     "architecture-design", "architecture-analysis", "architecture-artifact",
     "statement-of-architecture-work", "compliance-review", "waiver",
     "delivery-contract", "statement-of-intent", "request-for-architecture-work",
+    # Phase E's named artefacts (SPEC_V2 §8.1): a governed project's solution contract needs the
+    # gap analysis, the candidates, and the project context and benefits diagrams. They join this
+    # set so a project without them produces an honest absent artefact, not silence.
+    "candidate-solutions", "project-context-diagram", "benefits-diagram", "gap-analysis",
 }
 # A data-gap rule already owns this defect. The artefact record still reports the honest status,
 # but the package is the gap rule's: one defect, one package. A partial artefact is NOT covered,

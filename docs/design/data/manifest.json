@@ -74,10 +74,10 @@
       "sha256": "3807b68e9cb77bd166fbe6f6d4b0e269c8bc0923a8d156f45dba8342786bd2ee"
     },
     {
-      "bytes": 105457,
+      "bytes": 130289,
       "path": "output-standard.js",
       "records": 0,
-      "sha256": "8c372fcd38aac7d43965b7616a77ae2322215a525791f2a7fcc63148db413e39"
+      "sha256": "9dcb73b825cfed78357ba3ab3bb3bb9ffc5b4a91f4c820eb98ab8d0e374abec9"
     },
     {
       "bytes": 180846,
