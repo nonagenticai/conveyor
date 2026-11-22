@@ -339,6 +339,10 @@ def build_subjects(
         if subject["id"] not in governed:
             continue
         for phase in profile_phases:
+            if phase == "preliminary":
+                # The capability page owns Preliminary; a per-project preliminary subject has
+                # no category to render (the same rule as the declared-phase loop below).
+                continue
             seen_phases.add((subject["id"], phase))
             subjects["phase"].append({
                 "kind": "phase",
