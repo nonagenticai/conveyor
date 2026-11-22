@@ -23,7 +23,12 @@
         >source ↗</a
       >
     </header>
-    <main class="doc-body"><h1 id="s16--inference-ledger-and-prompt-audit">S16 — Inference ledger and prompt audit</h1>
+    <main class="doc-body"><!-- historical-rbuild -->
+
+<blockquote>
+<p>⚠️ <strong>Historical build order.</strong> <code>rbuild</code> was retired on 2026-11-20 (CONTRACT §16). The <code>rbuild -- …</code> lines below record how this slice was gated then, not a route to run now. The current route is the GitHub-hosted <code>preflight.yml</code> for the compile/lint verdict and <code>~/.claude/scripts/cargo-guard.py</code> on m4 for interactive feedback; never a local gate.</p>
+</blockquote>
+<h1 id="s16--inference-ledger-and-prompt-audit">S16 — Inference ledger and prompt audit</h1>
 <p>Programme project: S16 · issues #20</p>
 <h2 id="1-objective">1. Objective</h2>
 <p>Every model call the conveyor makes becomes a durable, tenant-scoped row carrying the prompt's identity, the token counts and the provider's prompt-cache classes, so "what did this cost and was it cached" is a query rather than a guess. On top of that record, a <strong>prompt audit</strong> inventories the three prompt surfaces the conveyor owns — procedure step templates, every action's description, and the copilot's system prompt — classifies them against the <code>claude-api</code> <code>prompt-audit</code> method's four anti-pattern groups, and reports findings with confidence and a proposed diff. Both are ordinary actions, so both are user-invokable over HTTP and machine-invokable over <code>/mcp</code>.</p>

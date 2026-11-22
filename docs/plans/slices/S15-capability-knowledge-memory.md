@@ -11,6 +11,13 @@ adds_modules: [capability, memory, knowledge]
 parity_ids: PENDING-S0
 ---
 
+<!-- historical-rbuild -->
+> ⚠️ **Historical build order.** `rbuild` was retired on 2026-11-20 (CONTRACT §16). The
+> `rbuild -- …` lines below record how this slice was gated then, not a route to run now. The
+> current route is the GitHub-hosted `preflight.yml` for the compile/lint verdict and
+> `~/.claude/scripts/cargo-guard.py` on m4 for interactive feedback; never a local gate.
+
+
 ⚠️ **Amended 2026-11-09 (process model).** `capability` gains `kind ∈ system|tenant` — `project_management`, `kanban_coach` and `kata` are the fixed system capabilities (always present, not deletable); every other capability is tenant-defined per project type. `capability_agent` gains `role ∈ process_agent|tool_agent`, `process_key text null` (the process/card type a process agent owns) and `toolset text null` (the toolset a tool agent executes), with a CHECK that exactly one of the two is set per role — migration `0033`. A capability is a knowledge area: its process agents hold the process domain knowledge, its tool agents make the tool calls. Run readiness resolves the run's **process agent**; the tool agent's `allowed_actions` is the exact set it executes.
 
 # S15 — Capability, knowledge and memory

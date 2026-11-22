@@ -23,7 +23,12 @@
         >source ↗</a
       >
     </header>
-    <main class="doc-body"><p>⚠️ <strong>Amended 2026-11-09 (process model).</strong> <code>capability</code> gains <code>kind ∈ system|tenant</code> — <code>project_management</code>, <code>kanban_coach</code> and <code>kata</code> are the fixed system capabilities (always present, not deletable); every other capability is tenant-defined per project type. <code>capability_agent</code> gains <code>role ∈ process_agent|tool_agent</code>, <code>process_key text null</code> (the process/card type a process agent owns) and <code>toolset text null</code> (the toolset a tool agent executes), with a CHECK that exactly one of the two is set per role — migration <code>0033</code>. A capability is a knowledge area: its process agents hold the process domain knowledge, its tool agents make the tool calls. Run readiness resolves the run's <strong>process agent</strong>; the tool agent's <code>allowed_actions</code> is the exact set it executes.</p>
+    <main class="doc-body"><!-- historical-rbuild -->
+
+<blockquote>
+<p>⚠️ <strong>Historical build order.</strong> <code>rbuild</code> was retired on 2026-11-20 (CONTRACT §16). The <code>rbuild -- …</code> lines below record how this slice was gated then, not a route to run now. The current route is the GitHub-hosted <code>preflight.yml</code> for the compile/lint verdict and <code>~/.claude/scripts/cargo-guard.py</code> on m4 for interactive feedback; never a local gate.</p>
+</blockquote>
+<p>⚠️ <strong>Amended 2026-11-09 (process model).</strong> <code>capability</code> gains <code>kind ∈ system|tenant</code> — <code>project_management</code>, <code>kanban_coach</code> and <code>kata</code> are the fixed system capabilities (always present, not deletable); every other capability is tenant-defined per project type. <code>capability_agent</code> gains <code>role ∈ process_agent|tool_agent</code>, <code>process_key text null</code> (the process/card type a process agent owns) and <code>toolset text null</code> (the toolset a tool agent executes), with a CHECK that exactly one of the two is set per role — migration <code>0033</code>. A capability is a knowledge area: its process agents hold the process domain knowledge, its tool agents make the tool calls. Run readiness resolves the run's <strong>process agent</strong>; the tool agent's <code>allowed_actions</code> is the exact set it executes.</p>
 <h1 id="s15--capability-knowledge-and-memory">S15 — Capability, knowledge and memory</h1>
 <p>Programme project: S15 · issues #19</p>
 <p>Design authority: <code>docs/KNOWLEDGE-MEMORY.md</code>. This slice builds it.</p>
