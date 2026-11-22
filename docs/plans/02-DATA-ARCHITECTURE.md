@@ -1241,16 +1241,18 @@ CREATE TABLE prompt (
     tenant_id   uuid NOT NULL DEFAULT app_current_tenant(),
     key         text NOT NULL,
     version     int  NOT NULL CHECK (version >= 1),
-    status      text NOT NULL DEFAULT 'active' CHECK (status IN ('active','retired')),
+    status      text NOT NULL DEFAULT 'active' CHECK (status IN ('draft','active','retired')),
     title       text NOT NULL,
+    budget_chars int CHECK (budget_chars > 0),          -- 0031
     created_at  timestamptz NOT NULL DEFAULT now(),
     updated_at  timestamptz NOT NULL DEFAULT now(),
     CONSTRAINT prompt_key_not_blank   CHECK (btrim(key) <> ''),
     CONSTRAINT prompt_title_not_blank CHECK (btrim(title) <> ''),
     CONSTRAINT prompt_tenant_key_version_key UNIQUE (tenant_id, key, version)
 );
--- At most one active version per key; retired rows stay addressable by exact pin.
+-- At most one active and one draft version per key; retired rows stay addressable by exact pin.
 CREATE UNIQUE INDEX uq_prompt_active ON prompt (tenant_id, key) WHERE status = 'active';
+CREATE UNIQUE INDEX uq_prompt_draft  ON prompt (tenant_id, key) WHERE status = 'draft';   -- 0061
 
 CREATE TABLE prompt_section (
     id          uuid PRIMARY KEY DEFAULT uuidv7(),
@@ -1258,9 +1260,12 @@ CREATE TABLE prompt_section (
     prompt_id   uuid NOT NULL,
     position    int  NOT NULL CHECK (position >= 1),
     source_kind text NOT NULL
-                CHECK (source_kind IN ('system','procedure','capability','project_card','knowledge')),
+                CHECK (source_kind IN ('system','procedure','capability','role','project_card','knowledge','memory')),
     required    boolean NOT NULL DEFAULT false,
     template    text NOT NULL DEFAULT '',
+    selector    jsonb NOT NULL DEFAULT '{}'             -- 0061
+                CHECK (jsonb_typeof(selector) = 'object'),
+    budget_chars int CHECK (budget_chars > 0),          -- 0031
     created_at  timestamptz NOT NULL DEFAULT now(),
     CONSTRAINT prompt_section_prompt_fk
         FOREIGN KEY (prompt_id) REFERENCES prompt (id) ON DELETE CASCADE,
@@ -1270,11 +1275,20 @@ CREATE TABLE prompt_section (
 );
 ```
 
-**`system` is the only literal kind.** The other four are rendered from the run's facts — the process (stored as a
-process) and its step, the capability/agent row, the project and card, and the capability's bound packs. A
-`required` section with no source is a readiness refusal, not an empty section. The built-in recipes
-(`copilot_system@1`, `prompt_audit@1`, `agent@1`) are seeded per tenant by `seed::prompts_for_tenant`; an
-existing `(key, version)` is never rewritten by a seed.
+**`system` is the only literal kind.** The other six are rendered from the run's facts — the process
+(stored as a process) and its step, the capability/agent row, the role, the project and card, the
+capability's bound packs with their selected hits, and the card's memory. A `required` section with
+no source is a readiness refusal, not an empty section. The built-in recipes (`copilot_system@1`,
+`prompt_audit@1`, `agent@1`) are seeded per tenant by `seed::prompts_for_tenant`; an existing
+`(key, version)` is never rewritten by a seed.
+
+**Recipe lifecycle (0061, ADR 0009).** A version is immutable per `(tenant, key, version)`. A tenant
+creates a `draft`, activates it (the previous active becomes `retired` in the same transaction), or
+retires a version. Exact pins stay readable; a new run resolves only an `active` row.
+`prompt_section.selector` is the one selection config — memory `{kinds, limit, include_digest}` and
+knowledge `{query}` — never a second template language. Knowledge targets are resolved in the
+compile transaction, but retrieval runs after that transaction commits, reusing the
+`knowledge.query` path; the compiled text itself is still never stored.
 
 ## 3. State machines and enforcement
 

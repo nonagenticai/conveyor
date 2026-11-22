@@ -1455,25 +1455,28 @@
     {
       "blocked_by": [],
       "evidence": [
-        "docs/plans/slices/S21-message-construction.md"
+        "crates/actions/src/knowledge",
+        "crates/actions/src/memory",
+        "crates/actions/src/prompt",
+        "migrations/0030_prompt_catalogue.sql"
       ],
-      "gap": "the v1 seam is built; the 2026-2027 design is unbuilt (#25)",
+      "gap": "action prompt_recipes.create, action prompt_recipes.list, action prompt_recipes.get, action prompt_recipes.activate, action prompt_recipes.retire",
       "key": "S21",
       "measured": {
         "actions": [
           0,
-          0
+          5
         ],
         "modules": [
-          0,
-          0
+          3,
+          3
         ],
         "tables": [
-          0,
-          0
+          2,
+          2
         ]
       },
-      "name": "S21",
+      "name": "Message construction (the compiled prompt)",
       "parallel_with": [
         "S18",
         "S20"
