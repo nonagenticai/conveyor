@@ -650,6 +650,15 @@
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/T2/acts.md"
     },
     {
+      "title": "The full-fidelity snapshot loop",
+      "path": "docs/evidence/rework/full-fidelity-snapshot.html",
+      "source": "docs/evidence/rework/full-fidelity-snapshot.md",
+      "section": "Evidence",
+      "sha256": "b7871c7112396b0cec6ff33361360b2e557632375ceeb8cd9797ec3d1dd31c94",
+      "bytes": 6032,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/full-fidelity-snapshot.md"
+    },
+    {
       "title": "Tranche 0 / PI 0 — the SAFe cadence record (retrospective, 2026-11-21)",
       "path": "docs/evidence/rework/tranche-0/acts.html",
       "source": "docs/evidence/rework/tranche-0/acts.md",
