@@ -76,8 +76,8 @@ pub const ASK_GATE: &str = "coach.ask";
 /// The seeded human-question route an `ask` remedy starts (`ask_fr`).
 pub const ASK_FR_PROCESS: &str = "ask_fr";
 
-/// The kata process a systemic class opens.
-pub const KATA_PROCESS: &str = "kata.open";
+/// The gate a systemic class opens when the policy cannot name a kata instrument.
+pub const KATA_ESCALATION_GATE: &str = "coach.kata";
 
 /// The platform job that re-pulls a board's queue: the `repull` remedy's trigger.
 pub const WIP_PULL_KIND: &str = "wip.pull";
@@ -167,8 +167,9 @@ pub struct RemedyOut {
     pub id: String,
     /// The class recorded.
     pub remedy_class: String,
-    /// The kata run opened for a systemic class, if any.
-    pub kata_run_id: Option<String>,
+    /// The measured kata opened for a systemic class, if any (a systemic class without a
+    /// policy-pinned instrument escalates instead and names no kata).
+    pub kata_id: Option<String>,
 }
 
 /// `coach.escalate`.
@@ -203,6 +204,52 @@ struct CoachPolicy {
     window: Duration,
     floor: f64,
     systemic: Vec<String>,
+    /// The measured kata pin a systemic class opens (SPEC_V2 §6.3). Absent means the policy
+    /// cannot name an instrument, and a systemic candidate escalates to a person instead.
+    kata: Option<KataPin>,
+}
+
+/// The instrument and pre-registered prediction `kata.open` requires.
+#[derive(Clone, Debug)]
+struct KataPin {
+    instrument_kind: String,
+    instrument_id: Option<Uuid>,
+    instrument_version: String,
+    split: String,
+    split_sha256: String,
+    prediction: Value,
+    base_ref: Value,
+}
+
+/// Parse the policy's `kata` block. Every field the open contract requires must be present and
+/// well-formed; a partial block is treated as no pin, never guessed at.
+fn kata_pin_of(meta: &Value) -> Option<KataPin> {
+    let block = meta.get("kata")?.as_object()?;
+    let text = |key: &str| {
+        block
+            .get(key)
+            .and_then(Value::as_str)
+            .map(str::trim)
+            .filter(|value| !value.is_empty())
+            .map(str::to_owned)
+    };
+    let instrument_id = block
+        .get("instrument_id")
+        .and_then(Value::as_str)
+        .and_then(|raw| Uuid::parse_str(raw).ok());
+    let prediction = block.get("prediction")?.clone();
+    if !prediction.is_object() || prediction.as_object().is_some_and(|map| map.is_empty()) {
+        return None;
+    }
+    Some(KataPin {
+        instrument_kind: text("instrument_kind")?,
+        instrument_id,
+        instrument_version: text("instrument_version")?,
+        split: text("split")?,
+        split_sha256: text("split_sha256")?,
+        prediction,
+        base_ref: block.get("base_ref")?.clone(),
+    })
 }
 
 async fn policy_tx(conn: &mut PgConnection, tenant: conveyor_domain::TenantId) -> CoachPolicy {
@@ -231,6 +278,7 @@ async fn policy_tx(conn: &mut PgConnection, tenant: conveyor_domain::TenantId) -
         window: Duration::hours(hours),
         floor,
         systemic,
+        kata: kata_pin_of(&meta),
     }
 }
 
@@ -272,6 +320,23 @@ async fn open_gate_tx(
 }
 
 /// Start a ROOT process run on the interrupted card, in the remedy's transaction.
+/// The project behind an interrupted card: the kata's project (a kata is a project type).
+async fn project_of_card_tx(
+    conn: &mut PgConnection,
+    tenant: conveyor_domain::TenantId,
+    card_id: Uuid,
+) -> Result<Uuid, ActionError> {
+    let card = store::card::get_card_record_tx(&mut *conn, tenant, card_id)
+        .await
+        .map_err(|error| store_failure("coach: read the interrupted card", error))?
+        .ok_or_else(|| ActionError::resource_not_found("card"))?;
+    let board = store::board::get_board_tx(&mut *conn, tenant, card.card.board_id)
+        .await
+        .map_err(|error| store_failure("coach: read the card's board", error))?
+        .ok_or_else(|| ActionError::resource_not_found("board"))?;
+    Ok(board.project_id)
+}
+
 async fn start_process_tx(
     tx: &mut PgConnection,
     ctx: &HandlerCtx,
@@ -985,24 +1050,63 @@ async fn coach_remedy(
     )
     .await?;
 
-    // P4: a systemic class opens exactly one kata; every other class opens none.
-    let mut kata_run_id = None;
+    // P4: a systemic class opens exactly one MEASURED kata; every other class opens none.
+    // §6.3: an unmeasurable kata is not opened — the instrument, its held-out split and the
+    // pre-registered prediction come from the coach policy, and a policy without a complete
+    // pin escalates the candidate to a person instead of starting a documentation run
+    // (v1-p6-2: the old path terminated at a process-run id).
+    let mut kata_id: Option<String> = None;
     if policy.systemic.iter().any(|class| class == &triage_class) {
-        let run_id = start_process_tx(
-            &mut *tx,
-            &ctx,
-            interruption.interrupted_card_id,
-            KATA_PROCESS,
-            json!({ "interruption_id": interruption.id }),
-        )
-        .await?;
-        if let Ok(run_id) = Uuid::parse_str(&run_id) {
-            store::coach::set_kata_candidate_tx(&mut *tx, ctx.tenant, interruption.id, run_id)
-                .await
-                .map_err(|error| store_failure("coach.remedy: record the kata candidate", error))?;
+        let project_id =
+            project_of_card_tx(&mut *tx, ctx.tenant, interruption.interrupted_card_id).await?;
+        match policy.kata.clone() {
+            Some(pin) => {
+                let opened = crate::kata::kata_open(
+                    &mut *tx,
+                    ctx.clone(),
+                    crate::kata::KataOpenIn {
+                        project_id,
+                        signature: interruption.signature.clone(),
+                        instrument_kind: pin.instrument_kind,
+                        instrument_id: pin.instrument_id,
+                        instrument_version: pin.instrument_version,
+                        split: pin.split,
+                        split_sha256: pin.split_sha256,
+                        prediction: pin.prediction,
+                        base_ref: pin.base_ref,
+                    },
+                )
+                .await?
+                .value;
+                let id = Uuid::parse_str(&opened.id).map_err(|error| {
+                    tracing::error!(%error, "coach.remedy: the kata id is not a uuid");
+                    ActionError::internal()
+                })?;
+                store::coach::set_kata_candidate_tx(&mut *tx, ctx.tenant, interruption.id, id)
+                    .await
+                    .map_err(|error| {
+                        store_failure("coach.remedy: record the kata candidate", error)
+                    })?;
+                effect["kata_id"] = json!(opened.id);
+                kata_id = Some(opened.id);
+            }
+            None => {
+                let approval = open_gate_tx(
+                    &mut *tx,
+                    &ctx,
+                    KATA_ESCALATION_GATE,
+                    interruption.interrupted_card_id,
+                    project_id,
+                    json!({
+                        "interruption_id": interruption.id,
+                        "signature": interruption.signature,
+                        "reason": "a systemic class needs a kata; the coach policy names no instrument",
+                    }),
+                )
+                .await?;
+                effect["kata_escalation"] = json!(approval);
+            }
         }
-        effect["kata_run_id"] = json!(run_id);
-        kata_run_id = Some(run_id);
     }
     if let Some(map) = detail.as_object_mut() {
         map.insert("effect".to_owned(), effect.clone());
@@ -1038,7 +1142,7 @@ async fn coach_remedy(
             "remedy_id": remedy.id,
             "remedy_class": remedy.remedy_class,
             "effect": effect,
-            "kata_run_id": kata_run_id,
+            "kata_id": kata_id,
         }),
     )
     .await?;
@@ -1046,7 +1150,7 @@ async fn coach_remedy(
     Ok(HandlerOutput::created(RemedyOut {
         id: remedy.id.to_string(),
         remedy_class: remedy.remedy_class,
-        kata_run_id,
+        kata_id,
     }))
 }
 

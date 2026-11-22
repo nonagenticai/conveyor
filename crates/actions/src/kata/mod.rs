@@ -449,7 +449,7 @@ pub struct KataListIn {
     confirm = "none",
     tenancy = "tenant"
 )]
-async fn kata_open(
+pub(crate) async fn kata_open(
     tx: &mut PgConnection,
     ctx: HandlerCtx,
     input: KataOpenIn,
