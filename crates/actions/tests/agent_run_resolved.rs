@@ -696,19 +696,20 @@ async fn bound_tools_reach_the_model() {
     drive(&pg, &seeded, &run).await;
     assert_eq!(run_status(&pg, &seeded, &run).await, "succeeded");
 
-    let bodies = bodies.lock().expect("bodies");
-    assert_eq!(bodies.len(), 2, "one tool turn, then the answer");
-    let tools = bodies[0]["tools"]
-        .as_array()
-        .unwrap_or_else(|| panic!("the bound surface is sent: {}", bodies[0]));
-    assert_eq!(tools.len(), 1, "only the bound tool: {tools:?}");
-    assert_eq!(tools[0]["function"]["name"], "fixtures_echo");
-    assert_eq!(
-        tools[0]["function"]["parameters"]["required"],
-        json!(["message"]),
-        "the tool's pinned schema, not the broker's generic one"
-    );
-    drop(bodies);
+    {
+        let bodies = bodies.lock().expect("bodies");
+        assert_eq!(bodies.len(), 2, "one tool turn, then the answer");
+        let tools = bodies[0]["tools"]
+            .as_array()
+            .unwrap_or_else(|| panic!("the bound surface is sent: {}", bodies[0]));
+        assert_eq!(tools.len(), 1, "only the bound tool: {tools:?}");
+        assert_eq!(tools[0]["function"]["name"], "fixtures_echo");
+        assert_eq!(
+            tools[0]["function"]["parameters"]["required"],
+            json!(["message"]),
+            "the tool's pinned schema, not the broker's generic one"
+        );
+    }
 
     assert_eq!(tool_stub.hits(), 1, "the destination was called once");
     let mut tx = begin_scoped(&pg.owner, seeded.tenant).await.expect("scope");

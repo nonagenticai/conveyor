@@ -21,11 +21,21 @@ async fn insert_run(db: &support::TestDb, seed: &support::Seeded) -> Uuid {
     let mut tx = begin_scoped(&db.runtime, tenant(seed))
         .await
         .expect("scope");
+    // `uq_run_project_live` allows one live run per project, so each fixture run owns a project.
+    let project: Uuid = sqlx::query_scalar(
+        "INSERT INTO project (tenant_id, key, name) VALUES ($1, $2, $3) RETURNING id",
+    )
+    .bind(seed.tenant)
+    .bind(format!("TOOL-{}", Uuid::now_v7().simple()))
+    .bind("Bound-tools fixture")
+    .fetch_one(&mut *tx)
+    .await
+    .expect("insert the project");
     let id: Uuid = sqlx::query_scalar(
         "INSERT INTO run (tenant_id, project_id, status) VALUES ($1, $2, 'running') RETURNING id",
     )
     .bind(seed.tenant)
-    .bind(seed.project)
+    .bind(project)
     .fetch_one(&mut *tx)
     .await
     .expect("insert the run");
