@@ -48,6 +48,7 @@ pub use runs::{RegradeIn, RegradeOut, RunIdIn, RunListIn, RunStartIn, RunStartOu
 pub mod audits;
 pub mod cases;
 pub mod climbs;
+pub(crate) mod cost;
 pub mod evals;
 pub mod export;
 pub mod graders;

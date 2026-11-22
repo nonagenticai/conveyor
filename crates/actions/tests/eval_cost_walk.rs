@@ -20,8 +20,10 @@ mod support;
 
 use conveyor_domain::TenantId;
 use conveyor_domain::eval::RunStatus;
+use conveyor_domain::inference::Usage;
 use conveyor_store as store;
 use conveyor_store::begin_scoped;
+use conveyor_store::inference::NewInferenceCall;
 use serde_json::{Value, json};
 use uuid::Uuid;
 
@@ -225,7 +227,8 @@ async fn registered_hold(pg: &support::Pg, tenant: TenantId, approval_id: &str) 
     meta["goal"]["hold"].clone()
 }
 
-/// A terminal run: every case at `score`, every case costing `tokens` tokens.
+/// A terminal run: every case at `score`, every case costing `tokens` tokens on both the result
+/// row and the inference ledger (the ledger is what the climb's spend is summed from).
 async fn fill_run(
     pg: &support::Pg,
     tenant: TenantId,
@@ -272,6 +275,36 @@ async fn fill_run(
         )
         .await
         .expect("insert a result");
+        store::inference::insert_call_tx(
+            &mut tx,
+            tenant,
+            &NewInferenceCall {
+                action_invocation_id: None,
+                trace_id: None,
+                correlation_id: None,
+                caller_kind: "eval",
+                run_id: None,
+                run_step_id: None,
+                conversation_turn_id: None,
+                eval_run_id: Some(run_id),
+                prompt_ref: Some("eval:completions.create"),
+                prompt_version: None,
+                prompt_sha256: None,
+                model: "stub-model",
+                served_model: None,
+                usage: Some(Usage {
+                    total_tokens: tokens as i32,
+                    ..Usage::default()
+                }),
+                cache_status: "miss",
+                usage_unit: None,
+                usage_units: None,
+                latency_ms: 3,
+                outcome: "ok",
+            },
+        )
+        .await
+        .expect("insert the ledger row the subject call wrote");
     }
     store::eval::transition_run_tx(&mut tx, tenant, run_id, RunStatus::Running)
         .await
@@ -279,6 +312,50 @@ async fn fill_run(
     store::eval::transition_run_tx(&mut tx, tenant, run_id, RunStatus::Complete)
         .await
         .expect("to complete");
+    tx.commit().await.expect("commit");
+}
+
+/// An extra ledger row on `run_id`: a judge call or a billed failure, which no result row
+/// carries, so the climb's spend can only include it if it reads the ledger.
+async fn ledger_call(
+    pg: &support::Pg,
+    tenant: TenantId,
+    run_id: Uuid,
+    prompt_ref: &str,
+    tokens: i32,
+    outcome: &str,
+) {
+    let mut tx = begin_scoped(&pg.owner, tenant).await.expect("scope");
+    store::inference::insert_call_tx(
+        &mut tx,
+        tenant,
+        &NewInferenceCall {
+            action_invocation_id: None,
+            trace_id: None,
+            correlation_id: None,
+            caller_kind: "eval",
+            run_id: None,
+            run_step_id: None,
+            conversation_turn_id: None,
+            eval_run_id: Some(run_id),
+            prompt_ref: Some(prompt_ref),
+            prompt_version: None,
+            prompt_sha256: None,
+            model: "stub-model",
+            served_model: None,
+            usage: Some(Usage {
+                total_tokens: tokens,
+                ..Usage::default()
+            }),
+            cache_status: "miss",
+            usage_unit: None,
+            usage_units: None,
+            latency_ms: 3,
+            outcome,
+        },
+    )
+    .await
+    .expect("insert a ledger row");
     tx.commit().await.expect("commit");
 }
 
@@ -408,6 +485,19 @@ async fn no_round_without_registered_gates() {
     assert_eq!(status, 201, "{body}");
     let v1 = run_of(&pg, seeded.tenant, &eval_id, "v1").await;
     fill_run(&pg, seeded.tenant, &version_id, v1, 1.0, 50.0).await;
+    // P2.1: two judge calls and one billed failure — spend no result row carries.
+    for _ in 0..2 {
+        ledger_call(&pg, seeded.tenant, v1, "eval_judge", 7, "ok").await;
+    }
+    ledger_call(
+        &pg,
+        seeded.tenant,
+        v1,
+        "eval:completions.create",
+        3,
+        "error",
+    )
+    .await;
 
     // ── round 2 is what settles round 1, and the kept round moves the staircase ──
     let (status, body) = cost_round(&running, &climb_id, "prompt_audit", 2).await;
@@ -438,5 +528,98 @@ async fn no_round_without_registered_gates() {
     assert_eq!(
         summary["reason"], "hold_broken",
         "quality 0.5 is below the 0.8 floor the plan registered: {summary}"
+    );
+
+    // ── P2.1: the climb's spend is the rounds' ledger, not their result rows ──
+    //
+    // v1: 20 subject calls × 50 tokens + 2 judge × 7 + 1 failure × 3 = 1017.
+    // v2: 20 subject calls × 10 = 200. The baseline is round 0 and not climb spend.
+    let (status, body) = running
+        .invoke(
+            "eval_climbs.get",
+            TOKEN,
+            json!({ "id": climb_id }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{body}");
+    assert_eq!(body["output"]["spend_unit"], "tokens", "{body}");
+    let spend = body["output"]["spend_cents"]
+        .as_f64()
+        .expect("the summed spend");
+    assert!(
+        (spend - 1217.0).abs() < 1e-9,
+        "subject + judge + failed across the two kept rounds: {spend}"
+    );
+
+    // ── P5.1: the narrative states cost and quality from that same model ───────────────
+    //
+    // The report prices the same ledger rows the climb summed; the narrative must state the
+    // report's own figure, the registered hold with its floor, and the decision — and carry no
+    // train/test score columns. A `cost_usd` climb has no `cost_usd` grade, so those columns
+    // are all zeroes and say nothing about the round.
+    let (status, body) = running
+        .invoke(
+            "eval_runs.report",
+            TOKEN,
+            json!({ "run_id": v1.to_string() }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{body}");
+    let report_cost = body["output"]["cost"]["total"]
+        .as_f64()
+        .expect("the report's cost total");
+    assert!(
+        (report_cost - 1017.0).abs() < 1e-9,
+        "the report prices subject 1000 + judge 14 + failure 3: {body}"
+    );
+
+    let (status, body) = running
+        .invoke(
+            "eval_climbs.stop",
+            TOKEN,
+            json!({ "id": climb_id, "reason": "the walk is done" }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{body}");
+    let narrative = body["output"]["narrative_md"]
+        .as_str()
+        .expect("the finished climb carries its narrative");
+    assert!(
+        narrative.contains(&format!("{report_cost:.2} tokens")),
+        "the narrative states the report's own figure for round 1: {narrative}"
+    );
+    assert!(
+        narrative.contains("200.00 tokens"),
+        "round 2's ledger spend is in the narrative: {narrative}"
+    );
+    assert!(
+        narrative.contains("1217.00 tokens"),
+        "the climb total is the ledger sum of both rounds: {narrative}"
+    );
+    assert!(
+        narrative.contains("label_accuracy 1.0000 (floor 0.8000)")
+            && narrative.contains("label_accuracy 0.5000 (floor 0.8000)"),
+        "quality is the registered hold with its floor: {narrative}"
+    );
+    assert!(
+        narrative.contains("hold_broken"),
+        "the decision's reason is stated: {narrative}"
+    );
+    assert!(
+        narrative.contains("Cheapest kept round: round 1"),
+        "a cost climb names the cheapest kept round, not a held-out score: {narrative}"
+    );
+    assert!(
+        !narrative.contains("train") && !narrative.contains("test"),
+        "the train/test score columns are gone: {narrative}"
     );
 }

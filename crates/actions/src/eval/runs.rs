@@ -68,7 +68,10 @@ pub struct RunStartIn {
     /// Only these cases. Absent means every case in the version.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub case_ids: Option<Vec<Uuid>>,
-    /// The spend ceiling a climb sets; recorded, never enforced by this action.
+    /// The spend ceiling, in cents. Enforced as the run's **hard execution ceiling** by
+    /// `run_core::start_or_resume_run_tx`: a run whose own ledger spend reaches it refuses to
+    /// start or resume (`409 cost_ceiling_reached`), and a version that prices no tokens is
+    /// refused outright (`422 ceiling_unpriceable`), because a cents ceiling cannot be measured.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub cost_ceiling_cents: Option<i32>,
 }

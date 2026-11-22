@@ -228,6 +228,7 @@ pub async fn grade_output(
         GRADE_ACTION,
         &format!("eval.grade:{grade_id}"),
         &format!("eval_grade:{grade_id}"),
+        None,
     )
     .await
     {
