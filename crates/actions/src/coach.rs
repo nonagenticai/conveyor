@@ -279,6 +279,13 @@ async fn start_process_tx(
     process_key: &str,
     inputs: Value,
 ) -> Result<String, ActionError> {
+    // A model-calling run declares its spend ceiling before it may start (D45). The coach's
+    // machine-owned runs are one bounded turn each; the ceiling is explicit here rather than
+    // inherited from a job release the coach does not have.
+    let mut inputs = inputs;
+    if inputs.get("limits").is_none() {
+        inputs["limits"] = json!({ "cost_budget_usd": 1.0 });
+    }
     let started = crate::process::runs::process_runs_start(
         &mut *tx,
         ctx.clone(),
@@ -595,23 +602,10 @@ async fn coach_interrupt(
         .map_err(|error| store_failure("coach.interrupt: read the board", error))?
         .ok_or_else(|| ActionError::resource_not_found("board"))?;
 
-    // The per-card BREADTH cap: three interruptions without convergence is the whole answer.
-    // (`COACH_INTERRUPTION_MAX` counts interruptions on one card, not run nesting depth; nesting is
-    // refused wholesale by the coach-about-a-coach guard above — a coach card's failure never
-    // opens another coach card, and `process_runs.start` refuses a run tree deeper than 3.)
-    let prior =
-        store::coach::count_interruptions_for_card_tx(&mut *tx, ctx.tenant, interrupted_card_id)
-            .await
-            .map_err(|error| {
-                store_failure("coach.interrupt: count the card's interruptions", error)
-            })?;
-    if prior >= crate::board::pull::COACH_INTERRUPTION_MAX {
-        return Err(ActionError::new(
-            409,
-            "coach.chain_capped",
-            "the card has already had three interruptions; a fourth would only repeat them",
-        ));
-    }
+    // There is deliberately no per-card breadth cap: §6.2 makes every interruption exactly one
+    // coach card, and the (card_id, signature) window below is the recursion guard — a repeat
+    // inside the window escalates to a person, and a marker never opens a second coach card.
+    // A distinct signature is always admitted (v1-p6-4).
 
     let process_key = store::run::process_key_of_run_tx(&mut *tx, ctx.tenant, input.run_id)
         .await
@@ -714,6 +708,9 @@ async fn coach_interrupt(
             due_at: None,
             parent_card_id: None,
             meta: Some(json!({ "interrupted_card_id": interrupted_card_id })),
+            // The one caller allowed to create a coach card (SPEC_V2 §6.2): the interruption
+            // that references it is inserted in the same transaction (v1-p6-6).
+            internal_coach_card: true,
         },
     )
     .await?
@@ -746,7 +743,11 @@ async fn coach_interrupt(
             card_id: coach_card_id,
             process_id: None,
             process_key: Some(crate::board::pull::COACH_ERROR_PROCESS.to_owned()),
-            inputs: json!({ "interruption_id": interruption.id }),
+            inputs: json!({
+                "interruption_id": interruption.id,
+                // One triage turn is the coach's whole spend; declare it, never inherit it.
+                "limits": { "cost_budget_usd": 1.0 },
+            }),
             parent_run_id: None,
             step_id: None,
             workflow_step_id: None,

@@ -1092,6 +1092,7 @@ async fn metrics_reconcile(
                     "conveyor {conveyor_usd} vs billing {billing_usd}; delta {delta}"
                 )),
                 card_type_code: "incident".to_owned(),
+                internal_coach_card: false,
                 due_at: None,
                 parent_card_id: None,
                 meta: Some(serde_json::json!({

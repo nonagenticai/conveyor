@@ -642,10 +642,12 @@ async fn an_archived_project_card_gets_no_coach() {
     no_coach_for_project_status("archived").await;
 }
 
-/// The per-card depth cap: three interruptions are history, not a reason for a fourth (T4: the
-/// cap counts interruptions, because the coach run no longer hangs from the interrupted card).
+/// §6.2: every interruption becomes exactly one coach card. A fourth DISTINCT signature is
+/// admitted — a card-level count never suppresses it (v1-p6-4); repeats are governed by the
+/// (card_id, signature) window inside `coach.interrupt`, which escalates rather than opening a
+/// second card.
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
-async fn the_coach_chain_stops_at_the_cap() {
+async fn a_distinct_signature_is_never_suppressed_by_a_card_level_count() {
     let (pg, seeded, running) = fixture().await;
     seed_start_and_coach(&pg, &running, seeded.tenant).await;
     let s = subject(&running).await;
@@ -654,8 +656,8 @@ async fn the_coach_chain_stops_at_the_cap() {
     let project = Uuid::parse_str(&s.project_id).expect("project");
 
     // Three interruptions with three DIFFERENT signatures: a repeat signature escalates instead
-    // of opening a second interruption, so the cap needs three distinct faults.
-    for index in 0..conveyor_actions::board::pull::COACH_INTERRUPTION_MAX {
+    // of opening a second interruption, so each loop iteration is a fresh signature.
+    for index in 0..3 {
         let key = format!("coach.cap.{index}");
         let sop = Uuid::parse_str(&support::publish_sop(&running, &key).await).expect("SOP");
         published_process(&pg, seeded.tenant, &key, "Cap probe", None, sop).await;
@@ -669,20 +671,21 @@ async fn the_coach_chain_stops_at_the_cap() {
             "interruption {index} is admitted: {outcome:?}"
         );
     }
-    // A v2 draft must not reset the count: the cap is per card and per key family.
+    // A v2 draft must not change the answer: the guard is per signature, not per process row.
     fork_coach_draft(&pg, seeded.tenant).await;
 
-    // A fourth failure from an ORDINARY process, so the only refusal in play is the cap.
+    // A FOURTH failure with a DISTINCT signature still gets exactly one coach card: the old
+    // card-level cap refused it and dropped the interruption silently.
     let run = failed_run_of(&pg, seeded.tenant, project, card, START_PROCESS_KEY).await;
     let outcome = conveyor_actions::board::pull::err_card(&pg.runtime, APP_KEY, seeded.tenant, run)
         .await
         .expect("err.card");
 
     assert!(
-        outcome.coach_skipped,
-        "the cap refuses a fourth coach: {outcome:?}"
+        !outcome.coach_skipped,
+        "a distinct signature is never suppressed by a count: {outcome:?}"
     );
-    assert_eq!(outcome.coach_run_id, None, "no run was started");
+    assert!(outcome.coach_run_id.is_some(), "a coach run was started");
     let interruptions: i64 = sqlx::query_scalar(
         "SELECT count(*) FROM coach_interruption WHERE tenant_id = $1 AND interrupted_card_id = $2",
     )
@@ -691,11 +694,7 @@ async fn the_coach_chain_stops_at_the_cap() {
     .fetch_one(&pg.super_pool)
     .await
     .expect("the interruption count");
-    assert_eq!(
-        interruptions,
-        conveyor_actions::board::pull::COACH_INTERRUPTION_MAX,
-        "the cap holds"
-    );
+    assert_eq!(interruptions, 4, "every interruption is recorded");
 }
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]

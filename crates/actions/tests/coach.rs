@@ -185,6 +185,47 @@ async fn create_card(
     text(output(&body), "id")
 }
 
+/// v1-p6-6: a coach card exists only as the record of an interruption. The public create path
+/// (a person or an agent) is refused, so an orphan coach card nothing can triage is impossible;
+/// the coach's own path creates its card inside `coach.interrupt`.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_coach_card_cannot_be_created_through_the_public_path() {
+    let (pg, running, seeded) = fixture().await;
+    publish_processes(&running).await;
+    let (board, active, _waiting) = board_lanes(&pg, &seeded).await;
+
+    let (status, body) = running
+        .invoke(
+            "cards.create",
+            TOKEN,
+            json!({
+                "board_id": board,
+                "list_id": active,
+                "name": "orphan coach",
+                "card_type_code": "coach",
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 422, "a public coach card is refused: {body}");
+    assert_eq!(body["type"], json!("coach_card_internal"), "{body}");
+
+    // The coach's own path still creates one: the interruption test's fixture proves it, and
+    // this row asserts no orphan can be counted on the board.
+    let cards: i64 = sqlx::query_scalar(
+        "SELECT count(*) FROM card c
+           JOIN card_type ct ON ct.tenant_id = c.tenant_id AND ct.id = c.card_type_id
+          WHERE c.tenant_id = $1 AND ct.code = 'coach'",
+    )
+    .bind(seeded.tenant_id)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("the coach card count");
+    assert_eq!(cards, 0, "no orphan coach card exists");
+}
+
 async fn publish_sop(running: &support::Running, key: &str) -> String {
     let (status, body) = running
         .invoke(
@@ -520,18 +561,22 @@ async fn execute_at(pg: &support::Pg, seeded: &support::Seeded, run: &str, posit
         1,
     )
     .await;
-    let status: String =
-        sqlx::query_scalar("SELECT status FROM run WHERE tenant_id = $1 AND id = $2")
-            .bind(seeded.tenant_id)
-            .bind(Uuid::parse_str(run).expect("run id"))
-            .fetch_one(&pg.super_pool)
-            .await
-            .expect("the run status");
+    let (status, error_class, error): (String, Option<String>, Option<String>) = sqlx::query_as(
+        "SELECT status, error_class, error_message FROM run WHERE tenant_id = $1 AND id = $2",
+    )
+    .bind(seeded.tenant_id)
+    .bind(Uuid::parse_str(run).expect("run id"))
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("the run status");
     assert!(
         result.is_ok(),
         "step {position} was expected to pass: {result:?}"
     );
-    assert_ne!(status, "failed", "step {position} failed the run");
+    assert_ne!(
+        status, "failed",
+        "step {position} failed the run: {error_class:?} {error:?}"
+    );
 }
 
 async fn triage(
