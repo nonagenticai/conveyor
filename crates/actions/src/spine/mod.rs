@@ -3576,8 +3576,9 @@ async fn cadences_update(
 /// `cadences.approve_plan` — the gate that stands between a PI plan and its cards.
 ///
 /// `decision` absent opens (or returns) the plan's pending `approval`; `approve`/`reject`
-/// records a **person's** decision on it. Nothing materialises until the gate carries a human
-/// approve, so the unattended cadence tick cannot commit an unapproved plan.
+/// records a person's decision, or a `rule` acting under the owner's published delegation
+/// (`delegation_ref`). Nothing materialises until the gate carries such an approve, so the
+/// unattended cadence tick cannot commit an unapproved plan.
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 pub struct CadenceApprovePlanIn {
     /// The PI cadence whose materialisation is gated.
@@ -3586,6 +3587,9 @@ pub struct CadenceApprovePlanIn {
     pub decision: Option<String>,
     /// The note the deciding person records on the gate.
     pub note: Option<String>,
+    /// The published decision document that delegates this act. When present the decision is
+    /// recorded as a `rule` under the owner's delegation (R1), not as a human's.
+    pub delegation_ref: Option<Uuid>,
 }
 
 /// A PI plan's gate as `cadences.approve_plan` returns it.
@@ -3717,14 +3721,19 @@ async fn cadences_approve_plan(
             store::spine::CADENCE_AWAITING_APPROVAL,
         )));
     };
-    // A decision is a person's act. The store's human-decision check is the backstop; the
-    // refusal belongs here so a machine caller learns why nothing happened.
-    if ctx.actor_kind != "user" || ctx.channel.is_some() {
+    // A decision is a person's act, or a rule acting under the owner's published delegation
+    // (R1). A machine identity with no delegation is refused; a delegated rule is validated
+    // against an active, published `category='decision'` output owned by P0.
+    let delegation_ref = input.delegation_ref;
+    if delegation_ref.is_none() && (ctx.actor_kind != "user" || ctx.channel.is_some()) {
         return Err(ActionError::new(
             403,
             "human_only",
-            "a PI plan is approved by a person; a machine identity cannot decide it",
+            "a PI plan is approved by a person or a rule under a published delegation; a machine identity cannot decide it",
         ));
+    }
+    if let Some(reference) = delegation_ref {
+        crate::programme::assert_delegation_ref(&mut *tx, ctx.tenant, reference).await?;
     }
     let existing = match kind {
         DecisionKind::Approve => {
@@ -3750,12 +3759,22 @@ async fn cadences_approve_plan(
         store::spine::open_pi_plan_approval_tx(&mut *tx, ctx.tenant, input.cadence_id, None)
             .await
             .map_err(|error| spine_error(error, ctx.action))?;
+    let (decided_by_kind, via) = match delegation_ref {
+        Some(reference) => (
+            DeciderKind::Rule,
+            serde_json::json!({
+                "channel": "internal",
+                "delegation_ref": reference.to_string()
+            }),
+        ),
+        None => (DeciderKind::Human, serde_json::json!({ "channel": "web" })),
+    };
     let decision = Decision {
         approver_id: ctx.actor_id,
         kind,
         note: input.note.unwrap_or_default(),
-        decided_by_kind: DeciderKind::Human,
-        via: Some(serde_json::json!({ "channel": "web" })),
+        decided_by_kind,
+        via: Some(via),
         item_decisions: None,
     };
     let decided =

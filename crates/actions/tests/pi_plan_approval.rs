@@ -332,6 +332,164 @@ async fn an_approved_plan_materialises_exactly_once() {
     assert_eq!(approver, reviewer);
 }
 
+/// A published P0 decision document: the owner's standing delegation (R1) for a rule decision.
+async fn published_delegation(pg: &support::Pg, seeded: &support::Seeded) -> Uuid {
+    let p0: Uuid = sqlx::query_scalar(
+        "INSERT INTO project (tenant_id, key, name)
+         VALUES ($1, 'P0', 'Programme definition') RETURNING id",
+    )
+    .bind(seeded.tenant_id)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("insert P0");
+    sqlx::query_scalar(
+        "INSERT INTO document
+             (tenant_id, project_id, title, kind, status, category, publishable,
+              published_at, published_by)
+         VALUES ($1, $2, 'Standing delegation', 'document', 'active', 'decision', true,
+                 now(), $3)
+         RETURNING id",
+    )
+    .bind(seeded.tenant_id)
+    .bind(p0)
+    .bind(seeded.user_id)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("insert the published delegation")
+}
+
+async fn decide_plan_delegated(
+    pg: &support::Pg,
+    f: &Fixture,
+    actor: Uuid,
+    actor_kind: &str,
+    authority: Authority,
+    decision: &str,
+    delegation_ref: Uuid,
+) -> Result<InvokeOutcome, conveyor_actions::ActionError> {
+    invoke(
+        &pg.runtime,
+        registry(),
+        f.tenant,
+        request(
+            actor,
+            actor_kind,
+            authority,
+            "cadences.approve_plan",
+            json!({
+                "cadence_id": f.cadence,
+                "decision": decision,
+                "delegation_ref": delegation_ref
+            }),
+        ),
+    )
+    .await
+}
+
+/// A rule decision under a published delegation approves and materialises the plan; the audit
+/// records `rule` with the delegation reference, never `human`.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_delegated_rule_decision_approves_the_plan() {
+    let (pg, seeded, f) = tenant_fixture().await;
+    let approval = request_approval(&pg, &seeded, &f).await;
+    let delegation = published_delegation(&pg, &seeded).await;
+    let reviewer = support::reviewer_id(&pg).await;
+
+    let outcome = decide_plan_delegated(
+        &pg,
+        &f,
+        reviewer,
+        "agent",
+        Authority::Role,
+        "approve",
+        delegation,
+    )
+    .await
+    .expect("a delegated rule approves the plan");
+    assert_eq!(outcome.status, 200, "{}", outcome.body);
+    assert_eq!(outcome.body["output"]["status"], json!("approved"));
+
+    let (kind, via): (String, Value) = sqlx::query_as(
+        "SELECT decided_by_kind, via FROM approval_decision
+          WHERE approval_id = $1 AND decision = 'approve'",
+    )
+    .bind(approval)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("read the delegated decision");
+    assert_eq!(kind, "rule", "the audit says a rule acted");
+    assert_eq!(
+        via["delegation_ref"],
+        json!(delegation.to_string()),
+        "the rule cites the published decision document"
+    );
+
+    let first = materialise(&pg, &f).await.expect("the plan materialises");
+    assert_eq!(first.cards.len(), 2, "one draft per backlog row");
+}
+
+/// A rule cannot manufacture a delegation: an unpublished document, a non-decision category and
+/// an unknown id are each refused before a decision is written.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_rule_without_a_published_decision_is_refused() {
+    let (pg, seeded, f) = tenant_fixture().await;
+    request_approval(&pg, &seeded, &f).await;
+    let delegation = published_delegation(&pg, &seeded).await;
+
+    sqlx::query("UPDATE document SET published_at = NULL WHERE id = $1")
+        .bind(delegation)
+        .execute(&pg.super_pool)
+        .await
+        .expect("unpublish the delegation");
+    let refused = decide_plan_delegated(
+        &pg,
+        &f,
+        seeded.user_id,
+        "agent",
+        Authority::Role,
+        "approve",
+        delegation,
+    )
+    .await
+    .expect_err("an unpublished delegation is not an approval");
+    assert_eq!(refused.code, "delegation_unpublished", "{}", refused.detail);
+
+    sqlx::query("UPDATE document SET published_at = now(), category = 'output' WHERE id = $1")
+        .bind(delegation)
+        .execute(&pg.super_pool)
+        .await
+        .expect("change the category");
+    let refused = decide_plan_delegated(
+        &pg,
+        &f,
+        seeded.user_id,
+        "agent",
+        Authority::Role,
+        "approve",
+        delegation,
+    )
+    .await
+    .expect_err("a non-decision output is not a delegation");
+    assert_eq!(
+        refused.code, "delegation_wrong_category",
+        "{}",
+        refused.detail
+    );
+
+    let refused = decide_plan_delegated(
+        &pg,
+        &f,
+        seeded.user_id,
+        "agent",
+        Authority::Role,
+        "approve",
+        Uuid::now_v7(),
+    )
+    .await
+    .expect_err("an unknown document is not a delegation");
+    assert_eq!(refused.code, "delegation_ref_invalid", "{}", refused.detail);
+}
+
 /// The approval gate does not relax the WIP bound: an approved plan still drafts only the free
 /// slots, and the second pass still adds nothing.
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
