@@ -117,6 +117,9 @@ pub enum ApprovalStoreError {
     /// `approvals.decide` path must not be a weaker door into the same row.
     #[error("an eval sign-off requires the evals:approve scope")]
     EvalScopeRequired,
+    /// A gate marked `requires_answer` was decided with no note: an empty answer is no answer.
+    #[error("this gate requires an answer; a decision with no note answers nothing")]
+    AnswerMissing,
     /// The database refused the statement.
     #[error(transparent)]
     Database(#[from] sqlx::Error),
@@ -859,6 +862,21 @@ pub async fn record_decision_tx(
                 ApprovalError::RequesterCannotDecide,
             ));
         }
+    }
+    // A free-text question must be answered. `approvals.request` marks one with
+    // `meta.requires_answer`; a decision that records no note answers nothing. This is the one
+    // writer every decision path traverses, so no channel can lose the answer. A yes/no gate
+    // does not set the marker and is unchanged.
+    let requires_answer: bool = sqlx::query_scalar(
+        "SELECT COALESCE(meta->>'requires_answer' = 'true', false)
+           FROM approval WHERE tenant_id = $1 AND id = $2",
+    )
+    .bind(tenant.as_uuid())
+    .bind(approval_id)
+    .fetch_one(&mut *conn)
+    .await?;
+    if requires_answer && decision.note.trim().is_empty() {
+        return Err(ApprovalStoreError::AnswerMissing);
     }
     // W1 (S06d): an eval gate is a person's act, and only a person holding `evals:approve` may
     // decide it. This check lives HERE — the one writer every decision path traverses — so

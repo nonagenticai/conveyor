@@ -414,6 +414,9 @@ async fn approvals_request(
     if let Some(allowed) = input.allowed_decisions {
         meta.insert("allowed_decisions".to_owned(), allowed);
     }
+    if input.requires_answer == Some(true) {
+        meta.insert("requires_answer".to_owned(), Value::Bool(true));
+    }
     if let Some(proposed) = input.proposed_input {
         meta.insert("proposed_input".to_owned(), proposed);
     }
