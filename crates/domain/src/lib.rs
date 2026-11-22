@@ -48,6 +48,9 @@ pub mod channel;
 pub mod compare;
 pub mod copilot;
 pub mod eval;
+// v1-close-1 (SPEC_V2 §5.4): the committed V1 findings ledger, read by the close gate so a
+// project cannot close while it owns an open P0.
+pub mod findings;
 mod governance;
 mod ids;
 // S16: the inference ledger's derived fields and the usage report's arithmetic.

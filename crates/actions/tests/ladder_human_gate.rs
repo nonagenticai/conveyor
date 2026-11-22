@@ -252,6 +252,36 @@ impl Fixture {
         )
         .await
     }
+
+    /// [`Fixture::invoke`] with the Idempotency-Key a verified `laya.classify` call needs.
+    async fn invoke_keyed(
+        &self,
+        action: &str,
+        input: Value,
+        actor_kind: &str,
+        key: &str,
+    ) -> Result<conveyor_actions::InvokeOutcome, conveyor_actions::ActionError> {
+        let mut request = request(action, input, actor_kind, self.seeded.user_id);
+        request.idempotency_key = Some(key.to_owned());
+        invoke(&self.pg.runtime, registry(), self.seeded.tenant, request).await
+    }
+}
+
+/// Seal the tenant's `laya.token`, so `laya.classify` reaches its service.
+async fn seal_laya_token(pg: &support::Pg, seeded: &support::Seeded) {
+    let mut tx = store::begin_scoped(&pg.runtime, seeded.tenant)
+        .await
+        .expect("scope the laya token");
+    store::secret::create_secret_tx(
+        &mut tx,
+        seeded.tenant,
+        "laya.token",
+        b"test-laya-token",
+        "tenant",
+    )
+    .await
+    .expect("seal the laya token");
+    tx.commit().await.expect("commit the laya token");
 }
 
 fn human_record(card_id: Option<Uuid>, approval_id: Uuid, kind: &str) -> Value {
@@ -447,6 +477,9 @@ async fn a_pending_approval_cannot_gate_a_draft() {
             refinement_version: None,
             laya_config_id: None,
             laya_config_version: None,
+            laya_invocation_id: None,
+            laya_request_hash: None,
+            laya_response_hash: None,
             actor_kind: "user".to_owned(),
             actor_id: Some(fx.seeded.user_id),
             approval_id: Some(pending),
@@ -534,7 +567,9 @@ async fn only_a_human_draft_apply_decision_can_gate_a_draft() {
     assert_eq!(refused.status, 422, "{refused:?}");
     assert_eq!(refused.code, "draft_requires_gate");
 
-    // An accepted L1 decision on the card, which the old check admitted.
+    // An accepted L1 decision on the card, which the old check admitted. It is recorded through
+    // the verified path: prepare the document, run the engine-owned classify call, then
+    // evaluate the key that call used.
     fx.invoke(
         "decision_policies.create",
         json!({
@@ -548,13 +583,44 @@ async fn only_a_human_draft_apply_decision_can_gate_a_draft() {
     )
     .await
     .expect("create the policy");
-    fx.invoke(
-        "laya_configs.create",
-        json!({"model_ref": "jev-latest", "timeout_ms": 2500}),
-        "user",
-    )
-    .await
-    .expect("create the laya config");
+    let laya_config = fx
+        .invoke(
+            "laya_configs.create",
+            json!({"model_ref": "jev-latest", "timeout_ms": 2500}),
+            "user",
+        )
+        .await
+        .expect("create the laya config");
+    assert_eq!(laya_config.status, 201, "{}", laya_config.body);
+    let laya_config_id = id_of(&laya_config.body, "id");
+    seal_laya_token(&fx.pg, &fx.seeded).await;
+    let stub = support::LayaStub::start(json!({
+        "answers": {"decision": {"score": 0.9}}
+    }))
+    .await;
+    support::set_env("CONVEYOR_EXTERNAL_LAYA_URL", &stub.base);
+    let prepared = fx
+        .invoke(
+            "ladder.prepare",
+            json!({
+                "kind": "gate.precheck",
+                "gate": "capability_ready",
+                "question": "Is the capability ready?",
+                "input": {"card": fx.card_id},
+                "laya_config_id": laya_config_id
+            }),
+            "user",
+        )
+        .await
+        .expect("prepare the laya document");
+    assert_eq!(prepared.status, 200, "{}", prepared.body);
+    let request = prepared.body["output"]["request"].clone();
+    let key = "ladder-human-gate-laya";
+    let classified = fx
+        .invoke_keyed("laya.classify", request, "user", key)
+        .await
+        .expect("classify through laya");
+    assert_eq!(classified.status, 200, "{}", classified.body);
     let laya = fx
         .invoke(
             "ladder.evaluate",
@@ -562,9 +628,10 @@ async fn only_a_human_draft_apply_decision_can_gate_a_draft() {
                 "kind": "gate.precheck",
                 "gate": "capability_ready",
                 "card_id": fx.card_id,
-                "answer": "pass",
-                "confidence": 0.9,
-                "latency_ms": 5
+                "question": "Is the capability ready?",
+                "input": {"card": fx.card_id},
+                "laya_config_id": laya_config_id,
+                "laya_key": key
             }),
             "user",
         )

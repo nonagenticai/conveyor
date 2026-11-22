@@ -128,7 +128,9 @@ use serde_json::{Value, json};
 /// `authoring.assets` read. 512 → **517**.
 /// **T5 (#77) adds 10 internal**: the kata loop — `kata.open|observe|analyse|propose|measure|`
 /// `adopt|propagate|close` and the `kata.get|list` reads. 517 → **527**.
-const EXPECTED: [&str; 527] = [
+/// **v1-w1c-3 adds 2**: `ladder.prepare` (internal read) and `laya.classify` (external) —
+/// the L1 path's own laya call, whose verified invocation a laya decision cites. 527 → **529**.
+const EXPECTED: [&str; 529] = [
     "actions.describe",
     "actions.list",
     "analyse.site",
@@ -381,7 +383,9 @@ const EXPECTED: [&str; 527] = [
     "ladder.apply_draft",
     "ladder.evaluate",
     "ladder.list",
+    "ladder.prepare",
     "ladder.record",
+    "laya.classify",
     "laya.judge",
     "laya_configs.create",
     "laya_configs.list",
@@ -754,7 +758,9 @@ fn the_registry_is_exactly_the_declared_set() {
     // API that had only store functions; #526 (U5c) adds `cadences.approve_plan` and
     // `tranches.resume`; #526 (V2 shell) adds the five `authoring.*` actions and T5 adds the ten `kata.*`:
     // 495 -> 514; external stays 13.
-    assert_eq!((internal, external), (514, 13));
+    // v1-w1c-3 adds `ladder.prepare` (internal read) and `laya.classify` (external): internal
+    // 514 -> 515, external 13 -> 14 — the L1 decision's own laya call.
+    assert_eq!((internal, external), (515, 14));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),

@@ -31,7 +31,7 @@
 
 mod support;
 
-use std::sync::atomic::Ordering;
+use support::LayaStub;
 
 use conveyor_domain::ListKind;
 use rust_decimal::Decimal;
@@ -430,58 +430,6 @@ async fn seal_laya_token(pg: &support::Pg, seeded: &support::Seeded) {
     .await
     .expect("seal the laya token");
     tx.commit().await.expect("commit the laya token");
-}
-
-/// A laya stub: every call is answered with one fixed document and counted.
-struct LayaStub {
-    base: String,
-    hits: support::StubHits,
-    task: tokio::task::JoinHandle<()>,
-}
-
-impl LayaStub {
-    /// A stub answering every laya call with `body`, counting the calls it served.
-    async fn start(body: Value) -> LayaStub {
-        let hits = support::StubHits::default();
-        let app = axum::Router::new()
-            .fallback(axum::routing::post(laya_answer))
-            .with_state(LayaAnswer {
-                body,
-                hits: hits.clone(),
-            });
-        let listener = tokio::net::TcpListener::bind("127.0.0.1:0")
-            .await
-            .expect("bind the laya stub");
-        let addr = listener.local_addr().expect("the laya stub's address");
-        let task = tokio::spawn(async move {
-            let _ = axum::serve(listener, app).await;
-        });
-        LayaStub {
-            base: format!("http://{addr}"),
-            hits,
-            task,
-        }
-    }
-}
-
-impl Drop for LayaStub {
-    fn drop(&mut self) {
-        self.task.abort();
-    }
-}
-
-/// The stub's state: the document it answers and the count of answers served.
-#[derive(Clone)]
-struct LayaAnswer {
-    body: Value,
-    hits: support::StubHits,
-}
-
-async fn laya_answer(
-    axum::extract::State(answer): axum::extract::State<LayaAnswer>,
-) -> axum::Json<Value> {
-    answer.hits.0.fetch_add(1, Ordering::SeqCst);
-    axum::Json(answer.body)
 }
 
 /// An eval with a current version — the instrument an `inspection.kind = 'eval'` SOP needs.

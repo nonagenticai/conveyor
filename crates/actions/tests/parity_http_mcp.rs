@@ -2816,6 +2816,11 @@ async fn prepare(sample: &Sample, pg: &support::Pg, ctx: &Ctx) {
             ctx.push("ladder.evaluate.policy", policy);
             seed_parity_laya(pg, ctx).await;
         }
+        "ladder.prepare" => {
+            let policy = seed_parity_policy(pg, ctx, "parity.prepare", "parity_gate").await;
+            ctx.push("ladder.prepare.policy", policy);
+            seed_parity_laya(pg, ctx).await;
+        }
         "ladder.record" => {
             let policy = seed_parity_policy(pg, ctx, "parity.record", "parity_gate").await;
             ctx.push("ladder.record.policy", policy);
@@ -7026,6 +7031,28 @@ fn ladder_samples() -> Vec<Sample> {
         ),
         expecting(plain("laya_configs.list", json!({}), None), 200),
         {
+            // A read: it resolves the policy/config rows and returns the document and its
+            // hash. Each round seeds its own policy (the kind embeds the row id), and the
+            // document carries no id, so the two rounds answer identically.
+            let mut sample = plain("ladder.prepare", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                let policy = ctx.pop("ladder.prepare.policy");
+                json!({
+                    "kind": format!("parity.prepare.{}", policy.as_str().unwrap_or_default()),
+                    "gate": "parity_gate",
+                    "question": "Is the case ready?",
+                    "input": {"subject": "parity"}
+                })
+            });
+            expecting(sample, 200)
+        },
+        // Sampled at the validation boundary: an empty wire document is a 422 on both
+        // transports. The success path needs a configured laya and its own suites.
+        plain("laya.classify", json!({}), None),
+        {
+            // No successful replay carries the key, so the L1 path answers
+            // `503 gate_unavailable` and writes nothing — the same body on both transports.
             let mut sample = plain("ladder.evaluate", json!({}), None);
             sample.prepare = true;
             sample.input = Box::new(|ctx: &Ctx| {
@@ -7033,12 +7060,11 @@ fn ladder_samples() -> Vec<Sample> {
                 json!({
                     "kind": format!("parity.evaluate.{}", policy.as_str().unwrap_or_default()),
                     "gate": "parity_gate",
-                    "answer": "pass",
-                    "confidence": 0.9,
-                    "input": {"subject": "parity"}
+                    "input": {"subject": "parity"},
+                    "laya_key": "parity-laya-never-called"
                 })
             });
-            expecting(sample, 201)
+            expecting(sample, 503)
         },
         {
             let mut sample = plain("ladder.record", json!({}), None);

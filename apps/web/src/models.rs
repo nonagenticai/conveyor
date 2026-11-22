@@ -400,6 +400,9 @@ pub struct ApprovalOut {
     /// The answer the requester proposed.
     #[serde(default)]
     pub proposed_answer: Option<String>,
+    /// Whether a decision must carry an answer in its note (`meta.requires_answer`).
+    #[serde(default)]
+    pub requires_answer: bool,
     /// The input the approved call will run with.
     #[serde(default)]
     pub proposed_input: Option<Value>,
