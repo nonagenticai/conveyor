@@ -1,7 +1,7 @@
 #![forbid(unsafe_code)]
 //! The project-type matrix: one cached read per `(tenant, project_type_code)`, with a TTL.
 //!
-//! The 280 generated Planka flows are one lookup: `catalogue_entry(kind='project_type',
+//! The 280 generated board flows are one lookup: `catalogue_entry(kind='project_type',
 //! code=<project.project_type_code>).meta.matrix`, keyed by card-type code and then by the
 //! list kind the card is leaving. `domain::board::may_move` is the only legality function;
 //! this module only resolves its input and maps a denial to the one wire code.

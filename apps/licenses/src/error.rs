@@ -90,7 +90,7 @@ pub fn validate_tenant_uuid(value: Option<&str>, source: &str) -> Result<Option<
         Err(_) => Err(Refusal::middleware(
             StatusCode::BAD_REQUEST,
             format!(
-                "Invalid {source} {}: must be a UUID. Legacy text labels (e.g. 'n8n-dev') \
+                "Invalid {source} {}: must be a UUID. Legacy text labels (e.g. 'legacy-tenant') \
                  are tenant_name values, not tenant_ids.",
                 safe_tenant_value(raw)
             ),
@@ -100,7 +100,7 @@ pub fn validate_tenant_uuid(value: Option<&str>, source: &str) -> Result<Option<
 
 /// `_safe_tenant_value`: render an invalid tenant value without leaking a credential.
 ///
-/// The fleet's n8n transport convention deliberately sends `X-Tenant-Id: Bearer <licenceToken>`,
+/// The legacy fleet's transport convention deliberately sends `X-Tenant-Id: Bearer <licenceToken>`,
 /// so the most likely malformed value on this path IS a live credential. Echoing it would put
 /// that credential in a 400 body and a log line. A value that carries an auth scheme, or does not
 /// look like a tenant name (`^[a-z0-9][a-z0-9-]*$`, at most 32 chars), is reduced to a length and
@@ -145,7 +145,7 @@ mod tests {
 
     #[test]
     fn a_malformed_tenant_is_named_only_when_it_is_safe_to_name_it() {
-        assert_eq!(safe_tenant_value("n8n-dev"), "'n8n-dev'");
+        assert_eq!(safe_tenant_value("legacy-tenant"), "'legacy-tenant'");
         assert_eq!(
             safe_tenant_value("Bearer abc.def.ghi"),
             "<bearer credential redacted, 18 chars>"

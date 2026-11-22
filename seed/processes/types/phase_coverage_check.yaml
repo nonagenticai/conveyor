@@ -3,7 +3,7 @@
 # ⚠️ This card type has NO entry in seed/catalogue.json (measured 2026-11-10: absent from all 74
 # card_types) and NO entry in the v4 capability file, so there is no catalogue acceptance and no
 # `inspect.criteria` to take. It is authored here because the four process keys are NOT optional:
-# `parity/n8n-dispositions.tsv` carries four live flows targeting `phase_coverage_check.READY/.DOING/
+# `parity/flow-dispositions.tsv` carries four live flows targeting `phase_coverage_check.READY/.DOING/
 # .QA/.DONE`, and the catalogue test requires every disposition target to resolve to a seeded key
 # (seed/processes/README.md §`manifest.yaml`, S13 §5.9). It is also one of the 70 types the type × list
 # matrix names, while the five `wf_*` catalogue types are not.

@@ -251,6 +251,12 @@ pub enum Scope {
     ProcessesRead,
     /// Create, change, publish and retire a process template.
     ProcessesWrite,
+    // S21 step 3 (#15) — the prompt recipe catalogue. Its system sections are operator
+    // instructions, so authoring is admin-only even though reading the catalogue is open.
+    /// Read prompt recipes and their versions.
+    PromptsRead,
+    /// Create, activate and retire a prompt recipe version.
+    PromptsWrite,
     // S17 — the benchmark harness. `benchmarks:read` covers suites, runs, cases and compare;
     // `benchmarks:write` starts, cancels and promotes runs. No benchmark action is in
     // `AGENT_TOOLS`: a model-driven principal cannot start a run or read an answer (CONTRACT §19).
@@ -302,7 +308,7 @@ pub enum Scope {
 
 impl Scope {
     /// Every scope this build knows.
-    pub const ALL: [Scope; 68] = [
+    pub const ALL: [Scope; 70] = [
         Scope::ActionsRead,
         Scope::ActionsWrite,
         Scope::MeRead,
@@ -357,6 +363,8 @@ impl Scope {
         Scope::ToolsWrite,
         Scope::ProcessesRead,
         Scope::ProcessesWrite,
+        Scope::PromptsRead,
+        Scope::PromptsWrite,
         Scope::BenchmarksRead,
         Scope::BenchmarksWrite,
         Scope::InferenceRead,
@@ -431,6 +439,8 @@ impl Scope {
             Self::OpsWrite => "ops:write",
             Self::ProcessesRead => "processes:read",
             Self::ProcessesWrite => "processes:write",
+            Self::PromptsRead => "prompts:read",
+            Self::PromptsWrite => "prompts:write",
             Self::BenchmarksRead => "benchmarks:read",
             Self::BenchmarksWrite => "benchmarks:write",
             Self::InferenceRead => "inference:read",
@@ -494,6 +504,7 @@ impl Scope {
             | Self::DocumentsRead
             | Self::SecretsRead
             | Self::ProcessesRead
+            | Self::PromptsRead
             | Self::BenchmarksRead
             | Self::InferenceRead
             | Self::IntegrationsRead
@@ -534,6 +545,7 @@ impl Scope {
             | Self::CardsWrite
             | Self::OrganisationWrite
             | Self::ToolsWrite
+            | Self::PromptsWrite
             | Self::OpsWrite => admin,
             // ⛔ NOT the `admin` predicate: that includes `Role::KataExecutor`, a machine
             // role, and a scope a machine holds cannot be a sign-off (CONTRACT §20 trap 1).
@@ -1045,7 +1057,7 @@ mod tests {
         assert_eq!(Scope::OrganisationRead.as_str(), "organisation:read");
         assert_eq!(Scope::OrganisationWrite.as_str(), "organisation:write");
         assert_eq!(Scope::OpsWrite.as_str(), "ops:write");
-        assert_eq!(Scope::ALL.len(), 68);
+        assert_eq!(Scope::ALL.len(), 70);
     }
 
     #[test]
@@ -1217,10 +1229,10 @@ pub struct FieldError {
 /// The validator reads the SAME `Schema` value the OpenAPI operation and MCP tool embed,
 /// so a refusal here and the published contract cannot disagree. It deliberately covers
 /// the JSON-Schema subset schemars emits for our documents: `$ref` into `$defs`,
-/// `allOf` (a flattened shared envelope), `anyOf`/`oneOf` (an `Option<T>`),
-/// `required`, `properties`, `additionalProperties`, `type` and `enum`. Anything outside
-/// that subset is accepted rather than guessed — the typed deserialization after this is
-/// the second belt.
+/// `allOf` (a flattened shared envelope), `anyOf`/`oneOf` (an `Option<T>`, and a closed
+/// enum's `oneOf` of `const` branches), `required`, `properties`, `additionalProperties`,
+/// `type`, `enum` and `const`. Anything outside that subset is accepted rather than
+/// guessed — the typed deserialization after this is the second belt.
 pub fn validate_input(schema: &Value, value: &Value) -> Vec<FieldError> {
     let mut errors = Vec::new();
     validate_at(schema, schema, value, "", &mut errors);
@@ -1379,6 +1391,23 @@ fn validate_at(
             },
             code: "invalid_value".into(),
             detail: format!("must be one of {choices:?}"),
+        });
+        return;
+    }
+
+    // `const`: schemars renders an enum of unit variants as a `oneOf` of `const` branches, so a
+    // validator that ignored `const` accepted any string for a closed enum's field.
+    if let Some(expected) = schema.get("const")
+        && expected != value
+    {
+        errors.push(FieldError {
+            field: if path.is_empty() {
+                "body".into()
+            } else {
+                path.to_owned()
+            },
+            code: "invalid_value".into(),
+            detail: format!("must be {expected}"),
         });
         return;
     }

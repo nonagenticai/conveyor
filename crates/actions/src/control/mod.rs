@@ -144,6 +144,11 @@ pub fn run_error(error: store::RunStoreError, action: &str) -> ActionError {
             "binding_required",
             "a run that names a release must name the job binding that pins it",
         ),
+        store::RunStoreError::ExecutorMismatch => ActionError::new(
+            409,
+            "executor_mismatch",
+            "the run already executes under a different capability or agent than its binding names",
+        ),
         store::RunStoreError::BindingNotFound => ActionError::resource_not_found("such binding"),
         // T16: a retired/draft binding or a stale pin is the caller's refusal, not an internal
         // failure — the same `409 job_binding_stale` the organisation family answers.

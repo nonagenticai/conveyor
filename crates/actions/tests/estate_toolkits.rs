@@ -249,8 +249,9 @@ async fn a_publish_is_idempotent_and_a_change_bumps_the_version() {
     let first = fixture.publish().await;
     let rows = outcomes(&first);
     // #450 removed the three manifests whose actions are internal now (`artifacts`, `billing`,
-    // `worker_management`); a toolkit binds External handlers only.
-    assert_eq!(rows.len(), 5, "one row per embedded manifest: {first}");
+    // `worker_management`); a toolkit binds External handlers only. #560 adds the scientific
+    // processor's draft.
+    assert_eq!(rows.len(), 6, "one row per embedded manifest: {first}");
     for (key, outcome, version) in &rows {
         assert_eq!(outcome, "created", "{key} on the first publish");
         assert_eq!(*version, 1, "{key} starts at version 1");
@@ -289,6 +290,47 @@ async fn a_publish_is_idempotent_and_a_change_bumps_the_version() {
 }
 
 // ── P1.3 / P2.1 ─────────────────────────────────────────────────────────────────────────
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn the_scientific_toolkit_publishes_as_a_draft() {
+    let _serial = SERIAL.lock().await;
+    let fixture = Fixture::new().await;
+    // The service's address is configured: the draft is the manifest's declared status, not an
+    // unconfigured-host accident (#560 P5.2).
+    support::set_env("CONVEYOR_EXTERNAL_SCIENTIFIC_URL", &fixture.stub.base);
+
+    let first = fixture.publish().await;
+    let scientific = outcomes(&first)
+        .into_iter()
+        .find(|(key, _, _)| key == "scientific")
+        .expect("the scientific row");
+    assert_eq!(
+        scientific,
+        ("scientific".to_owned(), "created".to_owned(), 1),
+        "{first}"
+    );
+    let (status, version) = fixture.toolkit_status("scientific").await;
+    assert_eq!((status.as_str(), version), ("draft", 1));
+
+    // A second publish of the same manifest is unchanged — one immutable version.
+    let second = fixture.publish().await;
+    let scientific = outcomes(&second)
+        .into_iter()
+        .find(|(key, _, _)| key == "scientific")
+        .expect("the scientific row");
+    assert_eq!(scientific.1, "unchanged");
+    assert_eq!(scientific.2, 1);
+
+    // A draft resolves no binding: the broker answers `409 tool_not_ready` before the destination.
+    fixture.bind("scientific", "read").await;
+    let hits = fixture.stub.hits();
+    let (code, body) = fixture
+        .call("scientific_stats.meta_analysis", json!({"studies": []}))
+        .await;
+    assert_eq!(code, 409, "{body}");
+    assert_eq!(body["type"], "tool_not_ready", "{body}");
+    assert_eq!(fixture.stub.hits(), hits, "no network call was made");
+}
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn an_unconfigured_toolkit_is_draft_and_uncallable() {

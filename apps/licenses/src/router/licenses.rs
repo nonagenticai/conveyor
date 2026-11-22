@@ -31,7 +31,7 @@ use crate::state::AppState;
 pub struct ActiveQuery {
     /// Tenant identifier
     pub tenant_id: Option<String>,
-    /// App key, e.g. 'n8n-gerard', 'kanban'
+    /// App key, e.g. 'work-management', 'board'
     pub app_key: Option<String>,
     /// OPTIONAL seat selector: the Keycloak `sub` claim OR the local subject id.
     pub subject_id: Option<String>,
@@ -61,7 +61,7 @@ fn missing(field: &str) -> Refusal {
     description = "Resolve the active license for (tenant_id, app_key). Response schema matches /license/introspect so callers can share a client.",
     params(
         ("tenant_id" = String, Query, description = "Tenant identifier"),
-        ("app_key" = String, Query, description = "App key, e.g. 'n8n-gerard', 'kanban'"),
+        ("app_key" = String, Query, description = "App key, e.g. 'work-management', 'board'"),
         ("subject_id" = Option<String>, Query, nullable, description = "OPTIONAL seat selector. Accepts EITHER the Keycloak 'sub' claim (what license-authz holds) OR the local Subject.id UUID. When it resolves to a subject holding an active license for (tenant_id, app_key), that exact license is returned; otherwise the deterministic tenant-level pick is used. Never causes a denial, and never widens the caller's tenant scope."),
         ("realm" = Option<String>, Query, nullable, description = "OPTIONAL Keycloak realm of the END USER the S2S caller (license-authz) is resolving for (migration 072, realm-per-app P0). When that realm has a `realm_owner` row, the tenant must be owned by that owner or carry an active `tenant_app_grant` to it, else 403 `realm_owner_mismatch`. A realm with no row, or no parameter, changes nothing. It can only NARROW what the caller's own authority admits — never widen it."),
         ("X-Tenant-Id" = Option<String>, Header, description = "Tenant identifier. Omit to accept the service-side default; when sent, it must be the caller's own tenant id.")

@@ -67,6 +67,7 @@ async fn the_builtin_catalogue_is_idempotent_and_a_pin_is_exact() {
             "capability",
             "role",
             "knowledge",
+            "memory",
             "project_card"
         ]
     );
@@ -82,8 +83,9 @@ async fn the_builtin_catalogue_is_idempotent_and_a_pin_is_exact() {
         !agent.definition.sections[4].required,
         "knowledge is optional"
     );
+    assert!(!agent.definition.sections[5].required, "memory is optional");
     assert!(
-        !agent.definition.sections[5].required,
+        !agent.definition.sections[6].required,
         "project/card is optional"
     );
 
