@@ -76,6 +76,9 @@ pub struct ToolManifest {
     pub key: String,
     /// The registry action the broker dispatches (`coding_jobs.create`).
     pub action: String,
+    /// Response fields the broker replaces with `[redacted]` (SPEC_V2 §11.3).
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub redact: Vec<String>,
     /// How the broker proves the write happened; absent only on non-writing tools (§11.3).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub verify: Option<VerifyManifest>,
@@ -403,6 +406,7 @@ mod tests {
             tools: vec![ToolManifest {
                 key: "jobs_create".to_owned(),
                 action: "coding_jobs.create".to_owned(),
+                redact: Vec::new(),
                 verify,
             }],
         }
@@ -456,11 +460,13 @@ mod tests {
                 ToolManifest {
                     key: "jobs_create".to_owned(),
                     action: "coding_jobs.create".to_owned(),
+                    redact: Vec::new(),
                     verify: None,
                 },
                 ToolManifest {
                     key: "jobs_get".to_owned(),
                     action: "coding_jobs.get".to_owned(),
+                    redact: Vec::new(),
                     verify: None,
                 },
             ],
@@ -473,5 +479,16 @@ mod tests {
             read_back: Some("jobs_get".to_owned()),
         });
         assert_ne!(content_hash(&unverified), content_hash(&verified));
+    }
+
+    /// Redaction is part of the tool declaration; changing it is a new manifest hash.
+    #[test]
+    fn a_redact_only_change_moves_the_content_hash() {
+        let mut redacted = coding_manifest(None);
+        redacted.tools[0].redact = vec!["token".to_owned()];
+        assert_ne!(
+            content_hash(&redacted),
+            content_hash(&coding_manifest(None))
+        );
     }
 }

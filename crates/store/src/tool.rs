@@ -471,6 +471,8 @@ pub struct NewTool<'a> {
     pub input_schema: &'a Value,
     /// The write verification declaration (§11.3); `{}` on a non-writing tool.
     pub verify: &'a Value,
+    /// The result fields the broker redacts (§11.3).
+    pub redact: &'a [String],
     /// The effect class copied from the action.
     pub effect: &'a str,
     /// 1..=300.
@@ -570,8 +572,8 @@ pub async fn insert_tool(
 ) -> Result<Uuid, ToolStoreError> {
     let (id,): (Uuid,) = sqlx::query_as(
         "INSERT INTO tool (tenant_id, toolkit_id, key, input_schema, effect, timeout_secs,
-                           handler_action, verify, status)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'published')
+                           handler_action, verify, redact, status)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 'published')
          RETURNING id",
     )
     .bind(tenant.as_uuid())
@@ -582,6 +584,7 @@ pub async fn insert_tool(
     .bind(tool.timeout_secs)
     .bind(tool.handler_action)
     .bind(tool.verify)
+    .bind(serde_json::json!(tool.redact))
     .fetch_one(conn)
     .await?;
     Ok(id)

@@ -293,6 +293,22 @@ impl Fixture {
         tx.commit().await.expect("commit the auth adapter");
     }
 
+    /// Declare the result fields the broker redacts (§11.3). The fixture seeds `[]` — the
+    /// state a tool published before the declaration had a home — so a test that wants a
+    /// redacted result names the fields here.
+    async fn set_redact(&self, fields: &[&str]) {
+        let mut tx = begin_scoped(&self.pg.owner, self.tenant)
+            .await
+            .expect("a scoped write");
+        sqlx::query("UPDATE tool SET redact = $2, updated_at = now() WHERE tenant_id = $1")
+            .bind(self.tenant.as_uuid())
+            .bind(json!(fields))
+            .execute(&mut *tx)
+            .await
+            .expect("set the tool's redact fields");
+        tx.commit().await.expect("commit the redact fields");
+    }
+
     /// Seal one tenant secret, exactly as a tenant's BYO credential is written. Two named
     /// secrets let a test prove WHICH one the engine opened.
     async fn seal_secret(&self, name: &str, value: &str) {
@@ -462,6 +478,36 @@ async fn a_bound_job_calls_coding_through_the_broker() {
     assert_eq!(
         body["output"]["path"], "/api/jobs",
         "the call reached the registered coding destination alias: {body}"
+    );
+
+    fixture.running.shutdown().await;
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_declared_redact_field_is_replaced() {
+    let _serial = SERIAL.lock().await;
+    let fixture = Fixture::new(
+        "coding",
+        "jobs.create",
+        "coding_jobs.create",
+        "write",
+        "write",
+        coding_schema(),
+    )
+    .await;
+    fixture.set_redact(&["output"]).await;
+
+    let (status, body) = fixture
+        .call(
+            "coding.jobs.create",
+            json!({"kind": "test", "input": {"files": []}}),
+        )
+        .await;
+
+    assert_eq!(status, 200, "the broker must dispatch: {body}");
+    assert_eq!(
+        body["output"], "[redacted]",
+        "the tool's declared field is replaced in the result: {body}"
     );
 
     fixture.running.shutdown().await;
