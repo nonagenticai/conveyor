@@ -156,6 +156,22 @@ window.CONVEYOR_DELIVERY = (function () {
       const line = value.line != null ? value.line : value.line_start;
       if (path && line != null) return `${path}:${line}`;
       if (path) return String(path);
+      // An artefact finding names the artefact and the section it lacks, plus the snapshot
+      // containers that were empty. Without this the register's package panel said "no evidence
+      // reference" for every one of the artefact packages.
+      if (value.artefact) {
+        const section = value.section ? ` · ${value.section}` : "";
+        const snapshot = list(value.snapshot)
+          .map((entry) =>
+            Array.isArray(entry)
+              ? entry.filter((part) => part != null && part !== "").join("#")
+              : evidenceText(entry),
+          )
+          .filter(Boolean)
+          .join(", ");
+        return `${value.artefact}${section}${snapshot ? ` (${snapshot})` : ""}`;
+      }
+      if (value.evidence) return evidenceText(value.evidence);
       if (value.subject) return evidenceText(value.subject);
       if (value.detail) return evidenceText(value.detail);
       return "";
@@ -1694,6 +1710,42 @@ window.CONVEYOR_DELIVERY = (function () {
   // The generated standards record. Every MSP/TOGAF/SAFe/PMP artefact is a row with a status and
   // a published page; an absent or partial artefact names the package that must close. The rail
   // never invents an artefact: no record means "not published", not an empty set of green chips.
+  // L2's roll-up: every project's own artefact record, worst first. The programme rail lists the
+  // programme's artefacts; this answers "which projects carry the missing work" without opening
+  // each project. The count includes the project's phase, architecture-artefact and card pages.
+  function projectArtefactRollup(standards, projects) {
+    const artefacts = list(standards && standards.artefacts);
+    if (!artefacts.length) return "";
+    const rows = list(projects)
+      .map((project) => {
+        const mine = artefacts.filter(
+          (artefact) => (artefact.subject || {}).project_key === project.key,
+        );
+        return {
+          project,
+          total: mine.length,
+          evidenced: mine.filter((artefact) => artefact.status === "evidenced").length,
+          absent: mine.filter((artefact) => artefact.status === "absent").length,
+        };
+      })
+      .filter((row) => row.total > 0)
+      .sort(
+        (left, right) =>
+          right.absent - left.absent || String(left.project.key).localeCompare(String(right.project.key)),
+      );
+    if (!rows.length) return "";
+    const shown = rows.slice(0, 12).map(
+      (row) =>
+        `<a class="rail-chip std-chip" href="#projects/${esc(row.project.id)}"><b>${esc(
+          row.project.key,
+        )}</b> ${row.evidenced}/${row.total} evidenced · ${row.absent} absent</a>`,
+    );
+    if (rows.length > 12) shown.push(`<span class="rail-chip">+${rows.length - 12} projects</span>`);
+    return `<div class="delivery-rail std-rail"><span class="rail-label">Project artefact record</span><div class="rail-chips">${shown.join(
+      "",
+    )}</div></div>`;
+  }
+
   function standardsSummary(standards) {
     const artefacts = list(standards && standards.artefacts);
     if (!artefacts.length) {
@@ -1751,18 +1803,26 @@ window.CONVEYOR_DELIVERY = (function () {
       .map((standard) => {
         const items = groups
           .get(standard)
-          .map(
-            (artefact) =>
-              `<li><a class="std-link ${esc(artefact.status)}" href="docs/standards/${esc(
-                artefact.id,
-              )}.html">${esc(artefact.category)} · ${esc((artefact.subject || {}).title || "—")}</a><span class="std-state">${esc(
-                artefact.status,
-              )}</span>${
-                artefact.status === "evidenced"
-                  ? ""
-                  : `<code class="std-package">${esc(artefact.package_key || "no package")}</code>`
-              }</li>`,
-          )
+          .map((artefact) => {
+            const missing = list(artefact.sections)
+              .filter((section) => section && section.status !== "evidenced")
+              .map((section) => section.heading)
+              .filter(Boolean);
+            const missingText = missing.length
+              ? `<small class="std-missing">missing: ${esc(
+                  missing.slice(0, 6).join(", "),
+                )}${missing.length > 6 ? ` +${missing.length - 6}` : ""}</small>`
+              : "";
+            return `<li><a class="std-link ${esc(artefact.status)}" href="docs/standards/${esc(
+              artefact.id,
+            )}.html">${esc(artefact.category)} · ${esc((artefact.subject || {}).title || "—")}</a><span class="std-state">${esc(
+              artefact.status,
+            )}</span>${
+              artefact.status === "evidenced"
+                ? ""
+                : `<code class="std-package">${esc(artefact.package_key || "no package")}</code>`
+            }${missingText}</li>`;
+          })
           .join("");
         return `<div class="std-group"><span class="std-standard">${esc(standard)}</span><ul class="std-links">${items}</ul></div>`;
       })
@@ -1797,6 +1857,7 @@ window.CONVEYOR_DELIVERY = (function () {
     scorecard,
     standardsSummary,
     artefactRail,
+    projectArtefactRollup,
     governanceLine,
     projectGovernance,
     executionPanel,
