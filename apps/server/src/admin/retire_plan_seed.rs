@@ -100,6 +100,9 @@ async fn archive_one(
                 "input": input,
                 "proposed_input": input,
                 "description": "conveyor admin retire-plan-seed",
+                // The gate's subject is the seeded card, not a typed document; an operator
+                // running the retire command records that explicitly (v1-u5a-approvals-1).
+                "evidence_waiver_reason": "conveyor admin retire-plan-seed: the gate's subject is the seeded card, not a document",
             }),
             None,
         )
