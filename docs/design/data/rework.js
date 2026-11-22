@@ -7864,7 +7864,7 @@ window.CONVEYOR_REWORK = {
       "baseline": {
         "disposition": "mixed",
         "earliest_expires": "2027-02-18",
-        "entries": 6,
+        "entries": 9,
         "owners": [
           "programme owner"
         ]
@@ -7892,6 +7892,9 @@ window.CONVEYOR_REWORK = {
             "T11",
             "T16",
             "T7",
+            "S09",
+            "T13",
+            "T14",
             "live project meta"
           ]
         }
@@ -7904,7 +7907,7 @@ window.CONVEYOR_REWORK = {
       "spec": "§5.3",
       "standard": "SPEC",
       "status": "open",
-      "subject_count": 6,
+      "subject_count": 9,
       "subjects": [
         {
           "detail": "seed status 'closed' != live status 'active'",
@@ -7955,6 +7958,36 @@ window.CONVEYOR_REWORK = {
           "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
           "subject": "T7"
+        },
+        {
+          "detail": "seed status 'active' != live status 'closed'",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "S09"
+        },
+        {
+          "detail": "seed status 'active' != live status 'closed'",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "T13"
+        },
+        {
+          "detail": "seed status 'active' != live status 'closed'",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "T14"
         },
         {
           "detail": "adm_phase is absent from the live meta for DESIGN-PUBLISH, P0, PLATFORM, S00, S01, S02, S03, S04, S05, S06, S06a, S06b, S06c, S06d, S07, S08, S09, S10, S11, S12, S13, S14, S15, S16, S17, S18, S19, S20, S21, SPEC-V2, T0, T1, T10, T11, T12, T13, T14, T15, T16, T17, T2, T3, T4, T5, T6, T7, T8, T9",
@@ -29793,10 +29826,10 @@ window.CONVEYOR_REWORK = {
     },
     "SPEC": {
       "findings": 89,
-      "gaps": 38,
+      "gaps": 41,
       "p0": 0,
       "p1": 5,
-      "p2": 33,
+      "p2": 36,
       "packages": 110,
       "rules": 8,
       "rules_clean": 2,
@@ -29838,7 +29871,7 @@ window.CONVEYOR_REWORK = {
     "open": 329,
     "packages": 332,
     "resolved": 11,
-    "subjects": 430,
+    "subjects": 433,
     "suppressed": 3
   }
 };

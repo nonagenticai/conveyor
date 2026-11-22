@@ -137,6 +137,9 @@ pub enum RunStoreError {
     /// A run that names a release must name the binding that pins it.
     #[error("a run that names a release must name its job binding")]
     ReleaseWithoutBinding,
+    /// The run already executes under a different capability/agent than the binding names.
+    #[error("the run already executes under a different executor configuration")]
+    ExecutorMismatch,
     /// The named binding does not exist in this tenant.
     #[error("the job binding does not exist in this tenant")]
     BindingNotFound,
@@ -962,6 +965,10 @@ pub struct RunContext {
     pub capability_id: Option<Uuid>,
     /// The capability agent configuration this run was resolved against.
     pub capability_agent_id: Option<Uuid>,
+    /// The job binding this run pins (T0, §4.4); `None` for an unbound run.
+    pub job_binding_id: Option<Uuid>,
+    /// The release the binding pins, when the run names one.
+    pub release_hash: Option<String>,
 }
 
 /// The raw columns [`get_run_context_tx`] reads, before the status is parsed.
@@ -977,6 +984,8 @@ struct RunContextRow {
     process_id: Option<Uuid>,
     capability_id: Option<Uuid>,
     capability_agent_id: Option<Uuid>,
+    job_binding_id: Option<Uuid>,
+    release_hash: Option<String>,
 }
 
 /// Read one run's executor-relevant facts inside the caller's scoped transaction.
@@ -987,7 +996,7 @@ pub async fn get_run_context_tx(
 ) -> Result<Option<RunContext>, RunStoreError> {
     let row: Option<RunContextRow> = sqlx::query_as(
         "SELECT id, status, attempt, card_id, project_id, correlation_id, inputs, process_id,
-                capability_id, capability_agent_id
+                capability_id, capability_agent_id, job_binding_id, release_hash
                FROM run
               WHERE tenant_id = $1 AND id = $2",
     )
@@ -1011,7 +1020,54 @@ pub async fn get_run_context_tx(
         process_id: row.process_id,
         capability_id: row.capability_id,
         capability_agent_id: row.capability_agent_id,
+        job_binding_id: row.job_binding_id,
+        release_hash: row.release_hash,
     }))
+}
+
+/// Bind the run's executor configuration from its job binding (S21 step 4, ADR 0010).
+///
+/// A `runs.create` run names its binding but carries no `capability_agent`, because the binding
+/// is what supplies one. This fills the two columns the prompt facts and the loop read; a run
+/// that already names a *different* capability or agent is refused rather than overwritten.
+pub async fn bind_executor_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    run_id: Uuid,
+    capability_id: Option<Uuid>,
+    capability_agent_id: Option<Uuid>,
+) -> Result<(), RunStoreError> {
+    let updated = sqlx::query(
+        "UPDATE run
+            SET capability_id = CASE WHEN capability_id IS NULL THEN $3 ELSE capability_id END,
+                capability_agent_id = CASE WHEN capability_agent_id IS NULL THEN $4
+                                           ELSE capability_agent_id END,
+                updated_at = now()
+          WHERE tenant_id = $1 AND id = $2
+            AND (capability_id IS NULL OR $3 IS NULL OR capability_id = $3)
+            AND (capability_agent_id IS NULL OR $4 IS NULL OR capability_agent_id = $4)",
+    )
+    .bind(tenant.as_uuid())
+    .bind(run_id)
+    .bind(capability_id)
+    .bind(capability_agent_id)
+    .execute(&mut *conn)
+    .await?;
+    if updated.rows_affected() == 0 {
+        let exists: bool = sqlx::query_scalar(
+            "SELECT EXISTS (SELECT 1 FROM run WHERE tenant_id = $1 AND id = $2)",
+        )
+        .bind(tenant.as_uuid())
+        .bind(run_id)
+        .fetch_one(&mut *conn)
+        .await?;
+        return Err(if exists {
+            RunStoreError::ExecutorMismatch
+        } else {
+            RunStoreError::NotFound
+        });
+    }
+    Ok(())
 }
 
 /// Fail every run whose driving `run.execute` job is dead.
