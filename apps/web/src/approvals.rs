@@ -114,23 +114,45 @@ async fn attempt(
         }
     }
 
-    let requested = ctx
+    let request = json!({
+        "gate": action,
+        "kind": "action",
+        "action": action,
+        // The input the target is computed from, and the same document kept for the
+        // approver to read. They are intentionally the same value: what is approved is
+        // what runs.
+        "input": input,
+        "proposed_input": input,
+        "description": format!("{action} from the console"),
+    });
+    let mut requested = ctx
         .invoke(
             "approvals.request",
-            json!({
-                "gate": action,
-                "kind": "action",
-                "action": action,
-                // The input the target is computed from, and the same document kept for the
-                // approver to read. They are intentionally the same value: what is approved is
-                // what runs.
-                "input": input,
-                "proposed_input": input,
-                "description": format!("{action} from the console"),
-            }),
+            request.clone(),
             InvokeOptions::default(),
         )
         .await;
+    // The minimal bridge of conveyor#526 — not the T18 design. A gate for a destructive action
+    // now refuses to open without typed evidence (`422 gate_evidence_missing`) and the console
+    // has no picker yet, so on exactly that refusal the operator is asked for the explicit §5.4
+    // waiver reason and the same request is retried ONCE with it. A cancel, a blank answer or
+    // any other refusal returns the original error unchanged: no waiver is invented, and a
+    // non-evidence failure never grows one. #572 replaces this prompt with the typed-evidence
+    // picker.
+    if requested
+        .as_ref()
+        .err()
+        .is_some_and(is_gate_evidence_missing)
+        && let Some(reason) = waiver_reason(action)
+    {
+        let mut retried = request;
+        if let Some(object) = retried.as_object_mut() {
+            object.insert("evidence_waiver_reason".to_owned(), json!(reason));
+        }
+        requested = ctx
+            .invoke("approvals.request", retried, InvokeOptions::default())
+            .await;
+    }
     let requested = match requested {
         Ok(invocation) => invocation,
         Err(error) => return Destructive::Failed(error),
@@ -231,6 +253,47 @@ async fn call(
         Ok(_) => Destructive::Done,
         Err(error) => Destructive::Failed(error),
     }
+}
+
+/// The sentence the engine's `422 gate_evidence_missing` problem document carries.
+///
+/// `ApiError::Invalid` keeps a problem document's `detail` but not its `type` slug
+/// (`crate::api::problem` drops it), so the code itself is not available to this module. Both
+/// emitters of the code — `resolve_evidence` and the PM gate request in
+/// `crates/actions/src/pm/mod.rs` — say this sentence, so matching it is the smallest faithful
+/// read of the existing field. If the wording changes, this bridge stops prompting and the
+/// action still fails; #572 removes the bridge altogether.
+const GATE_EVIDENCE_MISSING_DETAIL: &str = "at least one typed evidence reference";
+
+/// Whether a failed call is the server's `422 gate_evidence_missing` refusal.
+fn is_gate_evidence_missing(error: &ApiError) -> bool {
+    matches!(
+        error,
+        ApiError::Invalid { detail, .. } if detail.contains(GATE_EVIDENCE_MISSING_DETAIL)
+    )
+}
+
+/// Ask the operator for the evidence waiver reason the approval will store.
+///
+/// `window.prompt` answers `Some("")` for an empty OK and `None` for Cancel/ESC, and a blank
+/// reason is not a waiver the server accepts — so a blank answer is rejected and asked once
+/// more, and a second blank (or any cancel) returns `None`. A blank reason is never sent.
+fn waiver_reason(action: &str) -> Option<String> {
+    let question = format!(
+        "{action} is gated but names no evidence. Why does this gate carry none? Your reason is \
+         stored on the approval; Cancel keeps the refusal."
+    );
+    for _ in 0..2 {
+        let answered = web_sys::window()?
+            .prompt_with_message(&question)
+            .ok()
+            .flatten()?;
+        let reason = answered.trim();
+        if !reason.is_empty() {
+            return Some(reason.to_owned());
+        }
+    }
+    None
 }
 
 fn short(id: &str) -> String {
