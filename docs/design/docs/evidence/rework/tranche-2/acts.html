@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>Tranche 2 / PI 2 — the rework record (2026-11-21) · conveyor documents</title>
+    <link rel="icon" href="../../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/tranche-2/acts.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="tranche-2--pi-2--the-rework-record-2026-11-21">Tranche 2 / PI 2 — the rework record (2026-11-21)</h1>
+<p>Delegation: <code>01a1ff1f-e4ba-72dc-9c1a-13049933cf14</code> (the U5 extension of the standing delegation). Tranche: <code>01a1e9e0-e2ac-786b-ac48-3b8bcdf12188</code> (state <code>authorised</code> at 2026-11-21T19:51:16Z by the tranche-1 <code>continue</code> review <code>01a1ffa9-c06f-7921-9d6b-611d871ce6cc</code>). PI period: <code>tranche-2</code>. Programme: <code>01a1d039-0d24-7d16-ae52-4841e96ccfac</code>.</p>
+<h2 id="why-this-tranche-is-retrospective">Why this tranche is retrospective</h2>
+<p>Both of its projects are already recorded as delivered: S03 closed its V1 slice and T2 closed the decision ladder. What was never recorded is the programme's own evidence for them — charter, scope baseline, delivery contract, the A–D artefacts, a Phase-G review and a closure review. This batch writes that record from each project's plan and its code at HEAD, and re-closes each project through the one gate.</p>
+<p>T2 is additionally one of the four live-register <code>closed_without_closure_review</code> projects: its closure has no review at all, so it is reopened before it is re-closed.</p>
+<h2 id="the-acts">The acts</h2>
+<table>
+<thead>
+<tr>
+<th>act</th>
+<th>action</th>
+<th>row</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PI cadence</td>
+<td><code>cadences.create</code></td>
+<td><code>01a2004a-51f4-7482-b5f8-455a4bd371b5</code></td>
+</tr>
+<tr>
+<td>backlog refinement</td>
+<td><code>cadences.create</code></td>
+<td><code>01a2004a-739d-717e-81dd-15ddf37f4c2f</code></td>
+</tr>
+<tr>
+<td>system demo</td>
+<td><code>cadences.create</code></td>
+<td><code>01a2004a-87d8-77e9-b06a-171361548e38</code></td>
+</tr>
+<tr>
+<td>inspect and adapt</td>
+<td><code>cadences.create</code></td>
+<td><code>01a2004a-9c9a-7999-bbbd-9976427009b6</code></td>
+</tr>
+</tbody>
+</table>
+<p>Each write was read back through <code>cadences.list</code> and its id matched in the returned rows; the live list shows 12 cadence rows, four of them for <code>tranche-2</code>.</p>
+<h2 id="the-pi-artefacts">The PI artefacts</h2>
+<table>
+<thead>
+<tr>
+<th>artefact</th>
+<th>row</th>
+<th>published</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PI plan (published)</td>
+<td><code>01a20051-62d5-76b5-9c22-a298c4c31c46</code></td>
+<td>2026-11-21T22:54:58Z</td>
+</tr>
+<tr>
+<td>PI objectives (published)</td>
+<td><code>01a20052-1d3e-71e4-9490-f531e1592cc0</code></td>
+<td>2026-11-21T22:55:19Z</td>
+</tr>
+</tbody>
+</table>
+<p>Both were composed through the branch binary (<code>--local-bin</code>) because the deployed image's compiled-in output standard does not carry the <code>pi-plan</code> and <code>pi-objectives</code> categories: the same payload through the deployed engine is refused 422 with <code>unknown_category</code> in <code>errors[]</code>. Publication used <code>documents.publish</code> with the composed version as <code>If-Match</code>.</p>
+<h2 id="residue-that-must-be-cleaned-up">Residue that must be cleaned up</h2>
+<p>Two probe documents were created while diagnosing the category refusal and could not be deleted from this session: <code>documents.delete</code> is <code>effect = destructive</code> with <code>approval_target = target_documents_delete</code>, so removing them needs a destructive approval.</p>
+<table>
+<thead>
+<tr>
+<th>probe</th>
+<th>id</th>
+<th>state</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>probe-minimal</code> (no category)</td>
+<td><code>01a20050-8a6e-7597-b91f-9dbefe610535</code></td>
+<td>unpublished, body <code>probe</code></td>
+</tr>
+<tr>
+<td><code>probe-evidence</code> (category <code>evidence</code>)</td>
+<td><code>01a20051-1199-754d-aafc-4c797ccc75d3</code></td>
+<td>unpublished, body <code>probe</code></td>
+</tr>
+</tbody>
+</table>
+<p>Neither is publishable, so neither can reach the public pack; both should be deleted at the next destructive-approval window.</p>
+<h2 id="the-lifecycle-ran-against-an-in-pod-snapshot">The lifecycle ran against an in-pod snapshot</h2>
+<p><code>scripts/rework-project.py</code> builds its review snapshot with <code>$PROGRAMME_RECORD_BIN</code>, and that build fails on the live primary: the branch is at <code>0063_tool_verify</code> and the database at <code>0061_contract_requester</code>, so the branch query reads <code>departments.archetype</code>, which <code>0062_release_layers</code> adds. The batch therefore built each snapshot with the <strong>deployed</strong> engine in a one-off pod (<code>tr2-snapshot</code>, restricted security context, <code>emptyDir</code>, <code>envFrom conveyor-secrets</code>), copied it out, and ran a local copy of the runner that reads that directory and rebuilds it through the same pod command after each write. Nothing was migrated out of band and nothing in <code>scripts/</code> was changed on the branch.</p>
+<p>Both projects ran: S03 and T2 each reopened, chartered, contract requested and approved, seven Phase A–D artefacts created and approved, baseline taken, Phase-G review recorded, three outputs composed and published, WBS recorded and the demo credit issued. The full act list is in <code>S03/transcript.jsonl</code> and <code>T2/transcript.jsonl</code> in this directory.</p>
+<h2 id="the-manifests-are-red-and-the-tranche-is-paused">The manifests are red, and the tranche is paused</h2>
+<p>Run at the 23:17Z snapshot (<code>7ff27efd</code>):</p>
+<table>
+<thead>
+<tr>
+<th>project</th>
+<th>verdict</th>
+<th>failing checks</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>S03</td>
+<td>red, 5</td>
+<td>contract, review, closure gate, demo credit, lessons</td>
+</tr>
+<tr>
+<td>T2</td>
+<td>red, 4</td>
+<td>contract, review, demo credit, lessons</td>
+</tr>
+</tbody>
+</table>
+<p>Both projects are active. <code>projects.close</code> is refused while a Phase-G review is <code>non_conformant</code> and no active waiver covers it, and the tenant has no accepting owner other than its two service principals and a test identity — so no honest waiver can be signed.</p>
+<p>Tranche 2's review is therefore recorded as <strong>pause</strong> (<code>01a2006c-8f71-733d-a562-103c144882ce</code>, decided by <code>conveyor-approver</code> on the requester's gate; the tranche is <code>paused</code>, tranche 3 stays <code>planned</code>). The review document is published as <code>01a2006a-8db7-764e-9b21-fee33e71e815</code>.</p>
+<h2 id="the-acts-of-this-batch">The acts of this batch</h2>
+<table>
+<thead>
+<tr>
+<th>act</th>
+<th>action</th>
+<th>row</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PI cadence</td>
+<td><code>cadences.create</code></td>
+<td><code>01a2004a-51f4-7482-b5f8-455a4bd371b5</code></td>
+</tr>
+<tr>
+<td>backlog refinement</td>
+<td><code>cadences.create</code></td>
+<td><code>01a2004a-739d-717e-81dd-15ddf37f4c2f</code></td>
+</tr>
+<tr>
+<td>system demo</td>
+<td><code>cadences.create</code></td>
+<td><code>01a2004a-87d8-77e9-b06a-171361548e38</code></td>
+</tr>
+<tr>
+<td>inspect and adapt</td>
+<td><code>cadences.create</code></td>
+<td><code>01a2004a-9c9a-7999-bbbd-9976427009b6</code></td>
+</tr>
+<tr>
+<td>PI plan</td>
+<td><code>documents.compose</code> + <code>documents.publish</code></td>
+<td><code>01a20051-62d5-76b5-9c22-a298c4c31c46</code></td>
+</tr>
+<tr>
+<td>PI objectives</td>
+<td><code>documents.compose</code> + <code>documents.publish</code></td>
+<td><code>01a20052-1d3e-71e4-9490-f531e1592cc0</code></td>
+</tr>
+<tr>
+<td>tranche review</td>
+<td><code>tranches.review</code> (approval <code>01a2006b-6ffb-7a76-95ad-73cbae124869</code>)</td>
+<td><code>01a2006c-8f71-733d-a562-103c144882ce</code></td>
+</tr>
+<tr>
+<td>tranche review (corrected)</td>
+<td><code>documents.update</code> + <code>documents.publish</code></td>
+<td><code>01a2006a-8db7-764e-9b21-fee33e71e815</code> v2, republished 2026-11-21T23:25:57Z</td>
+</tr>
+</tbody>
+</table>
+<p>The review document was corrected at v2 after the lane head moved: <code>v1-t2-3</code> (fcb96fa9) and <code>v1-t2-6</code> (1167127d) are resolved with their tests, and <code>v1-s12-1</code> (8f1e5770) is resolved locally with its Playwright run pending the PR's web CI. The pause decision is unchanged: it rests on the red manifests and the refused closures, neither of which those resolutions touch.</p>
+<h2 id="the-manifest-verdicts-are-only-as-good-as-the-snapshot">The manifest verdicts are only as good as the snapshot</h2>
+<p>The S03/T2 verdicts in <code>docs/evidence/rework/{S03,T2}.json</code> were taken by the branch verifier against a snapshot built by the DEPLOYED engine. That projection is older than the branch's: it omits <code>architecture_contract.requested_by</code>, omits <code>document.published_at</code>, and returned no demo-credit rows. Three of the reported failures (contract, review, demo credit) are therefore snapshot artefacts, not defects in the live record; the live contract, review and credit all satisfy their properties. The real gaps are S03's unrun closure and T2's <code>non_conformant</code> review level. The branch's snapshot does select the three fields but cannot be built against the live <code>0061</code> schema, so this tranche's acceptance evidence is reproducible only after the lane's migrations are applied.</p>
+<p>The tranche review document records both corrections and was republished to v3.</p>
+<h2 id="what-the-pause-cost-found-by-using-it">What the pause cost, found by using it</h2>
+<p>S03's record is complete and its Phase-G review is <code>compliant</code>, so it should close. It cannot: <code>projects.close</code> requires the project's tranche to be <code>authorised</code>, <code>in_review</code> or <code>closed</code>, and tranche 2 is <code>paused</code>. There is no resume action, and a tranche can be reviewed only once. The pause this batch recorded honestly, because the exit criteria were not met, is therefore a one-way door that freezes the projects it was meant to gate. Recorded as <code>v1-tr2-1</code> (P1, owner T1) with the three evidence lines; it is a product gap, not a data problem, and no SQL was used to work around it.</p>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/rework/tranche-2/acts.md</code> at build time.</span>
+      <a href="../../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

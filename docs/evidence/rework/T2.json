@@ -4,10 +4,10 @@
       "allowed": false,
       "check": "project",
       "description": "T2 is closed",
-      "detail": "project T2 is active",
+      "detail": "status is 'active', expected 'closed'",
       "id": "T2-project",
       "kind": "snapshot",
-      "result": "pass",
+      "result": "fail",
       "severity": "P0"
     },
     {
@@ -48,20 +48,20 @@
       "allowed": false,
       "check": "contract",
       "description": "a live board-approved delivery contract exists",
-      "detail": "the live contract lacks an approval or a distinct requester/approver",
+      "detail": "contract 01a2005a-7886-7f2d-9b49-53d174544ee9 approved by 01a1e8a7-8b23-76a9-9114-aafb95f7a545, requested by 01a1e607-17d9-77d3-98d3-a43a87c4633d",
       "id": "T2-contract",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
       "allowed": false,
       "check": "review",
       "description": "the Phase-G review cites a published standing delegation",
-      "detail": "the review's delegation_ref is missing or does not resolve to a published output",
+      "detail": "review 01a2005d-20eb-72af-a5de-4606c0b16008 cites the published delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
       "id": "T2-review",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
@@ -128,20 +128,20 @@
       "allowed": false,
       "check": "demo_credits",
       "description": "every accepted deliverable has a demo credit carrying its evidence",
-      "detail": "1 accepted deliverable(s) have no demo credit with evidence",
+      "detail": "1 accepted deliverable(s), each with a demo credit",
       "id": "T2-demo-credits",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
       "allowed": false,
       "check": "lessons",
       "description": "the tranche retro produced at least one lesson",
-      "detail": "the tranche-2 retro produced no lesson",
+      "detail": "7 lesson(s) from the tranche-2 retro",
       "id": "T2-lessons",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P1"
     },
     {
@@ -156,22 +156,19 @@
     }
   ],
   "failures": [
-    "T2-contract (P0): the live contract lacks an approval or a distinct requester/approver",
-    "T2-review (P0): the review's delegation_ref is missing or does not resolve to a published output",
-    "T2-demo-credits (P0): 1 accepted deliverable(s) have no demo credit with evidence",
-    "T2-lessons (P1): the tranche-2 retro produced no lesson"
+    "T2-project (P0): status is 'active', expected 'closed'"
   ],
   "gate": "a rule, a laya decision and a human decision produce the same audit shape; a tenant refinement changes a threshold without a code change; every decision pins the refinement and laya config versions; a generated draft cannot transition a card",
-  "generated_at": "2026-11-21T23:21:32.027075+00:00",
+  "generated_at": "2026-11-22T00:11:58.485131+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T2.toml",
   "name": "Decision ladder",
   "project": "T2",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-21T23:17:59.733177403+00:00",
-    "git_sha": "7ff27efd",
-    "path": "retained-snapshot/7ff27efd"
+    "generated_at": "2026-11-21T23:27:35.116199+00:00",
+    "git_sha": "e55b92e050555c6acd2eefa9272a3721657d7de5",
+    "path": "retained-snapshot/e55b92e050555c6acd2eefa9272a3721657d7de5"
   },
   "verdict": "red",
   "warnings": []
