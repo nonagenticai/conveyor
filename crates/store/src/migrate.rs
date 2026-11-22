@@ -265,7 +265,11 @@ mod tests {
                 // #77 (T5): the kata loop — the pinned hypothesis, the candidates, the immutable
                 // held-out measurement and the per-target propagation rows
                 // (0067_kata.sql, SPEC_V2 §6.3, §9.3–§9.4, §12 T5).
-                (67, "kata".to_owned())
+                (67, "kata".to_owned()),
+                // v1-p82-3 (#526): `programme.shared_config` — the programme's shared values and
+                // the keys it locks against per-project override
+                // (0068_programme_shared_config.sql, SPEC_V2 §8.2).
+                (68, "programme shared config".to_owned())
             ],
             "the embedded migration set is {embedded:?}; a wrong sqlx::migrate! path or a \
              file outside the set changes it"
