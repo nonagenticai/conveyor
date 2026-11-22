@@ -786,9 +786,35 @@ async fn invoke_and_record(
         return Ok(());
     }
 
+    // `tools.call` is the broker's run-scoped action: the run and the step are properties of the
+    // execution, not of the step template. Inject them here, where the step's row is in hand; a
+    // template that names a different run is refused rather than silently redirected (#556).
+    let input = if row.action == crate::tools::TOOLS_CALL {
+        let mut input = row.input.clone();
+        let object = input
+            .as_object_mut()
+            .ok_or_else(|| StepFailure::failed("tools.call input is not a JSON object"))?;
+        if let Some(existing) = object.get("run_id") {
+            let matches = existing
+                .as_str()
+                .and_then(|text| Uuid::parse_str(text).ok())
+                == Some(row.run_id);
+            if !matches {
+                return Err(StepFailure::failed(
+                    "the step input's run_id does not name this run",
+                ));
+            }
+        }
+        object.insert("run_id".to_owned(), json!(row.run_id));
+        object.insert("step_id".to_owned(), json!(row.id));
+        input
+    } else {
+        row.input.clone()
+    };
+
     let request = InvokeRequest {
         action: row.action.clone(),
-        input: row.input.clone(),
+        input,
         // The precondition is the input's reserved `_version` member; `invoke` strips it itself
         // (CONTRACT §6), so the executor never touches it.
         precondition: None,

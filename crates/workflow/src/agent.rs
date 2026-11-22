@@ -11,7 +11,7 @@
 //! 300 s; a caller may lower one, never raise it above the ceiling, and hitting one fails **typed**
 //! (`agent.turn_limit`, `agent.tool_limit`, `agent.timeout`) — never a silent stop (S13 §8 trap 5).
 
-use std::collections::VecDeque;
+use std::collections::{BTreeMap, VecDeque};
 
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -121,6 +121,12 @@ pub struct AgentConfig {
     /// The tool schemas the model may name, built from the row's `allowed_actions`.
     #[serde(default)]
     pub tools: Vec<Value>,
+    /// The model-facing wire name → canonical `<toolkit>.<tool.key>` map for the run's bound
+    /// tools (SPEC_V2 §4.5). Empty when the agent may not call `tools.call` or the run grants no
+    /// toolkit. The map is resolved once by the executor and travels with the loop; a model call
+    /// to a key here is dispatched to `tools.call`, never to a registry action of that name.
+    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
+    pub broker_tools: BTreeMap<String, String>,
     /// Turns allowed; absent takes [`DEFAULT_TURNS`].
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub max_turns: Option<u8>,
@@ -384,6 +390,7 @@ pub struct Agent {
     caps: Caps,
     model: String,
     tools: Vec<Value>,
+    broker_tools: BTreeMap<String, String>,
     messages: Vec<Message>,
     prompt_ref: Option<String>,
     prompt_version: Option<String>,
@@ -405,6 +412,7 @@ impl Agent {
             caps,
             model: config.model,
             tools: config.tools,
+            broker_tools: config.broker_tools,
             messages: config.messages,
             prompt_ref: config.prompt_ref,
             prompt_version: config.prompt_version,
@@ -447,6 +455,12 @@ impl Agent {
                     .or_else(|| tool.get("name").and_then(Value::as_str))
             })
             .collect()
+    }
+
+    /// The canonical `<toolkit>.<tool.key>` a bound wire name dispatches to, when the executor
+    /// resolved one. `None` means the name is an ordinary registry action.
+    pub fn broker_tool(&self, name: &str) -> Option<&str> {
+        self.broker_tools.get(name).map(String::as_str)
     }
 
     /// The `prompt_ref` the executor resolved.
