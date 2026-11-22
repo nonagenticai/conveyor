@@ -795,10 +795,14 @@ def computed_rows(
     programme_projects: dict[str, set[str]],
     category: str = "",
     phase: str | None = None,
+    *,
+    register: dict[str, Any] | None = None,
 ) -> list[dict[str, Any]]:
     msp = snapshot.get("msp") or {}
     architecture = snapshot.get("architecture") or {}
     programme_doc = snapshot.get("programme") or {}
+    if name == "gap-analysis":
+        return gap_analysis_rows(snapshot, register, subject)
     if name == "shared_config":
         return shared_config_rows(snapshot, subject)
     if name == "dependency_graph":
@@ -982,6 +986,82 @@ def resolve_documents(
     return source, bool(matched)
 
 
+def gap_analysis_rows(
+    snapshot: dict[str, Any], register: dict[str, Any] | None, subject: dict[str, Any],
+) -> list[dict[str, Any]]:
+    """The open gaps as one list (§8.1 gap analysis): rework, phase E and the MSP register.
+
+    Three measured sources. An open rework package is a gap; a suppressed or resolved record is
+    not. A required phase-E artifact type with no artefact that satisfies it is a gap; an
+    evidenced type is not. An MSP `register_items` row of kind `issue`/`dependency` that is not
+    closed is a gap; any other kind, or a closed row, is not. A project subject sees its own
+    packages and its own phase-E artefacts; a programme subject sees every open one.
+    """
+    msp = snapshot.get("msp") or {}
+    architecture = snapshot.get("architecture") or {}
+    is_project = str(subject.get("kind") or "") in {"project", "phase"}
+    project_ids = {
+        str(subject.get("project_id") or ""),
+        str(subject.get("id") or ""),
+        str(subject.get("project_key") or ""),
+        str(subject.get("key") or ""),
+    } - {""}
+    rows: list[dict[str, Any]] = []
+    for package in (register or {}).get("packages") or []:
+        if not isinstance(package, dict) or str(package.get("status") or "") != "open":
+            continue
+        if is_project:
+            applies_to = {
+                str(package.get("apply_to") or ""),
+                str(package.get("owner_project") or ""),
+            }
+            if str(package.get("scope") or "") != "programme" and not (applies_to & project_ids):
+                continue
+        rows.append({
+            "kind": "rework",
+            "id": str(package.get("key") or ""),
+            "title": str(package.get("title") or package.get("rule") or "rework package"),
+            "severity": str(package.get("severity") or ""),
+            "status": "open",
+        })
+    profile = (architecture.get("profiles") or [{}])[0]
+    requirements = profile.get("artifact_requirements") or {}
+    wanted = requirements.get("e") or requirements.get("E") or {}
+    names = {
+        str(row.get("key")): str(row.get("name") or row.get("key"))
+        for row in architecture.get("standard") or []
+    }
+    evidence = [
+        artifact for artifact in architecture.get("artifacts") or []
+        if str(artifact.get("phase_code") or "").lower() == "e"
+        and (not is_project or str(artifact.get("project_id") or "") in project_ids)
+    ]
+    for plateau in sorted(wanted):
+        for key in wanted[plateau] or []:
+            if any(artifact_satisfies_requirement(artifact, str(key)) for artifact in evidence):
+                continue
+            rows.append({
+                "kind": "phase_e",
+                "id": str(key),
+                "title": names.get(str(key), str(key)),
+                "status": "missing",
+            })
+    for item in msp.get("register_items") or []:
+        if not isinstance(item, dict):
+            continue
+        kind = str(item.get("kind") or "")
+        if kind not in {"issue", "dependency"}:
+            continue
+        if str(item.get("status") or "").lower() in {"closed", "resolved", "done"}:
+            continue
+        rows.append({
+            **item,
+            "kind": kind,
+            "title": str(item.get("title") or item.get("statement") or item.get("id") or kind),
+        })
+    return rows
+
+
 def resolve_section(
     heading: str,
     template: dict[str, Any],
@@ -990,6 +1070,7 @@ def resolve_section(
     snapshot: dict[str, Any],
     outputs_dir: Path,
     programme_projects: dict[str, set[str]],
+    register: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     sources = template.get("sources") or {}
     declared = sources.get(heading)
@@ -1034,7 +1115,7 @@ def resolve_section(
             elif kind == "computed":
                 rows = computed_rows(
                     str(source.get("name")), source, snapshot, subject, programme_projects,
-                    category, subject.get("phase"),
+                    category, subject.get("phase"), register=register,
                 )
                 resolved.append({
                     "kind": "computed", "name": str(source.get("name")),
@@ -1203,6 +1284,7 @@ def build_instances(
     snapshot: dict[str, Any],
     outputs_dir: Path,
     declared_phases: dict[str, str] | None = None,
+    register: dict[str, Any] | None = None,
 ) -> tuple[list[dict[str, Any]], dict[str, list[dict[str, Any]]]]:
     subjects = build_subjects(snapshot, declared_phases)
     programme_doc = snapshot.get("programme") or {}
@@ -1231,14 +1313,16 @@ def build_instances(
                 sections: list[dict[str, Any]] = []
                 for heading in required:
                     section = resolve_section(
-                        heading, template, category, subject, snapshot, outputs_dir, programme_projects
+                        heading, template, category, subject, snapshot, outputs_dir,
+                        programme_projects, register=register,
                     )
                     section["required"] = True
                     sections.append(section)
                 for heading in template.get("optional") or []:
                     if heading in (template.get("sources") or {}):
                         section = resolve_section(
-                            heading, template, category, subject, snapshot, outputs_dir, programme_projects
+                            heading, template, category, subject, snapshot, outputs_dir,
+                            programme_projects, register=register,
                         )
                         section["required"] = False
                         sections.append(section)
@@ -1758,7 +1842,7 @@ def generate(
     covered_keys: set[str] | None = None,
     declared_phases: dict[str, str] | None = None,
 ) -> tuple[dict[str, Any], dict[str, Any]]:
-    instances, _ = build_instances(std, snapshot, outputs_dir, declared_phases)
+    instances, _ = build_instances(std, snapshot, outputs_dir, declared_phases, register=register)
     findings = build_findings(instances, snapshot, covered_keys)
     if register is not None:
         packages = [package for package in register.get("packages") or [] if isinstance(package, dict)]
@@ -2211,6 +2295,60 @@ def self_test_demo_and_lessons_mandatory(outputs: Path, std: dict[str, Any]) -> 
     print("generate-standards: self-test case demo-and-lesson-absence-fails-once-mandatory OK")
 
 
+def self_test_gap_analysis(outputs: Path, std: dict[str, Any]) -> None:
+    """Open rework, phase-E gaps and msp register items are one computed gap list."""
+    fixture = safe_evidence_fixture()
+    subject = {"id": "pg1", "key": "pg1", "kind": "programme", "phase": ""}
+    register = {"packages": [
+        {"key": "v1-x-1:T0", "status": "open", "severity": "P1",
+         "title": "S04 has no closure review"},
+        {"key": "v1-x-2:T1", "status": "suppressed", "severity": "P1",
+         "title": "waived by the conformance owner"},
+    ]}
+    fixture["msp"]["register_items"] = [
+        {"id": "ri1", "kind": "issue", "status": "open",
+         "title": "The supplier SLA is unsigned"},
+        {"id": "ri2", "kind": "dependency", "status": "resolved",
+         "title": "The uplink is commissioned"},
+        {"id": "ri3", "kind": "risk", "status": "open", "title": "not a gap kind"},
+    ]
+    profile = fixture["architecture"]["profiles"][0]
+    profile["artifact_requirements"]["e"] = {"psa": ["solution_candidate"]}
+    fixture["architecture"]["standard"].append({
+        "key": "solution_candidate", "name": "Solution Candidate",
+        "phase_code": "e", "plateau": "psa",
+    })
+
+    rows = computed_rows(
+        "gap-analysis", {"name": "gap-analysis"}, fixture, subject, {},
+        "gap-analysis", None, register=register,
+    )
+    kinds = sorted(str(row.get("kind")) for row in rows)
+    assert kinds == ["issue", "phase_e", "rework"], (
+        f"the three gap kinds must resolve, got {rows}"
+    )
+    rework = next(row for row in rows if row.get("kind") == "rework")
+    assert rework["id"] == "v1-x-1:T0" and rework["severity"] == "P1", rework
+
+    # An evidenced phase-E type is not a gap; a closed or suppressed record is not one either.
+    fixture["architecture"]["artifacts"].append({
+        "id": "a9", "title": "Solution candidate", "artifact_kind": "solution_candidate",
+        "phase_code": "e", "plateau": "psa", "status": "approved", "project_id": "p1",
+    })
+    rows = computed_rows(
+        "gap-analysis", {"name": "gap-analysis"}, fixture, subject, {},
+        "gap-analysis", None, register=register,
+    )
+    assert "phase_e" not in [row.get("kind") for row in rows], rows
+
+    # No register and no register items: the section is absent, not an empty pass.
+    assert computed_rows(
+        "gap-analysis", {"name": "gap-analysis"}, self_test_fixture(), subject, {},
+        "gap-analysis", None,
+    ) == []
+    print("generate-standards: self-test case gap-analysis-resolves-open-gaps OK")
+
+
 def self_test() -> int:
     fixture = self_test_fixture()
     std = json.loads(STANDARD_PATH.read_text(encoding="utf-8"))
@@ -2258,6 +2396,7 @@ def self_test() -> int:
         self_test_safe_sources_evidenced(outputs, std)
         self_test_wsjf(outputs, std)
         self_test_demo_and_lessons_mandatory(outputs, std)
+        self_test_gap_analysis(outputs, std)
     print(f"generate-standards: self-test OK ({len(document['artefacts'])} artefact instances)")
     return 0
 
