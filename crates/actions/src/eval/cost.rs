@@ -24,11 +24,16 @@ use uuid::Uuid;
 
 /// Price one call's `usage` against the version's `prices`, in cents.
 ///
-/// `prices` is the version's free-form jsonb; the two keys this understands are `input` and
-/// `output`, US dollars per million tokens (the shape `eval_version.prices` carries in the
-/// domain's own tests). Anything else — no prices, a missing rate, a usage object that names no
-/// token counts — returns `None`, and the caller then reports **tokens** instead of cents rather
-/// than inventing a rate.
+/// `prices` is the version's free-form jsonb, in US dollars per million tokens. `input` and
+/// `output` are the full-rate classes; `cache_write` (tokens written into the prompt cache) and
+/// `cache_read` (tokens served from it) are the cache classes, and each is required **only when
+/// the usage carries that class's token count**. A cache class is priced at its own rate, never
+/// folded into the full-rate input: the provider prices a write above a miss and a read below it,
+/// so one rate for all three would make every cache optimisation invisible.
+///
+/// A row the rates cannot express — no prices, a missing rate for a class it used, a usage object
+/// that names no token counts — returns `None`. The caller then counts the row as **unpriced**
+/// rather than inventing a rate or calling the call free.
 pub(crate) fn price_usage(usage: &Value, prices: &Value) -> Option<f64> {
     let input_rate = prices.get("input").and_then(Value::as_f64)?;
     let output_rate = prices.get("output").and_then(Value::as_f64)?;
@@ -41,8 +46,24 @@ pub(crate) fn price_usage(usage: &Value, prices: &Value) -> Option<f64> {
         .or_else(|| usage.get("output_tokens"))
         .and_then(Value::as_f64)
         .unwrap_or(0.0);
+    let cache_write = usage
+        .get("cache_creation_input_tokens")
+        .and_then(Value::as_f64)
+        .unwrap_or(0.0);
+    let cache_read = usage
+        .get("cache_read_input_tokens")
+        .and_then(Value::as_f64)
+        .unwrap_or(0.0);
+    // ⛔ A class the row used and the version did not price is unpriced, not free.
+    let mut cache_cost = 0.0;
+    if cache_write > 0.0 {
+        cache_cost += cache_write * prices.get("cache_write").and_then(Value::as_f64)?;
+    }
+    if cache_read > 0.0 {
+        cache_cost += cache_read * prices.get("cache_read").and_then(Value::as_f64)?;
+    }
     // Cents: (tokens / 1e6) dollars * 100.
-    Some((input * input_rate + output * output_rate) / 10_000.0)
+    Some((input * input_rate + output * output_rate + cache_cost) / 10_000.0)
 }
 
 /// The unpriced fallback: how many tokens a call cost.
@@ -110,9 +131,10 @@ fn usage_of(call: &InferenceCallRow) -> Value {
 /// One ledger row's cost, in the unit the version prices in.
 ///
 /// `None` means the row cannot be expressed in that unit: the provider returned no usage at all
-/// (`unknown`), the call was a non-token surface, or a priced version has no rate for it.
-/// Cache-class rates are P3's refinement; a cache row still prices today because
-/// `prompt_tokens` is the full-rate count.
+/// (`unknown`), the call was a non-token surface, or a priced version has no rate for a class it
+/// used. A cache row prices by its class when the version declares `cache_write`/`cache_read`
+/// (P3), and is `None` — counted unpriced by the report — when it does not; it is never priced at
+/// the full-rate input by accident.
 pub(crate) fn price_call(call: &InferenceCallRow, prices: &Value, priced: bool) -> Option<f64> {
     if call.cache_status == "unknown" || call.usage_unit.is_some() {
         return None;

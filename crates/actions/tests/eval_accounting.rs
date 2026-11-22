@@ -326,16 +326,120 @@ async fn ledger_call(
     tx.commit().await.expect("commit");
 }
 
-async fn set_prices(pg: &support::Pg, tenant: TenantId, version_id: &str) {
+async fn set_prices(pg: &support::Pg, tenant: TenantId, version_id: &str, prices: Value) {
     let mut tx = begin_scoped(&pg.owner, tenant).await.expect("scope");
     sqlx::query("UPDATE eval_version SET prices = $3 WHERE tenant_id = $1 AND id = $2")
         .bind(tenant.as_uuid())
         .bind(Uuid::parse_str(version_id).expect("version uuid"))
-        .bind(json!({ "input": 3.0, "output": 15.0 }))
+        .bind(prices)
         .execute(&mut *tx)
         .await
         .expect("write the prices");
     tx.commit().await.expect("commit");
+}
+
+/// The ledger row the runner writes for one cache-class call: the class counts ride the usage
+/// object, and the stored class is derived from them exactly as `domain::inference` writes it.
+async fn ledger_cache_call(
+    pg: &support::Pg,
+    tenant: TenantId,
+    run_id: Uuid,
+    prompt_tokens: i32,
+    completion_tokens: i32,
+    cache_creation_tokens: i32,
+    cache_read_tokens: i32,
+) {
+    let cache_status = if cache_read_tokens > 0 {
+        "hit"
+    } else if cache_creation_tokens > 0 {
+        "write"
+    } else {
+        "miss"
+    };
+    let mut tx = begin_scoped(&pg.owner, tenant).await.expect("scope");
+    store::inference::insert_call_tx(
+        &mut tx,
+        tenant,
+        &NewInferenceCall {
+            action_invocation_id: None,
+            trace_id: None,
+            correlation_id: None,
+            caller_kind: "eval",
+            run_id: None,
+            run_step_id: None,
+            conversation_turn_id: None,
+            eval_run_id: Some(run_id),
+            prompt_ref: Some("eval:completions.create"),
+            prompt_version: None,
+            prompt_sha256: None,
+            model: "stub-model",
+            served_model: None,
+            usage: Some(Usage {
+                prompt_tokens,
+                completion_tokens,
+                total_tokens: prompt_tokens
+                    + completion_tokens
+                    + cache_creation_tokens
+                    + cache_read_tokens,
+                cache_creation_input_tokens: cache_creation_tokens,
+                cache_read_input_tokens: cache_read_tokens,
+            }),
+            cache_status,
+            usage_unit: None,
+            usage_units: None,
+            latency_ms: 3,
+            outcome: "ok",
+        },
+    )
+    .await
+    .expect("insert a ledger row");
+    tx.commit().await.expect("commit");
+}
+
+/// Start a climb against `eval_id`, optionally under `cost_ceiling_cents`.
+async fn start_climb(
+    running: &support::Running,
+    eval_id: &str,
+    cost_ceiling_cents: Option<i32>,
+) -> (u16, Value) {
+    let mut body = json!({
+        "eval_id": eval_id,
+        "goal": { "target": "pass", "direction": "higher" },
+        "stopping": "plateau",
+        "plateau_k": 5,
+        "delta": DELTA,
+        "reps": 1,
+        "approve_each_round": false,
+    });
+    if let Some(ceiling) = cost_ceiling_cents {
+        body["cost_ceiling_cents"] = json!(ceiling);
+    }
+    running
+        .invoke("eval_climbs.start", TOKEN, body, None, None, None)
+        .await
+}
+
+/// One content round with its pre-registered prediction.
+async fn content_round(running: &support::Running, climb_id: &str) -> (u16, Value) {
+    running
+        .invoke(
+            "eval_climbs.round",
+            TOKEN,
+            json!({
+                "id": climb_id,
+                "change_md": "the instrument unchanged; the ceiling is what stops the climb",
+                "prediction": {
+                    "metric": "pass",
+                    "direction": "higher",
+                    "interval": [DELTA, 0.9],
+                    "falsifier": "the measured mean stays inside the noise band",
+                },
+            }),
+            None,
+            None,
+            None,
+        )
+        .await
 }
 
 async fn run_of(pg: &support::Pg, tenant: TenantId, eval_id: &str, variant: &str) -> Uuid {
@@ -363,7 +467,13 @@ async fn the_report_and_the_climb_agree_to_the_cent_on_the_same_model() {
     let seeded = support::seed(&pg, "dev-a", "alice", "Alice").await;
     let running = support::Running::start(&pg).await;
     let (eval_id, version_id) = ready_instrument(&running).await;
-    set_prices(&pg, seeded.tenant, &version_id).await;
+    set_prices(
+        &pg,
+        seeded.tenant,
+        &version_id,
+        json!({ "input": 3.0, "output": 15.0 }),
+    )
+    .await;
 
     // ── the climb: quality goal, plan signed, a baseline to measure against ──
     let (status, body) = running
@@ -512,7 +622,13 @@ async fn a_regrade_charges_the_subject_once() {
     let seeded = support::seed(&pg, "dev-a", "alice", "Alice").await;
     let running = support::Running::start(&pg).await;
     let (eval_id, version_id) = ready_instrument(&running).await;
-    set_prices(&pg, seeded.tenant, &version_id).await;
+    set_prices(
+        &pg,
+        seeded.tenant,
+        &version_id,
+        json!({ "input": 3.0, "output": 15.0 }),
+    )
+    .await;
 
     let (status, body) = running
         .invoke(
@@ -650,4 +766,183 @@ async fn a_regrade_charges_the_subject_once() {
         "one subject charge across the source and the regrade: {spend}"
     );
     assert_eq!(body["output"]["spend_unit"], "cents", "{body}");
+}
+
+/// P3.1 — a cache row is priced by its class, or counted unpriced when the class has no rate.
+///
+/// The ledger row is one subject call: 1000 full-rate prompt + 500 completion tokens, 2000
+/// cache-write tokens and 4000 cache-read tokens. At `{input: 3, output: 15}` the row's spend
+/// cannot be expressed in cents — it must be counted in `unpriced`, never silently priced as if
+/// every token were full-rate input. Adding the cache classes (`cache_write: 3.75`,
+/// `cache_read: 0.3`, dollars per million) makes the same row 1.92 cents:
+/// (1000·3 + 500·15 + 2000·3.75 + 4000·0.3) / 10 000.
+#[tokio::test]
+async fn a_cache_row_prices_by_class_or_is_counted_unpriced() {
+    let pg = support::Pg::fresh().await;
+    let seeded = support::seed(&pg, "dev-a", "alice", "Alice").await;
+    let running = support::Running::start(&pg).await;
+    let (eval_id, version_id) = ready_instrument(&running).await;
+    set_prices(
+        &pg,
+        seeded.tenant,
+        &version_id,
+        json!({ "input": 3.0, "output": 15.0 }),
+    )
+    .await;
+
+    let run = run_row(&pg, seeded.tenant, &eval_id, &version_id, "baseline", 0).await;
+    fill_run(&pg, seeded.tenant, &version_id, run, &subject_usage()).await;
+    ledger_cache_call(&pg, seeded.tenant, run, 1000, 500, 2000, 4000).await;
+
+    // ── no cache-class rate: the row is explicitly unpriced ──
+    let (status, body) = running
+        .invoke(
+            "eval_runs.report",
+            TOKEN,
+            json!({ "run_id": run }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{body}");
+    let cost = &body["output"]["cost"];
+    assert_eq!(cost["unit"], "cents", "{cost}");
+    assert!(
+        close(&cost["subject"]).abs() < 1e-9,
+        "a cache row is not full-rate input and not free: {cost}"
+    );
+    assert_eq!(
+        cost["unpriced"], 1,
+        "the row is counted, never silently treated as free: {cost}"
+    );
+
+    // ── the cache classes priced: the same row is 1.92 cents ──
+    set_prices(
+        &pg,
+        seeded.tenant,
+        &version_id,
+        json!({ "input": 3.0, "output": 15.0, "cache_write": 3.75, "cache_read": 0.3 }),
+    )
+    .await;
+    let (status, body) = running
+        .invoke(
+            "eval_runs.report",
+            TOKEN,
+            json!({ "run_id": run }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{body}");
+    let cost = &body["output"]["cost"];
+    assert!(
+        (close(&cost["subject"]) - 1.92).abs() < 1e-9,
+        "full-rate + write + read, each at its own class rate: {cost}"
+    );
+    assert!((close(&cost["total"]) - 1.92).abs() < 1e-9, "{cost}");
+    assert_eq!(cost["unpriced"], 0, "{cost}");
+}
+
+/// P4.1 / P4.2 — the hard execution ceiling and the round-admission threshold are two
+/// boundaries with distinct refusal codes.
+///
+/// A climb starts under a 10-cent ceiling on a version that prices tokens (an unpriceable
+/// ceiling is refused at the action, never silently unenforced). Round 1's run spends 12.6 cents;
+/// resuming that run is refused by the **hard execution ceiling** (`cost_ceiling_reached`). Once
+/// the round finishes, a new round is refused by the **round-admission threshold**
+/// (`round_admission_ceiling`), and its message names that threshold.
+#[tokio::test]
+async fn the_two_ceilings_refuse_at_distinct_boundaries() {
+    let pg = support::Pg::fresh().await;
+    let seeded = support::seed(&pg, "dev-a", "alice", "Alice").await;
+    let running = support::Running::start(&pg).await;
+    let (eval_id, version_id) = ready_instrument(&running).await;
+
+    // ── an unpriced version cannot carry a cents ceiling ──
+    let (status, body) = start_climb(&running, &eval_id, Some(10)).await;
+    assert_eq!(status, 422, "{body}");
+    assert_eq!(
+        body["type"], "ceiling_unpriceable",
+        "a ceiling that cannot be compared is refused, not accepted: {body}"
+    );
+
+    set_prices(
+        &pg,
+        seeded.tenant,
+        &version_id,
+        json!({ "input": 3.0, "output": 15.0 }),
+    )
+    .await;
+    let (status, body) = start_climb(&running, &eval_id, Some(10)).await;
+    assert_eq!(status, 201, "{body}");
+    let climb_id = body["output"]["id"].as_str().expect("climb id").to_owned();
+    assert_eq!(body["output"]["cost_ceiling_cents"], 10, "{body}");
+    approve_plan(&running).await;
+
+    let baseline = run_row(&pg, seeded.tenant, &eval_id, &version_id, "baseline", 0).await;
+    fill_run(&pg, seeded.tenant, &version_id, baseline, &subject_usage()).await;
+
+    // ── round 1 runs; its ledger spends 12.6 cents against the 10-cent ceiling ──
+    let (status, body) = content_round(&running, &climb_id).await;
+    assert_eq!(status, 201, "{body}");
+    let v1 = run_of(&pg, seeded.tenant, &eval_id, "v1").await;
+    for _ in 0..CASES {
+        ledger_call(
+            &pg,
+            seeded.tenant,
+            v1,
+            "eval:completions.create",
+            PROMPT_TOKENS,
+            COMPLETION_TOKENS,
+            "ok",
+        )
+        .await;
+    }
+    for _ in 0..2 {
+        ledger_call(&pg, seeded.tenant, v1, "eval_judge", 2000, 1000, "ok").await;
+    }
+
+    // ── P4.1: the hard execution ceiling — the run refuses to execute more work ──
+    let (status, body) = running
+        .invoke(
+            "eval_climbs.round",
+            TOKEN,
+            json!({ "id": climb_id, "round": 1 }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 409, "{body}");
+    assert_eq!(
+        body["type"], "cost_ceiling_reached",
+        "the run's own ceiling is a distinct refusal: {body}"
+    );
+    assert!(
+        body["detail"]
+            .as_str()
+            .unwrap_or_default()
+            .contains("hard execution ceiling"),
+        "the refusal must name the boundary it is: {body}"
+    );
+
+    // ── finish round 1 so the climb considers another round ──
+    fill_run(&pg, seeded.tenant, &version_id, v1, &subject_usage()).await;
+
+    // ── P4.2: the round-admission threshold — a distinct code, a distinct name ──
+    let (status, body) = content_round(&running, &climb_id).await;
+    assert_eq!(status, 409, "{body}");
+    assert_eq!(
+        body["type"], "round_admission_ceiling",
+        "the climb's threshold is labelled distinctly from the run's: {body}"
+    );
+    assert!(
+        body["detail"]
+            .as_str()
+            .unwrap_or_default()
+            .contains("round-admission threshold"),
+        "the refusal must name the boundary it is: {body}"
+    );
 }

@@ -766,6 +766,37 @@ async fn eval_climbs_start(
         .current_version_id
         .ok_or_else(|| not_ready(ctx.action, "the eval has no version to climb"))?;
 
+    // ── the ceiling must be enforceable before the climb accepts it ───────────────────
+    //
+    // A ceiling is cents; a version without `prices` measures spend in tokens, so a ceiling
+    // accepted on it would never fire. Refuse here rather than run a climb whose budget is a
+    // number nobody compares against anything.
+    if let Some(ceiling) = input.cost_ceiling_cents {
+        if ceiling < 0 {
+            return Err(invalid(
+                "cost_ceiling_cents",
+                "invalid_value",
+                "a spend ceiling cannot be negative",
+            ));
+        }
+        let version = store::eval::get_version_tx(&mut *tx, ctx.tenant, version_id)
+            .await
+            .map_err(|error| eval_error(error, ctx.action))?;
+        if !price_usage_available(&version.prices) {
+            return Err(ActionError::new(
+                422,
+                "ceiling_unpriceable",
+                format!(
+                    "{}: the climb's spend ceiling of {ceiling} cents cannot be enforced — the \
+                     version prices no tokens, so spend is counted in tokens and no comparison \
+                     with cents can fire. Set the version's `prices` (input/output per million \
+                     tokens) before asking for a ceiling",
+                    ctx.action
+                ),
+            ));
+        }
+    }
+
     let facts = store::eval::eval_readiness_tx(&mut *tx, ctx.tenant, eval.id, version_id)
         .await
         .map_err(|error| eval_error(error, ctx.action))?;
@@ -1463,19 +1494,28 @@ async fn eval_climbs_round(
             }
         }
     }
+    // ── the round-admission threshold, distinct from the hard execution ceiling ───────
+    //
+    // This check asks whether the climb may CREATE another round, from spend already accounted
+    // across its rounds; the run's own `cost_ceiling_cents` is enforced at the execution
+    // boundary (`run_core::start_or_resume_run_tx`, refusal `cost_ceiling_reached`), where a run
+    // that reached its own budget refuses to execute more work. Two different questions, two
+    // labels: conflating them makes "the run refused" and "the climb refused" indistinguishable.
+    // The cents comparison is only meaningful when the version prices in cents; a climb sets a
+    // ceiling only under that condition (`eval_climbs.start` refuses `ceiling_unpriceable`).
     if let Some(ceiling) = climb.cost_ceiling_cents
+        && pricing.unit == "cents"
         && state.spend >= ceiling as f64
     {
-        {
-            return Err(ActionError::new(
-                409,
-                "cost_ceiling_reached",
-                format!(
-                    "{}: the climb has spent {:.2} against a ceiling of {}",
-                    ctx.action, state.spend, ceiling
-                ),
-            ));
-        }
+        return Err(ActionError::new(
+            409,
+            "round_admission_ceiling",
+            format!(
+                "{}: the round-admission threshold is reached — the climb has spent {:.2} cents \
+                 across its rounds against its ceiling of {ceiling}; no further round is admitted",
+                ctx.action, state.spend
+            ),
+        ));
     }
 
     // ── the analyzer never reads the held-out half ─────────────────────────────────────

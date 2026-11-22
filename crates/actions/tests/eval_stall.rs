@@ -16,8 +16,10 @@ mod support;
 
 use conveyor_domain::TenantId;
 use conveyor_domain::eval::RunStatus;
+use conveyor_domain::inference::Usage;
 use conveyor_store as store;
 use conveyor_store::begin_scoped;
+use conveyor_store::inference::NewInferenceCall;
 use serde_json::{Value, json};
 use uuid::Uuid;
 
@@ -143,25 +145,77 @@ async fn ready_instrument(running: &support::Running) -> (String, String) {
 }
 
 /// Start a climb whose plateau fires at 5 — later than the triage wall the test is about.
-async fn start_climb(running: &support::Running, eval_id: &str) -> (u16, Value) {
+async fn start_climb(
+    running: &support::Running,
+    eval_id: &str,
+    cost_ceiling_cents: Option<i32>,
+) -> (u16, Value) {
+    let mut body = json!({
+        "eval_id": eval_id,
+        "goal": { "target": "label_accuracy", "direction": "higher" },
+        "stopping": "plateau",
+        "plateau_k": 5,
+        "delta": DELTA,
+        "reps": REPS,
+        "approve_each_round": false,
+    });
+    if let Some(ceiling) = cost_ceiling_cents {
+        body["cost_ceiling_cents"] = json!(ceiling);
+    }
     running
-        .invoke(
-            "eval_climbs.start",
-            TOKEN,
-            json!({
-                "eval_id": eval_id,
-                "goal": { "target": "label_accuracy", "direction": "higher" },
-                "stopping": "plateau",
-                "plateau_k": 5,
-                "delta": DELTA,
-                "reps": REPS,
-                "approve_each_round": false,
-            }),
-            None,
-            None,
-            None,
-        )
+        .invoke("eval_climbs.start", TOKEN, body, None, None, None)
         .await
+}
+
+/// The version's rates, so spend is counted in cents and a cents ceiling can fire.
+async fn set_prices(pg: &support::Pg, tenant: TenantId, version_id: &str) {
+    let mut tx = begin_scoped(&pg.owner, tenant).await.expect("scope");
+    sqlx::query("UPDATE eval_version SET prices = $3 WHERE tenant_id = $1 AND id = $2")
+        .bind(tenant.as_uuid())
+        .bind(Uuid::parse_str(version_id).expect("version uuid"))
+        .bind(json!({ "input": 3.0, "output": 15.0 }))
+        .execute(&mut *tx)
+        .await
+        .expect("write the prices");
+    tx.commit().await.expect("commit");
+}
+
+/// One billed `ok` call on the run's ledger: (2000·3 + 1000·15) / 10 000 = 2.1 cents.
+async fn ledger_call(pg: &support::Pg, tenant: TenantId, run_id: Uuid) {
+    let mut tx = begin_scoped(&pg.owner, tenant).await.expect("scope");
+    store::inference::insert_call_tx(
+        &mut tx,
+        tenant,
+        &NewInferenceCall {
+            action_invocation_id: None,
+            trace_id: None,
+            correlation_id: None,
+            caller_kind: "eval",
+            run_id: None,
+            run_step_id: None,
+            conversation_turn_id: None,
+            eval_run_id: Some(run_id),
+            prompt_ref: Some("eval_judge"),
+            prompt_version: None,
+            prompt_sha256: None,
+            model: "stub-model",
+            served_model: None,
+            usage: Some(Usage {
+                prompt_tokens: 2000,
+                completion_tokens: 1000,
+                total_tokens: 3000,
+                ..Usage::default()
+            }),
+            cache_status: "miss",
+            usage_unit: None,
+            usage_units: None,
+            latency_ms: 3,
+            outcome: "ok",
+        },
+    )
+    .await
+    .expect("insert a ledger row");
+    tx.commit().await.expect("commit");
 }
 
 async fn plan_gate_id(running: &support::Running) -> String {
@@ -319,7 +373,7 @@ async fn a_fourth_content_round_is_refused() {
     let seeded = support::seed(&pg, "dev-a", "alice", "Alice").await;
     let running = support::Running::start(&pg).await;
     let (eval_id, version_id) = ready_instrument(&running).await;
-    let (status, body) = start_climb(&running, &eval_id).await;
+    let (status, body) = start_climb(&running, &eval_id, None).await;
     assert_eq!(status, 201, "{body}");
     let climb_id = body["output"]["id"].as_str().expect("climb id").to_owned();
     approve_plan(&running).await;
@@ -373,5 +427,51 @@ async fn a_fourth_content_round_is_refused() {
     assert_eq!(
         body["type"], "content_round_refused",
         "three flat rounds mean the failure is not content: {body}"
+    );
+}
+
+/// P4.2 — spend at the ceiling refuses the next round with the typed error.
+///
+/// The climb admits a round from spend already accounted across its rounds: once the ledger
+/// crosses the 5-cent ceiling (three 2.1-cent calls), the next `eval_climbs.round` is refused
+/// with `round_admission_ceiling` — the round-admission threshold, labelled distinctly from the
+/// run's hard execution ceiling (`cost_ceiling_reached`).
+#[tokio::test]
+async fn spend_at_the_ceiling_refuses_the_next_round() {
+    let pg = support::Pg::fresh().await;
+    let seeded = support::seed(&pg, "dev-a", "alice", "Alice").await;
+    let running = support::Running::start(&pg).await;
+    let (eval_id, version_id) = ready_instrument(&running).await;
+    set_prices(&pg, seeded.tenant, &version_id).await;
+
+    let (status, body) = start_climb(&running, &eval_id, Some(5)).await;
+    assert_eq!(status, 201, "{body}");
+    let climb_id = body["output"]["id"].as_str().expect("climb id").to_owned();
+    approve_plan(&running).await;
+    let baseline = baseline_run(&pg, seeded.tenant, &eval_id, &version_id).await;
+    fill_run(&pg, seeded.tenant, &version_id, baseline, 0.0).await;
+
+    // ── round 1 picks the ledger up past the ceiling ──
+    let (status, body) = content_round(&running, &climb_id, 1).await;
+    assert_eq!(status, 201, "{body}");
+    let run = run_of(&pg, seeded.tenant, &eval_id, "v1").await;
+    fill_run(&pg, seeded.tenant, &version_id, run, 1.0).await;
+    for _ in 0..3 {
+        ledger_call(&pg, seeded.tenant, run).await;
+    }
+
+    // ── the next round: refused, and the code names the threshold ──
+    let (status, body) = content_round(&running, &climb_id, 2).await;
+    assert_eq!(status, 409, "{body}");
+    assert_eq!(
+        body["type"], "round_admission_ceiling",
+        "spend at the ceiling refuses the next round with the typed error: {body}"
+    );
+    assert!(
+        body["detail"]
+            .as_str()
+            .unwrap_or_default()
+            .contains("round-admission threshold"),
+        "the refusal must name the boundary it is: {body}"
     );
 }
