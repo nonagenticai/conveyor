@@ -867,6 +867,25 @@ pub async fn toolkit_by_key_version(
     Ok(row)
 }
 
+/// The release snapshot of one job binding, when the run pins one.
+///
+/// The second authorising row (§11.1): the release's operation grant lives inside the snapshot
+/// the binding pinned, so the broker reads it from here before it dispatches a tool.
+pub async fn release_snapshot_for_binding(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    job_binding_id: Uuid,
+) -> Result<Option<Value>, ToolStoreError> {
+    let snapshot: Option<Value> = sqlx::query_scalar(
+        "SELECT release_snapshot FROM job_binding WHERE tenant_id = $1 AND id = $2",
+    )
+    .bind(tenant.as_uuid())
+    .bind(job_binding_id)
+    .fetch_optional(conn)
+    .await?;
+    Ok(snapshot)
+}
+
 /// One row of the zero-use report (§11.9): a published tool version and its calls in a window.
 #[derive(Clone, Debug, sqlx::FromRow)]
 pub struct ToolUsageRow {

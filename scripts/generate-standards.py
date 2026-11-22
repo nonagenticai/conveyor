@@ -1082,6 +1082,7 @@ def resolve_section(
     outputs_dir: Path,
     programme_projects: dict[str, set[str]],
     register: dict[str, Any] | None = None,
+    item_limit: int | None = 12,
 ) -> dict[str, Any]:
     sources = template.get("sources") or {}
     declared = sources.get(heading)
@@ -1098,17 +1099,22 @@ def resolve_section(
             key=lambda value: SEVERITY_RANK.get(value, 0),
         )
     resolved: list[dict[str, Any]] = []
-    missing_headings: list[str] = []
+    missing_headings: set[str] = set()
     if declared:
         for source in declared:
             kind = source["kind"]
             if kind == "rows":
                 rows = rows_for(snapshot, source, subject, category, subject.get("phase"))
-                resolved.append({
+                entry = {
                     "kind": "rows", "file": source.get("file", ""),
                     "pointer": source.get("pointer", ""), "count": len(rows),
-                    "items": [row_summary(row) for row in rows[:12]],
-                })
+                    "items": [row_summary(row) for row in rows[:item_limit]],
+                }
+                if item_limit is None:
+                    # The publisher authors a document from the whole record; the pack page keeps
+                    # its bounded excerpt.
+                    entry["rows"] = rows
+                resolved.append(entry)
             elif kind == "documents":
                 wanted_category = str(substitute(
                     (source.get("match") or {}).get("category", "$category"),
@@ -1121,17 +1127,20 @@ def resolve_section(
                     wanted_category, wanted_scope,
                 )
                 if not heading_found:
-                    missing_headings.append(heading)
+                    missing_headings.add(heading)
                 resolved.append(document_source)
             elif kind == "computed":
                 rows = computed_rows(
                     str(source.get("name")), source, snapshot, subject, programme_projects,
                     category, subject.get("phase"), register=register,
                 )
-                resolved.append({
+                entry = {
                     "kind": "computed", "name": str(source.get("name")),
-                    "count": len(rows), "items": [row_summary(row) for row in rows[:12]],
-                })
+                    "count": len(rows), "items": [row_summary(row) for row in rows[:item_limit]],
+                }
+                if item_limit is None:
+                    entry["rows"] = rows
+                resolved.append(entry)
             elif kind == "register":
                 resolved.append({"kind": "register", "count": 0, "items": []})
 
@@ -1145,7 +1154,7 @@ def resolve_section(
         if document_source["count"] > 0 or document_source.get("items"):
             resolved.append(document_source)
         if not heading_found:
-            missing_headings.append(heading)
+            missing_headings.add(heading)
 
     evidence = [source for source in resolved if source["count"] > 0]
     status = "evidenced" if evidence else ("partial" if missing_headings else "absent")
@@ -1156,7 +1165,7 @@ def resolve_section(
         "sources": resolved,
         "missing": [] if evidence else [
             f"No row or document satisfies '{heading}'"
-            + (f"; a document exists but lacks the heading" if missing_headings else "")
+            + ("; a document exists but lacks the heading" if missing_headings else "")
         ],
     }
 
@@ -1322,6 +1331,7 @@ def build_instances(
                 seen.add(identifier)
                 required = list(template.get("required") or [])
                 sections: list[dict[str, Any]] = []
+                document_missing = False
                 for heading in required:
                     section = resolve_section(
                         heading, template, category, subject, snapshot, outputs_dir,
@@ -1337,11 +1347,43 @@ def build_instances(
                         )
                         section["required"] = False
                         sections.append(section)
+                # A programme-level artefact is a published document, not merely the rows behind
+                # it (SPEC_V2 §8, plan v6 bar 2: "a typed row AND a published document"). Row
+                # evidence must not make an artefact green while no document exists. Scoped to
+                # programme-subject artefacts: per-project and typed instances are the tranche
+                # batches' work and keep their section-level status.
+                if (str(template.get("level")) == "programme"
+                        and subject["kind"] == "programme"
+                        and template.get("document_category")):
+                    category_docs = documents_for(
+                        snapshot, subject, str(template["document_category"]), "programme",
+                        programme_projects,
+                    )
+                    if not category_docs:
+                        document_missing = True
+                        sections.append({
+                            "heading": "Published document",
+                            "status": "absent",
+                            "severity": "",
+                            "sources": [{
+                                "kind": "documents", "file": "artefacts.json",
+                                "pointer": "/documents",
+                                "category": str(template["document_category"]),
+                                "scope": "programme", "count": 0, "items": [],
+                            }],
+                            "required": True,
+                            "missing": [
+                                f"No published {template['document_category']} document "
+                                "for the programme"
+                            ],
+                        })
                 # The status counts every section the page carries, exactly as
                 # `check-standards.cjs` recomputes it; a section is not dropped from the
                 # artefact's honesty because it was declared optional.
                 evidenced = [section for section in sections if section["status"] == "evidenced"]
-                if len(evidenced) == len(sections):
+                if document_missing:
+                    status = "absent"
+                elif len(evidenced) == len(sections):
                     status = "evidenced"
                 elif evidenced:
                     status = "partial"
@@ -2219,23 +2261,41 @@ def self_test_safe_sources_absent(outputs: Path, std: dict[str, Any]) -> None:
 
 
 def self_test_safe_sources_evidenced(outputs: Path, std: dict[str, Any]) -> None:
-    """Each derived source passes on a present, valid record: no finding, status evidenced."""
+    """Each derived source passes on a present, valid record: its section is evidenced.
+
+    The artefact itself also needs its published document (the programme-level artefact gate),
+    which this fixture does not write; the assertion is therefore on the derived section and on
+    the finding never naming it.
+    """
     fixture = safe_evidence_fixture()
     document, findings = generate(mandatory_safe_standard(std), fixture, outputs)
     by_id = {artefact["id"]: artefact for artefact in document["artefacts"]}
-    programme_id = "pg1"
-    for category in ("safe-art", "pi-plan", "system-demo", "inspect-adapt", "pi-objectives"):
-        artefact = by_id[f"std-safe-{category}-{programme_id}"]
-        assert artefact["status"] == "evidenced", (
-            f"{category}: expected evidenced, got {artefact['status']} "
-            f"missing {[section['heading'] for section in artefact['sections'] if section['status'] != 'evidenced']}"
+    derived = {
+        "safe-art": ["Shared configuration"],
+        "pi-plan": ["Dependencies", "Backlog refinement"],
+        "system-demo": ["Evidence", "Credits"],
+        "inspect-adapt": ["Kata candidates"],
+        "pi-objectives": ["Measurement", "Evidence"],
+    }
+    for category, headings in derived.items():
+        artefact = by_id[f"std-safe-{category}-pg1"]
+        status = {section["heading"]: section["status"] for section in artefact["sections"]}
+        for heading in headings:
+            assert status.get(heading) == "evidenced", (
+                f"{category}: {heading} expected evidenced, got {status.get(heading)}"
+            )
+        finding = finding_for(findings, category)
+        assert finding is None or not (set(finding["missing"]) & set(headings)), (
+            f"{category}: a present derived source must not be missing: {finding and finding['missing']}"
         )
-        assert finding_for(findings, category) is None, f"{category}: an evidenced source must not be a finding"
     # A flat object is read as values with no locks (migration 0068), so it is evidence too.
     flat = safe_evidence_fixture()
     flat["programme"]["programme"][0]["shared_config"] = {"cadence": "two-week"}
     _, findings = generate(mandatory_safe_standard(std), flat, outputs)
-    assert finding_for(findings, "safe-art") is None, "a flat shared_config is a real configuration"
+    finding = finding_for(findings, "safe-art")
+    assert finding is None or "Shared configuration" not in finding["missing"], (
+        "a flat shared_config is a real configuration"
+    )
     print("generate-standards: self-test case safe-derived-sources-evidenced-passes OK")
 
 
@@ -2377,9 +2437,26 @@ def self_test_gap_analysis(outputs: Path, std: dict[str, Any]) -> None:
     print("generate-standards: self-test case gap-analysis-resolves-open-gaps OK")
 
 
+def self_test_sources_declared(std: dict[str, Any]) -> None:
+    """Every required heading names where its fact lives.
+
+    A required heading with no source can never be evidenced, so its absence looks like a record
+    gap forever. The standard must declare the source — rows, a computed source or the artefact's
+    own published document — before a finding about that heading is honest.
+    """
+    problems: list[str] = []
+    for category, template in sorted((std.get("templates") or {}).items()):
+        sources = template.get("sources") or {}
+        for heading in template.get("required") or []:
+            if not sources.get(heading):
+                problems.append(f"{category} / {heading}: no source")
+    assert not problems, "; ".join(problems)
+
+
 def self_test() -> int:
     fixture = self_test_fixture()
     std = json.loads(STANDARD_PATH.read_text(encoding="utf-8"))
+    self_test_sources_declared(std)
     with tempfile.TemporaryDirectory() as tmp:
         outputs = Path(tmp)
         self_test_outputs(outputs)
@@ -2394,10 +2471,20 @@ def self_test() -> int:
         assert vision is not None and vision["status"] == "evidenced", "vision should be evidenced"
         closure = by_id.get("std-pmp-closure-review-t1")
         assert closure is not None and closure["status"] == "partial", "the closure document lacks two headings"
-        absent = [artefact for artefact in document["artefacts"]
-                  if artefact["id"] == "std-msp-programme-strategies-pg1"]
-        assert absent and absent[0]["status"] == "absent", "the strategies have no rows"
-        assert any(f["category"] == "programme-strategies" for f in findings["findings"]), "an absent artefact must be a finding"
+        strategies = [artefact for artefact in document["artefacts"]
+                      if artefact["id"] == "std-msp-programme-strategies-pg1"]
+        assert strategies and strategies[0]["status"] == "absent", (
+            "row evidence alone is not the artefact: its published document is absent"
+        )
+        assert any(f["category"] == "programme-strategies" for f in findings["findings"]), (
+            "an absent artefact must be a finding"
+        )
+        refined = [artefact for artefact in document["artefacts"]
+                   if artefact["id"] == "std-msp-refined-vision-pg1"]
+        assert refined and refined[0]["status"] == "absent", "the refined vision has no record"
+        assert any(f["category"] == "refined-vision" for f in findings["findings"]), (
+            "an absent artefact must be a finding"
+        )
         baseline_artefact = [artefact for artefact in document["artefacts"]
                              if artefact["id"] == "std-msp-programme-baselines-pg1"]
         assert baseline_artefact and baseline_artefact[0]["status"] == "absent", "the baselines have no rows"

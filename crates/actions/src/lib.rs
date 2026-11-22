@@ -99,6 +99,7 @@ pub mod spec;
 pub mod spine;
 // T13 (SPEC_V2 §11.10): the job object-storage adapter — tenant-prefixed, hashed, capped.
 pub mod storage;
+pub mod storage_actions;
 // T13 (SPEC_V2 §11.3): the `tools.call` action declaration (the broker enforces it).
 pub mod tools;
 // T2 (SPEC_V2 §7): the decision ladder — `ladder.*` over `decision_policies.*`,
