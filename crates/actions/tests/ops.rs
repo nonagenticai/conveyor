@@ -375,7 +375,10 @@ async fn an_approved_mitigation_sets_mitigated_at_with_a_read_back() {
             "approvals.request",
             TOKEN,
             json!({"gate": "ops.mitigate", "kind": "action", "action": "ops.mitigate",
-                   "input": input.clone()}),
+                   "input": input.clone(),
+                   // The fixture is about the incident record, not evidence; a destructive
+                   // gate now requires evidence or an explicit waiver.
+                   "evidence_waiver_reason": "test fixture: the gate's subject is the incident"}),
             None,
             None,
             None,
@@ -636,6 +639,9 @@ async fn the_tenant_policy_sets_the_quorum() {
                 "action": "ops.mitigate",
                 "input": input,
                 "required_decisions": 2,
+                // The fixture is about the quorum, not evidence; a destructive gate now
+                // requires evidence or an explicit waiver.
+                "evidence_waiver_reason": "test fixture: the gate's subject is the incident",
             }),
             None,
             None,

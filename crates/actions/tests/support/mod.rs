@@ -408,6 +408,9 @@ pub async fn approved_gate(
                 "kind": "action",
                 "action": action,
                 "input": input,
+                // The fixture's subject is the target, not a document; a destructive gate now
+                // requires evidence or an explicit waiver (v1-u5a-approvals-1).
+                "evidence_waiver_reason": "test fixture: the gate's subject is the target",
             }),
             None,
             None,
