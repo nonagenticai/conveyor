@@ -334,7 +334,7 @@ pub async fn snapshot_tx(
         "SELECT COALESCE(jsonb_agg(to_jsonb(t) ORDER BY t.kind, t.key), '[]'::jsonb) FROM (
              SELECT id, kind, key, title, status, version, supersedes_id,
                     superseded_by_id, project_id, owner_user_id, phase_code, effort, reach,
-                    impact, confidence, links, created_at, updated_at
+                    impact, confidence, links, meta, created_at, updated_at
                FROM governed_asset WHERE tenant_id = $1
          ) t",
         tenant_id,
@@ -659,6 +659,8 @@ pub async fn snapshot_tx(
         "SELECT COALESCE(jsonb_agg(to_jsonb(t) ORDER BY t.phase_code, t.kind, t.created_at, t.id), '[]'::jsonb) FROM (
              SELECT id, project_id, kind, phase_code, title, body, status, approval_id,
                     approved_by, requested_by, approved_at, supersedes_id, superseded_by_id,
+                    COALESCE(body -> 'links', '{}'::jsonb) AS links,
+                    COALESCE(body -> 'meta', '{}'::jsonb) AS meta,
                     version, created_at, updated_at
                FROM architecture_contract WHERE tenant_id = $1
          ) t",
