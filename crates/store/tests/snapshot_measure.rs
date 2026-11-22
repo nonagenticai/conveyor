@@ -315,6 +315,7 @@ async fn the_snapshot_attributes_tokens_and_cost_by_project_and_card() {
                 cost,
                 error_class: None,
                 error_message: None,
+                resume_token: None,
             },
         )
         .await
