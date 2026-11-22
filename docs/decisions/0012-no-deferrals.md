@@ -1,4 +1,4 @@
-# 0010 — No deferrals; every finding executes
+# 0012 — No deferrals; every finding executes
 
 Status: Accepted · Date: 2026-11-22 · Slice: #526 (programme)
 
