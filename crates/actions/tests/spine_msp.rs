@@ -738,7 +738,7 @@ async fn msp_deletes_and_refusals() {
 }
 
 /// P1.6 — a realization record cannot claim a post-transition measurement without a measured
-/// baseline.
+/// baseline, and the timestamp alone is not the reading: the `post` measurement must exist.
 #[tokio::test(flavor = "multi_thread")]
 async fn transition_requires_baseline_before_post() {
     let (pg, running, seeded) = fixture().await;
@@ -773,6 +773,7 @@ async fn transition_requires_baseline_before_post() {
             json!({
                 "benefit_id": benefit,
                 "baseline_measured_at": "2026-11-01T00:00:00Z",
+                "enacted_at": "2026-11-20T00:00:00Z",
                 "readiness": {"state": "ready"}
             }),
             None,
@@ -782,6 +783,50 @@ async fn transition_requires_baseline_before_post() {
         .await;
     assert_eq!(status, 200, "{created}");
     let etag = headers.get("etag").cloned().expect("transition etag");
+
+    // A post timestamp no reading backs is refused: the evaluation cannot reproduce it.
+    let (status, refused) = running
+        .invoke(
+            "benefits.transition_upsert",
+            "dev:alice",
+            json!({
+                "benefit_id": benefit,
+                "post_measured_at": "2026-12-01T00:00:00Z",
+                "evidence": ["weekly measure"]
+            }),
+            Some(etag.as_str()),
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 422, "{refused}");
+    assert!(
+        refused
+            .to_string()
+            .contains("benefit_post_measurement_missing"),
+        "{refused}"
+    );
+
+    let (status, measured) = running
+        .invoke(
+            "benefits.measure",
+            "dev:alice",
+            json!({
+                "benefit_id": benefit,
+                "kind": "post",
+                "target_value": 8.0,
+                "actual_value": 9.0,
+                "unit": "hours",
+                "method": "weekly measure",
+                "measured_at": "2026-11-25T00:00:00Z"
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "{measured}");
+
     let (status, updated) = running
         .invoke(
             "benefits.transition_upsert",
