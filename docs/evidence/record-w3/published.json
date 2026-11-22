@@ -1,0 +1,96 @@
+{
+  "schema": "programme-artefacts/v1",
+  "documents": {
+    "mandate": {
+      "document_id": "01a204ef-2756-7799-97dd-363caa602e98",
+      "body_sha256": "43774b0bbd7aaecb39a2a316b37c5b3a5d5d944f1b7d54d611de93f6ef18d79e",
+      "version": 1,
+      "title": "Programme Mandate \u2014 conveyor buildout (retrospective, 2026-11-22)",
+      "applied_at": "2026-11-22T20:25:11.921731+00:00"
+    },
+    "programme-brief": {
+      "document_id": "01a204ef-2828-746e-9eaf-ce275cdde08d",
+      "body_sha256": "e72fe38180b9f02ffc725fed9c3b8be6f62284a5a0925af24b0bf9590791e2d3",
+      "version": 1,
+      "title": "Programme Brief \u2014 conveyor buildout (retrospective, 2026-11-22)",
+      "applied_at": "2026-11-22T20:25:12.110760+00:00"
+    },
+    "programme-strategies": {
+      "document_id": "01a204ef-28e5-77e4-ab2c-4c0fdea7b7db",
+      "body_sha256": "8a651b57a24c4d97df876c9799176428e50c063e3d802c3aee3a6fd2e175d78c",
+      "version": 1,
+      "title": "Programme Strategies \u2014 conveyor buildout (retrospective, 2026-11-22)",
+      "applied_at": "2026-11-22T20:25:12.311482+00:00"
+    },
+    "refined-vision": {
+      "document_id": "01a204ef-29ad-72a7-9b74-6a4c4df55ce5",
+      "body_sha256": "cd4da50b6e7abbb787fdb00c98b9aeb0a746ae81a5bf1247ef186142d1c5e305",
+      "version": 1,
+      "title": "Refined Vision \u2014 conveyor buildout (retrospective, 2026-11-22)",
+      "applied_at": "2026-11-22T20:25:12.496550+00:00"
+    },
+    "programme-baselines": {
+      "document_id": "01a204ef-2a66-72f2-9378-62b50466e39b",
+      "body_sha256": "190982e03cdf8f70a0276bb61385cb1ddaa75bfb8b0cecbf66f0784b0b1a6467",
+      "version": 1,
+      "title": "Programme Baselines \u2014 management, governance and boundary (retrospective, 2026-11-22)",
+      "applied_at": "2026-11-22T20:25:12.678901+00:00"
+    },
+    "programme-risk-register": {
+      "document_id": "01a204ef-2b1b-7799-8d67-1ae63c0e515c",
+      "body_sha256": "5a236adb170ce2ececcf6a720c155be86cd4f1e5a131e02969f5fda322cfbba9",
+      "version": 1,
+      "title": "Programme Risk Register \u2014 conveyor buildout (retrospective, 2026-11-22)",
+      "applied_at": "2026-11-22T20:25:12.862950+00:00"
+    },
+    "benefits-registry": {
+      "document_id": "01a204ef-2bd2-74a8-a30f-55885a6d65fd",
+      "body_sha256": "24e808ee3d76ef0601e0bf6e2d2c3d1c06bbd1078d2a2351cbe3aa8196d0a528",
+      "version": 1,
+      "title": "Benefits Registry \u2014 conveyor buildout (retrospective, 2026-11-22)",
+      "applied_at": "2026-11-22T20:25:13.042089+00:00"
+    },
+    "blueprint": {
+      "document_id": "01a204ef-2c87-7140-b882-c6f4a24082a2",
+      "body_sha256": "efd2df230b390ddac0b8979a04a4bda3880e0949baba190fcd113aece034aa66",
+      "version": 1,
+      "title": "Programme Blueprint \u2014 conveyor buildout (retrospective, 2026-11-22)",
+      "applied_at": "2026-11-22T20:25:13.227974+00:00"
+    },
+    "business-case": {
+      "document_id": "01a204ef-2d41-745c-8820-836c324e3b2e",
+      "body_sha256": "bb3a86cad014890d14ca58c7ac361aa8529645cfa835452a71e19788e7825d2e",
+      "version": 1,
+      "title": "Programme Business Case \u2014 conveyor buildout (retrospective, 2026-11-22)",
+      "applied_at": "2026-11-22T20:25:13.416613+00:00"
+    },
+    "requirements-catalog": {
+      "document_id": "01a204ef-2e00-74d2-a643-44bf6505ab77",
+      "body_sha256": "f57c6e05ebd9f106d55ac4e4cbfc1723aed8f32dcd8a20dc0d2403f3ba03f09c",
+      "version": 1,
+      "title": "Requirements Catalog \u2014 conveyor buildout (retrospective, 2026-11-22)",
+      "applied_at": "2026-11-22T20:25:13.627389+00:00"
+    },
+    "adr-register": {
+      "document_id": "01a204ef-2ed1-72d2-b9e8-eb3ac0167df6",
+      "body_sha256": "ad272dc1e622275264f3c1f269a9e8d0a409ae2d9e2a99b20255fb8bd8ef947c",
+      "version": 1,
+      "title": "Architecture Decision Register \u2014 conveyor buildout (retrospective, 2026-11-22)",
+      "applied_at": "2026-11-22T20:25:13.808910+00:00"
+    },
+    "safe-cadence": {
+      "document_id": "01a204ef-2f87-741c-a93d-412474481b8f",
+      "body_sha256": "881c706d1cdab2dce7f38dc1cc25a81abade1887027bf49455ace5337b1a5da5",
+      "version": 1,
+      "title": "SAFe Cadence \u2014 PI planning, demo, retro and refinement (retrospective, 2026-11-22)",
+      "applied_at": "2026-11-22T20:25:13.992205+00:00"
+    },
+    "safe-portfolio": {
+      "document_id": "01a204ef-303c-7539-b27f-bd0547c29e8f",
+      "body_sha256": "f0ed5b94a54a0823dd26caf8dfa7432f6417b9a7be3128465eca140e7b984538",
+      "version": 1,
+      "title": "SAFe Portfolio \u2014 conveyor buildout (retrospective, 2026-11-22)",
+      "applied_at": "2026-11-22T20:25:14.184368+00:00"
+    }
+  }
+}

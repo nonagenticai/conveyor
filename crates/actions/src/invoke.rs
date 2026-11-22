@@ -941,6 +941,8 @@ pub async fn precheck<'a>(
     // so the run it belongs to must admit it before the handler or the destination is reached.
     // It runs before the input is parsed (the broker's order: budget, then validate) and before
     // the broker dispatch, so neither a refused call nor a tool that would reach one is charged.
+    // `precheck` owns it because both callers — the sync invoke and the async submit — must refuse
+    // a spend before any work starts.
     if spec.captures_usage
         && let Some(run_id) = request.usage.as_ref().and_then(|usage| usage.run_id)
     {

@@ -1,0 +1,3077 @@
+{
+  "category": "business-case",
+  "standard": "MSP",
+  "spec": "\u00a78.3",
+  "subject": {
+    "kind": "programme",
+    "id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+    "key": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+    "title": "conveyor buildout",
+    "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+    "project_key": ""
+  },
+  "template_skeleton": "# Business case\n\nWhy now, what it buys, what it costs and the risk posture.\n\n## Why now\n\nThe problem, the cost of doing nothing, and the trigger for action.\n\n## Benefit map\n\nEach benefit, its mechanism and its measure; a benefit with no measure is a wish.\n\n## Cost and risk posture\n\nThe engineering cost, the recurring cost, and the exposure accepted.\n\n## Licensing frame\n\nThe public, opt-in and tenant boundary of the investment.\n\n## Options, including doing nothing\n\nThe options considered including doing nothing.\n\n## Investment appraisal and cash flow\n\nThe appraisal, the cash flow and the basis of both.\n\n## Capabilities the benefits depend on\n\nThe capabilities and business changes the benefits require, and who delivers them.\n\n## Decision\n\nThe investment decision and its authority.\n",
+  "headings": [
+    {
+      "heading": "Why now",
+      "status": "evidenced",
+      "sources": [
+        {
+          "kind": "documents",
+          "file": "artefacts.json",
+          "pointer": "/documents",
+          "category": "business-case",
+          "count": 1
+        }
+      ],
+      "items": [
+        {
+          "id": "01a1e006-e2ba-7372-87c7-61dbb38d2d6e",
+          "title": "Business case"
+        }
+      ]
+    },
+    {
+      "heading": "Benefit map",
+      "status": "evidenced",
+      "sources": [
+        {
+          "kind": "documents",
+          "file": "artefacts.json",
+          "pointer": "/documents",
+          "category": "business-case",
+          "count": 1
+        }
+      ],
+      "items": [
+        {
+          "id": "01a1e006-e2ba-7372-87c7-61dbb38d2d6e",
+          "title": "Business case"
+        }
+      ]
+    },
+    {
+      "heading": "Cost and risk posture",
+      "status": "evidenced",
+      "sources": [
+        {
+          "kind": "documents",
+          "file": "artefacts.json",
+          "pointer": "/documents",
+          "category": "business-case",
+          "count": 1
+        }
+      ],
+      "items": [
+        {
+          "id": "01a1e006-e2ba-7372-87c7-61dbb38d2d6e",
+          "title": "Business case"
+        }
+      ]
+    },
+    {
+      "heading": "Licensing frame",
+      "status": "partial",
+      "sources": [],
+      "items": []
+    },
+    {
+      "heading": "Options, including doing nothing",
+      "status": "evidenced",
+      "sources": [
+        {
+          "kind": "rows",
+          "file": "msp.json",
+          "pointer": "/register_items",
+          "category": null,
+          "count": 17
+        },
+        {
+          "kind": "rows",
+          "file": "work.json",
+          "pointer": "/approvals",
+          "category": null,
+          "count": 94
+        }
+      ],
+      "items": [
+        {
+          "baseline_ref": "01a1ff39-8d6e-7270-b2ba-9d235eb28b83",
+          "body": "Change request: rebuild S00's record under the owner's 2026-11-21 scope change (#526). The missing MSP, TOGAF and SAFe artefacts are provided retroactively, the record is taken through the full lifecycle, and the project is re-closed through the gates.\n\nImpact: scope - the project's record and declared outputs are rebuilt and republished. Schedule - no change to the delivery tranche; the work runs in its rework batch. Cost - no separate cost baseline; the rework runs inside the existing programme tranche. Quality - every owned finding is executed or waived by a named owner, and the acceptance manifest is re-run at the closing head.\n\nDecision: accepted by the programme owner's standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14, recorded in #526.",
+          "code": "U5-CHG-S00",
+          "created_at": "2026-11-22T06:45:14.798596+00:00",
+          "id": "01a20200-7fca-7da3-8f84-be7af377c451",
+          "impact": null,
+          "kind": "change",
+          "links": [
+            {
+              "kind": "issue",
+              "number": 526
+            },
+            {
+              "id": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+              "kind": "delegation"
+            }
+          ],
+          "meta": {
+            "change_request": "the retrospective rework of S00 under #526",
+            "decision": {
+              "decided_at": "2026-11-21",
+              "decided_by": "the programme owner's standing delegation",
+              "decision": "accepted",
+              "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+              "record": "#526"
+            },
+            "impact": {
+              "cost": "no separate cost baseline; the rework runs inside the existing programme tranche",
+              "quality": "every owned finding executed or waived by a named owner; manifest re-run at the closing head",
+              "schedule": "no change to the delivery tranche; the work runs in its rework batch",
+              "scope": "the record and declared outputs are rebuilt and republished"
+            }
+          },
+          "owner_job_id": null,
+          "probability": null,
+          "programme_id": null,
+          "project_id": "01a1d039-0d26-7573-9b0c-e0f60af92003",
+          "response": null,
+          "review_at": null,
+          "severity": null,
+          "status": "accepted",
+          "title": "Retrospective MSP/TOGAF/SAFe rework of S00 under the #526 scope change",
+          "updated_at": "2026-11-22T06:45:14.798596+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": "01a1ff31-72ec-766e-8ad3-227d927f64ab",
+          "body": "Change request: rebuild S01's record under the owner's 2026-11-21 scope change (#526). The missing MSP, TOGAF and SAFe artefacts are provided retroactively, the record is taken through the full lifecycle, and the project is re-closed through the gates.\n\nImpact: scope - the project's record and declared outputs are rebuilt and republished. Schedule - no change to the delivery tranche; the work runs in its rework batch. Cost - no separate cost baseline; the rework runs inside the existing programme tranche. Quality - every owned finding is executed or waived by a named owner, and the acceptance manifest is re-run at the closing head.\n\nDecision: accepted by the programme owner's standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14, recorded in #526.",
+          "code": "U5-CHG-S01",
+          "created_at": "2026-11-22T06:45:26.116886+00:00",
+          "id": "01a20200-a6d2-70b7-92aa-f1eca565b293",
+          "impact": null,
+          "kind": "change",
+          "links": [
+            {
+              "kind": "issue",
+              "number": 526
+            },
+            {
+              "id": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+              "kind": "delegation"
+            }
+          ],
+          "meta": {
+            "change_request": "the retrospective rework of S01 under #526",
+            "decision": {
+              "decided_at": "2026-11-21",
+              "decided_by": "the programme owner's standing delegation",
+              "decision": "accepted",
+              "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+              "record": "#526"
+            },
+            "impact": {
+              "cost": "no separate cost baseline; the rework runs inside the existing programme tranche",
+              "quality": "every owned finding executed or waived by a named owner; manifest re-run at the closing head",
+              "schedule": "no change to the delivery tranche; the work runs in its rework batch",
+              "scope": "the record and declared outputs are rebuilt and republished"
+            }
+          },
+          "owner_job_id": null,
+          "probability": null,
+          "programme_id": null,
+          "project_id": "01a1d039-0d27-724c-9bae-af96b2d926b1",
+          "response": null,
+          "review_at": null,
+          "severity": null,
+          "status": "accepted",
+          "title": "Retrospective MSP/TOGAF/SAFe rework of S01 under the #526 scope change",
+          "updated_at": "2026-11-22T06:45:26.116886+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": "01a1ff85-faae-7c2e-b897-fe957985ca78",
+          "body": "Change request: rebuild S02's record under the owner's 2026-11-21 scope change (#526). The missing MSP, TOGAF and SAFe artefacts are provided retroactively, the record is taken through the full lifecycle, and the project is re-closed through the gates.\n\nImpact: scope - the project's record and declared outputs are rebuilt and republished. Schedule - no change to the delivery tranche; the work runs in its rework batch. Cost - no separate cost baseline; the rework runs inside the existing programme tranche. Quality - every owned finding is executed or waived by a named owner, and the acceptance manifest is re-run at the closing head.\n\nDecision: accepted by the programme owner's standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14, recorded in #526.",
+          "code": "U5-CHG-S02",
+          "created_at": "2026-11-22T06:45:38.446695+00:00",
+          "id": "01a20200-d8b6-77fc-a176-76d4ea3f4567",
+          "impact": null,
+          "kind": "change",
+          "links": [
+            {
+              "kind": "issue",
+              "number": 526
+            },
+            {
+              "id": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+              "kind": "delegation"
+            }
+          ],
+          "meta": {
+            "change_request": "the retrospective rework of S02 under #526",
+            "decision": {
+              "decided_at": "2026-11-21",
+              "decided_by": "the programme owner's standing delegation",
+              "decision": "accepted",
+              "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+              "record": "#526"
+            },
+            "impact": {
+              "cost": "no separate cost baseline; the rework runs inside the existing programme tranche",
+              "quality": "every owned finding executed or waived by a named owner; manifest re-run at the closing head",
+              "schedule": "no change to the delivery tranche; the work runs in its rework batch",
+              "scope": "the record and declared outputs are rebuilt and republished"
+            }
+          },
+          "owner_job_id": null,
+          "probability": null,
+          "programme_id": null,
+          "project_id": "01a1d039-0d27-7b45-abb5-bf851a4c3d4a",
+          "response": null,
+          "review_at": null,
+          "severity": null,
+          "status": "accepted",
+          "title": "Retrospective MSP/TOGAF/SAFe rework of S02 under the #526 scope change",
+          "updated_at": "2026-11-22T06:45:38.446695+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": "01a20063-7af8-727b-b092-24de3821d204",
+          "body": "Change request: rebuild S03's record under the owner's 2026-11-21 scope change (#526). The missing MSP, TOGAF and SAFe artefacts are provided retroactively, the record is taken through the full lifecycle, and the project is re-closed through the gates.\n\nImpact: scope - the project's record and declared outputs are rebuilt and republished. Schedule - no change to the delivery tranche. Cost - no separate cost baseline; the rework runs inside the existing programme tranche. Quality - every owned finding is executed or waived by a named owner, and the acceptance manifest is re-run at the closing head.\n\nDecision: accepted by the programme owner's standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14, recorded in #526.",
+          "code": "U5-CHG-S03",
+          "created_at": "2026-11-22T07:34:36.878165+00:00",
+          "id": "01a2022d-b82e-723c-ac03-07afb43890dc",
+          "impact": null,
+          "kind": "change",
+          "links": [
+            {
+              "kind": "issue",
+              "number": 526
+            },
+            {
+              "id": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+              "kind": "delegation"
+            }
+          ],
+          "meta": {
+            "change_request": "the retrospective rework of S03 under #526",
+            "decision": {
+              "decided_at": "2026-11-21",
+              "decided_by": "the programme owner's standing delegation",
+              "decision": "accepted",
+              "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+              "record": "#526"
+            },
+            "impact": {
+              "cost": "no separate cost baseline; inside the existing tranche",
+              "quality": "every owned finding executed or waived; manifest re-run at the closing head",
+              "schedule": "no change to the delivery tranche",
+              "scope": "the record and declared outputs are rebuilt and republished"
+            }
+          },
+          "owner_job_id": null,
+          "probability": null,
+          "programme_id": null,
+          "project_id": "01a1d039-0d28-743b-86c7-0d0698ed69c1",
+          "response": null,
+          "review_at": null,
+          "severity": null,
+          "status": "accepted",
+          "title": "Retrospective MSP/TOGAF/SAFe rework of S03 under the #526 scope change",
+          "updated_at": "2026-11-22T07:34:36.878165+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": "01a20256-44d0-731d-b345-fffc5f3ac9e8",
+          "body": "Change request: rebuild S04's record under the owner's 2026-11-21 scope change (#526). The delivered action registry is recorded with its charter, SoAW, scope baseline, A-D artefacts, Phase-G review, closure and SAFe rows. Impact: scope - the record and declared outputs are rebuilt and republished; schedule - no change to the delivery tranche; cost - no separate cost baseline; quality - every owned finding is executed or waived and the acceptance manifest is re-run at the closing head. Decision: accepted by the programme owner's standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14, recorded in #526.",
+          "code": "U5-CHG-S04",
+          "created_at": "2026-11-22T08:19:55.959914+00:00",
+          "id": "01a20257-2b24-748f-81b2-0f3edd40e95b",
+          "impact": null,
+          "kind": "change",
+          "links": [
+            {
+              "kind": "issue",
+              "number": 526
+            },
+            {
+              "id": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+              "kind": "delegation"
+            }
+          ],
+          "meta": {
+            "change_request": "the retrospective rework of S04 under #526",
+            "decision": {
+              "decided_at": "2026-11-21",
+              "decided_by": "the programme owner's standing delegation",
+              "decision": "accepted",
+              "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+              "record": "#526"
+            },
+            "impact": {
+              "cost": "no separate cost baseline",
+              "quality": "every owned finding executed or waived; manifest re-run at the closing head",
+              "schedule": "no change to the delivery tranche",
+              "scope": "the record and declared outputs are rebuilt and republished"
+            }
+          },
+          "owner_job_id": null,
+          "probability": null,
+          "programme_id": null,
+          "project_id": "01a1d039-0d28-7eb6-a62a-f420e742595c",
+          "response": null,
+          "review_at": null,
+          "severity": null,
+          "status": "accepted",
+          "title": "Retrospective MSP/TOGAF/SAFe rework of S04 under the #526 scope change",
+          "updated_at": "2026-11-22T08:19:55.959914+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": "01a1ff47-5043-73f7-b18d-2fc03832c96a",
+          "body": "Change request: rebuild T0's record under the owner's 2026-11-21 scope change (#526). The missing MSP, TOGAF and SAFe artefacts are provided retroactively, the record is taken through the full lifecycle, and the project is re-closed through the gates.\n\nImpact: scope - the project's record and declared outputs are rebuilt and republished. Schedule - no change to the delivery tranche; the work runs in its rework batch. Cost - no separate cost baseline; the rework runs inside the existing programme tranche. Quality - every owned finding is executed or waived by a named owner, and the acceptance manifest is re-run at the closing head.\n\nDecision: accepted by the programme owner's standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14, recorded in #526.",
+          "code": "U5-CHG-T0",
+          "created_at": "2026-11-22T06:45:56.395202+00:00",
+          "id": "01a20201-1d76-7169-871c-ff02d6f012fc",
+          "impact": null,
+          "kind": "change",
+          "links": [
+            {
+              "kind": "issue",
+              "number": 526
+            },
+            {
+              "id": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+              "kind": "delegation"
+            }
+          ],
+          "meta": {
+            "change_request": "the retrospective rework of T0 under #526",
+            "decision": {
+              "decided_at": "2026-11-21",
+              "decided_by": "the programme owner's standing delegation",
+              "decision": "accepted",
+              "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+              "record": "#526"
+            },
+            "impact": {
+              "cost": "no separate cost baseline; the rework runs inside the existing programme tranche",
+              "quality": "every owned finding executed or waived by a named owner; manifest re-run at the closing head",
+              "schedule": "no change to the delivery tranche; the work runs in its rework batch",
+              "scope": "the record and declared outputs are rebuilt and republished"
+            }
+          },
+          "owner_job_id": null,
+          "probability": null,
+          "programme_id": null,
+          "project_id": "01a1d039-0d32-7734-98da-fb7f1e2386c7",
+          "response": null,
+          "review_at": null,
+          "severity": null,
+          "status": "accepted",
+          "title": "Retrospective MSP/TOGAF/SAFe rework of T0 under the #526 scope change",
+          "updated_at": "2026-11-22T06:45:56.395202+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": "01a1ff8a-b4f0-7e6e-9cc7-4231076e1039",
+          "body": "Change request: rebuild T1's record under the owner's 2026-11-21 scope change (#526). The missing MSP, TOGAF and SAFe artefacts are provided retroactively, the record is taken through the full lifecycle, and the project is re-closed through the gates.\n\nImpact: scope - the project's record and declared outputs are rebuilt and republished. Schedule - no change to the delivery tranche; the work runs in its rework batch. Cost - no separate cost baseline; the rework runs inside the existing programme tranche. Quality - every owned finding is executed or waived by a named owner, and the acceptance manifest is re-run at the closing head.\n\nDecision: accepted by the programme owner's standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14, recorded in #526.",
+          "code": "U5-CHG-T1",
+          "created_at": "2026-11-22T06:46:05.099021+00:00",
+          "id": "01a20201-41bd-7c64-899e-03d76d99b737",
+          "impact": null,
+          "kind": "change",
+          "links": [
+            {
+              "kind": "issue",
+              "number": 526
+            },
+            {
+              "id": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+              "kind": "delegation"
+            }
+          ],
+          "meta": {
+            "change_request": "the retrospective rework of T1 under #526",
+            "decision": {
+              "decided_at": "2026-11-21",
+              "decided_by": "the programme owner's standing delegation",
+              "decision": "accepted",
+              "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+              "record": "#526"
+            },
+            "impact": {
+              "cost": "no separate cost baseline; the rework runs inside the existing programme tranche",
+              "quality": "every owned finding executed or waived by a named owner; manifest re-run at the closing head",
+              "schedule": "no change to the delivery tranche; the work runs in its rework batch",
+              "scope": "the record and declared outputs are rebuilt and republished"
+            }
+          },
+          "owner_job_id": null,
+          "probability": null,
+          "programme_id": null,
+          "project_id": "01a1d039-0d32-7c81-8365-371217d16ef7",
+          "response": null,
+          "review_at": null,
+          "severity": null,
+          "status": "accepted",
+          "title": "Retrospective MSP/TOGAF/SAFe rework of T1 under the #526 scope change",
+          "updated_at": "2026-11-22T06:46:05.099021+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": "01a2005c-5a4f-7eb5-a004-ccb5545eb6fb",
+          "body": "Change request: rebuild T2's record under the owner's 2026-11-21 scope change (#526). The missing MSP, TOGAF and SAFe artefacts are provided retroactively, the record is taken through the full lifecycle, and the project is re-closed through the gates.\n\nImpact: scope - the project's record and declared outputs are rebuilt and republished. Schedule - no change to the delivery tranche. Cost - no separate cost baseline; the rework runs inside the existing programme tranche. Quality - every owned finding is executed or waived by a named owner, and the acceptance manifest is re-run at the closing head.\n\nDecision: accepted by the programme owner's standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14, recorded in #526.",
+          "code": "U5-CHG-T2",
+          "created_at": "2026-11-22T07:34:55.786488+00:00",
+          "id": "01a2022d-f9a0-785a-be03-30a658a59468",
+          "impact": null,
+          "kind": "change",
+          "links": [
+            {
+              "kind": "issue",
+              "number": 526
+            },
+            {
+              "id": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+              "kind": "delegation"
+            }
+          ],
+          "meta": {
+            "change_request": "the retrospective rework of T2 under #526",
+            "decision": {
+              "decided_at": "2026-11-21",
+              "decided_by": "the programme owner's standing delegation",
+              "decision": "accepted",
+              "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+              "record": "#526"
+            },
+            "impact": {
+              "cost": "no separate cost baseline; inside the existing tranche",
+              "quality": "every owned finding executed or waived; manifest re-run at the closing head",
+              "schedule": "no change to the delivery tranche",
+              "scope": "the record and declared outputs are rebuilt and republished"
+            }
+          },
+          "owner_job_id": null,
+          "probability": null,
+          "programme_id": null,
+          "project_id": "01a1d039-0d33-7282-b7b0-6dde32c38ab1",
+          "response": null,
+          "review_at": null,
+          "severity": null,
+          "status": "accepted",
+          "title": "Retrospective MSP/TOGAF/SAFe rework of T2 under the #526 scope change",
+          "updated_at": "2026-11-22T07:34:55.786488+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": "01a1ff8f-47cb-78cf-9db8-d98d863e7dd0",
+          "body": "Change request: rebuild T11's record under the owner's 2026-11-21 scope change (#526). The missing MSP, TOGAF and SAFe artefacts are provided retroactively, the record is taken through the full lifecycle, and the project is re-closed through the gates.\n\nImpact: scope - the project's record and declared outputs are rebuilt and republished. Schedule - no change to the delivery tranche; the work runs in its rework batch. Cost - no separate cost baseline; the rework runs inside the existing programme tranche. Quality - every owned finding is executed or waived by a named owner, and the acceptance manifest is re-run at the closing head.\n\nDecision: accepted by the programme owner's standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14, recorded in #526.",
+          "code": "U5-CHG-T11",
+          "created_at": "2026-11-22T06:46:12.810732+00:00",
+          "id": "01a20201-5f8c-7e50-aae8-1f3e8544bd72",
+          "impact": null,
+          "kind": "change",
+          "links": [
+            {
+              "kind": "issue",
+              "number": 526
+            },
+            {
+              "id": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+              "kind": "delegation"
+            }
+          ],
+          "meta": {
+            "change_request": "the retrospective rework of T11 under #526",
+            "decision": {
+              "decided_at": "2026-11-21",
+              "decided_by": "the programme owner's standing delegation",
+              "decision": "accepted",
+              "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+              "record": "#526"
+            },
+            "impact": {
+              "cost": "no separate cost baseline; the rework runs inside the existing programme tranche",
+              "quality": "every owned finding executed or waived by a named owner; manifest re-run at the closing head",
+              "schedule": "no change to the delivery tranche; the work runs in its rework batch",
+              "scope": "the record and declared outputs are rebuilt and republished"
+            }
+          },
+          "owner_job_id": null,
+          "probability": null,
+          "programme_id": null,
+          "project_id": "01a1d039-0d36-782b-8b18-ff07a64dedbe",
+          "response": null,
+          "review_at": null,
+          "severity": null,
+          "status": "accepted",
+          "title": "Retrospective MSP/TOGAF/SAFe rework of T11 under the #526 scope change",
+          "updated_at": "2026-11-22T06:46:12.810732+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": "01a20279-854d-79f6-a751-a34d51be7589",
+          "body": "The scope baseline freezes the plan; recording the deliverable's acceptance with its evidence is the one change this record makes to it.",
+          "code": "",
+          "created_at": "2026-11-22T10:17:36.77133+00:00",
+          "id": "01a202c2-e964-7130-8d6e-cb922e2667cb",
+          "impact": null,
+          "kind": "change",
+          "links": [],
+          "meta": {
+            "approved_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+            "impact": {
+              "scope": "the WBS deliverable's acceptance evidence"
+            }
+          },
+          "owner_job_id": null,
+          "probability": null,
+          "programme_id": null,
+          "project_id": "01a1d039-0d37-730f-8f8a-2f50e5a0933d",
+          "response": null,
+          "review_at": null,
+          "severity": null,
+          "status": "approved",
+          "title": "Accept the retrospective WBS deliverable for T13",
+          "updated_at": "2026-11-22T10:17:43.67327+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": "01a20279-854d-79f6-a751-a34d51be7589",
+          "body": "Measure B2 (less bespoke tooling) against the live record at the 2026-11-22 snapshot so its benefit profile carries a pre-transition baseline. B2's measured target is: every service a job uses is a toolkit; a toolkit with no calls in a cycle is retired or justified. This change authorises the profile measurement; the profile update follows under this change id.",
+          "code": "",
+          "created_at": "2026-11-22T19:59:24.272062+00:00",
+          "id": "01a204d7-8a84-789a-b02f-c8df27246bc0",
+          "impact": null,
+          "kind": "change",
+          "links": [],
+          "meta": {
+            "approved_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+            "impact": {
+              "scope": "B2's benefit profile gains its measured baseline; no project scope, schedule or cost changes."
+            }
+          },
+          "owner_job_id": null,
+          "probability": null,
+          "programme_id": null,
+          "project_id": "01a1d039-0d37-730f-8f8a-2f50e5a0933d",
+          "response": null,
+          "review_at": null,
+          "severity": null,
+          "status": "approved",
+          "title": "Record the B2 benefit baseline",
+          "updated_at": "2026-11-22T19:59:41.752181+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": "01a1ff3e-51c4-75b1-9db1-a2f729dd10b8",
+          "body": "Change request: rebuild DESIGN-PUBLISH's record under the owner's 2026-11-21 scope change (#526). The missing MSP, TOGAF and SAFe artefacts are provided retroactively, the record is taken through the full lifecycle, and the project is re-closed through the gates.\n\nImpact: scope - the project's record and declared outputs are rebuilt and republished. Schedule - no change to the delivery tranche; the work runs in its rework batch. Cost - no separate cost baseline; the rework runs inside the existing programme tranche. Quality - every owned finding is executed or waived by a named owner, and the acceptance manifest is re-run at the closing head.\n\nDecision: accepted by the programme owner's standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14, recorded in #526.",
+          "code": "U5-CHG-DESIGN-PUBLISH",
+          "created_at": "2026-11-22T06:44:53.339123+00:00",
+          "id": "01a20200-26e0-71ea-b81a-e5da0e806aea",
+          "impact": null,
+          "kind": "change",
+          "links": [
+            {
+              "kind": "issue",
+              "number": 526
+            },
+            {
+              "id": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+              "kind": "delegation"
+            }
+          ],
+          "meta": {
+            "change_request": "the retrospective rework of DESIGN-PUBLISH under #526",
+            "decision": {
+              "decided_at": "2026-11-21",
+              "decided_by": "the programme owner's standing delegation",
+              "decision": "accepted",
+              "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+              "record": "#526"
+            },
+            "impact": {
+              "cost": "no separate cost baseline; the rework runs inside the existing programme tranche",
+              "quality": "every owned finding executed or waived by a named owner; manifest re-run at the closing head",
+              "schedule": "no change to the delivery tranche; the work runs in its rework batch",
+              "scope": "the record and declared outputs are rebuilt and republished"
+            }
+          },
+          "owner_job_id": null,
+          "probability": null,
+          "programme_id": null,
+          "project_id": "01a1d039-0d39-7414-b43c-450de170ffe1",
+          "response": null,
+          "review_at": null,
+          "severity": null,
+          "status": "accepted",
+          "title": "Retrospective MSP/TOGAF/SAFe rework of DESIGN-PUBLISH under the #526 scope change",
+          "updated_at": "2026-11-22T06:44:53.339123+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": "01a1fdd8-cff3-7cd9-9535-26fed3d5836b",
+          "body": "Change request: rebuild PLATFORM's record under the owner's 2026-11-21 scope change (#526). The missing MSP, TOGAF and SAFe artefacts are provided retroactively, the record is taken through the full lifecycle, and the project is re-closed through the gates.\n\nImpact: scope - the project's record and declared outputs are rebuilt and republished. Schedule - no change to the delivery tranche; the work runs in its rework batch. Cost - no separate cost baseline; the rework runs inside the existing programme tranche. Quality - every owned finding is executed or waived by a named owner, and the acceptance manifest is re-run at the closing head.\n\nDecision: accepted by the programme owner's standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14, recorded in #526.",
+          "code": "U5-CHG-PLATFORM",
+          "created_at": "2026-11-22T06:45:04.5686+00:00",
+          "id": "01a20200-562e-7a53-9fcd-e136048a00fb",
+          "impact": null,
+          "kind": "change",
+          "links": [
+            {
+              "kind": "issue",
+              "number": 526
+            },
+            {
+              "id": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+              "kind": "delegation"
+            }
+          ],
+          "meta": {
+            "change_request": "the retrospective rework of PLATFORM under #526",
+            "decision": {
+              "decided_at": "2026-11-21",
+              "decided_by": "the programme owner's standing delegation",
+              "decision": "accepted",
+              "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+              "record": "#526"
+            },
+            "impact": {
+              "cost": "no separate cost baseline; the rework runs inside the existing programme tranche",
+              "quality": "every owned finding executed or waived by a named owner; manifest re-run at the closing head",
+              "schedule": "no change to the delivery tranche; the work runs in its rework batch",
+              "scope": "the record and declared outputs are rebuilt and republished"
+            }
+          },
+          "owner_job_id": null,
+          "probability": null,
+          "programme_id": null,
+          "project_id": "01a1d039-0d39-79ce-84b6-1173b94bc67f",
+          "response": null,
+          "review_at": null,
+          "severity": null,
+          "status": "accepted",
+          "title": "Retrospective MSP/TOGAF/SAFe rework of PLATFORM under the #526 scope change",
+          "updated_at": "2026-11-22T06:45:04.5686+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": "01a1fdd8-cff3-7cd9-9535-26fed3d5836b",
+          "body": "The programme's acceptance standard changes. A project is done only when (a) every gate clause is discharged by executable checks with an explicit kind (record/probe/code); (b) every mandatory artefact is evidenced with a published document; (c) every P0/P1 package is resolved; (d) every gate records a rule decision with a resolving delegation_ref; (e) outputs are published at the head; (f) the SAFe rows exist; (g) a Phase-G review with snapshot_sha triages findings; (h) the risk, ADR and benefit registers are operated; (i) no finding and no waiver is open; (j) the published pack is current at the head. No deferral is a disposition. Impact analysis and the affected verdicts are in meta.impact and the #526 work table (comment 7077202144). This change row stays open until its `change` gate can be approved: the guard reads meta.change_id, which no action writes today (v1-change-1, fix in flight). Approving it before that fix would be a false record, so it is not approved here.",
+          "code": "U5-ACCEPTANCE-STANDARD",
+          "created_at": "2026-11-22T09:39:00.040076+00:00",
+          "id": "01a2029f-8e2e-78de-bc99-119da42fdfbf",
+          "impact": null,
+          "kind": "change",
+          "links": [
+            {
+              "kind": "issue",
+              "number": 526
+            },
+            {
+              "id": "01a2029c-9254-7605-8a7c-3013b28ee794",
+              "kind": "document"
+            },
+            {
+              "id": "01a2029f-5a5f-70aa-be13-029435893a40",
+              "kind": "register_item"
+            }
+          ],
+          "meta": {
+            "blocked_by": "v1-change-1: the change gate's approval reads meta.change_id, which approvals.request does not write",
+            "change": {
+              "board": "issue #526 comment 7077202144",
+              "snapshot_sha": "58645942341648d61628029e4e46c5c367c022f6",
+              "standard": "v5 \u00a75 clauses (a)-(j)"
+            },
+            "decision": {
+              "decided_at": "2026-11-22",
+              "decided_by_kind": "rule",
+              "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+              "document": "01a2029c-9254-7605-8a7c-3013b28ee794",
+              "record": "#526"
+            },
+            "impact": {
+              "risk": "Red-first landing: 98 open findings and 539 packages become visible; no green is claimed until they clear.",
+              "schedule": "Applies retroactively to tranche 3 and every later tranche review.",
+              "scope": "All 47 project manifests and four instruments change verdict semantics; the 12 green projects are re-rendered under the executed-gate rule and the count is expected to fall."
+            }
+          },
+          "owner_job_id": null,
+          "probability": null,
+          "programme_id": null,
+          "project_id": "01a1d039-0d39-79ce-84b6-1173b94bc67f",
+          "response": null,
+          "review_at": null,
+          "severity": "P1",
+          "status": "open",
+          "title": "Change: the enhanced acceptance standard (gates executed, no deferrals)",
+          "updated_at": "2026-11-22T09:39:00.040076+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": "01a1ff42-ba64-7670-b694-99bb4b1354e5",
+          "body": "Change request: rebuild SPEC-V2's record under the owner's 2026-11-21 scope change (#526). The missing MSP, TOGAF and SAFe artefacts are provided retroactively, the record is taken through the full lifecycle, and the project is re-closed through the gates.\n\nImpact: scope - the project's record and declared outputs are rebuilt and republished. Schedule - no change to the delivery tranche; the work runs in its rework batch. Cost - no separate cost baseline; the rework runs inside the existing programme tranche. Quality - every owned finding is executed or waived by a named owner, and the acceptance manifest is re-run at the closing head.\n\nDecision: accepted by the programme owner's standing delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14, recorded in #526.",
+          "code": "U5-CHG-SPEC-V2",
+          "created_at": "2026-11-22T06:45:47.129531+00:00",
+          "id": "01a20200-f9a9-7e37-af71-c4cf15ca9b71",
+          "impact": null,
+          "kind": "change",
+          "links": [
+            {
+              "kind": "issue",
+              "number": 526
+            },
+            {
+              "id": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+              "kind": "delegation"
+            }
+          ],
+          "meta": {
+            "change_request": "the retrospective rework of SPEC-V2 under #526",
+            "decision": {
+              "decided_at": "2026-11-21",
+              "decided_by": "the programme owner's standing delegation",
+              "decision": "accepted",
+              "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+              "record": "#526"
+            },
+            "impact": {
+              "cost": "no separate cost baseline; the rework runs inside the existing programme tranche",
+              "quality": "every owned finding executed or waived by a named owner; manifest re-run at the closing head",
+              "schedule": "no change to the delivery tranche; the work runs in its rework batch",
+              "scope": "the record and declared outputs are rebuilt and republished"
+            }
+          },
+          "owner_job_id": null,
+          "probability": null,
+          "programme_id": null,
+          "project_id": "01a1d039-0d39-7f3b-bd04-211f7dfe1e50",
+          "response": null,
+          "review_at": null,
+          "severity": null,
+          "status": "accepted",
+          "title": "Retrospective MSP/TOGAF/SAFe rework of SPEC-V2 under the #526 scope change",
+          "updated_at": "2026-11-22T06:45:47.129531+00:00",
+          "version": 1
+        },
+        {
+          "baseline_ref": "01a1fbb1-b05c-76b6-a5ac-7186fb859dcc",
+          "body": "Approved under the standing delegation; cites the baseline-v2 acceptance output.",
+          "code": "U3-REBASELINE",
+          "created_at": "2026-11-21T01:21:50.581194+00:00",
+          "id": "01a1fbb2-06fd-71ac-9503-6696c218549c",
+          "impact": 0,
+          "kind": "change",
+          "links": [],
+          "meta": {
+            "impact": {
+              "cost": 0,
+              "schedule": 0,
+              "scope": "record correction"
+            }
+          },
+          "owner_job_id": null,
+          "probability": null,
+          "programme_id": null,
+          "project_id": "01a1dcb8-d24b-76de-b901-56fd56e001bc",
+          "response": null,
+          "review_at": null,
+          "severity": null,
+          "status": "approved",
+          "title": "Re-baseline tranches 9\u201313 to the accepted management baseline v2",
+          "updated_at": "2026-11-21T01:21:55.82619+00:00",
+          "version": 2
+        },
+        {
+          "baseline_ref": "01a1fbb1-b05c-76b6-a5ac-7186fb859dcc",
+          "body": "B1-B6 carry a placeholder baseline and incomplete groups; the measurements are in benefit_measurement. This change authorises the profile fields to cite the measured baselines.",
+          "code": "",
+          "created_at": "2026-11-22T19:56:04.763551+00:00",
+          "id": "01a204d4-7f2e-7a73-bf79-4b8767d52db8",
+          "impact": null,
+          "kind": "change",
+          "links": [
+            {
+              "id": "01a1e9de-4e4f-757e-a8c8-bf3522e5adcf",
+              "kind": "benefit"
+            },
+            {
+              "id": "01a1e9df-27b8-7827-ae4e-6d48ca5904e8",
+              "kind": "benefit"
+            }
+          ],
+          "meta": {
+            "approved_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+            "impact": {
+              "scope": "benefit profiles B1-B6: baseline, capabilities, operational_area, category, objectives, kpis, cost, preconditions, risks"
+            }
+          },
+          "owner_job_id": null,
+          "probability": null,
+          "programme_id": null,
+          "project_id": "01a1dcb8-d24b-76de-b901-56fd56e001bc",
+          "response": null,
+          "review_at": null,
+          "severity": null,
+          "status": "approved",
+          "title": "Record the six benefit profile baselines and six field groups",
+          "updated_at": "2026-11-22T19:56:58.852866+00:00",
+          "version": 3
+        },
+        {
+          "card_id": "01a1f7fc-a653-7545-8fc3-0a5157569a12",
+          "created_at": "2026-11-20T08:05:03.597162+00:00",
+          "expires_at": null,
+          "gate": "ops.mitigate",
+          "id": "01a1f7fc-d2ec-7137-b28e-12217dd7618d",
+          "kind": "ops",
+          "meta": {
+            "description": "Restart the injected workload after the crash-loop runbook selected it",
+            "target": "incident/01a1f7fc-a653-7545-8fc3-0a5157569a12/nonagentic-ops/deployment/ops-proof/restart"
+          },
+          "project_id": null,
+          "requested_by": "01a1cf1e-09dd-7580-99cc-de395f3e86cc",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-20T08:05:27.223057+00:00",
+          "version": 2
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-21T01:21:00.2986+00:00",
+          "expires_at": null,
+          "gate": "charter",
+          "id": "01a1fbb1-43b4-7c55-ae77-493c426731fa",
+          "kind": "pm",
+          "meta": {
+            "charter_asset_id": "01a1fbb1-430f-78ff-a9ae-956f7759a67d",
+            "description": "Approve the charter for P0"
+          },
+          "project_id": "01a1dcb8-d24b-76de-b901-56fd56e001bc",
+          "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-21T01:21:05.898594+00:00",
+          "version": 2
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-21T01:21:28.099656+00:00",
+          "expires_at": null,
+          "gate": "baseline",
+          "id": "01a1fbb1-b0c6-7348-8f86-2b3c4b4c620a",
+          "kind": "pm",
+          "meta": {
+            "baseline_id": "01a1fbb1-b05c-76b6-a5ac-7186fb859dcc",
+            "description": "Approve the scope baseline"
+          },
+          "project_id": "01a1dcb8-d24b-76de-b901-56fd56e001bc",
+          "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-21T11:15:46.123875+00:00",
+          "version": 2
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-21T11:16:30.333744+00:00",
+          "expires_at": null,
+          "gate": "architecture_board",
+          "id": "01a1fdd2-74eb-7fe3-a424-cdf02d021931",
+          "kind": "architecture_board",
+          "meta": {
+            "body_id": "01a1f2c0-b22a-7e27-a6cc-1a8e48db327e",
+            "evidence": {
+              "delegation_ref": "01a1fb9f-ac2d-732d-b274-1079be3dd2b3"
+            },
+            "subject_id": "01a1fdd2-5041-7f80-8032-3305751d498c",
+            "subject_kind": "contract"
+          },
+          "project_id": null,
+          "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-21T11:16:30.333744+00:00",
+          "version": 1
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-21T11:19:03.387858+00:00",
+          "expires_at": null,
+          "gate": "architecture_board",
+          "id": "01a1fdd4-cac3-7767-9b0f-4c15d064d6f6",
+          "kind": "architecture_board",
+          "meta": {
+            "body_id": "01a1f2c0-b22a-7e27-a6cc-1a8e48db327e",
+            "evidence": {
+              "delegation_ref": "01a1fb9f-ac2d-732d-b274-1079be3dd2b3"
+            },
+            "subject_id": "01a1fdd4-ab0f-7802-b7a7-2541a2902e6b",
+            "subject_kind": "contract"
+          },
+          "project_id": null,
+          "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-21T11:19:03.387858+00:00",
+          "version": 1
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-21T11:20:03.655377+00:00",
+          "expires_at": null,
+          "gate": "closure",
+          "id": "01a1fdd5-b773-78c3-87d1-8f3c5ae9eeda",
+          "kind": "pm",
+          "meta": {
+            "closure_asset_id": "01a1fdd5-b6e0-7d7e-818f-9b46cd7b5bfe",
+            "delegation_ref": "01a1fb9f-ac2d-732d-b274-1079be3dd2b3",
+            "description": "U5a rework complete",
+            "evidence": {
+              "manifest": "acceptance/programme/P0.toml",
+              "snapshot_sha": "5dfd3fa0"
+            }
+          },
+          "project_id": "01a1dcb8-d24b-76de-b901-56fd56e001bc",
+          "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-21T11:20:54.250212+00:00",
+          "version": 2
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-21T11:23:15.154352+00:00",
+          "expires_at": null,
+          "gate": "charter",
+          "id": "01a1fdd8-a348-7c44-a08c-1ba2f29162b9",
+          "kind": "pm",
+          "meta": {
+            "charter_asset_id": "01a1fdd8-a2b1-708d-b8cf-39e4e2177592",
+            "description": "Approve the charter for PLATFORM"
+          },
+          "project_id": "01a1d039-0d39-79ce-84b6-1173b94bc67f",
+          "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-21T11:23:20.399959+00:00",
+          "version": 2
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-21T11:23:26.290608+00:00",
+          "expires_at": null,
+          "gate": "baseline",
+          "id": "01a1fdd8-d052-7532-8e66-944a4db595ab",
+          "kind": "pm",
+          "meta": {
+            "baseline_id": "01a1fdd8-cff3-7cd9-9535-26fed3d5836b",
+            "description": "Approve the scope baseline"
+          },
+          "project_id": "01a1d039-0d39-79ce-84b6-1173b94bc67f",
+          "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-21T11:23:38.379267+00:00",
+          "version": 2
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-21T17:36:12.464739+00:00",
+          "expires_at": null,
+          "gate": "charter",
+          "id": "01a1ff2e-16ac-7c92-b0a6-0cc3385a57a7",
+          "kind": "pm",
+          "meta": {
+            "charter_asset_id": "01a1ff2e-1618-7ff9-8ca7-839f7197ce33",
+            "description": "Approve the charter for S01"
+          },
+          "project_id": "01a1d039-0d27-724c-9bae-af96b2d926b1",
+          "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-21T17:36:18.441736+00:00",
+          "version": 2
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-21T17:38:03.528727+00:00",
+          "expires_at": null,
+          "gate": "architecture_board",
+          "id": "01a1ff2f-c76b-7bfe-b71a-a39294a95644",
+          "kind": "architecture_board",
+          "meta": {
+            "body_id": "01a1f2c0-b22a-7e27-a6cc-1a8e48db327e",
+            "evidence": {
+              "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+              "manifest": "acceptance/programme/S01.toml",
+              "sha": "d7293f96082dbf2f99f53bb8fd765834dddf6858"
+            },
+            "subject_id": "01a1ff2e-7974-74cd-be6d-377e3c0071a4",
+            "subject_kind": "contract"
+          },
+          "project_id": null,
+          "requested_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-21T17:38:03.528727+00:00",
+          "version": 1
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-21T17:39:40.95611+00:00",
+          "expires_at": null,
+          "gate": "architecture_board",
+          "id": "01a1ff31-4403-7988-a64b-796300ce7102",
+          "kind": "architecture_board",
+          "meta": {
+            "body_id": "01a1f2c0-b22a-7e27-a6cc-1a8e48db327e",
+            "evidence": {
+              "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+              "manifest": "acceptance/programme/S01.toml",
+              "sha": "d7293f96082dbf2f99f53bb8fd765834dddf6858"
+            },
+            "subject_id": "01a1ff31-30fe-7003-8d62-59278699d128",
+            "subject_kind": "contract"
+          },
+          "project_id": null,
+          "requested_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-21T17:39:40.95611+00:00",
+          "version": 1
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-21T17:39:52.695711+00:00",
+          "expires_at": null,
+          "gate": "baseline",
+          "id": "01a1ff31-7348-7c52-b06f-e57cf09796e9",
+          "kind": "pm",
+          "meta": {
+            "baseline_id": "01a1ff31-72ec-766e-8ad3-227d927f64ab",
+            "description": "Approve the scope baseline"
+          },
+          "project_id": "01a1d039-0d27-724c-9bae-af96b2d926b1",
+          "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-21T17:39:58.128294+00:00",
+          "version": 2
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-21T17:42:39.980183+00:00",
+          "expires_at": null,
+          "gate": "closure",
+          "id": "01a1ff34-00a1-75eb-9022-02be586d0bb3",
+          "kind": "pm",
+          "meta": {
+            "closure_asset_id": "01a1ff34-0014-7020-b4fe-ff513a4dd938",
+            "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+            "description": "Close S01",
+            "evidence": {
+              "manifest": "acceptance/programme/S01.toml",
+              "retrospective": true,
+              "sha": "d7293f96082dbf2f99f53bb8fd765834dddf6858"
+            }
+          },
+          "project_id": "01a1d039-0d27-724c-9bae-af96b2d926b1",
+          "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-21T17:42:45.401096+00:00",
+          "version": 2
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-21T17:46:32.264807+00:00",
+          "expires_at": null,
+          "gate": "charter",
+          "id": "01a1ff37-8bae-7976-bf95-98ccac0c7735",
+          "kind": "pm",
+          "meta": {
+            "charter_asset_id": "01a1ff37-8b1a-7821-84c1-a598eadedccb",
+            "description": "Approve the charter for S00"
+          },
+          "project_id": "01a1d039-0d26-7573-9b0c-e0f60af92003",
+          "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-21T17:46:38.348793+00:00",
+          "version": 2
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-21T17:46:59.884642+00:00",
+          "expires_at": null,
+          "gate": "architecture_board",
+          "id": "01a1ff37-f693-7336-8c6d-fe98f6f5c7b7",
+          "kind": "architecture_board",
+          "meta": {
+            "body_id": "01a1f2c0-b22a-7e27-a6cc-1a8e48db327e",
+            "evidence": {
+              "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+              "manifest": "acceptance/programme/S00.toml",
+              "sha": "d7293f96082dbf2f99f53bb8fd765834dddf6858"
+            },
+            "subject_id": "01a1ff37-e240-779b-aab5-74a3fa86ecad",
+            "subject_kind": "contract"
+          },
+          "project_id": null,
+          "requested_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-21T17:46:59.884642+00:00",
+          "version": 1
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-21T17:48:33.244929+00:00",
+          "expires_at": null,
+          "gate": "architecture_board",
+          "id": "01a1ff39-637a-7a73-b91f-f95a02e804da",
+          "kind": "architecture_board",
+          "meta": {
+            "body_id": "01a1f2c0-b22a-7e27-a6cc-1a8e48db327e",
+            "evidence": {
+              "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+              "manifest": "acceptance/programme/S00.toml",
+              "sha": "d7293f96082dbf2f99f53bb8fd765834dddf6858"
+            },
+            "subject_id": "01a1ff39-4ee0-7ecc-93cc-eeaf21fb9738",
+            "subject_kind": "contract"
+          },
+          "project_id": null,
+          "requested_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-21T17:48:33.244929+00:00",
+          "version": 1
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-21T17:48:43.761438+00:00",
+          "expires_at": null,
+          "gate": "baseline",
+          "id": "01a1ff39-8dc8-78db-bb58-2d18f93d0b35",
+          "kind": "pm",
+          "meta": {
+            "baseline_id": "01a1ff39-8d6e-7270-b2ba-9d235eb28b83",
+            "description": "Approve the scope baseline"
+          },
+          "project_id": "01a1d039-0d26-7573-9b0c-e0f60af92003",
+          "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-21T17:48:48.880013+00:00",
+          "version": 2
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-21T17:50:25.358626+00:00",
+          "expires_at": null,
+          "gate": "closure",
+          "id": "01a1ff3b-1a6d-7952-be39-4a4f470ad5c3",
+          "kind": "pm",
+          "meta": {
+            "closure_asset_id": "01a1ff3b-19e4-7cc4-b08a-b367e42c4bf2",
+            "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+            "description": "Close S00",
+            "evidence": {
+              "manifest": "acceptance/programme/S00.toml",
+              "retrospective": true,
+              "sha": "d7293f96082dbf2f99f53bb8fd765834dddf6858"
+            }
+          },
+          "project_id": "01a1d039-0d26-7573-9b0c-e0f60af92003",
+          "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-21T17:50:30.807955+00:00",
+          "version": 2
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-21T17:51:38.522667+00:00",
+          "expires_at": null,
+          "gate": "charter",
+          "id": "01a1ff3c-3804-71e8-bb10-4618621cb4c6",
+          "kind": "pm",
+          "meta": {
+            "charter_asset_id": "01a1ff3c-3774-7209-b1b0-effd34d1a368",
+            "description": "Approve the charter for DESIGN-PUBLISH"
+          },
+          "project_id": "01a1d039-0d39-7414-b43c-450de170ffe1",
+          "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-21T17:51:45.03777+00:00",
+          "version": 2
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-21T17:52:01.067648+00:00",
+          "expires_at": null,
+          "gate": "architecture_board",
+          "id": "01a1ff3c-8f0f-7326-b8a7-2de4d2eb6597",
+          "kind": "architecture_board",
+          "meta": {
+            "body_id": "01a1f2c0-b22a-7e27-a6cc-1a8e48db327e",
+            "evidence": {
+              "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+              "manifest": "acceptance/programme/DESIGN-PUBLISH.toml",
+              "sha": "d7293f96082dbf2f99f53bb8fd765834dddf6858"
+            },
+            "subject_id": "01a1ff3c-7aad-7dda-820e-1c7d85fe70a8",
+            "subject_kind": "contract"
+          },
+          "project_id": null,
+          "requested_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-21T17:52:01.067648+00:00",
+          "version": 1
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-21T17:53:45.459028+00:00",
+          "expires_at": null,
+          "gate": "architecture_board",
+          "id": "01a1ff3e-26d6-7491-b341-73c0ffa3a683",
+          "kind": "architecture_board",
+          "meta": {
+            "body_id": "01a1f2c0-b22a-7e27-a6cc-1a8e48db327e",
+            "evidence": {
+              "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+              "manifest": "acceptance/programme/DESIGN-PUBLISH.toml",
+              "sha": "d7293f96082dbf2f99f53bb8fd765834dddf6858"
+            },
+            "subject_id": "01a1ff3e-0f21-7e12-888d-1a54e7a90c9d",
+            "subject_kind": "contract"
+          },
+          "project_id": null,
+          "requested_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-21T17:53:45.459028+00:00",
+          "version": 1
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-21T17:53:56.128695+00:00",
+          "expires_at": null,
+          "gate": "baseline",
+          "id": "01a1ff3e-5250-70a7-bdd4-c16e15c3a99a",
+          "kind": "pm",
+          "meta": {
+            "baseline_id": "01a1ff3e-51c4-75b1-9db1-a2f729dd10b8",
+            "description": "Approve the scope baseline"
+          },
+          "project_id": "01a1d039-0d39-7414-b43c-450de170ffe1",
+          "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-21T17:54:02.472603+00:00",
+          "version": 2
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-21T17:55:32.990877+00:00",
+          "expires_at": null,
+          "gate": "closure",
+          "id": "01a1ff3f-cc40-7000-bce5-85f41c4c0b13",
+          "kind": "pm",
+          "meta": {
+            "closure_asset_id": "01a1ff3f-cba8-7809-9d2d-6609f579b191",
+            "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+            "description": "Close DESIGN-PUBLISH",
+            "evidence": {
+              "manifest": "acceptance/programme/DESIGN-PUBLISH.toml",
+              "retrospective": true,
+              "sha": "d7293f96082dbf2f99f53bb8fd765834dddf6858"
+            }
+          },
+          "project_id": "01a1d039-0d39-7414-b43c-450de170ffe1",
+          "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-21T17:55:38.354543+00:00",
+          "version": 2
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-21T17:56:36.680451+00:00",
+          "expires_at": null,
+          "gate": "charter",
+          "id": "01a1ff40-c4d6-71ed-8a42-171bcab5aa5e",
+          "kind": "pm",
+          "meta": {
+            "charter_asset_id": "01a1ff40-c439-7814-a804-9583b4ba4c2f",
+            "description": "Approve the charter for SPEC-V2"
+          },
+          "project_id": "01a1d039-0d39-7f3b-bd04-211f7dfe1e50",
+          "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-21T17:56:42.886021+00:00",
+          "version": 2
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-21T17:57:03.540609+00:00",
+          "expires_at": null,
+          "gate": "architecture_board",
+          "id": "01a1ff41-2c98-7646-b835-7c7a96e1ca6e",
+          "kind": "architecture_board",
+          "meta": {
+            "body_id": "01a1f2c0-b22a-7e27-a6cc-1a8e48db327e",
+            "evidence": {
+              "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+              "manifest": "acceptance/programme/SPEC-V2.toml",
+              "sha": "d7293f96082dbf2f99f53bb8fd765834dddf6858"
+            },
+            "subject_id": "01a1ff41-19f9-77bb-aa4a-f416f0d758e3",
+            "subject_kind": "contract"
+          },
+          "project_id": null,
+          "requested_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-21T17:57:03.540609+00:00",
+          "version": 1
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-21T17:58:34.815721+00:00",
+          "expires_at": null,
+          "gate": "architecture_board",
+          "id": "01a1ff42-9127-7cad-b611-c1ebf1006b0a",
+          "kind": "architecture_board",
+          "meta": {
+            "body_id": "01a1f2c0-b22a-7e27-a6cc-1a8e48db327e",
+            "evidence": {
+              "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+              "manifest": "acceptance/programme/SPEC-V2.toml",
+              "sha": "d7293f96082dbf2f99f53bb8fd765834dddf6858"
+            },
+            "subject_id": "01a1ff42-7bd0-7d9e-883a-1059368cd356",
+            "subject_kind": "contract"
+          },
+          "project_id": null,
+          "requested_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-21T17:58:34.815721+00:00",
+          "version": 1
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-21T17:58:45.10455+00:00",
+          "expires_at": null,
+          "gate": "baseline",
+          "id": "01a1ff42-bac3-73c0-a04d-d3c13e99dfb1",
+          "kind": "pm",
+          "meta": {
+            "baseline_id": "01a1ff42-ba64-7670-b694-99bb4b1354e5",
+            "description": "Approve the scope baseline"
+          },
+          "project_id": "01a1d039-0d39-7f3b-bd04-211f7dfe1e50",
+          "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-21T17:58:50.971984+00:00",
+          "version": 2
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-21T18:00:25.884334+00:00",
+          "expires_at": null,
+          "gate": "closure",
+          "id": "01a1ff44-4454-72c4-803f-78cbc73dfbe0",
+          "kind": "pm",
+          "meta": {
+            "closure_asset_id": "01a1ff44-43bd-763d-ad9e-c239953f070a",
+            "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+            "description": "Close SPEC-V2",
+            "evidence": {
+              "manifest": "acceptance/programme/SPEC-V2.toml",
+              "retrospective": true,
+              "sha": "d7293f96082dbf2f99f53bb8fd765834dddf6858"
+            }
+          },
+          "project_id": "01a1d039-0d39-7f3b-bd04-211f7dfe1e50",
+          "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-21T18:00:31.3185+00:00",
+          "version": 2
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-21T18:01:44.370157+00:00",
+          "expires_at": null,
+          "gate": "charter",
+          "id": "01a1ff45-7691-7359-a888-763344d97f67",
+          "kind": "pm",
+          "meta": {
+            "charter_asset_id": "01a1ff45-7606-7900-b1d8-b7a1af787d7b",
+            "description": "Approve the charter for T0"
+          },
+          "project_id": "01a1d039-0d32-7734-98da-fb7f1e2386c7",
+          "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-21T18:01:49.835645+00:00",
+          "version": 2
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-21T18:02:05.199709+00:00",
+          "expires_at": null,
+          "gate": "architecture_board",
+          "id": "01a1ff45-c6f7-7a7d-ab9f-0c9c8293147e",
+          "kind": "architecture_board",
+          "meta": {
+            "body_id": "01a1f2c0-b22a-7e27-a6cc-1a8e48db327e",
+            "evidence": {
+              "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+              "manifest": "acceptance/programme/T0.toml",
+              "sha": "d7293f96082dbf2f99f53bb8fd765834dddf6858"
+            },
+            "subject_id": "01a1ff45-b2ce-7276-8a88-cf3d744e7976",
+            "subject_kind": "contract"
+          },
+          "project_id": null,
+          "requested_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-21T18:02:05.199709+00:00",
+          "version": 1
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-21T18:03:34.751948+00:00",
+          "expires_at": null,
+          "gate": "architecture_board",
+          "id": "01a1ff47-24cb-7ffb-87a0-3097d55adb64",
+          "kind": "architecture_board",
+          "meta": {
+            "body_id": "01a1f2c0-b22a-7e27-a6cc-1a8e48db327e",
+            "evidence": {
+              "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+              "manifest": "acceptance/programme/T0.toml",
+              "sha": "d7293f96082dbf2f99f53bb8fd765834dddf6858"
+            },
+            "subject_id": "01a1ff47-1159-707b-a737-582f894cc956",
+            "subject_kind": "contract"
+          },
+          "project_id": null,
+          "requested_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-21T18:03:34.751948+00:00",
+          "version": 1
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-21T18:03:45.609503+00:00",
+          "expires_at": null,
+          "gate": "baseline",
+          "id": "01a1ff47-50a2-719f-9d61-71fcf97f5f08",
+          "kind": "pm",
+          "meta": {
+            "baseline_id": "01a1ff47-5043-73f7-b18d-2fc03832c96a",
+            "description": "Approve the scope baseline"
+          },
+          "project_id": "01a1d039-0d32-7734-98da-fb7f1e2386c7",
+          "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-21T18:03:51.022685+00:00",
+          "version": 2
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-21T18:05:20.307942+00:00",
+          "expires_at": null,
+          "gate": "closure",
+          "id": "01a1ff48-c258-72af-9643-1c830af6b92f",
+          "kind": "pm",
+          "meta": {
+            "closure_asset_id": "01a1ff48-c1ce-79b4-8a92-10b8ab63f412",
+            "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+            "description": "Close T0",
+            "evidence": {
+              "manifest": "acceptance/programme/T0.toml",
+              "retrospective": true,
+              "sha": "d7293f96082dbf2f99f53bb8fd765834dddf6858"
+            }
+          },
+          "project_id": "01a1d039-0d32-7734-98da-fb7f1e2386c7",
+          "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-21T18:05:25.19634+00:00",
+          "version": 2
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-21T19:09:58.850624+00:00",
+          "expires_at": null,
+          "gate": "charter",
+          "id": "01a1ff83-f0c8-7113-bb51-101be2b0f7ea",
+          "kind": "pm",
+          "meta": {
+            "charter_asset_id": "01a1ff83-f031-7b6b-90a8-d41527bcf37f",
+            "description": "Approve the charter for S02"
+          },
+          "project_id": "01a1d039-0d27-7b45-abb5-bf851a4c3d4a",
+          "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-21T19:10:04.360766+00:00",
+          "version": 2
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-21T19:10:25.503968+00:00",
+          "expires_at": null,
+          "gate": "architecture_board",
+          "id": "01a1ff84-57c3-7f67-9229-94bf0188732d",
+          "kind": "architecture_board",
+          "meta": {
+            "body_id": "01a1f2c0-b22a-7e27-a6cc-1a8e48db327e",
+            "evidence": {
+              "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+              "manifest": "acceptance/programme/S02.toml",
+              "sha": "d367a4a992ca5338c82466e9d6ef308e62b01ba6"
+            },
+            "subject_id": "01a1ff84-4425-75d9-8772-08e09cf71069",
+            "subject_kind": "contract"
+          },
+          "project_id": null,
+          "requested_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-21T19:10:25.503968+00:00",
+          "version": 1
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-21T19:12:02.10345+00:00",
+          "expires_at": null,
+          "gate": "architecture_board",
+          "id": "01a1ff85-d11f-7c2a-8716-73985ceb94e7",
+          "kind": "architecture_board",
+          "meta": {
+            "body_id": "01a1f2c0-b22a-7e27-a6cc-1a8e48db327e",
+            "evidence": {
+              "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+              "manifest": "acceptance/programme/S02.toml",
+              "sha": "d367a4a992ca5338c82466e9d6ef308e62b01ba6"
+            },
+            "subject_id": "01a1ff85-bda3-7671-a5b1-42eae3b0e6ee",
+            "subject_kind": "contract"
+          },
+          "project_id": null,
+          "requested_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-21T19:12:02.10345+00:00",
+          "version": 1
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-21T19:12:12.47338+00:00",
+          "expires_at": null,
+          "gate": "baseline",
+          "id": "01a1ff85-fb0a-7e74-b5c5-cf27a530f0a8",
+          "kind": "pm",
+          "meta": {
+            "baseline_id": "01a1ff85-faae-7c2e-b897-fe957985ca78",
+            "description": "Approve the scope baseline"
+          },
+          "project_id": "01a1d039-0d27-7b45-abb5-bf851a4c3d4a",
+          "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-21T19:12:18.393901+00:00",
+          "version": 2
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-21T19:14:12.961851+00:00",
+          "expires_at": null,
+          "gate": "closure",
+          "id": "01a1ff87-d283-7952-b2e1-7512a8ad7864",
+          "kind": "pm",
+          "meta": {
+            "closure_asset_id": "01a1ff87-d1f0-7149-b67a-96a8aba79c28",
+            "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+            "description": "Close S02",
+            "evidence": {
+              "manifest": "acceptance/programme/S02.toml",
+              "retrospective": true,
+              "sha": "d367a4a992ca5338c82466e9d6ef308e62b01ba6"
+            }
+          },
+          "project_id": "01a1d039-0d27-7b45-abb5-bf851a4c3d4a",
+          "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-21T19:14:18.509715+00:00",
+          "version": 2
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-21T19:15:14.159079+00:00",
+          "expires_at": null,
+          "gate": "charter",
+          "id": "01a1ff88-c067-79d4-b056-5b6c12861371",
+          "kind": "pm",
+          "meta": {
+            "charter_asset_id": "01a1ff88-bfd5-7a31-8fdd-4c0dee71f0e8",
+            "description": "Approve the charter for T1"
+          },
+          "project_id": "01a1d039-0d32-7c81-8365-371217d16ef7",
+          "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-21T19:15:19.34457+00:00",
+          "version": 2
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-21T19:15:36.714666+00:00",
+          "expires_at": null,
+          "gate": "architecture_board",
+          "id": "01a1ff89-1794-79d0-8707-f7614987ee7c",
+          "kind": "architecture_board",
+          "meta": {
+            "body_id": "01a1f2c0-b22a-7e27-a6cc-1a8e48db327e",
+            "evidence": {
+              "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+              "manifest": "acceptance/programme/T1.toml",
+              "sha": "d367a4a992ca5338c82466e9d6ef308e62b01ba6"
+            },
+            "subject_id": "01a1ff89-02bd-7b6d-902e-ffa5902cc7f5",
+            "subject_kind": "contract"
+          },
+          "project_id": null,
+          "requested_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-21T19:15:36.714666+00:00",
+          "version": 1
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-21T19:17:11.072932+00:00",
+          "expires_at": null,
+          "gate": "architecture_board",
+          "id": "01a1ff8a-880f-7d08-b322-9656f2c5355f",
+          "kind": "architecture_board",
+          "meta": {
+            "body_id": "01a1f2c0-b22a-7e27-a6cc-1a8e48db327e",
+            "evidence": {
+              "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+              "manifest": "acceptance/programme/T1.toml",
+              "sha": "d367a4a992ca5338c82466e9d6ef308e62b01ba6"
+            },
+            "subject_id": "01a1ff8a-754f-70de-a63a-fa8d00596433",
+            "subject_kind": "contract"
+          },
+          "project_id": null,
+          "requested_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-21T19:17:11.072932+00:00",
+          "version": 1
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-21T19:17:22.31215+00:00",
+          "expires_at": null,
+          "gate": "baseline",
+          "id": "01a1ff8a-b550-7e62-a155-0a1f00699022",
+          "kind": "pm",
+          "meta": {
+            "baseline_id": "01a1ff8a-b4f0-7e6e-9cc7-4231076e1039",
+            "description": "Approve the scope baseline"
+          },
+          "project_id": "01a1d039-0d32-7c81-8365-371217d16ef7",
+          "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-21T19:17:27.521225+00:00",
+          "version": 2
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-21T19:19:09.060486+00:00",
+          "expires_at": null,
+          "gate": "closure",
+          "id": "01a1ff8c-5646-741c-82c6-0665f98c3adb",
+          "kind": "pm",
+          "meta": {
+            "closure_asset_id": "01a1ff8c-55b1-7573-b390-392c4f9fa0e6",
+            "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+            "description": "Close T1",
+            "evidence": {
+              "manifest": "acceptance/programme/T1.toml",
+              "retrospective": true,
+              "sha": "d367a4a992ca5338c82466e9d6ef308e62b01ba6"
+            }
+          },
+          "project_id": "01a1d039-0d32-7c81-8365-371217d16ef7",
+          "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-21T19:19:15.012565+00:00",
+          "version": 2
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-21T19:20:16.918541+00:00",
+          "expires_at": null,
+          "gate": "charter",
+          "id": "01a1ff8d-5f2a-765f-a457-414200b9f65c",
+          "kind": "pm",
+          "meta": {
+            "charter_asset_id": "01a1ff8d-5e7b-75df-bea5-932b15a1ae2a",
+            "description": "Approve the charter for T11"
+          },
+          "project_id": "01a1d039-0d36-782b-8b18-ff07a64dedbe",
+          "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-21T19:20:22.645322+00:00",
+          "version": 2
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-21T19:20:39.144071+00:00",
+          "expires_at": null,
+          "gate": "architecture_board",
+          "id": "01a1ff8d-b4cd-74f9-9f32-2b9f6cae33cd",
+          "kind": "architecture_board",
+          "meta": {
+            "body_id": "01a1f2c0-b22a-7e27-a6cc-1a8e48db327e",
+            "evidence": {
+              "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+              "manifest": "acceptance/programme/T11.toml",
+              "sha": "d367a4a992ca5338c82466e9d6ef308e62b01ba6"
+            },
+            "subject_id": "01a1ff8d-a0ad-7a91-b026-d9a2575daa3f",
+            "subject_kind": "contract"
+          },
+          "project_id": null,
+          "requested_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-21T19:20:39.144071+00:00",
+          "version": 1
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-21T19:22:11.15967+00:00",
+          "expires_at": null,
+          "gate": "architecture_board",
+          "id": "01a1ff8f-1c44-749c-ac12-c067de253ee7",
+          "kind": "architecture_board",
+          "meta": {
+            "body_id": "01a1f2c0-b22a-7e27-a6cc-1a8e48db327e",
+            "evidence": {
+              "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+              "manifest": "acceptance/programme/T11.toml",
+              "sha": "d367a4a992ca5338c82466e9d6ef308e62b01ba6"
+            },
+            "subject_id": "01a1ff8f-08ee-7bc5-bb39-81304d03c4ef",
+            "subject_kind": "contract"
+          },
+          "project_id": null,
+          "requested_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-21T19:22:11.15967+00:00",
+          "version": 1
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-21T19:22:22.038135+00:00",
+          "expires_at": null,
+          "gate": "baseline",
+          "id": "01a1ff8f-482a-746a-bd48-67924668daf2",
+          "kind": "pm",
+          "meta": {
+            "baseline_id": "01a1ff8f-47cb-78cf-9db8-d98d863e7dd0",
+            "description": "Approve the scope baseline"
+          },
+          "project_id": "01a1d039-0d36-782b-8b18-ff07a64dedbe",
+          "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-21T19:22:27.339913+00:00",
+          "version": 2
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-21T19:24:13.845806+00:00",
+          "expires_at": null,
+          "gate": "closure",
+          "id": "01a1ff90-fcdb-7ed1-bf51-54e24deb923d",
+          "kind": "pm",
+          "meta": {
+            "closure_asset_id": "01a1ff90-fc47-719b-83a8-2d4bd4dc6010",
+            "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+            "description": "Close T11",
+            "evidence": {
+              "manifest": "acceptance/programme/T11.toml",
+              "retrospective": true,
+              "sha": "d367a4a992ca5338c82466e9d6ef308e62b01ba6"
+            }
+          },
+          "project_id": "01a1d039-0d36-782b-8b18-ff07a64dedbe",
+          "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-21T19:24:19.492303+00:00",
+          "version": 2
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-21T19:43:36.423876+00:00",
+          "expires_at": null,
+          "gate": "closure",
+          "id": "01a1ffa2-ba35-7c57-be77-105d7ca09f92",
+          "kind": "pm",
+          "meta": {
+            "closure_asset_id": "01a1ffa2-b99d-7daf-9ac9-40a1dc937935",
+            "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+            "description": "Close T1",
+            "evidence": {
+              "manifest": "acceptance/programme/T1.toml",
+              "retrospective": true,
+              "sha": "d367a4a992ca5338c82466e9d6ef308e62b01ba6"
+            }
+          },
+          "project_id": "01a1d039-0d32-7c81-8365-371217d16ef7",
+          "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-21T19:43:41.458729+00:00",
+          "version": 2
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-21T19:45:18.822161+00:00",
+          "expires_at": null,
+          "gate": "closure",
+          "id": "01a1ffa4-4a14-7fd2-9cf2-08714286b017",
+          "kind": "pm",
+          "meta": {
+            "closure_asset_id": "01a1ffa4-4987-740d-a846-5f966971b6c2",
+            "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+            "description": "Close T11",
+            "evidence": {
+              "manifest": "acceptance/programme/T11.toml",
+              "retrospective": true,
+              "sha": "d367a4a992ca5338c82466e9d6ef308e62b01ba6"
+            }
+          },
+          "project_id": "01a1d039-0d36-782b-8b18-ff07a64dedbe",
+          "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-21T19:45:24.019355+00:00",
+          "version": 2
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-21T19:47:36.191544+00:00",
+          "expires_at": null,
+          "gate": "closure",
+          "id": "01a1ffa6-62ce-747b-abac-c41e9679dde8",
+          "kind": "pm",
+          "meta": {
+            "closure_asset_id": "01a1ffa6-622f-754b-96d6-a285fc985e9b",
+            "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+            "description": "Close S02",
+            "evidence": {
+              "manifest": "acceptance/programme/S02.toml",
+              "retrospective": true,
+              "sha": "d367a4a992ca5338c82466e9d6ef308e62b01ba6"
+            }
+          },
+          "project_id": "01a1d039-0d27-7b45-abb5-bf851a4c3d4a",
+          "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-21T19:47:41.786716+00:00",
+          "version": 2
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-21T19:50:58.253042+00:00",
+          "expires_at": null,
+          "gate": "tranches.review",
+          "id": "01a1ffa9-76b2-7956-98ba-c1d0be651017",
+          "kind": "action",
+          "meta": {
+            "description": "End-of-tranche 1 review: continue on the reworked evidence and authorise tranche 2",
+            "target": "tranche/01a1e9e0-d787-7f5c-b5ed-15b05f3dc531/review"
+          },
+          "project_id": "01a1dcb8-d24b-76de-b901-56fd56e001bc",
+          "requested_by": "01a1cf1e-09dd-7580-99cc-de395f3e86cc",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-21T19:51:03.837075+00:00",
+          "version": 2
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-21T23:03:58.781533+00:00",
+          "expires_at": null,
+          "gate": "charter",
+          "id": "01a2005a-2c3a-7398-a907-cf482afe3f85",
+          "kind": "pm",
+          "meta": {
+            "charter_asset_id": "01a2005a-2ba4-74f8-b173-55b9a42c4969",
+            "description": "Approve the charter for T2"
+          },
+          "project_id": "01a1d039-0d33-7282-b7b0-6dde32c38ab1",
+          "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-21T23:04:05.020203+00:00",
+          "version": 2
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-21T23:04:23.679742+00:00",
+          "expires_at": null,
+          "gate": "architecture_board",
+          "id": "01a2005a-8c6e-708a-84df-ab16d175072e",
+          "kind": "architecture_board",
+          "meta": {
+            "body_id": "01a1f2c0-b22a-7e27-a6cc-1a8e48db327e",
+            "evidence": {
+              "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+              "manifest": "acceptance/programme/T2.toml",
+              "sha": "7ff27efd65146630e62d9c235458be789fb68c14"
+            },
+            "subject_id": "01a2005a-7886-7f2d-9b49-53d174544ee9",
+            "subject_kind": "contract"
+          },
+          "project_id": null,
+          "requested_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-21T23:04:23.679742+00:00",
+          "version": 1
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-21T23:06:10.327789+00:00",
+          "expires_at": null,
+          "gate": "architecture_board",
+          "id": "01a2005c-2d07-714c-ac78-ca04396b7878",
+          "kind": "architecture_board",
+          "meta": {
+            "body_id": "01a1f2c0-b22a-7e27-a6cc-1a8e48db327e",
+            "evidence": {
+              "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+              "manifest": "acceptance/programme/T2.toml",
+              "sha": "7ff27efd65146630e62d9c235458be789fb68c14"
+            },
+            "subject_id": "01a2005c-18e4-75a7-9c20-2d83728194e0",
+            "subject_kind": "contract"
+          },
+          "project_id": null,
+          "requested_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-21T23:06:10.327789+00:00",
+          "version": 1
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-21T23:06:21.585567+00:00",
+          "expires_at": null,
+          "gate": "baseline",
+          "id": "01a2005c-5ab0-79f9-84d9-c014517687e8",
+          "kind": "pm",
+          "meta": {
+            "baseline_id": "01a2005c-5a4f-7eb5-a004-ccb5545eb6fb",
+            "description": "Approve the scope baseline"
+          },
+          "project_id": "01a1d039-0d33-7282-b7b0-6dde32c38ab1",
+          "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-21T23:06:29.057003+00:00",
+          "version": 2
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-21T23:11:08.459918+00:00",
+          "expires_at": null,
+          "gate": "closure",
+          "id": "01a20060-baee-70c8-babc-9a959e21fb82",
+          "kind": "pm",
+          "meta": {
+            "closure_asset_id": "01a20060-ba59-732b-acba-942a607bac92",
+            "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+            "description": "Close T2",
+            "evidence": {
+              "manifest": "acceptance/programme/T2.toml",
+              "retrospective": true,
+              "sha": "7ff27efd65146630e62d9c235458be789fb68c14"
+            }
+          },
+          "project_id": "01a1d039-0d33-7282-b7b0-6dde32c38ab1",
+          "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-21T23:11:13.86128+00:00",
+          "version": 2
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-21T23:11:53.421894+00:00",
+          "expires_at": null,
+          "gate": "charter",
+          "id": "01a20061-6a52-7da5-ba79-788ac48dc14f",
+          "kind": "pm",
+          "meta": {
+            "charter_asset_id": "01a20061-69b4-7e46-b687-6e4845e50baf",
+            "description": "Approve the charter for S03"
+          },
+          "project_id": "01a1d039-0d28-743b-86c7-0d0698ed69c1",
+          "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-21T23:11:58.779376+00:00",
+          "version": 2
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-21T23:12:20.147214+00:00",
+          "expires_at": null,
+          "gate": "architecture_board",
+          "id": "01a20061-d19f-7269-9f5c-113f3aeb0001",
+          "kind": "architecture_board",
+          "meta": {
+            "body_id": "01a1f2c0-b22a-7e27-a6cc-1a8e48db327e",
+            "evidence": {
+              "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+              "manifest": "acceptance/programme/S03.toml",
+              "sha": "7ff27efd65146630e62d9c235458be789fb68c14"
+            },
+            "subject_id": "01a20061-bd73-7a89-b08c-bd8b867eb061",
+            "subject_kind": "contract"
+          },
+          "project_id": null,
+          "requested_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-21T23:12:20.147214+00:00",
+          "version": 1
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-21T23:13:58.049456+00:00",
+          "expires_at": null,
+          "gate": "architecture_board",
+          "id": "01a20063-5009-7a66-aaa2-5f2876187e88",
+          "kind": "architecture_board",
+          "meta": {
+            "body_id": "01a1f2c0-b22a-7e27-a6cc-1a8e48db327e",
+            "evidence": {
+              "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+              "manifest": "acceptance/programme/S03.toml",
+              "sha": "7ff27efd65146630e62d9c235458be789fb68c14"
+            },
+            "subject_id": "01a20063-3a7d-7e67-a437-2e0884f6c46a",
+            "subject_kind": "contract"
+          },
+          "project_id": null,
+          "requested_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-21T23:13:58.049456+00:00",
+          "version": 1
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-21T23:14:08.772733+00:00",
+          "expires_at": null,
+          "gate": "baseline",
+          "id": "01a20063-7b58-7840-b544-cdfc5b38232f",
+          "kind": "pm",
+          "meta": {
+            "baseline_id": "01a20063-7af8-727b-b092-24de3821d204",
+            "description": "Approve the scope baseline"
+          },
+          "project_id": "01a1d039-0d28-743b-86c7-0d0698ed69c1",
+          "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-21T23:14:14.070483+00:00",
+          "version": 2
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-21T23:31:35.358094+00:00",
+          "expires_at": null,
+          "gate": "closure",
+          "id": "01a20073-737a-7574-954a-2d54d6be5af5",
+          "kind": "pm",
+          "meta": {
+            "closure_asset_id": "01a20073-72e6-7c7d-a824-994959b8e4e3",
+            "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+            "description": "Close S03",
+            "evidence": {
+              "manifest": "acceptance/programme/S03.toml",
+              "retrospective": true,
+              "sha": "58b2fb3ac710ee8a69e04c6ba52eab9bd80ff5a0"
+            }
+          },
+          "project_id": "01a1d039-0d28-743b-86c7-0d0698ed69c1",
+          "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-21T23:31:40.833045+00:00",
+          "version": 2
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-22T00:09:07.12046+00:00",
+          "expires_at": null,
+          "gate": "tranche.resume",
+          "id": "01a20095-d07b-737e-90e6-b235f3159cde",
+          "kind": "gate",
+          "meta": {
+            "allowed_decisions": [
+              "approve",
+              "reject"
+            ],
+            "description": "Resume tranche 2 after its pause review: the exit criteria are met on a full-fidelity snapshot (S03 and T2 each green except the retro lesson, now recorded) and tranche 3 is authorised on the same evidence.",
+            "proposed_answer": "approve",
+            "resume": {
+              "note": "Resumed under the owner's published delegation (2026-11-22)",
+              "resume_approval_id": "01a20095-d07b-737e-90e6-b235f3159cde",
+              "resumed_at": "2026-11-22T07:19:14.063568+00:00",
+              "tranche_id": "01a1e9e0-e2ac-786b-ac48-3b8bcdf12188"
+            },
+            "target": "01a1e9e0-e2ac-786b-ac48-3b8bcdf12188"
+          },
+          "project_id": "01a1d039-0d28-743b-86c7-0d0698ed69c1",
+          "requested_by": "01a1cf1e-09dd-7580-99cc-de395f3e86cc",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-22T07:19:14.063568+00:00",
+          "version": 3
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-22T00:14:24.428141+00:00",
+          "expires_at": null,
+          "gate": "architecture_board",
+          "id": "01a2009a-a7fa-7a68-a539-32dc78e5a221",
+          "kind": "architecture_board",
+          "meta": {
+            "body_id": "01a1f2c0-b22a-7e27-a6cc-1a8e48db327e",
+            "evidence": {
+              "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+              "manifest": "acceptance/programme/T2.toml",
+              "sha": "e55b92e050555c6acd2eefa9272a3721657d7de5",
+              "why": "re-review of T2 at the fixed P0 v1-t2-1"
+            },
+            "subject_id": "01a2009a-7bce-7a8f-96fd-f5159286a09e",
+            "subject_kind": "contract"
+          },
+          "project_id": null,
+          "requested_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-22T00:14:24.428141+00:00",
+          "version": 1
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-22T06:49:18.788982+00:00",
+          "expires_at": null,
+          "gate": "architecture_board",
+          "id": "01a20204-34e9-7eea-87d1-5b8265816c62",
+          "kind": "architecture_board",
+          "meta": {
+            "body_id": "01a1f2c0-b22a-7e27-a6cc-1a8e48db327e",
+            "evidence": {
+              "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+              "manifest": "acceptance/programme/PLATFORM.toml",
+              "record": "#526",
+              "retrospective": true,
+              "scope": "the programme capability's record, standards and gates"
+            },
+            "subject_id": "01a20203-883b-7231-b0d3-dee948cf90e4",
+            "subject_kind": "contract"
+          },
+          "project_id": null,
+          "requested_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-22T06:49:18.788982+00:00",
+          "version": 1
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-22T07:22:48.736236+00:00",
+          "expires_at": null,
+          "gate": "projects.close",
+          "id": "01a20222-df0f-77b5-ad70-b53bcea5ecb9",
+          "kind": "action",
+          "meta": {
+            "description": "Close S03 after the tranche-2 rework (#526)",
+            "target": "project/01a1d039-0d28-743b-86c7-0d0698ed69c1/close"
+          },
+          "project_id": "01a1d039-0d28-743b-86c7-0d0698ed69c1",
+          "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-22T07:22:52.352429+00:00",
+          "version": 2
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-22T07:23:07.862649+00:00",
+          "expires_at": null,
+          "gate": "projects.close",
+          "id": "01a20223-29bf-734c-9b5f-2543c7f2abed",
+          "kind": "action",
+          "meta": {
+            "description": "Close T2 after the tranche-2 rework (#526)",
+            "target": "project/01a1d039-0d33-7282-b7b0-6dde32c38ab1/close"
+          },
+          "project_id": "01a1d039-0d33-7282-b7b0-6dde32c38ab1",
+          "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-22T07:23:11.466704+00:00",
+          "version": 2
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-22T07:37:26.397051+00:00",
+          "expires_at": null,
+          "gate": "projects.close",
+          "id": "01a20230-46b3-7161-8b4d-0dfa7244375e",
+          "kind": "action",
+          "meta": {
+            "description": "Close T1 after the tranche-1 rework (#526)",
+            "target": "project/01a1d039-0d32-7c81-8365-371217d16ef7/close"
+          },
+          "project_id": "01a1d039-0d32-7c81-8365-371217d16ef7",
+          "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-22T07:37:34.308846+00:00",
+          "version": 2
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-22T07:38:14.710917+00:00",
+          "expires_at": null,
+          "gate": "closure",
+          "id": "01a20231-0d43-74ad-80ca-42088a1be984",
+          "kind": "pm",
+          "meta": {
+            "closure_asset_id": "01a20231-0913-70c8-b29f-ce8866e82885",
+            "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+            "description": "Close T1 after the tranche-1 rework (#526)",
+            "evidence": {
+              "manifest": "acceptance/programme/T1.toml",
+              "p0_test": "92e6b223",
+              "record": "#526"
+            }
+          },
+          "project_id": "01a1d039-0d32-7c81-8365-371217d16ef7",
+          "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-22T07:38:25.404039+00:00",
+          "version": 2
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-22T07:38:59.827308+00:00",
+          "expires_at": null,
+          "gate": "closure",
+          "id": "01a20231-bd2b-744e-b9f0-0daf9b21e25a",
+          "kind": "pm",
+          "meta": {
+            "closure_asset_id": "01a20231-b8f0-70f4-b659-3286935939a9",
+            "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+            "description": "Close T11 after the tranche-1 rework (#526)",
+            "evidence": {
+              "manifest": "acceptance/programme/T11.toml",
+              "p0_test": "8f1e5770",
+              "record": "#526"
+            }
+          },
+          "project_id": "01a1d039-0d36-782b-8b18-ff07a64dedbe",
+          "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-22T07:39:10.419282+00:00",
+          "version": 2
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-22T07:39:24.31498+00:00",
+          "expires_at": null,
+          "gate": "projects.close",
+          "id": "01a20232-12d8-70ff-afc9-320a80c262d6",
+          "kind": "action",
+          "meta": {
+            "description": "Close T11 after the tranche-1 rework (#526)",
+            "target": "project/01a1d039-0d36-782b-8b18-ff07a64dedbe/close"
+          },
+          "project_id": "01a1d039-0d36-782b-8b18-ff07a64dedbe",
+          "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-22T07:39:32.247641+00:00",
+          "version": 2
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-22T07:53:35.984637+00:00",
+          "expires_at": null,
+          "gate": "architecture_board",
+          "id": "01a2023f-11ac-7fe6-bf6f-101ced8f4ba2",
+          "kind": "architecture_board",
+          "meta": {
+            "body_id": "01a1f2c0-b22a-7e27-a6cc-1a8e48db327e",
+            "evidence": {
+              "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+              "manifest": "acceptance/programme/T9.toml",
+              "record": "#526",
+              "subject": "the re-issued T9 Statement of Architecture Work"
+            },
+            "subject_id": "01a2023e-4e59-75ad-b2ab-fd7d014511d2",
+            "subject_kind": "contract"
+          },
+          "project_id": null,
+          "requested_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-22T07:53:35.984637+00:00",
+          "version": 1
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-22T08:17:59.090556+00:00",
+          "expires_at": null,
+          "gate": "charter",
+          "id": "01a20255-6578-7a4d-b99b-81d6d03d8880",
+          "kind": "pm",
+          "meta": {
+            "charter_asset_id": "01a20255-63a6-71b3-9d8d-e7a13fcc3331",
+            "description": "Approve the charter for S04"
+          },
+          "project_id": "01a1d039-0d28-7eb6-a62a-f420e742595c",
+          "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-22T08:18:04.080107+00:00",
+          "version": 2
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-22T08:18:56.640334+00:00",
+          "expires_at": null,
+          "gate": "baseline",
+          "id": "01a20256-466e-7670-9a2b-5fad19bc3e08",
+          "kind": "pm",
+          "meta": {
+            "baseline_id": "01a20256-44d0-731d-b345-fffc5f3ac9e8",
+            "description": "Approve the scope baseline"
+          },
+          "project_id": "01a1d039-0d28-7eb6-a62a-f420e742595c",
+          "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-22T08:19:02.106253+00:00",
+          "version": 2
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-22T08:19:12.390358+00:00",
+          "expires_at": null,
+          "gate": "architecture_board",
+          "id": "01a20256-80ac-72f0-a310-d114488f1d7c",
+          "kind": "architecture_board",
+          "meta": {
+            "body_id": "01a1f2c0-b22a-7e27-a6cc-1a8e48db327e",
+            "evidence": {
+              "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+              "manifest": "acceptance/programme/S04.toml",
+              "record": "#526"
+            },
+            "subject_id": "01a20256-6ede-7d70-aae8-5dbfe681a1b7",
+            "subject_kind": "contract"
+          },
+          "project_id": null,
+          "requested_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-22T08:19:12.390358+00:00",
+          "version": 1
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-22T08:47:51.804813+00:00",
+          "expires_at": null,
+          "gate": "charter",
+          "id": "01a20270-c046-7214-8aca-d2c89b386bd0",
+          "kind": "pm",
+          "meta": {
+            "charter_asset_id": "01a20270-be7c-7f43-9505-4938a498126a",
+            "description": "Approve the charter for T13"
+          },
+          "project_id": "01a1d039-0d37-730f-8f8a-2f50e5a0933d",
+          "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-22T08:48:00.371944+00:00",
+          "version": 2
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-22T08:50:39.479287+00:00",
+          "expires_at": null,
+          "gate": "architecture_board",
+          "id": "01a20273-4f0f-77e6-8005-9744d1e3a574",
+          "kind": "architecture_board",
+          "meta": {
+            "body_id": "01a1f2c0-b22a-7e27-a6cc-1a8e48db327e",
+            "evidence": {
+              "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+              "manifest": "acceptance/programme/T13.toml",
+              "sha": "582e2dc67e5882eb63f40de67c129f8c2863c376"
+            },
+            "subject_id": "01a20271-2a37-7329-b159-28031ddcb966",
+            "subject_kind": "contract"
+          },
+          "project_id": null,
+          "requested_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-22T08:50:39.479287+00:00",
+          "version": 1
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-22T08:55:01.14104+00:00",
+          "expires_at": null,
+          "gate": "architecture_board",
+          "id": "01a20277-4be1-78c6-8516-728eb4d6068b",
+          "kind": "architecture_board",
+          "meta": {
+            "body_id": "01a1f2c0-b22a-7e27-a6cc-1a8e48db327e",
+            "evidence": {
+              "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+              "manifest": "acceptance/programme/T13.toml",
+              "sha": "582e2dc67e5882eb63f40de67c129f8c2863c376"
+            },
+            "subject_id": "01a20277-2d08-7c91-bce6-1a8326add30c",
+            "subject_kind": "contract"
+          },
+          "project_id": null,
+          "requested_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-22T08:55:01.14104+00:00",
+          "version": 1
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-22T08:55:18.027529+00:00",
+          "expires_at": null,
+          "gate": "baseline",
+          "id": "01a20277-92f1-7e49-9675-5bb2717081e8",
+          "kind": "pm",
+          "meta": {
+            "baseline_id": "01a20277-9131-7ee2-acad-7e40ffa8f947",
+            "description": "Approve the scope baseline"
+          },
+          "project_id": "01a1d039-0d37-730f-8f8a-2f50e5a0933d",
+          "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-22T08:55:26.310036+00:00",
+          "version": 2
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-22T08:57:26.477641+00:00",
+          "expires_at": null,
+          "gate": "baseline",
+          "id": "01a20279-8672-70c6-86b4-975cad387b8c",
+          "kind": "pm",
+          "meta": {
+            "baseline_id": "01a20279-854d-79f6-a751-a34d51be7589",
+            "description": "Approve the scope baseline"
+          },
+          "project_id": "01a1d039-0d37-730f-8f8a-2f50e5a0933d",
+          "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-22T08:57:33.781641+00:00",
+          "version": 2
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-22T09:02:41.432864+00:00",
+          "expires_at": null,
+          "gate": "charter",
+          "id": "01a2027e-53b5-76c1-8782-ea026cf4b0ee",
+          "kind": "pm",
+          "meta": {
+            "charter_asset_id": "01a2027e-517c-737f-9526-08d51122dc6c",
+            "description": "Approve the charter for T9"
+          },
+          "project_id": "01a1d039-0d35-7bd1-945d-cea12c5dfd6d",
+          "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-22T09:02:49.181852+00:00",
+          "version": 2
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-22T09:04:47.771355+00:00",
+          "expires_at": null,
+          "gate": "architecture_board",
+          "id": "01a20280-3d7c-72fd-bb24-5fe966d512e2",
+          "kind": "architecture_board",
+          "meta": {
+            "body_id": "01a1f2c0-b22a-7e27-a6cc-1a8e48db327e",
+            "evidence": {
+              "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+              "manifest": "acceptance/programme/T9.toml",
+              "sha": "0a1cc4a0825026c1be31fcc202fb33667fc0109d"
+            },
+            "subject_id": "01a20280-25ea-759d-8f96-51980017b97e",
+            "subject_kind": "contract"
+          },
+          "project_id": null,
+          "requested_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-22T09:04:47.771355+00:00",
+          "version": 1
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-22T09:05:00.383623+00:00",
+          "expires_at": null,
+          "gate": "baseline",
+          "id": "01a20280-7305-7fe4-b40c-998a13c392fc",
+          "kind": "pm",
+          "meta": {
+            "baseline_id": "01a20280-71de-7b06-9086-ae0158bfd36f",
+            "description": "Approve the scope baseline"
+          },
+          "project_id": "01a1d039-0d35-7bd1-945d-cea12c5dfd6d",
+          "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-22T09:43:21.961187+00:00",
+          "version": 2
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-22T09:12:14.97167+00:00",
+          "expires_at": null,
+          "gate": "charter",
+          "id": "01a20287-143c-70bb-96f6-108c33dd29bc",
+          "kind": "pm",
+          "meta": {
+            "charter_asset_id": "01a20287-1272-7a84-bab0-38826b02bcc8",
+            "description": "Approve the charter for T10"
+          },
+          "project_id": "01a1d039-0d36-70c1-a5e8-f50956c5e3f9",
+          "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-22T09:12:22.821934+00:00",
+          "version": 2
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-22T09:12:43.866105+00:00",
+          "expires_at": null,
+          "gate": "architecture_board",
+          "id": "01a20287-813e-7abd-83c5-ddf3bb9e98b3",
+          "kind": "architecture_board",
+          "meta": {
+            "body_id": "01a1f2c0-b22a-7e27-a6cc-1a8e48db327e",
+            "evidence": {
+              "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+              "manifest": "acceptance/programme/T10.toml",
+              "sha": "d8034b949bc2d27f60d83ff5a7a15b81ae246def"
+            },
+            "subject_id": "01a20287-696c-76a4-a2db-28c6092b5813",
+            "subject_kind": "contract"
+          },
+          "project_id": null,
+          "requested_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-22T09:12:43.866105+00:00",
+          "version": 1
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-22T09:14:39.414955+00:00",
+          "expires_at": null,
+          "gate": "architecture_board",
+          "id": "01a20289-44a3-7f2b-b741-b502fe86eef3",
+          "kind": "architecture_board",
+          "meta": {
+            "body_id": "01a1f2c0-b22a-7e27-a6cc-1a8e48db327e",
+            "evidence": {
+              "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+              "manifest": "acceptance/programme/T10.toml",
+              "sha": "d8034b949bc2d27f60d83ff5a7a15b81ae246def"
+            },
+            "subject_id": "01a20289-2b08-7ea3-96f6-b2ac928a7be4",
+            "subject_kind": "contract"
+          },
+          "project_id": null,
+          "requested_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-22T09:14:39.414955+00:00",
+          "version": 1
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-22T09:14:52.60631+00:00",
+          "expires_at": null,
+          "gate": "baseline",
+          "id": "01a20289-7d0e-7f76-87e9-f4ffd042a582",
+          "kind": "pm",
+          "meta": {
+            "baseline_id": "01a20289-7be3-7e47-afe0-f6b1f82f1892",
+            "description": "Approve the scope baseline"
+          },
+          "project_id": "01a1d039-0d36-70c1-a5e8-f50956c5e3f9",
+          "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-22T09:44:21.811703+00:00",
+          "version": 2
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-22T09:17:07.051694+00:00",
+          "expires_at": null,
+          "gate": "charter",
+          "id": "01a2028b-88c8-73af-a738-ede088c07761",
+          "kind": "pm",
+          "meta": {
+            "charter_asset_id": "01a2028b-86d7-77c8-b0bf-525d70aa3834",
+            "description": "Approve the charter for T4"
+          },
+          "project_id": "01a1d039-0d33-7e7e-890e-b437b0c78db9",
+          "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-22T09:17:14.579812+00:00",
+          "version": 2
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-22T09:17:35.887621+00:00",
+          "expires_at": null,
+          "gate": "architecture_board",
+          "id": "01a2028b-f63c-7c27-b580-d4cba2c1e70f",
+          "kind": "architecture_board",
+          "meta": {
+            "body_id": "01a1f2c0-b22a-7e27-a6cc-1a8e48db327e",
+            "evidence": {
+              "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+              "manifest": "acceptance/programme/T4.toml",
+              "sha": "fc4ed551b7ad1a1c062781d6b820d0d700633c86"
+            },
+            "subject_id": "01a2028b-dde6-7ed4-9e47-6e582f2341d8",
+            "subject_kind": "contract"
+          },
+          "project_id": null,
+          "requested_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-22T09:17:35.887621+00:00",
+          "version": 1
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-22T09:19:27.962103+00:00",
+          "expires_at": null,
+          "gate": "architecture_board",
+          "id": "01a2028d-abf9-78fb-a9c6-eb06c4bdd634",
+          "kind": "architecture_board",
+          "meta": {
+            "body_id": "01a1f2c0-b22a-7e27-a6cc-1a8e48db327e",
+            "evidence": {
+              "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+              "manifest": "acceptance/programme/T4.toml",
+              "sha": "fc4ed551b7ad1a1c062781d6b820d0d700633c86"
+            },
+            "subject_id": "01a2028d-942b-759a-ad59-ab9c38629977",
+            "subject_kind": "contract"
+          },
+          "project_id": null,
+          "requested_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-22T09:19:27.962103+00:00",
+          "version": 1
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-22T09:19:40.844998+00:00",
+          "expires_at": null,
+          "gate": "baseline",
+          "id": "01a2028d-e2ad-71fb-b3a9-656be39ce8ba",
+          "kind": "pm",
+          "meta": {
+            "baseline_id": "01a2028d-e17b-793d-9ea2-fe4f7f8e2b72",
+            "description": "Approve the scope baseline"
+          },
+          "project_id": "01a1d039-0d33-7e7e-890e-b437b0c78db9",
+          "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-22T09:45:22.454329+00:00",
+          "version": 2
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-22T10:17:36.77133+00:00",
+          "expires_at": null,
+          "gate": "change",
+          "id": "01a202c2-eae1-76ac-8d64-6a548051cc27",
+          "kind": "pm",
+          "meta": {
+            "change_id": "01a202c2-e964-7130-8d6e-cb922e2667cb",
+            "description": "Approve change 01a202c2-e964-7130-8d6e-cb922e2667cb",
+            "evidence": [
+              {
+                "id": "01a20279-854d-79f6-a751-a34d51be7589",
+                "kind": "baseline"
+              }
+            ]
+          },
+          "project_id": "01a1d039-0d37-730f-8f8a-2f50e5a0933d",
+          "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-22T10:17:43.67327+00:00",
+          "version": 2
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-22T19:56:04.763551+00:00",
+          "expires_at": null,
+          "gate": "change",
+          "id": "01a204d4-7f35-791c-8809-dc947d85a7b4",
+          "kind": "pm",
+          "meta": {
+            "change_id": "01a204d4-7f2e-7a73-bf79-4b8767d52db8",
+            "description": "Approve change 01a204d4-7f2e-7a73-bf79-4b8767d52db8",
+            "evidence": [
+              {
+                "id": "01a1fbb1-b05c-76b6-a5ac-7186fb859dcc",
+                "kind": "baseline"
+              }
+            ]
+          },
+          "project_id": "01a1dcb8-d24b-76de-b901-56fd56e001bc",
+          "requested_by": "01a1efd4-c3e5-7b74-b32b-1b15683a8c4e",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-22T19:56:46.645402+00:00",
+          "version": 2
+        },
+        {
+          "card_id": null,
+          "created_at": "2026-11-22T19:59:24.272062+00:00",
+          "expires_at": null,
+          "gate": "change",
+          "id": "01a204d7-8a89-7101-bc94-b4fa28dc2660",
+          "kind": "pm",
+          "meta": {
+            "change_id": "01a204d7-8a84-789a-b02f-c8df27246bc0",
+            "description": "Approve change 01a204d7-8a84-789a-b02f-c8df27246bc0",
+            "evidence": [
+              {
+                "id": "01a20279-854d-79f6-a751-a34d51be7589",
+                "kind": "baseline"
+              }
+            ]
+          },
+          "project_id": "01a1d039-0d37-730f-8f8a-2f50e5a0933d",
+          "requested_by": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+          "required_decisions": 1,
+          "run_id": null,
+          "status": "approved",
+          "updated_at": "2026-11-22T19:59:41.752181+00:00",
+          "version": 2
+        }
+      ]
+    },
+    {
+      "heading": "Investment appraisal and cash flow",
+      "status": "evidenced",
+      "sources": [
+        {
+          "kind": "rows",
+          "file": "measure.json",
+          "pointer": "/inference/by_project",
+          "category": null,
+          "count": 1
+        },
+        {
+          "kind": "rows",
+          "file": "measure.json",
+          "pointer": "/inference/by_model",
+          "category": null,
+          "count": 3
+        }
+      ],
+      "items": [
+        {
+          "calls": 8,
+          "completion_tokens": 1040,
+          "cost_usd": "0.000848",
+          "priced_calls": 8,
+          "project_id": "01a1dcb8-d24b-76de-b901-56fd56e001bc",
+          "prompt_tokens": 3978,
+          "total_tokens": 5018,
+          "unpriced_calls": 0
+        },
+        {
+          "cache_hits": 0,
+          "calls": 81,
+          "completion_tokens": 9429,
+          "model": "claude-sonnet-5-5",
+          "prompt_tokens": 961089,
+          "total_tokens": 970518
+        },
+        {
+          "cache_hits": 0,
+          "calls": 4,
+          "completion_tokens": 0,
+          "model": "image_gen",
+          "prompt_tokens": 0,
+          "total_tokens": 0
+        },
+        {
+          "cache_hits": 0,
+          "calls": 525,
+          "completion_tokens": 74844,
+          "model": "local-llm",
+          "prompt_tokens": 8413106,
+          "total_tokens": 8487950
+        }
+      ]
+    },
+    {
+      "heading": "Capabilities the benefits depend on",
+      "status": "evidenced",
+      "sources": [
+        {
+          "kind": "rows",
+          "file": "msp.json",
+          "pointer": "/benefit_links",
+          "category": null,
+          "count": 6
+        }
+      ],
+      "items": [
+        {
+          "benefit_id": "01a1e9de-4e4f-757e-a8c8-bf3522e5adcf",
+          "capability_ref": "every choice is traceable to a policy and a person",
+          "created_at": "2026-11-17T14:18:12.693427+00:00",
+          "id": "01a1e9df-6063-783c-a130-075067d33a17",
+          "kind": "benefit",
+          "operational_outcome": "O3 Every decision is auditable",
+          "output_ref": "T2 decision ladder",
+          "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "strategic_objective": "decision ladder (rule -> laya -> generation -> human)",
+          "version": 1
+        },
+        {
+          "benefit_id": "01a1e9df-0308-7fdc-8492-32db1e582a2d",
+          "capability_ref": "services with no calls are retired",
+          "created_at": "2026-11-17T14:18:15.299102+00:00",
+          "id": "01a1e9df-6a8a-7e0c-bf4b-022848d53774",
+          "kind": "benefit",
+          "operational_outcome": "O4 Every tool is governed",
+          "output_ref": "T13 tool platform",
+          "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "strategic_objective": "versioned toolkit with a probe, binding and ledger",
+          "version": 1
+        },
+        {
+          "benefit_id": "01a1e9df-0c4b-7807-b35c-5810ec418d45",
+          "capability_ref": "the conveyor changes itself with rollback",
+          "created_at": "2026-11-17T14:18:17.502606+00:00",
+          "id": "01a1e9df-732b-78a5-9b34-779be11092c5",
+          "kind": "benefit",
+          "operational_outcome": "O5 The conveyor develops and operates itself",
+          "output_ref": "T6 development project",
+          "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "strategic_objective": "development projects under gates",
+          "version": 1
+        },
+        {
+          "benefit_id": "01a1e9df-1592-79a5-839e-037d8fe4251b",
+          "capability_ref": "an outside review changes a published output",
+          "created_at": "2026-11-17T14:18:20.569102+00:00",
+          "id": "01a1e9df-7f1f-769c-bd17-8f71322cc505",
+          "kind": "benefit",
+          "operational_outcome": "O6 The public can see and challenge the design",
+          "output_ref": "DESIGN-PUBLISH public site",
+          "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "strategic_objective": "public repository and published outputs",
+          "version": 1
+        },
+        {
+          "benefit_id": "01a1e9df-1e42-7199-87e1-23c577c62f8e",
+          "capability_ref": "a concept has one table",
+          "created_at": "2026-11-17T14:18:22.767809+00:00",
+          "id": "01a1e9df-87b8-7761-ae0d-f5bb03c66628",
+          "kind": "benefit",
+          "operational_outcome": "O1 One model, one store",
+          "output_ref": "T0 model and contracts",
+          "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "strategic_objective": "one store and one action registry",
+          "version": 1
+        },
+        {
+          "benefit_id": "01a1e9df-27b8-7827-ae4e-6d48ca5904e8",
+          "capability_ref": "the plan and the measurement agree",
+          "created_at": "2026-11-17T14:18:24.995037+00:00",
+          "id": "01a1e9df-9066-70a9-8050-e86503fb1b7e",
+          "kind": "benefit",
+          "operational_outcome": "O2 Jobs, not code paths",
+          "output_ref": "P0 + T1 plan spine",
+          "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "strategic_objective": "programme plan and coverage instrument",
+          "version": 1
+        }
+      ]
+    }
+  ],
+  "definition_project_id": "01a1dcb8-d24b-76de-b901-56fd56e001bc"
+}

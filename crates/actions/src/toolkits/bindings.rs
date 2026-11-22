@@ -27,14 +27,14 @@ use crate::invoke::{ActionError, HandlerCtx};
 const CEILINGS: [&str; 4] = ["read", "write", "spend", "destructive"];
 
 fn store_error(error: store::tool::ToolStoreError, action: &'static str) -> ActionError {
-    if let store::tool::ToolStoreError::Database(sqlx::Error::Database(detail)) = &error {
-        if detail.is_unique_violation() {
-            return ActionError::new(
-                409,
-                "binding_exists",
-                "this target already holds a binding for that toolkit version",
-            );
-        }
+    if let store::tool::ToolStoreError::Database(sqlx::Error::Database(detail)) = &error
+        && detail.is_unique_violation()
+    {
+        return ActionError::new(
+            409,
+            "binding_exists",
+            "this target already holds a binding for that toolkit version",
+        );
     }
     tracing::error!(%error, action, "tool binding store error");
     ActionError::internal()

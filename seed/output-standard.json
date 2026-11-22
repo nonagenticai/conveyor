@@ -258,6 +258,83 @@
               "scope": "subject"
             }
           }
+        ],
+        "Boundary": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "project-brief",
+              "scope": "subject"
+            }
+          }
+        ],
+        "Reuse sources": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "project-brief",
+              "scope": "subject"
+            }
+          }
+        ],
+        "Inception units": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "project-brief",
+              "scope": "subject"
+            }
+          }
+        ],
+        "Dependencies": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "project-brief",
+              "scope": "subject"
+            }
+          }
+        ],
+        "Acceptance": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "project-brief",
+              "scope": "subject"
+            }
+          }
+        ],
+        "Capabilities": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "project-brief",
+              "scope": "subject"
+            }
+          }
+        ],
+        "Plan": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "project-brief",
+              "scope": "subject"
+            }
+          }
         ]
       }
     },
@@ -278,7 +355,53 @@
       "subject_kind": "project",
       "mandatory": false,
       "spec": "§8.4",
-      "document_category": "inception-analysis"
+      "document_category": "inception-analysis",
+      "sources": {
+        "Current state": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "inception-analysis",
+              "scope": "subject"
+            }
+          }
+        ],
+        "Reuse sources": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "inception-analysis",
+              "scope": "subject"
+            }
+          }
+        ],
+        "Build vs reuse": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "inception-analysis",
+              "scope": "subject"
+            }
+          }
+        ],
+        "Risks": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "inception-analysis",
+              "scope": "subject"
+            }
+          }
+        ]
+      }
     },
     "architecture-design": {
       "required": [
@@ -298,7 +421,64 @@
       "subject_kind": "project",
       "mandatory": false,
       "spec": "§8.1",
-      "document_category": "architecture-design"
+      "document_category": "architecture-design",
+      "sources": {
+        "Context and boundary": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "architecture-design",
+              "scope": "subject"
+            }
+          }
+        ],
+        "Aggregates, tables and actions": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "architecture-design",
+              "scope": "subject"
+            }
+          }
+        ],
+        "Decisions": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "architecture-design",
+              "scope": "subject"
+            }
+          }
+        ],
+        "Acceptance": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "architecture-design",
+              "scope": "subject"
+            }
+          }
+        ],
+        "Architecture artefacts": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "architecture-design",
+              "scope": "subject"
+            }
+          }
+        ]
+      }
     },
     "decision": {
       "required": [
@@ -320,6 +500,39 @@
       "document_category": "decision",
       "sources": {
         "Context": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "decision",
+              "scope": "subject"
+            }
+          }
+        ],
+        "Decision": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "decision",
+              "scope": "subject"
+            }
+          }
+        ],
+        "Consequences": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "decision",
+              "scope": "subject"
+            }
+          }
+        ],
+        "Evidence": [
           {
             "kind": "documents",
             "file": "artefacts.json",
@@ -359,6 +572,50 @@
               "scope": "subject"
             }
           }
+        ],
+        "Evidence": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "evidence",
+              "scope": "subject"
+            }
+          }
+        ],
+        "Verification": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "evidence",
+              "scope": "subject"
+            }
+          }
+        ],
+        "Links": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "evidence",
+              "scope": "subject"
+            }
+          }
+        ],
+        "Gap": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "evidence",
+              "scope": "subject"
+            }
+          }
         ]
       }
     },
@@ -379,6 +636,39 @@
       "document_category": "closure-review",
       "sources": {
         "Outcome vs acceptance": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "closure-review",
+              "scope": "subject"
+            }
+          }
+        ],
+        "Evidence": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "closure-review",
+              "scope": "subject"
+            }
+          }
+        ],
+        "Open items": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "closure-review",
+              "scope": "subject"
+            }
+          }
+        ],
+        "Decision": [
           {
             "kind": "documents",
             "file": "artefacts.json",
@@ -420,6 +710,39 @@
               "scope": "programme"
             }
           }
+        ],
+        "Outcomes": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "vision",
+              "scope": "programme"
+            }
+          }
+        ],
+        "Boundary": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "vision",
+              "scope": "programme"
+            }
+          }
+        ],
+        "Who it serves": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "vision",
+              "scope": "programme"
+            }
+          }
         ]
       }
     },
@@ -446,6 +769,11 @@
       "sources": {
         "Aggregates and services": [
           {
+            "kind": "rows",
+            "file": "config.json",
+            "pointer": "/capabilities"
+          },
+          {
             "kind": "documents",
             "file": "artefacts.json",
             "pointer": "/documents",
@@ -453,6 +781,63 @@
               "category": "blueprint",
               "scope": "programme"
             }
+          }
+        ],
+        "Action registry and data model": [
+          {
+            "kind": "rows",
+            "file": "actions.json",
+            "pointer": "/actions",
+            "projection": "live"
+          }
+        ],
+        "Deployment estate": [
+          {
+            "kind": "rows",
+            "file": "programme.json",
+            "pointer": "/projects",
+            "match": {
+              "programme_id": "$programme_id"
+            }
+          },
+          {
+            "kind": "rows",
+            "file": "organisation.json",
+            "pointer": "/jobs"
+          }
+        ],
+        "The to-be the projects deliver": [
+          {
+            "kind": "rows",
+            "file": "programme.json",
+            "pointer": "/projects",
+            "match": {
+              "programme_id": "$programme_id"
+            }
+          }
+        ],
+        "Organisation and skills": [
+          {
+            "kind": "rows",
+            "file": "organisation.json",
+            "pointer": "/jobs"
+          },
+          {
+            "kind": "rows",
+            "file": "organisation.json",
+            "pointer": "/departments"
+          }
+        ],
+        "Current, intermediate and target states": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/programme_baselines"
+          },
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/project_baselines"
           }
         ]
       }
@@ -488,6 +873,76 @@
               "scope": "programme"
             }
           }
+        ],
+        "Licensing frame": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "business-case",
+              "scope": "programme"
+            }
+          }
+        ],
+        "Options, including doing nothing": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/register_items",
+            "match": {
+              "kind": "change"
+            }
+          },
+          {
+            "kind": "rows",
+            "file": "work.json",
+            "pointer": "/approvals",
+            "match": {
+              "status": "approved"
+            }
+          }
+        ],
+        "Investment appraisal and cash flow": [
+          {
+            "kind": "rows",
+            "file": "measure.json",
+            "pointer": "/inference/by_project"
+          },
+          {
+            "kind": "rows",
+            "file": "measure.json",
+            "pointer": "/inference/by_model"
+          }
+        ],
+        "Capabilities the benefits depend on": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/benefit_links"
+          }
+        ],
+        "Benefit map": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "business-case",
+              "scope": "programme"
+            }
+          }
+        ],
+        "Cost and risk posture": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "business-case",
+              "scope": "programme"
+            }
+          }
         ]
       }
     },
@@ -512,12 +967,62 @@
       "sources": {
         "Tranches": [
           {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/tranches"
+          },
+          {
             "kind": "documents",
             "file": "artefacts.json",
             "pointer": "/documents",
             "match": {
               "category": "programme-plan",
               "scope": "programme"
+            }
+          }
+        ],
+        "Projects and sequencing": [
+          {
+            "kind": "rows",
+            "file": "programme.json",
+            "pointer": "/projects",
+            "match": {
+              "programme_id": "$programme_id"
+            }
+          },
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/project_dependencies"
+          }
+        ],
+        "Gates": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/tranche_reviews"
+          },
+          {
+            "kind": "rows",
+            "file": "work.json",
+            "pointer": "/approvals"
+          }
+        ],
+        "First three months": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/tranches",
+            "match": {
+              "number": 0
+            }
+          },
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/tranches",
+            "match": {
+              "number": 1
             }
           }
         ]
@@ -544,6 +1049,16 @@
       "sources": {
         "Roles": [
           {
+            "kind": "rows",
+            "file": "organisation.json",
+            "pointer": "/jobs"
+          },
+          {
+            "kind": "rows",
+            "file": "organisation.json",
+            "pointer": "/bindings"
+          },
+          {
             "kind": "documents",
             "file": "artefacts.json",
             "pointer": "/documents",
@@ -551,6 +1066,40 @@
               "category": "governance",
               "scope": "programme"
             }
+          }
+        ],
+        "Decision ladder": [
+          {
+            "kind": "rows",
+            "file": "work.json",
+            "pointer": "/approvals",
+            "match": {
+              "status": "approved"
+            }
+          }
+        ],
+        "Assurance": [
+          {
+            "kind": "rows",
+            "file": "work.json",
+            "pointer": "/approvals"
+          },
+          {
+            "kind": "rows",
+            "file": "architecture.json",
+            "pointer": "/compliance_reviews"
+          }
+        ],
+        "The unit protocol": [
+          {
+            "kind": "rows",
+            "file": "work.json",
+            "pointer": "/card_types"
+          },
+          {
+            "kind": "rows",
+            "file": "work.json",
+            "pointer": "/lists"
           }
         ]
       }
@@ -570,7 +1119,42 @@
       "subject_kind": "programme",
       "mandatory": false,
       "spec": "§8.1",
-      "document_category": "reuse-map"
+      "document_category": "reuse-map",
+      "sources": {
+        "Reuse candidates": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "reuse-map",
+              "scope": "programme"
+            }
+          }
+        ],
+        "Boundary": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "reuse-map",
+              "scope": "programme"
+            }
+          }
+        ],
+        "Licence and contract constraints": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "reuse-map",
+              "scope": "programme"
+            }
+          }
+        ]
+      }
     },
     "brief-template": {
       "required": [
@@ -585,7 +1169,42 @@
       "subject_kind": "programme",
       "mandatory": false,
       "spec": "§8.3",
-      "document_category": "brief-template"
+      "document_category": "brief-template",
+      "sources": {
+        "Mandatory fields": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "brief-template",
+              "scope": "programme"
+            }
+          }
+        ],
+        "Inception units": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "brief-template",
+              "scope": "programme"
+            }
+          }
+        ],
+        "Plan": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "brief-template",
+              "scope": "programme"
+            }
+          }
+        ]
+      }
     },
     "architecture-analysis": {
       "required": [
@@ -604,7 +1223,53 @@
       "subject_kind": "project",
       "mandatory": false,
       "spec": "§8.1",
-      "document_category": "architecture-analysis"
+      "document_category": "architecture-analysis",
+      "sources": {
+        "Current state": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "architecture-analysis",
+              "scope": "subject"
+            }
+          }
+        ],
+        "Options considered": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "architecture-analysis",
+              "scope": "subject"
+            }
+          }
+        ],
+        "Risks": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "architecture-analysis",
+              "scope": "subject"
+            }
+          }
+        ],
+        "Dependency map": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "architecture-analysis",
+              "scope": "subject"
+            }
+          }
+        ]
+      }
     },
     "spec": {
       "required": [
@@ -620,7 +1285,53 @@
       "subject_kind": "programme",
       "mandatory": false,
       "spec": "§5",
-      "document_category": "spec"
+      "document_category": "spec",
+      "sources": {
+        "Context": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "spec",
+              "scope": "programme"
+            }
+          }
+        ],
+        "Requirements": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "spec",
+              "scope": "programme"
+            }
+          }
+        ],
+        "Design": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "spec",
+              "scope": "programme"
+            }
+          }
+        ],
+        "Acceptance": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "spec",
+              "scope": "programme"
+            }
+          }
+        ]
+      }
     },
     "benefit-profile": {
       "required": [
@@ -1034,6 +1745,39 @@
               "scope": "programme"
             }
           }
+        ],
+        "Review cycle": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "benefits-strategy",
+              "scope": "programme"
+            }
+          }
+        ],
+        "Roles and assessment": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "benefits-strategy",
+              "scope": "programme"
+            }
+          }
+        ],
+        "Realization process": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "benefits-strategy",
+              "scope": "programme"
+            }
+          }
         ]
       }
     },
@@ -1054,6 +1798,39 @@
       "document_category": "realization-plan",
       "sources": {
         "Transition": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "realization-plan",
+              "scope": "programme"
+            }
+          }
+        ],
+        "Embedding": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "realization-plan",
+              "scope": "programme"
+            }
+          }
+        ],
+        "Post-closure measurement": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "realization-plan",
+              "scope": "programme"
+            }
+          }
+        ],
+        "Ownership": [
           {
             "kind": "documents",
             "file": "artefacts.json",
@@ -1139,6 +1916,28 @@
           {
             "kind": "computed",
             "name": "architecture_capability"
+          }
+        ],
+        "Approval": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "architecture-principles",
+              "scope": "programme"
+            }
+          }
+        ],
+        "Application": [
+          {
+            "kind": "documents",
+            "file": "artefacts.json",
+            "pointer": "/documents",
+            "match": {
+              "category": "architecture-principles",
+              "scope": "programme"
+            }
           }
         ]
       }
@@ -1663,6 +2462,57 @@
               "programme_id": "$programme_id"
             }
           }
+        ],
+        "Vision and outcomes": [
+          {
+            "kind": "rows",
+            "file": "programme.json",
+            "pointer": "/programme"
+          },
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/benefit_profiles"
+          }
+        ],
+        "Benefit categories": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/benefit_profiles"
+          }
+        ],
+        "Cost, timescale and effort": [
+          {
+            "kind": "rows",
+            "file": "programme.json",
+            "pointer": "/projects",
+            "match": {
+              "programme_id": "$programme_id"
+            }
+          },
+          {
+            "kind": "rows",
+            "file": "measure.json",
+            "pointer": "/inference/by_project"
+          }
+        ],
+        "Risks and support": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/register_items",
+            "match": {
+              "kind": "risk"
+            }
+          }
+        ],
+        "Delivery options": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/tranches"
+          }
         ]
       }
     },
@@ -1687,6 +2537,19 @@
         "Strategic fit": [
           {
             "kind": "rows",
+            "file": "programme.json",
+            "pointer": "/programme"
+          },
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/benefit_profiles",
+            "match": {
+              "status": "active"
+            }
+          },
+          {
+            "kind": "rows",
             "file": "artefacts.json",
             "pointer": "/governed_assets",
             "match": {
@@ -1695,6 +2558,17 @@
           }
         ],
         "Drivers": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/register_items",
+            "match": {
+              "kind": [
+                "risk",
+                "issue"
+              ]
+            }
+          },
           {
             "kind": "rows",
             "file": "artefacts.json",
@@ -1707,6 +2581,27 @@
         "Deliverables and boundaries": [
           {
             "kind": "rows",
+            "file": "programme.json",
+            "pointer": "/projects",
+            "match": {
+              "programme_id": "$programme_id"
+            }
+          },
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/tranches"
+          },
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/programme_baselines",
+            "match": {
+              "kind": "boundary"
+            }
+          },
+          {
+            "kind": "rows",
             "file": "artefacts.json",
             "pointer": "/governed_assets",
             "match": {
@@ -1715,6 +2610,22 @@
           }
         ],
         "Success and constraints": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/benefit_profiles",
+            "match": {
+              "status": "active"
+            }
+          },
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/programme_baselines",
+            "match": {
+              "kind": "boundary"
+            }
+          },
           {
             "kind": "rows",
             "file": "artefacts.json",
@@ -1744,12 +2655,27 @@
       "sources": {
         "Refined vision": [
           {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/tranche_reviews"
+          },
+          {
             "kind": "documents",
             "file": "artefacts.json",
             "pointer": "/documents",
             "match": {
               "category": "refined-vision",
               "scope": "programme"
+            }
+          }
+        ],
+        "Changes from the mandate": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/register_items",
+            "match": {
+              "kind": "change"
             }
           }
         ]
@@ -1829,10 +2755,7 @@
           {
             "kind": "rows",
             "file": "artefacts.json",
-            "pointer": "/governed_assets",
-            "match": {
-              "kind": "information_strategy"
-            }
+            "pointer": "/documents"
           }
         ],
         "Risk strategy": [
@@ -1858,41 +2781,45 @@
         "Monitoring strategy": [
           {
             "kind": "rows",
-            "file": "artefacts.json",
-            "pointer": "/governed_assets",
-            "match": {
-              "kind": "monitoring_strategy"
-            }
+            "file": "msp.json",
+            "pointer": "/cadences"
           }
         ],
         "Communications strategy": [
           {
             "kind": "rows",
-            "file": "artefacts.json",
-            "pointer": "/governed_assets",
-            "match": {
-              "kind": "communications_strategy"
-            }
+            "file": "msp.json",
+            "pointer": "/stakeholder_profiles"
           }
         ],
         "Quality strategy": [
           {
             "kind": "rows",
-            "file": "artefacts.json",
-            "pointer": "/governed_assets",
+            "file": "work.json",
+            "pointer": "/approvals",
             "match": {
-              "kind": "quality_strategy"
+              "status": "approved"
             }
+          },
+          {
+            "kind": "rows",
+            "file": "architecture.json",
+            "pointer": "/compliance_reviews"
           }
         ],
         "Resource strategy": [
           {
             "kind": "rows",
-            "file": "artefacts.json",
-            "pointer": "/governed_assets",
+            "file": "programme.json",
+            "pointer": "/projects",
             "match": {
-              "kind": "resource_strategy"
+              "programme_id": "$programme_id"
             }
+          },
+          {
+            "kind": "rows",
+            "file": "measure.json",
+            "pointer": "/inference/by_project"
           }
         ]
       }
@@ -2108,7 +3035,10 @@
             "file": "architecture.json",
             "pointer": "/links",
             "match": {
-              "kind": "trace"
+              "kind": [
+                "derivation",
+                "realization"
+              ]
             }
           }
         ]
@@ -2555,6 +3485,19 @@
           }
         ],
         "Lean governance": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/tranche_reviews"
+          },
+          {
+            "kind": "rows",
+            "file": "work.json",
+            "pointer": "/approvals",
+            "match": {
+              "gate": "tranche_review"
+            }
+          },
           {
             "kind": "rows",
             "file": "work.json",
