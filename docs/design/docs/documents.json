@@ -128,6 +128,15 @@
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0009-prompt-selection-and-recipe-authoring.md"
     },
     {
+      "title": "0010 — The internalagent executor runtime and its tool grant",
+      "path": "docs/decisions/0010-internal-agent-executor-runtime.html",
+      "source": "docs/decisions/0010-internal-agent-executor-runtime.md",
+      "section": "Decisions",
+      "sha256": "8acb4cb612d7b2d7d687f7a5fe4e4f8b9b5d0cacbeca00a83d49f88412c45e88",
+      "bytes": 8890,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0010-internal-agent-executor-runtime.md"
+    },
+    {
       "title": "Programme architecture and benefits realization",
       "path": "docs/design/Program_Architecture_and_Benefits_Realization.html",
       "source": "docs/design/Program_Architecture_and_Benefits_Realization.md",
@@ -519,8 +528,8 @@
       "path": "docs/plans/00-INDEX.html",
       "source": "docs/plans/00-INDEX.md",
       "section": "Plans",
-      "sha256": "dc3548f1235282a3b2704042c25ab42b4a2efc9a8feb0de2949e9cebb68b1868",
-      "bytes": 252350,
+      "sha256": "97868655c78c34514dc5840d52d3a387e18ff658fc5b4df2df48d2f11953541e",
+      "bytes": 252412,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/00-INDEX.md"
     },
     {
@@ -1023,8 +1032,8 @@
       "path": "docs/plans/slices/S21-message-construction.html",
       "source": "docs/plans/slices/S21-message-construction.md",
       "section": "Plans",
-      "sha256": "80f8a8c6df0773b5b4297ce31113d8ee2c77ccb105a0bd0fbc485103e8e9716a",
-      "bytes": 30903,
+      "sha256": "839b0fde117c4dbcb6289641430db57655d128203fcb8d5940592489e1743a53",
+      "bytes": 34495,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S21-message-construction.md"
     }
   ]

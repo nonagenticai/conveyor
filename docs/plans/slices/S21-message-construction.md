@@ -1,7 +1,7 @@
 ---
 slice: S21
 title: Message construction (the compiled prompt)
-status: partial
+status: built
 depends_on: [S09, S11, S13, S15, S16, T2, T13]
 spec_sections: ["§3 D27", "§8 S21", "§4.4", "§4.5", "§7.7", "§10.2", "§11.1", "§11.4"]
 adds_tables: [prompt, prompt_section]
@@ -17,7 +17,8 @@ Programme project: S21 · issues #15, #581
 **Status:** `plan written 2026-11-09`; the v1 seam is built (D27) and steps 1–2 are built. Step 3
 (the work-package prompt envelope — recipe authoring, memory selection, knowledge content) is
 **built, #574, 2026-11-22**; the design is §12 and the build record is §13. Step 4 (the
-`internal_agent` executor runtime and its dynamic tool grant) is **planned in §14, issue #581**.
+`internal_agent` executor runtime and its dynamic tool grant) is **built, #581, 2026-11-22**; the
+design is §14 and the build record is §15.
 **Depends on:** S15 (capability/knowledge), S16 (prompt audit), S13 (agent.run), S11 (procedure steps),
 S09 (`retrieval.query` / `strata` packs).
 **Owner ruling:** George, 2026-11-09 — *a prompt is a run-time compilation from the procedure and the
@@ -436,3 +437,48 @@ operator row).
 `crates/actions/tests/internal_agent_runtime.rs` (new), extensions to
 `agent_run_resolved`, and `crates/store/tests/organisation.rs`. The scenarios are issue #581
 P1–P4; the receipt is `docs/evidence/S21-EXECUTOR.md`.
+
+## 15. Build record — step 4: the `internal_agent` executor runtime and its tool grant (2026-11-22, issue #581)
+
+**Built.** `conveyor_actions::executor` — `execute_run` is the one dispatch point: a run with no
+binding keeps the T0 start hook; a bound run re-checks the binding (active), its release
+(published), the snapshot hash and the kind (through the T0 `Registry`), then dispatches through a
+`RunExecutor` map. The `internal_agent` handler compiles with the one compiler (the release's
+recipe; the release's model and caps win over the live row), materialises one `run_step`, drives
+the one loop, writes the output as an unattached `document` with `meta.generated = true`, and
+records the `gate.precheck` laya decision on the step. A `procedure` binding on a plain run is
+refused — `process_runs.start` remains the one process start path. `ReleaseAnatomy` types the
+job's execution fields; `job_releases.publish` refuses a malformed grant or limit before the hash,
+and `job_bindings.create` refuses a kind the release disagrees with. The model's tool surface is
+`bound_tools(run) ∩ enabled(grants) ∩ effect ≤ min(grant.max_side_effect, binding.effect_ceiling)`,
+gated by `tools.call` in the agent's `allowlist`; an enabled grant with no bound tool refuses
+`409 capability_not_ready` before the model call.
+
+**Found by execution.** The first `documents.compose` call failed in the test because the loop acts
+as the tenant's service actor and the tenant had none — `agent.run` had already recorded that trap
+on 2026-11-17; the executor now resolves the same actor before it composes. The laya gate's first
+test run recorded `gate_unavailable` because the tenant had no sealed `laya.token`; the seal is
+part of the fixture. A numeric `decision.confidence` decodes as `NUMERIC`, not `f64`, in the test
+query. The shared cargo target dir served a stale `conveyor-actions-derive` proc-macro after the
+merge (an "unknown scope prompts:write" compile error); touching the derive crate rebuilt it.
+
+**Measured at the branch head.** Issue #581's acceptance: `executor_runtime` **5/5**,
+`internal_agent_runtime` **9/9**, `agent_run_resolved` **15/15**. Regressions: `prompt_compile`
+**7/7**, `process_agent_resolved` **4/4**, `decision_ladder` **7/7**, `registry` **12/12**, store
+`prompt_catalogue` **4/4**, store `organisation` **9/9**, domain `organisation` **12/12**, server
+`run_retry` **4/4** and `andon` **3/3**. The receipt is `docs/evidence/S21-EXECUTOR.md`.
+
+**Reversal proofs.** Disabling the binding re-check left a retired binding dispatchable; dropping
+the grant filter offered a bound-but-ungranted tool; removing the grant-ceiling check offered a
+write tool under a read grant; removing the readiness check called the model for a grant the
+binding cannot reach; removing the Request source made the plain run fail `capability_not_ready`
+on `process`; removing the decision record left `run_step.judge` empty.
+
+**Generated.** `actions.json` **508** actions (no new action; `agent.run`'s output schema names the
+compiled identity); coverage measures S21 **built** with **4/4** modules; the document pack is
+regenerated; `served-spec.lock.json` is **539** operations with `agent.run` re-hashed, and the
+refresh absorbed four hashes #573 had already left stale on `main`.
+
+**Next lane.** The applying gate: `ladder.apply_draft` and the approval-resume worker for a
+`handover` gate, so an escalated draft can be decisioned and attached without a human editing the
+card. No PDDL storage, no second compiler, no external runtime.

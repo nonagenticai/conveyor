@@ -334,7 +334,7 @@
       "tranche": 0,
       "units": {
         "blocked": 8,
-        "claimed": 3,
+        "claimed": 4,
         "numbers": [
           17,
           22,
@@ -367,9 +367,10 @@
           565,
           566,
           569,
-          572
+          572,
+          582
         ],
-        "open": 22,
+        "open": 23,
         "ready": 5,
         "unknown": 0
       }
@@ -1466,10 +1467,10 @@
     {
       "blocked_by": [],
       "evidence": [
+        "crates/actions/src/executor",
         "crates/actions/src/knowledge",
         "crates/actions/src/memory",
         "crates/actions/src/prompt",
-        "crates/domain/src/executor.rs",
         "migrations/0030_prompt_catalogue.sql"
       ],
       "gap": null,
@@ -1858,7 +1859,7 @@
       "tranche": 4,
       "units": {
         "blocked": 0,
-        "claimed": 1,
+        "claimed": 2,
         "numbers": [
           83,
           558,
@@ -1866,7 +1867,7 @@
           561
         ],
         "open": 3,
-        "ready": 2,
+        "ready": 1,
         "unknown": 0
       }
     },

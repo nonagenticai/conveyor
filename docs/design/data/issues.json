@@ -1,6 +1,23 @@
 {
   "issues": [
     {
+      "number": 582,
+      "title": "code: remove retired application names from Rust identities",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/582",
+      "updatedAt": "2026-11-22T10:29:10Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        }
+      ]
+    },
+    {
       "number": 581,
       "title": "add: the internal_agent executor runtime and its tool grant",
       "state": "OPEN",
@@ -290,15 +307,15 @@
       "title": "add: the scientific toolkit as a draft",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/560",
-      "updatedAt": "2026-11-22T08:25:39Z",
+      "updatedAt": "2026-11-22T10:32:36Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:ready",
-          "color": "0E8A16"
+          "name": "status:claimed",
+          "color": "FBCA04"
         },
         {
           "name": "T14",
@@ -336,7 +353,7 @@
       "title": "add: the executable tool-provenance and retirement gate",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/558",
-      "updatedAt": "2026-11-22T09:37:40Z",
+      "updatedAt": "2026-11-22T10:05:09Z",
       "labels": [
         {
           "name": "unit",
@@ -542,7 +559,7 @@
       "title": "#526 programme: the retrospective rework \u2014 tranche 0, all remaining tranches, benefits and the viability gate (U5a\u2013U5h, U6, U7)",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/526",
-      "updatedAt": "2026-11-22T09:31:25Z",
+      "updatedAt": "2026-11-22T10:26:35Z",
       "labels": [
         {
           "name": "unit",

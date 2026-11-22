@@ -177,8 +177,8 @@ pub struct NewWorkflowStep {
     pub position: i32,
     /// 1 for the first attempt.
     pub attempt: i32,
-    /// The node the attempt runs.
-    pub node_id: String,
+    /// The node the attempt runs; `None` for a run-level step (S21 step 4).
+    pub node_id: Option<String>,
     /// The action an `action` node invokes, or the node kind otherwise (`run_step.action` is NOT NULL).
     pub action: String,
     /// The resolved input.
@@ -214,7 +214,7 @@ pub async fn start_step_tx(
     .bind(step.attempt)
     .bind(&step.action)
     .bind(&step.input)
-    .bind(&step.node_id)
+    .bind(step.node_id.as_deref())
     .bind(&step.input_hash)
     .fetch_optional(&mut *conn)
     .await

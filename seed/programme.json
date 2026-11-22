@@ -792,7 +792,7 @@
           "T2",
           "T13"
         ],
-        "plan_status": "partial",
+        "plan_status": "built",
         "status_source": "github issue state > measured coverage > plan frontmatter",
         "measured_status": "built",
         "tranche": 9,
@@ -1562,7 +1562,8 @@
           565,
           566,
           569,
-          572
+          572,
+          582
         ],
         "depends_on": [],
         "plan_status": "active",
