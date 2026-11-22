@@ -102,10 +102,19 @@ WRITE_ACTIONS = {
     "projects.close",
     "cards.comment",
     "cards.move",
-    # The tr3 record family: a register risk edited in place, a benefits-map edge.
+    # The tr3 record family: a register risk edited in place, a benefits-map edge, and the
+    # architecture decision register's rows.
     "registers.update",
     "benefits.link",
+    "decisions.create",
+    "decisions.transition",
 }
+
+# The ADR register's 57 source rows are NOT journaled one entry per row: the seed
+# (`scripts/seed-adr-register.py`) is already idempotent and writes through `decisions.*`, so
+# the promotion runs it against production with the approval id from the journal's
+# `change:Seed the architecture decision register` entry. Journaling 57 creates + transitions
+# would duplicate the seed's own sequencing (supersession included) without adding a check.
 
 # Product read actions used by --apply.
 READ_ACTIONS = {
@@ -121,6 +130,8 @@ READ_ACTIONS = {
     "pm.get",
     "benefits.link_list",
     "documents.list",
+    "decisions.list",
+    "decisions.get",
 }
 
 # The release this script ships with has no action that lists measurements.  If one is
@@ -140,6 +151,7 @@ PROJECT_CLOSE_KEY_RE = re.compile(r"^project:close:([0-9a-f-]{36})$")
 CARD_COMMENT_KEY_RE = re.compile(r"^card-comment:([0-9a-f-]{36}):([0-9a-f]{8,64})$")
 CARD_MOVE_KEY_RE = re.compile(r"^card-move:([0-9a-f-]{36}):(intake|active|waiting|done|archive)$")
 BENEFIT_LINK_KEY_RE = re.compile(rf"^benefit-link:({TOKEN}):(.+)$")
+DECISION_KEY_RE = re.compile(rf"^decision:({TOKEN})(?:/(draft|in_review|approved|superseded|archived))?$")
 
 
 class PromoteError(Exception):
@@ -182,6 +194,8 @@ class NaturalKey:
             return f"card-move:{self.first}:{self.second}"
         if self.kind == "benefit_link":
             return f"benefit-link:{self.first}:{self.second}"
+        if self.kind == "decision":
+            return f"decision:{self.first}" + (f"/{self.second}" if self.second else "")
         raise PromoteError(f"unknown natural-key kind {self.kind!r}")
 
 
@@ -191,6 +205,9 @@ def parse_natural_key(value: str) -> NaturalKey:
     match = RISK_KEY_RE.match(value)
     if match:
         return NaturalKey("risk", match.group(1), match.group(2))
+    match = DECISION_KEY_RE.match(value)
+    if match:
+        return NaturalKey("decision", match.group(1), match.group(2))
     match = BENEFIT_LINK_KEY_RE.match(value)
     if match:
         return NaturalKey("benefit_link", match.group(1), match.group(2).strip())
@@ -449,6 +466,33 @@ def validate_entries(entries: list[Entry]) -> list[str]:
                     f"line {entry.lineno}: natural key {key.first!r} does not match "
                     f"input benefit_ref {entry.payload.get('benefit_ref')!r}"
                 )
+        elif entry.action == "decisions.create":
+            if key.kind != "decision" or key.second is not None:
+                errors.append(
+                    f"line {entry.lineno}: decisions.create key must be decision:<key>"
+                )
+                continue
+            if entry.payload.get("key") != key.first:
+                errors.append(
+                    f"line {entry.lineno}: natural key {key.first!r} does not match "
+                    f"input key {entry.payload.get('key')!r}"
+                )
+            if not entry.payload.get("title"):
+                errors.append(f"line {entry.lineno}: decisions.create input has no title")
+        elif entry.action == "decisions.transition":
+            if key.kind != "decision" or key.second is None:
+                errors.append(
+                    f"line {entry.lineno}: decisions.transition key must be "
+                    "decision:<key>/<status>"
+                )
+                continue
+            if entry.payload.get("to") != key.second:
+                errors.append(
+                    f"line {entry.lineno}: natural key status {key.second!r} does not "
+                    f"match input to {entry.payload.get('to')!r}"
+                )
+            if not entry.payload.get("id"):
+                errors.append(f"line {entry.lineno}: transition input has no id")
         elif entry.action == "projects.close_request":
             if key.kind != "project_closure":
                 errors.append(
@@ -633,6 +677,8 @@ class State:
     links: list[dict] = field(default_factory=list)
     # The document family's production rows, by (project, category) as listed.
     documents: list[dict] = field(default_factory=list)
+    # The architecture decision register's production rows, by key.
+    decisions: list[dict] = field(default_factory=list)
 
 
 def snapshot_file(directory: str) -> Path:
@@ -700,6 +746,10 @@ def load_state(
             if row.get("id") not in seen_registers:
                 state.registers.append(row)
                 seen_registers.add(row.get("id"))
+    if any(
+        entry.action in ("decisions.create", "decisions.transition") for entry in entries
+    ):
+        state.decisions.extend(list_all(client, "decisions.list", {}))
     if any(
         entry.action in ("documents.compose", "documents.publish") for entry in entries
     ):
@@ -778,6 +828,13 @@ def load_state(
 def benefit_by_reference(state: State, reference: str) -> dict | None:
     for row in state.benefits:
         if row.get("reference") == reference:
+            return row
+    return None
+
+
+def decision_by_key(state: State, key: str) -> dict | None:
+    for row in state.decisions:
+        if row.get("key") == key:
             return row
     return None
 
@@ -943,6 +1000,13 @@ def existing_for(
     if entry.action == "benefits.update":
         if update_already_reflected(state, key, entry.payload):
             return benefit_by_reference(state, key.first)
+        return None
+    if entry.action == "decisions.create":
+        return decision_by_key(state, key.first)
+    if entry.action == "decisions.transition":
+        row = decision_by_key(state, key.first)
+        if row is not None and row.get("status") == key.second:
+            return row
         return None
     if entry.action == "documents.compose":
         for row in state.documents:
@@ -1175,6 +1239,13 @@ def remap_payload(
             )
         payload["benefit_id"] = benefit["id"]
         payload.pop("benefit_ref", None)
+    elif entry.action == "decisions.transition":
+        row = decision_by_key(state, key.first)
+        if row is None:
+            raise PromoteError(
+                f"decision {key.first!r} has no production row to transition"
+            )
+        payload["id"] = row["id"]
     elif entry.action == "documents.publish":
         staging = payload.get("id")
         production = id_map.get(staging) if staging else None
@@ -1367,6 +1438,25 @@ def readback_entry(
             )
         state.cards[key.first] = card
         return card
+    if entry.action == "decisions.create":
+        row = read_row(client, "decisions.get", production_id)
+        if row.get("key") != key.first:
+            raise ReadbackError(
+                f"decisions.get: key is {row.get('key')!r}, not {key.first!r}"
+            )
+        state.decisions.append(row)
+        return row
+    if entry.action == "decisions.transition":
+        row = read_row(client, "decisions.get", production_id)
+        if row.get("status") != key.second:
+            raise ReadbackError(
+                f"decisions.get: status is {row.get('status')!r}, not {key.second!r}"
+            )
+        state.decisions = [
+            row if item.get("id") == production_id else item
+            for item in state.decisions
+        ]
+        return row
     if entry.action in ("documents.compose", "documents.publish"):
         row = read_row(client, "documents.get", production_id)
         if entry.action == "documents.compose":
@@ -1663,6 +1753,26 @@ class FakeClient:
             row.setdefault("status", "draft")
             self.state.benefits.append(row)
             return copy.deepcopy(row)
+        if action == "decisions.create":
+            row = copy.deepcopy(payload)
+            row.update(id=self._id("decision"), version=1, status="draft")
+            self.state.decisions.append(row)
+            return copy.deepcopy(row)
+        if action == "decisions.transition":
+            for row in self.state.decisions:
+                if row.get("id") == payload.get("id"):
+                    if row.get("status") != payload.get("to"):
+                        row["status"] = payload.get("to")
+                        row["version"] = int(row.get("version") or 1) + 1
+                    return copy.deepcopy(row)
+            raise AssertionError(f"decisions.transition: no decision {payload.get('id')}")
+        if action == "decisions.list":
+            return {"items": self._rows(self.state.decisions, payload), "next_cursor": None}
+        if action == "decisions.get":
+            for row in self.state.decisions:
+                if row.get("id") == payload.get("id"):
+                    return copy.deepcopy(row)
+            return None
         if action == "documents.compose":
             row = copy.deepcopy(payload)
             row.update(id=self._id("document"), version=1, status="draft", published_at=None)
@@ -2268,6 +2378,44 @@ def self_test() -> int:
             f"a pre-existing published document suppresses both: "
             f"{[(o.entry.natural_key, o.verdict, o.detail) for o in third]}",
         )
+
+        # 11. the decision register family: a row is created once and transitioned once.
+        decision_payload = {
+            "key": "adr-9999", "title": "Fixture decision", "body": "# Fixture decision",
+            "meta": {"number": "9999", "deciders": ["the programme owner"]},
+        }
+        decide_create_path = root / "inputs" / "decision_create.json"
+        decide_create_path.write_text(json.dumps(decision_payload), encoding="utf-8")
+        state = State()
+        client = FakeClient(state)
+        entries, errors = build_entries([
+            (2, {"action": "decisions.create", "input": str(decide_create_path),
+                 "natural_key": "decision:adr-9999", "output_id": "staging-decision"}),
+        ])
+        ok(not errors and not validate_entries(entries), "the decision create fixture validates")
+        _, outcomes = apply_entries(client, entries, state, None)
+        ok([o.verdict for o in outcomes] == ["created"], f"decision create: {outcomes}")
+        production_id = state.decisions[0]["id"]
+        transition_payload = {"id": production_id, "to": "approved"}
+        transition_path = root / "inputs" / "decision_transition.json"
+        transition_path.write_text(json.dumps(transition_payload), encoding="utf-8")
+        entries, errors = build_entries([
+            (2, {"action": "decisions.transition", "input": str(transition_path),
+                 "natural_key": "decision:adr-9999/approved",
+                 "output_id": production_id}),
+        ])
+        ok(not errors and not validate_entries(entries), "the decision transition fixture validates")
+        _, outcomes = apply_entries(client, entries, state, None)
+        ok([o.verdict for o in outcomes] == ["created"], f"decision transition: {outcomes}")
+        ok(state.decisions[0]["status"] == "approved", "the transition landed")
+        _, second = apply_entries(FakeClient(state), entries, state, None)
+        ok([o.verdict for o in second] == ["skipped"], f"a transition replay skips: {second}")
+        create_entries, errors = build_entries([
+            (2, {"action": "decisions.create", "input": str(decide_create_path),
+                 "natural_key": "decision:adr-9999", "output_id": "staging-decision"}),
+        ])
+        _, third = apply_entries(FakeClient(state), create_entries, state, None)
+        ok([o.verdict for o in third] == ["skipped"], f"a create replay skips: {third}")
 
     print(f"self-test: {checks} checks passed (offline; no network, no database)")
     return 0
