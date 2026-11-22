@@ -4,9 +4,11 @@
 -- 0044's `project_register_item_change_impact` only tested that `meta` HAS an `impact` key and
 -- that it is not JSON null, so `{"impact": {}}` (and a bare number or string) passed the DB lock
 -- while telling an approver nothing about scope, schedule, cost or risk. The replacement requires
--- an object carrying at least one of those four top-level keys. `meta ? 'impact'` is part of the
--- condition because `jsonb_typeof(NULL)` is NULL: without it a row missing the key entirely would
--- evaluate the CHECK to NULL and pass.
+-- an object carrying at least one of those four top-level keys WITH A NON-NULL VALUE — the same
+-- rule `validate_change` applies, so `{"impact": {"scope": null}}` cannot slip past the DB lock
+-- when the domain refuses it. `meta ? 'impact'` and `jsonb_typeof(...) = 'object'` are part of
+-- the condition because `jsonb_typeof(NULL)` is NULL: without them a row missing the key
+-- entirely, or carrying a scalar, would evaluate the CHECK to NULL and pass.
 --
 -- The domain/store rule (`crates/domain/src/spine.rs::validate_change`, enforced by
 -- `insert_register_tx` and `update_register_tx`) is the first lock; this CHECK is the second.
@@ -24,5 +26,14 @@ ALTER TABLE project_register_item
         OR (baseline_ref IS NOT NULL
             AND meta ? 'impact'
             AND jsonb_typeof(meta->'impact') = 'object'
-            AND (meta->'impact') ?| array['scope', 'schedule', 'cost', 'risk'])
+            AND (
+                ((meta->'impact') ? 'scope'
+                    AND (meta->'impact')->'scope' <> 'null'::jsonb)
+                OR ((meta->'impact') ? 'schedule'
+                    AND (meta->'impact')->'schedule' <> 'null'::jsonb)
+                OR ((meta->'impact') ? 'cost'
+                    AND (meta->'impact')->'cost' <> 'null'::jsonb)
+                OR ((meta->'impact') ? 'risk'
+                    AND (meta->'impact')->'risk' <> 'null'::jsonb)
+            ))
     ) NOT VALID;

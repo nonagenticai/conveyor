@@ -567,7 +567,7 @@
         },
         {
           "path": "crates/store/src/spine.rs",
-          "line": 3825,
+          "line": 3827,
           "quote": "            if matches!(state.as_str(), \"authorised\" | \"in_review\" | \"closed\") =>"
         }
       ],
@@ -586,7 +586,7 @@
       "evidence": [
         {
           "path": "crates/store/src/spine.rs",
-          "line": 2643,
+          "line": 2644,
           "quote": "/// The editable fields of a realization record. `None` leaves the stored value in place."
         }
       ],
@@ -663,12 +663,12 @@
         },
         {
           "path": "crates/store/src/spine.rs",
-          "line": 4014,
+          "line": 4016,
           "quote": "pub async fn close_programme_tx("
         },
         {
           "path": "crates/store/src/spine.rs",
-          "line": 4048,
+          "line": 4050,
           "quote": "        \"UPDATE programme SET status = 'closed', version = version + 1, updated_at = now()"
         }
       ],
@@ -976,7 +976,7 @@
       "evidence": [
         {
           "path": "crates/store/src/spine.rs",
-          "line": 3308,
+          "line": 3310,
           "quote": "          WHERE tenant_id = $1 AND project_id = $2 AND kind = 'deliverable'"
         }
       ],
@@ -1570,7 +1570,7 @@
         },
         {
           "path": "crates/store/src/organisation.rs",
-          "line": 955,
+          "line": 956,
           "quote": "    if job.status == \"retired\" {"
         }
       ],
@@ -1686,7 +1686,7 @@
         },
         {
           "path": "crates/store/src/organisation.rs",
-          "line": 213,
+          "line": 214,
           "quote": "    /// `department_scope`, authority, limits override."
         }
       ],
@@ -2073,7 +2073,7 @@
         },
         {
           "path": "crates/store/src/spine.rs",
-          "line": 3790,
+          "line": 3792,
           "quote": "                PlanError::RetroFindingWithoutLesson(key),"
         }
       ],
@@ -4197,6 +4197,961 @@
         "test": "crates/actions/tests/spine_gates.rs",
         "evidence": "spine_gates 14/14. `a_paused_tranche_resumes_only_with_its_approved_gate` refuses an unknown approval, a wrong gate, a pending gate, a wrong target and a machine-only decision (422 approval_missing each, the tranche left paused), then resumes under an approved HUMAN `tranche.resume` gate naming the tranche (200, state in_review), records the resume on the gate and refuses a second resume 409 tranche_not_paused. `a_compliant_project_closes_in_a_resumed_tranche` shows the freeze the finding names (every close record in place, still 409 closure_tranche_not_authorised) and the same close passing after the resume. `a_resumed_tranche_reviews_again_and_authorises_its_successor` proves the paused tranche still has its one review before the resume (409 tranche_already_reviewed) and that the resumed tranche records the second, dated review, whose `continue` closes it and authorises the next tranche."
       }
+    },
+    {
+      "id": "v1-p42-1",
+      "area": "§4.2",
+      "standard": "SPEC",
+      "spec": "§4.2",
+      "severity": "P1",
+      "title": "A pinned release does not pin the executor configuration that runs",
+      "problem": "Execution reads model_ref, prompt_ref, allowed_actions and the iteration and timeout limits from the live capability_agents row, never from the binding's release_snapshot, so the release hash does not describe the configuration that ran.",
+      "evidence": [
+        {
+          "path": "crates/actions/src/workflow/agent.rs",
+          "line": 330,
+          "quote": "    let record = store::capability::get_agent_tx(&mut tx, tenant, agent_id)"
+        },
+        {
+          "path": "crates/actions/src/capability/agents.rs",
+          "line": 152,
+          "quote": "        .unwrap_or_else(|| current.allowed_actions.clone());"
+        },
+        {
+          "path": "crates/actions/src/workflow/agent.rs",
+          "line": 388,
+          "quote": "    let bound_turns = u8::try_from(record.max_iterations).unwrap_or(MAX_TURNS);"
+        }
+      ],
+      "failure_scenario": "Publish release R and bind it; run once with model medium and grants G1. Call capability_agents.update to router/large with G2. The next run executes the new model and grants under the unchanged release hash R, and neither the run nor the ledger records the change.",
+      "acceptance": "Execution resolves model_ref, prompt_ref, allowed_actions and the limits from binding.release_snapshot (or pins an immutable agent version); editing an agent used by an active binding requires a new release and binding; a test mutates the agent and asserts the pinned run still uses the snapshot.",
+      "owner_project": "T0"
+    },
+    {
+      "id": "v1-p44-1",
+      "area": "§4.4",
+      "standard": "SPEC",
+      "spec": "§4.4",
+      "severity": "P1",
+      "title": "An internal_agent binding's pinned agent is never the agent that runs",
+      "problem": "The binding stores capability_agent_id, but a process run resolves its executor from the process's bound agents or the capability's active agents, so the recorded executor and the executed one can differ with no refusal.",
+      "evidence": [
+        {
+          "path": "crates/store/src/organisation.rs",
+          "line": 1059,
+          "quote": "        capability_agent_id: input.capability_agent_id,"
+        },
+        {
+          "path": "crates/actions/src/process/runs.rs",
+          "line": 140,
+          "quote": "    let capability_agent_id = match bound_agents.as_slice() {"
+        }
+      ],
+      "failure_scenario": "Create an internal_agent binding that pins agent A. Start a run of a process whose step names agent B, or whose capability has one active agent B. The run executes B and records A's binding and release hash; nothing refuses or flags the divergence, and readiness checks the process's agents rather than the binding's.",
+      "acceptance": "Execution resolves the capability agent through the run's job binding, or refuses a step agent that differs from the binding with a 409; a test pins A and resolves B and asserts the refusal, and every run's recorded agent equals its binding's.",
+      "owner_project": "T0"
+    },
+    {
+      "id": "v1-p44-2",
+      "area": "§4.4",
+      "standard": "SPEC",
+      "spec": "§4.4",
+      "severity": "P1",
+      "title": "A new binding goes live with no decision",
+      "problem": "job_bindings.create accepts status active by default and writes no approval or decision, so a release becomes executable on one organisation:write call.",
+      "evidence": [
+        {
+          "path": "crates/actions/src/organisation.rs",
+          "line": 500,
+          "quote": "    match raw.unwrap_or(\"active\") {"
+        },
+        {
+          "path": "crates/actions/src/organisation.rs",
+          "line": 845,
+          "quote": "async fn job_bindings_create("
+        }
+      ],
+      "failure_scenario": "The sole organisation:write holder publishes release R2 and calls job_bindings.create without a status. The binding is active immediately, runs pin it, and the audit contains no decision, approver or evidence for the activation.",
+      "acceptance": "Creating or activating a binding opens a gated decision; only an approved decision flips it to active, and a direct status=active request is refused until then; tests cover the refusal and the approval.",
+      "owner_project": "T0"
+    },
+    {
+      "id": "v1-p45-1",
+      "area": "§4.5",
+      "standard": "SPEC",
+      "spec": "§4.5",
+      "severity": "P1",
+      "title": "The compiled prompt has no Memory source",
+      "problem": "§4.5 assembles the agent prompt from Knowledge, Memory, Request and Tools, but PromptSource has no memory variant and no memory section is rendered, so hot rows and digests never reach an agent.",
+      "evidence": [
+        {
+          "path": "crates/domain/src/prompt.rs",
+          "line": 38,
+          "quote": "    Knowledge,"
+        },
+        {
+          "path": "crates/actions/src/memory/recall.rs",
+          "line": 2,
+          "quote": "//! `memory.recall` — hot rows first, then the semantic digest derived from them."
+        }
+      ],
+      "failure_scenario": "A card with a hot memory row and a consolidated digest runs under an internal_agent job. The prompt carries no hot row, digest or prior-step memory, so the agent re-derives context and can repeat a decision already recorded on the card.",
+      "acceptance": "The prompt compiler gains a Memory source fed by memory.recall (hot rows plus digest) and the run's prior steps; a test compiles a prompt for a card with a hot row and asserts the text contains it, and an absent memory source is a named refusal.",
+      "owner_project": "T0"
+    },
+    {
+      "id": "v1-p46-1",
+      "area": "§4.6",
+      "standard": "SPEC",
+      "spec": "§4.6",
+      "severity": "P2",
+      "title": "job_catalogue.list has no search or pagination",
+      "problem": "§4.6 requires the catalogue to be searchable by code, capability and department and paginated; the action takes EmptyIn and the query returns every job in the tenant.",
+      "evidence": [
+        {
+          "path": "crates/actions/src/organisation.rs",
+          "line": 748,
+          "quote": "    _input: EmptyIn,"
+        },
+        {
+          "path": "crates/store/src/organisation.rs",
+          "line": 489,
+          "quote": "        \"SELECT {JOB_COLUMNS} FROM job_catalogue WHERE tenant_id = $1 ORDER BY job_key, id\""
+        }
+      ],
+      "failure_scenario": "A tenant activates thousands of jobs. An operator asks for delivery's backend jobs and receives the entire catalogue in one uncursored response, so the console truncates or times out and the promised search is impossible.",
+      "acceptance": "list accepts code, capability and department filters plus limit and cursor and returns next_cursor; a test inserts more than one page and asserts each filter and the page bound.",
+      "owner_project": "T0"
+    },
+    {
+      "id": "v1-p52-1",
+      "area": "§5.2",
+      "standard": "SPEC",
+      "spec": "§5.2",
+      "severity": "P1",
+      "title": "Five of the seven project types have no catalogue row",
+      "problem": "The seed carries eight project types (it, kaizen, kata, meta_procedure, meta_prompt, program, architecture, py2rust); SPEC §5.2's delivery, development, operations, setup and media types have no row, and creation refuses a code with no live catalogue row.",
+      "evidence": [
+        {
+          "path": "seed/catalogue.json",
+          "line": 4019,
+          "quote": "      \"code\": \"py2rust\","
+        },
+        {
+          "path": "crates/actions/src/board/projects.rs",
+          "line": 121,
+          "quote": "                \"no active project_type catalogue row has this code in this tenant\","
+        }
+      ],
+      "failure_scenario": "After migrate --seed, projects.create with project_type_code media (or delivery, development, operations, setup) returns 422; the §5.2.1 media sequence and the §9.1 development gates cannot be selected at all.",
+      "acceptance": "The seed carries active rows for delivery, architecture, improvement, development, operations, setup and media, each with its phase template and gate references; a test creates one project of each type and asserts its phases and gates.",
+      "owner_project": "T1"
+    },
+    {
+      "id": "v1-p55-1",
+      "area": "§5.5",
+      "standard": "SPEC",
+      "spec": "§5.5",
+      "severity": "P2",
+      "title": "project_register_item.links does not implement the declared shape",
+      "problem": "§5.5 declares links as {cards[], requirements[], decisions[]}; the column defaults to an array, create defaults to an empty array, and the only internal writer appends {kind,id} entries.",
+      "evidence": [
+        {
+          "path": "migrations/0044_plan_spine.sql",
+          "line": 115,
+          "quote": "    links           jsonb NOT NULL DEFAULT '[]'::jsonb,"
+        },
+        {
+          "path": "crates/actions/src/spine/mod.rs",
+          "line": 1703,
+          "quote": "            links: input.links.unwrap_or_else(|| serde_json::json!([])),"
+        },
+        {
+          "path": "crates/store/src/spine.rs",
+          "line": 2153,
+          "quote": "    let link = serde_json::json!([{ \"kind\": \"benefit\", \"id\": benefit_id.to_string() }]);"
+        }
+      ],
+      "failure_scenario": "A change row created without links stores an empty array; a client reading links.requirements or links.decisions gets null, and a later benefit citation appends an array element, so a typed reader cannot rely on the documented shape.",
+      "acceptance": "The column and both writers enforce {cards:[], requirements:[], decisions:[]}; a test round-trips one card, requirement and decision link through create and get.",
+      "owner_project": "T1"
+    },
+    {
+      "id": "v1-p56-1",
+      "area": "§5.6",
+      "standard": "SPEC",
+      "spec": "§5.6",
+      "severity": "P2",
+      "title": "The SOP source review gate is hard-coded to a human",
+      "problem": "§5.6 says every SOP-derived artefact sits behind a review gate whose default is human and is tenant-configurable; procedures.review_source refuses every non-user actor and reads no tenant policy.",
+      "evidence": [
+        {
+          "path": "crates/actions/src/procedure/ingest.rs",
+          "line": 1152,
+          "quote": "    if ctx.actor_kind != \"user\" {"
+        }
+      ],
+      "failure_scenario": "A tenant configures source review to a rule or dual-control gate; the setting is ignored, every non-human review is refused with a 403, and an automated pre-review or a non-human second decider cannot be used.",
+      "acceptance": "The review gate kind resolves from tenant configuration with human as the default; a test shows a configured rule decider is accepted and an unconfigured agent is refused.",
+      "owner_project": "T16"
+    },
+    {
+      "id": "v1-p56-2",
+      "area": "§5.6",
+      "standard": "SPEC",
+      "spec": "§5.6",
+      "severity": "P2",
+      "title": "SOP intake has no batch path",
+      "problem": "§5.6 says a tenant supplies SOPs singly or as a batch and that a batch never publishes itself; every intake action takes one source.",
+      "evidence": [
+        {
+          "path": "crates/actions/src/procedure/ingest.rs",
+          "line": 84,
+          "quote": "    pub source: SourceIn,"
+        }
+      ],
+      "failure_scenario": "Onboarding 200 SOPs forces 200 calls; a mid-run failure leaves a partially ingested set with no batch record, and the guarantee that a batch never publishes itself has no batch to enforce.",
+      "acceptance": "Intake accepts an array of sources, or a batch action, producing N unpublished drafts with per-item results; a two-source test publishes nothing.",
+      "owner_project": "T16"
+    },
+    {
+      "id": "v1-p57-1",
+      "area": "§5.7",
+      "standard": "SPEC",
+      "spec": "§5.7",
+      "severity": "P2",
+      "title": "The authoring pipeline is an inline converter call, not a procedure job",
+      "problem": "§5.7 requires the authoring family to be ordinary jobs on the two executors and the pipeline to be a procedure; procedures.ingest_sop calls the converter inside the action and records no job or run.",
+      "evidence": [
+        {
+          "path": "crates/actions/src/procedure/ingest.rs",
+          "line": 723,
+          "quote": "    let draft = crate::integrations::convert::convert(&ConvertRequest {"
+        },
+        {
+          "path": "crates/actions/src/integrations/convert.rs",
+          "line": 176,
+          "quote": "    let response = reqwest::Client::new()"
+        }
+      ],
+      "failure_scenario": "A long SOP exceeds the action timeout; the conversion fails before the source asset is written, nothing durable can be retried, no executor isolates the call, and no authoring run is measured.",
+      "acceptance": "Conversion runs as a job driven by a published procedure with a run row per intake and a retry; a test proves a converter failure leaves the source recorded and retryable.",
+      "owner_project": "T17"
+    },
+    {
+      "id": "v1-p91-1",
+      "area": "§9.1",
+      "standard": "SPEC",
+      "spec": "§9.1",
+      "severity": "P1",
+      "title": "No dev.* action family exists for the nine-step development gate set",
+      "problem": "§9.1 defines charter, lane branch, implement, verify, review, merge gate, deploy with live verification and close as gated steps; the action registry enumerates every registered action and none is a dev.* action, so the cycle has no execution surface. v1-p6-2 records the missing trigger in the improvement loop; this records the missing pipeline itself.",
+      "evidence": [
+        {
+          "path": "docs/SPEC_V2.md",
+          "line": 1024,
+          "quote": "`development` type and a stricter gate set:"
+        },
+        {
+          "path": "crates/actions/src/registry.rs",
+          "line": 184,
+          "quote": "        let mut actions: Vec<ActionSpec> = inventory::iter::<ActionRegistration>()"
+        }
+      ],
+      "failure_scenario": "T6's lane, PR, CI, review, merge, deploy and live verify is attempted on conveyor itself; there is no action to open the lane, record verification, request the review or record the deploy, so the only record is prose and no gate can refuse a red merge.",
+      "acceptance": "dev.open, dev.implement, dev.verify, dev.review, dev.merge, dev.release and dev.rollback are registered ActionSpecs, or a seeded process map bound to the development type, each writing its evidence row; a test refuses a merge with red verification and a release without a rollback plan.",
+      "owner_project": "T6"
+    },
+    {
+      "id": "v1-p93-1",
+      "area": "§9.3",
+      "standard": "SPEC",
+      "spec": "§9.3",
+      "severity": "P1",
+      "title": "A completed eval run pins no instrument digest",
+      "problem": "§9.3 freezes eval versions per measurement; eval_cases.update rewrites a case in place with no version or status guard, and eval_run stores only version_id, so a completed measurement cannot be reproduced after an edit.",
+      "evidence": [
+        {
+          "path": "crates/store/src/eval/cases.rs",
+          "line": 255,
+          "quote": "          WHERE tenant_id = $1 AND id = $2"
+        },
+        {
+          "path": "migrations/0026_s19_eval.sql",
+          "line": 158,
+          "quote": "    version_id    uuid NOT NULL,"
+        },
+        {
+          "path": "docs/SPEC_V2.md",
+          "line": 1073,
+          "quote": "  creates a new version and voids its sign-offs."
+        }
+      ],
+      "failure_scenario": "A candidate is measured on version 3 and adopted; later eval_cases.update rewrites a case in version 3. Readiness voids the sign-offs, but the completed run and its report still point at version 3, so before and after scores are no longer reproducible or distinguishable.",
+      "acceptance": "eval_run stores the instrument digest it measured, or edits mint a new version; a test edits a case cited by a completed run and asserts either that the edit is refused or that the run's digest still identifies the measured instrument.",
+      "owner_project": "T5"
+    },
+    {
+      "id": "v1-p93-2",
+      "area": "§9.3",
+      "standard": "SPEC",
+      "spec": "§9.3",
+      "severity": "P1",
+      "title": "No deploy or live-verify gate; ops.rollback is a kubectl undo",
+      "problem": "§9.1 requires rollout by image digest, a /health check, the slice's acceptance check and a rollback plan before deploy, and §9.3 refuses a deploy without a tested rollback; the registry has no deploy or release action for a project and the only rollback restores a pod template revision.",
+      "evidence": [
+        {
+          "path": "crates/actions/src/ops/writes.rs",
+          "line": 327,
+          "quote": "/// `ops.rollback` — restore the pod template of an earlier revision (`kubectl rollout undo`)."
+        },
+        {
+          "path": "crates/actions/src/ops/incidents.rs",
+          "line": 68,
+          "quote": "    [\"ops.restart\", \"ops.scale\", \"ops.rollback\", \"ops.flag_flip\"];"
+        },
+        {
+          "path": "docs/SPEC_V2.md",
+          "line": 1071,
+          "quote": "- **Rollback is mandatory** for deployable changes; a deploy without a tested rollback is refused."
+        }
+      ],
+      "failure_scenario": "A change merges and a person deploys it by hand; no image digest, /health result or acceptance row is written, and a later ops.rollback only undoes a ReplicaSet revision citing no rollback plan. The rule that a deploy without a tested rollback is refused has no refusal point.",
+      "acceptance": "A dev release action records the image digest, the /health result, the slice acceptance evidence and a rollback-plan reference, refusing a missing or failed rollback plan and a missing live check; tests assert each refusal and that release is a separate decision from merge.",
+      "owner_project": "T6"
+    },
+    {
+      "id": "v1-p66-1",
+      "area": "§6.6",
+      "standard": "SPEC",
+      "spec": "§6.6",
+      "severity": "P1",
+      "title": "A handoff is not expressible: no cards.assign and no binding on a card",
+      "problem": "§6.6 requires a handoff card to name its job binding, inputs and acceptance and to be produced by cards.assign or cards.move with a comment; card.job_binding_id exists in the schema but no code writes or reads it and cards.assign does not exist.",
+      "evidence": [
+        {
+          "path": "crates/actions/src/board/cards.rs",
+          "line": 2,
+          "quote": "//! `cards.create` · `.get` · `.update` · `.move` · `.archive` · `.unarchive` · `.duplicate`"
+        },
+        {
+          "path": "migrations/0040_organisation.sql",
+          "line": 203,
+          "quote": "    ADD COLUMN job_binding_id uuid,"
+        },
+        {
+          "path": "docs/SPEC_V2.md",
+          "line": 614,
+          "quote": "2. **A handoff is an action** (`cards.assign` / `cards.move` + `comment`/`artifact.attach`) producing an `event`."
+        }
+      ],
+      "failure_scenario": "The PM needs delivery binding J-4 to do WP-3 and calls cards.create. The row lands with job_binding_id NULL and no acceptance, and any delivery binding with cards:write can claim it; the run starts with no binding, so which job was asked, and what done means, is unrecorded and unauditable.",
+      "acceptance": "A handoff action (cards.assign, or a binding on create) requires an active job_binding_id plus artefact ids and acceptance criteria, writes card.job_binding_id, emits an event and is exposed on CardOut; moving a delivery card into a work lane without a binding is refused 422; a test proves the binding reaches the run.",
+      "owner_project": "T0"
+    },
+    {
+      "id": "v1-p61-1",
+      "area": "§6.1",
+      "standard": "SPEC",
+      "spec": "§6.1",
+      "severity": "P1",
+      "title": "pm.plan replaces an approved baseline without a change request",
+      "problem": "§6.1 says the PM never changes an approved baseline without a change request, but plan_project calls the store's take_baseline_tx with change_id None, bypassing the guarded baselines.take action; a second call also duplicates the WBS. This is the baseline path: v1-p5-4 is the WBS row mutation path and they share one missing guard.",
+      "evidence": [
+        {
+          "path": "crates/actions/src/pm/mod.rs",
+          "line": 560,
+          "quote": "        store::spine::take_baseline_tx(&mut *tx, ctx.tenant, project_id, &kind, ctx.actor_id, None)"
+        },
+        {
+          "path": "crates/actions/src/spine/mod.rs",
+          "line": 1555,
+          "quote": "                    \"project {project_id} already holds an approved {kind} baseline ({}); a new \\"
+        },
+        {
+          "path": "docs/SPEC_V2.md",
+          "line": 536,
+          "quote": "| **Never** | approve its own gates; change an approved baseline without a change request; do the work of a delivery job |"
+        }
+      ],
+      "failure_scenario": "The PM runs pm.plan and the scope baseline is approved. The PM runs pm.plan again with added nodes: a second scope baseline is inserted with change_id NULL, its gate opens and is approved, and the latest approved baseline is the changed scope. No change register row exists.",
+      "acceptance": "plan_project refuses with 409 change_request_required when an approved baseline of that kind exists unless an approved change naming it is supplied, and refuses the duplicate WBS; a test re-calls pm.plan and projects.baseline after approval and asserts the refusal, and both paths share one guard.",
+      "owner_project": "T3"
+    },
+    {
+      "id": "v1-p61-2",
+      "area": "§6.1",
+      "standard": "SPEC",
+      "spec": "§6.1",
+      "severity": "P2",
+      "title": "The PM's status report output has no producer",
+      "problem": "§6.1 lists a status report and an LLM status narrative as PM outputs; no action, asset kind or console surface produces one, and pm.get is a raw read of the project, charter, WBS, baselines and gates.",
+      "evidence": [
+        {
+          "path": "docs/SPEC_V2.md",
+          "line": 533,
+          "quote": "| **Outputs** | project + charter, WBS, baseline, cards with job bindings, gate decisions, status report, closure record |"
+        },
+        {
+          "path": "crates/actions/src/pm/mod.rs",
+          "line": 857,
+          "quote": "/// `pm.get` — the PM's view: project, charter, WBS, baselines and gates."
+        },
+        {
+          "path": "crates/domain/src/governance.rs",
+          "line": 59,
+          "quote": "    pub const ALL: [AssetKind; 15] = ["
+        }
+      ],
+      "failure_scenario": "A sponsor asks for the project's status. The PM can only dump rows through pm.get; no report asset exists to gate, version or cite at a tranche review, so status reporting happens outside the governed record and cannot be audited.",
+      "acceptance": "A pm.status action writes or returns a report with the PM's status narrative scoped to the project, WBS and gates, backed by a status-report asset kind or a documented non-asset contract; a test asserts the report cites the live baseline and gate set.",
+      "owner_project": "T3"
+    },
+    {
+      "id": "v1-p116-1",
+      "area": "§11.6",
+      "standard": "SPEC",
+      "spec": "§11.6",
+      "severity": "P1",
+      "title": "A missing operation dead-ends instead of opening a tool request",
+      "problem": "§11.6 makes a missing operation a governed path: the procedure step opens a tool-request card, a development job implements and publishes it, and the step is rebound; intake instead refuses the whole source with 422 sop.cannot_grant_tool, and no tool-request action or card type exists.",
+      "evidence": [
+        {
+          "path": "docs/SPEC_V2.md",
+          "line": 1445,
+          "quote": "3. **Missing operation → tool request.** A procedure step that needs an operation with no tool opens a tool-request"
+        },
+        {
+          "path": "crates/actions/src/procedure/ingest.rs",
+          "line": 1114,
+          "quote": "                \"sop.cannot_grant_tool\","
+        }
+      ],
+      "failure_scenario": "An author ingests a procedure whose step needs an operation no tool provides. The intake is refused with no record of what was missing, and no card is opened; the procedure can never acquire the tool, so it stays permanently invalid and the gap is invisible to the tool estate.",
+      "acceptance": "A missing operation creates a tool-request card naming the operation, the step and the procedure; publishing a tool version rebinds the step; a test ingests such a procedure, asserts the card exists and that the procedure is retryable once the tool is published.",
+      "owner_project": "T13"
+    },
+    {
+      "id": "v1-p119-1",
+      "area": "§11.9",
+      "standard": "SPEC",
+      "spec": "§11.9",
+      "severity": "P1",
+      "title": "Zero-use tools are flagged but never retired, and a schema drift opens no kata",
+      "problem": "§11.9 requires a zero-call tool to be retired over a cycle and a schema-drift signature to open a kata; tools.usage computes zero_use and nothing consumes it, there is no tools.retire action, and a backend 422 is ledgered as check_failed.",
+      "evidence": [
+        {
+          "path": "crates/actions/src/toolkits/usage.rs",
+          "line": 53,
+          "quote": "    /// True when the tool had no call in the window — the retirement flag."
+        },
+        {
+          "path": "docs/SPEC_V2.md",
+          "line": 1497,
+          "quote": "in-flight runs finish. A tool with zero calls over one programme cycle is flagged and retired (P10). A schema-drift"
+        },
+        {
+          "path": "crates/actions/src/broker.rs",
+          "line": 506,
+          "quote": "                422 => \"check_failed\","
+        }
+      ],
+      "failure_scenario": "A tool has had no call for a cycle; the report lists it as zero_use and nothing retires or unbinds it, so stale tools stay bound indefinitely. A backend changes under its contract; every call is ledgered check_failed and no kata is opened, so the drift is a silent per-call failure.",
+      "acceptance": "tools.retire unbinds and retires a zero-use tool with an owner decision, and a schema-drift signature opens a kata; a test drives a zero-use window to retirement and a 422 drift to a kata row.",
+      "owner_project": "T13"
+    },
+    {
+      "id": "v1-p1110-1",
+      "area": "§11.10",
+      "standard": "SPEC",
+      "spec": "§11.10",
+      "severity": "P1",
+      "title": "Job object storage has no live path: JobStorage is test-only",
+      "problem": "§11.10 requires one storage adapter that writes and reads MinIO directly with a tenant prefix, encryption, a content hash and a size cap; JobStorage implements that contract but no registered action, broker tool or toolkit calls it, so a run cannot persist bytes.",
+      "evidence": [
+        {
+          "path": "crates/actions/src/storage.rs",
+          "line": 82,
+          "quote": "pub struct JobStorage {"
+        },
+        {
+          "path": "crates/actions/tests/s3_wire.rs",
+          "line": 79,
+          "quote": "    let storage = JobStorage::from_env().expect("
+        },
+        {
+          "path": "docs/SPEC_V2.md",
+          "line": 1502,
+          "quote": "The conveyor does not depend on `artifact_service` :8556 or `storage-api` :8391 for its own bytes. One storage adapter"
+        }
+      ],
+      "failure_scenario": "A run produces bytes and has no way to persist them: no action exposes JobStorage, so the tenant prefix, SSE, hash and size cap never execute inside a job. The storage cap of the tool contract is satisfiable only by tests calling the adapter directly.",
+      "acceptance": "A storage action or broker tool exposes get and put through JobStorage with the tenant prefix, SSE, hash and cap enforced at the call path; a test stores and retrieves a job's object through the action and refuses a cross-tenant key and an oversize object.",
+      "owner_project": "T13"
+    },
+    {
+      "id": "v1-p77-1",
+      "area": "§7.7",
+      "standard": "SPEC",
+      "spec": "§7.7",
+      "severity": "P1",
+      "title": "A run can call a model with no compiled prompt and a NULL prompt hash",
+      "problem": "§7.7 requires every prompt to be compiled at run time from the run's sources with a recorded hash; agent.run compiles only when prompt_ref is Some, readiness skips the check when it is None, and the domain claims a default that does not exist.",
+      "evidence": [
+        {
+          "path": "crates/actions/src/workflow/agent.rs",
+          "line": 463,
+          "quote": "    if let Some(reference) = record.prompt_ref.as_deref() {"
+        },
+        {
+          "path": "crates/actions/src/capability/readiness.rs",
+          "line": 184,
+          "quote": "    if let Some(reference) = agent.prompt_ref.as_deref()"
+        },
+        {
+          "path": "crates/domain/src/capability.rs",
+          "line": 192,
+          "quote": "    /// A built-in `<name>@<version>`, or `None` to use the action's default."
+        }
+      ],
+      "failure_scenario": "capability_agents.create with prompt_ref null and status active succeeds; a process run resolves it, readiness passes, agent.run sends the step-input messages and the model answers; inference_call records a NULL prompt hash, so the call is not reproducible and can carry an arbitrary caller-supplied system message.",
+      "acceptance": "Creating or activating an internal_agent without a resolvable prompt_ref is refused, readiness blocks it and agent.run cannot call a model without compiled text; a test proves a NULL prompt_ref yields zero calls and every internal_agent call carries a 64-hex prompt hash.",
+      "owner_project": "PLATFORM"
+    },
+    {
+      "id": "v1-p76-1",
+      "area": "§7.6",
+      "standard": "SPEC",
+      "spec": "§7.6",
+      "severity": "P1",
+      "title": "Workflow and generic runs bypass the required-knowledge readiness guard",
+      "problem": "The only readiness call is in process_runs.start; workflow_runs.start and runs.create insert runs with capability_id None, so §7.6's required-pack block never runs there and the compile receives no capability or knowledge facts.",
+      "evidence": [
+        {
+          "path": "crates/actions/src/workflow/runs.rs",
+          "line": 204,
+          "quote": "        capability_id: None,"
+        },
+        {
+          "path": "crates/actions/src/process/runs.rs",
+          "line": 184,
+          "quote": "    let readiness = crate::capability::readiness::capability_readiness_tx("
+        },
+        {
+          "path": "crates/store/src/prompt.rs",
+          "line": 161,
+          "quote": "    if let Some(capability_id) = capability_id {"
+        }
+      ],
+      "failure_scenario": "A workflow whose node is an internal_agent with a required knowledge pack bound at an unpublished version starts through workflow_runs.start; no readiness check exists on that path, the run row is written, and the agent step later refuses or runs with no knowledge facts. The required pack is never enforced before the first step.",
+      "acceptance": "Every run-start seam either resolves capability_id, including workflow and generic runs, or runs the same readiness check; a test starts a workflow run against a required unpublished pack and asserts the refusal with zero run rows and zero model calls.",
+      "owner_project": "PLATFORM"
+    },
+    {
+      "id": "v1-p77-2",
+      "area": "§7.7",
+      "standard": "SPEC",
+      "spec": "§7.7",
+      "severity": "P2",
+      "title": "Prompt character budgets cannot be written, so the over-budget refusal is unreachable",
+      "problem": "§7.7 requires compiled prompts with character budgets and a measured refusal over budget; both seed inserts omit budget_chars and no action writes the column, so every recipe stays unbounded.",
+      "evidence": [
+        {
+          "path": "crates/store/src/seed.rs",
+          "line": 1272,
+          "quote": "            \"INSERT INTO prompt (tenant_id, key, version, status, title)"
+        },
+        {
+          "path": "crates/store/src/seed.rs",
+          "line": 1289,
+          "quote": "                     (tenant_id, prompt_id, position, source_kind, required, template)"
+        },
+        {
+          "path": "migrations/0031_s21_prompt_budget.sql",
+          "line": 9,
+          "quote": "--      what every seeded recipe stays — the mechanism is opt-in until a recipe names a ceiling."
+        }
+      ],
+      "failure_scenario": "A tenant wants to cap the copilot prompt; there is no prompt create or update action and no route exposing budget_chars, so the only route is direct SQL. Every compiled prompt is unbounded and an oversized prompt is sent rather than refused.",
+      "acceptance": "An action can set and version prompt.budget_chars and prompt_section.budget_chars; with a tight ceiling the compile refuses with the measured size over the limit and makes no model call; a test sets a ceiling and asserts the refusal.",
+      "owner_project": "PLATFORM"
+    },
+    {
+      "id": "v1-p76-2",
+      "area": "§7.6",
+      "standard": "SPEC",
+      "spec": "§7.6",
+      "severity": "P2",
+      "title": "memory.recall serves the consolidated digest inside the hot rows",
+      "problem": "§7.6 separates hot rows from the cold digest; consolidation writes the digest into work_package_memory as kind digest and the hot query has no kind filter, so recall returns a derived digest body as a hot row.",
+      "evidence": [
+        {
+          "path": "crates/store/src/memory.rs",
+          "line": 346,
+          "quote": "         VALUES ($1, $2, $3, 'digest', 'system', $4, now(), $5)"
+        },
+        {
+          "path": "crates/store/src/memory.rs",
+          "line": 229,
+          "quote": "          WHERE tenant_id = $1 AND card_id = $2"
+        },
+        {
+          "path": "crates/actions/src/memory/mod.rs",
+          "line": 20,
+          "quote": "/// One memory row as an action returns it. Never carries a digest body: that is read from strata."
+        }
+      ],
+      "failure_scenario": "After a run completes and memory.consolidate writes a digest, memory.recall for that card returns a hot entry of kind digest carrying the full, possibly stale, digest text beside the real hot rows and the cold hits. A consumer that reads hot as the record acts on a derived fact that a newer hot row has already superseded.",
+      "acceptance": "The hot query or recall excludes kind digest; a test consolidates a card and asserts the hot list carries no digest row or body and that the digest is read only from the cold store.",
+      "owner_project": "PLATFORM"
+    },
+    {
+      "id": "v1-p101-1",
+      "area": "§10.1",
+      "standard": "SPEC",
+      "spec": "§10.1",
+      "severity": "P1",
+      "title": "A per-step judge verdict is a second decision store",
+      "problem": "§10.1 requires one record per fact; the step judge's accept or reject is persisted only as JSON on run_step.judge, with no decision row, so the per-step choice lives in a store the model does not declare.",
+      "evidence": [
+        {
+          "path": "crates/actions/src/process/step.rs",
+          "line": 1446,
+          "quote": "        \"decision\": if verdict.accepted { \"accept\" } else { \"reject\" },"
+        },
+        {
+          "path": "crates/actions/src/process/step.rs",
+          "line": 1493,
+          "quote": "        store::process_judge::set_verdict_tx(&mut tx, tenant, row.id, verdict)"
+        },
+        {
+          "path": "crates/store/src/process.rs",
+          "line": 1456,
+          "quote": "            SET judge = $3, updated_at = now()"
+        }
+      ],
+      "failure_scenario": "A laya judge rejects a step. ladder.list returns nothing for that gate, and the row carries no policy version, input hash or latency, so the refusal is unreproducible and invisible to the reporting that finds gates which never refuse.",
+      "acceptance": "Every laya, checker and eval verdict writes one decision row with rung, answer, versions, input hash and latency, linked to the run step in the same transaction; a test asserts the decision count equals the judged steps and that ladder.list returns the step gate.",
+      "owner_project": "T2"
+    },
+    {
+      "id": "v1-p102-1",
+      "area": "§10.2",
+      "standard": "SPEC",
+      "spec": "§10.2",
+      "severity": "P2",
+      "title": "laya's 3 second hard budget is enforced as 30 seconds",
+      "problem": "§10.2 fixes the conveyor-to-laya seam at a 1500 ms default with a 3 s hard budget; the only laya action declares a 30 s timeout and the invoker enforces that value, so no 1500 or 3000 ms constant exists.",
+      "evidence": [
+        {
+          "path": "crates/actions/src/process/judge.rs",
+          "line": 273,
+          "quote": "        timeout_ms: 30_000,"
+        },
+        {
+          "path": "crates/actions/src/invoke.rs",
+          "line": 1101,
+          "quote": "    match tokio::time::timeout(Duration::from_millis(u64::from(spec.timeout_ms)), work).await {"
+        },
+        {
+          "path": "docs/SPEC_V2.md",
+          "line": 1129,
+          "quote": "| conveyor → laya | `POST /v1/systemone`, 1500 ms default / 3 s hard budget; fail policy per decision policy |"
+        }
+      ],
+      "failure_scenario": "The laya bridge accepts connections and stops answering; every judge call holds a worker for 30 seconds, and the decision policy's unavailable path cannot run inside the contract, so a stalled laya becomes a worker starvation event.",
+      "acceptance": "laya dispatch uses min(config timeout, 3000 ms) with a 1500 ms default; a stalled fake laya test asserts abandonment within 3 seconds and records the unavailable outcome under the decision policy.",
+      "owner_project": "T2"
+    },
+    {
+      "id": "v1-p102-2",
+      "area": "§10.2",
+      "standard": "SPEC",
+      "spec": "§10.2",
+      "severity": "P2",
+      "title": "Kubernetes is reached directly from ops actions, not through the broker",
+      "problem": "§10.2 sends conveyor-to-k8s traffic through the ops toolkit and the broker with declared effect classes; ops actions build a client from the worker's service-account token and call the API inside the action, and no ops toolkit manifest exists.",
+      "evidence": [
+        {
+          "path": "crates/actions/src/ops/reads.rs",
+          "line": 44,
+          "quote": "    let client = client()?;"
+        },
+        {
+          "path": "crates/actions/src/ops/mod.rs",
+          "line": 24,
+          "quote": "//! **The credential is the worker's.** `conveyor-worker` is the only pod template that"
+        },
+        {
+          "path": "docs/SPEC_V2.md",
+          "line": 1133,
+          "quote": "| conveyor → k8s | the ops toolkit through the broker: namespace-scoped service account; read/write verbs declared as tools with effect classes (§11.4) |"
+        }
+      ],
+      "failure_scenario": "A tenant-scoped caller invokes ops.pods with namespace kube-system and reads whatever the worker service account can reach; ops.scale is approval-gated but never effect-ceiling-gated or ledgered, so per-tool metrics and zero-use retirement cannot see cluster operations at all.",
+      "acceptance": "Kubernetes verbs are toolkit operations bound per tenant and dispatched through the broker with one tool_call row each and the namespace taken from the binding; a test asserts the ledger row and the refusal of an out-of-binding namespace.",
+      "owner_project": "T7"
+    },
+    {
+      "id": "v1-p102-3",
+      "area": "§10.2",
+      "standard": "SPEC",
+      "spec": "§10.2",
+      "severity": "P1",
+      "title": "Documents escape the mandated tenant prefix on the shared bucket",
+      "problem": "§11.10 mandates the tenant/tenant_id/ prefix for tenant separation; document bytes are written under t/tenant/ while the job-object adapter writes under tenant/, so one bucket carries two tenant conventions and the policy covers only one.",
+      "evidence": [
+        {
+          "path": "crates/actions/src/integrations/objects.rs",
+          "line": 195,
+          "quote": "    format!(\"t/{tenant}/{document}/{prefix}\")"
+        },
+        {
+          "path": "crates/actions/src/storage.rs",
+          "line": 27,
+          "quote": "pub const TENANT_PREFIX: &str = \"tenant\";"
+        },
+        {
+          "path": "docs/SPEC_V2.md",
+          "line": 1504,
+          "quote": "enforced by key prefix and bucket policy: a mandatory tenant prefix (`tenant/<tenant_id>/`), project/run prefixes"
+        }
+      ],
+      "failure_scenario": "A retention or deny policy written for tenant/id/* governs run objects but not documents; a prefix audit or a tenant-scoped bucket policy sees documents outside the documented namespace, so tenant separation depends on the application rather than the key scheme.",
+      "acceptance": "One key scheme: key_for returns tenant/<tenant_id>/<document>/<hash>, matching the storage adapter and §11.10; a test asserts both adapters share the tenant prefix and that a key lacking it is refused.",
+      "owner_project": "T13"
+    },
+    {
+      "id": "v1-p111-1",
+      "area": "§11.1",
+      "standard": "SPEC",
+      "spec": "§11.1",
+      "severity": "P1",
+      "title": "The tool binding has no writer, so a production tool call cannot resolve",
+      "problem": "§11.1 makes the tool binding one of the two conveyor rows that authorise tool use; no action or store function inserts a tool_binding, so resolution finds none in a real tenant and every call is refused.",
+      "evidence": [
+        {
+          "path": "migrations/0055_tool_platform.sql",
+          "line": 102,
+          "quote": "CREATE TABLE tool_binding ("
+        },
+        {
+          "path": "crates/store/src/tool.rs",
+          "line": 193,
+          "quote": "            AND (b.run_id = $2 OR (b.job_binding_id IS NOT NULL AND b.job_binding_id = $3))"
+        },
+        {
+          "path": "docs/SPEC_V2.md",
+          "line": 1298,
+          "quote": "hash); the binding pins the toolkit versions and the credential alias. Both are conveyor rows; the release never"
+        }
+      ],
+      "failure_scenario": "A tenant admin wants a development job to call the coding toolkit. There is no request to make: job_bindings.create writes a job_binding, not a tool_binding, and the tool actions are publish, probe, usage and call. Every tools.call resolves no binding and answers 409 tool_not_ready; tools.probe can only disable or restore bindings that do not exist.",
+      "acceptance": "A registered action creates, narrows and retires a tenant-scoped tool_binding against a published toolkit version with an effect ceiling and a credential alias; a test creates one, runs tools.call through the broker and asserts one tool_call row; a draft or retired toolkit is refused at binding creation.",
+      "owner_project": "T13"
+    },
+    {
+      "id": "v1-p111-2",
+      "area": "§11.1",
+      "standard": "SPEC",
+      "spec": "§11.1",
+      "severity": "P1",
+      "title": "The release's tool grant does not exist, so an internal agent is bounded only by the binding",
+      "problem": "§11.1 names a second authorising row, the release's operation allowlist with op, variant, max_side_effect and enabled, and §11.4 says it bounds what an internal_agent may choose; no table, struct or action carries max_side_effect and resolution joins only tool_binding.",
+      "evidence": [
+        {
+          "path": "docs/SPEC_V2.md",
+          "line": 1294,
+          "quote": "| **Tool grant** | the release's operation allowlist (`op`, `variant`, `max_side_effect`, `enabled`) and per-call tool gate | the conveyor binding (tool existence + credential) |"
+        },
+        {
+          "path": "docs/SPEC_V2.md",
+          "line": 1420,
+          "quote": "choose, and every choice is recorded; the broker never widens the grant."
+        },
+        {
+          "path": "crates/store/src/tool.rs",
+          "line": 188,
+          "quote": "           FROM tool_binding b"
+        }
+      ],
+      "failure_scenario": "A release grants only the read operation; its internal_agent run is bound to the whole toolkit at ceiling write, so the agent also calls the create operation. Nothing compares the choice with the release allowlist and no row on the run records a grant.",
+      "acceptance": "A release-scoped grant row (op, variant, max_side_effect, enabled) is written inside the release hash and read at tools.call; an operation absent from the grant is refused 403 and a max_side_effect below the tool's effect is refused; tests cover both.",
+      "owner_project": "T13"
+    },
+    {
+      "id": "v1-p111-3",
+      "area": "§11.1",
+      "standard": "SPEC",
+      "spec": "§11.1",
+      "severity": "P1",
+      "title": "Redaction is unreachable: no tool can declare a field to redact",
+      "problem": "§11.1 lists redaction as part of a tool and §11.3 applies the declared fields to the response; ToolManifest carries only key and action and the insert never names the column, so every published tool keeps the empty default and redaction is a no-op.",
+      "evidence": [
+        {
+          "path": "crates/store/src/tool.rs",
+          "line": 539,
+          "quote": "        \"INSERT INTO tool (tenant_id, toolkit_id, key, input_schema, effect, timeout_secs,"
+        },
+        {
+          "path": "migrations/0055_tool_platform.sql",
+          "line": 73,
+          "quote": "    redact         jsonb NOT NULL DEFAULT '[]'::jsonb,"
+        },
+        {
+          "path": "docs/SPEC_V2.md",
+          "line": 1394,
+          "quote": "   `ok | precondition_failed | check_failed | pending | backend_error`; declared fields are redacted and the response"
+        }
+      ],
+      "failure_scenario": "A binding to an ingestion backend returns a document containing an API token or personal data. The tool cannot declare anything to redact, the column is empty, and the full body reaches the caller and the compiled prompt.",
+      "acceptance": "A toolkit manifest or tool version can declare result fields to redact; publish persists them on tool.redact; a test publishes a tool that redacts a token field, calls it and asserts the value is redacted.",
+      "owner_project": "T13"
+    },
+    {
+      "id": "v1-p112-1",
+      "area": "§11.2",
+      "standard": "SPEC",
+      "spec": "§11.2",
+      "severity": "P1",
+      "title": "The live strata_rag toolkit is seeded as draft and can never be called",
+      "problem": "§11.2 lists strata_rag as live and used by every job; its seed manifest carries status draft and resolution requires a published toolkit, so the live retrieval estate has no callable tool.",
+      "evidence": [
+        {
+          "path": "seed/toolkits/retrieval.json",
+          "line": 8,
+          "quote": "  \"status\": \"draft\","
+        },
+        {
+          "path": "docs/SPEC_V2.md",
+          "line": 1306,
+          "quote": "| `strata_rag` | pinned-leaf retrieval (`knowledge.query`), routed RAG | live | every job |"
+        },
+        {
+          "path": "crates/store/src/tool.rs",
+          "line": 195,
+          "quote": "            AND k.status = 'published'"
+        }
+      ],
+      "failure_scenario": "A procedure step explicitly searches through the retrieval toolkit. The toolkit is draft, so the broker answers 409 tool_not_ready before any network call; the live, every-job retrieval estate has no callable tool and tools.probe never reports it, because an unpublished toolkit is not probed.",
+      "acceptance": "The retrieval manifest publishes strata_rag as published, or a test asserts a live-only status is refused for a planned service; a bound run's retrieval call reaches the destination and ledgers one tool_call, and tools.probe reports it live.",
+      "owner_project": "PLATFORM"
+    },
+    {
+      "id": "v1-p54-1",
+      "area": "§5.4",
+      "standard": "SPEC",
+      "spec": "§5.4",
+      "severity": "P1",
+      "title": "A card's Definition of Done is never checked when it enters the done lane",
+      "problem": "§5.4 puts the Definition of Done on card_type.definition and requires the domain layer to check it before a card enters a done list, with an approval override whose reason the coach reads; the column exists but no code reads it and cards.move consults only the project-type matrix.",
+      "evidence": [
+        {
+          "path": "migrations/0002_domain.sql",
+          "line": 102,
+          "quote": "    definition jsonb NOT NULL DEFAULT '{}'::jsonb,"
+        },
+        {
+          "path": "crates/actions/src/board/cards.rs",
+          "line": 401,
+          "quote": "        matrix::ensure_move(&current.card, from.list.kind, to.list.kind, &rules)?;"
+        },
+        {
+          "path": "crates/domain/src/catalogue.rs",
+          "line": 210,
+          "quote": "    matrix: BTreeMap<ListKind, Vec<ListKind>>,"
+        }
+      ],
+      "failure_scenario": "A delivery card whose card_type.definition declares required outputs is moved active to done by cards.move; ensure_move approves the transition from the matrix alone, no acceptance artefact is required, no override row is written, and the coach never sees a reason. The project then closes over work that never met its own definition.",
+      "acceptance": "Moving a card into a done list with unmet card_type.definition acceptance refuses 422 with a named error; an approval carrying an override reason permits it and the coach surfaces that reason; tests prove the refusal, the override and the unmet-evidence case.",
+      "owner_project": "T1"
+    },
+    {
+      "id": "v1-p54-2",
+      "area": "§5.4",
+      "standard": "SPEC",
+      "spec": "§5.4",
+      "severity": "P1",
+      "title": "The human-approver default is enforced only for eval gates",
+      "problem": "§5.4 makes an approver human by default and lets a tenant authorise a job or agent only for a gate it explicitly declares non-governance; the one decision writer requires a human decision only when an eval gate is set, so every other gate accepts an agent or service decision.",
+      "evidence": [
+        {
+          "path": "crates/store/src/approval.rs",
+          "line": 873,
+          "quote": "    if eval_gate.is_some() {"
+        },
+        {
+          "path": "crates/store/src/approval.rs",
+          "line": 874,
+          "quote": "        if decision.decided_by_kind != DeciderKind::Human {"
+        },
+        {
+          "path": "crates/store/src/approval_policy.rs",
+          "line": 117,
+          "quote": "    pub self_approval: SelfApproval,"
+        }
+      ],
+      "failure_scenario": "A service principal holding approvals:write answers a PM charter or baseline gate through an internal invoke. record_decision_tx writes a service decider and resolves the gate because it is not an eval gate; with two required decisions, two machine principals complete dual control and no human is involved, although the tenant never declared the gate non-governance.",
+      "acceptance": "A non-human decision on any gate not declared non-governance in a tenant gate-policy row is refused 403 human_only_gate; the policy row carries the approver kind; tests cover the default refusal and the tenant-declared job or agent approval.",
+      "owner_project": "T11"
+    },
+    {
+      "id": "v1-p118-1",
+      "area": "§11.8",
+      "standard": "SPEC",
+      "spec": "§11.8",
+      "severity": "P2",
+      "title": "governed_asset(kind='tool_draft') cannot be inserted",
+      "problem": "§11.8 says the tool draft lifecycle reuses governed_asset(kind='tool_draft'), but the live CHECK admits fifteen kinds without it and tool_draft appears nowhere in migrations, seeds or code.",
+      "evidence": [
+        {
+          "path": "docs/SPEC_V2.md",
+          "line": 1488,
+          "quote": "Reused, not created: V1 `secret` (credential storage), `governed_asset(kind='tool_draft')`, `event`, `audit_event`,"
+        },
+        {
+          "path": "migrations/0044_plan_spine.sql",
+          "line": 415,
+          "quote": "    kind IN ('requirement', 'principle', 'adr', 'charter', 'closure', 'postmortem',"
+        },
+        {
+          "path": "migrations/0044_plan_spine.sql",
+          "line": 418,
+          "quote": "             'projects_dossier')"
+        }
+      ],
+      "failure_scenario": "An imported draft tool is recorded as a governed asset for tenant-admin approval; the insert violates the kind check, so the draft and the approval and contract-test anchor that §11.5 requires cannot exist.",
+      "acceptance": "A forward migration adds tool_draft to the kind check; a draft-create action writes one; a test creates the draft, attaches an approval decision and only then publishes the toolkit.",
+      "owner_project": "PLATFORM"
+    },
+    {
+      "id": "v1-p118-2",
+      "area": "§11.8",
+      "standard": "SPEC",
+      "spec": "§11.8",
+      "severity": "P2",
+      "title": "tool.output_schema is never stored or read",
+      "problem": "§11.8 requires the tool row to carry an input and an output schema; the column exists, but insert_tool supplies only input_schema and the resolution select never reads output_schema, so it is NULL for every published tool.",
+      "evidence": [
+        {
+          "path": "docs/SPEC_V2.md",
+          "line": 1483,
+          "quote": "| `tool` | one operation version | input/output schema, effect, idempotency, timeout, redact, destination alias, status |"
+        },
+        {
+          "path": "crates/store/src/tool.rs",
+          "line": 539,
+          "quote": "        \"INSERT INTO tool (tenant_id, toolkit_id, key, input_schema, effect, timeout_secs,"
+        },
+        {
+          "path": "crates/store/src/tool.rs",
+          "line": 129,
+          "quote": "     k.toolkit_version, t.key AS tool_key, t.input_schema, t.effect, t.idempotency, \\"
+        }
+      ],
+      "failure_scenario": "A destination silently renames response fields; the pinned tool version holds no output contract, so the broker passes the changed body to the run and nothing can detect drift from what was published.",
+      "acceptance": "Publish copies the manifest output into tool.output_schema, resolution selects it, and a response that violates it is surfaced distinctly; a test asserts a non-NULL stored output schema and flags a drifted response.",
+      "owner_project": "T13"
     }
   ]
 }
