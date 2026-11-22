@@ -3,8 +3,9 @@
 //! CONTRACT §19 "Sandbox isolation").
 //!
 //! One `batch/v1` Job per `(run, instance)`: a ConfigMap carrying `patch.diff`, `eval.sh` and
-//! `run.sh`; the instance image by digest; **no service-account token**; CPU/memory/ephemeral
-//! caps; a pod deadline. The conveyor never executes test code in its own pod.
+//! `run.sh`, a small wrapper ConfigMap carrying the `gs` shim; the instance image by digest;
+//! **no service-account token**; CPU/memory/ephemeral caps; a pod deadline. The conveyor never
+//! executes test code in its own pod.
 //!
 //! **Client choice (recorded deviation from S17 §6's "kube client").** This talks to the
 //! Kubernetes API over the workspace `reqwest` instead of the generated `kube` client: the
@@ -33,6 +34,18 @@ pub const CONFIGMAP_LIMIT: usize = 1_000_000;
 pub const DEFAULT_PULL_SECRET: &str = "registry-pull-secret";
 /// The in-cluster service-account directory.
 pub const SA_DIR: &str = "/var/run/secrets/kubernetes.io/serviceaccount";
+/// The wrapper directory, placed first on the grader's `PATH` by the runner script.
+pub const GS_WRAPPER_DIR: &str = "/bench-bin";
+/// The `gs` shim for matplotlib's Ghostscript image comparisons.
+///
+/// The instance images call the system Ghostscript (9.55), whose default policy refuses to
+/// read or write under `/testbed` from the sandbox pod: matplotlib passes the result path as
+/// an operand and the comparison dies with `invalidfileaccess in --run--`. The shim grants
+/// exactly the `/testbed/` tree and passes every other argument through unchanged.
+pub const GS_WRAPPER: &str = concat!(
+    "#!/bin/sh\n",
+    "exec /usr/bin/gs --permit-file-read=/testbed/ --permit-file-write=/testbed/ \"$@\"\n",
+);
 
 /// swebench 5.0.2's `GIT_APPLY_CMDS`, read from the pinned sdist (`run_evaluation.py:54`).
 pub const GIT_APPLY_CMDS: [&str; 4] = [
@@ -301,12 +314,21 @@ impl Sandbox {
         format!("{head}-{suffix}")
     }
 
-    /// The ConfigMap and Job for one instance.
+    /// The name of the Job's wrapper ConfigMap: the deterministic Job name plus `-bin`.
     ///
-    /// The ConfigMap carries the three inputs (`patch.diff`, `eval.sh`, `run.sh`) and is
-    /// refused over [`CONFIGMAP_LIMIT`]. The Job runs the runner script as a non-root,
-    /// token-less pod with CPU/memory/ephemeral caps and the instance image by digest —
-    /// an unpinned image (a mutable tag) is refused before anything is created.
+    /// A ConfigMap name may be up to 253 characters, so appending to the Job's 63-character
+    /// name is safe; the Job itself stays under its own cap.
+    pub fn wrapper_configmap_name(job_name: &str) -> String {
+        format!("{job_name}-bin")
+    }
+
+    /// The ConfigMaps and Job for one instance.
+    ///
+    /// The inputs ConfigMap carries `patch.diff`, `eval.sh` and `run.sh` and is refused over
+    /// [`CONFIGMAP_LIMIT`]; the wrapper ConfigMap carries [`GS_WRAPPER`] and is mounted first
+    /// on the grader's `PATH`. The Job runs the runner script as a non-root, token-less pod
+    /// with CPU/memory/ephemeral caps and the instance image by digest — an unpinned image (a
+    /// mutable tag) is refused before anything is created.
     pub fn manifests(
         &self,
         run_id: Uuid,
@@ -314,11 +336,12 @@ impl Sandbox {
         image: &str,
         eval_script: &str,
         model_patch: &str,
-    ) -> Result<(Value, Value), SandboxError> {
+    ) -> Result<(Value, Value, Value), SandboxError> {
         if !digest_pinned(image) {
             return Err(SandboxError::ImageNotPinned(image.to_owned()));
         }
         let name = Self::job_name(run_id, instance_id);
+        let bin_name = Self::wrapper_configmap_name(&name);
         let labels = json!({
             "app.kubernetes.io/name": "conveyor-bench-grader",
             "conveyor/run": run_id.to_string(),
@@ -349,12 +372,21 @@ impl Sandbox {
                     "limits": { "cpu": "2", "memory": "6Gi", "ephemeral-storage": "10Gi" }
                 },
                 "securityContext": { "allowPrivilegeEscalation": false },
-                "volumeMounts": [{ "name": "bench", "mountPath": "/bench", "readOnly": true }]
+                "volumeMounts": [
+                    { "name": "bench", "mountPath": "/bench", "readOnly": true },
+                    { "name": "bench-bin", "mountPath": GS_WRAPPER_DIR, "readOnly": true }
+                ]
             }],
-            "volumes": [{
-                "name": "bench",
-                "configMap": { "name": name, "defaultMode": 0o555 }
-            }]
+            "volumes": [
+                {
+                    "name": "bench",
+                    "configMap": { "name": name, "defaultMode": 0o555 }
+                },
+                {
+                    "name": "bench-bin",
+                    "configMap": { "name": bin_name, "defaultMode": 0o755 }
+                }
+            ]
         });
         if let Some(selector) = &self.config.node_selector {
             let mut node_selector = Map::new();
@@ -376,6 +408,16 @@ impl Sandbox {
             "metadata": { "name": name, "namespace": self.config.namespace, "labels": labels.clone() },
             "data": data,
         });
+        let bin_configmap = json!({
+            "apiVersion": "v1",
+            "kind": "ConfigMap",
+            "metadata": {
+                "name": bin_name,
+                "namespace": self.config.namespace,
+                "labels": labels.clone(),
+            },
+            "data": { "gs": GS_WRAPPER },
+        });
         let job = json!({
             "apiVersion": "batch/v1",
             "kind": "Job",
@@ -395,10 +437,10 @@ impl Sandbox {
                 },
             },
         });
-        Ok((configmap, job))
+        Ok((configmap, bin_configmap, job))
     }
 
-    /// Create the ConfigMap and Job, returning the Job name.
+    /// Create the ConfigMaps and Job, returning the Job name.
     ///
     /// A `409 AlreadyExists` on either object is a **reattach** — the deterministic name means a
     /// repeated tick finds the Job it started, not a second one.
@@ -410,14 +452,12 @@ impl Sandbox {
         eval_script: &str,
         model_patch: &str,
     ) -> Result<String, SandboxError> {
-        let (configmap, job) =
+        let (configmap, bin_configmap, job) =
             self.manifests(run_id, instance_id, image, eval_script, model_patch)?;
         let name = Self::job_name(run_id, instance_id);
-        self.create(
-            &format!("/api/v1/namespaces/{}/configmaps", self.config.namespace),
-            &configmap,
-        )
-        .await?;
+        let configmaps = format!("/api/v1/namespaces/{}/configmaps", self.config.namespace);
+        self.create(&configmaps, &configmap).await?;
+        self.create(&configmaps, &bin_configmap).await?;
         self.create(
             &format!("/apis/batch/v1/namespaces/{}/jobs", self.config.namespace),
             &job,
@@ -476,19 +516,22 @@ impl Sandbox {
         self.get_text(&path, "pod", &pod).await
     }
 
-    /// Delete the Job (and its pod, background propagation) and the ConfigMap. A `404` is fine:
-    /// the reaper may run after the Job's TTL cleanup.
+    /// Delete the Job (and its pod, background propagation) and its ConfigMaps. A `404` is
+    /// fine: the reaper may run after the Job's TTL cleanup.
     pub async fn delete(&self, name: &str) -> Result<(), SandboxError> {
         let job = format!(
             "/apis/batch/v1/namespaces/{}/jobs/{name}?propagationPolicy=Background",
             self.config.namespace
         );
         self.delete_path(&job).await?;
-        let configmap = format!(
-            "/api/v1/namespaces/{}/configmaps/{name}",
-            self.config.namespace
-        );
-        self.delete_path(&configmap).await
+        for configmap in [name.to_owned(), Self::wrapper_configmap_name(name)] {
+            let path = format!(
+                "/api/v1/namespaces/{}/configmaps/{configmap}",
+                self.config.namespace
+            );
+            self.delete_path(&path).await?;
+        }
+        Ok(())
     }
 
     async fn pod_name(&self, job: &str, selector: &str) -> Result<String, SandboxError> {
@@ -541,6 +584,10 @@ impl Sandbox {
 /// each retry), prints [`APPLY_PATCH_FAIL`] and exits when none applies, otherwise prints
 /// [`APPLY_PATCH_PASS`] and [`EVAL_MARKER`], runs the eval under `timeout`, and prints
 /// [`TIMEOUT_MARKER`] on exit 124. Every marker is outside the graded region.
+///
+/// The first line after `set` puts [`GS_WRAPPER_DIR`] first on `PATH` and keeps the image's
+/// entries after it. It must happen here, not in the pod's `env`: kubelet only expands
+/// `$(VAR)` against variables it defines, never the image's own `PATH`.
 pub fn runner_script() -> String {
     let cmds = GIT_APPLY_CMDS
         .iter()
@@ -550,6 +597,7 @@ pub fn runner_script() -> String {
     format!(
         r#"#!/bin/bash
 set -uo pipefail
+export PATH="{wrapper_dir}:$PATH"
 cd /testbed
 cp /bench/patch.diff /tmp/patch.diff
 applied=0
@@ -573,6 +621,7 @@ if [ "$rc" -eq 124 ]; then echo "{TIMEOUT_MARKER}"; fi
 exit 0
 "#,
         cmds = cmds,
+        wrapper_dir = GS_WRAPPER_DIR,
         APPLY_PATCH_FAIL = APPLY_PATCH_FAIL,
         APPLY_PATCH_PASS = APPLY_PATCH_PASS,
         EVAL_MARKER = EVAL_MARKER,

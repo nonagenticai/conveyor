@@ -8,8 +8,9 @@ use std::time::Duration;
 
 use conveyor_domain::benchmark::{APPLY_PATCH_FAIL, APPLY_PATCH_PASS, EVAL_MARKER, TIMEOUT_MARKER};
 use conveyor_server::sandbox::{
-    CONFIGMAP_LIMIT, DEFAULT_PULL_SECRET, EVAL_TIMEOUT_S, GIT_APPLY_CMDS, NodeSelector,
-    POD_DEADLINE_S, Sandbox, SandboxConfig, SandboxError, Toleration, runner_script,
+    CONFIGMAP_LIMIT, DEFAULT_PULL_SECRET, EVAL_TIMEOUT_S, GIT_APPLY_CMDS, GS_WRAPPER,
+    GS_WRAPPER_DIR, NodeSelector, POD_DEADLINE_S, Sandbox, SandboxConfig, SandboxError, Toleration,
+    runner_script,
 };
 use uuid::Uuid;
 
@@ -112,7 +113,7 @@ fn the_node_selector_and_toleration_are_deployment_config() {
 fn the_manifest_carries_the_isolation_contract() {
     let sandbox = Sandbox::new(config()).unwrap();
     let run = Uuid::now_v7();
-    let (configmap, job) = sandbox
+    let (configmap, bin_configmap, job) = sandbox
         .manifests(
             run,
             "django__django-16493",
@@ -152,6 +153,64 @@ fn the_manifest_carries_the_isolation_contract() {
     assert_eq!(job["spec"]["activeDeadlineSeconds"], POD_DEADLINE_S);
     assert_eq!(pod["containers"][0]["resources"]["limits"]["cpu"], "2");
     assert_eq!(pod["volumes"][0]["configMap"]["defaultMode"], 0o555);
+
+    // The `gs` shim: matplotlib's `[pdf]`/`[eps]` comparisons call the image's system
+    // Ghostscript, which refuses the sandbox's `/testbed` paths without the permit flags.
+    let bin_name = Sandbox::wrapper_configmap_name(&name);
+    assert_eq!(bin_configmap["metadata"]["name"], bin_name.as_str());
+    let wrapper = bin_configmap["data"]["gs"]
+        .as_str()
+        .expect("the gs wrapper is a string");
+    assert_eq!(wrapper, GS_WRAPPER, "the ConfigMap ships the shim verbatim");
+    assert!(
+        wrapper.starts_with("#!/bin/sh\n") && wrapper.contains("exec /usr/bin/gs"),
+        "the shim must exec the image's Ghostscript: {wrapper:?}"
+    );
+    assert!(
+        wrapper.contains("--permit-file-read=/testbed/")
+            && wrapper.contains("--permit-file-write=/testbed/")
+            && wrapper.contains("\"$@\""),
+        "the shim must grant only /testbed and pass its arguments through: {wrapper:?}"
+    );
+
+    let volumes = pod["volumes"].as_array().expect("volumes");
+    let bin_volume = volumes
+        .iter()
+        .find(|volume| volume["name"] == "bench-bin")
+        .expect("the wrapper ConfigMap is a volume");
+    assert_eq!(bin_volume["configMap"]["name"], bin_name.as_str());
+    assert_eq!(
+        bin_volume["configMap"]["defaultMode"], 0o755,
+        "the wrapper must be executable inside the pod"
+    );
+
+    let mounts = pod["containers"][0]["volumeMounts"]
+        .as_array()
+        .expect("volume mounts");
+    let bin_mount = mounts
+        .iter()
+        .find(|mount| mount["name"] == "bench-bin")
+        .expect("the wrapper volume is mounted");
+    assert_eq!(bin_mount["mountPath"], GS_WRAPPER_DIR);
+    assert_eq!(bin_mount["readOnly"], true);
+
+    // `$(PATH)` in a pod env value would not expand from the image (kubelet only expands
+    // variables it defines), so the runner script applies the ordering at runtime instead.
+    let run_script = configmap["data"]["run.sh"]
+        .as_str()
+        .expect("the runner script is a string");
+    let path_line = format!("export PATH=\"{GS_WRAPPER_DIR}:$PATH\"");
+    let path_at = run_script
+        .find(&path_line)
+        .unwrap_or_else(|| panic!("{path_line:?} missing from the runner script"));
+    let first_command = run_script
+        .find("cp /bench/patch.diff")
+        .expect("the runner script copies the patch");
+    assert!(
+        path_at < first_command,
+        "the wrapper directory must be first on PATH before the runner runs any command"
+    );
+
     assert!(
         pod.get("nodeSelector").is_none(),
         "a node selector must not be invented: the grading node is deployment config (SPEC R12)"
@@ -485,9 +544,27 @@ async fn the_driver_starts_grades_and_finishes_a_control_run() {
             read_at < deleted_at,
             "the log of {job:?} must be read before its pod is deleted"
         );
+        let bin_created_at = events
+            .iter()
+            .position(|event| event == &format!("configmap:create:{job}-bin"))
+            .unwrap_or_else(|| {
+                panic!("the wrapper ConfigMap of {job:?} was never created: {events:?}")
+            });
+        let job_created_at = events
+            .iter()
+            .position(|event| event == &format!("job:create:{job}"))
+            .expect("the Job create was recorded");
+        assert!(
+            bin_created_at < job_created_at,
+            "the wrapper ConfigMap of {job:?} must exist before its Job starts"
+        );
         assert!(
             events.contains(&format!("configmap:delete:{job}")),
             "the ConfigMap of {job:?} must be deleted too: {events:?}"
+        );
+        assert!(
+            events.contains(&format!("configmap:delete:{job}-bin")),
+            "the wrapper ConfigMap of {job:?} must be deleted too: {events:?}"
         );
     }
     assert_eq!(
