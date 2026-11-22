@@ -3618,13 +3618,10 @@
       "failure_scenario": "The S14 gate aborts on R1-live-n8n.md, so the health, andon, decommission and parity checks never run.",
       "acceptance": "R1-R7, freeze-log and rollback exist in-tree; the S14 gate exits 0.",
       "owner_project": "S14",
-      "waiver": {
-        "accepted_by": "programme owner",
-        "accepted_at": "2026-11-22",
-        "decision_ref": "01a20208-5261-7085-a4a7-74f061e4842b",
-        "register_item": "01a20208-0c30-7f4f-a3b7-ab1b467e2b46",
-        "expires": "2027-02-18",
-        "reason": "The cutover was executed before the receipt tree existed. The R1/R2/R4/R6 rehearsals cannot be reconstructed — n8n, fr and requirements_management are decommissioned and the external agent app is absent — so the receipts stay NOT PROVEN and none is invented. The surviving evidence is the native harness (acceptance/native.toml, PR #483) and the deployed service's own probes. The programme owner accepted this residual on 2026-11-22; the live register item U5-RESIDUAL-S14 and its published decision document record it. Reassess by 2027-02-18."
+      "resolved_by": {
+        "commit": "398c87d762da167eaaecdddc0254ad1decdf02c5",
+        "test": "docs/plans/slices/S14-cutover.md",
+        "evidence": "R7 (owner decision 01a202a3-76b1-72da-8a41-7a1662b91fc7, the published project-scoped copy superseding 01a20208-5261-7085-a4a7-74f061e4842b) rules that a proof whose system is decommissioned is corrected to the surviving proof, never waived. Commit 398c87d7 corrects S14-cutover.md: P4 now claims only the surviving retirement evidence (P1 measurements and gitops-production #5333) and the build-order evidence-status block names the surviving native harness (acceptance/native.toml, scripts/acceptance.py, the acceptance workflow, PR #483), the native map and the deployed probes, stating that no R* receipt is asserted. The waiver is removed; there is no expiry."
       }
     },
     {
@@ -5555,6 +5552,30 @@
       "failure_scenario": "A project's scope baseline is approved (the recorder's normal order). Its WBS deliverable is then accepted with evidence: the guard refuses 409, the only change-opening action needs a PM job binding that no seed ever created, and the deliverable can never reach accepted, so no demo credit can be recorded for it. The record is frozen at the baseline while the work it describes is complete.",
       "acceptance": "A tenant with an approved scope baseline can always authorise a WBS acceptance through a provisioned path: either the organisation seed creates the PM process and its binding that `changes.request` requires, or `changes.request` takes the baseline directly and validates it rather than a PM job binding; a test proves a post-baseline WBS acceptance end to end through that path.",
       "owner_project": "T3"
+    },
+    {
+      "id": "v1-outputs-1",
+      "area": "public pack / output index",
+      "standard": "SPEC",
+      "spec": "§12",
+      "severity": "P1",
+      "title": "A ruling published without a text body is invisible to the pack, even when project-scoped",
+      "problem": "The pack renders only published documents whose body is stored as text and that belong to the programme: `list_published_outputs_tx` filters `body IS NOT NULL`, and the pack documents that as the publication decision. A decision created from bytes (object-backed, body null) is therefore published but absent from `docs/outputs.js` and `documents.preview` refuses it. R7 was first created projectless (excluded twice) and re-issued under PLATFORM (01a202a3) — still excluded, because its body is null (measured 2026-11-22: body null for 01a2029c and 01a202a3; the earlier delegation 01a2021d has a text body and is indexed). The re-issue was recorded as the fix; it is not one.",
+      "evidence": [
+        {
+          "path": "crates/store/src/document.rs",
+          "line": 449,
+          "quote": "          WHERE tenant_id = $1 AND published_at IS NOT NULL AND status = 'active' AND body IS NOT NULL"
+        },
+        {
+          "path": "crates/pack/src/outputs.rs",
+          "line": 10,
+          "quote": "//! **The filter is the publication decision.** Only `published_at IS NOT NULL AND status='active'` rows with a"
+        }
+      ],
+      "failure_scenario": "An owner decision is published from a Markdown file through the byte path: the row is published and active, the pack omits it, the public reader cannot see the ruling, and a later reader of the pack believes no such decision exists. Re-issuing it with a project still fails while the body stays object-backed.",
+      "acceptance": "A published decision is either rendered in the output index or the publish refuses with a reason naming the missing text body; a programme-level decision can be created project-scoped to PLATFORM through a text compose path and appears in `docs/outputs.js`; a test proves a byte-backed published document is refused at publish or surfaced in the index.",
+      "owner_project": "PLATFORM"
     }
   ]
 }
