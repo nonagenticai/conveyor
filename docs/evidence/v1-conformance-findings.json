@@ -2247,12 +2247,12 @@
         },
         {
           "path": "apps/web/src/app.rs",
-          "line": 143,
+          "line": 145,
           "quote": "                        <Routes fallback=|| view! { <p class=\"muted\">\"No such page.\"</p> }>"
         },
         {
           "path": "apps/web/src/app.rs",
-          "line": 277,
+          "line": 281,
           "quote": "        <nav class=\"rail\" aria-label=\"Destinations\">"
         }
       ],

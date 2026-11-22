@@ -19,10 +19,12 @@ use crate::screens::boards::{BoardIndex, BoardScreen};
 use crate::screens::cockpit::Cockpit;
 use crate::screens::copilot::CopilotScreen;
 use crate::screens::evals::{EvalDetail, Evals};
+use crate::screens::improve::Improve;
 use crate::screens::improvement::Improvement;
 use crate::screens::inference::InferenceEndpoint;
 use crate::screens::members::Members;
 use crate::screens::models::{ModelDetail, ModelsScreen};
+use crate::screens::operations::Operations;
 use crate::screens::organisation::Organisation;
 use crate::screens::plan::Plan;
 use crate::screens::platform::Platform;
@@ -176,6 +178,8 @@ fn Shell() -> impl IntoView {
                             <Route path=path!("/organisation") view=Organisation/>
                             <Route path=path!("/procedures") view=Procedures/>
                             <Route path=path!("/plan") view=Plan/>
+                            <Route path=path!("/improve") view=Improve/>
+                            <Route path=path!("/operations") view=Operations/>
                             <Route path=path!("/platform") view=Platform/>
                         </Routes>
                     </main>
@@ -293,6 +297,12 @@ fn Sidebar() -> impl IntoView {
                 })}
                 {move || ctx.has_action("projects.list").then(|| view! {
                     <li><A href="/plan"><span class="nav-item">"Plan"</span></A></li>
+                })}
+                {move || ctx.has_action("metrics.flow").then(|| view! {
+                    <li><A href="/improve"><span class="nav-item">"Improve"</span></A></li>
+                })}
+                {move || ctx.has_action("workers.list").then(|| view! {
+                    <li><A href="/operations"><span class="nav-item">"Operations"</span></A></li>
                 })}
                 {move || ctx.has_action("approvals.list").then(|| view! {
                     <li><A href="/approvals"><span class="nav-item">"Approvals"</span></A></li>
