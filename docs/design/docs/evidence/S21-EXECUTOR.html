@@ -154,6 +154,8 @@
 <li>A <code>tool_binding</code> provisioning action: tests insert raw rows; a live job needs an operator row.</li>
 <li>Broker-side grant enforcement for a direct <code>tools.call</code> caller (the agent surface is bounded; a direct caller is governed by the binding ceiling).</li>
 </ul>
+<h2 id="found-by-the-prs-ci">Found by the PR's CI</h2>
+<p>The first suite run failed <code>cargo audit</code>, not a test: <strong>RUSTSEC-2026-0592</strong> (a stack overflow in <code>Url::origin()</code> on nested <code>blob:</code> URLs, published 2026-11-20) against <code>url</code> <strong>2.5.8</strong>, which was already in the lock on <code>main</code>. The fix is the advisory's: <code>url</code> <strong>2.5.9</strong> and its <code>form_urlencoded</code> <strong>1.2.3</strong> dependency, and nothing else in <code>Cargo.lock</code> moves (<code>cargo metadata --locked</code> accepts the trimmed lock). The PR is the messenger; the merge closes the advisory for <code>main</code> too.</p>
 </main>
     <footer class="doc-footer">
       <span>Rendered from <code>docs/evidence/S21-EXECUTOR.md</code> at build time.</span>

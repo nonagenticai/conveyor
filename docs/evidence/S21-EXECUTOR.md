@@ -78,3 +78,12 @@
 - A `tool_binding` provisioning action: tests insert raw rows; a live job needs an operator row.
 - Broker-side grant enforcement for a direct `tools.call` caller (the agent surface is bounded; a
   direct caller is governed by the binding ceiling).
+
+## Found by the PR's CI
+
+The first suite run failed `cargo audit`, not a test: **RUSTSEC-2026-0592** (a stack overflow in
+`Url::origin()` on nested `blob:` URLs, published 2026-11-20) against `url` **2.5.8**, which was
+already in the lock on `main`. The fix is the advisory's: `url` **2.5.9** and its
+`form_urlencoded` **1.2.3** dependency, and nothing else in `Cargo.lock` moves
+(`cargo metadata --locked` accepts the trimmed lock). The PR is the messenger; the merge closes the
+advisory for `main` too.
