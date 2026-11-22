@@ -254,7 +254,10 @@ pub async fn invoke_http(
     // HERE, synchronously: the work is never queued and nobody polls to learn their request was
     // bad.
     if wants_async(&headers) {
-        if let Err(error) = conveyor_actions::invoke::precheck(registry(), &request) {
+        if let Err(error) =
+            conveyor_actions::invoke::precheck(&state.pool, registry(), caller.tenant, &request)
+                .await
+        {
             return problem(&error, &instance, &request_id);
         }
         let input_hash = conveyor_store::idempotency::request_hash(&request.input);
