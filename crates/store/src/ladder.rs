@@ -582,6 +582,7 @@ impl EffectivePolicy {
             policy_version: Some(self.policy.version),
             refinement_version: self.refinement.as_ref().map(|row| row.version),
             laya_config_version: self.laya_config.as_ref().map(|row| row.version),
+            laya_invocation_id: None,
         }
     }
 
@@ -680,6 +681,12 @@ pub struct NewDecision {
     pub laya_config_id: Option<Uuid>,
     /// The laya config version it read.
     pub laya_config_version: Option<i64>,
+    /// The verified `laya.classify` invocation behind a laya answer.
+    pub laya_invocation_id: Option<Uuid>,
+    /// The idempotency request hash the verified answer was produced for.
+    pub laya_request_hash: Option<String>,
+    /// The sha256 of the laya answer document.
+    pub laya_response_hash: Option<String>,
     /// `system | user | agent | service`.
     pub actor_kind: String,
     /// The acting principal.
@@ -733,6 +740,12 @@ pub struct DecisionRecord {
     pub laya_config_id: Option<Uuid>,
     /// The laya config version pinned.
     pub laya_config_version: Option<i64>,
+    /// The verified `laya.classify` invocation behind a laya answer.
+    pub laya_invocation_id: Option<Uuid>,
+    /// The idempotency request hash the verified answer was produced for.
+    pub laya_request_hash: Option<String>,
+    /// The sha256 of the laya answer document.
+    pub laya_response_hash: Option<String>,
     /// `system | user | agent | service`.
     pub actor_kind: String,
     /// The acting principal.
@@ -758,8 +771,9 @@ pub struct DecisionRecord {
 const DECISION_COLUMNS: &str = "id, kind, rung, project_id, card_id, question, answer, \
     option_set_version, probabilities, confidence::float8 AS confidence, policy_id, \
     policy_version, policy_refinement_id, refinement_version, laya_config_id, \
-    laya_config_version, actor_kind, actor_id, approval_id, input_hash, latency_ms, outcome, \
-    decided_at, meta, version, created_at";
+    laya_config_version, laya_invocation_id, laya_request_hash, laya_response_hash, \
+    actor_kind, actor_id, approval_id, input_hash, latency_ms, outcome, decided_at, meta, \
+    version, created_at";
 
 /// Record one decision and its authored options in the caller's transaction.
 pub async fn record_decision_tx(
@@ -777,6 +791,7 @@ pub async fn record_decision_tx(
         policy_version: new.policy_version,
         refinement_version: new.refinement_version,
         laya_config_version: new.laya_config_version,
+        laya_invocation_id: new.laya_invocation_id,
     };
     let missing = missing_pins(new.rung, &pins, new.approval_id);
     if !missing.is_empty() {
@@ -784,6 +799,37 @@ pub async fn record_decision_tx(
             rung: new.rung.as_str(),
             missing,
         }));
+    }
+    // A laya answer is not the row's own arithmetic: it is the verified response of an
+    // `laya.classify` invocation (§7.2, finding v1-w1c-3). The row pins the invocation and the
+    // request/response hashes that call was verified against; the database CHECK is the second
+    // lock, never the first.
+    if matches!(new.rung, Rung::Laya) {
+        if new
+            .laya_request_hash
+            .as_deref()
+            .is_none_or(|hash| hash.trim().is_empty())
+        {
+            return Err(LadderStoreError::Illegal(LadderError::FieldMissing {
+                field: "laya_request_hash",
+                rung: new.rung.as_str(),
+            }));
+        }
+        if new
+            .laya_response_hash
+            .as_deref()
+            .is_none_or(|hash| hash.trim().is_empty())
+        {
+            return Err(LadderStoreError::Illegal(LadderError::FieldMissing {
+                field: "laya_response_hash",
+                rung: new.rung.as_str(),
+            }));
+        }
+        if let Some(hash) = new.laya_response_hash.as_deref()
+            && !is_input_hash(hash)
+        {
+            return Err(LadderStoreError::Illegal(LadderError::InputHashShape));
+        }
     }
     if new.rung.requires_reproducibility() {
         let Some(hash) = new.input_hash.as_deref() else {
@@ -814,9 +860,10 @@ pub async fn record_decision_tx(
         "INSERT INTO decision
             (tenant_id, kind, rung, project_id, card_id, question, answer, option_set_version,
              probabilities, confidence, policy_id, policy_version, policy_refinement_id,
-             refinement_version, laya_config_id, laya_config_version, actor_kind, actor_id,
-             approval_id, input_hash, latency_ms, outcome, decided_at, meta)
-         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10::float8::numeric,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24)
+             refinement_version, laya_config_id, laya_config_version, laya_invocation_id,
+             laya_request_hash, laya_response_hash, actor_kind, actor_id, approval_id,
+             input_hash, latency_ms, outcome, decided_at, meta)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10::float8::numeric,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25,$26,$27)
          RETURNING {DECISION_COLUMNS}"
     );
     let row: DecisionRecord = sqlx::query_as(AssertSqlSafe(sql))
@@ -836,6 +883,9 @@ pub async fn record_decision_tx(
         .bind(new.refinement_version)
         .bind(new.laya_config_id)
         .bind(new.laya_config_version)
+        .bind(new.laya_invocation_id)
+        .bind(&new.laya_request_hash)
+        .bind(&new.laya_response_hash)
         .bind(&new.actor_kind)
         .bind(new.actor_id)
         .bind(new.approval_id)
