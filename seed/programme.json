@@ -367,7 +367,7 @@
       "key": "S09",
       "name": "Documents, repositories, secrets, workers UI, reports/metrics, billing display",
       "description": "Plan: docs/plans/slices/S09-documents-integrations.md",
-      "status": "closed",
+      "status": "active",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/plans/slices/S09-documents-integrations.md",
@@ -378,7 +378,8 @@
           183,
           195,
           231,
-          245
+          245,
+          571
         ],
         "depends_on": [
           "S03",
@@ -1591,7 +1592,9 @@
           435,
           476,
           526,
-          545
+          545,
+          569,
+          572
         ],
         "depends_on": [],
         "plan_status": "active",

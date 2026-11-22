@@ -1,6 +1,61 @@
 {
   "issues": [
     {
+      "number": 572,
+      "title": "v1-ui-1: the console's destructive flow sends no evidence or waiver (P1)",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/572",
+      "updatedAt": "2026-11-22T07:42:41Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:blocked",
+          "color": "D93F0B"
+        },
+        {
+          "name": "programme",
+          "color": "5319E7"
+        }
+      ]
+    },
+    {
+      "number": 571,
+      "title": "fix(actions): every shared-host budget outlasts the host it waits on",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/571",
+      "updatedAt": "2026-11-22T07:41:55Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:ready",
+          "color": "0E8A16"
+        },
+        {
+          "name": "S09",
+          "color": "6E7781"
+        }
+      ]
+    },
+    {
+      "number": 569,
+      "title": "conveyor-buildout \u2014 the SPEC_V2 programme",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/569",
+      "updatedAt": "2026-11-22T07:30:36Z",
+      "labels": [
+        {
+          "name": "programme",
+          "color": "5319E7"
+        }
+      ]
+    },
+    {
       "number": 566,
       "title": "T18-5: Architecture capability, System architecture, Knowledge and the T12 acceptance",
       "state": "OPEN",
@@ -130,7 +185,7 @@
       "title": "add: research and Lean toolkits, first wave",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/561",
-      "updatedAt": "2026-11-22T07:05:49Z",
+      "updatedAt": "2026-11-22T07:18:32Z",
       "labels": [
         {
           "name": "unit",
@@ -151,7 +206,7 @@
       "title": "add: the scientific toolkit as a draft",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/560",
-      "updatedAt": "2026-11-22T07:05:42Z",
+      "updatedAt": "2026-11-22T07:18:29Z",
       "labels": [
         {
           "name": "unit",
@@ -172,7 +227,7 @@
       "title": "T18: the real V2 UI \u2014 the normative spec, the plan and the programme artefacts",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/559",
-      "updatedAt": "2026-11-22T07:05:44Z",
+      "updatedAt": "2026-11-22T07:43:06Z",
       "labels": [
         {
           "name": "unit",
@@ -197,7 +252,7 @@
       "title": "add: the executable tool-provenance and retirement gate",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/558",
-      "updatedAt": "2026-11-22T07:04:54Z",
+      "updatedAt": "2026-11-22T07:18:24Z",
       "labels": [
         {
           "name": "unit",
@@ -218,7 +273,7 @@
       "title": "add: binding and catalogue actions, and the full published tool contract",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/557",
-      "updatedAt": "2026-11-22T07:04:35Z",
+      "updatedAt": "2026-11-22T07:18:19Z",
       "labels": [
         {
           "name": "unit",
@@ -243,7 +298,7 @@
       "title": "add: bound toolkits reach the agent executor",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/556",
-      "updatedAt": "2026-11-22T07:08:03Z",
+      "updatedAt": "2026-11-22T07:26:34Z",
       "labels": [
         {
           "name": "unit",
@@ -403,7 +458,7 @@
       "title": "#526 programme: the retrospective rework \u2014 tranche 0, all remaining tranches, benefits and the viability gate (U5a\u2013U5h, U6, U7)",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/526",
-      "updatedAt": "2026-11-22T07:06:57Z",
+      "updatedAt": "2026-11-22T07:42:43Z",
       "labels": [
         {
           "name": "unit",
@@ -3974,7 +4029,7 @@
       "title": "T6 \u2014 Development project",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/80",
-      "updatedAt": "2026-11-19T07:49:00Z",
+      "updatedAt": "2026-11-22T07:37:05Z",
       "labels": [
         {
           "name": "unit",
@@ -4037,7 +4092,7 @@
       "title": "T5 \u2014 Kata",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/77",
-      "updatedAt": "2026-11-19T07:48:54Z",
+      "updatedAt": "2026-11-22T07:37:07Z",
       "labels": [
         {
           "name": "unit",
@@ -4816,7 +4871,7 @@
       "title": "S21 \u2014 tenant recipe authoring and memory selection into the compiled prompt",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/15",
-      "updatedAt": "2026-11-22T07:07:43Z",
+      "updatedAt": "2026-11-22T07:44:05Z",
       "labels": [
         {
           "name": "unit",

@@ -7864,7 +7864,7 @@ window.CONVEYOR_REWORK = {
       "baseline": {
         "disposition": "mixed",
         "earliest_expires": "2027-02-18",
-        "entries": 8,
+        "entries": 9,
         "owners": [
           "programme owner"
         ]
@@ -7892,6 +7892,7 @@ window.CONVEYOR_REWORK = {
             "T11",
             "T16",
             "T7",
+            "S09",
             "T13",
             "T14",
             "live project meta"
@@ -7906,7 +7907,7 @@ window.CONVEYOR_REWORK = {
       "spec": "§5.3",
       "standard": "SPEC",
       "status": "open",
-      "subject_count": 8,
+      "subject_count": 9,
       "subjects": [
         {
           "detail": "seed status 'closed' != live status 'active'",
@@ -7957,6 +7958,16 @@ window.CONVEYOR_REWORK = {
           "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
           "subject": "T7"
+        },
+        {
+          "detail": "seed status 'active' != live status 'closed'",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "S09"
         },
         {
           "detail": "seed status 'active' != live status 'closed'",
@@ -29815,10 +29826,10 @@ window.CONVEYOR_REWORK = {
     },
     "SPEC": {
       "findings": 89,
-      "gaps": 40,
+      "gaps": 41,
       "p0": 0,
       "p1": 5,
-      "p2": 35,
+      "p2": 36,
       "packages": 110,
       "rules": 8,
       "rules_clean": 2,
@@ -29860,7 +29871,7 @@ window.CONVEYOR_REWORK = {
     "open": 329,
     "packages": 332,
     "resolved": 11,
-    "subjects": 432,
+    "subjects": 433,
     "suppressed": 3
   }
 };
