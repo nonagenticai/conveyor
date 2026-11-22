@@ -24,8 +24,10 @@ use crate::screens::inference::InferenceEndpoint;
 use crate::screens::members::Members;
 use crate::screens::models::{ModelDetail, ModelsScreen};
 use crate::screens::organisation::Organisation;
+use crate::screens::plan::Plan;
 use crate::screens::platform::Platform;
 use crate::screens::portfolio::Portfolio;
+use crate::screens::procedures::Procedures;
 use crate::screens::process_map::{ProcessMapDetail, ProcessMapList};
 use crate::screens::processes::{ProcessDetail, ProcessesScreen};
 use crate::screens::programme::Programme;
@@ -172,6 +174,8 @@ fn Shell() -> impl IntoView {
                             <Route path=path!("/portfolio") view=Portfolio/>
                             <Route path=path!("/programme") view=Programme/>
                             <Route path=path!("/organisation") view=Organisation/>
+                            <Route path=path!("/procedures") view=Procedures/>
+                            <Route path=path!("/plan") view=Plan/>
                             <Route path=path!("/platform") view=Platform/>
                         </Routes>
                     </main>
@@ -283,6 +287,12 @@ fn Sidebar() -> impl IntoView {
                 })}
                 {move || ctx.has_action("industries.list").then(|| view! {
                     <li><A href="/organisation"><span class="nav-item">"Organisation"</span></A></li>
+                })}
+                {move || ctx.has_action("procedures.list").then(|| view! {
+                    <li><A href="/procedures"><span class="nav-item">"Procedures"</span></A></li>
+                })}
+                {move || ctx.has_action("projects.list").then(|| view! {
+                    <li><A href="/plan"><span class="nav-item">"Plan"</span></A></li>
                 })}
                 {move || ctx.has_action("approvals.list").then(|| view! {
                     <li><A href="/approvals"><span class="nav-item">"Approvals"</span></A></li>
