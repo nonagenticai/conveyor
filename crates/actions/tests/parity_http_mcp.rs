@@ -6970,7 +6970,7 @@ fn kata_samples() -> Vec<Sample> {
         {
             let mut sample = plain("kata.list", json!({}), None);
             sample.prepare = true;
-            sample.input = Box::new(|ctx: &Ctx| json!({"limit": 50}));
+            sample.input = Box::new(|_ctx: &Ctx| json!({"limit": 50}));
             expecting(sample, 200)
         },
     ]
