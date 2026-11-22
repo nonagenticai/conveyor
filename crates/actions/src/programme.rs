@@ -695,7 +695,7 @@ async fn assert_mandatory_artefacts(
         );
     }
     if change_control {
-        let rows = spine_store::list_register_tx(&mut *tx, tenant, project.id)
+        let rows = spine_store::list_register_tx(&mut *tx, tenant, project.id, None)
             .await
             .map_err(|error| {
                 tracing::error!(%error, "close gate: read the project's registers");

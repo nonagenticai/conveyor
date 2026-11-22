@@ -143,24 +143,22 @@ async fn measure(
     benefit: &str,
     kind: &str,
     measured_at: &str,
+    tranche: Option<&str>,
 ) -> (u16, Value) {
+    let mut input = json!({
+        "benefit_id": benefit,
+        "kind": kind,
+        "target_value": 8.0,
+        "actual_value": if kind == "baseline" { 14.0 } else { 9.0 },
+        "unit": "hours",
+        "method": "median of the weekly run timestamps",
+        "measured_at": measured_at,
+    });
+    if let Some(tranche) = tranche {
+        input["tranche_id"] = json!(tranche);
+    }
     running
-        .invoke(
-            "benefits.measure",
-            TOKEN,
-            json!({
-                "benefit_id": benefit,
-                "kind": kind,
-                "target_value": 8.0,
-                "actual_value": if kind == "baseline" { 14.0 } else { 9.0 },
-                "unit": "hours",
-                "method": "median of the weekly run timestamps",
-                "measured_at": measured_at,
-            }),
-            None,
-            None,
-            None,
-        )
+        .invoke("benefits.measure", TOKEN, input, None, None, None)
         .await
 }
 
@@ -565,7 +563,8 @@ async fn a_realized_status_needs_a_complete_transition() {
     );
 
     // The baseline reading alone cannot claim realization: the post reading is missing.
-    let (status, body) = measure(&running, &benefit, "baseline", "2026-11-01T00:00:00Z").await;
+    let (status, body) =
+        measure(&running, &benefit, "baseline", "2026-11-01T00:00:00Z", None).await;
     assert_eq!(status, 201, "{body}");
 
     let (status, body) = running
@@ -588,7 +587,7 @@ async fn a_realized_status_needs_a_complete_transition() {
     );
 
     // A post reading taken before the enactment is not the post-transition measurement.
-    let (status, body) = measure(&running, &benefit, "post", "2026-11-19T00:00:00Z").await;
+    let (status, body) = measure(&running, &benefit, "post", "2026-11-19T00:00:00Z", None).await;
     assert_eq!(status, 201, "{body}");
 
     let (status, body) = running
@@ -614,7 +613,7 @@ async fn a_realized_status_needs_a_complete_transition() {
     assert_eq!(unchanged["version"].as_i64(), Some(version), "{unchanged}");
 
     // A post reading taken after the enactment realises the benefit.
-    let (status, body) = measure(&running, &benefit, "post", "2026-11-21T00:00:00Z").await;
+    let (status, body) = measure(&running, &benefit, "post", "2026-11-21T00:00:00Z", None).await;
     assert_eq!(status, 201, "{body}");
     let (status, body) = running
         .invoke(
@@ -628,6 +627,108 @@ async fn a_realized_status_needs_a_complete_transition() {
         .await;
     assert_eq!(status, 200, "{body}");
     assert_eq!(output(&body)["status"], "realized", "{body}");
+}
+
+/// P1.3 — a reading names the tranche it is attributed to, and the read-back lists the
+/// measurements by benefit and by programme.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_measurement_names_its_tranche_and_is_listed() {
+    let (pg, running, seeded) = fixture().await;
+    let programme = create_programme(&running, "Measurement programme").await;
+    let owner = owner_job(&pg, &seeded).await;
+    let (benefit, _) = create_benefit(&running, &programme, None, "BEN-M1", "draft", owner).await;
+
+    let (status, body) = running
+        .invoke(
+            "tranches.create",
+            TOKEN,
+            json!({"programme_id": programme, "number": 1}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "{body}");
+    let tranche = text(output(&body), "id");
+
+    let (status, body) = measure(
+        &running,
+        &benefit,
+        "baseline",
+        "2026-11-01T00:00:00Z",
+        Some(&tranche),
+    )
+    .await;
+    assert_eq!(status, 201, "{body}");
+    assert_eq!(output(&body)["tranche_id"], json!(tranche), "{body}");
+
+    let (status, body) = running
+        .invoke(
+            "benefits.measurement_list",
+            TOKEN,
+            json!({"benefit_id": benefit}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{body}");
+    let items = output(&body)["items"].as_array().expect("a page");
+    assert_eq!(items.len(), 1, "{body}");
+    assert_eq!(items[0]["benefit_id"], json!(benefit), "{body}");
+    assert_eq!(items[0]["tranche_id"], json!(tranche), "{body}");
+    assert_eq!(items[0]["kind"], "baseline", "{body}");
+
+    // A programme read returns the same reading, narrowed by the optional benefit.
+    let (status, body) = running
+        .invoke(
+            "benefits.measurement_list",
+            TOKEN,
+            json!({"programme_id": programme, "benefit_id": benefit}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{body}");
+    let items = output(&body)["items"].as_array().expect("a page");
+    assert_eq!(items.len(), 1, "{body}");
+    assert_eq!(items[0]["tranche_id"], json!(tranche), "{body}");
+
+    // Another benefit in the same programme narrows the page to nothing.
+    let other = uuid::Uuid::new_v4();
+    let (status, body) = running
+        .invoke(
+            "benefits.measurement_list",
+            TOKEN,
+            json!({"programme_id": programme, "benefit_id": other}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{body}");
+    assert!(
+        output(&body)["items"].as_array().is_some_and(Vec::is_empty),
+        "a foreign benefit must not see this reading: {body}"
+    );
+
+    // Neither scope names a row.
+    let (status, body) = running
+        .invoke(
+            "benefits.measurement_list",
+            TOKEN,
+            json!({}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 422, "{body}");
+    assert_eq!(
+        body["errors"][0]["code"], "benefit_scope_required",
+        "{body}"
+    );
 }
 
 /// P2.1 — a profile is never born realized: the realization record can only reference a row that
