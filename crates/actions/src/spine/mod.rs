@@ -650,8 +650,14 @@ pub struct RegisterUpdateIn {
     pub body: Option<String>,
     /// The new severity.
     pub severity: Option<String>,
+    /// The new probability.
+    pub probability: Option<String>,
+    /// The new owning job.
+    pub owner_job_id: Option<Uuid>,
     /// The new impact.
     pub impact: Option<i32>,
+    /// New related links (a risk must keep at least one).
+    pub links: Option<Value>,
     /// The new review date.
     pub review_at: Option<NaiveDate>,
     /// The recorded response.
@@ -667,6 +673,9 @@ pub struct RegisterListIn {
     pub project_id: Option<Uuid>,
     /// The programme whose register is read (the programme-level rows).
     pub programme_id: Option<Uuid>,
+    /// Narrow the page to one `kind` (`risk | issue | assumption | dependency | benefit |
+    /// change`).
+    pub kind: Option<String>,
 }
 
 /// A dependency edge as `project_dependencies.*` returns it.
@@ -1215,6 +1224,8 @@ pub struct BenefitTransitionOut {
 pub struct BenefitMeasureIn {
     /// The benefit measured.
     pub benefit_id: Uuid,
+    /// The tranche the reading is attributed to, if any.
+    pub tranche_id: Option<Uuid>,
     /// `baseline | interim | post`.
     pub kind: String,
     /// The target this reading is compared with.
@@ -1256,6 +1267,15 @@ pub struct BenefitMeasurementOut {
     pub measured_at: DateTime<Utc>,
     /// The evidence behind the reading.
     pub evidence: Value,
+}
+
+/// `benefits.measurement_list`.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct BenefitMeasurementListIn {
+    /// The benefit whose readings are read; a programme read may narrow to one benefit.
+    pub benefit_id: Option<Uuid>,
+    /// The programme whose readings are read.
+    pub programme_id: Option<Uuid>,
 }
 
 fn benefit_measurement_out(
@@ -1943,14 +1963,19 @@ async fn registers_update(
             "a project-scoped register row cannot also name a programme",
         ));
     }
-    // The create rule is not a one-time admission: an update must leave a risk complete.
+    // The create rule is not a one-time admission: an update must leave a risk complete, and
+    // the check runs against the merged row (the fields the update leaves alone keep their
+    // stored values).
     if current.kind == "risk" {
         let missing = risk_missing(
-            current.probability.as_deref(),
+            input
+                .probability
+                .as_deref()
+                .or(current.probability.as_deref()),
             input.impact.or(current.impact),
-            current.owner_job_id,
+            input.owner_job_id.or(current.owner_job_id),
             input.review_at.or(current.review_at),
-            &current.links,
+            input.links.as_ref().unwrap_or(&current.links),
         );
         if !missing.is_empty() {
             return Err(invalid(
@@ -1975,7 +2000,10 @@ async fn registers_update(
         trimmed(input.title).as_deref(),
         input.body.as_deref(),
         input.severity.as_deref(),
+        trimmed(input.probability).as_deref(),
+        input.owner_job_id,
         input.impact,
+        input.links.as_ref(),
         input.review_at,
         trimmed(input.response).as_deref(),
         input.meta.as_ref(),
@@ -2034,6 +2062,11 @@ async fn registers_list(
     ctx: HandlerCtx,
     input: RegisterListIn,
 ) -> Result<Page<RegisterOut>, ActionError> {
+    let kind = input
+        .kind
+        .as_deref()
+        .map(str::trim)
+        .filter(|kind| !kind.is_empty());
     let records = match (input.project_id, input.programme_id) {
         (Some(_), Some(_)) => {
             return Err(invalid(
@@ -2043,12 +2076,12 @@ async fn registers_list(
             ));
         }
         (Some(project_id), None) => {
-            store::spine::list_register_tx(&mut *tx, ctx.tenant, project_id)
+            store::spine::list_register_tx(&mut *tx, ctx.tenant, project_id, kind)
                 .await
                 .map_err(|error| spine_error(error, ctx.action))?
         }
         (None, Some(programme_id)) => {
-            store::spine::list_programme_register_tx(&mut *tx, ctx.tenant, programme_id)
+            store::spine::list_programme_register_tx(&mut *tx, ctx.tenant, programme_id, kind)
                 .await
                 .map_err(|error| spine_error(error, ctx.action))?
         }
@@ -2746,6 +2779,7 @@ async fn benefits_measure(
         ctx.tenant,
         &store::spine::NewBenefitMeasurement {
             benefit_id: input.benefit_id,
+            tranche_id: input.tranche_id,
             kind,
             target_value: input.target_value,
             actual_value: input.actual_value,
@@ -2759,6 +2793,52 @@ async fn benefits_measure(
     .map_err(|error| spine_error(error, ctx.action))?;
     emit_spine_event(&mut *tx, &ctx, "benefit_measurement", record.id, "created").await?;
     Ok(HandlerOutput::created(benefit_measurement_out(&record)))
+}
+
+/// Read benefit measurements: one benefit's readings, or a programme's readings optionally
+/// narrowed to one benefit.
+#[crate::action(
+    name = "benefits.measurement_list",
+    version = 1,
+    kind = "internal",
+    scopes = ["portfolio:read"],
+    idempotent = true,
+    timeout_ms = 30000,
+    effect = "read",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn benefits_measurement_list(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: BenefitMeasurementListIn,
+) -> Result<Page<BenefitMeasurementOut>, ActionError> {
+    let records = match (input.benefit_id, input.programme_id) {
+        (Some(benefit_id), None) => {
+            store::spine::list_benefit_measurements_tx(&mut *tx, ctx.tenant, benefit_id)
+                .await
+                .map_err(|error| spine_error(error, ctx.action))?
+        }
+        (benefit_id, Some(programme_id)) => store::spine::list_programme_benefit_measurements_tx(
+            &mut *tx,
+            ctx.tenant,
+            programme_id,
+            benefit_id,
+        )
+        .await
+        .map_err(|error| spine_error(error, ctx.action))?,
+        (None, None) => {
+            return Err(invalid(
+                "benefit_id",
+                "benefit_scope_required",
+                "name a benefit_id or a programme_id",
+            ));
+        }
+    };
+    Ok(Page {
+        items: records.iter().map(benefit_measurement_out).collect(),
+        next_cursor: None,
+    })
 }
 
 /// List a programme's benefit profiles.

@@ -86,6 +86,26 @@ async fn owner_job(pg: &support::Pg, seeded: &support::Seeded) -> uuid::Uuid {
     .expect("job")
 }
 
+/// A second real `job_catalogue` row, reusing the industry `owner_job` created, so an update can
+/// be proved to change the risk's owner rather than rewrite it with itself.
+async fn another_owner_job(pg: &support::Pg, seeded: &support::Seeded) -> uuid::Uuid {
+    let industry: uuid::Uuid =
+        sqlx::query_scalar("SELECT id FROM industry WHERE tenant_id = $1 AND key = 'software'")
+            .bind(seeded.tenant_id)
+            .fetch_one(&pg.super_pool)
+            .await
+            .expect("industry");
+    sqlx::query_scalar(
+        "INSERT INTO job_catalogue (tenant_id, job_key, industry_id, title)
+         VALUES ($1, 'finance', $2, 'Finance lead') RETURNING id",
+    )
+    .bind(seeded.tenant_id)
+    .bind(industry)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("job")
+}
+
 /// A complete programme risk. `review_at` is omitted when `review` is false, which is the
 /// refusal under test.
 async fn create_risk(
@@ -297,4 +317,174 @@ async fn a_risk_update_keeps_the_risk_complete() {
         .await;
     assert_eq!(status, 422, "{body}");
     assert_eq!(body["errors"][0]["code"], "risk_incomplete", "{body}");
+}
+
+/// P5 — the register read narrows by `kind`; an absent filter returns the whole register (it
+/// must not be silently widened, and a present filter must not be ignored).
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_register_list_filters_by_kind() {
+    let (pg, running, seeded) = fixture().await;
+    let programme = create_programme(&running, "Kind filter programme").await;
+    let owner = owner_job(&pg, &seeded).await;
+    let (status, risk) = create_risk(&running, &programme, owner, true).await;
+    assert_eq!(status, 201, "{risk}");
+    let risk_id = text(output(&risk), "id");
+
+    let (status, issue) = running
+        .invoke(
+            "registers.create",
+            TOKEN,
+            json!({
+                "programme_id": programme,
+                "kind": "issue",
+                "code": "I-01",
+                "title": "The vendor's sandbox is unavailable",
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "{issue}");
+    let issue_id = text(output(&issue), "id");
+
+    let (status, filtered) = running
+        .invoke(
+            "registers.list",
+            TOKEN,
+            json!({"programme_id": programme, "kind": "risk"}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{filtered}");
+    let items = output(&filtered)["items"].as_array().expect("a page");
+    assert!(
+        items.iter().any(|item| item["id"] == json!(risk_id)),
+        "the risk must survive its own filter: {filtered}"
+    );
+    assert!(
+        items.iter().all(|item| item["kind"] == "risk"),
+        "the filter must exclude every other kind: {filtered}"
+    );
+    assert!(
+        !items.iter().any(|item| item["id"] == json!(issue_id)),
+        "the issue must not leak through the risk filter: {filtered}"
+    );
+
+    let (status, unfiltered) = running
+        .invoke(
+            "registers.list",
+            TOKEN,
+            json!({"programme_id": programme}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{unfiltered}");
+    let items = output(&unfiltered)["items"].as_array().expect("a page");
+    assert_eq!(
+        items.len(),
+        2,
+        "an absent kind filter reads the whole register: {unfiltered}"
+    );
+}
+
+/// P6 — a risk's probability, owner and links are correctable after creation.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_risk_update_corrects_probability_owner_and_links() {
+    let (pg, running, seeded) = fixture().await;
+    let programme = create_programme(&running, "Correction programme").await;
+    let owner = owner_job(&pg, &seeded).await;
+    let corrected_owner = another_owner_job(&pg, &seeded).await;
+    let (status, body) = create_risk(&running, &programme, owner, true).await;
+    assert_eq!(status, 201, "{body}");
+    let risk = text(output(&body), "id");
+
+    let (status, body) = running
+        .invoke(
+            "registers.update",
+            TOKEN,
+            json!({
+                "id": risk,
+                "probability": "high",
+                "owner_job_id": corrected_owner,
+                "links": [{"kind": "objective", "ref": "corrected link"}],
+            }),
+            Some("\"1\""),
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{body}");
+    let corrected = output(&body);
+    assert_eq!(corrected["probability"], "high", "{body}");
+    assert_eq!(
+        corrected["owner_job_id"],
+        json!(corrected_owner.to_string()),
+        "{body}"
+    );
+    let links = corrected["links"].as_array().expect("links stay an array");
+    assert_eq!(links.len(), 1, "{body}");
+    assert_eq!(links[0]["ref"], "corrected link", "{body}");
+
+    let (status, read) = running
+        .invoke(
+            "registers.get",
+            TOKEN,
+            json!({"id": risk}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{read}");
+    assert_eq!(output(&read)["probability"], "high", "{read}");
+}
+
+/// P7 — the create rule holds after the merge: an update that empties a risk's links makes it
+/// incomplete and is refused, leaving the stored row untouched.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_risk_update_that_empties_its_links_is_refused() {
+    let (pg, running, seeded) = fixture().await;
+    let programme = create_programme(&running, "Empty links programme").await;
+    let owner = owner_job(&pg, &seeded).await;
+    let (status, body) = create_risk(&running, &programme, owner, true).await;
+    assert_eq!(status, 201, "{body}");
+    let risk = text(output(&body), "id");
+
+    let (status, body) = running
+        .invoke(
+            "registers.update",
+            TOKEN,
+            json!({"id": risk, "links": []}),
+            Some("\"1\""),
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 422, "{body}");
+    assert_eq!(body["errors"][0]["code"], "risk_incomplete", "{body}");
+    let detail = text(&body["errors"][0], "detail");
+    assert!(detail.contains("links"), "{body}");
+
+    let (status, read) = running
+        .invoke(
+            "registers.get",
+            TOKEN,
+            json!({"id": risk}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{read}");
+    assert!(
+        output(&read)["links"]
+            .as_array()
+            .is_some_and(|links| !links.is_empty()),
+        "a refused update must not write: {read}"
+    );
 }
