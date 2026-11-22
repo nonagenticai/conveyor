@@ -542,6 +542,9 @@ struct Settled {
     round: i32,
     run_id: Uuid,
     outcome: RoundOutcome,
+    /// The round's spend, summed from its inference ledger — the same sum the climb's total and
+    /// the report are built from. The narrative states this, never a score column.
+    spend: f64,
     /// The held-out mean of the run this one was measured against (the previous round, or the
     /// baseline for round 1). Kept so the recorded delta is the comparison that was actually made.
     base_test: f64,
@@ -632,6 +635,7 @@ async fn settle(
             round: row.round,
             run_id: row.run_id,
             outcome: numbers.outcome,
+            spend: numbers.spend,
             base_test: base_outcome.test,
             excluded: numbers.excluded,
             pattern,
@@ -1120,7 +1124,16 @@ async fn eval_climbs_stop(
             json!({"reason": reason, "at": chrono::Utc::now().to_rfc3339()}),
         );
     }
-    let report = build_report(&climb, &rounds, &state, best_round, best_score, reason);
+    let report = build_report(
+        &climb,
+        &goal,
+        &rounds,
+        &state,
+        best_round,
+        best_score,
+        reason,
+        pricing.unit,
+    );
     let best_test_score = match best_score {
         Some(score) => Some(as_decimal(score)?),
         None => None,
@@ -2026,14 +2039,47 @@ fn movement_name(movement: Movement) -> &'static str {
     }
 }
 
+/// A spend figure in the version's unit, as the narrative states it.
+fn spend_text(spend: f64, unit: &str) -> String {
+    format!("{spend:.2} {unit}")
+}
+
+/// A round's quality as the declared model states it: every hold the plan registered with its
+/// floor, or — for a quality goal — the target metric's held-out mean the decision was taken on.
+/// A cost round with no registered hold has no quality reading, never a zero from a score column.
+fn quality_text(goal: &Goal, outcome: &RoundOutcome) -> String {
+    if !outcome.holds.is_empty() {
+        return outcome
+            .holds
+            .iter()
+            .map(|hold| format!("{} {:.4} (floor {:.4})", hold.metric, hold.value, hold.min))
+            .collect::<Vec<_>>()
+            .join("; ");
+    }
+    if goal.is_cost() {
+        "—".to_owned()
+    } else {
+        format!("{} {:.4} held-out", goal.target, outcome.test)
+    }
+}
+
 /// The status table plus the four-part summary.
+///
+/// **Cost and quality come from the one ledger-derived model**, not from a train/test score
+/// table (S19 P5, audit W12). A round's spend is the same `inference_call` sum `eval_runs.report`
+/// prices — subject, judge and billed failed calls — and its quality is the registered hold with
+/// its floor, or the target metric's held-out mean the decision used. A cost climb therefore
+/// names its **cheapest kept** round and its spend, never the zeroes a `cost_usd` grade would
+/// print in a score column.
 fn build_report(
     climb: &Climb,
+    goal: &Goal,
     rounds: &[RoundRow],
     state: &SettleState,
     best_round: Option<i32>,
     best_score: Option<f64>,
     reason: &str,
+    unit: &str,
 ) -> String {
     let mut out = String::new();
     out.push_str("# Eval climb report\n\n");
@@ -2049,27 +2095,22 @@ fn build_report(
         state.settled.len(),
         reason
     ));
-    out.push_str("| round | variant | train | test | Δ test | decision | reason |\n");
-    out.push_str("|---|---|---|---|---|---|---|\n");
-    let mut previous: Option<f64> = None;
+    out.push_str("| round | variant | spend | quality | decision | reason |\n");
+    out.push_str("|---|---|---|---|---|---|\n");
     for round in rounds {
         let settled = state.settled.iter().find(|row| row.round == round.round);
-        let train = settled.map(|row| row.outcome.train);
-        let test = settled.map(|row| row.outcome.test);
-        let delta = match (test, previous) {
-            (Some(test), Some(previous)) => format!("{:+.4}", test - previous),
-            _ => "—".to_owned(),
-        };
+        let spend = settled
+            .map(|row| spend_text(row.spend, unit))
+            .unwrap_or_else(|| "—".to_owned());
+        let quality = settled
+            .map(|row| quality_text(goal, &row.outcome))
+            .unwrap_or_else(|| "—".to_owned());
         out.push_str(&format!(
-            "| {} | {} | {} | {} | {} | {} | {} |\n",
+            "| {} | {} | {} | {} | {} | {} |\n",
             round.round,
             round.variant,
-            train
-                .map(|value| format!("{value:.4}"))
-                .unwrap_or_else(|| "—".to_owned()),
-            test.map(|value| format!("{value:.4}"))
-                .unwrap_or_else(|| "—".to_owned()),
-            delta,
+            spend,
+            quality,
             settled.map(|row| row.decision.as_str()).unwrap_or("—"),
             settled
                 .and_then(|row| match row.decision {
@@ -2078,10 +2119,12 @@ fn build_report(
                 })
                 .unwrap_or("—"),
         ));
-        if let Some(test) = test {
-            previous = Some(test);
-        }
     }
+    out.push_str(&format!(
+        "\nTotal spend: {} — the sum of every round's inference ledger (subject, judge and \
+         billed failed calls), the same rows `eval_runs.report` prices.\n",
+        spend_text(state.spend, unit)
+    ));
 
     out.push_str("\n## What moved\n\n");
     let kept: Vec<&Settled> = state
@@ -2090,12 +2133,14 @@ fn build_report(
         .filter(|round| round.decision == Decision::Keep)
         .collect();
     if kept.is_empty() {
-        out.push_str("No round was kept: every change was reverted on the held-out number.\n");
+        out.push_str("No round was kept: every change was reverted.\n");
     } else {
         for round in &kept {
             out.push_str(&format!(
-                "- round {}: held-out {:.4} (train {:.4})\n",
-                round.round, round.outcome.test, round.outcome.train
+                "- round {}: {}; {}\n",
+                round.round,
+                spend_text(round.spend, unit),
+                quality_text(goal, &round.outcome)
             ));
         }
     }
@@ -2125,15 +2170,33 @@ fn build_report(
              triage round named are the material to work from.\n",
             state.flat_streak
         ));
+    } else if goal.is_cost() {
+        out.push_str(
+            "Each decision above compared a round's spend — summed from the inference ledger — \
+             with the quality floor the plan registered before round 1.\n",
+        );
     } else {
         out.push_str(
-            "Each decision above was taken on the held-out split, with the train split as \
-             corroboration. The split is the version's and was never redrawn.\n",
+            "Each decision above was taken on the version's held-out split, which was never \
+             redrawn.\n",
         );
     }
 
     out.push_str("\n## What to do next\n\n");
     match (best_round, best_score) {
+        (Some(round), _) if goal.is_cost() => {
+            let spend = state
+                .settled
+                .iter()
+                .find(|settled| settled.round == round)
+                .map(|settled| spend_text(settled.spend, unit))
+                .unwrap_or_else(|| "—".to_owned());
+            out.push_str(&format!(
+                "**Cheapest kept round: round {round}**, {spend}. Applying it to the live process \
+                 is a person's `processes.update`; this climb names the version and ships the \
+                 patch, it never rewrites a published process.\n"
+            ));
+        }
         (Some(round), Some(score)) => out.push_str(&format!(
             "**Winner: round {round}**, held-out {score:.4}. Applying it to the live process is \
              a person's `processes.update`; this climb names the version and ships the patch, it \

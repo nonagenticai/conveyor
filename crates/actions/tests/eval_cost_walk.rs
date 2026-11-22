@@ -553,4 +553,73 @@ async fn no_round_without_registered_gates() {
         (spend - 1217.0).abs() < 1e-9,
         "subject + judge + failed across the two kept rounds: {spend}"
     );
+
+    // ── P5.1: the narrative states cost and quality from that same model ───────────────
+    //
+    // The report prices the same ledger rows the climb summed; the narrative must state the
+    // report's own figure, the registered hold with its floor, and the decision — and carry no
+    // train/test score columns. A `cost_usd` climb has no `cost_usd` grade, so those columns
+    // are all zeroes and say nothing about the round.
+    let (status, body) = running
+        .invoke(
+            "eval_runs.report",
+            TOKEN,
+            json!({ "run_id": v1.to_string() }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{body}");
+    let report_cost = body["output"]["cost"]["total"]
+        .as_f64()
+        .expect("the report's cost total");
+    assert!(
+        (report_cost - 1017.0).abs() < 1e-9,
+        "the report prices subject 1000 + judge 14 + failure 3: {body}"
+    );
+
+    let (status, body) = running
+        .invoke(
+            "eval_climbs.stop",
+            TOKEN,
+            json!({ "id": climb_id, "reason": "the walk is done" }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{body}");
+    let narrative = body["output"]["narrative_md"]
+        .as_str()
+        .expect("the finished climb carries its narrative");
+    assert!(
+        narrative.contains(&format!("{report_cost:.2} tokens")),
+        "the narrative states the report's own figure for round 1: {narrative}"
+    );
+    assert!(
+        narrative.contains("200.00 tokens"),
+        "round 2's ledger spend is in the narrative: {narrative}"
+    );
+    assert!(
+        narrative.contains("1217.00 tokens"),
+        "the climb total is the ledger sum of both rounds: {narrative}"
+    );
+    assert!(
+        narrative.contains("label_accuracy 1.0000 (floor 0.8000)")
+            && narrative.contains("label_accuracy 0.5000 (floor 0.8000)"),
+        "quality is the registered hold with its floor: {narrative}"
+    );
+    assert!(
+        narrative.contains("hold_broken"),
+        "the decision's reason is stated: {narrative}"
+    );
+    assert!(
+        narrative.contains("Cheapest kept round: round 1"),
+        "a cost climb names the cheapest kept round, not a held-out score: {narrative}"
+    );
+    assert!(
+        !narrative.contains("train") && !narrative.contains("test"),
+        "the train/test score columns are gone: {narrative}"
+    );
 }
