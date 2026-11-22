@@ -27,12 +27,10 @@ Read surfaces
   each ``project_id`` named in a change input.
 * Benefits: ``benefits.list`` with ``programme_id``.
 * Approvals: ``approvals.list`` filtered by the change's ``project_id``.
-* Measurements: this release has **no** ``benefits.measurement_list`` action.  ``--apply``
-  therefore requires ``--snapshot DIR`` and reads the production MSP export
-  (``msp.json``).  A measurement created in this run cannot appear in a pre-run export,
-  so its readback is a **failure** until a measurement read action exists; the verdict is
-  recorded as ``readback_failed`` and the command exits non-zero.  It is never reported
-  as a pass.
+* Measurements: ``benefits.measurement_list`` (the action exists on this lane).  When the
+  target image predates it, ``--apply`` falls back to ``--snapshot DIR`` and the MSP export
+  (``msp.json``); with neither, the verdict is ``readback_failed`` and the command exits
+  non-zero.  It is never reported as a pass.
 
 Natural keys and existence
 --------------------------
@@ -160,7 +158,9 @@ MEASUREMENT_LIST_ACTION = "benefits.measurement_list"
 
 TOKEN = r"[A-Za-z0-9][A-Za-z0-9._-]*"
 RISK_KEY_RE = re.compile(rf"^risk:({TOKEN})(?:/(update))?$")
-BENEFIT_KEY_RE = re.compile(rf"^benefit:({TOKEN})(?:/(baseline|fields|status))?$")
+BENEFIT_KEY_RE = re.compile(
+    rf"^benefit:({TOKEN})(?:/(baseline|fields|status|preconditions|baseline-fields))?$"
+)
 CHANGE_KEY_RE = re.compile(r"^change:(.+)$")
 APPROVAL_KEY_RE = re.compile(r"^approval:([^/:]+)[/:](.+)$")
 DOCUMENT_KEY_RE = re.compile(r"^document:(.+)$")
@@ -526,10 +526,16 @@ def validate_entries(entries: list[Entry]) -> list[str]:
             if not entry.payload.get("approval_id"):
                 errors.append(f"line {entry.lineno}: approval input has no approval_id")
         elif entry.action == "benefits.update":
-            if key.kind != "benefit" or key.second not in ("fields", "status"):
+            if key.kind != "benefit" or key.second not in (
+                "fields",
+                "status",
+                "preconditions",
+                "baseline-fields",
+            ):
                 errors.append(
                     f"line {entry.lineno}: benefits.update key must be "
-                    "benefit:<reference>/fields or benefit:<reference>/status"
+                    "benefit:<reference>/fields, /status, /preconditions or "
+                    "/baseline-fields"
                 )
                 continue
             if not entry.payload.get("id"):
@@ -538,6 +544,16 @@ def validate_entries(entries: list[Entry]) -> list[str]:
                 if not entry.payload.get("status"):
                     errors.append(
                         f"line {entry.lineno}: status update input has no status"
+                    )
+            elif key.second == "preconditions":
+                if not isinstance(entry.payload.get("preconditions"), list):
+                    errors.append(
+                        f"line {entry.lineno}: a preconditions update needs a list"
+                    )
+            elif key.second == "baseline-fields":
+                if "baseline" not in entry.payload:
+                    errors.append(
+                        f"line {entry.lineno}: a baseline update needs the baseline field"
                     )
             elif entry.payload.get("status") is not None:
                 errors.append(
@@ -1230,8 +1246,15 @@ def load_state(
         "cards.move",
     }
     if any(entry.action in closure_actions for entry in entries):
-        for project_id in sorted(project_ids):
-            row = client.invoke("projects.get", {"id": project_id})
+        close_projects = {
+            entry.key.first
+            for entry in entries
+            if entry.key is not None
+            and entry.key.kind in ("project_close", "project_closure")
+        }
+        for project_id in sorted(project_ids | close_projects):
+            output = client.invoke("projects.get", {"id": project_id})
+            row = output.get("project") if isinstance(output, dict) else None
             if isinstance(row, dict):
                 state.projects[project_id] = row
         for entry in entries:
@@ -1325,7 +1348,19 @@ def load_state(
             if gate.get("id") not in seen_gates:
                 state.approvals.append(gate)
                 seen_gates.add(gate.get("id"))
-    if snapshot is not None:
+    if any(entry.action == "benefits.measure" for entry in entries):
+        try:
+            state.measurements.extend(
+                rows(
+                    client,
+                    MEASUREMENT_LIST_ACTION,
+                    {"programme_id": programme_id},
+                )
+            )
+        except PromoteError:
+            # The deployed image may predate the action; the MSP export is the fallback.
+            pass
+    if snapshot is not None and not state.measurements:
         state.measurements.extend(snapshot.get("benefit_measurements") or [])
     return state
 
@@ -1503,7 +1538,8 @@ def change_rows(state: State, key: NaturalKey, payload: dict) -> list[dict]:
     return [
         row
         for row in state.registers
-        if row.get("kind") == "change" and row.get("title") in labels
+        if row.get("kind") == "change"
+        and (row.get("title") in labels or row.get("id") in labels)
     ]
 
 
@@ -1531,18 +1567,27 @@ def gate_for_change(state: State, change: dict) -> dict | None:
     return None
 
 
-def update_already_reflected(state: State, key: NaturalKey, payload: dict) -> bool:
+def update_already_reflected(
+    state: State,
+    key: NaturalKey,
+    payload: dict,
+    ignore: set[str] | None = None,
+) -> bool:
     benefit = benefit_by_reference(state, key.first)
     if benefit is None:
         return False
     if key.second == "status":
         return benefit.get("status") == payload.get("status")
+    compared = 0
     for name, value in payload.items():
-        if name in ("id", "change_id"):
+        if name in ("id", "change_id") or (ignore and name in ignore):
             continue
+        compared += 1
         if benefit.get(name) != value:
             return False
-    return True
+    # Every field this entry changes is owned by a later entry: the row's existence is all
+    # that is left to test, and re-applying the early value would undo the later one.
+    return compared > 0 or benefit is not None
 
 
 def baseline_measurement(state: State, reference: str) -> dict | None:
@@ -1614,6 +1659,7 @@ def existing_for(
     state: State,
     change_index: dict[str, dict],
     id_map: dict[str, str] | None = None,
+    ignore_fields: set[str] | None = None,
 ) -> dict | None:
     """The production row that already carries this entry's natural key, if any."""
     key = entry.key
@@ -1732,7 +1778,7 @@ def existing_for(
             return gate
         return None
     if entry.action == "benefits.update":
-        if update_already_reflected(state, key, entry.payload):
+        if update_already_reflected(state, key, entry.payload, ignore_fields):
             return benefit_by_reference(state, key.first)
         return None
     if entry.action == "decisions.create":
@@ -1806,6 +1852,33 @@ def existing_for(
             return card
         return None
     return None
+
+
+def superseded_fields(entries: list[Entry]) -> dict[int, set[str]]:
+    """For each benefit patch, the fields a LATER patch to the same profile owns.
+
+    Replaying the record in order must reach the same final row.  An earlier patch whose
+    effect was superseded would, if re-applied on a complete record, undo the later one —
+    the skip test must therefore leave those fields to the entry that owns them.
+    """
+    superseded: dict[int, set[str]] = {}
+    for index, entry in enumerate(entries):
+        if entry.action != "benefits.update" or entry.key is None:
+            continue
+        owned: set[str] = set()
+        for later in entries[index + 1:]:
+            if later.key is None or later.key.first != entry.key.first:
+                continue
+            if later.action == "benefits.update":
+                owned.update(
+                    name for name in later.payload if name not in ("id", "change_id")
+                )
+            elif later.action == "benefits.measure":
+                # A measurement writes the profile's baseline (measured_at and method included).
+                owned.add("baseline")
+        if owned:
+            superseded[entry.lineno] = owned
+    return superseded
 
 
 def build_change_index(
@@ -1926,11 +1999,37 @@ def readback_retro_card(client: Any, cadence: dict, findings: list) -> dict:
     raise ReadbackError("cards.list: the retro card is not readable")
 
 
-def readback_measurement(snapshot: str | None, row_id: str) -> dict:
+def readback_measurement(
+    client: Any,
+    state: State,
+    entry: Entry,
+    snapshot: str | None,
+    row_id: str,
+) -> dict:
+    """The measurement's row: the read action first, the MSP export only as a fallback."""
+    key = entry.key
+    assert key is not None
+    benefit = benefit_by_reference(state, key.first)
+    benefit_id = benefit.get("id") if benefit else None
+    if benefit_id:
+        try:
+            for row in rows(
+                client, MEASUREMENT_LIST_ACTION, {"benefit_id": benefit_id}
+            ):
+                if row.get("id") == row_id:
+                    return row
+            raise ReadbackError(
+                f"{MEASUREMENT_LIST_ACTION}: measurement {row_id} is not on the benefit"
+            )
+        except ReadbackError:
+            raise
+        except PromoteError as error:
+            if not snapshot:
+                raise ReadbackError(str(error)) from None
     if not snapshot:
         raise ReadbackError(
-            "no benefits.measurement_list action exists and no --snapshot was given; "
-            f"measurement {row_id} cannot be read back"
+            f"measurement {row_id} cannot be read back: no read action result and no "
+            "--snapshot"
         )
     data = load_snapshot(snapshot)
     for row in data.get("benefit_measurements") or []:
@@ -2268,7 +2367,7 @@ def readback_entry(
             )
         return gate
     if entry.action == "benefits.measure":
-        return readback_measurement(snapshot, production_id)
+        return readback_measurement(client, state, entry, snapshot, production_id)
     if entry.action == "projects.close_request":
         project_id = entry.payload.get("id")
         if not project_id:
@@ -2487,12 +2586,15 @@ def apply_entries(
 ) -> tuple[dict[str, str], list[Outcome]]:
     id_map: dict[str, str] = {}
     change_index = build_change_index(entries, state)
+    superseded = superseded_fields(entries)
     outcomes: list[Outcome] = []
     for entry in entries:
         key = entry.key
         assert key is not None
         try:
-            existing = existing_for(entry, state, change_index, id_map)
+            existing = existing_for(
+                entry, state, change_index, id_map, superseded.get(entry.lineno)
+            )
             if existing is not None:
                 production_id = str(existing["id"])
                 id_map[entry.output_id] = production_id
@@ -2511,6 +2613,21 @@ def apply_entries(
 
             payload = remap_payload(entry, state, id_map, change_index)
             approval = None
+            if entry.action == "projects.close":
+                project_id = str(payload.get("id") or "")
+                expected_target = f"project/{project_id}/close"
+                for gate in state.approvals:
+                    if (
+                        gate.get("gate") == "projects.close"
+                        and gate.get("target") == expected_target
+                        and gate.get("status") == "approved"
+                    ):
+                        approval = gate.get("id")
+                        break
+                if not approval:
+                    raise PromoteError(
+                        f"projects.close: no approved gate for {expected_target}"
+                    )
             if entry.action == "tranches.review":
                 approval = id_map.get(str(entry.raw.get("approval_id") or ""))
                 if not approval:
@@ -2869,6 +2986,21 @@ class FakeClient:
             row.update(id=self._id("measurement"))
             self.state.measurements.append(row)
             return copy.deepcopy(row)
+        if action == "benefits.measurement_list":
+            if "benefits.measurement_list" in self.unreadable:
+                raise PromoteError("benefits.measurement_list: not served by this image")
+            return {
+                "items": [
+                    copy.deepcopy(row)
+                    for row in self.state.measurements
+                    if row.get("benefit_id") == payload.get("benefit_id")
+                    or (
+                        payload.get("programme_id")
+                        and row.get("programme_id") == payload.get("programme_id")
+                    )
+                ],
+                "next_cursor": None,
+            }
         if action == "changes.request":
             change_id = self._id("change")
             gate_id = self._id("gate")
@@ -3265,6 +3397,11 @@ def _fixture_inputs(root: Path) -> dict[str, Path]:
                           "id": "01a2051f-d60f-7f6c-bf3e-935e8fc43482"}],
         },
         "close": {"id": project, "reason": "fixture close"},
+        "decide_close": {
+            "approval_id": "01a20520-6853-73c3-8b04-4139d64d3ef8",
+            "decision": "approve",
+            "note": "approved",
+        },
         "comment": {"id": "01a1ffeb-311e-708e-a994-83eb40fd3a69",
                     "body": "Resolved: the fixture receipt"},
         "move": {"id": "01a1ffeb-311e-708e-a994-83eb40fd3a69",
@@ -3339,6 +3476,13 @@ def _fixture_entries(
                 "action": "approvals.request", "input": str(paths["close_gate"]),
                 "natural_key": "approval:projects.close:project/"
                                 "01a1dcb8-d24b-76de-b901-56fd56e001bc/close",
+                "output_id": "01a20520-6853-73c3-8b04-4139d64d3ef8",
+            }
+        elif name == "decide_close":
+            raw = {
+                "action": "approvals.decide", "input": str(paths["decide_close"]),
+                "natural_key": "approval:projects.close:"
+                                "01a1dcb8-d24b-76de-b901-56fd56e001bc",
                 "output_id": "01a20520-6853-73c3-8b04-4139d64d3ef8",
             }
         elif name == "close":
@@ -3494,16 +3638,26 @@ def self_test() -> int:
         ok(outcomes[0].verdict == "readback_failed",
            f"an unreadable row is readback_failed: {outcomes[0].verdict}")
 
-        # 7. a measurement has no product read action: its readback fails, loudly.
+        # 7. a measurement is read back through benefits.measurement_list, not the export.
         entries, _ = build_entries(_fixture_entries(paths, ("benefit", "measure")))
         state = State()
-        _, outcomes = apply_entries(FakeClient(state), entries, state, str(snapshot))
-        ok(outcomes[1].verdict == "readback_failed",
-           f"a measurement absent from msp.json fails readback: {outcomes[1].verdict}")
+        _, outcomes = apply_entries(FakeClient(state), entries, state, None)
         ok(
-            "measurement" in outcomes[1].detail,
-            "the measurement failure says why",
+            outcomes[1].verdict == "created",
+            f"a measurement is readable through the action, with no snapshot: "
+            f"{outcomes[1].verdict} {outcomes[1].detail}",
         )
+        # 7b. without the action and without the export, the failure is loud.
+        state = State()
+        _, outcomes = apply_entries(
+            FakeClient(state, unreadable={"benefits.measurement_list"}),
+            entries, state, None,
+        )
+        ok(
+            outcomes[1].verdict == "readback_failed",
+            f"a measurement with no read surface fails readback: {outcomes[1].verdict}",
+        )
+        ok("measurement" in outcomes[1].detail, "the measurement failure says why")
 
         # 8. the closure family: a close chain applies once and replays as skips.
         project = "01a1dcb8-d24b-76de-b901-56fd56e001bc"
@@ -3512,7 +3666,8 @@ def self_test() -> int:
         intake = "01a1d3e7-bc47-7384-94cf-f1009fd9c0b7"
         staging_done = "01a1d3e7-bd2f-7998-bf7b-8b4039393db9"
         production_done = "01a1d3e7-0000-4000-8000-00000000d0e5"
-        closure_names = ("closure", "close_gate", "close", "comment", "move")
+        closure_names = ("closure", "close_gate", "decide_close", "close",
+                         "comment", "move")
         entries, errors = build_entries(_fixture_entries(paths, closure_names))
         ok(not errors, f"the closure fixture parses: {errors}")
         ok(not validate_entries(entries), "the closure fixture validates")
@@ -4026,7 +4181,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "--snapshot",
         default=os.environ.get("CONVEYOR_SNAPSHOT"),
-        help="directory holding the production msp.json export",
+        help="fallback export for measurements when the target image has no read action",
     )
     parser.add_argument("--programme-id", default=None)
     parser.add_argument("--timeout", type=float, default=60.0)
@@ -4065,15 +4220,7 @@ def main(argv: list[str] | None = None) -> int:
         if not args.token:
             print("error: --apply over HTTP requires --token", file=sys.stderr)
             return 1
-    needs_snapshot = any(entry.action == "benefits.measure" for entry in entries)
     snapshot = args.snapshot
-    if needs_snapshot and not snapshot:
-        print(
-            "error: this release has no benefits.measurement_list action; --apply "
-            "requires --snapshot DIR holding the production msp.json export",
-            file=sys.stderr,
-        )
-        return 1
 
     if args.local_bin:
         client: Any = LocalActionClient(

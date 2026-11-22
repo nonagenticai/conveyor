@@ -1,0 +1,10 @@
+{
+ "id": "01a1e9df-1592-79a5-839e-037d8fe4251b",
+ "baseline": {
+  "unit": "outside contributions",
+  "value": 0.0,
+  "method": "merged PR authors from the GitHub issue registry; the publication trail on the programme issues",
+  "definition": "no outside author in the merged PRs at 2026-11-22",
+  "measured_at": "2026-11-22"
+ }
+}
