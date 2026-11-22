@@ -500,6 +500,7 @@
     "toolkits.publish",
     "tools.call",
     "tools.probe",
+    "tools.resume",
     "tools.retire",
     "tools.usage",
     "trace_links.create",
