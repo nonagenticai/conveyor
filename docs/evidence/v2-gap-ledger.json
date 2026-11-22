@@ -1,9 +1,9 @@
 {
   "schema": "v2-gap-ledger/v1",
-  "lane_pin": "864e71c4",
+  "lane_pin": "614df7f3",
   "generated_from": {
     "artefact_record": {
-      "command": "/opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-artefacts/scripts/generate-standards.py --snapshot /tmp/snap-526-0738/data --outputs-dir /tmp/snap-526-0738/docs --register /tmp/conf-0738/rework.json --data-out /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/v2-gap-ledger-5c_64umk --findings-out /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/v2-gap-ledger-5c_64umk/findings.json",
+      "command": "/opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-gap-analysis/scripts/generate-standards.py --snapshot /tmp/snap-526-0738/data --outputs-dir /tmp/snap-526-0738/docs --register /tmp/conf-0738/rework.json --data-out /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/v2-gap-ledger-52zhstc3 --findings-out /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/v2-gap-ledger-52zhstc3/findings.json",
       "summary": {
         "absent": 393,
         "artefacts": 826,
@@ -35,23 +35,23 @@
         "role": "live gaps; baseline liveness"
       },
       {
-        "path": "/Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-artefacts/docs/evidence/conformance-baseline.json",
+        "path": "/Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-gap-analysis/docs/evidence/conformance-baseline.json",
         "sha256": "a5acacc6f9e46463f8a3c19b8a79a5b9db7473d7cbfdb6eecadf068c9dba7a99",
         "role": "baseline entries; stale set"
       },
       {
-        "path": "/Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-artefacts/docs/evidence/v1-conformance-findings.json",
-        "sha256": "67e12256667f3014eb0e79b377e6125fce3f2684a0009159ba40552339045d89",
+        "path": "/Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-gap-analysis/docs/evidence/v1-conformance-findings.json",
+        "sha256": "e694920cb98b47e7d925ef156ade3a089746945ace33d5d1dcfd28748e6f59ec",
         "role": "v1 findings; open ledger"
       },
       {
-        "path": "/Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-artefacts/governance/conformance.json",
+        "path": "/Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-gap-analysis/governance/conformance.json",
         "sha256": "a027b667aa328e97cd3f2d2ef49b4e370a45bae00cad3fff97e670a9909786f6",
         "role": "rule standard and spec refs for baseline rows"
       },
       {
-        "path": "/Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-artefacts/seed/programme.json",
-        "sha256": "471a4b125557d83fd7d0616d158926ce80dc6136ba4bab10ea6e7f83209e3593",
+        "path": "/Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-gap-analysis/seed/programme.json",
+        "sha256": "b307b352808536d99d2e6a27f60d541bc07715fa0ccb973dd4e2ef55e4ecbb1a",
         "role": "project ADM phase for target_phase"
       }
     ]
@@ -79,16 +79,16 @@
     "deploy_bound": "the not-yet-deployed set is migrations 0062-0066 and the authoring.* family 0066 creates"
   },
   "counts": {
-    "rows": 509,
+    "rows": 505,
     "by_kind": {
       "artefact": 393,
       "baseline": 16,
-      "ledger": 100
+      "ledger": 96
     },
     "by_severity": {
-      "P1": 228,
+      "P1": 225,
       "unassigned": 65,
-      "P0": 19,
+      "P0": 18,
       "P2": 197
     },
     "by_kind_severity": {
@@ -103,18 +103,18 @@
         "P0": 4
       },
       "ledger": {
-        "P1": 71,
+        "P1": 68,
         "P2": 27,
-        "P0": 2
+        "P0": 1
       }
     },
     "by_deploy_bound": {
-      "false": 509
+      "false": 505
     },
     "by_status": {
       "absent": 393,
       "stale": 16,
-      "open": 100
+      "open": 96
     },
     "artefact_fix_card_resolution": {
       "published_package": 314,
@@ -6259,32 +6259,17 @@
       "deploy_bound": false
     },
     {
-      "key": "ledger:v1-approvals-route-1",
+      "key": "ledger:v1-outputs-1",
       "kind": "ledger",
       "standard": "SPEC",
-      "spec": "§5.4",
-      "subject": "approvals routing / interaction dispatch",
-      "project": "S06",
-      "title": "The multicast offer cannot carry a question's answer or the delegation",
-      "status": "open",
-      "severity": "P1",
-      "owner": "S06",
-      "fix_card": "v1-approvals-route-1",
-      "target_phase": "G",
-      "deploy_bound": false
-    },
-    {
-      "key": "ledger:v1-close-1",
-      "kind": "ledger",
-      "standard": "SPEC",
-      "spec": "§5.4",
-      "subject": "projects.close / artefact gate",
+      "spec": "§12",
+      "subject": "public pack / output index",
       "project": "PLATFORM",
-      "title": "A project can close while its manifest is red: the close gate never reads the artefact standard",
+      "title": "A ruling published without a text body is invisible to the pack, even when project-scoped",
       "status": "open",
       "severity": "P1",
       "owner": "PLATFORM",
-      "fix_card": "v1-close-1",
+      "fix_card": "v1-outputs-1",
       "target_phase": "Preliminary",
       "deploy_bound": false
     },
@@ -7249,21 +7234,6 @@
       "deploy_bound": false
     },
     {
-      "key": "ledger:v1-s14-1",
-      "kind": "ledger",
-      "standard": "SPEC",
-      "spec": "§5",
-      "subject": "S14 cutover",
-      "project": "S14",
-      "title": "S14 cutover gate's evidence tree does not exist",
-      "status": "open",
-      "severity": "P0",
-      "owner": "S14",
-      "fix_card": "v1-s14-1",
-      "target_phase": "G",
-      "deploy_bound": false
-    },
-    {
       "key": "ledger:v1-s17-1",
       "kind": "ledger",
       "standard": "SPEC",
@@ -7456,36 +7426,6 @@
       "owner": "PLATFORM",
       "fix_card": "v1-w1b-5",
       "target_phase": "Preliminary",
-      "deploy_bound": false
-    },
-    {
-      "key": "ledger:v1-w1c-3",
-      "kind": "ledger",
-      "standard": "SPEC",
-      "spec": "§7.2/§7.3",
-      "subject": "§7.2/§7.3",
-      "project": "T2",
-      "title": "L1 laya is never invoked: ladder.evaluate stamps rung=laya on caller-supplied answer, confidence and latency",
-      "status": "open",
-      "severity": "P1",
-      "owner": "T2",
-      "fix_card": "v1-w1c-3",
-      "target_phase": "G",
-      "deploy_bound": false
-    },
-    {
-      "key": "ledger:v1-w1c-4",
-      "kind": "ledger",
-      "standard": "SPEC",
-      "spec": "§7.2",
-      "subject": "§7.2",
-      "project": "T2",
-      "title": "Options are inline request text, not authored/versioned rows, and the answer is never checked against them",
-      "status": "open",
-      "severity": "P1",
-      "owner": "T2",
-      "fix_card": "v1-w1c-4",
-      "target_phase": "G",
       "deploy_bound": false
     },
     {

@@ -13,7 +13,12 @@ approved; scope baseline taken and approved (`01a20277-9131-7ee2-acad-7e40ffa8f9
 and evidence outputs published; Phase-G review `01a2027a` recorded `compliant` and re-run for the
 review (tool_platform 17/17 at 582e2dc6).
 
-**Stopped at:** the WBS acceptance. With the scope baseline approved, `wbs.update` refuses without
-an approved change request, and the tenant has no PM process or job binding, so `changes.request`
-cannot open one — finding v1-change-1. The demo credit and the baseline re-acceptance wait on that
-fix; the tranche-3 PI plan, PI objectives and retro lesson are peer 1's S04 batch.
+**Completed 2026-11-22T10:18Z** once `v1-change-1` was fixed (5a5b0505): four acts — the change
+`01a202c2-e964-7130-8d6e-cb922…` opened on the direct baseline route with its impact block, decided
+as a `rule` under the delegation (`approval 01a202c2-eae1-76ac-8d64-6a548051cc27`), the WBS
+deliverable accepted with the change id, and the demo credit recorded on the tranche-3 demo cadence
+`01a20280-ef3f-7aac-8fad-3840a7995847`. The tranche-3 PI plan, PI objectives, retro lesson and the
+change-control artefact are peer 1's S04/standards batch; the project stays open by its recorded
+decision.
+
+T13: 35 acts in `transcript.jsonl`; the last run recorded 4.
