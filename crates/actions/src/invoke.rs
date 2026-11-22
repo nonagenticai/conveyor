@@ -906,8 +906,10 @@ pub struct Prechecked<'a> {
 /// invalid input or a forbidden caller therefore fails the SUBMIT with the status the
 /// synchronous call would have returned — the work is never queued and the caller never has to
 /// poll to learn that its request was bad.
-pub fn precheck<'a>(
+pub async fn precheck<'a>(
+    pool: &PgPool,
     registry: &'a Registry,
+    tenant: TenantId,
     request: &InvokeRequest,
 ) -> Result<Prechecked<'a>, ActionError> {
     let Some(spec) = registry.get(&request.action) else {
@@ -991,7 +993,7 @@ pub async fn invoke(
         spec,
         input,
         precondition,
-    } = precheck(registry, &request)?;
+    } = precheck(pool, registry, tenant, &request).await?;
 
     let input_hash = idempotency::request_hash(&input);
     let (version, if_match) = match precondition {
