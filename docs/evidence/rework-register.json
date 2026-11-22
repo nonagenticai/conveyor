@@ -18159,13 +18159,13 @@
               "source": "code"
             },
             {
-              "line": 138,
+              "line": 141,
               "path": "apps/web/src/app.rs",
               "quote": "                        <Routes fallback=|| view! { <p class=\"muted\">\"No such page.\"</p> }>",
               "source": "code"
             },
             {
-              "line": 267,
+              "line": 273,
               "path": "apps/web/src/app.rs",
               "quote": "        <nav class=\"rail\" aria-label=\"Destinations\">",
               "source": "code"
@@ -18204,13 +18204,13 @@
                   "source": "code"
                 },
                 {
-                  "line": 138,
+                  "line": 141,
                   "path": "apps/web/src/app.rs",
                   "quote": "                        <Routes fallback=|| view! { <p class=\"muted\">\"No such page.\"</p> }>",
                   "source": "code"
                 },
                 {
-                  "line": 267,
+                  "line": 273,
                   "path": "apps/web/src/app.rs",
                   "quote": "        <nav class=\"rail\" aria-label=\"Destinations\">",
                   "source": "code"
