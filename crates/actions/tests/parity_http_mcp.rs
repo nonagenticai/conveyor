@@ -5781,6 +5781,14 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
             );
             sample
         },
+        // S21 step 3 (#15): the recipe catalogue. Sampled at the validation boundary — an empty
+        // create/activate/retire is a 422 on both transports, and the list is a deterministic
+        // empty page; the dedicated suite covers the lifecycle.
+        plain("prompt_recipes.create", json!({}), None),
+        plain("prompt_recipes.get", json!({}), None),
+        plain("prompt_recipes.list", json!({"limit": 10}), None),
+        plain("prompt_recipes.activate", json!({}), None),
+        plain("prompt_recipes.retire", json!({}), None),
         // The andon pair is last and must net to RELEASED: `engage` leaves the cord pulled, which
         // would make every later run-starting sample (`process_runs.start`,
         // `workflow_runs.start`, `projects.execute`) a 409. Each prepare sets the opposite state,

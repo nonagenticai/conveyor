@@ -1,4 +1,4 @@
--- 0070_ladder_option_sets.sql — options are authored, versioned rows; a decision pins
+-- 0071_ladder_option_sets.sql — options are authored, versioned rows; a decision pins
 -- the set it was constrained to (SPEC_V2 §7.2, §10.3; finding v1-w1c-4).
 --
 -- Before this migration `decision_option` was only a per-decision child: the caller posted

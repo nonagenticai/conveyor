@@ -23,14 +23,18 @@ closed at 00:37:54Z.
 `reap-stale-claims.sh` cannot catch any of this, by design: *a claim is a REMOTE BRANCH*,
 so it reads branches and never labels. This reads the labels and the branches together.
 
-THE FOUR RULES, AND WHY ONLY ONE OF THEM ACTS
-----------------------------------------------
+THE FOUR RULES, AND WHICH OF THEM ACT
+-------------------------------------
 A (acts)    `status:ready` + a live branch or an open PR -> `status:claimed`, one comment.
             Safe because it moves in ONE direction only. A check that could also move an
             issue back to `ready` would be able to steal a claim, which is a worse failure
             than the drift it repairs.
-B (reports) `status:blocked` with no line starting `Blocker: #N`, or whose every named
-            blocker is closed or missing. A block is real while any named blocker is open.
+B (acts,    `status:blocked` whose EVERY named blocker is positively `closed` ->
+   narrow)  `status:ready`, one comment. The contract's own clause is "naming an OPEN
+            issue", so a block whose blockers are all closed is factually over. It never
+            acts on a claimed issue, and never on a blocker whose state is `missing` or
+            `unknown`: a typo or a failed lookup is not evidence of closure. Those, and a
+            body with no conforming blocker line, are reported only.
 C (reports) `status:claimed` with no branch, no PR, and no update in 48 h — the reaper's
             two tests applied to the label. Reporting only: releasing a human's claim
             stays a human decision, which is also why the reaper defaults to report mode.
@@ -44,18 +48,20 @@ A rule's evidence is always printed. A wrong fix is silent; a printed verdict is
 the job summary is the record a later session reads.
 
 USAGE
-    board.py --repo nonagenticai/conveyor            # apply rule A, report B, C and P
+    board.py --repo nonagenticai/conveyor            # apply A and stale B, report C and P
     board.py --repo nonagenticai/conveyor --dry-run  # print the plan, write nothing
+    board.py --repo nonagenticai/conveyor --dor N    # check issue N's Definition of ready
     board.py --self-test                             # fixtures only, no network, no git
 
 EXIT CODES
-    0  clean, or every rule-A fix applied
-    1  --dry-run found a rule-A violation, or a fix failed
+    0  clean, or every fix applied; `--dor` found no gap
+    1  --dry-run found a fix pending, a fix failed, or `--dor` found a Programme gap
     2  the instrument is broken (gh failed, git failed, malformed input)
 
 The fallbacks are deliberately unlike the reaper's. This script fails OPEN on a lookup it
 cannot complete, because the alternative -- relabelling on incomplete evidence -- edits a
-shared board; it never writes on anything but a positively-identified live branch or PR.
+shared board; it writes only on a positively-identified live branch/PR (rule A) or a
+positively-closed blocker set (rule B).
 """
 
 from __future__ import annotations
@@ -224,18 +230,62 @@ def plan(issues, prs, branches, blocker_state, now):
                 )
                 continue
             states = {blocker: blocker_state(blocker) for blocker in blockers}
-            # A block is real while ANY named blocker is open, and while any lookup could not be
-            # completed. It is stale only when every named blocker is positively closed or missing.
-            if all(state in ("closed", "missing") for state in states.values()):
-                named = ", ".join(f"#{b} {s}" for b, s in states.items())
+            named = ", ".join(f"#{b} {s}" for b, s in states.items())
+            # A block is real while ANY named blocker is open.
+            if any(state == "open" for state in states.values()):
+                continue
+            # A missing number is a typo or a transferred issue, not proof of closure; an
+            # unknown state is a lookup that failed. Neither may release work, and the
+            # missing case is reported because its fix is a body edit, not a wait.
+            if any(state == "missing" for state in states.values()):
                 reports.append(
                     {
                         "rule": "B",
                         "number": number,
                         "title": issue["title"],
-                        "why": f"every named blocker is closed or missing ({named})",
+                        "why": f"not released; a named blocker cannot be proven closed ({named})",
                     }
                 )
+                continue
+            if any(state == "unknown" for state in states.values()):
+                reports.append(
+                    {
+                        "rule": "B",
+                        "number": number,
+                        "title": issue["title"],
+                        "why": (
+                            "not released; a named blocker's state could not be "
+                            f"determined ({named})"
+                        ),
+                    }
+                )
+                continue
+            # Every named blocker is positively closed. Releasing a stale block is mechanical;
+            # releasing a claim is still a human decision.
+            if CLAIMED in labels:
+                reports.append(
+                    {
+                        "rule": "B",
+                        "number": number,
+                        "title": issue["title"],
+                        "why": (
+                            f"every named blocker is closed ({named}), but the issue is "
+                            f"`{CLAIMED}`; not released"
+                        ),
+                    }
+                )
+                continue
+            fixes.append(
+                {
+                    "rule": "B",
+                    "release": True,
+                    "number": number,
+                    "title": issue["title"],
+                    "evidence": [
+                        f"#{blocker} {state}" for blocker, state in states.items()
+                    ],
+                }
+            )
             continue
 
         if CLAIMED in labels and not evidence:
@@ -288,6 +338,21 @@ def comment_for(fix) -> str:
         "\n"
         "Restored automatically by `scripts/ci/board.py`; no human action is needed. The "
         "issue is not free to claim."
+    )
+
+
+def release_comment_for(fix) -> str:
+    """The release comment names the evidence that retired the block, not just the move."""
+    named = ", ".join(fix["evidence"])
+    return (
+        f"Board contract check: `{BLOCKED}` -> `{READY}`.\n"
+        "\n"
+        f"Every issue named on this issue's `Blocker:` line is closed: {named}. "
+        f"`docs/plans/03-DELIVERY.md` § \"Labels and states\" defines `{BLOCKED}` as the body "
+        "carrying a plain `Blocker: #N` naming an OPEN issue, so the block no longer holds.\n"
+        "\n"
+        "Released automatically by `scripts/ci/board.py`; no human action is needed. The "
+        "issue is free to claim."
     )
 
 
@@ -365,12 +430,45 @@ def blocker_states(repo: str):
                 text=True,
             )
             # "unknown" is not "missing": a lookup that failed is not evidence that the blocker
-            # closed, and reporting a stale block on a failed lookup would be a lie that costs
-            # a human a trip to the issue. Rule B only reports on closed or missing.
+            # closed. Rule B releases only on a positively closed set; a missing or unknown
+            # blocker is reported and never released.
             cache[number] = proc.stdout.strip().lower() if proc.returncode == 0 else "unknown"
         return cache[number]
 
     return state
+
+
+def check_dor(repo: str, number: int) -> int:
+    """`--dor N`: the Programme half of the Definition of ready, for the pickup gate.
+
+    Exit 1 names the missing section/fields; exit 0 means the issue may be claimed on this
+    rule. Forward-only: an issue created before PROGRAMME_SINCE is exempt, and a non-unit
+    issue has no Programme requirement.
+    """
+    try:
+        raw = json.loads(
+            gh(
+                "issue", "view", str(number), "--repo", repo,
+                "--json", "number,labels,createdAt,body",
+            )
+        )
+    except (RuntimeError, json.JSONDecodeError) as error:
+        print(f"board: {error}", file=sys.stderr)
+        return 2
+    labels = {label["name"] for label in raw["labels"]}
+    created = parse_ts(raw["createdAt"]).date()
+    if UNIT not in labels:
+        print(f"#{number}: not a `{UNIT}` issue; no Programme requirement.")
+        return 0
+    if created < PROGRAMME_SINCE:
+        print(f"#{number}: created {created}, before {PROGRAMME_SINCE}; exempt (forward-only).")
+        return 0
+    gaps = programme_gaps(raw.get("body") or "")
+    if gaps:
+        print(f"#{number}: not ready — `## Programme` missing or empty: {', '.join(gaps)}")
+        return 1
+    print(f"#{number}: Programme complete; ready on this rule.")
+    return 0
 
 
 # --------------------------------------------------------------------------- output
@@ -378,15 +476,27 @@ def blocker_states(repo: str):
 
 def emit(fixes, reports, dry_run: bool, repo: str) -> int:
     lines = [f"# Board contract — {repo}", ""]
-    if fixes:
+    claims = [fix for fix in fixes if not fix.get("release")]
+    releases = [fix for fix in fixes if fix.get("release")]
+    if claims:
         verb = "would restore" if dry_run else "restored"
-        lines.append(f"## Rule A — {verb} {len(fixes)} label(s)")
-        for fix in fixes:
+        lines.append(f"## Rule A — {verb} {len(claims)} label(s)")
+        for fix in claims:
             lines.append(
                 f"- #{fix['number']} {fix['title']} — {' and '.join(fix['evidence'])}"
             )
     else:
         lines.append("## Rule A — no violation")
+    lines.append("")
+    if releases:
+        verb = "would release" if dry_run else "released"
+        lines.append(f"## Rule B — {verb} {len(releases)} stale block(s)")
+        for fix in releases:
+            lines.append(
+                f"- #{fix['number']} {fix['title']} — {' and '.join(fix['evidence'])}"
+            )
+    else:
+        lines.append("## Rule B — no stale block")
     lines.append("")
     if reports:
         lines.append(f"## Reported, not changed ({len(reports)})")
@@ -405,21 +515,36 @@ def emit(fixes, reports, dry_run: bool, repo: str) -> int:
 
 
 def apply(fixes, repo: str):
-    """Apply rule A. Returns (applied, failed) so the summary reports what actually happened --
-    a summary that claims a restore it did not make is the same failure as a stale label."""
+    """Apply rule A and a stale-block rule B. Returns (applied, failed) so the summary reports
+    what actually happened -- a summary that claims a move it did not make is the same failure
+    as a stale label."""
     applied, failed = [], []
     for fix in fixes:
         try:
-            edit = [
-                "issue", "edit", str(fix["number"]), "--repo", repo,
-                "--remove-label", READY,
-            ]
-            if not fix.get("blocked"):
-                edit += ["--add-label", CLAIMED]
-            gh(*edit)
-            gh("issue", "comment", str(fix["number"]), "--repo", repo, "--body", comment_for(fix))
+            if fix.get("release"):
+                gh(
+                    "issue", "edit", str(fix["number"]), "--repo", repo,
+                    "--remove-label", BLOCKED, "--add-label", READY,
+                )
+                gh(
+                    "issue", "comment", str(fix["number"]), "--repo", repo,
+                    "--body", release_comment_for(fix),
+                )
+                outcome = "blocked -> ready"
+            else:
+                edit = [
+                    "issue", "edit", str(fix["number"]), "--repo", repo,
+                    "--remove-label", READY,
+                ]
+                if not fix.get("blocked"):
+                    edit += ["--add-label", CLAIMED]
+                gh(*edit)
+                gh(
+                    "issue", "comment", str(fix["number"]), "--repo", repo,
+                    "--body", comment_for(fix),
+                )
+                outcome = "ready removed, block kept" if fix.get("blocked") else "ready -> claimed"
             applied.append(fix)
-            outcome = "ready removed, block kept" if fix.get("blocked") else "ready -> claimed"
             print(f"fixed #{fix['number']}: {outcome}")
         except RuntimeError as error:
             failed.append((fix, str(error)))
@@ -503,9 +628,24 @@ def self_test() -> int:
             [], [], [], [],
         ),
         (
-            "blocked on a closed issue -> report",
+            "stale block, every named blocker closed -> release",
             [issue(121, [BLOCKED], "Blocker: #120 — the P0 seed unit.\n")],
-            [], [], [], ["B:121"],
+            [], [], [121], [],
+        ),
+        (
+            "stale block, closed + missing -> report only",
+            [issue(123, [BLOCKED], "Blocker: #120, #999\n")],
+            [], [], [], ["B:123"],
+        ),
+        (
+            "stale block, closed + unknown -> report only",
+            [issue(124, [BLOCKED], "Blocker: #120, #777\n")],
+            [], [], [], ["B:124"],
+        ),
+        (
+            "stale block on a claimed issue -> report only",
+            [issue(125, [CLAIMED, BLOCKED], "Blocker: #120\n")],
+            [], [], [], ["B:125"],
         ),
         (
             "blocked on a missing issue -> report",
@@ -529,9 +669,10 @@ def self_test() -> int:
         ),
         (
             "blocker's reason cites other issues -> only the leading run counts",
-            # #120 is closed; #999 is cited in the reason as open. The block is #120 only.
+            # #120 is closed; #999/#151 are cited in the reason. The block is #120 only, so it
+            # releases even though an issue named in the prose is open.
             [issue(95, [BLOCKED], "Blocker: #120 — superseded by #999, see #151 too.\n")],
-            [], [], [], ["B:95"],
+            [], [], [95], [],
         ),
         (
             "two blocker lines -> union, one open keeps the block",
@@ -539,9 +680,9 @@ def self_test() -> int:
             [], [], [], [],
         ),
         (
-            "blocker lookup failed -> no stale report",
+            "blocker lookup failed -> report only",
             [issue(13, [BLOCKED], "Blocker: #777\n")],
-            [], [], [], [],
+            [], [], [], ["B:13"],
         ),
         (
             "claimed, no branch, stale -> report",
@@ -634,6 +775,52 @@ def self_test() -> int:
             failures += 1
             print(f"FAIL: comment omits {needle!r}")
 
+    # The release comment must name the closed blockers, not just the move.
+    release = {"number": 121, "title": "the P0 seed unit", "evidence": ["#120 closed"]}
+    body = release_comment_for(release)
+    for needle in ("status:ready", "#120 closed", "free to claim"):
+        total += 1
+        if needle in body:
+            print(f"ok: release comment names {needle!r}")
+        else:
+            failures += 1
+            print(f"FAIL: release comment omits {needle!r}")
+
+    # `apply()` is the half that moves the label; a planner-only fixture would not catch a
+    # release fix that forgot to remove `status:blocked`. Record the gh calls, write nothing.
+    global gh
+    recorded = []
+    original = gh
+
+    def recorder(*args):
+        recorded.append(list(args))
+        return ""
+
+    gh = recorder
+    try:
+        applied, failed = apply(
+            [{"rule": "B", "release": True, "number": 121, "title": "the P0 seed unit",
+              "evidence": ["#120 closed"]}],
+            "owner/repo",
+        )
+    finally:
+        gh = original
+    edit_args = recorded[0] if recorded else []
+    total += 1
+    if (
+        not failed
+        and applied
+        and "--remove-label" in edit_args
+        and BLOCKED in edit_args
+        and "--add-label" in edit_args
+        and READY in edit_args
+        and any("free to claim" in part for row in recorded for part in row)
+    ):
+        print("ok: release fix removes blocked and adds ready")
+    else:
+        failures += 1
+        print(f"FAIL: release fix did not move the label (recorded {recorded!r})")
+
     # A ready+blocked issue must lose `ready` without being claimed: `blocked` is not claimable,
     # and a fix that added `claimed` would leave two state labels on the issue.
     total += 1
@@ -659,12 +846,17 @@ def main() -> int:
     parser.add_argument("--repo", help="owner/name, e.g. nonagenticai/conveyor")
     parser.add_argument("--dry-run", action="store_true", help="print the plan, write nothing")
     parser.add_argument("--self-test", action="store_true", help="run the fixture matrix")
+    parser.add_argument(
+        "--dor", type=int, metavar="N", help="check issue N's Programme Definition of ready"
+    )
     args = parser.parse_args()
 
     if args.self_test:
         return self_test()
     if not args.repo:
         parser.error("--repo is required unless --self-test")
+    if args.dor is not None:
+        return check_dor(args.repo, args.dor)
 
     try:
         issues = load_issues(args.repo)

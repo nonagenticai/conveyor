@@ -1,9 +1,9 @@
 {
   "schema": "v2-gap-ledger/v1",
-  "lane_pin": "25ab2760",
+  "lane_pin": "9d3352f4",
   "generated_from": {
     "artefact_record": {
-      "command": "/opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-artefacts/scripts/generate-standards.py --snapshot /tmp/snap-526-0738/data --outputs-dir /tmp/snap-526-0738/docs --register /tmp/conf-0738/rework.json --data-out /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/v2-gap-ledger-dtc47vwd --findings-out /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/v2-gap-ledger-dtc47vwd/findings.json",
+      "command": "/opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-artefacts/scripts/generate-standards.py --snapshot /tmp/snap-526-0738/data --outputs-dir /tmp/snap-526-0738/docs --register /tmp/conf-0738/rework.json --data-out /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/v2-gap-ledger-tu_b4840 --findings-out /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/v2-gap-ledger-tu_b4840/findings.json",
       "summary": {
         "absent": 393,
         "artefacts": 826,
@@ -51,7 +51,7 @@
       },
       {
         "path": "/Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-artefacts/seed/programme.json",
-        "sha256": "471a4b125557d83fd7d0616d158926ce80dc6136ba4bab10ea6e7f83209e3593",
+        "sha256": "b307b352808536d99d2e6a27f60d541bc07715fa0ccb973dd4e2ef55e4ecbb1a",
         "role": "project ADM phase for target_phase"
       }
     ]

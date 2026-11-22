@@ -468,14 +468,21 @@ A **work executor** drives a `run`. Two kinds exist (amended 2026-11-09); the pr
   its principal's — since S06d, the tenant's `channel_action_grant` set for the principal's connector
 kind (`mcp` for the agent's licence principal), never a hard-coded name list.
 - **Prompt discipline.** `prompt_ref` names a **versioned recipe** `<name>@<version>` in the tenant's Postgres
-  catalogue (D27, owner ruling 2026-11-09). The step executor **compiles** it at run time from the run's sources —
-  the procedure/workflow and its step, the capability/agent, the project and card, the bound knowledge packs — and
-  carries exactly one system message plus `{capability_agent_id, prompt_ref, model_ref}` in the `agent.run` step
-  input, so `action_invocation.input_hash` and the trace pin what ran, and `inference_call.prompt_sha256` pins the
-  compiled text. A required source the surface lacks is `409 capability_not_ready` naming the pin and the section,
-  never an empty or ad-hoc prompt. No handler concatenates prompt text ad hoc; the copilot and the prompt audit
-  resolve through the same catalogue, and the S21 design (selection + budgets + the `plan` projection) extends this
-  renderer without changing the contract.
+  catalogue (D27, owner ruling 2026-11-09). A version is immutable; a tenant creates a `draft`, activates it (the
+  previous active becomes `retired` in the same transaction) or retires a version, and a new run resolves only an
+  `active` row. The step executor **compiles** it at run time from the run's sources — the procedure/workflow and
+  its step, the capability/agent and role, the project and card, the card's memory, and the bound knowledge packs
+  with their selected content — and carries exactly one system message plus
+  `{capability_agent_id, prompt_ref, model_ref}` in the `agent.run` step input, so
+  `action_invocation.input_hash` and the trace pin what ran, and `inference_call.prompt_sha256` pins the compiled
+  text. A required source the surface lacks is `409 capability_not_ready` naming the pin and the section, never an
+  empty or ad-hoc prompt. No handler concatenates prompt text ad hoc; the copilot and the prompt audit resolve
+  through the same catalogue, and the S21 design (selection + budgets + the `plan` projection) extends this renderer
+  without changing the contract. Knowledge targets are resolved in the compile transaction, but retrieval runs
+  **after** it commits, through the same path `knowledge.query` uses: one retrieval implementation, no network call
+  inside a compile transaction. Source identities are rendered into the text, so the SHA-256 covers them; the
+  compiled text is never stored. Laya is not a prompt source — the judge and the decision ladder consume typed step
+  facts, and the compiler never calls laya.
 - **Readiness before execution.** A run must not start when a binding is unusable: a `required` pack has no resolvable
   leaves, an `allowed_actions` entry is not a registered action, or the `prompt_ref` does not resolve. The refusal is
   `409 capability_not_ready` with `blocking[]`, **before** the first step. `knowledge_degraded` remains the mid-run

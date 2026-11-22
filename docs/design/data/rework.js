@@ -7730,7 +7730,7 @@ window.CONVEYOR_REWORK = {
       "disposition": "rework",
       "dod": [
         {
-          "item": "std-msp-blueprint-01a1d039-0d24-7d16-ae52-4841e96ccfac: evidence the missing section(s) Aggregates and services, Action registry and data model, Deployment estate, The to-be the projects deliver of Blueprint — conveyor buildout from seed/output-standard.json#blueprint, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+          "item": "std-msp-blueprint-01a1d039-0d24-7d16-ae52-4841e96ccfac: evidence the missing section(s) Aggregates and services, Action registry and data model, Deployment estate, The to-be the projects deliver, Organisation and skills, Current, intermediate and target states of Blueprint — conveyor buildout from seed/output-standard.json#blueprint, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
           "met": false
         }
       ],
@@ -7784,6 +7784,30 @@ window.CONVEYOR_REWORK = {
                 ]
               ],
               "source": "artefact"
+            },
+            {
+              "artefact": "std-msp-blueprint-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+              "section": "Organisation and skills",
+              "snapshot": [
+                [
+                  "seed/output-standard.json",
+                  "blueprint",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-msp-blueprint-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+              "section": "Current, intermediate and target states",
+              "snapshot": [
+                [
+                  "seed/output-standard.json",
+                  "blueprint",
+                  0
+                ]
+              ],
+              "source": "artefact"
             }
           ],
           "rule": "std-msp-blueprint-01a1d039-0d24-7d16-ae52-4841e96ccfac",
@@ -7801,7 +7825,7 @@ window.CONVEYOR_REWORK = {
       "subject_count": 1,
       "subjects": [
         {
-          "detail": "The blueprint artefact for conveyor buildout is absent; missing required sections: Aggregates and services, Action registry and data model, Deployment estate, The to-be the projects deliver.",
+          "detail": "The blueprint artefact for conveyor buildout is absent; missing required sections: Aggregates and services, Action registry and data model, Deployment estate, The to-be the projects deliver, Organisation and skills, Current, intermediate and target states.",
           "disposition": "rework",
           "evidence": [
             {
@@ -7845,6 +7869,30 @@ window.CONVEYOR_REWORK = {
                 {
                   "artefact": "std-msp-blueprint-01a1d039-0d24-7d16-ae52-4841e96ccfac",
                   "section": "The to-be the projects deliver",
+                  "snapshot": [
+                    [
+                      "seed/output-standard.json",
+                      "blueprint",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-msp-blueprint-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+                  "section": "Organisation and skills",
+                  "snapshot": [
+                    [
+                      "seed/output-standard.json",
+                      "blueprint",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-msp-blueprint-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+                  "section": "Current, intermediate and target states",
                   "snapshot": [
                     [
                       "seed/output-standard.json",
@@ -21398,7 +21446,7 @@ window.CONVEYOR_REWORK = {
       "disposition": "rework",
       "dod": [
         {
-          "item": "std-msp-business-case-01a1d039-0d24-7d16-ae52-4841e96ccfac: evidence the missing section(s) Licensing frame of Business Case — conveyor buildout from seed/output-standard.json#business-case, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+          "item": "std-msp-business-case-01a1d039-0d24-7d16-ae52-4841e96ccfac: evidence the missing section(s) Licensing frame, Options, including doing nothing, Investment appraisal and cash flow, Capabilities the benefits depend on of Business Case — conveyor buildout from seed/output-standard.json#business-case, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
           "met": false
         }
       ],
@@ -21408,6 +21456,42 @@ window.CONVEYOR_REWORK = {
             {
               "artefact": "std-msp-business-case-01a1d039-0d24-7d16-ae52-4841e96ccfac",
               "section": "Licensing frame",
+              "snapshot": [
+                [
+                  "seed/output-standard.json",
+                  "business-case",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-msp-business-case-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+              "section": "Options, including doing nothing",
+              "snapshot": [
+                [
+                  "seed/output-standard.json",
+                  "business-case",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-msp-business-case-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+              "section": "Investment appraisal and cash flow",
+              "snapshot": [
+                [
+                  "seed/output-standard.json",
+                  "business-case",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-msp-business-case-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+              "section": "Capabilities the benefits depend on",
               "snapshot": [
                 [
                   "seed/output-standard.json",
@@ -21433,7 +21517,7 @@ window.CONVEYOR_REWORK = {
       "subject_count": 1,
       "subjects": [
         {
-          "detail": "The business-case artefact for conveyor buildout is partial; missing required sections: Licensing frame.",
+          "detail": "The business-case artefact for conveyor buildout is partial; missing required sections: Licensing frame, Options, including doing nothing, Investment appraisal and cash flow, Capabilities the benefits depend on.",
           "disposition": "rework",
           "evidence": [
             {
@@ -21441,6 +21525,42 @@ window.CONVEYOR_REWORK = {
                 {
                   "artefact": "std-msp-business-case-01a1d039-0d24-7d16-ae52-4841e96ccfac",
                   "section": "Licensing frame",
+                  "snapshot": [
+                    [
+                      "seed/output-standard.json",
+                      "business-case",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-msp-business-case-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+                  "section": "Options, including doing nothing",
+                  "snapshot": [
+                    [
+                      "seed/output-standard.json",
+                      "business-case",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-msp-business-case-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+                  "section": "Investment appraisal and cash flow",
+                  "snapshot": [
+                    [
+                      "seed/output-standard.json",
+                      "business-case",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-msp-business-case-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+                  "section": "Capabilities the benefits depend on",
                   "snapshot": [
                     [
                       "seed/output-standard.json",
