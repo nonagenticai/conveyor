@@ -86,6 +86,7 @@ class Runner:
         acts_path: Path | None = None,
         today: str | None = None,
         keep_active: bool = False,
+        closure_asset: str | None = None,
     ) -> None:
         self.project = project
         self.content = content
@@ -97,6 +98,7 @@ class Runner:
         self.acts_path = acts_path or evidence
         self.today = today or datetime.now(timezone.utc).strftime("%Y-%m-%d")
         self.keep_active = keep_active
+        self.closure_asset = closure_asset
         self.transcript = evidence.parent / "transcript.jsonl"
         self.snapshot = ""
         self.baseline_approval: str | None = None
@@ -676,6 +678,10 @@ class Runner:
             ]
             if approved_closure:
                 print("  closure gate: already approved")
+                # The closure asset that gate approved is the evidence; no read action
+                # projects `meta.closure_asset_id`, so a resumed run takes the operator's
+                # `--closure-asset` — read from the record, never invented.
+                closure_asset = self.closure_asset
             else:
                 closure = self.invoke(
                     "projects.close_request",
@@ -692,19 +698,47 @@ class Runner:
                     read_input={"id": self.project_id},
                 )
                 self.decide(closure["approval_id"], "decide the closure gate")
-            gate = self.invoke(
-                "approvals.request",
-                {
-                    "gate": "projects.close",
-                    "kind": "action",
-                    "action": "projects.close",
-                    "input": {"id": self.project_id},
-                    "description": f"Close {self.project} after the retrospective rework",
-                },
-                read_action="approvals.list",
-                read_match=["gate=projects.close", "status=pending"],
-            )
-            self.decide(gate["id"], "approve the destructive close", close_gate=True)
+                # The destructive gate needs a typed, live evidence reference: the closure asset
+                # the closure gate just approved (a draft asset is refused, so this request runs
+                # only after its decide). `proposed_input` pins the exact close call it authorises.
+                closure_asset = closure.get("closure_asset_id")
+            if not closure_asset:
+                fail(
+                    f"{self.project}: projects.close_request returned no closure_asset_id; "
+                    "the destructive gate has no typed evidence to name"
+                )
+            approved_close = [
+                approval
+                for approval in approvals
+                if approval.get("gate") == "projects.close"
+                and approval.get("status") == "approved"
+                and current(approval, since)
+            ]
+            if approved_close:
+                # A resumed run must not open a second gate for the same close: the first
+                # one is decided and names the same target.
+                print("  destructive gate: already approved")
+                gate = approved_close[0]
+            else:
+                gate = self.invoke(
+                    "approvals.request",
+                    {
+                        "project_id": self.project_id,
+                        "gate": "projects.close",
+                        "kind": "action",
+                        "action": "projects.close",
+                        "input": {"id": self.project_id},
+                        "proposed_input": {
+                            "id": self.project_id,
+                            "reason": self.close_reason(),
+                        },
+                        "description": f"Close {self.project} after the retrospective rework",
+                        "evidence": [{"kind": "governed_asset", "id": closure_asset}],
+                    },
+                    read_action="approvals.list",
+                    read_match=["gate=projects.close", "status=pending"],
+                )
+                self.decide(gate["id"], "approve the destructive close", close_gate=True)
             closed = self.invoke(
                 "projects.close",
                 {"id": self.project_id, "reason": self.close_reason()},
@@ -952,6 +986,11 @@ def main() -> None:
         action="store_true",
         help="rework but do not close: a project with an open issue is never closed (#526)",
     )
+    parser.add_argument(
+        "--closure-asset",
+        help="the approved closure governed_asset a resumed run names as the destructive "
+        "gate's typed evidence (the id the earlier run's close_request created)",
+    )
     args = parser.parse_args()
     if args.self_test:
         self_test()
@@ -977,6 +1016,7 @@ def main() -> None:
         tranche_label=args.tranche_label,
         acts_path=args.acts,
         keep_active=args.keep_active,
+        closure_asset=args.closure_asset,
     ).run()
 
 
