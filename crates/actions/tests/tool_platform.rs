@@ -346,6 +346,27 @@ impl Fixture {
     }
 }
 
+/// A published owner decision document — the authorisation a retirement names.
+async fn owner_decision(fixture: &Fixture) -> Uuid {
+    let id = Uuid::now_v7();
+    let mut tx = begin_scoped(&fixture.pg.owner, fixture.tenant)
+        .await
+        .expect("a scoped write");
+    sqlx::query(
+        "INSERT INTO document (id, tenant_id, kind, title, status, category, body, publishable,
+                               published_at)
+         VALUES ($1, $2, 'document', 'Owner decision — retire the coding toolkit', 'active',
+                 'decision', 'owner decision', true, now())",
+    )
+    .bind(id)
+    .bind(fixture.tenant.as_uuid())
+    .execute(&mut *tx)
+    .await
+    .expect("insert the owner decision");
+    tx.commit().await.expect("commit");
+    id
+}
+
 /// A project and a running run. The run is the binding's first-class target (`tool_binding.run_id`),
 /// so a test needs no job ladder to grant a tool.
 async fn seed_run(pg: &support::Pg, tenant: TenantId) -> (Uuid, Uuid) {
@@ -594,6 +615,85 @@ async fn a_registered_binding_writer_creates_the_grant() {
         body.to_string().contains("toolkit_not_published"),
         "the refusal names the reason: {body}"
     );
+
+    fixture.running.shutdown().await;
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn tools_retire_unbinds_a_zero_use_toolkit() {
+    let _serial = SERIAL.lock().await;
+    let fixture = Fixture::new(
+        "coding",
+        "jobs.create",
+        "coding_jobs.create",
+        "write",
+        "write",
+        coding_schema(),
+    )
+    .await;
+    let decision = owner_decision(&fixture).await;
+
+    let (status, body) = fixture
+        .invoke_action(
+            "tools.retire",
+            json!({"toolkit_key": "coding", "decision_ref": decision}),
+        )
+        .await;
+    assert_eq!(status, 200, "a zero-use toolkit retires: {body}");
+    assert_eq!(body["calls"], 0, "{body}");
+    assert_eq!(body["bindings_disabled"], 1, "{body}");
+
+    let (status, enabled): (String, Option<bool>) = {
+        let mut tx = begin_scoped(&fixture.pg.owner, fixture.tenant)
+            .await
+            .expect("a scoped read");
+        let row = sqlx::query_as(
+            "SELECT k.status, b.enabled FROM toolkit k
+               LEFT JOIN tool_binding b ON b.toolkit_id = k.id AND b.tenant_id = k.tenant_id
+              WHERE k.tenant_id = $1 AND k.key = 'coding'",
+        )
+        .bind(fixture.tenant.as_uuid())
+        .fetch_one(&mut *tx)
+        .await
+        .expect("the toolkit row");
+        tx.commit().await.expect("commit");
+        row
+    };
+    assert_eq!(status, "retired");
+    assert_eq!(enabled, Some(false), "the binding is disabled");
+
+    fixture.running.shutdown().await;
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn tools_retire_refuses_a_toolkit_used_in_the_window() {
+    let _serial = SERIAL.lock().await;
+    let fixture = Fixture::new(
+        "coding",
+        "jobs.create",
+        "coding_jobs.create",
+        "write",
+        "write",
+        coding_schema(),
+    )
+    .await;
+    let (status, body) = fixture
+        .call(
+            "coding.jobs.create",
+            json!({"kind": "test", "input": {"files": []}}),
+        )
+        .await;
+    assert_eq!(status, 200, "the call lands first: {body}");
+    let decision = owner_decision(&fixture).await;
+
+    let (status, body) = fixture
+        .invoke_action(
+            "tools.retire",
+            json!({"toolkit_key": "coding", "decision_ref": decision}),
+        )
+        .await;
+    assert_eq!(status, 409, "a used toolkit is not retired: {body}");
+    assert!(body.to_string().contains("tool_in_use"), "{body}");
 
     fixture.running.shutdown().await;
 }
