@@ -293,7 +293,10 @@ mod tests {
         assert_eq!(spec.kind, ActionKind::External);
         assert_eq!(spec.effect, Effect::Spend);
         assert!(spec.captures_usage, "a synthesis is a model call");
-        assert_eq!(spec.timeout_ms, 600_000);
+        assert_eq!(
+            spec.timeout_ms, 1_200_000,
+            "narration shares the render host's queue (#571)"
+        );
         assert_eq!(spec.scope_names(), vec!["capabilities:write"]);
         let artefact = spec
             .artefact
