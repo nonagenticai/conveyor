@@ -17,9 +17,14 @@ test("the improve destination reads the flow figures and says what is unavailabl
   // honest empty sentence when every figure has one.
   await expect(page.getByRole("heading", { name: "Unavailable figures", exact: true })).toBeVisible();
 
-  // The kata queue is not faked: it is a Planned panel naming the actions that will open it.
+  // The kata queue is a real read (kata.list): rows when the tenant has a kata, an honest
+  // empty state otherwise. Adoption and revert stay governed actions.
   await expect(page.getByRole("heading", { name: "Kata queue", exact: true })).toBeVisible();
-  await expect(page.getByText("The kata queue is planned")).toBeVisible();
+  const kataRows = page.locator("table tbody tr");
+  const kataEmpty = page.getByText("No kata is recorded in this tenant");
+  const rows = await kataRows.count();
+  const emptyVisible = await kataEmpty.isVisible().catch(() => false);
+  expect(rows > 0 || emptyVisible, "the kata queue shows rows or the empty state").toBeTruthy();
 });
 
 test("the improve screen has no horizontal page scroll at 1280 and 390", async ({ page }) => {

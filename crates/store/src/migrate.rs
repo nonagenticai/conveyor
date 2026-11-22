@@ -261,7 +261,11 @@ mod tests {
                 // v1-w3b-3 (#526): the tenant-asset authoring family — the intake brief, the
                 // asset drafts, the human review gate and one published row per (kind, key)
                 // (0066_authoring.sql, SPEC_V2 §5.7, §10.4).
-                (66, "authoring".to_owned())
+                (66, "authoring".to_owned()),
+                // #77 (T5): the kata loop — the pinned hypothesis, the candidates, the immutable
+                // held-out measurement and the per-target propagation rows
+                // (0067_kata.sql, SPEC_V2 §6.3, §9.3–§9.4, §12 T5).
+                (67, "kata".to_owned())
             ],
             "the embedded migration set is {embedded:?}; a wrong sqlx::migrate! path or a \
              file outside the set changes it"

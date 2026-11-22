@@ -3764,7 +3764,7 @@
         },
         {
           "path": "docs/design/data/actions.json",
-          "line": 246,
+          "line": 256,
           "quote": "    \"lessons.list\","
         }
       ],
@@ -3794,7 +3794,7 @@
         },
         {
           "path": "docs/design/data/actions.json",
-          "line": 471,
+          "line": 481,
           "quote": "    \"tools.call\","
         }
       ],
@@ -3859,7 +3859,7 @@
         },
         {
           "path": "docs/design/data/actions.json",
-          "line": 471,
+          "line": 481,
           "quote": "    \"tools.call\","
         }
       ],
@@ -3894,7 +3894,7 @@
         },
         {
           "path": "docs/design/data/actions.json",
-          "line": 347,
+          "line": 357,
           "quote": "    \"procedures.ingest_sop\","
         }
       ],

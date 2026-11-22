@@ -2088,6 +2088,56 @@ async fn seed_parity_refinement_gate(pg: &support::Pg, ctx: &Ctx, policy: Uuid) 
     approval.id
 }
 
+/// The pinned held-out split the kata samples measure against (any stable 64-hex value).
+const KATA_SPLIT_SHA: &str = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
+
+/// A fresh open kata on a prepared project.
+async fn seed_parity_kata(pg: &support::Pg, ctx: &Ctx) -> Uuid {
+    let project = seed_parity_project(pg, ctx).await;
+    scoped(pg, ctx, async move |conn| {
+        store::kata::kata_open_tx(
+            conn,
+            ctx.tenant,
+            ctx.alice_user,
+            project,
+            &format!("parity-kata-{}", Uuid::now_v7().simple()),
+            "benchmark",
+            Some(Uuid::now_v7()),
+            "v1",
+            "test",
+            KATA_SPLIT_SHA,
+            &json!({"delta": "5%"}),
+            &json!({"kind": "procedure", "version": 1}),
+        )
+        .await
+        .expect("authoring kata")
+        .id
+    })
+    .await
+}
+
+/// A kata with a proposed candidate.
+async fn seed_parity_kata_candidate(pg: &support::Pg, ctx: &Ctx) -> (Uuid, Uuid) {
+    let kata = seed_parity_kata(pg, ctx).await;
+    let candidate = scoped(pg, ctx, async move |conn| {
+        store::kata::kata_propose_tx(
+            conn,
+            ctx.tenant,
+            ctx.alice_user,
+            kata,
+            "Parity candidate",
+            "raise the threshold",
+            &json!({"kind": "procedure", "version": 2}),
+            &json!({"delta": "5%"}),
+        )
+        .await
+        .expect("kata candidate")
+        .id
+    })
+    .await;
+    (kata, candidate)
+}
+
 /// A fresh authoring intake.
 async fn seed_parity_authoring_intake(pg: &support::Pg, ctx: &Ctx) -> Uuid {
     scoped(pg, ctx, async |conn| {
@@ -3695,6 +3745,80 @@ async fn prepare(sample: &Sample, pg: &support::Pg, ctx: &Ctx) {
             })
             .await;
             ctx.push("authoring.publish.asset", asset);
+        }
+        // ── the kata loop (T5) ─────────────────────────────────────────────────────────
+        "kata.open" => {
+            let p = seed_parity_project(pg, ctx).await;
+            ctx.push("kata.open", p);
+        }
+        "kata.observe" | "kata.analyse" | "kata.propose" | "kata.propagate" | "kata.close"
+        | "kata.get" | "kata.list" => {
+            let k = seed_parity_kata(pg, ctx).await;
+            ctx.push(sample.name, k);
+        }
+        "kata.measure" => {
+            let (k, c) = seed_parity_kata_candidate(pg, ctx).await;
+            ctx.push("kata.measure.kata", k);
+            ctx.push("kata.measure.candidate", c);
+        }
+        "kata.adopt" => {
+            let (k, c) = seed_parity_kata_candidate(pg, ctx).await;
+            scoped(pg, ctx, async move |conn| {
+                store::kata::kata_measure_tx(
+                    conn,
+                    ctx.tenant,
+                    ctx.alice_user,
+                    k,
+                    c,
+                    "v1",
+                    "test",
+                    KATA_SPLIT_SHA,
+                    Uuid::now_v7(),
+                    &json!({"rate": 0.91}),
+                    &json!({"low": 0.88, "high": 0.94}),
+                )
+                .await
+                .expect("measure the prepared candidate");
+            })
+            .await;
+            // The adoption gate is decided by a SECOND principal: the kata's opener may not
+            // decide it (kata_self_approval), and the refusals live in kata_gate.rs.
+            let approval = scoped(pg, ctx, async move |conn| {
+                let approval = store::approval::insert_approval_tx(
+                    conn,
+                    ctx.tenant,
+                    &store::approval::NewApproval {
+                        run_id: None,
+                        card_id: None,
+                        project_id: None,
+                        eval_id: None,
+                        gate: "kata.adopt".to_owned(),
+                        kind: "gate".to_owned(),
+                        required_decisions: 1,
+                        requested_by: None,
+                        expires_at: None,
+                        callback_url: None,
+                        correlation_id: None,
+                        meta: json!({"target": k.to_string()}),
+                    },
+                )
+                .await
+                .expect("kata.adopt gate");
+                store::approval::record_decision_tx(
+                    conn,
+                    ctx.tenant,
+                    approval.id,
+                    &conveyor_domain::Decision::approve(ctx.bob_user),
+                    false,
+                )
+                .await
+                .expect("approve the kata.adopt gate");
+                approval.id
+            })
+            .await;
+            ctx.push("kata.adopt.kata", k);
+            ctx.push("kata.adopt.candidate", c);
+            ctx.push("kata.adopt.approval", approval);
         }
         _ => {}
     }
@@ -6471,6 +6595,7 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
     out.extend(ladder_samples());
     out.extend(pm_samples());
     out.extend(authoring_samples());
+    out.extend(kata_samples());
 
     for sample in &mut out {
         if matches!(
@@ -6719,6 +6844,133 @@ fn authoring_samples() -> Vec<Sample> {
         {
             let mut sample = plain("authoring.assets", json!({"limit": 50}), None);
             sample.prepare = true;
+            expecting(sample, 200)
+        },
+    ]
+}
+
+/// The kata loop (SPEC_V2 §6.3, §12 T5): open → observe/analyse → propose → measure → adopt →
+/// close, plus the two reads. The prepares build the state each action's gate reads (a pinned
+/// instrument and split, a pre-registered prediction, a measured candidate, a human adoption
+/// gate decided by a SECOND principal); the refusal paths live in kata_gate.rs.
+fn kata_samples() -> Vec<Sample> {
+    vec![
+        {
+            let mut sample = plain("kata.open", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "project_id": ctx.pop("kata.open"),
+                    "signature": format!("parity-kata-{}", Uuid::now_v7().simple()),
+                    "instrument_kind": "benchmark",
+                    "instrument_id": Uuid::now_v7(),
+                    "instrument_version": "v1",
+                    "split": "test",
+                    "split_sha256": KATA_SPLIT_SHA,
+                    "prediction": {"delta": "5%"},
+                    "base_ref": {"kind": "procedure", "version": 1},
+                })
+            });
+            expecting(sample, 201)
+        },
+        {
+            let mut sample = plain("kata.observe", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "kata_id": ctx.pop("kata.observe"),
+                    "evidence": [{"kind": "run", "id": "parity"}],
+                })
+            });
+            expecting(sample, 200)
+        },
+        {
+            let mut sample = plain("kata.analyse", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "kata_id": ctx.pop("kata.analyse"),
+                    "problem": {"statement": "the step retries too often", "data": [{"kind": "run", "id": "parity"}]},
+                })
+            });
+            expecting(sample, 200)
+        },
+        {
+            let mut sample = plain("kata.propose", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "kata_id": ctx.pop("kata.propose"),
+                    "title": "Parity candidate",
+                    "rationale": "raise the threshold",
+                    "target_ref": {"kind": "procedure", "version": 2},
+                    "prediction": {"delta": "5%"},
+                })
+            });
+            expecting(sample, 201)
+        },
+        {
+            let mut sample = plain("kata.measure", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "kata_id": ctx.pop("kata.measure.kata"),
+                    "candidate_id": ctx.pop("kata.measure.candidate"),
+                    "instrument_version": "v1",
+                    "split": "test",
+                    "split_sha256": KATA_SPLIT_SHA,
+                    "run_id": Uuid::now_v7(),
+                    "metric": {"rate": 0.91},
+                    "noise_band": {"low": 0.88, "high": 0.94},
+                })
+            });
+            expecting(sample, 201)
+        },
+        {
+            let mut sample = plain("kata.adopt", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "kata_id": ctx.pop("kata.adopt.kata"),
+                    "candidate_id": ctx.pop("kata.adopt.candidate"),
+                    "approval_id": ctx.pop("kata.adopt.approval"),
+                })
+            });
+            expecting(sample, 200)
+        },
+        {
+            let mut sample = plain("kata.propagate", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "kata_id": ctx.pop("kata.propagate"),
+                    "target_ref": {"kind": "job", "id": "parity"},
+                })
+            });
+            expecting(sample, 201)
+        },
+        {
+            let mut sample = plain("kata.close", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "kata_id": ctx.pop("kata.close"),
+                    "outcome": "kept",
+                    "reason": "the measurement held",
+                })
+            });
+            expecting(sample, 200)
+        },
+        {
+            let mut sample = plain("kata.get", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| json!({"id": ctx.pop("kata.get")}));
+            expecting(sample, 200)
+        },
+        {
+            let mut sample = plain("kata.list", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| json!({"limit": 50}));
             expecting(sample, 200)
         },
     ]

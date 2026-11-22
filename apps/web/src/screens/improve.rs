@@ -1,20 +1,17 @@
-//! Improve — the flow figures (SPEC_V2 §10.5, destination **Improve**).
+//! Improve — the flow figures and the kata queue (SPEC_V2 §10.5, destination **Improve**).
 //!
-//! One read and no write: `metrics.flow` derives WIP, throughput, lead time and flow efficiency
+//! Two reads and no write: `metrics.flow` derives WIP, throughput, lead time and flow efficiency
 //! at read time from the board's own rows (`card`, `list` and the `card.moved` outbox). A figure
 //! whose source ledger does not exist is returned in `unavailable` with its reason and rendered
-//! that way — never as a zero.
-//!
-//! The kata queue this destination will host awaits the `kata.*` action family (T5): until those
-//! actions are registered it is a named Planned panel, never an invented control. The coach cards
-//! are governed actions, not a read on this screen.
+//! that way — never as a zero. `kata.list` is the kata queue (T5): each kata pins its instrument
+//! and split, and adoption/revert stay governed actions, not this screen's write.
 
 use leptos::prelude::*;
 use serde::Deserialize;
 use serde_json::json;
 
-use crate::api::{ApiError, InvokeOptions};
-use crate::components::{Empty, ErrorPanel, Planned, Tile};
+use crate::api::{ApiError, InvokeOptions, Page};
+use crate::components::{Empty, ErrorPanel, Planned, StatusPill, Tile};
 use crate::state::AppCtx;
 
 /// A figure `metrics.flow` could not compute, with the reason: unavailable, never zero.
@@ -51,6 +48,36 @@ fn load_flow(ctx: AppCtx) -> LocalResource<Result<FlowReport, ApiError>> {
     })
 }
 
+/// One kata as `kata.list` returns it; only the rendered fields are kept.
+#[derive(Clone, Debug, Deserialize)]
+struct Kata {
+    signature: String,
+    #[serde(default)]
+    instrument_kind: String,
+    #[serde(default)]
+    instrument_version: String,
+    #[serde(default)]
+    split: String,
+    status: String,
+    #[serde(default)]
+    outcome: Option<String>,
+}
+
+fn load_kata(ctx: AppCtx) -> LocalResource<Result<Vec<Kata>, ApiError>> {
+    LocalResource::new(move || {
+        let _tenant = ctx.tenant.get();
+        async move {
+            let page: Page<Kata> = serde_json::from_value(
+                ctx.invoke("kata.list", json!({"limit": 50}), InvokeOptions::default())
+                    .await?
+                    .output,
+            )
+            .map_err(|error| ApiError::Network(format!("kata queue: {error}")))?;
+            Ok(page.items)
+        }
+    })
+}
+
 /// A duration in seconds as `Xd Yh` or `N min`; `—` when the read has no figure for it. An
 /// unmeasured span is a null, and a null is never drawn as zero minutes.
 fn duration(seconds: Option<f64>) -> String {
@@ -77,6 +104,7 @@ fn percent(value: Option<f64>) -> String {
 pub fn Improve() -> impl IntoView {
     let ctx = expect_context::<AppCtx>();
     let flow = load_flow(ctx);
+    let kata = load_kata(ctx);
 
     view! {
         <section class="screen">
@@ -164,10 +192,50 @@ pub fn Improve() -> impl IntoView {
                     }}
                     <section class="panel">
                         <h2>"Kata queue"</h2>
-                        <Planned
-                            title="The kata queue is planned".to_owned()
-                            detail="kata.open|observe|analyse|propose|measure|adopt|propagate|close are not registered actions yet (T5); the queue appears when they land, not before.".to_owned()
-                        />
+                        {move || {
+                            if !ctx.has_action("kata.list") {
+                                return view! {
+                                    <Planned
+                                        title="The kata queue is unavailable".to_owned()
+                                        detail="kata.list is not in this role's manifest; the queue appears when the action is, not before.".to_owned()
+                                    />
+                                }
+                                .into_any();
+                            }
+                            match kata.get() {
+                                None => view! { <p class="muted">"Reading the kata queue…"</p> }.into_any(),
+                                Some(Err(error)) => view! {
+                                    <ErrorPanel error=error on_retry=Callback::new(move |_| kata.refetch())/>
+                                }
+                                .into_any(),
+                                Some(Ok(items)) if items.is_empty() => view! {
+                                    <Empty message="No kata is recorded in this tenant; one opens from a coach escalation or a review finding.".to_owned()/>
+                                }
+                                .into_any(),
+                                Some(Ok(items)) => view! {
+                                    <div class="tablewrap">
+                                        <table class="table">
+                                            <thead><tr>
+                                                <th>"Signature"</th><th>"Instrument"</th><th>"Split"</th>
+                                                <th>"Status"</th><th>"Outcome"</th>
+                                            </tr></thead>
+                                            <tbody>
+                                                {items.iter().map(|row| view! {
+                                                    <tr>
+                                                        <td class="mono">{row.signature.clone()}</td>
+                                                        <td>{format!("{} {}", row.instrument_kind, row.instrument_version).trim().to_owned()}</td>
+                                                        <td><StatusPill status=row.split.clone()/></td>
+                                                        <td><StatusPill status=row.status.clone()/></td>
+                                                        <td>{row.outcome.clone().unwrap_or_else(|| "—".to_owned())}</td>
+                                                    </tr>
+                                                }).collect_view()}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                }
+                                .into_any(),
+                            }
+                        }}
                     </section>
                 }
                 .into_any()

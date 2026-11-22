@@ -126,7 +126,9 @@ use serde_json::{Value, json};
 /// **#526 (V2 shell) adds 5 internal**: the tenant-asset authoring family (SPEC_V2 §5.7/§10.4)
 /// — `authoring.intake`, `authoring.draft`, `authoring.review`, `authoring.publish` and the
 /// `authoring.assets` read. 512 → **517**.
-const EXPECTED: [&str; 517] = [
+/// **T5 (#77) adds 10 internal**: the kata loop — `kata.open|observe|analyse|propose|measure|`
+/// `adopt|propagate|close` and the `kata.get|list` reads. 517 → **527**.
+const EXPECTED: [&str; 527] = [
     "actions.describe",
     "actions.list",
     "analyse.site",
@@ -362,6 +364,16 @@ const EXPECTED: [&str; 517] = [
     "job_releases.retire",
     "jobs.list",
     "jobs.retry",
+    "kata.adopt",
+    "kata.analyse",
+    "kata.close",
+    "kata.get",
+    "kata.list",
+    "kata.measure",
+    "kata.observe",
+    "kata.open",
+    "kata.propagate",
+    "kata.propose",
     "knowledge.query",
     "labels.create",
     "labels.delete",
@@ -740,9 +752,9 @@ fn the_registry_is_exactly_the_declared_set() {
     // `lessons.propose|list`): 491 -> 495; external stays 13.
     // #526 (P) adds two internal actions (`retros.record_findings|close`), the inspect-and-adapt
     // API that had only store functions; #526 (U5c) adds `cadences.approve_plan` and
-    // `tranches.resume`; #526 (V2 shell) adds the five `authoring.*` actions:
-    // 495 -> 504; external stays 13.
-    assert_eq!((internal, external), (504, 13));
+    // `tranches.resume`; #526 (V2 shell) adds the five `authoring.*` actions and T5 adds the ten `kata.*`:
+    // 495 -> 514; external stays 13.
+    assert_eq!((internal, external), (514, 13));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),
