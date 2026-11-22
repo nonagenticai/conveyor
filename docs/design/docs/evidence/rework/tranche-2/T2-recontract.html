@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>T2 — the superseding delivery contract and its Phase-G re-review · conveyor documents</title>
+    <link rel="icon" href="../../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/tranche-2/T2-recontract.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="t2--the-superseding-delivery-contract-and-its-phase-g-re-review">T2 — the superseding delivery contract and its Phase-G re-review</h1>
+<p><strong>Recorded 2026-11-22.</strong> T2's live delivery contract <code>01a2005c-18e4-75a7-9c20-2d83728194e0</code> carries a Phase-G review at level <code>non_conformant</code> (<code>01a2005d-20eb-72af-a5de-4606c0b16008</code>). That level was honest when it was recorded: it named <code>v1-t2-1</code> (P0) — <code>documents.compose</code> attached a generated draft to a card with no gate. The P0 is fixed at <code>920a1dcb</code> with <code>crates/actions/tests/documents_compose_gate.rs</code>. A level is fixed per contract and <code>review_for_contract_tx</code> reads one review per contract, so the correction is a superseding contract with the re-review at the new head — never a second review attached to the old one.</p>
+<h2 id="what-the-re-review-records">What the re-review records</h2>
+<p><strong>Level:</strong> <code>compliant</code>, with the deviations below recorded in its findings. The policy applied is the one written in the programme plan: <code>compliant</code> when no P0 is open and no mandatory artefact is absent; <code>non_conformant</code> only for an open P0 or an absent mandatory artefact.</p>
+<p><strong>Evidence:</strong> the acceptance manifest <code>acceptance/programme/T2.toml</code> (which now asserts <code>status = "closed"</code>), the full-fidelity snapshot built from the live database, the fix commit <code>920a1dcb</code> and its test, and <code>docs/evidence/rework/tranche-2/lessons.md</code>.</p>
+<h2 id="the-deviations-carried-not-waived-away">The deviations carried, not waived away</h2>
+<table>
+<thead>
+<tr>
+<th>Finding</th>
+<th>Severity</th>
+<th>What is still true</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>v1-w1c-3</code></td>
+<td>P1</td>
+<td>L1 never calls laya: <code>ladder.evaluate</code> stamps <code>rung=laya</code> on a caller-supplied answer; no T2 path issues <code>POST /v1/systemone</code>, so the recorded L1 decision is a shape, not an inference.</td>
+</tr>
+<tr>
+<td><code>v1-w1c-4</code></td>
+<td>P1</td>
+<td>Options and questions are inline request text, not authored, versioned rows; the answer is never checked against a stored option set.</td>
+</tr>
+<tr>
+<td><code>v1-p101-1</code></td>
+<td>P1</td>
+<td>A per-step judge verdict is a second decision store beside the ladder.</td>
+</tr>
+<tr>
+<td><code>v1-t2-5</code></td>
+<td>P2</td>
+<td>The budget refusal code is <code>tool_budget_exceeded</code>, not the spec's <code>budget_exceeded</code>.</td>
+</tr>
+<tr>
+<td><code>v1-w1c-5</code></td>
+<td>P2</td>
+<td><code>fail_policy</code> and the Unavailable outcome are stored but never applied; a laya outage does not take the declared failure action.</td>
+</tr>
+<tr>
+<td><code>v1-p102-1</code></td>
+<td>P2</td>
+<td>laya's 3-second hard budget is enforced as 30 seconds.</td>
+</tr>
+<tr>
+<td><code>std-pmp-project-brief-t2</code></td>
+<td>P2</td>
+<td>The project brief is partial: the <code>Plan</code> section is missing.</td>
+</tr>
+<tr>
+<td><code>std-togaf-architecture-artifact-t2</code></td>
+<td>P2</td>
+<td>The architecture artefact is partial: <code>Metadata</code>, <code>Entries</code> and <code>Document</code> sections are missing.</td>
+</tr>
+</tbody>
+</table>
+<p>No finding above is P0. None is waived: they are recorded as deviations of a compliant implementation, which is what a TOGAF Phase-G review exists to say. The two artefact findings are the next artefact work on this project, tracked in the standards register.</p>
+<h2 id="the-chain">The chain</h2>
+<ol type="1">
+<li><code>architecture.contracts_request</code> — <code>delivery_contract</code>, phase <code>f</code>, <code>supersedes_id</code> = the old contract, body carrying this assessment.</li>
+<li><code>architecture.board_decide</code> — <code>approved</code>, <code>subject_kind = contract</code>, <code>subject_id</code> = the new contract, evidence naming the delegation.</li>
+<li><code>architecture.contracts_approve</code> — the board decision, acted by an actor other than the requester.</li>
+<li><code>architecture.reviews_record</code> — level <code>compliant</code>, the deviations above in <code>findings</code>, the manifest and snapshot in <code>evidence</code>, acted by an actor other than the requester.</li>
+</ol>
+<p>Each write is read back; the rows are cited in the tranche-2 acts record.</p>
+<h2 id="the-rows">The rows</h2>
+<table>
+<thead>
+<tr>
+<th>Act</th>
+<th>Action</th>
+<th>Row</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>superseding contract</td>
+<td><code>architecture.contracts_request</code></td>
+<td><code>01a2009a-7bce-7a8f-96fd-f5159286a09e</code> (live; <code>01a2005c</code> superseded)</td>
+</tr>
+<tr>
+<td>board decision</td>
+<td><code>architecture.board_decide</code></td>
+<td><code>01a2009a-a7fa-7a68-a539-32dc78e5a221</code> (approved, subject = the contract)</td>
+</tr>
+<tr>
+<td>contract approval</td>
+<td><code>architecture.contracts_approve</code></td>
+<td>the same contract, approved by <code>conveyor-approver</code> ≠ requester</td>
+</tr>
+<tr>
+<td>Phase-G review</td>
+<td><code>architecture.reviews_record</code></td>
+<td><code>01a2009b-0768-72c1-bba1-2a8a3a8dae59</code> (level <code>compliant</code>)</td>
+</tr>
+</tbody>
+</table>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/rework/tranche-2/T2-recontract.md</code> at build time.</span>
+      <a href="../../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>
