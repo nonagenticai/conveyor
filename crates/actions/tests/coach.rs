@@ -1502,3 +1502,86 @@ async fn a_nested_coach_run_is_refused() {
         "still exactly one coach card"
     );
 }
+
+/// v1-p6-5: a §6.2 flow input opens an interruption with no run. The producer carries its own
+/// repeat key, and the row records which input opened it — so a WIP breach no longer waits for a
+/// downstream crash to be noticed.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_flow_input_opens_an_interruption_without_a_run() {
+    let (pg, running, seeded) = fixture().await;
+    publish_processes(&running).await;
+    let (board, active, _waiting) = board_lanes(&pg, &seeded).await;
+    let card = create_card(&running, &board, &active, "feature", "over wip").await;
+
+    let (status, body) = running
+        .invoke(
+            "coach.interrupt",
+            TOKEN,
+            json!({
+                "card_id": card,
+                "trigger_kind": "wip_breach",
+                "signature": "wip_breach|active|limit:1",
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "{body}");
+    let interruption =
+        Uuid::parse_str(&text(output(&body), "interruption_id")).expect("an interruption id");
+
+    let (failed_run_id, trigger_kind, signature): (Option<Uuid>, String, String) = sqlx::query_as(
+        "SELECT failed_run_id, trigger_kind, signature FROM coach_interruption
+              WHERE tenant_id = $1 AND id = $2",
+    )
+    .bind(seeded.tenant_id)
+    .bind(interruption)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("the interruption row");
+    assert_eq!(failed_run_id, None, "a flow input carries no failed run");
+    assert_eq!(trigger_kind, "wip_breach");
+    assert_eq!(signature, "wip_breach|active|limit:1");
+
+    // The coach card and its run exist: a flow interruption is triaged like any other.
+    assert_eq!(count_cards_of_type(&pg, &seeded, &board, "coach").await, 1);
+    assert!(
+        !text(output(&body), "coach_run_id").is_empty(),
+        "the coach run starts for a flow input too: {body}"
+    );
+}
+
+/// An interruption names exactly one cause, and a flow cause carries its own repeat key.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_flow_input_must_name_its_cause_and_signature() {
+    let (pg, running, seeded) = fixture().await;
+    let (board, active, _waiting) = board_lanes(&pg, &seeded).await;
+    let card = create_card(&running, &board, &active, "feature", "no cause").await;
+
+    let (status, body) = running
+        .invoke(
+            "coach.interrupt",
+            TOKEN,
+            json!({ "card_id": card }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 400, "{body}");
+    assert_eq!(body["type"], json!("coach.no_cause"));
+
+    let (status, body) = running
+        .invoke(
+            "coach.interrupt",
+            TOKEN,
+            json!({ "card_id": card, "trigger_kind": "wip_breach" }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 400, "{body}");
+    assert_eq!(body["type"], json!("coach.no_signature"));
+}

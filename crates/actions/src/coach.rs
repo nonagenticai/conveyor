@@ -84,11 +84,25 @@ pub const WIP_PULL_KIND: &str = "wip.pull";
 
 // ── the inputs and outputs ───────────────────────────────────────────────────────────────
 
+/// The §6.2 flow inputs that are not run failures: each carries its own repeat key and no run.
+pub const FLOW_TRIGGER_KINDS: [&str; 4] =
+    ["wip_breach", "stale_lease", "gate_timeout", "board_event"];
+
 /// `coach.interrupt`.
 #[derive(Clone, Debug, Deserialize, JsonSchema)]
 pub struct CoachInterruptIn {
-    /// The failed run to coach.
-    pub run_id: Uuid,
+    /// The failed run to coach. Absent for the four flow inputs (§6.2).
+    #[serde(default)]
+    pub run_id: Option<Uuid>,
+    /// The card the interruption is about, required when `run_id` is absent.
+    #[serde(default)]
+    pub card_id: Option<Uuid>,
+    /// The flow input that opened it — one of [`FLOW_TRIGGER_KINDS`]. Absent for a failed run.
+    #[serde(default)]
+    pub trigger_kind: Option<String>,
+    /// The producer's own repeat key, required when `run_id` is absent.
+    #[serde(default)]
+    pub signature: Option<String>,
 }
 
 /// What one interruption did.
@@ -428,13 +442,21 @@ async fn apply_effect_tx(
         // The rerun guard is `process_runs.start`'s own `uq_run_live`: a retry while another
         // execution is live is refused, and the remedy is not written.
         "retry" => {
-            let failed =
-                store::run::get_run_detail_tx(&mut *tx, ctx.tenant, interruption.failed_run_id)
-                    .await
-                    .map_err(|error| store_failure("coach.remedy: read the failed run", error))?
-                    .ok_or_else(|| ActionError::resource_not_found("run"))?;
+            // §6.2 flow inputs carry no run; there is nothing to rerun, and inventing one would
+            // put a stranger's execution behind the remedy.
+            let Some(failed_run_id) = interruption.failed_run_id else {
+                return Err(ActionError::new(
+                    409,
+                    "coach.no_run",
+                    "a flow interruption has no failed run to retry",
+                ));
+            };
+            let failed = store::run::get_run_detail_tx(&mut *tx, ctx.tenant, failed_run_id)
+                .await
+                .map_err(|error| store_failure("coach.remedy: read the failed run", error))?
+                .ok_or_else(|| ActionError::resource_not_found("run"))?;
             let process_key =
-                store::run::process_key_of_run_tx(&mut *tx, ctx.tenant, interruption.failed_run_id)
+                store::run::process_key_of_run_tx(&mut *tx, ctx.tenant, failed_run_id)
                     .await
                     .map_err(|error| {
                         store_failure("coach.remedy: read the failed run's process", error)
@@ -628,23 +650,84 @@ async fn coach_interrupt(
     ctx: HandlerCtx,
     input: CoachInterruptIn,
 ) -> Result<HandlerOutput<CoachInterruptOut>, ActionError> {
-    let run = store::run::get_run_tx(&mut *tx, ctx.tenant, input.run_id)
-        .await
-        .map_err(|error| store_failure("coach.interrupt: read the run", error))?
-        .ok_or_else(|| ActionError::resource_not_found("run"))?;
-    if run.status != RunStatus::Failed {
-        return Err(ActionError::new(
-            409,
-            "coach.run_not_failed",
-            "only a failed run has an interruption to coach",
-        ));
-    }
-    let Some(interrupted_card_id) = run.card_id else {
-        return Err(ActionError::new(
-            409,
-            "coach.no_card",
-            "a project-scoped run has no card to coach",
-        ));
+    // §6.2 names four flow inputs that are not run failures. Exactly one cause is named: a
+    // failed run, or one flow trigger carrying its own card and its own repeat key.
+    let (failed_run_id, flow_trigger) = match (input.run_id, input.trigger_kind.as_deref()) {
+        (Some(run_id), None) => (Some(run_id), None),
+        (None, Some(kind)) if FLOW_TRIGGER_KINDS.contains(&kind) => (None, Some(kind.to_owned())),
+        (None, Some(kind)) => {
+            return Err(ActionError::new(
+                400,
+                "coach.trigger_unknown",
+                format!("{kind:?} is not a §6.2 flow input"),
+            ));
+        }
+        (None, None) => {
+            return Err(ActionError::new(
+                400,
+                "coach.no_cause",
+                "an interruption names a failed run or a flow trigger",
+            ));
+        }
+        (Some(_), Some(_)) => {
+            return Err(ActionError::new(
+                400,
+                "coach.two_causes",
+                "an interruption names a failed run or one flow trigger, never both",
+            ));
+        }
+    };
+    let trigger_kind = flow_trigger
+        .clone()
+        .unwrap_or_else(|| "failed_run".to_owned());
+
+    let (interrupted_card_id, error_class, process_key, failing_step) = match failed_run_id {
+        Some(run_id) => {
+            let run = store::run::get_run_tx(&mut *tx, ctx.tenant, run_id)
+                .await
+                .map_err(|error| store_failure("coach.interrupt: read the run", error))?
+                .ok_or_else(|| ActionError::resource_not_found("run"))?;
+            if run.status != RunStatus::Failed {
+                return Err(ActionError::new(
+                    409,
+                    "coach.run_not_failed",
+                    "only a failed run has an interruption to coach",
+                ));
+            }
+            let Some(card_id) = run.card_id else {
+                return Err(ActionError::new(
+                    409,
+                    "coach.no_card",
+                    "a project-scoped run has no card to coach",
+                ));
+            };
+            let process_key = store::run::process_key_of_run_tx(&mut *tx, ctx.tenant, run_id)
+                .await
+                .map_err(|error| {
+                    store_failure("coach.interrupt: read the failed run's process", error)
+                })?;
+            let failing_step = store::coach::failing_step_position_tx(&mut *tx, ctx.tenant, run_id)
+                .await
+                .map_err(|error| store_failure("coach.interrupt: read the failing step", error))?;
+            (
+                card_id,
+                run.error_class
+                    .clone()
+                    .unwrap_or_else(|| "unknown".to_owned()),
+                process_key,
+                failing_step,
+            )
+        }
+        None => {
+            let card_id = input.card_id.ok_or_else(|| {
+                ActionError::new(
+                    400,
+                    "coach.no_card",
+                    "a flow interruption names the card it is about",
+                )
+            })?;
+            (card_id, trigger_kind.clone(), None, None)
+        }
     };
     // P3: a coach card is terminal for the interruption path. The enqueue boundary refuses
     // this too; the handler refuses again so an already-queued job cannot open a second card.
@@ -672,28 +755,40 @@ async fn coach_interrupt(
     // inside the window escalates to a person, and a marker never opens a second coach card.
     // A distinct signature is always admitted (v1-p6-4).
 
-    let process_key = store::run::process_key_of_run_tx(&mut *tx, ctx.tenant, input.run_id)
-        .await
-        .map_err(|error| store_failure("coach.interrupt: read the failed run's process", error))?;
-    let failing_step = store::coach::failing_step_position_tx(&mut *tx, ctx.tenant, input.run_id)
-        .await
-        .map_err(|error| store_failure("coach.interrupt: read the failing step", error))?;
-    let error_class = run
-        .error_class
-        .clone()
-        .unwrap_or_else(|| "unknown".to_owned());
-    let signature = format!(
-        "{error_class}|{}|{}",
-        process_key.as_deref().unwrap_or("-"),
-        failing_step
-            .map(|position| position.to_string())
-            .unwrap_or_else(|| "-".to_owned())
-    );
-    let signature_parts = json!({
-        "error_class": error_class,
-        "process_key": process_key,
-        "step_position": failing_step,
-    });
+    let (signature, signature_parts) = match failed_run_id {
+        Some(_) => (
+            format!(
+                "{error_class}|{}|{}",
+                process_key.as_deref().unwrap_or("-"),
+                failing_step
+                    .map(|position| position.to_string())
+                    .unwrap_or_else(|| "-".to_owned())
+            ),
+            json!({
+                "error_class": error_class,
+                "process_key": process_key,
+                "step_position": failing_step,
+            }),
+        ),
+        None => {
+            let supplied = input
+                .signature
+                .as_deref()
+                .map(str::trim)
+                .unwrap_or_default();
+            if supplied.is_empty() {
+                return Err(ActionError::new(
+                    400,
+                    "coach.no_signature",
+                    "a flow interruption carries its own repeat key",
+                ));
+            }
+            (
+                supplied.to_owned(),
+                json!({ "trigger_kind": trigger_kind.clone(), "supplied": supplied }),
+            )
+        }
+    };
 
     let policy = policy_tx(&mut *tx, ctx.tenant).await;
     let now = Utc::now();
@@ -791,7 +886,8 @@ async fn coach_interrupt(
         &store::coach::NewInterruption {
             coach_card_id,
             interrupted_card_id,
-            failed_run_id: input.run_id,
+            failed_run_id,
+            trigger_kind: trigger_kind.clone(),
             signature,
             signature_parts,
             window_ends_at: now + policy.window,
@@ -832,7 +928,8 @@ async fn coach_interrupt(
             "interruption_id": interruption.id,
             "coach_card_id": coach_card_id,
             "interrupted_card_id": interrupted_card_id,
-            "failed_run_id": input.run_id,
+            "failed_run_id": failed_run_id,
+            "trigger_kind": trigger_kind,
             "signature": interruption.signature,
         }),
     )
