@@ -88,6 +88,11 @@ test -f "$tmp/conformance/rework.json" || {
   exit 1
 }
 
+# The live register is public: evidence quotes code and plans, and must never carry a private
+# address. Redact before it is embedded in the snapshot, so the pack and the committed register
+# are the same document. publish-standards.sh does the same for the committed-pack half.
+python3 "$root/scripts/redact-public-register.py" "$tmp/conformance/rework.json"
+
 # 3b. The FINAL snapshot carries that register (`rework.json` and `snapshot.js.rework`), and the
 #     strict gate below audits THESE bytes — not the draft's.
 "$conveyor" "${snapshot_args[@]}" --conformance "$tmp/conformance/rework.json"
