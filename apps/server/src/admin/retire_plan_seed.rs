@@ -47,11 +47,10 @@ impl RetireReport {
 ///
 /// `cards.archive` is destructive (#282, #283), so each card needs a gate naming **that card**.
 /// This command is the operator's decision — run by hand, on one tenant, against cards nothing
-/// else holds — but the gate is the engine's, so the command asks for one per card and decides
-/// it as the same service principal. What it needs from the tenant is `self_approval: allowed`
-/// for the duration, which is the narrowest setting that makes that possible: an approval is
-/// still REQUIRED for every card (and one row is written per card), only the identity of the
-/// decider is relaxed, and it is restored before the command returns.
+/// else holds — but the gate is the engine's, so the command asks for one per card and has a
+/// DISTINCT tenant member decide it (SPEC_V2 §5.4). It never writes an approval policy: the
+/// requester's exclusion is an invariant, not a permission (ledger v1-w4b-4). A tenant with no
+/// second member is refused rather than self-approved.
 pub async fn run(
     pool: &PgPool,
     tenant: TenantId,
@@ -67,22 +66,29 @@ pub async fn run(
     if scan.candidates.is_empty() {
         return Ok(report);
     }
-    let before = policy(&caller, "cards.archive").await?;
-    set_policy(&caller, "cards.archive", &before.0, "allowed").await?;
+    // §5.4: the gate's requester cannot decide it. The command therefore asks a DISTINCT active
+    // member to decide each gate; it never stores a self-approval permission (ledger v1-w4b-4).
+    let approver_id = store::identity::tenant_actor_excluding(pool, tenant, caller.actor_id())
+        .await?
+        .ok_or(RetireError::NoDistinctApprover(tenant))?;
+    let approver = ActionCaller::new_as(pool, tenant, app_key, Some(approver_id)).await?;
     for card in scan.candidates {
-        match archive_one(&caller, card.id, card.version).await {
+        match archive_one(&caller, &approver, card.id, card.version).await {
             Ok(()) => report.archived += 1,
             Err(error) => report.failed.push((card.id, error.to_string())),
         }
     }
-    // Restore what the tenant had, before the report is returned — a command that left the
-    // tenant's policy widened would be a worse defect than the one it fixed.
-    set_policy(&caller, "cards.archive", &before.0, &before.1).await?;
     Ok(report)
 }
 
-/// Open a gate for one card, approve it as this principal, and archive through the real handler.
-async fn archive_one(caller: &ActionCaller<'_>, card: Uuid, version: i64) -> Result<(), CallError> {
+/// Open a gate for one card as the caller, have the distinct approver decide it, and archive
+/// through the real handler with that approval id.
+async fn archive_one(
+    caller: &ActionCaller<'_>,
+    approver: &ActionCaller<'_>,
+    card: Uuid,
+    version: i64,
+) -> Result<(), CallError> {
     let input = json!({ "id": card });
     let gate = caller
         .call(
@@ -106,7 +112,7 @@ async fn archive_one(caller: &ActionCaller<'_>, card: Uuid, version: i64) -> Res
             status: 500,
             detail: format!("the gate carried no id: {gate}"),
         })?;
-    caller
+    approver
         .call(
             "approvals.decide",
             json!({ "approval_id": approval_id, "decision": "approve" }),
@@ -124,40 +130,19 @@ async fn archive_one(caller: &ActionCaller<'_>, card: Uuid, version: i64) -> Res
         .map(|_| ())
 }
 
-/// `(approval, self_approval)` as the tenant currently holds them for `action`.
-async fn policy(caller: &ActionCaller<'_>, action: &str) -> Result<(String, String), CallError> {
-    let policy = caller
-        .call("approval_policies.get", json!({ "action": action }), None)
-        .await?;
-    let text = |field: &str, fallback: &str| policy[field].as_str().unwrap_or(fallback).to_owned();
-    Ok((
-        text("approval", "required"),
-        text("self_approval", "forbidden"),
-    ))
-}
-
-async fn set_policy(
-    caller: &ActionCaller<'_>,
-    action: &str,
-    approval: &str,
-    self_approval: &str,
-) -> Result<(), CallError> {
-    caller
-        .call(
-            "approval_policies.set",
-            json!({ "action": action, "approval": approval, "self_approval": self_approval }),
-            None,
-        )
-        .await
-        .map(|_| ())
-}
-
 /// Why the command could not start.
 #[derive(Debug, thiserror::Error)]
 pub enum RetireError {
     /// The scan failed.
     #[error("database: {0}")]
     Database(#[from] sqlx::Error),
+    /// §5.4: the gate's requester cannot decide it, and this tenant has no second active member
+    /// to act as the distinct approver (ledger v1-w4b-4).
+    #[error(
+        "tenant {0} has no second active member to approve the archive gates; add a distinct \
+         approver (SPEC_V2 §5.4)"
+    )]
+    NoDistinctApprover(TenantId),
     /// The action caller could not be built.
     #[error(transparent)]
     Call(#[from] CallError),

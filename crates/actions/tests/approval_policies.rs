@@ -1,10 +1,11 @@
 //! #282 — the tenant decides how its destructive actions are gated, and the defaults are the
 //! strict §11.4 / §5.4 rule.
 //!
-//! The point of every test here is the same: the two settings are DATA. Nothing in the code
-//! waives an approval or allows a self-decision for a particular action name, so a tenant that
-//! sets nothing keeps the behaviour it had, and a tenant that sets something can be shown exactly
-//! what it set.
+//! `approval` is DATA: nothing in the code waives an approval for a particular action name, so a
+//! tenant that sets nothing keeps the behaviour it had, and a tenant that sets something can be
+//! shown exactly what it set. `self_approval` is the opposite — §5.4 / P4 make the requester's
+//! exclusion an invariant, so `allowed` cannot be stored and a historical `allowed` row
+//! authorises nothing (ledger v1-w4b-4).
 
 mod support;
 
@@ -211,12 +212,114 @@ async fn a_waived_policy_covers_only_its_action() {
     assert_eq!(refused.code, "approval_required");
 }
 
-/// P2.3 — §5.4's self-approval exclusion is the default, and the opt-out is a recorded policy.
+/// Write a historical `self_approval = 'allowed'` row straight to the table, as a deployment
+/// that ran before ledger v1-w4b-4 still carries one. `approval_policies.set` now refuses the
+/// value, so only SQL can model the old data the reader must keep parsing.
+async fn seed_historical_allow(pg: &support::Pg, tenant: TenantId, action: &str) {
+    let mut tx = store::scope::begin_scoped(&pg.runtime, tenant)
+        .await
+        .expect("scope the historical policy write");
+    sqlx::query(
+        "INSERT INTO approval_policy (tenant_id, action, approval, self_approval)
+         VALUES ($1, $2, 'required', 'allowed')
+         ON CONFLICT (tenant_id, action) DO UPDATE SET self_approval = 'allowed'",
+    )
+    .bind(tenant.as_uuid())
+    .bind(action)
+    .execute(&mut *tx)
+    .await
+    .expect("seed the historical policy");
+    tx.commit().await.expect("commit the historical policy");
+}
+
+/// P2.3 (ledger v1-w4b-4) — `self_approval = allowed` is unstorable, while a historical row
+/// still reads: old data must not break the reader, but it must never be writable again.
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
-async fn self_approval_is_a_policy_never_a_hardcode() {
+async fn allowed_self_approval_cannot_be_stored() {
+    let pg = support::Pg::fresh().await;
+    let seeded = support::seed(&pg, "dev-a", "alice", "Alice").await;
+
+    let refused = invoke(
+        &pg.runtime,
+        registry(),
+        seeded.tenant,
+        request_as(
+            seeded.user_id,
+            "approval_policies.set",
+            json!({"action": "ops.restart", "approval": "required", "self_approval": "allowed"}),
+            None,
+        ),
+    )
+    .await
+    .expect_err("§5.4 is an invariant, so `allowed` cannot be stored");
+    assert_eq!(refused.status, 422, "{}", refused.detail);
+    assert_eq!(refused.errors.len(), 1, "{:?}", refused.errors);
+    assert_eq!(refused.errors[0].field, "self_approval");
+    assert_eq!(refused.errors[0].code, "invalid_value");
+    assert!(
+        refused.errors[0].detail.contains("5.4"),
+        "the refusal must name SPEC_V2 §5.4: {}",
+        refused.errors[0].detail
+    );
+
+    // The refused write recorded no row: the strict default still answers.
+    let got = invoke(
+        &pg.runtime,
+        registry(),
+        seeded.tenant,
+        request_as(
+            seeded.user_id,
+            "approval_policies.get",
+            json!({"action": "ops.restart"}),
+            None,
+        ),
+    )
+    .await
+    .expect("read the default policy");
+    assert_eq!(got.body["output"]["self_approval"], json!("forbidden"));
+
+    // A row written before the invariant still parses — the compatibility that keeps old data
+    // readable, proven by this read succeeding. The answer is the invariant, and the stored
+    // value has not been rewritten; the next test proves it authorises nothing.
+    seed_historical_allow(&pg, seeded.tenant, "ops.restart").await;
+    let got = invoke(
+        &pg.runtime,
+        registry(),
+        seeded.tenant,
+        request_as(
+            seeded.user_id,
+            "approval_policies.get",
+            json!({"action": "ops.restart"}),
+            None,
+        ),
+    )
+    .await
+    .expect("a historical policy still reads");
+    assert_eq!(got.body["output"]["self_approval"], json!("forbidden"));
+
+    let mut tx = store::scope::begin_scoped(&pg.owner, seeded.tenant)
+        .await
+        .expect("scope the historical read");
+    let stored: String = sqlx::query_scalar(
+        "SELECT self_approval FROM approval_policy WHERE tenant_id = $1 AND action = $2",
+    )
+    .bind(seeded.tenant.as_uuid())
+    .bind("ops.restart")
+    .fetch_one(&mut *tx)
+    .await
+    .expect("read the historical row");
+    tx.commit().await.expect("commit the historical read");
+    assert_eq!(stored, "allowed", "the old row must not be rewritten");
+}
+
+/// P2.3 (ledger v1-w4b-4) — the requester cannot decide its own gate even when a historical
+/// policy row says `allowed`, and a distinct approver still can.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_requester_cannot_decide_its_own_gate_even_with_a_historical_allowed_row() {
     let pg = support::Pg::fresh().await;
     let seeded = support::seed(&pg, "dev-a", "alice", "Alice").await;
     let reviewer = support::reviewer_id(&pg).await;
+    seed_historical_allow(&pg, seeded.tenant, "ops.restart").await;
 
     let own = pending(&pg, seeded.tenant, "ops.restart", reviewer).await;
     let refused = invoke(
@@ -231,7 +334,7 @@ async fn self_approval_is_a_policy_never_a_hardcode() {
         ),
     )
     .await
-    .expect_err("the default forbids a self-decision");
+    .expect_err("a stored `allowed` row must not authorise a self-decision");
     assert_eq!(refused.status, 409, "{}", refused.detail);
     assert!(
         refused.detail.contains("own"),
@@ -239,46 +342,21 @@ async fn self_approval_is_a_policy_never_a_hardcode() {
         refused.detail
     );
 
-    set_policy(
-        &pg,
-        seeded.tenant,
-        seeded.user_id,
-        "ops.restart",
-        "required",
-        "allowed",
-    )
-    .await;
-    let own = pending(&pg, seeded.tenant, "ops.restart", reviewer).await;
-    invoke(
+    // A distinct person's decision is exactly what the invariant still permits.
+    let decided = invoke(
         &pg.runtime,
         registry(),
         seeded.tenant,
         request_as(
-            reviewer,
+            seeded.user_id,
             "approvals.decide",
             json!({"approval_id": own, "decision": "approve"}),
             None,
         ),
     )
     .await
-    .expect("the policy allows the requester to decide its own gate");
-
-    // The permission is per action: another action's gate is still un-decidable by its requester.
-    let other = pending(&pg, seeded.tenant, "ops.scale", reviewer).await;
-    let refused = invoke(
-        &pg.runtime,
-        registry(),
-        seeded.tenant,
-        request_as(
-            reviewer,
-            "approvals.decide",
-            json!({"approval_id": other, "decision": "approve"}),
-            None,
-        ),
-    )
-    .await
-    .expect_err("the self-approval policy names one action");
-    assert_eq!(refused.status, 409, "{}", refused.detail);
+    .expect("a distinct approver can decide the gate");
+    assert_eq!(decided.body["output"]["status"], json!("approved"));
 }
 
 /// P2.4 — `approvals.request` computes the target from the action, so no caller types it.
@@ -323,6 +401,7 @@ async fn a_request_computes_the_target_it_will_need() {
                 "kind": "gate",
                 "action": "ops.scale",
                 "input": {"namespace": "conveyor", "deployment": "conveyor", "replicas": 3},
+                "evidence_waiver_reason": "test fixture: the gate's subject is the target",
             }),
             None,
         ),
@@ -368,6 +447,7 @@ async fn a_request_computes_the_target_it_will_need() {
                 "action": "ops.scale",
                 "target": "conveyor/deployment/elsewhere/scale/3",
                 "input": {"namespace": "conveyor", "deployment": "conveyor", "replicas": 3},
+                "evidence_waiver_reason": "test fixture: the gate's subject is the target",
             }),
             None,
         ),
@@ -390,7 +470,7 @@ async fn policies_are_tenant_scoped() {
         alice.user_id,
         "ops.scale",
         "waived",
-        "allowed",
+        "forbidden",
     )
     .await;
 

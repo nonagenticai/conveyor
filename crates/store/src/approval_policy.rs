@@ -1,18 +1,22 @@
 #![forbid(unsafe_code)]
 //! How a tenant wants its destructive actions gated (conveyor#282, SPEC_V2 §10.4 / §11.4 / §5.4).
 //!
-//! Two questions per (tenant, action), and nothing else:
+//! One setting per (tenant, action):
 //!
-//! * `approval` — `required` (the default, and §11.4's rule) or `waived` (this tenant's opt-out);
-//! * `self_approval` — `forbidden` (the default, and §5.4's rule) or `allowed`.
+//! * `approval` — `required` (the default, and §11.4's rule) or `waived` (this tenant's opt-out).
+//!
+//! `self_approval` is **not** a setting: §5.4 / P4 make the requester's exclusion an invariant,
+//! so [`SelfApproval::Forbidden`] is the only storable value and no read path returns permission.
+//! The `allowed` spelling survives only so a row written before ledger v1-w4b-4 still reads; such
+//! a row is inert data.
 //!
 //! ⛔ **An absent row is the safe default, never "no policy".** Every reader in this module
 //! answers with `required` / `forbidden` when the row is missing, so a tenant that has decided
 //! nothing gets the strict behaviour it never opted out of. Only `set` writes a row.
 //!
 //! `action` is the action's own name, which is the same string `approval.gate` carries for a
-//! destructive gate — that equality is what lets the decide path read this policy for the gate it
-//! is about to resolve without any caller naming the action again.
+//! destructive gate — that equality is what lets [`waives`] read the policy for the gate it is
+//! about to admit without any caller naming the action again.
 
 use std::str::FromStr;
 
@@ -33,6 +37,14 @@ pub enum ApprovalPolicyStoreError {
         /// The stored value.
         value: String,
     },
+    /// `self_approval = allowed` was offered for storage. §5.4 / P4 make the requester's
+    /// exclusion an invariant, so `forbidden` is the only storable spelling; a historical
+    /// `allowed` row still reads (ledger v1-w4b-4).
+    #[error(
+        "self_approval cannot be `allowed`: the requester can never decide their own gate \
+         (SPEC_V2 §5.4)"
+    )]
+    SelfApprovalAllowed,
     /// The database refused the statement.
     #[error(transparent)]
     Database(#[from] sqlx::Error),
@@ -72,12 +84,15 @@ impl std::str::FromStr for ApprovalRequirement {
     }
 }
 
-/// Whether the person who requested a gate may decide it.
+/// The `self_approval` column's vocabulary. `Forbidden` is the only storable value.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum SelfApproval {
-    /// §5.4: the requester cannot decide the gate that judges their own work. The default.
+    /// §5.4 / P4: the requester cannot decide the gate that judges their own work. The default
+    /// and the only value `set` accepts.
     Forbidden,
-    /// This tenant has opted out for this action.
+    /// A **historical** value only. It exists so a row written before ledger v1-w4b-4 still
+    /// reads, and it never authorises a decision: the writer refuses a self-decision
+    /// unconditionally and [`set`] refuses to store this variant.
     Allowed,
 }
 
@@ -106,14 +121,14 @@ impl std::str::FromStr for SelfApproval {
     }
 }
 
-/// One tenant's decision about one action.
+/// A tenant's gating policy for one action.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct ApprovalPolicy {
     /// The action the policy governs.
     pub action: String,
     /// Whether the action is gated.
     pub approval: ApprovalRequirement,
-    /// Whether its requester may decide its gate.
+    /// The requester's exclusion; `Forbidden` for every policy `set` accepts.
     pub self_approval: SelfApproval,
 }
 
@@ -179,12 +194,19 @@ pub async fn list(
 }
 
 /// Insert or replace the tenant's policy for one action.
+///
+/// ⛔ `self_approval = allowed` is refused (ledger v1-w4b-4). §5.4 / P4 is an invariant, not a
+/// permission: reads still parse a historical `allowed` row, but no write may record the value,
+/// so `forbidden` is the only storable spelling.
 pub async fn set(
     conn: &mut PgConnection,
     tenant: TenantId,
     policy: &ApprovalPolicy,
     updated_by: Option<Uuid>,
 ) -> Result<ApprovalPolicy, ApprovalPolicyStoreError> {
+    if policy.self_approval == SelfApproval::Allowed {
+        return Err(ApprovalPolicyStoreError::SelfApprovalAllowed);
+    }
     sqlx::query(
         "INSERT INTO approval_policy (tenant_id, action, approval, self_approval, updated_by)
          VALUES ($1, $2, $3, $4, $5)
@@ -221,18 +243,7 @@ pub async fn waives(
     }
 }
 
-/// Whether the requester of a gate on `action` may decide it themselves. **The decide path's read.**
-///
-/// A missing row answers `false`: §5.4 is the default, not a permission.
-pub async fn allows_self_approval(
-    conn: &mut PgConnection,
-    tenant: TenantId,
-    action: &str,
-) -> Result<bool, ApprovalPolicyStoreError> {
-    match get(conn, tenant, action).await {
-        Ok(Some(policy)) => Ok(policy.self_approval == SelfApproval::Allowed),
-        Ok(None) => Ok(false),
-        Err(ApprovalPolicyStoreError::Vocabulary { .. }) => Ok(false),
-        Err(error) => Err(error),
-    }
-}
+// ⛔ There is deliberately no `allows_self_approval` reader (ledger v1-w4b-4): §5.4 / P4 is an
+// invariant, so no decision path may turn a stored row into a permission. The decision writer
+// refuses a requester's own decision unconditionally; a historical `allowed` row reads but is
+// inert. Reintroducing a permission read would reopen the finding.
