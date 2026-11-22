@@ -894,7 +894,7 @@
       "evidence": [
         {
           "path": "crates/actions/src/spine/mod.rs",
-          "line": 3262,
+          "line": 3301,
           "quote": "            state: input.state,"
         },
         {
@@ -2005,12 +2005,12 @@
       "evidence": [
         {
           "path": "crates/actions/src/spine/mod.rs",
-          "line": 2421,
+          "line": 2460,
           "quote": "            capabilities: input.capabilities.unwrap_or_else(|| serde_json::json!([])),"
         },
         {
           "path": "crates/actions/src/spine/mod.rs",
-          "line": 2426,
+          "line": 2465,
           "quote": "            operational_area: input.operational_area.unwrap_or_default(),"
         },
         {
@@ -2049,7 +2049,7 @@
         },
         {
           "path": "crates/actions/src/spine/mod.rs",
-          "line": 2521,
+          "line": 2560,
           "quote": "            output_ref: input.output_ref,"
         }
       ],
@@ -2073,7 +2073,7 @@
       "evidence": [
         {
           "path": "crates/actions/src/spine/mod.rs",
-          "line": 3262,
+          "line": 3301,
           "quote": "            state: input.state,"
         },
         {
@@ -4312,7 +4312,12 @@
       ],
       "failure_scenario": "Create an internal_agent binding that pins agent A. Start a run of a process whose step names agent B, or whose capability has one active agent B. The run executes B and records A's binding and release hash; nothing refuses or flags the divergence, and readiness checks the process's agents rather than the binding's.",
       "acceptance": "Execution resolves the capability agent through the run's job binding, or refuses a step agent that differs from the binding with a 409; a test pins A and resolves B and asserts the refusal, and every run's recorded agent equals its binding's.",
-      "owner_project": "T0"
+      "owner_project": "T0",
+      "resolved_by": {
+        "commit": "965e22294da68b395ef29c95075cda3f73d85235",
+        "test": "crates/actions/tests/process_start.rs::a_job_binding_whose_executor_differs_from_the_process_is_refused",
+        "evidence": "process_start 14 passed at the lane head: a_job_binding_whose_executor_differs_from_the_process_is_refused asserts 409 job_binding_executor_mismatch and no run row; a_job_bindings_pinned_agent_is_the_agent_that_dispatches asserts the run records the binding's capability_agent_id and the model runs as executor: binding-agent-a. The follow-up e6a67864307185183c768790f7fb9242539bd511 makes runs.create record it too: conveyor-server organisation_gate 4/4 (a_run_on_an_internal_agent_binding_records_its_pinned_agent, a_run_without_a_binding_records_no_agent) and store organisation 7 passed, including a_run_pins_its_binding_and_a_retired_or_mismatched_pin_is_refused."
+      }
     },
     {
       "id": "v1-p44-2",
@@ -4657,7 +4662,7 @@
         },
         {
           "path": "crates/actions/src/pm/mod.rs",
-          "line": 857,
+          "line": 874,
           "quote": "/// `pm.get` — the PM's view: project, charter, WBS, baselines and gates."
         },
         {
@@ -5232,7 +5237,7 @@
         },
         {
           "path": "apps/web/e2e/helpers.ts",
-          "line": 180,
+          "line": 267,
           "quote": "    \"projects.create\","
         }
       ],
@@ -5267,7 +5272,12 @@
       ],
       "failure_scenario": "A tranche continues on evidence that no revision can reproduce; the gate is green because the object is non-empty, not because the record was judged.",
       "acceptance": "A tranche review is refused unless its evidence names the snapshot it judged (snapshot_sha or snapshot.git_sha, 40-hex), and a test proves the refusal and the accepted form.",
-      "owner_project": "T1"
+      "owner_project": "T1",
+      "resolved_by": {
+        "commit": "c206bedd979051f3e5356653ebfb262f15e4eae3",
+        "test": "crates/actions/tests/spine_gates.rs::a_tranche_review_without_a_snapshot_identity_is_refused",
+        "evidence": "spine_gates 20 passed at the lane head: the refusal is 422 tranche_review_unpinned naming snapshot_sha; a_tranche_review_records_the_snapshot_it_judged proves the accepted form and normalises the nested snapshot.git_sha into the flat key on the row. plan_spine 19, spine_msp 10 and write_path 20 passed in the same run."
+      }
     },
     {
       "id": "v1-project-1",
@@ -5280,7 +5290,7 @@
       "evidence": [
         {
           "path": "crates/actions/src/board/projects.rs",
-          "line": 520,
+          "line": 537,
           "quote": "    Ok(project_view(&project, &boards))"
         },
         {
@@ -5291,7 +5301,12 @@
       ],
       "failure_scenario": "A delivery consumer watching project events never learns a project closed; the record says closed and the consumer's view does not.",
       "acceptance": "projects.close appends one project.updated (or project.closed) event in the same transaction, and a test asserts the event, its type and its aggregate id.",
-      "owner_project": "PLATFORM"
+      "owner_project": "PLATFORM",
+      "resolved_by": {
+        "commit": "69d942d5e67b717dc59313a168ca3e3242a66240",
+        "test": "crates/actions/tests/closure_gate.rs::a_close_appends_one_project_updated_event",
+        "evidence": "closure_gate 12 passed at the lane head; the close appends exactly one project.updated on topic project:<id> with changed [\"status\"] in the close transaction, and the 404/409/gate/concurrent paths append none. The PM half is eda6642efc2492f209d294997844bed92f334768: conveyor-api pm_close_gate 4 passed, including a_project_closes_only_after_the_closure_gate, which asserts the same event on the pm.close path."
+      }
     },
     {
       "id": "v1-close-1",
@@ -5339,7 +5354,12 @@
       ],
       "failure_scenario": "An operator confirms a destructive action in the console; the request is refused 422 for missing evidence, and the UI shows a failure with no way to supply evidence or a waiver.",
       "acceptance": "The console's destructive gate request sends the gate's evidence or an explicit operator-entered evidence waiver reason, and a test asserts the payload plus a refused-without / accepted-with path; no silent hard-coded waiver.",
-      "owner_project": "PLATFORM"
+      "owner_project": "PLATFORM",
+      "resolved_by": {
+        "commit": "885f15fc06fb8d890c6595d1f1dfd9e4d8d1a641",
+        "test": "apps/web/e2e/destructive.spec.ts::a reason retries the gate request exactly once with the waiver",
+        "evidence": "The console bridge (cca52774423ba28cdf4e365b1505762241f86100) asks the operator on exactly the 422 gate_evidence_missing refusal and retries the same request once with evidence_waiver_reason; the spec asserts the payload and both paths, plus a_cancelled waiver prompt surfaces the refusal and opens no gate and a_blank waiver reason is refused and never sent. The e2e suite runs in the PR's web CI; the browser run is not claimed locally. #572 tracks the typed picker that replaces the wording-coupled detection."
+      }
     },
     {
       "id": "v1-manif-2",
@@ -5372,12 +5392,12 @@
         },
         {
           "path": "scripts/verify-project.py",
-          "line": 505,
+          "line": 502,
           "quote": "    if not pi:"
         },
         {
           "path": "scripts/verify-project.py",
-          "line": 564,
+          "line": 599,
           "quote": "        if lesson.get(\"cadence_id\") in retro_ids"
         }
       ],
@@ -5433,6 +5453,45 @@
         "test": "scripts/verify-project.py",
         "evidence": "The five checks now resolve their property: benefit_baseline requires a structured measurement (value, unit, measured_at, method, evidence) and refuses strings; wsjf requires all four inputs present as JSON integers with job_size >= 1 and not all values zero; demo_credits refuses placeholder evidence; _published_for_period requires published_at and a whole-token tranche match; product_findings fails a register without packages, fails an ownerless open P0, and matches the owner by key or project id. Self-test green with one crafted failing case per rule (benefit-string-baseline, wsjf-missing-input, credit-placeholder-evidence, pi-plan-draft-tranche-40, no-packages). On the branch-built snapshot the programme stays 12 green / 35 red — the rigour binds as records arrive."
       }
+    },
+    {
+      "id": "v1-approvals-route-1",
+      "area": "approvals routing / interaction dispatch",
+      "standard": "SPEC",
+      "spec": "§5.4",
+      "severity": "P1",
+      "title": "The multicast offer cannot carry a question's answer or the delegation",
+      "problem": "`interaction.dispatch` already multicasts a pending approval to the web inbox and Telegram, and `record_decision_tx` locks the row so the first decision wins and a second is refused, but the offer shape only knows approve/reject: `pending_approvals_tx` selects the description and proposed answer and not `meta.requires_answer`, `interaction_text` advertises only `reply: approve … | reject …`, the MCP `input_request` builds an approved/rejected enum with `meta: None` (so `_meta.delegation_ref` is dropped and there is no answer field), and neither `ApprovalOut` carries the flag, so the web UI cannot know the note is mandatory. A run-scoped free-text question therefore cannot be answered truthfully on any offered surface: an empty answer is refused 422 by the one decision writer, and a surface that does send text has no way to carry the rule delegation.",
+      "evidence": [
+        {
+          "path": "crates/store/src/interaction.rs",
+          "line": 61,
+          "quote": "                meta->>'proposed_answer' AS proposed_answer"
+        },
+        {
+          "path": "crates/store/src/interaction.rs",
+          "line": 243,
+          "quote": "        \"\\nreply: approve {} [note] | reject {} [note]\","
+        },
+        {
+          "path": "crates/actions/src/mcp/tasks.rs",
+          "line": 154,
+          "quote": "            meta: None,"
+        },
+        {
+          "path": "crates/actions/src/control/views.rs",
+          "line": 407,
+          "quote": "pub struct ApprovalOut {"
+        },
+        {
+          "path": "apps/web/src/models.rs",
+          "line": 380,
+          "quote": "pub struct ApprovalOut {"
+        }
+      ],
+      "failure_scenario": "A run-scoped question opens with `requires_answer`: the web inbox and Telegram offer it as approve/reject with no answer form, MCP offers an approved/rejected enum carrying no delegation, and the approvals screen has no note input because the flag is absent from the view. An approver answers in prose; the decision either records no note (refused 422 `note/missing`, unactionable from that surface) or records the decision without the delegation ref, so the answer and its authority never reach the record.",
+      "acceptance": "A run-scoped free-text question is offered to web, Telegram and MCP; the first decision resolves it; a second decision on any surface is refused 409; the MCP answer records exactly one decision as `rule` with the delegation ref and the note; no surface claims a human. An explicitly quorumed gate (required_decisions > 1) keeps its opt-in dual-control semantics; only the default quorum-1 gate resolves on the first response.",
+      "owner_project": "S06"
     }
   ]
 }
