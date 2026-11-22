@@ -71,6 +71,7 @@ import hashlib
 import json
 import os
 import re
+import subprocess
 import sys
 import tempfile
 import urllib.error
@@ -574,66 +575,168 @@ def check_journal(path: Path) -> tuple[list[Entry], list[str]]:
     return entries, errors
 
 
-# ── HTTP action client (the small urllib shape of scripts/seed-adr-register.py) ─────────
+# ── action transports ───────────────────────────────────────────────────────────────────
 
 
 class ActionClient:
-    """The one action endpoint: ``POST /api/actions/<name>/invocations``."""
+    """The one action endpoint: ``POST /api/actions/<name>/invocations``.
+
+    The body is the invoke boundary's envelope, not the bare input:
+    ``{"input": …, "approval_id": …}`` (``crates/api/src/actions.rs::parse_body``).  The
+    ``approval_id`` is a property of the call, never of the action's input, and it is what makes
+    a gated action (a tranche review, a destructive close) callable at all.
+    """
 
     def __init__(
         self,
         url: str,
         token: str | None = None,
-        app_key: str | None = None,
         timeout: float = 60.0,
     ) -> None:
         if not url:
             raise PromoteError("--apply requires --url or CONVEYOR_URL")
-        if not token and not app_key:
-            raise PromoteError(
-                "--apply requires --token or --app-key (or their env vars)"
-            )
+        if not token:
+            raise PromoteError("--apply over HTTP requires --token (or CONVEYOR_TOKEN)")
         base = url.rstrip("/")
         if not base.endswith("/api"):
             base += "/api"
         self.base = base
         self.token = token
-        self.app_key = app_key
         self.timeout = timeout
 
+    def build_body(self, payload: dict, approval_id: str | None = None) -> dict:
+        """The invoke boundary's envelope: the input, and the call's gate when there is one."""
+        body: dict[str, Any] = {"input": payload}
+        if approval_id:
+            body["approval_id"] = approval_id
+        return body
+
     def invoke(
-        self, action: str, payload: dict, if_match: int | None = None
+        self,
+        action: str,
+        payload: dict,
+        if_match: int | None = None,
+        approval_id: str | None = None,
     ) -> Any:
         endpoint = f"{self.base}/actions/{action}/invocations"
         request = urllib.request.Request(
             endpoint,
             data=json.dumps(
-                payload, separators=(",", ":"), ensure_ascii=False
+                self.build_body(payload, approval_id),
+                separators=(",", ":"),
+                ensure_ascii=False,
             ).encode("utf-8"),
             method="POST",
             headers={"Content-Type": "application/json", "Accept": "application/json"},
         )
-        if self.token:
-            request.add_header("Authorization", f"Bearer {self.token}")
-        if self.app_key:
-            request.add_header("X-App-Key", self.app_key)
+        request.add_header("Authorization", f"Bearer {self.token}")
         if if_match is not None:
             request.add_header("If-Match", f'"{if_match}"')
         try:
             with urllib.request.urlopen(request, timeout=self.timeout) as response:
-                body = response.read().decode("utf-8")
+                text = response.read().decode("utf-8")
         except urllib.error.HTTPError as error:
             detail = error.read().decode("utf-8", "replace")
             raise PromoteError(f"{action}: HTTP {error.code}: {detail[:2000]}") from None
         except (urllib.error.URLError, OSError) as error:
             raise PromoteError(f"{action}: cannot reach {endpoint}: {error}") from None
         try:
-            envelope = json.loads(body)
+            envelope = json.loads(text)
         except ValueError:
-            raise PromoteError(f"{action}: response is not JSON: {body[:500]!r}") from None
+            raise PromoteError(f"{action}: response is not JSON: {text[:500]!r}") from None
         if isinstance(envelope, dict) and "output" in envelope:
             return envelope["output"]
         return envelope
+
+
+class LocalActionClient:
+    """Invoke actions through the branch binary's admin CLI.
+
+    This is the record's own transport (``programme-record.py``): the action layer runs inside
+    the binary the record was written with, against ``DATABASE_MIGRATE_URL``, so no HTTP
+    authentication stands between the replay and the actions.  stdin is the action's input —
+    except for an action whose input itself carries an ``input`` key (``approvals.request``),
+    which the CLI would read as its envelope, so it is wrapped.
+    """
+
+    def __init__(
+        self,
+        binary: str,
+        tenant: str = "nonagentic",
+        timeout: float = 300.0,
+    ) -> None:
+        if not binary:
+            raise PromoteError("--apply requires --local-bin PATH")
+        self.binary = binary
+        self.tenant = tenant
+        self.timeout = timeout
+
+    def build(
+        self,
+        action: str,
+        approval_id: str | None = None,
+        if_match: int | None = None,
+    ) -> list[str]:
+        args = [
+            self.binary,
+            "admin",
+            "action",
+            "invoke",
+            "--tenant",
+            self.tenant,
+            "--name",
+            action,
+            "--input",
+            "/dev/stdin",
+        ]
+        if approval_id:
+            args += ["--approval-id", str(approval_id)]
+        if if_match is not None:
+            args += ["--if-match", str(if_match)]
+        return args
+
+    def build_stdin(self, payload: dict) -> str:
+        """The action input on stdin, wrapped only where the CLI would read an envelope."""
+        if isinstance(payload, dict) and "input" in payload:
+            return json.dumps(
+                {"input": payload}, separators=(",", ":"), ensure_ascii=False
+            ) + "\n"
+        return json.dumps(payload, separators=(",", ":"), ensure_ascii=False) + "\n"
+
+    def invoke(
+        self,
+        action: str,
+        payload: dict,
+        if_match: int | None = None,
+        approval_id: str | None = None,
+    ) -> Any:
+        stdin = self.build_stdin(payload)
+        environment = dict(os.environ)
+        environment.setdefault("RUST_LOG", "error")
+        try:
+            completed = subprocess.run(
+                self.build(action, approval_id=approval_id, if_match=if_match),
+                input=stdin,
+                capture_output=True,
+                text=True,
+                encoding="utf-8",
+                errors="replace",
+                env=environment,
+                timeout=self.timeout,
+            )
+        except (OSError, subprocess.TimeoutExpired) as error:
+            raise PromoteError(f"{action}: cannot run {self.binary}: {error}") from None
+        if completed.returncode != 0:
+            detail = (completed.stderr or completed.stdout or "").strip()
+            raise PromoteError(
+                f"{action}: transport exited {completed.returncode}: {detail[:2000]}"
+            )
+        try:
+            return json.loads(completed.stdout)
+        except ValueError:
+            raise PromoteError(
+                f"{action}: transport output is not JSON: {completed.stdout[:500]!r}"
+            ) from None
 
 
 def page_items(output: Any) -> list[dict]:
@@ -1636,6 +1739,7 @@ def build_promotion(
     journal_path: Path,
     url: str | None,
     snapshot: str | None,
+    local_bin: str | None = None,
 ) -> dict:
     verdicts = {}
     for outcome in outcomes:
@@ -1648,7 +1752,7 @@ def build_promotion(
             "sha256": hashlib.sha256(journal_path.read_bytes()).hexdigest(),
             "entries": len(entries),
         },
-        "target": {"url": url, "snapshot": snapshot},
+        "target": {"url": url, "snapshot": snapshot, "local_bin": local_bin},
         "map": {key: id_map[key] for key in sorted(id_map)},
         "entries": [
             {
@@ -1694,7 +1798,7 @@ class FakeClient:
 
     def __init__(self, state: State, unreadable: set[str] | None = None) -> None:
         self.state = state
-        self.calls: list[tuple[str, dict, int | None]] = []
+        self.calls: list[tuple[str, dict, int | None, str | None]] = []
         self.unreadable = unreadable or set()
         self.counter = 0
 
@@ -1716,8 +1820,16 @@ class FakeClient:
             ]
         return [copy.deepcopy(row) for row in selected]
 
-    def invoke(self, action: str, payload: dict, if_match: int | None = None) -> Any:
-        self.calls.append((action, copy.deepcopy(payload), if_match))
+    def invoke(
+        self,
+        action: str,
+        payload: dict,
+        if_match: int | None = None,
+        approval_id: str | None = None,
+    ) -> Any:
+        self.calls.append(
+            (action, copy.deepcopy(payload), if_match, approval_id)
+        )
         if action == "registers.list":
             return {"items": self._rows(self.state.registers, payload)}
         if action == "benefits.list":
@@ -2089,6 +2201,13 @@ def self_test() -> int:
         if not condition:
             raise AssertionError(message)
 
+    def refused(call) -> bool:
+        try:
+            call()
+        except PromoteError:
+            return True
+        return False
+
     full = ("risk", "benefit", "change", "approval", "fields", "status")
     with tempfile.TemporaryDirectory(prefix="promote-record-self-test-") as tmp:
         root = Path(tmp)
@@ -2164,7 +2283,7 @@ def self_test() -> int:
             f"{[(o.entry.natural_key, o.verdict, o.detail) for o in outcomes]}",
         )
         gate_decision = [
-            payload for action, payload, _ in client.calls
+            payload for action, payload, _, _ in client.calls
             if action == "approvals.decide"
         ][-1]
         ok(
@@ -2172,7 +2291,7 @@ def self_test() -> int:
             "approvals.decide is invoked with the production gate id",
         )
         update_call = [
-            payload for action, payload, _ in client.calls
+            payload for action, payload, _, _ in client.calls
             if action == "benefits.update"
         ][0]
         ok(
@@ -2248,7 +2367,7 @@ def self_test() -> int:
             "the move resolved the production done lane by kind, not by id",
         )
         request_call = [
-            payload for action, payload, _ in client.calls
+            payload for action, payload, _, _ in client.calls
             if action == "approvals.request"
         ][0]
         ok(
@@ -2417,6 +2536,39 @@ def self_test() -> int:
         _, third = apply_entries(FakeClient(state), create_entries, state, None)
         ok([o.verdict for o in third] == ["skipped"], f"a create replay skips: {third}")
 
+    # Transport: the HTTP envelope and the admin CLI's argv/stdin are what the boundary reads.
+    http = ActionClient("http://127.0.0.1:1", token="t")
+    ok(http.build_body({"id": "x"}) == {"input": {"id": "x"}},
+       "the HTTP body wraps the action input")
+    ok(
+        http.build_body({"id": "x"}, "a-approval")
+        == {"input": {"id": "x"}, "approval_id": "a-approval"},
+        "an approval is a property of the call, not of the input",
+    )
+    ok(
+        refused(lambda: ActionClient("http://127.0.0.1:1")),
+        "HTTP apply refuses a client with no bearer token",
+    )
+    ok(refused(lambda: LocalActionClient("")),
+       "the local transport requires a binary")
+    local = LocalActionClient("/tmp/conveyor-test", tenant="t")
+    ok(
+        local.build("tranches.review", approval_id="a", if_match=3)
+        == [
+            "/tmp/conveyor-test", "admin", "action", "invoke", "--tenant", "t",
+            "--name", "tranches.review", "--input", "/dev/stdin",
+            "--approval-id", "a", "--if-match", "3",
+        ],
+        "the local transport names the action, the gate and the precondition",
+    )
+    ok(local.build_stdin({"id": "x"}) == '{"id":"x"}\n',
+       "an ordinary input goes on stdin bare")
+    ok(
+        local.build_stdin({"gate": "g", "input": {"id": "x"}})
+        == '{"input":{"gate":"g","input":{"id":"x"}}}\n',
+        "an input carrying its own input key is wrapped for the CLI",
+    )
+
     print(f"self-test: {checks} checks passed (offline; no network, no database)")
     return 0
 
@@ -2458,7 +2610,12 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--output", default=DEFAULT_PROMOTION)
     parser.add_argument("--url", default=os.environ.get("CONVEYOR_URL"))
     parser.add_argument("--token", default=os.environ.get("CONVEYOR_TOKEN"))
-    parser.add_argument("--app-key", default=os.environ.get("CONVEYOR_APP_KEY"))
+    parser.add_argument(
+        "--local-bin",
+        default=os.environ.get("PROGRAMME_RECORD_LOCAL_BIN"),
+        help="run the actions in this branch binary (its DATABASE_MIGRATE_URL), not over HTTP",
+    )
+    parser.add_argument("--tenant", default=os.environ.get("TENANT") or "nonagentic")
     parser.add_argument(
         "--snapshot",
         default=os.environ.get("CONVEYOR_SNAPSHOT"),
@@ -2491,12 +2648,16 @@ def main(argv: list[str] | None = None) -> int:
         print(f"check: {len(entries)} entries ({summary(entries)}); journal is well formed")
         return 0
 
-    if not args.url:
-        print("error: --apply requires --url or CONVEYOR_URL", file=sys.stderr)
-        return 1
-    if not args.token and not args.app_key:
-        print("error: --apply requires --token or --app-key", file=sys.stderr)
-        return 1
+    if not args.local_bin:
+        if not args.url:
+            print(
+                "error: --apply requires --local-bin PATH, or --url with --token",
+                file=sys.stderr,
+            )
+            return 1
+        if not args.token:
+            print("error: --apply over HTTP requires --token", file=sys.stderr)
+            return 1
     needs_snapshot = any(entry.action == "benefits.measure" for entry in entries)
     snapshot = args.snapshot
     if needs_snapshot and not snapshot:
@@ -2507,8 +2668,12 @@ def main(argv: list[str] | None = None) -> int:
         )
         return 1
 
-    client = ActionClient(args.url, token=args.token, app_key=args.app_key,
-                          timeout=args.timeout)
+    if args.local_bin:
+        client: Any = LocalActionClient(
+            args.local_bin, tenant=args.tenant, timeout=args.timeout
+        )
+    else:
+        client = ActionClient(args.url, token=args.token, timeout=args.timeout)
     snapshot_document = None
     if snapshot:
         try:
@@ -2526,7 +2691,8 @@ def main(argv: list[str] | None = None) -> int:
         return 1
 
     document = build_promotion(
-        entries, id_map, outcomes, journal_path, args.url, snapshot
+        entries, id_map, outcomes, journal_path, args.url, snapshot,
+        local_bin=args.local_bin,
     )
     output_path = resolve_path(args.output)
     write_promotion(output_path, document)
