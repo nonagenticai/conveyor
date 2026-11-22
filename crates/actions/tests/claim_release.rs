@@ -114,6 +114,31 @@ async fn a_cancelled_call_releases_its_claim() {
     support::set_env("CONVEYOR_EXTERNAL_IMAGE_GEN_URL", &base);
     let key = "cancelled-call";
 
+    // The claim is an INSERT inside the future under test, so an observer proves it existed
+    // BEFORE the caller walks away. Without this the release assertion below could pass on a row
+    // that was never written, and the test would prove nothing.
+    let observed = std::sync::Arc::new(std::sync::atomic::AtomicBool::new(false));
+    let watcher = {
+        let pool = pg.super_pool.clone();
+        let observed = observed.clone();
+        let key = key.to_owned();
+        tokio::spawn(async move {
+            for _ in 0..100 {
+                let rows: i64 =
+                    sqlx::query_scalar("SELECT count(*) FROM idempotency_key WHERE key = $1")
+                        .bind(&key)
+                        .fetch_one(&pool)
+                        .await
+                        .unwrap_or(0);
+                if rows > 0 {
+                    observed.store(true, std::sync::atomic::Ordering::SeqCst);
+                    return;
+                }
+                tokio::time::sleep(Duration::from_millis(20)).await;
+            }
+        })
+    };
+
     let invocation = conveyor_actions::invoke(
         &pg.runtime,
         registry(),
@@ -124,6 +149,11 @@ async fn a_cancelled_call_releases_its_claim() {
     assert!(
         abandoned.is_err(),
         "the caller gave up before the host answered"
+    );
+    watcher.await.expect("the observer task");
+    assert!(
+        observed.load(std::sync::atomic::Ordering::SeqCst),
+        "the claim was never observed, so this test proves nothing about releasing it"
     );
 
     // The guard's release runs on a spawned task, so the assertion polls rather than sleeps once.

@@ -1182,6 +1182,7 @@ async fn invoke_external(
             elapsed,
         )
         .await;
+        settle_claim(&claim_settled);
         return Err(ActionError::circuit_open(spec.name));
     }
 
@@ -1202,6 +1203,7 @@ async fn invoke_external(
             elapsed,
         )
         .await;
+        settle_claim(&claim_settled);
         return Err(ActionError::unconfigured(service));
     };
     let url = format!("{}{}", base.trim_end_matches('/'), path);
@@ -1243,6 +1245,7 @@ async fn invoke_external(
                         elapsed,
                     )
                     .await;
+                    settle_claim(&claim_settled);
                     return Err(ActionError::unconfigured(service));
                 }
             }
@@ -1361,11 +1364,6 @@ async fn invoke_external(
             if breaker {
                 breaker_record_failure(ctx.tenant, spec.name, Instant::now());
             }
-            // A failure the engine observes releases the claim itself (`record_failure`), so the
-            // guard is disarmed first: it must never delete a row a retry has already re-claimed.
-            if let Some(settled) = &settled {
-                settled.store(true, Ordering::SeqCst);
-            }
             record_failure(
                 pool,
                 spec,
@@ -1377,6 +1375,10 @@ async fn invoke_external(
                 elapsed,
             )
             .await;
+            // AFTER the recorder: `record_failure` releases the claim itself, so disarming first
+            // would leave the row behind if this future is dropped mid-recorder. A late duplicate
+            // delete is the harmless side, and this ordering has none.
+            settle_claim(&settled);
             Err(error)
         }
     };
@@ -1690,6 +1692,13 @@ async fn record_bookkeeping(
         }
     }
     Ok(invocation_id)
+}
+
+/// Disarm a claim guard on a path where the engine itself has released the row.
+fn settle_claim(settled: &Option<Arc<AtomicBool>>) {
+    if let Some(flag) = settled {
+        flag.store(true, Ordering::SeqCst);
+    }
 }
 
 /// Releases an un-settled idempotency claim when the invocation future is dropped (#577).
