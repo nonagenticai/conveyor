@@ -5282,6 +5282,30 @@
       "failure_scenario": "A delivery consumer watching project events never learns a project closed; the record says closed and the consumer's view does not.",
       "acceptance": "projects.close appends one project.updated (or project.closed) event in the same transaction, and a test asserts the event, its type and its aggregate id.",
       "owner_project": "PLATFORM"
+    },
+    {
+      "id": "v1-close-1",
+      "area": "projects.close / artefact gate",
+      "standard": "SPEC",
+      "spec": "§5.4",
+      "severity": "P1",
+      "title": "A project can close while its manifest is red: the close gate never reads the artefact standard",
+      "problem": "assert_project_can_close checks the declared closure outputs, the tranche authorisation and the closure decision, but not the project's mandatory artefact set or its open P0 findings. S03 and T2 closed through the gate and were red at the next snapshot, owning open change-control P0 packages. The rule 'no project closes on a red manifest' exists only in the verifier, so a closure can pass and turn red when the record grows.",
+      "evidence": [
+        {
+          "path": "crates/actions/src/programme.rs",
+          "line": 399,
+          "quote": "pub(crate) async fn assert_project_can_close("
+        },
+        {
+          "path": "crates/actions/src/programme.rs",
+          "line": 404,
+          "quote": "    assert_closure_outputs_published(&mut *tx, tenant, project_id).await?;"
+        }
+      ],
+      "failure_scenario": "A project closes while owning an open P0 artefact package; the record says closed, the audit says red, and nothing in the close path noticed.",
+      "acceptance": "projects.close refuses a project whose mandatory artefact set is incomplete or which owns an open P0 finding/package, reading the artefact standard and the findings directly (never a generated register file), with a test proving the refusal and the green path; the verifier remains the evidence.",
+      "owner_project": "PLATFORM"
     }
   ]
 }
