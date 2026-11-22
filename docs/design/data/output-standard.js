@@ -28,6 +28,7 @@ window.CONVEYOR_OUTPUT_STANDARD = {
     "adm-profile",
     "artifact-standard",
     "architecture-artifact",
+    "architecture-artifact-instance",
     "statement-of-architecture-work",
     "compliance-review",
     "waiver",
@@ -1018,9 +1019,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
         ],
         "Links": [
           {
-            "kind": "rows",
-            "file": "architecture.json",
-            "pointer": "/links"
+            "kind": "computed",
+            "name": "project_artifact_links"
           }
         ],
         "Document": [
@@ -1032,6 +1032,47 @@ window.CONVEYOR_OUTPUT_STANDARD = {
               "category": "architecture-artifact",
               "scope": "subject"
             }
+          }
+        ]
+      }
+    },
+    "architecture-artifact-instance": {
+      "required": [
+        "Metadata",
+        "Entries",
+        "Links",
+        "Document"
+      ],
+      "optional": [],
+      "skeleton": "# Architecture artefact\n\nOne typed TOGAF artefact — a catalog, a matrix or a diagram — as its own record, with the metadata that identifies it, the entries that make it queryable, the links that place it in the repository, and the document or contract it sits under. The catalogue's `architecture-artifact` page is the project's index; this page is the artefact itself.\n\n## Metadata\n\nThe artefact's type, title, version, status, phase, plateau and related change initiative. A reviewer can tell what it is and whether it has been approved without opening the document.\n\n## Entries\n\nThe catalogue items (one axis) or matrix cells (two axes) the artefact carries. A catalog is queryable and a matrix is joinable because these are rows, not a picture.\n\n## Links\n\nWhat this artefact derives from, realizes, reuses or depends on. These edges are the architecture repository's trace; an artefact with no link is an orphan.\n\n## Document\n\nThe published document or contract the artefact sits under. A typed artefact without a document is metadata about something a reader cannot inspect.\n",
+      "standard": "TOGAF",
+      "level": "project",
+      "subject_kind": "artifact",
+      "mandatory": true,
+      "spec": "§8.1",
+      "sources": {
+        "Metadata": [
+          {
+            "kind": "computed",
+            "name": "artifact_metadata"
+          }
+        ],
+        "Entries": [
+          {
+            "kind": "computed",
+            "name": "artifact_entries"
+          }
+        ],
+        "Links": [
+          {
+            "kind": "computed",
+            "name": "artifact_links"
+          }
+        ],
+        "Document": [
+          {
+            "kind": "computed",
+            "name": "artifact_document"
           }
         ]
       }
@@ -1060,7 +1101,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             "pointer": "/contracts",
             "match": {
               "kind": "statement_of_architecture_work",
-              "phase_code": "a"
+              "phase_code": "a",
+              "project_id": "$subject_id"
             }
           }
         ],
@@ -1071,7 +1113,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             "pointer": "/contracts",
             "match": {
               "kind": "statement_of_architecture_work",
-              "phase_code": "a"
+              "phase_code": "a",
+              "project_id": "$subject_id"
             }
           }
         ],
@@ -1082,7 +1125,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             "pointer": "/contracts",
             "match": {
               "kind": "statement_of_architecture_work",
-              "phase_code": "a"
+              "phase_code": "a",
+              "project_id": "$subject_id"
             }
           }
         ],
@@ -1093,7 +1137,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             "pointer": "/contracts",
             "match": {
               "kind": "statement_of_architecture_work",
-              "phase_code": "a"
+              "phase_code": "a",
+              "project_id": "$subject_id"
             }
           }
         ],
@@ -1104,7 +1149,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             "pointer": "/contracts",
             "match": {
               "kind": "statement_of_architecture_work",
-              "phase_code": "a"
+              "phase_code": "a",
+              "project_id": "$subject_id"
             }
           }
         ]
@@ -1131,6 +1177,7 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             "kind": "rows",
             "file": "architecture.json",
             "pointer": "/compliance_reviews",
+            "optional": true,
             "match": {
               "project_id": "$subject_id"
             }
@@ -1141,6 +1188,7 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             "kind": "rows",
             "file": "architecture.json",
             "pointer": "/compliance_reviews",
+            "optional": true,
             "match": {
               "project_id": "$subject_id"
             }
@@ -1151,6 +1199,7 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             "kind": "rows",
             "file": "architecture.json",
             "pointer": "/waivers",
+            "optional": true,
             "match": {
               "project_id": "$subject_id"
             }
@@ -1161,6 +1210,7 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             "kind": "rows",
             "file": "architecture.json",
             "pointer": "/compliance_reviews",
+            "optional": true,
             "match": {
               "project_id": "$subject_id"
             }
@@ -1188,6 +1238,7 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             "kind": "rows",
             "file": "architecture.json",
             "pointer": "/waivers",
+            "optional": true,
             "match": {
               "project_id": "$subject_id"
             }
@@ -1198,6 +1249,7 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             "kind": "rows",
             "file": "architecture.json",
             "pointer": "/waivers",
+            "optional": true,
             "match": {
               "project_id": "$subject_id"
             }
@@ -1208,6 +1260,7 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             "kind": "rows",
             "file": "architecture.json",
             "pointer": "/waivers",
+            "optional": true,
             "match": {
               "project_id": "$subject_id"
             }
@@ -1218,6 +1271,7 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             "kind": "rows",
             "file": "architecture.json",
             "pointer": "/waivers",
+            "optional": true,
             "match": {
               "project_id": "$subject_id"
             }
@@ -1430,7 +1484,18 @@ window.CONVEYOR_OUTPUT_STANDARD = {
       "subject_kind": "programme",
       "mandatory": true,
       "spec": "§8.3",
+      "document_category": "programme-strategies",
       "sources": {
+        "Information strategy": [
+          {
+            "kind": "rows",
+            "file": "artefacts.json",
+            "pointer": "/governed_assets",
+            "match": {
+              "kind": "information_strategy"
+            }
+          }
+        ],
         "Risk strategy": [
           {
             "kind": "rows",
@@ -1448,6 +1513,46 @@ window.CONVEYOR_OUTPUT_STANDARD = {
             "pointer": "/register_items",
             "match": {
               "kind": "issue"
+            }
+          }
+        ],
+        "Monitoring strategy": [
+          {
+            "kind": "rows",
+            "file": "artefacts.json",
+            "pointer": "/governed_assets",
+            "match": {
+              "kind": "monitoring_strategy"
+            }
+          }
+        ],
+        "Communications strategy": [
+          {
+            "kind": "rows",
+            "file": "artefacts.json",
+            "pointer": "/governed_assets",
+            "match": {
+              "kind": "communications_strategy"
+            }
+          }
+        ],
+        "Quality strategy": [
+          {
+            "kind": "rows",
+            "file": "artefacts.json",
+            "pointer": "/governed_assets",
+            "match": {
+              "kind": "quality_strategy"
+            }
+          }
+        ],
+        "Resource strategy": [
+          {
+            "kind": "rows",
+            "file": "artefacts.json",
+            "pointer": "/governed_assets",
+            "match": {
+              "kind": "resource_strategy"
             }
           }
         ]
@@ -1600,7 +1705,10 @@ window.CONVEYOR_OUTPUT_STANDARD = {
           {
             "kind": "rows",
             "file": "architecture.json",
-            "pointer": "/links"
+            "pointer": "/links",
+            "match": {
+              "kind": "trace"
+            }
           }
         ]
       }
@@ -1617,7 +1725,7 @@ window.CONVEYOR_OUTPUT_STANDARD = {
       "optional": [
         "Links"
       ],
-      "skeleton": "# Architecture Capability\n\nOne standards artefact, derived from the record or explicitly absent.\n\n## Principles\n\nThe record the section derives from, or an explicit absence.\n\n## Tailored ADM\n\nThe record the section derives from, or an explicit absence.\n\n## Artefact standard\n\nThe record the section derives from, or an explicit absence.\n\n## Architecture Board\n\nThe record the section derives from, or an explicit absence.\n\n## Governance and contracts\n\nThe record the section derives from, or an explicit absence.\n\n## Maturity and skills\n\nThe record the section derives from, or an explicit absence.\n",
+      "skeleton": "# Architecture capability\n\nThe Preliminary phase is a capability before it is a project: the principles, the tailored ADM, the artefact standard, the Architecture Board, the governance and contracts, and the maturity and skills baseline. Each is a row, and each is approved by the body that owns it.\n\n## Principles\n\nThe architecture principles catalogue, each with its statement, rationale and implications. The Board approves the catalogue; a principle without a rationale or its implications is not a principle.\n\n## Tailored ADM\n\nThe adopted `adm_profile`: which phases this organisation runs, which artefacts are mandatory per phase and plateau, and which contract closes each phase. A profile that cannot be adopted is a draft, not the capability.\n\n## Artefact standard\n\nThe `artifact_type` catalogue the repository is seeded from: each type's phase, plateau and mandatory flag. The standard is adopted once and grows with the assessed maturity.\n\n## Architecture Board\n\nThe `governance_body` of kind architecture board: membership, charter, commissioning authority and decision limits. A draft board cannot govern.\n\n## Governance and contracts\n\nThe architecture contracts (Statement of Architecture Work, delivery contract, statement of intent, Request for Architecture Work) and the waivers that accept a deviation for a period. A waiver names its accepting owner and reassessment date.\n\n## Maturity and skills\n\nThe nine-dimension maturity assessment (0–5) and the seven-category skills assessment, each a dated row with evidence. The development plan is a set of milestones a tranche review can hold the capability to.\n",
       "standard": "TOGAF",
       "level": "programme",
       "subject_kind": "capability",
@@ -1627,37 +1735,37 @@ window.CONVEYOR_OUTPUT_STANDARD = {
         "Principles": [
           {
             "kind": "computed",
-            "name": "architecture_capability"
+            "name": "architecture_principles"
           }
         ],
         "Tailored ADM": [
           {
             "kind": "computed",
-            "name": "architecture_capability"
+            "name": "architecture_profile"
           }
         ],
         "Artefact standard": [
           {
             "kind": "computed",
-            "name": "architecture_capability"
+            "name": "artifact_standard"
           }
         ],
         "Architecture Board": [
           {
             "kind": "computed",
-            "name": "architecture_capability"
+            "name": "architecture_board"
           }
         ],
         "Governance and contracts": [
           {
             "kind": "computed",
-            "name": "architecture_capability"
+            "name": "architecture_governance"
           }
         ],
         "Maturity and skills": [
           {
             "kind": "computed",
-            "name": "architecture_capability"
+            "name": "architecture_maturity_skills"
           }
         ]
       }
@@ -1689,14 +1797,16 @@ window.CONVEYOR_OUTPUT_STANDARD = {
           {
             "kind": "rows",
             "file": "architecture.json",
-            "pointer": "/compliance_reviews"
+            "pointer": "/compliance_reviews",
+            "optional": true
           }
         ],
         "Waivers": [
           {
             "kind": "rows",
             "file": "architecture.json",
-            "pointer": "/waivers"
+            "pointer": "/waivers",
+            "optional": true
           }
         ]
       }
@@ -1981,7 +2091,10 @@ window.CONVEYOR_OUTPUT_STANDARD = {
           {
             "kind": "rows",
             "file": "work.json",
-            "pointer": "/approvals"
+            "pointer": "/approvals",
+            "match": {
+              "gate": "tranche_review"
+            }
           }
         ]
       }
@@ -2240,7 +2353,7 @@ window.CONVEYOR_OUTPUT_STANDARD = {
       "optional": [
         "Findings"
       ],
-      "skeleton": "# Phase Preliminary\n\nOne standards artefact, derived from the record or explicitly absent.\n\n## Mandatory artefacts\n\nThe record the section derives from, or an explicit absence.\n\n## Contract and gate\n\nThe record the section derives from, or an explicit absence.\n\n## Evidence\n\nThe record the section derives from, or an explicit absence.\n",
+      "skeleton": "# Phase Preliminary\n\nThe capability that makes architecture work possible: the principles, the tailored ADM, the artefact standard, the Board, governance and the maturity and skills baseline. Preliminary closes when the capability is adopted, not when a document is filed.\n\n## Mandatory artefacts\n\nThe preliminary artefact types the adopted profile requires, each evidenced by an artefact of that type in this phase. A required type with no artefact is missing; the package names it.\n\n## Contract and gate\n\nThe Board and the adopted profile are the gate objects: the Board's charter is approved and the profile is adopted. A draft board or an unadopted profile is not a gate.\n\n## Evidence\n\nThe preliminary artifacts and the adopted profile, with their status. This is what the Board approved.\n",
       "standard": "TOGAF",
       "level": "programme",
       "subject_kind": "capability",
@@ -2250,7 +2363,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
         "Mandatory artefacts": [
           {
             "kind": "computed",
-            "name": "architecture_capability"
+            "name": "phase_artefacts",
+            "phase": "preliminary"
           }
         ],
         "Contract and gate": [
@@ -2821,7 +2935,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
           {
             "kind": "rows",
             "file": "msp.json",
-            "pointer": "/demo_credits"
+            "pointer": "/demo_credits",
+            "optional": true
           }
         ],
         "Evidence": [
@@ -2837,7 +2952,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
           {
             "kind": "rows",
             "file": "msp.json",
-            "pointer": "/demo_credits"
+            "pointer": "/demo_credits",
+            "optional": true
           }
         ]
       }
@@ -2873,14 +2989,16 @@ window.CONVEYOR_OUTPUT_STANDARD = {
           {
             "kind": "rows",
             "file": "msp.json",
-            "pointer": "/demo_credits"
+            "pointer": "/demo_credits",
+            "optional": true
           }
         ],
         "Credits": [
           {
             "kind": "rows",
             "file": "msp.json",
-            "pointer": "/demo_credits"
+            "pointer": "/demo_credits",
+            "optional": true
           }
         ],
         "Findings": [
@@ -2939,20 +3057,23 @@ window.CONVEYOR_OUTPUT_STANDARD = {
           {
             "kind": "rows",
             "file": "msp.json",
-            "pointer": "/lessons"
+            "pointer": "/lessons",
+            "optional": true
           }
         ],
         "Actions": [
           {
             "kind": "rows",
             "file": "msp.json",
-            "pointer": "/lessons"
+            "pointer": "/lessons",
+            "optional": true
           }
         ]
       }
     }
   },
   "on_demand": [
+    "architecture-artifact-instance",
     "decision",
     "programme-brief",
     "refined-vision",
