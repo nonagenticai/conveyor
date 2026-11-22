@@ -10097,11 +10097,11 @@
     },
     {
       "category": "closure-review",
-      "covered_key": "",
+      "covered_key": "closed_without_closure_review:P0",
       "covered_rule": "closed_without_closure_review",
       "document": {
         "path": "docs/standards/std-pmp-closure-review-p0.html",
-        "sha256": "946946ec0fa545e827fdf1658140ad48b991d67b8481cedc243f7670cccfb535"
+        "sha256": "ab23506add5030d3795722fff57eff2c61a701fbf1ec1cf09118a9df7428df21"
       },
       "gate": {
         "approval_id": "",
@@ -10112,7 +10112,7 @@
       "level": "project",
       "mandatory": true,
       "owner_project": "P0",
-      "package_key": "std-pmp-closure-review-p0:P0",
+      "package_key": "closed_without_closure_review:P0",
       "package_published": true,
       "sections": [
         {
@@ -18703,11 +18703,11 @@
     },
     {
       "category": "project-brief",
-      "covered_key": "",
+      "covered_key": "unpublished_declared_output:P0",
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-p0.html",
-        "sha256": "5aafe4e9081c706caf2472c4be14145380bdfe310d9709e50a698d3142be0cf2"
+        "sha256": "e8e388a7bb3b5bfbfc682a8f4fc58e39acd99bad433248151cf39058f4c6cf92"
       },
       "gate": {
         "approval_id": "",
@@ -18718,7 +18718,7 @@
       "level": "project",
       "mandatory": true,
       "owner_project": "P0",
-      "package_key": "std-pmp-project-brief-p0:P0",
+      "package_key": "unpublished_declared_output:tranche-0",
       "package_published": true,
       "sections": [
         {
@@ -18802,7 +18802,7 @@
     },
     {
       "category": "project-brief",
-      "covered_key": "",
+      "covered_key": "unpublished_declared_output:PLATFORM",
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-platform.html",
@@ -18992,7 +18992,7 @@
     },
     {
       "category": "project-brief",
-      "covered_key": "",
+      "covered_key": "unpublished_declared_output:S00",
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s00.html",
@@ -19169,7 +19169,7 @@
     },
     {
       "category": "project-brief",
-      "covered_key": "",
+      "covered_key": "unpublished_declared_output:S01",
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s01.html",
@@ -19359,7 +19359,7 @@
     },
     {
       "category": "project-brief",
-      "covered_key": "",
+      "covered_key": "unpublished_declared_output:S02",
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s02.html",
@@ -19549,7 +19549,7 @@
     },
     {
       "category": "project-brief",
-      "covered_key": "",
+      "covered_key": "unpublished_declared_output:S03",
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s03.html",
@@ -19726,7 +19726,7 @@
     },
     {
       "category": "project-brief",
-      "covered_key": "",
+      "covered_key": "unpublished_declared_output:S04",
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s04.html",
@@ -19903,7 +19903,7 @@
     },
     {
       "category": "project-brief",
-      "covered_key": "",
+      "covered_key": "unpublished_declared_output:S05",
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s05.html",
@@ -20080,7 +20080,7 @@
     },
     {
       "category": "project-brief",
-      "covered_key": "",
+      "covered_key": "unpublished_declared_output:S06",
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s06.html",
@@ -20270,7 +20270,7 @@
     },
     {
       "category": "project-brief",
-      "covered_key": "",
+      "covered_key": "unpublished_declared_output:S06b",
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s06b.html",
@@ -20460,7 +20460,7 @@
     },
     {
       "category": "project-brief",
-      "covered_key": "",
+      "covered_key": "unpublished_declared_output:S06c",
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s06c.html",
@@ -20637,7 +20637,7 @@
     },
     {
       "category": "project-brief",
-      "covered_key": "",
+      "covered_key": "unpublished_declared_output:S06d",
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s06d.html",
@@ -20788,7 +20788,7 @@
     },
     {
       "category": "project-brief",
-      "covered_key": "",
+      "covered_key": "unpublished_declared_output:S07",
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s07.html",
@@ -20965,7 +20965,7 @@
     },
     {
       "category": "project-brief",
-      "covered_key": "",
+      "covered_key": "unpublished_declared_output:S08",
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s08.html",
@@ -21142,7 +21142,7 @@
     },
     {
       "category": "project-brief",
-      "covered_key": "",
+      "covered_key": "unpublished_declared_output:S09",
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s09.html",
@@ -21319,7 +21319,7 @@
     },
     {
       "category": "project-brief",
-      "covered_key": "",
+      "covered_key": "unpublished_declared_output:S10",
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s10.html",
@@ -21509,7 +21509,7 @@
     },
     {
       "category": "project-brief",
-      "covered_key": "",
+      "covered_key": "unpublished_declared_output:S11",
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s11.html",
@@ -21686,7 +21686,7 @@
     },
     {
       "category": "project-brief",
-      "covered_key": "",
+      "covered_key": "unpublished_declared_output:S12",
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s12.html",
@@ -21863,7 +21863,7 @@
     },
     {
       "category": "project-brief",
-      "covered_key": "",
+      "covered_key": "unpublished_declared_output:S13",
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s13.html",
@@ -22040,7 +22040,7 @@
     },
     {
       "category": "project-brief",
-      "covered_key": "",
+      "covered_key": "unpublished_declared_output:S14",
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s14.html",
@@ -22217,7 +22217,7 @@
     },
     {
       "category": "project-brief",
-      "covered_key": "",
+      "covered_key": "unpublished_declared_output:S15",
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s15.html",
@@ -22394,7 +22394,7 @@
     },
     {
       "category": "project-brief",
-      "covered_key": "",
+      "covered_key": "unpublished_declared_output:S16",
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s16.html",
@@ -22571,7 +22571,7 @@
     },
     {
       "category": "project-brief",
-      "covered_key": "",
+      "covered_key": "unpublished_declared_output:S17",
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s17.html",
@@ -22748,7 +22748,7 @@
     },
     {
       "category": "project-brief",
-      "covered_key": "",
+      "covered_key": "unpublished_declared_output:S18",
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s18.html",
@@ -22925,7 +22925,7 @@
     },
     {
       "category": "project-brief",
-      "covered_key": "",
+      "covered_key": "unpublished_declared_output:S19",
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s19.html",
@@ -23115,7 +23115,7 @@
     },
     {
       "category": "project-brief",
-      "covered_key": "",
+      "covered_key": "unpublished_declared_output:S20",
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s20.html",
@@ -23305,7 +23305,7 @@
     },
     {
       "category": "project-brief",
-      "covered_key": "",
+      "covered_key": "unpublished_declared_output:S21",
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-s21.html",
@@ -23495,7 +23495,7 @@
     },
     {
       "category": "project-brief",
-      "covered_key": "",
+      "covered_key": "unpublished_declared_output:SPEC-V2",
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-spec-v2.html",
@@ -23685,7 +23685,7 @@
     },
     {
       "category": "project-brief",
-      "covered_key": "",
+      "covered_key": "unpublished_declared_output:T0",
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-t0.html",
@@ -23875,7 +23875,7 @@
     },
     {
       "category": "project-brief",
-      "covered_key": "",
+      "covered_key": "unpublished_declared_output:T1",
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-t1.html",
@@ -24065,7 +24065,7 @@
     },
     {
       "category": "project-brief",
-      "covered_key": "",
+      "covered_key": "unpublished_declared_output:T10",
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-t10.html",
@@ -24445,7 +24445,7 @@
     },
     {
       "category": "project-brief",
-      "covered_key": "",
+      "covered_key": "unpublished_declared_output:T12",
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-t12.html",
@@ -24635,7 +24635,7 @@
     },
     {
       "category": "project-brief",
-      "covered_key": "",
+      "covered_key": "unpublished_declared_output:T13",
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-t13.html",
@@ -25015,7 +25015,7 @@
     },
     {
       "category": "project-brief",
-      "covered_key": "",
+      "covered_key": "unpublished_declared_output:T15",
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-t15.html",
@@ -25395,7 +25395,7 @@
     },
     {
       "category": "project-brief",
-      "covered_key": "",
+      "covered_key": "unpublished_declared_output:T17",
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-t17.html",
@@ -25585,7 +25585,7 @@
     },
     {
       "category": "project-brief",
-      "covered_key": "",
+      "covered_key": "unpublished_declared_output:T2",
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-t2.html",
@@ -25775,7 +25775,7 @@
     },
     {
       "category": "project-brief",
-      "covered_key": "",
+      "covered_key": "unpublished_declared_output:T3",
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-t3.html",
@@ -25965,7 +25965,7 @@
     },
     {
       "category": "project-brief",
-      "covered_key": "",
+      "covered_key": "unpublished_declared_output:T4",
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-t4.html",
@@ -26155,7 +26155,7 @@
     },
     {
       "category": "project-brief",
-      "covered_key": "",
+      "covered_key": "unpublished_declared_output:T5",
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-t5.html",
@@ -26345,7 +26345,7 @@
     },
     {
       "category": "project-brief",
-      "covered_key": "",
+      "covered_key": "unpublished_declared_output:T6",
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-t6.html",
@@ -26725,7 +26725,7 @@
     },
     {
       "category": "project-brief",
-      "covered_key": "",
+      "covered_key": "unpublished_declared_output:T8",
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-t8.html",
@@ -26915,7 +26915,7 @@
     },
     {
       "category": "project-brief",
-      "covered_key": "",
+      "covered_key": "unpublished_declared_output:T9",
       "covered_rule": "unpublished_declared_output",
       "document": {
         "path": "docs/standards/std-pmp-project-brief-t9.html",
@@ -56505,13 +56505,13 @@
   },
   "generated_at": "2026-11-20T11:50:50.848127361+00:00",
   "git_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
-  "payload_sha256": "642f32093a966cd584b926e22aef690a03bae916c5bcbc6f8a90af6f86c5d2e4",
+  "payload_sha256": "a95d976cbbed684301caa7a2cf11d81eb81612b9120b34da3f79603a7aeda6d1",
   "schema": "design-standards/v1",
   "summary": {
     "absent": 373,
     "artefacts": 505,
     "evidenced": 75,
-    "findings": 317,
+    "findings": 315,
     "mandatory": 465,
     "partial": 57
   }

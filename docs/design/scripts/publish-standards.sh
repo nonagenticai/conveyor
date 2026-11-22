@@ -69,6 +69,27 @@ test -f "$tmp/rework.json" || {
   exit 1
 }
 
+# The register's evidence quotes code and plans; the public pack must never carry a private
+# address. Redact at the one point every consumer reads, so the committed register, the pages'
+# package keys and the console's `rework.js` are the same document.
+python3 - "$tmp/rework.json" <<'PY'
+import json, pathlib, re, sys
+path = pathlib.Path(sys.argv[1])
+register = json.loads(path.read_text(encoding="utf-8"))
+def redact(value):
+    if isinstance(value, str):
+        return re.sub(r"\b(?:\d{1,3}\.){3}\d{1,3}\b", "[redacted-ip]", value)
+    if isinstance(value, list):
+        return [redact(item) for item in value]
+    if isinstance(value, dict):
+        return {key: redact(item) for key, item in value.items()}
+    return value
+path.write_text(
+    json.dumps(redact(register), indent=2, sort_keys=True, ensure_ascii=False) + "\n",
+    encoding="utf-8",
+)
+PY
+
 # 4. Pass 2: the record, one page per artefact and the register global. The generator writes
 #    `standards.json`, `standards.js` and `rework.js`; the canonical register stays JSON.
 python3 scripts/generate-standards.py \

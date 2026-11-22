@@ -26,16 +26,16 @@
       "sha256": "a8fd56b89802f3d35199cac1b3b75a10e6d1562781fbf15020192791fd7c588c"
     },
     {
-      "bytes": 26595,
+      "bytes": 26599,
       "path": "coverage.js",
       "records": 0,
-      "sha256": "a5748f2331875d2dd907f0e9fb4aabf2ae6fe794ea883c0ac8f429331ca95125"
+      "sha256": "cb24714e0832d341e135a522e08209a729b247eb44708930f24cb7b9abd6f7c0"
     },
     {
-      "bytes": 48826,
+      "bytes": 48841,
       "path": "coverage.json",
       "records": 0,
-      "sha256": "455fbee650608f51a55aa31ca394d78f0e51db959b1d62be0bad91665e36d2ee"
+      "sha256": "f425a6cec563b2cbba13298752a70f0332b3f2a57518c454e5a397db2162ee35"
     },
     {
       "bytes": 109,
@@ -50,10 +50,10 @@
       "sha256": "c0dd0d7c535bbdc7ceb958fffa8f3eb7b28893c3a07f64b6524d3bbbf0d89736"
     },
     {
-      "bytes": 123611,
+      "bytes": 125170,
       "path": "issues.json",
       "records": 0,
-      "sha256": "517f420cd7e6df52f180cedd53a85b16c9c70966198585b171452df2c6b2bfa7"
+      "sha256": "d6f0af86389c3fcd30dd7073469854fad00e7ebf89739ad85e99baee5881c53e"
     },
     {
       "bytes": 1349,
@@ -74,16 +74,22 @@
       "sha256": "3807b68e9cb77bd166fbe6f6d4b0e269c8bc0923a8d156f45dba8342786bd2ee"
     },
     {
-      "bytes": 104977,
+      "bytes": 105457,
       "path": "output-standard.js",
       "records": 0,
-      "sha256": "981cde2ddbc722be51f87ff3e9fb82d4d83f78da36fde2add4e89600e2e21edf"
+      "sha256": "8c372fcd38aac7d43965b7616a77ae2322215a525791f2a7fcc63148db413e39"
     },
     {
       "bytes": 180846,
       "path": "programme.json",
       "records": 49,
       "sha256": "e868cfc4d87105681c7ec5c022093b37f59223b288ce686d7ec2ce20d4fa58d3"
+    },
+    {
+      "bytes": 1946968,
+      "path": "rework.js",
+      "records": 505,
+      "sha256": "533a13f69636acbfbb77b32af696fe150eb558ed06f20fb2b0874f58ce574c62"
     },
     {
       "bytes": 225,
@@ -98,16 +104,16 @@
       "sha256": "f14da210b7930ea189d21257895fd4df743dc0a4acdb855abcbec3cf816c7afe"
     },
     {
-      "bytes": 1647654,
+      "bytes": 1649004,
       "path": "standards.js",
       "records": 505,
-      "sha256": "178e0ad7f588c4590471a0d224d81765a73025f61e851a090c3f01d3a9400b35"
+      "sha256": "f9b3a2416edb04d652ec1345527bc2d4540289316582da9e2e19b453faa9c998"
     },
     {
-      "bytes": 1647625,
+      "bytes": 1648975,
       "path": "standards.json",
       "records": 505,
-      "sha256": "59e187deee3dc759b25e9248823e94e9700b517618e121b5a9f60890235c5f84"
+      "sha256": "6a8b45ad98daa937fa5db1574b4951c29d3e19d19144577131d3c9509104c8ba"
     },
     {
       "bytes": 1091172,

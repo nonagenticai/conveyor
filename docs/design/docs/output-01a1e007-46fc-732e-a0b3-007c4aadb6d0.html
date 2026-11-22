@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>S04 — Action registry — derive, manifest, OpenAPI, MCP, invocation, external ingest · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>S04 — Action registry — derive, manifest, OpenAPI, MCP, invocation, external ingest</h1>
+<p><strong>Track:</strong> v1 · <strong>Tranche:</strong> 3 · <strong>Measured status:</strong> built · <strong>Plan:</strong> <code>docs/plans/slices/S04-action-registry.md</code>
+<strong>Dependencies:</strong> S02, S03 · <strong>Issues:</strong> #3</p>
+<h2>Outcome</h2>
+<p>One declaration per invocable operation, from which manifest, operation, MCP tool and route are generated, so HTTP and MCP cannot diverge. It replaces the 24 node packages and fr's 88 capability declarations; later slices add actions, never a surface.</p>
+<h2>Boundary</h2>
+<p><strong>IN</strong> — <code>ActionSpec</code> + <code>#[action]</code>; the compile-time registry and boot assertion; <code>GET /api/actions</code>; <code>POST /api/actions/{name}/invocations</code> with idempotency, timeout, audit, outbox; <code>rmcp</code> at <code>/mcp</code>; the OpenAPI fold and lock; <code>openapiv3</code> ingest; <code>migrations/0003_action_registry.sql</code>; 16 internal + 4 <code>fixtures.*</code> actions.</p>
+<p><strong>OUT</strong> — domain actions (<code>cards.move</code>, …) are S05–S11's; <code>kind: workflow</code> (S13); channel-<code>mcp</code> delivery rows (S06); the signed <code>mcp_server</code> channel (S06-α).</p>
+<h2>Reuse sources</h2>
+<table><thead><tr><th>path</th><th>read this</th><th>carry</th><th>do not carry</th></tr></thead><tbody>
+<tr><td><code>20-fr</code> registry</td><td><code>Capability</code> fields, <code>derive-{openapi,mcp,router}.ts</code>, <code>registry.ts</code></td><td>field set, closed <code>effect</code>/<code>confirm</code>/<code>tenancy</code> vocabularies, <code>assertRegistryConsistent</code>, <code>served-spec.lock.json</code>, <code>specExempt</code></td><td>Zod, <code>legacyHandler</code>, <code>frozen</code></td></tr>
+<tr><td><code>agent/crates/agent-api/src/runtime/catalog.rs</code></td><td><code>OpDef</code>, <code>PinnedCatalog::from_rows</code>, <code>effective_level</code>, <code>outputs</code></td><td>one catalogue; a compiled row beats a stored one</td><td><code>OpSource::Template</code></td></tr>
+<tr><td><code>30</code> §4 node resources</td><td>14 fr resource names</td><td>the action-name vocabulary</td><td><code>_legacy</code></td></tr>
+</tbody></table>
+<h2>Inception units</h2>
+<ol>
+<li><code>analysis</code> — current state and reuse: inventory what already exists, the contract and licence constraints, the build-vs-reuse decision, and the risks.</li>
+<li><code>architecture</code> — the project's design: aggregates, tables, actions, modules, integrations, the decision record, and acceptance.</li>
+</ol>
+<p>Both are documents on this project with <code>meta.category</code> set to <code>analysis</code> / <code>architecture</code>; both published is the inception standard.</p>
+<h2>Dependencies</h2>
+<p>Blocked-by: S02, S03.</p>
+<h2>Acceptance</h2>
+<pre><code class="language-bash">set -euo pipefail
+source ~/.cargo/env          # CONTRACT §16 — cargo is not on PATH
+B=http://127.0.0.1:8930
+docker compose up -d db &amp;&amp; cargo run -p conveyor-server -- migrate --dev-seed   # the DB and the dev principals (S02)
+cargo test -p conveyor-actions
+cargo run -p conveyor-server -- --print-openapi --check-lock          # exit 0
+! CONVEYOR_TEST_DUPLICATE=members.set_role cargo run -p conveyor-server -- serve   # exit 1, before bind
+CONVEYOR_DEV_AUTH=1 cargo run -p conveyor-server -…
+
+Verify: the gate script above (its executable acceptance)
+
+## Capabilities
+
+`architecture`, `development`
+
+## Gaps
+
+- None recorded beyond the inception units themselves.
+</code></pre>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Action registry — derive, manifest, OpenAPI, MCP, invocation, external ingest · conveyor output · published 2026-11-20T11:50:50.848127361+00:00</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>
