@@ -788,15 +788,13 @@
         ],
         "plan_status": "partial",
         "status_source": "github issue state > measured coverage > plan frontmatter",
-        "measured_status": "partial",
+        "measured_status": "built",
         "tranche": 9,
         "expected_outputs": [
           "project-brief",
           "evidence"
         ],
-        "closure_outputs": [
-          "closure-review"
-        ],
+        "closure_outputs": [],
         "adm_phase": "G",
         "plateau": "delivery"
       }

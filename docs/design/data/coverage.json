@@ -1460,11 +1460,11 @@
         "crates/actions/src/prompt",
         "migrations/0030_prompt_catalogue.sql"
       ],
-      "gap": "action prompt_recipes.create, action prompt_recipes.list, action prompt_recipes.get, action prompt_recipes.activate, action prompt_recipes.retire",
+      "gap": null,
       "key": "S21",
       "measured": {
         "actions": [
-          0,
+          5,
           5
         ],
         "modules": [
@@ -1482,7 +1482,7 @@
         "S20"
       ],
       "plan": "docs/plans/slices/S21-message-construction.md",
-      "status": "partial",
+      "status": "built",
       "track": "v1",
       "tranche": 9,
       "units": {
@@ -2573,8 +2573,8 @@
       "by_status": {
         "absent": 0,
         "archived": 1,
-        "built": 39,
-        "partial": 2,
+        "built": 40,
+        "partial": 1,
         "planned": 0,
         "proposed": 5,
         "standing": 1

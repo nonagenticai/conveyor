@@ -1252,7 +1252,7 @@ CREATE TABLE prompt (
 );
 -- At most one active and one draft version per key; retired rows stay addressable by exact pin.
 CREATE UNIQUE INDEX uq_prompt_active ON prompt (tenant_id, key) WHERE status = 'active';
-CREATE UNIQUE INDEX uq_prompt_draft  ON prompt (tenant_id, key) WHERE status = 'draft';   -- 0061
+CREATE UNIQUE INDEX uq_prompt_draft  ON prompt (tenant_id, key) WHERE status = 'draft';   -- 0062
 
 CREATE TABLE prompt_section (
     id          uuid PRIMARY KEY DEFAULT uuidv7(),
@@ -1260,10 +1260,10 @@ CREATE TABLE prompt_section (
     prompt_id   uuid NOT NULL,
     position    int  NOT NULL CHECK (position >= 1),
     source_kind text NOT NULL
-                CHECK (source_kind IN ('system','procedure','capability','role','project_card','knowledge','memory')),
+                CHECK (source_kind IN ('system','process','capability','role','project_card','knowledge','memory')),
     required    boolean NOT NULL DEFAULT false,
     template    text NOT NULL DEFAULT '',
-    selector    jsonb NOT NULL DEFAULT '{}'             -- 0061
+    selector    jsonb NOT NULL DEFAULT '{}'             -- 0062
                 CHECK (jsonb_typeof(selector) = 'object'),
     budget_chars int CHECK (budget_chars > 0),          -- 0031
     created_at  timestamptz NOT NULL DEFAULT now(),
@@ -1282,11 +1282,11 @@ no source is a readiness refusal, not an empty section. The built-in recipes (`c
 `prompt_audit@1`, `agent@1`) are seeded per tenant by `seed::prompts_for_tenant`; an existing
 `(key, version)` is never rewritten by a seed.
 
-**Recipe lifecycle (0061, ADR 0009).** A version is immutable per `(tenant, key, version)`. A tenant
+**Recipe lifecycle (0062, ADR 0009).** A version is immutable per `(tenant, key, version)`. A tenant
 creates a `draft`, activates it (the previous active becomes `retired` in the same transaction), or
 retires a version. Exact pins stay readable; a new run resolves only an `active` row.
 `prompt_section.selector` is the one selection config — memory `{kinds, limit, include_digest}` and
-knowledge `{query}` — never a second template language. Knowledge targets are resolved in the
+knowledge `{query, top_k}` — never a second template language. Knowledge targets are resolved in the
 compile transaction, but retrieval runs after that transaction commits, reusing the
 `knowledge.query` path; the compiled text itself is still never stored.
 
