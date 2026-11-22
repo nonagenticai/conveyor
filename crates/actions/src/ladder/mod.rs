@@ -8,8 +8,14 @@
 //! **The family name.** §10.4 proposed `decisions.*` for the ladder, but the ADR family already
 //! owns that name (`decisions.create|get|list|transition|update`, `crates/actions/src/
 //! governance/assets.rs`). The ladder's own verbs are therefore `ladder.*`, and its
-//! configuration is `decision_policies.*`, `refinements.*` and `laya_configs.*`; this module is
-//! the amendment §10.4 records.
+//! configuration is `decision_options.*`, `decision_policies.*`, `refinements.*` and
+//! `laya_configs.*`; this module is the amendment §10.4 records.
+//!
+//! **Options are rows.** A choice is resolved from the authored `decision_option_set` the case
+//! names — the tenant's published set shadows the platform library, a library option carries
+//! the tenant's refinement, and a hidden option never reaches the wire. No ladder input carries
+//! an option list, and the decision pins the set id, version and effective hash it read
+//! (finding v1-w1c-4).
 //!
 //! **The one shape.** An L0 rule outcome, an L1 laya choice and an L3 human approval are
 //! recorded through the same insert and projected through the same [`DecisionOut`] — only the
@@ -106,8 +112,27 @@ fn ladder_error(error: LadderStoreError, action: &str) -> ActionError {
         ),
         LadderStoreError::Conflict { what } => ActionError::new(
             409,
-            "policy_exists",
+            if what == "decision_option_set" {
+                "set_exists"
+            } else {
+                "policy_exists"
+            },
             format!("a {what} already exists for this case"),
+        ),
+        LadderStoreError::ReadOnly { what } => ActionError::new(
+            409,
+            "read_only",
+            format!("the {what} is authored by the platform, not this tenant"),
+        ),
+        LadderStoreError::NotRefinable { key } => ActionError::new(
+            409,
+            "not_refinable",
+            format!("{key:?} belongs to a tenant-authored set; edit the set rather than refine it"),
+        ),
+        LadderStoreError::BaseMismatch { what, key } => ActionError::new(
+            409,
+            "base_changed",
+            format!("the {what} {key} changed since the refinement pinned it"),
         ),
         LadderStoreError::Parent(parent) => parent_error(parent, action),
         LadderStoreError::Illegal(LadderError::UnknownRung { value }) => {
@@ -160,6 +185,41 @@ fn ladder_error(error: LadderStoreError, action: &str) -> ActionError {
             409,
             "policy_exists",
             format!("a policy already exists for {kind}/{gate:?}"),
+        ),
+        LadderStoreError::Illegal(LadderError::OptionSetSize { count }) => invalid(
+            "options",
+            "option_set_size",
+            format!("a choice question needs between 2 and 255 options, got {count}"),
+        ),
+        LadderStoreError::Illegal(LadderError::DuplicateOption { key }) => invalid(
+            "options",
+            "option_key_duplicate",
+            format!("the option key {key:?} is repeated"),
+        ),
+        LadderStoreError::Illegal(LadderError::DuplicatePosition { position }) => invalid(
+            "options",
+            "option_position_duplicate",
+            format!("the option position {position} is repeated"),
+        ),
+        LadderStoreError::Illegal(LadderError::InvalidPosition) => invalid(
+            "position",
+            "out_of_range",
+            "the option position must be at least 1",
+        ),
+        LadderStoreError::Illegal(LadderError::UnknownOptionOrigin { value }) => invalid(
+            "origin",
+            "unknown_origin",
+            format!("{value:?} is not library|tenant"),
+        ),
+        LadderStoreError::Illegal(LadderError::AnswerNotInSet { answer }) => invalid(
+            "answer",
+            "answer_not_in_set",
+            format!("the answer {answer:?} is not a key of the authored option set"),
+        ),
+        LadderStoreError::Illegal(LadderError::TooFewOptions { visible }) => ActionError::new(
+            409,
+            "too_few_options",
+            format!("a question keeps at least two visible options; {visible} would remain"),
         ),
         LadderStoreError::Vocabulary { what, value } => {
             tracing::error!(what, value = %value, "a stored ladder value is outside the domain");
@@ -412,6 +472,8 @@ pub struct RefinementOut {
     pub fail_action: Option<String>,
     /// The laya config it pins.
     pub laya_config_id: Option<String>,
+    /// The policy content hash the refinement was authored against.
+    pub base_hash: Option<String>,
     /// The pinned refinement version.
     pub version: i64,
     /// Creation time.
@@ -428,6 +490,7 @@ fn refinement_out(record: &RefinementRecord) -> RefinementOut {
         rule_override: record.rule_override.clone(),
         fail_action: record.fail_action.clone(),
         laya_config_id: record.laya_config_id.map(|id| id.to_string()),
+        base_hash: record.base_hash.clone(),
         version: record.version,
         created_at: record.created_at,
         updated_at: record.updated_at,
@@ -660,27 +723,459 @@ async fn laya_configs_list(
     })
 }
 
-/// An authored option to record with a decision.
+// ── the authored option set family ──────────────────────────────────────────────────────
+
+/// One authored option in a set the caller is writing.
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
-pub struct OptionIn {
-    /// The option key the answer names.
+pub struct OptionEntryIn {
+    /// The option key the answer must equal.
     pub key: String,
     /// The human label.
     pub label: Option<String>,
-    /// The option's payload.
-    pub payload: Option<Value>,
+    /// The description the laya wire reads; the label is used when absent.
+    pub criteria: Option<String>,
+    /// The 1-based authored order; the input order is used when absent.
+    pub position: Option<i32>,
 }
 
-fn options_of(options: Option<Vec<OptionIn>>) -> Vec<NewOption> {
-    options
-        .unwrap_or_default()
+fn option_entries_of(entries: Vec<OptionEntryIn>) -> Vec<store::ladder::NewOptionEntry> {
+    entries
         .into_iter()
-        .map(|option| NewOption {
-            key: option.key,
-            label: option.label.unwrap_or_default(),
-            payload: option.payload.unwrap_or_else(|| serde_json::json!({})),
+        .enumerate()
+        .map(|(index, entry)| store::ladder::NewOptionEntry {
+            key: entry.key.trim().to_owned(),
+            label: entry.label.unwrap_or_default().trim().to_owned(),
+            criteria: entry.criteria.unwrap_or_default().trim().to_owned(),
+            position: entry
+                .position
+                .unwrap_or_else(|| i32::try_from(index + 1).unwrap_or(1)),
         })
         .collect()
+}
+
+/// One option as the `decision_options.*` actions return it.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct OptionOut {
+    /// The base entry id a refinement names.
+    pub entry_id: String,
+    /// The option key.
+    pub key: String,
+    /// The human label.
+    pub label: String,
+    /// The description the laya wire reads.
+    pub criteria: String,
+    /// The authored order.
+    pub position: i32,
+    /// Whether the option is withheld from the wire.
+    pub hidden: bool,
+    /// Whether a tenant refinement applied.
+    pub refined: bool,
+    /// The canonical hash of the base entry.
+    pub base_hash: String,
+}
+
+/// One authored or effective set as the `decision_options.*` actions return it.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct OptionSetOut {
+    /// The set row a decision pins.
+    pub id: String,
+    /// The case kind.
+    pub kind: String,
+    /// The gate, when the set is gate-specific.
+    pub gate: Option<String>,
+    /// `library | tenant`.
+    pub origin: String,
+    /// `draft | published`.
+    pub status: String,
+    /// The authored revision.
+    pub version: i64,
+    /// The canonical hash of the effective visible options.
+    pub option_set_hash: String,
+    /// The base hash of every refinement applied.
+    pub refinement_hashes: Vec<String>,
+    /// Every member; hidden ones are flagged.
+    pub options: Vec<OptionOut>,
+}
+
+fn effective_option_set_out(set: &store::ladder::EffectiveOptionSet) -> OptionSetOut {
+    OptionSetOut {
+        id: set.id.to_string(),
+        kind: set.kind.clone(),
+        gate: set.gate.clone(),
+        origin: set.origin.clone(),
+        status: "published".to_owned(),
+        version: set.version,
+        option_set_hash: set.content_hash(),
+        refinement_hashes: set.refinement_hashes(),
+        options: set
+            .options
+            .iter()
+            .map(|option| OptionOut {
+                entry_id: option.entry_id.to_string(),
+                key: option.key.clone(),
+                label: option.label.clone(),
+                criteria: option.criteria.clone(),
+                position: option.position,
+                hidden: option.hidden,
+                refined: option.refined,
+                base_hash: option.base_hash.clone(),
+            })
+            .collect(),
+    }
+}
+
+fn raw_option_set_out(
+    set: &store::ladder::OptionSetRecord,
+    entries: &[store::ladder::OptionEntryRecord],
+) -> OptionSetOut {
+    let hashes: Vec<String> = entries
+        .iter()
+        .map(|entry| {
+            conveyor_domain::ladder::option_base_hash(
+                &set.kind,
+                set.gate.as_deref(),
+                &entry.key,
+                &entry.label,
+                &entry.criteria,
+                entry.position,
+            )
+        })
+        .collect();
+    let pins: Vec<conveyor_domain::ladder::OptionPin<'_>> = entries
+        .iter()
+        .zip(hashes.iter())
+        .map(|(entry, hash)| conveyor_domain::ladder::OptionPin {
+            key: &entry.key,
+            label: &entry.label,
+            criteria: &entry.criteria,
+            position: entry.position,
+            base_hash: hash,
+        })
+        .collect();
+    OptionSetOut {
+        id: set.id.to_string(),
+        kind: set.kind.clone(),
+        gate: set.gate.clone(),
+        origin: set.origin.clone(),
+        status: set.status.clone(),
+        version: set.version,
+        option_set_hash: conveyor_domain::ladder::option_set_hash(
+            &set.kind,
+            set.gate.as_deref(),
+            &pins,
+        ),
+        refinement_hashes: Vec::new(),
+        options: entries
+            .iter()
+            .zip(hashes.iter())
+            .map(|(entry, hash)| OptionOut {
+                entry_id: entry.id.to_string(),
+                key: entry.key.clone(),
+                label: entry.label.clone(),
+                criteria: entry.criteria.clone(),
+                position: entry.position,
+                hidden: false,
+                refined: false,
+                base_hash: hash.clone(),
+            })
+            .collect(),
+    }
+}
+
+/// `decision_options.create`.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct OptionSetCreateIn {
+    /// The case kind the policy is keyed by.
+    pub kind: String,
+    /// The gate, when the set is gate-specific.
+    pub gate: Option<String>,
+    /// The authored options.
+    pub options: Vec<OptionEntryIn>,
+}
+
+/// Author the tenant's option set for one case. It shadows the platform library once published.
+#[crate::action(
+    name = "decision_options.create",
+    version = 1,
+    kind = "internal",
+    scopes = ["governance:write"],
+    idempotent = false,
+    timeout_ms = 30000,
+    effect = "write",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn decision_options_create(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: OptionSetCreateIn,
+) -> Result<HandlerOutput<OptionSetOut>, ActionError> {
+    let kind = input.kind.trim();
+    if kind.is_empty() {
+        return Err(invalid("kind", "missing", "a case kind is required"));
+    }
+    let (set, entries) = store::ladder::insert_option_set_tx(
+        &mut *tx,
+        ctx.tenant,
+        &store::ladder::NewOptionSet {
+            kind: kind.to_owned(),
+            gate: trimmed(input.gate),
+            origin: "tenant".to_owned(),
+            entries: option_entries_of(input.options),
+        },
+    )
+    .await
+    .map_err(|error| ladder_error(error, ctx.action))?;
+    emit_decision_event(&mut *tx, &ctx, "decision_option_set", set.id, "created").await?;
+    Ok(HandlerOutput::created(raw_option_set_out(&set, &entries)).with_etag(etag_of(set.version)))
+}
+
+/// `decision_options.update`.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct OptionSetUpdateIn {
+    /// The tenant set to replace.
+    pub id: Uuid,
+    /// The replacement options.
+    pub options: Vec<OptionEntryIn>,
+}
+
+/// Replace a tenant set's options; the set's version advances and every decision pins it.
+#[crate::action(
+    name = "decision_options.update",
+    version = 1,
+    kind = "internal",
+    scopes = ["governance:write"],
+    idempotent = false,
+    timeout_ms = 30000,
+    effect = "write",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn decision_options_update(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: OptionSetUpdateIn,
+) -> Result<HandlerOutput<OptionSetOut>, ActionError> {
+    let current = store::ladder::get_option_set_tx(&mut *tx, ctx.tenant, input.id)
+        .await
+        .map_err(|error| ladder_error(error, ctx.action))?
+        .ok_or_else(|| ActionError::resource_not_found("decision_option_set"))?;
+    if current.origin != "tenant" {
+        return Err(ActionError::new(
+            409,
+            "read_only",
+            "a platform library set is authored by the platform, not this tenant",
+        ));
+    }
+    require_precondition_with(
+        &ctx,
+        ctx.action,
+        serde_json::json!({ "version": current.version }),
+    )?;
+    let (set, entries) = store::ladder::update_option_set_entries_tx(
+        &mut *tx,
+        ctx.tenant,
+        input.id,
+        &option_entries_of(input.options),
+        Some(current.version),
+    )
+    .await
+    .map_err(|error| ladder_error(error, ctx.action))?;
+    emit_decision_event(&mut *tx, &ctx, "decision_option_set", set.id, "updated").await?;
+    Ok(HandlerOutput::ok(raw_option_set_out(&set, &entries)).with_etag(etag_of(set.version)))
+}
+
+/// `decision_options.publish`.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct OptionSetPublishIn {
+    /// The tenant set to publish.
+    pub id: Uuid,
+}
+
+/// Publish a tenant set: from this version on it is the case's effective set.
+#[crate::action(
+    name = "decision_options.publish",
+    version = 1,
+    kind = "internal",
+    scopes = ["governance:write"],
+    idempotent = false,
+    timeout_ms = 30000,
+    effect = "write",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn decision_options_publish(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: OptionSetPublishIn,
+) -> Result<HandlerOutput<OptionSetOut>, ActionError> {
+    let current = store::ladder::get_option_set_tx(&mut *tx, ctx.tenant, input.id)
+        .await
+        .map_err(|error| ladder_error(error, ctx.action))?
+        .ok_or_else(|| ActionError::resource_not_found("decision_option_set"))?;
+    if current.origin != "tenant" {
+        return Err(ActionError::new(
+            409,
+            "read_only",
+            "a platform library set is authored by the platform, not this tenant",
+        ));
+    }
+    require_precondition_with(
+        &ctx,
+        ctx.action,
+        serde_json::json!({ "version": current.version }),
+    )?;
+    let (set, entries) =
+        store::ladder::publish_option_set_tx(&mut *tx, ctx.tenant, input.id, Some(current.version))
+            .await
+            .map_err(|error| ladder_error(error, ctx.action))?;
+    emit_decision_event(&mut *tx, &ctx, "decision_option_set", set.id, "published").await?;
+    Ok(HandlerOutput::ok(raw_option_set_out(&set, &entries)).with_etag(etag_of(set.version)))
+}
+
+/// `decision_options.get`.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct OptionSetGetIn {
+    /// The case kind the policy is keyed by.
+    pub kind: String,
+    /// The gate, when the set is gate-specific.
+    pub gate: Option<String>,
+}
+
+/// Read the effective set: the tenant's shadow when published, else the library with the
+/// tenant's refinements applied.
+#[crate::action(
+    name = "decision_options.get",
+    version = 1,
+    kind = "internal",
+    scopes = ["governance:read"],
+    idempotent = true,
+    timeout_ms = 30000,
+    effect = "read",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn decision_options_get(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: OptionSetGetIn,
+) -> Result<HandlerOutput<OptionSetOut>, ActionError> {
+    let kind = input.kind.trim();
+    if kind.is_empty() {
+        return Err(invalid("kind", "missing", "a case kind is required"));
+    }
+    let gate = trimmed(input.gate);
+    let set = store::ladder::effective_option_set_tx(&mut *tx, ctx.tenant, kind, gate.as_deref())
+        .await
+        .map_err(|error| ladder_error(error, ctx.action))?
+        .ok_or_else(|| ActionError::resource_not_found("decision_option_set"))?;
+    Ok(HandlerOutput::ok(effective_option_set_out(&set)))
+}
+
+/// `decision_options.refine`.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct OptionRefineIn {
+    /// The library option to refine (the `entry_id` `decision_options.get` returns).
+    pub entry_id: Uuid,
+    /// The replacement label; the base label reverts it.
+    pub label: Option<String>,
+    /// The replacement wire description; the base description reverts it.
+    pub criteria: Option<String>,
+    /// The replacement order; the base position reverts it.
+    pub position: Option<i32>,
+    /// Withhold the option from the wire; a question keeps at least two visible options.
+    pub hidden: Option<bool>,
+    /// The human gate that authorised this configuration change (§7.2).
+    ///
+    /// It must be an approved [`REFINEMENT_PUBLISH_GATE`] approval naming the option in its
+    /// `meta.target`, with at least one human `approve` decision.
+    pub approval_id: Option<Uuid>,
+}
+
+/// Refine one platform-library option for this tenant, or revert the refinement.
+#[crate::action(
+    name = "decision_options.refine",
+    version = 1,
+    kind = "internal",
+    scopes = ["governance:write"],
+    idempotent = false,
+    timeout_ms = 30000,
+    effect = "write",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn decision_options_refine(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: OptionRefineIn,
+) -> Result<HandlerOutput<OptionSetOut>, ActionError> {
+    let context = store::ladder::option_entry_context_tx(&mut *tx, ctx.tenant, input.entry_id)
+        .await
+        .map_err(|error| ladder_error(error, ctx.action))?
+        .ok_or_else(|| ActionError::resource_not_found("decision_option_entry"))?;
+    if context.set.origin != "library" {
+        return Err(ActionError::new(
+            409,
+            "not_refinable",
+            "an option of a tenant-authored set is edited through the set, not refined",
+        ));
+    }
+    let approval_id = input.approval_id.ok_or_else(|| {
+        invalid(
+            "approval_id",
+            "approval_missing",
+            "an option refinement is a gated policy change; cite the approved \
+             refinement.publish gate naming this option",
+        )
+    })?;
+    let target = input.entry_id.to_string();
+    if !human_approved_gate_tx(
+        &mut *tx,
+        ctx.tenant,
+        approval_id,
+        Some(REFINEMENT_PUBLISH_GATE),
+        None,
+        None,
+        Some(target.as_str()),
+    )
+    .await?
+    {
+        return Err(invalid(
+            "approval_id",
+            "approval_missing",
+            "the cited approval is not an approved refinement.publish gate with a human approve \
+             decision naming this option",
+        ));
+    }
+    let refinement = store::ladder::refine_option_tx(
+        &mut *tx,
+        ctx.tenant,
+        &context,
+        &store::ladder::OptionRefinePatch {
+            label: input.label,
+            criteria: input.criteria,
+            position: input.position,
+            hidden: input.hidden,
+        },
+    )
+    .await
+    .map_err(|error| ladder_error(error, ctx.action))?;
+    let set = store::ladder::effective_option_set_tx(
+        &mut *tx,
+        ctx.tenant,
+        &context.set.kind,
+        context.set.gate.as_deref(),
+    )
+    .await
+    .map_err(|error| ladder_error(error, ctx.action))?
+    .ok_or_else(|| ActionError::resource_not_found("decision_option_set"))?;
+    let op = if refinement.is_some() {
+        "refined"
+    } else {
+        "reverted"
+    };
+    emit_decision_event(&mut *tx, &ctx, "decision_option_set", context.set.id, op).await?;
+    Ok(HandlerOutput::ok(effective_option_set_out(&set)).with_etag(etag_of(set.version)))
 }
 
 /// A decision as `ladder.*` returns it — the one shape all three rungs project.
@@ -700,8 +1195,14 @@ pub struct DecisionOut {
     pub question: String,
     /// The answer.
     pub answer: Option<String>,
+    /// The authored option set the decision was constrained to.
+    pub option_set_id: Option<String>,
     /// The authored option set's version.
     pub option_set_version: Option<i64>,
+    /// The canonical hash of the effective options the decision offered.
+    pub option_set_hash: Option<String>,
+    /// The base hash of every refinement the effective set applied.
+    pub option_refinement_hashes: Vec<String>,
     /// The probabilities the question type provides.
     pub probabilities: Value,
     /// The confidence.
@@ -755,7 +1256,10 @@ fn decision_out(record: &DecisionRecord) -> DecisionOut {
         card_id: record.card_id.map(|id| id.to_string()),
         question: record.question.clone(),
         answer: record.answer.clone(),
+        option_set_id: record.option_set_id.map(|id| id.to_string()),
         option_set_version: record.option_set_version,
+        option_set_hash: record.option_set_hash.clone(),
+        option_refinement_hashes: record.option_refinement_hashes.clone(),
         probabilities: record.probabilities.clone(),
         confidence: record.confidence,
         policy_id: record.policy_id.map(|id| id.to_string()),
@@ -793,41 +1297,16 @@ struct LayaPlan {
     config: LayaConfigRecord,
     request: Value,
     request_hash: String,
+    /// The effective options, as the decision's immutable snapshot.
     options: Vec<NewOption>,
+    /// The authored set the decision was constrained to, when one exists.
+    option_set_id: Option<Uuid>,
+    /// The set version the decision pins.
     option_set_version: Option<i64>,
-}
-
-/// Refuse an option set that cannot be a finite authored choice.
-///
-/// The Jev bridge validates a `choice` question's criteria as a map of 2–255 option keys (the
-/// agent platform's `CHOICE_OPTIONS` limits); a one-option choice is a live `422` at the
-/// service, so it is refused here — before any call — rather than at the wire.
-fn validate_option_keys(options: &[NewOption]) -> Result<(), ActionError> {
-    if !options.is_empty() && !(2..=255).contains(&options.len()) {
-        return Err(invalid(
-            "options",
-            "option_set_size",
-            "a choice question needs between 2 and 255 options",
-        ));
-    }
-    let mut seen = std::collections::BTreeSet::new();
-    for option in options {
-        if option.key.trim().is_empty() {
-            return Err(invalid(
-                "options",
-                "option_key_missing",
-                "every authored option needs a key",
-            ));
-        }
-        if !seen.insert(option.key.as_str()) {
-            return Err(invalid(
-                "options",
-                "option_key_duplicate",
-                format!("the option key {:?} is repeated", option.key),
-            ));
-        }
-    }
-    Ok(())
+    /// The canonical hash of the effective options the decision offered.
+    option_set_hash: Option<String>,
+    /// The base hash of every refinement applied, hidden ones included.
+    option_refinement_hashes: Vec<String>,
 }
 
 /// The case inputs `ladder.prepare` and `ladder.evaluate` resolve into one wire document.
@@ -836,11 +1315,15 @@ struct LayaCase<'a> {
     gate: Option<&'a str>,
     question: &'a str,
     facts: Option<&'a Value>,
-    options: Vec<NewOption>,
     laya_config_id: Option<Uuid>,
 }
 
-/// Resolve the policy, the laya config and the wire document for one case.
+/// Resolve the policy, the laya config, the authored option set and the wire document.
+///
+/// The options come from the set, never from the caller: a published tenant set shadows the
+/// library for the case, the tenant's per-option refinements are applied to a library set,
+/// and a hidden option never reaches the wire. A case with no authored set is the `score`
+/// question it always was.
 async fn laya_plan_tx(
     conn: &mut PgConnection,
     tenant: TenantId,
@@ -852,7 +1335,6 @@ async fn laya_plan_tx(
         gate,
         question,
         facts,
-        options,
         laya_config_id,
     } = case;
     let effective = store::ladder::effective_policy_tx(&mut *conn, tenant, kind, gate)
@@ -875,24 +1357,66 @@ async fn laya_plan_tx(
             )
         })?,
     };
-    validate_option_keys(&options)?;
-    let wire: Vec<laya::OptionWire<'_>> = options
-        .iter()
-        .map(|option| laya::OptionWire {
-            key: &option.key,
-            label: &option.label,
-        })
-        .collect();
-    let request = laya::request(&config.model_ref, question, facts, &wire);
+    let option_set = store::ladder::effective_option_set_tx(&mut *conn, tenant, kind, gate)
+        .await
+        .map_err(|error| ladder_error(error, action))?;
+    let (request, options, option_set_id, option_set_version, option_set_hash) = match &option_set {
+        Some(set) => {
+            let visible = set.visible();
+            let wire: Vec<laya::OptionWire<'_>> = visible
+                .iter()
+                .map(|option| laya::OptionWire {
+                    key: &option.key,
+                    label: option.wire_label(),
+                })
+                .collect();
+            let request = laya::request(&config.model_ref, question, facts, &wire);
+            let options: Vec<NewOption> = visible
+                .iter()
+                .map(|option| NewOption {
+                    key: option.key.clone(),
+                    label: option.label.clone(),
+                    criteria: option.criteria.clone(),
+                    position: option.position,
+                    payload: serde_json::json!({
+                        "criteria": option.criteria.clone(),
+                        "position": option.position,
+                        "refinement_hash": option.refinement_hash.clone(),
+                    }),
+                    refinement_hash: option.refinement_hash.clone(),
+                })
+                .collect();
+            (
+                request,
+                options,
+                Some(set.id),
+                Some(set.version),
+                Some(set.content_hash()),
+            )
+        }
+        None => (
+            laya::request(&config.model_ref, question, facts, &[]),
+            Vec::new(),
+            None,
+            None,
+            None,
+        ),
+    };
     let request_hash = store::idempotency::request_hash(&request);
-    let option_set_version = (!options.is_empty()).then_some(1);
+    let option_refinement_hashes = option_set
+        .as_ref()
+        .map(store::ladder::EffectiveOptionSet::refinement_hashes)
+        .unwrap_or_default();
     Ok(LayaPlan {
         effective,
         config,
         request,
         request_hash,
         options,
+        option_set_id,
         option_set_version,
+        option_set_hash,
+        option_refinement_hashes,
     })
 }
 
@@ -930,7 +1454,11 @@ pub struct PrepareOut {
 }
 
 /// `ladder.prepare`.
+///
+/// There is deliberately no `options` member: the choice comes from the authored set the
+/// case resolves to (`decision_options.*`), never from the request body.
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+#[serde(deny_unknown_fields)]
 pub struct PrepareIn {
     /// The case kind the policy is keyed by.
     pub kind: String,
@@ -940,8 +1468,6 @@ pub struct PrepareIn {
     pub question: Option<String>,
     /// The facts the answer consumes.
     pub input: Option<Value>,
-    /// The authored options a choice question picks between.
-    pub options: Option<Vec<OptionIn>>,
     /// A laya config override; the effective policy's config is used otherwise.
     pub laya_config_id: Option<Uuid>,
 }
@@ -982,7 +1508,6 @@ async fn ladder_prepare(
             gate: gate.as_deref(),
             question: &question,
             facts: input.input.as_ref(),
-            options: options_of(input.options),
             laya_config_id: input.laya_config_id,
         },
     )
@@ -1011,10 +1536,6 @@ pub struct EvaluateIn {
     pub input: Option<Value>,
     /// An explicit input hash; computed from the basis when absent.
     pub input_hash: Option<String>,
-    /// The authored options this decision chose between.
-    pub options: Option<Vec<OptionIn>>,
-    /// The authored option set's version; defaults to 1 when options are recorded.
-    pub option_set_version: Option<i64>,
     /// A laya config override; the effective policy's config is used otherwise.
     pub laya_config_id: Option<Uuid>,
     /// The `Idempotency-Key` of the verified `laya.classify` call behind this answer.
@@ -1072,7 +1593,6 @@ async fn ladder_evaluate(
             gate: gate.as_deref(),
             question: &question,
             facts: input.input.as_ref(),
-            options: options_of(input.options.clone()),
             laya_config_id: input.laya_config_id,
         },
     )
@@ -1174,13 +1694,25 @@ async fn ladder_evaluate(
             "the stored replay carries no answer document",
         )
     })?;
-    let parsed = laya::parse_answer(&plan.request, output).map_err(|_| {
-        gate_unavailable(
-            fail_policy,
-            fail_action,
-            "the answer document is unreadable for this question",
-        )
-    })?;
+    let parsed = match laya::parse_answer(&plan.request, output) {
+        Ok(parsed) => parsed,
+        // A choice outside the authored set is the caller's answer being wrong, not an
+        // outage: §7.2's finite set is enforced with a 422, never hidden behind a 503.
+        Err(laya::LayaError::AnswerOutsideSet { answer }) => {
+            return Err(invalid(
+                "answer",
+                "answer_not_in_set",
+                format!("the answer {answer:?} is not a key of the authored option set"),
+            ));
+        }
+        Err(laya::LayaError::Unreadable) => {
+            return Err(gate_unavailable(
+                fail_policy,
+                fail_action,
+                "the answer document is unreadable for this question",
+            ));
+        }
+    };
     let outcome = evaluate(parsed.confidence, threshold, fail_action)
         .map_err(|error| ladder_error(error.into(), ctx.action))?;
     let hash = match input.input_hash.clone() {
@@ -1199,7 +1731,11 @@ async fn ladder_evaluate(
         ActionError::internal()
     })?);
     let pins = plan.effective.pins();
-    let option_set_version = input.option_set_version.or(plan.option_set_version);
+    // The pins are the resolved set, never a caller's claim: `ladder.prepare` and this action
+    // share the same builder, so a caller cannot invent an option set or a version.
+    let option_set_version = plan.option_set_version;
+    let option_set_id = plan.option_set_id;
+    let option_set_hash = plan.option_set_hash.clone();
     let decided_at = if matches!(outcome, Outcome::Escalated) {
         None
     } else {
@@ -1215,7 +1751,10 @@ async fn ladder_evaluate(
             card_id: input.card_id,
             question,
             answer: parsed.answer,
+            option_set_id,
             option_set_version,
+            option_set_hash,
+            option_refinement_hashes: plan.option_refinement_hashes,
             probabilities: parsed.probabilities,
             confidence: Some(parsed.confidence),
             input_hash: Some(hash),
@@ -1273,10 +1812,6 @@ pub struct RecordIn {
     pub policy_id: Option<Uuid>,
     /// The approval a human decision records.
     pub approval_id: Option<Uuid>,
-    /// The authored options this decision chose between.
-    pub options: Option<Vec<OptionIn>>,
-    /// The authored option set's version.
-    pub option_set_version: Option<i64>,
     /// The evaluation latency.
     pub latency_ms: Option<i32>,
     /// Free-form metadata.
@@ -1511,10 +2046,8 @@ async fn ladder_record(
         )?),
         None => None,
     };
-    let options = options_of(input.options.clone());
-    let option_set_version = input
-        .option_set_version
-        .or_else(|| (!options.is_empty()).then_some(1));
+    // A rule or human answer is not a laya choice: no authored option set constrains it, and
+    // the request carries no option list to record.
     let record = store::ladder::record_decision_tx(
         &mut *tx,
         ctx.tenant,
@@ -1525,7 +2058,10 @@ async fn ladder_record(
             card_id: input.card_id,
             question,
             answer: input.answer.clone(),
-            option_set_version,
+            option_set_id: None,
+            option_set_version: None,
+            option_set_hash: None,
+            option_refinement_hashes: Vec::new(),
             probabilities: serde_json::json!({}),
             confidence: input.confidence,
             input_hash: hash,
@@ -1545,7 +2081,7 @@ async fn ladder_record(
             outcome,
             decided_at: Some(Utc::now()),
             meta: input.meta.unwrap_or_else(|| serde_json::json!({})),
-            options,
+            options: Vec::new(),
         },
     )
     .await

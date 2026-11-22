@@ -1686,12 +1686,12 @@
       "evidence": [
         {
           "path": "crates/actions/src/pm/mod.rs",
-          "line": 160,
+          "line": 162,
           "quote": "    if !job.job_key.eq_ignore_ascii_case(PM_JOB_KEY)"
         },
         {
           "path": "crates/actions/src/pm/mod.rs",
-          "line": 649,
+          "line": 651,
           "quote": "    let required = input.required_decisions.unwrap_or(1);"
         },
         {
@@ -1799,7 +1799,12 @@
       ],
       "failure_scenario": "A prompt or agent sends options [{key:'yes'},{key:'no'}] with answer 'yes, because the ticket says so'. The row stores option_set_version=1 and two option rows, and the answer is accepted as a valid laya choice even though it is not a key in the set. Conversely it can send only the option it picked, so the ledger can never prove the decision was constrained to a finite authored set; a prompt can inject or shrink the option space per call.",
       "acceptance": "option sets are authored/versioned rows resolved by policy+question, the evaluate action references the set (and a real version), and the answer must equal one of that set's keys or the action returns 422; tests cover an answer outside the set and a caller trying to pass its own option list.",
-      "owner_project": "T2"
+      "owner_project": "T2",
+      "resolved_by": {
+        "commit": "78cdf4ebbaabbdafbc547fbfd4cdb68c526acf7a",
+        "test": "crates/actions/tests/decision_ladder.rs::a_caller_cannot_supply_its_own_options",
+        "evidence": "Option sets are authored and versioned rows (`decision_option_set`/`decision_option_entry`, tenant sets shadowing the library set, refinements pinning `base_hash`), the evaluate action resolves the set by policy+question and pins its real version, and an answer outside the set is refused 422 `answer_not_in_set` with no laya row written. decision_ladder 22/22 at merged head 7b4b9a0: a_tenant_option_set_shadows_the_library_set, a_hidden_option_is_absent_from_the_wire, a_decision_pins_the_option_set_version_it_read, a_caller_cannot_supply_its_own_options, a_refinement_whose_base_changed_is_refused."
+      }
     },
     {
       "id": "v1-w1c-5",
@@ -1812,17 +1817,17 @@
       "evidence": [
         {
           "path": "crates/domain/src/ladder.rs",
-          "line": 268,
+          "line": 432,
           "quote": "pub fn unavailable(fail_policy: FailPolicy, action: FailAction) -> Outcome {"
         },
         {
           "path": "crates/actions/src/ladder/mod.rs",
-          "line": 1184,
+          "line": 1716,
           "quote": "    let outcome = evaluate(parsed.confidence, threshold, fail_action)"
         },
         {
           "path": "crates/store/src/ladder.rs",
-          "line": 572,
+          "line": 1348,
           "quote": "    pub fn fail_policy(&self) -> Result<FailPolicy, LadderStoreError> {"
         }
       ],
@@ -2539,7 +2544,7 @@
         },
         {
           "path": "crates/actions/src/tools.rs",
-          "line": 70,
+          "line": 74,
           "quote": "        timeout_ms: 300_000,"
         },
         {
@@ -2680,7 +2685,7 @@
         },
         {
           "path": "crates/actions/src/pm/mod.rs",
-          "line": 59,
+          "line": 61,
           "quote": "            \"gate_evidence_missing\","
         }
       ],
@@ -2733,22 +2738,22 @@
       "evidence": [
         {
           "path": "docs/design/data/coverage.json",
-          "line": 1808,
+          "line": 1811,
           "quote": "      \"evidence\": ["
         },
         {
           "path": "docs/design/data/coverage.json",
-          "line": 1809,
+          "line": 1812,
           "quote": "        \"crates/actions/src/toolkits\""
         },
         {
           "path": "docs/design/data/coverage.json",
-          "line": 1812,
+          "line": 1815,
           "quote": "      \"key\": \"T14\","
         },
         {
           "path": "docs/design/data/coverage.json",
-          "line": 1838,
+          "line": 1841,
           "quote": "      \"status\": \"built\","
         }
       ],
@@ -2767,32 +2772,32 @@
       "evidence": [
         {
           "path": "docs/design/data/coverage.json",
-          "line": 2244,
+          "line": 2247,
           "quote": "      \"evidence\": ["
         },
         {
           "path": "docs/design/data/coverage.json",
-          "line": 2245,
+          "line": 2248,
           "quote": "        \"migrations/0056_cadence_tranche.sql\""
         },
         {
           "path": "docs/design/data/coverage.json",
-          "line": 2248,
+          "line": 2251,
           "quote": "      \"key\": \"T8\","
         },
         {
           "path": "docs/design/data/coverage.json",
-          "line": 2269,
+          "line": 2272,
           "quote": "      \"status\": \"built\","
         },
         {
           "path": "docs/design/data/coverage.json",
-          "line": 2250,
+          "line": 2253,
           "quote": "        \"actions\": ["
         },
         {
           "path": "docs/design/data/coverage.json",
-          "line": 2251,
+          "line": 2254,
           "quote": "          0,"
         }
       ],
@@ -2811,22 +2816,22 @@
       "evidence": [
         {
           "path": "docs/design/data/coverage.json",
-          "line": 2026,
+          "line": 2029,
           "quote": "      \"evidence\": ["
         },
         {
           "path": "docs/design/data/coverage.json",
-          "line": 2027,
+          "line": 2030,
           "quote": "        \"docs/SPEC_V2.md\""
         },
         {
           "path": "docs/design/data/coverage.json",
-          "line": 2030,
+          "line": 2033,
           "quote": "      \"key\": \"T3\","
         },
         {
           "path": "docs/design/data/coverage.json",
-          "line": 2051,
+          "line": 2054,
           "quote": "      \"status\": \"built\","
         }
       ],
@@ -3814,7 +3819,7 @@
         },
         {
           "path": "docs/design/data/actions.json",
-          "line": 258,
+          "line": 263,
           "quote": "    \"lessons.list\","
         }
       ],
@@ -3844,7 +3849,7 @@
         },
         {
           "path": "docs/design/data/actions.json",
-          "line": 483,
+          "line": 493,
           "quote": "    \"tools.call\","
         }
       ],
@@ -3909,7 +3914,7 @@
         },
         {
           "path": "docs/design/data/actions.json",
-          "line": 483,
+          "line": 493,
           "quote": "    \"tools.call\","
         }
       ],
@@ -3944,7 +3949,7 @@
         },
         {
           "path": "docs/design/data/actions.json",
-          "line": 359,
+          "line": 364,
           "quote": "    \"procedures.ingest_sop\","
         }
       ],
@@ -4274,7 +4279,7 @@
       "evidence": [
         {
           "path": "crates/actions/src/workflow/agent.rs",
-          "line": 330,
+          "line": 332,
           "quote": "    let record = store::capability::get_agent_tx(&mut tx, tenant, agent_id)"
         },
         {
@@ -4284,7 +4289,7 @@
         },
         {
           "path": "crates/actions/src/workflow/agent.rs",
-          "line": 388,
+          "line": 390,
           "quote": "    let bound_turns = u8::try_from(record.max_iterations).unwrap_or(MAX_TURNS);"
         }
       ],
@@ -4356,7 +4361,7 @@
       "evidence": [
         {
           "path": "crates/domain/src/prompt.rs",
-          "line": 38,
+          "line": 42,
           "quote": "    Knowledge,"
         },
         {
@@ -4630,7 +4635,7 @@
       "evidence": [
         {
           "path": "crates/actions/src/pm/mod.rs",
-          "line": 560,
+          "line": 562,
           "quote": "        store::spine::take_baseline_tx(&mut *tx, ctx.tenant, project_id, &kind, ctx.actor_id, None)"
         },
         {
@@ -4664,7 +4669,7 @@
         },
         {
           "path": "crates/actions/src/pm/mod.rs",
-          "line": 874,
+          "line": 876,
           "quote": "/// `pm.get` — the PM's view: project, charter, WBS, baselines and gates."
         },
         {
@@ -4770,7 +4775,7 @@
       "evidence": [
         {
           "path": "crates/actions/src/workflow/agent.rs",
-          "line": 463,
+          "line": 546,
           "quote": "    if let Some(reference) = record.prompt_ref.as_deref() {"
         },
         {
@@ -4809,7 +4814,7 @@
         },
         {
           "path": "crates/store/src/prompt.rs",
-          "line": 161,
+          "line": 185,
           "quote": "    if let Some(capability_id) = capability_id {"
         }
       ],
@@ -4828,12 +4833,12 @@
       "evidence": [
         {
           "path": "crates/store/src/seed.rs",
-          "line": 1272,
+          "line": 1275,
           "quote": "            \"INSERT INTO prompt (tenant_id, key, version, status, title)"
         },
         {
           "path": "crates/store/src/seed.rs",
-          "line": 1289,
+          "line": 1292,
           "quote": "                     (tenant_id, prompt_id, position, source_kind, required, template)"
         },
         {
@@ -4857,12 +4862,12 @@
       "evidence": [
         {
           "path": "crates/store/src/memory.rs",
-          "line": 346,
+          "line": 438,
           "quote": "         VALUES ($1, $2, $3, 'digest', 'system', $4, now(), $5)"
         },
         {
           "path": "crates/store/src/memory.rs",
-          "line": 229,
+          "line": 453,
           "quote": "          WHERE tenant_id = $1 AND card_id = $2"
         },
         {
@@ -4886,12 +4891,12 @@
       "evidence": [
         {
           "path": "crates/actions/src/process/step.rs",
-          "line": 1446,
+          "line": 1451,
           "quote": "        \"decision\": if verdict.accepted { \"accept\" } else { \"reject\" },"
         },
         {
           "path": "crates/actions/src/process/step.rs",
-          "line": 1493,
+          "line": 1498,
           "quote": "        store::process_judge::set_verdict_tx(&mut tx, tenant, row.id, verdict)"
         },
         {
@@ -4915,8 +4920,8 @@
       "evidence": [
         {
           "path": "crates/actions/src/process/judge.rs",
-          "line": 273,
-          "quote": "        timeout_ms: 30_000,"
+          "line": 275,
+          "quote": "        timeout_ms: 60_000,"
         },
         {
           "path": "crates/actions/src/invoke.rs",
@@ -5060,7 +5065,7 @@
       "evidence": [
         {
           "path": "crates/store/src/tool.rs",
-          "line": 539,
+          "line": 572,
           "quote": "        \"INSERT INTO tool (tenant_id, toolkit_id, key, input_schema, effect, timeout_secs,"
         },
         {
@@ -5210,7 +5215,7 @@
         },
         {
           "path": "crates/store/src/tool.rs",
-          "line": 539,
+          "line": 572,
           "quote": "        \"INSERT INTO tool (tenant_id, toolkit_id, key, input_schema, effect, timeout_secs,"
         },
         {
@@ -5551,7 +5556,12 @@
       ],
       "failure_scenario": "A project's scope baseline is approved (the recorder's normal order). Its WBS deliverable is then accepted with evidence: the guard refuses 409, the only change-opening action needs a PM job binding that no seed ever created, and the deliverable can never reach accepted, so no demo credit can be recorded for it. The record is frozen at the baseline while the work it describes is complete.",
       "acceptance": "A tenant with an approved scope baseline can always authorise a WBS acceptance through a provisioned path: either the organisation seed creates the PM process and its binding that `changes.request` requires, or `changes.request` takes the baseline directly and validates it rather than a PM job binding; a test proves a post-baseline WBS acceptance end to end through that path.",
-      "owner_project": "T3"
+      "owner_project": "T3",
+      "resolved_by": {
+        "commit": "5a5b05052da0737b168b1fe632c6f67c76a7906e",
+        "test": "crates/actions/tests/plan_spine.rs::a_direct_change_request_authorises_a_post_baseline_wbs_acceptance",
+        "evidence": "`changes.request` now takes an optional `job_binding_id` and a `baseline_id`: on the direct route it validates the baseline (exists, same project, in scope, approved, current) with typed 422 codes instead of demanding a PM job binding. plan_spine 21/21 at merged head 7b4b9a0, including a_direct_change_request_authorises_a_post_baseline_wbs_acceptance and a_direct_change_request_refuses_an_invalid_baseline. The T13 recorder now opens and approves that change before a post-baseline WBS acceptance."
+      }
     },
     {
       "id": "v1-outputs-1",

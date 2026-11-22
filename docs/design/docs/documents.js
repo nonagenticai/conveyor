@@ -119,6 +119,15 @@ window.CONVEYOR_DOCUMENTS = {
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0008-card-ledger.md"
     },
     {
+      "title": "0009 — Prompt selection and recipe authoring",
+      "path": "docs/decisions/0009-prompt-selection-and-recipe-authoring.html",
+      "source": "docs/decisions/0009-prompt-selection-and-recipe-authoring.md",
+      "section": "Decisions",
+      "sha256": "f9900bfe8e8870119e0e335fa7d51020459d91a548b0c2f43701794b9097a4c3",
+      "bytes": 4223,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0009-prompt-selection-and-recipe-authoring.md"
+    },
+    {
       "title": "0010 — No deferrals; every finding executes",
       "path": "docs/decisions/0010-no-deferrals.html",
       "source": "docs/decisions/0010-no-deferrals.md",
@@ -398,6 +407,15 @@ window.CONVEYOR_DOCUMENTS = {
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S21-PLAN.md"
     },
     {
+      "title": "S21 step 3 — the work-package prompt envelope (issue #15)",
+      "path": "docs/evidence/S21-WORKPACKAGE.html",
+      "source": "docs/evidence/S21-WORKPACKAGE.md",
+      "section": "Evidence",
+      "sha256": "d7ce665d7ac7e8ce18f9ca8434a3324ef83061e1d0651fe6ecf16c26a3177cab",
+      "bytes": 5255,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S21-WORKPACKAGE.md"
+    },
+    {
       "title": "The analysis service — capture and drop table (2026-11-15)",
       "path": "docs/evidence/analysis-capture-2026-11-15.html",
       "source": "docs/evidence/analysis-capture-2026-11-15.md",
@@ -672,8 +690,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/evidence/rework/T13/acts.html",
       "source": "docs/evidence/rework/T13/acts.md",
       "section": "Evidence",
-      "sha256": "b3cbd2d8aa64b56d38a327ab352538080fa35a656278704478cf1578ef62e713",
-      "bytes": 1171,
+      "sha256": "86c0a74e3862b0ee47033fff5d2ff6d9ae132e7a5322c0356bb06f753ec86d91",
+      "bytes": 1450,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/T13/acts.md"
     },
     {
@@ -762,7 +780,7 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/evidence/rework/tranche-2/acts.html",
       "source": "docs/evidence/rework/tranche-2/acts.md",
       "section": "Evidence",
-      "sha256": "c8b13408b88c8b3fef68d8d71cd34307ce27ccdb2b5d7d4c8a1451cd925ce83f",
+      "sha256": "004fbf3c23db7b9448068107194445dc0d38e35053379447f1df5246406f3453",
       "bytes": 7532,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/tranche-2/acts.md"
     },
@@ -789,8 +807,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/00-INDEX.html",
       "source": "docs/plans/00-INDEX.md",
       "section": "Plans",
-      "sha256": "786145e9cfcb9b70a49555ec245d4c423f94319d8c977f7518a47213cd04dffc",
-      "bytes": 251347,
+      "sha256": "21c693cf010776f87d025fca8f95f206fc6f78522c3a465eee1b452b0bbb8662",
+      "bytes": 251893,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/00-INDEX.md"
     },
     {
@@ -798,8 +816,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/01-CONTRACT.html",
       "source": "docs/plans/01-CONTRACT.md",
       "section": "Plans",
-      "sha256": "9ca19a82b56c4002f19e6f38bbc8c8a0a67cd68f12608cc5e96dcb50af62860e",
-      "bytes": 65869,
+      "sha256": "c832ffb7013378aeeb5d1fbad1957be77bb0cbada357d25c6472ca67a59dc7b9",
+      "bytes": 66597,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/01-CONTRACT.md"
     },
     {
@@ -807,8 +825,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/02-DATA-ARCHITECTURE.html",
       "source": "docs/plans/02-DATA-ARCHITECTURE.md",
       "section": "Plans",
-      "sha256": "b7404c934cfeb204416287493b420c6b5377feaa81203c1766bb16abcef30d8f",
-      "bytes": 136458,
+      "sha256": "8488039bfa61ae75a115f71366b2c6de2ed9d5bbc694a5c0cff5565374f2988c",
+      "bytes": 137545,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/02-DATA-ARCHITECTURE.md"
     },
     {
@@ -861,8 +879,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/03-DELIVERY.html",
       "source": "docs/plans/03-DELIVERY.md",
       "section": "Plans",
-      "sha256": "3cc0009a9ce7c398071d84d23533c2dab86cef39b02fbc8d99a8ec5dcf719675",
-      "bytes": 24410,
+      "sha256": "9413f92167d008328c5d294de4abbb6f33784b0a30ca6bcfb31832257fcc4533",
+      "bytes": 25084,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/03-DELIVERY.md"
     },
     {
@@ -1293,8 +1311,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/slices/S21-message-construction.html",
       "source": "docs/plans/slices/S21-message-construction.md",
       "section": "Plans",
-      "sha256": "3db41eba341f3983658b865578ed21a1cf6550f09179b8541d2c4a8dd074ca05",
-      "bytes": 19611,
+      "sha256": "3ab8a104044e312729d6d687e0cf7eee8ac7879036202293a598e0b63f72b904",
+      "bytes": 26694,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S21-message-construction.md"
     }
   ]

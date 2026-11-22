@@ -84,11 +84,6 @@ SLICE_EVIDENCE = {
         "evidence": ["docs/plans/slices/S14-cutover.md"],
         "gap": "the fr/RM/Planka decommission is open (#8, #29); the app itself is deployed",
     },
-    "S21": {
-        "status": "partial",
-        "evidence": ["docs/plans/slices/S21-message-construction.md"],
-        "gap": "the v1 seam is built; the 2026-2027 design is unbuilt (#25)",
-    },
 }
 
 # A page whose status is not a single ribbon/no-ribbon fact. Every non-obvious claim carries

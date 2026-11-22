@@ -270,7 +270,9 @@ fn laya_judge() -> ActionSpec {
         output: wire_output,
         scopes: &[Scope::ProcessesWrite],
         idempotent: true,
-        timeout_ms: 30_000,
+        // A decision is an inference call on a shared GPU host, so the budget covers the queue as
+        // well as the turn; 30 s was a local read's allowance, not a model call's.
+        timeout_ms: 60_000,
         // It changes nothing here; it meters an external decision call.
         effect: Effect::Read,
         confirm: Confirm::None,

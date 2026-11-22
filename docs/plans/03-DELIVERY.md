@@ -121,13 +121,20 @@ blocker that had closed. `reap-stale-claims.sh` cannot see any of it: a claim is
 
 - **Automatic, one direction only.** An issue carrying `status:ready` while a branch `issue/<n>-*`
   or an open PR names it is relabelled `status:claimed`, with one comment naming the evidence. The
-  check never moves an issue back to `ready`: a check that could return a live claim to the pool is
-  worse than the drift it repairs.
-- **Reported, never applied.** `status:blocked` with no line *starting* `Blocker: #N` naming an open
-  issue, and `status:claimed` with no branch, no PR and no update in 48 h. Releasing a claim is a
-  human decision — the same reason the reaper defaults to report mode.
+  check never moves a **claim** back to `ready`: a check that could return a live claim to the pool
+  is worse than the drift it repairs.
+- **Automatic, the stale block only.** A `status:blocked` issue whose *every* line-starting
+  `Blocker: #N` names a positively **closed** issue is relabelled `status:ready`, with one comment
+  naming each closed blocker. The block's own clause is "naming an OPEN issue", so this is the
+  mechanical half. It never releases a `status:claimed` issue, and it never acts on a `missing` or
+  `unknown` blocker, or a body with no conforming line: a typo or a failed lookup is not evidence of
+  closure, so those are reported only.
+- **Reported, never applied.** `status:blocked` with no line *starting* `Blocker: #N`, a blocker that
+  is missing or could not be looked up, and `status:claimed` with no branch, no PR and no update in
+  48 h. Releasing a claim is a human decision — the same reason the reaper defaults to report mode.
 - **By hand:** `python3 scripts/ci/board.py --repo <owner/name> --dry-run` (exit 1 when a fix is
-  pending). The fixtures run in the `checks` job; the job summary is the record.
+  pending); `--dor N` (exit 1 when a `unit` issue created on/after 2026-11-18 has a missing or empty
+  `## Programme` field). The fixtures run in the `checks` job; the job summary is the record.
 
 ## Claim — four checks, then push
 

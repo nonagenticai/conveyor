@@ -1,12 +1,14 @@
 #![forbid(unsafe_code)]
 //! T3 — the PM job (SPEC_V2 §6.1, §5.4, §8.4; issue #74).
 //!
-//! The PM is a job, not a code path: every action here names the caller's `job_binding_id` and
-//! refuses unless that binding resolves to an active `job_catalogue(job_key='pm')` job. The
-//! PM creates the project, writes its charter, plans the WBS, takes the baseline, routes the
-//! gates with typed evidence, requests a baseline change, and closes the project after the
-//! closure gate — never approving any of those gates itself (the store's single decision
-//! writer already refuses a requester's decision, T1/#72).
+//! The PM is a job, not a code path: the PM's own actions name the caller's `job_binding_id` and
+//! refuse unless that binding resolves to an active `job_catalogue(job_key='pm')` job. The one
+//! exception is `changes.request`: a tenant with no PM process satisfies the WBS change guard
+//! through the project's approved scope baseline instead (v1-change-1). The PM creates the
+//! project, writes its charter, plans the WBS, takes the baseline, routes the gates with typed
+//! evidence, requests a baseline change, and closes the project after the closure gate — never
+//! approving any of those gates itself (the store's single decision writer already refuses a
+//! requester's decision, T1/#72).
 //!
 //! Reused, not rebuilt: the approval primitive, the WBS/baseline/register rows (T1, 0044), the
 //! governed-asset lifecycle (S07), the project/board/start-card creation (S13), and the trace
@@ -26,7 +28,7 @@ use sqlx::PgConnection;
 use uuid::Uuid;
 
 use crate::board::projects::{insert_board_from_template, insert_start_card_and_run};
-use crate::control::store_error;
+use crate::control::{invalid, store_error};
 use crate::invoke::{ActionError, HandlerCtx};
 use crate::spec::HandlerOutput;
 
@@ -986,12 +988,16 @@ async fn pm_get(
 /// `changes.request` — the only path that advances an approved baseline.
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 pub struct ChangeRequestIn {
-    /// The PM's active job binding.
-    pub job_binding_id: Uuid,
+    /// The PM's active job binding — the process route. Omit it to authorise the change by the
+    /// project's approved scope baseline in `baseline_id`.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub job_binding_id: Option<Uuid>,
     /// The project.
     pub project_id: Uuid,
-    /// The approved baseline the change would replace.
-    pub baseline_id: Uuid,
+    /// The approved baseline the change would replace. Required on the direct route (no
+    /// `job_binding_id`), where it must be the project's current approved scope baseline.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub baseline_id: Option<Uuid>,
     /// The change's title.
     pub title: String,
     /// The change's body.
@@ -1027,14 +1033,43 @@ async fn changes_request(
     ctx: HandlerCtx,
     input: ChangeRequestIn,
 ) -> Result<HandlerOutput<ChangeRequestOut>, ActionError> {
-    assert_pm(&mut *tx, ctx.tenant, input.job_binding_id).await?;
+    // Two authorities: a PM process run's active binding, or — for a tenant that has no PM
+    // process — the project's current approved scope baseline itself (v1-change-1). The direct
+    // route validates exactly what the WBS change guard resolves, so the change it opens can
+    // authorise a post-baseline mutation.
+    let baseline_id = match (input.job_binding_id, input.baseline_id) {
+        (None, None) => {
+            return Err(invalid(
+                "job_binding_id",
+                "change_authority_missing",
+                "a change needs the PM job's active `job_binding_id` or the project's approved \
+                 scope baseline in `baseline_id`",
+            ));
+        }
+        (Some(binding_id), Some(baseline_id)) => {
+            assert_pm(&mut *tx, ctx.tenant, binding_id).await?;
+            baseline_id
+        }
+        (Some(binding_id), None) => {
+            assert_pm(&mut *tx, ctx.tenant, binding_id).await?;
+            return Err(invalid(
+                "baseline_id",
+                "baseline_required",
+                "the process route names the approved baseline the change would replace",
+            ));
+        }
+        (None, Some(baseline_id)) => {
+            assert_direct_change_baseline(&mut *tx, &ctx, input.project_id, baseline_id).await?;
+            baseline_id
+        }
+    };
     // The change gate resolves the approved baseline it would replace before it is opened.
     let evidence = resolve_evidence(
         &mut *tx,
         ctx.tenant,
         &[EvidenceRef {
             kind: "baseline".to_owned(),
-            id: input.baseline_id,
+            id: baseline_id,
         }],
         true,
     )
@@ -1055,7 +1090,7 @@ async fn changes_request(
             probability: None,
             impact: None,
             links: Value::Array(Vec::new()),
-            baseline_ref: Some(input.baseline_id),
+            baseline_ref: Some(baseline_id),
             review_at: None,
             response: None,
             // The store validates the block (at least one of the four impact keys) in
@@ -1086,6 +1121,71 @@ async fn changes_request(
         change_id: change.id,
         approval_id,
     }))
+}
+
+/// The direct route's authority: `baseline_id` must be the project's current approved scope
+/// baseline. That is the baseline `wbs_change_guard` resolves, so a change opened against it is
+/// one the guard can accept; an older approved baseline, another project's row or an unapproved
+/// row would open a change that authorises nothing.
+async fn assert_direct_change_baseline(
+    conn: &mut PgConnection,
+    ctx: &HandlerCtx,
+    project_id: Uuid,
+    baseline_id: Uuid,
+) -> Result<(), ActionError> {
+    let baseline = store::spine::get_baseline_tx(&mut *conn, ctx.tenant, baseline_id)
+        .await
+        .map_err(|error| {
+            tracing::error!(%error, "changes.request: read baseline");
+            ActionError::internal()
+        })?
+        .ok_or_else(|| {
+            invalid(
+                "baseline_id",
+                "not_found",
+                format!("no baseline {baseline_id} in this tenant"),
+            )
+        })?;
+    if baseline.project_id != project_id {
+        return Err(invalid(
+            "baseline_id",
+            "baseline_project_mismatch",
+            format!("baseline {baseline_id} belongs to another project"),
+        ));
+    }
+    if baseline.kind != "scope" {
+        return Err(invalid(
+            "baseline_id",
+            "baseline_not_scope",
+            format!(
+                "baseline {baseline_id} is a {} baseline; the direct route needs the scope \
+                 baseline",
+                baseline.kind
+            ),
+        ));
+    }
+    if baseline.approved_by.is_none() {
+        return Err(invalid(
+            "baseline_id",
+            "baseline_not_approved",
+            format!("baseline {baseline_id} is not approved"),
+        ));
+    }
+    let current =
+        store::spine::latest_approved_baseline_tx(&mut *conn, ctx.tenant, project_id, "scope")
+            .await
+            .map_err(|error| {
+                tracing::error!(%error, "changes.request: read the current scope baseline");
+                ActionError::internal()
+            })?;
+    if current.as_ref().map(|row| row.id) != Some(baseline_id) {
+        return Err(invalid(
+            "baseline_id",
+            "baseline_not_current",
+            format!("baseline {baseline_id} is not the project's current approved scope baseline"),
+        ));
+    }
+    Ok(())
 }
 
 /// Move a governed asset to `approved` through its legal lifecycle.

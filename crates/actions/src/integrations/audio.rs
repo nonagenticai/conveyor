@@ -196,7 +196,9 @@ fn speech() -> ActionSpec {
         // A replay with the same key returns the first clip — one synthesis, one charge.
         idempotent: true,
         // Long narration is chunked by the service; a 10,000-character ask is minutes of audio.
-        timeout_ms: 600_000,
+        // The host is shared with the image renders and the transcriptions, so the budget absorbs
+        // the queue ahead of the ask as well as the ask itself.
+        timeout_ms: 1_200_000,
         // Synthesis costs the tenant money and deletes nothing (§11.4).
         effect: Effect::Spend,
         confirm: Confirm::None,
@@ -236,9 +238,10 @@ fn transcribe() -> ActionSpec {
         scopes: &[Scope::CapabilitiesWrite],
         // The same audio and the same key produce the same transcript; a replay returns the first.
         idempotent: true,
-        // Transcription is linear in audio length; five minutes covers a long narration and fails
-        // before the caller's own deadline does.
-        timeout_ms: 300_000,
+        // Transcription is linear in audio length, and the same host serves the estate's speech and
+        // image work from one queue: ten minutes covers a long narration plus the wait behind a
+        // render.
+        timeout_ms: 600_000,
         // A model call that also creates a document: money, not deletion.
         effect: Effect::Spend,
         confirm: Confirm::None,
@@ -290,7 +293,10 @@ mod tests {
         assert_eq!(spec.kind, ActionKind::External);
         assert_eq!(spec.effect, Effect::Spend);
         assert!(spec.captures_usage, "a synthesis is a model call");
-        assert_eq!(spec.timeout_ms, 600_000);
+        assert_eq!(
+            spec.timeout_ms, 1_200_000,
+            "narration shares the render host's queue (#571)"
+        );
         assert_eq!(spec.scope_names(), vec!["capabilities:write"]);
         let artefact = spec
             .artefact
