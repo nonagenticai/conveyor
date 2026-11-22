@@ -2046,6 +2046,89 @@ async fn seed_parity_policy(pg: &support::Pg, ctx: &Ctx, kind_prefix: &str, gate
     inserted
 }
 
+/// Seed an authored option set for the `decision_options.*` samples.
+///
+/// Each sample seeds a stable per-sample `kind`, so `decision_options.get` can name the case
+/// directly. `origin = "library"` models the platform base the refine sample needs; `published`
+/// makes the set resolvable.
+async fn seed_parity_option_set(
+    pg: &support::Pg,
+    ctx: &Ctx,
+    origin: &str,
+    published: bool,
+    kind: &str,
+    unique: bool,
+) -> (Uuid, Vec<Uuid>) {
+    let seed_id = Uuid::now_v7();
+    let kind = if unique {
+        format!("{kind}.{seed_id}")
+    } else {
+        kind.to_owned()
+    };
+    let mut tx = begin_scoped(&pg.owner, ctx.tenant).await.expect("scope");
+    // A stable key is re-used by the second round; the mutating samples get a per-round key.
+    if !unique {
+        let existing: Option<Uuid> = sqlx::query_scalar(
+            "SELECT id FROM decision_option_set
+              WHERE tenant_id = $1 AND kind = $2
+                AND gate IS NOT DISTINCT FROM $3::text AND origin = $4",
+        )
+        .bind(ctx.tenant.as_uuid())
+        .bind(&kind)
+        .bind(Some("parity_gate"))
+        .bind(origin)
+        .fetch_optional(&mut *tx)
+        .await
+        .expect("read the existing option set");
+        if let Some(id) = existing {
+            let entries = store::ladder::option_entries_tx(&mut tx, ctx.tenant, id)
+                .await
+                .expect("read the existing entries");
+            tx.commit().await.expect("commit the option-set read");
+            return (id, entries.into_iter().map(|entry| entry.id).collect());
+        }
+    }
+    let entries = vec![
+        store::ladder::NewOptionEntry {
+            key: "allow".to_owned(),
+            label: "Allow".to_owned(),
+            criteria: "the case may proceed".to_owned(),
+            position: 1,
+        },
+        store::ladder::NewOptionEntry {
+            key: "review".to_owned(),
+            label: "Review".to_owned(),
+            criteria: "a person decides".to_owned(),
+            position: 2,
+        },
+        store::ladder::NewOptionEntry {
+            key: "refuse".to_owned(),
+            label: "Refuse".to_owned(),
+            criteria: "the case is refused".to_owned(),
+            position: 3,
+        },
+    ];
+    let (set, stored) = store::ladder::insert_option_set_tx(
+        &mut tx,
+        ctx.tenant,
+        &store::ladder::NewOptionSet {
+            kind,
+            gate: Some("parity_gate".to_owned()),
+            origin: origin.to_owned(),
+            entries,
+        },
+    )
+    .await
+    .expect("insert the option set");
+    if published {
+        let _ = store::ladder::publish_option_set_tx(&mut tx, ctx.tenant, set.id, None)
+            .await
+            .expect("publish the option set");
+    }
+    tx.commit().await.expect("commit the option set");
+    (set.id, stored.into_iter().map(|entry| entry.id).collect())
+}
+
 /// Seed the approved `refinement.publish` gate the publish sample cites (§7.2).
 ///
 /// `prepare` runs before either transport, so the gate is written through the store — the same
@@ -2832,6 +2915,32 @@ async fn prepare(sample: &Sample, pg: &support::Pg, ctx: &Ctx) {
             ctx.push("ladder.apply_draft.card", card);
             ctx.push("ladder.apply_draft.decision", decision);
             ctx.push("ladder.apply_draft.document", document);
+        }
+        "decision_options.create" => {}
+        "decision_options.update" => {
+            let (set, _) =
+                seed_parity_option_set(pg, ctx, "tenant", false, "parity.options.update", true)
+                    .await;
+            ctx.push("decision_options.update", set);
+        }
+        "decision_options.publish" => {
+            let (set, _) =
+                seed_parity_option_set(pg, ctx, "tenant", false, "parity.options.publish", true)
+                    .await;
+            ctx.push("decision_options.publish", set);
+        }
+        "decision_options.get" => {
+            let _ =
+                seed_parity_option_set(pg, ctx, "tenant", true, "parity.options.get", false).await;
+        }
+        "decision_options.refine" => {
+            // Hiding the third of three leaves the two-visible floor intact.
+            let (_, entries) =
+                seed_parity_option_set(pg, ctx, "library", true, "parity.options.refine", true)
+                    .await;
+            let gate = seed_parity_refinement_gate(pg, ctx, entries[2]).await;
+            ctx.push("decision_options.refine.entry", entries[2]);
+            ctx.push("decision_options.refine.approval", gate);
         }
         "tenants.update_settings" => {
             sqlx::query("UPDATE tenant SET settings = '{}'::jsonb, version = 1 WHERE id = $1")
@@ -6985,6 +7094,61 @@ fn kata_samples() -> Vec<Sample> {
 fn ladder_samples() -> Vec<Sample> {
     vec![
         // ── T2 decision ladder (SPEC_V2 §7, §10.3–§10.4) ────────────────────────────────
+        {
+            // The authored option set family (v1-w1c-4): the case is unique per execution,
+            // because one tenant set per (kind, gate, origin) is the table's contract.
+            let mut sample = plain("decision_options.create", json!({}), None);
+            sample.input = Box::new(|_: &Ctx| {
+                json!({
+                    "kind": format!("parity.options.{}", Uuid::now_v7().simple()),
+                    "gate": "parity_gate_options",
+                    "options": [
+                        {"key": "allow", "label": "Allow"},
+                        {"key": "review", "label": "Review", "criteria": "a person decides"},
+                        {"key": "refuse", "label": "Refuse"}
+                    ]
+                })
+            });
+            expecting(sample, 201)
+        },
+        {
+            let mut sample = on_prepared("decision_options.update", Some("\"1\""));
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "id": ctx.pop("decision_options.update"),
+                    "options": [
+                        {"key": "allow", "label": "Allow"},
+                        {"key": "refuse", "label": "Refuse"}
+                    ]
+                })
+            });
+            expecting(sample, 200)
+        },
+        {
+            let mut sample = on_prepared("decision_options.publish", Some("\"1\""));
+            sample.input = Box::new(|ctx: &Ctx| json!({"id": ctx.pop("decision_options.publish")}));
+            expecting(sample, 200)
+        },
+        {
+            // The library's third option is hidden; the two-visible floor still holds.
+            let mut sample = plain("decision_options.refine", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "entry_id": ctx.pop("decision_options.refine.entry"),
+                    "hidden": true,
+                    "approval_id": ctx.pop("decision_options.refine.approval")
+                })
+            });
+            expecting(sample, 200)
+        },
+        {
+            let mut sample = plain("decision_options.get", json!({}), None);
+            sample.prepare = true;
+            sample.input =
+                Box::new(|_: &Ctx| json!({"kind": "parity.options.get", "gate": "parity_gate"}));
+            expecting(sample, 200)
+        },
         {
             // The case is unique per execution: one policy per (kind, gate) is the table's
             // contract, and round B executes rather than replays.
