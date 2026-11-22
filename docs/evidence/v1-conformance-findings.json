@@ -2549,7 +2549,7 @@
         },
         {
           "path": "crates/actions/src/broker.rs",
-          "line": 507,
+          "line": 533,
           "quote": "                _ => \"backend_error\","
         }
       ],
@@ -3950,7 +3950,12 @@
       ],
       "failure_scenario": "A tenant is seeded, a person binds the backend_engineer job to a process, and runs.create is called: the binding resolves, but the run-start budget gate refuses 422 budget_missing although the published anatomy displays a $2.50 ceiling. The displayed limit is not the enforced one.",
       "acceptance": "The seeded definitions carry a structured `limits` object with a numeric `cost_budget_usd` (the display string preserved as `limits.display`), the release compile copies it into the anatomy verbatim, a seeded binding satisfies the run-start budget gate, and existing live rows are migrated forward or reseeded with a recorded migration.",
-      "owner_project": "T0"
+      "owner_project": "T0",
+      "resolved_by": {
+        "commit": "5b957de540524c7ca6525dcf01321dc5003acc2a",
+        "test": "crates/store/tests/seed_organisation_limits.rs::every_seeded_limit_is_the_budget_the_resolver_reads",
+        "evidence": "seed and test added at 5b957de5; preflight 45066752913 (fmt+clippy all-targets) green at efc4cf0d; the test runs in the PR CI shard"
+      }
     },
     {
       "id": "v1-u5a-expired-filter-1",
@@ -4688,7 +4693,7 @@
       "spec": "§11.9",
       "severity": "P1",
       "title": "Zero-use tools are flagged but never retired, and a schema drift opens no kata",
-      "problem": "§11.9 requires a zero-call tool to be retired over a cycle and a schema-drift signature to open a kata; tools.usage computes zero_use and nothing consumes it, there is no tools.retire action, and a backend 422 is ledgered as check_failed.",
+      "problem": "The retirement half is implemented: tools.retire refuses a used toolkit and retires a zero-use one with a published owner decision (test in tool_platform.rs). The kata half remains: SPEC §11.9 requires a schema-drift signature to open a kata, but kata_open_tx requires a project and a measurable instrument (eval/benchmark, split, sha, prediction) and a runtime destination 422 has none. Re-anchored to T5, which must add the contract-test instrument class (\"drift detected and refused with a typed error; contract test green\") before opening this kata.",
       "evidence": [
         {
           "path": "crates/actions/src/toolkits/usage.rs",
@@ -4702,13 +4707,14 @@
         },
         {
           "path": "crates/actions/src/broker.rs",
-          "line": 506,
+          "line": 532,
           "quote": "                422 => \"check_failed\","
         }
       ],
       "failure_scenario": "A tool has had no call for a cycle; the report lists it as zero_use and nothing retires or unbinds it, so stale tools stay bound indefinitely. A backend changes under its contract; every call is ledgered check_failed and no kata is opened, so the drift is a silent per-call failure.",
-      "acceptance": "tools.retire unbinds and retires a zero-use tool with an owner decision, and a schema-drift signature opens a kata; a test drives a zero-use window to retirement and a 422 drift to a kata row.",
-      "owner_project": "T13"
+      "acceptance": "Retirement: tools.retire unbinds and retires a zero-use tool with a published owner decision (implemented; tool_platform.rs test). Kata (T5): a contract-test instrument class exists and a schema-drift signature opens a kata with \"drift detected and refused with a typed error; contract test green\" as its threshold; a test drives a 422 drift to that kata row.",
+      "owner_project": "T5",
+      "disposition": "re-anchored to T5 by the programme approver (2026-11-22): the retirement half is implemented by tools.retire; the kata half needs a contract-test instrument class, which T5 must add before it can open a drift kata. No instrument is fabricated."
     },
     {
       "id": "v1-p1110-1",
@@ -4969,7 +4975,12 @@
       ],
       "failure_scenario": "A retention or deny policy written for tenant/id/* governs run objects but not documents; a prefix audit or a tenant-scoped bucket policy sees documents outside the documented namespace, so tenant separation depends on the application rather than the key scheme.",
       "acceptance": "One key scheme: key_for returns tenant/<tenant_id>/<document>/<hash>, matching the storage adapter and §11.10; a test asserts both adapters share the tenant prefix and that a key lacking it is refused.",
-      "owner_project": "T13"
+      "owner_project": "T13",
+      "resolved_by": {
+        "commit": "6d15f90bb41709cb58de451975c1bbd750c53e77",
+        "test": "crates/actions/src/integrations/objects.rs::a_key_outside_the_tenant_prefix_is_refused",
+        "evidence": "one key scheme at 6d15f90b (objects key_for + put/get/delete/head refusal; storage shared prefix); preflight 45066752913 green at efc4cf0d; unit test runs in the PR CI shard"
+      }
     },
     {
       "id": "v1-p111-1",
