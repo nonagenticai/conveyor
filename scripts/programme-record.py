@@ -92,6 +92,7 @@ READBACK_MAP = {
     "documents.update": "documents.get",
     "registers.create": "registers.get",
     "registers.update": "registers.get",
+    "benefits.measure": "benefits.measurement_list",
     "pm.plan": "pm.get",
     "pm.close": "pm.get",
     "projects.close_request": "projects.get",
@@ -127,7 +128,10 @@ READBACK_ID_FROM_OUTPUT = {
 }
 
 # A read-back that needs identifiers different from the write's input.
-READBACK_REQUIRED_INPUT = {"tranches.list": ("programme_id",)}
+READBACK_REQUIRED_INPUT = {
+    "tranches.list": ("programme_id",),
+    "benefits.measurement_list": ("benefit_id",),
+}
 
 # A write whose row is read back from the product's own snapshot of the live database,
 # because the deployed engine serves no read action for it yet. The directory must be

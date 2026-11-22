@@ -440,7 +440,8 @@ pub async fn take_baseline_tx(
         .await
         .map_err(PlanStoreError::Parent)?;
     let wbs: Vec<WbsRecord> = list_wbs_tx(&mut *conn, tenant, project_id).await?;
-    let register: Vec<RegisterRecord> = list_register_tx(&mut *conn, tenant, project_id).await?;
+    let register: Vec<RegisterRecord> =
+        list_register_tx(&mut *conn, tenant, project_id, None).await?;
     let snapshot = serde_json::json!({
         "project_id": project_id,
         "wbs": wbs.iter().map(|node| serde_json::json!({
@@ -767,15 +768,18 @@ pub async fn list_register_tx(
     conn: &mut PgConnection,
     tenant: TenantId,
     project_id: Uuid,
+    kind: Option<&str>,
 ) -> Result<Vec<RegisterRecord>, PlanStoreError> {
     let sql = format!(
         "SELECT {REGISTER_COLUMNS} FROM project_register_item
           WHERE tenant_id = $1 AND project_id = $2
+            AND ($3::text IS NULL OR kind = $3)
           ORDER BY created_at DESC, id DESC"
     );
     Ok(sqlx::query_as(AssertSqlSafe(sql))
         .bind(tenant.as_uuid())
         .bind(project_id)
+        .bind(kind)
         .fetch_all(&mut *conn)
         .await?)
 }
@@ -786,15 +790,18 @@ pub async fn list_programme_register_tx(
     conn: &mut PgConnection,
     tenant: TenantId,
     programme_id: Uuid,
+    kind: Option<&str>,
 ) -> Result<Vec<RegisterRecord>, PlanStoreError> {
     let sql = format!(
         "SELECT {REGISTER_COLUMNS} FROM project_register_item
           WHERE tenant_id = $1 AND programme_id = $2
+            AND ($3::text IS NULL OR kind = $3)
           ORDER BY created_at DESC, id DESC"
     );
     Ok(sqlx::query_as(AssertSqlSafe(sql))
         .bind(tenant.as_uuid())
         .bind(programme_id)
+        .bind(kind)
         .fetch_all(&mut *conn)
         .await?)
 }
@@ -811,7 +818,10 @@ pub async fn update_register_tx(
     title: Option<&str>,
     body: Option<&str>,
     severity: Option<&str>,
+    probability: Option<&str>,
+    owner_job_id: Option<Uuid>,
     impact: Option<i32>,
+    links: Option<&Value>,
     review_at: Option<NaiveDate>,
     response: Option<&str>,
     meta: Option<&Value>,
@@ -846,9 +856,11 @@ pub async fn update_register_tx(
         "UPDATE project_register_item SET
             programme_id = coalesce($4, programme_id), status = coalesce($5, status),
             title = coalesce($6, title), body = coalesce($7, body),
-            severity = coalesce($8, severity), impact = coalesce($9, impact),
-            review_at = coalesce($10, review_at), response = coalesce($11, response),
-            meta = coalesce($12, meta),
+            severity = coalesce($8, severity), probability = coalesce($9, probability),
+            owner_job_id = coalesce($10, owner_job_id), impact = coalesce($11, impact),
+            links = coalesce($12, links),
+            review_at = coalesce($13, review_at), response = coalesce($14, response),
+            meta = coalesce($15, meta),
             version = version + 1, updated_at = now()
           WHERE tenant_id = $1 AND id = $2 AND version = $3
           RETURNING {REGISTER_COLUMNS}"
@@ -862,7 +874,10 @@ pub async fn update_register_tx(
         .bind(title)
         .bind(body)
         .bind(severity)
+        .bind(probability)
+        .bind(owner_job_id)
         .bind(impact)
+        .bind(links)
         .bind(review_at)
         .bind(response)
         .bind(meta)
@@ -2929,6 +2944,8 @@ const BENEFIT_MEASUREMENT_COLUMNS: &str = "id, benefit_id, programme_id, tranche
 pub struct NewBenefitMeasurement {
     /// The benefit measured.
     pub benefit_id: Uuid,
+    /// The tranche the reading is attributed to, if any.
+    pub tranche_id: Option<Uuid>,
     /// `baseline | interim | post`.
     pub kind: String,
     /// The target the reading is compared with.
@@ -2964,15 +2981,17 @@ pub async fn insert_benefit_measurement_tx(
     })?;
     let sql = format!(
         "INSERT INTO benefit_measurement
-            (tenant_id, benefit_id, programme_id, kind, target_value, actual_value, unit,
-             method, measured_at, evidence)
-         VALUES ($1, $2, $3, $4, $5::float8::numeric, $6::float8::numeric, $7, $8, $9, $10)
+            (tenant_id, benefit_id, programme_id, tranche_id, kind, target_value, actual_value,
+             unit, method, measured_at, evidence)
+         VALUES ($1, $2, $3, $4, $5, $6::float8::numeric, $7::float8::numeric, $8, $9, $10,
+                 $11)
          RETURNING {BENEFIT_MEASUREMENT_COLUMNS}"
     );
     let row: BenefitMeasurementRecord = sqlx::query_as(AssertSqlSafe(sql))
         .bind(tenant.as_uuid())
         .bind(new.benefit_id)
         .bind(programme_id)
+        .bind(new.tranche_id)
         .bind(&new.kind)
         .bind(new.target_value)
         .bind(new.actual_value)
@@ -2998,6 +3017,28 @@ pub async fn list_benefit_measurements_tx(
     );
     Ok(sqlx::query_as(AssertSqlSafe(sql))
         .bind(tenant.as_uuid())
+        .bind(benefit_id)
+        .fetch_all(&mut *conn)
+        .await?)
+}
+
+/// List a programme's measurements, newest reading first; `benefit_id` narrows the page to one
+/// benefit when given.
+pub async fn list_programme_benefit_measurements_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    programme_id: Uuid,
+    benefit_id: Option<Uuid>,
+) -> Result<Vec<BenefitMeasurementRecord>, PlanStoreError> {
+    let sql = format!(
+        "SELECT {BENEFIT_MEASUREMENT_COLUMNS} FROM benefit_measurement
+          WHERE tenant_id = $1 AND programme_id = $2
+            AND ($3::uuid IS NULL OR benefit_id = $3)
+          ORDER BY measured_at DESC, id DESC"
+    );
+    Ok(sqlx::query_as(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(programme_id)
         .bind(benefit_id)
         .fetch_all(&mut *conn)
         .await?)
