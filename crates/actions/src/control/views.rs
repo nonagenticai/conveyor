@@ -841,7 +841,8 @@ pub struct ApprovalPolicyOut {
     pub action: String,
     /// `required` — an approved approval naming the exact target is needed; `waived` — it is not.
     pub approval: String,
-    /// `forbidden` — the requester cannot decide its own gate (§5.4); `allowed` — they may.
+    /// **Always `forbidden`.** SPEC_V2 §5.4 makes the requester's exclusion an invariant; a
+    /// historical `allowed` row still reads, but this answer is the invariant (ledger v1-w4b-4).
     pub self_approval: String,
 }
 
@@ -855,8 +856,9 @@ pub struct ApprovalPolicyGetIn {
 
 /// `approval_policies.set` input — the complete decision for one action.
 ///
-/// Both settings are required: a `set` replaces the whole policy, so leaving one out would mean
-/// silently resetting it to the default rather than leaving it alone.
+/// Both fields are required: a `set` replaces the whole policy, so leaving one out would mean
+/// silently resetting it to the default rather than leaving it alone. `self_approval` accepts
+/// only `forbidden`; `allowed` is refused 422 because §5.4 is an invariant (ledger v1-w4b-4).
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(deny_unknown_fields)]
 pub struct ApprovalPolicySetIn {
@@ -864,6 +866,6 @@ pub struct ApprovalPolicySetIn {
     pub action: String,
     /// `required` or `waived`.
     pub approval: String,
-    /// `forbidden` or `allowed`.
+    /// `forbidden` only: `allowed` is refused 422 (SPEC_V2 §5.4, ledger v1-w4b-4).
     pub self_approval: String,
 }
