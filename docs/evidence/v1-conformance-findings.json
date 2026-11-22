@@ -2559,7 +2559,7 @@
       "resolved_by": {
         "commit": "94f090b4c8afaa9c67043347b0569569456745da",
         "test": "crates/actions/tests/tool_platform.rs::a_call_over_the_tool_timeout_is_pending_and_resumes",
-        "evidence": "pending/resume implemented at 94f090b4 (migration 0075, broker timeout→202+pending ledger row, tools.resume with hash/idempotency guards); the test runs in the PR CI shard"
+        "evidence": "pending/resume implemented at 94f090b4 (migration 0075, the broker's tool timeout -> 202 + pending ledger row, tools.resume with hash and idempotency guards); the tool_platform suite (2026-11-22): 22 passed, including a_call_over_the_tool_timeout_is_pending_and_resumes — a destination that outlives the tool timeout yields the pending row and token, and the resumed call completes after the timeout is raised."
       }
     },
     {
@@ -4280,7 +4280,12 @@
       ],
       "failure_scenario": "Publish release R and bind it; run once with model medium and grants G1. Call capability_agents.update to router/large with G2. The next run executes the new model and grants under the unchanged release hash R, and neither the run nor the ledger records the change.",
       "acceptance": "Execution resolves model_ref, prompt_ref, allowed_actions and the limits from binding.release_snapshot (or pins an immutable agent version); editing an agent used by an active binding requires a new release and binding; a test mutates the agent and asserts the pinned run still uses the snapshot.",
-      "owner_project": "T0"
+      "owner_project": "T0",
+      "resolved_by": {
+        "commit": "5b957de540524c7ca6525dcf01321dc5003acc2a",
+        "test": "crates/actions/tests/internal_agent_runtime.rs::a_mutated_agent_does_not_change_a_bound_run",
+        "evidence": "cargo test -p conveyor-actions --test internal_agent_runtime (2026-11-22): 13 passed, including a_mutated_agent_does_not_change_a_bound_run — the live agent row is mutated after the binding, and the pinned run still calls the release snapshot's model (router/release), not the mutated row's."
+      }
     },
     {
       "id": "v1-p44-1",
@@ -4748,7 +4753,12 @@
       ],
       "failure_scenario": "A run produces bytes and has no way to persist them: no action exposes JobStorage, so the tenant prefix, SSE, hash and size cap never execute inside a job. The storage cap of the tool contract is satisfiable only by tests calling the adapter directly.",
       "acceptance": "A storage action or broker tool exposes get and put through JobStorage with the tenant prefix, SSE, hash and cap enforced at the call path; a test stores and retrieves a job's object through the action and refuses a cross-tenant key and an oversize object.",
-      "owner_project": "T13"
+      "owner_project": "T13",
+      "resolved_by": {
+        "commit": "ab61f9bcd044a25befaafb19207cad6f5e907512",
+        "test": "crates/actions/tests/storage_actions.rs::a_job_object_round_trips_through_the_actions_and_a_cross_tenant_name_is_refused",
+        "evidence": "cargo test -p conveyor-actions --test storage_actions (2026-11-22): 5 passed; a job object round-trips through storage.put/storage.get under the tenant/<tenant>/ key and a cross-tenant name is refused 422 object_name_invalid before the store is touched."
+      }
     },
     {
       "id": "v1-p77-1",
@@ -4777,7 +4787,12 @@
       ],
       "failure_scenario": "capability_agents.create with prompt_ref null and status active succeeds; a process run resolves it, readiness passes, agent.run sends the step-input messages and the model answers; inference_call records a NULL prompt hash, so the call is not reproducible and can carry an arbitrary caller-supplied system message.",
       "acceptance": "Creating or activating an internal_agent without a resolvable prompt_ref is refused, readiness blocks it and agent.run cannot call a model without compiled text; a test proves a NULL prompt_ref yields zero calls and every internal_agent call carries a 64-hex prompt hash.",
-      "owner_project": "PLATFORM"
+      "owner_project": "PLATFORM",
+      "resolved_by": {
+        "commit": "6be31fb17d6fedc04766587093f00c2ac123459d",
+        "test": "crates/actions/tests/internal_agent_runtime.rs::a_missing_prompt_ref_refuses_before_a_model_call",
+        "evidence": "cargo test -p conveyor-actions --test internal_agent_runtime (2026-11-22): 13 passed, including a_missing_prompt_ref_refuses_before_a_model_call and a_bound_run_generates_a_draft; the internal-agent fixtures now declare limits.cost_budget_usd, and the gate path runs prepare → laya.classify → ladder.evaluate so the recorded decision cites a verified call."
+      }
     },
     {
       "id": "v1-p76-1",
@@ -5014,7 +5029,12 @@
       ],
       "failure_scenario": "A tenant admin wants a development job to call the coding toolkit. There is no request to make: job_bindings.create writes a job_binding, not a tool_binding, and the tool actions are publish, probe, usage and call. Every tools.call resolves no binding and answers 409 tool_not_ready; tools.probe can only disable or restore bindings that do not exist.",
       "acceptance": "A registered action creates, narrows and retires a tenant-scoped tool_binding against a published toolkit version with an effect ceiling and a credential alias; a test creates one, runs tools.call through the broker and asserts one tool_call row; a draft or retired toolkit is refused at binding creation.",
-      "owner_project": "T13"
+      "owner_project": "T13",
+      "resolved_by": {
+        "commit": "a61cdda00a59e229e66cf371e68f597a306a1761",
+        "test": "crates/actions/tests/tool_platform.rs::a_registered_binding_writer_creates_the_grant",
+        "evidence": "cargo test -p conveyor-actions --lib --test tool_platform (2026-11-22): 173 lib + 22 integration passed. a_registered_binding_writer_creates_the_grant creates the binding through tool_bindings.create, the created grant resolves a tools.call to the broker (exactly one tool_call row), and a draft toolkit is refused 409 toolkit_not_published."
+      }
     },
     {
       "id": "v1-p111-2",
@@ -5043,7 +5063,12 @@
       ],
       "failure_scenario": "A release grants only the read operation; its internal_agent run is bound to the whole toolkit at ceiling write, so the agent also calls the create operation. Nothing compares the choice with the release allowlist and no row on the run records a grant.",
       "acceptance": "A release-scoped grant row (op, variant, max_side_effect, enabled) is written inside the release hash and read at tools.call; an operation absent from the grant is refused 403 and a max_side_effect below the tool's effect is refused; tests cover both.",
-      "owner_project": "T13"
+      "owner_project": "T13",
+      "resolved_by": {
+        "commit": "4a98cb46a32c32bceb3277d3225a56fb74162501",
+        "test": "crates/actions/src/broker.rs",
+        "evidence": "cargo test -p conveyor-actions --lib (2026-11-22): 173 passed, including the five release-grant cases in crates/actions/src/broker.rs — an operation absent from the grant is refused, a disabled grant is refused, a grant below the tool's effect is refused, a grant at the effect is accepted and an undeclared grant allows nothing."
+      }
     },
     {
       "id": "v1-p111-3",
@@ -5072,7 +5097,12 @@
       ],
       "failure_scenario": "A binding to an ingestion backend returns a document containing an API token or personal data. The tool cannot declare anything to redact, the column is empty, and the full body reaches the caller and the compiled prompt.",
       "acceptance": "A toolkit manifest or tool version can declare result fields to redact; publish persists them on tool.redact; a test publishes a tool that redacts a token field, calls it and asserts the value is redacted.",
-      "owner_project": "T13"
+      "owner_project": "T13",
+      "resolved_by": {
+        "commit": "6d15f90bb41709cb58de451975c1bbd750c53e77",
+        "test": "crates/actions/tests/tool_platform.rs::a_declared_redact_field_is_replaced",
+        "evidence": "cargo test -p conveyor-actions --lib --test tool_platform (2026-11-22): a_redact_only_change_moves_the_content_hash and a_declared_redact_field_is_replaced passed; toolkits.publish persists the manifest's redact list on the tool version and the broker replaces the declared field with its hash. The manifest content_hash now covers the redact declaration (it omitted it until this batch), so a redaction-only change inserts a new version instead of answering unchanged."
+      }
     },
     {
       "id": "v1-p112-1",
