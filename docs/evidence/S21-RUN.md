@@ -31,7 +31,7 @@ start, an invoke precheck that refuses an unbudgeted capturing call). The token 
 |---|---|
 | `crates/actions/tests/card_binding.rs` (new) | **7 passed** (4 scenarios + 3 support) |
 | `crates/store/tests/run_memory.rs` (new) | **4 passed** |
-| `internal_agent_runtime.rs` (extended) | **16 passed / 1 ignored** (the live proof) |
+| `internal_agent_runtime.rs` (extended) | **16 passed / 2 ignored** (the live proofs) |
 | `board` | **15 passed** |
 | `executor_runtime` | **8 passed** |
 | `registry` | **7 passed** |
@@ -65,11 +65,31 @@ start, an invoke precheck that refuses an unbudgeted capturing call). The token 
 
 ## Live proof
 
-`internal_agent_runtime::the_live_run_executes_against_the_real_router_and_laya` (`#[ignore]`,
-env-gated on `CONVEYOR_EXTERNAL_INFERENCE_URL`, `CONVEYOR_EXTERNAL_LAYA_URL`,
-`CONVEYOR_LIVE_LAYA_TOKEN`, `CONVEYOR_LIVE_MODEL`). **Pending** — it needs the estate's endpoints
-and a real laya token; the run and its measured evidence are recorded here when executed. A stub is
-not the proof.
+Two `#[ignore]`, env-gated tests in `internal_agent_runtime`:
+
+- `the_live_model_executes_the_compiled_prompt` — the model leg: the compiled prompt reaches the
+  estate's real inference-router, the reply becomes a draft, the terminal run records its attempt.
+  Needs `CONVEYOR_EXTERNAL_INFERENCE_URL` and `CONVEYOR_LIVE_MODEL`.
+- `the_live_run_executes_against_the_real_router_and_laya` — the full leg: the same, plus one real
+  `gate.precheck` decision from the laya bridge. Needs `CONVEYOR_EXTERNAL_LAYA_URL` and
+  `CONVEYOR_LIVE_LAYA_TOKEN` too.
+
+**Attempted 2026-11-22 23:15Z — BLOCKED on a caller licence, not on reachability.**
+
+- The router is reachable: a tunnel to `inference-router.inference-router.svc.cluster.local:8150`
+  answers `/health` **200** from this box.
+- A direct `POST /api/chat/completions` answers **401** with
+  `{"detail":"Caller licence could not be introspected; caller is not authorised"}` and
+  `x-ir-error-classification: unlicensed`; the executor records that as
+  `action-upstream-failed: inference answered 502`.
+- The conveyor resolves the bearer from the tenant's sealed `inference.token` (or `laya.token`);
+  a throwaway test tenant has neither, and minting a licence for one is a production licensing act
+  with no cause (`inference-router-unlicensed-rate-is-rising` warns against exactly that).
+- So both live legs stay `#[ignore]`d and unrun. A stub is not the proof; neither is a forged token.
+
+**Unblock:** provision a test tenant's `inference.token` (and `laya.token`) for the estate's router
+and laya bridge, then run the two ignored tests with those values in the environment. The commands
+are in the tests' doc comments.
 
 ## Residuals (recorded, not built)
 

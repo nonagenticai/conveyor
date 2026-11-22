@@ -1611,3 +1611,92 @@ async fn the_live_run_executes_against_the_real_router_and_laya() {
     .await;
     assert_eq!(attempts, 1, "the terminal run recorded its attempt");
 }
+
+/// P3.1a — the live **model** leg: the compiled prompt reaches the estate's real inference-router,
+/// the reply becomes a draft, and the terminal run records its attempt. No gate policy is seeded,
+/// so no laya call is made (the gate leg is `the_live_run_executes_against_the_real_router_and_laya`).
+///
+/// Ignored because it needs the real router. It refuses when the URL or model is unset.
+///
+/// ```text
+/// CONVEYOR_EXTERNAL_INFERENCE_URL=http://127.0.0.1:8150 CONVEYOR_LIVE_MODEL=router/medium \
+/// cargo test -p conveyor-actions --test internal_agent_runtime -- --ignored the_live_model
+/// ```
+#[tokio::test]
+#[ignore = "needs the estate's real inference-router"]
+async fn the_live_model_executes_the_compiled_prompt() {
+    let _guard = STUBS.lock().await;
+    let router = std::env::var("CONVEYOR_EXTERNAL_INFERENCE_URL")
+        .expect("CONVEYOR_EXTERNAL_INFERENCE_URL must point at the real inference-router");
+    let model = std::env::var("CONVEYOR_LIVE_MODEL").unwrap_or_else(|_| "router/medium".to_owned());
+    support::set_env("CONVEYOR_EXTERNAL_INFERENCE_URL", &router);
+
+    let (pg, seeded, running) = fixture().await;
+    let (capability, agent) = seed_agent(&pg, &seeded, Some("agent@1"), &model).await;
+    let (job, release) = seed_job(
+        &pg,
+        &seeded,
+        "live_model_job",
+        json!({"executor_kind": "internal_agent", "prompt_recipe": "agent@1",
+               "model_ref": model, "title": "Live model job",
+               "charter": "write one short sentence about the conveyor"}),
+    )
+    .await;
+    let binding = bind(&pg, &seeded, job, release, agent, capability).await;
+    let (board, lane) = board_and_lane(&running).await;
+    let card = create_card(&running, &board, &lane).await;
+    let run = start_run(&running, &card, binding).await;
+
+    execute(&pg, &seeded, run).await;
+
+    let status: String = scalar(
+        &pg,
+        seeded.tenant,
+        "SELECT status FROM run WHERE tenant_id = $1 AND id = $2",
+        run,
+    )
+    .await;
+    assert_eq!(
+        status, "succeeded",
+        "the live model produced an applicable draft"
+    );
+    let (calls, tokens, hash): (i64, i64, Option<String>) = {
+        let mut tx = begin_scoped(&pg.runtime, seeded.tenant)
+            .await
+            .expect("scope");
+        let row = sqlx::query_as(
+            "SELECT count(*) OVER (), coalesce(sum(total_tokens) OVER (), 0)::bigint,
+                    max(prompt_sha256) OVER ()
+               FROM inference_call WHERE tenant_id = $1 AND run_id = $2",
+        )
+        .bind(seeded.tenant.as_uuid())
+        .bind(run)
+        .fetch_one(&mut *tx)
+        .await
+        .expect("inference call");
+        tx.commit().await.expect("commit");
+        row
+    };
+    assert_eq!(calls, 1, "one real model call");
+    assert!(tokens > 0, "the router reported usage");
+    assert!(
+        hash.as_deref().is_some_and(|hash| hash.len() == 64),
+        "the compiled prompt's hash is recorded"
+    );
+    let drafts: i64 = scalar(
+        &pg,
+        seeded.tenant,
+        "SELECT count(*) FROM document WHERE tenant_id = $1 AND meta->>'run_id' = $2",
+        run,
+    )
+    .await;
+    assert_eq!(drafts, 1, "one draft document");
+    let attempts: i64 = scalar(
+        &pg,
+        seeded.tenant,
+        "SELECT count(*) FROM work_package_memory WHERE tenant_id = $1 AND run_id = $2 AND kind = 'attempt'",
+        run,
+    )
+    .await;
+    assert_eq!(attempts, 1, "the terminal run recorded its attempt");
+}
