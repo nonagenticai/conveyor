@@ -354,13 +354,15 @@ window.CONVEYOR_OUTPUT_STANDARD = {
         "Aggregates and services",
         "Action registry and data model",
         "Deployment estate",
-        "The to-be the projects deliver"
+        "The to-be the projects deliver",
+        "Organisation and skills",
+        "Current, intermediate and target states"
       ],
       "optional": [
         "Decisions",
         "Links"
       ],
-      "skeleton": "# Blueprint\n\nThe target architecture and operating model the projects are held to.\n\n## Aggregates and services\n\nThe bounded contexts, their data ownership and the service boundaries.\n\n## Action registry and data model\n\nThe actions, tables, invariants and events that form the contract.\n\n## Deployment estate\n\nWhere each service runs and what it depends on.\n\n## The to-be the projects deliver\n\nEach project's contribution to this blueprint, and the gap it closes.\n\n## Decisions\n\nThe architecture decisions this blueprint rests on.\n\n## Links\n\nArtefacts, contracts, coverage.\n",
+      "skeleton": "# Blueprint\n\nThe target architecture and operating model the projects are held to.\n\n## Aggregates and services\n\nThe bounded contexts, their data ownership and the service boundaries.\n\n## Action registry and data model\n\nThe actions, tables, invariants and events that form the contract.\n\n## Deployment estate\n\nWhere each service runs and what it depends on.\n\n## The to-be the projects deliver\n\nEach project's contribution to this blueprint, and the gap it closes.\n\n## Organisation and skills\n\nThe organisation, roles and skills the target state requires.\n\n## Current, intermediate and target states\n\nThe current, intermediate and target states and what separates them.\n\n## Decisions\n\nThe architecture decisions this blueprint rests on.\n\n## Links\n\nArtefacts, contracts, coverage.\n",
       "standard": "MSP",
       "level": "programme",
       "subject_kind": "programme",
@@ -373,13 +375,15 @@ window.CONVEYOR_OUTPUT_STANDARD = {
         "Why now",
         "Benefit map",
         "Cost and risk posture",
-        "Licensing frame"
+        "Licensing frame",
+        "Options, including doing nothing",
+        "Investment appraisal and cash flow",
+        "Capabilities the benefits depend on"
       ],
       "optional": [
-        "Options",
         "Decision"
       ],
-      "skeleton": "# Business case\n\nWhy now, what it buys, what it costs and the risk posture.\n\n## Why now\n\nThe problem, the cost of doing nothing, and the trigger for action.\n\n## Benefit map\n\nEach benefit, its mechanism and its measure; a benefit with no measure is a wish.\n\n## Cost and risk posture\n\nThe engineering cost, the recurring cost, and the exposure accepted.\n\n## Licensing frame\n\nThe public, opt-in and tenant boundary of the investment.\n\n## Options\n\nThe options considered including doing nothing.\n\n## Decision\n\nThe investment decision and its authority.\n",
+      "skeleton": "# Business case\n\nWhy now, what it buys, what it costs and the risk posture.\n\n## Why now\n\nThe problem, the cost of doing nothing, and the trigger for action.\n\n## Benefit map\n\nEach benefit, its mechanism and its measure; a benefit with no measure is a wish.\n\n## Cost and risk posture\n\nThe engineering cost, the recurring cost, and the exposure accepted.\n\n## Licensing frame\n\nThe public, opt-in and tenant boundary of the investment.\n\n## Options, including doing nothing\n\nThe options considered including doing nothing.\n\n## Investment appraisal and cash flow\n\nThe appraisal, the cash flow and the basis of both.\n\n## Capabilities the benefits depend on\n\nThe capabilities and business changes the benefits require, and who delivers them.\n\n## Decision\n\nThe investment decision and its authority.\n",
       "standard": "MSP",
       "level": "programme",
       "subject_kind": "programme",

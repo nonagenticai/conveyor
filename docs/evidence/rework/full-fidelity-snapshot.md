@@ -79,18 +79,32 @@ product's actions (`programme-record.py`, or the deployed engine). The copy is r
 5. **Verify with the command clauses pointed at the copy.** Manifest command clauses call
    `programme-record.py`, which uses the *local binary* when `PROGRAMME_RECORD_LOCAL_BIN` is set —
    and the binary's admin path connects with `DATABASE_MIGRATE_URL`, not `DATABASE_URL` (the
-   default `DATABASE_URL` points at the compose stack and times out). `admin action invoke` also
-   takes `--input` as a **file path**, not inline JSON:
+   default `DATABASE_URL` points at the compose stack and times out). **`DATABASE_LISTEN_URL`
+   must also point at the copy**: unset, the binary opens its listen pool against the default host
+   and every command clause dies on `pool timed out while waiting for an open connection` — which
+   reads exactly like a red gate. `admin action invoke` also takes `--input` as a **file path**,
+   not inline JSON:
 
    ```sh
-   export DATABASE_URL="$URL" DATABASE_MIGRATE_URL="$URL" APP_ENV=test
+   export DATABASE_URL="$URL" DATABASE_MIGRATE_URL="$URL" DATABASE_LISTEN_URL="$URL" APP_ENV=test
    export PROGRAMME_RECORD_LOCAL_BIN=target/claude/debug/conveyor
    python3 scripts/verify-project.py --all --snapshot /tmp/snap-full/data \
      --evidence-dir /tmp/evidence-full
    ```
 
    Keep `--evidence-dir` outside the repo until the verdict is accepted; a run against a stale copy
-   must never overwrite committed evidence.
+   must never overwrite committed evidence. Note that `verify-viability.py` re-runs the verifier
+   **without** an evidence dir of its own: it writes all forty-seven files into
+   `docs/evidence/rework/`. Run it on a clean tree and restore those generated files unless that
+   render is the one being committed.
+
+6. **A live write's read-back is not a branch snapshot.** The branch binary carries the newer
+   projection and **cannot snapshot the live primary while the deployed database is behind its
+   migrations** — measured 2026-11-22 against the primary at `0061`: `column d.archetype does not
+   exist`. A live write's read-back therefore uses the action's own response (and any read action
+   that exists); the copy is refreshed by dump → restore → migrate for the next verdict. This is
+   also why a write recorded against the primary shows up in the *next* full snapshot, not the one
+   at the head that preceded it.
 
 ## What the first run proved
 
