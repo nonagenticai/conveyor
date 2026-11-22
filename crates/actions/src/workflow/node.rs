@@ -277,7 +277,7 @@ pub async fn record_gate_row(
         &NewWorkflowStep {
             position,
             attempt,
-            node_id: node_id.to_owned(),
+            node_id: Some(node_id.to_owned()),
             action: "gate".to_owned(),
             input: json!({}),
             input_hash: Some(hash_value(&json!({}))),
@@ -338,7 +338,7 @@ async fn persist_tick(
         &NewWorkflowStep {
             position,
             attempt,
-            node_id: row.node_id.clone(),
+            node_id: Some(row.node_id.clone()),
             action,
             input: row.input.clone(),
             input_hash: Some(hash_value(&row.input)),
@@ -579,7 +579,7 @@ impl Host<'_> {
             &NewWorkflowStep {
                 position: i32::try_from(request.position).unwrap_or(i32::MAX),
                 attempt: i32::try_from(request.attempt).unwrap_or(i32::MAX),
-                node_id: request.node_id.clone(),
+                node_id: Some(request.node_id.clone()),
                 action: request.action.clone().unwrap_or_else(|| {
                     request
                         .procedure_key
