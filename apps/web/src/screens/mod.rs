@@ -1,6 +1,7 @@
 pub mod admin;
 pub mod approvals;
 pub mod architecture;
+pub mod authoring;
 pub mod benchmarks;
 pub mod billing;
 pub mod boards;

@@ -141,6 +141,8 @@ const shot = (name) => path.join(process.env.CONVEYOR_QA_OUTPUT || os.tmpdir(), 
     for (const id of [
       "organisation",
       "jobs",
+      "authoring",
+      "improve",
       "operations",
       "toolkits",
       "metering",
