@@ -658,7 +658,7 @@
       "evidence": [
         {
           "path": "crates/actions/src/portfolio/programmes.rs",
-          "line": 162,
+          "line": 182,
           "quote": "        status: trimmed(input.status),"
         },
         {
@@ -933,18 +933,23 @@
         },
         {
           "path": "crates/actions/src/portfolio/programmes.rs",
-          "line": 87,
+          "line": 106,
           "quote": "            name: name.to_owned(),"
         },
         {
           "path": "crates/actions/src/portfolio/programmes.rs",
-          "line": 89,
+          "line": 108,
           "quote": "            owner_user_id: input.owner_user_id,"
         }
       ],
       "failure_scenario": "Every project re-declares cadence/ART config; nothing inherits or locks it, so programmes drift.",
       "acceptance": "programme.shared_config exists with inheritance/lock semantics, resolved on read, and tests prove a locked value cannot be overridden per project.",
-      "owner_project": "T10"
+      "owner_project": "T10",
+      "resolved_by": {
+        "commit": "a54d1f43b624539adcef18efdf716991715ace07",
+        "test": "crates/store/tests/programme_shared_config.rs::a_locked_programme_config_cannot_be_overridden_per_project",
+        "evidence": "programme_shared_config 3 passed on the merged lane: migration 0068 adds the column and its shape CHECK; programmes.create/update/get/list carry shared_config; resolve_shared_config makes a locked programme key win over a project override; a flat object reads as values with no locks; a round trip through the programme row preserves the config. The migration-set test expects 68 and --check-lock passes after the lock was regenerated."
+      }
     },
     {
       "id": "v1-p82-4",
@@ -3592,7 +3597,15 @@
       ],
       "failure_scenario": "The S14 gate aborts on R1-live-n8n.md, so the health, andon, decommission and parity checks never run.",
       "acceptance": "R1-R7, freeze-log and rollback exist in-tree; the S14 gate exits 0.",
-      "owner_project": "S14"
+      "owner_project": "S14",
+      "waiver": {
+        "accepted_by": "programme owner",
+        "accepted_at": "2026-11-22",
+        "decision_ref": "01a20208-5261-7085-a4a7-74f061e4842b",
+        "register_item": "01a20208-0c30-7f4f-a3b7-ab1b467e2b46",
+        "expires": "2027-02-18",
+        "reason": "The cutover was executed before the receipt tree existed. The R1/R2/R4/R6 rehearsals cannot be reconstructed — n8n, fr and requirements_management are decommissioned and the external agent app is absent — so the receipts stay NOT PROVEN and none is invented. The surviving evidence is the native harness (acceptance/native.toml, PR #483) and the deployed service's own probes. The programme owner accepted this residual on 2026-11-22; the live register item U5-RESIDUAL-S14 and its published decision document record it. Reassess by 2027-02-18."
+      }
     },
     {
       "id": "v1-s15-1",
