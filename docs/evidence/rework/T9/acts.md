@@ -14,3 +14,5 @@ binary: project reopened; charter approved as a `rule` decision; SoAW and delive
 **Stopped at:** the demo credit (tranche-4 demo cadence, peer 1) and the deferred baseline
 decision. The plan's `a_systemic_finding_produces_a_kata_candidate` does not exist at HEAD; the
 behaviour is proved inside `togaf_h_change.rs::a_scope_change_produces_a_change_register_row`.
+
+T9: 59 acts in `transcript.jsonl`; the last run recorded 2.

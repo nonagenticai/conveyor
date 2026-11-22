@@ -13,3 +13,5 @@ binary: project reopened; charter approved as a `rule` decision; SoAW and delive
 
 **Stopped at:** the demo credit (tranche-4 demo cadence, peer 1) and the deferred baseline
 decision; the `pi_plan_missing:tranche-3` P0 package waits on peer 1's S04 PI outputs.
+
+T10: 32 acts in `transcript.jsonl`; the last run recorded 2.
