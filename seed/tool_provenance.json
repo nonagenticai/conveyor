@@ -395,8 +395,20 @@
     { "source": "research-and-lean-services", "operation": "lean4.prove", "method": "POST", "path": "/api/prove",
       "consumer": "apps/lean4-prover", "sample": "apps/lean4-prover/tests/parity.rs",
       "disposition": "PORT", "target": "none", "pending": "#561" },
-    { "source": "research-and-lean-services", "operation": "scientific.read-operations", "method": "GET/POST", "path": "18 locked reads (see contract)",
+    { "source": "research-and-lean-services", "operation": "scientific.meta_analysis", "method": "POST", "path": "/api/stats/meta-analysis",
       "consumer": "apps/scientific", "sample": "apps/scientific/contract/openapi.lock.json",
-      "disposition": "PORT", "target": "none", "pending": "#560" }
+      "disposition": "ALREADY-PRESENT", "target": "tool:scientific.meta_analysis" },
+    { "source": "research-and-lean-services", "operation": "scientific.confidence_interval", "method": "POST", "path": "/api/stats/confidence-interval",
+      "consumer": "apps/scientific", "sample": "apps/scientific/contract/openapi.lock.json",
+      "disposition": "ALREADY-PRESENT", "target": "tool:scientific.confidence_interval" },
+    { "source": "research-and-lean-services", "operation": "scientific.trend", "method": "POST", "path": "/api/stats/trend",
+      "consumer": "apps/scientific", "sample": "apps/scientific/contract/openapi.lock.json",
+      "disposition": "ALREADY-PRESENT", "target": "tool:scientific.trend" },
+    { "source": "research-and-lean-services", "operation": "scientific.translate", "method": "POST", "path": "/api/formal/translate",
+      "consumer": "apps/scientific", "sample": "apps/scientific/contract/openapi.lock.json",
+      "disposition": "ALREADY-PRESENT", "target": "tool:scientific.translate" },
+    { "source": "research-and-lean-services", "operation": "scientific.verify", "method": "POST", "path": "/api/formal/verify",
+      "consumer": "apps/scientific", "sample": "apps/scientific/contract/openapi.lock.json",
+      "disposition": "ALREADY-PRESENT", "target": "tool:scientific.verify" }
   ]
 }
