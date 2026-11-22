@@ -1,9 +1,9 @@
 {
   "schema": "v2-gap-ledger/v1",
-  "lane_pin": "0552806a",
+  "lane_pin": "c206bedd",
   "generated_from": {
     "artefact_record": {
-      "command": "/opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-artefacts/scripts/generate-standards.py --snapshot /tmp/snap-526-0738/data --outputs-dir /tmp/snap-526-0738/docs --register /tmp/conf-0738/rework.json --data-out /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/v2-gap-ledger-bau1yrvy --findings-out /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/v2-gap-ledger-bau1yrvy/findings.json",
+      "command": "/opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-artefacts/scripts/generate-standards.py --snapshot /tmp/snap-526-0738/data --outputs-dir /tmp/snap-526-0738/docs --register /tmp/conf-0738/rework.json --data-out /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/v2-gap-ledger-v2pliw0i --findings-out /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/v2-gap-ledger-v2pliw0i/findings.json",
       "summary": {
         "absent": 393,
         "artefacts": 826,
@@ -41,7 +41,7 @@
       },
       {
         "path": "/Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-artefacts/docs/evidence/v1-conformance-findings.json",
-        "sha256": "b4dfec61fcd2f327144c046a1cd823718bd6e6264a0ae0edef0a23d32387bc8f",
+        "sha256": "21a81731891452d146eb67f01389de4dd7ed7e0c1ee7d991cf6e568715c9aaa6",
         "role": "v1 findings; open ledger"
       },
       {
@@ -79,14 +79,14 @@
     "deploy_bound": "the not-yet-deployed set is migrations 0062-0066 and the authoring.* family 0066 creates"
   },
   "counts": {
-    "rows": 515,
+    "rows": 511,
     "by_kind": {
       "artefact": 393,
       "baseline": 16,
-      "ledger": 106
+      "ledger": 102
     },
     "by_severity": {
-      "P1": 233,
+      "P1": 229,
       "unassigned": 65,
       "P0": 19,
       "P2": 198
@@ -103,18 +103,18 @@
         "P0": 4
       },
       "ledger": {
-        "P1": 76,
+        "P1": 72,
         "P2": 28,
         "P0": 2
       }
     },
     "by_deploy_bound": {
-      "false": 515
+      "false": 511
     },
     "by_status": {
       "absent": 393,
       "stale": 16,
-      "open": 106
+      "open": 102
     },
     "artefact_fix_card_resolution": {
       "published_package": 314,
@@ -6274,21 +6274,6 @@
       "deploy_bound": false
     },
     {
-      "key": "ledger:v1-manif-2",
-      "kind": "ledger",
-      "standard": "SPEC",
-      "spec": "§12",
-      "subject": "acceptance manifest checks",
-      "project": "PLATFORM",
-      "title": "Six acceptance checks pass rows that do not prove their property",
-      "status": "open",
-      "severity": "P1",
-      "owner": "PLATFORM",
-      "fix_card": "v1-manif-2",
-      "target_phase": "Preliminary",
-      "deploy_bound": false
-    },
-    {
       "key": "ledger:v1-p101-1",
       "kind": "ledger",
       "standard": "SPEC",
@@ -6495,21 +6480,6 @@
       "severity": "P1",
       "owner": "T0",
       "fix_card": "v1-p42-1",
-      "target_phase": "G",
-      "deploy_bound": false
-    },
-    {
-      "key": "ledger:v1-p44-1",
-      "kind": "ledger",
-      "standard": "SPEC",
-      "spec": "§4.4",
-      "subject": "§4.4",
-      "project": "T0",
-      "title": "An internal_agent binding's pinned agent is never the agent that runs",
-      "status": "open",
-      "severity": "P1",
-      "owner": "T0",
-      "fix_card": "v1-p44-1",
       "target_phase": "G",
       "deploy_bound": false
     },
@@ -7399,21 +7369,6 @@
       "deploy_bound": false
     },
     {
-      "key": "ledger:v1-u5a-approvals-1",
-      "kind": "ledger",
-      "standard": "SPEC",
-      "spec": "§5.4",
-      "subject": "§5.4",
-      "project": "PLATFORM",
-      "title": "The generic approval request still lets the caller opt out of evidence",
-      "status": "open",
-      "severity": "P1",
-      "owner": "PLATFORM",
-      "fix_card": "v1-u5a-approvals-1",
-      "target_phase": "Preliminary",
-      "deploy_bound": false
-    },
-    {
       "key": "ledger:v1-u5a-budget-1",
       "kind": "ledger",
       "standard": "SPEC",
@@ -7800,21 +7755,6 @@
       "severity": "P1",
       "owner": "T11",
       "fix_card": "v1-w4b-3",
-      "target_phase": "G",
-      "deploy_bound": false
-    },
-    {
-      "key": "ledger:v1-w4b-4",
-      "kind": "ledger",
-      "standard": "SPEC",
-      "spec": "§5.4, P4",
-      "subject": "§14/R5",
-      "project": "T11",
-      "title": "self_approval='allowed' lets a requester decide their own gate",
-      "status": "open",
-      "severity": "P1",
-      "owner": "T11",
-      "fix_card": "v1-w4b-4",
       "target_phase": "G",
       "deploy_bound": false
     },
