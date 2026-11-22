@@ -511,7 +511,7 @@ fn path_tenant_uuid(raw: &str) -> Result<String, Refusal> {
                 StatusCode::BAD_REQUEST,
                 format!(
                     "Invalid path tenant_id {shown}: must be a UUID. Legacy text labels \
-                     (e.g. 'n8n-dev') are tenant_name values, not tenant_ids."
+                     (e.g. 'legacy-tenant') are tenant_name values, not tenant_ids."
                 ),
             ))
         }

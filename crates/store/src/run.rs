@@ -1165,7 +1165,7 @@ pub async fn enqueue_run_execute_tx(
 
 /// The job kind the `run.failed` handler is dispatched on (S13 §5.8).
 ///
-/// The old n8n `err.card` flow is code now: the worker's `err.card` arm moves the card to the
+/// The old recorded `err.card` flow is code now: the worker's `err.card` arm moves the card to the
 /// waiting lane, comments and starts the coach. The kind is a constant so the emitter and the
 /// dispatcher cannot spell it differently.
 pub const ERR_CARD_KIND: &str = "err.card";
@@ -1179,7 +1179,7 @@ pub const COACH_PROCESS_FAMILY: &str = "cap.kanban_coach.";
 
 /// Enqueue the `err.card` handler for a run that just failed.
 ///
-/// The old n8n `err.card` flow was the estate's error trigger: a failed execution moved the
+/// The old recorded `err.card` flow was the estate's error trigger: a failed execution moved the
 /// card to BLOCKED and told the coach. Here the run's own `run.failed` emission enqueues one
 /// [`ERR_CARD_KIND`] job, keyed by the run, so the several emitters that can fail one run (the
 /// reaper, the step executor, the action layer) produce at most one delivery. The handler
