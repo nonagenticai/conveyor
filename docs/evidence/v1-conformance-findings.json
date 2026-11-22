@@ -3621,7 +3621,7 @@
       "resolved_by": {
         "commit": "398c87d762da167eaaecdddc0254ad1decdf02c5",
         "test": "docs/plans/slices/S14-cutover.md",
-        "evidence": "R7 (owner decision 01a202a3-76b1-72da-8a41-7a1662b91fc7, the published project-scoped copy superseding 01a20208-5261-7085-a4a7-74f061e4842b) rules that a proof whose system is decommissioned is corrected to the surviving proof, never waived. Commit 398c87d7 corrects S14-cutover.md: P4 now claims only the surviving retirement evidence (P1 measurements and gitops-production #5333) and the build-order evidence-status block names the surviving native harness (acceptance/native.toml, scripts/acceptance.py, the acceptance workflow, PR #483), the native map and the deployed probes, stating that no R* receipt is asserted. The waiver is removed; there is no expiry."
+        "evidence": "R7 (owner decision 01a202a6-c20c-7079-9e0e-488009d21e86 — the operative text-composed, published, PLATFORM-scoped copy; it supersedes 01a20208-5261-7085-a4a7-74f061e4842b, and the two byte-backed copies 01a202a3 and 01a2029c are unpublished) rules that a proof whose system is decommissioned is corrected to the surviving proof, never waived. Commit 398c87d7 corrects S14-cutover.md: P4 now claims only the surviving retirement evidence (P1 measurements and gitops-production #5333) and the build-order evidence-status block names the surviving native harness (acceptance/native.toml, scripts/acceptance.py, the acceptance workflow, PR #483), the native map and the deployed probes, stating that no R* receipt is asserted. The waiver is removed; there is no expiry."
       }
     },
     {
