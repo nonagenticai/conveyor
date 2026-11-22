@@ -960,6 +960,95 @@ async fn action_invocation_prune_keeps_the_window_and_the_other_tenant() {
 }
 
 #[tokio::test]
+async fn action_invocation_prune_keeps_a_cited_laya_invocation() {
+    let db = common::TestDb::fresh().await;
+    let (a, _b) = tenants(&db).await;
+
+    let policy = sqlx::query_scalar::<_, Uuid>(
+        "INSERT INTO decision_policy (tenant_id, kind, threshold, fail_policy, action)
+         VALUES ($1, 'prune.laya', 0.5, 'closed', 'block') RETURNING id",
+    )
+    .bind(a.as_uuid())
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("seed a decision policy");
+    let laya_config = sqlx::query_scalar::<_, Uuid>(
+        "INSERT INTO laya_inference_config (tenant_id, model_ref)
+         VALUES ($1, 'jev-latest') RETURNING id",
+    )
+    .bind(a.as_uuid())
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("seed a laya config");
+    let cited = sqlx::query_scalar::<_, Uuid>(
+        "INSERT INTO action_invocation (tenant_id, action, input_hash, outcome, created_at)
+         VALUES ($1, 'laya.classify', 'fnv1a64:0000000000000000:1', 'ok',
+                 now() - interval '31 days') RETURNING id",
+    )
+    .bind(a.as_uuid())
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("seed the cited invocation");
+    let uncited = sqlx::query_scalar::<_, Uuid>(
+        "INSERT INTO action_invocation (tenant_id, action, input_hash, outcome, created_at)
+         VALUES ($1, 'laya.classify', 'fnv1a64:0000000000000001:1', 'ok',
+                 now() - interval '31 days') RETURNING id",
+    )
+    .bind(a.as_uuid())
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("seed an uncited invocation");
+    // The L1 decision cites `cited`: its provenance must outlive the trace window.
+    sqlx::query(
+        "INSERT INTO decision
+             (tenant_id, kind, rung, answer, input_hash, confidence, policy_id, policy_version,
+              laya_config_id, laya_config_version, actor_kind, laya_invocation_id,
+              laya_request_hash, laya_response_hash)
+         VALUES ($1, 'prune.laya', 'laya', 'accepted', repeat('a', 64), 0.9, $2, 1, $3, 1,
+                 'system', $4, 'fnv1a64:0000000000000000:1', repeat('b', 64))",
+    )
+    .bind(a.as_uuid())
+    .bind(policy)
+    .bind(laya_config)
+    .bind(cited)
+    .execute(&db.super_pool)
+    .await
+    .expect("seed the laya decision");
+
+    worker::run_kind(
+        &db.runtime,
+        &config(),
+        None,
+        a,
+        "action_invocation.prune",
+        &json!({}),
+    )
+    .await
+    .expect("action_invocation.prune for A");
+
+    let left = |id: Uuid| {
+        let pool = db.super_pool.clone();
+        async move {
+            sqlx::query_scalar::<_, i64>("SELECT count(*) FROM action_invocation WHERE id = $1")
+                .bind(id)
+                .fetch_one(&pool)
+                .await
+                .expect("count")
+        }
+    };
+    assert_eq!(
+        left(cited).await,
+        1,
+        "an invocation a laya decision cites is its provenance, not a prunable trace"
+    );
+    assert_eq!(
+        left(uncited).await,
+        0,
+        "an uncited 31-day-old invocation is pruned"
+    );
+}
+
+#[tokio::test]
 async fn run_prune_detaches_the_approval_and_skips_a_pending_gate() {
     let db = common::TestDb::fresh().await;
     let (a, b) = tenants(&db).await;
