@@ -1,6 +1,6 @@
-//! S13 — the n8n disposition ledger, proved to resolve against the seeded process catalogue.
+//! S13 — the flow disposition ledger, proved to resolve against the seeded process catalogue.
 //!
-//! `parity/n8n-dispositions.tsv` carries one row per node of the 348 retired n8n flows, five
+//! `parity/flow-dispositions.tsv` carries one row per node of the 348 retired flows, five
 //! tab-separated columns and no header (`node_id`, `name`, `kind`, `action`, `target`). Each row
 //! states where that node's work now lives: a seeded process key, one of the three absorbed
 //! computed handlers, or an outright retirement. The file is worth keeping only because that claim
@@ -15,7 +15,7 @@
 //! 2. **Nothing is deferred** — no cell carries `delta:`, the DAG era's "this node has no home
 //!    yet" marker.
 //! 3. **Every target has a kind** — a target is a `process:`, an `absorbed:`, or the verbatim
-//!    `n8n-retire`. Without this, a row left on a retired DAG target (`matrix:`, `procedure:`,
+//!    `flow-retire`. Without this, a row left on a retired DAG target (`matrix:`, `procedure:`,
 //!    `workflow:`, `schedule:`, `run.failed:`) would be invisible to the resolution check below.
 //! 4. **Every `process:<key>` resolves** — against `conveyor_store::process_seed::catalogue()`:
 //!    every `types[].processes[].key` plus `named.processes[].key`. The assertion names the keys
@@ -25,7 +25,7 @@
 //! 6. **The twelve retirements survive** — an unchanged count, so the ledger is never quietly
 //!    grown into "everything was absorbed".
 //!
-//! The recorded-trace gate (an old n8n execution diffed against a process run) lives in
+//! The recorded-trace gate (an old recorded flow execution diffed against a process run) lives in
 //! `crates/actions/tests/process_trace.rs`. This file reads no fixture and opens no database.
 
 use std::collections::BTreeSet;
@@ -54,7 +54,7 @@ impl Row {
 }
 
 fn ledger_path() -> PathBuf {
-    PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../parity/n8n-dispositions.tsv")
+    PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../parity/flow-dispositions.tsv")
 }
 
 /// Parse the ledger. Blank lines are skipped; every other line must carry all five cells, so a
@@ -134,7 +134,7 @@ fn the_ledger_holds_348_rows_of_five_cells() {
     assert_eq!(
         ledger().len(),
         348,
-        "the ledger's coverage claim is one row per old n8n node"
+        "the ledger's coverage claim is one row per old recorded-flow node"
     );
 }
 
@@ -156,7 +156,7 @@ fn every_target_is_a_process_an_absorbed_handler_or_a_retirement() {
     for row in ledger() {
         let known = row.target.starts_with("process:")
             || row.target.starts_with("absorbed:")
-            || row.target == "n8n-retire";
+            || row.target == "flow-retire";
         assert!(
             known,
             "{}: {:?} is neither a seeded process, an absorbed handler nor a retirement",
@@ -215,7 +215,7 @@ fn twelve_rows_are_retired_outright() {
     let rows = ledger();
     let retired: Vec<&str> = rows
         .iter()
-        .filter(|row| row.target == "n8n-retire")
+        .filter(|row| row.target == "flow-retire")
         .map(|row| row.node_id.as_str())
         .collect();
     assert_eq!(

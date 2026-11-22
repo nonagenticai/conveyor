@@ -1,7 +1,7 @@
 #![forbid(unsafe_code)]
 //! `conveyor admin fixture|import|export|diff board` — the board-export/v1 toolchain (S05 §5).
 //!
-//! The live Planka database is five `[agent-contract-test]` cards, so a dump cannot be
+//! The live board database is five `[agent-contract-test]` cards, so a dump cannot be
 //! evidence. `board-export/v1` is a **defined, key-referenced** document (S5-D1): every
 //! reference is a stable key (`list-1`, `card-7`, `field-2`) and no uuid appears anywhere, so
 //! two exports of the same board compare equal and a replay has something to prove.

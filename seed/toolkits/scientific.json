@@ -1,0 +1,17 @@
+{
+  "key": "scientific",
+  "service": "scientific",
+  "title": "Scientific processor",
+  "owner": "platform",
+  "auth_adapter": "none",
+  "licence_app": null,
+  "status": "draft",
+  "health_path": "/health",
+  "tools": [
+    { "key": "meta_analysis", "action": "scientific_stats.meta_analysis" },
+    { "key": "confidence_interval", "action": "scientific_stats.confidence_interval" },
+    { "key": "trend", "action": "scientific_stats.trend" },
+    { "key": "translate", "action": "scientific_formal.translate" },
+    { "key": "verify", "action": "scientific_formal.verify" }
+  ]
+}

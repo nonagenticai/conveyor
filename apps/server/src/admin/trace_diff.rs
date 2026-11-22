@@ -19,7 +19,7 @@
 //!   human read out of the recording and committed. Compared under the **migration** rule; the
 //!   `end_state` block is not checked here (it needs the run's facts, so the fixture test asserts
 //!   it through `Expected::end_state_matches`).
-//! - a raw recorded n8n execution (`execution_data.data`, the flatted envelope) together with
+//! - a raw recorded flow execution (`execution_data.data`, the flatted envelope) together with
 //!   `--old-workflow <snapshot>`. An execution does not carry node types, so the snapshot is not
 //!   optional; without it the old side cannot name a single effect. Two systems' payloads are
 //!   different schemas, so the **migration** rule applies: the ordered effect and outcome with
@@ -31,8 +31,8 @@ use std::path::{Path, PathBuf};
 
 use conveyor_actions::process::trace as process_trace;
 use conveyor_actions::workflow::trace::{
-    DiffMode, Expected, N8nUnmapped, TraceDelta, TraceRecord, diff_records_with, parse_jsonl,
-    project_n8n_execution, read_n8n_snapshot,
+    DiffMode, Expected, RecordedFlowUnmapped, TraceDelta, TraceRecord, diff_records_with,
+    parse_jsonl, project_recorded_flow, read_recorded_flow_snapshot,
 };
 use conveyor_domain::TenantId;
 use sqlx::PgConnection;
@@ -82,7 +82,7 @@ pub fn trace_diff(
             }
         };
 
-        // `--old-workflow` exists only for a recorded n8n execution, so its presence is the mode.
+        // `--old-workflow` exists only for a recorded flow execution, so its presence is the mode.
         let mode = if old_workflow.is_some() {
             DiffMode::Migration
         } else {
@@ -107,18 +107,18 @@ pub fn trace_diff(
     }
 }
 
-/// Project a raw recorded n8n execution into trace records.
+/// Project a raw recorded flow execution into trace records.
 ///
 /// An executed node with no mapped conveyor effect makes the old side incomplete; a diff over it
 /// would be a number with no meaning, so it is refused rather than shortened.
 fn project(old: &Path, snapshot_path: &Path) -> Result<Vec<TraceRecord>, String> {
     let snapshot_text = read(snapshot_path)?;
-    let snapshot = read_n8n_snapshot(&snapshot_text)
+    let snapshot = read_recorded_flow_snapshot(&snapshot_text)
         .map_err(|error| format!("{}: {error}", snapshot_path.display()))?;
     let execution_text = read(old)?;
     let execution: serde_json::Value = serde_json::from_str(&execution_text)
         .map_err(|error| format!("{}: not JSON: {error}", old.display()))?;
-    let projected = project_n8n_execution(&snapshot, &execution, &old.display().to_string())
+    let projected = project_recorded_flow(&snapshot, &execution, &old.display().to_string())
         .map_err(|error| format!("{}: {error}", old.display()))?;
     if !projected.unmapped.is_empty() {
         return Err(format!(
@@ -140,7 +140,7 @@ fn read(path: &Path) -> Result<String, String> {
     std::fs::read_to_string(path).map_err(|error| format!("read {}: {error}", path.display()))
 }
 
-fn describe_unmapped(node: &N8nUnmapped) -> String {
+fn describe_unmapped(node: &RecordedFlowUnmapped) -> String {
     format!("{:?} ({}) — {}", node.node_id, node.node_type, node.detail)
 }
 

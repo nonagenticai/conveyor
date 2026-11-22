@@ -70,6 +70,11 @@ const DESTINATIONS: &[Destination] = &[
         runtime: "Rust",
         evidence: "mac-mini asr-backend-rs on :9201 — 2026-11-19",
     },
+    Destination {
+        service: "scientific",
+        runtime: "Rust",
+        evidence: "apps/scientific (Rust, absorbed by #105); deployment at zero replicas — 2026-11-22",
+    },
 ];
 
 fn external_services(registry: &Registry) -> BTreeSet<&'static str> {

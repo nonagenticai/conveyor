@@ -54,7 +54,7 @@ P-0750	POST /api/webhooks/n8n/execution-event	dropped:n8n-callbacks-retired	docs
 P-0751	POST /api/webhooks/n8n/plan-event	dropped:n8n-callbacks-retired	docs/plans/slices/S13-n8n-engine.md — plan edits are pm.plan, not reports from a flow
 P-0752	POST /api/webhooks/n8n/project-coach-failed	dropped:n8n-callbacks-retired	docs/plans/slices/S13-n8n-engine.md + docs/plans/slices/S06-control-plane.md §5.3 (err.card runs on run.failed)
 P-0753	POST /api/webhooks/n8n/project-request-outline/{id}	dropped:outline-tables-dropped	parity/SUMMARY.md PENDING-S0 — outline/outline_node dropped by migration 0011
-P-0754	POST /api/webhooks/n8n/project-start-failed	dropped:conveyor-start-absorbed	parity/n8n-dispositions.tsv (conveyor.start → absorbed:projects.create) + docs/plans/slices/S06-control-plane.md amendment
+P-0754	POST /api/webhooks/n8n/project-start-failed	dropped:conveyor-start-absorbed	parity/flow-dispositions.tsv (conveyor.start → absorbed:projects.create) + docs/plans/slices/S06-control-plane.md amendment
 P-0755	POST /api/webhooks/n8n/report	replacement:documents.report	crates/actions/src/documents/actions.rs::documents_report
 P-0756	POST /api/webhooks/n8n/router-dedupe	dropped:n8n-callbacks-retired	docs/plans/slices/S13-n8n-engine.md — dedupe is a job dedupe_key (docs/plans/slices/S06-control-plane.md §5.3)
 P-0758	POST /api/webhooks/telegram/incoming	test:conveyor-api::a_reply_is_the_service_identitys_decision_recorded_with_its_transport	crates/api/tests/channel_inbound.rs::a_reply_is_the_service_identitys_decision_recorded_with_its_transport (/api/channels/{binding_id}/inbound, telegram)
@@ -146,7 +146,7 @@ P-0883	@nonagentic/n8n-nodes-workflows.n8nWorkflowsApi.execution.list	replacemen
 P-0884	@nonagentic/n8n-nodes-workflows.n8nWorkflowsApi.workflow.get	action:workflows.get	crates/actions/src/workflow/actions.rs::workflows.get
 P-0885	@nonagentic/n8n-nodes-workflows.n8nWorkflowsApi.workflow.list	action:workflows.list	crates/actions/src/workflow/actions.rs::workflows.list
 P-0886	ask_fr	replacement:process_runs.start	seed/processes/named.yaml::ask_fr (the seeded human-approval process)
-P-0887	conveyor.start	action:projects.create	docs/plans/slices/S13-n8n-engine.md section 5.8; parity/n8n-dispositions.tsv::conveyor.start=absorbed:projects.create
+P-0887	conveyor.start	action:projects.create	docs/plans/slices/S13-n8n-engine.md section 5.8; parity/flow-dispositions.tsv::conveyor.start=absorbed:projects.create
 P-0888	err.card	test:conveyor-api::a_failed_run_blocks_the_card_comments_once_and_starts_one_coach	crates/api/tests/computed_set.rs::a_failed_run_blocks_the_card_comments_once_and_starts_one_coach
 P-0889	wip.pull	replacement:cards.move	crates/actions/src/board/pull.rs::wip_pull (selects intake cards to the WIP cap and moves each via cards.move); docs/plans/slices/S13-n8n-engine.md section 5.8
 P-0912	GET /api/boards/{id}	action:boards.get	crates/actions/src/board/boards.rs::boards.get
