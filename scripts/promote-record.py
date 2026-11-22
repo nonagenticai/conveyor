@@ -149,6 +149,7 @@ READ_ACTIONS = {
     "tranches.review_list",
     "cards.list",
     "wbs.list",
+    "baselines.list",
 }
 
 # The release this script ships with has no action that lists measurements.  If one is
@@ -1127,6 +1128,7 @@ class State:
     reviews: list[dict] = field(default_factory=list)
     wbs: dict[str, list[dict]] = field(default_factory=dict)
     board_cards: dict[str, list[dict]] = field(default_factory=dict)
+    baselines: dict[str, list[dict]] = field(default_factory=dict)
 
 
 def snapshot_file(directory: str) -> Path:
@@ -1282,6 +1284,22 @@ def load_state(
                 state.approvals.extend(
                     list_all(client, "approvals.list", {"project_id": project_id})
                 )
+    if any(
+        entry.action == "changes.request" and entry.payload.get("baseline_id")
+        for entry in entries
+    ):
+        for project_id in sorted(
+            {
+                entry.payload.get("project_id")
+                for entry in entries
+                if entry.action == "changes.request"
+                and entry.payload.get("baseline_id")
+                and entry.payload.get("project_id")
+            }
+        ):
+            state.baselines[str(project_id)] = rows(
+                client, "baselines.list", {"project_id": project_id}
+            )
     cadence_actions = {
         "cadences.create",
         "cadences.update",
@@ -2170,6 +2188,47 @@ def remap_payload(
                 f"tranche-review-decide:{key.first}: no gate on the production tranche"
             )
         payload["approval_id"] = gate["id"]
+    elif entry.action == "changes.request" and payload.get("baseline_id"):
+        staging = str(payload["baseline_id"])
+        known = {str(row.get("id")) for row in state.baselines.get(
+            str(payload.get("project_id")), []
+        )}
+        if staging not in known:
+            kind = entry.meta.get("baseline_kind") or "scope"
+            candidates = [
+                row
+                for row in state.baselines.get(str(payload.get("project_id")), [])
+                if row.get("kind") == kind
+            ]
+            if not candidates:
+                raise PromoteError(
+                    f"changes.request: no {kind!r} baseline on project "
+                    f"{payload.get('project_id')!r} to cite"
+                )
+            approved = [row for row in candidates if row.get("approved_by")]
+            chosen = (approved or candidates)[-1]
+            payload["baseline_id"] = chosen["id"]
+    elif entry.action == "changes.request" and payload.get("baseline_id"):
+        staging = str(payload["baseline_id"])
+        known = {
+            str(row.get("id"))
+            for row in state.baselines.get(str(payload.get("project_id")), [])
+        }
+        if staging not in known:
+            kind = entry.meta.get("baseline_kind") or "scope"
+            candidates = [
+                row
+                for row in state.baselines.get(str(payload.get("project_id")), [])
+                if row.get("kind") == kind
+            ]
+            if not candidates:
+                raise PromoteError(
+                    f"changes.request: no {kind!r} baseline on project "
+                    f"{payload.get('project_id')!r} to cite"
+                )
+            approved = [row for row in candidates if row.get("approved_by")]
+            chosen = (approved or candidates)[-1]
+            payload["baseline_id"] = chosen["id"]
     elif entry.action == "cadences.create":
         programme = entry.meta.get("programme_id") or payload.get("programme_id")
         if not programme:
@@ -3336,6 +3395,11 @@ class FakeClient:
             successor["state"] = "authorised"
             successor["authorisation_review_id"] = review["id"]
             return copy.deepcopy(successor)
+        if action == "baselines.list":
+            return {
+                "items": copy.deepcopy(self.state.baselines.get(payload.get("project_id"), [])),
+                "next_cursor": None,
+            }
         if action == "wbs.list":
             return {
                 "items": copy.deepcopy(self.state.wbs.get(payload.get("project_id"), [])),
@@ -3593,6 +3657,12 @@ def self_test() -> int:
         )
         entries, _ = build_entries(_fixture_entries(paths, full))
         state = State()
+        # The fixture's change cites a STAGING baseline id; production has its own row.
+        state.baselines["01a1dcb8-d24b-76de-b901-56fd56e001bc"] = [
+            {"id": "production-scope-baseline",
+             "project_id": "01a1dcb8-d24b-76de-b901-56fd56e001bc",
+             "kind": "scope", "approved_by": "01a1e8a7-8b23-76a9-9114-aafb95f7a545"},
+        ]
         client = FakeClient(state)
         id_map, outcomes = apply_entries(client, entries, state, str(snapshot))
         ok(
@@ -3600,6 +3670,14 @@ def self_test() -> int:
             == ["created"] * len(full),
             f"first apply creates every entry: "
             f"{[(o.entry.natural_key, o.verdict, o.detail) for o in outcomes]}",
+        )
+        change_call = [
+            payload for action, payload, _, _ in client.calls
+            if action == "changes.request"
+        ][-1]
+        ok(
+            change_call["baseline_id"] == "production-scope-baseline",
+            "the change cites the production baseline resolved by kind",
         )
         gate_decision = [
             payload for action, payload, _, _ in client.calls
