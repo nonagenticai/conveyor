@@ -32,7 +32,9 @@ only when its screen reads real rows; until then the mock's `V2 · PROPOSED` bad
 
 | Destination | Route | Screen | Actions |
 |---|---|---|---|
+| Organisation | `/organisation` | `apps/web/src/screens/organisation.rs` | `industries.list`, `departments.list`, `job_catalogue.list`, `job_bindings.list` |
 | Portfolio | `/portfolio` | `apps/web/src/screens/portfolio.rs` | `portfolio.in_flight` |
+| Programme | `/programme` | `apps/web/src/screens/programme.rs` | `programmes.list`, `tranches.list`, `cadences.list`, `benefits.list`, `lessons.list` |
 
 ## Review paths
 
