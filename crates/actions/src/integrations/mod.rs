@@ -25,6 +25,8 @@ pub mod inference;
 pub mod ingest;
 pub mod objects;
 pub mod strata;
+// T14: the scientific processor's five read actions (`scientific_stats.*`, `scientific_formal.*`).
+pub mod scientific;
 // #182 slice A: Google's OAuth token endpoint, behind `crate::youtube::YouTubeProvider`.
 pub mod youtube;
 // #173: the two audio capabilities of the model hosts — `produce.speech`, `media.transcribe`.

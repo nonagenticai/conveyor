@@ -4373,6 +4373,14 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
         plain("coding_jobs.create", json!({}), None),
         plain("coding_jobs.get", json!({}), None),
         plain("retrieval.query", json!({}), None),
+        // T14 (#560): the scientific reads. An empty body is refused by the closed input schema on
+        // both transports (422 / `isError`), which is the parity property a declared external has
+        // when its service is a draft and no call should leave the process.
+        plain("scientific_stats.meta_analysis", json!({}), None),
+        plain("scientific_stats.confidence_interval", json!({}), None),
+        plain("scientific_stats.trend", json!({}), None),
+        plain("scientific_formal.translate", json!({}), None),
+        plain("scientific_formal.verify", json!({}), None),
         // S10: the copilot's model call. The stub's catch-all answers the router's path, so the two
         // transports receive the same document — this proves the declaration, not a model.
         plain(
