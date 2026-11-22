@@ -1,0 +1,8 @@
+{
+ "title": "T3 \u2014 Statement of Architecture Work",
+ "project_id": "01a1d039-0d33-7915-8833-75f4dc31cc07",
+ "body": "# Statement of Architecture Work \u2014 T3 PM job\n\n## Assignment\n\nThe T3 slice (issue #74) under the programme's PM governance; the live delivery contract is\n`01a2052f-29da-76c4-9bda-e45e0f408fe8`, requested by the PM job and approved by the Architecture Board under the standing\ndelegation.\n\n## Scope\n\nThe PM request-to-plan path (`pm.plan`, `projects.baseline`), the dual-controlled charter,\nbaseline and change gates, the change-request path with its impact block, and closure against the\nfrozen baseline (`projects.close_request`, `projects.close`). Not in scope: project creation and\nthe board surfaces, which belong to S05.\n\n## Responsibilities\n\nThe PM job requests and plans; the approver job decides every gate and is never its requester;\nthe programme manager owns delivery; the architect owns the baseline's architecture content; the\nprogramme board reviews the tranche.\n\n## Acceptance criteria\n\nSPEC_V2 \u00a712 T3: \"PM runs a request end to end; cannot approve its own gate; a baseline change\nrequires a change request\". The manifest `acceptance/programme/T3.toml` is the gate, not this\ndocument; its checks execute against the live rows.\n\n## Contract\n\nThe live `delivery_contract` `01a2052f-29da-76c4-9bda-e45e0f408fe8` (phase g), approved by the Board decision under the standing\ndelegation; its body names the same scope, obligations and acceptance.\n",
+ "category": "statement-of-architecture-work",
+ "publishable": true,
+ "unit": "T3"
+}
