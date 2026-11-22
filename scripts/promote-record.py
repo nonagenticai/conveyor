@@ -96,6 +96,12 @@ WRITE_ACTIONS = {
     "benefits.update",
     "documents.compose",
     "documents.publish",
+    # The closure family: the retrospective rework's close chains (T13/T10/T9/T4 corpus).
+    "projects.close_request",
+    "approvals.request",
+    "projects.close",
+    "cards.comment",
+    "cards.move",
 }
 
 # Product read actions used by --apply.
@@ -106,6 +112,10 @@ READ_ACTIONS = {
     "benefits.get",
     "approvals.list",
     "documents.get",
+    "projects.get",
+    "cards.get",
+    "lists.list",
+    "pm.get",
 }
 
 # The release this script ships with has no action that lists measurements.  If one is
@@ -120,6 +130,10 @@ CHANGE_KEY_RE = re.compile(r"^change:(.+)$")
 APPROVAL_KEY_RE = re.compile(r"^approval:([^/:]+)[/:](.+)$")
 DOCUMENT_KEY_RE = re.compile(r"^document:(.+)$")
 DOCUMENT_PUBLISH_KEY_RE = re.compile(r"^document-publish:(.+)$")
+PROJECT_CLOSURE_KEY_RE = re.compile(r"^project:closure:([0-9a-f-]{36})$")
+PROJECT_CLOSE_KEY_RE = re.compile(r"^project:close:([0-9a-f-]{36})$")
+CARD_COMMENT_KEY_RE = re.compile(r"^card-comment:([0-9a-f-]{36}):([0-9a-f]{8,64})$")
+CARD_MOVE_KEY_RE = re.compile(r"^card-move:([0-9a-f-]{36}):(intake|active|waiting|done|archive)$")
 
 
 class PromoteError(Exception):
@@ -152,6 +166,14 @@ class NaturalKey:
             return f"document:{self.first}"
         if self.kind == "document_publish":
             return f"document-publish:{self.first}"
+        if self.kind == "project_closure":
+            return f"project:closure:{self.first}"
+        if self.kind == "project_close":
+            return f"project:close:{self.first}"
+        if self.kind == "card_comment":
+            return f"card-comment:{self.first}:{self.second}"
+        if self.kind == "card_move":
+            return f"card-move:{self.first}:{self.second}"
         raise PromoteError(f"unknown natural-key kind {self.kind!r}")
 
 
@@ -185,6 +207,18 @@ def parse_natural_key(value: str) -> NaturalKey:
         if not title or any(ord(char) < 0x20 for char in title):
             raise PromoteError(f"malformed document natural key: {value!r}")
         return NaturalKey("document", title)
+    match = PROJECT_CLOSURE_KEY_RE.match(value)
+    if match:
+        return NaturalKey("project_closure", match.group(1))
+    match = PROJECT_CLOSE_KEY_RE.match(value)
+    if match:
+        return NaturalKey("project_close", match.group(1))
+    match = CARD_COMMENT_KEY_RE.match(value)
+    if match:
+        return NaturalKey("card_comment", match.group(1), match.group(2))
+    match = CARD_MOVE_KEY_RE.match(value)
+    if match:
+        return NaturalKey("card_move", match.group(1), match.group(2))
     raise PromoteError(f"malformed natural key: {value!r}")
 
 
@@ -372,6 +406,72 @@ def validate_entries(entries: list[Entry]) -> list[str]:
                 errors.append(
                     f"line {entry.lineno}: fields update must not change status"
                 )
+        elif entry.action == "projects.close_request":
+            if key.kind != "project_closure":
+                errors.append(
+                    f"line {entry.lineno}: projects.close_request key must be "
+                    "project:closure:<project id>"
+                )
+                continue
+            if entry.payload.get("id") != key.first:
+                errors.append(
+                    f"line {entry.lineno}: natural key {key.first!r} does not match "
+                    f"input id {entry.payload.get('id')!r}"
+                )
+        elif entry.action == "approvals.request":
+            if key.kind != "approval":
+                errors.append(
+                    f"line {entry.lineno}: approvals.request key must be approval:<gate>/<target>"
+                )
+                continue
+            if not entry.payload.get("gate"):
+                errors.append(f"line {entry.lineno}: approvals.request input has no gate")
+            if not isinstance(entry.payload.get("evidence"), list) or not entry.payload["evidence"]:
+                errors.append(
+                    f"line {entry.lineno}: a destructive gate needs typed evidence"
+                )
+        elif entry.action == "projects.close":
+            if key.kind != "project_close":
+                errors.append(
+                    f"line {entry.lineno}: projects.close key must be project:close:<project id>"
+                )
+                continue
+            if entry.payload.get("id") != key.first:
+                errors.append(
+                    f"line {entry.lineno}: natural key {key.first!r} does not match "
+                    f"input id {entry.payload.get('id')!r}"
+                )
+        elif entry.action == "cards.comment":
+            if key.kind != "card_comment":
+                errors.append(
+                    f"line {entry.lineno}: cards.comment key must be card-comment:<card>:<sha>"
+                )
+                continue
+            if entry.payload.get("id") != key.first:
+                errors.append(
+                    f"line {entry.lineno}: natural key {key.first!r} does not match "
+                    f"input id {entry.payload.get('id')!r}"
+                )
+            body = entry.payload.get("body")
+            if not isinstance(body, str) or not body:
+                errors.append(f"line {entry.lineno}: comment input has no body")
+            elif not hashlib.sha256(body.encode("utf-8")).hexdigest().startswith(key.second):
+                errors.append(
+                    f"line {entry.lineno}: natural key sha does not name the comment body"
+                )
+        elif entry.action == "cards.move":
+            if key.kind != "card_move":
+                errors.append(
+                    f"line {entry.lineno}: cards.move key must be card-move:<card>:<lane kind>"
+                )
+                continue
+            if entry.payload.get("id") != key.first:
+                errors.append(
+                    f"line {entry.lineno}: natural key {key.first!r} does not match "
+                    f"input id {entry.payload.get('id')!r}"
+                )
+            if not entry.payload.get("list_id"):
+                errors.append(f"line {entry.lineno}: move input has no list_id")
     return errors
 
 
@@ -481,6 +581,11 @@ class State:
     benefits: list[dict] = field(default_factory=list)
     measurements: list[dict] = field(default_factory=list)
     approvals: list[dict] = field(default_factory=list)
+    # The closure family's production rows: projects by id (status, meta.reopened_at),
+    # cards by id (list_id, board_id, version, comments with a body hash), lanes by id.
+    projects: dict[str, dict] = field(default_factory=dict)
+    cards: dict[str, dict] = field(default_factory=dict)
+    lists: dict[str, dict] = field(default_factory=dict)
 
 
 def snapshot_file(directory: str) -> Path:
@@ -553,6 +658,43 @@ def load_state(
             state.approvals.extend(
                 list_all(client, "approvals.list", {"project_id": project_id})
             )
+    closure_actions = {
+        "projects.close_request",
+        "approvals.request",
+        "projects.close",
+        "cards.comment",
+        "cards.move",
+    }
+    if any(entry.action in closure_actions for entry in entries):
+        for project_id in sorted(project_ids):
+            row = client.invoke("projects.get", {"id": project_id})
+            if isinstance(row, dict):
+                state.projects[project_id] = row
+        for entry in entries:
+            if entry.action not in ("cards.comment", "cards.move"):
+                continue
+            card_id = entry.payload.get("id")
+            if not card_id:
+                raise PromoteError(f"{entry.action}: the input names no card id")
+            card = client.invoke("cards.get", {"id": card_id})
+            if not isinstance(card, dict):
+                raise PromoteError(f"cards.get: no card {card_id}")
+            for comment in card.get("comments") or []:
+                body = comment.get("body") if isinstance(comment, dict) else None
+                if isinstance(body, str):
+                    comment["_sha"] = hashlib.sha256(body.encode("utf-8")).hexdigest()
+            state.cards[card_id] = card
+            board_id = card.get("board_id")
+            if board_id:
+                for row in list_all(client, "lists.list", {"board_id": board_id}):
+                    if row.get("id"):
+                        state.lists[row["id"]] = row
+        # A projects.close replay needs the project's gates even when no change entry does.
+        for project_id in sorted(project_ids):
+            if not any(row.get("project_id") == project_id for row in state.approvals):
+                state.approvals.extend(
+                    list_all(client, "approvals.list", {"project_id": project_id})
+                )
     if snapshot is not None:
         state.measurements.extend(snapshot.get("benefit_measurements") or [])
     return state
@@ -635,6 +777,53 @@ def expected_gate_status(payload: dict) -> str:
     return "approved" if payload.get("decision") == "approve" else "rejected"
 
 
+def closure_gate(state: State, project_id: str) -> dict | None:
+    """The project's closure gate, in whatever state — a request that happened is a skip."""
+    for gate in state.approvals:
+        if gate.get("gate") == "closure" and gate.get("project_id") == project_id:
+            return gate
+    return None
+
+
+def requested_target(payload: dict) -> str | None:
+    """The engine's target for an `approvals.request` payload, where it is derivable."""
+    if payload.get("target"):
+        return str(payload["target"])
+    if payload.get("action") == "projects.close":
+        inner = payload.get("input")
+        project_id = inner.get("id") if isinstance(inner, dict) else None
+        return f"project/{project_id}/close" if project_id else None
+    return None
+
+
+def request_gate(state: State, payload: dict) -> dict | None:
+    """A gate with the same gate name and target is the request that already happened."""
+    gate_name = payload.get("gate")
+    target = requested_target(payload)
+    if not gate_name:
+        return None
+    for gate in state.approvals:
+        if gate.get("gate") != gate_name:
+            continue
+        if gate.get("status") == "rejected":
+            continue
+        if target is not None and gate.get("target") == target:
+            return gate
+    return None
+
+
+def card_comment(card: dict, wanted: str) -> dict | None:
+    for comment in card.get("comments") or []:
+        if isinstance(comment, dict) and str(comment.get("_sha") or "").startswith(wanted):
+            return comment
+    return None
+
+
+def lane_kind(state: State, list_id: str | None) -> str | None:
+    lane = state.lists.get(list_id or "")
+    return str(lane.get("kind")) if lane and lane.get("kind") else None
+
+
 def existing_for(
     entry: Entry,
     state: State,
@@ -651,6 +840,14 @@ def existing_for(
         return baseline_measurement(state, key.first)
     if entry.action == "changes.request":
         return change_row(state, key, entry.payload)
+    if entry.action == "approvals.decide" and key.first in ("closure", "projects.close"):
+        # The closure chain's decides: the key names the gate and the project, not a change.
+        for gate in state.approvals:
+            if gate.get("gate") != key.first or gate.get("project_id") != key.second:
+                continue
+            if gate.get("status") == expected_gate_status(entry.payload):
+                return gate
+        return None
     if entry.action == "approvals.decide":
         known = change_index.get(key.second or "")
         gate = None
@@ -671,6 +868,23 @@ def existing_for(
     if entry.action == "benefits.update":
         if update_already_reflected(state, key, entry.payload):
             return benefit_by_reference(state, key.first)
+        return None
+    if entry.action == "projects.close_request":
+        return closure_gate(state, key.first)
+    if entry.action == "approvals.request":
+        return request_gate(state, entry.payload)
+    if entry.action == "projects.close":
+        project = state.projects.get(key.first)
+        if project is not None and project.get("status") == "closed":
+            return project
+        return None
+    if entry.action == "cards.comment":
+        card = state.cards.get(key.first)
+        return card_comment(card, key.second) if card is not None else None
+    if entry.action == "cards.move":
+        card = state.cards.get(key.first)
+        if card is not None and lane_kind(state, card.get("list_id")) == key.second:
+            return card
         return None
     return None
 
@@ -694,6 +908,18 @@ def build_change_index(
 
 
 # ── readback ────────────────────────────────────────────────────────────────────────────
+
+
+def read_project(client: Any, project_id: str) -> dict:
+    """`projects.get` answers `{project, boards}`; the row is the nested project."""
+    try:
+        output = client.invoke("projects.get", {"id": project_id})
+    except PromoteError as error:
+        raise ReadbackError(str(error)) from None
+    project = output.get("project") if isinstance(output, dict) else None
+    if not isinstance(project, dict) or project.get("id") != project_id:
+        raise ReadbackError("projects.get: the row was not read back")
+    return project
 
 
 def read_row(client: Any, action: str, row_id: str) -> dict:
@@ -813,6 +1039,36 @@ def remap_payload(
                     "the change entry must create or find it first"
                 )
             payload["change_id"] = production_change
+    elif entry.action == "cards.move":
+        card = state.cards.get(key.first)
+        target_id = payload.get("list_id")
+        # The journal's lane id is the staging copy's; the production lane is the one of the
+        # SAME KIND on the same board. A kind is the matrix semantics; an id is not portable.
+        resolved = None
+        if card is not None:
+            for lane_id, lane in state.lists.items():
+                if lane.get("board_id") != card.get("board_id"):
+                    continue
+                if lane.get("kind") == key.second:
+                    resolved = lane_id
+                    break
+        if resolved is None:
+            if lane_kind(state, target_id) == key.second:
+                resolved = target_id
+        if resolved is None:
+            raise PromoteError(f"cards.move: no {key.second!r} lane on the card's board")
+        payload["list_id"] = resolved
+    elif entry.action == "approvals.request":
+        evidence = payload.get("evidence")
+        if isinstance(evidence, list):
+            remapped: list[dict] = []
+            for item in evidence:
+                item = copy.deepcopy(item)
+                staging = item.get("id") if isinstance(item, dict) else None
+                if staging and id_map.get(str(staging)):
+                    item["id"] = id_map[str(staging)]
+                remapped.append(item)
+            payload["evidence"] = remapped
     elif entry.action == "approvals.decide":
         staging_approval = payload.get("approval_id")
         production = id_map.get(staging_approval) if staging_approval else None
@@ -838,6 +1094,17 @@ def output_id_for(action: str, output: Any) -> tuple[str, str | None]:
         if not change_id:
             raise PromoteError("changes.request: output has no change_id")
         return str(change_id), str(approval_id) if approval_id else None
+    if action == "projects.close_request":
+        project_id = output.get("project_id")
+        if not project_id:
+            raise PromoteError("projects.close_request: output has no project_id")
+        return str(project_id), None
+    if action == "projects.close":
+        project = output.get("project")
+        project_id = project.get("id") if isinstance(project, dict) else None
+        if not project_id:
+            raise PromoteError("projects.close: output has no project id")
+        return str(project_id), None
     row_id = output.get("id")
     if not row_id:
         raise PromoteError(f"{action}: output has no id")
@@ -903,6 +1170,58 @@ def readback_entry(
         return gate
     if entry.action == "benefits.measure":
         return readback_measurement(snapshot, production_id)
+    if entry.action == "projects.close_request":
+        project_id = entry.payload.get("id")
+        if not project_id:
+            raise ReadbackError("projects.close_request: the input names no project")
+        project = read_project(client, str(project_id))
+        if gate_id:
+            readback_gate(client, str(project_id), gate_id)
+        if closure_gate(state, str(project_id)) is None:
+            state.approvals.append(
+                {"id": gate_id, "gate": "closure", "status": "approved",
+                 "project_id": str(project_id)}
+            )
+        return project
+    if entry.action == "approvals.request":
+        project_id = entry.payload.get("project_id")
+        if not project_id:
+            raise ReadbackError("approvals.request: the input names no project")
+        gate = readback_gate(client, str(project_id), production_id)
+        if gate.get("status") not in ("pending", "approved"):
+            raise ReadbackError(
+                f"approvals.list: gate is {gate.get('status')!r}, not pending"
+            )
+        state.approvals.append(gate)
+        return gate
+    if entry.action == "projects.close":
+        project = read_project(client, production_id)
+        if project.get("status") != "closed":
+            raise ReadbackError(
+                f"projects.get: status is {project.get('status')!r}, not closed"
+            )
+        state.projects[production_id] = project
+        return project
+    if entry.action == "cards.comment":
+        card = read_row(client, "cards.get", key.first)
+        for comment in card.get("comments") or []:
+            body = comment.get("body") if isinstance(comment, dict) else None
+            if isinstance(body, str):
+                digest = hashlib.sha256(body.encode("utf-8")).hexdigest()
+                comment["_sha"] = digest
+                if comment.get("id") == production_id or digest.startswith(key.second):
+                    state.cards[key.first] = card
+                    return comment
+        raise ReadbackError("cards.get: the comment is not on the card")
+    if entry.action == "cards.move":
+        card = read_row(client, "cards.get", key.first)
+        kind = lane_kind(state, card.get("list_id"))
+        if kind != key.second:
+            raise ReadbackError(
+                f"cards.get: the card is in a {kind!r} lane, not {key.second!r}"
+            )
+        state.cards[key.first] = card
+        return card
     raise PromoteError(f"{entry.action}: no readback is defined")
 
 
@@ -937,7 +1256,15 @@ def apply_entries(
                 continue
 
             payload = remap_payload(entry, state, id_map, change_index)
-            if entry.action == "benefits.update":
+            if entry.action == "cards.move":
+                current = read_row(client, "cards.get", str(payload["id"]))
+                version = current.get("version")
+                if not isinstance(version, int):
+                    raise PromoteError(
+                        f"cards.get: {payload['id']} has no version for If-Match"
+                    )
+                output = client.invoke(entry.action, payload, if_match=version)
+            elif entry.action == "benefits.update":
                 current = read_row(client, "benefits.get", payload["id"])
                 version = current.get("version")
                 if not isinstance(version, int):
@@ -949,6 +1276,21 @@ def apply_entries(
                 output = client.invoke(entry.action, payload)
             production_id, gate_id = output_id_for(entry.action, output)
             id_map[entry.output_id] = production_id
+            if entry.action == "projects.close_request":
+                asset = output.get("closure_asset_id") if isinstance(output, dict) else None
+                if asset:
+                    id_map[str(asset)] = str(asset)
+                staging_asset = entry.raw.get("closure_asset_id")
+                if staging_asset and asset:
+                    id_map[str(staging_asset)] = str(asset)
+                gate_id = (
+                    str(output.get("approval_id"))
+                    if isinstance(output, dict) and output.get("approval_id")
+                    else None
+                )
+                staging_gate = entry.raw.get("approval_id")
+                if staging_gate and gate_id:
+                    id_map[str(staging_gate)] = str(gate_id)
             if entry.action == "changes.request":
                 change_index[key.first] = {
                     "change_id": production_id,
@@ -1180,6 +1522,75 @@ class FakeClient:
                     row["version"] += 1
                     return copy.deepcopy(row)
             raise PromoteError("benefits.update: no benefit")
+        if action == "projects.get":
+            project = self.state.projects.get(payload.get("id"))
+            if project is None:
+                return None
+            return {"project": copy.deepcopy(project), "boards": []}
+        if action == "lists.list":
+            rows = [
+                row for row in self.state.lists.values()
+                if row.get("board_id") == payload.get("board_id")
+            ]
+            return {"items": copy.deepcopy(rows), "next_cursor": None}
+        if action == "cards.get":
+            card = self.state.cards.get(payload.get("id"))
+            if card is None:
+                return None
+            return copy.deepcopy(card)
+        if action == "projects.close_request":
+            asset = self._id("closure")
+            gate = {
+                "id": self._id("closure-gate"),
+                "gate": "closure",
+                "status": "pending",
+                "project_id": payload.get("id"),
+                "target": None,
+                "description": "Close the fixture project",
+                "version": 1,
+            }
+            self.state.approvals.append(gate)
+            return {
+                "project_id": payload.get("id"),
+                "status": "requested",
+                "closure_asset_id": asset,
+                "approval_id": gate["id"],
+            }
+        if action == "approvals.request":
+            gate = {
+                "id": self._id("gate"),
+                "gate": payload.get("gate"),
+                "status": "pending",
+                "project_id": payload.get("project_id"),
+                "target": requested_target(payload),
+                "description": payload.get("description"),
+                "proposed_input": payload.get("proposed_input"),
+                "version": 1,
+            }
+            self.state.approvals.append(gate)
+            return {"id": gate["id"], "gate": gate["gate"], "status": gate["status"]}
+        if action == "projects.close":
+            project = self.state.projects.get(payload.get("id"))
+            if project is None:
+                raise PromoteError("projects.close: no project")
+            project["status"] = "closed"
+            return {"project": copy.deepcopy(project), "boards": []}
+        if action == "cards.comment":
+            card = self.state.cards.get(payload.get("id"))
+            if card is None:
+                raise PromoteError("cards.comment: no card")
+            comment = {"id": self._id("comment"), "body": payload.get("body")}
+            card.setdefault("comments", []).append(comment)
+            return copy.deepcopy(comment)
+        if action == "cards.move":
+            card = self.state.cards.get(payload.get("id"))
+            if card is None:
+                raise PromoteError("cards.move: no card")
+            if if_match != card.get("version"):
+                raise PromoteError("cards.move: If-Match is stale")
+            card["list_id"] = payload.get("list_id")
+            card["version"] = int(card.get("version") or 0) + 1
+            return copy.deepcopy(card)
         raise PromoteError(f"fake client: unknown action {action}")
 
 
@@ -1215,6 +1626,24 @@ def _fixture_inputs(root: Path) -> dict[str, Path]:
             "actual_value": 1.0, "unit": "fixture",
             "measured_at": "2026-11-22T20:00:00Z",
         },
+        "closure": {
+            "id": project, "closure": "fixture closure",
+            "delegation_ref": "01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+            "evidence": {"manifest": "fixture", "retrospective": True},
+        },
+        "close_gate": {
+            "project_id": project, "gate": "projects.close", "kind": "action",
+            "action": "projects.close", "input": {"id": project},
+            "proposed_input": {"id": project, "reason": "fixture close"},
+            "description": "Close the fixture project",
+            "evidence": [{"kind": "governed_asset",
+                          "id": "01a2051f-d60f-7f6c-bf3e-935e8fc43482"}],
+        },
+        "close": {"id": project, "reason": "fixture close"},
+        "comment": {"id": "01a1ffeb-311e-708e-a994-83eb40fd3a69",
+                    "body": "Resolved: the fixture receipt"},
+        "move": {"id": "01a1ffeb-311e-708e-a994-83eb40fd3a69",
+                 "list_id": "01a1d3e7-bd2f-7998-bf7b-8b4039393db9"},
     }
     paths: dict[str, Path] = {}
     for name, payload in files.items():
@@ -1272,6 +1701,40 @@ def _fixture_entries(
                 "action": "benefits.measure", "input": str(paths["measure"]),
                 "natural_key": "benefit:B1/baseline",
                 "output_id": "01a204d3-87c0-736a-a0bf-a93aa2b638c0",
+            }
+        elif name == "closure":
+            raw = {
+                "action": "projects.close_request", "input": str(paths["closure"]),
+                "natural_key": "project:closure:01a1dcb8-d24b-76de-b901-56fd56e001bc",
+                "output_id": "01a1dcb8-d24b-76de-b901-56fd56e001bc",
+                "closure_asset_id": "01a2051f-d60f-7f6c-bf3e-935e8fc43482",
+            }
+        elif name == "close_gate":
+            raw = {
+                "action": "approvals.request", "input": str(paths["close_gate"]),
+                "natural_key": "approval:projects.close:project/"
+                                "01a1dcb8-d24b-76de-b901-56fd56e001bc/close",
+                "output_id": "01a20520-6853-73c3-8b04-4139d64d3ef8",
+            }
+        elif name == "close":
+            raw = {
+                "action": "projects.close", "input": str(paths["close"]),
+                "natural_key": "project:close:01a1dcb8-d24b-76de-b901-56fd56e001bc",
+                "output_id": "01a1dcb8-d24b-76de-b901-56fd56e001bc",
+            }
+        elif name == "comment":
+            body = json.loads(paths["comment"].read_text(encoding="utf-8"))["body"]
+            sha = hashlib.sha256(body.encode("utf-8")).hexdigest()[:8]
+            raw = {
+                "action": "cards.comment", "input": str(paths["comment"]),
+                "natural_key": f"card-comment:01a1ffeb-311e-708e-a994-83eb40fd3a69:{sha}",
+                "output_id": "01a20544-0000-7000-8000-00000000c001",
+            }
+        elif name == "move":
+            raw = {
+                "action": "cards.move", "input": str(paths["move"]),
+                "natural_key": "card-move:01a1ffeb-311e-708e-a994-83eb40fd3a69:done",
+                "output_id": "01a1ffeb-311e-708e-a994-83eb40fd3a69",
             }
         else:
             raise AssertionError(name)
@@ -1408,6 +1871,59 @@ def self_test() -> int:
         ok(
             "measurement" in outcomes[1].detail,
             "the measurement failure says why",
+        )
+
+        # 8. the closure family: a close chain applies once and replays as skips.
+        project = "01a1dcb8-d24b-76de-b901-56fd56e001bc"
+        card = "01a1ffeb-311e-708e-a994-83eb40fd3a69"
+        board = "01a1d3e7-bbfa-7e5f-a4d2-4b44ca69886c"
+        intake = "01a1d3e7-bc47-7384-94cf-f1009fd9c0b7"
+        staging_done = "01a1d3e7-bd2f-7998-bf7b-8b4039393db9"
+        production_done = "01a1d3e7-0000-4000-8000-00000000d0e5"
+        closure_names = ("closure", "close_gate", "close", "comment", "move")
+        entries, errors = build_entries(_fixture_entries(paths, closure_names))
+        ok(not errors, f"the closure fixture parses: {errors}")
+        ok(not validate_entries(entries), "the closure fixture validates")
+        state = State()
+        state.projects[project] = {"id": project, "status": "active", "meta": {}}
+        state.cards[card] = {
+            "id": card, "board_id": board, "list_id": intake,
+            "version": 1, "comments": [],
+        }
+        state.lists[intake] = {"id": intake, "board_id": board, "kind": "intake"}
+        # The production board carries ONE done lane, under an id the staging journal does not
+        # know: resolution must be by kind.
+        state.lists[production_done] = {
+            "id": production_done, "board_id": board, "kind": "done",
+        }
+        client = FakeClient(state)
+        id_map, outcomes = apply_entries(client, entries, state, str(snapshot))
+        ok(
+            [outcome.verdict for outcome in outcomes]
+            == ["created"] * len(closure_names),
+            f"the closure chain applies: "
+            f"{[(o.entry.natural_key, o.verdict, o.detail) for o in outcomes]}",
+        )
+        ok(state.projects[project]["status"] == "closed", "the close landed")
+        ok(
+            state.cards[card]["list_id"] == production_done,
+            "the move resolved the production done lane by kind, not by id",
+        )
+        request_call = [
+            payload for action, payload, _ in client.calls
+            if action == "approvals.request"
+        ][0]
+        ok(
+            request_call["evidence"][0]["id"]
+            == id_map["01a2051f-d60f-7f6c-bf3e-935e8fc43482"],
+            "the destructive gate's evidence is the production closure asset",
+        )
+        _, second = apply_entries(FakeClient(state), entries, state, str(snapshot))
+        ok(
+            [outcome.verdict for outcome in second]
+            == ["skipped"] * len(closure_names),
+            f"a replay skips the whole closure chain: "
+            f"{[(o.entry.natural_key, o.verdict, o.detail) for o in second]}",
         )
 
     print(f"self-test: {checks} checks passed (offline; no network, no database)")
