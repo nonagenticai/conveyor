@@ -248,6 +248,17 @@ def plan(issues, prs, branches, blocker_state, now):
                 )
                 continue
             if any(state == "unknown" for state in states.values()):
+                reports.append(
+                    {
+                        "rule": "B",
+                        "number": number,
+                        "title": issue["title"],
+                        "why": (
+                            "not released; a named blocker's state could not be "
+                            f"determined ({named})"
+                        ),
+                    }
+                )
                 continue
             # Every named blocker is positively closed. Releasing a stale block is mechanical;
             # releasing a claim is still a human decision.
@@ -419,8 +430,8 @@ def blocker_states(repo: str):
                 text=True,
             )
             # "unknown" is not "missing": a lookup that failed is not evidence that the blocker
-            # closed, and reporting a stale block on a failed lookup would be a lie that costs
-            # a human a trip to the issue. Rule B only reports on closed or missing.
+            # closed. Rule B releases only on a positively closed set; a missing or unknown
+            # blocker is reported and never released.
             cache[number] = proc.stdout.strip().lower() if proc.returncode == 0 else "unknown"
         return cache[number]
 
@@ -627,9 +638,9 @@ def self_test() -> int:
             [], [], [], ["B:123"],
         ),
         (
-            "stale block, closed + unknown -> no report",
+            "stale block, closed + unknown -> report only",
             [issue(124, [BLOCKED], "Blocker: #120, #777\n")],
-            [], [], [], [],
+            [], [], [], ["B:124"],
         ),
         (
             "stale block on a claimed issue -> report only",
@@ -669,9 +680,9 @@ def self_test() -> int:
             [], [], [], [],
         ),
         (
-            "blocker lookup failed -> no stale report",
+            "blocker lookup failed -> report only",
             [issue(13, [BLOCKED], "Blocker: #777\n")],
-            [], [], [], [],
+            [], [], [], ["B:13"],
         ),
         (
             "claimed, no branch, stale -> report",
