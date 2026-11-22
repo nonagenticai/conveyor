@@ -1,0 +1,587 @@
+{
+  "actions": "docs/design/data/actions.json",
+  "description": "Every audit rule's output category, live source and verifier (WP11). The checker enforces: no orphan rule, a known verifier name, and a source that resolves (or an explicitly live-only projection that is still absent from the committed pack).",
+  "entries": {
+    "backlog_refinement_missing": {
+      "categories": [
+        "pi-plan"
+      ],
+      "source": {
+        "file": "msp.json",
+        "pointer": "/cadences"
+      },
+      "spec": "\u00a78.2",
+      "standard": "SAFe",
+      "verifier": {
+        "kind": "registry",
+        "name": "backlog_refinement_missing"
+      }
+    },
+    "benefit_baseline_placeholder": {
+      "categories": [
+        "benefit-profile"
+      ],
+      "source": {
+        "file": "msp.json",
+        "pointer": "/benefit_profiles"
+      },
+      "spec": "\u00a78.3",
+      "standard": "MSP",
+      "verifier": {
+        "clause": "benefit-baseline",
+        "kind": "manifest"
+      }
+    },
+    "benefit_profile_incomplete": {
+      "categories": [
+        "benefit-profile"
+      ],
+      "source": {
+        "file": "msp.json",
+        "pointer": "/benefit_profiles"
+      },
+      "spec": "\u00a78.3",
+      "standard": "MSP",
+      "verifier": {
+        "kind": "registry",
+        "name": "benefit_profile_incomplete"
+      }
+    },
+    "board_not_approved": {
+      "categories": [
+        "architecture-governance-log"
+      ],
+      "source": {
+        "file": "architecture.json",
+        "pointer": "/board"
+      },
+      "spec": "\u00a78.1",
+      "standard": "TOGAF",
+      "verifier": {
+        "kind": "registry",
+        "name": "board_not_approved"
+      }
+    },
+    "cadence_absent": {
+      "categories": [
+        "safe-cadence"
+      ],
+      "source": {
+        "file": "msp.json",
+        "pointer": "/cadences"
+      },
+      "spec": "\u00a78.2",
+      "standard": "SAFe",
+      "verifier": {
+        "clause": "pi-cadence",
+        "kind": "manifest"
+      }
+    },
+    "capability_artefacts": {
+      "categories": [
+        "architecture-capability",
+        "phase-preliminary"
+      ],
+      "source": {
+        "file": "architecture.json",
+        "pointer": "/artifacts"
+      },
+      "spec": "\u00a78.1",
+      "standard": "TOGAF",
+      "verifier": {
+        "kind": "registry",
+        "name": "capability_artefacts"
+      }
+    },
+    "closed_without_closure_review": {
+      "categories": [
+        "closure-review"
+      ],
+      "source": {
+        "file": "artefacts.json",
+        "pointer": "/documents"
+      },
+      "spec": "\u00a78.4",
+      "standard": "MSP",
+      "verifier": {
+        "clause": "closure-gate",
+        "kind": "manifest"
+      }
+    },
+    "closure_outputs_undeclared": {
+      "categories": [
+        "programme-brief",
+        "closure-review"
+      ],
+      "source": {
+        "file": "programme.json",
+        "pointer": "/projects"
+      },
+      "spec": "\u00a78.3",
+      "standard": "MSP",
+      "verifier": {
+        "clause": "closure-outputs",
+        "kind": "manifest"
+      }
+    },
+    "compliance_review_missing": {
+      "categories": [
+        "compliance-review"
+      ],
+      "source": {
+        "available": "live",
+        "file": "architecture.json",
+        "pointer": "/compliance_reviews",
+        "reason": "projected by the store's live snapshot; the committed pack is frozen at a33e6562"
+      },
+      "spec": "\u00a78.1",
+      "standard": "TOGAF",
+      "verifier": {
+        "clause": "review",
+        "kind": "manifest"
+      }
+    },
+    "contract_missing": {
+      "categories": [
+        "delivery-contract"
+      ],
+      "source": {
+        "file": "architecture.json",
+        "pointer": "/contracts"
+      },
+      "spec": "\u00a78.1",
+      "standard": "TOGAF",
+      "verifier": {
+        "clause": "contract",
+        "kind": "manifest"
+      }
+    },
+    "contract_unapproved": {
+      "categories": [
+        "delivery-contract"
+      ],
+      "source": {
+        "file": "architecture.json",
+        "pointer": "/contracts"
+      },
+      "spec": "\u00a78.1",
+      "standard": "TOGAF",
+      "verifier": {
+        "clause": "contract",
+        "kind": "manifest"
+      }
+    },
+    "demo_credit_missing": {
+      "categories": [
+        "system-demo",
+        "pi-objectives"
+      ],
+      "source": {
+        "available": "live",
+        "file": "msp.json",
+        "pointer": "/demo_credits",
+        "reason": "projected by the store's live snapshot; the committed pack is frozen at a33e6562"
+      },
+      "spec": "\u00a78.2",
+      "standard": "SAFe",
+      "verifier": {
+        "clause": "demo-credits",
+        "kind": "manifest"
+      }
+    },
+    "dependency_cycle": {
+      "categories": [
+        "projects-dossier"
+      ],
+      "source": {
+        "file": "msp.json",
+        "pointer": "/project_dependencies"
+      },
+      "spec": "\u00a75.1",
+      "standard": "SPEC",
+      "verifier": {
+        "kind": "registry",
+        "name": "dependency_cycle"
+      }
+    },
+    "dependency_unknown_target": {
+      "categories": [
+        "projects-dossier"
+      ],
+      "source": {
+        "file": "msp.json",
+        "pointer": "/project_dependencies"
+      },
+      "spec": "\u00a75.1",
+      "standard": "SPEC",
+      "verifier": {
+        "kind": "registry",
+        "name": "dependency_unknown_target"
+      }
+    },
+    "dependency_untyped": {
+      "categories": [
+        "projects-dossier"
+      ],
+      "source": {
+        "file": "msp.json",
+        "pointer": "/project_dependencies"
+      },
+      "spec": "\u00a75.1",
+      "standard": "SPEC",
+      "verifier": {
+        "kind": "registry",
+        "name": "dependency_untyped"
+      }
+    },
+    "derivation_missing": {
+      "categories": [
+        "requirements-catalog",
+        "artifact-standard"
+      ],
+      "source": {
+        "file": "architecture.json",
+        "pointer": "/links"
+      },
+      "spec": "\u00a75.3",
+      "standard": "SPEC",
+      "verifier": {
+        "kind": "registry",
+        "name": "derivation_missing"
+      }
+    },
+    "mandatory_artefacts": {
+      "categories": [
+        "phase-preliminary",
+        "phase-a",
+        "phase-b",
+        "phase-c",
+        "phase-d",
+        "phase-e",
+        "phase-f",
+        "phase-g",
+        "phase-h"
+      ],
+      "source": {
+        "file": "architecture.json",
+        "pointer": "/artifacts"
+      },
+      "spec": "\u00a78.1",
+      "standard": "TOGAF",
+      "verifier": {
+        "kind": "registry",
+        "name": "artefact_standard"
+      }
+    },
+    "pi_cadence_missing": {
+      "categories": [
+        "pi-plan",
+        "safe-cadence"
+      ],
+      "source": {
+        "file": "msp.json",
+        "pointer": "/cadences"
+      },
+      "spec": "\u00a78.2",
+      "standard": "SAFe",
+      "verifier": {
+        "clause": "pi-cadence",
+        "kind": "manifest"
+      }
+    },
+    "pi_objectives_missing": {
+      "categories": [
+        "pi-objectives"
+      ],
+      "source": {
+        "file": "artefacts.json",
+        "pointer": "/documents"
+      },
+      "spec": "\u00a78.2",
+      "standard": "SAFe",
+      "verifier": {
+        "clause": "pi-objectives",
+        "kind": "manifest"
+      }
+    },
+    "pi_plan_missing": {
+      "categories": [
+        "pi-plan"
+      ],
+      "source": {
+        "file": "artefacts.json",
+        "pointer": "/documents"
+      },
+      "spec": "\u00a78.2",
+      "standard": "SAFe",
+      "verifier": {
+        "clause": "pi-plan",
+        "kind": "manifest"
+      }
+    },
+    "profile_adopted": {
+      "categories": [
+        "adm-profile"
+      ],
+      "source": {
+        "file": "architecture.json",
+        "pointer": "/profiles"
+      },
+      "spec": "\u00a78.1",
+      "standard": "TOGAF",
+      "verifier": {
+        "kind": "registry",
+        "name": "profile_adopted"
+      }
+    },
+    "programme_baselines": {
+      "categories": [
+        "programme-baselines"
+      ],
+      "source": {
+        "file": "msp.json",
+        "pointer": "/programme_baselines"
+      },
+      "spec": "\u00a78.3",
+      "standard": "MSP",
+      "verifier": {
+        "kind": "registry",
+        "name": "programme_baselines"
+      }
+    },
+    "programme_outputs": {
+      "categories": [
+        "programme-brief"
+      ],
+      "source": {
+        "file": "programme.json",
+        "pointer": "/projects"
+      },
+      "spec": "\u00a78.3",
+      "standard": "MSP",
+      "verifier": {
+        "kind": "registry",
+        "name": "programme_outputs"
+      }
+    },
+    "project_in_unauthorised_tranche": {
+      "categories": [
+        "tranche-review"
+      ],
+      "source": {
+        "file": "programme.json",
+        "pointer": "/projects"
+      },
+      "spec": "\u00a78.3",
+      "standard": "MSP",
+      "verifier": {
+        "kind": "registry",
+        "name": "project_in_unauthorised_tranche"
+      }
+    },
+    "realized_without_transition": {
+      "categories": [
+        "benefit-transition",
+        "benefits-map"
+      ],
+      "source": {
+        "file": "msp.json",
+        "pointer": "/benefit_transitions"
+      },
+      "spec": "\u00a78.3",
+      "standard": "MSP",
+      "verifier": {
+        "kind": "registry",
+        "name": "realized_without_transition"
+      }
+    },
+    "requester_is_approver": {
+      "categories": [
+        "delivery-contract"
+      ],
+      "source": {
+        "file": "architecture.json",
+        "pointer": "/contracts"
+      },
+      "spec": "\u00a78.1",
+      "standard": "TOGAF",
+      "verifier": {
+        "kind": "registry",
+        "name": "requester_is_approver"
+      }
+    },
+    "retro_lesson_missing": {
+      "categories": [
+        "inspect-adapt"
+      ],
+      "source": {
+        "available": "live",
+        "file": "msp.json",
+        "pointer": "/lessons",
+        "reason": "projected by the store's live snapshot; the committed pack is frozen at a33e6562"
+      },
+      "spec": "\u00a78.2",
+      "standard": "SAFe",
+      "verifier": {
+        "clause": "lessons",
+        "kind": "manifest"
+      }
+    },
+    "seed_live_drift": {
+      "categories": [
+        "programme-brief"
+      ],
+      "source": {
+        "file": "programme.json",
+        "pointer": "/projects"
+      },
+      "spec": "\u00a75.3",
+      "standard": "SPEC",
+      "verifier": {
+        "kind": "registry",
+        "name": "seed_live_drift"
+      }
+    },
+    "snapshot_schema_stale": {
+      "categories": [],
+      "source": {
+        "file": "manifest.json",
+        "pointer": "/schema"
+      },
+      "spec": "\u00a710.3",
+      "standard": "SPEC",
+      "verifier": {
+        "kind": "registry",
+        "name": "snapshot_schema_stale"
+      }
+    },
+    "status_source_drift": {
+      "categories": [
+        "programme-brief"
+      ],
+      "source": {
+        "file": "programme.json",
+        "pointer": "/projects"
+      },
+      "spec": "\u00a75.3",
+      "standard": "SPEC",
+      "verifier": {
+        "kind": "registry",
+        "name": "status_source_drift"
+      }
+    },
+    "tranche_plan": {
+      "categories": [
+        "tranche-plan"
+      ],
+      "source": {
+        "file": "msp.json",
+        "pointer": "/tranches"
+      },
+      "spec": "\u00a78.3",
+      "standard": "MSP",
+      "verifier": {
+        "kind": "registry",
+        "name": "tranche_plan"
+      }
+    },
+    "tranche_review_without_authorisation": {
+      "categories": [
+        "tranche-review"
+      ],
+      "source": {
+        "file": "msp.json",
+        "pointer": "/tranche_reviews"
+      },
+      "spec": "\u00a78.3",
+      "standard": "MSP",
+      "verifier": {
+        "kind": "registry",
+        "name": "tranche_review_without_authorisation"
+      }
+    },
+    "transition_order": {
+      "categories": [
+        "benefit-transition"
+      ],
+      "source": {
+        "file": "msp.json",
+        "pointer": "/benefit_transitions"
+      },
+      "spec": "\u00a78.3",
+      "standard": "MSP",
+      "verifier": {
+        "kind": "registry",
+        "name": "transition_order"
+      }
+    },
+    "unpublished_declared_output": {
+      "categories": [
+        "programme-brief"
+      ],
+      "source": {
+        "file": "artefacts.json",
+        "pointer": "/documents"
+      },
+      "spec": "\u00a78.3",
+      "standard": "MSP",
+      "verifier": {
+        "kind": "registry",
+        "name": "published_proof"
+      }
+    },
+    "waiver_invalid": {
+      "categories": [
+        "waiver"
+      ],
+      "source": {
+        "available": "live",
+        "file": "architecture.json",
+        "pointer": "/waivers",
+        "reason": "projected by the store's live snapshot; the committed pack is frozen at a33e6562"
+      },
+      "spec": "\u00a78.1",
+      "standard": "TOGAF",
+      "verifier": {
+        "clause": "waivers",
+        "kind": "manifest"
+      }
+    },
+    "wbs_absent": {
+      "categories": [
+        "project-wbs"
+      ],
+      "source": {
+        "file": "msp.json",
+        "pointer": "/wbs_nodes"
+      },
+      "spec": "\u00a75.1",
+      "standard": "SPEC",
+      "verifier": {
+        "kind": "registry",
+        "name": "wbs_absent"
+      }
+    },
+    "wsjf_inputs_missing": {
+      "categories": [
+        "project-wbs",
+        "safe-art",
+        "pi-plan"
+      ],
+      "source": {
+        "file": "msp.json",
+        "pointer": "/wbs_nodes"
+      },
+      "spec": "\u00a78.2",
+      "standard": "SAFe",
+      "verifier": {
+        "clause": "wsjf",
+        "kind": "manifest"
+      }
+    }
+  },
+  "output_standard": "seed/output-standard.json",
+  "snapshot": "docs/design/data",
+  "standard": "governance/conformance.json",
+  "version": 1
+}
