@@ -63,6 +63,34 @@ async fn approvals_decide(
     input: ApprovalDecideIn,
 ) -> Result<ApprovalOut, ActionError> {
     let kind = parse_decision(&input.decision)?;
+    // A delegation names a PUBLISHED decision document in this tenant. It is validated here, so
+    // a decision can never cite a delegation that does not exist, is unpublished, or is not a
+    // decision. The caller does not thereby become a human: the decision is recorded as a rule
+    // acting under that document, and a gate that requires a person accepts it only by name.
+    let delegation = match input.delegation_ref {
+        Some(reference) => {
+            let found: Option<i32> = sqlx::query_scalar(
+                "SELECT 1 FROM document
+                  WHERE tenant_id = $1 AND id = $2
+                    AND status = 'active' AND published_at IS NOT NULL
+                    AND category = 'decision'",
+            )
+            .bind(ctx.tenant.as_uuid())
+            .bind(reference)
+            .fetch_optional(&mut *tx)
+            .await
+            .map_err(|_| ActionError::internal())?;
+            if found.is_none() {
+                return Err(invalid(
+                    "delegation_ref",
+                    "invalid_value",
+                    "the delegation must name a published decision document in this tenant",
+                ));
+            }
+            Some(reference)
+        }
+        None => None,
+    };
     // The transport is DERIVED from the authenticated authority, never from the input
     // (S06 decision 8, extended by S06d). `ctx.channel` is `Some` only for a machine connector;
     // a human session records `web`, and the engine records `internal`. The sender reference is
@@ -79,11 +107,21 @@ async fn approvals_decide(
             "channel": if ctx.actor_kind == "user" { "web" } else { "internal" }
         }),
     };
+    let mut via = via;
+    if let Some(reference) = delegation {
+        via["delegation_ref"] = serde_json::Value::String(reference.to_string());
+    }
+    let decided_by_kind = if delegation.is_some() {
+        // Delegated, not human: the audit says a rule acted under a named owner decision.
+        DeciderKind::Rule
+    } else {
+        decider_kind(&ctx.actor_kind)
+    };
     let decision = Decision {
         approver_id: ctx.actor_id,
         kind,
         note: input.note.unwrap_or_default(),
-        decided_by_kind: decider_kind(&ctx.actor_kind),
+        decided_by_kind,
         via: Some(via),
         item_decisions: input.item_decisions,
     };

@@ -1696,7 +1696,17 @@ pub async fn resume_tranche_tx(
                AND EXISTS (
                    SELECT 1 FROM approval_decision d
                     WHERE d.tenant_id = a.tenant_id AND d.approval_id = a.id
-                      AND d.decision = 'approve' AND d.decided_by_kind = 'human'))",
+                      AND d.decision = 'approve'
+                      AND (d.decided_by_kind = 'human'
+                           OR (d.decided_by_kind = 'rule'
+                               AND d.via->>'delegation_ref' IS NOT NULL
+                               AND EXISTS (
+                                   SELECT 1 FROM document doc
+                                    WHERE doc.tenant_id = a.tenant_id
+                                      AND doc.id::text = d.via->>'delegation_ref'
+                                      AND doc.status = 'active'
+                                      AND doc.published_at IS NOT NULL
+                                      AND doc.category = 'decision')))))",
     )
     .bind(tenant.as_uuid())
     .bind(approval_id)
