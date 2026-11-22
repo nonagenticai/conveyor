@@ -40,10 +40,10 @@ T12 adds no production slice. Its current state is the state of the seams it ass
 
 **absent.**
 
-- Development project (T6, #80): `name = "dev\.` → 0; no development gate set.
-- Lessons (T8, #79): `name = "lessons\.` → 0 and `CREATE TABLE lesson` → 0.
-- Incident lifecycle (T7, #78): `CREATE TABLE incident` → 0 and `ops.incident|triage|mitigate|resolve|postmortem` → 0.
-- Architecture capability (T9, #81): `CREATE TABLE architecture_artifact` → 0.
+- Development project (T6, #80): **absent** — no `dev.*` action family (v1-p91-1); no development gate set.
+- Lessons (T8, #79): **partial** — the `lesson` table exists (`migrations/0056_cadence_tranche.sql:10`) and `lessons.propose|list` are registered (`docs/design/data/actions.json`); the §7.6 promotion mechanism is absent.
+- Incident lifecycle (T7, #78): **card-backed** — there is no `incident` table by design; `ops.incident|triage|mitigate|postmortem` are registered and the lifecycle lives on the incident card's meta (`crates/actions/src/ops/incidents.rs`).
+- Architecture capability (T9, #81): **built** — `migrations/0054_architecture.sql:144` creates `architecture_artifact` and the `architecture.*` family is registered; the review's named deviations (v1-p81-4..6) remain open work.
 - Acceptance harness: `apps/server/tests/organisation_loop.rs` does not exist (listing → 0). Precedent: `apps/server/tests/organisation_gate.rs:1`, which proves the T0 wire gate through `conveyor_actions::invoke`.
 
 ## Reuse sources
