@@ -422,15 +422,42 @@ async fn approvals_request(
     }
     // T3: a gate resolves its typed evidence before it is opened, so an absent, draft,
     // superseded or non-typed reference never becomes a pending gate.
+    //
+    // §5.4: a gate for a destructive action always names evidence. The action spec is
+    // authoritative — `Effect::Destructive` makes evidence mandatory whether or not the tenant
+    // has stored a policy row for it — and `require_evidence` can add the requirement, never
+    // remove it.
+    let destructive = crate::registry::registry()
+        .get(gate)
+        .is_some_and(|spec| spec.effect == crate::spec::Effect::Destructive);
+    let require = input.require_evidence || destructive;
+    // The one override is an explicit reason, never a flag: a non-empty reason opens an
+    // evidence-less gate and is stored on the row (`meta.evidence_waiver`) where the governance
+    // audit reads it. An empty or whitespace-only reason is not a waiver. A reason supplied
+    // alongside real evidence is ignored — there is nothing to waive.
+    let waiver = input
+        .evidence_waiver_reason
+        .as_deref()
+        .map(str::trim)
+        .filter(|reason| !reason.is_empty());
     let evidence = crate::pm::resolve_evidence(
         &mut *tx,
         ctx.tenant,
         &input.evidence,
-        input.require_evidence,
+        require && !(input.evidence.is_empty() && waiver.is_some()),
     )
     .await?;
     if !evidence.is_empty() {
         meta.insert("evidence".to_owned(), Value::Array(evidence));
+    }
+    if require
+        && input.evidence.is_empty()
+        && let Some(reason) = waiver
+    {
+        meta.insert(
+            "evidence_waiver".to_owned(),
+            Value::String(reason.to_owned()),
+        );
     }
 
     let new = store::approval::NewApproval {
