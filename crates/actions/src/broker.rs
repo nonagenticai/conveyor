@@ -38,6 +38,7 @@ use crate::invoke::{
 };
 use crate::registry::registry;
 use crate::spec::{ActionKind, Effect, FieldError, validate_input};
+use conveyor_domain::organisation::{ReleaseAnatomy, parse_release_anatomy};
 
 /// The largest destination body the broker passes through. A bigger answer is refused rather
 /// than carried into a run's context.
@@ -310,6 +311,31 @@ pub(crate) async fn invoke_broker(
                 ceiling.as_str()
             ),
         ));
+    }
+
+    // §11.1's second authorising row: the release's operation grant. A run pinned to a job
+    // binding carries its release snapshot; the operation must be granted there and enabled, and
+    // the grant's max_side_effect must cover the tool's effect. A release that declared no grants
+    // allows none — absent is an empty grant, never "no bound".
+    if let Some(job_binding_id) = run.job_binding_id {
+        let snapshot =
+            store::tool::release_snapshot_for_binding(&mut tx, ctx.tenant, job_binding_id)
+                .await
+                .map_err(|error| {
+                    tracing::error!(%error, "broker: read the run's release snapshot");
+                    ActionError::internal()
+                })?;
+        if let Some(snapshot) = snapshot {
+            let anatomy = parse_release_anatomy(&snapshot).map_err(|error| {
+                tracing::error!(%error, tool = %call.tool, "broker: the release anatomy is invalid");
+                ActionError::new(
+                    403,
+                    "tool_grant_forbidden",
+                    format!("run {} pins a release with no valid operation grant", run.run_id),
+                )
+            })?;
+            enforce_release_grant(&anatomy, &call.tool, effect)?;
+        }
     }
 
     // §11.3 step 2's second half: a spend-class call is refused before the destination when the
@@ -651,3 +677,129 @@ fn redact_fields(value: &mut Value, fields: &[String]) {
 
 /// The event a successful or failed call emits (§11.3 step 7).
 pub const TOOL_CALLED: &str = "tool.called";
+
+/// The release grant's check (§11.1): the operation must be present and enabled, and the grant's
+/// `max_side_effect` must cover the tool's effect. A release that declared no grants allows none.
+fn enforce_release_grant(
+    anatomy: &ReleaseAnatomy,
+    op: &str,
+    effect: Effect,
+) -> Result<(), ActionError> {
+    if !anatomy.grants_declared {
+        return Err(ActionError::new(
+            403,
+            "tool_grant_forbidden",
+            format!("the run's release declares no grants; {op} is not allowed"),
+        ));
+    }
+    let Some(grant) = anatomy
+        .grants
+        .iter()
+        .find(|grant| grant.op == op && grant.enabled)
+    else {
+        return Err(ActionError::new(
+            403,
+            "tool_grant_forbidden",
+            format!("{op} is not granted by the run's release"),
+        ));
+    };
+    if grant.max_side_effect.rank() < effect.rank() {
+        return Err(ActionError::new(
+            403,
+            "tool_grant_forbidden",
+            format!(
+                "{op} is a {} tool and the release grants at most {}",
+                effect.as_str(),
+                grant.max_side_effect.as_str()
+            ),
+        ));
+    }
+    Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::spec::Effect;
+    use conveyor_domain::organisation::{ReleaseAnatomy, ReleaseGrant, ReleaseLimits, SideEffect};
+
+    fn anatomy(grants: Vec<ReleaseGrant>, grants_declared: bool) -> ReleaseAnatomy {
+        ReleaseAnatomy {
+            job_key: "delivery".to_owned(),
+            title: "Delivery".to_owned(),
+            executor_kind: None,
+            model_ref: None,
+            prompt_recipe: None,
+            procedure_ref: None,
+            charter: None,
+            authority: None,
+            gate: None,
+            grants,
+            grants_declared,
+            limits: ReleaseLimits::default(),
+        }
+    }
+
+    fn grant(op: &str, max: SideEffect, enabled: bool) -> ReleaseGrant {
+        ReleaseGrant {
+            op: op.to_owned(),
+            variant: None,
+            max_side_effect: max,
+            enabled,
+        }
+    }
+
+    #[test]
+    fn an_operation_absent_from_the_grant_is_refused() {
+        let anatomy = anatomy(vec![grant("coding.jobs.get", SideEffect::Read, true)], true);
+        let error = enforce_release_grant(&anatomy, "coding.jobs.create", Effect::Write)
+            .expect_err("an ungranted operation must be refused");
+        assert_eq!(error.status, 403);
+        assert_eq!(error.code, "tool_grant_forbidden");
+    }
+
+    #[test]
+    fn a_disabled_grant_is_refused() {
+        let anatomy = anatomy(
+            vec![grant("coding.jobs.create", SideEffect::Write, false)],
+            true,
+        );
+        assert!(
+            enforce_release_grant(&anatomy, "coding.jobs.create", Effect::Write).is_err(),
+            "a disabled grant must not authorise a call"
+        );
+    }
+
+    #[test]
+    fn a_grant_below_the_tools_effect_is_refused() {
+        let anatomy = anatomy(
+            vec![grant("coding.jobs.create", SideEffect::Read, true)],
+            true,
+        );
+        let error = enforce_release_grant(&anatomy, "coding.jobs.create", Effect::Write)
+            .expect_err("a read grant must not cover a write tool");
+        assert_eq!(error.status, 403);
+        assert_eq!(error.code, "tool_grant_forbidden");
+    }
+
+    #[test]
+    fn a_grant_at_the_tools_effect_is_accepted() {
+        let anatomy = anatomy(
+            vec![grant("coding.jobs.create", SideEffect::Write, true)],
+            true,
+        );
+        assert!(
+            enforce_release_grant(&anatomy, "coding.jobs.create", Effect::Write).is_ok(),
+            "an equal-max grant authorises the call"
+        );
+    }
+
+    #[test]
+    fn an_undeclared_grant_allows_nothing() {
+        let anatomy = anatomy(Vec::new(), false);
+        let error = enforce_release_grant(&anatomy, "coding.jobs.read", Effect::Read)
+            .expect_err("a release that declared no grants allows none");
+        assert_eq!(error.status, 403);
+        assert_eq!(error.code, "tool_grant_forbidden");
+    }
+}
