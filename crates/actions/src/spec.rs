@@ -1229,10 +1229,10 @@ pub struct FieldError {
 /// The validator reads the SAME `Schema` value the OpenAPI operation and MCP tool embed,
 /// so a refusal here and the published contract cannot disagree. It deliberately covers
 /// the JSON-Schema subset schemars emits for our documents: `$ref` into `$defs`,
-/// `allOf` (a flattened shared envelope), `anyOf`/`oneOf` (an `Option<T>`),
-/// `required`, `properties`, `additionalProperties`, `type` and `enum`. Anything outside
-/// that subset is accepted rather than guessed — the typed deserialization after this is
-/// the second belt.
+/// `allOf` (a flattened shared envelope), `anyOf`/`oneOf` (an `Option<T>`, and a closed
+/// enum's `oneOf` of `const` branches), `required`, `properties`, `additionalProperties`,
+/// `type`, `enum` and `const`. Anything outside that subset is accepted rather than
+/// guessed — the typed deserialization after this is the second belt.
 pub fn validate_input(schema: &Value, value: &Value) -> Vec<FieldError> {
     let mut errors = Vec::new();
     validate_at(schema, schema, value, "", &mut errors);
@@ -1391,6 +1391,23 @@ fn validate_at(
             },
             code: "invalid_value".into(),
             detail: format!("must be one of {choices:?}"),
+        });
+        return;
+    }
+
+    // `const`: schemars renders an enum of unit variants as a `oneOf` of `const` branches, so a
+    // validator that ignored `const` accepted any string for a closed enum's field.
+    if let Some(expected) = schema.get("const")
+        && expected != value
+    {
+        errors.push(FieldError {
+            field: if path.is_empty() {
+                "body".into()
+            } else {
+                path.to_owned()
+            },
+            code: "invalid_value".into(),
+            detail: format!("must be {expected}"),
         });
         return;
     }
