@@ -75,10 +75,8 @@ pub fn request(
     let question_spec = if options.is_empty() {
         json!({
             "type": "score",
-            "instructions": format!(
-                "Score the answer to the question in `state` on the ordered scale in \
-                 `criteria`."
-            ),
+            "instructions": "Score the answer to the question in `state` on the ordered scale in \
+                             `criteria`.",
             "criteria": SCORE_LEVELS,
         })
     } else {
@@ -98,10 +96,8 @@ pub fn request(
             .collect();
         json!({
             "type": "choice",
-            "instructions": format!(
-                "Choose exactly one option key from `criteria` to answer the question in \
-                 `state`."
-            ),
+            "instructions": "Choose exactly one option key from `criteria` to answer the \
+                             question in `state`.",
             "criteria": criteria,
         })
     };
