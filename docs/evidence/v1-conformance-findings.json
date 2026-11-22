@@ -5306,6 +5306,30 @@
       "failure_scenario": "A project closes while owning an open P0 artefact package; the record says closed, the audit says red, and nothing in the close path noticed.",
       "acceptance": "projects.close refuses a project whose mandatory artefact set is incomplete or which owns an open P0 finding/package, reading the artefact standard and the findings directly (never a generated register file), with a test proving the refusal and the green path; the verifier remains the evidence.",
       "owner_project": "PLATFORM"
+    },
+    {
+      "id": "v1-ui-1",
+      "area": "approvals UI / console destructive flow",
+      "standard": "SPEC",
+      "spec": "§5.4",
+      "severity": "P1",
+      "title": "The console's destructive-request flow sends no evidence and no waiver",
+      "problem": "apps/web/src/approvals.rs requests a gate for every destructive console action with only gate, kind, action, input, proposed_input and description. When a destructive gate's evidence becomes mandatory (v1-u5a-approvals-1), every console-initiated restart/scale/rollback will be refused 422: the UI has no evidence or waiver path, so the live flow breaks at the moment the rule lands.",
+      "evidence": [
+        {
+          "path": "apps/web/src/approvals.rs",
+          "line": 119,
+          "quote": "            \"approvals.request\","
+        },
+        {
+          "path": "apps/web/src/approvals.rs",
+          "line": 129,
+          "quote": "                \"description\": format!(\"{action} from the console\"),"
+        }
+      ],
+      "failure_scenario": "An operator confirms a destructive action in the console; the request is refused 422 for missing evidence, and the UI shows a failure with no way to supply evidence or a waiver.",
+      "acceptance": "The console's destructive gate request sends the gate's evidence or an explicit operator-entered evidence waiver reason, and a test asserts the payload plus a refused-without / accepted-with path; no silent hard-coded waiver.",
+      "owner_project": "PLATFORM"
     }
   ]
 }
