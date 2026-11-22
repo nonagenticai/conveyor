@@ -858,7 +858,7 @@ async fn the_coach_chain_settles_at_one_card() {
 // ── P4.1 — a systemic class opens one kata ───────────────────────────────────────────────
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
-async fn a_systemic_class_opens_one_kata() {
+async fn a_systemic_class_without_a_pinned_instrument_escalates() {
     let (pg, running, seeded) = fixture().await;
     publish_processes(&running).await;
     let (board, active, _waiting) = board_lanes(&pg, &seeded).await;
@@ -871,11 +871,92 @@ async fn a_systemic_class_opens_one_kata() {
     let (status, body) = remedy(&running, interruption, None).await;
     assert_eq!(status, 201, "{body}");
     assert_eq!(text(output(&body), "remedy_class"), "block");
+    // Without a pin the coach cannot name an instrument: §6.3 forbids opening an unmeasurable
+    // kata, so the candidate escalates to a person and no kata row is created (v1-p6-2).
     assert!(
-        output(&body)["kata_run_id"].is_string(),
-        "the systemic class opened a kata: {body}"
+        output(&body)["kata_id"].is_null(),
+        "no kata without a pin: {body}"
+    );
+    let detail = remedy_detail(&pg, &seeded, interruption).await;
+    assert!(
+        detail["effect"]["kata_escalation"].is_string(),
+        "the candidate escalates: {detail}"
+    );
+    let gates: i64 = sqlx::query_scalar(
+        "SELECT count(*) FROM approval WHERE tenant_id = $1 AND gate = 'coach.kata'",
+    )
+    .bind(seeded.tenant_id)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("the kata gates");
+    assert_eq!(gates, 1, "one human gate names the missing instrument");
+    let katas: i64 = sqlx::query_scalar("SELECT count(*) FROM kata WHERE tenant_id = $1")
+        .bind(seeded.tenant_id)
+        .fetch_one(&pg.super_pool)
+        .await
+        .expect("the kata rows");
+    assert_eq!(katas, 0, "an unmeasurable kata is not opened");
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_systemic_class_opens_one_measured_kata() {
+    let (pg, running, seeded) = fixture().await;
+    publish_processes(&running).await;
+    // The policy names the instrument, the held-out split and the pre-registered prediction.
+    let pin = json!({
+        "systemic_classes": ["conveyor_defect"],
+        "kata": {
+            "instrument_kind": "eval",
+            "instrument_id": "01a1e607-17d9-77d3-98d3-a43a87c4633d",
+            "instrument_version": "eval@1",
+            "split": "test",
+            "split_sha256": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+            "prediction": {"statement": "the coach removes the systemic class"},
+            "base_ref": {"kind": "fixture", "version": 1},
+        },
+    });
+    sqlx::query(
+        "INSERT INTO decision_policy (tenant_id, kind, threshold, fail_policy, action, meta)
+         VALUES ($1, 'coach.window', 0.5, 'open', 'block', $2)",
+    )
+    .bind(seeded.tenant_id)
+    .bind(&pin)
+    .execute(&pg.super_pool)
+    .await
+    .expect("the coach policy");
+    let (board, active, _waiting) = board_lanes(&pg, &seeded).await;
+    let card = create_card(&running, &board, &active, "feature", "systemic").await;
+    let run = fail_run(&pg, &seeded, &running, &card, FAILING_KEY).await;
+    err_card(&pg, &seeded, &run).await;
+    let (interruption, _, signature, _, _) = interruption_row(&pg, &seeded, &card).await;
+    let (status, body) = triage(&running, interruption, "conveyor_defect", 0.9).await;
+    assert_eq!(status, 200, "{body}");
+    let (status, body) = remedy(&running, interruption, None).await;
+    assert_eq!(status, 201, "{body}");
+    assert_eq!(text(output(&body), "remedy_class"), "block");
+    let kata_id = output(&body)["kata_id"]
+        .as_str()
+        .expect("the systemic class opened a kata")
+        .to_owned();
+
+    let (signature_row, instrument_version): (String, String) = sqlx::query_as(
+        "SELECT signature, instrument_version FROM kata WHERE tenant_id = $1 AND id = $2",
+    )
+    .bind(seeded.tenant_id)
+    .bind(Uuid::parse_str(&kata_id).expect("kata id"))
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("the kata row");
+    assert_eq!(
+        signature_row, signature,
+        "the kata names the repeat signature"
+    );
+    assert_eq!(
+        instrument_version, "eval@1",
+        "the pinned instrument is recorded"
     );
 
+    // No documentation run: the systemic path opens the measured kata itself.
     let kata_runs: i64 = sqlx::query_scalar(
         "SELECT count(*) FROM run r
            JOIN process p ON p.tenant_id = r.tenant_id AND p.id = r.process_id
@@ -887,19 +968,14 @@ async fn a_systemic_class_opens_one_kata() {
     .fetch_one(&pg.super_pool)
     .await
     .expect("the kata runs");
-    assert_eq!(kata_runs, 1, "exactly one kata run");
+    assert_eq!(kata_runs, 0, "the old process-run path is gone");
 
-    // `block` is applied through cards.move, and the effect records the kata beside it.
     let detail = remedy_detail(&pg, &seeded, interruption).await;
     assert_eq!(detail["effect"]["kind"], json!("block"), "{detail}");
-    assert!(
-        detail["effect"]["kata_run_id"].is_string(),
-        "the systemic class opens the kata path: {detail}"
-    );
     assert_eq!(
-        card_lane(&pg, &seeded, &card).await,
-        Uuid::parse_str(&_waiting).expect("waiting lane"),
-        "the block leaves the card in the waiting lane"
+        detail["effect"]["kata_id"].as_str(),
+        Some(kata_id.as_str()),
+        "the effect records the kata: {detail}"
     );
 }
 
@@ -918,7 +994,13 @@ async fn a_transient_class_opens_no_kata() {
     assert_eq!(status, 200, "{body}");
     let (status, body) = remedy(&running, interruption, None).await;
     assert_eq!(status, 201, "{body}");
-    assert!(output(&body)["kata_run_id"].is_null(), "no kata: {body}");
+    assert!(output(&body)["kata_id"].is_null(), "no kata: {body}");
+    let kata_run_rows: i64 = sqlx::query_scalar("SELECT count(*) FROM kata WHERE tenant_id = $1")
+        .bind(seeded.tenant_id)
+        .fetch_one(&pg.super_pool)
+        .await
+        .expect("the kata rows");
+    assert_eq!(kata_run_rows, 0, "a transient class opens no kata");
     let kata_runs: i64 = sqlx::query_scalar(
         "SELECT count(*) FROM run r
            JOIN process p ON p.tenant_id = r.tenant_id AND p.id = r.process_id

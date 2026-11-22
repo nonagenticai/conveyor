@@ -421,12 +421,12 @@ pub async fn mark_escalated_tx(
     }
 }
 
-/// Record the kata run a systemic class opened.
+/// Record the measured kata a systemic class opened.
 pub async fn set_kata_candidate_tx(
     conn: &mut PgConnection,
     tenant: TenantId,
     id: Uuid,
-    kata_run_id: Uuid,
+    kata_id: Uuid,
 ) -> Result<(), CoachStoreError> {
     sqlx::query(
         "UPDATE coach_interruption
@@ -435,7 +435,7 @@ pub async fn set_kata_candidate_tx(
     )
     .bind(tenant.as_uuid())
     .bind(id)
-    .bind(kata_run_id)
+    .bind(kata_id)
     .execute(&mut *conn)
     .await?;
     Ok(())
