@@ -775,6 +775,41 @@ def self_test() -> int:
             failures += 1
             print(f"FAIL: release comment omits {needle!r}")
 
+    # `apply()` is the half that moves the label; a planner-only fixture would not catch a
+    # release fix that forgot to remove `status:blocked`. Record the gh calls, write nothing.
+    global gh
+    recorded = []
+    original = gh
+
+    def recorder(*args):
+        recorded.append(list(args))
+        return ""
+
+    gh = recorder
+    try:
+        applied, failed = apply(
+            [{"rule": "B", "release": True, "number": 121, "title": "the P0 seed unit",
+              "evidence": ["#120 closed"]}],
+            "owner/repo",
+        )
+    finally:
+        gh = original
+    edit_args = recorded[0] if recorded else []
+    total += 1
+    if (
+        not failed
+        and applied
+        and "--remove-label" in edit_args
+        and BLOCKED in edit_args
+        and "--add-label" in edit_args
+        and READY in edit_args
+        and any("free to claim" in part for row in recorded for part in row)
+    ):
+        print("ok: release fix removes blocked and adds ready")
+    else:
+        failures += 1
+        print(f"FAIL: release fix did not move the label (recorded {recorded!r})")
+
     # A ready+blocked issue must lose `ready` without being claimed: `blocked` is not claimable,
     # and a fix that added `claimed` would leave two state labels on the issue.
     total += 1
