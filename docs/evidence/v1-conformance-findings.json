@@ -218,7 +218,7 @@
       "evidence": [
         {
           "path": "crates/store/src/metrics.rs",
-          "line": 483,
+          "line": 550,
           "quote": "               FROM tool_call tc"
         },
         {
@@ -2719,7 +2719,7 @@
         },
         {
           "path": "crates/actions/src/metrics/mod.rs",
-          "line": 1013,
+          "line": 1113,
           "quote": "    store::metrics::record_reconciliation_tx("
         }
       ],
@@ -4438,8 +4438,8 @@
         },
         {
           "path": "crates/actions/src/spine/mod.rs",
-          "line": 1722,
-          "quote": "            links: input.links.unwrap_or_else(|| serde_json::json!([])),"
+          "line": 1844,
+          "quote": "    let links = input.links.unwrap_or_else(|| serde_json::json!([]));"
         },
         {
           "path": "crates/store/src/spine.rs",

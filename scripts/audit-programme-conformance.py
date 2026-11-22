@@ -22,6 +22,7 @@ import argparse
 import hashlib
 import json
 import re
+import subprocess
 import sys
 import tempfile
 from datetime import datetime, timezone
@@ -2995,6 +2996,23 @@ def self_test() -> None:
     if first["scorecard"]["MSP"]["rules"] < 1:
         fail("the scorecard has no MSP rules")
 
+    # WP11: every standard rule is covered by exactly one category, source and verifier. The
+    # coverage instrument owns that property; the auditor does not self-test green without it.
+    coverage = ROOT / "scripts" / "check-standards-coverage.py"
+    if not coverage.is_file():
+        raise SystemExit(
+            "audit-programme-conformance: scripts/check-standards-coverage.py is missing"
+        )
+    for argv in (
+        [sys.executable, str(coverage)],
+        [sys.executable, str(coverage), "--self-test"],
+    ):
+        completed = subprocess.run(argv, capture_output=True, text=True)
+        if completed.returncode != 0:
+            tail = (completed.stdout + completed.stderr).strip().splitlines()[-3:]
+            raise SystemExit(
+                "audit-programme-conformance: standards coverage failed: " + " ".join(tail)
+            )
     print("audit-programme-conformance: self-test OK")
 
 
