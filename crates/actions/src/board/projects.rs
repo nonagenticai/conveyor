@@ -517,6 +517,23 @@ async fn projects_close(
     let boards = store::board::list_boards_tx(&mut *tx, ctx.tenant, project.id)
         .await
         .map_err(|error| store_error(error, "projects.close"))?;
+    // The row is not the whole close: a consumer subscribed to the project aggregate must see
+    // it, so the event is appended in the same transaction as the status change (v1-project-1).
+    let event = store::NewEvent {
+        topic: format!("project:{}", project.id),
+        event_type: "project.updated".to_owned(),
+        aggregate_type: "project".to_owned(),
+        aggregate_id: project.id,
+        payload: serde_json::json!({"id": project.id, "changed": ["status"]}),
+        correlation_id: None,
+        causation_id: None,
+    };
+    store::outbox::append(&mut *tx, ctx.tenant, &event)
+        .await
+        .map_err(|error| {
+            tracing::error!(%error, "append project event");
+            ActionError::internal()
+        })?;
     Ok(project_view(&project, &boards))
 }
 
