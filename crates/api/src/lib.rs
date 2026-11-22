@@ -20,6 +20,7 @@ pub mod design;
 pub mod documents;
 pub mod error;
 pub mod extract;
+pub mod invocations;
 pub mod job_routes;
 pub mod metrics;
 pub mod models;
@@ -148,7 +149,10 @@ pub fn app(state: AppState) -> Router {
         .route(
             "/api/actions/{name}/invocations",
             post(actions::invoke_http),
-        );
+        )
+        // The poll half of the async invocation surface (#579). `spec_exempt`: it is a REST
+        // endpoint over an engine record, not an action, and it is not in the registry.
+        .route("/api/invocations/{id}", get(invocations::get));
 
     // One literal route per registered action. Static segments win over `{name}`, so the
     // fallback only ever sees a name that is not in the registry.
