@@ -48,30 +48,30 @@
       "allowed": false,
       "check": "contract",
       "description": "a live board-approved delivery contract exists",
-      "detail": "the live contract lacks an approval or a distinct requester/approver",
+      "detail": "contract 01a20061-bd73-7a89-b08c-bd8b867eb061 approved by 01a1e8a7-8b23-76a9-9114-aafb95f7a545, requested by 01a1e607-17d9-77d3-98d3-a43a87c4633d",
       "id": "S03-contract",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
       "allowed": false,
       "check": "review",
       "description": "the Phase-G review cites a published standing delegation",
-      "detail": "the review's delegation_ref is missing or does not resolve to a published output",
+      "detail": "review 01a20066-3107-7b16-8835-6b6cd2aa8c84 cites the published delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
       "id": "S03-review",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
       "allowed": false,
       "check": "closure_gate",
       "description": "the closure gate was decided by an approver other than its requester",
-      "detail": "no approved closure gate for the project",
+      "detail": "closure gate 01a20073-737a-7574-954a-2d54d6be5af5 decided by a distinct approver",
       "id": "S03-closure-gate",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
@@ -118,10 +118,10 @@
       "allowed": false,
       "check": "lessons",
       "description": "the tranche retro produced at least one lesson",
-      "detail": "the tranche-2 retro produced no lesson",
+      "detail": "7 lesson(s) from the tranche-2 retro",
       "id": "S03-lessons",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P1"
     },
     {
@@ -138,10 +138,10 @@
       "allowed": false,
       "check": "demo_credits",
       "description": "every accepted deliverable has a demo credit carrying its evidence",
-      "detail": "no accepted deliverable to demo",
+      "detail": "1 accepted deliverable(s), each with a demo credit",
       "id": "S03-demo-credits",
       "kind": "snapshot",
-      "result": "fail",
+      "result": "pass",
       "severity": "P0"
     },
     {
@@ -155,25 +155,19 @@
       "severity": "P0"
     }
   ],
-  "failures": [
-    "S03-contract (P0): the live contract lacks an approval or a distinct requester/approver",
-    "S03-review (P0): the review's delegation_ref is missing or does not resolve to a published output",
-    "S03-closure-gate (P0): no approved closure gate for the project",
-    "S03-lessons (P1): the tranche-2 retro produced no lesson",
-    "S03-demo-credits (P0): no accepted deliverable to demo"
-  ],
+  "failures": [],
   "gate": "proptest on transitions and schema review \u2014 no transition leaves `list.kind` and `archived_at` contradictory, a claim never succeeds twice without release or expiry, one pending approval per (run, gate), and truncate/archive invariants hold",
-  "generated_at": "2026-11-21T23:21:25.378197+00:00",
+  "generated_at": "2026-11-22T00:09:49.068869+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/S03.toml",
   "name": "Domain and schema \u2014 aggregates, state machines, baseline domain migration",
   "project": "S03",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-21T23:17:59.733177403+00:00",
-    "git_sha": "7ff27efd",
-    "path": "retained-snapshot/7ff27efd"
+    "generated_at": "2026-11-21T23:27:35.116199+00:00",
+    "git_sha": "e55b92e050555c6acd2eefa9272a3721657d7de5",
+    "path": "retained-snapshot/e55b92e050555c6acd2eefa9272a3721657d7de5"
   },
-  "verdict": "red",
+  "verdict": "green",
   "warnings": []
 }
