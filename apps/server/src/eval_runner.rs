@@ -562,6 +562,10 @@ impl GradeFailure {
 ///
 /// The judge is invoked through the ordinary engine **outside** the caller's transaction — a
 /// model call inside it would hold row locks for the length of an inference.
+///
+/// `judge_eval_run_id` is the run the judge's spend belongs to; `None` for a one-shot
+/// `eval.grade` that has no run. Without it the judge call is billed but the run's report cannot
+/// see it.
 #[allow(clippy::too_many_arguments)]
 pub(crate) async fn grade_metrics(
     pool: &PgPool,
@@ -575,8 +579,6 @@ pub(crate) async fn grade_metrics(
     action: &str,
     judge_request_id: &str,
     judge_trace_id: &str,
-    /// The eval run the judge's spend belongs to; `None` for a one-shot `eval.grade` that has no
-    /// run. Without it the judge call is billed but the run's report cannot see it.
     judge_eval_run_id: Option<Uuid>,
 ) -> Result<MetricGrades, GradeFailure> {
     let mut grades = MetricGrades {
