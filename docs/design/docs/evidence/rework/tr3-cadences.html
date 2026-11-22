@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>Tranche-3 SAFe cadences — evidence · conveyor documents</title>
+    <link rel="icon" href="../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/tr3-cadences.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="tranche-3-safe-cadences--evidence">Tranche-3 SAFe cadences — evidence</h1>
+<p><strong>Created 2026-11-22</strong> for #526 (S04's record). This file exists <strong>before</strong> the four write actions run: the recorder refuses a write whose evidence path does not already exist.</p>
+<h2 id="source">Source</h2>
+<ul>
+<li>Tranche 3 is <code>authorised</code>: row <code>01a1e9e0-eb54-74d8-a2b5-44fb2b87eb52</code>, programme <code>01a1d039-0d24-7d16-ae52-4841e96ccfac</code>. It was authorised by the tranche-2 review under the published delegation <code>01a1ff1f-e4ba-72dc-9c1a-13049933cf14</code>.</li>
+<li>The measured baseline for the tranche is the fresh full-fidelity snapshot at lane <code>582e2dc6</code> (2026-11-22): <strong>12 green / 35 red</strong> manifests, <strong>919 standard artefacts / 456 findings</strong>, strict audit 200 gaps (23 P0 / 157 P1 / 20 P2), viability NOT VIABLE 6/6. The work table is <a href="https://github.com/nonagenticai/conveyor/issues/526#issuecomment-7076904694">comment 7076904694</a>.</li>
+</ul>
+<h2 id="what-is-created">What is created</h2>
+<p>Four <code>programme_cadence</code> rows for tranche 3 — <code>pi</code>, <code>refinement</code>, <code>demo</code>, <code>retro</code> — each with <code>period = tranche-3</code> and <code>meta = {tranche_id, tranche_number: 3, delegation_ref}</code>. That meta link is what <code>verify-project.py</code>'s <code>pi_cadence</code> check and the conformance audit read.</p>
+<p><code>cadences.create</code> is a write with <code>confirm = "none"</code>; no approval gate applies. The demo cadence's id is sent to T13's owner so its demo credit lands on the tranche-3 cadence rather than the tranche-0 default.</p>
+<h2 id="read-back">Read-back</h2>
+<p>Each action is followed by the recorder's read-back; the ids are recorded in the session and in the issue work table. The snapshot after the writes must show the four rows under tranche 3.</p>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/rework/tr3-cadences.md</code> at build time.</span>
+      <a href="../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

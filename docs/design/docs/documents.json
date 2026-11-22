@@ -119,6 +119,15 @@
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0008-card-ledger.md"
     },
     {
+      "title": "0010 — No deferrals; every finding executes",
+      "path": "docs/decisions/0010-no-deferrals.html",
+      "source": "docs/decisions/0010-no-deferrals.md",
+      "section": "Decisions",
+      "sha256": "c3bfdeb4d10c7d5e8abb337716b74b6ba16b0fc494b91045611d654876bc9ff7",
+      "bytes": 3740,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0010-no-deferrals.md"
+    },
+    {
       "title": "Programme architecture and benefits realization",
       "path": "docs/design/Program_Architecture_and_Benefits_Realization.html",
       "source": "docs/design/Program_Architecture_and_Benefits_Realization.md",
@@ -641,6 +650,15 @@
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/T1/acts.md"
     },
     {
+      "title": "T10 — retrospective rework acts (2026-11-22)",
+      "path": "docs/evidence/rework/T10/acts.html",
+      "source": "docs/evidence/rework/T10/acts.md",
+      "section": "Evidence",
+      "sha256": "1f7efe8c3683c2b71f8d1a4ae4090331fe085c70df005405387b52571d43d996",
+      "bytes": 810,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/T10/acts.md"
+    },
+    {
       "title": "T11 — retrospective rework acts (2026-11-21)",
       "path": "docs/evidence/rework/T11/acts.html",
       "source": "docs/evidence/rework/T11/acts.md",
@@ -648,6 +666,15 @@
       "sha256": "9dbde481a2c8a7d1ef38bf70131b1eaf3789d40478289911c3d60af15ef772d0",
       "bytes": 208,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/T11/acts.md"
+    },
+    {
+      "title": "T13 — retrospective rework acts (2026-11-22)",
+      "path": "docs/evidence/rework/T13/acts.html",
+      "source": "docs/evidence/rework/T13/acts.md",
+      "section": "Evidence",
+      "sha256": "b3cbd2d8aa64b56d38a327ab352538080fa35a656278704478cf1578ef62e713",
+      "bytes": 1171,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/T13/acts.md"
     },
     {
       "title": "T2 — retrospective rework acts (2026-11-21)",
@@ -659,13 +686,49 @@
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/T2/acts.md"
     },
     {
+      "title": "T4 — retrospective rework acts (2026-11-22)",
+      "path": "docs/evidence/rework/T4/acts.html",
+      "source": "docs/evidence/rework/T4/acts.md",
+      "section": "Evidence",
+      "sha256": "80d3dcb071fc8bf52c2381c9b3a27b647bb8450326245c8008f32682ad6affab",
+      "bytes": 914,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/T4/acts.md"
+    },
+    {
+      "title": "T9 — retrospective rework acts (2026-11-22)",
+      "path": "docs/evidence/rework/T9/acts.html",
+      "source": "docs/evidence/rework/T9/acts.md",
+      "section": "Evidence",
+      "sha256": "c3429074fbf41058900be93ce56435bdd569e3927458d15ecdc21328fbc8efc6",
+      "bytes": 919,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/T9/acts.md"
+    },
+    {
       "title": "The full-fidelity snapshot loop",
       "path": "docs/evidence/rework/full-fidelity-snapshot.html",
       "source": "docs/evidence/rework/full-fidelity-snapshot.md",
       "section": "Evidence",
-      "sha256": "e9dfa4530366c0d1bbd8bc3097577c5e4850113c8e7a9ae740c76e1d2e99826d",
-      "bytes": 6288,
+      "sha256": "cdcade5af26cc716355263c0e0d3c4af64a549a60aa11e250e1c331e05a52804",
+      "bytes": 7461,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/full-fidelity-snapshot.md"
+    },
+    {
+      "title": "S04 — the Phase-G compliance review's evidence (2026-11-22)",
+      "path": "docs/evidence/rework/s04-phase-g.html",
+      "source": "docs/evidence/rework/s04-phase-g.md",
+      "section": "Evidence",
+      "sha256": "bcdc051e358717417cba1b679a5eb133f512f75b0b1fe74920509611da0acc2e",
+      "bytes": 2443,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/s04-phase-g.md"
+    },
+    {
+      "title": "Tranche-3 SAFe cadences — evidence",
+      "path": "docs/evidence/rework/tr3-cadences.html",
+      "source": "docs/evidence/rework/tr3-cadences.md",
+      "section": "Evidence",
+      "sha256": "bc971218428530a4924787e059f58fccce3194b8a8d2dea4093320aeb2c9ad07",
+      "bytes": 1564,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/tr3-cadences.md"
     },
     {
       "title": "Tranche 0 / PI 0 — the SAFe cadence record (retrospective, 2026-11-21)",
