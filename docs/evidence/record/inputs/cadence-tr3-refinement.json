@@ -1,0 +1,15 @@
+{"id":"01a20280-d52b-7791-a9b1-ebc2a10b5c3d","meta":{
+ "delegation_ref":"01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+ "tranche_id":"01a1e9e0-eb54-74d8-a2b5-44fb2b87eb52",
+ "tranche_number":3,
+ "refinement":{
+  "period":"tranche-3",
+  "reordered":[
+   {"item":"v1-w4a-5 long-op resume","from":"unscored","to":"committed","why":"T13's last open P1; the demo cannot claim the tool path complete without it"},
+   {"item":"ADR register seed and its approval gate","from":"backlog","to":"delivered","why":"57 rows live; the approval gate is a T5/T0 code package"},
+   {"item":"kata contract-test instrument","from":"absent","to":"T5 scope","why":"the schema-drift kata needs an instrument class before it can open"},
+   {"item":"programme artefact factory","from":"partial","to":"programme set delivered","why":"the programme-level documents are published; per-project cards follow"}
+  ],
+  "reestimate":{"S04":"two remaining deliverables","T13":"one open P1 plus closure","T3":"change path, baseline, compliance, closure"}
+ }
+}}

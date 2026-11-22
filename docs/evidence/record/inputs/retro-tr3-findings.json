@@ -1,0 +1,7 @@
+{"cadence_id":"01a20281-09ba-709a-b61e-51a22f2ed172","findings":[
+ {"key":"k1","statement":"A clean build before a lock regeneration is the only trustworthy verdict: the shared target answered with another session's metadata and the first lock was hashed from a stale binary.","evidence":["f7409473 clean build","a7fcf0e7 lock correction","docs/evidence/record/journal.jsonl"]},
+ {"key":"k2","statement":"The promotion journal must be validated after every append: trimming by line count silently dropped the publish row, and --check caught it.","evidence":["scripts/promote-record.py --check","docs/evidence/record/journal.jsonl"]},
+ {"key":"k3","statement":"A delegation document's owner project is part of its contract: a PLATFORM-owned standing delegation was refused by a P0-only guard until the guard accepted both.","evidence":["crates/actions/src/programme.rs","crates/actions/tests/pi_plan_approval.rs"]},
+ {"key":"k4","statement":"A measurement change resets a benefit profile to draft; activation is a second recorded write with its own version.","evidence":["docs/evidence/record/journal.jsonl benefit:B2/fields","docs/evidence/record/journal.jsonl benefit:B2/status"]},
+ {"key":"k5","statement":"A defect with no instrument cannot open a kata: the schema-drift half is re-anchored to T5 with a contract-test instrument class rather than fabricating a measurement.","evidence":["docs/SPEC_V2.md 11.9","docs/evidence/v1-conformance-findings.json v1-p119-1"]}
+]}

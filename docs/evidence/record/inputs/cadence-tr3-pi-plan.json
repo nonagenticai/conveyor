@@ -1,0 +1,28 @@
+{"id":"01a20280-a739-7bb9-823f-232f34b32aaa","meta":{
+ "delegation_ref":"01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+ "tranche_id":"01a1e9e0-eb54-74d8-a2b5-44fb2b87eb52",
+ "tranche_number":3,
+ "pi_plan":{
+  "period":"tranche-3",
+  "scope":["S04","T13","T3"],
+  "objectives":[
+   {"id":"O1","statement":"T13 proves the governed call path: release-grant enforcement at tools.call, job storage over the broker, retirement over the zero-use report, and long-op resume","business_value":10,"committed":true},
+   {"id":"O2","statement":"The v1 verdict is a published table: every SPEC_V2 section 12 slice gate executes and is recorded implemented, partial or absent with evidence","business_value":8,"committed":true},
+   {"id":"O3","statement":"The three registers are operated: fourteen programme risks with owners and review dates, fifty-seven ADR rows, and B1-B7 baselined and evaluated","business_value":9,"committed":true},
+   {"id":"O4","statement":"The record instruments tell the truth: render, strict audit, register checks and a promotion journal that replays every programme write","business_value":6,"committed":true},
+   {"id":"O5","statement":"S04 delivers the ActionSpec derive crate and the registry and spec vocabularies with manifests that execute their own gates","business_value":6,"committed":false},
+   {"id":"O6","statement":"T3 records the change path, the scope baseline, the compliance review and the closure with published evidence","business_value":5,"committed":false}
+  ],
+  "capacity":{"projects":["S04","T13","T3"],"live_record_writer":1,"build_concurrency":1,"read_agents_max":6},
+  "wip_limit":{"open_cards_per_writer":1,"open_batches":2},
+  "dependencies":[
+   {"from":"T3","to":"v1-change-1","note":"the change path reads the approval's meta.change_id"},
+   {"from":"T13","to":"v1-p1110-1","note":"job storage over the broker"},
+   {"from":"T13","to":"v1-p119-1","note":"retirement over the zero-use report; the kata half re-anchored to T5"},
+   {"from":"T13","to":"v1-w4a-5","note":"long-op timeout, pending and resume_token"},
+   {"from":"S04","to":"verify-slices","note":"the verdict harness executes the manifests"}
+  ],
+  "evidence":["01a20280-a739-7bb9-823f-232f34b32aaa","01a1e9e0-eb54-74d8-a2b5-44fb2b87eb52","docs/evidence/record/journal.jsonl"],
+  "refinement":{"cadence_id":"01a20280-d52b-7791-a9b1-ebc2a10b5c3d"}
+ }
+}}
