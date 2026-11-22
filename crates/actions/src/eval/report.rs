@@ -11,10 +11,10 @@
 //! ⚠️ **Cost is priced from the inference ledger, never from the rows' copied usage.** The
 //! engine writes every eval model call to `inference_call` with `caller_kind='eval'` and the
 //! run's id (D23's amendment, S19 §9), and [`CostOut`] sums those rows: the subject's calls, the
-//! judge's calls and the billed failed attempts. The same [`price_usage`] arithmetic prices them
-//! as S20's climb uses for the rows it reads, so the two surfaces cannot invent different cents
-//! for the same call. A ledger row the version cannot price — no rates, no token counts, or a
-//! non-token surface — is counted in [`CostOut::unpriced`], never silently treated as free.
+//! judge's calls and the billed failed attempts. S20's climb reads the same rows through the same
+//! [`super::cost`] model, so the two surfaces cannot invent different cents for the same call. A
+//! ledger row the version cannot price — no rates, no token counts, or a non-token surface — is
+//! counted in [`CostOut::unpriced`], never silently treated as free.
 //!
 //! Three rules the numbers obey:
 //!
@@ -31,7 +31,6 @@ use std::collections::{BTreeMap, BTreeSet};
 
 use conveyor_store as store;
 use conveyor_store::eval::{AttemptError, EvalMetric, ResultRow};
-use conveyor_store::inference::InferenceCallRow;
 use serde_json::Value;
 use sqlx::PgConnection;
 use uuid::Uuid;
@@ -39,7 +38,7 @@ use uuid::Uuid;
 use crate::control::invalid;
 use crate::invoke::{ActionError, HandlerCtx};
 
-use super::climbs::{price_usage, tokens_of};
+use super::cost::{SpendSlot, price_call, price_usage_available, spend_slot};
 use super::eval_error;
 use super::run_core::all_results;
 
@@ -423,66 +422,6 @@ async fn report(
         headroom,
         cost,
     })
-}
-
-/// Whether the version's prices carry the two rates [`price_usage`] understands.
-fn price_usage_available(prices: &Value) -> bool {
-    prices.get("input").and_then(Value::as_f64).is_some()
-        && prices.get("output").and_then(Value::as_f64).is_some()
-}
-
-/// Where one ledger row's spend belongs in the report.
-enum SpendSlot {
-    /// The subject's own call.
-    Subject,
-    /// A judge call: the runner's `eval_judge` seam, or an audit's judge probe attributed to
-    /// the run it audited.
-    Judge,
-    /// A billed call that did not answer `ok` (a refused, errored or timed-out attempt).
-    Failed,
-}
-
-fn spend_slot(call: &InferenceCallRow) -> SpendSlot {
-    if call.outcome != "ok" {
-        return SpendSlot::Failed;
-    }
-    match call.prompt_ref.as_deref() {
-        Some(reference)
-            if reference.starts_with("eval_judge") || reference.starts_with("eval_audit") =>
-        {
-            SpendSlot::Judge
-        }
-        _ => SpendSlot::Subject,
-    }
-}
-
-/// The ledger row as the usage object [`price_usage`] prices.
-fn usage_of(call: &InferenceCallRow) -> Value {
-    serde_json::json!({
-        "prompt_tokens": call.prompt_tokens,
-        "completion_tokens": call.completion_tokens,
-        "total_tokens": call.total_tokens,
-        "cache_creation_input_tokens": call.cache_creation_input_tokens,
-        "cache_read_input_tokens": call.cache_read_input_tokens,
-    })
-}
-
-/// One ledger row's cost, in the unit the version prices in.
-///
-/// `None` means the row cannot be expressed in that unit: the provider returned no usage at all
-/// (`unknown`), the call was a non-token surface, or a priced version has no rate for it.
-/// Cache-class rates are P3's refinement; a cache row still prices today because
-/// `prompt_tokens` is the full-rate count.
-fn price_call(call: &InferenceCallRow, prices: &Value, priced: bool) -> Option<f64> {
-    if call.cache_status == "unknown" || call.usage_unit.is_some() {
-        return None;
-    }
-    let usage = usage_of(call);
-    if priced {
-        price_usage(&usage, prices)
-    } else {
-        Some(tokens_of(&usage))
-    }
 }
 
 // ── the action ──────────────────────────────────────────────────────────────────────────

@@ -1,10 +1,16 @@
-//! S19 P1 — **one ledger-derived accounting model.**
+//! S19 P1–P2 — **one ledger-derived accounting model.**
 //!
 //! `eval_runs.report` prices the run's `inference_call` rows (subject, judge and billed failed
-//! attempts); `eval_climbs.get` prices the same calls from the result rows it reads. Both run the
-//! same `price_usage` arithmetic, so on a run whose ledger and rows describe the same calls the
+//! attempts); `eval_climbs.get` sums each of the climb's rounds from the same ledger through the
+//! same `cost::price_call` arithmetic. On a run whose ledger and rows describe the same calls the
 //! two surfaces must agree **to the cent** — a cent of drift means a second accounting model
 //! exists, which is exactly what W12 forbids.
+//!
+//! The climb used to price the rows' copied `usage`, which silently dropped the judge and every
+//! billed failure; the agreement test now seeds all three kinds of call. The regrade test copies
+//! the shape `eval_runner::regrade_case` writes — round 0, empty subject usage, only the judge's
+//! calls on the ledger — and proves the subject's spend is charged once (D26: "never a second
+//! count of the subject's tokens").
 //!
 //! The fixture seeds both sides by hand: the result rows through the store (the driver's own
 //! proof is `apps/server/tests/eval_runner.rs`) and the ledger through
@@ -29,13 +35,13 @@ const DELTA: f64 = 0.6;
 const PROMPT_TOKENS: i32 = 1000;
 const COMPLETION_TOKENS: i32 = 500;
 
-fn usage() -> Usage {
-    Usage {
-        prompt_tokens: PROMPT_TOKENS,
-        completion_tokens: COMPLETION_TOKENS,
-        total_tokens: PROMPT_TOKENS + COMPLETION_TOKENS,
-        ..Usage::default()
-    }
+/// The usage a subject result row and its ledger row both describe in the agreement fixture.
+fn subject_usage() -> Value {
+    json!({
+        "prompt_tokens": PROMPT_TOKENS,
+        "completion_tokens": COMPLETION_TOKENS,
+        "total_tokens": PROMPT_TOKENS + COMPLETION_TOKENS,
+    })
 }
 
 /// An eval, a version, eight cases, the `pass` metric, both sign-offs and a drawn split.
@@ -221,9 +227,14 @@ async fn run_row(
     run.id
 }
 
-/// One scorable result per case, each carrying the usage the runner copied off the response,
-/// then drive the run to `complete`.
-async fn fill_run(pg: &support::Pg, tenant: TenantId, version_id: &str, run_id: Uuid) {
+/// One scorable result per case, each carrying `row_usage`, then drive the run to `complete`.
+async fn fill_run(
+    pg: &support::Pg,
+    tenant: TenantId,
+    version_id: &str,
+    run_id: Uuid,
+    row_usage: &Value,
+) {
     let mut tx = begin_scoped(&pg.owner, tenant).await.expect("scope");
     let cases: Vec<Uuid> = sqlx::query_scalar(
         "SELECT id FROM eval_case WHERE tenant_id = $1 AND version_id = $2 ORDER BY ordinal",
@@ -233,11 +244,6 @@ async fn fill_run(pg: &support::Pg, tenant: TenantId, version_id: &str, run_id: 
     .fetch_all(&mut *tx)
     .await
     .expect("read the cases");
-    let row_usage = json!({
-        "prompt_tokens": PROMPT_TOKENS,
-        "completion_tokens": COMPLETION_TOKENS,
-        "total_tokens": PROMPT_TOKENS + COMPLETION_TOKENS,
-    });
     for case_id in &cases {
         store::eval::insert_case_result_tx(
             &mut tx,
@@ -251,7 +257,7 @@ async fn fill_run(pg: &support::Pg, tenant: TenantId, version_id: &str, run_id: 
                 grade: &json!({ "pass": 1.0 }),
                 explanation: &json!({}),
                 model: "stub-model",
-                usage: &row_usage,
+                usage: row_usage,
                 latency_ms: 3,
                 tool_calls: 0,
                 action_invocation_id: None,
@@ -273,8 +279,17 @@ async fn fill_run(pg: &support::Pg, tenant: TenantId, version_id: &str, run_id: 
     tx.commit().await.expect("commit");
 }
 
-/// The ledger row the runner writes for one subject call of `run_id`.
-async fn ledger_call(pg: &support::Pg, tenant: TenantId, run_id: Uuid) {
+/// The ledger row the runner writes for one call of `run_id`: `caller_kind='eval'`, the run's
+/// id, and the prompt ref that places it in its slot.
+async fn ledger_call(
+    pg: &support::Pg,
+    tenant: TenantId,
+    run_id: Uuid,
+    prompt_ref: &str,
+    prompt_tokens: i32,
+    completion_tokens: i32,
+    outcome: &str,
+) {
     let mut tx = begin_scoped(&pg.owner, tenant).await.expect("scope");
     store::inference::insert_call_tx(
         &mut tx,
@@ -288,17 +303,22 @@ async fn ledger_call(pg: &support::Pg, tenant: TenantId, run_id: Uuid) {
             run_step_id: None,
             conversation_turn_id: None,
             eval_run_id: Some(run_id),
-            prompt_ref: Some("eval:completions.create"),
+            prompt_ref: Some(prompt_ref.to_owned()),
             prompt_version: None,
             prompt_sha256: None,
             model: "stub-model",
             served_model: None,
-            usage: Some(usage()),
+            usage: Some(Usage {
+                prompt_tokens,
+                completion_tokens,
+                total_tokens: prompt_tokens + completion_tokens,
+                ..Usage::default()
+            }),
             cache_status: "miss",
             usage_unit: None,
             usage_units: None,
             latency_ms: 3,
-            outcome: "ok",
+            outcome: outcome.to_owned(),
         },
     )
     .await
@@ -369,7 +389,7 @@ async fn the_report_and_the_climb_agree_to_the_cent_on_the_same_model() {
     approve_plan(&running).await;
 
     let baseline = run_row(&pg, seeded.tenant, &eval_id, &version_id, "baseline", 0).await;
-    fill_run(&pg, seeded.tenant, &version_id, baseline).await;
+    fill_run(&pg, seeded.tenant, &version_id, baseline, &subject_usage()).await;
 
     // ── round 1 creates the `v1` run; fill it and write its ledger ──
     let (status, body) = running
@@ -393,12 +413,37 @@ async fn the_report_and_the_climb_agree_to_the_cent_on_the_same_model() {
         .await;
     assert_eq!(status, 201, "{body}");
     let v1 = run_of(&pg, seeded.tenant, &eval_id, "v1").await;
-    fill_run(&pg, seeded.tenant, &version_id, v1).await;
+    fill_run(&pg, seeded.tenant, &version_id, v1, &subject_usage()).await;
     for _ in 0..CASES {
-        ledger_call(&pg, seeded.tenant, v1).await;
+        ledger_call(
+            &pg,
+            seeded.tenant,
+            v1,
+            "eval:completions.create",
+            PROMPT_TOKENS,
+            COMPLETION_TOKENS,
+            "ok",
+        )
+        .await;
     }
+    // ── P2.1: the other two kinds of billed call the row sum used to drop ──
+    // Two judge calls at (2000·3 + 1000·15) / 10 000 = 2.1 cents each …
+    for _ in 0..2 {
+        ledger_call(&pg, seeded.tenant, v1, "eval_judge", 2000, 1000, "ok").await;
+    }
+    // … and one billed failure at (400·3 + 200·15) / 10 000 = 0.42 cents.
+    ledger_call(
+        &pg,
+        seeded.tenant,
+        v1,
+        "eval:completions.create",
+        400,
+        200,
+        "error",
+    )
+    .await;
 
-    // ── the climb's spend, from the result rows ──
+    // ── the climb's spend, from the same ledger ──
     let (status, body) = running
         .invoke(
             "eval_climbs.get",
@@ -429,14 +474,180 @@ async fn the_report_and_the_climb_agree_to_the_cent_on_the_same_model() {
     assert_eq!(cost["unit"], "cents", "{cost}");
     let total = close(&cost["total"]);
 
-    // Eight calls at (1000·3 + 500·15) / 10 000 = 1.05 cents each.
+    // The report attributes each call to its slot …
     assert!(
-        (total - 8.4).abs() < 1e-9,
-        "the ledger prices eight subject calls: {cost}"
+        (close(&cost["subject"]) - 8.4).abs() < 1e-9,
+        "eight subject calls at 1.05 cents each: {cost}"
     );
+    assert!(
+        (close(&cost["judge"]) - 4.2).abs() < 1e-9,
+        "two judge calls at 2.1 cents each: {cost}"
+    );
+    assert!(
+        (close(&cost["failed"]) - 0.42).abs() < 1e-9,
+        "a billed failure is spend too: {cost}"
+    );
+    assert!(
+        (total - 13.02).abs() < 1e-9,
+        "subject + judge + failed, and nothing else: {cost}"
+    );
+    // … and the climb's sum is the same total from the same rows. A climb priced from the
+    // result rows would say 8.4 and silently lose the judge and the failed attempt.
     assert!(
         (spend - total).abs() < 1e-9,
         "the report and the climb must agree to the cent: spend {spend} vs report {total}"
     );
     assert_eq!(cost["unpriced"], 0, "{cost}");
+}
+
+/// P2.2 — a regrade reads the captured output; it never re-bills the subject.
+///
+/// The fixture reproduces what `eval_runner::regrade_case` writes: a run with round 0 (so it is
+/// not a climb round), result rows carrying empty `usage` (the subject's tokens were billed on
+/// the source run), and only the judge's calls on the ledger. The subject's 8.4 cents must
+/// appear on the source run and nowhere else.
+#[tokio::test]
+async fn a_regrade_charges_the_subject_once() {
+    let pg = support::Pg::fresh().await;
+    let seeded = support::seed(&pg, "dev-a", "alice", "Alice").await;
+    let running = support::Running::start(&pg).await;
+    let (eval_id, version_id) = ready_instrument(&running).await;
+    set_prices(&pg, seeded.tenant, &version_id).await;
+
+    let (status, body) = running
+        .invoke(
+            "eval_climbs.start",
+            TOKEN,
+            json!({
+                "eval_id": eval_id,
+                "goal": { "target": "pass", "direction": "higher" },
+                "stopping": "plateau",
+                "plateau_k": 5,
+                "delta": DELTA,
+                "reps": 1,
+                "approve_each_round": false,
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "{body}");
+    let climb_id = body["output"]["id"].as_str().expect("climb id").to_owned();
+    approve_plan(&running).await;
+
+    let baseline = run_row(&pg, seeded.tenant, &eval_id, &version_id, "baseline", 0).await;
+    fill_run(&pg, seeded.tenant, &version_id, baseline, &subject_usage()).await;
+
+    // ── the source round: eight captured subject calls, billed on this run ──
+    let (status, body) = running
+        .invoke(
+            "eval_climbs.round",
+            TOKEN,
+            json!({
+                "id": climb_id,
+                "change_md": "round 1: the run whose outputs a grader fix will regrade",
+                "prediction": {
+                    "metric": "pass",
+                    "direction": "higher",
+                    "interval": [DELTA, 0.9],
+                    "falsifier": "the measured mean stays inside the noise band",
+                },
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "{body}");
+    let source = run_of(&pg, seeded.tenant, &eval_id, "v1").await;
+    fill_run(&pg, seeded.tenant, &version_id, source, &subject_usage()).await;
+    for _ in 0..CASES {
+        ledger_call(
+            &pg,
+            seeded.tenant,
+            source,
+            "eval:completions.create",
+            PROMPT_TOKENS,
+            COMPLETION_TOKENS,
+            "ok",
+        )
+        .await;
+    }
+
+    // ── the regrade, exactly as the worker writes it: round 0, empty subject usage, the
+    //    source's provenance, and two judge calls that are this run's only cost ──
+    let regrade = run_row(&pg, seeded.tenant, &eval_id, &version_id, "v2", 0).await;
+    fill_run(&pg, seeded.tenant, &version_id, regrade, &json!({})).await;
+    for _ in 0..2 {
+        ledger_call(&pg, seeded.tenant, regrade, "eval_judge", 2000, 1000, "ok").await;
+    }
+
+    // ── the two reports: the subject is priced on the source, the judge on the regrade ──
+    let (status, body) = running
+        .invoke(
+            "eval_runs.report",
+            TOKEN,
+            json!({ "run_id": source }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{body}");
+    let source_cost = &body["output"]["cost"];
+    assert!(
+        (close(&source_cost["subject"]) - 8.4).abs() < 1e-9,
+        "the source's subject calls: {source_cost}"
+    );
+    assert!(
+        close(&source_cost["judge"]).abs() < 1e-9,
+        "the source ran no judge: {source_cost}"
+    );
+
+    let (status, body) = running
+        .invoke(
+            "eval_runs.report",
+            TOKEN,
+            json!({ "run_id": regrade }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{body}");
+    let regrade_cost = &body["output"]["cost"];
+    assert!(
+        close(&regrade_cost["subject"]).abs() < 1e-9,
+        "⛔ the subject answered once, on the source run; the regrade re-priced no call: \
+         {regrade_cost}"
+    );
+    assert!(
+        (close(&regrade_cost["judge"]) - 4.2).abs() < 1e-9,
+        "the regrade's own spend is its two judge calls: {regrade_cost}"
+    );
+    assert!(
+        (close(&regrade_cost["total"]) - 4.2).abs() < 1e-9,
+        "{regrade_cost}"
+    );
+
+    // ── the climb: the regrade is round 0, so it widens the ledger without re-charging the
+    //    subject; the climb's spend is the source round's 8.4, never 16.8 ──
+    let (status, body) = running
+        .invoke(
+            "eval_climbs.get",
+            TOKEN,
+            json!({ "id": climb_id }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{body}");
+    let spend = close(&body["output"]["spend_cents"]);
+    assert!(
+        (spend - 8.4).abs() < 1e-9,
+        "one subject charge across the source and the regrade: {spend}"
+    );
+    assert_eq!(body["output"]["spend_unit"], "cents", "{body}");
 }

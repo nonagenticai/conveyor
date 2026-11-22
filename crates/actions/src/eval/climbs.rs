@@ -18,8 +18,9 @@
 //!   and refuses `422 test_transcript_in_round` if any belongs to a `test`-split case.
 //! - **One round is one hypothesis.** The prediction must name the climb's target metric; a round
 //!   that predicts two things is stacking.
-//! - **Spend is summed, never stored.** `get` prices the result rows at read time; the ceiling is
-//!   checked against that sum, so it cannot drift from what it counts.
+//! - **Spend is summed, never stored.** `get` prices each round's inference ledger at read time
+//!   (subject, judge and billed failures alike); the ceiling is checked against that sum, so it
+//!   cannot drift from what it counts.
 
 use rust_decimal::Decimal;
 use rust_decimal::prelude::ToPrimitive;
@@ -43,6 +44,7 @@ use crate::invoke::{ActionError, HandlerCtx};
 use crate::spec::HandlerOutput;
 use crate::views::Page;
 
+use super::cost::{ledger_spend_tx, price_usage, price_usage_available, tokens_of};
 use super::run_core::{RunRequest, all_results, start_or_resume_run_tx};
 use super::{EVAL_CLIMB_CHANGED, EVAL_CLIMB_ROUND_COMPLETED, emit, eval_error, not_ready};
 
@@ -215,8 +217,8 @@ pub struct ClimbView {
     pub best_test_score: Option<f64>,
     /// `planned | running | plateaued | stopped`.
     pub status: String,
-    /// Cumulative spend, summed from the result rows at read time. `null` on `list`, which does
-    /// not read them.
+    /// Cumulative spend, summed from the rounds' inference ledger at read time. `null` on
+    /// `list`, which does not read them.
     pub spend_cents: Option<f64>,
     /// `cents` when the version prices its tokens, `tokens` when it does not.
     pub spend_unit: String,
@@ -342,57 +344,14 @@ fn as_decimal(value: f64) -> Result<Decimal, ActionError> {
     })
 }
 
-// ── pricing ─────────────────────────────────────────────────────────────────────────────
-
-/// Price one result's `usage` against the version's `prices`, in cents.
-///
-/// `prices` is the version's free-form jsonb; the two keys this understands are `input` and
-/// `output`, US dollars per million tokens (the shape `eval_version.prices` carries in the
-/// domain's own tests). Anything else — no prices, a missing rate, a usage object that names no
-/// token counts — returns `None`, and the climb then reports **tokens** instead of cents rather
-/// than inventing a rate.
-pub(crate) fn price_usage(usage: &Value, prices: &Value) -> Option<f64> {
-    let input_rate = prices.get("input").and_then(Value::as_f64)?;
-    let output_rate = prices.get("output").and_then(Value::as_f64)?;
-    let input = usage
-        .get("prompt_tokens")
-        .or_else(|| usage.get("input_tokens"))
-        .and_then(Value::as_f64)?;
-    let output = usage
-        .get("completion_tokens")
-        .or_else(|| usage.get("output_tokens"))
-        .and_then(Value::as_f64)
-        .unwrap_or(0.0);
-    // Cents: (tokens / 1e6) dollars * 100.
-    Some((input * input_rate + output * output_rate) / 10_000.0)
-}
-
-/// The unpriced fallback: how many tokens a result cost.
-pub(crate) fn tokens_of(usage: &Value) -> f64 {
-    usage
-        .get("total_tokens")
-        .and_then(Value::as_f64)
-        .unwrap_or_else(|| {
-            let input = usage
-                .get("prompt_tokens")
-                .or_else(|| usage.get("input_tokens"))
-                .and_then(Value::as_f64)
-                .unwrap_or(0.0);
-            let output = usage
-                .get("completion_tokens")
-                .or_else(|| usage.get("output_tokens"))
-                .and_then(Value::as_f64)
-                .unwrap_or(0.0);
-            input + output
-        })
-}
-
 // ── reading a run ───────────────────────────────────────────────────────────────────────
 
-/// One run's numbers, computed in Rust from its result rows (never a SQL aggregate).
+/// One run's numbers: its quality means computed in Rust from its result rows (never a SQL
+/// aggregate), and its spend summed from the same inference ledger the report reads.
 struct RunNumbers {
     outcome: RoundOutcome,
-    /// Cumulative spend for this run, in the unit [`Pricing::unit`] names.
+    /// Cumulative spend for this run, in the unit [`Pricing::unit`] names, including the judge's
+    /// calls and billed failed attempts.
     spend: f64,
     /// How many rows were left out of every mean (not `ok`, or ungraded).
     excluded: usize,
@@ -431,7 +390,8 @@ async fn run_numbers(
             "cents" => price_usage(&row.usage, &pricing.prices).unwrap_or_default(),
             _ => tokens_of(&row.usage),
         };
-        // A result counts towards *something* even when ungraded: its spend is real money.
+        // A non-`ok` row is not scorable. Any spend it incurred is still priced, from the
+        // ledger below — which is why this only excludes it from the means.
         if row.status != "ok" {
             excluded += 1;
             continue;
@@ -483,13 +443,23 @@ async fn run_numbers(
             }
         })
         .collect();
-    let spend = rows
-        .iter()
-        .map(|row| match pricing.unit {
-            "cents" => price_usage(&row.usage, &pricing.prices).unwrap_or_default(),
-            _ => tokens_of(&row.usage),
-        })
-        .sum();
+    // ⛔ Spend is **not** summed from these rows. The rows carry the subject's copied `usage`
+    // only, so they omit the judge's calls and every billed failed attempt; the ledger carries
+    // all three. Both this and the report read the same rows through the same model, and a
+    // regrade's rows stay empty of subject tokens (they were billed on the source run), so no
+    // call is charged twice.
+    let spend = ledger_spend_tx(
+        &mut *tx,
+        tenant,
+        run_id,
+        &pricing.prices,
+        pricing.unit == "cents",
+    )
+    .await
+    .map_err(|error| {
+        tracing::error!(%error, "read the run's inference ledger");
+        ActionError::internal()
+    })?;
 
     Ok(RunNumbers {
         outcome: RoundOutcome {
@@ -1060,16 +1030,7 @@ async fn pricing_of(
     let version = store::eval::get_version_tx(&mut *tx, tenant, version_id)
         .await
         .map_err(|error| eval_error(error, action))?;
-    let priced = version
-        .prices
-        .get("input")
-        .and_then(Value::as_f64)
-        .is_some()
-        && version
-            .prices
-            .get("output")
-            .and_then(Value::as_f64)
-            .is_some();
+    let priced = price_usage_available(&version.prices);
     Ok(Pricing {
         unit: if priced { "cents" } else { "tokens" },
         prices: version.prices.clone(),

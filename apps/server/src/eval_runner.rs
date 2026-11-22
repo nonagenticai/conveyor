@@ -331,8 +331,8 @@ pub async fn run_case(
 ///
 /// The fields that differ between a measurement and a regrade are **provenance**, not behaviour:
 /// a regrade's [`output`](Self::output) is the one the source run captured, its
-/// [`usage`](Self::usage) is empty (the subject call was already billed on the source run, and
-/// spend is summed from these rows), and its [`action`](Self::action) names the job that wrote it.
+/// [`usage`](Self::usage) is empty (the subject call was billed on the source run and the ledger
+/// attributes it there), and its [`action`](Self::action) names the job that wrote it.
 struct GradeRequest<'a> {
     run_id: Uuid,
     case_id: Uuid,
@@ -758,8 +758,9 @@ pub async fn regrade_case(
     };
 
     let deadline = CaseDeadline::starting(Utc::now(), EVAL_CASE_TIMEOUT);
-    // The subject's tokens were billed on the source run; `usage` stays empty so the climb's
-    // summed spend does not count them twice. `judge_usage` carries the regrade's own cost.
+    // The subject's tokens were billed on the source run, and the ledger attributes that call
+    // to the source run; `usage` stays empty so this run claims no second subject cost. The
+    // regrade's own cost is the judge's, recorded in `judge_usage` and the ledger.
     let usage = json!({});
     grade_and_record(
         pool,
