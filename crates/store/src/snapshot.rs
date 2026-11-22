@@ -64,7 +64,8 @@ pub async fn snapshot_tx(
     let programme = rows(
         &mut *conn,
         "SELECT COALESCE(jsonb_agg(to_jsonb(t) ORDER BY t.name), '[]'::jsonb) FROM (
-             SELECT id, name, status, owner_user_id, version, created_at, updated_at
+             SELECT id, name, status, owner_user_id, shared_config, version, created_at,
+                    updated_at
                FROM programme WHERE tenant_id = $1
          ) t",
         tenant_id,
@@ -543,7 +544,7 @@ pub async fn snapshot_tx(
         &mut *conn,
         "SELECT COALESCE(jsonb_agg(to_jsonb(t) ORDER BY t.programme_id, t.cadence_id, t.finding_key, t.id), '[]'::jsonb) FROM (
              SELECT id, programme_id, cadence_id, finding_key, statement, evidence,
-                    independent_count, state, source, version, created_at, updated_at
+                    independent_count, state, source, meta, version, created_at, updated_at
                FROM lesson WHERE tenant_id = $1
          ) t",
         tenant_id,
