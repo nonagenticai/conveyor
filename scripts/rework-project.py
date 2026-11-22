@@ -591,11 +591,10 @@ class Runner:
             node = self._read("wbs.get", {"id": deliverable})
         if node and node.get("status") != "accepted":
             wbs = self.content["wbs_deliverable"]
-            self.invoke(
-                "wbs.update",
-                {
-                    "id": deliverable,
-                    "status": "accepted",
+            change_id = None if self.dry_run else self.ensure_change()
+            payload = {
+                "id": deliverable,
+                "status": "accepted",
                     "evidence": [
                         f"acceptance/programme/{self.project}.toml",
                         f"docs/evidence/rework/{self.project}.json",
@@ -604,8 +603,13 @@ class Runner:
                     "business_value": wbs["business_value"],
                     "time_criticality": wbs["time_criticality"],
                     "risk_reduction": wbs["risk_reduction"],
-                    "job_size": wbs["job_size"],
-                },
+                "job_size": wbs["job_size"],
+            }
+            if change_id:
+                payload["change_id"] = change_id
+            self.invoke(
+                "wbs.update",
+                payload,
                 read_action="wbs.get",
                 read_input={"id": deliverable},
                 if_match=node.get("version", 1),
@@ -791,6 +795,37 @@ class Runner:
                 if_match=row.get("version", 1),
             )
         print(f"  {category} output: body corrected and republished")
+
+    def ensure_change(self) -> str | None:
+        """The approved change a post-baseline acceptance needs (v1-p5-4, v1-change-1).
+
+        Reads the project's baselines; when an approved scope baseline exists, opens the one
+        change that authorises this acceptance on the direct route (the baseline, not a PM job
+        binding) and approves it under the delegation. No approved baseline returns None and
+        the `wbs.update` needs no change.
+        """
+        items = self._read("baselines.list", {"project_id": self.project_id}).get("items", [])
+        approved = [row for row in items if row.get("approved_by")]
+        if not approved:
+            return None
+        baseline = max(approved, key=lambda row: row.get("taken_at") or "")
+        change = self.invoke(
+            "changes.request",
+            {
+                "project_id": self.project_id,
+                "baseline_id": baseline["id"],
+                "title": f"Accept the retrospective WBS deliverable for {self.project}",
+                "body": (
+                    "The scope baseline freezes the plan; recording the deliverable's "
+                    "acceptance with its evidence is the one change this record makes to it."
+                ),
+                "impact": {"scope": "the WBS deliverable's acceptance evidence"},
+            },
+            read_action="registers.get",
+            read_id_from_output="change_id",
+        )
+        self.decide(change["approval_id"], "approve the change that authorises the acceptance")
+        return str(change["change_id"])
 
     def decision_payload(self, approval_id: str, note: str) -> dict:
         """The approvals.decide input, citing the published delegation.
