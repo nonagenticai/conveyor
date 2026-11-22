@@ -707,8 +707,83 @@ async fn an_unavailable_judge_fails_closed() {
     );
 }
 
+/// One run state read: `(status, error_class)`.
+async fn run_state(pg: &support::Pg, tenant: TenantId, run: Uuid) -> (String, Option<String>) {
+    let mut tx = begin_scoped(&pg.runtime, tenant).await.expect("scope");
+    let row =
+        sqlx::query_as("SELECT status, error_class FROM run WHERE tenant_id = $1 AND id = $2")
+            .bind(tenant.as_uuid())
+            .bind(run)
+            .fetch_one(&mut *tx)
+            .await
+            .expect("run");
+    tx.commit().await.expect("commit");
+    row
+}
+
+/// How many ladder decisions cite one approval.
+async fn decisions_for_approval(pg: &support::Pg, tenant: TenantId, approval: Uuid) -> i64 {
+    let mut tx = begin_scoped(&pg.runtime, tenant).await.expect("scope");
+    let count = sqlx::query_scalar(
+        "SELECT count(*) FROM decision WHERE tenant_id = $1 AND approval_id = $2",
+    )
+    .bind(tenant.as_uuid())
+    .bind(approval)
+    .fetch_one(&mut *tx)
+    .await
+    .expect("decisions");
+    tx.commit().await.expect("commit");
+    count
+}
+
+/// The attached card of one document, or `None` while it is unattached.
+async fn document_card(pg: &support::Pg, tenant: TenantId, document: Uuid) -> Option<Uuid> {
+    let mut tx = begin_scoped(&pg.runtime, tenant).await.expect("scope");
+    let card = sqlx::query_scalar("SELECT card_id FROM document WHERE tenant_id = $1 AND id = $2")
+        .bind(tenant.as_uuid())
+        .bind(document)
+        .fetch_one(&mut *tx)
+        .await
+        .expect("document");
+    tx.commit().await.expect("commit");
+    card
+}
+
+/// Park one handover run and return `(run, card, approval)`.
+///
+/// The caller has already installed the stubs, the sealed laya token and a `handover` policy.
+async fn park_handover(
+    pg: &support::Pg,
+    seeded: &support::Seeded,
+    running: &support::Running,
+    key: &str,
+) -> (Uuid, String, Uuid) {
+    let (capability, agent) = seed_agent(pg, seeded, Some("agent@1"), "router/medium").await;
+    let (job, release) = seed_job(
+        pg,
+        seeded,
+        key,
+        json!({"executor_kind": "internal_agent", "prompt_recipe": "agent@1",
+               "model_ref": "router/release"}),
+    )
+    .await;
+    let binding = bind(pg, seeded, job, release, agent, capability).await;
+    let (board, lane) = board_and_lane(running).await;
+    let card = create_card(running, &board, &lane).await;
+    let run = start_run(running, &card, binding).await;
+    execute(pg, seeded, run).await;
+    let approval: Uuid = scalar(
+        pg,
+        seeded.tenant,
+        "SELECT id FROM approval WHERE tenant_id = $1 AND kind = 'executor' AND run_id = $2",
+        run,
+    )
+    .await;
+    (run, card, approval)
+}
+
 #[tokio::test]
-async fn a_handover_gate_fails_the_run_and_opens_an_approval() {
+async fn a_handover_gate_parks_the_run_and_opens_an_approval() {
     let _guard = STUBS.lock().await;
     let (pg, seeded, running) = fixture().await;
     let (router, _models) = stub_router().await;
@@ -717,47 +792,276 @@ async fn a_handover_gate_fails_the_run_and_opens_an_approval() {
     support::set_env("CONVEYOR_EXTERNAL_LAYA_URL", &laya);
     seal_laya_token(&pg, &seeded).await;
     seed_policy(&pg, &seeded, 0.5, "closed", "handover").await;
-    let (capability, agent) = seed_agent(&pg, &seeded, Some("agent@1"), "router/medium").await;
-    let (job, release) = seed_job(
+    let (run, _card, approval) = park_handover(&pg, &seeded, &running, "handover_job").await;
+
+    let (status, class) = run_state(&pg, seeded.tenant, run).await;
+    assert_eq!(status, "waiting_approval", "the handover parks the run");
+    assert_eq!(class, None, "a parked run is not a failed one");
+
+    let meta: Value = scalar(
         &pg,
-        &seeded,
-        "handover_job",
-        json!({"executor_kind": "internal_agent", "prompt_recipe": "agent@1",
-               "model_ref": "router/release"}),
+        seeded.tenant,
+        "SELECT meta FROM approval WHERE tenant_id = $1 AND id = $2",
+        approval,
     )
     .await;
-    let binding = bind(&pg, &seeded, job, release, agent, capability).await;
-    let (board, lane) = board_and_lane(&running).await;
-    let card = create_card(&running, &board, &lane).await;
-    let run = start_run(&running, &card, binding).await;
+    let document_id = meta["draft_document_id"]
+        .as_str()
+        .expect("the approval names its draft");
+    assert_eq!(
+        meta["prompt_sha256"].as_str().map(str::len),
+        Some(64),
+        "the approval names the compiled prompt: {meta}"
+    );
+    assert_eq!(
+        document_card(
+            &pg,
+            seeded.tenant,
+            Uuid::parse_str(document_id).expect("uuid")
+        )
+        .await,
+        None,
+        "the draft is unattached until the person's approval applies it"
+    );
 
-    execute(&pg, &seeded, run).await;
-
-    let (status, class): (String, Option<String>) = {
+    let (step_status, output): (String, Value) = {
         let mut tx = begin_scoped(&pg.runtime, seeded.tenant)
             .await
             .expect("scope");
-        let row =
-            sqlx::query_as("SELECT status, error_class FROM run WHERE tenant_id = $1 AND id = $2")
-                .bind(seeded.tenant.as_uuid())
-                .bind(run)
-                .fetch_one(&mut *tx)
-                .await
-                .expect("run");
+        let row = sqlx::query_as(
+            "SELECT status, output FROM run_step
+              WHERE tenant_id = $1 AND run_id = $2 AND position = 1 AND attempt = 1",
+        )
+        .bind(seeded.tenant.as_uuid())
+        .bind(run)
+        .fetch_one(&mut *tx)
+        .await
+        .expect("step");
         tx.commit().await.expect("commit");
         row
     };
-    assert_eq!(status, "failed");
-    assert_eq!(class.as_deref(), Some("gate_requires_approval"));
-    let approvals: i64 = scalar(
+    assert_eq!(step_status, "succeeded", "the generation step succeeded");
+    assert_eq!(
+        output["draft_document_id"].as_str(),
+        Some(document_id),
+        "the step names the same draft"
+    );
+    let calls: i64 = scalar(
         &pg,
         seeded.tenant,
-        "SELECT count(*) FROM approval WHERE tenant_id = $1 AND kind = 'executor' \
-         AND run_id = $2",
+        "SELECT count(*) FROM inference_call WHERE tenant_id = $1 AND run_id = $2",
         run,
     )
     .await;
-    assert_eq!(approvals, 1, "the handover opens one card-scoped approval");
+    assert_eq!(calls, 1, "the model was called once");
+}
+
+#[tokio::test]
+async fn an_approved_handover_applies_the_draft_and_finishes_the_run() {
+    let _guard = STUBS.lock().await;
+    let (pg, seeded, running) = fixture().await;
+    let (router, _models) = stub_router().await;
+    let (laya, _hits) = stub_laya(Some(0.1)).await;
+    support::set_env("CONVEYOR_EXTERNAL_INFERENCE_URL", &router);
+    support::set_env("CONVEYOR_EXTERNAL_LAYA_URL", &laya);
+    seal_laya_token(&pg, &seeded).await;
+    seed_policy(&pg, &seeded, 0.5, "closed", "handover").await;
+    let (run, card, approval) = park_handover(&pg, &seeded, &running, "approve_job").await;
+    let card = Uuid::parse_str(&card).expect("uuid");
+
+    let (status, approved) = running
+        .invoke(
+            "approvals.decide",
+            support::REVIEWER,
+            json!({"approval_id": approval, "decision": "approve"}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{approved}");
+    assert_eq!(
+        run_state(&pg, seeded.tenant, run).await.0,
+        "running",
+        "approval settles the parked run"
+    );
+    let job: Value = scalar(
+        &pg,
+        seeded.tenant,
+        "SELECT payload FROM job WHERE tenant_id = $1 AND kind = 'run.resume' \
+         AND payload->>'run_id' = $2::text ORDER BY created_at DESC LIMIT 1",
+        run,
+    )
+    .await;
+    let decision_id = Uuid::parse_str(
+        job["decision_id"]
+            .as_str()
+            .expect("the resume job names its decision"),
+    )
+    .expect("uuid");
+
+    conveyor_actions::executor::resume_run(
+        &pg.runtime,
+        seeded.tenant,
+        APP_KEY,
+        run,
+        approval,
+        decision_id,
+    )
+    .await
+    .expect("the resume applies the draft");
+
+    let (status, class) = run_state(&pg, seeded.tenant, run).await;
+    assert_eq!(status, "succeeded", "{class:?}");
+    let original: Value = scalar(
+        &pg,
+        seeded.tenant,
+        "SELECT output FROM run_step WHERE tenant_id = $1 AND run_id = $2 \
+         AND position = 1 AND attempt = 1",
+        run,
+    )
+    .await;
+    let document = Uuid::parse_str(
+        original["draft_document_id"]
+            .as_str()
+            .expect("the step names the draft"),
+    )
+    .expect("uuid");
+    assert_eq!(
+        document_card(&pg, seeded.tenant, document).await,
+        Some(card),
+        "the approved draft is attached to the run's card"
+    );
+    let decisions: i64 = scalar(
+        &pg,
+        seeded.tenant,
+        "SELECT count(*) FROM decision WHERE tenant_id = $1 AND card_id = \
+         (SELECT card_id FROM run WHERE tenant_id = $1 AND id = $2) \
+         AND kind = 'gate.draft_apply' AND outcome = 'accepted'",
+        run,
+    )
+    .await;
+    assert_eq!(decisions, 1, "one L3 decision gates the apply");
+    let calls: i64 = scalar(
+        &pg,
+        seeded.tenant,
+        "SELECT count(*) FROM inference_call WHERE tenant_id = $1 AND run_id = $2",
+        run,
+    )
+    .await;
+    assert_eq!(calls, 1, "the resume never calls the model again");
+    let succeeded: i64 = scalar(
+        &pg,
+        seeded.tenant,
+        "SELECT count(*) FROM event WHERE tenant_id = $1 AND aggregate_id = $2 \
+         AND type = 'run.succeeded'",
+        run,
+    )
+    .await;
+    assert_eq!(succeeded, 1, "one run.succeeded");
+}
+
+#[tokio::test]
+async fn a_rejected_handover_cancels_the_run_and_leaves_the_draft() {
+    let _guard = STUBS.lock().await;
+    let (pg, seeded, running) = fixture().await;
+    let (router, _models) = stub_router().await;
+    let (laya, _hits) = stub_laya(Some(0.1)).await;
+    support::set_env("CONVEYOR_EXTERNAL_INFERENCE_URL", &router);
+    support::set_env("CONVEYOR_EXTERNAL_LAYA_URL", &laya);
+    seal_laya_token(&pg, &seeded).await;
+    seed_policy(&pg, &seeded, 0.5, "closed", "handover").await;
+    let (run, _card, approval) = park_handover(&pg, &seeded, &running, "reject_job").await;
+
+    let (status, rejected) = running
+        .invoke(
+            "approvals.decide",
+            support::REVIEWER,
+            json!({"approval_id": approval, "decision": "reject"}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{rejected}");
+    assert_eq!(
+        run_state(&pg, seeded.tenant, run).await.0,
+        "cancelled",
+        "a rejection cancels the parked run"
+    );
+    let meta: Value = scalar(
+        &pg,
+        seeded.tenant,
+        "SELECT meta FROM approval WHERE tenant_id = $1 AND id = $2",
+        approval,
+    )
+    .await;
+    let document =
+        Uuid::parse_str(meta["draft_document_id"].as_str().expect("draft")).expect("uuid");
+    assert_eq!(
+        document_card(&pg, seeded.tenant, document).await,
+        None,
+        "a rejection applies nothing"
+    );
+    assert_eq!(
+        decisions_for_approval(&pg, seeded.tenant, approval).await,
+        0,
+        "a rejection records no ladder decision"
+    );
+}
+
+#[tokio::test]
+async fn a_reclaimed_resume_is_a_no_op() {
+    let _guard = STUBS.lock().await;
+    let (pg, seeded, running) = fixture().await;
+    let (router, _models) = stub_router().await;
+    let (laya, _hits) = stub_laya(Some(0.1)).await;
+    support::set_env("CONVEYOR_EXTERNAL_INFERENCE_URL", &router);
+    support::set_env("CONVEYOR_EXTERNAL_LAYA_URL", &laya);
+    seal_laya_token(&pg, &seeded).await;
+    seed_policy(&pg, &seeded, 0.5, "closed", "handover").await;
+    let (run, _card, approval) = park_handover(&pg, &seeded, &running, "reclaim_job").await;
+    let (status, approved) = running
+        .invoke(
+            "approvals.decide",
+            support::REVIEWER,
+            json!({"approval_id": approval, "decision": "approve"}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{approved}");
+    let job: Value = scalar(
+        &pg,
+        seeded.tenant,
+        "SELECT payload FROM job WHERE tenant_id = $1 AND kind = 'run.resume' \
+         AND payload->>'run_id' = $2::text ORDER BY created_at DESC LIMIT 1",
+        run,
+    )
+    .await;
+    let decision_id =
+        Uuid::parse_str(job["decision_id"].as_str().expect("decision")).expect("uuid");
+    for _ in 0..2 {
+        conveyor_actions::executor::resume_run(
+            &pg.runtime,
+            seeded.tenant,
+            APP_KEY,
+            run,
+            approval,
+            decision_id,
+        )
+        .await
+        .expect("a reclaimed resume is a no-op");
+    }
+    let calls: i64 = scalar(
+        &pg,
+        seeded.tenant,
+        "SELECT count(*) FROM inference_call WHERE tenant_id = $1 AND run_id = $2",
+        run,
+    )
+    .await;
+    assert_eq!(calls, 1, "the reclaim did not buy a second model call");
 }
 
 // ── the release grant (P4) ──────────────────────────────────────────────────────────────────

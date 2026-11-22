@@ -1774,93 +1774,6 @@ window.CONVEYOR_REWORK = {
       "title": "Release compile ignores the knowledge layers and can never refuse release_not_ready or department_conflict"
     },
     {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-w1c-2:T2",
-      "apply_to": "PLATFORM",
-      "artefact": "§7.1/§7.4",
-      "baseline": null,
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "ladder.record refuses rung='human' unless the actor is a person and the cited approval has an accepted approval_decision bound to this decision; ladder.apply_draft requires an accepted decision of a dedicated draft-application gate kind (and/or the document's prompt_sha256/inference_call_id) and refuses a generic or pending approval; tests prove a pending approval and an unrelated accepted laya decision both cannot gate a draft.",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "evidence": [
-            {
-              "line": 1015,
-              "path": "crates/actions/src/ladder/mod.rs",
-              "quote": "            actor_kind: ctx.actor_kind.clone(),",
-              "source": "code"
-            },
-            {
-              "line": 809,
-              "path": "crates/store/src/ladder.rs",
-              "quote": "    ensure_optional_parent_tx(&mut *conn, tenant, Parent::Approval, new.approval_id)",
-              "source": "code"
-            },
-            {
-              "line": 1126,
-              "path": "crates/actions/src/ladder/mod.rs",
-              "quote": "    if matches!(rung, Rung::Rule) || decision.outcome.as_deref() != Some(\"accepted\") {",
-              "source": "code"
-            }
-          ],
-          "rule": "v1-w1c-2",
-          "source": "audit"
-        }
-      ],
-      "key": "v1-w1c-2:T2",
-      "owner_project": "T2",
-      "rule": "v1-w1c-2",
-      "scope": "T2",
-      "severity": "P0",
-      "spec": "§7.1/§7.4",
-      "standard": "SPEC",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "§7.1 makes L3 a human approval (approval + approval_decision) for every irreversible action, and §7.4 says a generated draft becomes applicable only through an action with a gate. ladder.record accepts rung='human' from any caller holding governance:write (the action is kind=internal) and copies ctx.actor_kind with no check that the actor is a person; record_decision_tx only checks that the cited approval row exists in the tenant, never that its approval_decision is accepted or that it covers this draft. ladder.apply_draft then admits any accepted non-rule decision that names the same card, regardless of the question it answered or the artefact it was about, so a routine accepted laya classification also unlocks a generated patch.",
-          "disposition": "rework",
-          "evidence": [
-            {
-              "evidence": [
-                {
-                  "line": 1015,
-                  "path": "crates/actions/src/ladder/mod.rs",
-                  "quote": "            actor_kind: ctx.actor_kind.clone(),",
-                  "source": "code"
-                },
-                {
-                  "line": 809,
-                  "path": "crates/store/src/ladder.rs",
-                  "quote": "    ensure_optional_parent_tx(&mut *conn, tenant, Parent::Approval, new.approval_id)",
-                  "source": "code"
-                },
-                {
-                  "line": 1126,
-                  "path": "crates/actions/src/ladder/mod.rs",
-                  "quote": "    if matches!(rung, Rung::Rule) || decision.outcome.as_deref() != Some(\"accepted\") {",
-                  "source": "code"
-                }
-              ],
-              "rule": "v1-w1c-2",
-              "source": "audit"
-            }
-          ],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P0",
-          "subject": "T2"
-        }
-      ],
-      "title": "The L3 human gate on a generated draft is forgeable by any service principal, and any accepted non-rule decision on the card qualifies"
-    },
-    {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-w3a-1:T7",
       "apply_to": "T7",
       "artefact": "§9.2",
@@ -29825,12 +29738,12 @@ window.CONVEYOR_REWORK = {
       "suppressed": 0
     },
     "SPEC": {
-      "findings": 89,
+      "findings": 88,
       "gaps": 41,
       "p0": 0,
       "p1": 5,
       "p2": 36,
-      "packages": 110,
+      "packages": 109,
       "rules": 8,
       "rules_clean": 2,
       "rules_with_gaps": 6,
@@ -29852,7 +29765,7 @@ window.CONVEYOR_REWORK = {
   "snapshot": "docs/design/data",
   "summary": {
     "by_severity": {
-      "P0": 27,
+      "P0": 26,
       "P1": 150,
       "P2": 155
     },
@@ -29860,18 +29773,18 @@ window.CONVEYOR_REWORK = {
       "MSP": 66,
       "PMP": 49,
       "SAFe": 16,
-      "SPEC": 110,
+      "SPEC": 109,
       "TOGAF": 91
     },
     "by_status": {
-      "open": 329,
+      "open": 328,
       "suppressed": 3
     },
     "duplicates": 0,
-    "open": 329,
-    "packages": 332,
-    "resolved": 11,
-    "subjects": 433,
+    "open": 328,
+    "packages": 331,
+    "resolved": 12,
+    "subjects": 432,
     "suppressed": 3
   }
 };

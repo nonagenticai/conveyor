@@ -429,9 +429,9 @@ grant — it has no op column to widen it with.
 
 **Out of this step.** No new executor kind; no edit to `crates/domain/src/executor.rs`'s trait
 shape; no broker change; no laya change; no PDDL storage; no second compiler; no external runtime;
-no run-resume worker for a `handover` gate; no mid-loop budget enforcement; no migration. A
-`tool_binding` provisioning action remains a follow-up (tests insert raw rows; a live job needs an
-operator row).
+no run-resume worker for a `handover` gate (step 5, #590, owns it); no mid-loop budget enforcement;
+no migration. A `tool_binding` provisioning action remains a follow-up (tests insert raw rows; a
+live job needs an operator row).
 
 **Acceptance.** `crates/actions/tests/executor_runtime.rs` (new),
 `crates/actions/tests/internal_agent_runtime.rs` (new), extensions to
@@ -479,6 +479,48 @@ compiled identity); coverage measures S21 **built** with **4/4** modules; the do
 regenerated; `served-spec.lock.json` is **539** operations with `agent.run` re-hashed, and the
 refresh absorbed four hashes #573 had already left stale on `main`.
 
-**Next lane.** The applying gate: `ladder.apply_draft` and the approval-resume worker for a
-`handover` gate, so an escalated draft can be decisioned and attached without a human editing the
-card. No PDDL storage, no second compiler, no external runtime.
+**Next lane.** Step 5 (issue #590, §16): the applying gate — `ladder.apply_draft` bound to the
+exact draft and the approval-resume worker for a `handover` gate, so an escalated draft can be
+decisioned and attached without a human editing the card. No PDDL storage, no second compiler, no
+external runtime.
+
+## 16. Build plan — step 5: the applying gate (2026-11-22, issue #590)
+
+**Why this step.** Step 4 generated a draft and, on a `handover`, failed the run and opened a
+card-scoped approval: the run was `failed` before a person could decide it, no worker applied the
+draft, and `ladder.apply_draft` admitted any accepted non-rule decision naming the card. SPEC_V2
+§5.1's `waiting_approval → running` edge, §7.1's L3 human gate and §7.4's "a generated draft applies
+only through a gate" describe the target; rework finding `v1-w1c-2:T2` (P0) names the forgeable
+gate. This step joins them: the handover parks, the person decides, the resume applies.
+
+**P1 — the gate's binding.** A new `gate.draft_apply` kind for the L3 human decision; `ladder.record`
+accepts `rung=human` only from a person and only citing an approved approval with an approve
+decision (enforced in the one store writer); `ladder.apply_draft` accepts only an accepted non-rule
+decision of `gate.precheck` (L1) or `gate.draft_apply` (L3) whose `meta` names this draft
+(`draft_document_id`, and `prompt_sha256`/`run_id` when the document carries them). The apply is one
+`pub(crate)` helper shared with the resume worker; `documents.update` stays closed to generated
+drafts.
+
+**P2 — the handover parks the run.** `decide()` returns a disposition instead of opening a gate in
+its own transaction; the finish transaction opens the `executor` approval with
+`open_gate_with_meta_tx` (`running → waiting_approval`, meta naming the draft, position/attempt,
+threshold, policy and laya config), records the step `succeeded` and its judge, and does not fail
+the run. The draft stays unattached; a retried `run.execute` is a no-op because the run has left
+`queued`.
+
+**P3 — decide, then resume.** An `executor` gate is a person's act (the approval writer enforces
+`decided_by_kind = human`). On approval, `approvals.decide` records the L3 `gate.draft_apply`
+decision bound to the approval and the draft, settles the run `waiting_approval → running`, and
+enqueues `run.resume`. The worker applies the draft through the one helper, finishes the run
+`succeeded` with one `run.succeeded`, and never calls the model. Rejection and expiry cancel the run
+and leave the draft unattached; a reclaimed resume is a no-op.
+
+**Out of this step.** No automatic apply of an L1-accepted draft; no new executor kind; no laya
+change; no second apply path; no PDDL storage; no secondary prompt compiler; no mid-loop budget
+enforcement; no `memory.remember` write-back; no card-driven run creation; no live model or laya
+proof; no migration.
+
+**Acceptance.** `crates/actions/tests/draft_apply.rs` (new), `internal_agent_runtime.rs` (extended
+with the parked/approved/rejected/reclaimed scenarios), the rewritten ladder tests, and
+`apps/server/tests/approval_expire.rs` (stays green). The scenarios are issue #590 P1–P3; the
+receipt is `docs/evidence/S21-APPLY.md`.

@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>S21 step 5 — the applying gate (issue #590) · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S21-APPLY.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="s21-step-5--the-applying-gate-issue-590">S21 step 5 — the applying gate (issue #590)</h1>
+<p><strong>Measured at <code>2126904b</code>, 2026-11-22.</strong> The PR's <code>ci</code> run <strong>45064933007</strong> is green: <code>checks-shard (1)</code> <strong>1925/1925 passed</strong>, <code>checks-shard (2)</code> <strong>1713/1713 passed</strong>, the <code>checks</code> aggregate passed, and <code>image</code>, <code>service-image</code>, <code>design-pack</code>, <code>dco</code>, <code>preflight</code>, <code>lint</code>, <code>no-private-refs</code> and <code>secret-scan</code> passed. The final commit adds the executor-gate writer check and its store test; PR #592 attests that final run.</p>
+<h2 id="what-changes">What changes</h2>
+<ul>
+<li>A <code>handover</code> parks the run in <code>waiting_approval</code>; the <code>executor</code> approval names the draft.</li>
+<li><code>approvals.decide</code> records the L3 <code>gate.draft_apply</code> decision, settles the run <code>running</code> and enqueues <code>run.resume</code>; an <code>executor</code> gate refuses a machine decider in the approval writer.</li>
+<li><code>run.resume</code> applies the draft through the one hardened <code>apply_draft_tx</code> and finishes the run; it never calls the model.</li>
+<li><code>ladder.record</code> refuses a forged human rung or a pending approval; <code>ladder.apply_draft</code> requires the decision to name the exact draft (rework <code>v1-w1c-2:T2</code>).</li>
+</ul>
+<h2 id="scenarios">Scenarios</h2>
+<table>
+<thead>
+<tr>
+<th>Scenario</th>
+<th>Test</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>P1.1</td>
+<td><code>decision_ladder::a_generated_draft_cannot_transition_a_card</code></td>
+<td>pass at 2126904b</td>
+</tr>
+<tr>
+<td>P1.2</td>
+<td><code>draft_apply::an_unbound_decision_cannot_apply_a_draft</code></td>
+<td>pass at 2126904b</td>
+</tr>
+<tr>
+<td>P1.3</td>
+<td><code>draft_apply::a_decision_bound_to_another_draft_is_refused</code></td>
+<td>pass at 2126904b</td>
+</tr>
+<tr>
+<td>P1.4</td>
+<td><code>draft_apply::a_human_decision_requires_a_person_and_an_approved_approval</code> + the rewritten <code>decision_ladder::a_rule_a_laya_and_a_human_decision_share_one_audit_shape</code></td>
+<td>pass at 2126904b</td>
+</tr>
+<tr>
+<td>P1.5</td>
+<td><code>draft_apply::an_approved_human_decision_applies_its_draft</code></td>
+<td>pass at 2126904b</td>
+</tr>
+<tr>
+<td>P2.1/P2.2</td>
+<td><code>internal_agent_runtime::a_handover_gate_parks_the_run_and_opens_an_approval</code></td>
+<td>pass at 2126904b</td>
+</tr>
+<tr>
+<td>P3.1</td>
+<td><code>internal_agent_runtime::an_approved_handover_applies_the_draft_and_finishes_the_run</code></td>
+<td>pass at 2126904b</td>
+</tr>
+<tr>
+<td>P3.2</td>
+<td>the same test (draft attached, one <code>inference_call</code>, one <code>run.succeeded</code>)</td>
+<td>pass at 2126904b</td>
+</tr>
+<tr>
+<td>P3.3</td>
+<td><code>internal_agent_runtime::a_rejected_handover_cancels_the_run_and_leaves_the_draft</code> + <code>apps/server/tests/approval_expire.rs</code></td>
+<td>pass at 2126904b</td>
+</tr>
+<tr>
+<td>P3.4</td>
+<td><code>internal_agent_runtime::a_reclaimed_resume_is_a_no_op</code></td>
+<td>pass at 2126904b</td>
+</tr>
+<tr>
+<td>P3 writer</td>
+<td><code>store::executor_gate::an_executor_gate_refuses_a_machine_decision</code></td>
+<td>final PR run</td>
+</tr>
+</tbody>
+</table>
+<h2 id="reversal-evidence">Reversal evidence</h2>
+<p>The negative scenarios are the guard proofs; each names the guard it exercises:</p>
+<ul>
+<li>remove the draft-binding check → <code>an_unbound_decision_cannot_apply_a_draft</code> would attach;</li>
+<li>remove the prompt-hash/document check → <code>a_decision_bound_to_another_draft_is_refused</code> would apply the wrong draft;</li>
+<li>remove the person check → <code>a_human_decision_requires_a_person_and_an_approved_approval</code> would record a service actor;</li>
+<li>remove the approval-state check → that test's pending approval would resolve the decision;</li>
+<li>remove the executor-gate writer check → <code>an_executor_gate_refuses_a_machine_decision</code> would approve a machine decision.</li>
+</ul>
+<p>The guards were not separately deleted in a local run (no local Rust compilation); the negative tests are the standing evidence.</p>
+<h2 id="generated">Generated</h2>
+<ul>
+<li><code>served-spec.lock.json</code> — <strong>539</strong> operations, <code>--check-lock</code> <strong>OK</strong>.</li>
+<li>Rework <code>v1-w1c-2:T2</code> — <strong>cleared</strong> by the acceptance command; the findings ledger marks it resolved.</li>
+<li><code>seed/programme.json</code> links #15, #581 and #590; coverage, issues and the docs pack regenerated; <code>check-data</code>, <code>check-architecture</code>, <code>check-docs</code> and <code>publish-standards --check</code> green.</li>
+</ul>
+<h2 id="residuals">Residuals</h2>
+<ul>
+<li>Automatic application of an L1-accepted draft (a policy question).</li>
+<li>Mid-loop token/cost budget enforcement, <code>memory.remember</code> write-back, card-driven run creation, a <code>tool_binding</code> provisioning action, and a live model/laya proof.</li>
+<li><code>run.execute</code>'s retry after a handler DB fault is a pre-existing #581 gap; a reclaimed job no-ops because the run has left <code>queued</code>.</li>
+</ul>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/S21-APPLY.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

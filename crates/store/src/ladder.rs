@@ -49,6 +49,15 @@ pub enum LadderStoreError {
     /// The domain refused the write.
     #[error(transparent)]
     Illegal(#[from] LadderError),
+    /// A human decision was recorded by a non-person actor.
+    #[error("a human decision must be recorded by a person")]
+    HumanRequiresPerson,
+    /// The approval a human decision cites is not approved with an approve decision.
+    #[error("the cited approval is not approved with an approve decision")]
+    ApprovalNotAccepted,
+    /// The approval a human decision cites belongs to another card.
+    #[error("the cited approval belongs to another card")]
+    ApprovalWrongCard,
     /// A stored vocabulary value no longer parses.
     #[error("the database holds {what} = {value:?}, which the domain does not know")]
     Vocabulary {
@@ -809,6 +818,31 @@ pub async fn record_decision_tx(
     ensure_optional_parent_tx(&mut *conn, tenant, Parent::Approval, new.approval_id)
         .await
         .map_err(LadderStoreError::Parent)?;
+
+    // The L3 human rung is a person's act, and the approval it cites must actually have resolved
+    // in its favour. This lives in the one writer every decision path traverses, so
+    // `ladder.record`, the `approvals.decide` path and a later caller cannot disagree
+    // (SPEC_V2 §7.1; rework `v1-w1c-2:T2`).
+    if new.rung == Rung::Human {
+        if new.actor_kind != "user" {
+            return Err(LadderStoreError::HumanRequiresPerson);
+        }
+        if let Some(approval_id) = new.approval_id {
+            let Some((approval_card, approved)) =
+                crate::approval::approved_gate_tx(&mut *conn, tenant, approval_id).await?
+            else {
+                return Err(LadderStoreError::NotFound { what: "approval" });
+            };
+            if !approved {
+                return Err(LadderStoreError::ApprovalNotAccepted);
+            }
+            if let (Some(decision_card), Some(approval_card)) = (new.card_id, approval_card)
+                && decision_card != approval_card
+            {
+                return Err(LadderStoreError::ApprovalWrongCard);
+            }
+        }
+    }
 
     let sql = format!(
         "INSERT INTO decision
