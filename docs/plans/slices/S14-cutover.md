@@ -32,7 +32,7 @@ task, and fr / requirements_management / Planka decommissioned — each dumped f
 | P1 | S13 closed | **Historical (executed 2026-11-18):** S13's close deactivated every flow it replaces, so the count was 0 before this slice; the n8n database was dumped at T+14 and deleted with its namespace (measured 2026-11-19: `select datname from pg_database where datname='n8n'` → no row). `parity/n8n-dispositions.tsv` (S13's deliverable) has 348 rows |
 | P2 | S06b closed | `docs/evidence/S06b-agent-task.md` exists with a `run_id`, a project id and one decided approval, plus the imported tool keys (`projects.create`, not `tool.*`) |
 | P3 | the contract and its native map | `python3 scripts/check-parity.py --require-native` green: the signed `parity/parity.yaml` is the capability input and `parity/native.tsv` is the acceptance gate — every `used` id carries an `action:` / `test:` / `replacement:` / `dropped:` disposition. The legacy `probe:` acceptances are reachability evidence, not the gate |
-| P4 | Old system frozen (D8) | **NOT PROVEN in-tree (v1-s14-1):** `docs/cutover/` is absent at HEAD, so `docs/cutover/freeze-log.md` does not exist. The freeze is recorded only in this plan and in gitops-production #5333; until the log is committed this precondition is unmet and the §7 gate stays red. |
+| P4 | Old system frozen (D8) | **R7 disposition (2026-11-22): the claim is corrected, not deferred.** The freeze log cannot exist — fr, n8n and requirements_management are decommissioned and the rehearsal hosts are gone — so under the owner decision `01a202a3-76b1-72da-8a41-7a1662b91fc7` (no deferrals; every finding executes) this row claims only the surviving proof: the old system's retirement is evidenced by P1's measurements (no `n8n` database, namespace deleted, `parity/n8n-dispositions.tsv` with 348 rows) and by gitops-production #5333. No receipt is asserted and no waiver is recorded. |
 | P5 | 8930 free | local: `lsof -nP -iTCP:8930 -sTCP:LISTEN` → empty (measured free 2026-11-07). In-cluster: `kubectl get svc -A -o json \| jq -r '.items[].spec.ports[]?.port' \| grep -x 8930` → empty |
 | P6 | Disk | `df -h /srv/backups` on master ≥ 3× the three dumps; doubt ⇒ STOP, never prune |
 
@@ -94,11 +94,14 @@ PR #483) and the native map (`parity/native.tsv`, `scripts/check-parity.py`).
 
 ## 6. Build order
 
-⚠️ **Evidence status (v1-s14-1, 2026-11-21).** The `R1`–`R7` receipts named in the steps below were
-never committed: `docs/cutover/` is absent at HEAD, so every `R*` filename below is a **requirement,
-not a receipt**. The live acceptance evidence that exists is the native harness shipped by #8
-(PR #483); its run result is recorded only in that PR's body, and P6's
-`docs/evidence/RELEASE-<sha>.md` is also absent. Do not cite a step's receipt name as proof.
+⚠️ **Evidence status (v1-s14-1, corrected under R7 on 2026-11-22).** The `R1`–`R7` receipts named
+in the steps below were never committed and cannot be reconstructed — the systems they rehearsed
+are decommissioned — so every `R*` filename below is a **requirement, not a receipt**, and this
+plan no longer claims otherwise. Under the owner decision `01a202a3-76b1-72da-8a41-7a1662b91fc7`
+the surviving proof is the native harness shipped by #8 (PR #483, `acceptance/native.toml`,
+`scripts/acceptance.py`, `.github/workflows/acceptance.yml`), the native map (`parity/native.tsv`,
+`scripts/check-parity.py`) and the deployed service's own probes. Do not cite a step's receipt
+name as proof; cite the surviving proof or record the row as unmet.
 
 1. **Name decision (day 1).** `GH_SHIM=off gh api repos/nonagenticai/conveyor` → `archived=true`; rename:
    `GH_SHIM=off gh repo rename conveyor-archive -R nonagenticai/conveyor --yes`. George authorises (deleting forfeits
