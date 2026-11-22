@@ -935,16 +935,6 @@ pub fn precheck<'a>(
         return Err(ActionError::workflow(spec.name));
     }
 
-    // #526: the run-level inference pre-call gate. A capturing action buys a billable model call,
-    // so the run it belongs to must admit it before the handler or the destination is reached.
-    // It runs before the input is parsed (the broker's order: budget, then validate) and before
-    // the broker dispatch, so neither a refused call nor a tool that would reach one is charged.
-    if spec.captures_usage
-        && let Some(run_id) = request.usage.as_ref().and_then(|usage| usage.run_id)
-    {
-        enforce_run_budget(pool, registry, tenant, run_id).await?;
-    }
-
     // The reserved `_version` member is stripped BEFORE validation (CONTRACT §6); the
     // header, when present, has already been folded into `precondition` by the route. A
     // JSON number is a row version; a JSON string is an opaque ETag (a table with no
@@ -981,12 +971,38 @@ pub fn precheck<'a>(
     })
 }
 
+/// #526: the run-level inference pre-call gate. A capturing action buys a billable model call,
+/// so the run it belongs to must admit it before the handler or the destination is reached.
+/// It runs before the input is parsed (the broker's order: budget, then validate) and before
+/// the broker dispatch, so neither a refused call nor a tool that would reach one is charged.
+///
+/// It lives beside [`precheck`] rather than inside it: #579 made `precheck` synchronous so the
+/// async submit can run the cheap checks without a pool, and this gate needs the run's budget.
+async fn enforce_request_budget(
+    pool: &PgPool,
+    registry: &Registry,
+    tenant: TenantId,
+    request: &InvokeRequest,
+) -> Result<(), ActionError> {
+    let Some(spec) = registry.get(&request.action) else {
+        return Ok(());
+    };
+    if !spec.captures_usage {
+        return Ok(());
+    }
+    let Some(run_id) = request.usage.as_ref().and_then(|usage| usage.run_id) else {
+        return Ok(());
+    };
+    enforce_run_budget(pool, registry, tenant, run_id).await
+}
+
 pub async fn invoke(
     pool: &PgPool,
     registry: &Registry,
     tenant: TenantId,
     request: InvokeRequest,
 ) -> Result<InvokeOutcome, ActionError> {
+    enforce_request_budget(pool, registry, tenant, &request).await?;
     let Prechecked {
         spec,
         input,
