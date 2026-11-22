@@ -15,3 +15,5 @@ kata as a run id without measurement; WBS deliverable accepted.
 
 **Stopped at:** the demo credit, which needs the tranche-4 demo cadence (peer 1) and the pending
 baseline decision.
+
+T4: 32 acts in `transcript.jsonl`; the last run recorded 2.
