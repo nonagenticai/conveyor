@@ -177,6 +177,13 @@ def pointer_problems(std: dict[str, Any], snapshot: dict[str, Any]) -> list[str]
                 # `check-standards.cjs` still requires the package.
                 if source.get("optional"):
                     continue
+                # The records session's flip makes a live-projected source mandatory while the
+                # committed pack is still frozen before the projection: the pointer is absent
+                # from this snapshot and is not a typo. `projection: live` says exactly that —
+                # the section stays absent at the declared severity, and the pointer check
+                # resumes once a live snapshot carries the collection.
+                if source.get("projection") == "live":
+                    continue
                 file = str(source.get("file") or "")
                 document = snapshot.get(Path(file).stem)
                 if document is None:
@@ -2082,7 +2089,8 @@ def mandatory_safe_standard(std: dict[str, Any]) -> dict[str, Any]:
     """
     variant = copy.deepcopy(std)
     safe_art = variant["templates"]["safe-art"]
-    safe_art["required"].append("Shared configuration")
+    if "Shared configuration" not in safe_art["required"]:
+        safe_art["required"].append("Shared configuration")
     safe_art.setdefault("sources", {}).update({
         "Shared configuration": [
             {"kind": "computed", "name": "shared_config", "severity": "P1"}
@@ -2119,7 +2127,8 @@ def mandatory_safe_standard(std: dict[str, Any]) -> dict[str, Any]:
             if source.get("pointer") == "/lessons":
                 source.pop("optional", None)
                 source["severity"] = "P1"
-    retro["required"].append("Kata candidates")
+    if "Kata candidates" not in retro["required"]:
+        retro["required"].append("Kata candidates")
     retro.setdefault("sources", {})["Kata candidates"] = [
         {"kind": "computed", "name": "kata_candidates", "severity": "P1"}
     ]
@@ -2274,13 +2283,28 @@ def self_test_wsjf(outputs: Path, std: dict[str, Any]) -> None:
 
 def self_test_demo_and_lessons_mandatory(outputs: Path, std: dict[str, Any]) -> None:
     """Demo-credit and lesson absence is a P2 section gap while optional, P1 once mandatory."""
+    # The committed standard is already flipped (the records session's edits), so the P2 half
+    # restores the optional flag explicitly and the P1 half reads the standard as committed.
+    optional_std = copy.deepcopy(std)
+    for category in ("system-demo", "pi-objectives", "inspect-adapt"):
+        for sources in (optional_std["templates"][category].get("sources") or {}).values():
+            for source in sources:
+                if source.get("pointer") in {"/demo_credits", "/lessons"}:
+                    source["optional"] = True
+                    source.pop("projection", None)
+    # The flip also made "Kata candidates" a required heading; the pre-flip shape has neither the
+    # heading nor its computed source, so the P2 half removes both.
+    retro = optional_std["templates"]["inspect-adapt"]
+    if "Kata candidates" in retro["required"]:
+        retro["required"].remove("Kata candidates")
+    (retro.get("sources") or {}).pop("Kata candidates", None)
     for category, key, headings in (
         ("system-demo", "demo_credits", ["Evidence", "Credits"]),
         ("inspect-adapt", "lessons", ["Lessons", "Actions"]),
     ):
         fixture = safe_evidence_fixture()
         fixture["msp"][key] = []
-        document, findings = generate(std, fixture, outputs)
+        document, findings = generate(optional_std, fixture, outputs)
         by_id = {artefact["id"]: artefact for artefact in document["artefacts"]}
         artefact = by_id[f"std-safe-{category}-pg1"]
         assert artefact["status"] == "partial", (
