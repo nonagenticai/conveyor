@@ -71,12 +71,13 @@ pub enum OrganisationStoreError {
         kind: String,
         /// The first department, in declared order.
         left_department: String,
-        /// Its value.
-        left_value: Value,
+        /// Its value (boxed: two inline JSON values push the error past clippy's
+        /// `result_large_err` threshold, which every seed function returning it pays for).
+        left_value: Box<Value>,
         /// The second department, in declared order.
         right_department: String,
-        /// Its value.
-        right_value: Value,
+        /// Its value, boxed for the same reason.
+        right_value: Box<Value>,
     },
     /// The release does not belong to the job the binding names.
     #[error("the release does not belong to that job")]
@@ -713,9 +714,9 @@ fn resolve_layer_values(
             return Err(OrganisationStoreError::DepartmentConflict {
                 kind: kind.to_owned(),
                 left_department: left_department.to_owned(),
-                left_value: left_value.clone(),
+                left_value: Box::new(left_value.clone()),
                 right_department: right_department.to_owned(),
-                right_value: right_value.clone(),
+                right_value: Box::new(right_value.clone()),
             });
         }
 

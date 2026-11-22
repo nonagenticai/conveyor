@@ -978,7 +978,7 @@ async fn coach_remedy(
         &mut *tx,
         &ctx,
         &interruption,
-        &remedy_class,
+        remedy_class,
         &triage_class,
         confidence,
     )
