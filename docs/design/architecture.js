@@ -91,8 +91,8 @@ window.ArchitecturePack = (function () {
   P->>API: start a run for a card and binding
   API->>WF: enqueue the run
   WF->>B: check the pinned release_hash
-  alt stale or retired binding
-    B-->>WF: 409 job_binding_stale
+  alt retired binding, stale pin or unknown kind
+    B-->>WF: 409 job_binding_stale / unknown_executor_kind
     WF-->>P: refused before any model call
   else pinned release
     WF->>PC: compile the step
@@ -104,9 +104,9 @@ window.ArchitecturePack = (function () {
       BR-->>WF: status, data, checks, next
     end
     opt internal_agent executor
-      PC-->>R: generation over the compiled prompt
-      R-->>WF: draft artefact only
-      WF->>L: decide the configured option set
+      PC-->>R: generation over the compiled envelope
+      R-->>WF: unattached draft artefact
+      WF->>L: gate.precheck over the draft
       L-->>WF: answer and confidence
     end
     opt gate requires approval
@@ -395,7 +395,7 @@ window.ArchitecturePack = (function () {
       title: "Run execution — binding, compile, decide, gate",
       spec: "§4.4, §4.5, §7.7",
       caption:
-        "A stale or retired binding refuses 409 before any model call. The internal agent receives the four sources; its output is a draft, and the gate is the only route to a transition.",
+        "A retired binding, a stale pin or an unknown executor kind refuses before any model call. The internal agent receives the four sources compiled into one envelope; the release grant ∩ the tenant binding bounds the tools offered; its output is an unattached draft, and a gate is the only route to a transition.",
     },
     "broker-sequence": {
       title: "Tool broker — one call path",

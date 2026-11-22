@@ -828,7 +828,7 @@ async fn dispatch(
                 "webhook delivered"
             );
         }
-        "run.execute" => run_execute(pool, tenant, payload).await?,
+        "run.execute" => run_execute(pool, tenant, &config.app_key, payload).await?,
         "run.reap" => run_reap(pool, tenant).await?,
         "process.step" => process_step(pool, tenant, &config.app_key, payload).await?,
         // S13: one node attempt of a workflow run (the run's single driving tick).
@@ -1038,55 +1038,28 @@ async fn andon_engaged(pool: &PgPool, tenant: TenantId) -> bool {
     }
 }
 
-/// `run.execute` — start a queued run.
+/// `run.execute` — start, and for a bound run execute, one queued run.
 ///
-/// This is a start hook, not an engine: S11/S13 replace the body with the process or
-/// workflow executor. The transition is only `queued → running`; a run that is already
-/// running, waiting on a gate, or terminal is finished with no transition and no second
-/// `run.started`, which is what makes a reclaimed job safe.
-async fn run_execute(pool: &PgPool, tenant: TenantId, payload: &Value) -> Result<(), JobFailure> {
+/// The dispatch itself lives in `conveyor_actions::executor` (S21 step 4, ADR 0010): an unbound
+/// run keeps the T0 `queued → running` hook, a bound run is re-checked against its pinned release
+/// and handed to the executor its `executor_kind` names. A typed refusal there finishes the run
+/// `failed` and returns success; only a database or transport failure is retried.
+async fn run_execute(
+    pool: &PgPool,
+    tenant: TenantId,
+    app_key: &str,
+    payload: &Value,
+) -> Result<(), JobFailure> {
     let run_id = want_uuid(payload, "run_id", "run.execute")?;
-    let mut tx = store::begin_scoped(pool, tenant).await.map_err(retryable)?;
-    let Some(run) = store::run::get_run_tx(&mut tx, tenant, run_id)
+    conveyor_actions::executor::execute_run(pool, tenant, app_key, run_id)
         .await
-        .map_err(run_failure)?
-    else {
-        // The run is gone; replaying cannot bring it back.
-        tx.commit().await.map_err(retryable)?;
-        tracing::warn!(run = %run_id, "run.execute: the run no longer exists");
-        return Ok(());
-    };
-    if run.status != RunStatus::Queued {
-        tx.commit().await.map_err(retryable)?;
-        tracing::info!(
-            run = %run_id,
-            status = run.status.as_str(),
-            "run.execute: the run already left queued; nothing to start"
-        );
-        return Ok(());
-    }
-    match store::run::transition_run_tx(&mut tx, tenant, run_id, RunStatus::Running).await {
-        Ok(started) => {
-            emit_event(
-                &mut tx,
-                tenant,
-                &run_topic(run_id),
-                "run",
-                run_id,
-                "run.started",
-                serde_json::json!({ "run_id": run_id, "attempt": started.attempt }),
-            )
-            .await?;
-        }
-        // The state moved between the read and the write: another driver started it. The
-        // work is done, so the job succeeds rather than retrying into the same refusal.
-        Err(store::run::RunStoreError::Illegal(_)) | Err(store::run::RunStoreError::NotFound) => {
-            tracing::info!(run = %run_id, "run.execute: the transition lost the race");
-        }
-        Err(error) => return Err(run_failure(error)),
-    }
-    tx.commit().await.map_err(retryable)?;
-    Ok(())
+        .map_err(|failure| {
+            if failure.retryable {
+                JobFailure::retryable(failure.detail)
+            } else {
+                JobFailure::permanent(failure.detail)
+            }
+        })
 }
 
 /// `run.reap` — fail every run whose driving `run.execute` job died.
