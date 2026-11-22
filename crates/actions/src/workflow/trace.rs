@@ -16,11 +16,11 @@ pub use conveyor_workflow::trace::{
     DiffMode, DiffReport, TraceDelta, TraceDiffError, TraceRecord, diff_records, diff_records_with,
     parse_jsonl,
 };
-// The old side of the gate is a recorded n8n execution (S13 step 10); the projection lives in
+// The old side of the gate is a recorded flow execution (S13 step 10); the projection lives in
 // `conveyor-workflow` and reaches the CLI the same way.
-pub use conveyor_workflow::n8n::{
-    Projected as N8nProjected, Unmapped as N8nUnmapped, project_execution as project_n8n_execution,
-    read_snapshot as read_n8n_snapshot,
+pub use conveyor_workflow::recorded_flow::{
+    Projected as RecordedFlowProjected, Unmapped as RecordedFlowUnmapped,
+    project_execution as project_recorded_flow, read_snapshot as read_recorded_flow_snapshot,
 };
 // The reviewed expectation (S13 §5.4) is the gate's second entry point: the CLI reaches it here for
 // the same reason as the projection — the server already depends on `conveyor-actions`.

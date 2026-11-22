@@ -7,7 +7,7 @@
 //! the trace as forensics, and [`DiffMode::Migration`] ignores them.
 //!
 //! A step names both ids: `node_id` is the conveyor flow's id (what the comparison uses) and
-//! `old_node_id` is the n8n node name (provenance, never compared). Derivation normalises the old
+//! `old_node_id` is the recorded-flow node name (provenance, never compared). Derivation normalises the old
 //! name and refuses it by name when the flow has no such node, so a mapping is never skipped.
 
 use conveyor_domain::compare::content_hash;
@@ -23,7 +23,7 @@ use crate::trace::{
 /// Where an expectation came from. A reader can re-run the derivation and get the same steps.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Provenance {
-    /// The recorded n8n execution id.
+    /// The recorded flow execution id.
     pub execution_id: i64,
     /// `sha256:` of the **projected records** the steps were derived from (canonical JSON of the
     /// projection, not of the recorded file). This hash pins what the derivation actually read.
@@ -39,7 +39,7 @@ pub struct ExpectedStep {
     pub position: u32,
     /// The conveyor flow's node id — the comparison value.
     pub node_id: String,
-    /// The n8n node name it came from — provenance, never compared.
+    /// The recorded-flow node name it came from — provenance, never compared.
     pub old_node_id: String,
     /// The consequential effect after the S0 effect map.
     pub effect: String,

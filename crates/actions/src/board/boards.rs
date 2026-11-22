@@ -18,7 +18,7 @@ use crate::board::{invalid, row_version, store_error, views::IdIn};
 use crate::invoke::{ActionError, HandlerCtx};
 use crate::spec::HandlerOutput;
 
-/// The one role enum (S05 §5): Planka's `editor` maps to `member`, and there is no
+/// The one role enum (S05 §5): the board application's `editor` maps to `member`, and there is no
 /// `project_manager` or `board_subscription` row anywhere on this path.
 pub const ROLES: [&str; 4] = ["owner", "admin", "member", "viewer"];
 
@@ -89,7 +89,7 @@ async fn boards_get(
 
 /// Add a member to a board, or change the one membership that already exists.
 ///
-/// One row per `(board, user)` with one role out of `owner|admin|member|viewer` — Planka's
+/// One row per `(board, user)` with one role out of `owner|admin|member|viewer` — the board application's
 /// `board_membership` + `project_manager` + `board_subscription` folded into this row
 /// (S05 §5). Absent `can_comment`/`watching` keep the stored value; absent `role` keeps it
 /// too, defaulting to `member` on a first insert.
