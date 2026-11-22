@@ -1,0 +1,10 @@
+{
+ "id": "01a1e9df-27b8-7827-ae4e-6d48ca5904e8",
+ "baseline": {
+  "value": 28.0,
+  "unit": "open register findings",
+  "measured_at": "2026-11-22",
+  "method": "check-registers.py against the recorded snapshot",
+  "definition": "check-registers at /tmp/conveyor-526-reg-snap"
+ }
+}
