@@ -208,6 +208,7 @@ async fn a_measured_baseline_enables_realization() {
         f.tenant,
         &NewBenefitMeasurement {
             benefit_id: f.benefit,
+            tranche_id: None,
             kind: "post".to_owned(),
             target_value: Some(8.0),
             actual_value: Some(14.0),

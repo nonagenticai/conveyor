@@ -2752,6 +2752,11 @@ async fn prepare(sample: &Sample, pg: &support::Pg, ctx: &Ctx) {
             let b = seed_parity_benefit(pg, ctx, g).await;
             ctx.push(sample.name, b);
         }
+        "benefits.measurement_list" => {
+            let g = seed_parity_programme(pg, ctx).await;
+            let b = seed_parity_benefit(pg, ctx, g).await;
+            ctx.push(sample.name, b);
+        }
         "benefits.update" | "benefits.delete" | "benefits.retire" => {
             let g = seed_parity_programme(pg, ctx).await;
             let b = seed_parity_benefit(pg, ctx, g).await;
@@ -7481,6 +7486,14 @@ fn spine_samples() -> Vec<Sample> {
                 })
             });
             expecting(sample, 201)
+        },
+        {
+            // The read-back `benefits.measure` claims: the same list over both transports.
+            let mut sample = plain("benefits.measurement_list", json!({}), None);
+            sample.prepare = true;
+            sample.input =
+                Box::new(|ctx: &Ctx| json!({"benefit_id": ctx.pop("benefits.measurement_list")}));
+            expecting(sample, 200)
         },
         {
             let mut sample = plain("benefits.link", json!({}), None);
