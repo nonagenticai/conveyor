@@ -4005,7 +4005,7 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
             sample.input = Box::new(|ctx: &Ctx| {
                 json!({
                     "id": ctx.pop("project_requests.update"),
-                    "external_origin": "planka",
+                    "external_origin": "board-application",
                 })
             });
             sample

@@ -2,7 +2,7 @@
 //! S13 §5.8's two computed handlers: `wip.pull` and `err.card`.
 //!
 //! **`wip.pull`** — the platform job behind S13's re-authored `wip.pull` flow (R346). The old
-//! n8n flow selected TODO cards against a WIP limit and moved them to READY. The conveyor's
+//! recorded flow selected TODO cards against a WIP limit and moved them to READY. The conveyor's
 //! board already carries the cap (`list.wip_limit`) and the move invariants
 //! (`domain::board::may_move`), so the selection is the only new code: the **intake** lane's
 //! live cards in position order, up to `wip_limit − active_count`. Every move goes through the
@@ -15,7 +15,7 @@
 //! is a real action invocation with a per-run `Idempotency-Key`, so an at-least-once delivery
 //! cannot comment or start the coach twice.
 //!
-//! Recorded deltas vs. the old flows (`parity/n8n-dispositions.tsv`): the conveyor has no
+//! Recorded deltas vs. the old flows (`parity/flow-dispositions.tsv`): the conveyor has no
 //! per-card `requires` graph, no structural/closure card-type classes and no `DROPPED` lane;
 //! the kata-board exclusion is not ported (a kata project uses its own board). A card the
 //! matrix refuses is skipped and counted, never treated as a job failure.

@@ -189,8 +189,8 @@ pub enum TraceDiffError {
         /// The position still running.
         position: u32,
     },
-    /// A recorded n8n document (execution or workflow snapshot) cannot be projected.
-    #[error("n8n envelope: {detail}")]
+    /// A recorded flow document (execution or workflow snapshot) cannot be projected.
+    #[error("recorded flow envelope: {detail}")]
     Envelope {
         /// What is wrong with the document.
         detail: String,
@@ -290,7 +290,7 @@ pub fn to_jsonl(records: &[TraceRecord]) -> Result<String, TraceDiffError> {
 /// Parse JSONL into records.
 ///
 /// Blank lines are skipped. A line that is not a [`TraceRecord`] is refused with its number; the
-/// n8n `execution_data` envelope is not a record and is refused the same way (steps 10–13 project
+/// recorded-flow `execution_data` envelope is not a record and is refused the same way (steps 10–13 project
 /// it before this point).
 pub fn parse_jsonl(text: &str) -> Result<Vec<TraceRecord>, TraceDiffError> {
     let mut records = Vec::new();
@@ -339,8 +339,8 @@ pub fn effects(records: &[TraceRecord]) -> Result<Vec<Effect>, TraceDiffError> {
 
 /// Which comparison rules a diff applies.
 ///
-/// The two systems that produce traces store different payloads for the same effect: an old n8n
-/// node returns Planka's or RM's row, the conveyor returns its own view. A cross-system
+/// The two systems that produce traces store different payloads for the same effect: an old recorded-flow
+/// node returns the board application's or work-management application's row, the conveyor returns its own view. A cross-system
 /// comparison therefore cannot compare `input_hash`/`output_hash` — they hash different schemas.
 /// Owner ruling 2026-11-09: the cross-system hash rule is **thrown out**, not normalised; the
 /// ordered effect and outcome are the comparison. Definition ids may not contain spaces

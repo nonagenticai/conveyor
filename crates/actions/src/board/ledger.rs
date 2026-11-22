@@ -3,7 +3,7 @@
 //!
 //! ADR 0008 decides the home and the shape: `card_ledger`, keyed by the conveyor card id, with
 //! two kinds (`claim`, `fact`), a free-form `source` object and an optional laya `verdict`. The
-//! old `planka_card_id` is not carried — nothing is copied at cutover (D7).
+//! old board card id is not carried — nothing is copied at cutover (D7).
 //!
 //! The ledger is append-only by the module's surface: the append action is the only write, there
 //! is no update and no delete action, and the table has no `version` because nothing edits a row.

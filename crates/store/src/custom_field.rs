@@ -1,6 +1,6 @@
 //! Custom fields and their per-card values (S05 §5, data-arch §2.5).
 //!
-//! Planka models `group → field → value`; the group is **flattened** into
+//! The board application models `group → field → value`; the group is **flattened** into
 //! `group_name` + `group_position` (S5-D3) and is never an entity, so nothing here joins a
 //! group table.
 //!

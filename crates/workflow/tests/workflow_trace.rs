@@ -134,9 +134,9 @@ fn a_running_position_makes_the_trace_incomplete() {
 }
 
 #[test]
-fn parse_refuses_the_n8n_envelope() {
+fn parse_refuses_the_recorded_flow_envelope() {
     let envelope = r#"{"data":{"resultData":{"runData":{}}}}"#;
-    let error = parse_jsonl(envelope).expect_err("the n8n envelope is not a trace");
+    let error = parse_jsonl(envelope).expect_err("the recorded flow envelope is not a trace");
     match error {
         TraceDiffError::Parse { line, .. } => assert_eq!(line, 1),
         other => panic!("unexpected error: {other:?}"),

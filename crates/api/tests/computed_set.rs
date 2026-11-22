@@ -1,4 +1,4 @@
-//! S13 §5.8 — the computed set is CODE, not four n8n flows.
+//! S13 §5.8 — the computed set is CODE, not four legacy flows.
 //!
 //! `conveyor.start` became `projects.create` (S13 step 4); the move step is `cards.move`;
 //! `err.card` runs on `run.failed`; `wip.pull` runs on board events. The four named flows, the
