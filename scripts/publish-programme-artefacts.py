@@ -23,6 +23,7 @@ import hashlib
 import importlib.util
 import json
 import os
+import re
 import subprocess
 import sys
 from datetime import datetime, timezone
@@ -119,11 +120,18 @@ def build_instances(gen, std: dict, snapshot: dict, outputs: Path) -> dict:
     return {(i["category"], str(i["subject"]["kind"])): i for i in instances}
 
 
-def facts_for(gen, instance: dict, template: dict) -> dict:
+def facts_for(gen, instance: dict, template: dict, snapshot: dict, outputs: Path,
+              programme_projects_map: dict[str, set[str]]) -> dict:
+    """The full record behind every heading — not the pack's 12-row excerpt."""
     headings = []
-    for section in instance["sections"]:
-        if section["heading"] == "Published document":
-            continue
+    wanted = list(template.get("required") or [])
+    wanted += [h for h in (template.get("optional") or [])
+               if h in (template.get("sources") or {})]
+    for heading in wanted:
+        section = gen.resolve_section(
+            heading, template, instance["category"], instance["subject"], snapshot,
+            outputs, programme_projects_map, register=None, item_limit=None,
+        )
         items: list[dict] = []
         sources: list[dict] = []
         for source in section["sources"]:
@@ -136,7 +144,7 @@ def facts_for(gen, instance: dict, template: dict) -> dict:
                 "category": source.get("category"),
                 "count": source.get("count"),
             })
-            items.extend(source.get("items") or [])
+            items.extend(source.get("rows") or source.get("items") or [])
         headings.append({
             "heading": section["heading"],
             "status": section["status"],
@@ -171,8 +179,7 @@ def validate_body(body: str, template: dict, category: str) -> list[str]:
     for heading in required_headings(template):
         if normalise(heading) not in headings:
             problems.append(f"missing heading: {heading}")
-    lowered = body.lower()
-    if "placeholder" in lowered or "todo" in lowered or "tbd" in lowered:
+    if re.search(r"\b(TODO|TBD|PLACEHOLDER|FIXME|LOREM IPSUM)\b", body):
         problems.append("body contains a placeholder marker")
     if "$subject" in body or "$programme_id" in body:
         problems.append("body contains an unsubstituted template token")
@@ -277,14 +284,16 @@ def main() -> int:
 
     if args.facts_dir:
         args.facts_dir.mkdir(parents=True, exist_ok=True)
+        projects_map = programme_projects(snapshot)
         for category, template, instance in selected:
-            facts = facts_for(gen, instance, template)
+            facts = facts_for(gen, instance, template, snapshot, args.outputs_dir, projects_map)
             facts["definition_project_id"] = p0
             (args.facts_dir / f"{category}.facts.json").write_text(
                 json.dumps(facts, indent=2) + "\n", encoding="utf-8"
             )
         print(f"facts: {len(selected)} categories -> {args.facts_dir}")
-        return 0
+        if not (args.dry_run or args.apply):
+            return 0
 
     if not (args.dry_run or args.apply):
         parser.error("one of --facts-dir, --dry-run or --apply is required")
@@ -371,10 +380,14 @@ def main() -> int:
             "applied_at": datetime.now(timezone.utc).isoformat(),
         }
         write_manifest(manifest)
+        evidence_ref = (
+            str(evidence.relative_to(ROOT))
+            if str(evidence).startswith(str(ROOT) + os.sep) else str(evidence)
+        )
         append_journal({
             "action": "documents.compose",
             "actor": args.actor_id,
-            "input": str(evidence.relative_to(ROOT)),
+            "input": evidence_ref,
             "natural_key": compose["meta"]["w3_natural_key"],
             "output_id": document_id,
             "readback": f"documents.get:{document_id}",
