@@ -753,12 +753,28 @@ pub async fn invoke_bound(
 }
 
 /// Invoke one action.
-pub async fn invoke(
-    pool: &PgPool,
-    registry: &Registry,
-    tenant: TenantId,
-    request: InvokeRequest,
-) -> Result<InvokeOutcome, ActionError> {
+/// What [`precheck`] resolves: the spec, the input with `_version` folded out, and the
+/// precondition the call will use.
+pub struct Prechecked<'a> {
+    /// The registry entry the request names.
+    pub spec: &'a crate::spec::ActionSpec,
+    /// The input as the handler will see it.
+    pub input: Value,
+    /// The precondition from `If-Match` or `_version`, whichever named one.
+    pub precondition: Option<Precondition>,
+}
+
+/// Everything an invocation must satisfy BEFORE any work starts (#579): the action exists, the
+/// caller may call it, and the input satisfies the schema.
+///
+/// Split out of [`invoke`] so the async submit runs exactly these checks and nothing else. An
+/// invalid input or a forbidden caller therefore fails the SUBMIT with the status the
+/// synchronous call would have returned — the work is never queued and the caller never has to
+/// poll to learn that its request was bad.
+pub fn precheck<'a>(
+    registry: &'a Registry,
+    request: &InvokeRequest,
+) -> Result<Prechecked<'a>, ActionError> {
     let Some(spec) = registry.get(&request.action) else {
         return Err(ActionError::not_found(&request.action));
     };
@@ -813,6 +829,24 @@ pub async fn invoke(
     if !field_errors.is_empty() {
         return Err(ActionError::invalid_input(field_errors));
     }
+    Ok(Prechecked {
+        spec,
+        input,
+        precondition,
+    })
+}
+
+pub async fn invoke(
+    pool: &PgPool,
+    registry: &Registry,
+    tenant: TenantId,
+    request: InvokeRequest,
+) -> Result<InvokeOutcome, ActionError> {
+    let Prechecked {
+        spec,
+        input,
+        precondition,
+    } = precheck(registry, &request)?;
 
     let input_hash = idempotency::request_hash(&input);
     let (version, if_match) = match precondition {
