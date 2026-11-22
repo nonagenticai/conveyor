@@ -2292,7 +2292,12 @@
       ],
       "failure_scenario": "An agent front end or UI calls authoring.intake to submit a document to the authoring queue, or authoring.publish to release a drafted asset: the registry returns no such action (404/unknown action), so the Authoring destination's intake, draft catalogue, review/publish and dependency-status flows have no HTTP or MCP surface and can only be faked through ad-hoc documents.* calls.",
       "acceptance": "authoring.intake|draft|review|publish and authoring.assets are registered ActionSpecs with handlers, appear in served-spec.lock.json and the MCP manifest, and a registry test asserts the five names; or SPEC_V2 §10.4 is amended by owner decision naming the replacement family.",
-      "owner_project": "PLATFORM"
+      "owner_project": "PLATFORM",
+      "resolved_by": {
+        "commit": "8b4cae479391bf2d374bdf5ef4213e83dd265eef",
+        "test": "crates/actions/tests/authoring.rs",
+        "evidence": "The five declared actions are registered ActionSpecs with handlers: authoring.intake, authoring.draft, authoring.review, authoring.publish and the authoring.assets read (registry 12/12 at 517 actions, 504 internal / 13 external; the served-spec lock carries all five operations and --check-lock is exit 0). The engine is migration 0066 (authoring_intake, authoring_asset, tenant RLS, one published row per kind/key) plus the store invariants: a draft is refused while a dependency is unpublished (then allowed once it publishes), a payload cannot carry approval_policy/effect_ceiling/grants/self_approval, review needs a HUMAN authoring.review gate naming the asset (pending and machine-only approvals refused), and publish needs a reviewed row. Proven by crates/actions/tests/authoring.rs (4 scenarios) and crates/store/tests/authoring.rs (5), with the parity suite (7/7) exercising all five over both transports."
+      }
     },
     {
       "id": "v1-w3b-5",
