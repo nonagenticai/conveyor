@@ -245,7 +245,7 @@
       "level": "project",
       "subject_kind": "project",
       "mandatory": true,
-      "spec": "\u00a78.4",
+      "spec": "§8.4",
       "document_category": "project-brief",
       "sources": {
         "Outcome": [
@@ -277,7 +277,7 @@
       "level": "project",
       "subject_kind": "project",
       "mandatory": false,
-      "spec": "\u00a78.4",
+      "spec": "§8.4",
       "document_category": "inception-analysis"
     },
     "architecture-design": {
@@ -297,7 +297,7 @@
       "level": "project",
       "subject_kind": "project",
       "mandatory": false,
-      "spec": "\u00a78.1",
+      "spec": "§8.1",
       "document_category": "architecture-design"
     },
     "decision": {
@@ -316,7 +316,7 @@
       "level": "work_package",
       "subject_kind": "card",
       "mandatory": true,
-      "spec": "\u00a710.4",
+      "spec": "§10.4",
       "document_category": "decision",
       "sources": {
         "Context": [
@@ -346,7 +346,7 @@
       "level": "work_package",
       "subject_kind": "card",
       "mandatory": true,
-      "spec": "\u00a78.5",
+      "spec": "§8.5",
       "document_category": "evidence",
       "sources": {
         "Claim": [
@@ -375,7 +375,7 @@
       "level": "project",
       "subject_kind": "project",
       "mandatory": true,
-      "spec": "\u00a78.4",
+      "spec": "§8.4",
       "document_category": "closure-review",
       "sources": {
         "Outcome vs acceptance": [
@@ -407,7 +407,7 @@
       "level": "programme",
       "subject_kind": "programme",
       "mandatory": true,
-      "spec": "\u00a78.3",
+      "spec": "§8.3",
       "document_category": "vision",
       "sources": {
         "Purpose": [
@@ -441,7 +441,7 @@
       "level": "programme",
       "subject_kind": "programme",
       "mandatory": true,
-      "spec": "\u00a78.3",
+      "spec": "§8.3",
       "document_category": "blueprint",
       "sources": {
         "Aggregates and services": [
@@ -475,7 +475,7 @@
       "level": "programme",
       "subject_kind": "programme",
       "mandatory": true,
-      "spec": "\u00a78.3",
+      "spec": "§8.3",
       "document_category": "business-case",
       "sources": {
         "Why now": [
@@ -507,7 +507,7 @@
       "level": "programme",
       "subject_kind": "programme",
       "mandatory": true,
-      "spec": "\u00a78.3",
+      "spec": "§8.3",
       "document_category": "programme-plan",
       "sources": {
         "Tranches": [
@@ -539,7 +539,7 @@
       "level": "programme",
       "subject_kind": "programme",
       "mandatory": true,
-      "spec": "\u00a78.3",
+      "spec": "§8.3",
       "document_category": "governance",
       "sources": {
         "Roles": [
@@ -569,7 +569,7 @@
       "level": "programme",
       "subject_kind": "programme",
       "mandatory": false,
-      "spec": "\u00a78.1",
+      "spec": "§8.1",
       "document_category": "reuse-map"
     },
     "brief-template": {
@@ -584,7 +584,7 @@
       "level": "programme",
       "subject_kind": "programme",
       "mandatory": false,
-      "spec": "\u00a78.3",
+      "spec": "§8.3",
       "document_category": "brief-template"
     },
     "architecture-analysis": {
@@ -603,7 +603,7 @@
       "level": "project",
       "subject_kind": "project",
       "mandatory": false,
-      "spec": "\u00a78.1",
+      "spec": "§8.1",
       "document_category": "architecture-analysis"
     },
     "spec": {
@@ -619,7 +619,7 @@
       "level": "programme",
       "subject_kind": "programme",
       "mandatory": false,
-      "spec": "\u00a75",
+      "spec": "§5",
       "document_category": "spec"
     },
     "benefit-profile": {
@@ -637,7 +637,7 @@
       "level": "programme",
       "subject_kind": "benefit",
       "mandatory": true,
-      "spec": "\u00a78.3",
+      "spec": "§8.3",
       "document_category": "benefit-profile",
       "sources": {
         "Identification and purpose": [
@@ -709,12 +709,12 @@
         "Benefits at risk"
       ],
       "optional": [],
-      "skeleton": "# Benefits map\n\nEvery path from a project output to a strategic objective, and the benefits put at risk when a project slips.\n\n## Benefit paths\n\nEach path: output \u2192 capability \u2192 operational outcome \u2192 benefit or disbenefit \u2192 strategic objective.\n\n## Dependencies\n\nThe dependencies between benefits and on project outputs.\n\n## Benefits at risk\n\nWhich benefits a slipping project or capability puts at risk, and the early warning.\n",
+      "skeleton": "# Benefits map\n\nEvery path from a project output to a strategic objective, and the benefits put at risk when a project slips.\n\n## Benefit paths\n\nEach path: output → capability → operational outcome → benefit or disbenefit → strategic objective.\n\n## Dependencies\n\nThe dependencies between benefits and on project outputs.\n\n## Benefits at risk\n\nWhich benefits a slipping project or capability puts at risk, and the early warning.\n",
       "standard": "MSP",
       "level": "programme",
       "subject_kind": "programme",
       "mandatory": true,
-      "spec": "\u00a78.3",
+      "spec": "§8.3",
       "document_category": "benefits-map",
       "sources": {
         "Benefit paths": [
@@ -752,7 +752,7 @@
       "level": "programme",
       "subject_kind": "programme",
       "mandatory": true,
-      "spec": "\u00a78.3",
+      "spec": "§8.3",
       "document_category": "benefits-registry",
       "sources": {
         "Benefit profiles": [
@@ -791,7 +791,7 @@
       "level": "programme",
       "subject_kind": "benefit",
       "mandatory": true,
-      "spec": "\u00a78.3",
+      "spec": "§8.3",
       "document_category": "benefit-evaluation",
       "sources": {
         "Baseline and target": [
@@ -849,7 +849,7 @@
       "level": "programme",
       "subject_kind": "programme",
       "mandatory": true,
-      "spec": "\u00a78.3",
+      "spec": "§8.3",
       "document_category": "projects-dossier",
       "sources": {
         "Projects": [
@@ -908,7 +908,7 @@
       "level": "programme",
       "subject_kind": "programme",
       "mandatory": true,
-      "spec": "\u00a78.3",
+      "spec": "§8.3",
       "document_category": "tranche-plan",
       "sources": {
         "Tranches": [
@@ -966,7 +966,7 @@
       "level": "programme",
       "subject_kind": "tranche",
       "mandatory": true,
-      "spec": "\u00a78.3",
+      "spec": "§8.3",
       "document_category": "tranche-review",
       "sources": {
         "Evidence": [
@@ -1021,7 +1021,7 @@
       "level": "programme",
       "subject_kind": "programme",
       "mandatory": true,
-      "spec": "\u00a78.3",
+      "spec": "§8.3",
       "document_category": "benefits-strategy",
       "sources": {
         "Measurement methods": [
@@ -1050,7 +1050,7 @@
       "level": "programme",
       "subject_kind": "programme",
       "mandatory": true,
-      "spec": "\u00a78.3",
+      "spec": "§8.3",
       "document_category": "realization-plan",
       "sources": {
         "Transition": [
@@ -1080,7 +1080,7 @@
       "level": "programme",
       "subject_kind": "programme",
       "mandatory": true,
-      "spec": "\u00a78.3",
+      "spec": "§8.3",
       "document_category": "stakeholder-profiles",
       "sources": {
         "Stakeholders": [
@@ -1132,7 +1132,7 @@
       "level": "programme",
       "subject_kind": "capability",
       "mandatory": true,
-      "spec": "\u00a78.1",
+      "spec": "§8.1",
       "document_category": "architecture-principles",
       "sources": {
         "Principles": [
@@ -1156,7 +1156,7 @@
       "level": "programme",
       "subject_kind": "capability",
       "mandatory": true,
-      "spec": "\u00a78.1",
+      "spec": "§8.1",
       "document_category": "adm-profile",
       "sources": {
         "Phases": [
@@ -1200,7 +1200,7 @@
       "level": "programme",
       "subject_kind": "capability",
       "mandatory": true,
-      "spec": "\u00a78.1",
+      "spec": "§8.1",
       "document_category": "artifact-standard",
       "sources": {
         "Common metadata": [
@@ -1256,7 +1256,7 @@
       "level": "project",
       "subject_kind": "project",
       "mandatory": true,
-      "spec": "\u00a78.1",
+      "spec": "§8.1",
       "document_category": "architecture-artifact",
       "sources": {
         "Metadata": [
@@ -1306,12 +1306,12 @@
         "Document"
       ],
       "optional": [],
-      "skeleton": "# Architecture artefact\n\nOne typed TOGAF artefact \u2014 a catalog, a matrix or a diagram \u2014 as its own record, with the metadata that identifies it, the entries that make it queryable, the links that place it in the repository, and the document or contract it sits under. The catalogue's `architecture-artifact` page is the project's index; this page is the artefact itself.\n\n## Metadata\n\nThe artefact's type, title, version, status, phase, plateau and related change initiative. A reviewer can tell what it is and whether it has been approved without opening the document.\n\n## Entries\n\nThe catalogue items (one axis) or matrix cells (two axes) the artefact carries. A catalog is queryable and a matrix is joinable because these are rows, not a picture.\n\n## Links\n\nWhat this artefact derives from, realizes, reuses or depends on. These edges are the architecture repository's trace; an artefact with no link is an orphan.\n\n## Document\n\nThe published document or contract the artefact sits under. A typed artefact without a document is metadata about something a reader cannot inspect.\n",
+      "skeleton": "# Architecture artefact\n\nOne typed TOGAF artefact — a catalog, a matrix or a diagram — as its own record, with the metadata that identifies it, the entries that make it queryable, the links that place it in the repository, and the document or contract it sits under. The catalogue's `architecture-artifact` page is the project's index; this page is the artefact itself.\n\n## Metadata\n\nThe artefact's type, title, version, status, phase, plateau and related change initiative. A reviewer can tell what it is and whether it has been approved without opening the document.\n\n## Entries\n\nThe catalogue items (one axis) or matrix cells (two axes) the artefact carries. A catalog is queryable and a matrix is joinable because these are rows, not a picture.\n\n## Links\n\nWhat this artefact derives from, realizes, reuses or depends on. These edges are the architecture repository's trace; an artefact with no link is an orphan.\n\n## Document\n\nThe published document or contract the artefact sits under. A typed artefact without a document is metadata about something a reader cannot inspect.\n",
       "standard": "TOGAF",
       "level": "project",
       "subject_kind": "artifact",
       "mandatory": true,
-      "spec": "\u00a78.1",
+      "spec": "§8.1",
       "document_category": "architecture-artifact-instance",
       "sources": {
         "Metadata": [
@@ -1354,7 +1354,7 @@
       "level": "project",
       "subject_kind": "project",
       "mandatory": true,
-      "spec": "\u00a78.1",
+      "spec": "§8.1",
       "document_category": "statement-of-architecture-work",
       "sources": {
         "Assignment": [
@@ -1432,7 +1432,7 @@
       "level": "project",
       "subject_kind": "project",
       "mandatory": true,
-      "spec": "\u00a78.1",
+      "spec": "§8.1",
       "document_category": "compliance-review",
       "sources": {
         "Relationship": [
@@ -1494,7 +1494,7 @@
       "level": "project",
       "subject_kind": "project",
       "mandatory": false,
-      "spec": "\u00a78.1",
+      "spec": "§8.1",
       "sources": {
         "Deviation": [
           {
@@ -1550,12 +1550,12 @@
         "Milestones"
       ],
       "optional": [],
-      "skeleton": "# Architecture maturity assessment\n\nThe nine-dimension maturity baseline, scored 0\u20135 with evidence and a development plan.\n\n## Dimensions\n\nArchitecture process, architecture development, business linkage, senior-management involvement, operating-unit participation, architecture communication, IT security, architecture governance, and IT investment and acquisition strategy.\n\n## Scores\n\nEach dimension's score from 0 (none) to 5 (measured), with the evidence for the rating.\n\n## Baseline\n\nThe dated baseline the next assessment is compared with.\n\n## Milestones\n\nThe development milestones a tranche review can hold the capability to.\n",
+      "skeleton": "# Architecture maturity assessment\n\nThe nine-dimension maturity baseline, scored 0–5 with evidence and a development plan.\n\n## Dimensions\n\nArchitecture process, architecture development, business linkage, senior-management involvement, operating-unit participation, architecture communication, IT security, architecture governance, and IT investment and acquisition strategy.\n\n## Scores\n\nEach dimension's score from 0 (none) to 5 (measured), with the evidence for the rating.\n\n## Baseline\n\nThe dated baseline the next assessment is compared with.\n\n## Milestones\n\nThe development milestones a tranche review can hold the capability to.\n",
       "standard": "TOGAF",
       "level": "programme",
       "subject_kind": "capability",
       "mandatory": true,
-      "spec": "\u00a78.1",
+      "spec": "§8.1",
       "document_category": "maturity-assessment",
       "sources": {
         "Dimensions": [
@@ -1601,7 +1601,7 @@
       "level": "programme",
       "subject_kind": "capability",
       "mandatory": true,
-      "spec": "\u00a78.1",
+      "spec": "§8.1",
       "document_category": "skills-assessment",
       "sources": {
         "Categories": [
@@ -1651,7 +1651,7 @@
       "level": "programme",
       "subject_kind": "programme",
       "mandatory": true,
-      "spec": "\u00a78.3",
+      "spec": "§8.3",
       "document_category": "programme-brief",
       "sources": {
         "Candidate projects and timing": [
@@ -1681,7 +1681,7 @@
       "level": "programme",
       "subject_kind": "programme",
       "mandatory": true,
-      "spec": "\u00a78.3",
+      "spec": "§8.3",
       "document_category": "mandate",
       "sources": {
         "Strategic fit": [
@@ -1739,7 +1739,7 @@
       "level": "programme",
       "subject_kind": "programme",
       "mandatory": true,
-      "spec": "\u00a78.3",
+      "spec": "§8.3",
       "document_category": "refined-vision",
       "sources": {
         "Refined vision": [
@@ -1769,7 +1769,7 @@
       "level": "programme",
       "subject_kind": "programme",
       "mandatory": true,
-      "spec": "\u00a78.3",
+      "spec": "§8.3",
       "document_category": "programme-baselines",
       "sources": {
         "Management baseline": [
@@ -1822,7 +1822,7 @@
       "level": "programme",
       "subject_kind": "programme",
       "mandatory": true,
-      "spec": "\u00a78.3",
+      "spec": "§8.3",
       "document_category": "programme-strategies",
       "sources": {
         "Information strategy": [
@@ -1912,7 +1912,7 @@
       "level": "programme",
       "subject_kind": "programme",
       "mandatory": true,
-      "spec": "\u00a78.3",
+      "spec": "§8.3",
       "document_category": "programme-risk-register",
       "sources": {
         "Register": [
@@ -1973,7 +1973,7 @@
       "level": "programme",
       "subject_kind": "benefit",
       "mandatory": true,
-      "spec": "\u00a78.3",
+      "spec": "§8.3",
       "document_category": "benefit-transition",
       "sources": {
         "Baseline measurement": [
@@ -2043,7 +2043,7 @@
       "level": "programme",
       "subject_kind": "programme",
       "mandatory": false,
-      "spec": "\u00a78.3",
+      "spec": "§8.3",
       "sources": {
         "Status": [
           {
@@ -2087,7 +2087,7 @@
       "level": "programme",
       "subject_kind": "programme",
       "mandatory": true,
-      "spec": "\u00a78.1",
+      "spec": "§8.1",
       "document_category": "requirements-catalog",
       "sources": {
         "Requirements": [
@@ -2126,12 +2126,12 @@
       "optional": [
         "Links"
       ],
-      "skeleton": "# Architecture capability\n\nThe Preliminary phase is a capability before it is a project: the principles, the tailored ADM, the artefact standard, the Architecture Board, the governance and contracts, and the maturity and skills baseline. Each is a row, and each is approved by the body that owns it.\n\n## Principles\n\nThe architecture principles catalogue, each with its statement, rationale and implications. The Board approves the catalogue; a principle without a rationale or its implications is not a principle.\n\n## Tailored ADM\n\nThe adopted `adm_profile`: which phases this organisation runs, which artefacts are mandatory per phase and plateau, and which contract closes each phase. A profile that cannot be adopted is a draft, not the capability.\n\n## Artefact standard\n\nThe `artifact_type` catalogue the repository is seeded from: each type's phase, plateau and mandatory flag. The standard is adopted once and grows with the assessed maturity.\n\n## Architecture Board\n\nThe `governance_body` of kind architecture board: membership, charter, commissioning authority and decision limits. A draft board cannot govern.\n\n## Governance and contracts\n\nThe architecture contracts (Statement of Architecture Work, delivery contract, statement of intent, Request for Architecture Work) and the waivers that accept a deviation for a period. A waiver names its accepting owner and reassessment date.\n\n## Maturity and skills\n\nThe nine-dimension maturity assessment (0\u20135) and the seven-category skills assessment, each a dated row with evidence. The development plan is a set of milestones a tranche review can hold the capability to.\n",
+      "skeleton": "# Architecture capability\n\nThe Preliminary phase is a capability before it is a project: the principles, the tailored ADM, the artefact standard, the Architecture Board, the governance and contracts, and the maturity and skills baseline. Each is a row, and each is approved by the body that owns it.\n\n## Principles\n\nThe architecture principles catalogue, each with its statement, rationale and implications. The Board approves the catalogue; a principle without a rationale or its implications is not a principle.\n\n## Tailored ADM\n\nThe adopted `adm_profile`: which phases this organisation runs, which artefacts are mandatory per phase and plateau, and which contract closes each phase. A profile that cannot be adopted is a draft, not the capability.\n\n## Artefact standard\n\nThe `artifact_type` catalogue the repository is seeded from: each type's phase, plateau and mandatory flag. The standard is adopted once and grows with the assessed maturity.\n\n## Architecture Board\n\nThe `governance_body` of kind architecture board: membership, charter, commissioning authority and decision limits. A draft board cannot govern.\n\n## Governance and contracts\n\nThe architecture contracts (Statement of Architecture Work, delivery contract, statement of intent, Request for Architecture Work) and the waivers that accept a deviation for a period. A waiver names its accepting owner and reassessment date.\n\n## Maturity and skills\n\nThe nine-dimension maturity assessment (0–5) and the seven-category skills assessment, each a dated row with evidence. The development plan is a set of milestones a tranche review can hold the capability to.\n",
       "standard": "TOGAF",
       "level": "programme",
       "subject_kind": "capability",
       "mandatory": true,
-      "spec": "\u00a78.1",
+      "spec": "§8.1",
       "document_category": "architecture-capability",
       "sources": {
         "Principles": [
@@ -2186,7 +2186,7 @@
       "level": "programme",
       "subject_kind": "capability",
       "mandatory": true,
-      "spec": "\u00a78.1",
+      "spec": "§8.1",
       "document_category": "architecture-governance-log",
       "sources": {
         "Decisions": [
@@ -2228,7 +2228,7 @@
       "level": "programme",
       "subject_kind": "programme",
       "mandatory": true,
-      "spec": "\u00a78.1",
+      "spec": "§8.1",
       "document_category": "adr-register",
       "sources": {
         "Register": [
@@ -2277,7 +2277,7 @@
       "level": "project",
       "subject_kind": "project",
       "mandatory": true,
-      "spec": "\u00a78.1",
+      "spec": "§8.1",
       "document_category": "delivery-contract",
       "sources": {
         "Commitments": [
@@ -2329,7 +2329,7 @@
       "level": "project",
       "subject_kind": "project",
       "mandatory": false,
-      "spec": "\u00a78.1",
+      "spec": "§8.1",
       "sources": {
         "Intended use": [
           {
@@ -2380,7 +2380,7 @@
       "level": "project",
       "subject_kind": "project",
       "mandatory": false,
-      "spec": "\u00a78.1",
+      "spec": "§8.1",
       "sources": {
         "Purpose": [
           {
@@ -2431,7 +2431,7 @@
       "level": "programme",
       "subject_kind": "programme",
       "mandatory": true,
-      "spec": "\u00a78.2",
+      "spec": "§8.2",
       "document_category": "safe-portfolio",
       "sources": {
         "Portfolio canvas": [
@@ -2471,7 +2471,7 @@
       "level": "programme",
       "subject_kind": "programme",
       "mandatory": true,
-      "spec": "\u00a78.2",
+      "spec": "§8.2",
       "document_category": "safe-art",
       "sources": {
         "ART charter": [
@@ -2521,7 +2521,7 @@
       "level": "programme",
       "subject_kind": "programme",
       "mandatory": true,
-      "spec": "\u00a78.2",
+      "spec": "§8.2",
       "document_category": "safe-cadence",
       "sources": {
         "PI plan": [
@@ -2580,7 +2580,7 @@
       "level": "project",
       "subject_kind": "project",
       "mandatory": true,
-      "spec": "\u00a78.4",
+      "spec": "§8.4",
       "document_category": "project-wbs",
       "sources": {
         "Work packages": [
@@ -2630,7 +2630,7 @@
       "level": "project",
       "subject_kind": "project",
       "mandatory": true,
-      "spec": "\u00a78.4",
+      "spec": "§8.4",
       "document_category": "project-baseline",
       "sources": {
         "Scope": [
@@ -2692,7 +2692,7 @@
       "level": "project",
       "subject_kind": "project",
       "mandatory": true,
-      "spec": "\u00a78.4",
+      "spec": "§8.4",
       "document_category": "project-registers",
       "sources": {
         "Risks": [
@@ -2777,7 +2777,7 @@
       "level": "project",
       "subject_kind": "project",
       "mandatory": true,
-      "spec": "\u00a78.4",
+      "spec": "§8.4",
       "document_category": "change-control",
       "sources": {
         "Change requests": [
@@ -2829,7 +2829,7 @@
       "level": "programme",
       "subject_kind": "capability",
       "mandatory": true,
-      "spec": "\u00a78.1",
+      "spec": "§8.1",
       "document_category": "phase-preliminary",
       "sources": {
         "Mandatory artefacts": [
@@ -2877,7 +2877,7 @@
       "level": "project",
       "subject_kind": "phase",
       "mandatory": true,
-      "spec": "\u00a78.1",
+      "spec": "§8.1",
       "document_category": "phase-a",
       "sources": {
         "Mandatory artefacts": [
@@ -2932,7 +2932,7 @@
       "level": "project",
       "subject_kind": "phase",
       "mandatory": true,
-      "spec": "\u00a78.1",
+      "spec": "§8.1",
       "document_category": "phase-b",
       "sources": {
         "Mandatory artefacts": [
@@ -2987,7 +2987,7 @@
       "level": "project",
       "subject_kind": "phase",
       "mandatory": true,
-      "spec": "\u00a78.1",
+      "spec": "§8.1",
       "document_category": "phase-c",
       "sources": {
         "Mandatory artefacts": [
@@ -3042,7 +3042,7 @@
       "level": "project",
       "subject_kind": "phase",
       "mandatory": true,
-      "spec": "\u00a78.1",
+      "spec": "§8.1",
       "document_category": "phase-d",
       "sources": {
         "Mandatory artefacts": [
@@ -3097,7 +3097,7 @@
       "level": "project",
       "subject_kind": "project",
       "mandatory": true,
-      "spec": "\u00a78.1",
+      "spec": "§8.1",
       "document_category": "candidate-solutions",
       "sources": {
         "Candidates": [
@@ -3147,7 +3147,7 @@
       "level": "project",
       "subject_kind": "project",
       "mandatory": true,
-      "spec": "\u00a78.1",
+      "spec": "§8.1",
       "document_category": "project-context-diagram",
       "sources": {
         "Context": [
@@ -3197,7 +3197,7 @@
       "level": "project",
       "subject_kind": "project",
       "mandatory": true,
-      "spec": "\u00a78.1",
+      "spec": "§8.1",
       "document_category": "benefits-diagram",
       "sources": {
         "Goals and outcomes": [
@@ -3247,7 +3247,7 @@
       "level": "project",
       "subject_kind": "project",
       "mandatory": true,
-      "spec": "\u00a78.1",
+      "spec": "§8.1",
       "document_category": "gap-analysis",
       "sources": {
         "Baseline": [
@@ -3274,13 +3274,9 @@
         ],
         "Gaps and work packages": [
           {
-            "kind": "documents",
-            "file": "artefacts.json",
-            "pointer": "/documents",
-            "match": {
-              "category": "gap-analysis",
-              "scope": "subject"
-            }
+            "kind": "computed",
+            "name": "gap-analysis",
+            "severity": "P1"
           }
         ]
       }
@@ -3304,7 +3300,7 @@
       "level": "project",
       "subject_kind": "phase",
       "mandatory": true,
-      "spec": "\u00a78.1",
+      "spec": "§8.1",
       "document_category": "phase-e",
       "sources": {
         "Mandatory artefacts": [
@@ -3413,7 +3409,7 @@
       "level": "project",
       "subject_kind": "phase",
       "mandatory": true,
-      "spec": "\u00a78.1",
+      "spec": "§8.1",
       "document_category": "phase-f",
       "sources": {
         "Mandatory artefacts": [
@@ -3468,7 +3464,7 @@
       "level": "project",
       "subject_kind": "phase",
       "mandatory": true,
-      "spec": "\u00a78.1",
+      "spec": "§8.1",
       "document_category": "phase-g",
       "sources": {
         "Mandatory artefacts": [
@@ -3523,7 +3519,7 @@
       "level": "project",
       "subject_kind": "phase",
       "mandatory": true,
-      "spec": "\u00a78.1",
+      "spec": "§8.1",
       "document_category": "phase-h",
       "sources": {
         "Mandatory artefacts": [
@@ -3577,12 +3573,12 @@
       "optional": [
         "Links"
       ],
-      "skeleton": "# PI plan\n\nThe plan for one programme increment: the deliverables selected from the backlog, ordered by WSJF, within the WIP limit.\n\n## Objectives\n\nThe PI objectives this plan is judged against, with their planned business value.\n\n## Plan\n\nThe deliverables materialised for this increment, one per WBS node, with their project and acceptance.\n\n## WSJF order\n\nThe four typed inputs per candidate \u2014 business value, time criticality, risk reduction and job size \u2014 in the order the plan takes them. The score is computed, never stored.\n\n## Capacity and WIP\n\nThe capacity the plan is bounded by and the WIP limit it respects.\n\n## Evidence\n\nThe backlog rows, the cadence row and the approval that made this the plan.\n\n## Dependencies\n\nThe cross-project dependencies the order is constrained by.\n\n## Links\n\nThe cadence, the objectives and the tranche this plan belongs to.\n\n## Backlog refinement\n\nThe refinement cadence that re-scored the backlog before this plan was taken.\n",
+      "skeleton": "# PI plan\n\nThe plan for one programme increment: the deliverables selected from the backlog, ordered by WSJF, within the WIP limit.\n\n## Objectives\n\nThe PI objectives this plan is judged against, with their planned business value.\n\n## Plan\n\nThe deliverables materialised for this increment, one per WBS node, with their project and acceptance.\n\n## WSJF order\n\nThe four typed inputs per candidate — business value, time criticality, risk reduction and job size — in the order the plan takes them. The score is computed, never stored.\n\n## Capacity and WIP\n\nThe capacity the plan is bounded by and the WIP limit it respects.\n\n## Evidence\n\nThe backlog rows, the cadence row and the approval that made this the plan.\n\n## Dependencies\n\nThe cross-project dependencies the order is constrained by.\n\n## Links\n\nThe cadence, the objectives and the tranche this plan belongs to.\n\n## Backlog refinement\n\nThe refinement cadence that re-scored the backlog before this plan was taken.\n",
       "standard": "SAFe",
       "level": "programme",
       "subject_kind": "programme",
       "mandatory": true,
-      "spec": "\u00a78.2",
+      "spec": "§8.2",
       "document_category": "pi-plan",
       "sources": {
         "Objectives": [
@@ -3671,7 +3667,7 @@
       "level": "programme",
       "subject_kind": "programme",
       "mandatory": true,
-      "spec": "\u00a78.2",
+      "spec": "§8.2",
       "document_category": "pi-objectives",
       "sources": {
         "Objectives": [
@@ -3736,7 +3732,7 @@
       "level": "programme",
       "subject_kind": "programme",
       "mandatory": true,
-      "spec": "\u00a78.2",
+      "spec": "§8.2",
       "document_category": "system-demo",
       "sources": {
         "Demonstrated": [
@@ -3796,7 +3792,7 @@
       "level": "programme",
       "subject_kind": "programme",
       "mandatory": true,
-      "spec": "\u00a78.2",
+      "spec": "§8.2",
       "document_category": "inspect-adapt",
       "sources": {
         "What went well": [

@@ -24074,7 +24074,7 @@
       "title": "TOGAF artefact absent: delivery-contract"
     },
     {
-      "acceptance": "std-togaf-gap-analysis-t9: evidence the missing section(s) Baseline, Target, Gaps and work packages of Gap Analysis — SPEC_V2 slice T9 (docs/SPEC_V2.md §12) from artefacts.json#/documents, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+      "acceptance": "std-togaf-gap-analysis-t9: evidence the missing section(s) Baseline, Target of Gap Analysis — SPEC_V2 slice T9 (docs/SPEC_V2.md §12) from artefacts.json#/documents, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "gap-analysis",
       "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
       "category": "gap-analysis",
@@ -24102,30 +24102,17 @@
             ]
           ],
           "source": "artefact"
-        },
-        {
-          "artefact": "std-togaf-gap-analysis-t9",
-          "section": "Gaps and work packages",
-          "snapshot": [
-            [
-              "artefacts.json",
-              "/documents",
-              0
-            ]
-          ],
-          "source": "artefact"
         }
       ],
       "failure_scenario": "The published record claims a TOGAF artefact the row set does not support, or omits a mandatory one without a work package.",
       "id": "std-togaf-gap-analysis-t9",
       "missing": [
         "Baseline",
-        "Target",
-        "Gaps and work packages"
+        "Target"
       ],
       "owner_project": "T9",
       "package_key": "std-togaf-gap-analysis-t9:T9",
-      "problem": "The gap-analysis artefact for SPEC_V2 slice T9 (docs/SPEC_V2.md §12) is absent; missing required sections: Baseline, Target, Gaps and work packages. Not yet due: tranche 4 is planned.",
+      "problem": "The gap-analysis artefact for SPEC_V2 slice T9 (docs/SPEC_V2.md §12) is partial; missing required sections: Baseline, Target. Not yet due: tranche 4 is planned.",
       "severity": "P2",
       "source": "artefact",
       "spec": "§8.1",
@@ -24138,7 +24125,7 @@
         "project_key": "T9",
         "title": "SPEC_V2 slice T9 (docs/SPEC_V2.md §12)"
       },
-      "title": "TOGAF artefact absent: gap-analysis"
+      "title": "TOGAF artefact partial: gap-analysis"
     },
     {
       "acceptance": "std-togaf-phase-a-t9-a: evidence the missing section(s) Mandatory artefacts, Evidence of Phase A — T9 — A from architecture.json#/artifacts, artefacts.json#/documents, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
