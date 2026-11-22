@@ -1,0 +1,10 @@
+{
+ "id": "01a1e9df-0308-7fdc-8492-32db1e582a2d",
+ "baseline": {
+  "value": 18.0,
+  "unit": "tool_call rows",
+  "measured_at": "2026-11-22",
+  "method": "tool_call rows by toolkit from the call ledger at the recorded snapshot",
+  "definition": "18 tool_call rows at 2026-11-22"
+ }
+}

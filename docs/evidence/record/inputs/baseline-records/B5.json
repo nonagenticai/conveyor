@@ -1,0 +1,10 @@
+{
+ "id": "01a1e9df-1e42-7199-87e1-23c577c62f8e",
+ "baseline": {
+  "value": 1.0,
+  "unit": "model stores",
+  "measured_at": "2026-11-22",
+  "method": "the T0 ownership-matrix check: one home for the model",
+  "definition": "one ownership matrix home at 2026-11-22"
+ }
+}
