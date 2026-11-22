@@ -23,6 +23,7 @@ import hashlib
 import json
 import re
 import sys
+import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -1505,6 +1506,43 @@ def baseline_entries(gaps: list[dict[str, Any]], standard: dict[str, Any]) -> di
     }
 
 
+def accepted_baseline(
+    gaps: list[dict[str, Any]],
+    standard: dict[str, Any],
+    dataset: Dataset,
+    snapshot_dir: Path,
+    *,
+    accepted_by: str,
+    approver: str,
+    acceptance_ref: str,
+    delegation_ref: str,
+    accepted_at: str | None = None,
+) -> dict[str, Any]:
+    """A proposal plus the record of who accepted it, and of what snapshot.
+
+    The strict gate refuses a ledger without this header, so an accepted ledger can only be
+    produced by naming the decision that accepted it and the bytes it was taken from.  A
+    proposal is produced by ``baseline_entries`` and must never be copied over the accepted
+    file: that is how a report silently becomes an acceptance.
+    """
+    document = baseline_entries(gaps, standard)
+    manifest_path = Path(snapshot_dir) / "manifest.json"
+    if not manifest_path.exists():
+        fail(f"cannot accept a baseline: no manifest at {manifest_path}")
+    document["accepted_at"] = accepted_at or datetime.now(timezone.utc).isoformat()
+    document["accepted_by"] = accepted_by
+    document["approver"] = approver
+    document["acceptance_ref"] = acceptance_ref
+    document["delegation_ref"] = delegation_ref
+    document["snapshot"] = {
+        "git_sha": dataset.manifest.get("git_sha"),
+        "generated_at": dataset.manifest.get("generated_at"),
+        "manifest_sha256": hashlib.sha256(manifest_path.read_bytes()).hexdigest(),
+        "outputs": len(dataset.outputs.get("outputs") or []),
+    }
+    return document
+
+
 def check_strict(
     gaps: list[dict[str, Any]], baseline: dict[str, Any], fail_on: set[str]
 ) -> list[str]:
@@ -2229,6 +2267,39 @@ def self_test() -> None:
     if base_gaps:
         fail(f"the self-test base is not conformant: {base_gaps}")
 
+    # A report is evidence, not an acceptance: the proposal carries no header and strict
+    # refuses it; only the accepted form, which names the decision and the snapshot bytes,
+    # passes. This is the trap that let `--report` overwrite an accepted ledger.
+    proposal = baseline_entries(base_gaps, base().standard)
+    if "accepted_at" in proposal or "snapshot" in proposal:
+        fail("a proposal must not carry an acceptance header")
+    proposal_failures = check_strict(base_gaps, proposal, {"P0", "P1"})
+    if not any("header is missing accepted_at" in item for item in proposal_failures):
+        fail(f"strict accepted a proposal: {proposal_failures}")
+    with tempfile.TemporaryDirectory() as snapshot_dir:
+        fixture = base()
+        Path(snapshot_dir, "manifest.json").write_text(
+            json.dumps(fixture.manifest), encoding="utf-8"
+        )
+        accepted = accepted_baseline(
+            base_gaps,
+            fixture.standard,
+            fixture,
+            Path(snapshot_dir),
+            accepted_by="self-test",
+            approver="self-test-approver",
+            acceptance_ref="ref",
+            delegation_ref="delegation",
+            accepted_at="2026-11-22T00:00:00Z",
+        )
+        accepted_failures = check_strict(base_gaps, accepted, {"P0", "P1"})
+        if accepted_failures:
+            fail(f"strict refused the accepted ledger: {accepted_failures}")
+        if accepted["snapshot"]["manifest_sha256"] != hashlib.sha256(
+            Path(snapshot_dir, "manifest.json").read_bytes()
+        ).hexdigest():
+            fail("the accepted ledger does not pin the manifest it was taken from")
+
     def expect(mutate, rule: str, severity: str | None = None) -> None:
         data = base()
         mutate(data)
@@ -2720,6 +2791,18 @@ def main() -> None:
     parser.add_argument("--fail-on", default="P0,P1")
     parser.add_argument("--write-baseline", type=Path, default=None)
     parser.add_argument(
+        "--accept-baseline",
+        action="store_true",
+        help=(
+            "write the accepted ledger to --baseline; requires --accepted-by, --approver, "
+            "--acceptance-ref and --delegation-ref, and records the snapshot it was taken from"
+        ),
+    )
+    parser.add_argument("--accepted-by", default=None)
+    parser.add_argument("--approver", default=None)
+    parser.add_argument("--acceptance-ref", default=None)
+    parser.add_argument("--delegation-ref", default=None)
+    parser.add_argument(
         "--findings",
         type=Path,
         action="append",
@@ -2828,21 +2911,53 @@ def main() -> None:
         (args.out / "conformance-gap-register.md").write_text(
             render_markdown(gaps, dataset, args.snapshot), encoding="utf-8"
         )
-        if args.report:
-            # The canonical regeneration writes the ledger beside its register, so the accepted
-            # set and the evidence are always produced by the same audit of the same snapshot.
-            (args.out / "conformance-baseline.json").write_text(
-                json.dumps(baseline_entries(gaps, standard), indent=2, sort_keys=False) + "\n",
-                encoding="utf-8",
+        # A report is evidence, not an acceptance: it must never write the accepted ledger.
+        # The accepted file is produced only by --accept-baseline, which names the decision.
+
+    if args.accept_baseline:
+        missing = [
+            flag
+            for flag, value in (
+                ("--accepted-by", args.accepted_by),
+                ("--approver", args.approver),
+                ("--acceptance-ref", args.acceptance_ref),
+                ("--delegation-ref", args.delegation_ref),
             )
+            if not str(value or "").strip()
+        ]
+        if missing:
+            parser.error("--accept-baseline requires " + ", ".join(missing))
+        accepted = accepted_baseline(
+            gaps,
+            standard,
+            dataset,
+            args.snapshot,
+            accepted_by=args.accepted_by,
+            approver=args.approver,
+            acceptance_ref=args.acceptance_ref,
+            delegation_ref=args.delegation_ref,
+        )
+        args.baseline.parent.mkdir(parents=True, exist_ok=True)
+        args.baseline.write_text(
+            json.dumps(accepted, indent=2, sort_keys=False) + "\n", encoding="utf-8"
+        )
+        print(
+            f"audit-programme-conformance: accepted {len(accepted['entries'])} entries from "
+            f"{args.snapshot} into {args.baseline}"
+        )
 
     if args.write_baseline:
         args.write_baseline.parent.mkdir(parents=True, exist_ok=True)
         baseline = baseline_entries(gaps, standard)
+        # Marked, so nobody can mistake a proposal for the accepted ledger.
+        baseline["status"] = "proposed"
         args.write_baseline.write_text(
             json.dumps(baseline, indent=2, sort_keys=False) + "\n", encoding="utf-8"
         )
-        print(f"audit-programme-conformance: wrote {len(baseline['entries'])} baseline entries")
+        print(
+            f"audit-programme-conformance: wrote {len(baseline['entries'])} proposed entries "
+            "(not an acceptance)"
+        )
 
     if args.strict:
         if not args.baseline.exists():

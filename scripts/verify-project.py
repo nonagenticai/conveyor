@@ -11,7 +11,7 @@ Usage:
     python3 scripts/verify-project.py --project P0
     python3 scripts/verify-project.py --all
     python3 scripts/verify-project.py --project P0 --snapshot /tmp/u5a-snapshot/data
-    python3 scripts/verify-project.py --project P0 --kind static|live
+    python3 scripts/verify-project.py --project P0 --kind all|snapshot|command
 
 Manifest shape:
 
@@ -687,6 +687,28 @@ def snapshot_label(path: Path, manifest: dict[str, Any]) -> str:
         return f"retained-snapshot/{manifest.get('git_sha') or 'unknown'}"
 
 
+def allow_error(allowed: dict[str, Any]) -> str | None:
+    """An allow is a documented residual, not a silent pass.
+
+    It must name who owns it, why it is accepted, and when it must be reassessed.  A manifest
+    whose allow has no owner, no reason or no unexpired date is refused: otherwise a residual
+    clears the verdict by simply existing.
+    """
+    for field in ("reason", "owner", "expires"):
+        if not str(allowed.get(field) or "").strip():
+            return f"the allow entry has no {field}"
+    raw = str(allowed.get("expires")).replace("Z", "+00:00")
+    try:
+        expires = datetime.fromisoformat(raw)
+    except ValueError:
+        return f"the allow entry's expires is not a date: {allowed.get('expires')!r}"
+    if expires.tzinfo is None:
+        expires = expires.replace(tzinfo=timezone.utc)
+    if expires <= datetime.now(timezone.utc):
+        return f"the allow entry expired at {allowed.get('expires')}"
+    return None
+
+
 def run_project(
     key: str,
     snapshot_dir: Path,
@@ -722,6 +744,10 @@ def run_project(
             fail(f"{identifier}: severity must be one of {', '.join(SEVERITY)}")
         description = str(check.get("description") or "")
         allowed = allows.get(name) or allows.get(identifier)
+        if allowed:
+            problem = allow_error(allowed)
+            if problem:
+                fail(f"{identifier}: {problem}")
         record: dict[str, Any] = {
             "id": identifier,
             "check": name or None,
@@ -924,6 +950,37 @@ expires = "2027-02-18"
         failures.append("an allowed residual did not clear the verdict")
     if not any(row.get("allowed") for row in green["checks"]):
         failures.append("the allowed residual was not recorded")
+
+    # An allow is a documented residual: ownerless and expired ones are refused, never
+    # silently accepted. These are the two ways a residual could otherwise pass by existing.
+    def refused_allow(name: str, body: str) -> None:
+        path = workdir / f"TEST-allow-{name}.toml"
+        path.write_text(manifest.read_text() + body)
+        try:
+            run_project("TEST", snapshot / "data", path, workdir / "evidence", quiet=True)
+        except SystemExit:
+            return
+        failures.append(f"an invalid allow ({name}) was accepted")
+
+    refused_allow(
+        "ownerless",
+        """
+[[allow]]
+check = "closure_outputs"
+reason = "self-test residual"
+expires = "2027-02-18"
+""",
+    )
+    refused_allow(
+        "expired",
+        """
+[[allow]]
+check = "closure_outputs"
+reason = "self-test residual"
+owner = "programme owner"
+expires = "2020-01-01"
+""",
+    )
 
     command_manifest = workdir / "TEST-command.toml"
     command_manifest.write_text(
