@@ -210,6 +210,102 @@ fn load_lessons(
     })
 }
 
+/// One risk row as `metrics.programme` returns it: the operated register, not a profile.
+#[derive(Clone, Debug, Deserialize)]
+#[allow(dead_code)]
+struct RiskMetric {
+    code: String,
+    title: String,
+    #[serde(default)]
+    severity: Option<String>,
+    #[serde(default)]
+    probability: Option<String>,
+    #[serde(default)]
+    impact: Option<i32>,
+    status: String,
+    #[serde(default)]
+    owner_job_id: Option<String>,
+    #[serde(default)]
+    review_at: Option<String>,
+    overdue: bool,
+}
+
+/// One benefit as the evaluation view returns it — baseline, target and the live variance.
+#[derive(Clone, Debug, Deserialize)]
+#[allow(dead_code)]
+struct BenefitMetric {
+    reference: String,
+    status: String,
+    baseline_state: String,
+    #[serde(default)]
+    baseline: Option<Value>,
+    #[serde(default)]
+    target: Option<Value>,
+    #[serde(default)]
+    variance: Option<f64>,
+    evaluation_status: String,
+}
+
+/// `metrics.programme`: the risk register and the benefit evaluation the tranche review cites.
+#[derive(Clone, Debug, Default, Deserialize)]
+#[allow(dead_code)]
+struct ProgrammeMetrics {
+    #[serde(default)]
+    risks: Vec<RiskMetric>,
+    #[serde(default)]
+    risks_overdue: i64,
+    #[serde(default)]
+    benefits: Vec<BenefitMetric>,
+    #[serde(default)]
+    realised: i64,
+    #[serde(default)]
+    planned: i64,
+    #[serde(default)]
+    benefit_ratio: Option<f64>,
+}
+
+fn load_metrics(
+    ctx: AppCtx,
+    programme: RwSignal<Option<String>>,
+) -> LocalResource<Result<ProgrammeMetrics, ApiError>> {
+    LocalResource::new(move || {
+        let _tenant = ctx.tenant.get();
+        let programme = programme.get();
+        async move {
+            let Some(programme_id) = programme else {
+                return Ok(ProgrammeMetrics::default());
+            };
+            parse(
+                ctx.invoke(
+                    "metrics.programme",
+                    json!({"programme_id": programme_id}),
+                    InvokeOptions::default(),
+                )
+                .await?
+                .output,
+                "metrics.programme",
+            )
+        }
+    })
+}
+
+/// A UUID cut to its first segment for a table cell; the full id stays in the row's title.
+fn short_id(value: Option<&str>) -> String {
+    match value {
+        Some(id) if id.len() > 8 => id[..8].to_owned(),
+        Some(id) => id.to_owned(),
+        None => "—".to_owned(),
+    }
+}
+
+/// `actual - target` with its sign, or `—` when the measurement is absent.
+fn variance(value: Option<f64>) -> String {
+    match value {
+        Some(value) => format!("{value:+.2}"),
+        None => "—".to_owned(),
+    }
+}
+
 /// A tile's count: the read's length, or `—` until it has answered (and when it failed — the
 /// panel below says why).
 fn tile_count<T>(items: Option<Result<Vec<T>, ApiError>>) -> String {
@@ -247,6 +343,7 @@ pub fn Programme() -> impl IntoView {
     let cadences = load_cadences(ctx, selected);
     let benefits = load_benefits(ctx, selected);
     let lessons = load_lessons(ctx, selected);
+    let metrics = load_metrics(ctx, selected);
 
     // Default the picker to the first programme the real read returns.
     Effect::new(move |_| {
@@ -267,6 +364,7 @@ pub fn Programme() -> impl IntoView {
                     "cadences.list",
                     "benefits.list",
                     "lessons.list",
+                    "metrics.programme",
                 ]
                     .into_iter()
                     .filter(|action| !ctx.has_action(action))
@@ -319,6 +417,7 @@ pub fn Programme() -> impl IntoView {
                                 cadences.refetch();
                                 benefits.refetch();
                                 lessons.refetch();
+                                metrics.refetch();
                             }>"Refresh"</button>
                         </div>
                     </header>
@@ -336,12 +435,32 @@ pub fn Programme() -> impl IntoView {
                         let cadence_count = tile_count(cadences.get());
                         let benefit_count = tile_count(benefits.get());
                         let lesson_count = tile_count(lessons.get());
+                        let metrics_summary = metrics.get();
+                        let (risk_value, risk_detail) = match &metrics_summary {
+                            Some(Ok(m)) => (
+                                m.risks.len().to_string(),
+                                format!("{} overdue · owners and review dates", m.risks_overdue),
+                            ),
+                            _ => ("—".to_owned(), "the operated register".to_owned()),
+                        };
+                        let (evaluated_value, evaluated_detail) = match &metrics_summary {
+                            Some(Ok(m)) => (
+                                format!("{}/{}", m.realised, m.planned),
+                                match m.benefit_ratio {
+                                    Some(ratio) => format!("realised/planned · ratio {ratio:.2}"),
+                                    None => "realised/planned".to_owned(),
+                                },
+                            ),
+                            _ => ("—".to_owned(), "realised/planned".to_owned()),
+                        };
                         view! {
                             <div class="tiles">
                                 <Tile label="Tranches".to_owned() value=tranche_count detail="in the plan view (retired hidden)".to_owned()/>
                                 <Tile label="Cadences".to_owned() value=cadence_count detail="PI, sprint, demo, retro and refinement rows".to_owned()/>
                                 <Tile label="Benefits".to_owned() value=benefit_count detail="live benefit profiles".to_owned()/>
                                 <Tile label="Lessons".to_owned() value=lesson_count detail="recorded lessons".to_owned()/>
+                                <Tile label="Programme risks".to_owned() value=risk_value detail=risk_detail/>
+                                <Tile label="Benefits evaluated".to_owned() value=evaluated_value detail=evaluated_detail/>
                             </div>
                         }
                     }}
@@ -441,6 +560,86 @@ pub fn Programme() -> impl IntoView {
                                                 <td>{benefit.category.clone()}</td>
                                                 <td>{brief(&benefit.baseline)}</td>
                                                 <td>{benefit.measurement_method.clone()}</td>
+                                            </tr>
+                                        }).collect_view()}
+                                    </tbody>
+                                </table>
+                            </div>
+                        }.into_any(),
+                    }}
+                    <h2>"Risk register"</h2>
+                    {move || match metrics.get() {
+                        None => view! { <p class="muted">"Reading the register…"</p> }.into_any(),
+                        Some(Err(error)) => view! {
+                            <ErrorPanel error=error on_retry=Callback::new(move |_| metrics.refetch())/>
+                        }.into_any(),
+                        Some(Ok(metrics)) if metrics.risks.is_empty() => {
+                            let message = if selected.get().is_some() {
+                                "No programme risk on the register — a risk is created by `registers.create` with probability, impact, an owner and a review date."
+                            } else {
+                                "No programme selected — choose one above to read its risk register."
+                            };
+                            view! { <Empty message=message.to_owned()/> }.into_any()
+                        }
+                        Some(Ok(metrics)) => view! {
+                            <div class="tablewrap">
+                                <table class="table">
+                                    <thead><tr>
+                                        <th>"Code"</th><th>"Risk"</th><th>"Severity"</th>
+                                        <th>"Probability"</th><th class="n">"Impact"</th><th>"Status"</th>
+                                        <th>"Owner"</th><th>"Review at"</th><th>"Overdue"</th>
+                                    </tr></thead>
+                                    <tbody>
+                                        {metrics.risks.iter().map(|risk| view! {
+                                            <tr>
+                                                <td class="mono">{risk.code.clone()}</td>
+                                                <td>{risk.title.clone()}</td>
+                                                <td>{risk.severity.clone().unwrap_or_else(|| "—".to_owned())}</td>
+                                                <td>{risk.probability.clone().unwrap_or_else(|| "—".to_owned())}</td>
+                                                <td class="n">{risk.impact.map(|value| value.to_string()).unwrap_or_else(|| "—".to_owned())}</td>
+                                                <td><StatusPill status=risk.status.clone()/></td>
+                                                <td class="mono" title=risk.owner_job_id.clone().unwrap_or_default()>
+                                                    {short_id(risk.owner_job_id.as_deref())}
+                                                </td>
+                                                <td>{day(risk.review_at.as_deref())}</td>
+                                                <td>{if risk.overdue { "overdue" } else { "—" }}</td>
+                                            </tr>
+                                        }).collect_view()}
+                                    </tbody>
+                                </table>
+                            </div>
+                        }.into_any(),
+                    }}
+                    <h2>"Benefits evaluation"</h2>
+                    {move || match metrics.get() {
+                        None => view! { <p class="muted">"Reading the evaluation…"</p> }.into_any(),
+                        Some(Err(error)) => view! {
+                            <ErrorPanel error=error on_retry=Callback::new(move |_| metrics.refetch())/>
+                        }.into_any(),
+                        Some(Ok(metrics)) if metrics.benefits.is_empty() => {
+                            let message = if selected.get().is_some() {
+                                "No benefit to evaluate — a profile with a baseline and a measurement is the evaluation's input."
+                            } else {
+                                "No programme selected — choose one above to read the benefit evaluation."
+                            };
+                            view! { <Empty message=message.to_owned()/> }.into_any()
+                        }
+                        Some(Ok(metrics)) => view! {
+                            <div class="tablewrap">
+                                <table class="table">
+                                    <thead><tr>
+                                        <th>"Reference"</th><th>"Status"</th><th>"Baseline"</th>
+                                        <th>"Target"</th><th class="n">"Variance"</th><th>"Evaluation"</th>
+                                    </tr></thead>
+                                    <tbody>
+                                        {metrics.benefits.iter().map(|benefit| view! {
+                                            <tr>
+                                                <td class="mono">{benefit.reference.clone()}</td>
+                                                <td><StatusPill status=benefit.status.clone()/></td>
+                                                <td>{brief(&benefit.baseline)}</td>
+                                                <td>{brief(&benefit.target)}</td>
+                                                <td class="n">{variance(benefit.variance)}</td>
+                                                <td><StatusPill status=benefit.evaluation_status.clone()/></td>
                                             </tr>
                                         }).collect_view()}
                                     </tbody>
