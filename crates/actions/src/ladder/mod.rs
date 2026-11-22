@@ -49,7 +49,7 @@ use crate::invoke::{ActionError, HandlerCtx};
 use crate::spec::HandlerOutput;
 use crate::views::Page;
 
-mod laya;
+pub(crate) mod laya;
 
 pub use store::ladder::{
     DecisionRecord, EffectivePolicy, LadderStoreError, LayaConfigRecord, NewDecision,

@@ -308,10 +308,10 @@ fn key_shape(key: &str) -> bool {
 /// The content hash of one manifest, as published.
 ///
 /// Covers everything a caller could observe changing: the identity fields, the destination, the
-/// status, and per tool the action, its verification declaration, its effect class, its timeout
-/// and a digest of the input schema copied from the registry. Two publishes of the same content
-/// therefore no-op; any change — including a schema change in the action itself — inserts a new
-/// version.
+/// status, and per tool the action, its redaction rule, its verification declaration, its effect
+/// class, its timeout and a digest of the input schema copied from the registry. Two publishes of
+/// the same content therefore no-op; any change — including a schema change in the action itself
+/// — inserts a new version.
 pub fn content_hash(manifest: &ToolkitManifest) -> String {
     let mut hasher = Sha256::new();
     hasher.update(b"conveyor.toolkit.v1\0");
@@ -333,6 +333,13 @@ pub fn content_hash(manifest: &ToolkitManifest) -> String {
         hasher.update([0u8]);
         hasher.update(tool.action.as_bytes());
         hasher.update([0u8]);
+        // Only a declared rule is content: a tool that never carried one hashes exactly as it did
+        // before this field existed, so the first publish after the upgrade bumps only the tools
+        // whose declarations changed.
+        if !tool.redact.is_empty() {
+            hasher.update(serde_json::to_vec(&tool.redact).unwrap_or_default());
+            hasher.update([0u8]);
+        }
         // Only a declared path is content: a tool that never carried one hashes exactly as it did
         // before this field existed, so the first publish after the upgrade bumps only the
         // toolkits whose tools gained a declaration.

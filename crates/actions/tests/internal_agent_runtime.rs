@@ -156,6 +156,13 @@ async fn seed_job(
     key: &str,
     definition: Value,
 ) -> (Uuid, Uuid) {
+    // An internal-agent run must declare its spend ceiling before it may start (invoke.rs,
+    // `budget_missing`); the release's anatomy is where it is declared. A test that cares about
+    // the ceiling passes its own `limits`; every other test gets a budget it cannot exhaust.
+    let mut definition = definition;
+    if definition.get("limits").is_none() {
+        definition["limits"] = json!({"cost_budget_usd": 100});
+    }
     let mut tx = begin_scoped(&pg.runtime, seeded.tenant)
         .await
         .expect("scope");
@@ -322,11 +329,14 @@ async fn stub_laya(score: Option<f64>) -> (String, Arc<Mutex<usize>>) {
             let state = state.clone();
             async move {
                 *state.lock().expect("hits") += 1;
+                // The ladder's question key is `decision` (DECISION_QUESTION): the executor
+                // prepares and classifies the ladder's own document, so the stub answers the
+                // key that document carries.
                 match score {
                     Some(score) => axum::Json(json!({
-                        "answers": {"accept": {"score": score, "reason": "the stub's verdict"}}
+                        "answers": {"decision": {"score": score, "reason": "the stub's verdict"}}
                     })),
-                    None => axum::Json(json!({"answers": {"accept": {"error": "unavailable"}}})),
+                    None => axum::Json(json!({"answers": {"decision": {"error": "unavailable"}}})),
                 }
             }
         }),
@@ -641,7 +651,10 @@ async fn the_gate_records_a_laya_decision() {
         row
     };
     assert_eq!(status, "succeeded");
-    assert_eq!(answer, "accept");
+    // The recorded answer is the VERIFIED document's answer: a score question records the
+    // score itself (`ladder.evaluate` reads it from the classify replay), never a caller's
+    // synthetic "accept" label.
+    assert_eq!(answer, "0.9");
     assert!((confidence - 0.9).abs() < f64::EPSILON);
     let judge: Value = {
         let mut tx = begin_scoped(&pg.runtime, seeded.tenant)

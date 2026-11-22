@@ -42,14 +42,30 @@ struct StubState {
     /// The answer every request gets; `None` is the path-and-authorization echo the refusal
     /// and credential tests rely on.
     reply: Option<Value>,
+    /// How long every answer waits before it is sent. The long-operation test needs a
+    /// destination that outlives the tool's own timeout but still answers.
+    delay_ms: u64,
 }
 
 async fn answer(
     axum::extract::State(state): axum::extract::State<StubState>,
     uri: axum::http::Uri,
     headers: axum::http::HeaderMap,
+    body: Option<axum::Json<Value>>,
 ) -> axum::Json<Value> {
     state.hits.fetch_add(1, Ordering::SeqCst);
+    // The long-operation test needs a destination that is actually slow: the stub's configured
+    // delay (and any `delay_ms` in the input) is honoured before answering, so the broker's own
+    // timeout can fire while the call is in flight.
+    let body_delay = body
+        .as_ref()
+        .and_then(|axum::Json(value)| value.get("delay_ms"))
+        .and_then(Value::as_u64)
+        .unwrap_or(0);
+    let delay = state.delay_ms.max(body_delay).min(5_000);
+    if delay > 0 {
+        tokio::time::sleep(std::time::Duration::from_millis(delay)).await;
+    }
     let authorization = headers
         .get(axum::http::header::AUTHORIZATION)
         .and_then(|value| value.to_str().ok())
@@ -61,22 +77,29 @@ async fn answer(
 
 impl Stub {
     async fn start() -> Stub {
-        Stub::start_with_reply(None).await
+        Stub::start_with_reply(None, 0).await
     }
 
     /// A stub that answers every request with the same document: the destination's half of a
     /// write-verification test, where the answer itself is what the broker judges.
     async fn start_with(reply: Value) -> Stub {
-        Stub::start_with_reply(Some(reply)).await
+        Stub::start_with_reply(Some(reply), 0).await
     }
 
-    async fn start_with_reply(reply: Option<Value>) -> Stub {
+    /// A stub that waits `delay_ms` before every answer: the slow destination the broker's
+    /// long-operation path needs.
+    async fn start_with_delay(delay_ms: u64) -> Stub {
+        Stub::start_with_reply(None, delay_ms).await
+    }
+
+    async fn start_with_reply(reply: Option<Value>, delay_ms: u64) -> Stub {
         let hits = Arc::new(AtomicUsize::new(0));
         let app = axum::Router::new()
             .fallback(axum::routing::any(answer))
             .with_state(StubState {
                 hits: hits.clone(),
                 reply,
+                delay_ms,
             });
         let listener = tokio::net::TcpListener::bind("127.0.0.1:0")
             .await
@@ -122,6 +145,32 @@ impl Fixture {
             ceiling,
             input_schema,
             None,
+            0,
+        )
+        .await
+    }
+
+    /// [`Fixture::new`] with a destination that waits `delay_ms` before answering: the slow
+    /// backend the broker's long-operation path needs, outliving the tool's timeout while its
+    /// own action timeout still admits the call.
+    async fn new_with_delay(
+        toolkit_key: &str,
+        tool_key: &str,
+        handler_action: &str,
+        effect: &str,
+        ceiling: &str,
+        input_schema: Value,
+        delay_ms: u64,
+    ) -> Fixture {
+        Fixture::build(
+            toolkit_key,
+            tool_key,
+            handler_action,
+            effect,
+            ceiling,
+            input_schema,
+            None,
+            delay_ms,
         )
         .await
     }
@@ -146,6 +195,7 @@ impl Fixture {
             ceiling,
             input_schema,
             Some(reply),
+            0,
         )
         .await
     }
@@ -159,12 +209,13 @@ impl Fixture {
         ceiling: &str,
         input_schema: Value,
         reply: Option<Value>,
+        delay_ms: u64,
     ) -> Fixture {
         let pg = support::Pg::fresh().await;
         let seeded = support::seed(&pg, "dev-a", "alice", "Alice").await;
         let stub = match reply {
             Some(reply) => Stub::start_with(reply).await,
-            None => Stub::start().await,
+            None => Stub::start_with_delay(delay_ms).await,
         };
         // Both services the broker tests reach: `fixtures.*` and the coding action (SPEC §12 T13's
         // "a development job calls coding through the broker").
@@ -480,6 +531,17 @@ fn slow_schema() -> Value {
     })
 }
 
+/// `coding_jobs.get`'s input (`CodingJobGetIn`): the long-operation test's destination, whose
+/// own action timeout (5 s) is longer than the tool timeout the test sets (1 s).
+fn coding_get_schema() -> Value {
+    json!({
+        "type": "object",
+        "properties": {"id": {"type": "string"}},
+        "required": ["id"],
+        "additionalProperties": false
+    })
+}
+
 // ── P1.1 ────────────────────────────────────────────────────────────────────────────────
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
@@ -583,8 +645,8 @@ async fn a_registered_binding_writer_creates_the_grant() {
         status, 200,
         "the binding writer must accept a published toolkit: {body}"
     );
-    assert_eq!(body["toolkit_key"], "coding", "{body}");
-    assert_eq!(body["enabled"], true, "{body}");
+    assert_eq!(body["output"]["toolkit_key"], "coding", "{body}");
+    assert_eq!(body["output"]["enabled"], true, "{body}");
 
     let (status, body) = fixture
         .call(
@@ -649,8 +711,8 @@ async fn tools_retire_unbinds_a_zero_use_toolkit() {
         )
         .await;
     assert_eq!(status, 200, "a zero-use toolkit retires: {body}");
-    assert_eq!(body["calls"], 0, "{body}");
-    assert_eq!(body["bindings_disabled"], 1, "{body}");
+    assert_eq!(body["output"]["calls"], 0, "{body}");
+    assert_eq!(body["output"]["bindings_disabled"], 1, "{body}");
 
     let (status, enabled): (String, Option<bool>) = {
         let mut tx = begin_scoped(&fixture.pg.owner, fixture.tenant)
@@ -710,16 +772,18 @@ async fn tools_retire_refuses_a_toolkit_used_in_the_window() {
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn a_call_over_the_tool_timeout_is_pending_and_resumes() {
     let _serial = SERIAL.lock().await;
-    let fixture = Fixture::new(
-        "fixtures",
-        "slow.run",
-        "fixtures.slow",
+    let fixture = Fixture::new_with_delay(
+        "coding",
+        "jobs.get",
+        "coding_jobs.get",
         "read",
         "read",
-        slow_schema(),
+        coding_get_schema(),
+        1_500,
     )
     .await;
-    // The tool's own timeout is 1 s; the destination waits 1.5 s.
+    // The tool's own timeout is 1 s; the destination waits 1.5 s and its own action timeout
+    // (5 s) admits that, so the tool timeout — not a destination failure — is what fires.
     let mut tx = begin_scoped(&fixture.pg.owner, fixture.tenant)
         .await
         .expect("a scoped write");
@@ -731,7 +795,7 @@ async fn a_call_over_the_tool_timeout_is_pending_and_resumes() {
     tx.commit().await.expect("commit");
 
     let (status, body) = fixture
-        .call("fixtures.slow.run", json!({"delay_ms": 1500}))
+        .call("coding.jobs.get", json!({"id": "job-1"}))
         .await;
     assert_eq!(
         status, 202,
@@ -775,11 +839,14 @@ async fn a_call_over_the_tool_timeout_is_pending_and_resumes() {
     let (status, body) = fixture
         .invoke_action(
             "tools.resume",
-            json!({"resume_token": token, "input": {"delay_ms": 1500}}),
+            json!({"resume_token": token, "input": {"id": "job-1"}}),
         )
         .await;
     assert_eq!(status, 200, "the resumed call completes: {body}");
-    assert_eq!(body["waited_ms"], 1500, "{body}");
+    assert_eq!(
+        body["output"]["path"], "/api/jobs/status",
+        "the resumed call completes at the destination: {body}"
+    );
 
     fixture.running.shutdown().await;
 }

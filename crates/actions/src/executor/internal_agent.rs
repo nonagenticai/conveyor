@@ -568,41 +568,92 @@ async fn decide(
         ));
     };
 
-    let criteria = policy
-        .policy
-        .meta
-        .get("criteria")
-        .cloned()
-        .unwrap_or_else(|| json!("the draft satisfies the request"));
-    let case_input = json!({
+    // The ladder owns the case: it builds the wire document from the policy rows and, at
+    // `ladder.evaluate`, rebuilds that document from the same rows and requires the answer to
+    // come from a `laya.classify` replay of EXACTLY that body (S06's verified-answer rule).
+    // An executor-authored judge document can never hash to the ladder's, so the gate path is
+    // prepare → classify → evaluate, and the classify key is what evaluate verifies.
+    let case_facts = json!({
         "run_id": run.id,
         "card_id": run.card_id,
         "job_key": anatomy.job_key,
         "release_hash": binding.release_hash,
+        "output": out.output,
+        "turns": out.turns,
     });
-    let request = judge::request(
-        Some(&laya_config.model_ref),
-        &json!({ "output": out.output, "turns": out.turns }),
-        &criteria,
-        Some(&case_input),
-    );
-    let started = std::time::Instant::now();
-    let judged = invoke(
+    let prepared = invoke(
         pool,
         registry(),
         tenant,
         InvokeRequest {
-            action: "laya.judge".to_owned(),
-            input: request,
+            action: "ladder.prepare".to_owned(),
+            input: json!({
+                "kind": GATE_KIND,
+                "gate": anatomy.gate,
+                "question": judge::JUDGE_QUESTION,
+                "input": case_facts,
+            }),
             precondition: None,
-            idempotency_key: Some(format!("{prefix}:judge")),
+            idempotency_key: None,
             approval_id: None,
             actor_id,
             actor_kind: "service".to_owned(),
             role: Role::KataExecutor,
             policy: Default::default(),
             authority: Authority::Internal,
-            request_id: Some(format!("internal_agent:{}:judge", run.id)),
+            request_id: Some(format!("internal_agent:{}:prepare", run.id)),
+            trace_id: Some(format!("run:{}", run.id)),
+            depth: 1,
+            app_key: app_key.to_owned(),
+            usage: None,
+            credential_alias: None,
+        },
+    )
+    .await;
+    let request = match prepared {
+        Ok(outcome) if outcome.status == 200 || outcome.status == 201 => outcome
+            .body
+            .get("output")
+            .and_then(|output| output.get("request"))
+            .cloned()
+            .ok_or_else(|| {
+                ExecutorFailure::permanent("ladder.prepare answered no wire document")
+            })?,
+        Ok(outcome) => {
+            // A policy with no usable pins is a configuration fault, not a passing gate.
+            tracing::warn!(
+                status = outcome.status,
+                "internal_agent: the ladder could not prepare the case"
+            );
+            return Err(ExecutorFailure::permanent(
+                "ladder.prepare refused the gate case",
+            ));
+        }
+        Err(error) => {
+            return Err(ExecutorFailure::retryable(format!(
+                "ladder.prepare: {}: {}",
+                error.code, error.detail
+            )));
+        }
+    };
+    let classify_key = format!("{prefix}:classify");
+    let started = std::time::Instant::now();
+    let judged = invoke(
+        pool,
+        registry(),
+        tenant,
+        InvokeRequest {
+            action: "laya.classify".to_owned(),
+            input: request.clone(),
+            precondition: None,
+            idempotency_key: Some(classify_key.clone()),
+            approval_id: None,
+            actor_id,
+            actor_kind: "service".to_owned(),
+            role: Role::KataExecutor,
+            policy: Default::default(),
+            authority: Authority::Internal,
+            request_id: Some(format!("internal_agent:{}:classify", run.id)),
             trace_id: Some(format!("run:{}", run.id)),
             depth: 1,
             app_key: app_key.to_owned(),
@@ -615,13 +666,15 @@ async fn decide(
     let verdict = match judged {
         Err(error) if error.status >= 500 => None,
         Err(error) => {
-            // A 4xx from the judge is an outage too: only a readable verdict can decide.
-            tracing::warn!(code = %error.code, "internal_agent: the laya judge refused the request");
+            // A 4xx from laya is an outage too: only a readable verdict can decide.
+            tracing::warn!(code = %error.code, "internal_agent: the laya call refused the request");
             None
         }
         Ok(outcome) => {
             let answer = outcome.body.get("output").cloned().unwrap_or(Value::Null);
-            match judge::parse_verdict(&answer, Some(threshold)) {
+            // The ladder's parser, not the judge's: `ladder.prepare` keys its questions
+            // `decision` and `ladder.evaluate` re-reads the stored answer the same way.
+            match crate::ladder::laya::parse_answer(&request, &answer) {
                 Ok(verdict) => Some(verdict),
                 Err(error) => {
                     tracing::warn!(%error, "internal_agent: unreadable laya verdict");
@@ -649,8 +702,8 @@ async fn decide(
         });
     };
 
-    let answer = if verdict.accepted { "accept" } else { "refuse" };
-    let confidence = verdict.score.unwrap_or(0.0);
+    let answer = verdict.answer.as_str();
+    let confidence = verdict.confidence;
     let evaluated = invoke(
         pool,
         registry(),
@@ -663,13 +716,8 @@ async fn decide(
                 "project_id": run.project_id,
                 "card_id": run.card_id,
                 "question": judge::JUDGE_QUESTION,
-                "answer": answer,
-                "confidence": confidence,
-                "input": {
-                    "output": out.output,
-                    "release_hash": binding.release_hash,
-                },
-                "latency_ms": latency_ms,
+                "input": case_facts,
+                "laya_key": classify_key,
                 "meta": {
                     "run_id": run.id,
                     "job_binding_id": binding.id,
@@ -732,7 +780,6 @@ async fn decide(
         "answer": answer,
         "confidence": confidence,
         "threshold": threshold,
-        "reason": verdict.reason,
         "policy_id": policy.policy.id.to_string(),
         "laya_config_id": laya_config.id.to_string(),
         "latency_ms": latency_ms,
