@@ -105,7 +105,8 @@ Blocker: #N — <a plain line, present iff this issue is `status:blocked`; say w
 
 ## Definition of done
 - [ ] Every scenario passes at the PR head; `Evidence at completion` has one row per scenario.
-- [ ] Repo gate green at the exact head (`rbuild --gate`; docs: `git diff --check` + links).
+- [ ] Repo gate green at the exact head (`preflight.yml` for the compile/lint verdict, the PR's
+      `ci-public` as the final gate; docs: `git diff --check` + links).
 - [ ] Tests added/updated per part; none skipped.
 - [ ] Docs updated; migrations/ledger and `--check-lock` handled when touched.
 - [ ] Live verification recorded where deployment is a prerequisite.

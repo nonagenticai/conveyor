@@ -3,3 +3,4 @@
 //! `retrieval.query` is the raw strata passthrough and is deliberately distinct.
 
 pub mod query;
+pub mod retrieval;

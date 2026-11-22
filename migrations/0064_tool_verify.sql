@@ -1,4 +1,4 @@
--- 0063_tool_verify.sql — a write tool's declared verification path travels with its version
+-- 0064_tool_verify.sql — a write tool's declared verification path travels with its version
 -- (SPEC_V2 §11.3; finding v1-w4a-2, conveyor#526).
 --
 -- A `write`/`destructive` tool must declare how the broker proves the write happened — a

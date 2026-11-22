@@ -2043,7 +2043,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-blueprint-01a1d039-0d24-7d16-ae52-4841e96ccfac.html",
-        "sha256": "17489ddcac9d8ac348fd7755fb9e59ceabab61dd0e8470e9c99a43ecdaa20e0e"
+        "sha256": "a2a2445f4d6340af32765551de2594d291e2b84770023f97a05aae527a23798a"
       },
       "gate": {
         "approval_id": "",
@@ -2091,6 +2091,26 @@ window.CONVEYOR_STANDARDS = {
           "heading": "The to-be the projects deliver",
           "missing": [
             "No row or document satisfies 'The to-be the projects deliver'; a document exists but lacks the heading"
+          ],
+          "required": true,
+          "severity": "",
+          "sources": [],
+          "status": "partial"
+        },
+        {
+          "heading": "Organisation and skills",
+          "missing": [
+            "No row or document satisfies 'Organisation and skills'; a document exists but lacks the heading"
+          ],
+          "required": true,
+          "severity": "",
+          "sources": [],
+          "status": "partial"
+        },
+        {
+          "heading": "Current, intermediate and target states",
+          "missing": [
+            "No row or document satisfies 'Current, intermediate and target states'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -2182,7 +2202,7 @@ window.CONVEYOR_STANDARDS = {
       "covered_rule": "",
       "document": {
         "path": "docs/standards/std-msp-business-case-01a1d039-0d24-7d16-ae52-4841e96ccfac.html",
-        "sha256": "0ea62c0027718d32deaedf20b6f5d858c79a75cd7503d12705c5e5c8b3aea8c7"
+        "sha256": "d8f638fa3f5daabe6dc84fa3512c7e433a5c877aca43af104156cc206135f579"
       },
       "gate": {
         "approval_id": "",
@@ -2269,6 +2289,36 @@ window.CONVEYOR_STANDARDS = {
           "heading": "Licensing frame",
           "missing": [
             "No row or document satisfies 'Licensing frame'; a document exists but lacks the heading"
+          ],
+          "required": true,
+          "severity": "",
+          "sources": [],
+          "status": "partial"
+        },
+        {
+          "heading": "Options, including doing nothing",
+          "missing": [
+            "No row or document satisfies 'Options, including doing nothing'; a document exists but lacks the heading"
+          ],
+          "required": true,
+          "severity": "",
+          "sources": [],
+          "status": "partial"
+        },
+        {
+          "heading": "Investment appraisal and cash flow",
+          "missing": [
+            "No row or document satisfies 'Investment appraisal and cash flow'; a document exists but lacks the heading"
+          ],
+          "required": true,
+          "severity": "",
+          "sources": [],
+          "status": "partial"
+        },
+        {
+          "heading": "Capabilities the benefits depend on",
+          "missing": [
+            "No row or document satisfies 'Capabilities the benefits depend on'; a document exists but lacks the heading"
           ],
           "required": true,
           "severity": "",
@@ -60799,7 +60849,7 @@ window.CONVEYOR_STANDARDS = {
   },
   "generated_at": "2026-11-20T11:50:50.848127361+00:00",
   "git_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
-  "payload_sha256": "4abc2bbae746be00e8353a6a324d345c943b968115cee7b1e245972fb8b6171e",
+  "payload_sha256": "c49a71b057a360c2102a9461714d341b5f56a2d8b9a27280fcc5df300e0c9a92",
   "schema": "design-standards/v1",
   "summary": {
     "absent": 373,

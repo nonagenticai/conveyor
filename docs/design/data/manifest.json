@@ -2,10 +2,10 @@
   "feedback_url": "https://github.com/nonagenticai/conveyor/discussions",
   "files": [
     {
-      "bytes": 13331,
+      "bytes": 13473,
       "path": "actions.json",
       "records": 0,
-      "sha256": "216c6c5fde2b61becd4ef2406f8d7b1894d6a863ec2cfdf2dd7a96eacaf1cf0e"
+      "sha256": "ee63f4e387752aca7e9dcdb0a91b19d884e4e8a1adf35502502d0a8e8ec3d3e0"
     },
     {
       "bytes": 108957,
@@ -26,16 +26,16 @@
       "sha256": "a8fd56b89802f3d35199cac1b3b75a10e6d1562781fbf15020192791fd7c588c"
     },
     {
-      "bytes": 26599,
+      "bytes": 26657,
       "path": "coverage.js",
       "records": 0,
-      "sha256": "18c16315bb02416cdcd1752408e258b515ae040c4e052c60ffc3447351925188"
+      "sha256": "e6e00cfcda1d848b5f398985144c20ff9c9a0477c2a130f2a0c35d86f0cb40ad"
     },
     {
-      "bytes": 48841,
+      "bytes": 48926,
       "path": "coverage.json",
       "records": 0,
-      "sha256": "53bb25f65af9dc7be35090033df1ff6ddfab4c3201c5fa39a1990f55a07152e0"
+      "sha256": "b9fa76af0d5392b0ac3a4f61a6e55e7539d8a7b20dc17f0ae3b4460b33abb08c"
     },
     {
       "bytes": 109,
@@ -74,10 +74,10 @@
       "sha256": "3807b68e9cb77bd166fbe6f6d4b0e269c8bc0923a8d156f45dba8342786bd2ee"
     },
     {
-      "bytes": 105457,
+      "bytes": 106123,
       "path": "output-standard.js",
       "records": 0,
-      "sha256": "8c372fcd38aac7d43965b7616a77ae2322215a525791f2a7fcc63148db413e39"
+      "sha256": "456501d01c0fc0818bdddabfa4948c3bd277ace4a2d0db3e670f591c80d18624"
     },
     {
       "bytes": 180846,
@@ -86,10 +86,10 @@
       "sha256": "e868cfc4d87105681c7ec5c022093b37f59223b288ce686d7ec2ce20d4fa58d3"
     },
     {
-      "bytes": 2020146,
+      "bytes": 2024666,
       "path": "rework.js",
       "records": 505,
-      "sha256": "335209c25a7b6f399e78fe445270d2334d403d26f386d803f6b14e03d7c2c0fe"
+      "sha256": "a35fda856ed982493deddb94a3c73541b1550b3a3da0b6c2083d2f1b3e9c9ffd"
     },
     {
       "bytes": 225,
@@ -104,16 +104,16 @@
       "sha256": "f14da210b7930ea189d21257895fd4df743dc0a4acdb855abcbec3cf816c7afe"
     },
     {
-      "bytes": 1764983,
+      "bytes": 1766699,
       "path": "standards.js",
       "records": 505,
-      "sha256": "d131e972b9da22170df946b6e94aa89b7dfaa96c98eb422ffaf9ef9c970f5141"
+      "sha256": "bbe16309f94488ae2a962639fafd3ff96ae96245c0c5a0250eb1c5964dc286c6"
     },
     {
-      "bytes": 1764954,
+      "bytes": 1766670,
       "path": "standards.json",
       "records": 505,
-      "sha256": "7dc4f644b4409c107b26fc45f0c724ec952784bb0f054fc47a27a2952c6d58ff"
+      "sha256": "1497b294b02793ad0939b2f03ed0db1caae1c290362d63bccb18b9d3ae88a856"
     },
     {
       "bytes": 1091172,

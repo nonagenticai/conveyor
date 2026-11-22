@@ -2150,7 +2150,7 @@
       "title": "MSP artefact absent: benefit-transition"
     },
     {
-      "acceptance": "std-msp-blueprint-01a1d039-0d24-7d16-ae52-4841e96ccfac: evidence the missing section(s) Aggregates and services, Action registry and data model, Deployment estate, The to-be the projects deliver of Blueprint — conveyor buildout from seed/output-standard.json#blueprint, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+      "acceptance": "std-msp-blueprint-01a1d039-0d24-7d16-ae52-4841e96ccfac: evidence the missing section(s) Aggregates and services, Action registry and data model, Deployment estate, The to-be the projects deliver, Organisation and skills, Current, intermediate and target states of Blueprint — conveyor buildout from seed/output-standard.json#blueprint, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "blueprint",
       "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
       "category": "blueprint",
@@ -2202,6 +2202,30 @@
             ]
           ],
           "source": "artefact"
+        },
+        {
+          "artefact": "std-msp-blueprint-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "section": "Organisation and skills",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "blueprint",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-msp-blueprint-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "section": "Current, intermediate and target states",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "blueprint",
+              0
+            ]
+          ],
+          "source": "artefact"
         }
       ],
       "failure_scenario": "The published record claims a MSP artefact the row set does not support, or omits a mandatory one without a work package.",
@@ -2210,11 +2234,13 @@
         "Aggregates and services",
         "Action registry and data model",
         "Deployment estate",
-        "The to-be the projects deliver"
+        "The to-be the projects deliver",
+        "Organisation and skills",
+        "Current, intermediate and target states"
       ],
       "owner_project": "PLATFORM",
       "package_key": "std-msp-blueprint-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM",
-      "problem": "The blueprint artefact for conveyor buildout is absent; missing required sections: Aggregates and services, Action registry and data model, Deployment estate, The to-be the projects deliver.",
+      "problem": "The blueprint artefact for conveyor buildout is absent; missing required sections: Aggregates and services, Action registry and data model, Deployment estate, The to-be the projects deliver, Organisation and skills, Current, intermediate and target states.",
       "severity": "P1",
       "source": "artefact",
       "spec": "§8.3",
@@ -4666,7 +4692,7 @@
       "title": "TOGAF artefact absent: requirements-catalog"
     },
     {
-      "acceptance": "std-msp-business-case-01a1d039-0d24-7d16-ae52-4841e96ccfac: evidence the missing section(s) Licensing frame of Business Case — conveyor buildout from seed/output-standard.json#business-case, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+      "acceptance": "std-msp-business-case-01a1d039-0d24-7d16-ae52-4841e96ccfac: evidence the missing section(s) Licensing frame, Options, including doing nothing, Investment appraisal and cash flow, Capabilities the benefits depend on of Business Case — conveyor buildout from seed/output-standard.json#business-case, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "business-case",
       "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
       "category": "business-case",
@@ -4682,16 +4708,55 @@
             ]
           ],
           "source": "artefact"
+        },
+        {
+          "artefact": "std-msp-business-case-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "section": "Options, including doing nothing",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "business-case",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-msp-business-case-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "section": "Investment appraisal and cash flow",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "business-case",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-msp-business-case-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "section": "Capabilities the benefits depend on",
+          "snapshot": [
+            [
+              "seed/output-standard.json",
+              "business-case",
+              0
+            ]
+          ],
+          "source": "artefact"
         }
       ],
       "failure_scenario": "The published record claims a MSP artefact the row set does not support, or omits a mandatory one without a work package.",
       "id": "std-msp-business-case-01a1d039-0d24-7d16-ae52-4841e96ccfac",
       "missing": [
-        "Licensing frame"
+        "Licensing frame",
+        "Options, including doing nothing",
+        "Investment appraisal and cash flow",
+        "Capabilities the benefits depend on"
       ],
       "owner_project": "PLATFORM",
       "package_key": "std-msp-business-case-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM",
-      "problem": "The business-case artefact for conveyor buildout is partial; missing required sections: Licensing frame.",
+      "problem": "The business-case artefact for conveyor buildout is partial; missing required sections: Licensing frame, Options, including doing nothing, Investment appraisal and cash flow, Capabilities the benefits depend on.",
       "severity": "P2",
       "source": "artefact",
       "spec": "§8.3",

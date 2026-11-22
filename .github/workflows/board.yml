@@ -11,11 +11,12 @@ name: board
 # already looking for work. This runs server-side, so it holds for every session on every
 # machine, including the ones that never read this file.
 #
-# Rule A (ready + a live branch or an open PR -> claimed) is the only automatic action, and it
-# moves in ONE direction only: a check that could also return an issue to `ready` could steal a
-# claim, which is worse than the drift it repairs. Rules B (blocked with no open blocker) and C
-# (claimed with no branch and no update in 48 h) are reported in the job summary and never
-# applied -- releasing a claim stays a human decision.
+# Rule A (ready + a live branch or an open PR -> claimed) moves in ONE direction only: a check
+# that could also return a claim to `ready` could steal it, which is worse than the drift it
+# repairs. Rule B has a narrow second automatic action: a block whose EVERY named blocker is
+# positively closed is released to `ready`; a missing/unknown blocker or a claimed issue is
+# reported, never edited. Rule C (claimed with no branch and no update in 48 h) is reported and
+# never applied -- releasing a claim stays a human decision.
 #
 # THE CRON ALONE IS NOT ENOUGH. GitHub's `schedule` event is best-effort and this repository drops
 # most of its fires: measured 2026-11-17, this hourly cron produced 5 runs in ~35 h, and no
@@ -33,7 +34,7 @@ on:
   workflow_dispatch:
     inputs:
       dry_run:
-        description: "Print the plan and write nothing (the job fails if a rule-A fix is pending)"
+        description: "Print the plan and write nothing (the job fails if any fix is pending)"
         type: boolean
         default: false
 
