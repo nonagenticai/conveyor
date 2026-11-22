@@ -105,6 +105,55 @@ async fn make_board(running: &support::Running, title: &str) -> Board {
     Board { board_id, lanes }
 }
 
+/// v1-e2e-1: a test-created project carries `meta.test_row`, so the public pack excludes it and
+/// lists it under `programme.test_projects` instead of treating a proof fixture as work.
+#[tokio::test]
+async fn a_test_row_project_carries_the_marker() {
+    let (pg, running, _seeded) = fixture().await;
+    let (status, created) = running
+        .invoke(
+            "projects.create",
+            "dev:alice",
+            json!({"title": "e2e proof", "test_row": true}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "{created}");
+    let test_id = id_of(output(&created), "id");
+    let (status, ordinary) = running
+        .invoke(
+            "projects.create",
+            "dev:alice",
+            json!({"title": "ordinary work"}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "{ordinary}");
+    let ordinary_id = id_of(output(&ordinary), "id");
+
+    let test_marker: Option<bool> =
+        sqlx::query_scalar("SELECT (meta->>'test_row')::boolean FROM project WHERE id = $1::uuid")
+            .bind(&test_id)
+            .fetch_one(&pg.super_pool)
+            .await
+            .expect("read the test marker");
+    assert_eq!(test_marker, Some(true), "a test row carries the marker");
+    let ordinary_marker: Option<bool> =
+        sqlx::query_scalar("SELECT (meta->>'test_row')::boolean FROM project WHERE id = $1::uuid")
+            .bind(&ordinary_id)
+            .fetch_one(&pg.super_pool)
+            .await
+            .expect("read the ordinary marker");
+    assert_eq!(
+        ordinary_marker, None,
+        "an ordinary project carries no marker"
+    );
+}
+
 async fn create_card(
     running: &support::Running,
     board_id: &str,

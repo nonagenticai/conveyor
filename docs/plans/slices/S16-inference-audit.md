@@ -22,6 +22,13 @@ adds_modules: [inference, prompt_audit]
 parity_ids: PENDING-S0   # net-new: this slice ports no old surface, so S0 has no id for it
 ---
 
+<!-- historical-rbuild -->
+> ⚠️ **Historical build order.** `rbuild` was retired on 2026-11-20 (CONTRACT §16). The
+> `rbuild -- …` lines below record how this slice was gated then, not a route to run now. The
+> current route is the GitHub-hosted `preflight.yml` for the compile/lint verdict and
+> `~/.claude/scripts/cargo-guard.py` on m4 for interactive feedback; never a local gate.
+
+
 # S16 — Inference ledger and prompt audit
 
 Programme project: S16 · issues #20

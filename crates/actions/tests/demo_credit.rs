@@ -183,9 +183,11 @@ async fn a_credit_needs_an_accepted_deliverable() {
     refused(status, &body, "deliverable_id");
 }
 
-/// A credit needs the deliverable's evidence, not only its acceptance.
+/// An accepted deliverable cannot be written without the evidence that met its acceptance. The
+/// action layer refuses the update; the store-level `demo_gate.rs` still proves the credit refuses
+/// an evidence-less row written outside the action.
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
-async fn a_credit_needs_evidence() {
+async fn an_accepted_deliverable_must_carry_its_evidence() {
     let (_pg, running, _seeded) = fixture().await;
     let programme = create_programme(&running, "Demo credit evidence").await;
     let cadence = create_cadence(&running, &programme, "demo").await;
@@ -197,7 +199,7 @@ async fn a_credit_needs_evidence() {
         json!({"id": deliverable, "status": "accepted"}),
     )
     .await;
-    assert_eq!(status, 200, "{body}");
+    refused(status, &body, "evidence");
 
     let (status, body) = credit(&running, &cadence, &deliverable).await;
     refused(status, &body, "deliverable_id");
@@ -377,6 +379,27 @@ async fn cadence_state(running: &support::Running, programme: &str, cadence: &st
         .expect("the cadence row")
 }
 
+async fn cadence_version(running: &support::Running, programme: &str, cadence: &str) -> String {
+    let (status, body) = running
+        .invoke(
+            "cadences.list",
+            TOKEN,
+            json!({"programme_id": programme}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{body}");
+    output(&body)["items"]
+        .as_array()
+        .expect("a page")
+        .iter()
+        .find(|row| row["id"] == json!(cadence))
+        .map(|row| row["version"].as_i64().expect("version").to_string())
+        .expect("the cadence row")
+}
+
 /// A retro cannot close over a finding with no lesson; the refusal writes nothing.
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn a_retro_close_without_a_lesson_is_refused_and_stays_open() {
@@ -482,5 +505,119 @@ async fn a_retro_closes_once_each_finding_has_a_lesson() {
         cadence_state(&running, &programme, &cadence).await,
         "closed",
         "the cadence closes with the retro"
+    );
+}
+
+/// The close writes each finding's lesson from the finding itself, and a systemic finding carries
+/// the typed `kata_candidate` marker the kata opener consumes (v1-w2c-2, T5's contract).
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_retro_close_writes_the_lesson_and_a_systemic_candidate() {
+    let (pg, running, seeded) = fixture().await;
+    let programme = create_programme(&running, "Retro writes").await;
+    let project = create_project(&running).await;
+    let meta = retro_meta(&pg, seeded.tenant_id, &project).await;
+    let cadence = create_retro_cadence(&running, &programme, meta).await;
+
+    let findings = json!([
+        {
+            "key": "F-1",
+            "statement": "the deploy took four tries",
+            "evidence": ["retro:note-1", "retro:note-2"]
+        },
+        {
+            "key": "F-2",
+            "statement": "the lease proof was missing",
+            "evidence": ["retro:note-3", "retro:note-4"],
+            "systemic": true,
+            "kata": {
+                "signature": "lease-proof",
+                "title": "Pin the lease proof",
+                "rationale": "the same gap recurred",
+                "target_ref": {"kind": "procedure", "id": "lease"}
+            }
+        }
+    ]);
+    let (status, body) = running
+        .invoke(
+            "retros.record_findings",
+            TOKEN,
+            json!({"cadence_id": cadence, "findings": findings}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{body}");
+
+    let (status, body) = running
+        .invoke(
+            "retros.close",
+            TOKEN,
+            json!({"cadence_id": cadence}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{body}");
+    assert_eq!(
+        cadence_state(&running, &programme, &cadence).await,
+        "closed"
+    );
+
+    let lessons: Vec<(String, String, Option<String>)> = sqlx::query_as(
+        "SELECT source, state, meta->'kata_candidate'->>'signature'
+           FROM lesson
+          WHERE tenant_id = $1 AND cadence_id = $2::uuid
+          ORDER BY finding_key",
+    )
+    .bind(seeded.tenant_id)
+    .bind(&cadence)
+    .fetch_all(&pg.super_pool)
+    .await
+    .expect("read the lessons");
+    assert_eq!(lessons.len(), 2, "one lesson per finding: {lessons:?}");
+    assert!(
+        lessons
+            .iter()
+            .all(|(source, state, _)| source == "retro" && state == "proposed"),
+        "both lessons are retro proposals: {lessons:?}"
+    );
+    let signatures: Vec<&str> = lessons
+        .iter()
+        .filter_map(|(_, _, signature)| signature.as_deref())
+        .collect();
+    assert_eq!(
+        signatures,
+        vec!["lease-proof"],
+        "only the systemic finding carries a kata marker: {lessons:?}"
+    );
+}
+
+/// A retro cannot be closed through a generic cadence edit; the close gate is the only path.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn cadences_update_cannot_close_a_retro() {
+    let (pg, running, seeded) = fixture().await;
+    let programme = create_programme(&running, "Retro bypass").await;
+    let project = create_project(&running).await;
+    let meta = retro_meta(&pg, seeded.tenant_id, &project).await;
+    let cadence = create_retro_cadence(&running, &programme, meta).await;
+    let version = cadence_version(&running, &programme, &cadence).await;
+
+    let (status, body) = running
+        .invoke(
+            "cadences.update",
+            TOKEN,
+            json!({"id": cadence, "state": "closed"}),
+            Some(&version),
+            None,
+            None,
+        )
+        .await;
+    refused(status, &body, "state");
+    assert_ne!(
+        cadence_state(&running, &programme, &cadence).await,
+        "closed",
+        "the refused edit leaves the retro open"
     );
 }

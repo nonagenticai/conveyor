@@ -3,6 +3,11 @@
 **Read order for a new session:** this file → `03-DELIVERY.md` → `01-CONTRACT.md` → the slice you are
 building → its source-map anchor. Do not read all nineteen plans.
 
+**Historical build orders.** The `S##` plans record how the V1 slices were gated. `rbuild` lines in
+them are historical (CONTRACT §16, owner 2026-11-20); they are not a route to run now. The current
+route is the GitHub-hosted `preflight.yml` for the compile/lint verdict and
+`~/.claude/scripts/cargo-guard.py` on m4 for interactive feedback — never a local gate.
+
 **Work is claimed by a GitHub issue, not by a branch or a conversation.** The slice status table below is
 *inventory* — what has been built. The *queue* is the open issues: `gh issue list --label unit --state open`.
 Run the `issue-pickup` skill before creating any branch. One issue = one branch = exactly one PR; a slice

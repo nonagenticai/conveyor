@@ -738,6 +738,27 @@ pub async fn snapshot_tx(
         tenant_id,
     )
     .await?;
+    // Test residue is not the programme's portfolio. The e2e/UI-proof rows named below created
+    // projects in the live tenant with no marker; the public pack must neither count them as
+    // programme projects nor let their boards, cards, runs, documents or architecture rows in.
+    // They are listed under `programme.test_projects` with the reason, so the exclusion is
+    // visible rather than silent. The authenticated API (`GET /api/projects`) is unaffected: an
+    // operator still sees every row.
+    let mut test_projects: Vec<Value> = Vec::new();
+    if let Some(rows) = projects.as_array_mut() {
+        rows.retain(|row| match test_row_reason(row) {
+            Some(reason) => {
+                test_projects.push(json!({
+                    "key": row.get("key").cloned().unwrap_or(Value::Null),
+                    "name": row.get("name").cloned().unwrap_or(Value::Null),
+                    "status": row.get("status").cloned().unwrap_or(Value::Null),
+                    "reason": reason,
+                }));
+                false
+            }
+            None => true,
+        });
+    }
     // ⛔ The public pack is the TENANT'S PORTFOLIO (SPEC_V2 §5.1; owner brief 2026-11-21). Every
     // programme-bound project is public. A standalone project is public only when it is a real
     // change initiative: status `active`/`paused` AND it carries a board or a card. A standalone
@@ -876,7 +897,11 @@ pub async fn snapshot_tx(
     );
 
     Ok(SnapshotData {
-        programme: json!({"programme": programme, "projects": projects}),
+        programme: json!({
+            "programme": programme,
+            "projects": projects,
+            "test_projects": test_projects,
+        }),
         // T0: the organisation spine (§4) — industries, the placed departments, the job
         // catalogue with its latest release's anatomy flattened onto each row, releases and
         // bindings. Structural fields only (the publication privacy contract).
@@ -967,6 +992,30 @@ fn inference_error(error: crate::inference::InferenceStoreError) -> sqlx::Error 
 
 /// The public project keys by row id. A derived section names a project by key: the key is the
 /// reader's name for it, and an id would dangle outside the tenant.
+/// The two e2e/UI-proof projects that predate the `meta.test_row` marker.
+const LEGACY_TEST_PROJECT_KEYS: [&str; 2] = [
+    "AAA-UI-PROOF-285-2026-11-19T07-3-2",
+    "AAA-UI-PROOF-285-2026-11-19T07-4",
+];
+
+/// Why a project row is test residue, or `None` when it is a real project.
+fn test_row_reason(row: &Value) -> Option<&'static str> {
+    let marked = row
+        .get("meta")
+        .and_then(Value::as_object)
+        .and_then(|meta| meta.get("test_row"))
+        .and_then(Value::as_bool)
+        == Some(true);
+    if marked {
+        return Some("meta.test_row is true");
+    }
+    let key = row.get("key").and_then(Value::as_str).unwrap_or_default();
+    if LEGACY_TEST_PROJECT_KEYS.contains(&key) {
+        return Some("a known pre-marker e2e project key");
+    }
+    None
+}
+
 fn project_key_by_id(projects: &Value) -> HashMap<String, String> {
     projects
         .as_array()

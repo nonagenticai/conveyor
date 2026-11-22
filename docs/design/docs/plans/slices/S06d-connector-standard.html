@@ -23,7 +23,12 @@
         >source ↗</a
       >
     </header>
-    <main class="doc-body"><h1 id="s06d--interaction-connector-standard">S06d — Interaction connector standard</h1>
+    <main class="doc-body"><!-- historical-rbuild -->
+
+<blockquote>
+<p>⚠️ <strong>Historical build order.</strong> <code>rbuild</code> was retired on 2026-11-20 (CONTRACT §16). The <code>rbuild -- …</code> lines below record how this slice was gated then, not a route to run now. The current route is the GitHub-hosted <code>preflight.yml</code> for the compile/lint verdict and <code>~/.claude/scripts/cargo-guard.py</code> on m4 for interactive feedback; never a local gate.</p>
+</blockquote>
+<h1 id="s06d--interaction-connector-standard">S06d — Interaction connector standard</h1>
 <p>Programme project: S06d · issues none yet</p>
 <h2 id="1-objective">1. Objective</h2>
 <p>Web, Telegram and MCP are <strong>three instances of one class of user-interaction app</strong>. This slice builds the standard that makes the next connector cheap: one registry entry per kind (typed config + <code>schemars</code> schema, named secrets, default grant set, <code>authenticate</code>/<code>parse</code>/<code>send</code>), one inbound route and one command grammar, one multicast dispatcher with a first-response close, and a tenant-admin grant matrix. Config and credentials live in Postgres and are entered through the web UI; there are no per-connector environment variables.</p>

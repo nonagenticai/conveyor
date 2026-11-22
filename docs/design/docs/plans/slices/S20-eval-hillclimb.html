@@ -23,7 +23,12 @@
         >source ↗</a
       >
     </header>
-    <main class="doc-body"><h1 id="s20--eval-hillclimb">S20 — Eval hillclimb</h1>
+    <main class="doc-body"><!-- historical-rbuild -->
+
+<blockquote>
+<p>⚠️ <strong>Historical build order.</strong> <code>rbuild</code> was retired on 2026-11-20 (CONTRACT §16). The <code>rbuild -- …</code> lines below record how this slice was gated then, not a route to run now. The current route is the GitHub-hosted <code>preflight.yml</code> for the compile/lint verdict and <code>~/.claude/scripts/cargo-guard.py</code> on m4 for interactive feedback; never a local gate.</p>
+</blockquote>
+<h1 id="s20--eval-hillclimb">S20 — Eval hillclimb</h1>
 <p>Programme project: S20 · issues #24</p>
 <h2 id="1-objective">1. Objective</h2>
 <p>The <code>eval-hillclimb</code> and <code>cost-hillclimb</code> methods become a loop over one eval: a goal, a stopping condition, a fixed train/test split, and rounds that each propose a change, run the full set, and are kept or reverted on the <strong>held-out</strong> number. At the end a person has the winning version applied, a per-round table with train and test side by side, a paired delta with a significance test, two before/after transcript pairs, and the failures nobody could fix classified by cause rather than blamed on the model.</p>
