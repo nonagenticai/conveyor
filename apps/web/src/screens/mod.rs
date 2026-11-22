@@ -12,6 +12,7 @@ pub mod inference;
 pub mod members;
 pub mod models;
 pub mod platform;
+pub mod portfolio;
 pub mod process_map;
 pub mod processes;
 pub mod prompt_audit;

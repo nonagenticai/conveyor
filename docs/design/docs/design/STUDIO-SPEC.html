@@ -28,9 +28,29 @@
 <p>This revision aligns the studio design pack with <strong><code>docs/SPEC_V2.md</code></strong> (2026-11-11, draft for review). V1 (<code>docs/SPEC.md</code>) remains the build record and stays binding for the slices it defines. SPEC_V2 adds the organisation that works the conveyor and the work hierarchy that organisation needs; it states that no V2 code has been written. The studio therefore distinguishes three things on every screen:</p>
 <ul>
 <li><strong>V1 surfaces</strong> — implemented in the Rust app (projects, cards, runs, approvals, procedures, capabilities, knowledge/memory, evals, benchmarks, hillclimb, prompt audit, the ledger, secrets, channels, licences and billing). These carry no V2 badge and link to their existing pages.</li>
-<li><strong>V2 destinations</strong> — proposed aggregates and actions from SPEC_V2. Every new destination carries a <code>V2 · PROPOSED</code> ribbon naming the tables/actions it previews. There is no write path, no backend call and no claim that the aggregate exists.</li>
+<li><strong>V2 destinations</strong> — aggregates and actions from SPEC_V2. A destination that has landed is <strong>live</strong>: it has a route in <code>apps/web</code>, one screen module and the real action list in "Live V2 shell" below; the nav shows it only when the caller's manifest carries its first read. A destination still in design carries the <code>V2 · PROPOSED</code> ribbon, names the tables/actions it previews and makes no backend call.</li>
 <li><strong>Legacy study surfaces</strong> — the S12 surfaces V2 supersedes or reframes (the historical 92-entry job catalogue, the coding action catalogue, the TOC reasoning study). They remain reachable and are banner-labelled, never presented as the live model.</li>
 </ul>
+<h3 id="live-v2-shell">Live V2 shell</h3>
+<p>The design site (<code>v2.js</code>) is the mock of each destination; this table is the product's contract with it. One route, one screen module, and the destination's whole server contract — a control whose action is absent from the caller's manifest is not rendered. A destination is added here only when its screen reads real rows; until then the mock's <code>V2 · PROPOSED</code> badge stands.</p>
+<table>
+<thead>
+<tr>
+<th>Destination</th>
+<th>Route</th>
+<th>Screen</th>
+<th>Actions</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Portfolio</td>
+<td><code>/portfolio</code></td>
+<td><code>apps/web/src/screens/portfolio.rs</code></td>
+<td><code>portfolio.in_flight</code></td>
+</tr>
+</tbody>
+</table>
 <h2 id="review-paths">Review paths</h2>
 <ol type="1">
 <li><strong>Portfolio → Plan.</strong> Open Portfolio: in-flight projects and programmes (a computed read model, no portfolio row), programme shared configuration, the typed project-dependency graph, the WSJF backlog, the PI cadence and per-project metering. Switch programme: the set re-scopes. Add a dependency that closes a cycle: it is refused. Open Plan: WBS, a frozen baseline against a computed forecast, the one six-kind register and controlled change. Approve a change without a rationale: <code>422 change_rationale_required</code>; with a rationale, a new baseline is drafted and existing run pins are unchanged.</li>

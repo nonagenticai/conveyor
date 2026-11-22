@@ -24,6 +24,7 @@ use crate::screens::inference::InferenceEndpoint;
 use crate::screens::members::Members;
 use crate::screens::models::{ModelDetail, ModelsScreen};
 use crate::screens::platform::Platform;
+use crate::screens::portfolio::Portfolio;
 use crate::screens::process_map::{ProcessMapDetail, ProcessMapList};
 use crate::screens::processes::{ProcessDetail, ProcessesScreen};
 use crate::screens::prompt_audit::PromptAuditScreen;
@@ -166,6 +167,7 @@ fn Shell() -> impl IntoView {
                             <Route path=path!("/settings/inference") view=InferenceEndpoint/>
                             <Route path=path!("/settings/admin") view=AdminScreen/>
                             <Route path=path!("/copilot") view=CopilotScreen/>
+                            <Route path=path!("/portfolio") view=Portfolio/>
                             <Route path=path!("/platform") view=Platform/>
                         </Routes>
                     </main>
@@ -269,6 +271,9 @@ fn Sidebar() -> impl IntoView {
                 <li><A href="/" exact=true><span class="nav-item">"Today"</span></A></li>
                 <li><A href="/boards"><span class="nav-item">"Board"</span></A></li>
                 <li><A href="/runs"><span class="nav-item">"Runs"</span></A></li>
+                {move || ctx.has_action("portfolio.in_flight").then(|| view! {
+                    <li><A href="/portfolio"><span class="nav-item">"Portfolio"</span></A></li>
+                })}
                 {move || ctx.has_action("approvals.list").then(|| view! {
                     <li><A href="/approvals"><span class="nav-item">"Approvals"</span></A></li>
                 })}
