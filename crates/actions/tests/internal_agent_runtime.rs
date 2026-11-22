@@ -505,6 +505,54 @@ async fn a_bound_run_generates_a_draft() {
 }
 
 #[tokio::test]
+async fn a_mutated_agent_does_not_change_a_bound_run() {
+    let _guard = STUBS.lock().await;
+    let (pg, seeded, running) = fixture().await;
+    let (router, models) = stub_router().await;
+    support::set_env("CONVEYOR_EXTERNAL_INFERENCE_URL", &router);
+    let (capability, agent) = seed_agent(&pg, &seeded, Some("agent@1"), "router/medium").await;
+    let (job, release) = seed_job(
+        &pg,
+        &seeded,
+        "mutated_job",
+        json!({"executor_kind": "internal_agent", "prompt_recipe": "agent@1",
+               "model_ref": "router/release", "title": "Mutated job", "charter": "write a draft"}),
+    )
+    .await;
+    let binding = bind(&pg, &seeded, job, release, agent, capability).await;
+    // The live row changes after the binding exists. The release snapshot is the execution
+    // authority, so the pinned run must not see the mutation.
+    sqlx::query(
+        "UPDATE capability_agent SET model_ref = 'router/mutated', max_iterations = 3
+          WHERE tenant_id = $1 AND id = $2",
+    )
+    .bind(seeded.tenant.as_uuid())
+    .bind(agent)
+    .execute(&pg.super_pool)
+    .await
+    .expect("mutate the live agent");
+    let (board, lane) = board_and_lane(&running).await;
+    let card = create_card(&running, &board, &lane).await;
+    let run = start_run(&running, &card, binding).await;
+
+    execute(&pg, &seeded, run).await;
+
+    let status: String = scalar(
+        &pg,
+        seeded.tenant,
+        "SELECT status FROM run WHERE tenant_id = $1 AND id = $2",
+        run,
+    )
+    .await;
+    assert_eq!(status, "succeeded", "the pinned run still completes");
+    assert_eq!(
+        models.lock().expect("models").as_slice(),
+        ["router/release"],
+        "the release's model, not the mutated live row, is the execution authority"
+    );
+}
+
+#[tokio::test]
 async fn a_missing_prompt_ref_refuses_before_a_model_call() {
     let _guard = STUBS.lock().await;
     let (pg, seeded, running) = fixture().await;
