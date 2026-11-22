@@ -94,6 +94,8 @@ WRITE_ACTIONS = {
     "changes.request",
     "approvals.decide",
     "benefits.update",
+    "documents.compose",
+    "documents.publish",
 }
 
 # Product read actions used by --apply.
@@ -103,6 +105,7 @@ READ_ACTIONS = {
     "benefits.list",
     "benefits.get",
     "approvals.list",
+    "documents.get",
 }
 
 # The release this script ships with has no action that lists measurements.  If one is
@@ -115,6 +118,8 @@ RISK_KEY_RE = re.compile(rf"^risk:({TOKEN})$")
 BENEFIT_KEY_RE = re.compile(rf"^benefit:({TOKEN})(?:/(baseline|fields|status))?$")
 CHANGE_KEY_RE = re.compile(r"^change:(.+)$")
 APPROVAL_KEY_RE = re.compile(r"^approval:([^/:]+)[/:](.+)$")
+DOCUMENT_KEY_RE = re.compile(r"^document:(.+)$")
+DOCUMENT_PUBLISH_KEY_RE = re.compile(r"^document-publish:(.+)$")
 
 
 class PromoteError(Exception):
@@ -143,6 +148,10 @@ class NaturalKey:
             return f"change:{self.first}"
         if self.kind == "approval":
             return f"approval:{self.first}/{self.second}"
+        if self.kind == "document":
+            return f"document:{self.first}"
+        if self.kind == "document_publish":
+            return f"document-publish:{self.first}"
         raise PromoteError(f"unknown natural-key kind {self.kind!r}")
 
 
@@ -164,6 +173,18 @@ def parse_natural_key(value: str) -> NaturalKey:
         if not title or any(ord(char) < 0x20 for char in title):
             raise PromoteError(f"malformed change natural key: {value!r}")
         return NaturalKey("change", title)
+    match = DOCUMENT_PUBLISH_KEY_RE.match(value)
+    if match:
+        title = match.group(1).strip()
+        if not title or any(ord(char) < 0x20 for char in title):
+            raise PromoteError(f"malformed document publish natural key: {value!r}")
+        return NaturalKey("document_publish", title)
+    match = DOCUMENT_KEY_RE.match(value)
+    if match:
+        title = match.group(1).strip()
+        if not title or any(ord(char) < 0x20 for char in title):
+            raise PromoteError(f"malformed document natural key: {value!r}")
+        return NaturalKey("document", title)
     raise PromoteError(f"malformed natural key: {value!r}")
 
 
