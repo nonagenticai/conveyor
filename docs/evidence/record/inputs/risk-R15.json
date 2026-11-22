@@ -1,0 +1,17 @@
+{
+ "project_id": "01a1d039-0d39-79ce-84b6-1173b94bc67f",
+ "kind": "risk",
+ "code": "R15",
+ "title": "V2 acceptance (#88/T12) remains open",
+ "body": "The one-organisation-loop proof (issue #88, T12) has no test and T5/T6 are proposed. The programme's viability verdict must not claim V2 acceptance; tranche 12 cannot record a continue on unbuilt work.",
+ "severity": "high",
+ "probability": "high",
+ "impact": 5,
+ "status": "open",
+ "owner_job_id": "01a1db6b-4f0c-7bd5-940f-3674a1ddf7fd",
+ "review_at": "2026-11-29",
+ "links": [
+  "https://github.com/nonagenticai/conveyor/issues/88",
+  "docs/SPEC_V2.md#12"
+ ]
+}
