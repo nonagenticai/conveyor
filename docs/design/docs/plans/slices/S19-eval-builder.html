@@ -23,7 +23,12 @@
         >source ↗</a
       >
     </header>
-    <main class="doc-body"><h1 id="s19--eval-builder">S19 — Eval builder</h1>
+    <main class="doc-body"><!-- historical-rbuild -->
+
+<blockquote>
+<p>⚠️ <strong>Historical build order.</strong> <code>rbuild</code> was retired on 2026-11-20 (CONTRACT §16). The <code>rbuild -- …</code> lines below record how this slice was gated then, not a route to run now. The current route is the GitHub-hosted <code>preflight.yml</code> for the compile/lint verdict and <code>~/.claude/scripts/cargo-guard.py</code> on m4 for interactive feedback; never a local gate.</p>
+</blockquote>
+<h1 id="s19--eval-builder">S19 — Eval builder</h1>
 <p>Programme project: S19 · issues #23, #46</p>
 <h2 id="1-objective">1. Objective</h2>
 <p>The <code>claude-api</code> <code>build-eval</code> and <code>eval-audit</code> methods become an ordinary product surface: a person defines <strong>one</strong> flow, builds an input set, signs off the inputs, chooses metrics and a grader, signs off the grading, runs a pilot and then a baseline, and reads a report — all against rows, not a <code>.claude/hillclimb/&lt;flow&gt;/</code> directory of <code>results.jsonl</code>, <code>traces/</code> and <code>report.html</code>. At the end, "did this prompt, model or procedure change help?" has a number with a confidence interval, a per-case transcript behind every score, and a health audit that says whether the number can be believed at all.</p>

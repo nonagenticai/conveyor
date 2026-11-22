@@ -401,6 +401,10 @@ above exactly.
   `~/.claude/scripts/cargo-guard.py test ...` for interactive feedback only; the authoritative run is
   `preflight.yml`. An assertion that needs the database must be a Rust `#[test]` (the harness provisions its own
   Postgres 18), never a `psql` probe in the gate script.
+
+**Historical mechanics (2026-11-07 to 2026-11-20; do not follow).** The bullets below describe the
+retired build host and are kept only as the record of how the V1 slices were gated then.
+
 - **Toolchains:** the host runs **rustup 1.99.0**, the exact pin in `rust-toolchain.toml`; `rbuild` invokes the
   rustup path by absolute path and refuses on a version mismatch. Homebrew's rust (1.99.1) ignores
   `rust-toolchain.toml` and must never be what compiles this tree. `wasm32-unknown-unknown`, `trunk` and
@@ -424,9 +428,9 @@ above exactly.
   Playwright; `df -h` before a heavy download, disk full ⇒ STOP.
 - **`check-jsonschema`, `k6` and `sqlx-cli` are not installed.** S00's gate installs the first once with
   `uv tool install check-jsonschema`; S05's load gate installs `k6` (`brew install k6`). **Migrations always
-  run through the binary** — `cargo run -p conveyor-server -- migrate`, i.e. `rbuild -- run -p conveyor-server --
-  migrate` — never `sqlx migrate run`: the binary's `migrate` re-applies the runtime grants after the last
-  migration (S02 §5), and `sqlx-cli` is not on this box.
+  run through the binary** — interactively `~/.claude/scripts/cargo-guard.py run -p conveyor-server -- migrate`;
+  CI runs them in the gate — never `sqlx migrate run`: the binary's `migrate` re-applies the runtime grants after
+  the last migration (S02 §5), and `sqlx-cli` is not on this box.
   `npx`, `ruby`, `yq` and `jq` are present (S12's Playwright and this set's YAML/JSON checks).
 - **A pinned SHA is a snapshot, not the tip.** `fr@4a579e91` / `fr@6f7c5097`, `nonagenticai_mcp_server@dd2cabf6`
   and `template-rust-service@0c7396a0` are what the plans were written against; `origin/main` moves. Re-read a

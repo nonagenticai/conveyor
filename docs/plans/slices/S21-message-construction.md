@@ -1,5 +1,12 @@
 # S21 — Message construction (the compiled prompt)
 
+<!-- historical-rbuild -->
+> ⚠️ **Historical build order.** `rbuild` was retired on 2026-11-20 (CONTRACT §16). The
+> `rbuild -- …` lines below record how this slice was gated then, not a route to run now. The
+> current route is the GitHub-hosted `preflight.yml` for the compile/lint verdict and
+> `~/.claude/scripts/cargo-guard.py` on m4 for interactive feedback; never a local gate.
+
+
 Programme project: S21 · issues #25
 
 **Status:** `plan written 2026-11-09`; the v1 seam is built (D27), the 2026-2027 design is this document.
