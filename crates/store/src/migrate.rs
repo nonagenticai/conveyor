@@ -247,7 +247,9 @@ mod tests {
                 (61, "contract requester".to_owned()),
                 // S21 step 3 (#15): the draft recipe lifecycle, the section selector and the
                 // memory source kind (0062_s21_prompt_selection.sql, ADR 0009).
-                (62, "s21 prompt selection".to_owned())
+                (62, "s21 prompt selection".to_owned()),
+                // #557: the per-tool verification declaration (0063_tool_meta.sql, SPEC_V2 §11.3).
+                (63, "tool meta".to_owned())
             ],
             "the embedded migration set is {embedded:?}; a wrong sqlx::migrate! path or a \
              file outside the set changes it"

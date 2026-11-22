@@ -114,7 +114,7 @@ use serde_json::{Value, json};
 /// authorises). 500 → **502**.
 /// **#15 (S21 step 3) adds 5 internal**: the `prompt_recipes.create|get|list|activate|retire`
 /// catalogue surface. 503 → **508**.
-const EXPECTED: [&str; 508] = [
+const EXPECTED: [&str; 515] = [
     "actions.describe",
     "actions.list",
     "analyse.site",
@@ -577,8 +577,15 @@ const EXPECTED: [&str; 508] = [
     "tasks.update",
     "tenants.get",
     "tenants.update_settings",
+    "tool_bindings.create",
+    "tool_bindings.retire",
+    "tool_bindings.update",
+    "tool_calls.list",
+    "toolkits.list",
     "toolkits.publish",
     "tools.call",
+    "tools.get",
+    "tools.list",
     "tools.probe",
     "tools.usage",
     "trace_links.create",
@@ -715,7 +722,9 @@ fn the_registry_is_exactly_the_declared_set() {
     // request that opens the closure gate): 489 -> 490; external stays 13.
     // #15 (S21 step 3) adds five internal actions (`prompt_recipes.create|get|list|activate|retire`):
     // 490 -> 495; external stays 13.
-    assert_eq!((internal, external), (495, 13));
+    // #557 adds seven internal actions (`tool_bindings.create|update|retire`, `tools.list|get`,
+    // `toolkits.list`, `tool_calls.list`): 495 -> 502; external stays 13.
+    assert_eq!((internal, external), (502, 13));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),

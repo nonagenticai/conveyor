@@ -76,6 +76,17 @@ pub struct ToolManifest {
     pub key: String,
     /// The registry action the broker dispatches (`coding_jobs.create`).
     pub action: String,
+    /// The idempotency rule the published tool carries (`required | optional | forbidden`).
+    /// Absent is `optional`; a write or destructive tool must declare `required`.
+    #[serde(default)]
+    pub idempotency: Option<String>,
+    /// The result fields the broker redacts.
+    #[serde(default)]
+    pub redact: Vec<String>,
+    /// The sibling tool key that reads the written object back. Required for a write or
+    /// destructive tool; the named sibling must be a `read` action.
+    #[serde(default)]
+    pub verification: Option<String>,
 }
 
 /// Why a manifest cannot be published.
@@ -136,6 +147,30 @@ pub enum ManifestError {
         actual: String,
         /// The service the toolkit declares.
         declared: String,
+    },
+    /// The idempotency rule is not one of the three the column accepts.
+    #[error("{tool:?} has idempotency {value:?}, not required|optional|forbidden")]
+    InvalidIdempotency {
+        /// The tool.
+        tool: String,
+        /// The rejected value.
+        value: String,
+    },
+    /// The verification names a tool the manifest does not declare.
+    #[error("{tool:?} verifies through unknown tool {verification:?}")]
+    UnknownVerification {
+        /// The tool that declares the verification.
+        tool: String,
+        /// The missing sibling.
+        verification: String,
+    },
+    /// The verification tool is not a read.
+    #[error("{tool:?} verifies through {verification:?}, which is not a read")]
+    VerificationNotRead {
+        /// The tool that declares the verification.
+        tool: String,
+        /// The sibling that must read.
+        verification: String,
     },
 }
 
@@ -211,6 +246,35 @@ fn validate(manifest: &ToolkitManifest) -> Result<(), ManifestError> {
                 declared: manifest.service.clone(),
             });
         }
+        if let Some(idempotency) = tool.idempotency.as_deref()
+            && !matches!(idempotency, "required" | "optional" | "forbidden")
+        {
+            return Err(ManifestError::InvalidIdempotency {
+                tool: tool.key.clone(),
+                value: idempotency.to_owned(),
+            });
+        }
+        if let Some(verification) = tool.verification.as_deref() {
+            let sibling = manifest
+                .tools
+                .iter()
+                .find(|candidate| candidate.key == verification)
+                .ok_or_else(|| ManifestError::UnknownVerification {
+                    tool: tool.key.clone(),
+                    verification: verification.to_owned(),
+                })?;
+            let sibling_spec = crate::registry::registry()
+                .get(sibling.action.as_str())
+                .ok_or_else(|| ManifestError::UnknownAction {
+                    action: sibling.action.clone(),
+                })?;
+            if sibling_spec.effect != crate::spec::Effect::Read {
+                return Err(ManifestError::VerificationNotRead {
+                    tool: tool.key.clone(),
+                    verification: verification.to_owned(),
+                });
+            }
+        }
     }
     Ok(())
 }
@@ -230,7 +294,7 @@ fn key_shape(key: &str) -> bool {
 /// change — including a schema change in the action itself — inserts a new version.
 pub fn content_hash(manifest: &ToolkitManifest) -> String {
     let mut hasher = Sha256::new();
-    hasher.update(b"conveyor.toolkit.v1\0");
+    hasher.update(b"conveyor.toolkit.v2\0");
     for part in [
         manifest.key.as_str(),
         manifest.service.as_str(),
@@ -254,10 +318,22 @@ pub fn content_hash(manifest: &ToolkitManifest) -> String {
             hasher.update([0u8]);
             hasher.update(spec.timeout_ms.to_string().as_bytes());
             hasher.update([0u8]);
-            let schema = serde_json::to_vec(&(spec.input)()).unwrap_or_default();
-            hasher.update(Sha256::digest(&schema));
+            let input = serde_json::to_vec(&(spec.input)()).unwrap_or_default();
+            hasher.update(Sha256::digest(&input));
+            hasher.update([0u8]);
+            // The output schema is copied from the action at publish time; hashing it here makes
+            // a registry schema change a new version, exactly like the input schema.
+            let output = serde_json::to_vec(&(spec.output)()).unwrap_or_default();
+            hasher.update(Sha256::digest(&output));
             hasher.update([0u8]);
         }
+        hasher.update(tool.idempotency.as_deref().unwrap_or("").as_bytes());
+        hasher.update([0u8]);
+        let redact = serde_json::to_vec(&tool.redact).unwrap_or_default();
+        hasher.update(Sha256::digest(&redact));
+        hasher.update([0u8]);
+        hasher.update(tool.verification.as_deref().unwrap_or("").as_bytes());
+        hasher.update([0u8]);
     }
     hex(&hasher.finalize())
 }
@@ -298,5 +374,23 @@ mod tests {
         assert!(!key_shape("Coding"));
         assert!(!key_shape("coding.x"));
         assert!(!key_shape(""));
+    }
+
+    #[test]
+    fn a_changed_contract_is_a_new_version() {
+        let base = manifests().expect("the embedded manifests validate")[0].clone();
+        let original = content_hash(&base);
+
+        let mut changed = base.clone();
+        changed.tools[0].idempotency = Some("optional".to_owned());
+        assert_ne!(content_hash(&changed), original, "idempotency must hash");
+
+        let mut changed = base.clone();
+        changed.tools[0].redact.push("secret".to_owned());
+        assert_ne!(content_hash(&changed), original, "redact must hash");
+
+        let mut changed = base.clone();
+        changed.tools[0].verification = None;
+        assert_ne!(content_hash(&changed), original, "verification must hash");
     }
 }

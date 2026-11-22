@@ -5706,6 +5706,46 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
         expecting(plain("toolkits.publish", json!({}), None), 200),
         expecting(plain("tools.probe", json!({"dry_run": true}), None), 200),
         expecting(plain("tools.usage", json!({"window_days": 30}), None), 200),
+        // ── T13/T14 (#557): the bindings and the catalogue reads ──────────────────────────
+        // The reads answer an empty page; the by-id and by-name refusals are the typed 404.
+        expecting(plain("tools.list", json!({}), None), 200),
+        expecting(plain("toolkits.list", json!({}), None), 200),
+        expecting(plain("tool_calls.list", json!({}), None), 200),
+        expecting(
+            plain(
+                "tools.get",
+                json!({"toolkit": "missing", "tool": "missing"}),
+                None,
+            ),
+            404,
+        ),
+        expecting(
+            plain(
+                "tool_bindings.create",
+                json!({
+                    "toolkit_id": "018f3f7c-0000-7000-8000-0000000000f1",
+                    "run_id": "018f3f7c-0000-7000-8000-0000000000ff"
+                }),
+                None,
+            ),
+            404,
+        ),
+        expecting(
+            plain(
+                "tool_bindings.update",
+                json!({"id": "018f3f7c-0000-7000-8000-0000000000f2"}),
+                None,
+            ),
+            404,
+        ),
+        expecting(
+            plain(
+                "tool_bindings.retire",
+                json!({"id": "018f3f7c-0000-7000-8000-0000000000f3"}),
+                None,
+            ),
+            404,
+        ),
         // ── T9: the architecture capability (#81) ─────────────────────────────────────────
         // Reads anchored on rows the fixture/prepare writes; writes on a fresh row per round.
         expecting(plain("architecture.artifacts_list", json!({}), None), 200),
