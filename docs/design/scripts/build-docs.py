@@ -33,6 +33,7 @@ import re
 import shutil
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 from urllib.parse import unquote
 
@@ -150,6 +151,7 @@ def rewrite_links(
     out_rel: str,
     published: dict[str, str],
     unresolved: list[str],
+    out: Path,
 ) -> str:
     source_dir = posixpath.dirname(source)
     out_dir = posixpath.dirname(out_rel)
@@ -171,7 +173,7 @@ def rewrite_links(
                 unresolved.append(f"{out_rel}: {url} -> {resolved}")
                 return match.group(0)
             if attr == "src":
-                asset = OUT / "_assets" / resolved
+                asset = out / "_assets" / resolved
                 asset.parent.mkdir(parents=True, exist_ok=True)
                 if disk.is_file():
                     shutil.copy2(disk, asset)
@@ -185,7 +187,7 @@ def rewrite_links(
     return HREF.sub(replace, html)
 
 
-def render(sources: list[str], published: dict[str, str]) -> list[str]:
+def render(sources: list[str], published: dict[str, str], out: Path) -> list[str]:
     pandoc = shutil.which("pandoc")
     if not pandoc:
         raise SystemExit("build-docs: pandoc is not installed (needed to regenerate)")
@@ -193,7 +195,7 @@ def render(sources: list[str], published: dict[str, str]) -> list[str]:
     errors: list[str] = []
     for source in sources:
         out_rel = published[source]
-        target = OUT / out_rel
+        target = out / out_rel
         target.parent.mkdir(parents=True, exist_ok=True)
         depth = len(Path(out_rel).parts) - 1
         # OUT is PACK/docs, so reaching the pack root always costs one extra level.
@@ -213,7 +215,7 @@ def render(sources: list[str], published: dict[str, str]) -> list[str]:
             cwd=ROOT,
             capture_output=True,
         ).stdout.decode("utf-8")
-        fragment = rewrite_links(fragment, source, out_rel, published, errors)
+        fragment = rewrite_links(fragment, source, out_rel, published, errors, out)
         fragment = redact(fragment)
         page = (
             template.replace("$title$", redact(title_of(source)))
@@ -223,7 +225,7 @@ def render(sources: list[str], published: dict[str, str]) -> list[str]:
             .replace("$body$", fragment)
         )
         target.write_text(page, encoding="utf-8")
-        print(f"  {source} -> {target.relative_to(PACK)}")
+        print(f"  {source} -> docs/{out_rel}")
     return errors
 
 
@@ -246,18 +248,18 @@ def index(sources: list[str], published: dict[str, str]) -> dict:
     return {"schema": SCHEMA, "documents": documents}
 
 
-def write_index(payload: dict) -> None:
-    OUT.mkdir(parents=True, exist_ok=True)
-    (OUT / "documents.json").write_text(
+def write_index(payload: dict, out: Path) -> None:
+    out.mkdir(parents=True, exist_ok=True)
+    (out / "documents.json").write_text(
         json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
     )
-    (OUT / "documents.js").write_text(
+    (out / "documents.js").write_text(
         "window.CONVEYOR_DOCUMENTS = "
         + json.dumps(payload, indent=2, ensure_ascii=False)
         + ";\n",
         encoding="utf-8",
     )
-    write_outputs_placeholder()
+    write_outputs_placeholder(out)
 
 
 # Platform outputs are generated at publish time, into this same directory. The clean checkout
@@ -270,9 +272,9 @@ window.CONVEYOR_OUTPUTS = null;
 """
 
 
-def write_outputs_placeholder() -> None:
-    OUT.mkdir(parents=True, exist_ok=True)
-    (OUT / "outputs.js").write_text(OUTPUTS_PLACEHOLDER, encoding="utf-8")
+def write_outputs_placeholder(out: Path) -> None:
+    out.mkdir(parents=True, exist_ok=True)
+    (out / "outputs.js").write_text(OUTPUTS_PLACEHOLDER, encoding="utf-8")
 
 
 def read_index() -> dict | None:
@@ -317,6 +319,40 @@ def check(sources: list[str], published: dict[str, str]) -> int:
     return 1 if failures else 0
 
 
+def build(sources: list[str], published: dict[str, str], out: Path) -> list[str]:
+    """Render every managed file into `out` (a staging directory, never the shared OUT)."""
+    out.mkdir(parents=True, exist_ok=True)
+    errors = render(sources, published, out)
+    if errors:
+        return errors
+    write_index(index(sources, published), out)
+    return []
+
+
+def install(staged: Path, out: Path) -> None:
+    """Move the managed set into the shared output directory, touching nothing else.
+
+    build-docs must never `rmtree(OUT)`: the directory also holds the platform outputs written
+    at publish time (`standards/`, `output-*.html`), and a blanket delete during a rebuild swept
+    506 committed pages that this script cannot regenerate.
+    """
+    out.mkdir(parents=True, exist_ok=True)
+    for path in sorted(staged.rglob("*")):
+        if not path.is_file():
+            continue
+        destination = out / path.relative_to(staged)
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        path.replace(destination)
+
+
+def tree(root: Path) -> dict[Path, bytes]:
+    return {
+        path.relative_to(root): path.read_bytes()
+        for path in root.rglob("*")
+        if path.is_file()
+    }
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--check", action="store_true", help="verify committed output; no pandoc")
@@ -329,38 +365,41 @@ def main() -> int:
     if args.check:
         return check(sources, published)
 
-    if OUT.exists():
-        shutil.rmtree(OUT)
-    OUT.mkdir(parents=True, exist_ok=True)
-    errors = render(sources, published)
-    if errors:
-        print("build-docs: unresolved links:", file=sys.stderr)
-        for error in errors:
-            print("  " + error, file=sys.stderr)
-        return 1
-    write_outputs_placeholder()
-    if args.verify_render:
-        snapshot = {
-            path.relative_to(OUT): path.read_bytes()
-            for path in OUT.rglob("*")
-            if path.is_file()
-        }
-        shutil.rmtree(OUT)
-        OUT.mkdir(parents=True, exist_ok=True)
-        errors = render(sources, published)
+    # Stage under PACK so the install is a same-filesystem rename, and never write into OUT
+    # until the whole build (and --verify-render) has succeeded: a failed run leaves the
+    # previously published pack, managed pages included, exactly as it was.
+    staged = Path(tempfile.mkdtemp(prefix=".build-docs-", dir=PACK))
+    try:
+        errors = build(sources, published, staged)
         if errors:
-            print("build-docs: unresolved links on re-render: " + "; ".join(errors), file=sys.stderr)
+            print("build-docs: unresolved links:", file=sys.stderr)
+            for error in errors:
+                print("  " + error, file=sys.stderr)
             return 1
-        write_outputs_placeholder()
-        drift = [
-            str(rel)
-            for rel, data in snapshot.items()
-            if (OUT / rel).read_bytes() != data
-        ]
-        if drift:
-            print("build-docs: non-deterministic render: " + ", ".join(drift))
-            return 1
-    write_index(index(sources, published))
+        if args.verify_render:
+            restaged = Path(tempfile.mkdtemp(prefix=".build-docs-verify-", dir=PACK))
+            try:
+                errors = build(sources, published, restaged)
+                if errors:
+                    print(
+                        "build-docs: unresolved links on re-render: " + "; ".join(errors),
+                        file=sys.stderr,
+                    )
+                    return 1
+                first, second = tree(staged), tree(restaged)
+                drift = [
+                    str(rel)
+                    for rel in sorted(first.keys() | second.keys())
+                    if first.get(rel) != second.get(rel)
+                ]
+                if drift:
+                    print("build-docs: non-deterministic render: " + ", ".join(drift))
+                    return 1
+            finally:
+                shutil.rmtree(restaged, ignore_errors=True)
+        install(staged, OUT)
+    finally:
+        shutil.rmtree(staged, ignore_errors=True)
     print(f"build-docs: {len(sources)} documents -> {OUT.relative_to(ROOT)}")
     return 0
 
