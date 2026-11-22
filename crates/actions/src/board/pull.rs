@@ -149,10 +149,6 @@ pub async fn wip_pull(
 /// the index is root-only and a coach for a dead run has no live parent to hang from.
 pub const COACH_ERROR_PROCESS: &str = "cap.kanban_coach.handle_error.v2";
 
-/// The most coach interruptions one card may accumulate before `err.card` stops starting them
-/// (SPEC_V2 §1.4 · §12 T4's depth cap). Three failures are enough to show the coach is not
-/// converging; a fourth would only repeat the first three.
-
 /// The failure comment's marker: the old flow's `BLOCKED/flow_error` line, kept verbatim so a
 /// person (and the parity ledger) can still recognise it.
 pub const ERR_CARD_COMMENT_MARKER: &str = "BLOCKED/flow_error";
