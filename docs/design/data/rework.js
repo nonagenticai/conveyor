@@ -15510,7 +15510,7 @@ window.CONVEYOR_REWORK = {
         {
           "evidence": [
             {
-              "line": 483,
+              "line": 550,
               "path": "crates/store/src/metrics.rs",
               "quote": "               FROM tool_call tc",
               "source": "code"
@@ -15543,7 +15543,7 @@ window.CONVEYOR_REWORK = {
             {
               "evidence": [
                 {
-                  "line": 483,
+                  "line": 550,
                   "path": "crates/store/src/metrics.rs",
                   "quote": "               FROM tool_call tc",
                   "source": "code"
@@ -48837,9 +48837,9 @@ window.CONVEYOR_REWORK = {
               "source": "code"
             },
             {
-              "line": 1722,
+              "line": 1844,
               "path": "crates/actions/src/spine/mod.rs",
-              "quote": "            links: input.links.unwrap_or_else(|| serde_json::json!([])),",
+              "quote": "    let links = input.links.unwrap_or_else(|| serde_json::json!([]));",
               "source": "code"
             },
             {
@@ -48876,9 +48876,9 @@ window.CONVEYOR_REWORK = {
                   "source": "code"
                 },
                 {
-                  "line": 1722,
+                  "line": 1844,
                   "path": "crates/actions/src/spine/mod.rs",
-                  "quote": "            links: input.links.unwrap_or_else(|| serde_json::json!([])),",
+                  "quote": "    let links = input.links.unwrap_or_else(|| serde_json::json!([]));",
                   "source": "code"
                 },
                 {
@@ -50082,7 +50082,7 @@ window.CONVEYOR_REWORK = {
               "source": "code"
             },
             {
-              "line": 1013,
+              "line": 1113,
               "path": "crates/actions/src/metrics/mod.rs",
               "quote": "    store::metrics::record_reconciliation_tx(",
               "source": "code"
@@ -50127,7 +50127,7 @@ window.CONVEYOR_REWORK = {
                   "source": "code"
                 },
                 {
-                  "line": 1013,
+                  "line": 1113,
                   "path": "crates/actions/src/metrics/mod.rs",
                   "quote": "    store::metrics::record_reconciliation_tx(",
                   "source": "code"
