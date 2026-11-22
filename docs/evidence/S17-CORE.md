@@ -201,3 +201,44 @@ targets above are green; this is the shared-tree cost, not an S17 defect.
 `served-spec.lock.json` from it — **258 operations**, `--check-lock` exit 0, with 8 benchmark, 6 `workflows.*`,
 4 `eval_runs.*` and 3 `eval_results.*` operations present. The 245-op figure above is this lane's own
 224-action state; 258 is what the tree now holds.
+
+## Live run — hp1 (2026-11-22)
+
+The deployment-gated proof `apps/server/tests/sandbox_live.rs` (`#[ignore]`) ran against the live
+strato cluster from m4 through an SSH tunnel to the kube-apiserver. This is the P1 end-to-end receipt:
+the Job object the API stored, the terminal state, the log, and the delete were observed on a real
+cluster, not against the stub.
+
+| input | value |
+|---|---|
+| namespace / identity | `swe-bench` / ServiceAccount `conveyor-bench` (Role `conveyor-bench-grader`), short-lived token |
+| image | `swebench/sweb.eval.x86_64.django_1776_django-16493@sha256:43fbf022eb3ddbbd32edf3cbc325c8dc532b48551f78fef14c2afd1d26dde858` (`seed/benchmark/images-verified50-v1.lock.json`) |
+| placement | `SANDBOX_NODE_SELECTOR=conveyor.ai/grading=hp1`; hp1 is untainted, so no toleration was set |
+| Job | `swb-7fa599e09fc0-conveyor-live-proof` (recovered from namespace events; the test does not print it) |
+| pod | `swb-7fa599e09fc0-conveyor-live-proof-xjt4m`, scheduled to **hp1** |
+| timeout | `SANDBOX_LIVE_TIMEOUT_S=900` |
+
+```text
+test the_live_sandbox_lifecycle_creates_runs_reads_logs_and_deletes ... ok
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 244.18s
+```
+
+The test asserts the stored object (digest image; `automountServiceAccountToken: false`;
+`enableServiceLinks: false`; `backoffLimit: 0`; a positive `activeDeadlineSeconds`;
+`ttlSecondsAfterFinished: 3600`; the hp1 selector), waits for `Succeeded`, reads the log and finds the
+runner's apply marker plus the eval proof `conveyor sandbox live proof`, then deletes the Job and
+waits until the Job and its pod are gone. Cluster events corroborate the lifecycle: pod scheduled to
+hp1, image pulled by digest in 3m4s (1,240,562,520 bytes), container started, and `Job completed` at
+10:02:16Z. After the run `kubectl -n swe-bench get jobs,pods` was empty (only `istio-ca-crl`,
+`istio-ca-root-cert` and `kube-root-ca.crt` remained), so the test's own cleanup left nothing behind.
+
+Run through the sanctioned m4 guard (the token was passed in the environment and never printed):
+
+```bash
+SANDBOX_NAMESPACE=swe-bench SANDBOX_API_URL=https://127.0.0.1:16443 \
+SANDBOX_TOKEN="$(cat "$TOKEN_FILE")" SANDBOX_CA_PATH="$CA_FILE" \
+SANDBOX_NODE_SELECTOR=conveyor.ai/grading=hp1 \
+SANDBOX_LIVE_IMAGE='swebench/sweb.eval.x86_64.django_1776_django-16493@sha256:43fbf022eb3ddbbd32edf3cbc325c8dc532b48551f78fef14c2afd1d26dde858' \
+SANDBOX_LIVE_TIMEOUT_S=900 \
+  ~/.claude/scripts/cargo-guard.py test -p conveyor-server --test sandbox_live -- --ignored --nocapture
+```
