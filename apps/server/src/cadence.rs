@@ -83,13 +83,15 @@ pub async fn tick(pool: &PgPool, tenant: TenantId) -> Result<Vec<Uuid>, PlanStor
         }
     }
     // A demo cadence credits every completed deliverable that exhibits its evidence; a retro
-    // cadence opens its one coach card. Both move to `materialised` in the same write, so a
+    // cadence opens its one coach card; a refinement revalidates the standing backlog's WSJF
+    // inputs and flags stale rows. All three move to `materialised` in the same write, so a
     // second pass repeats neither.
     let due: Vec<(Uuid, String)> = {
         let mut listing = begin_scoped(pool, tenant).await?;
         let rows = sqlx::query_as(
             "SELECT id, kind FROM programme_cadence
-              WHERE tenant_id = $1 AND kind IN ('demo', 'retro') AND state = 'planned'
+              WHERE tenant_id = $1 AND kind IN ('demo', 'retro', 'refinement')
+                AND state = 'planned'
               ORDER BY created_at, id",
         )
         .bind(tenant.as_uuid())
@@ -102,6 +104,9 @@ pub async fn tick(pool: &PgPool, tenant: TenantId) -> Result<Vec<Uuid>, PlanStor
         let mut tx = begin_scoped(pool, tenant).await?;
         let outcome = match kind.as_str() {
             "demo" => demo(&mut tx, tenant, cadence).await,
+            "refinement" => spine::refine_backlog_tx(&mut tx, tenant, cadence)
+                .await
+                .map(|_| ()),
             _ => spine::open_retro_tx(&mut tx, tenant, cadence)
                 .await
                 .map(|_| ()),
