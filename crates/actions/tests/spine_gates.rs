@@ -1531,3 +1531,96 @@ async fn a_compliant_project_closes_in_a_resumed_tranche() {
     );
     assert_eq!(project_status(&running, &project).await, "closed");
 }
+
+/// The owner's delegation is a PUBLISHED decision document. A `rule` decision citing it resumes
+/// a paused tranche; a rule decision citing an unpublished document does not. The decision is
+/// never recorded as human — the audit says a rule acted under the named decision.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_delegated_rule_decision_resumes_under_a_published_decision() {
+    let (pg, running, seeded) = running_fixture().await;
+    let (_programme, tranche) = programme_and_tranche(&pg, seeded.tenant_id, "planned").await;
+    let delegation = support::delegation_ref(&running, TOKEN).await;
+    pause_tranche(&pg, &running, &seeded, tranche, &delegation).await;
+    let target = tranche.to_string();
+
+    let document: Uuid = sqlx::query_scalar(
+        "INSERT INTO document (tenant_id, title, kind, status, category)
+         VALUES ($1, 'owner build delegation', 'document', 'active', 'decision')
+         RETURNING id",
+    )
+    .bind(seeded.tenant_id)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("seed the delegation document");
+
+    async fn delegated_gate(
+        pg: &support::Pg,
+        seeded: &support::Seeded,
+        target: &str,
+        reference: Uuid,
+    ) -> Uuid {
+        let id: Uuid = sqlx::query_scalar(
+            "INSERT INTO approval (tenant_id, gate, kind, status, meta)
+             VALUES ($1, 'tranche.resume', 'gate', 'approved',
+                     jsonb_build_object('target', $2::text))
+             RETURNING id",
+        )
+        .bind(seeded.tenant_id)
+        .bind(target.to_owned())
+        .fetch_one(&pg.super_pool)
+        .await
+        .expect("insert the approval");
+        sqlx::query(
+            "INSERT INTO approval_decision
+                 (tenant_id, approval_id, approver_id, decision, decided_by_kind, via)
+             VALUES ($1, $2, $3, 'approve', 'rule',
+                     jsonb_build_object('delegation_ref', $4::text))",
+        )
+        .bind(seeded.tenant_id)
+        .bind(id)
+        .bind(support::reviewer_id(pg).await)
+        .bind(reference.to_string())
+        .execute(&pg.super_pool)
+        .await
+        .expect("insert the delegated decision");
+        id
+    }
+
+    // An unpublished document is not a delegation.
+    let unpublished = delegated_gate(&pg, &seeded, &target, document).await;
+    assert_approval_missing(&refused_resume(&pg, &seeded, tranche, unpublished).await);
+
+    sqlx::query("UPDATE document SET published_at = now(), published_by = $2 WHERE id = $1")
+        .bind(document)
+        .bind(seeded.user_id)
+        .execute(&pg.super_pool)
+        .await
+        .expect("publish the delegation");
+
+    let published = delegated_gate(&pg, &seeded, &target, document).await;
+
+    let outcome = invoke(
+        &pg.runtime,
+        registry(),
+        seeded.tenant,
+        resume_request(seeded.user_id, tranche, published, Some("delegated resume")),
+    )
+    .await
+    .expect("a delegated rule decision resumes the tranche");
+    assert_eq!(outcome.status, 200, "{}", outcome.body);
+    assert_eq!(
+        output(&outcome.body)["state"],
+        "in_review",
+        "{}",
+        outcome.body
+    );
+
+    let (kind, via): (String, Value) =
+        sqlx::query_as("SELECT decided_by_kind, via FROM approval_decision WHERE approval_id = $1")
+            .bind(published)
+            .fetch_one(&pg.super_pool)
+            .await
+            .expect("read the delegated decision");
+    assert_eq!(kind, "rule", "a delegated decision is a rule, never human");
+    assert_eq!(via["delegation_ref"], json!(document.to_string()));
+}

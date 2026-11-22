@@ -271,6 +271,13 @@ pub struct ApprovalDecideIn {
     /// Per-item decisions, when the gate covers several items.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub item_decisions: Option<Value>,
+    /// The published owner decision that delegates this approval.
+    ///
+    /// A delegated decision is recorded as `decided_by_kind='rule'` with the reference in
+    /// `via`, never as a human decision: the audit says a policy acted under a named decision,
+    /// and a gate that requires a person accepts it only by naming its delegation.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub delegation_ref: Option<Uuid>,
 }
 
 /// `approvals.request` — a question posed for a human to decide (S06b §5).
