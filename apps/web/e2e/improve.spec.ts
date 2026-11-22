@@ -2,7 +2,7 @@ import { expect, test } from "./fixture";
 
 // SPEC_V2 §10.5 — the live Improve destination. `metrics.flow` is read at call grain; a figure
 // without a source ledger is listed unavailable with its reason, never rendered as zero. The
-// kata queue is honestly planned until the kata.* family (T5) lands.
+// kata queue reads `kata.list` (T5); adoption and revert stay governed actions.
 
 test("the improve destination reads the flow figures and says what is unavailable", async ({
   page,
@@ -18,10 +18,13 @@ test("the improve destination reads the flow figures and says what is unavailabl
   await expect(page.getByRole("heading", { name: "Unavailable figures", exact: true })).toBeVisible();
 
   // The kata queue is a real read (kata.list): rows when the tenant has a kata, an honest
-  // empty state otherwise. Adoption and revert stay governed actions.
-  await expect(page.getByRole("heading", { name: "Kata queue", exact: true })).toBeVisible();
-  const kataRows = page.locator("table tbody tr");
-  const kataEmpty = page.getByText("No kata is recorded in this tenant");
+  // empty state otherwise. The locators are scoped to that panel — a page-wide row count could
+  // be satisfied by the unavailable table above it — and the planned placeholder must be gone.
+  const kata = page.locator("section.panel", { has: page.getByRole("heading", { name: "Kata queue" }) });
+  await expect(kata).toBeVisible();
+  await expect(kata.getByText("The kata queue is unavailable")).toHaveCount(0);
+  const kataRows = kata.locator("table tbody tr");
+  const kataEmpty = kata.getByText("No kata is recorded in this tenant");
   const rows = await kataRows.count();
   const emptyVisible = await kataEmpty.isVisible().catch(() => false);
   expect(rows > 0 || emptyVisible, "the kata queue shows rows or the empty state").toBeTruthy();

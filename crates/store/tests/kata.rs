@@ -165,13 +165,36 @@ async fn measure(
     split: &str,
     split_sha256: &str,
 ) -> Result<MeasurementRecord, KataStoreError> {
+    measure_as(
+        db,
+        f,
+        f.opener,
+        kata_id,
+        candidate_id,
+        instrument_version,
+        split,
+        split_sha256,
+    )
+    .await
+}
+
+async fn measure_as(
+    db: &support::TestDb,
+    f: &Fixture,
+    actor: Uuid,
+    kata_id: Uuid,
+    candidate_id: Uuid,
+    instrument_version: &str,
+    split: &str,
+    split_sha256: &str,
+) -> Result<MeasurementRecord, KataStoreError> {
     let mut tx = begin_scoped(&db.owner, f.tenant).await.expect("scope");
     let metric = json!({ "pass_rate": 0.81 });
     let noise_band = json!({ "stddev": 0.02 });
     let outcome = kata::kata_measure_tx(
         &mut tx,
         f.tenant,
-        f.opener,
+        actor,
         kata_id,
         candidate_id,
         instrument_version,
@@ -578,6 +601,40 @@ async fn adoption_needs_another_person_and_a_measured_candidate() {
     tx.commit().await.expect("commit");
     assert_eq!(read.status, "open", "adoption does not close the kata");
     assert_eq!(read.outcome.as_deref(), Some("kept"));
+}
+
+/// The MEASURER is excluded too: running the instrument and deciding the adoption are one
+/// principal's work, so the guard must refuse the measurer as well as the opener. Deleting the
+/// measurer limb would leave every other test green; this one pins it.
+#[tokio::test]
+async fn the_kata_measurer_cannot_decide_its_adoption() {
+    let db = support::TestDb::fresh().await;
+    let f = fixture(&db).await;
+    let kata = open(&db, &f, "kata/measurer-adopt").await;
+    let candidate = propose(&db, &f, kata.id, &prediction())
+        .await
+        .expect("propose");
+    measure_as(
+        &db,
+        &f,
+        f.approver,
+        kata.id,
+        candidate.id,
+        "eval-v3",
+        "test",
+        "sha-locked-v3",
+    )
+    .await
+    .expect("the approver runs the held-out measurement");
+    let approval = decided(&db, &f, ADOPT_GATE, kata.id, "approve", "human", f.approver).await;
+    let refused = adopt(&db, &f, kata.id, candidate.id, approval).await;
+    assert!(
+        matches!(
+            refused,
+            Err(KataStoreError::Illegal(KataError::SelfApproval))
+        ),
+        "the measurer's own approval is refused: {refused:?}"
+    );
 }
 
 #[tokio::test]
