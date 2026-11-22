@@ -290,6 +290,13 @@ fn plan_approval_error(error: store::ApprovalStoreError, action: &str) -> Action
             "eval_scope_required",
             format!("{action:?}: an eval sign-off needs evals:approve"),
         ),
+        store::ApprovalStoreError::AnswerMissing => crate::control::invalid(
+            "note",
+            "missing",
+            format!(
+                "{action:?}: this gate requires an answer; a decision with no note answers nothing"
+            ),
+        ),
         store::ApprovalStoreError::Database(error) => store_error(error, action),
     }
 }
