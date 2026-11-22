@@ -10,7 +10,7 @@
 //! tenant's configured in-flight set (`tenant.settings -> 'portfolio' -> 'in_flight'`, default
 //! `active,paused`). There is no portfolio row (D-T1-7).
 
-use chrono::{DateTime, Utc};
+use chrono::{DateTime, NaiveDate, Utc};
 use conveyor_domain::spine::{
     BenefitMapFields, BenefitProfileFields, PlanError, WsjfInputs, benefit_map_missing,
     benefit_profile_missing, tranche_review_has_evidence, validate_change,
@@ -599,8 +599,10 @@ pub async fn list_baselines_tx(
 pub struct RegisterRecord {
     /// The row id.
     pub id: Uuid,
-    /// The owning project.
-    pub project_id: Uuid,
+    /// The owning project; null for a programme-level row.
+    pub project_id: Option<Uuid>,
+    /// The owning programme; null for a project-level row.
+    pub programme_id: Option<Uuid>,
     /// `risk | issue | assumption | dependency | benefit | change`.
     pub kind: String,
     /// The human code.
@@ -623,6 +625,10 @@ pub struct RegisterRecord {
     pub links: Value,
     /// The baseline a change changes.
     pub baseline_ref: Option<Uuid>,
+    /// When the row is next reviewed (a risk's review date).
+    pub review_at: Option<NaiveDate>,
+    /// The recorded response (a risk's mitigation).
+    pub response: Option<String>,
     /// Free-form metadata (a change's impact block lives here).
     pub meta: Value,
     /// The If-Match version.
@@ -633,15 +639,18 @@ pub struct RegisterRecord {
     pub updated_at: DateTime<Utc>,
 }
 
-const REGISTER_COLUMNS: &str = "id, project_id, kind, code, title, body, owner_job_id, status, \
-                                severity, probability, impact, links, baseline_ref, meta, version, \
-                                created_at, updated_at";
+const REGISTER_COLUMNS: &str = "id, project_id, programme_id, kind, code, title, body, \
+                                owner_job_id, status, severity, probability, impact, links, \
+                                baseline_ref, review_at, response, meta, version, created_at, \
+                                updated_at";
 
 /// A new register row.
 #[derive(Clone, Debug, Default)]
 pub struct NewRegisterItem {
-    /// The owning project.
-    pub project_id: Uuid,
+    /// The owning project; exactly one of this and `programme_id` is set.
+    pub project_id: Option<Uuid>,
+    /// The owning programme; exactly one of this and `project_id` is set.
+    pub programme_id: Option<Uuid>,
     /// The kind.
     pub kind: String,
     /// The human code.
@@ -664,6 +673,10 @@ pub struct NewRegisterItem {
     pub links: Value,
     /// The baseline a change changes.
     pub baseline_ref: Option<Uuid>,
+    /// When the row is next reviewed.
+    pub review_at: Option<NaiveDate>,
+    /// The recorded response.
+    pub response: Option<String>,
     /// Metadata; a change's impact block lives here.
     pub meta: Value,
 }
@@ -674,7 +687,14 @@ pub async fn insert_register_tx(
     tenant: TenantId,
     new: &NewRegisterItem,
 ) -> Result<RegisterRecord, PlanStoreError> {
-    require_project_tx(&mut *conn, tenant, new.project_id).await?;
+    if let Some(project) = new.project_id {
+        require_project_tx(&mut *conn, tenant, project).await?;
+    }
+    if let Some(programme) = new.programme_id {
+        ensure_parent_tx(&mut *conn, tenant, Parent::Programme, programme)
+            .await
+            .map_err(PlanStoreError::Parent)?;
+    }
     if let Some(owner) = new.owner_job_id {
         ensure_job_tx(&mut *conn, tenant, owner).await?;
     }
@@ -697,14 +717,15 @@ pub async fn insert_register_tx(
     }
     let sql = format!(
         "INSERT INTO project_register_item
-            (tenant_id, project_id, kind, code, title, body, owner_job_id, status, severity,
-             probability, impact, links, baseline_ref, meta)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+            (tenant_id, project_id, programme_id, kind, code, title, body, owner_job_id, status,
+             severity, probability, impact, links, baseline_ref, review_at, response, meta)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
          RETURNING {REGISTER_COLUMNS}"
     );
     let row: RegisterRecord = sqlx::query_as(AssertSqlSafe(sql))
         .bind(tenant.as_uuid())
         .bind(new.project_id)
+        .bind(new.programme_id)
         .bind(&new.kind)
         .bind(&new.code)
         .bind(&new.title)
@@ -716,6 +737,8 @@ pub async fn insert_register_tx(
         .bind(new.impact)
         .bind(&new.links)
         .bind(new.baseline_ref)
+        .bind(new.review_at)
+        .bind(&new.response)
         .bind(&new.meta)
         .fetch_one(&mut *conn)
         .await?;
@@ -738,7 +761,8 @@ pub async fn get_register_tx(
         .await?)
 }
 
-/// List a project's register rows.
+/// List a project's register rows. Programme-level rows have a null `project_id` and are
+/// deliberately not returned here: they belong to [`list_programme_register_tx`].
 pub async fn list_register_tx(
     conn: &mut PgConnection,
     tenant: TenantId,
@@ -756,6 +780,25 @@ pub async fn list_register_tx(
         .await?)
 }
 
+/// List a programme's register rows. The null `project_id` is the scope, not a defect, so this
+/// read filters on `programme_id` and never on the project column.
+pub async fn list_programme_register_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    programme_id: Uuid,
+) -> Result<Vec<RegisterRecord>, PlanStoreError> {
+    let sql = format!(
+        "SELECT {REGISTER_COLUMNS} FROM project_register_item
+          WHERE tenant_id = $1 AND programme_id = $2
+          ORDER BY created_at DESC, id DESC"
+    );
+    Ok(sqlx::query_as(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(programme_id)
+        .fetch_all(&mut *conn)
+        .await?)
+}
+
 /// Update a register row under `If-Match`.
 #[allow(clippy::too_many_arguments)]
 pub async fn update_register_tx(
@@ -763,11 +806,14 @@ pub async fn update_register_tx(
     tenant: TenantId,
     id: Uuid,
     expected: i64,
+    programme_id: Option<Uuid>,
     status: Option<&str>,
     title: Option<&str>,
     body: Option<&str>,
     severity: Option<&str>,
     impact: Option<i32>,
+    review_at: Option<NaiveDate>,
+    response: Option<&str>,
     meta: Option<&Value>,
 ) -> Result<RegisterRecord, PlanStoreError> {
     let current =
@@ -781,6 +827,13 @@ pub async fn update_register_tx(
             what: "register item",
         });
     }
+    if let Some(programme) = programme_id
+        && current.programme_id != Some(programme)
+    {
+        ensure_parent_tx(&mut *conn, tenant, Parent::Programme, programme)
+            .await
+            .map_err(PlanStoreError::Parent)?;
+    }
     // The create rule is not a one-time admission: an update that replaces `meta` replaces the
     // impact block too, so it is validated against the same §5.5 rule. The row's baseline is
     // immutable here, so the stored `baseline_ref` is the one the new block belongs with.
@@ -791,9 +844,11 @@ pub async fn update_register_tx(
     }
     let sql = format!(
         "UPDATE project_register_item SET
-            status = coalesce($4, status), title = coalesce($5, title),
-            body = coalesce($6, body), severity = coalesce($7, severity),
-            impact = coalesce($8, impact), meta = coalesce($9, meta),
+            programme_id = coalesce($4, programme_id), status = coalesce($5, status),
+            title = coalesce($6, title), body = coalesce($7, body),
+            severity = coalesce($8, severity), impact = coalesce($9, impact),
+            review_at = coalesce($10, review_at), response = coalesce($11, response),
+            meta = coalesce($12, meta),
             version = version + 1, updated_at = now()
           WHERE tenant_id = $1 AND id = $2 AND version = $3
           RETURNING {REGISTER_COLUMNS}"
@@ -802,11 +857,14 @@ pub async fn update_register_tx(
         .bind(tenant.as_uuid())
         .bind(id)
         .bind(expected)
+        .bind(programme_id)
         .bind(status)
         .bind(title)
         .bind(body)
         .bind(severity)
         .bind(impact)
+        .bind(review_at)
+        .bind(response)
         .bind(meta)
         .fetch_optional(&mut *conn)
         .await?;
@@ -2199,22 +2257,36 @@ pub async fn update_benefit_tx(
         return Err(PlanStoreError::Illegal(PlanError::BenefitRetired));
     }
     if patch.status.as_deref() == Some("realized") {
-        // §8.3: a benefit whose baseline was never measured cannot claim an improvement. The
-        // realization record is the proof: both readings and the evidence behind them. Timestamps
-        // alone are an assertion, so the status cannot advance past an empty evidence field.
-        let measured = get_transition_tx(&mut *conn, tenant, id)
+        // §8.3: a benefit whose baseline was never measured cannot claim an improvement, and a
+        // realization is proved by a `post` measurement taken after the transition was enacted.
+        // A timestamp on the transition is an assertion; the `benefit_measurement` row is the
+        // reading the sponsor compares with the baseline.
+        let enacted_at = get_transition_tx(&mut *conn, tenant, id)
             .await?
-            .is_some_and(|t| {
-                t.baseline_measured_at.is_some()
-                    && t.post_measured_at.is_some()
-                    && match &t.evidence {
-                        Value::Array(items) => !items.is_empty(),
-                        Value::Object(map) => !map.is_empty(),
-                        _ => false,
-                    }
-            });
-        if !measured {
+            .and_then(|transition| transition.enacted_at);
+        let baseline_measured: bool = sqlx::query_scalar(
+            "SELECT EXISTS (
+                SELECT 1 FROM benefit_measurement
+                 WHERE tenant_id = $1 AND benefit_id = $2 AND kind = 'baseline'
+            )",
+        )
+        .bind(tenant.as_uuid())
+        .bind(id)
+        .fetch_one(&mut *conn)
+        .await?;
+        if !baseline_measured {
             return Err(PlanStoreError::Illegal(PlanError::BenefitBaselineMissing));
+        }
+        let post_measured = match enacted_at {
+            Some(enacted_at) => {
+                post_measurement_after_tx(&mut *conn, tenant, id, enacted_at).await?
+            }
+            None => false,
+        };
+        if !post_measured {
+            return Err(PlanStoreError::Illegal(
+                PlanError::BenefitPostMeasurementMissing,
+            ));
         }
     }
     let approved =
@@ -2742,6 +2814,25 @@ pub async fn upsert_transition_tx(
     if post.is_some() && baseline.is_none() {
         return Err(PlanStoreError::Illegal(PlanError::BenefitBaselineMissing));
     }
+    // A post-transition timestamp (or a legacy retirement) claims the post reading exists. The
+    // reading is the `benefit_measurement(kind='post')` row taken after the enactment; without
+    // it the transition would carry an assertion the evaluation cannot reproduce.
+    let enacted = patch
+        .enacted_at
+        .or(current.as_ref().and_then(|row| row.enacted_at));
+    if post.is_some() || patch.retired_at.is_some() {
+        let measured = match enacted {
+            Some(enacted_at) => {
+                post_measurement_after_tx(&mut *conn, tenant, benefit_id, enacted_at).await?
+            }
+            None => false,
+        };
+        if !measured {
+            return Err(PlanStoreError::Illegal(
+                PlanError::BenefitPostMeasurementMissing,
+            ));
+        }
+    }
     match current {
         Some(current) => {
             let sql = format!(
@@ -2795,6 +2886,142 @@ pub async fn upsert_transition_tx(
             Ok(row)
         }
     }
+}
+
+// ── benefit_measurement ────────────────────────────────────────────────────────────────
+// §8.3's readings: the baseline measured while the old practice is observable, the interim
+// monitoring readings, and the post-transition measurement the sponsor compares. A realization
+// claim cites these rows, never a timestamp alone.
+
+/// One measurement of a benefit.
+#[derive(Clone, Debug, sqlx::FromRow)]
+pub struct BenefitMeasurementRecord {
+    /// The row id.
+    pub id: Uuid,
+    /// The benefit measured.
+    pub benefit_id: Uuid,
+    /// The programme the benefit belongs to.
+    pub programme_id: Uuid,
+    /// The tranche the reading is attributed to, if any.
+    pub tranche_id: Option<Uuid>,
+    /// `baseline | interim | post`.
+    pub kind: String,
+    /// The target the reading is compared with.
+    pub target_value: Option<f64>,
+    /// The value actually observed.
+    pub actual_value: Option<f64>,
+    /// The unit of the values.
+    pub unit: String,
+    /// How the reading was taken.
+    pub method: String,
+    /// When the reading was taken.
+    pub measured_at: DateTime<Utc>,
+    /// The evidence behind the reading.
+    pub evidence: Value,
+}
+
+const BENEFIT_MEASUREMENT_COLUMNS: &str = "id, benefit_id, programme_id, tranche_id, kind, \
+    target_value::float8 AS target_value, actual_value::float8 AS actual_value, unit, method, \
+    measured_at, evidence";
+
+/// A new benefit measurement.
+#[derive(Clone, Debug)]
+pub struct NewBenefitMeasurement {
+    /// The benefit measured.
+    pub benefit_id: Uuid,
+    /// `baseline | interim | post`.
+    pub kind: String,
+    /// The target the reading is compared with.
+    pub target_value: Option<f64>,
+    /// The value actually observed.
+    pub actual_value: Option<f64>,
+    /// The unit of the values.
+    pub unit: String,
+    /// How the reading was taken.
+    pub method: String,
+    /// When the reading was taken.
+    pub measured_at: DateTime<Utc>,
+    /// The evidence behind the reading.
+    pub evidence: Value,
+}
+
+/// Insert one measurement of a benefit. The programme is denormalised from the profile, so a
+/// reading cannot be filed under a programme the benefit does not belong to.
+pub async fn insert_benefit_measurement_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    new: &NewBenefitMeasurement,
+) -> Result<BenefitMeasurementRecord, PlanStoreError> {
+    let programme_id: Option<Uuid> = sqlx::query_scalar(
+        "SELECT programme_id FROM benefit_profile WHERE tenant_id = $1 AND id = $2",
+    )
+    .bind(tenant.as_uuid())
+    .bind(new.benefit_id)
+    .fetch_optional(&mut *conn)
+    .await?;
+    let programme_id = programme_id.ok_or(PlanStoreError::NotFound {
+        what: "benefit profile",
+    })?;
+    let sql = format!(
+        "INSERT INTO benefit_measurement
+            (tenant_id, benefit_id, programme_id, kind, target_value, actual_value, unit,
+             method, measured_at, evidence)
+         VALUES ($1, $2, $3, $4, $5::float8::numeric, $6::float8::numeric, $7, $8, $9, $10)
+         RETURNING {BENEFIT_MEASUREMENT_COLUMNS}"
+    );
+    let row: BenefitMeasurementRecord = sqlx::query_as(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(new.benefit_id)
+        .bind(programme_id)
+        .bind(&new.kind)
+        .bind(new.target_value)
+        .bind(new.actual_value)
+        .bind(&new.unit)
+        .bind(&new.method)
+        .bind(new.measured_at)
+        .bind(&new.evidence)
+        .fetch_one(&mut *conn)
+        .await?;
+    Ok(row)
+}
+
+/// List a benefit's measurements, newest reading first.
+pub async fn list_benefit_measurements_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    benefit_id: Uuid,
+) -> Result<Vec<BenefitMeasurementRecord>, PlanStoreError> {
+    let sql = format!(
+        "SELECT {BENEFIT_MEASUREMENT_COLUMNS} FROM benefit_measurement
+          WHERE tenant_id = $1 AND benefit_id = $2
+          ORDER BY measured_at DESC, id DESC"
+    );
+    Ok(sqlx::query_as(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(benefit_id)
+        .fetch_all(&mut *conn)
+        .await?)
+}
+
+/// True when the benefit has a `post` measurement taken strictly after `enacted_at`.
+pub async fn post_measurement_after_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    benefit_id: Uuid,
+    enacted_at: DateTime<Utc>,
+) -> Result<bool, sqlx::Error> {
+    sqlx::query_scalar(
+        "SELECT EXISTS (
+            SELECT 1 FROM benefit_measurement
+             WHERE tenant_id = $1 AND benefit_id = $2 AND kind = 'post'
+               AND measured_at > $3
+        )",
+    )
+    .bind(tenant.as_uuid())
+    .bind(benefit_id)
+    .bind(enacted_at)
+    .fetch_one(&mut *conn)
+    .await
 }
 
 // ── programme_cadence ───────────────────────────────────────────────────────────────────

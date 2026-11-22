@@ -1661,11 +1661,16 @@ async fn seed_programme_baseline(pg: &support::Pg, ctx: &Ctx, programme: Uuid) -
 async fn seed_parity_register(pg: &support::Pg, ctx: &Ctx, project: Uuid) -> Uuid {
     let mut tx = begin_scoped(&pg.owner, ctx.tenant).await.expect("scope");
     let id: Uuid = sqlx::query_scalar(
-        "INSERT INTO project_register_item (tenant_id, project_id, kind, title)
-         VALUES ($1, $2, 'risk', 'Parity risk') RETURNING id",
+        "INSERT INTO project_register_item
+             (tenant_id, project_id, kind, title, probability, impact, owner_job_id,
+              review_at, links)
+         VALUES ($1, $2, 'risk', 'Parity risk', 'medium', 3, $3, '2026-12-01',
+                 '[{\"kind\":\"objective\",\"ref\":\"parity\"}]'::jsonb)
+         RETURNING id",
     )
     .bind(ctx.tenant_id)
     .bind(project)
+    .bind(ctx.org_job_id)
     .fetch_one(&mut *tx)
     .await
     .expect("insert register item");
@@ -2741,6 +2746,11 @@ async fn prepare(sample: &Sample, pg: &support::Pg, ctx: &Ctx) {
             let b = seed_parity_benefit(pg, ctx, g).await;
             ctx.push("benefits.link.programme", g);
             ctx.push("benefits.link.benefit", b);
+        }
+        "benefits.measure" => {
+            let g = seed_parity_programme(pg, ctx).await;
+            let b = seed_parity_benefit(pg, ctx, g).await;
+            ctx.push(sample.name, b);
         }
         "benefits.update" | "benefits.delete" | "benefits.retire" => {
             let g = seed_parity_programme(pg, ctx).await;
@@ -7326,6 +7336,11 @@ fn spine_samples() -> Vec<Sample> {
                     "project_id": ctx.pop("registers.create"),
                     "kind": "risk",
                     "title": format!("Parity risk {}", Uuid::now_v7().simple()),
+                    "probability": "medium",
+                    "impact": 3,
+                    "owner_job_id": ctx.org_job_id,
+                    "review_at": "2026-12-01",
+                    "links": [{"kind": "objective", "ref": "parity"}],
                 })
             });
             expecting(sample, 201)
@@ -7448,6 +7463,24 @@ fn spine_samples() -> Vec<Sample> {
             sample.prepare = true;
             sample.input = Box::new(|ctx: &Ctx| json!({"programme_id": ctx.pop("benefits.list")}));
             expecting(sample, 200)
+        },
+        {
+            // §8.3: the readings a realization cites. The seeded profile is deliberately bare,
+            // so this asserts the measurement surface, not the profile's completeness.
+            let mut sample = plain("benefits.measure", json!({}), None);
+            sample.prepare = true;
+            sample.input = Box::new(|ctx: &Ctx| {
+                json!({
+                    "benefit_id": ctx.pop("benefits.measure"),
+                    "kind": "baseline",
+                    "target_value": 8.0,
+                    "actual_value": 14.0,
+                    "unit": "hours",
+                    "method": "parity baseline reading",
+                    "measured_at": "2026-11-01T00:00:00Z",
+                })
+            });
+            expecting(sample, 201)
         },
         {
             let mut sample = plain("benefits.link", json!({}), None);

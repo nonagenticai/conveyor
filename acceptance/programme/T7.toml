@@ -2,6 +2,7 @@
 key = "T7"
 name = "Operations"
 gate = "An injected pod failure is triaged, mitigated by an approved write, resolved and postmortemed; a destructive action without the tenant's configured approvals is refused; restart, scale, rollback and flag-flip are callable."
+gate_checks = ["T7-project", "T7-baseline", "T7-charter", "T7-closure-outputs", "T7-contract", "T7-review", "T7-closure-gate", "T7-waivers", "T7-pi-cadence", "T7-pi-plan", "T7-pi-objectives", "T7-wsjf", "T7-demo-credits", "T7-lessons", "T7-product"]
 
 [[check]]
 id = "T7-project"

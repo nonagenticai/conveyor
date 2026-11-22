@@ -1078,7 +1078,8 @@ async fn changes_request(
         &mut *tx,
         ctx.tenant,
         &NewRegisterItem {
-            project_id: input.project_id,
+            project_id: Some(input.project_id),
+            programme_id: None,
             kind: "change".to_owned(),
             code: String::new(),
             title: input.title,
@@ -1090,6 +1091,8 @@ async fn changes_request(
             impact: None,
             links: Value::Array(Vec::new()),
             baseline_ref: Some(baseline_id),
+            review_at: None,
+            response: None,
             // The store validates the block (at least one of the four impact keys) in
             // `insert_register_tx`; the numeric `impact` column stays empty for a change.
             meta: json!({ "impact": input.impact }),

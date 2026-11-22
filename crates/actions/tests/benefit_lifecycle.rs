@@ -137,6 +137,33 @@ async fn get_benefit(running: &support::Running, id: &str) -> Value {
     output(&body).clone()
 }
 
+/// `benefits.measure` — one reading of the benefit: the baseline or the post-transition value.
+async fn measure(
+    running: &support::Running,
+    benefit: &str,
+    kind: &str,
+    measured_at: &str,
+) -> (u16, Value) {
+    running
+        .invoke(
+            "benefits.measure",
+            TOKEN,
+            json!({
+                "benefit_id": benefit,
+                "kind": kind,
+                "target_value": 8.0,
+                "actual_value": if kind == "baseline" { 14.0 } else { 9.0 },
+                "unit": "hours",
+                "method": "median of the weekly run timestamps",
+                "measured_at": measured_at,
+            }),
+            None,
+            None,
+            None,
+        )
+        .await
+}
+
 async fn list_benefits(
     running: &support::Running,
     programme: &str,
@@ -477,8 +504,9 @@ async fn a_profile_in_transition_cannot_retire() {
     assert_eq!(output(&body)["status"], "retired", "{body}");
 }
 
-/// P1.1/P1.2 — `realized` is gated on the realization record: both the baseline and the
-/// post-transition measurement must exist, and a refused update leaves the row untouched.
+/// P1.1/P1.2 — `realized` is gated on the measurements the evaluation cites: a `baseline`
+/// reading and a `post` reading taken after the transition was enacted must both exist, and a
+/// refused update leaves the row untouched.
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn a_realized_status_needs_a_complete_transition() {
     let (pg, running, seeded) = fixture().await;
@@ -487,6 +515,7 @@ async fn a_realized_status_needs_a_complete_transition() {
     let (benefit, version) =
         create_benefit(&running, &programme, None, "BEN-01", "active", owner).await;
 
+    // No reading and no transition: the claim names no improvement.
     let (status, body) = running
         .invoke(
             "benefits.update",
@@ -506,15 +535,38 @@ async fn a_realized_status_needs_a_complete_transition() {
     assert_eq!(unchanged["status"], "active", "{unchanged}");
     assert_eq!(unchanged["version"].as_i64(), Some(version), "{unchanged}");
 
-    sqlx::query(
-        "INSERT INTO benefit_transition (tenant_id, benefit_id, baseline_measured_at)
-         VALUES ($1, $2::uuid, now())",
-    )
-    .bind(seeded.tenant_id)
-    .bind(&benefit)
-    .execute(&pg.super_pool)
-    .await
-    .expect("transition row");
+    // The transition is enacted, but no baseline reading exists yet.
+    let (status, body) = running
+        .invoke(
+            "benefits.transition_upsert",
+            TOKEN,
+            json!({"benefit_id": benefit, "enacted_at": "2026-11-20T00:00:00Z"}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{body}");
+
+    let (status, body) = running
+        .invoke(
+            "benefits.update",
+            TOKEN,
+            json!({"id": benefit, "status": "realized"}),
+            Some("\"1\""),
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 422, "{body}");
+    assert_eq!(
+        body["errors"][0]["code"], "benefit_baseline_missing",
+        "{body}"
+    );
+
+    // The baseline reading alone cannot claim realization: the post reading is missing.
+    let (status, body) = measure(&running, &benefit, "baseline", "2026-11-01T00:00:00Z").await;
+    assert_eq!(status, 201, "{body}");
 
     let (status, body) = running
         .invoke(
@@ -531,19 +583,14 @@ async fn a_realized_status_needs_a_complete_transition() {
         "a baseline alone cannot claim realization: {body}"
     );
     assert_eq!(
-        body["errors"][0]["code"], "benefit_baseline_missing",
+        body["errors"][0]["code"], "benefit_post_measurement_missing",
         "{body}"
     );
 
-    sqlx::query(
-        "UPDATE benefit_transition SET post_measured_at = now() WHERE benefit_id = $1::uuid",
-    )
-    .bind(&benefit)
-    .execute(&pg.super_pool)
-    .await
-    .expect("post-transition measurement");
-    // v1-p83-2: two timestamps are an assertion, not proof. The transition must also carry its
-    // evidence before the status can advance.
+    // A post reading taken before the enactment is not the post-transition measurement.
+    let (status, body) = measure(&running, &benefit, "post", "2026-11-19T00:00:00Z").await;
+    assert_eq!(status, 201, "{body}");
+
     let (status, body) = running
         .invoke(
             "benefits.update",
@@ -556,22 +603,19 @@ async fn a_realized_status_needs_a_complete_transition() {
         .await;
     assert_eq!(
         status, 422,
-        "timestamps without evidence cannot claim realization: {body}"
+        "a post reading before the enactment cannot claim realization: {body}"
     );
     assert_eq!(
-        body["errors"][0]["code"], "benefit_baseline_missing",
+        body["errors"][0]["code"], "benefit_post_measurement_missing",
         "{body}"
     );
+    let unchanged = get_benefit(&running, &benefit).await;
+    assert_eq!(unchanged["status"], "active", "{unchanged}");
+    assert_eq!(unchanged["version"].as_i64(), Some(version), "{unchanged}");
 
-    sqlx::query(
-        "UPDATE benefit_transition
-            SET evidence = '[{\"kind\":\"measurement\",\"ref\":\"m-1\"}]'::jsonb
-          WHERE benefit_id = $1::uuid",
-    )
-    .bind(&benefit)
-    .execute(&pg.super_pool)
-    .await
-    .expect("transition evidence");
+    // A post reading taken after the enactment realises the benefit.
+    let (status, body) = measure(&running, &benefit, "post", "2026-11-21T00:00:00Z").await;
+    assert_eq!(status, 201, "{body}");
     let (status, body) = running
         .invoke(
             "benefits.update",

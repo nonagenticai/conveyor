@@ -2150,7 +2150,7 @@
       "title": "MSP artefact absent: benefit-transition"
     },
     {
-      "acceptance": "std-msp-blueprint-01a1d039-0d24-7d16-ae52-4841e96ccfac: evidence the missing section(s) Aggregates and services, Action registry and data model, Deployment estate, The to-be the projects deliver, Organisation and skills, Current, intermediate and target states of Blueprint — conveyor buildout from seed/output-standard.json#blueprint, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+      "acceptance": "std-msp-blueprint-01a1d039-0d24-7d16-ae52-4841e96ccfac: evidence the missing section(s) Aggregates and services, Action registry and data model, Deployment estate, The to-be the projects deliver, Organisation and skills, Current, intermediate and target states of Blueprint — conveyor buildout from artefacts.json#/documents, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "blueprint",
       "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
       "category": "blueprint",
@@ -2160,8 +2160,8 @@
           "section": "Aggregates and services",
           "snapshot": [
             [
-              "seed/output-standard.json",
-              "blueprint",
+              "artefacts.json",
+              "/documents",
               0
             ]
           ],
@@ -2256,7 +2256,7 @@
       "title": "MSP artefact absent: blueprint"
     },
     {
-      "acceptance": "std-msp-governance-01a1d039-0d24-7d16-ae52-4841e96ccfac: evidence the missing section(s) Roles, Decision ladder, Assurance, The unit protocol of Governance — conveyor buildout from seed/output-standard.json#governance, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+      "acceptance": "std-msp-governance-01a1d039-0d24-7d16-ae52-4841e96ccfac: evidence the missing section(s) Roles, Decision ladder, Assurance, The unit protocol of Governance — conveyor buildout from artefacts.json#/documents, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "governance",
       "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
       "category": "governance",
@@ -2266,8 +2266,8 @@
           "section": "Roles",
           "snapshot": [
             [
-              "seed/output-standard.json",
-              "governance",
+              "artefacts.json",
+              "/documents",
               0
             ]
           ],
@@ -2336,7 +2336,87 @@
       "title": "MSP artefact absent: governance"
     },
     {
-      "acceptance": "std-msp-programme-plan-01a1d039-0d24-7d16-ae52-4841e96ccfac: evidence the missing section(s) Tranches, Projects and sequencing, Gates, First three months of Programme Plan — conveyor buildout from seed/output-standard.json#programme-plan, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+      "acceptance": "std-msp-mandate-01a1d039-0d24-7d16-ae52-4841e96ccfac: evidence the missing section(s) Strategic fit, Drivers, Deliverables and boundaries, Success and constraints of Mandate — conveyor buildout from artefacts.json#/governed_assets, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+      "area": "mandate",
+      "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
+      "category": "mandate",
+      "evidence": [
+        {
+          "artefact": "std-msp-mandate-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "section": "Strategic fit",
+          "snapshot": [
+            [
+              "artefacts.json",
+              "/governed_assets",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-msp-mandate-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "section": "Drivers",
+          "snapshot": [
+            [
+              "artefacts.json",
+              "/governed_assets",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-msp-mandate-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "section": "Deliverables and boundaries",
+          "snapshot": [
+            [
+              "artefacts.json",
+              "/governed_assets",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-msp-mandate-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "section": "Success and constraints",
+          "snapshot": [
+            [
+              "artefacts.json",
+              "/governed_assets",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a MSP artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-msp-mandate-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+      "missing": [
+        "Strategic fit",
+        "Drivers",
+        "Deliverables and boundaries",
+        "Success and constraints"
+      ],
+      "owner_project": "PLATFORM",
+      "package_key": "std-msp-mandate-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM",
+      "problem": "The mandate artefact for conveyor buildout is absent; missing required sections: Strategic fit, Drivers, Deliverables and boundaries, Success and constraints.",
+      "severity": "P1",
+      "source": "artefact",
+      "spec": "§8.3",
+      "standard": "MSP",
+      "subject": {
+        "id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "key": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "kind": "programme",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "",
+        "title": "conveyor buildout"
+      },
+      "title": "MSP artefact absent: mandate"
+    },
+    {
+      "acceptance": "std-msp-programme-plan-01a1d039-0d24-7d16-ae52-4841e96ccfac: evidence the missing section(s) Tranches, Projects and sequencing, Gates, First three months of Programme Plan — conveyor buildout from artefacts.json#/documents, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "programme-plan",
       "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
       "category": "programme-plan",
@@ -2346,8 +2426,8 @@
           "section": "Tranches",
           "snapshot": [
             [
-              "seed/output-standard.json",
-              "programme-plan",
+              "artefacts.json",
+              "/documents",
               0
             ]
           ],
@@ -2414,6 +2494,86 @@
         "title": "conveyor buildout"
       },
       "title": "MSP artefact absent: programme-plan"
+    },
+    {
+      "acceptance": "std-msp-programme-risk-register-01a1d039-0d24-7d16-ae52-4841e96ccfac: evidence the missing section(s) Register, Categories, Owners and review dates, Escalations of Programme Risk Register — conveyor buildout from msp.json#/register_items, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+      "area": "programme-risk-register",
+      "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
+      "category": "programme-risk-register",
+      "evidence": [
+        {
+          "artefact": "std-msp-programme-risk-register-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "section": "Register",
+          "snapshot": [
+            [
+              "msp.json",
+              "/register_items",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-msp-programme-risk-register-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "section": "Categories",
+          "snapshot": [
+            [
+              "msp.json",
+              "/register_items",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-msp-programme-risk-register-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "section": "Owners and review dates",
+          "snapshot": [
+            [
+              "msp.json",
+              "/register_items",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-msp-programme-risk-register-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "section": "Escalations",
+          "snapshot": [
+            [
+              "msp.json",
+              "/register_items",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a MSP artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-msp-programme-risk-register-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+      "missing": [
+        "Register",
+        "Categories",
+        "Owners and review dates",
+        "Escalations"
+      ],
+      "owner_project": "PLATFORM",
+      "package_key": "std-msp-programme-risk-register-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM",
+      "problem": "The programme-risk-register artefact for conveyor buildout is absent; missing required sections: Register, Categories, Owners and review dates, Escalations.",
+      "severity": "P1",
+      "source": "artefact",
+      "spec": "§8.3",
+      "standard": "MSP",
+      "subject": {
+        "id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "key": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "kind": "programme",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "",
+        "title": "conveyor buildout"
+      },
+      "title": "MSP artefact absent: programme-risk-register"
     },
     {
       "acceptance": "std-msp-programme-strategies-01a1d039-0d24-7d16-ae52-4841e96ccfac: evidence the missing section(s) Information strategy, Risk strategy, Issue strategy, Monitoring strategy, Communications strategy, Quality strategy, Resource strategy of Programme Strategies — conveyor buildout from artefacts.json#/governed_assets, msp.json#/register_items, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
@@ -2535,7 +2695,7 @@
       "title": "MSP artefact absent: programme-strategies"
     },
     {
-      "acceptance": "std-msp-refined-vision-01a1d039-0d24-7d16-ae52-4841e96ccfac: evidence the missing section(s) Refined vision, Changes from the mandate of Refined Vision — conveyor buildout from seed/output-standard.json#refined-vision, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+      "acceptance": "std-msp-refined-vision-01a1d039-0d24-7d16-ae52-4841e96ccfac: evidence the missing section(s) Refined vision, Changes from the mandate of Refined Vision — conveyor buildout from artefacts.json#/documents, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "refined-vision",
       "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
       "category": "refined-vision",
@@ -2545,8 +2705,8 @@
           "section": "Refined vision",
           "snapshot": [
             [
-              "seed/output-standard.json",
-              "refined-vision",
+              "artefacts.json",
+              "/documents",
               0
             ]
           ],
@@ -3733,7 +3893,7 @@
       "title": "PMP artefact absent: project-wbs"
     },
     {
-      "acceptance": "std-safe-inspect-adapt-01a1d039-0d24-7d16-ae52-4841e96ccfac: evidence the missing section(s) What went well, What did not, Lessons, Actions of Inspect Adapt — conveyor buildout from artefacts.json#/documents, msp.json#/lessons, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+      "acceptance": "std-safe-inspect-adapt-01a1d039-0d24-7d16-ae52-4841e96ccfac: evidence the missing section(s) What went well, What did not, Lessons, Actions, Kata candidates of Inspect Adapt — conveyor buildout from artefacts.json#/documents, msp.json#/lessons, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "inspect-adapt",
       "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
       "category": "inspect-adapt",
@@ -3785,6 +3945,18 @@
             ]
           ],
           "source": "artefact"
+        },
+        {
+          "artefact": "std-safe-inspect-adapt-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "section": "Kata candidates",
+          "snapshot": [
+            [
+              null,
+              null,
+              0
+            ]
+          ],
+          "source": "artefact"
         }
       ],
       "failure_scenario": "The published record claims a SAFe artefact the row set does not support, or omits a mandatory one without a work package.",
@@ -3793,11 +3965,12 @@
         "What went well",
         "What did not",
         "Lessons",
-        "Actions"
+        "Actions",
+        "Kata candidates"
       ],
       "owner_project": "PLATFORM",
       "package_key": "std-safe-inspect-adapt-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM",
-      "problem": "The inspect-adapt artefact for conveyor buildout is absent; missing required sections: What went well, What did not, Lessons, Actions.",
+      "problem": "The inspect-adapt artefact for conveyor buildout is absent; missing required sections: What went well, What did not, Lessons, Actions, Kata candidates.",
       "severity": "P1",
       "source": "artefact",
       "spec": "§8.2",
@@ -3898,7 +4071,7 @@
       "title": "SAFe artefact absent: pi-objectives"
     },
     {
-      "acceptance": "std-safe-pi-plan-01a1d039-0d24-7d16-ae52-4841e96ccfac: evidence the missing section(s) Objectives, Plan, WSJF order, Capacity and WIP, Evidence of Pi Plan — conveyor buildout from artefacts.json#/documents, msp.json#/wbs_nodes, msp.json#/cadences, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+      "acceptance": "std-safe-pi-plan-01a1d039-0d24-7d16-ae52-4841e96ccfac: evidence the missing section(s) Objectives, Plan, WSJF order, Capacity and WIP, Evidence, Dependencies, Backlog refinement of Pi Plan — conveyor buildout from artefacts.json#/documents, msp.json#/wbs_nodes, msp.json#/cadences, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "pi-plan",
       "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
       "category": "pi-plan",
@@ -3932,8 +4105,8 @@
           "section": "WSJF order",
           "snapshot": [
             [
-              "msp.json",
-              "/wbs_nodes",
+              null,
+              null,
               0
             ]
           ],
@@ -3967,6 +4140,30 @@
             ]
           ],
           "source": "artefact"
+        },
+        {
+          "artefact": "std-safe-pi-plan-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "section": "Dependencies",
+          "snapshot": [
+            [
+              null,
+              null,
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-safe-pi-plan-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "section": "Backlog refinement",
+          "snapshot": [
+            [
+              null,
+              null,
+              0
+            ]
+          ],
+          "source": "artefact"
         }
       ],
       "failure_scenario": "The published record claims a SAFe artefact the row set does not support, or omits a mandatory one without a work package.",
@@ -3976,11 +4173,13 @@
         "Plan",
         "WSJF order",
         "Capacity and WIP",
-        "Evidence"
+        "Evidence",
+        "Dependencies",
+        "Backlog refinement"
       ],
       "owner_project": "PLATFORM",
       "package_key": "std-safe-pi-plan-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM",
-      "problem": "The pi-plan artefact for conveyor buildout is absent; missing required sections: Objectives, Plan, WSJF order, Capacity and WIP, Evidence.",
+      "problem": "The pi-plan artefact for conveyor buildout is absent; missing required sections: Objectives, Plan, WSJF order, Capacity and WIP, Evidence, Dependencies, Backlog refinement.",
       "severity": "P1",
       "source": "artefact",
       "spec": "§8.2",
@@ -3994,6 +4193,60 @@
         "title": "conveyor buildout"
       },
       "title": "SAFe artefact absent: pi-plan"
+    },
+    {
+      "acceptance": "std-safe-safe-art-01a1d039-0d24-7d16-ae52-4841e96ccfac: evidence the missing section(s) Backlog with WSJF, Shared configuration of Safe Art — conveyor buildout from seed/output-standard.json#safe-art, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+      "area": "safe-art",
+      "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
+      "category": "safe-art",
+      "evidence": [
+        {
+          "artefact": "std-safe-safe-art-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "section": "Backlog with WSJF",
+          "snapshot": [
+            [
+              null,
+              null,
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-safe-safe-art-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "section": "Shared configuration",
+          "snapshot": [
+            [
+              null,
+              null,
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a SAFe artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-safe-safe-art-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+      "missing": [
+        "Backlog with WSJF",
+        "Shared configuration"
+      ],
+      "owner_project": "PLATFORM",
+      "package_key": "std-safe-safe-art-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM",
+      "problem": "The safe-art artefact for conveyor buildout is partial; missing required sections: Backlog with WSJF, Shared configuration.",
+      "severity": "P1",
+      "source": "artefact",
+      "spec": "§8.2",
+      "standard": "SAFe",
+      "subject": {
+        "id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "key": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "kind": "programme",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "",
+        "title": "conveyor buildout"
+      },
+      "title": "SAFe artefact partial: safe-art"
     },
     {
       "acceptance": "std-safe-safe-cadence-01a1d039-0d24-7d16-ae52-4841e96ccfac: evidence the missing section(s) PI plan, System demo, Inspect and adapt, Lean governance of Safe Cadence — conveyor buildout from msp.json#/cadences, work.json#/approvals, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
@@ -4154,6 +4407,73 @@
         "title": "conveyor buildout"
       },
       "title": "SAFe artefact absent: system-demo"
+    },
+    {
+      "acceptance": "std-togaf-adr-register-01a1d039-0d24-7d16-ae52-4841e96ccfac: evidence the missing section(s) Register, Status and supersession, Decisions of Adr Register — conveyor buildout from artefacts.json#/governed_assets, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+      "area": "adr-register",
+      "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
+      "category": "adr-register",
+      "evidence": [
+        {
+          "artefact": "std-togaf-adr-register-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "section": "Register",
+          "snapshot": [
+            [
+              "artefacts.json",
+              "/governed_assets",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-togaf-adr-register-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "section": "Status and supersession",
+          "snapshot": [
+            [
+              "artefacts.json",
+              "/governed_assets",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-togaf-adr-register-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "section": "Decisions",
+          "snapshot": [
+            [
+              "artefacts.json",
+              "/governed_assets",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a TOGAF artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-togaf-adr-register-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+      "missing": [
+        "Register",
+        "Status and supersession",
+        "Decisions"
+      ],
+      "owner_project": "PLATFORM",
+      "package_key": "std-togaf-adr-register-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM",
+      "problem": "The adr-register artefact for conveyor buildout is absent; missing required sections: Register, Status and supersession, Decisions.",
+      "severity": "P1",
+      "source": "artefact",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "subject": {
+        "id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "key": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "kind": "programme",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "",
+        "title": "conveyor buildout"
+      },
+      "title": "TOGAF artefact absent: adr-register"
     },
     {
       "acceptance": "std-togaf-delivery-contract-design-publish: evidence the missing section(s) Commitments, Compliance method, Approval of Delivery Contract — Programme-level unit (plan: docs/design/STUDIO-SPEC.md) from architecture.json#/contracts, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
@@ -4692,6 +5012,330 @@
       "title": "TOGAF artefact absent: requirements-catalog"
     },
     {
+      "acceptance": "std-msp-benefit-evaluation-b1: evidence the missing section(s) Actuals and variance, Decision of Benefit Evaluation — Auditable decisions from msp.json#/benefit_transitions, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+      "area": "benefit-evaluation",
+      "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
+      "category": "benefit-evaluation",
+      "evidence": [
+        {
+          "artefact": "std-msp-benefit-evaluation-b1",
+          "section": "Actuals and variance",
+          "snapshot": [
+            [
+              "msp.json",
+              "/benefit_transitions",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-msp-benefit-evaluation-b1",
+          "section": "Decision",
+          "snapshot": [
+            [
+              "msp.json",
+              "/benefit_transitions",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a MSP artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-msp-benefit-evaluation-b1",
+      "missing": [
+        "Actuals and variance",
+        "Decision"
+      ],
+      "owner_project": "PLATFORM",
+      "package_key": "std-msp-benefit-evaluation-b1:PLATFORM",
+      "problem": "The benefit-evaluation artefact for Auditable decisions is partial; missing required sections: Actuals and variance, Decision.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.3",
+      "standard": "MSP",
+      "subject": {
+        "id": "01a1e9de-4e4f-757e-a8c8-bf3522e5adcf",
+        "key": "B1",
+        "kind": "benefit",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "",
+        "title": "Auditable decisions"
+      },
+      "title": "MSP artefact partial: benefit-evaluation"
+    },
+    {
+      "acceptance": "std-msp-benefit-evaluation-b2: evidence the missing section(s) Actuals and variance, Decision of Benefit Evaluation — Less bespoke tooling from msp.json#/benefit_transitions, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+      "area": "benefit-evaluation",
+      "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
+      "category": "benefit-evaluation",
+      "evidence": [
+        {
+          "artefact": "std-msp-benefit-evaluation-b2",
+          "section": "Actuals and variance",
+          "snapshot": [
+            [
+              "msp.json",
+              "/benefit_transitions",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-msp-benefit-evaluation-b2",
+          "section": "Decision",
+          "snapshot": [
+            [
+              "msp.json",
+              "/benefit_transitions",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a MSP artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-msp-benefit-evaluation-b2",
+      "missing": [
+        "Actuals and variance",
+        "Decision"
+      ],
+      "owner_project": "PLATFORM",
+      "package_key": "std-msp-benefit-evaluation-b2:PLATFORM",
+      "problem": "The benefit-evaluation artefact for Less bespoke tooling is partial; missing required sections: Actuals and variance, Decision.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.3",
+      "standard": "MSP",
+      "subject": {
+        "id": "01a1e9df-0308-7fdc-8492-32db1e582a2d",
+        "key": "B2",
+        "kind": "benefit",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "",
+        "title": "Less bespoke tooling"
+      },
+      "title": "MSP artefact partial: benefit-evaluation"
+    },
+    {
+      "acceptance": "std-msp-benefit-evaluation-b3: evidence the missing section(s) Actuals and variance, Decision of Benefit Evaluation — Self-development from msp.json#/benefit_transitions, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+      "area": "benefit-evaluation",
+      "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
+      "category": "benefit-evaluation",
+      "evidence": [
+        {
+          "artefact": "std-msp-benefit-evaluation-b3",
+          "section": "Actuals and variance",
+          "snapshot": [
+            [
+              "msp.json",
+              "/benefit_transitions",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-msp-benefit-evaluation-b3",
+          "section": "Decision",
+          "snapshot": [
+            [
+              "msp.json",
+              "/benefit_transitions",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a MSP artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-msp-benefit-evaluation-b3",
+      "missing": [
+        "Actuals and variance",
+        "Decision"
+      ],
+      "owner_project": "PLATFORM",
+      "package_key": "std-msp-benefit-evaluation-b3:PLATFORM",
+      "problem": "The benefit-evaluation artefact for Self-development is partial; missing required sections: Actuals and variance, Decision.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.3",
+      "standard": "MSP",
+      "subject": {
+        "id": "01a1e9df-0c4b-7807-b35c-5810ec418d45",
+        "key": "B3",
+        "kind": "benefit",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "",
+        "title": "Self-development"
+      },
+      "title": "MSP artefact partial: benefit-evaluation"
+    },
+    {
+      "acceptance": "std-msp-benefit-evaluation-b4: evidence the missing section(s) Actuals and variance, Decision of Benefit Evaluation — Public collaboration from msp.json#/benefit_transitions, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+      "area": "benefit-evaluation",
+      "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
+      "category": "benefit-evaluation",
+      "evidence": [
+        {
+          "artefact": "std-msp-benefit-evaluation-b4",
+          "section": "Actuals and variance",
+          "snapshot": [
+            [
+              "msp.json",
+              "/benefit_transitions",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-msp-benefit-evaluation-b4",
+          "section": "Decision",
+          "snapshot": [
+            [
+              "msp.json",
+              "/benefit_transitions",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a MSP artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-msp-benefit-evaluation-b4",
+      "missing": [
+        "Actuals and variance",
+        "Decision"
+      ],
+      "owner_project": "PLATFORM",
+      "package_key": "std-msp-benefit-evaluation-b4:PLATFORM",
+      "problem": "The benefit-evaluation artefact for Public collaboration is partial; missing required sections: Actuals and variance, Decision.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.3",
+      "standard": "MSP",
+      "subject": {
+        "id": "01a1e9df-1592-79a5-839e-037d8fe4251b",
+        "key": "B4",
+        "kind": "benefit",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "",
+        "title": "Public collaboration"
+      },
+      "title": "MSP artefact partial: benefit-evaluation"
+    },
+    {
+      "acceptance": "std-msp-benefit-evaluation-b5: evidence the missing section(s) Actuals and variance, Decision of Benefit Evaluation — One model from msp.json#/benefit_transitions, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+      "area": "benefit-evaluation",
+      "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
+      "category": "benefit-evaluation",
+      "evidence": [
+        {
+          "artefact": "std-msp-benefit-evaluation-b5",
+          "section": "Actuals and variance",
+          "snapshot": [
+            [
+              "msp.json",
+              "/benefit_transitions",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-msp-benefit-evaluation-b5",
+          "section": "Decision",
+          "snapshot": [
+            [
+              "msp.json",
+              "/benefit_transitions",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a MSP artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-msp-benefit-evaluation-b5",
+      "missing": [
+        "Actuals and variance",
+        "Decision"
+      ],
+      "owner_project": "PLATFORM",
+      "package_key": "std-msp-benefit-evaluation-b5:PLATFORM",
+      "problem": "The benefit-evaluation artefact for One model is partial; missing required sections: Actuals and variance, Decision.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.3",
+      "standard": "MSP",
+      "subject": {
+        "id": "01a1e9df-1e42-7199-87e1-23c577c62f8e",
+        "key": "B5",
+        "kind": "benefit",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "",
+        "title": "One model"
+      },
+      "title": "MSP artefact partial: benefit-evaluation"
+    },
+    {
+      "acceptance": "std-msp-benefit-evaluation-b6: evidence the missing section(s) Actuals and variance, Decision of Benefit Evaluation — Predictable delivery from msp.json#/benefit_transitions, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+      "area": "benefit-evaluation",
+      "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
+      "category": "benefit-evaluation",
+      "evidence": [
+        {
+          "artefact": "std-msp-benefit-evaluation-b6",
+          "section": "Actuals and variance",
+          "snapshot": [
+            [
+              "msp.json",
+              "/benefit_transitions",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-msp-benefit-evaluation-b6",
+          "section": "Decision",
+          "snapshot": [
+            [
+              "msp.json",
+              "/benefit_transitions",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a MSP artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-msp-benefit-evaluation-b6",
+      "missing": [
+        "Actuals and variance",
+        "Decision"
+      ],
+      "owner_project": "PLATFORM",
+      "package_key": "std-msp-benefit-evaluation-b6:PLATFORM",
+      "problem": "The benefit-evaluation artefact for Predictable delivery is partial; missing required sections: Actuals and variance, Decision.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.3",
+      "standard": "MSP",
+      "subject": {
+        "id": "01a1e9df-27b8-7827-ae4e-6d48ca5904e8",
+        "key": "B6",
+        "kind": "benefit",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "",
+        "title": "Predictable delivery"
+      },
+      "title": "MSP artefact partial: benefit-evaluation"
+    },
+    {
       "acceptance": "std-msp-business-case-01a1d039-0d24-7d16-ae52-4841e96ccfac: evidence the missing section(s) Licensing frame, Options, including doing nothing, Investment appraisal and cash flow, Capabilities the benefits depend on of Business Case — conveyor buildout from seed/output-standard.json#business-case, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "business-case",
       "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
@@ -4863,47 +5507,6 @@
         "title": "conveyor buildout"
       },
       "title": "MSP artefact partial: programme-brief"
-    },
-    {
-      "acceptance": "std-msp-projects-dossier-01a1d039-0d24-7d16-ae52-4841e96ccfac: evidence the missing section(s) Delivery risks of Projects Dossier — conveyor buildout from msp.json#/register_items, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
-      "area": "projects-dossier",
-      "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
-      "category": "projects-dossier",
-      "evidence": [
-        {
-          "artefact": "std-msp-projects-dossier-01a1d039-0d24-7d16-ae52-4841e96ccfac",
-          "section": "Delivery risks",
-          "snapshot": [
-            [
-              "msp.json",
-              "/register_items",
-              0
-            ]
-          ],
-          "source": "artefact"
-        }
-      ],
-      "failure_scenario": "The published record claims a MSP artefact the row set does not support, or omits a mandatory one without a work package.",
-      "id": "std-msp-projects-dossier-01a1d039-0d24-7d16-ae52-4841e96ccfac",
-      "missing": [
-        "Delivery risks"
-      ],
-      "owner_project": "PLATFORM",
-      "package_key": "std-msp-projects-dossier-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM",
-      "problem": "The projects-dossier artefact for conveyor buildout is partial; missing required sections: Delivery risks.",
-      "severity": "P2",
-      "source": "artefact",
-      "spec": "§8.3",
-      "standard": "MSP",
-      "subject": {
-        "id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
-        "key": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
-        "kind": "programme",
-        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
-        "project_key": "",
-        "title": "conveyor buildout"
-      },
-      "title": "MSP artefact partial: projects-dossier"
     },
     {
       "acceptance": "std-pmp-change-control-s02: evidence the missing section(s) Change requests, Impact, Decisions of Change Control — Plan: docs/plans/slices/S02-skeleton.md from msp.json#/register_items, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
@@ -18432,47 +19035,6 @@
       "title": "PMP artefact absent: project-wbs"
     },
     {
-      "acceptance": "std-safe-safe-art-01a1d039-0d24-7d16-ae52-4841e96ccfac: evidence the missing section(s) Backlog with WSJF of Safe Art — conveyor buildout from msp.json#/wbs_nodes, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
-      "area": "safe-art",
-      "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
-      "category": "safe-art",
-      "evidence": [
-        {
-          "artefact": "std-safe-safe-art-01a1d039-0d24-7d16-ae52-4841e96ccfac",
-          "section": "Backlog with WSJF",
-          "snapshot": [
-            [
-              "msp.json",
-              "/wbs_nodes",
-              0
-            ]
-          ],
-          "source": "artefact"
-        }
-      ],
-      "failure_scenario": "The published record claims a SAFe artefact the row set does not support, or omits a mandatory one without a work package.",
-      "id": "std-safe-safe-art-01a1d039-0d24-7d16-ae52-4841e96ccfac",
-      "missing": [
-        "Backlog with WSJF"
-      ],
-      "owner_project": "PLATFORM",
-      "package_key": "std-safe-safe-art-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM",
-      "problem": "The safe-art artefact for conveyor buildout is partial; missing required sections: Backlog with WSJF.",
-      "severity": "P2",
-      "source": "artefact",
-      "spec": "§8.2",
-      "standard": "SAFe",
-      "subject": {
-        "id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
-        "key": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
-        "kind": "programme",
-        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
-        "project_key": "",
-        "title": "conveyor buildout"
-      },
-      "title": "SAFe artefact partial: safe-art"
-    },
-    {
       "acceptance": "std-togaf-architecture-artifact-instance-01a1f2c1-5717-75e7-9b3d-1d7707648c09: evidence the missing section(s) Document of Architecture Artifact Instance — Conveyor architecture principles — PF-1 from seed/output-standard.json#architecture-artifact-instance, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "architecture-artifact-instance",
       "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
@@ -18596,42 +19158,30 @@
       "title": "TOGAF artefact partial: architecture-artifact-instance"
     },
     {
-      "acceptance": "std-togaf-architecture-artifact-t9: evidence the missing section(s) Metadata, Entries, Links of Architecture Artifact — SPEC_V2 slice T9 (docs/SPEC_V2.md §12) from architecture.json#/artifacts, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
-      "area": "architecture-artifact",
+      "acceptance": "std-togaf-architecture-governance-log-01a1d039-0d24-7d16-ae52-4841e96ccfac: evidence the missing section(s) Reviews, Waivers of Architecture Governance Log — Architecture capability — conveyor buildout from architecture.json#/compliance_reviews, architecture.json#/waivers, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+      "area": "architecture-governance-log",
       "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
-      "category": "architecture-artifact",
+      "category": "architecture-governance-log",
       "evidence": [
         {
-          "artefact": "std-togaf-architecture-artifact-t9",
-          "section": "Metadata",
+          "artefact": "std-togaf-architecture-governance-log-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "section": "Reviews",
           "snapshot": [
             [
               "architecture.json",
-              "/artifacts",
+              "/compliance_reviews",
               0
             ]
           ],
           "source": "artefact"
         },
         {
-          "artefact": "std-togaf-architecture-artifact-t9",
-          "section": "Entries",
+          "artefact": "std-togaf-architecture-governance-log-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "section": "Waivers",
           "snapshot": [
             [
               "architecture.json",
-              "/artifacts",
-              0
-            ]
-          ],
-          "source": "artefact"
-        },
-        {
-          "artefact": "std-togaf-architecture-artifact-t9",
-          "section": "Links",
-          "snapshot": [
-            [
-              null,
-              null,
+              "/waivers",
               0
             ]
           ],
@@ -18639,15 +19189,81 @@
         }
       ],
       "failure_scenario": "The published record claims a TOGAF artefact the row set does not support, or omits a mandatory one without a work package.",
-      "id": "std-togaf-architecture-artifact-t9",
+      "id": "std-togaf-architecture-governance-log-01a1d039-0d24-7d16-ae52-4841e96ccfac",
       "missing": [
-        "Metadata",
-        "Entries",
-        "Links"
+        "Reviews",
+        "Waivers"
+      ],
+      "owner_project": "PLATFORM",
+      "package_key": "std-togaf-architecture-governance-log-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM",
+      "problem": "The architecture-governance-log artefact for Architecture capability — conveyor buildout is partial; missing required sections: Reviews, Waivers.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "subject": {
+        "id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "key": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "kind": "capability",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "",
+        "title": "Architecture capability — conveyor buildout"
+      },
+      "title": "TOGAF artefact partial: architecture-governance-log"
+    },
+    {
+      "acceptance": "std-togaf-benefits-diagram-t9: evidence the missing section(s) Goals and outcomes, Measures, Benefits and sub-benefits of Benefits Diagram — SPEC_V2 slice T9 (docs/SPEC_V2.md §12) from artefacts.json#/documents, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+      "area": "benefits-diagram",
+      "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
+      "category": "benefits-diagram",
+      "evidence": [
+        {
+          "artefact": "std-togaf-benefits-diagram-t9",
+          "section": "Goals and outcomes",
+          "snapshot": [
+            [
+              "artefacts.json",
+              "/documents",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-togaf-benefits-diagram-t9",
+          "section": "Measures",
+          "snapshot": [
+            [
+              "artefacts.json",
+              "/documents",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-togaf-benefits-diagram-t9",
+          "section": "Benefits and sub-benefits",
+          "snapshot": [
+            [
+              "artefacts.json",
+              "/documents",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a TOGAF artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-togaf-benefits-diagram-t9",
+      "missing": [
+        "Goals and outcomes",
+        "Measures",
+        "Benefits and sub-benefits"
       ],
       "owner_project": "T9",
-      "package_key": "std-togaf-architecture-artifact-t9:T9",
-      "problem": "The architecture-artifact artefact for SPEC_V2 slice T9 (docs/SPEC_V2.md §12) is partial; missing required sections: Metadata, Entries, Links. Not yet due: tranche 4 is planned.",
+      "package_key": "std-togaf-benefits-diagram-t9:T9",
+      "problem": "The benefits-diagram artefact for SPEC_V2 slice T9 (docs/SPEC_V2.md §12) is absent; missing required sections: Goals and outcomes, Measures, Benefits and sub-benefits. Not yet due: tranche 4 is planned.",
       "severity": "P2",
       "source": "artefact",
       "spec": "§8.1",
@@ -18660,7 +19276,74 @@
         "project_key": "T9",
         "title": "SPEC_V2 slice T9 (docs/SPEC_V2.md §12)"
       },
-      "title": "TOGAF artefact partial: architecture-artifact"
+      "title": "TOGAF artefact absent: benefits-diagram"
+    },
+    {
+      "acceptance": "std-togaf-candidate-solutions-t9: evidence the missing section(s) Candidates, Criteria, Options rejected of Candidate Solutions — SPEC_V2 slice T9 (docs/SPEC_V2.md §12) from artefacts.json#/documents, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+      "area": "candidate-solutions",
+      "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
+      "category": "candidate-solutions",
+      "evidence": [
+        {
+          "artefact": "std-togaf-candidate-solutions-t9",
+          "section": "Candidates",
+          "snapshot": [
+            [
+              "artefacts.json",
+              "/documents",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-togaf-candidate-solutions-t9",
+          "section": "Criteria",
+          "snapshot": [
+            [
+              "artefacts.json",
+              "/documents",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-togaf-candidate-solutions-t9",
+          "section": "Options rejected",
+          "snapshot": [
+            [
+              "artefacts.json",
+              "/documents",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a TOGAF artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-togaf-candidate-solutions-t9",
+      "missing": [
+        "Candidates",
+        "Criteria",
+        "Options rejected"
+      ],
+      "owner_project": "T9",
+      "package_key": "std-togaf-candidate-solutions-t9:T9",
+      "problem": "The candidate-solutions artefact for SPEC_V2 slice T9 (docs/SPEC_V2.md §12) is absent; missing required sections: Candidates, Criteria, Options rejected. Not yet due: tranche 4 is planned.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "subject": {
+        "id": "01a1d039-0d35-7bd1-945d-cea12c5dfd6d",
+        "key": "T9",
+        "kind": "project",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "T9",
+        "title": "SPEC_V2 slice T9 (docs/SPEC_V2.md §12)"
+      },
+      "title": "TOGAF artefact absent: candidate-solutions"
     },
     {
       "acceptance": "std-togaf-compliance-review-s02: evidence the missing section(s) Relationship, Findings, Waivers, Decision of Compliance Review — Plan: docs/plans/slices/S02-skeleton.md from architecture.json#/compliance_reviews, architecture.json#/waivers, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
@@ -23391,6 +24074,73 @@
       "title": "TOGAF artefact absent: delivery-contract"
     },
     {
+      "acceptance": "std-togaf-gap-analysis-t9: evidence the missing section(s) Baseline, Target, Gaps and work packages of Gap Analysis — SPEC_V2 slice T9 (docs/SPEC_V2.md §12) from artefacts.json#/documents, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+      "area": "gap-analysis",
+      "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
+      "category": "gap-analysis",
+      "evidence": [
+        {
+          "artefact": "std-togaf-gap-analysis-t9",
+          "section": "Baseline",
+          "snapshot": [
+            [
+              "artefacts.json",
+              "/documents",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-togaf-gap-analysis-t9",
+          "section": "Target",
+          "snapshot": [
+            [
+              "artefacts.json",
+              "/documents",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-togaf-gap-analysis-t9",
+          "section": "Gaps and work packages",
+          "snapshot": [
+            [
+              "artefacts.json",
+              "/documents",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a TOGAF artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-togaf-gap-analysis-t9",
+      "missing": [
+        "Baseline",
+        "Target",
+        "Gaps and work packages"
+      ],
+      "owner_project": "T9",
+      "package_key": "std-togaf-gap-analysis-t9:T9",
+      "problem": "The gap-analysis artefact for SPEC_V2 slice T9 (docs/SPEC_V2.md §12) is absent; missing required sections: Baseline, Target, Gaps and work packages. Not yet due: tranche 4 is planned.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "subject": {
+        "id": "01a1d039-0d35-7bd1-945d-cea12c5dfd6d",
+        "key": "T9",
+        "kind": "project",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "T9",
+        "title": "SPEC_V2 slice T9 (docs/SPEC_V2.md §12)"
+      },
+      "title": "TOGAF artefact absent: gap-analysis"
+    },
+    {
       "acceptance": "std-togaf-phase-a-t9-a: evidence the missing section(s) Mandatory artefacts, Evidence of Phase A — T9 — A from architecture.json#/artifacts, artefacts.json#/documents, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
       "area": "phase-a",
       "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
@@ -23448,6 +24198,73 @@
         "title": "T9 — A"
       },
       "title": "TOGAF artefact partial: phase-a"
+    },
+    {
+      "acceptance": "std-togaf-project-context-diagram-t9: evidence the missing section(s) Context, Affected organisation, Affected systems of Project Context Diagram — SPEC_V2 slice T9 (docs/SPEC_V2.md §12) from artefacts.json#/documents, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+      "area": "project-context-diagram",
+      "audited_sha": "a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b",
+      "category": "project-context-diagram",
+      "evidence": [
+        {
+          "artefact": "std-togaf-project-context-diagram-t9",
+          "section": "Context",
+          "snapshot": [
+            [
+              "artefacts.json",
+              "/documents",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-togaf-project-context-diagram-t9",
+          "section": "Affected organisation",
+          "snapshot": [
+            [
+              "artefacts.json",
+              "/documents",
+              0
+            ]
+          ],
+          "source": "artefact"
+        },
+        {
+          "artefact": "std-togaf-project-context-diagram-t9",
+          "section": "Affected systems",
+          "snapshot": [
+            [
+              "artefacts.json",
+              "/documents",
+              0
+            ]
+          ],
+          "source": "artefact"
+        }
+      ],
+      "failure_scenario": "The published record claims a TOGAF artefact the row set does not support, or omits a mandatory one without a work package.",
+      "id": "std-togaf-project-context-diagram-t9",
+      "missing": [
+        "Context",
+        "Affected organisation",
+        "Affected systems"
+      ],
+      "owner_project": "T9",
+      "package_key": "std-togaf-project-context-diagram-t9:T9",
+      "problem": "The project-context-diagram artefact for SPEC_V2 slice T9 (docs/SPEC_V2.md §12) is absent; missing required sections: Context, Affected organisation, Affected systems. Not yet due: tranche 4 is planned.",
+      "severity": "P2",
+      "source": "artefact",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "subject": {
+        "id": "01a1d039-0d35-7bd1-945d-cea12c5dfd6d",
+        "key": "T9",
+        "kind": "project",
+        "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+        "project_key": "T9",
+        "title": "SPEC_V2 slice T9 (docs/SPEC_V2.md §12)"
+      },
+      "title": "TOGAF artefact absent: project-context-diagram"
     }
   ],
   "method": "generate-standards.py resolves every section of every applicable standards artefact against the published snapshot, its documents and the artefact standard; only an unresolved mandatory section becomes a finding.",

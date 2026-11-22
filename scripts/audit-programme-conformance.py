@@ -38,7 +38,10 @@ REGISTER_SCHEMA = "conveyor-rework/v1"
 REGISTER_STANDARDS = ("MSP", "TOGAF", "SAFe", "PMP", "SPEC")
 REGISTER_SCOPES = ("project", "tranche", "programme")
 REGISTER_MAX_SUBJECTS = 20
-REGISTER_SUPPRESSED = ("waiver", "unprovable")
+# No disposition suppresses a package (ADR 0010): a baseline row recorded as a waiver is
+# still an open gap. The tuple is kept as the one extension point so a future legal
+# suppression has a single place to be declared.
+REGISTER_SUPPRESSED = ()
 
 # A test row is not a programme project. The marker is `meta.test_row = true`; the two known
 # keys predate the marker and are named explicitly rather than matched by prefix, so a future
@@ -1221,6 +1224,12 @@ class Audit:
                     active_waiver = any(
                         row.get("review_id") == review.get("id")
                         and row.get("status") == "active"
+                        and str(
+                            row.get("kind")
+                            or row.get("waiver_type")
+                            or "architecture_waiver"
+                        )
+                        == "architecture_waiver"
                         and parse_time(row.get("reassessment_at"))
                         and parse_time(row.get("reassessment_at")) > datetime.now(timezone.utc)
                         for row in self.data.waivers
@@ -1236,8 +1245,25 @@ class Audit:
     def waivers(self) -> None:
         if "waivers" not in self.data.architecture:
             return
+        review_ids = {str(row.get("id")) for row in self.data.reviews_arch}
         for waiver in self.data.waivers:
             subject = str(waiver.get("id"))
+            kind = str(
+                waiver.get("kind") or waiver.get("waiver_type") or "architecture_waiver"
+            )
+            if kind != "architecture_waiver" or str(
+                waiver.get("review_id") or ""
+            ) not in review_ids:
+                # Only an architecture_waiver — one attached to a compliance review — is a
+                # legal TOGAF deviation. A programme waiver is a finding, never a permit.
+                self.add(
+                    "waiver_not_permitted",
+                    "P1",
+                    subject,
+                    "the waiver is a programme waiver or is not attached to an architecture "
+                    "compliance review; programme work permits no waiver",
+                )
+                continue
             missing = [
                 field
                 for field in ("owner_user_id", "reason", "reassessment_at")
@@ -1248,7 +1274,7 @@ class Audit:
                     "waiver_invalid",
                     "P1",
                     subject,
-                    "waiver is missing " + ", ".join(missing),
+                    "architecture waiver is missing " + ", ".join(missing),
                 )
                 continue
             if waiver.get("status") == "active":
@@ -1258,7 +1284,7 @@ class Audit:
                         "waiver_invalid",
                         "P2",
                         subject,
-                        "active waiver is past its reassessment date",
+                        "active architecture waiver is past its reassessment date",
                     )
 
     def capability_artefacts(self) -> None:
@@ -1671,6 +1697,7 @@ def standard_checks(standard: dict[str, Any], seed_dir: Path) -> None:
         "requester_is_approver",
         "compliance_review_missing",
         "waiver_invalid",
+        "waiver_not_permitted",
         "capability_artefacts",
         "mandatory_artefacts",
         "closed_without_closure_review",
@@ -1855,10 +1882,10 @@ def build_register(
     """Project the gap register into labelled rework packages, deterministically.
 
     P0 is never grouped (one package per rule and subject). P1–P3 are grouped by the rule's
-    scope (project / tranche / programme) and split at [`REGISTER_MAX_SUBJECTS`]. Baseline
-    dispositions are respected: `waiver` and `unprovable` packages are `suppressed` and counted,
-    never hidden. A checked-in v1 finding is dropped only when it names the data gap it
-    duplicates with `duplicate_of`.
+    scope (project / tranche / programme) and split at [`REGISTER_MAX_SUBJECTS`]. No
+    disposition suppresses a package: every open row computes as an open gap (ADR 0010). A
+    checked-in v1 finding is dropped only when it names the data gap it duplicates with
+    `duplicate_of`.
     """
     entries = {
         (str(entry.get("rule")), str(entry.get("subject"))): entry
@@ -1913,10 +1940,10 @@ def build_register(
         if duplicate_of and str(duplicate_of) in data_keys:
             duplicates.append(identifier)
             continue
-        # An owner-accepted residual is a waiver, not a resolution: the finding still stands and
-        # its package is suppressed and counted, never hidden. A waiver names who accepted it,
-        # the decision that records it, why, and when it must be reassessed; anything less is
-        # refused rather than silently passing.
+        # The residual-waiver legality check survives: a waiver names who accepted it, the
+        # decision that records it, why, and when it must be reassessed, and anything less is
+        # refused. A legal programme waiver is still not a disposition (ADR 0010): the finding
+        # stays open and the waiver itself becomes a `waiver_not_permitted` finding.
         disposition = "rework"
         waiver = finding.get("waiver")
         if waiver is not None:
@@ -1940,9 +1967,31 @@ def build_register(
                 )
             if expires < datetime.now(timezone.utc).date():
                 fail(f"the finding {identifier} waiver expired at {waiver['expires']}")
-            disposition = "waiver"
         owner = str(finding["owner_project"])
         scope = owner if owner in dataset.by_key else "programme"
+        if waiver is not None:
+            add(
+                f"waiver_not_permitted:{scope}",
+                "waiver_not_permitted",
+                rule_row(standard, "waiver_not_permitted"),
+                scope,
+                {
+                    "rule": "waiver_not_permitted",
+                    "severity": str(finding["severity"]),
+                    "subject": identifier,
+                    "detail": (
+                        f"finding {identifier} carries an owner-accepted waiver; "
+                        "programme work permits no waiver"
+                    ),
+                    "disposition": "rework",
+                    "evidence": [
+                        {"source": "code", **item}
+                        for item in finding["evidence"]
+                        if isinstance(item, dict)
+                    ],
+                },
+                False,
+            )
         row = {
             "severity": str(finding["severity"]),
             "standard": str(finding["standard"]),
@@ -2560,11 +2609,46 @@ def self_test() -> None:
     expect(transition_without_baseline, "transition_order")
 
     def invalid_waiver(data: Dataset) -> None:
-        row = {"id": "w1", "status": "active"}
+        row = {"id": "w1", "status": "active", "review_id": "r1"}
         data.architecture["waivers"].append(row)
         data.waivers.append(row)
 
     expect(invalid_waiver, "waiver_invalid")
+
+    def programme_waiver(data: Dataset) -> None:
+        # A waiver not attached to an architecture compliance review is programme work; it is
+        # a finding, not a legal deviation.
+        row = {"id": "w2", "status": "active", "review_id": "no-such-review"}
+        data.architecture["waivers"].append(row)
+        data.waivers.append(row)
+
+    expect(programme_waiver, "waiver_not_permitted")
+
+    def review_waiver(kind: str):
+        def mutate(data: Dataset) -> None:
+            data.by_key["T1"]["status"] = "closed"
+            data.published["T1"].add("closure-review")
+            data.reviews_arch[0]["level"] = "non_conformant"
+            row = {
+                "id": f"w-{kind}",
+                "status": "active",
+                "review_id": "r1",
+                "kind": kind,
+                "owner_user_id": "u1",
+                "reason": "self-test",
+                "reassessment_at": "2099-01-01T00:00:00+00:00",
+            }
+            data.architecture["waivers"].append(row)
+            data.waivers.append(row)
+
+        return mutate
+
+    # A programme waiver never suppresses a non-conformant compliance review; only an
+    # architecture_waiver on that review may.
+    expect(review_waiver("programme"), "waiver_not_permitted")
+    expect(review_waiver("programme"), "compliance_review_missing", "P0")
+    expect_absent(review_waiver("architecture_waiver"), "compliance_review_missing")
+    expect_absent(review_waiver("architecture_waiver"), "waiver_not_permitted")
 
     # capability_artefacts: the Preliminary set is checked once, at capability level.
     expect(lambda data: drop_artefact(data, "type-principles"), "capability_artefacts", "P1")
@@ -2727,8 +2811,9 @@ def self_test() -> None:
     second = json.dumps([gap for gap in audit(base())], sort_keys=True)
     if first != second:
         fail("two audits of the same input differ")
-    # The rework register: P0 is never grouped, P1 splits deterministically at the cap, a waiver
-    # suppresses its package, a duplicate finding is folded, and a re-run is byte-identical.
+    # The rework register: P0 is never grouped, P1 splits deterministically at the cap, a
+    # waiver is refused as a disposition, a duplicate finding is folded, and a re-run is
+    # byte-identical.
     register_data = base()
     register_gaps = [
         {
@@ -2839,12 +2924,12 @@ def self_test() -> None:
         fail("a P0 gap was grouped")
     if not any(
         package["key"].startswith("benefit_baseline_placeholder")
-        and package["status"] == "suppressed"
+        and package["status"] == "open"
         for package in first["packages"]
     ):
-        fail("a waiver did not suppress its package")
-    # A finding's owner-accepted residual is a first-class waiver: its package is suppressed,
-    # and a waiver with no owner, no decision reference or an expired date is refused.
+        fail("a baseline waiver suppressed its package; no disposition may suppress a gap")
+    # A finding's waiver is refused as a disposition: the finding stays open and the waiver is
+    # itself a `waiver_not_permitted` finding. A malformed waiver is still refused outright.
     def with_waiver(waiver: dict[str, Any]) -> dict[str, Any]:
         document = json.loads(json.dumps(register_findings))
         document["findings"][0]["waiver"] = waiver
@@ -2866,10 +2951,21 @@ def self_test() -> None:
         "fixture",
     )
     if not any(
-        package["rule"] == "v1-x-1" and package["status"] == "suppressed"
+        package["rule"] == "v1-x-1" and package["status"] == "open"
         for package in waived["packages"]
     ):
-        fail("a finding waiver did not suppress its package")
+        fail("a finding waiver suppressed its package")
+    waiver_packages = [
+        package for package in waived["packages"] if package["rule"] == "waiver_not_permitted"
+    ]
+    if not waiver_packages:
+        fail("a programme waiver did not become a waiver_not_permitted finding")
+    if "v1-x-1" not in {
+        str(subject.get("subject"))
+        for package in waiver_packages
+        for subject in package["subjects"]
+    }:
+        fail("the waiver_not_permitted finding does not name the waivered finding")
 
     def refused_waiver(waiver: dict[str, Any], why: str) -> None:
         try:

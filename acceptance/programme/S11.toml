@@ -2,6 +2,7 @@
 key = "S11"
 name = "Processes, steps and SOPs — executable documentation"
 gate = "S11's gate is author → publish → execute a procedure run; §7 adds the gate, refusal, retry and publish-time proofs."
+gate_checks = ["S11-project", "S11-baseline", "S11-charter", "S11-closure-outputs", "S11-contract", "S11-review", "S11-closure-gate", "S11-waivers", "S11-pi-cadence", "S11-pi-plan", "S11-pi-objectives", "S11-wsjf", "S11-demo-credits", "S11-lessons", "S11-product"]
 
 [[check]]
 id = "S11-project"

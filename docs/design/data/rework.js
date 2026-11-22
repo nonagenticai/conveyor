@@ -7655,7 +7655,7 @@ window.CONVEYOR_REWORK = {
       "disposition": "rework",
       "dod": [
         {
-          "item": "std-msp-blueprint-01a1d039-0d24-7d16-ae52-4841e96ccfac: evidence the missing section(s) Aggregates and services, Action registry and data model, Deployment estate, The to-be the projects deliver, Organisation and skills, Current, intermediate and target states of Blueprint — conveyor buildout from seed/output-standard.json#blueprint, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+          "item": "std-msp-blueprint-01a1d039-0d24-7d16-ae52-4841e96ccfac: evidence the missing section(s) Aggregates and services, Action registry and data model, Deployment estate, The to-be the projects deliver, Organisation and skills, Current, intermediate and target states of Blueprint — conveyor buildout from artefacts.json#/documents, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
           "met": false
         }
       ],
@@ -7667,8 +7667,8 @@ window.CONVEYOR_REWORK = {
               "section": "Aggregates and services",
               "snapshot": [
                 [
-                  "seed/output-standard.json",
-                  "blueprint",
+                  "artefacts.json",
+                  "/documents",
                   0
                 ]
               ],
@@ -7760,8 +7760,8 @@ window.CONVEYOR_REWORK = {
                   "section": "Aggregates and services",
                   "snapshot": [
                     [
-                      "seed/output-standard.json",
-                      "blueprint",
+                      "artefacts.json",
+                      "/documents",
                       0
                     ]
                   ],
@@ -7850,7 +7850,7 @@ window.CONVEYOR_REWORK = {
       "disposition": "rework",
       "dod": [
         {
-          "item": "std-msp-governance-01a1d039-0d24-7d16-ae52-4841e96ccfac: evidence the missing section(s) Roles, Decision ladder, Assurance, The unit protocol of Governance — conveyor buildout from seed/output-standard.json#governance, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+          "item": "std-msp-governance-01a1d039-0d24-7d16-ae52-4841e96ccfac: evidence the missing section(s) Roles, Decision ladder, Assurance, The unit protocol of Governance — conveyor buildout from artefacts.json#/documents, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
           "met": false
         }
       ],
@@ -7862,8 +7862,8 @@ window.CONVEYOR_REWORK = {
               "section": "Roles",
               "snapshot": [
                 [
-                  "seed/output-standard.json",
-                  "governance",
+                  "artefacts.json",
+                  "/documents",
                   0
                 ]
               ],
@@ -7931,8 +7931,8 @@ window.CONVEYOR_REWORK = {
                   "section": "Roles",
                   "snapshot": [
                     [
-                      "seed/output-standard.json",
-                      "governance",
+                      "artefacts.json",
+                      "/documents",
                       0
                     ]
                   ],
@@ -7989,6 +7989,153 @@ window.CONVEYOR_REWORK = {
       "title": "MSP artefact absent: governance"
     },
     {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-msp-mandate-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM",
+      "apply_to": "PLATFORM",
+      "artefact": "mandate",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "std-msp-mandate-01a1d039-0d24-7d16-ae52-4841e96ccfac: evidence the missing section(s) Strategic fit, Drivers, Deliverables and boundaries, Success and constraints of Mandate — conveyor buildout from artefacts.json#/governed_assets, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-msp-mandate-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+              "section": "Strategic fit",
+              "snapshot": [
+                [
+                  "artefacts.json",
+                  "/governed_assets",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-msp-mandate-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+              "section": "Drivers",
+              "snapshot": [
+                [
+                  "artefacts.json",
+                  "/governed_assets",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-msp-mandate-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+              "section": "Deliverables and boundaries",
+              "snapshot": [
+                [
+                  "artefacts.json",
+                  "/governed_assets",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-msp-mandate-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+              "section": "Success and constraints",
+              "snapshot": [
+                [
+                  "artefacts.json",
+                  "/governed_assets",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-msp-mandate-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "source": "audit"
+        }
+      ],
+      "key": "std-msp-mandate-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM",
+      "owner_project": "PLATFORM",
+      "rule": "std-msp-mandate-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+      "scope": "PLATFORM",
+      "severity": "P1",
+      "spec": "§8.3",
+      "standard": "MSP",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The mandate artefact for conveyor buildout is absent; missing required sections: Strategic fit, Drivers, Deliverables and boundaries, Success and constraints.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-msp-mandate-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+                  "section": "Strategic fit",
+                  "snapshot": [
+                    [
+                      "artefacts.json",
+                      "/governed_assets",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-msp-mandate-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+                  "section": "Drivers",
+                  "snapshot": [
+                    [
+                      "artefacts.json",
+                      "/governed_assets",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-msp-mandate-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+                  "section": "Deliverables and boundaries",
+                  "snapshot": [
+                    [
+                      "artefacts.json",
+                      "/governed_assets",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-msp-mandate-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+                  "section": "Success and constraints",
+                  "snapshot": [
+                    [
+                      "artefacts.json",
+                      "/governed_assets",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-msp-mandate-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P1",
+          "subject": "PLATFORM"
+        }
+      ],
+      "title": "MSP artefact absent: mandate"
+    },
+    {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-msp-programme-plan-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM",
       "apply_to": "PLATFORM",
       "artefact": "programme-plan",
@@ -7997,7 +8144,7 @@ window.CONVEYOR_REWORK = {
       "disposition": "rework",
       "dod": [
         {
-          "item": "std-msp-programme-plan-01a1d039-0d24-7d16-ae52-4841e96ccfac: evidence the missing section(s) Tranches, Projects and sequencing, Gates, First three months of Programme Plan — conveyor buildout from seed/output-standard.json#programme-plan, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+          "item": "std-msp-programme-plan-01a1d039-0d24-7d16-ae52-4841e96ccfac: evidence the missing section(s) Tranches, Projects and sequencing, Gates, First three months of Programme Plan — conveyor buildout from artefacts.json#/documents, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
           "met": false
         }
       ],
@@ -8009,8 +8156,8 @@ window.CONVEYOR_REWORK = {
               "section": "Tranches",
               "snapshot": [
                 [
-                  "seed/output-standard.json",
-                  "programme-plan",
+                  "artefacts.json",
+                  "/documents",
                   0
                 ]
               ],
@@ -8078,8 +8225,8 @@ window.CONVEYOR_REWORK = {
                   "section": "Tranches",
                   "snapshot": [
                     [
-                      "seed/output-standard.json",
-                      "programme-plan",
+                      "artefacts.json",
+                      "/documents",
                       0
                     ]
                   ],
@@ -8134,6 +8281,153 @@ window.CONVEYOR_REWORK = {
         }
       ],
       "title": "MSP artefact absent: programme-plan"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-msp-programme-risk-register-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM",
+      "apply_to": "PLATFORM",
+      "artefact": "programme-risk-register",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "std-msp-programme-risk-register-01a1d039-0d24-7d16-ae52-4841e96ccfac: evidence the missing section(s) Register, Categories, Owners and review dates, Escalations of Programme Risk Register — conveyor buildout from msp.json#/register_items, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-msp-programme-risk-register-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+              "section": "Register",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-msp-programme-risk-register-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+              "section": "Categories",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-msp-programme-risk-register-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+              "section": "Owners and review dates",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-msp-programme-risk-register-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+              "section": "Escalations",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/register_items",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-msp-programme-risk-register-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "source": "audit"
+        }
+      ],
+      "key": "std-msp-programme-risk-register-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM",
+      "owner_project": "PLATFORM",
+      "rule": "std-msp-programme-risk-register-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+      "scope": "PLATFORM",
+      "severity": "P1",
+      "spec": "§8.3",
+      "standard": "MSP",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The programme-risk-register artefact for conveyor buildout is absent; missing required sections: Register, Categories, Owners and review dates, Escalations.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-msp-programme-risk-register-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+                  "section": "Register",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-msp-programme-risk-register-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+                  "section": "Categories",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-msp-programme-risk-register-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+                  "section": "Owners and review dates",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-msp-programme-risk-register-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+                  "section": "Escalations",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/register_items",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-msp-programme-risk-register-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P1",
+          "subject": "PLATFORM"
+        }
+      ],
+      "title": "MSP artefact absent: programme-risk-register"
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-msp-programme-strategies-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM",
@@ -8363,7 +8657,7 @@ window.CONVEYOR_REWORK = {
       "disposition": "rework",
       "dod": [
         {
-          "item": "std-msp-refined-vision-01a1d039-0d24-7d16-ae52-4841e96ccfac: evidence the missing section(s) Refined vision, Changes from the mandate of Refined Vision — conveyor buildout from seed/output-standard.json#refined-vision, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+          "item": "std-msp-refined-vision-01a1d039-0d24-7d16-ae52-4841e96ccfac: evidence the missing section(s) Refined vision, Changes from the mandate of Refined Vision — conveyor buildout from artefacts.json#/documents, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
           "met": false
         }
       ],
@@ -8375,8 +8669,8 @@ window.CONVEYOR_REWORK = {
               "section": "Refined vision",
               "snapshot": [
                 [
-                  "seed/output-standard.json",
-                  "refined-vision",
+                  "artefacts.json",
+                  "/documents",
                   0
                 ]
               ],
@@ -8420,8 +8714,8 @@ window.CONVEYOR_REWORK = {
                   "section": "Refined vision",
                   "snapshot": [
                     [
-                      "seed/output-standard.json",
-                      "refined-vision",
+                      "artefacts.json",
+                      "/documents",
                       0
                     ]
                   ],
@@ -12231,7 +12525,7 @@ window.CONVEYOR_REWORK = {
       "disposition": "rework",
       "dod": [
         {
-          "item": "std-safe-inspect-adapt-01a1d039-0d24-7d16-ae52-4841e96ccfac: evidence the missing section(s) What went well, What did not, Lessons, Actions of Inspect Adapt — conveyor buildout from artefacts.json#/documents, msp.json#/lessons, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+          "item": "std-safe-inspect-adapt-01a1d039-0d24-7d16-ae52-4841e96ccfac: evidence the missing section(s) What went well, What did not, Lessons, Actions, Kata candidates of Inspect Adapt — conveyor buildout from artefacts.json#/documents, msp.json#/lessons, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
           "met": false
         }
       ],
@@ -12285,6 +12579,18 @@ window.CONVEYOR_REWORK = {
                 ]
               ],
               "source": "artefact"
+            },
+            {
+              "artefact": "std-safe-inspect-adapt-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+              "section": "Kata candidates",
+              "snapshot": [
+                [
+                  null,
+                  null,
+                  0
+                ]
+              ],
+              "source": "artefact"
             }
           ],
           "rule": "std-safe-inspect-adapt-01a1d039-0d24-7d16-ae52-4841e96ccfac",
@@ -12302,7 +12608,7 @@ window.CONVEYOR_REWORK = {
       "subject_count": 1,
       "subjects": [
         {
-          "detail": "The inspect-adapt artefact for conveyor buildout is absent; missing required sections: What went well, What did not, Lessons, Actions.",
+          "detail": "The inspect-adapt artefact for conveyor buildout is absent; missing required sections: What went well, What did not, Lessons, Actions, Kata candidates.",
           "disposition": "rework",
           "evidence": [
             {
@@ -12350,6 +12656,18 @@ window.CONVEYOR_REWORK = {
                     [
                       "msp.json",
                       "/lessons",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-safe-inspect-adapt-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+                  "section": "Kata candidates",
+                  "snapshot": [
+                    [
+                      null,
+                      null,
                       0
                     ]
                   ],
@@ -12535,7 +12853,7 @@ window.CONVEYOR_REWORK = {
       "disposition": "rework",
       "dod": [
         {
-          "item": "std-safe-pi-plan-01a1d039-0d24-7d16-ae52-4841e96ccfac: evidence the missing section(s) Objectives, Plan, WSJF order, Capacity and WIP, Evidence of Pi Plan — conveyor buildout from artefacts.json#/documents, msp.json#/wbs_nodes, msp.json#/cadences, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+          "item": "std-safe-pi-plan-01a1d039-0d24-7d16-ae52-4841e96ccfac: evidence the missing section(s) Objectives, Plan, WSJF order, Capacity and WIP, Evidence, Dependencies, Backlog refinement of Pi Plan — conveyor buildout from artefacts.json#/documents, msp.json#/wbs_nodes, msp.json#/cadences, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
           "met": false
         }
       ],
@@ -12571,8 +12889,8 @@ window.CONVEYOR_REWORK = {
               "section": "WSJF order",
               "snapshot": [
                 [
-                  "msp.json",
-                  "/wbs_nodes",
+                  null,
+                  null,
                   0
                 ]
               ],
@@ -12606,6 +12924,30 @@ window.CONVEYOR_REWORK = {
                 ]
               ],
               "source": "artefact"
+            },
+            {
+              "artefact": "std-safe-pi-plan-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+              "section": "Dependencies",
+              "snapshot": [
+                [
+                  null,
+                  null,
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-safe-pi-plan-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+              "section": "Backlog refinement",
+              "snapshot": [
+                [
+                  null,
+                  null,
+                  0
+                ]
+              ],
+              "source": "artefact"
             }
           ],
           "rule": "std-safe-pi-plan-01a1d039-0d24-7d16-ae52-4841e96ccfac",
@@ -12623,7 +12965,7 @@ window.CONVEYOR_REWORK = {
       "subject_count": 1,
       "subjects": [
         {
-          "detail": "The pi-plan artefact for conveyor buildout is absent; missing required sections: Objectives, Plan, WSJF order, Capacity and WIP, Evidence.",
+          "detail": "The pi-plan artefact for conveyor buildout is absent; missing required sections: Objectives, Plan, WSJF order, Capacity and WIP, Evidence, Dependencies, Backlog refinement.",
           "disposition": "rework",
           "evidence": [
             {
@@ -12657,8 +12999,8 @@ window.CONVEYOR_REWORK = {
                   "section": "WSJF order",
                   "snapshot": [
                     [
-                      "msp.json",
-                      "/wbs_nodes",
+                      null,
+                      null,
                       0
                     ]
                   ],
@@ -12692,6 +13034,30 @@ window.CONVEYOR_REWORK = {
                     ]
                   ],
                   "source": "artefact"
+                },
+                {
+                  "artefact": "std-safe-pi-plan-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+                  "section": "Dependencies",
+                  "snapshot": [
+                    [
+                      null,
+                      null,
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-safe-pi-plan-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+                  "section": "Backlog refinement",
+                  "snapshot": [
+                    [
+                      null,
+                      null,
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
                 }
               ],
               "rule": "std-safe-pi-plan-01a1d039-0d24-7d16-ae52-4841e96ccfac",
@@ -12706,6 +13072,105 @@ window.CONVEYOR_REWORK = {
         }
       ],
       "title": "SAFe artefact absent: pi-plan"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-safe-safe-art-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM",
+      "apply_to": "PLATFORM",
+      "artefact": "safe-art",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "std-safe-safe-art-01a1d039-0d24-7d16-ae52-4841e96ccfac: evidence the missing section(s) Backlog with WSJF, Shared configuration of Safe Art — conveyor buildout from seed/output-standard.json#safe-art, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-safe-safe-art-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+              "section": "Backlog with WSJF",
+              "snapshot": [
+                [
+                  null,
+                  null,
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-safe-safe-art-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+              "section": "Shared configuration",
+              "snapshot": [
+                [
+                  null,
+                  null,
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-safe-safe-art-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "source": "audit"
+        }
+      ],
+      "key": "std-safe-safe-art-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM",
+      "owner_project": "PLATFORM",
+      "rule": "std-safe-safe-art-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+      "scope": "PLATFORM",
+      "severity": "P1",
+      "spec": "§8.2",
+      "standard": "SAFe",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The safe-art artefact for conveyor buildout is partial; missing required sections: Backlog with WSJF, Shared configuration.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-safe-safe-art-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+                  "section": "Backlog with WSJF",
+                  "snapshot": [
+                    [
+                      null,
+                      null,
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-safe-safe-art-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+                  "section": "Shared configuration",
+                  "snapshot": [
+                    [
+                      null,
+                      null,
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-safe-safe-art-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P1",
+          "subject": "PLATFORM"
+        }
+      ],
+      "title": "SAFe artefact partial: safe-art"
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-safe-safe-cadence-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM",
@@ -19794,6 +20259,129 @@ window.CONVEYOR_REWORK = {
       "title": "Complete the mandatory phase artefact sets"
     },
     {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-adr-register-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM",
+      "apply_to": "PLATFORM",
+      "artefact": "adr-register",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "std-togaf-adr-register-01a1d039-0d24-7d16-ae52-4841e96ccfac: evidence the missing section(s) Register, Status and supersession, Decisions of Adr Register — conveyor buildout from artefacts.json#/governed_assets, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-adr-register-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+              "section": "Register",
+              "snapshot": [
+                [
+                  "artefacts.json",
+                  "/governed_assets",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-adr-register-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+              "section": "Status and supersession",
+              "snapshot": [
+                [
+                  "artefacts.json",
+                  "/governed_assets",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-adr-register-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+              "section": "Decisions",
+              "snapshot": [
+                [
+                  "artefacts.json",
+                  "/governed_assets",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-adr-register-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-adr-register-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM",
+      "owner_project": "PLATFORM",
+      "rule": "std-togaf-adr-register-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+      "scope": "PLATFORM",
+      "severity": "P1",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The adr-register artefact for conveyor buildout is absent; missing required sections: Register, Status and supersession, Decisions.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-adr-register-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+                  "section": "Register",
+                  "snapshot": [
+                    [
+                      "artefacts.json",
+                      "/governed_assets",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-adr-register-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+                  "section": "Status and supersession",
+                  "snapshot": [
+                    [
+                      "artefacts.json",
+                      "/governed_assets",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-adr-register-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+                  "section": "Decisions",
+                  "snapshot": [
+                    [
+                      "artefacts.json",
+                      "/governed_assets",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-adr-register-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P1",
+          "subject": "PLATFORM"
+        }
+      ],
+      "title": "TOGAF artefact absent: adr-register"
+    },
+    {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-delivery-contract-design-publish:DESIGN-PUBLISH",
       "apply_to": "PLATFORM",
       "artefact": "delivery-contract",
@@ -21276,6 +21864,600 @@ window.CONVEYOR_REWORK = {
       "title": "Trace links are optional and not required at creation for architecture-governed work"
     },
     {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-msp-benefit-evaluation-b1:PLATFORM",
+      "apply_to": "PLATFORM",
+      "artefact": "benefit-evaluation",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "std-msp-benefit-evaluation-b1: evidence the missing section(s) Actuals and variance, Decision of Benefit Evaluation — Auditable decisions from msp.json#/benefit_transitions, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-msp-benefit-evaluation-b1",
+              "section": "Actuals and variance",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/benefit_transitions",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-msp-benefit-evaluation-b1",
+              "section": "Decision",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/benefit_transitions",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-msp-benefit-evaluation-b1",
+          "source": "audit"
+        }
+      ],
+      "key": "std-msp-benefit-evaluation-b1:PLATFORM",
+      "owner_project": "PLATFORM",
+      "rule": "std-msp-benefit-evaluation-b1",
+      "scope": "PLATFORM",
+      "severity": "P2",
+      "spec": "§8.3",
+      "standard": "MSP",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The benefit-evaluation artefact for Auditable decisions is partial; missing required sections: Actuals and variance, Decision.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-msp-benefit-evaluation-b1",
+                  "section": "Actuals and variance",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/benefit_transitions",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-msp-benefit-evaluation-b1",
+                  "section": "Decision",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/benefit_transitions",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-msp-benefit-evaluation-b1",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "PLATFORM"
+        }
+      ],
+      "title": "MSP artefact partial: benefit-evaluation"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-msp-benefit-evaluation-b2:PLATFORM",
+      "apply_to": "PLATFORM",
+      "artefact": "benefit-evaluation",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "std-msp-benefit-evaluation-b2: evidence the missing section(s) Actuals and variance, Decision of Benefit Evaluation — Less bespoke tooling from msp.json#/benefit_transitions, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-msp-benefit-evaluation-b2",
+              "section": "Actuals and variance",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/benefit_transitions",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-msp-benefit-evaluation-b2",
+              "section": "Decision",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/benefit_transitions",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-msp-benefit-evaluation-b2",
+          "source": "audit"
+        }
+      ],
+      "key": "std-msp-benefit-evaluation-b2:PLATFORM",
+      "owner_project": "PLATFORM",
+      "rule": "std-msp-benefit-evaluation-b2",
+      "scope": "PLATFORM",
+      "severity": "P2",
+      "spec": "§8.3",
+      "standard": "MSP",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The benefit-evaluation artefact for Less bespoke tooling is partial; missing required sections: Actuals and variance, Decision.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-msp-benefit-evaluation-b2",
+                  "section": "Actuals and variance",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/benefit_transitions",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-msp-benefit-evaluation-b2",
+                  "section": "Decision",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/benefit_transitions",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-msp-benefit-evaluation-b2",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "PLATFORM"
+        }
+      ],
+      "title": "MSP artefact partial: benefit-evaluation"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-msp-benefit-evaluation-b3:PLATFORM",
+      "apply_to": "PLATFORM",
+      "artefact": "benefit-evaluation",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "std-msp-benefit-evaluation-b3: evidence the missing section(s) Actuals and variance, Decision of Benefit Evaluation — Self-development from msp.json#/benefit_transitions, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-msp-benefit-evaluation-b3",
+              "section": "Actuals and variance",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/benefit_transitions",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-msp-benefit-evaluation-b3",
+              "section": "Decision",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/benefit_transitions",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-msp-benefit-evaluation-b3",
+          "source": "audit"
+        }
+      ],
+      "key": "std-msp-benefit-evaluation-b3:PLATFORM",
+      "owner_project": "PLATFORM",
+      "rule": "std-msp-benefit-evaluation-b3",
+      "scope": "PLATFORM",
+      "severity": "P2",
+      "spec": "§8.3",
+      "standard": "MSP",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The benefit-evaluation artefact for Self-development is partial; missing required sections: Actuals and variance, Decision.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-msp-benefit-evaluation-b3",
+                  "section": "Actuals and variance",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/benefit_transitions",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-msp-benefit-evaluation-b3",
+                  "section": "Decision",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/benefit_transitions",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-msp-benefit-evaluation-b3",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "PLATFORM"
+        }
+      ],
+      "title": "MSP artefact partial: benefit-evaluation"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-msp-benefit-evaluation-b4:PLATFORM",
+      "apply_to": "PLATFORM",
+      "artefact": "benefit-evaluation",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "std-msp-benefit-evaluation-b4: evidence the missing section(s) Actuals and variance, Decision of Benefit Evaluation — Public collaboration from msp.json#/benefit_transitions, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-msp-benefit-evaluation-b4",
+              "section": "Actuals and variance",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/benefit_transitions",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-msp-benefit-evaluation-b4",
+              "section": "Decision",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/benefit_transitions",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-msp-benefit-evaluation-b4",
+          "source": "audit"
+        }
+      ],
+      "key": "std-msp-benefit-evaluation-b4:PLATFORM",
+      "owner_project": "PLATFORM",
+      "rule": "std-msp-benefit-evaluation-b4",
+      "scope": "PLATFORM",
+      "severity": "P2",
+      "spec": "§8.3",
+      "standard": "MSP",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The benefit-evaluation artefact for Public collaboration is partial; missing required sections: Actuals and variance, Decision.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-msp-benefit-evaluation-b4",
+                  "section": "Actuals and variance",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/benefit_transitions",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-msp-benefit-evaluation-b4",
+                  "section": "Decision",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/benefit_transitions",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-msp-benefit-evaluation-b4",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "PLATFORM"
+        }
+      ],
+      "title": "MSP artefact partial: benefit-evaluation"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-msp-benefit-evaluation-b5:PLATFORM",
+      "apply_to": "PLATFORM",
+      "artefact": "benefit-evaluation",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "std-msp-benefit-evaluation-b5: evidence the missing section(s) Actuals and variance, Decision of Benefit Evaluation — One model from msp.json#/benefit_transitions, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-msp-benefit-evaluation-b5",
+              "section": "Actuals and variance",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/benefit_transitions",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-msp-benefit-evaluation-b5",
+              "section": "Decision",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/benefit_transitions",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-msp-benefit-evaluation-b5",
+          "source": "audit"
+        }
+      ],
+      "key": "std-msp-benefit-evaluation-b5:PLATFORM",
+      "owner_project": "PLATFORM",
+      "rule": "std-msp-benefit-evaluation-b5",
+      "scope": "PLATFORM",
+      "severity": "P2",
+      "spec": "§8.3",
+      "standard": "MSP",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The benefit-evaluation artefact for One model is partial; missing required sections: Actuals and variance, Decision.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-msp-benefit-evaluation-b5",
+                  "section": "Actuals and variance",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/benefit_transitions",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-msp-benefit-evaluation-b5",
+                  "section": "Decision",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/benefit_transitions",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-msp-benefit-evaluation-b5",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "PLATFORM"
+        }
+      ],
+      "title": "MSP artefact partial: benefit-evaluation"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-msp-benefit-evaluation-b6:PLATFORM",
+      "apply_to": "PLATFORM",
+      "artefact": "benefit-evaluation",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "std-msp-benefit-evaluation-b6: evidence the missing section(s) Actuals and variance, Decision of Benefit Evaluation — Predictable delivery from msp.json#/benefit_transitions, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-msp-benefit-evaluation-b6",
+              "section": "Actuals and variance",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/benefit_transitions",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-msp-benefit-evaluation-b6",
+              "section": "Decision",
+              "snapshot": [
+                [
+                  "msp.json",
+                  "/benefit_transitions",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-msp-benefit-evaluation-b6",
+          "source": "audit"
+        }
+      ],
+      "key": "std-msp-benefit-evaluation-b6:PLATFORM",
+      "owner_project": "PLATFORM",
+      "rule": "std-msp-benefit-evaluation-b6",
+      "scope": "PLATFORM",
+      "severity": "P2",
+      "spec": "§8.3",
+      "standard": "MSP",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The benefit-evaluation artefact for Predictable delivery is partial; missing required sections: Actuals and variance, Decision.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-msp-benefit-evaluation-b6",
+                  "section": "Actuals and variance",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/benefit_transitions",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-msp-benefit-evaluation-b6",
+                  "section": "Decision",
+                  "snapshot": [
+                    [
+                      "msp.json",
+                      "/benefit_transitions",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-msp-benefit-evaluation-b6",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "PLATFORM"
+        }
+      ],
+      "title": "MSP artefact partial: benefit-evaluation"
+    },
+    {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-msp-business-case-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM",
       "apply_to": "PLATFORM",
       "artefact": "business-case",
@@ -21592,81 +22774,6 @@ window.CONVEYOR_REWORK = {
         }
       ],
       "title": "MSP artefact partial: programme-brief"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-msp-projects-dossier-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM",
-      "apply_to": "PLATFORM",
-      "artefact": "projects-dossier",
-      "baseline": null,
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "std-msp-projects-dossier-01a1d039-0d24-7d16-ae52-4841e96ccfac: evidence the missing section(s) Delivery risks of Projects Dossier — conveyor buildout from msp.json#/register_items, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "evidence": [
-            {
-              "artefact": "std-msp-projects-dossier-01a1d039-0d24-7d16-ae52-4841e96ccfac",
-              "section": "Delivery risks",
-              "snapshot": [
-                [
-                  "msp.json",
-                  "/register_items",
-                  0
-                ]
-              ],
-              "source": "artefact"
-            }
-          ],
-          "rule": "std-msp-projects-dossier-01a1d039-0d24-7d16-ae52-4841e96ccfac",
-          "source": "audit"
-        }
-      ],
-      "key": "std-msp-projects-dossier-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM",
-      "owner_project": "PLATFORM",
-      "rule": "std-msp-projects-dossier-01a1d039-0d24-7d16-ae52-4841e96ccfac",
-      "scope": "PLATFORM",
-      "severity": "P2",
-      "spec": "§8.3",
-      "standard": "MSP",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "The projects-dossier artefact for conveyor buildout is partial; missing required sections: Delivery risks.",
-          "disposition": "rework",
-          "evidence": [
-            {
-              "evidence": [
-                {
-                  "artefact": "std-msp-projects-dossier-01a1d039-0d24-7d16-ae52-4841e96ccfac",
-                  "section": "Delivery risks",
-                  "snapshot": [
-                    [
-                      "msp.json",
-                      "/register_items",
-                      0
-                    ]
-                  ],
-                  "source": "artefact"
-                }
-              ],
-              "rule": "std-msp-projects-dossier-01a1d039-0d24-7d16-ae52-4841e96ccfac",
-              "source": "audit"
-            }
-          ],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P2",
-          "subject": "PLATFORM"
-        }
-      ],
-      "title": "MSP artefact partial: projects-dossier"
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-pmp-change-control-s02:S02",
@@ -46617,7 +47724,7 @@ window.CONVEYOR_REWORK = {
       "severity": "P2",
       "spec": "§8.2",
       "standard": "SAFe",
-      "status": "suppressed",
+      "status": "open",
       "subject_count": 1,
       "subjects": [
         {
@@ -46632,81 +47739,6 @@ window.CONVEYOR_REWORK = {
         }
       ],
       "title": "Credit every accepted deliverable at the demo"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-safe-safe-art-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM",
-      "apply_to": "PLATFORM",
-      "artefact": "safe-art",
-      "baseline": null,
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "std-safe-safe-art-01a1d039-0d24-7d16-ae52-4841e96ccfac: evidence the missing section(s) Backlog with WSJF of Safe Art — conveyor buildout from msp.json#/wbs_nodes, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "evidence": [
-            {
-              "artefact": "std-safe-safe-art-01a1d039-0d24-7d16-ae52-4841e96ccfac",
-              "section": "Backlog with WSJF",
-              "snapshot": [
-                [
-                  "msp.json",
-                  "/wbs_nodes",
-                  0
-                ]
-              ],
-              "source": "artefact"
-            }
-          ],
-          "rule": "std-safe-safe-art-01a1d039-0d24-7d16-ae52-4841e96ccfac",
-          "source": "audit"
-        }
-      ],
-      "key": "std-safe-safe-art-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM",
-      "owner_project": "PLATFORM",
-      "rule": "std-safe-safe-art-01a1d039-0d24-7d16-ae52-4841e96ccfac",
-      "scope": "PLATFORM",
-      "severity": "P2",
-      "spec": "§8.2",
-      "standard": "SAFe",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "The safe-art artefact for conveyor buildout is partial; missing required sections: Backlog with WSJF.",
-          "disposition": "rework",
-          "evidence": [
-            {
-              "evidence": [
-                {
-                  "artefact": "std-safe-safe-art-01a1d039-0d24-7d16-ae52-4841e96ccfac",
-                  "section": "Backlog with WSJF",
-                  "snapshot": [
-                    [
-                      "msp.json",
-                      "/wbs_nodes",
-                      0
-                    ]
-                  ],
-                  "source": "artefact"
-                }
-              ],
-              "rule": "std-safe-safe-art-01a1d039-0d24-7d16-ae52-4841e96ccfac",
-              "source": "audit"
-            }
-          ],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P2",
-          "subject": "PLATFORM"
-        }
-      ],
-      "title": "SAFe artefact partial: safe-art"
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-p6-6:T4",
@@ -46991,7 +48023,7 @@ window.CONVEYOR_REWORK = {
       "severity": "P2",
       "spec": "§5.3",
       "standard": "SPEC",
-      "status": "suppressed",
+      "status": "open",
       "subject_count": 1,
       "subjects": [
         {
@@ -47048,7 +48080,7 @@ window.CONVEYOR_REWORK = {
       "severity": "P2",
       "spec": "§10.3",
       "standard": "SPEC",
-      "status": "suppressed",
+      "status": "open",
       "subject_count": 3,
       "subjects": [
         {
@@ -49923,7 +50955,7 @@ window.CONVEYOR_REWORK = {
       "severity": "P2",
       "spec": "§8.1",
       "standard": "TOGAF",
-      "status": "suppressed",
+      "status": "open",
       "subject_count": 1,
       "subjects": [
         {
@@ -50165,15 +51197,15 @@ window.CONVEYOR_REWORK = {
       "title": "TOGAF artefact partial: architecture-artifact-instance"
     },
     {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-architecture-artifact-t9:T9",
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-architecture-governance-log-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM",
       "apply_to": "PLATFORM",
-      "artefact": "architecture-artifact",
+      "artefact": "architecture-governance-log",
       "baseline": null,
       "depends_on": [],
       "disposition": "rework",
       "dod": [
         {
-          "item": "std-togaf-architecture-artifact-t9: evidence the missing section(s) Metadata, Entries, Links of Architecture Artifact — SPEC_V2 slice T9 (docs/SPEC_V2.md §12) from architecture.json#/artifacts, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+          "item": "std-togaf-architecture-governance-log-01a1d039-0d24-7d16-ae52-4841e96ccfac: evidence the missing section(s) Reviews, Waivers of Architecture Governance Log — Architecture capability — conveyor buildout from architecture.json#/compliance_reviews, architecture.json#/waivers, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
           "met": false
         }
       ],
@@ -50181,49 +51213,148 @@ window.CONVEYOR_REWORK = {
         {
           "evidence": [
             {
-              "artefact": "std-togaf-architecture-artifact-t9",
-              "section": "Metadata",
+              "artefact": "std-togaf-architecture-governance-log-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+              "section": "Reviews",
               "snapshot": [
                 [
                   "architecture.json",
-                  "/artifacts",
+                  "/compliance_reviews",
                   0
                 ]
               ],
               "source": "artefact"
             },
             {
-              "artefact": "std-togaf-architecture-artifact-t9",
-              "section": "Entries",
+              "artefact": "std-togaf-architecture-governance-log-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+              "section": "Waivers",
               "snapshot": [
                 [
                   "architecture.json",
-                  "/artifacts",
-                  0
-                ]
-              ],
-              "source": "artefact"
-            },
-            {
-              "artefact": "std-togaf-architecture-artifact-t9",
-              "section": "Links",
-              "snapshot": [
-                [
-                  null,
-                  null,
+                  "/waivers",
                   0
                 ]
               ],
               "source": "artefact"
             }
           ],
-          "rule": "std-togaf-architecture-artifact-t9",
+          "rule": "std-togaf-architecture-governance-log-01a1d039-0d24-7d16-ae52-4841e96ccfac",
           "source": "audit"
         }
       ],
-      "key": "std-togaf-architecture-artifact-t9:T9",
+      "key": "std-togaf-architecture-governance-log-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM",
+      "owner_project": "PLATFORM",
+      "rule": "std-togaf-architecture-governance-log-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+      "scope": "PLATFORM",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The architecture-governance-log artefact for Architecture capability — conveyor buildout is partial; missing required sections: Reviews, Waivers.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-architecture-governance-log-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+                  "section": "Reviews",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/compliance_reviews",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-architecture-governance-log-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+                  "section": "Waivers",
+                  "snapshot": [
+                    [
+                      "architecture.json",
+                      "/waivers",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-architecture-governance-log-01a1d039-0d24-7d16-ae52-4841e96ccfac",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "PLATFORM"
+        }
+      ],
+      "title": "TOGAF artefact partial: architecture-governance-log"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-benefits-diagram-t9:T9",
+      "apply_to": "PLATFORM",
+      "artefact": "benefits-diagram",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "std-togaf-benefits-diagram-t9: evidence the missing section(s) Goals and outcomes, Measures, Benefits and sub-benefits of Benefits Diagram — SPEC_V2 slice T9 (docs/SPEC_V2.md §12) from artefacts.json#/documents, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-benefits-diagram-t9",
+              "section": "Goals and outcomes",
+              "snapshot": [
+                [
+                  "artefacts.json",
+                  "/documents",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-benefits-diagram-t9",
+              "section": "Measures",
+              "snapshot": [
+                [
+                  "artefacts.json",
+                  "/documents",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-benefits-diagram-t9",
+              "section": "Benefits and sub-benefits",
+              "snapshot": [
+                [
+                  "artefacts.json",
+                  "/documents",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-benefits-diagram-t9",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-benefits-diagram-t9:T9",
       "owner_project": "T9",
-      "rule": "std-togaf-architecture-artifact-t9",
+      "rule": "std-togaf-benefits-diagram-t9",
       "scope": "T9",
       "severity": "P2",
       "spec": "§8.1",
@@ -50232,49 +51363,49 @@ window.CONVEYOR_REWORK = {
       "subject_count": 1,
       "subjects": [
         {
-          "detail": "The architecture-artifact artefact for SPEC_V2 slice T9 (docs/SPEC_V2.md §12) is partial; missing required sections: Metadata, Entries, Links. Not yet due: tranche 4 is planned.",
+          "detail": "The benefits-diagram artefact for SPEC_V2 slice T9 (docs/SPEC_V2.md §12) is absent; missing required sections: Goals and outcomes, Measures, Benefits and sub-benefits. Not yet due: tranche 4 is planned.",
           "disposition": "rework",
           "evidence": [
             {
               "evidence": [
                 {
-                  "artefact": "std-togaf-architecture-artifact-t9",
-                  "section": "Metadata",
+                  "artefact": "std-togaf-benefits-diagram-t9",
+                  "section": "Goals and outcomes",
                   "snapshot": [
                     [
-                      "architecture.json",
-                      "/artifacts",
+                      "artefacts.json",
+                      "/documents",
                       0
                     ]
                   ],
                   "source": "artefact"
                 },
                 {
-                  "artefact": "std-togaf-architecture-artifact-t9",
-                  "section": "Entries",
+                  "artefact": "std-togaf-benefits-diagram-t9",
+                  "section": "Measures",
                   "snapshot": [
                     [
-                      "architecture.json",
-                      "/artifacts",
+                      "artefacts.json",
+                      "/documents",
                       0
                     ]
                   ],
                   "source": "artefact"
                 },
                 {
-                  "artefact": "std-togaf-architecture-artifact-t9",
-                  "section": "Links",
+                  "artefact": "std-togaf-benefits-diagram-t9",
+                  "section": "Benefits and sub-benefits",
                   "snapshot": [
                     [
-                      null,
-                      null,
+                      "artefacts.json",
+                      "/documents",
                       0
                     ]
                   ],
                   "source": "artefact"
                 }
               ],
-              "rule": "std-togaf-architecture-artifact-t9",
+              "rule": "std-togaf-benefits-diagram-t9",
               "source": "audit"
             }
           ],
@@ -50285,7 +51416,130 @@ window.CONVEYOR_REWORK = {
           "subject": "T9"
         }
       ],
-      "title": "TOGAF artefact partial: architecture-artifact"
+      "title": "TOGAF artefact absent: benefits-diagram"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-candidate-solutions-t9:T9",
+      "apply_to": "PLATFORM",
+      "artefact": "candidate-solutions",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "std-togaf-candidate-solutions-t9: evidence the missing section(s) Candidates, Criteria, Options rejected of Candidate Solutions — SPEC_V2 slice T9 (docs/SPEC_V2.md §12) from artefacts.json#/documents, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-candidate-solutions-t9",
+              "section": "Candidates",
+              "snapshot": [
+                [
+                  "artefacts.json",
+                  "/documents",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-candidate-solutions-t9",
+              "section": "Criteria",
+              "snapshot": [
+                [
+                  "artefacts.json",
+                  "/documents",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-candidate-solutions-t9",
+              "section": "Options rejected",
+              "snapshot": [
+                [
+                  "artefacts.json",
+                  "/documents",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-candidate-solutions-t9",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-candidate-solutions-t9:T9",
+      "owner_project": "T9",
+      "rule": "std-togaf-candidate-solutions-t9",
+      "scope": "T9",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The candidate-solutions artefact for SPEC_V2 slice T9 (docs/SPEC_V2.md §12) is absent; missing required sections: Candidates, Criteria, Options rejected. Not yet due: tranche 4 is planned.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-candidate-solutions-t9",
+                  "section": "Candidates",
+                  "snapshot": [
+                    [
+                      "artefacts.json",
+                      "/documents",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-candidate-solutions-t9",
+                  "section": "Criteria",
+                  "snapshot": [
+                    [
+                      "artefacts.json",
+                      "/documents",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-candidate-solutions-t9",
+                  "section": "Options rejected",
+                  "snapshot": [
+                    [
+                      "artefacts.json",
+                      "/documents",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-candidate-solutions-t9",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "T9"
+        }
+      ],
+      "title": "TOGAF artefact absent: candidate-solutions"
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-compliance-review-s02:S02",
@@ -58973,6 +60227,129 @@ window.CONVEYOR_REWORK = {
       "title": "TOGAF artefact absent: delivery-contract"
     },
     {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-gap-analysis-t9:T9",
+      "apply_to": "PLATFORM",
+      "artefact": "gap-analysis",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "std-togaf-gap-analysis-t9: evidence the missing section(s) Baseline, Target, Gaps and work packages of Gap Analysis — SPEC_V2 slice T9 (docs/SPEC_V2.md §12) from artefacts.json#/documents, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-gap-analysis-t9",
+              "section": "Baseline",
+              "snapshot": [
+                [
+                  "artefacts.json",
+                  "/documents",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-gap-analysis-t9",
+              "section": "Target",
+              "snapshot": [
+                [
+                  "artefacts.json",
+                  "/documents",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-gap-analysis-t9",
+              "section": "Gaps and work packages",
+              "snapshot": [
+                [
+                  "artefacts.json",
+                  "/documents",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-gap-analysis-t9",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-gap-analysis-t9:T9",
+      "owner_project": "T9",
+      "rule": "std-togaf-gap-analysis-t9",
+      "scope": "T9",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The gap-analysis artefact for SPEC_V2 slice T9 (docs/SPEC_V2.md §12) is absent; missing required sections: Baseline, Target, Gaps and work packages. Not yet due: tranche 4 is planned.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-gap-analysis-t9",
+                  "section": "Baseline",
+                  "snapshot": [
+                    [
+                      "artefacts.json",
+                      "/documents",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-gap-analysis-t9",
+                  "section": "Target",
+                  "snapshot": [
+                    [
+                      "artefacts.json",
+                      "/documents",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-gap-analysis-t9",
+                  "section": "Gaps and work packages",
+                  "snapshot": [
+                    [
+                      "artefacts.json",
+                      "/documents",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-gap-analysis-t9",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "T9"
+        }
+      ],
+      "title": "TOGAF artefact absent: gap-analysis"
+    },
+    {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-phase-a-t9-a:T9",
       "apply_to": "PLATFORM",
       "artefact": "phase-a",
@@ -59080,6 +60457,129 @@ window.CONVEYOR_REWORK = {
         }
       ],
       "title": "TOGAF artefact partial: phase-a"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check std-togaf-project-context-diagram-t9:T9",
+      "apply_to": "PLATFORM",
+      "artefact": "project-context-diagram",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "std-togaf-project-context-diagram-t9: evidence the missing section(s) Context, Affected organisation, Affected systems of Project Context Diagram — SPEC_V2 slice T9 (docs/SPEC_V2.md §12) from artefacts.json#/documents, or retire the category with an owner's decision; `python3 scripts/generate-standards.py --check --snapshot docs/design/data` must then report no finding for this artefact.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "artefact": "std-togaf-project-context-diagram-t9",
+              "section": "Context",
+              "snapshot": [
+                [
+                  "artefacts.json",
+                  "/documents",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-project-context-diagram-t9",
+              "section": "Affected organisation",
+              "snapshot": [
+                [
+                  "artefacts.json",
+                  "/documents",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            },
+            {
+              "artefact": "std-togaf-project-context-diagram-t9",
+              "section": "Affected systems",
+              "snapshot": [
+                [
+                  "artefacts.json",
+                  "/documents",
+                  0
+                ]
+              ],
+              "source": "artefact"
+            }
+          ],
+          "rule": "std-togaf-project-context-diagram-t9",
+          "source": "audit"
+        }
+      ],
+      "key": "std-togaf-project-context-diagram-t9:T9",
+      "owner_project": "T9",
+      "rule": "std-togaf-project-context-diagram-t9",
+      "scope": "T9",
+      "severity": "P2",
+      "spec": "§8.1",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The project-context-diagram artefact for SPEC_V2 slice T9 (docs/SPEC_V2.md §12) is absent; missing required sections: Context, Affected organisation, Affected systems. Not yet due: tranche 4 is planned.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "artefact": "std-togaf-project-context-diagram-t9",
+                  "section": "Context",
+                  "snapshot": [
+                    [
+                      "artefacts.json",
+                      "/documents",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-project-context-diagram-t9",
+                  "section": "Affected organisation",
+                  "snapshot": [
+                    [
+                      "artefacts.json",
+                      "/documents",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                },
+                {
+                  "artefact": "std-togaf-project-context-diagram-t9",
+                  "section": "Affected systems",
+                  "snapshot": [
+                    [
+                      "artefacts.json",
+                      "/documents",
+                      0
+                    ]
+                  ],
+                  "source": "artefact"
+                }
+              ],
+              "rule": "std-togaf-project-context-diagram-t9",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "T9"
+        }
+      ],
+      "title": "TOGAF artefact absent: project-context-diagram"
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check v1-p81-6:T9",
@@ -59276,9 +60776,9 @@ window.CONVEYOR_REWORK = {
       "p0": 30,
       "p1": 129,
       "p2": 1,
-      "packages": 84,
-      "rules": 12,
-      "rules_clean": 3,
+      "packages": 91,
+      "rules": 13,
+      "rules_clean": 4,
       "rules_with_gaps": 9,
       "suppressed": 0
     },
@@ -59324,7 +60824,7 @@ window.CONVEYOR_REWORK = {
       "p0": 0,
       "p1": 61,
       "p2": 1,
-      "packages": 116,
+      "packages": 121,
       "rules": 9,
       "rules_clean": 5,
       "rules_with_gaps": 4,
@@ -59335,25 +60835,24 @@ window.CONVEYOR_REWORK = {
   "summary": {
     "by_severity": {
       "P0": 42,
-      "P1": 178,
-      "P2": 306
+      "P1": 182,
+      "P2": 314
     },
     "by_standard": {
-      "MSP": 84,
+      "MSP": 91,
       "PMP": 213,
       "SAFe": 17,
       "SPEC": 96,
-      "TOGAF": 116
+      "TOGAF": 121
     },
     "by_status": {
-      "open": 522,
-      "suppressed": 4
+      "open": 538
     },
     "duplicates": 0,
-    "open": 522,
-    "packages": 526,
+    "open": 538,
+    "packages": 538,
     "resolved": 92,
-    "subjects": 675,
-    "suppressed": 4
+    "subjects": 687,
+    "suppressed": 0
   }
 };

@@ -2,6 +2,7 @@
 key = "T16"
 name = "SOP, RDF/OWL and process-document ingestion"
 gate = "a real SOP, an OWL file and a BPMN diagram are each ingested end to end; the procedure draft is published behind a human gate; a re-ingest creates the next draft version while the published row keeps its source and pack; a job bound to the procedure runs the PDDL steps; an unreviewed source never binds"
+gate_checks = ["T16-project", "T16-baseline", "T16-charter", "T16-closure-outputs", "T16-contract", "T16-review", "T16-closure-gate", "T16-waivers", "T16-pi-cadence", "T16-pi-plan", "T16-pi-objectives", "T16-wsjf", "T16-demo-credits", "T16-lessons", "T16-product"]
 
 [[check]]
 id = "T16-project"

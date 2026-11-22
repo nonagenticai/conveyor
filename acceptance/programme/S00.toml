@@ -2,6 +2,7 @@
 key = "S00"
 name = "Usage inventory → parity/parity.yaml"
 gate = "The A–D artefacts, the closure review and the declared outputs exist; the project re-closes through the one gate."
+gate_checks = ["S00-project", "S00-baseline", "S00-charter", "S00-closure-outputs", "S00-contract", "S00-review", "S00-closure-gate", "S00-waivers", "S00-pi-cadence", "S00-wsjf", "S00-demo-credits", "S00-product"]
 
 [[check]]
 id = "S00-project"

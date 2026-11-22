@@ -2,6 +2,7 @@
 key = "T0"
 name = "Model and contracts"
 gate = "The A–D set is approved; the project re-closes through the one gate."
+gate_checks = ["T0-project", "T0-baseline", "T0-charter", "T0-closure-outputs", "T0-contract", "T0-review", "T0-closure-gate", "T0-waivers", "T0-pi-cadence", "T0-wsjf", "T0-demo-credits", "T0-product"]
 
 [[check]]
 id = "T0-project"

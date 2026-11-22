@@ -36,7 +36,7 @@ sessions, exercised with rigour, grounding, and captured and published evidence.
 ## Consequences
 
 - The findings ledger re-anchors `v1-s14-1` to decision document
-  `01a2029c-9254-7605-8a7c-3013b28ee794`; its waiver is removed and the finding stays open until it
+  `01a202a6-c20c-7079-9e0e-488009d21e86`; its waiver is removed and the finding stays open until it
   is executed or its claim corrected.
 - Removing suppression turns the gates red-first (98 open findings, 539 packages). The gate stays red
   until the work clears it; no green is claimed in the meantime.
@@ -47,7 +47,10 @@ sessions, exercised with rigour, grounding, and captured and published evidence.
 
 ## Evidence
 
-- Decision document `01a2029c-9254-7605-8a7c-3013b28ee794` (published, category `decision`, unit `U5`).
+- Decision document `01a202a6-c20c-7079-9e0e-488009d21e86` (published text compose, category
+  `decision`, unit `U5`, project PLATFORM — the pack-indexed copy; the byte-backed issues
+  `01a202a3-76b1-72da-8a41-7a1662b91fc7` and `01a2029c-9254-7605-8a7c-3013b28ee794` are
+  unpublished and kept as history, `v1-outputs-1`).
 - Register row `U5-NO-DEFERRALS` `01a2029f-5a5f-70aa-be13-029435893a40`.
 - The measured board at `58645942`: issue #526, comment 7077202144.
 - Plan of record `~/.claude/plans/which-project-in-the-noble-turing.md` v5, rulings R7–R9.
