@@ -1998,6 +1998,14 @@ def build_register(
             "standard": str(finding["standard"]),
             "spec": str(finding["spec"]),
             "artefact": str(finding.get("area", "code")),
+            # R11's package kind. A ledger finding is a product defect (CODE); an artefact
+            # finding states its own cause (STANDARD when the template cannot resolve the
+            # section, RECORD when the rows or documents are missing). A finding written by an
+            # older generator carries no kind and reads as RECORD.
+            "kind": str(
+                finding.get("kind")
+                or ("CODE" if identifier.startswith("v1-") else "RECORD")
+            ),
             "scope": "project" if owner in dataset.by_key else "programme",
             "owner_project": owner,
             "rework": {
@@ -2077,6 +2085,7 @@ def build_register(
                 {
                     "key": key,
                     "rule": rule,
+                    "kind": str(row.get("kind") or "RECORD"),
                     "standard": str(row.get("standard", "SPEC")),
                     "spec": str(row.get("spec", "")),
                     "artefact": str(row.get("artefact", "")),
@@ -2177,10 +2186,13 @@ def _summary(
     by_standard: dict[str, int] = {}
     by_severity: dict[str, int] = {}
     by_status: dict[str, int] = {}
+    by_kind: dict[str, int] = {}
     for package in packages:
         by_standard[package["standard"]] = by_standard.get(package["standard"], 0) + 1
         by_severity[package["severity"]] = by_severity.get(package["severity"], 0) + 1
         by_status[package["status"]] = by_status.get(package["status"], 0) + 1
+        kind = str(package.get("kind") or "RECORD")
+        by_kind[kind] = by_kind.get(kind, 0) + 1
     return {
         "packages": len(packages),
         "open": by_status.get("open", 0),
@@ -2191,6 +2203,7 @@ def _summary(
         "by_standard": dict(sorted(by_standard.items())),
         "by_severity": {key: by_severity[key] for key in sorted(by_severity)},
         "by_status": dict(sorted(by_status.items())),
+        "by_kind": dict(sorted(by_kind.items())),
     }
 
 
@@ -2993,6 +3006,25 @@ def self_test() -> None:
         fail("duplicate_of did not fold the finding")
     if not any(package["rule"] == "v1-x-1" for package in first["packages"]):
         fail("the v1 finding is not a package")
+    # R11's package kind: a ledger finding is CODE, a conformance gap is RECORD, and a kind the
+    # generator states (a template defect) is carried through as STANDARD.
+    kinds = {package["rule"]: package["kind"] for package in first["packages"]}
+    if kinds.get("v1-x-1") != "CODE":
+        fail(f"a v1 ledger finding is not a CODE package: {kinds.get('v1-x-1')}")
+    if not any(package["kind"] == "RECORD" for package in first["packages"]):
+        fail("a conformance gap is not a RECORD package")
+    if first["summary"]["by_kind"].get("CODE", 0) < 1:
+        fail("the summary does not count package kinds")
+    kinded = json.loads(json.dumps(register_findings))
+    kinded["findings"][0]["kind"] = "STANDARD"
+    standard_register = build_register(
+        register_gaps, register_baseline, kinded, standard, register_data, "fixture"
+    )
+    if not any(
+        package["rule"] == "v1-x-1" and package["kind"] == "STANDARD"
+        for package in standard_register["packages"]
+    ):
+        fail("a generator-declared STANDARD finding did not become a STANDARD package")
     if first["scorecard"]["MSP"]["rules"] < 1:
         fail("the scorecard has no MSP rules")
 
