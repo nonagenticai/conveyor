@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>0009 — Prompt selection and recipe authoring · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0009-prompt-selection-and-recipe-authoring.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="0009--prompt-selection-and-recipe-authoring">0009 — Prompt selection and recipe authoring</h1>
+<p>Status: Accepted · Date: 2026-11-22 · Issue: #15 · Resolves: S21 §4 §8 §12, SPEC_V2 §4.5 and §7.7</p>
+<h2 id="decision">Decision</h2>
+<ol type="1">
+<li><p><strong>A recipe version is immutable.</strong> <code>(tenant, key, version)</code> is created once and never edited. A change is a new version. The lifecycle is <code>draft → active → retired</code>: at most one draft and one active version per <code>(tenant, key)</code>, both partial unique indexes. <code>prompt_recipes.activate</code> retires the current active version and activates the target in one transaction; the unique active index, not an application check, refuses a race. A retired or draft version stays readable by exact pin so an old <code>inference_call</code> remains explicable, but a new run may not pin it. The default status stays <code>active</code>, so seeds and existing rows are unchanged.</p></li>
+<li><p><strong><code>prompt_section.selector</code> is the one selection config.</strong> It is a JSON object, not a second template language. An empty object means the source's default selection. The recipe names section <em>kinds</em> and a selector; it never carries source text for a rendered kind. <code>system</code> is still the only literal kind.</p></li>
+<li><p><strong>Memory is selected from the card, hot first.</strong> The selector may name <code>kinds</code>, <code>limit</code> (default 8, maximum 32) and <code>include_digest</code>. Selection is the card's newest un-consolidated hot rows (<code>created_at DESC, id DESC</code>), then only the newest <code>kind='digest'</code> row if room remains; hot is never displaced by a digest. Rows render oldest-first as <code>[kind/source#id] body</code>. The ids are in the text, so the selection is part of the hash. An optional section with no rows is absent; a required one refuses by name.</p></li>
+<li><p><strong>Knowledge retrieval happens before the compile, outside any transaction.</strong> <code>compile_for_run</code> resolves the recipe, facts, memory and the capability's knowledge targets in a transaction, commits, then calls the one retrieval path that <code>knowledge.query</code> also uses, and only then runs the pure compiler. No network call runs inside a compile transaction and no second retrieval implementation exists. The query is <code>selector.query</code>, else the card name + description, capped at 2,000 characters; with no query the section renders pack identities only. A missing or failed required pack keeps <code>409 knowledge_degraded</code>.</p></li>
+<li><p><strong>The hash is SHA-256 of the rendered text.</strong> Source identities — recipe version, pack <code>key@version</code>, memory row ids, knowledge hit ids — are rendered into the text, so they are in the pre-image. The compiled text is never stored: <code>inference_call.prompt_ref</code>, <code>prompt_version</code> and <code>prompt_sha256</code> are the record.</p></li>
+<li><p><strong>Laya is outside the compiler.</strong> The judge's <code>{model, state, questions}</code> document is built from the step output and the SOP's acceptance criteria in <code>crates/actions/src/process/judge.rs</code>; the decision ladder reads typed facts. Neither consumes the compiled LLM prompt, and the compiler never calls laya. One compiler, one judge, two different questions.</p></li>
+<li><p><strong>The runtime tool list is not prompt text.</strong> The executor passes the grant's closed schemas as the model's <code>tools</code> array; the capability section names the allowed actions. The prompt compiler does not serialize tool schemas a second time.</p></li>
+</ol>
+<h2 id="context">Context</h2>
+<p>S21's v1 seam shipped the recipe table, the pure compiler, budgets and the role section. The 2026-11-10 plan audit (§W15) recorded the three remaining gaps: tenant recipe authoring, memory selection → <code>prompt.memory</code>, and knowledge sections that carry retrieved content rather than pack ids. SPEC_V2 §4.5 names knowledge, memory, the PDDL request and the curated tool list as the four sources of an internal agent's prompt, and §7.7 requires one compiler with a recorded hash.</p>
+<p>Alternatives rejected: reusing <code>prompt_section.template</code> as a query string (it would become a second, undocumented template language); calling the <code>knowledge.query</code> action from inside the compile transaction (a nested action and a network call inside a transaction); a separate memory store for prompts (the card ledger is already the record); and storing the compiled text (it drifts from the sources it was built from).</p>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/decisions/0009-prompt-selection-and-recipe-authoring.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

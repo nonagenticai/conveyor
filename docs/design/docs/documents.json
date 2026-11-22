@@ -119,6 +119,15 @@
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0008-card-ledger.md"
     },
     {
+      "title": "0009 — Prompt selection and recipe authoring",
+      "path": "docs/decisions/0009-prompt-selection-and-recipe-authoring.html",
+      "source": "docs/decisions/0009-prompt-selection-and-recipe-authoring.md",
+      "section": "Decisions",
+      "sha256": "0e7302eba1198b4995691345f42e9337f8e6d9ce5a9a8870c7c0eb9338a71804",
+      "bytes": 4180,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0009-prompt-selection-and-recipe-authoring.md"
+    },
+    {
       "title": "Programme architecture and benefits realization",
       "path": "docs/design/Program_Architecture_and_Benefits_Realization.html",
       "source": "docs/design/Program_Architecture_and_Benefits_Realization.md",
@@ -501,8 +510,8 @@
       "path": "docs/plans/00-INDEX.html",
       "source": "docs/plans/00-INDEX.md",
       "section": "Plans",
-      "sha256": "aef99a3088bc2666a6598df665221afb32c6abbd9e6a93c893b6176000ffcbda",
-      "bytes": 250980,
+      "sha256": "1d4f973c3dc582d2f3ae4c3652cd322770d5e3a59dfb4077cfec0801aba0ab84",
+      "bytes": 251475,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/00-INDEX.md"
     },
     {
@@ -510,8 +519,8 @@
       "path": "docs/plans/01-CONTRACT.html",
       "source": "docs/plans/01-CONTRACT.md",
       "section": "Plans",
-      "sha256": "587eafdcc4c89b990fe063ebabe6d7784c6fe935ed515c2a7db83a2c237d862e",
-      "bytes": 65856,
+      "sha256": "33ad647f8d99ddd02382e0e72df347680a28697b7795ab59c490e1f42789bd6e",
+      "bytes": 66584,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/01-CONTRACT.md"
     },
     {
@@ -519,8 +528,8 @@
       "path": "docs/plans/02-DATA-ARCHITECTURE.html",
       "source": "docs/plans/02-DATA-ARCHITECTURE.md",
       "section": "Plans",
-      "sha256": "b7404c934cfeb204416287493b420c6b5377feaa81203c1766bb16abcef30d8f",
-      "bytes": 136458,
+      "sha256": "3d881fbac562162bc69b44e8266c7cf13a96524f363c9bd136cd05b39f4a2a17",
+      "bytes": 137540,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/02-DATA-ARCHITECTURE.md"
     },
     {
@@ -1005,8 +1014,8 @@
       "path": "docs/plans/slices/S21-message-construction.html",
       "source": "docs/plans/slices/S21-message-construction.md",
       "section": "Plans",
-      "sha256": "a78024dd459c2aa659cecf9791e8c3aee8f844161bae993d97e5c827431aa021",
-      "bytes": 19218,
+      "sha256": "91c75c17ffdadb854b0bd470008158086443b009ca2a1360c4ef2ad30bf5359b",
+      "bytes": 23913,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S21-message-construction.md"
     }
   ]
