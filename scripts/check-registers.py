@@ -37,7 +37,12 @@ DEFAULT_SNAPSHOT = ROOT / "docs" / "design" / "data"
 ADR_FILE = re.compile(r"^(?P<number>\d{4})-(?P<slug>.+)\.md$")
 ADR_KEY = re.compile(r"^adr-(?P<number>\d{4})$")
 OPEN_RISK_STATES = {"open", "assessed", "mitigating", "accepted"}
-ADR_STATES = {"proposed", "accepted", "approved", "superseded", "rejected", "deprecated"}
+ADR_STATES = {
+    # The register's own lifecycle plus the governed-asset states a row passes through: a
+    # decision under authoring is `draft`/`in_review`, not a defect.
+    "proposed", "accepted", "approved", "superseded", "rejected", "deprecated",
+    "draft", "in_review", "archived",
+}
 
 SEVERITY_ORDER = {"P0": 0, "P1": 1, "P2": 2}
 
@@ -116,20 +121,24 @@ def check_risks(items: list[dict[str, Any]], today: date) -> list[dict[str, str]
                 )
             )
         if non_empty(row.get("programme_id")):
-            escalations = [
-                link
-                for link in (row.get("links") or [])
-                if isinstance(link, dict) and link.get("kind") == "escalated_from"
-            ]
-            if not escalations:
+            links = [link for link in (row.get("links") or []) if isinstance(link, dict)]
+            escalations = [link for link in links if link.get("kind") == "escalated_from"]
+            # A programme risk is either an escalation aggregate (an escalated_from edge to the
+            # project risk it aggregates) or a direct programme risk (a relates_to link to what
+            # it threatens — a benefit, a project, a tranche). An unlinked risk is the finding;
+            # forcing an escalation edge where no project risk exists would be fiction.
+            if not links:
                 out.append(
                     finding(
-                        "risk_escalation_unlinked",
+                        "risk_unlinked",
                         "P1",
                         subject,
-                        "a programme risk has no escalated_from link to a project risk",
+                        "a programme risk carries no link (escalated_from a project risk, or "
+                        "relates_to what it threatens)",
                     )
                 )
+                continue
+            if not escalations:
                 continue
             for link in escalations:
                 target = by_id.get(str(link.get("item_id")))
@@ -179,6 +188,25 @@ def check_adrs(
         files[number] = path
 
     adr_rows = [row for row in rows if str(row.get("kind")) == "adr"]
+
+    def is_spec_row(row: dict[str, Any]) -> bool:
+        """A SPEC_V2 D## decision row, not a file-backed ADR: identified by its meta or key."""
+        meta = row.get("meta") or {}
+        return bool(meta.get("spec_section")) or str(row.get("key") or "").startswith("spec-d")
+
+    spec_rows = [row for row in adr_rows if is_spec_row(row)]
+    adr_rows = [row for row in adr_rows if not is_spec_row(row)]
+    for row in spec_rows:
+        key = str(row.get("key") or "")
+        if not re.fullmatch(r"spec-d\d+", key):
+            out.append(finding("adr_bad_key", "P1", key or str(row.get("id")),
+                               "a SPEC decision row's key is not spec-dNN"))
+        if str(row.get("status") or "") not in ADR_STATES:
+            out.append(finding("adr_status_invalid", "P1", key,
+                               f"status {row.get('status')!r} is not a register status"))
+    # An archived row is history, not a register entry: a superseded key (a renumbering, a
+    # re-key migration) is kept for the audit trail and never re-checked against today's file.
+    adr_rows = [row for row in adr_rows if str(row.get("status")) != "archived"]
     row_by_number: dict[str, list[dict[str, Any]]] = {}
     for row in adr_rows:
         match = ADR_KEY.match(str(row.get("key") or ""))
@@ -666,7 +694,12 @@ def self_test() -> int:
 
         write(risks=[{**good_risk, "programme_id": "p", "links": ["x"]}])
         report = run_checks(snapshot, root, today)
-        expect("risk_escalation_unlinked" in checks(report), "a programme risk needs its escalation")
+        expect("risk_unlinked" in checks(report), "a programme risk needs a link")
+        write(risks=[{**good_risk, "programme_id": "p",
+                      "links": [{"kind": "relates_to", "target": "benefit/B1"}]}])
+        report = run_checks(snapshot, root, today)
+        expect("risk_unlinked" not in checks(report),
+               "a direct programme risk with a relates_to link is operated")
 
         write(adrs=[])
         report = run_checks(snapshot, root, today)
