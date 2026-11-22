@@ -980,8 +980,9 @@ pub struct ChangeRequestIn {
     /// The change's body.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub body: Option<String>,
-    /// The impact block (required by the register's CHECK).
-    pub impact: i64,
+    /// The scope/schedule/cost/risk impact block (SPEC_V2 §5.5): an object carrying at least
+    /// one of `scope`, `schedule`, `cost` or `risk`. It is stored in the change's `meta`.
+    pub impact: Value,
 }
 
 /// `changes.request`'s result.
@@ -1010,8 +1011,6 @@ async fn changes_request(
     input: ChangeRequestIn,
 ) -> Result<HandlerOutput<ChangeRequestOut>, ActionError> {
     assert_pm(&mut *tx, ctx.tenant, input.job_binding_id).await?;
-    let impact = i32::try_from(input.impact)
-        .map_err(|_| ActionError::new(422, "invalid_value", "impact must fit a 32-bit integer"))?;
     // The change gate resolves the approved baseline it would replace before it is opened.
     let evidence = resolve_evidence(
         &mut *tx,
@@ -1036,9 +1035,11 @@ async fn changes_request(
             status: "open".to_owned(),
             severity: None,
             probability: None,
-            impact: Some(impact),
+            impact: None,
             links: Value::Array(Vec::new()),
             baseline_ref: Some(input.baseline_id),
+            // The store validates the block (at least one of the four impact keys) in
+            // `insert_register_tx`; the numeric `impact` column stays empty for a change.
             meta: json!({ "impact": input.impact }),
         },
     )

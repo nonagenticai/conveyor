@@ -13,6 +13,11 @@
 //!   human-approved `tranche.resume` gate naming the tranche moves it to `in_review`
 //!   (`tranches.resume`), a compliant project can then close, and the resumed tranche records
 //!   the second, dated review that authorises its successor.
+//! * `v1-p5-3` — a change's `meta.impact` is a real §5.5 scope/schedule/cost/risk block: `{}`
+//!   is refused on create AND on an update that replaces `meta` (`registers.create`,
+//!   `registers.update`).
+//! * `v1-w1a-3` — a change is approved by its `change` gate's decision, never a `registers.update`
+//!   status write; the guard reads the approval row, not the register's self-declared status.
 //!
 //! The harness is `support::Pg::fresh()` plus a direct `InvokeRequest` as a real seeded actor
 //! (`seeded.user_id`), the same shape `ops_write.rs` uses.
@@ -22,7 +27,7 @@
 mod support;
 
 use conveyor_actions::spine::TRANCHE_RESUME_GATE;
-use conveyor_actions::{Authority, InvokeRequest, invoke, registry};
+use conveyor_actions::{Authority, InvokeRequest, Precondition, invoke, registry};
 use conveyor_auth::Role;
 use serde_json::{Value, json};
 use uuid::Uuid;
@@ -413,6 +418,237 @@ async fn a_register_cannot_be_born_approved() {
         "{:?}",
         error.errors
     );
+}
+
+// ── v1-p5-3 — a change carries a real impact analysis, not a placeholder ────────────────
+
+/// The code the store and the domain answer when the §5.5 block is absent or empty.
+fn assert_impact_missing(error: &conveyor_actions::ActionError) {
+    assert_eq!(error.status, 422, "{}", error.detail);
+    assert_eq!(error.errors.len(), 1, "{:?}", error.errors);
+    assert_eq!(error.errors[0].field, "impact", "{:?}", error.errors);
+    assert_eq!(
+        error.errors[0].code, "change_impact_missing",
+        "{:?}",
+        error.errors
+    );
+}
+
+/// v1-p5-3 — `{}` is not an impact block: a change created with an empty (or absent, or
+/// non-object) impact is refused, and the same change with a scope delta is created.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_change_with_no_impact_analysis_is_refused() {
+    let (pg, seeded) = fixture().await;
+    let project = project(&pg, seeded.tenant_id, None, json!({})).await;
+    let baseline = approved_baseline(&pg, seeded.tenant_id, project, seeded.user_id).await;
+
+    let error = invoke(
+        &pg.runtime,
+        registry(),
+        seeded.tenant,
+        request(
+            seeded.user_id,
+            "registers.create",
+            json!({
+                "project_id": project,
+                "kind": "change",
+                "title": "Move the gate",
+                "baseline_ref": baseline,
+                "meta": {"impact": {}},
+            }),
+        ),
+    )
+    .await
+    .expect_err("an empty impact block is not an impact analysis");
+    assert_impact_missing(&error);
+    let rows: i64 = sqlx::query_scalar(
+        "SELECT count(*) FROM project_register_item WHERE tenant_id = $1 AND kind = 'change'",
+    )
+    .bind(seeded.tenant_id)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("count the refused change");
+    assert_eq!(rows, 0, "the refused create wrote a change row");
+
+    // The second lock is the DB CHECK: a raw insert that bypasses the store is refused too, so
+    // the schema itself cannot hold a change with an empty impact block.
+    let direct = sqlx::query(
+        "INSERT INTO project_register_item
+             (tenant_id, project_id, kind, title, baseline_ref, meta)
+         VALUES ($1, $2, 'change', 'Bypass the store', $3, '{\"impact\": {}}'::jsonb)",
+    )
+    .bind(seeded.tenant_id)
+    .bind(project)
+    .bind(baseline)
+    .execute(&pg.super_pool)
+    .await;
+    assert!(
+        direct.is_err(),
+        "the DB CHECK accepted an empty impact block: {direct:?}"
+    );
+
+    let outcome = invoke(
+        &pg.runtime,
+        registry(),
+        seeded.tenant,
+        request(
+            seeded.user_id,
+            "registers.create",
+            json!({
+                "project_id": project,
+                "kind": "change",
+                "title": "Move the gate",
+                "baseline_ref": baseline,
+                "meta": {"impact": {"scope": "a deliverable moves"}},
+            }),
+        ),
+    )
+    .await
+    .expect("a change with a scope delta is a change");
+
+    assert_eq!(outcome.status, 201, "{}", outcome.body);
+    assert_eq!(
+        outcome.body["output"]["meta"]["impact"],
+        json!({"scope": "a deliverable moves"}),
+        "{}",
+        outcome.body
+    );
+}
+
+/// v1-p5-3 — the `meta` an update replaces is validated too: stripping the block is refused and
+/// the stored row (meta and version) does not move.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_change_impact_cannot_be_stripped_by_an_update() {
+    let (pg, seeded) = fixture().await;
+    let project = project(&pg, seeded.tenant_id, None, json!({})).await;
+    let baseline = approved_baseline(&pg, seeded.tenant_id, project, seeded.user_id).await;
+
+    let created = invoke(
+        &pg.runtime,
+        registry(),
+        seeded.tenant,
+        request(
+            seeded.user_id,
+            "registers.create",
+            json!({
+                "project_id": project,
+                "kind": "change",
+                "title": "Move the gate",
+                "baseline_ref": baseline,
+                "meta": {"impact": {"scope": "a deliverable moves"}},
+            }),
+        ),
+    )
+    .await
+    .expect("create the valid change");
+    assert_eq!(created.status, 201, "{}", created.body);
+    let change: Uuid = created.body["output"]["id"]
+        .as_str()
+        .and_then(|raw| Uuid::parse_str(raw).ok())
+        .unwrap_or_else(|| panic!("no change id: {}", created.body));
+    let version = created.body["output"]["version"]
+        .as_i64()
+        .unwrap_or_else(|| panic!("no change version: {}", created.body));
+
+    let mut update = request(
+        seeded.user_id,
+        "registers.update",
+        json!({"id": change, "meta": {"impact": {}}}),
+    );
+    update.precondition = Some(Precondition::Version(version));
+    let error = invoke(&pg.runtime, registry(), seeded.tenant, update)
+        .await
+        .expect_err("an update cannot strip a change's impact analysis");
+    assert_impact_missing(&error);
+
+    let stored: Value = sqlx::query_scalar(
+        "SELECT meta FROM project_register_item WHERE tenant_id = $1 AND id = $2",
+    )
+    .bind(seeded.tenant_id)
+    .bind(change)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("read the change's meta");
+    assert_eq!(
+        stored,
+        json!({"impact": {"scope": "a deliverable moves"}}),
+        "the refused update replaced the stored meta"
+    );
+    let current: i64 = sqlx::query_scalar(
+        "SELECT version FROM project_register_item WHERE tenant_id = $1 AND id = $2",
+    )
+    .bind(seeded.tenant_id)
+    .bind(change)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("read the change's version");
+    assert_eq!(current, version, "the refused update bumped the version");
+}
+
+/// v1-w1a-3 — a change's `approved` status is the `change` gate's decision, never a register
+/// write: `registers.update` refuses it and the row does not move. (`registers.create`'s refusal
+/// is `a_register_cannot_be_born_approved`; the approved-gate path is
+/// `an_approved_change_gate_advances_the_baseline`.)
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_change_status_cannot_be_written_approved() {
+    let (pg, seeded) = fixture().await;
+    let project = project(&pg, seeded.tenant_id, None, json!({})).await;
+    let baseline = approved_baseline(&pg, seeded.tenant_id, project, seeded.user_id).await;
+    let created = invoke(
+        &pg.runtime,
+        registry(),
+        seeded.tenant,
+        request(
+            seeded.user_id,
+            "registers.create",
+            json!({
+                "project_id": project,
+                "kind": "change",
+                "title": "Move the gate",
+                "baseline_ref": baseline,
+                "meta": {"impact": {"scope": "a deliverable moves"}},
+            }),
+        ),
+    )
+    .await
+    .expect("create the change");
+    assert_eq!(created.status, 201, "{}", created.body);
+    let change: Uuid = created.body["output"]["id"]
+        .as_str()
+        .and_then(|raw| Uuid::parse_str(raw).ok())
+        .unwrap_or_else(|| panic!("no change id: {}", created.body));
+    let version = created.body["output"]["version"]
+        .as_i64()
+        .unwrap_or_else(|| panic!("no change version: {}", created.body));
+
+    let mut update = request(
+        seeded.user_id,
+        "registers.update",
+        json!({"id": change, "status": "approved"}),
+    );
+    update.precondition = Some(Precondition::Version(version));
+    let error = invoke(&pg.runtime, registry(), seeded.tenant, update)
+        .await
+        .expect_err("a status write cannot approve a change");
+    assert_eq!(error.status, 422, "{}", error.detail);
+    assert_eq!(error.errors.len(), 1, "{:?}", error.errors);
+    assert_eq!(error.errors[0].field, "status", "{:?}", error.errors);
+    assert_eq!(
+        error.errors[0].code, "approval_gate_only",
+        "{:?}",
+        error.errors
+    );
+
+    let (status, current): (String, i64) = sqlx::query_as(
+        "SELECT status, version FROM project_register_item WHERE tenant_id = $1 AND id = $2",
+    )
+    .bind(seeded.tenant_id)
+    .bind(change)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("read the refused change");
+    assert_eq!(status, "open", "the refused update approved the change");
+    assert_eq!(current, version, "the refused update bumped the version");
 }
 
 /// v1-w2b-2 — the programme HAS a tranche plan, but no row for the project's tranche (1).

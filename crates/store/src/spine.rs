@@ -781,6 +781,14 @@ pub async fn update_register_tx(
             what: "register item",
         });
     }
+    // The create rule is not a one-time admission: an update that replaces `meta` replaces the
+    // impact block too, so it is validated against the same §5.5 rule. The row's baseline is
+    // immutable here, so the stored `baseline_ref` is the one the new block belongs with.
+    if current.kind == "change" {
+        if let Some(meta) = meta {
+            validate_change(meta.get("impact"), current.baseline_ref)?;
+        }
+    }
     let sql = format!(
         "UPDATE project_register_item SET
             status = coalesce($4, status), title = coalesce($5, title),
@@ -2095,9 +2103,9 @@ pub async fn change_is_approved_tx(
 /// A change names the baseline it changes in the register's own `baseline_ref` column (the FK
 /// `project_register_item_baseline_fk`; every `kind='change'` row carries one — `validate_change`
 /// refuses a change without it). The change must belong to the same project as the baseline, its
-/// `meta.impact` block must be present (the `validate_change` rule: present and not JSON null),
-/// and its `change` gate must be approved — the row's own `status` is never an approval
-/// (`change_is_approved_tx`'s rule).
+/// `meta.impact` block must be present (the `validate_change` rule: a §5.5 object carrying at
+/// least one of scope/schedule/cost/risk), and its `change` gate must be approved — the row's own
+/// `status` is never an approval (`change_is_approved_tx`'s rule).
 ///
 /// The reciprocal `meta.baseline_id` that `link_change_to_baseline_tx` writes names the baseline
 /// the change *produced*, so it is not the authorisation for edits under the new baseline; an

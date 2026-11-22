@@ -200,7 +200,7 @@ async fn approved_change(
         "INSERT INTO project_register_item
             (tenant_id, project_id, kind, title, impact, baseline_ref, meta)
          VALUES ($1, $2::uuid, 'change', 'Change the baseline', 3, $3::uuid,
-                 '{\"impact\": 3}'::jsonb)
+                 '{\"impact\": {\"cost\": 3}}'::jsonb)
          RETURNING id",
     )
     .bind(seeded.tenant_id)

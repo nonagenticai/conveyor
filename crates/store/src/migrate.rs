@@ -254,7 +254,10 @@ mod tests {
                 (63, "tool verify".to_owned()),
                 // v1-p82-2 (#526): `programme_cadence.state` becomes a closed set
                 // (0064_cadence_state.sql, SPEC_V2 §8.2).
-                (64, "cadence state".to_owned())
+                (64, "cadence state".to_owned()),
+                // v1-p5-3 (#526): a change's impact block is an object carrying at least one of
+                // scope/schedule/cost/risk (0065_change_impact_keys.sql, SPEC_V2 §5.5).
+                (65, "change impact keys".to_owned())
             ],
             "the embedded migration set is {embedded:?}; a wrong sqlx::migrate! path or a \
              file outside the set changes it"
