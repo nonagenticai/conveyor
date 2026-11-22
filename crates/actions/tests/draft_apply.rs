@@ -230,7 +230,7 @@ async fn an_unbound_decision_cannot_apply_a_draft() {
 
     let (status, refused) = apply(&running, &document, &card_id, &decision).await;
     assert_eq!(status, 422, "{refused}");
-    assert_eq!(output(&refused)["code"], "draft_requires_gate", "{refused}");
+    assert_eq!(output(&refused)["type"], "draft_requires_gate", "{refused}");
     assert_eq!(
         document_card(&running, &document).await,
         None,
@@ -263,7 +263,7 @@ async fn a_decision_bound_to_another_draft_is_refused() {
     let bound = evaluate_accepted(&running, &card_id, json!({"draft_document_id": first})).await;
     let (status, refused) = apply(&running, &second, &card_id, &bound).await;
     assert_eq!(status, 422, "{refused}");
-    assert_eq!(output(&refused)["code"], "draft_requires_gate", "{refused}");
+    assert_eq!(output(&refused)["type"], "draft_requires_gate", "{refused}");
     let (status, applied) = apply(&running, &first, &card_id, &bound).await;
     assert_eq!(status, 200, "{applied}");
 
@@ -284,7 +284,7 @@ async fn a_decision_bound_to_another_draft_is_refused() {
     .await;
     let (status, refused) = apply(&running, &hashed, &card_id, &wrong).await;
     assert_eq!(status, 422, "{refused}");
-    assert_eq!(output(&refused)["code"], "draft_requires_gate", "{refused}");
+    assert_eq!(output(&refused)["type"], "draft_requires_gate", "{refused}");
 }
 
 /// A human decision needs a person and an approval that actually resolved.
