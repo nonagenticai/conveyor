@@ -658,7 +658,7 @@
       "evidence": [
         {
           "path": "crates/actions/src/portfolio/programmes.rs",
-          "line": 162,
+          "line": 182,
           "quote": "        status: trimmed(input.status),"
         },
         {
@@ -933,18 +933,23 @@
         },
         {
           "path": "crates/actions/src/portfolio/programmes.rs",
-          "line": 87,
+          "line": 106,
           "quote": "            name: name.to_owned(),"
         },
         {
           "path": "crates/actions/src/portfolio/programmes.rs",
-          "line": 89,
+          "line": 108,
           "quote": "            owner_user_id: input.owner_user_id,"
         }
       ],
       "failure_scenario": "Every project re-declares cadence/ART config; nothing inherits or locks it, so programmes drift.",
       "acceptance": "programme.shared_config exists with inheritance/lock semantics, resolved on read, and tests prove a locked value cannot be overridden per project.",
-      "owner_project": "T10"
+      "owner_project": "T10",
+      "resolved_by": {
+        "commit": "a54d1f43b624539adcef18efdf716991715ace07",
+        "test": "crates/store/tests/programme_shared_config.rs::a_locked_programme_config_cannot_be_overridden_per_project",
+        "evidence": "programme_shared_config 3 passed on the merged lane: migration 0068 adds the column and its shape CHECK; programmes.create/update/get/list carry shared_config; resolve_shared_config makes a locked programme key win over a project override; a flat object reads as values with no locks; a round trip through the programme row preserves the config. The migration-set test expects 68 and --check-lock passes after the lock was regenerated."
+      }
     },
     {
       "id": "v1-p82-4",
