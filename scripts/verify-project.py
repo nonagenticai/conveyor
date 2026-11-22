@@ -262,17 +262,15 @@ def check_contract(
                 continue
             if str(meta.get("subject_id")) != str(contract.get("id")):
                 continue
-            distinct = [
-                decision
-                for decision in snapshot.decisions(str(approval_id))
-                if decision.get("decision") == "approve"
-                and decision.get("approver_id")
-                and decision.get("approver_id") != requester
-            ]
-            if distinct:
+            # `decide_board_tx` writes the board decision as an APPROVED approval row with no
+            # separate decision row (its `requested_by` is the deciding actor). The action's
+            # distinctness rule is therefore the contract's requester vs the actor who approved
+            # the contract, not an approval_decision — requiring one would fail every lawful
+            # board decision.
+            if requester and approver and requester != approver:
                 return True, (
-                    f"contract {contract.get('id')} approved by board decision {approval_id}; "
-                    f"decision by {distinct[0].get('approver_id')} distinct from requester {requester}"
+                    f"contract {contract.get('id')} approved by board decision {approval_id} "
+                    f"about this contract; approver {approver} distinct from requester {requester}"
                 )
             continue
         # Mirrors the action's other lawful path: a contract with a recorded requester and a kind
@@ -1356,12 +1354,17 @@ severity = "P0"
         lambda a, w, m, o: m["project_baselines"][0].update({"approved_by": "u-taker"}),
         False,
     )
+    # A board decision is an approved approval row about THIS contract; a decision row is not
+    # written by decide_board_tx. The red cases are a decision about another subject and a
+    # contract whose approver is its requester.
     hardening_case(
-        "contract-no-decision",
-        lambda a, w, m, o: w.__setitem__(
-            "approval_decisions",
-            [d for d in w["approval_decisions"] if d["approval_id"] != "ap-contract"],
-        ),
+        "contract-wrong-subject",
+        lambda a, w, m, o: w["approvals"][0]["meta"].__setitem__("subject_id", "ct-other"),
+        False,
+    )
+    hardening_case(
+        "contract-self-approved",
+        lambda a, w, m, o: a["contracts"][0].__setitem__("approved_by", "u-requester"),
         False,
     )
     hardening_case(
