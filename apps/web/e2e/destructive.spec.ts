@@ -1,41 +1,28 @@
-import { expect, test, type APIRequestContext } from "./fixture";
+import { expect, test, type APIRequestContext, type Page } from "./fixture";
 
-import { createBoardCard, invoke } from "./helpers";
+import {
+  answerWaiverPrompt,
+  archiveTarget,
+  createBoardCard,
+  decideAsReviewer,
+  FIXTURE_EVIDENCE_WAIVER,
+  isDevAuth,
+  pendingGateFor,
+  pendingGates,
+  recordGateRequests,
+  setApprovalPolicy,
+  type PendingGate,
+} from "./helpers";
 
 // #285 — the console's destructive path. A destructive action answers `403 approval_required`
 // unless the call names an approved approval whose target equals the target the action
 // computes (#282). These specs drive the console through that gate: it asks, the person is told
 // what is waiting, and the approvals screen is where the target and the input are read.
-
-/** The tenant's decision for one action, so each spec states the policy it is testing. */
-async function setPolicy(
-  request: APIRequestContext,
-  action: string,
-  approval: "required" | "waived",
-  selfApproval: "forbidden" | "allowed",
-): Promise<void> {
-  await invoke(request, "approval_policies.set", {
-    action,
-    approval,
-    self_approval: selfApproval,
-  });
-}
-
-type Gate = { id: string; gate: string; status: string; target?: string };
-
-/** The tenant's pending gates, newest first. */
-async function pendingGates(request: APIRequestContext): Promise<Gate[]> {
-  const page = await invoke<{ items: Gate[] }>(request, "approvals.list", {
-    status: "pending",
-    limit: 50,
-  });
-  return page.items;
-}
-
-/** `cards.archive`'s target for one card — the string the invoke boundary compares. */
-function archiveTarget(cardId: string): string {
-  return `card/${cardId}/archive`;
-}
+//
+// A gate for a destructive action also requires typed evidence (§5.4), and the console's
+// minimal bridge asks the operator to record an explicit waiver reason instead. The fixture
+// gates use `FIXTURE_EVIDENCE_WAIVER`; the prompt's cancel / reason / blank paths are asserted
+// below.
 
 /**
  * The approvals row for one target.
@@ -43,18 +30,21 @@ function archiveTarget(cardId: string): string {
  * Matched by its text, not by a `data-target` attribute: the row's identity on the screen is
  * what it renders, and a test that leans on an attribute proves the attribute, not the row.
  */
-function approvalRow(page: import("@playwright/test").Page, target: string) {
+function approvalRow(page: Page, target: string) {
   return page.locator("article").filter({ hasText: target }).first();
 }
 
 /** A board, a card, and the gate its archive asked for, created through the console. */
 async function waitForArchiveGate(
-  page: import("@playwright/test").Page,
+  page: Page,
   request: APIRequestContext,
   title: string,
 ): Promise<{ cardId: string; target: string }> {
   const fixture = await createBoardCard(request, title);
   const target = archiveTarget(fixture.card.id);
+  // The console's request is refused for want of evidence; the operator records the waiver,
+  // and the retry opens the gate.
+  answerWaiverPrompt(page, [FIXTURE_EVIDENCE_WAIVER]);
   await page.goto(`/board/${fixture.boardId}`);
   const card = page.locator(".card", { hasText: title });
   await expect(card).toBeVisible();
@@ -65,10 +55,12 @@ async function waitForArchiveGate(
 }
 
 test("a gated delete asks before it deletes", async ({ page, request }) => {
-  await setPolicy(request, "cards.archive", "required", "forbidden");
+  await setApprovalPolicy(request, "cards.archive", "required");
   const title = `e2e gated archive ${Date.now()}`;
 
   const fixture = await createBoardCard(request, title);
+  // The gate request is refused for want of evidence; the operator records the waiver.
+  answerWaiverPrompt(page, [FIXTURE_EVIDENCE_WAIVER]);
   await page.goto(`/board/${fixture.boardId}`);
   const card = page.locator(".card", { hasText: title });
   await expect(card).toBeVisible();
@@ -91,7 +83,7 @@ test("a gated delete asks before it deletes", async ({ page, request }) => {
 });
 
 test("a waived action runs without a gate", async ({ page, request }) => {
-  await setPolicy(request, "cards.archive", "waived", "forbidden");
+  await setApprovalPolicy(request, "cards.archive", "waived");
   const title = `e2e waived archive ${Date.now()}`;
 
   const fixture = await createBoardCard(request, title);
@@ -130,7 +122,7 @@ test("a forbidden action is not offered", async ({ page, request }) => {
 });
 
 test("the approvals screen shows the target and the input", async ({ page, request }) => {
-  await setPolicy(request, "cards.archive", "required", "forbidden");
+  await setApprovalPolicy(request, "cards.archive", "required");
   const title = `e2e approvals screen ${Date.now()}`;
   const { cardId, target } = await waitForArchiveGate(page, request, title);
 
@@ -145,20 +137,14 @@ test("the approvals screen shows the target and the input", async ({ page, reque
 });
 
 test("a retry after the gate is approved completes the call", async ({ page, request }) => {
-  await setPolicy(request, "cards.archive", "required", "forbidden");
+  await setApprovalPolicy(request, "cards.archive", "required");
   const title = `e2e approved retry ${Date.now()}`;
   const { target } = await waitForArchiveGate(page, request, title);
 
-  // Someone approves the gate. The dev fixture has one principal per tenant, so the tenant is
-  // asked to allow a self-decision AFTER the gate exists — the decision is still recorded by the
-  // same `approvals.decide` a second person would use.
-  await setPolicy(request, "cards.archive", "required", "allowed");
-  const gate = (await pendingGates(request)).find((row) => row.target === target);
-  expect(gate, "the gate the console asked for").toBeTruthy();
-  await invoke(request, "approvals.decide", {
-    approval_id: gate!.id,
-    decision: "approve",
-  });
+  // §5.4: the requester can never decide its own gate, so a distinct principal approves it.
+  test.skip(!isDevAuth(), "the deployed suite has one principal, so nobody else can decide");
+  const gate = await pendingGateFor(request, target);
+  await decideAsReviewer(request, "approvals.decide", gate.id);
 
   // The requester's retry spends that gate instead of asking for a second one.
   await page
@@ -168,12 +154,12 @@ test("a retry after the gate is approved completes the call", async ({ page, req
   await expect(page.locator(".archived")).toContainText(title, { timeout: 15_000 });
 
   // One gate in total for that object: the retry spent the approved one, it did not ask again.
-  const all = await invoke<{ items: Gate[] }>(request, "approvals.list", { limit: 200 });
+  const all = await invoke<{ items: PendingGate[] }>(request, "approvals.list", { limit: 200 });
   expect(all.items.filter((row) => row.target === target)).toHaveLength(1);
 });
 
 test("a self gate is shown but not decidable", async ({ page, request }) => {
-  await setPolicy(request, "cards.archive", "required", "forbidden");
+  await setApprovalPolicy(request, "cards.archive", "required");
   const title = `e2e self gate ${Date.now()}`;
   const { target } = await waitForArchiveGate(page, request, title);
 
@@ -185,4 +171,95 @@ test("a self gate is shown but not decidable", async ({ page, request }) => {
   await expect(row.getByRole("button", { name: "Approve" })).toBeDisabled();
   await expect(row.getByRole("button", { name: "Reject" })).toBeDisabled();
   await expect(row).toContainText("another person must decide");
+});
+
+// v1-ui-1 — the console's minimal §5.4 bridge. A destructive gate now requires evidence; the
+// console asks the operator for an explicit waiver reason on exactly the `422
+// gate_evidence_missing` refusal, and retries the same request once with it. The app never
+// invents a waiver: Cancel and a blank answer keep the refusal.
+
+test("a cancelled waiver prompt surfaces the refusal and opens no gate", async ({
+  page,
+  request,
+}) => {
+  await setApprovalPolicy(request, "cards.archive", "required");
+  const title = `e2e cancelled waiver ${Date.now()}`;
+  const fixture = await createBoardCard(request, title);
+  const target = archiveTarget(fixture.card.id);
+
+  const gates = recordGateRequests(page);
+  const prompt = answerWaiverPrompt(page, [null]);
+
+  await page.goto(`/board/${fixture.boardId}`);
+  const card = page.locator(".card", { hasText: title });
+  await expect(card).toBeVisible();
+  await card.getByRole("button", { name: "Archive" }).click();
+
+  // The server's refusal is surfaced unchanged; Cancel retries nothing and sends no waiver.
+  await expect(page.locator(".toast")).toContainText("typed evidence reference");
+  expect(prompt.dialogs, "the operator is asked exactly once").toBe(1);
+  expect(gates, "a cancelled prompt sends no retry").toHaveLength(1);
+  expect(gates[0].input.evidence_waiver_reason).toBeUndefined();
+
+  // Nothing was destroyed and no gate was opened.
+  await page.reload();
+  await expect(page.locator(".card", { hasText: title })).toBeVisible();
+  expect((await pendingGates(request)).some((row) => row.target === target)).toBe(false);
+});
+
+test("a reason retries the gate request exactly once with the waiver", async ({
+  page,
+  request,
+}) => {
+  await setApprovalPolicy(request, "cards.archive", "required");
+  const title = `e2e waiver reason ${Date.now()}`;
+  const fixture = await createBoardCard(request, title);
+  const target = archiveTarget(fixture.card.id);
+  const reason = "e2e: this card row is the gate's subject";
+
+  const gates = recordGateRequests(page);
+  const prompt = answerWaiverPrompt(page, [reason]);
+
+  await page.goto(`/board/${fixture.boardId}`);
+  const card = page.locator(".card", { hasText: title });
+  await expect(card).toBeVisible();
+  await card.getByRole("button", { name: "Archive" }).click();
+
+  await expect(page.locator(".toast")).toContainText("Waiting for approval");
+  expect(prompt.dialogs, "one reason, one prompt").toBe(1);
+  // The refusal, then exactly one retry — the same gate request plus the waiver reason.
+  expect(gates).toHaveLength(2);
+  expect(gates[0].input.evidence_waiver_reason).toBeUndefined();
+  expect(gates[1].input.evidence_waiver_reason).toBe(reason);
+  expect(gates[1].input).toMatchObject({
+    gate: "cards.archive",
+    action: "cards.archive",
+    input: { id: fixture.card.id },
+  });
+
+  // The retry opened the gate the reason is stored on.
+  const gate = await pendingGateFor(request, target);
+  expect(gate.gate).toBe("cards.archive");
+});
+
+test("a blank waiver reason is refused and never sent", async ({ page, request }) => {
+  await setApprovalPolicy(request, "cards.archive", "required");
+  const title = `e2e blank waiver ${Date.now()}`;
+  const fixture = await createBoardCard(request, title);
+  const target = archiveTarget(fixture.card.id);
+
+  const gates = recordGateRequests(page);
+  // A blank answer is not a waiver: the app asks once more, then keeps the refusal.
+  const prompt = answerWaiverPrompt(page, ["", "   "]);
+
+  await page.goto(`/board/${fixture.boardId}`);
+  const card = page.locator(".card", { hasText: title });
+  await expect(card).toBeVisible();
+  await card.getByRole("button", { name: "Archive" }).click();
+
+  await expect(page.locator(".toast")).toContainText("typed evidence reference");
+  expect(prompt.dialogs, "a blank answer is asked again, then refused").toBe(2);
+  expect(gates, "a blank reason never becomes a waiver retry").toHaveLength(1);
+  expect(gates[0].input.evidence_waiver_reason).toBeUndefined();
+  expect((await pendingGates(request)).some((row) => row.target === target)).toBe(false);
 });

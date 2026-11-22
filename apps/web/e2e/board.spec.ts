@@ -1,6 +1,16 @@
 import { expect, test } from "./fixture";
 
-import { allowSelfApproval, createBoardCard, invoke } from "./helpers";
+import {
+  answerWaiverPrompt,
+  archiveTarget,
+  createBoardCard,
+  decideAsReviewer,
+  FIXTURE_EVIDENCE_WAIVER,
+  invoke,
+  isDevAuth,
+  pendingGateFor,
+  setApprovalPolicy,
+} from "./helpers";
 
 // The board is the first screen where a write matters: `cards.move` carries the card's
 // version as If-Match, and the lane is the state. Both pointer and keyboard paths are real.
@@ -106,10 +116,11 @@ test("a project, its card, an edit and an archive round-trip through the UI", as
   const projectTitle = `AAA Playwright board ${stamp}`;
   const cardName = `Playwright card ${stamp}`;
 
-  // #285: archiving is destructive and runs only behind a gate. The dev seed has one principal
-  // per tenant, so the tenant allows the requester to decide — the console still requests,
-  // decides and invokes; nothing here skips the gate.
-  await allowSelfApproval(request, "cards.archive");
+  // #285: archiving is destructive and runs only behind a gate. §5.4 makes the requester's
+  // exclusion an invariant, so the gate is decided by the seed's second principal, and the
+  // console's §5.4 bridge records the fixture waiver reason for the evidence-less gate.
+  await setApprovalPolicy(request, "cards.archive", "required");
+  answerWaiverPrompt(page, [FIXTURE_EVIDENCE_WAIVER]);
 
   await page.goto("/boards");
   await expect(page.getByRole("heading", { name: "Board", exact: true })).toBeVisible();
@@ -174,6 +185,14 @@ test("a project, its card, an edit and an archive round-trip through the UI", as
       { timeout: 30_000 },
     )
     .toContain(editedName);
+  // The edited row's id is the gate target's subject; the name already proves the row exists.
+  const boardCards = await request
+    .get(`/api/boards/${boardId}/cards?limit=200`)
+    .then((r) => r.json());
+  const editedRow = (boardCards.items ?? []).find(
+    (row: { id: string; name: string }) => row.name === editedName,
+  ) as { id: string } | undefined;
+  expect(editedRow, "the edited card's row").toBeTruthy();
   await page.reload();
 
   const edited = page.locator(".card", { hasText: editedName });
@@ -181,6 +200,13 @@ test("a project, its card, an edit and an archive round-trip through the UI", as
   await expect(edited.locator(".card-title")).toHaveText(editedName);
   await expect(page.getByText(cardName, { exact: true })).toHaveCount(0);
 
+  // The first click asks for the gate; the requester cannot decide it, so a distinct approver
+  // does, and the requester's retry spends that approval.
+  await edited.getByRole("button", { name: "Archive" }).click();
+  await expect(page.locator(".toast")).toContainText("Waiting for approval");
+  test.skip(!isDevAuth(), "the deployed suite has one principal, so nobody else can decide");
+  const gate = await pendingGateFor(request, archiveTarget(editedRow!.id));
+  await decideAsReviewer(request, "approvals.decide", gate.id);
   await edited.getByRole("button", { name: "Archive" }).click();
   await expect(page.locator(".card", { hasText: editedName })).toHaveCount(0);
   await expect(page.locator(".archived")).toContainText(editedName);
@@ -243,7 +269,10 @@ test("a label, a lane and an unarchive round-trip through the UI", async ({ page
   const stamp = Date.now();
   const title = `e2e authoring ${stamp}`;
   const fixture = await createBoardCard(request, title);
-  await allowSelfApproval(request, "cards.archive");
+  // The archive below is a real gate: the requester cannot decide it, and the fixture gate
+  // records the §5.4 waiver reason because the row, not a document, is its subject.
+  await setApprovalPolicy(request, "cards.archive", "required");
+  answerWaiverPrompt(page, [FIXTURE_EVIDENCE_WAIVER]);
 
   await page.goto(`/board/${fixture.boardId}`);
   // The screen's heading is the board's name, not the project's; the fixture's card is the mark.
@@ -295,7 +324,7 @@ test("a label, a lane and an unarchive round-trip through the UI", async ({ page
   // The card is a `feature`: the seeded delivery matrix gives `bug` no archive→intake edge, so
   // a bug card's unarchive is refused by the type, not by the screen.
   const featureName = `e2e feature ${stamp}`;
-  await invoke(request, "cards.create", {
+  const feature = await invoke<{ id: string }>(request, "cards.create", {
     board_id: fixture.boardId,
     list_id: fixture.intake.id,
     name: featureName,
@@ -303,6 +332,12 @@ test("a label, a lane and an unarchive round-trip through the UI", async ({ page
   });
   await page.reload();
   const card = page.locator(".card", { hasText: featureName });
+  // The first click asks for the gate; a distinct approver decides it, then the retry archives.
+  await card.getByRole("button", { name: "Archive" }).click();
+  await expect(page.locator(".toast")).toContainText("Waiting for approval");
+  test.skip(!isDevAuth(), "the deployed suite has one principal, so nobody else can decide");
+  const gate = await pendingGateFor(request, archiveTarget(feature.id));
+  await decideAsReviewer(request, "approvals.decide", gate.id);
   await card.getByRole("button", { name: "Archive" }).click();
   await expect(page.locator(".archived")).toContainText(featureName);
   await page.locator(".archived").getByRole("button", { name: "Unarchive" }).click();
