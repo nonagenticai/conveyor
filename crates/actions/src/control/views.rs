@@ -362,8 +362,19 @@ pub struct ApprovalRequestIn {
     #[serde(default)]
     pub evidence: Vec<crate::pm::EvidenceRef>,
     /// Refuse an empty evidence list when true.
+    ///
+    /// A caller can only **add** this requirement. A gate for a destructive action (one with an
+    /// `approval_policy` row) requires evidence whatever this says; `false` cannot remove it.
     #[serde(default)]
     pub require_evidence: bool,
+    /// Why this gate carries no evidence — the explicit §5.4 override.
+    ///
+    /// Ignored when the gate does not require evidence or when `evidence` is non-empty. A reason
+    /// that is non-empty after trim opens an evidence-less gate and is stored in
+    /// `meta.evidence_waiver`; an empty or whitespace-only reason is not a waiver, so a gate that
+    /// requires evidence is refused (`422 gate_evidence_missing`).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub evidence_waiver_reason: Option<String>,
 }
 
 /// `approvals.list` — the gate filters plus the shared page envelope.
