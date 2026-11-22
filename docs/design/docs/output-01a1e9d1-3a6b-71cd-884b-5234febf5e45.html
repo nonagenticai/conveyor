@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Architecture skills assessment · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>Architecture skills assessment</h1>
+<p><strong>Programme:</strong> conveyor buildout · <strong>Status:</strong> proposed for P0 acceptance (drafted 2026-11-17) · <strong>Date:</strong> 2026-11-17 · <strong>Owner:</strong> the
+programme architect · <strong>Reviewer:</strong> the Architecture Board (charter proposed in PF-1; rows are T9's)
+· <strong>Artefact:</strong> SA-1, <code>architecture_skill_assessment</code>, Preliminary baseline.</p>
+<h2>Categories</h2>
+<p>The seven Architecture Skills Framework categories:</p>
+<ol>
+<li><strong>General</strong> — communication, leadership, teamwork, decision-making.</li>
+<li><strong>Business skills and methods</strong> — strategy, benefits, operating models, process.</li>
+<li><strong>Architecture skills</strong> — the ADM, modelling, artefact production, architecture governance.</li>
+<li><strong>Programme and project management</strong> — planning, tranches, risk, quality, delivery control.</li>
+<li><strong>General IT knowledge</strong> — systems, data, networking, operations, security fundamentals.</li>
+<li><strong>Technical IT skills</strong> — software engineering, languages, databases, platforms, testing.</li>
+<li><strong>Legal environment</strong> — licensing, contracts, data protection, procurement.</li>
+</ol>
+<p>Proficiency: <strong>none</strong>, <strong>aware</strong>, <strong>practitioner</strong>, <strong>expert</strong>. A rating names its evidence; an
+unstaffed role is <strong>none</strong> and is a gap, not a zero score to be argued away.</p>
+<h2>Proficiency by role</h2>
+<table><thead><tr><th>Role</th><th>General</th><th>Business</th><th>Architecture</th><th>PgM</th><th>General IT</th><th>Technical IT</th><th>Legal</th></tr></thead><tbody>
+<tr><td>Sponsor / owner</td><td>expert</td><td>expert</td><td>practitioner</td><td>practitioner</td><td>practitioner</td><td>aware</td><td>aware</td></tr>
+<tr><td>Programme architect (position; held by the maintainer sessions under the owner's authority)</td><td>practitioner</td><td>aware</td><td>expert</td><td>aware</td><td>expert</td><td>expert</td><td>aware</td></tr>
+<tr><td>Programme manager (position; unstaffed)</td><td>—</td><td>aware</td><td>—</td><td>practitioner</td><td>—</td><td>—</td><td>—</td></tr>
+<tr><td>PM (position; T3 unbuilt)</td><td>—</td><td>aware</td><td>—</td><td>aware</td><td>—</td><td>—</td><td>—</td></tr>
+<tr><td>Maintainer sessions (AI)</td><td>practitioner</td><td>aware</td><td>practitioner</td><td>aware</td><td>expert</td><td>expert</td><td>none</td></tr>
+<tr><td>Outside contributor</td><td>aware</td><td>aware</td><td>aware</td><td>—</td><td>practitioner</td><td>practitioner</td><td>aware</td></tr>
+<tr><td>Business change manager (unstaffed)</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+<tr><td>Architecture Board (not convened)</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+</tbody></table>
+<p>Evidence notes:</p>
+<ul>
+<li><strong>Sponsor/owner</strong> — the ADRs, the owner rulings and the public programme record are the evidence
+for strategy/decision-making; the business case and the licensing frame for business and legal
+awareness. The legal rating is awareness with advice, not authority.</li>
+<li><strong>Programme architect / maintainer sessions</strong> — the evidence is the code and its tests: the
+registry, the migrations, the document aggregate, the published output set, the design-pack gates
+and the CI. The sessions are not a legal authority and do not approve their own work (P4): the
+admin publish decision is the owner's.</li>
+<li><strong>Programme manager / PM</strong> — the catalogue positions exist and are not bound to a running project;
+their architecture and technical ratings are not assessed because no holder is bound. The PM job
+is T3's.</li>
+<li><strong>BCM and Board</strong> — unstaffed and not convened. The benefit profiles name the BCM as their owner
+while the position is unstaffed; that is a governance gap, recorded here and kata'd, not hidden.</li>
+</ul>
+<h2>Baseline</h2>
+<ul>
+<li><strong>Dated:</strong> 2026-11-17, at <code>main@4ac0ede</code> plus the #245 branch head.</li>
+<li><strong>Scope:</strong> the roles the programme actually uses; a role with no holder is listed and rated none.</li>
+<li><strong>Method:</strong> a review judgement against evidence a reviewer can open (ADRs, code, tests, the
+published record); not an external assessment and not a certification.</li>
+<li><strong>Reading:</strong> the capability has a strong technical and architecture core in the maintainer
+sessions and the owner, and a thin programme-governance layer: the BCM, PMO lead, quality manager
+and the PM job are not staffed. The thin layer is why the maturity assessment scores governance
+low (MA-1).</li>
+</ul>
+<h2>Development milestones</h2>
+<table><thead><tr><th>Milestone</th><th>Target</th><th>Evidence that closes it</th></tr></thead><tbody>
+<tr><td>S1 — staff the BCM</td><td>next tranche</td><td>a named BCM position bound to the programme; the benefit profiles re-attributed from the interim owner</td></tr>
+<tr><td>S2 — staff the PMO lead and quality manager</td><td>next tranche</td><td>both positions bound; a quality review with a recorded finding</td></tr>
+<tr><td>S3 — the PM job</td><td>T3</td><td><code>pm</code> job released and bound; a project delivered through it</td></tr>
+<tr><td>S4 — the Board</td><td>after T9's rows</td><td>the board convened with its charter; one recorded decision</td></tr>
+<tr><td>S5 — skills are measured, not asserted</td><td>end of the second tranche</td><td>the assessment reads released job requirements and their bindings instead of a review judgement; each rating cites a row</td></tr>
+<tr><td>S6 — the sessions' evidence is auditable</td><td>continuous</td><td>every maintainer contribution has a run/test record and an owner's approval; the sessions never approve their own work</td></tr>
+</tbody></table>
+<p><strong>Gap recorded as a kata.</strong> There is no skills instrument: the ratings are a review judgement, and
+the role catalogue is not yet in a release that names required proficiency. The missing measurement
+— a skills assessment action with dated rows over the seven categories and the released roles — is a
+system issue, recorded as a kata candidate on the kata project. Until it exists, SA-1 is a dated
+review with named evidence, and the gaps are listed rather than scored away.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Programme definition — vision, blueprint, plan and project briefs · conveyor output · published 2026-11-20T11:50:50.848127361+00:00 · FR Test</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

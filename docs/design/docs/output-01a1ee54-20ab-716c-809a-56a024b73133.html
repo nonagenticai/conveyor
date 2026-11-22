@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>T8 Organisational memory — architecture design · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>T8 — Architecture design</h1>
+<p>Project: T8 — Organisational memory · Track: v2 · Tranche: 11 · Plan: docs/SPEC_V2.md §12
+Unit: #79 (this document is dependency-shaping work; blocked-by T5 and P0)
+Measured at: main@61edfcf8, 2026-11-18 · Project row: active, meta.depends_on = ["T5", "P0"]</p>
+<h2>Context and boundary</h2>
+<p>T8 owns the lesson lifecycle — proposal, counted evidence refs, a person's review, promotion to a knowledge <strong>source draft</strong> — implementing §7.6 and D36, supplying the §7.5 <code>lesson</code> rows.</p>
+<p>Must not duplicate:</p>
+<ul>
+<li><strong>work-package memory</strong> — S15's hot rows and digest; corroboration only, never doctrine.</li>
+<li><strong>retrieval</strong> — <code>strata_rag</code> owns bytes and the source; T8 owns proposal and review.</li>
+<li><strong>pack publication and pins</strong> — the estate release path and <code>capabilities.bind_knowledge</code>; T8 has no publish action.</li>
+<li><strong>T5, T7, T10</strong> — measurement, postmortems and retros produce lessons via <code>lessons.propose</code>, not the lifecycle; <strong>T11</strong> reads the rate.</li>
+</ul>
+<p>Fit: one Postgres, one registry, no port (8930); generation may draft a body (§7.4) but cannot transition one (P2).</p>
+<h2>Aggregates, tables and actions</h2>
+<p>Aggregate: <strong>lesson</strong> — statement, scope, evidence, reviews, one promotion.</p>
+<table><thead><tr><th>Existing table</th><th>Role</th></tr></thead><tbody>
+<tr><td><code>migrations/0002_domain.sql:trace_link</code></td><td>typed edges; gains <code>evidences</code> <code>(to extend)</code>, D-T8-2</td></tr>
+<tr><td><code>migrations/0020_capability.sql:work_package_memory</code>, <code>migrations/0020_capability.sql:capability_knowledge</code></td><td>corroboration; a pin read-only, never written</td></tr>
+<tr><td><code>migrations/0002_domain.sql:card</code>, <code>run</code>; <code>migrations/0026_s19_eval.sql:eval_run</code>; <code>migrations/0025_s17_benchmark.sql:benchmark_run</code></td><td>resolve a ref and its root</td></tr>
+</tbody></table>
+<p>New (tenant-RLS):</p>
+<table><thead><tr><th>Table (to create)</th><th>Invariants</th><th>Trace</th></tr></thead><tbody>
+<tr><td><code>lesson</code></td><td><code>title</code>/<code>statement</code> non-blank; <code>scope_kind</code> ∈ organisation|department|project|capability, <code>scope_id</code> NULL only for organisation; <code>status</code> moved only by <code>lessons.*</code>; promotion fields non-NULL exactly when promoted</td><td>§12 T8, §10.3, D36, D-T8-1/4</td></tr>
+<tr><td><code>lesson_review</code></td><td>append-only; <code>verdict</code> ∈ approve|reject; reviewer human, ≠ <code>proposed_by</code>; approve requires <code>independent_count &gt;= 2</code>; <code>evidence_hash</code> names the set; unique <code>(lesson_id, evidence_hash)</code></td><td>§7.6, D36, D-T8-3</td></tr>
+</tbody></table>
+<p>Invariants:</p>
+<ol>
+<li><strong>Roots, not rows.</strong> A ref's root is its card, run, incident, eval run or benchmark run (§7.6: independent refs are different cards, runs or incidents); roots count once; propose and review refuse fewer than two.</li>
+<li><strong>A review names its evidence.</strong> A ref added after approval voids it and returns the lesson to <code>proposed</code>; the review is kept.</li>
+<li><strong>Unresolvable is refused.</strong> An unreadable owner (incident before T7) is a 422, never trusted (P8).</li>
+<li><strong>Promotion is terminal, unique and inert.</strong> An approving review on the current hash is required; a second promote is 409; no pack, pin or binding is written.</li>
+</ol>
+<p>Existing (resolve in <code>docs/design/data/actions.json</code>): <code>memory.remember</code>, <code>memory.recall</code>, <code>knowledge.query</code>, <code>capabilities.bind_knowledge</code>.</p>
+<p>Proposed <code>(to create)</code>: <code>lessons.propose</code>, <code>lessons.review</code>, <code>lessons.promote</code> (§10.4); <code>lessons.evidence.add</code>, <code>lessons.list</code>, <code>lessons.get</code> (D-T8-6).</p>
+<p>Events <code>(to create)</code>, §12 T8: <code>lesson.proposed</code>, <code>lesson.evidenced</code>, <code>lesson.reviewed</code>, <code>lesson.promoted</code>; a rejection is <code>lesson.reviewed</code> verdict <code>reject</code>.</p>
+<h2>Decisions</h2>
+<ul>
+<li><strong>D-T8-1 — the lesson is its own aggregate.</strong> Alternative: a memory kind. Consequence: 0020 untouched; a lesson outlives its rows and carries review.</li>
+<li><strong>D-T8-2 — evidence refs are <code>trace_link</code> edges; independence is over roots.</strong> Alternative: <code>lesson_evidence</code>. Consequence: one graph; a card plus its only run is one ref.</li>
+<li><strong>D-T8-3 — review is a typed <code>lesson_review</code>.</strong> Alternative: <code>approvals.*</code>. Consequence: the Improve screen serves it, not the inbox.</li>
+<li><strong>D-T8-4 — promotion creates a source draft only.</strong> Alternative: publish a pack. Consequence: doctrine reaches a run only via the estate release path, never T8.</li>
+<li><strong>D-T8-5 — promotion is recorded on the lesson row.</strong> Alternative: a pending/committed table. Consequence: no state unobservable across a call; retries rely on the stable <code>lesson: &lt;id&gt;</code> body and documented dedupe.</li>
+<li><strong>D-T8-6 — the family grows by three actions.</strong> Alternative: UI reads and re-proposing for evidence. Consequence: the family gains six actions beyond the two #79 names (<code>lessons.propose</code>, <code>lessons.review</code>); all are recorded in this design and added to <code>actions.json</code> by #79.</li>
+<li><strong>D-T8-7 — ref kinds are closed and resolved.</strong> Alternative: free text. Consequence: incident and postmortem refs wait, absent, until T7.</li>
+</ul>
+<h2>Acceptance</h2>
+<p>Gate, verbatim from <code>docs/SPEC_V2.md</code> §12 T8: <strong>“a lesson with one evidence ref is refused; two independent refs + review promotes a source draft; a bad run never becomes doctrine”.</strong></p>
+<ol>
+<li><strong>One ref is refused.</strong> Verify: <code>git grep -n '"lessons\.' origin/main -- docs/design/data/actions.json</code> is empty today; <code>crates/store/tests/lesson.rs::the_database_refuses_a_lesson_with_one_independent_ref</code> (to create at #79) and <code>crates/actions/tests/lessons.rs</code> (to create at #79) — one card ref returns 422 <code>lesson_evidence_insufficient</code>, no lesson.</li>
+<li><strong>Two independent refs and a review promote a source draft.</strong> Verify: <code>(to create at crates/actions/tests/lessons.rs)</code> — card plus independent run, approve, promote; a <code>governed_asset</code> row of kind <code>lesson</code> is created in <code>draft</code> (the #79 default), <code>source_ref</code> and <code>source_sha256</code> set, strata called once, no pin written (<code>crates/store/src/capability.rs:bind_knowledge_tx</code> is the only writer).</li>
+<li><strong>A bad run never becomes doctrine.</strong> Verify: <code>(to create at crates/actions/tests/lessons.rs)</code> — a card plus its only run, and two runs of one card, are refused as one root; a promoted lesson leaves no pin, so <code>crates/actions/src/capability/readiness.rs:capability_readiness_tx</code> cannot expose it to a run.</li>
+<li><strong>Regression.</strong> Verify: <code>cargo test -p conveyor-domain memory</code> and <code>cargo test -p conveyor-actions --test registry</code> after the action count changes. The build unit records it; this document claims neither.</li>
+<li><strong>The proposer cannot review.</strong> Verify: <code>crates/actions/tests/lessons.rs::the_proposer_cannot_review_its_own_lesson</code> (to create at #79) — a self-review refuses <code>403 lesson_self_review</code>.</li>
+<li><strong>Promotion writes no inference call.</strong> Verify: <code>crates/actions/tests/lessons.rs::promotion_writes_no_inference_call_or_embedding</code> (to create at #79) — no <code>inference_call</code> and no embedding row; the estate does retrieval and embedding.</li>
+<li><strong>A rejection stands.</strong> Verify: <code>crates/actions/tests/lessons.rs::a_rejected_lesson_stays_rejected</code> (to create at #79) — a rejected lesson cannot be promoted without a new proposal.</li>
+</ol>
+<h2>Architecture artefacts</h2>
+<h3>The PSA set at inception</h3>
+<ul>
+<li><strong>Principles applied (SPEC_V2 §3).</strong> P1 — one record per fact: lesson in conveyor, source in strata, refs in <code>trace_link</code>. P3 — status moves only through <code>lessons.*</code>; P2 — generation cannot transition a state. P3 also requires the counted refs and the review. P4 — the reviewer is a person, never the proposer. P5 — the review cites evidence and T11 measures adoption. P8 — an unresolvable ref or unconfigured strata refuses. P10 — two tables, each written by a named action and read by a named gate. P11 — the two-ref floor is the D36 invariant, not tunable; a tenant may raise it, never lower it.</li>
+<li><strong>Requirements.</strong> §7.6 lesson promotion; §9.4 the loop ends in a lesson; §10.3 <code>lesson</code>; §10.4 <code>lessons.*</code>; §12 T8; D36; P0 §5.</li>
+<li><strong>Stakeholder map (stakeholder × concern).</strong> Every cell is populated; <code>—</code> is an explicit absence.</li>
+</ul>
+<table><thead><tr><th>Stakeholder</th><th>Evidence integrity</th><th>Review authority</th><th>Promotion target</th><th>Metric</th></tr></thead><tbody>
+<tr><td>Proposer (PM, coach, kata)</td><td>two resolvable refs; a memory row is not a ref</td><td>may not review own proposal</td><td>names the scope to change</td><td>sees the refusal reason</td></tr>
+<tr><td>Reviewer (authority matrix, §6.7)</td><td>judges the hash shown</td><td>sole human approve/reject</td><td>confirms scope</td><td>count on the review row</td></tr>
+<tr><td>Knowledge/pack owner</td><td>refs must resolve</td><td>may review in-scope lessons</td><td>owns the publishing release</td><td>pack hit rate separate</td></tr>
+<tr><td>Tenant administrator</td><td>may raise, never lower, the floor</td><td>assigns the reviewer role</td><td>tenant or platform pack (open)</td><td>promotion rate per tenant</td></tr>
+<tr><td>T11 metrics owner</td><td>reads rows only</td><td>—</td><td>—</td><td>computes promotion rate</td></tr>
+</tbody></table>
+<ul>
+<li><strong>Driver, goal, objective.</strong> Driver: a lesson dies at a memory row; doctrine changes by opinion. Goal: every promoted source has two independent refs and a human review. Objective: one tenant shows a refused one-ref lesson, a promoted two-ref lesson, unchanged pins.</li>
+<li><strong>Solution concept.</strong> Two tables, one edge kind, six actions; the strata client ingests; no new runtime, port or store.</li>
+</ul>
+<h3>Typed artefact</h3>
+<p><strong>T8 Lesson-lifecycle matrix</strong> — a typed <strong>matrix</strong>: axis A lifecycle state, axis B control; each cell names action, precondition or refusal, rows/event.</p>
+<table><thead><tr><th>State \ Control</th><th>Writing action</th><th>Precondition or refusal</th><th>Rows and event</th></tr></thead><tbody>
+<tr><td>Proposed</td><td><code>lessons.propose</code> / <code>lessons.evidence.add</code> <code>(to create)</code></td><td>≥2 independent roots; add refused when rejected or promoted</td><td><code>lesson</code>, <code>trace_link(evidences)</code>, <code>lesson.proposed</code>/<code>lesson.evidenced</code></td></tr>
+<tr><td>Approved</td><td><code>lessons.review</code> approve <code>(to create)</code></td><td>human reviewer ≠ proposer; count ≥2; current hash</td><td><code>lesson_review</code>, <code>lesson.status</code>, <code>lesson.reviewed</code></td></tr>
+<tr><td>Rejected</td><td><code>lessons.review</code> reject <code>(to create)</code></td><td>human reviewer; any evidence set</td><td><code>lesson_review</code>, terminal status, <code>lesson.reviewed</code></td></tr>
+<tr><td>Promoted</td><td><code>lessons.promote</code> <code>(to create)</code></td><td>approving review on the same hash; not promoted</td><td>promotion fields, strata source, <code>lesson.promoted</code></td></tr>
+<tr><td>Evidence after approval</td><td><code>lessons.evidence.add</code> <code>(to create)</code></td><td>approval hash no longer matches</td><td>back to proposed, review kept, <code>lesson.evidenced</code></td></tr>
+</tbody></table>
+<ul>
+<li><strong>Type / phase / plateau:</strong> matrix; phase A; plateau <code>psa</code>.</li>
+<li><strong>Owner:</strong> T8 build unit (#79). <strong>Reviewer:</strong> this review, recorded on #347.</li>
+<li><strong>Review date:</strong> 2026-11-18. <strong>Version:</strong> 1. <strong>Status:</strong> draft — a design artefact, not evidence.</li>
+<li><strong>Purpose:</strong> prove each transition has one action, precondition and event. <strong>Stakeholders:</strong> proposers, reviewers, pack owners, T11. <strong>Scope:</strong> lesson lifecycle; excludes memory, retrieval, pack release.</li>
+<li><strong>Project:</strong> T8 (#79). <strong>Published document:</strong> this architecture design, to be published on #79.</li>
+<li><strong>Links:</strong> derivation → <code>docs/SPEC_V2.md</code> §7.6, §12 T8; realization → D36, D-T8-1…7; reuse → <code>trace_link</code>, <code>crates/actions/src/integrations/strata.rs:Strata</code>, <code>docs/design/data/actions.json</code>.</li>
+</ul>
+<h2>Migration and rollout</h2>
+<ul>
+<li>One lane, one PR. The migration takes the next free number after <code>migrations/0051_tranche_review.sql</code>.</li>
+<li>Order: extend <code>trace_link.kind</code>; create <code>lesson</code> and <code>lesson_review</code> with RLS; store and action specs; the resolver; promotion around <code>Strata::ingest_document</code>; the Improve panel; the T11 handoff.</li>
+<li>Blocked-by T5: the gate proof needs a measured kata outcome as one ref; until then card, run, eval and benchmark refs carry it. Incident refs are refused, not simulated, until T7.</li>
+<li>Rollback: actions retire; rows are kept; no pin was written, so no run depends on T8 data. The live proof is the gate recorded on the project; this document proves nothing.</li>
+</ul>
+<h2>Links</h2>
+<ul>
+<li>Brief: https://conveyor.nonagentic.ai/design/docs/output-01a1e008-9a09-76c1-a454-3d69989cc86d.html</li>
+<li>Issue: #79. Reviewer record: #347.</li>
+<li>Spec: <code>docs/SPEC_V2.md</code> §7.6, §9.4, §10.3, §10.4, §12 T8; principles §3; D36.</li>
+<li>Inception standard: <code>docs/plans/P0-programme-definition.md</code> §5.</li>
+<li>Artefact standard: the project's published <code>artifact-standard</code> document (§8.1).</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Organisational memory · conveyor output · published 2026-11-20T11:50:50.848127361+00:00 · FR Test</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>
