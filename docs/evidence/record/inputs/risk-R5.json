@@ -1,0 +1,1 @@
+{"programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac", "kind": "risk", "code": "R5", "title": "Shared binary/target race", "probability": "M", "impact": 3, "owner_job_id": "01a1db6b-4f0f-7b77-ab6f-5b49038bef37", "links": [{"kind": "relates_to", "target": "benefit/B3"}], "review_at": "2026-11-29", "severity": "medium", "status": "open"}

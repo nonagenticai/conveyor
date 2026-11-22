@@ -332,16 +332,23 @@ async fn an_approved_plan_materialises_exactly_once() {
     assert_eq!(approver, reviewer);
 }
 
-/// A published P0 decision document: the owner's standing delegation (R1) for a rule decision.
-async fn published_delegation(pg: &support::Pg, seeded: &support::Seeded) -> Uuid {
-    let p0: Uuid = sqlx::query_scalar(
+/// A published decision document under a governance project: the owner's standing delegation (R1).
+async fn published_delegation_in(
+    pg: &support::Pg,
+    seeded: &support::Seeded,
+    key: &str,
+    name: &str,
+) -> Uuid {
+    let project: Uuid = sqlx::query_scalar(
         "INSERT INTO project (tenant_id, key, name)
-         VALUES ($1, 'P0', 'Programme definition') RETURNING id",
+         VALUES ($1, $2, $3) RETURNING id",
     )
     .bind(seeded.tenant_id)
+    .bind(key)
+    .bind(name)
     .fetch_one(&pg.super_pool)
     .await
-    .expect("insert P0");
+    .expect("insert the governance project");
     sqlx::query_scalar(
         "INSERT INTO document
              (tenant_id, project_id, title, kind, status, category, publishable,
@@ -351,11 +358,15 @@ async fn published_delegation(pg: &support::Pg, seeded: &support::Seeded) -> Uui
          RETURNING id",
     )
     .bind(seeded.tenant_id)
-    .bind(p0)
+    .bind(project)
     .bind(seeded.user_id)
     .fetch_one(&pg.super_pool)
     .await
     .expect("insert the published delegation")
+}
+
+async fn published_delegation(pg: &support::Pg, seeded: &support::Seeded) -> Uuid {
+    published_delegation_in(pg, seeded, "P0", "Programme definition").await
 }
 
 async fn decide_plan_delegated(
@@ -426,6 +437,47 @@ async fn a_delegated_rule_decision_approves_the_plan() {
 
     let first = materialise(&pg, &f).await.expect("the plan materialises");
     assert_eq!(first.cards.len(), 2, "one draft per backlog row");
+}
+
+/// The live standing delegation is owned by PLATFORM, not P0. The owner's published decision
+/// must be accepted wherever the governance record lives, or the delegated PI gate cannot be
+/// exercised at all.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_platform_owned_delegation_approves_the_plan() {
+    let (pg, seeded, f) = tenant_fixture().await;
+    let approval = request_approval(&pg, &seeded, &f).await;
+    let delegation =
+        published_delegation_in(&pg, &seeded, "PLATFORM", "CI, runners and platform").await;
+    let reviewer = support::reviewer_id(&pg).await;
+
+    let outcome = decide_plan_delegated(
+        &pg,
+        &f,
+        reviewer,
+        "agent",
+        Authority::Role,
+        "approve",
+        delegation,
+    )
+    .await
+    .expect("the PLATFORM-owned delegation approves the plan");
+    assert_eq!(outcome.status, 200, "{}", outcome.body);
+    assert_eq!(outcome.body["output"]["status"], json!("approved"));
+
+    let (kind, via): (String, Value) = sqlx::query_as(
+        "SELECT decided_by_kind, via FROM approval_decision
+          WHERE approval_id = $1 AND decision = 'approve'",
+    )
+    .bind(approval)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("read the delegated decision");
+    assert_eq!(kind, "rule", "the audit says a rule acted");
+    assert_eq!(
+        via["delegation_ref"],
+        json!(delegation.to_string()),
+        "the rule cites the PLATFORM-owned decision document"
+    );
 }
 
 /// A rule cannot manufacture a delegation: an unpublished document, a non-decision category and

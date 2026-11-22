@@ -1,0 +1,21 @@
+{
+  "actual_value": 1.0,
+  "benefit_id": "01a1e9df-1e42-7199-87e1-23c577c62f8e",
+  "evidence": {
+    "detail": {
+      "gate": "T0 manifest",
+      "stores": 1
+    },
+    "instrument": "the ownership matrix's one home",
+    "reference": "B5",
+    "value": 1.0
+  },
+  "id": "01a204d3-889c-7ff9-ae88-fe754d3a0e40",
+  "kind": "baseline",
+  "measured_at": "2026-11-22T20:00:00Z",
+  "method": "the ownership matrix's one home",
+  "programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac",
+  "target_value": null,
+  "tranche_id": null,
+  "unit": "model stores"
+}

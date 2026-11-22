@@ -378,11 +378,15 @@ pub(crate) async fn assert_delegation_ref(
                 "the delegation output's owning project no longer exists",
             )
         })?;
-    if project.key != "P0" {
+    // The standing delegation is a programme-governance output. P0 is the programme definition
+    // project and PLATFORM is the platform record project; the live delegation
+    // (01a2021d-cca2-757c-bfc2-21bd4e4b6d85) is owned by PLATFORM. Accepting only P0 refused the
+    // owner's own published delegation.
+    if project.key != "P0" && project.key != "PLATFORM" {
         return Err(ActionError::new(
             409,
             "delegation_wrong_project",
-            "the delegation output is not owned by P0",
+            "the delegation output is not owned by P0 or PLATFORM",
         ));
     }
     Ok(())
