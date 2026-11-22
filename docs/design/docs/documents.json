@@ -677,6 +677,15 @@
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/tranche-1/acts.md"
     },
     {
+      "title": "T2 — the superseding delivery contract and its Phase-G re-review",
+      "path": "docs/evidence/rework/tranche-2/T2-recontract.html",
+      "source": "docs/evidence/rework/tranche-2/T2-recontract.md",
+      "section": "Evidence",
+      "sha256": "afab38bbfac1680bd43f7842ac574baaa3b08610e0e2356273551dad747e7807",
+      "bytes": 3871,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/tranche-2/T2-recontract.md"
+    },
+    {
       "title": "Tranche 2 / PI 2 — the rework record (2026-11-21)",
       "path": "docs/evidence/rework/tranche-2/acts.html",
       "source": "docs/evidence/rework/tranche-2/acts.md",
