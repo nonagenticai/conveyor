@@ -1448,6 +1448,84 @@ async fn baseline(running: &support::Running, project: &str) {
     approve(running, &text(output(&body), "approval_id")).await;
 }
 
+/// v1-close-1: the mandatory set a `v2` programme project owes — its `v2-built` class
+/// (`project-brief`, `evidence`, `closure-review`), PMP's WBS/registers, TOGAF's artefact pages
+/// (a programme project is governed), plus the `change` register row; the baseline is written
+/// by [`baseline`].
+async fn satisfy_mandatory_set(
+    pg: &support::Pg,
+    running: &support::Running,
+    seeded: &support::Seeded,
+    project: &str,
+) {
+    const DOCUMENTS: [&str; 7] = [
+        "project-brief",
+        "evidence",
+        "closure-review",
+        "project-wbs",
+        "project-registers",
+        "architecture-artifact",
+        "statement-of-architecture-work",
+    ];
+    for category in DOCUMENTS {
+        let body = conveyor_domain::output_standard::template(category)
+            .map(|template| template.skeleton)
+            .unwrap_or_else(|| format!("# {category}\n\nWritten by the close gate test.\n"));
+        let (status, body) = running
+            .invoke(
+                "documents.compose",
+                TOKEN,
+                json!({
+                    "title": format!("{category} of {project}"),
+                    "project_id": project,
+                    "body": body,
+                    "category": category,
+                }),
+                None,
+                None,
+                None,
+            )
+            .await;
+        assert_eq!(status, 201, "{body}");
+        let document = text(output(&body), "id");
+        let version = output(&body)["version"].as_i64().expect("a version");
+        let (status, body) = running
+            .invoke(
+                "documents.publish",
+                TOKEN,
+                json!({"id": document, "publish": true}),
+                Some(&format!("\"{version}\"")),
+                None,
+                None,
+            )
+            .await;
+        assert_eq!(status, 200, "{body}");
+    }
+    let project_id: Uuid = project.parse().expect("the project uuid");
+    let baseline: Uuid = sqlx::query_scalar(
+        "SELECT id FROM project_baseline
+          WHERE tenant_id = $1 AND project_id = $2 AND kind = 'scope'
+          ORDER BY taken_at DESC, id DESC LIMIT 1",
+    )
+    .bind(seeded.tenant_id)
+    .bind(project_id)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("the project's scope baseline");
+    sqlx::query(
+        "INSERT INTO project_register_item
+            (tenant_id, project_id, kind, code, title, body, baseline_ref, meta)
+         VALUES ($1, $2, 'change', 'CHG-1', 'An approved change', 'A change to the baseline.',
+                 $3, '{\"impact\": {\"scope\": \"the accepted scope widens\"}}'::jsonb)",
+    )
+    .bind(seeded.tenant_id)
+    .bind(project_id)
+    .bind(baseline)
+    .execute(&pg.super_pool)
+    .await
+    .expect("insert the change register row");
+}
+
 async fn board(pg: &support::Pg, tenant: Uuid) -> Uuid {
     sqlx::query_scalar(
         "INSERT INTO governance_body (tenant_id, kind, key, name)
@@ -1631,6 +1709,7 @@ async fn a_compliant_project_closes_in_a_resumed_tranche() {
     baseline(&running, &project).await;
     let contract_id = contract(&pg, &running, &seeded, &project, &delegation).await;
     let _review = review(&running, &project, &contract_id, &delegation).await;
+    satisfy_mandatory_set(&pg, &running, &seeded, &project).await;
     let gate = close_request(&running, &project, &delegation).await;
     approve(&running, &gate).await;
 
