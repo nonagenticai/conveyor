@@ -1,7 +1,7 @@
 {
   "version": 1,
   "operations": {
-    "GET /api/actions": "6e0c3ae3ae12f024ceeb80079f433fc578269acf5a93d8e5edd7a2aac64c8cc7",
+    "GET /api/actions": "38126d398b3a64e0ef9e9cf9a7eaaf769f39a356d56aed3be93c1fc90bd0c0ef",
     "GET /api/boards/{id}": "e1a5ad504ea61c9f6f4c9940f6bce0a13a06587c4545d9d52616852f0e67fa5b",
     "GET /api/boards/{id}/cards": "be3ca9f8fea011aa8b097206310d24ba4641698d2a8d239c5b2df6c48b784502",
     "GET /api/boards/{id}/webhooks": "5b77b802ff044156108b56072acb99bed0e2f9dfb5f2dc667b000af191cffd1b",
@@ -456,6 +456,11 @@
     "POST /api/actions/runs.start/invocations": "e48fe866075e43438256212ded2c1ce7a46d87106c82ae7ae5b17cc1a25453ed",
     "POST /api/actions/schedules.list/invocations": "870affccb92434adc318415aa1d2727c4294cd97893191220474b1b9739ff760",
     "POST /api/actions/schedules.upsert/invocations": "3aa028ec5e2aac52cf65b1adab43822d483f37e4ef48ab0ef0f3917885ea7575",
+    "POST /api/actions/scientific_formal.translate/invocations": "4cc6f8229690a0c1d045cb68753fb62d3251661008d98eafa88919121a96188a",
+    "POST /api/actions/scientific_formal.verify/invocations": "edea585302775d27ff3d09e9dcf62193d5ef1a8688416253b49af502f1776b41",
+    "POST /api/actions/scientific_stats.confidence_interval/invocations": "cd406ba460e3c089032326b4b41a25c5a5a48279209e8e89c7150f78a81a871f",
+    "POST /api/actions/scientific_stats.meta_analysis/invocations": "d6deb1cb3b4b970f79ec179b248633600c8ab4a10f62102d6db9792252076873",
+    "POST /api/actions/scientific_stats.trend/invocations": "c07c193369088ff7d59cc13fe1e4dd0086200db8faf1be0ee12c2d1e8fafd5c9",
     "POST /api/actions/search.query/invocations": "a260797b8d19ea75111045450da6ff1ab0788f093dcf81dbbce4973d751e127c",
     "POST /api/actions/secrets.create/invocations": "6f8d20cd67308c5993beb252c37efad71c9e40225e05dbefd88ab7d0a72dd187",
     "POST /api/actions/secrets.delete/invocations": "00ab45c6134e701d93dd19e9fecc82d21194f4f5c8a28d8dfb9b6c6742ce9d5d",
