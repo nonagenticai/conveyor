@@ -5492,6 +5492,30 @@
       "failure_scenario": "A run-scoped question opens with `requires_answer`: the web inbox and Telegram offer it as approve/reject with no answer form, MCP offers an approved/rejected enum carrying no delegation, and the approvals screen has no note input because the flag is absent from the view. An approver answers in prose; the decision either records no note (refused 422 `note/missing`, unactionable from that surface) or records the decision without the delegation ref, so the answer and its authority never reach the record.",
       "acceptance": "A run-scoped free-text question is offered to web, Telegram and MCP; the first decision resolves it; a second decision on any surface is refused 409; the MCP answer records exactly one decision as `rule` with the delegation ref and the note; no surface claims a human. An explicitly quorumed gate (required_decisions > 1) keeps its opt-in dual-control semantics; only the default quorum-1 gate resolves on the first response.",
       "owner_project": "S06"
+    },
+    {
+      "id": "v1-recorder-1",
+      "area": "rework recorder / delegated decisions",
+      "standard": "SPEC",
+      "spec": "§5.4",
+      "severity": "P1",
+      "title": "The rework recorder decides gates as service, not under the delegation",
+      "problem": "`rework-project.py`'s `decide()` sent `approvals.decide` without `delegation_ref`, so every charter, baseline and closure gate the recorder approved was recorded `decided_by_kind='service'` — the machine approving its own record. The deployed engine cannot express the delegation at all (it predates the lane and silently drops the field), and a run through it therefore always decides as service.",
+      "evidence": [
+        {
+          "path": "scripts/rework-project.py",
+          "line": 772,
+          "quote": "    def decision_payload(self, approval_id: str, note: str) -> dict:"
+        }
+      ],
+      "failure_scenario": "A recorder run opens and approves a charter, baseline or closure gate; the decision row names `service` as the kind, the manifest passes because its check only needs an approver distinct from the requester, and the record claims the system signed its own governance instead of the assistant's rule decision under the owner's published delegation.",
+      "acceptance": "Every gate the recorder decides records `decided_by_kind='rule'` with `via.delegation_ref` equal to the published delegation, the recorder's self-test proves the decision payload carries the reference, and a recorder run uses the branch binary (`PROGRAMME_RECORD_LOCAL_BIN`) for decisions because the deployed image cannot record one.",
+      "owner_project": "PLATFORM",
+      "resolved_by": {
+        "commit": "498eb87434e8589e66f920a39157d7b6d9d144ab",
+        "test": "scripts/rework-project.py",
+        "evidence": "`decision_payload()` now carries `delegation_ref` on every approvals.decide the recorder makes; `rework-project --self-test` refuses a payload without it. Live audit at 2026-11-22 before the fix: charter rule 1/service 12, baseline 1/12, closure 2/14. Recorder runs for the T4/T9/T10/T13 batches set PROGRAMME_RECORD_LOCAL_BIN to the lane binary, which records rule/via.delegation_ref (proved on documents.delete gate 01a2025a)."
+      }
     }
   ]
 }
