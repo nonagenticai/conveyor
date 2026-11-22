@@ -123,8 +123,8 @@
       "path": "docs/decisions/0009-prompt-selection-and-recipe-authoring.html",
       "source": "docs/decisions/0009-prompt-selection-and-recipe-authoring.md",
       "section": "Decisions",
-      "sha256": "0e7302eba1198b4995691345f42e9337f8e6d9ce5a9a8870c7c0eb9338a71804",
-      "bytes": 4180,
+      "sha256": "f9900bfe8e8870119e0e335fa7d51020459d91a548b0c2f43701794b9097a4c3",
+      "bytes": 4223,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0009-prompt-selection-and-recipe-authoring.md"
     },
     {
@@ -398,6 +398,15 @@
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S21-PLAN.md"
     },
     {
+      "title": "S21 step 3 — the work-package prompt envelope (issue #15)",
+      "path": "docs/evidence/S21-WORKPACKAGE.html",
+      "source": "docs/evidence/S21-WORKPACKAGE.md",
+      "section": "Evidence",
+      "sha256": "d7ce665d7ac7e8ce18f9ca8434a3324ef83061e1d0651fe6ecf16c26a3177cab",
+      "bytes": 5255,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S21-WORKPACKAGE.md"
+    },
+    {
       "title": "The analysis service — capture and drop table (2026-11-15)",
       "path": "docs/evidence/analysis-capture-2026-11-15.html",
       "source": "docs/evidence/analysis-capture-2026-11-15.md",
@@ -510,8 +519,8 @@
       "path": "docs/plans/00-INDEX.html",
       "source": "docs/plans/00-INDEX.md",
       "section": "Plans",
-      "sha256": "1d4f973c3dc582d2f3ae4c3652cd322770d5e3a59dfb4077cfec0801aba0ab84",
-      "bytes": 251475,
+      "sha256": "2e7254b22a497fd95206e1225b4d27f0be8f5f6c591ce6f30038a36a69f0e1c4",
+      "bytes": 251526,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/00-INDEX.md"
     },
     {
@@ -528,8 +537,8 @@
       "path": "docs/plans/02-DATA-ARCHITECTURE.html",
       "source": "docs/plans/02-DATA-ARCHITECTURE.md",
       "section": "Plans",
-      "sha256": "3d881fbac562162bc69b44e8266c7cf13a96524f363c9bd136cd05b39f4a2a17",
-      "bytes": 137540,
+      "sha256": "8488039bfa61ae75a115f71366b2c6de2ed9d5bbc694a5c0cff5565374f2988c",
+      "bytes": 137545,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/02-DATA-ARCHITECTURE.md"
     },
     {
@@ -1014,8 +1023,8 @@
       "path": "docs/plans/slices/S21-message-construction.html",
       "source": "docs/plans/slices/S21-message-construction.md",
       "section": "Plans",
-      "sha256": "91c75c17ffdadb854b0bd470008158086443b009ca2a1360c4ef2ad30bf5359b",
-      "bytes": 23913,
+      "sha256": "e13bc3154b3b92d70850d863ea91122a082d7084236666ecb5f96b1de1074d6e",
+      "bytes": 26301,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S21-message-construction.md"
     }
   ]

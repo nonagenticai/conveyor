@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>S21 step 3 — the work-package prompt envelope (issue #15) · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S21-WORKPACKAGE.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="s21-step-3--the-work-package-prompt-envelope-issue-15">S21 step 3 — the work-package prompt envelope (issue #15)</h1>
+<p>Date: 2026-11-22 · Branch: <code>issue/15-s21-workpackage-prompt</code> · Baseline: <code>origin/main@490ad555</code> Design: S21 §12 · ADR <code>docs/decisions/0009-prompt-selection-and-recipe-authoring.md</code>.</p>
+<p>The executor now compiles a work package's prompt from the run's process, capability/role, the card's memory, and the capability's pinned knowledge content; a tenant can author and activate the recipe that names those sources. The compiled text is still never stored, and laya still consumes its own typed judge document rather than this prompt.</p>
+<h2 id="what-landed">What landed</h2>
+<table>
+<thead>
+<tr>
+<th>Part</th>
+<th>Change</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>P1 recipe authoring</td>
+<td>Migration <code>0062_s21_prompt_selection.sql</code>: <code>draft</code> status, <code>uq_prompt_draft</code>, <code>prompt_section.selector</code>, <code>memory</code> source kind. Actions <code>prompt_recipes.create|get|list|activate|retire</code>; scopes <code>prompts:read</code> (open) / <code>prompts:write</code> (admin). Activation retires the current active version in one transaction; a race refuses with the unique active index.</td>
+</tr>
+<tr>
+<td>P2 memory selection</td>
+<td><code>PromptSource::Memory</code>; <code>MemorySelector {kinds, limit 1–32 default 8, include_digest}</code>; the card's newest un-consolidated hot rows first, then one digest only if room remains; rendered oldest-first as <code>[kind/source#id] body</code>; ids are in the hash. <code>agent@1</code> gains an optional memory section for new tenants.</td>
+</tr>
+<tr>
+<td>P3 knowledge content</td>
+<td><code>crates/actions/src/knowledge/retrieval.rs</code> splits target resolution (DB) from retrieval (network). <code>compile_for_run</code> resolves recipe/facts/memory/targets in one transaction, <strong>commits</strong>, retrieves through the same path <code>knowledge.query</code> uses, then compiles. No network call runs inside a compile transaction; no second retrieval implementation. <code>KnowledgeSelector {query, top_k 1–32 default 8}</code>; a missing query falls back to the card name + description.</td>
+</tr>
+<tr>
+<td>Laya</td>
+<td>Untouched. The judge's <code>{model, state, questions}</code> document and the decision ladder remain outside the compiler.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="measured-at-the-branch-head">Measured at the branch head</h2>
+<p>The shared Cargo target was contaminated by another worktree's build (a foreign <code>conveyor-domain</code> appeared in the diagnostics), so these were run in an isolated copy of this exact branch with a private target directory. The PR CI is the final gate and runs the same commands from a clean tree.</p>
+<table>
+<thead>
+<tr>
+<th>Scenario</th>
+<th>Command</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>P1 lifecycle + race + scope + audit</td>
+<td><code>cargo test -p conveyor-actions --test prompt_recipes</code></td>
+<td><strong>7/7</strong></td>
+</tr>
+<tr>
+<td>P2 rendering, selection identity, determinism, selector bounds</td>
+<td><code>cargo test -p conveyor-domain --test prompt_memory</code></td>
+<td><strong>5/5</strong></td>
+</tr>
+<tr>
+<td>P2 store selection (hot first, digest, kinds, bounds, consolidation)</td>
+<td><code>cargo test -p conveyor-store --test memory the_prompt_selection</code></td>
+<td><strong>1/1</strong></td>
+</tr>
+<tr>
+<td>P3 compile over a real run, pack, memory and card</td>
+<td><code>cargo test -p conveyor-actions --test prompt_knowledge</code></td>
+<td><strong>4/4</strong></td>
+</tr>
+<tr>
+<td>Existing prompt surfaces</td>
+<td><code>cargo test -p conveyor-actions --test prompt_compile</code></td>
+<td><strong>7/7</strong></td>
+</tr>
+<tr>
+<td>Existing executor compile</td>
+<td><code>cargo test -p conveyor-actions --test process_agent_resolved</code></td>
+<td><strong>4/4</strong></td>
+</tr>
+<tr>
+<td>Recipe store + seed</td>
+<td><code>cargo test -p conveyor-store --test prompt_catalogue</code></td>
+<td><strong>4/4</strong></td>
+</tr>
+<tr>
+<td>Migration ledger through 62</td>
+<td><code>cargo test -p conveyor-store --test s07_schema</code></td>
+<td><strong>3/3</strong></td>
+</tr>
+<tr>
+<td>Registry, dump and count</td>
+<td><code>cargo test -p conveyor-actions --test registry</code></td>
+<td><strong>12/12</strong></td>
+</tr>
+<tr>
+<td>Registry-wide HTTP/MCP parity</td>
+<td><code>cargo test -p conveyor-actions --test parity_http_mcp every_registered_action_returns_the_same_body_over_http_and_mcp</code></td>
+<td><strong>1/1</strong> (25 s)</td>
+</tr>
+</tbody>
+</table>
+<p>The first P1 run exposed a real defect: <code>0062</code> re-added the section-kind CHECK with the pre-0035 <code>procedure</code> spelling, dropping <code>process</code>, so every prompt seed failed. The check now lists <code>system, process, capability, role, project_card, knowledge, memory</code>, and <code>prompt_catalogue</code> is green.</p>
+<h2 id="reversal-proofs">Reversal proofs</h2>
+<table>
+<thead>
+<tr>
+<th>Delete</th>
+<th>Test that turns red</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>The <code>PromptSource::Memory</code> render arm (return <code>None</code>)</td>
+<td><code>prompt_memory</code> <strong>2 red</strong>: the memory rows disappear and a changed selection no longer changes the hash</td>
+</tr>
+<tr>
+<td>The <code>AlreadyActive</code> guard in <code>activate_prompt_tx</code></td>
+<td><code>prompt_recipes</code> race test red: both activations answered <code>200</code> instead of <code>[200, 409]</code></td>
+</tr>
+<tr>
+<td><code>facts.knowledge.hits = knowledge_hits(&amp;retrieved.hits)</code></td>
+<td><code>prompt_knowledge</code> red: the knowledge section rendered the pack identity but no retrieved hit content</td>
+</tr>
+</tbody>
+</table>
+<h2 id="generated-artifacts">Generated artifacts</h2>
+<ul>
+<li><code>docs/design/data/actions.json</code> — <strong>508</strong> actions (503 + the five <code>prompt_recipes.*</code>).</li>
+<li><code>docs/design/data/coverage.json</code> + <code>seed/programme.json</code> — S21 measures <strong>built</strong> (5/5 declared actions, 2/2 tables, 3/3 modules).</li>
+<li><code>docs/design/docs/**</code> — the 113-source document pack regenerated; only the edited documents move.</li>
+<li><code>served-spec.lock.json</code> — 539 operations. The refresh also absorbed <strong>12 operations and 20 hashes already missing from the committed lock</strong> (<code>#508</code>/<code>#511</code>); the drift predates this branch. Verified with <code>conveyor --print-openapi --check-lock</code> (the bare <code>--check-lock</code> tries to open a database first).</li>
+</ul>
+<h2 id="out-of-scope">Out of scope</h2>
+<p>The V2 <code>internal_agent</code> executor runtime and its dynamic tool grant remain the next lane; T0 built the <code>Executor</code> contract only. No laya change, no PDDL storage, no second compiler, no duplicate <code>knowledge.query</code>, no recipe-authoring UI.</p>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/S21-WORKPACKAGE.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

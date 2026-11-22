@@ -1044,7 +1044,7 @@ CREATE INDEX eval_climb_eval_idx ON eval_climb (tenant_id, eval_id, created_at D
 );
 -- At most one active and one draft version per key; retired rows stay addressable by exact pin.
 CREATE UNIQUE INDEX uq_prompt_active ON prompt (tenant_id, key) WHERE status = &#39;active&#39;;
-CREATE UNIQUE INDEX uq_prompt_draft  ON prompt (tenant_id, key) WHERE status = &#39;draft&#39;;   -- 0061
+CREATE UNIQUE INDEX uq_prompt_draft  ON prompt (tenant_id, key) WHERE status = &#39;draft&#39;;   -- 0062
 
 CREATE TABLE prompt_section (
     id          uuid PRIMARY KEY DEFAULT uuidv7(),
@@ -1052,10 +1052,10 @@ CREATE TABLE prompt_section (
     prompt_id   uuid NOT NULL,
     position    int  NOT NULL CHECK (position &gt;= 1),
     source_kind text NOT NULL
-                CHECK (source_kind IN (&#39;system&#39;,&#39;procedure&#39;,&#39;capability&#39;,&#39;role&#39;,&#39;project_card&#39;,&#39;knowledge&#39;,&#39;memory&#39;)),
+                CHECK (source_kind IN (&#39;system&#39;,&#39;process&#39;,&#39;capability&#39;,&#39;role&#39;,&#39;project_card&#39;,&#39;knowledge&#39;,&#39;memory&#39;)),
     required    boolean NOT NULL DEFAULT false,
     template    text NOT NULL DEFAULT &#39;&#39;,
-    selector    jsonb NOT NULL DEFAULT &#39;{}&#39;             -- 0061
+    selector    jsonb NOT NULL DEFAULT &#39;{}&#39;             -- 0062
                 CHECK (jsonb_typeof(selector) = &#39;object&#39;),
     budget_chars int CHECK (budget_chars &gt; 0),          -- 0031
     created_at  timestamptz NOT NULL DEFAULT now(),
@@ -1066,7 +1066,7 @@ CREATE TABLE prompt_section (
         CHECK (source_kind &lt;&gt; &#39;system&#39; OR btrim(template) &lt;&gt; &#39;&#39;)
 );</code></pre>
 <p><strong><code>system</code> is the only literal kind.</strong> The other six are rendered from the run's facts — the process (stored as a process) and its step, the capability/agent row, the role, the project and card, the capability's bound packs with their selected hits, and the card's memory. A <code>required</code> section with no source is a readiness refusal, not an empty section. The built-in recipes (<code>copilot_system@1</code>, <code>prompt_audit@1</code>, <code>agent@1</code>) are seeded per tenant by <code>seed::prompts_for_tenant</code>; an existing <code>(key, version)</code> is never rewritten by a seed.</p>
-<p><strong>Recipe lifecycle (0061, ADR 0009).</strong> A version is immutable per <code>(tenant, key, version)</code>. A tenant creates a <code>draft</code>, activates it (the previous active becomes <code>retired</code> in the same transaction), or retires a version. Exact pins stay readable; a new run resolves only an <code>active</code> row. <code>prompt_section.selector</code> is the one selection config — memory <code>{kinds, limit, include_digest}</code> and knowledge <code>{query}</code> — never a second template language. Knowledge targets are resolved in the compile transaction, but retrieval runs after that transaction commits, reusing the <code>knowledge.query</code> path; the compiled text itself is still never stored.</p>
+<p><strong>Recipe lifecycle (0062, ADR 0009).</strong> A version is immutable per <code>(tenant, key, version)</code>. A tenant creates a <code>draft</code>, activates it (the previous active becomes <code>retired</code> in the same transaction), or retires a version. Exact pins stay readable; a new run resolves only an <code>active</code> row. <code>prompt_section.selector</code> is the one selection config — memory <code>{kinds, limit, include_digest}</code> and knowledge <code>{query, top_k}</code> — never a second template language. Knowledge targets are resolved in the compile transaction, but retrieval runs after that transaction commits, reusing the <code>knowledge.query</code> path; the compiled text itself is still never stored.</p>
 <h2 id="3-state-machines-and-enforcement">3. State machines and enforcement</h2>
 <p>Every transition is a pure function in <code>crates/domain</code>; no DB trigger, no per-flow rule, no CHECK that duplicates the function. The CHECK constraints below guard <em>vocabulary</em>, never <em>legality</em>.</p>
 <h3 id="31-card-lifecycle">3.1 Card lifecycle</h3>

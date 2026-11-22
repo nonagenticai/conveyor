@@ -29,8 +29,9 @@ Status: Accepted · Date: 2026-11-22 · Issue: #15 · Resolves: S21 §4 §8 §12
    transaction, commits, then calls the one retrieval path that `knowledge.query` also uses, and
    only then runs the pure compiler. No network call runs inside a compile transaction and no
    second retrieval implementation exists. The query is `selector.query`, else the card name +
-   description, capped at 2,000 characters; with no query the section renders pack identities only.
-   A missing or failed required pack keeps `409 knowledge_degraded`.
+   description, capped at 2,000 characters; `selector.top_k` is 1–32 (default 8); with no query the
+   section renders pack identities only. A missing or failed required pack keeps
+   `409 knowledge_degraded`.
 
 5. **The hash is SHA-256 of the rendered text.** Source identities — recipe version, pack
    `key@version`, memory row ids, knowledge hit ids — are rendered into the text, so they are in
