@@ -1,0 +1,46 @@
+{
+ "project_id": "01a1d039-0d33-7915-8833-75f4dc31cc07",
+ "wbs": [
+  {
+   "kind": "deliverable",
+   "title": "The PM request-to-plan path: pm.plan writes the WBS and the scope baseline",
+   "business_value": 8,
+   "time_criticality": 8,
+   "risk_reduction": 5,
+   "job_size": 3
+  },
+  {
+   "kind": "deliverable",
+   "title": "Dual control on every PM gate: charter, baseline and change are approved by a distinct approver",
+   "business_value": 9,
+   "time_criticality": 7,
+   "risk_reduction": 6,
+   "job_size": 3
+  },
+  {
+   "kind": "deliverable",
+   "title": "A baseline change travels as a change request with its impact and its own gate",
+   "business_value": 9,
+   "time_criticality": 6,
+   "risk_reduction": 6,
+   "job_size": 2
+  },
+  {
+   "kind": "deliverable",
+   "title": "Closure against the frozen baseline: close_request, a distinct decision and projects.close",
+   "business_value": 7,
+   "time_criticality": 5,
+   "risk_reduction": 4,
+   "job_size": 2
+  },
+  {
+   "kind": "deliverable",
+   "title": "The T3 acceptance record: the manifest's checks execute against the live rows",
+   "business_value": 5,
+   "time_criticality": 4,
+   "risk_reduction": 4,
+   "job_size": 2
+  }
+ ],
+ "baseline_kind": "scope"
+}
