@@ -1,6 +1,6 @@
 import { expect, test, type APIRequestContext } from "./fixture";
 
-import { allowSelfApproval, approvedInvoke, invoke } from "./helpers";
+import { approvedInvoke, invoke } from "./helpers";
 
 async function firstEval(
   request: APIRequestContext,
@@ -16,10 +16,10 @@ async function firstEval(
 
 /** The spec mutates the shared seed fixture; put the version back to six cases. */
 async function removeImported(request: APIRequestContext, versionId: string) {
-  // #285: a case delete is destructive, so it needs a gate. The dev seed has one principal per
-  // tenant, so the cleanup asks the tenant to let the requester decide — then goes through the
-  // real request → decide → invoke path rather than around it.
-  await allowSelfApproval(request, "eval_cases.delete");
+  // #285 / §5.4: a case delete is destructive, so it needs a gate, its requester can never
+  // decide it, and the gate names evidence. `approvedInvoke` records the fixture waiver reason
+  // and has the seed's second principal decide — the same request → decide → invoke path, not
+  // around it.
   const cases = await invoke<{ items: { id: string; input: string }[] }>(
     request,
     "eval_cases.list",
