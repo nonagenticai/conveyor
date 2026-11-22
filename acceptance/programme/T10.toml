@@ -2,6 +2,7 @@
 key = "T10"
 name = "SAFe cadence and MSP tranches"
 gate = "PI planning materialises cards from the backlog by WSJF within WIP; a deliverable without evidence cannot demo; retro produces lessons; an end-of-tranche review with no baselines, benefit status or risk evidence is refused; a transition that never measured its baseline cannot report the benefit realized"
+gate_checks = ["T10-project", "T10-baseline", "T10-charter", "T10-closure-outputs", "T10-contract", "T10-review", "T10-closure-gate", "T10-waivers", "T10-pi-cadence", "T10-pi-plan", "T10-pi-objectives", "T10-wsjf", "T10-demo-credits", "T10-lessons", "T10-product"]
 
 [[check]]
 id = "T10-project"

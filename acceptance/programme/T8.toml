@@ -2,6 +2,7 @@
 key = "T8"
 name = "Organisational memory"
 gate = "T8 is NOT built, and its acceptance — `SPEC_V2` §12: 'a lesson with one evidence ref is refused; two independent refs + review promotes a source draft; a bad run never becomes doctrine' — is the condition on which it may be closed, not a claim that it is met."
+gate_checks = ["T8-project", "T8-baseline", "T8-charter", "T8-closure-outputs", "T8-contract", "T8-review", "T8-closure-gate", "T8-waivers", "T8-pi-cadence", "T8-pi-plan", "T8-pi-objectives", "T8-wsjf", "T8-demo-credits", "T8-lessons", "T8-product"]
 
 [[check]]
 id = "T8-project"

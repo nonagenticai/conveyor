@@ -2,6 +2,7 @@
 key = "S03"
 name = "Domain and schema — aggregates, state machines, baseline domain migration"
 gate = "proptest on transitions and schema review — no transition leaves `list.kind` and `archived_at` contradictory, a claim never succeeds twice without release or expiry, one pending approval per (run, gate), and truncate/archive invariants hold"
+gate_checks = ["S03-project", "S03-baseline", "S03-charter", "S03-closure-outputs", "S03-contract", "S03-review", "S03-closure-gate", "S03-waivers", "S03-pi-cadence", "S03-pi-plan", "S03-pi-objectives", "S03-lessons", "S03-wsjf", "S03-demo-credits", "S03-product"]
 
 [[check]]
 id = "S03-project"

@@ -8,10 +8,10 @@ programme-level assertions no manifest can make on its own:
   A. manifests      `verify-project.py --all` exits 0 (every project's own
                     acceptance, run against the same snapshot).
   B. conformance    `audit-programme-conformance.py --strict --fail-on P0,P1`
-                    exits 0 (every mandatory artefact evidenced or deferred).
-  C. findings       `verify-findings.py` exits 0, and no open finding is a P0;
-                    every other open finding carries a valid deferral (named
-                    owner, dated acceptance, decision ref, future expiry).
+                    exits 0 (every mandatory artefact evidenced).
+  C. findings       `verify-findings.py` exits 0, and no finding is open: no
+                    deferral, waiver or dated residual is a disposition
+                    (ADR 0010), so every open row is a miss.
   D. contracts      every active or closed project has a live Statement of
                     Architecture Work AND a live delivery contract, each with a
                     requester, an approving actor and the approval row that
@@ -37,7 +37,6 @@ Exit: 0 all pass; 1 any miss; 2 usage or an unreadable input.
 from __future__ import annotations
 
 import argparse
-import datetime as dt
 import json
 import re
 import subprocess
@@ -75,55 +74,32 @@ def read_json(path: Path) -> Any:
 # ── C. the code-findings ledger ──────────────────────────────────────────────
 
 
-def valid_deferral(finding: dict[str, Any], today: dt.date) -> list[str]:
-    """Why an open finding carries no valid deferral, or an empty list."""
-    waiver = finding.get("waiver")
-    if not isinstance(waiver, dict):
-        return ["open with no waiver"]
-    problems = []
-    if not str(waiver.get("accepted_by") or "").strip():
-        problems.append("waiver names no accepting owner")
-    if not str(waiver.get("decision_ref") or "").strip():
-        problems.append("waiver names no published decision")
-    if not str(waiver.get("reason") or "").strip():
-        problems.append("waiver gives no reason")
-    expires = str(waiver.get("expires") or "").strip()
-    try:
-        if dt.date.fromisoformat(expires) <= today:
-            problems.append(f"waiver expired {expires}")
-    except ValueError:
-        problems.append("waiver names no valid expiry")
-    return problems
-
-
-def check_findings(ledger: dict[str, Any], today: dt.date) -> tuple[bool, str]:
+def check_findings(ledger: dict[str, Any]) -> tuple[bool, str]:
+    """No open finding: every finding is executed (ADR 0010, no deferrals)."""
     findings = ledger.get("findings")
     if not isinstance(findings, list):
         return False, "the ledger has no findings array"
-    open_rows = [f for f in findings if not f.get("resolved_by")]
-    undeferred = []
+    open_rows = [row for row in findings if not row.get("resolved_by")]
+    problems: list[str] = []
+    waived: list[str] = []
     for row in open_rows:
+        reasons = []
         if row.get("severity") not in SEVERITY_ORDER:
-            undeferred.append(f"{row.get('id')} (no severity)")
-            continue
-        problems = valid_deferral(row, today)
-        if problems:
-            undeferred.append(f"{row.get('id')} ({'; '.join(problems)})")
-    # A P0 is acceptable only when an owner has accepted it as a dated residual;
-    # an unwaived one is never deferrable (the plan's "zero unwaived P0" bar).
-    p0 = [
-        row
-        for row in open_rows
-        if row.get("severity") == "P0" and valid_deferral(row, today)
-    ]
-    if p0:
-        ids = ", ".join(str(row.get("id")) for row in p0)
-        return False, f"{len(p0)} open P0 finding(s) with no accepted residual: {ids}"
-    if undeferred:
-        preview = "; ".join(undeferred[:6])
-        more = "" if len(undeferred) <= 6 else f"; +{len(undeferred) - 6} more"
-        return False, f"{len(undeferred)} open finding(s) without a valid deferral: {preview}{more}"
-    return True, f"{len(findings)} findings, {len(open_rows)} open, all deferred with a dated owner"
+            reasons.append("no severity")
+        if row.get("waiver") is not None:
+            # A waiver is not a disposition for programme work: it is itself a finding.
+            reasons.append("waiver_not_permitted")
+            waived.append(str(row.get("id")))
+        identifier = str(row.get("id"))
+        problems.append(f"{identifier} ({', '.join(reasons)})" if reasons else identifier)
+    if problems:
+        preview = "; ".join(problems[:6])
+        more = "" if len(problems) <= 6 else f"; +{len(problems) - 6} more"
+        flagged = (
+            f"; waiver_not_permitted: {', '.join(waived)}" if waived else ""
+        )
+        return False, f"{len(problems)} open finding(s) not executed: {preview}{more}{flagged}"
+    return True, f"{len(findings)} findings, none open; every finding is executed"
 
 
 # ── D. every live project has its architecture spine ─────────────────────────
@@ -322,7 +298,7 @@ def check_conformance(snapshot_dir: Path) -> tuple[bool, str]:
 
 def check_findings_instrument(ledger: Path) -> tuple[bool, str]:
     code, output = run_command(
-        [sys.executable, str(ROOT / "scripts" / "verify-findings.py"), "--findings", str(ledger)]
+        [sys.executable, str(ROOT / "scripts" / "verify-findings.py"), str(ledger)]
     )
     if code != 0:
         tail = " ".join(output.strip().splitlines()[-3:])
@@ -346,8 +322,9 @@ def render(rows: list[tuple[str, str, bool, str]]) -> bool:
 
 
 def self_test() -> None:
-    today = dt.date(2026, 11, 22)
-    valid_waiver = {
+    # The superseded S14 residual: a complete, in-date, owner-accepted waiver. It is not a
+    # disposition (ADR 0010); the finding stays open and the waiver is its own finding.
+    s14_waiver = {
         "accepted_by": "programme owner",
         "accepted_at": "2026-11-22",
         "decision_ref": "01a20208-5261-7085-a4a7-74f061e4842b",
@@ -364,24 +341,24 @@ def self_test() -> None:
     def ledger(*rows: dict[str, Any]) -> dict[str, Any]:
         return {"findings": list(rows)}
 
-    ok, _ = check_findings(ledger(finding("a", "P1", dict(valid_waiver))), today)
-    assert ok, "a validly deferred P1 must pass"
-    ok, _ = check_findings(ledger(finding("p0", "P0", dict(valid_waiver))), today)
-    assert ok, "an owner-accepted P0 residual is a dated deferral, not an open miss"
-    ok, detail = check_findings(ledger(finding("p0", "P0")), today)
-    assert not ok and "P0" in detail, "an unwaived P0 always fails"
-    for label, waiver in (
-        ("ownerless", {**valid_waiver, "accepted_by": ""}),
-        ("undecided", {**valid_waiver, "decision_ref": ""}),
-        ("expired", {**valid_waiver, "expires": "2026-11-21"}),
-        ("dateless", {**valid_waiver, "expires": "soon"}),
-    ):
-        ok, detail = check_findings(ledger(finding(label, "P1", waiver)), today)
-        assert not ok, f"a {label} waiver must be refused: {detail}"
-    ok, _ = check_findings(
-        ledger({"id": "done", "severity": "P0", "resolved_by": {"commit": "x"}}), today
+    ok, detail = check_findings(ledger(finding("v1-s14-1", "P0", dict(s14_waiver))))
+    assert not ok and "waiver_not_permitted" in detail, detail
+    ok, detail = check_findings(ledger(finding("open", "P1")))
+    assert not ok and "not executed" in detail, detail
+    ok, detail = check_findings(ledger(finding("open", "P1", {})))
+    assert not ok and "waiver_not_permitted" in detail, detail
+    ok, detail = check_findings(
+        ledger({"id": "no-severity", "severity": "P9"})
     )
-    assert ok, "a resolved P0 is history, not an open miss"
+    assert not ok and "no severity" in detail, detail
+    ok, detail = check_findings(
+        ledger({"id": "done", "severity": "P0", "resolved_by": {"commit": "x"}})
+    )
+    assert ok, detail
+    ok, detail = check_findings(ledger())
+    assert ok, detail
+    ok, detail = check_findings({"findings": "nope"})
+    assert not ok and "findings array" in detail, detail
 
     def workspace(projects: list[dict[str, Any]], contracts: list[dict[str, Any]]) -> Path:
         directory = Path(tempfile.mkdtemp(prefix="viability-self-test-"))
@@ -493,7 +470,6 @@ def main(argv: list[str]) -> int:
         fail(f"the snapshot directory does not exist: {snapshot}")
     ledger_path = Path(args.findings)
     ledger = read_json(ledger_path)
-    today = dt.date.today()
 
     rows: list[tuple[str, str, bool, str]] = []
     if not args.skip_commands:
@@ -506,8 +482,8 @@ def main(argv: list[str]) -> int:
                 *check_findings_instrument(ledger_path),
             )
         )
-    ok, detail = check_findings(ledger, today)
-    rows.append(("deferrals", "no open P0, every open finding deferred", ok, detail))
+    ok, detail = check_findings(ledger)
+    rows.append(("execution", "every open finding is executed", ok, detail))
     rows.append(("contracts", "every live project's SoAW and contract", *check_contracts(snapshot)))
     rows.append(("benefits", "one measured benefit and the token KPI", *check_benefits(snapshot)))
 

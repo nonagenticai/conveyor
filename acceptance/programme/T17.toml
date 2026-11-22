@@ -2,6 +2,7 @@
 key = "T17"
 name = "Tenant asset authoring"
 gate = "A tenant supplies a short brief plus documents, and a reviewed catalogue of departments, jobs, procedures and policies is published; no asset can publish itself or widen a tool grant."
+gate_checks = ["T17-project", "T17-baseline", "T17-charter", "T17-closure-outputs", "T17-contract", "T17-review", "T17-closure-gate", "T17-waivers", "T17-pi-cadence", "T17-pi-plan", "T17-pi-objectives", "T17-wsjf", "T17-demo-credits", "T17-lessons", "T17-product"]
 
 [[check]]
 id = "T17-project"

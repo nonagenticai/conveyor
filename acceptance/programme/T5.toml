@@ -2,6 +2,7 @@
 key = "T5"
 name = "Kata"
 gate = "T5 is NOT built, and its acceptance — `SPEC_V2` §12: 'a procedure change is measured on a held-out instrument; a regression is reverted; self-approval refused; an unmeasurable kata is not opened' — is the condition on which it may be closed, not a claim that it is met."
+gate_checks = ["T5-project", "T5-baseline", "T5-charter", "T5-closure-outputs", "T5-contract", "T5-review", "T5-closure-gate", "T5-waivers", "T5-pi-cadence", "T5-pi-plan", "T5-pi-objectives", "T5-wsjf", "T5-demo-credits", "T5-lessons", "T5-product"]
 
 [[check]]
 id = "T5-project"

@@ -2,6 +2,7 @@
 key = "S15"
 name = "Capability, knowledge and memory"
 gate = "At the end, a card's run resolves its capability and executor, the capability's readiness is reported before the run starts, a cited passage is retrieved from a pinned `strata` pack, work-package memory is written, consolidated into `strata_rag`, and recalled by `source_id`."
+gate_checks = ["S15-project", "S15-baseline", "S15-charter", "S15-closure-outputs", "S15-contract", "S15-review", "S15-closure-gate", "S15-waivers", "S15-pi-cadence", "S15-pi-plan", "S15-pi-objectives", "S15-wsjf", "S15-demo-credits", "S15-lessons", "S15-product"]
 
 [[check]]
 id = "S15-project"

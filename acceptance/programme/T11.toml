@@ -2,6 +2,7 @@
 key = "T11"
 name = "Metrics, metering and maturity"
 gate = "The A–D artefacts, the delivery contract, the closure review and the declared outputs exist; the project re-closes through the one gate."
+gate_checks = ["T11-project", "T11-baseline", "T11-charter", "T11-closure-outputs", "T11-contract", "T11-review", "T11-closure-gate", "T11-waivers", "T11-pi-cadence", "T11-pi-plan", "T11-pi-objectives", "T11-wsjf", "T11-demo-credits", "T11-lessons", "T11-product"]
 
 [[check]]
 id = "T11-project"

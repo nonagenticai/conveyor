@@ -2,6 +2,7 @@
 key = "T14"
 name = "Estate toolkits"
 gate = "each published toolkit has a probe and one live call; `scientific_processor` is scaled up for its probe and one live call, then scaled back; a zero-use report exists; a backend outage unbinds new runs and in-flight runs finish"
+gate_checks = ["T14-project", "T14-baseline", "T14-charter", "T14-closure-outputs", "T14-contract", "T14-review", "T14-closure-gate", "T14-waivers", "T14-pi-cadence", "T14-pi-plan", "T14-pi-objectives", "T14-wsjf", "T14-demo-credits", "T14-lessons", "T14-product"]
 
 [[check]]
 id = "T14-project"

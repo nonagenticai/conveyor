@@ -2,6 +2,7 @@
 key = "S13"
 name = "Process engine, judge, map and care-bus — the process is the executor, the DAG retained as the tool-sequence engine, the 348 flows re-authored"
 gate = "Green when the process limb passes with the gate parked and resumed and the coach child proving the run tree; the judge proves accept, reject-rerun, the two-reject BLOCK and the outage wait; the bus proves duplicate idempotency, re-delivery after `FLUSHALL` and the DLQ; the default catalogue is exactly 280; the dispositions have no `delta:` row; and with Redis stopped the Postgres-only limb still passes."
+gate_checks = ["S13-project", "S13-baseline", "S13-charter", "S13-closure-outputs", "S13-contract", "S13-review", "S13-closure-gate", "S13-waivers", "S13-pi-cadence", "S13-pi-plan", "S13-pi-objectives", "S13-lessons", "S13-wsjf", "S13-demo-credits", "S13-product"]
 
 [[check]]
 id = "S13-project"

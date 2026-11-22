@@ -2,6 +2,7 @@
 key = "S01"
 name = "UI spike — Leptos CSR vs Leptos SSR"
 gate = "The decision record states what is observable and marks the rest not recoverable; the project re-closes through the one gate."
+gate_checks = ["S01-project", "S01-baseline", "S01-charter", "S01-closure-outputs", "S01-contract", "S01-review", "S01-closure-gate", "S01-waivers", "S01-decision-record", "S01-pi-cadence", "S01-wsjf", "S01-demo-credits", "S01-product"]
 
 [[check]]
 id = "S01-project"

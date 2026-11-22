@@ -2,6 +2,7 @@
 key = "T13"
 name = "Tool platform"
 gate = "a development job calls coding through the broker (not `nonagenticai_mcp_server`); a `tool_call` is recorded; a destructive call without the tenant's configured approvals is refused; schema-invalid input is refused before the backend call; a job writes and reads a tenant-prefixed MinIO object with no S3 key in the prompt"
+gate_checks = ["T13-project", "T13-baseline", "T13-charter", "T13-closure-outputs", "T13-contract", "T13-review", "T13-closure-gate", "T13-waivers", "T13-pi-cadence", "T13-pi-plan", "T13-pi-objectives", "T13-wsjf", "T13-demo-credits", "T13-lessons", "T13-product"]
 
 [[check]]
 id = "T13-project"
