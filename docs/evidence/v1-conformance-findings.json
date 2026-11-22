@@ -3611,7 +3611,12 @@
       ],
       "failure_scenario": "The gate stops at the first missing target; capability, memory, readiness and clippy checks never execute.",
       "acceptance": "Both test targets exist and assert pack/layer hits and run-visible recall.",
-      "owner_project": "S15"
+      "owner_project": "S15",
+      "resolved_by": {
+        "commit": "83a732b97646ac51ae9ae9e92bfcdc0389e2835a",
+        "test": "crates/actions/tests/knowledge_binding.rs::a_pack_bound_capability_returns_a_hit_carrying_pack_and_layer",
+        "evidence": "pack/layer: knowledge_binding green (1 passed, 3 support tests) — a capability bound to design@1 asks the stub strata for exactly the pack's leaf with metadata.capability, and the upstream hit's pack=design@1 and layer=domain reach the caller unchanged. run-visible recall: crates/store/tests/memory.rs::a_memory_write_shares_the_run_transaction green (1 passed) — the write names the fixture's live run, hot_for_card_tx sees it inside the same transaction, and the rollback removes it with the run. The live strata rehearsal stays the ignored strata_live target, blocked on a conveyor token in strata-rag-secrets."
+      }
     },
     {
       "id": "v1-s16-1",
@@ -3635,7 +3640,12 @@
       ],
       "failure_scenario": "A capture seam that drops router usage yields a green S16 gate because zero capture tests matched.",
       "acceptance": "Every --exact filter matches one test; a zero-match run fails the gate; the missing targets exist.",
-      "owner_project": "S16"
+      "owner_project": "S16",
+      "resolved_by": {
+        "commit": "8f1e57706a3c1efea6092a3f7b7edebb0facc594",
+        "test": "crates/actions/tests/inference_capture.rs::a_real_external_call_records_the_router_usage_field_for_field",
+        "evidence": "Every exact filter in the corrected gate lists exactly one shipped test at 195665bb: inference_capture 1, prompt_audits 1, registry 1, conveyor-store inference_ 1; conveyor-domain inference::tests lists 8 (the gate needs 2). The gate's one_test/some_tests helpers exit 1 on a zero match, and the pre-correction names no longer appear. The live-router rehearsal stays a named gap: inference_live.rs exists and needs CONVEYOR_LIVE_ROUTER_TOKEN, which the acceptance does not require."
+      }
     },
     {
       "id": "v1-s17-1",
