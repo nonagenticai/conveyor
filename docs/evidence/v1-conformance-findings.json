@@ -1633,27 +1633,27 @@
       "standard": "SPEC",
       "spec": "§6.3",
       "severity": "P1",
-      "title": "Kata opens as a document-only run in the target tenant, with no instrument, threshold or adoption gate",
-      "problem": "The systemic path starts a `kata.open` process run on the interrupted card with inputs `{interruption_id}` only, inside the coach's tenant. No kata record names an instrument or a success threshold (spec: a kata that cannot name both 'is not opened'), no pre-registered prediction is required, no adoption gate is opened, and the kata tenant required by D45 is never resolved. The improvement loop therefore inherits the target tenant's autonomy, approvals and budgets.",
+      "title": "The kata opens measured but inside the coach's tenant, not tenant kata",
+      "problem": "The systemic path now opens a measured kata (instrument, held-out split, pre-registered prediction from the coach policy; adoption is kata.adopt's human gate), so the document-only run and the missing instrument are fixed. What remains: the kata row is created under the coach's (target) tenant — kata_open runs with ctx.tenant — where SPEC_V2 §6.3 / D45 make the improvement loop its own tenant `kata`, so a kata's write scope still inherits the target tenant's autonomy and policy.",
       "evidence": [
         {
           "path": "crates/actions/src/coach.rs",
-          "line": 989,
+          "line": 1059,
           "quote": "    if policy.systemic.iter().any(|class| class == &triage_class) {"
         },
         {
           "path": "crates/actions/src/coach.rs",
-          "line": 994,
-          "quote": "            KATA_PROCESS,"
+          "line": 1064,
+          "quote": "                let opened = crate::kata::kata_open("
         },
         {
           "path": "crates/actions/src/coach.rs",
-          "line": 995,
-          "quote": "            json!({ \"interruption_id\": interruption.id }),"
+          "line": 1085,
+          "quote": "                store::coach::set_kata_candidate_tx(&mut *tx, ctx.tenant, interruption.id, id)"
         }
       ],
       "failure_scenario": "A systemic `conveyor_defect` opens a kata that is an ordinary document-composing agent run bound to the target project's card and tenant. It can compose and comment but cannot measure, cannot open its mandatory adoption approval, and any write it is later granted runs under the target tenant's autonomy. Every systemic signal yields a document, never a measured, adopted change.",
-      "acceptance": "`coach.remedy` refuses to open a systemic kata unless an instrument id and numeric success threshold are supplied; the run is created under tenant `kata` with the kata tenant's policy; adoption requires a resolved human approval whose approver is not the kata's own actor; tests assert each refusal.",
+      "acceptance": "A systemic kata is created under tenant `kata` with the kata tenant's policy, and adoption requires a resolved human approval whose approver is not the kata's own actor; a test proves the kata row's tenant is `kata`, not the target tenant.",
       "owner_project": "T5"
     },
     {
