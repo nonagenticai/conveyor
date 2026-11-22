@@ -7,9 +7,9 @@ gate_checks = ["S04-project", "S04-baseline", "S04-charter", "S04-closure-output
 [[check]]
 id = "S04-project"
 check = "project"
-status = "active"
+status = "closed"
 severity = "P0"
-description = "S04 is active"
+description = "S04 is closed against its record"
 
 [[check]]
 id = "S04-baseline"
