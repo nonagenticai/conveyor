@@ -221,6 +221,13 @@ impl Fixture {
             .await
     }
 
+    /// Invoke one action through the same engine as the HTTP route, as the session's actor.
+    async fn invoke_action(&self, action: &str, input: Value) -> (u16, Value) {
+        self.running
+            .invoke(action, "dev:alice", input, None, None, None)
+            .await
+    }
+
     /// Declare the tool's verification path (§11.3). The fixture writes the tool row directly, so
     /// the declaration is test input exactly like the effect and the schema.
     async fn set_verify(&self, verify: Value) {
@@ -508,6 +515,84 @@ async fn a_declared_redact_field_is_replaced() {
     assert_eq!(
         body["output"], "[redacted]",
         "the tool's declared field is replaced in the result: {body}"
+    );
+
+    fixture.running.shutdown().await;
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_registered_binding_writer_creates_the_grant() {
+    let _serial = SERIAL.lock().await;
+    let fixture = Fixture::new(
+        "coding",
+        "jobs.create",
+        "coding_jobs.create",
+        "write",
+        "write",
+        coding_schema(),
+    )
+    .await;
+    // The fixture seeds its grant directly; remove it so the registered action is the only writer.
+    let mut tx = begin_scoped(&fixture.pg.owner, fixture.tenant)
+        .await
+        .expect("a scoped write");
+    sqlx::query("DELETE FROM tool_binding WHERE tenant_id = $1")
+        .bind(fixture.tenant.as_uuid())
+        .execute(&mut *tx)
+        .await
+        .expect("clear the seeded grant");
+    tx.commit().await.expect("commit");
+
+    let (status, body) = fixture
+        .invoke_action(
+            "tool_bindings.create",
+            json!({"toolkit_key": "coding", "run_id": fixture.run_id, "effect_ceiling": "write"}),
+        )
+        .await;
+    assert_eq!(
+        status, 200,
+        "the binding writer must accept a published toolkit: {body}"
+    );
+    assert_eq!(body["toolkit_key"], "coding", "{body}");
+    assert_eq!(body["enabled"], true, "{body}");
+
+    let (status, body) = fixture
+        .call(
+            "coding.jobs.create",
+            json!({"kind": "test", "input": {"files": []}}),
+        )
+        .await;
+    assert_eq!(
+        status, 200,
+        "the created grant must resolve the call: {body}"
+    );
+    assert_eq!(fixture.ledger().await.len(), 1, "one ledger row");
+
+    // A draft toolkit cannot be bound.
+    let mut tx = begin_scoped(&fixture.pg.owner, fixture.tenant)
+        .await
+        .expect("a scoped write");
+    sqlx::query("UPDATE toolkit SET status = 'draft' WHERE tenant_id = $1")
+        .bind(fixture.tenant.as_uuid())
+        .execute(&mut *tx)
+        .await
+        .expect("draft the toolkit");
+    sqlx::query("DELETE FROM tool_binding WHERE tenant_id = $1")
+        .bind(fixture.tenant.as_uuid())
+        .execute(&mut *tx)
+        .await
+        .expect("clear the grant again");
+    tx.commit().await.expect("commit");
+    let (status, body) = fixture
+        .invoke_action(
+            "tool_bindings.create",
+            json!({"toolkit_key": "coding", "run_id": fixture.run_id, "effect_ceiling": "write"}),
+        )
+        .await;
+    assert_eq!(status, 409, "a draft toolkit is refused: {body}");
+    assert!(
+        body.to_string().contains("toolkit_not_published"),
+        "the refusal names the reason: {body}"
     );
 
     fixture.running.shutdown().await;
