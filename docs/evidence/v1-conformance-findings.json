@@ -567,7 +567,7 @@
         },
         {
           "path": "crates/store/src/spine.rs",
-          "line": 3827,
+          "line": 3954,
           "quote": "            if matches!(state.as_str(), \"authorised\" | \"in_review\" | \"closed\") =>"
         }
       ],
@@ -663,12 +663,12 @@
         },
         {
           "path": "crates/store/src/spine.rs",
-          "line": 4016,
+          "line": 4143,
           "quote": "pub async fn close_programme_tx("
         },
         {
           "path": "crates/store/src/spine.rs",
-          "line": 4050,
+          "line": 4177,
           "quote": "        \"UPDATE programme SET status = 'closed', version = version + 1, updated_at = now()"
         }
       ],
@@ -963,7 +963,12 @@
       ],
       "failure_scenario": "Refinement cadences sit planned forever and stale backlog inputs are never flagged.",
       "acceptance": "The tick handles refinement, revalidates/re-scores the four inputs and flags stale backlog rows with evidence.",
-      "owner_project": "T10"
+      "owner_project": "T10",
+      "resolved_by": {
+        "commit": "61fca7739498d6e2e2f18e40a1b2b29c080295bd",
+        "test": "crates/store/tests/refinement.rs::refinement_flags_unscored_and_aged_rows",
+        "evidence": "refinement 2 passed at the merged lane: the cadence tick now consumes kind='refinement' (cadence.rs includes 'demo', 'retro', 'refinement'); refine_backlog_tx walks every open deliverable of the cadence's programme, revalidates the four typed WSJF inputs, flags a row that cannot score (negative value or zero job size), a row whose value inputs are all zero, and a row unmoved for stale_after_days (default 30) on meta.refinement with its reason, and clears the flag when a row scores again. The computed score is never stored."
+      }
     },
     {
       "id": "v1-p82-5",
@@ -2073,7 +2078,7 @@
         },
         {
           "path": "crates/store/src/spine.rs",
-          "line": 3792,
+          "line": 3919,
           "quote": "                PlanError::RetroFindingWithoutLesson(key),"
         }
       ],
@@ -3611,7 +3616,12 @@
       ],
       "failure_scenario": "The gate stops at the first missing target; capability, memory, readiness and clippy checks never execute.",
       "acceptance": "Both test targets exist and assert pack/layer hits and run-visible recall.",
-      "owner_project": "S15"
+      "owner_project": "S15",
+      "resolved_by": {
+        "commit": "83a732b97646ac51ae9ae9e92bfcdc0389e2835a",
+        "test": "crates/actions/tests/knowledge_binding.rs::a_pack_bound_capability_returns_a_hit_carrying_pack_and_layer",
+        "evidence": "pack/layer: knowledge_binding green (1 passed, 3 support tests) — a capability bound to design@1 asks the stub strata for exactly the pack's leaf with metadata.capability, and the upstream hit's pack=design@1 and layer=domain reach the caller unchanged. run-visible recall: crates/store/tests/memory.rs::a_memory_write_shares_the_run_transaction green (1 passed) — the write names the fixture's live run, hot_for_card_tx sees it inside the same transaction, and the rollback removes it with the run. The live strata rehearsal stays the ignored strata_live target, blocked on a conveyor token in strata-rag-secrets."
+      }
     },
     {
       "id": "v1-s16-1",
@@ -3635,7 +3645,12 @@
       ],
       "failure_scenario": "A capture seam that drops router usage yields a green S16 gate because zero capture tests matched.",
       "acceptance": "Every --exact filter matches one test; a zero-match run fails the gate; the missing targets exist.",
-      "owner_project": "S16"
+      "owner_project": "S16",
+      "resolved_by": {
+        "commit": "8f1e57706a3c1efea6092a3f7b7edebb0facc594",
+        "test": "crates/actions/tests/inference_capture.rs::a_real_external_call_records_the_router_usage_field_for_field",
+        "evidence": "Every exact filter in the corrected gate lists exactly one shipped test at 195665bb: inference_capture 1, prompt_audits 1, registry 1, conveyor-store inference_ 1; conveyor-domain inference::tests lists 8 (the gate needs 2). The gate's one_test/some_tests helpers exit 1 on a zero match, and the pre-correction names no longer appear. The live-router rehearsal stays a named gap: inference_live.rs exists and needs CONVEYOR_LIVE_ROUTER_TOKEN, which the acceptance does not require."
+      }
     },
     {
       "id": "v1-s17-1",
@@ -5162,6 +5177,30 @@
       "failure_scenario": "A destination silently renames response fields; the pinned tool version holds no output contract, so the broker passes the changed body to the run and nothing can detect drift from what was published.",
       "acceptance": "Publish copies the manifest output into tool.output_schema, resolution selects it, and a response that violates it is surfaced distinctly; a test asserts a non-NULL stored output schema and flags a drifted response.",
       "owner_project": "T13"
+    },
+    {
+      "id": "v1-e2e-1",
+      "area": "e2e / live tenant",
+      "standard": "SPEC",
+      "spec": "§12",
+      "severity": "P1",
+      "title": "e2e/UI-proof projects write into the live tenant with no test marker",
+      "problem": "The live tenant contains two e2e test projects (AAA-UI-PROOF-285-2026-11-19T07-3-2 and ...-07-4) with no test marker. They are counted as programme projects and produce six P0 artefact packages (change-control, project-baseline, compliance-review x2), none of which is real work. No in-repo producer matches `git grep UI-PROOF`: the public e2e path creates projects directly (apps/web/e2e/helpers.ts and board.spec.ts call projects.create), so test residue and a delivered project are indistinguishable to the audit, the public pack and the viability gate.",
+      "evidence": [
+        {
+          "path": "apps/web/e2e/board.spec.ts",
+          "line": 221,
+          "quote": "    await invoke(request, \"projects.create\", { title: `e2e paging project ${stamp} ${index}` });"
+        },
+        {
+          "path": "apps/web/e2e/helpers.ts",
+          "line": 180,
+          "quote": "    \"projects.create\","
+        }
+      ],
+      "failure_scenario": "A UI test run leaves real rows in the live tenant; the audit counts them as programme projects, they own P0 packages, and the pack and viability gate treat test residue as delivered work.",
+      "acceptance": "A test-created project carries meta.test_row=true or exists only in a test tenant, and the public pack and viability gate exclude it by a documented, visible predicate.",
+      "owner_project": "PLATFORM"
     }
   ]
 }
