@@ -1,0 +1,175 @@
+{
+  "checks": [
+    {
+      "check": "project",
+      "description": "S04 is active",
+      "detail": "project S04 is active",
+      "id": "S04-project",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "project_baseline",
+      "description": "the scope baseline is approved; the close gate reads the approved row",
+      "detail": "baseline 01a20256-44d0-731d-b345-fffc5f3ac9e8 approved by 01a1e8a7-8b23-76a9-9114-aafb95f7a545, taken by 01a1e607-17d9-77d3-98d3-a43a87c4633d, snapshot frozen",
+      "id": "S04-baseline",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": null,
+      "command": "python3 scripts/programme-record.py --check --action pm.get --input '{\"project_id\":\"01a1d039-0d28-7eb6-a62a-f420e742595c\"}' | python3 -c '\nimport json,sys\ns=sys.stdin.read()\nd=json.loads(s[s.find(\"{\"):])\no=d.get(\"output\",d)\nassert o.get(\"charter_asset_id\"), \"no charter asset\"\ngates={g.get(\"gate\"):g.get(\"status\") for g in o.get(\"gates\",[])}\nassert gates.get(\"charter\")==\"approved\", gates\n'\n",
+      "description": "the charter asset exists and the charter gate is approved",
+      "detail": "exit 0",
+      "exit": 0,
+      "id": "S04-charter",
+      "kind": "command",
+      "result": "pass",
+      "severity": "P0",
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "check": "closure_outputs",
+      "description": "the declared closure outputs are declared and published",
+      "detail": "the project declares no closure_outputs",
+      "id": "S04-closure-outputs",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P0"
+    },
+    {
+      "check": "contract",
+      "description": "a live board-approved delivery contract exists",
+      "detail": "contract 01a20256-6ede-7d70-aae8-5dbfe681a1b7 approved by board decision 01a20256-80ac-72f0-a310-d114488f1d7c about this contract; approver 01a1e8a7-8b23-76a9-9114-aafb95f7a545 distinct from requester 01a1e607-17d9-77d3-98d3-a43a87c4633d",
+      "id": "S04-contract",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "review",
+      "description": "the Phase-G review cites a published standing delegation",
+      "detail": "review 01a20284-e742-757a-ae91-0b8fb19ad3c0 (compliant) of the live contract cites the published delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14",
+      "id": "S04-review",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "closure_gate",
+      "description": "the closure gate was decided by an approver other than its requester",
+      "detail": "no approved closure gate for the project",
+      "id": "S04-closure-gate",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P0"
+    },
+    {
+      "check": "waivers",
+      "description": "no active waiver is expired or owned by its reviewer",
+      "detail": "0 active waiver(s), all dated and distinct from the reviewer",
+      "id": "S04-waivers",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "pi_cadence",
+      "description": "the project's PI has a cadence row and a backlog-refinement row",
+      "detail": "PI cadence 01a20280-a739-7bb9-823f-232f34b32aaa and refinement 01a20280-d52b-7791-a9b1-ebc2a10b5c3d for tranche-3",
+      "id": "S04-pi-cadence",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "pi_plan",
+      "description": "the project tranche's PI plan is published",
+      "detail": "no published pi-plan output for tranche-3",
+      "id": "S04-pi-plan",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P0"
+    },
+    {
+      "check": "pi_objectives",
+      "description": "the project tranche's PI objectives are published",
+      "detail": "no published pi-objectives output for tranche-3",
+      "id": "S04-pi-objectives",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P0"
+    },
+    {
+      "check": "lessons",
+      "description": "the tranche retro produced at least one lesson",
+      "detail": "the tranche-3 retro produced no lesson",
+      "id": "S04-lessons",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P1"
+    },
+    {
+      "check": "wsjf",
+      "description": "every WBS deliverable of the project carries the four typed WSJF inputs",
+      "detail": "11 WBS node(s) carry the four WSJF inputs",
+      "id": "S04-wsjf",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": "demo_credits",
+      "description": "every accepted deliverable has a demo credit carrying its evidence",
+      "detail": "no accepted deliverable to demo",
+      "id": "S04-demo-credits",
+      "kind": "snapshot",
+      "result": "fail",
+      "severity": "P0"
+    },
+    {
+      "check": "product_findings",
+      "description": "no open P0 product finding remains for the project",
+      "detail": "no open P0 package for this project",
+      "id": "S04-product",
+      "kind": "snapshot",
+      "result": "pass",
+      "severity": "P0"
+    },
+    {
+      "check": null,
+      "description": "the declared gate is discharged by executable checks",
+      "detail": "the gate check 'S04-closure-outputs' did not pass; the gate check 'S04-closure-gate' did not pass; the gate check 'S04-pi-plan' did not pass; the gate check 'S04-pi-objectives' did not pass; the gate check 'S04-lessons' did not pass; the gate check 'S04-demo-credits' did not pass",
+      "id": "gate",
+      "kind": "manifest",
+      "result": "fail",
+      "severity": "P0"
+    }
+  ],
+  "failures": [
+    "S04-closure-outputs (P0): the project declares no closure_outputs",
+    "S04-closure-gate (P0): no approved closure gate for the project",
+    "S04-pi-plan (P0): no published pi-plan output for tranche-3",
+    "S04-pi-objectives (P0): no published pi-objectives output for tranche-3",
+    "S04-lessons (P1): the tranche-3 retro produced no lesson",
+    "S04-demo-credits (P0): no accepted deliverable to demo",
+    "gate (P0): the gate check 'S04-closure-outputs' did not pass; the gate check 'S04-closure-gate' did not pass; the gate check 'S04-pi-plan' did not pass; the gate check 'S04-pi-objectives' did not pass; the gate check 'S04-lessons' did not pass; the gate check 'S04-demo-credits' did not pass"
+  ],
+  "gate": "20 actions identical over HTTP and MCP \u2014 one value in three projections, duplicates fail closed, schema-invalid input returns RFC 9457 with populated `errors[]` and never a 500, an idempotent replay yields one `action_invocation`, and the lock catches drift while breaking ingest is refused",
+  "generated_at": "2026-11-22T19:42:01.370819+00:00",
+  "kind": "all",
+  "manifest": "acceptance/programme/S04.toml",
+  "name": "Action registry \u2014 derive, manifest, OpenAPI, MCP, invocation, external ingest",
+  "project": "S04",
+  "schema": "project-acceptance/v1",
+  "snapshot": {
+    "generated_at": "2026-11-22T09:46:52.711627+00:00",
+    "git_sha": "97d45aa63832ccfcd03cfac5b8a5014bc63155fb",
+    "path": "retained-snapshot/97d45aa63832ccfcd03cfac5b8a5014bc63155fb"
+  },
+  "verdict": "red",
+  "warnings": []
+}
