@@ -868,9 +868,11 @@ pub struct CardCreateIn {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub meta: Option<Value>,
     /// Internal only: set by `coach.interrupt` for the one card it is allowed to create
-    /// (SPEC_V2 §6.2). `serde(skip)` keeps it out of the wire document, so no caller of the
-    /// public action can name it — a coach card can never be an orphan (T4, v1-p6-6).
+    /// (SPEC_V2 §6.2). `serde(skip)` keeps it out of the wire document and `schemars(skip)`
+    /// keeps it out of the served schema, so no caller of the public action can name it — a
+    /// coach card can never be an orphan (T4, v1-p6-6).
     #[serde(skip)]
+    #[schemars(skip)]
     pub internal_coach_card: bool,
 }
 
