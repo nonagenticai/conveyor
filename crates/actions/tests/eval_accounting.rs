@@ -303,7 +303,7 @@ async fn ledger_call(
             run_step_id: None,
             conversation_turn_id: None,
             eval_run_id: Some(run_id),
-            prompt_ref: Some(prompt_ref.to_owned()),
+            prompt_ref: Some(prompt_ref),
             prompt_version: None,
             prompt_sha256: None,
             model: "stub-model",
@@ -318,7 +318,7 @@ async fn ledger_call(
             usage_unit: None,
             usage_units: None,
             latency_ms: 3,
-            outcome: outcome.to_owned(),
+            outcome,
         },
     )
     .await
