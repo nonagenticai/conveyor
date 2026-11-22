@@ -1,7 +1,7 @@
 ---
 slice: S04
 title: Action registry — derive, manifest, OpenAPI, MCP, invocation, external ingest
-status: planned
+status: built 2026-11-22
 depends_on: [S02, S03]
 spec_sections: ["§5.5", "§7", "§8 S4", "§3 D11"]
 adds_tables: [action_registry]
@@ -185,6 +185,22 @@ kill %1 2>/dev/null || true
 | d | schema-invalid input | RFC 9457 with populated `errors[]`, never a 500 |
 | e | idempotent replay | two identical POSTs, one key: same status and body, one `action_invocation` |
 | f | the lock catches drift; breaking ingest refused | a renamed field makes `--check-lock` exit 1 naming the operation; the removed-field fixture exits 2 (`422`) while the approved version serves |
+
+**Delivery evidence (2026-11-22).** The registry this slice declares is live: the compiled
+`Registry` and `assert_registry_consistent` in `crates/actions`, the served manifest at
+`docs/design/data/actions.json` (527 actions), and `served-spec.lock.json` under `--check-lock`.
+The gate is proved in `crates/actions/tests/parity_http_mcp.rs`, which invokes the actions over
+HTTP and MCP and compares the bodies; the four `fixtures.*` actions, the idempotency replay, the
+RFC 9457 refusals, the timeout/breaker paths and the OpenAPI ingest diff are covered by the same
+workspace tests. This corrects the frontmatter's stale `planned`: the code and the proof existed;
+the status did not follow them.
+
+`parity_ids` stays `PENDING-S0`: the S00 parity contract (`parity/parity.yaml`,
+`parity/native.tsv`) does not yet name this slice's actions. That is an S00 trace obligation, not
+a missing S04 deliverable; the S04 gate (HTTP/MCP identity) does not depend on it.
+
+The three open questions in §10 remain open as recorded design defaults; the closure review
+carries them as open items.
 
 ## 8. Traps
 
