@@ -322,8 +322,23 @@
       "rework": {
         "title": "Correct the architecture waivers",
         "dod": [
-          "Every waiver names an owner and a review date and is unexpired",
+          "Every architecture waiver names an owner and a review date and is unexpired",
           "The audit reports zero waiver_invalid gaps"
+        ]
+      }
+    },
+    "waiver_not_permitted": {
+      "severity": "P1",
+      "standard": "MSP",
+      "spec": "ADR 0010 \u00a7Decision 1",
+      "artefact": "waiver",
+      "scope": "programme",
+      "owner_project": "P0",
+      "rework": {
+        "title": "Execute the work a waiver or allow block deferred",
+        "dod": [
+          "No open finding, rework package or artefact carries a waiver, deferral or [[allow]]",
+          "The audit reports zero waiver_not_permitted gaps"
         ]
       }
     },

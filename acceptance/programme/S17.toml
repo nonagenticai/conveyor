@@ -2,6 +2,7 @@
 key = "S17"
 name = "Native benchmark harness"
 gate = "`conveyor-bench` is absorbed: the conveyor becomes the whole measurement loop — seed the SWE-bench subset, produce a patch per instance for an arm, run the graded test in a sandbox, parse the log with a ported swebench parser, resolve it, store the verdict, and compare runs."
+gate_checks = ["S17-project", "S17-baseline", "S17-charter", "S17-closure-outputs", "S17-contract", "S17-review", "S17-closure-gate", "S17-waivers", "S17-pi-cadence", "S17-pi-plan", "S17-pi-objectives", "S17-wsjf", "S17-demo-credits", "S17-lessons", "S17-product"]
 
 [[check]]
 id = "S17-project"

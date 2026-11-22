@@ -2,6 +2,7 @@
 key = "S06"
 name = "Control plane — claims, runs, approvals, andon, comms and notifications"
 gate = "S06's gate is the golden card-type×list path, dual-control approval and retry."
+gate_checks = ["S06-project", "S06-baseline", "S06-charter", "S06-closure-outputs", "S06-contract", "S06-review", "S06-closure-gate", "S06-waivers", "S06-pi-cadence", "S06-pi-plan", "S06-pi-objectives", "S06-wsjf", "S06-demo-credits", "S06-lessons", "S06-product"]
 
 [[check]]
 id = "S06-project"

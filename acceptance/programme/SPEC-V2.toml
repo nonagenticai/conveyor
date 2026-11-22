@@ -2,6 +2,7 @@
 key = "SPEC-V2"
 name = "SPEC V2 — the organisational operating model"
 gate = "The closure review exists and every declared closure output is published; the project re-closes through the one gate."
+gate_checks = ["SPEC-V2-project", "SPEC-V2-baseline", "SPEC-V2-charter", "SPEC-V2-closure-outputs", "SPEC-V2-contract", "SPEC-V2-review", "SPEC-V2-closure-gate", "SPEC-V2-waivers", "SPEC-V2-pi-cadence", "SPEC-V2-wsjf", "SPEC-V2-demo-credits", "SPEC-V2-product"]
 
 [[check]]
 id = "SPEC-V2-project"

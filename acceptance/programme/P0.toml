@@ -2,6 +2,7 @@
 key = "P0"
 name = "Programme definition — vision, blueprint, plan and project briefs"
 gate = "The definition set is published; the charter and scope baseline are approved; the closure review and close gate are recorded."
+gate_checks = ["P0-project", "P0-baseline", "P0-charter", "P0-closure-outputs", "P0-contract", "P0-review", "P0-closure-gate", "P0-waivers", "P0-benefit-baseline", "P0-pi-cadence", "P0-wsjf", "P0-demo-credits", "P0-lessons", "P0-pi-plan", "P0-pi-objectives", "P0-product"]
 
 [[check]]
 id = "P0-project"
@@ -67,13 +68,6 @@ id = "P0-benefit-baseline"
 check = "benefit_baseline"
 severity = "P1"
 description = "the programme's six benefit baselines are measured"
-
-[[allow]]
-check = "benefit_baseline"
-reason = "the six benefit instruments and their baselines are U6's measurement unit; the ledger keeps the P1"
-owner = "programme owner"
-issue = "U6"
-expires = "2027-02-18"
 
 [[check]]
 id = "P0-pi-cadence"

@@ -2,6 +2,7 @@
 key = "PLATFORM"
 name = "CI, runners and platform"
 gate = "The standing platform row carries an approved charter and a baseline; it does not close."
+gate_checks = ["PLATFORM-project", "PLATFORM-baseline", "PLATFORM-charter", "PLATFORM-pi-cadence", "PLATFORM-wsjf", "PLATFORM-demo-credits", "PLATFORM-product"]
 
 [[check]]
 id = "PLATFORM-project"

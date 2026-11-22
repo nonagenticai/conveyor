@@ -132,8 +132,8 @@
       "path": "docs/decisions/0010-no-deferrals.html",
       "source": "docs/decisions/0010-no-deferrals.md",
       "section": "Decisions",
-      "sha256": "c3bfdeb4d10c7d5e8abb337716b74b6ba16b0fc494b91045611d654876bc9ff7",
-      "bytes": 3740,
+      "sha256": "c747876eecd33d03ba63456d70a58bbc2bf90e941edf19490d37e69d38e5879c",
+      "bytes": 3961,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0010-no-deferrals.md"
     },
     {

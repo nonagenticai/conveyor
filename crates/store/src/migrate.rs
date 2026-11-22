@@ -280,7 +280,15 @@ mod tests {
                 // v1-w1c-4 (#526): the authored option set, its per-option tenant
                 // refinement and the decision's set pins — options are rows, never a
                 // caller's list (0071_ladder_option_sets.sql, SPEC_V2 §7.2).
-                (71, "ladder option sets".to_owned())
+                (71, "ladder option sets".to_owned()),
+                // (0072): a register row belongs to a project OR a programme, and carries its
+                // next review date and response (0072_programme_risk_register.sql, SPEC_V2
+                // §8.3–§8.4).
+                (72, "programme risk register".to_owned()),
+                // (0073): the baseline/interim/post readings a benefit's evaluation reads, and
+                // the seven programme strategy/plan asset kinds
+                // (0073_benefit_measurement.sql, SPEC_V2 §8.3).
+                (73, "benefit measurement".to_owned())
             ],
             "the embedded migration set is {embedded:?}; a wrong sqlx::migrate! path or a \
              file outside the set changes it"

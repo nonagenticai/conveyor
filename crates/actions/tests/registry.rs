@@ -118,7 +118,9 @@ use serde_json::{Value, json};
 /// `decision_options.create|update|publish|refine|get`. 529 → **534**.
 /// **#15 (S21 step 3) adds 5 internal**: the `prompt_recipes.create|get|list|activate|retire`
 /// catalogue surface. 534 → **539**.
-const EXPECTED: [&str; 539] = [
+/// **#526 (tr2) adds 1 internal**: `benefits.measure` — the baseline/interim/post reading a
+/// realization cites. 539 → **540**.
+const EXPECTED: [&str; 540] = [
     "actions.describe",
     "actions.list",
     "analyse.site",
@@ -190,6 +192,7 @@ const EXPECTED: [&str; 539] = [
     "benefits.link",
     "benefits.link_list",
     "benefits.list",
+    "benefits.measure",
     "benefits.retire",
     "benefits.transition_list",
     "benefits.transition_upsert",
@@ -752,7 +755,7 @@ fn the_registry_is_exactly_the_declared_set() {
     // all internal: 515 -> 520; external stays 14 — they author this tenant's own options.
     // #15 (S21 step 3) adds five internal actions (`prompt_recipes.create|get|list|activate|retire`):
     // 520 -> 525; external stays 14.
-    assert_eq!((internal, external), (525, 14));
+    assert_eq!((internal, external), (526, 14));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),

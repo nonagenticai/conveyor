@@ -16,7 +16,7 @@
 //! payload `{entity, id, op}` and the topic `<entity>:<id>` — the same shape the portfolio
 //! surface uses, so a subscriber watches one row or a family.
 
-use chrono::{DateTime, Utc};
+use chrono::{DateTime, NaiveDate, Utc};
 use conveyor_domain::spine::{PlanError, WsjfInputs, tranche_review_has_evidence, wsjf};
 use conveyor_domain::{ApprovalError, DeciderKind, Decision, DecisionKind};
 use conveyor_store as store;
@@ -180,6 +180,12 @@ fn spine_error(error: PlanStoreError, action: &str) -> ActionError {
             "baseline",
             "benefit_baseline_missing",
             "a benefit with no measured baseline cannot record a post-transition measurement",
+        ),
+        PlanStoreError::Illegal(PlanError::BenefitPostMeasurementMissing) => invalid(
+            "post_measured_at",
+            "benefit_post_measurement_missing",
+            "a benefit is realised only by a post measurement taken after the transition was \
+             enacted",
         ),
         PlanStoreError::Illegal(PlanError::BenefitChangeRequired) => ActionError::new(
             409,
@@ -527,8 +533,10 @@ pub struct BaselineListIn {
 pub struct RegisterOut {
     /// The row id.
     pub id: String,
-    /// The owning project.
-    pub project_id: String,
+    /// The owning project; null for a programme-level row.
+    pub project_id: Option<String>,
+    /// The owning programme; null for a project-level row.
+    pub programme_id: Option<String>,
     /// The kind.
     pub kind: String,
     /// The human code.
@@ -551,6 +559,10 @@ pub struct RegisterOut {
     pub links: Value,
     /// The baseline a change changes.
     pub baseline_ref: Option<String>,
+    /// When the row is next reviewed.
+    pub review_at: Option<NaiveDate>,
+    /// The recorded response.
+    pub response: Option<String>,
     /// Metadata; a change's impact block lives here.
     pub meta: Value,
     /// The If-Match version.
@@ -564,7 +576,8 @@ pub struct RegisterOut {
 fn register_out(record: &RegisterRecord) -> RegisterOut {
     RegisterOut {
         id: record.id.to_string(),
-        project_id: record.project_id.to_string(),
+        project_id: record.project_id.map(|id| id.to_string()),
+        programme_id: record.programme_id.map(|id| id.to_string()),
         kind: record.kind.clone(),
         code: record.code.clone(),
         title: record.title.clone(),
@@ -576,6 +589,8 @@ fn register_out(record: &RegisterRecord) -> RegisterOut {
         impact: record.impact,
         links: record.links.clone(),
         baseline_ref: record.baseline_ref.map(|id| id.to_string()),
+        review_at: record.review_at,
+        response: record.response.clone(),
         meta: record.meta.clone(),
         version: record.version,
         created_at: record.created_at,
@@ -586,8 +601,10 @@ fn register_out(record: &RegisterRecord) -> RegisterOut {
 /// `registers.create`.
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 pub struct RegisterCreateIn {
-    /// The owning project.
-    pub project_id: Uuid,
+    /// The owning project; exactly one of this and `programme_id` is set.
+    pub project_id: Option<Uuid>,
+    /// The owning programme; exactly one of this and `project_id` is set.
+    pub programme_id: Option<Uuid>,
     /// `risk | issue | assumption | dependency | benefit | change`.
     pub kind: String,
     /// The human code.
@@ -610,6 +627,10 @@ pub struct RegisterCreateIn {
     pub links: Option<Value>,
     /// The baseline a change changes.
     pub baseline_ref: Option<Uuid>,
+    /// When the row is next reviewed (required for a risk).
+    pub review_at: Option<NaiveDate>,
+    /// The recorded response.
+    pub response: Option<String>,
     /// Metadata; a change's impact block lives here.
     pub meta: Option<Value>,
 }
@@ -619,6 +640,8 @@ pub struct RegisterCreateIn {
 pub struct RegisterUpdateIn {
     /// The row to edit.
     pub id: Uuid,
+    /// Move the row to a programme (a project-scoped row cannot gain one).
+    pub programme_id: Option<Uuid>,
     /// The new status.
     pub status: Option<String>,
     /// The new title.
@@ -629,6 +652,10 @@ pub struct RegisterUpdateIn {
     pub severity: Option<String>,
     /// The new impact.
     pub impact: Option<i32>,
+    /// The new review date.
+    pub review_at: Option<NaiveDate>,
+    /// The recorded response.
+    pub response: Option<String>,
     /// New metadata.
     pub meta: Option<Value>,
 }
@@ -636,8 +663,10 @@ pub struct RegisterUpdateIn {
 /// `registers.list`.
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 pub struct RegisterListIn {
-    /// The project whose register is read.
-    pub project_id: Uuid,
+    /// The project whose register is read; exactly one of this and `programme_id` is set.
+    pub project_id: Option<Uuid>,
+    /// The programme whose register is read (the programme-level rows).
+    pub programme_id: Option<Uuid>,
 }
 
 /// A dependency edge as `project_dependencies.*` returns it.
@@ -1181,6 +1210,72 @@ pub struct BenefitTransitionOut {
     pub version: i64,
 }
 
+/// `benefits.measure`.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct BenefitMeasureIn {
+    /// The benefit measured.
+    pub benefit_id: Uuid,
+    /// `baseline | interim | post`.
+    pub kind: String,
+    /// The target this reading is compared with.
+    pub target_value: Option<f64>,
+    /// The value actually observed.
+    pub actual_value: Option<f64>,
+    /// The unit of the values.
+    pub unit: Option<String>,
+    /// How the reading was taken.
+    pub method: Option<String>,
+    /// When the reading was taken.
+    pub measured_at: DateTime<Utc>,
+    /// The evidence behind the reading.
+    pub evidence: Option<Value>,
+}
+
+/// A benefit measurement as `benefits.measure` returns it.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct BenefitMeasurementOut {
+    /// The row id.
+    pub id: String,
+    /// The benefit measured.
+    pub benefit_id: String,
+    /// The programme the benefit belongs to.
+    pub programme_id: String,
+    /// The tranche the reading is attributed to, if any.
+    pub tranche_id: Option<String>,
+    /// `baseline | interim | post`.
+    pub kind: String,
+    /// The target the reading is compared with.
+    pub target_value: Option<f64>,
+    /// The value actually observed.
+    pub actual_value: Option<f64>,
+    /// The unit of the values.
+    pub unit: String,
+    /// How the reading was taken.
+    pub method: String,
+    /// When the reading was taken.
+    pub measured_at: DateTime<Utc>,
+    /// The evidence behind the reading.
+    pub evidence: Value,
+}
+
+fn benefit_measurement_out(
+    record: &store::spine::BenefitMeasurementRecord,
+) -> BenefitMeasurementOut {
+    BenefitMeasurementOut {
+        id: record.id.to_string(),
+        benefit_id: record.benefit_id.to_string(),
+        programme_id: record.programme_id.to_string(),
+        tranche_id: record.tranche_id.map(|id| id.to_string()),
+        kind: record.kind.clone(),
+        target_value: record.target_value,
+        actual_value: record.actual_value,
+        unit: record.unit.clone(),
+        method: record.method.clone(),
+        measured_at: record.measured_at,
+        evidence: record.evidence.clone(),
+    }
+}
+
 fn benefit_link_out(record: &BenefitLinkRecord) -> BenefitLinkOut {
     BenefitLinkOut {
         id: record.id.to_string(),
@@ -1667,6 +1762,56 @@ async fn baselines_list(
 
 // ── register actions ────────────────────────────────────────────────────────────────────
 
+/// A register row belongs to exactly one parent: a project or a programme (0070's CHECK).
+fn register_scope(project_id: Option<Uuid>, programme_id: Option<Uuid>) -> Result<(), ActionError> {
+    match (project_id, programme_id) {
+        (Some(_), Some(_)) => Err(invalid(
+            "programme_id",
+            "register_scope_invalid",
+            "a register row belongs to a project or a programme, never both",
+        )),
+        (None, None) => Err(invalid(
+            "project_id",
+            "register_scope_required",
+            "a register row needs a project_id or a programme_id",
+        )),
+        _ => Ok(()),
+    }
+}
+
+/// §8.4's risk register rule: a risk is probability, impact, owner, review date and at least
+/// one link. A row missing one is a note, not a managed risk.
+fn risk_missing(
+    probability: Option<&str>,
+    impact: Option<i32>,
+    owner_job_id: Option<Uuid>,
+    review_at: Option<NaiveDate>,
+    links: &Value,
+) -> Vec<&'static str> {
+    let mut missing = Vec::new();
+    if probability.is_none_or(|value| value.trim().is_empty()) {
+        missing.push("probability");
+    }
+    if impact.is_none() {
+        missing.push("impact");
+    }
+    if owner_job_id.is_none() {
+        missing.push("owner_job_id");
+    }
+    if review_at.is_none() {
+        missing.push("review_at");
+    }
+    let linked = match links {
+        Value::Array(items) => !items.is_empty(),
+        Value::Object(map) => !map.is_empty(),
+        _ => false,
+    };
+    if !linked {
+        missing.push("links");
+    }
+    missing
+}
+
 /// Create a register row.
 #[crate::action(
     name = "registers.create",
@@ -1695,6 +1840,24 @@ async fn registers_create(
             "kind must be risk, issue, assumption, dependency, benefit or change",
         ));
     }
+    register_scope(input.project_id, input.programme_id)?;
+    let links = input.links.unwrap_or_else(|| serde_json::json!([]));
+    if kind == "risk" {
+        let missing = risk_missing(
+            input.probability.as_deref(),
+            input.impact,
+            input.owner_job_id,
+            input.review_at,
+            &links,
+        );
+        if !missing.is_empty() {
+            return Err(invalid(
+                "review_at",
+                "risk_incomplete",
+                format!("a risk is missing: {missing:?}"),
+            ));
+        }
+    }
     // §8.4: approval is a gate effect, never a row write. A change is approved by its `change`
     // gate's decision (the read `baselines.take` uses); a create that self-declares `approved`
     // would be the bypass that guard exists to close.
@@ -1710,6 +1873,7 @@ async fn registers_create(
         ctx.tenant,
         &NewRegisterItem {
             project_id: input.project_id,
+            programme_id: input.programme_id,
             kind,
             code: input.code.unwrap_or_default(),
             title: input.title,
@@ -1719,8 +1883,10 @@ async fn registers_create(
             severity: input.severity,
             probability: input.probability,
             impact: input.impact,
-            links: input.links.unwrap_or_else(|| serde_json::json!([])),
+            links,
             baseline_ref: input.baseline_ref,
+            review_at: input.review_at,
+            response: input.response,
             meta: input.meta.unwrap_or_else(|| serde_json::json!({})),
         },
     )
@@ -1767,6 +1933,33 @@ async fn registers_update(
             "a change is approved by its `change` gate decision, not by a status write",
         ));
     }
+    // Scope is not an editable field that can make a row parentless or doubly-parented: a row
+    // already owned by a project cannot gain a programme (0070's CHECK would refuse it, and the
+    // refusal is a 422 here rather than a database error).
+    if input.programme_id.is_some() && current.project_id.is_some() {
+        return Err(invalid(
+            "programme_id",
+            "register_scope_invalid",
+            "a project-scoped register row cannot also name a programme",
+        ));
+    }
+    // The create rule is not a one-time admission: an update must leave a risk complete.
+    if current.kind == "risk" {
+        let missing = risk_missing(
+            current.probability.as_deref(),
+            input.impact.or(current.impact),
+            current.owner_job_id,
+            input.review_at.or(current.review_at),
+            &current.links,
+        );
+        if !missing.is_empty() {
+            return Err(invalid(
+                "review_at",
+                "risk_incomplete",
+                format!("a risk is missing: {missing:?}"),
+            ));
+        }
+    }
     let expected = require_precondition_with(
         &ctx,
         ctx.action,
@@ -1777,11 +1970,14 @@ async fn registers_update(
         ctx.tenant,
         input.id,
         i64::try_from(expected.get()).unwrap_or(i64::MAX),
+        input.programme_id,
         input.status.as_deref(),
         trimmed(input.title).as_deref(),
         input.body.as_deref(),
         input.severity.as_deref(),
         input.impact,
+        input.review_at,
+        trimmed(input.response).as_deref(),
         input.meta.as_ref(),
     )
     .await
@@ -1838,9 +2034,32 @@ async fn registers_list(
     ctx: HandlerCtx,
     input: RegisterListIn,
 ) -> Result<Page<RegisterOut>, ActionError> {
-    let records = store::spine::list_register_tx(&mut *tx, ctx.tenant, input.project_id)
-        .await
-        .map_err(|error| spine_error(error, ctx.action))?;
+    let records = match (input.project_id, input.programme_id) {
+        (Some(_), Some(_)) => {
+            return Err(invalid(
+                "programme_id",
+                "register_scope_invalid",
+                "read a project's register or a programme's register, not both",
+            ));
+        }
+        (Some(project_id), None) => {
+            store::spine::list_register_tx(&mut *tx, ctx.tenant, project_id)
+                .await
+                .map_err(|error| spine_error(error, ctx.action))?
+        }
+        (None, Some(programme_id)) => {
+            store::spine::list_programme_register_tx(&mut *tx, ctx.tenant, programme_id)
+                .await
+                .map_err(|error| spine_error(error, ctx.action))?
+        }
+        (None, None) => {
+            return Err(invalid(
+                "project_id",
+                "register_scope_required",
+                "name a project_id or a programme_id",
+            ));
+        }
+    };
     Ok(Page {
         items: records.iter().map(register_out).collect(),
         next_cursor: None,
@@ -2494,6 +2713,52 @@ async fn benefits_get(
         .map_err(|error| spine_error(error, ctx.action))?
         .ok_or_else(|| ActionError::resource_not_found("such benefit profile"))?;
     Ok(HandlerOutput::ok(benefit_out(&record)).with_etag(etag_of(record.version)))
+}
+
+/// Record one measurement of a benefit: the baseline, an interim reading or the post-transition
+/// reading (SPEC_V2 §8.3).
+#[crate::action(
+    name = "benefits.measure",
+    version = 1,
+    kind = "internal",
+    scopes = ["portfolio:write"],
+    idempotent = false,
+    timeout_ms = 30000,
+    effect = "write",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn benefits_measure(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: BenefitMeasureIn,
+) -> Result<HandlerOutput<BenefitMeasurementOut>, ActionError> {
+    let kind = input.kind.trim().to_owned();
+    if !matches!(kind.as_str(), "baseline" | "interim" | "post") {
+        return Err(invalid(
+            "kind",
+            "unknown_kind",
+            "kind must be baseline, interim or post",
+        ));
+    }
+    let record = store::spine::insert_benefit_measurement_tx(
+        &mut *tx,
+        ctx.tenant,
+        &store::spine::NewBenefitMeasurement {
+            benefit_id: input.benefit_id,
+            kind,
+            target_value: input.target_value,
+            actual_value: input.actual_value,
+            unit: input.unit.unwrap_or_default(),
+            method: input.method.unwrap_or_default(),
+            measured_at: input.measured_at,
+            evidence: input.evidence.unwrap_or_else(|| serde_json::json!({})),
+        },
+    )
+    .await
+    .map_err(|error| spine_error(error, ctx.action))?;
+    emit_spine_event(&mut *tx, &ctx, "benefit_measurement", record.id, "created").await?;
+    Ok(HandlerOutput::created(benefit_measurement_out(&record)))
 }
 
 /// List a programme's benefit profiles.
