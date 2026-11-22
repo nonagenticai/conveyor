@@ -123,8 +123,8 @@
       "path": "docs/decisions/0010-no-deferrals.html",
       "source": "docs/decisions/0010-no-deferrals.md",
       "section": "Decisions",
-      "sha256": "c3bfdeb4d10c7d5e8abb337716b74b6ba16b0fc494b91045611d654876bc9ff7",
-      "bytes": 3740,
+      "sha256": "c747876eecd33d03ba63456d70a58bbc2bf90e941edf19490d37e69d38e5879c",
+      "bytes": 3961,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0010-no-deferrals.md"
     },
     {
@@ -654,8 +654,8 @@
       "path": "docs/evidence/rework/T10/acts.html",
       "source": "docs/evidence/rework/T10/acts.md",
       "section": "Evidence",
-      "sha256": "1f7efe8c3683c2b71f8d1a4ae4090331fe085c70df005405387b52571d43d996",
-      "bytes": 810,
+      "sha256": "527e64f96d43ddf8387cee054b4f10ea7d71910889091ebe479326fab88dee45",
+      "bytes": 872,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/T10/acts.md"
     },
     {
@@ -690,8 +690,8 @@
       "path": "docs/evidence/rework/T4/acts.html",
       "source": "docs/evidence/rework/T4/acts.md",
       "section": "Evidence",
-      "sha256": "80d3dcb071fc8bf52c2381c9b3a27b647bb8450326245c8008f32682ad6affab",
-      "bytes": 914,
+      "sha256": "fd33c15247f2ae9b606254bb6dfc5c98687ef3cf974c5dd0be870143afa393b5",
+      "bytes": 975,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/T4/acts.md"
     },
     {
@@ -699,8 +699,8 @@
       "path": "docs/evidence/rework/T9/acts.html",
       "source": "docs/evidence/rework/T9/acts.md",
       "section": "Evidence",
-      "sha256": "c3429074fbf41058900be93ce56435bdd569e3927458d15ecdc21328fbc8efc6",
-      "bytes": 919,
+      "sha256": "5711885ed86fa9e4413c56e2da3a4eb1d4b427d2f0384d6d5089d4d6f8c58f3d",
+      "bytes": 980,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/T9/acts.md"
     },
     {
@@ -1230,8 +1230,8 @@
       "path": "docs/plans/slices/S14-cutover.html",
       "source": "docs/plans/slices/S14-cutover.md",
       "section": "Plans",
-      "sha256": "cd66732f57d4f0a814add991c092700411c5bda34d9d9be23d8d866d3dd94e44",
-      "bytes": 25934,
+      "sha256": "7a923f572c995f29cf1a9a6f27721a889cfea273c4786a211e4f8670109aa1df",
+      "bytes": 26519,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S14-cutover.md"
     },
     {
