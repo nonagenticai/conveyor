@@ -266,6 +266,7 @@ pub async fn intake_create_tx(
 /// and brief are trimmed; the payload must be an object and must not carry one of
 /// [`FORBIDDEN_PAYLOAD_KEYS`]. Every id in `depends_on` must already be a published asset of the
 /// same tenant, which is §5.7's dependency order enforced at the draft, not at publish.
+#[allow(clippy::too_many_arguments)] // one argument per column of the row it validates and writes
 pub async fn asset_draft_tx(
     conn: &mut PgConnection,
     tenant: TenantId,
