@@ -789,28 +789,7 @@ async fn invoke_and_record(
     // `tools.call` is the broker's run-scoped action: the run and the step are properties of the
     // execution, not of the step template. Inject them here, where the step's row is in hand; a
     // template that names a different run is refused rather than silently redirected (#556).
-    let input = if row.action == crate::tools::TOOLS_CALL {
-        let mut input = row.input.clone();
-        let object = input
-            .as_object_mut()
-            .ok_or_else(|| StepFailure::failed("tools.call input is not a JSON object"))?;
-        if let Some(existing) = object.get("run_id") {
-            let matches = existing
-                .as_str()
-                .and_then(|text| Uuid::parse_str(text).ok())
-                == Some(row.run_id);
-            if !matches {
-                return Err(StepFailure::failed(
-                    "the step input's run_id does not name this run",
-                ));
-            }
-        }
-        object.insert("run_id".to_owned(), json!(row.run_id));
-        object.insert("step_id".to_owned(), json!(row.id));
-        input
-    } else {
-        row.input.clone()
-    };
+    let input = tools_call_input(&row.action, row.run_id, row.id, &row.input)?;
 
     let request = InvokeRequest {
         action: row.action.clone(),
@@ -2288,4 +2267,80 @@ async fn emit_run_event(
         }
         other => StepFailure::permanent(format!("event: {other}")),
     })
+}
+
+/// The step input for a `tools.call` step: the run and the step are execution facts, not template
+/// variables. A template that names another run is refused rather than redirected (#556).
+fn tools_call_input(
+    action: &str,
+    run_id: Uuid,
+    run_step_id: Uuid,
+    input: &Value,
+) -> Result<Value, StepFailure> {
+    if action != crate::tools::TOOLS_CALL {
+        return Ok(input.clone());
+    }
+    let mut input = input.clone();
+    let object = input
+        .as_object_mut()
+        .ok_or_else(|| StepFailure::permanent("tools.call input is not a JSON object"))?;
+    if let Some(existing) = object.get("run_id") {
+        let matches = existing
+            .as_str()
+            .and_then(|text| Uuid::parse_str(text).ok())
+            == Some(run_id);
+        if !matches {
+            return Err(StepFailure::permanent(
+                "the step input's run_id does not name this run",
+            ));
+        }
+    }
+    object.insert("run_id".to_owned(), json!(run_id));
+    object.insert("step_id".to_owned(), json!(run_step_id));
+    Ok(input)
+}
+
+#[cfg(test)]
+mod tools_call_tests {
+    use super::*;
+
+    #[test]
+    fn a_tools_call_step_gets_the_run_and_step_ids() {
+        let run = Uuid::now_v7();
+        let step = Uuid::now_v7();
+        let input = tools_call_input(
+            crate::tools::TOOLS_CALL,
+            run,
+            step,
+            &json!({"tool": "fixtures.echo", "input": {"message": "hi"}}),
+        )
+        .expect("the input is an object");
+        assert_eq!(input["run_id"], json!(run));
+        assert_eq!(input["step_id"], json!(step));
+        assert_eq!(input["tool"], "fixtures.echo");
+    }
+
+    #[test]
+    fn another_action_is_untouched() {
+        let input = json!({"message": "hi"});
+        let out = tools_call_input("fixtures.echo", Uuid::now_v7(), Uuid::now_v7(), &input)
+            .expect("untouched");
+        assert_eq!(out, input);
+    }
+
+    #[test]
+    fn a_template_cannot_redirect_the_run() {
+        let run = Uuid::now_v7();
+        let input = json!({
+            "run_id": Uuid::now_v7().to_string(),
+            "tool": "fixtures.echo",
+            "input": {}
+        });
+        let error = tools_call_input(crate::tools::TOOLS_CALL, run, Uuid::now_v7(), &input)
+            .expect_err("a conflicting run id is refused");
+        assert!(
+            error.message.contains("does not name this run"),
+            "{error:?}"
+        );
+    }
 }

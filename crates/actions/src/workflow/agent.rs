@@ -432,7 +432,7 @@ async fn resolve_bound(
     for name in &record.allowed_actions {
         // `tools.call` is the broker's dispatch action, never a model-facing tool. When it is in
         // the allowlist, the run's bound tools are projected below in its place (#556).
-        if name == crate::tools::TOOLS_CALL {
+        if name.as_str() == crate::tools::TOOLS_CALL {
             continue;
         }
         let Some(spec) = registry().get(name) else {
@@ -459,7 +459,7 @@ async fn resolve_bound(
     if record
         .allowed_actions
         .iter()
-        .any(|name| name == crate::tools::TOOLS_CALL)
+        .any(|name| name.as_str() == crate::tools::TOOLS_CALL)
     {
         let mut tx = store::begin_scoped(pool, tenant).await.map_err(|error| {
             tracing::error!(%error, "agent.run: begin the tool-binding read");
