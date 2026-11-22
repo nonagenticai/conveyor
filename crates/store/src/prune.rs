@@ -277,8 +277,10 @@ pub async fn validation_run_prune(
 
 /// Delete this tenant's `action_invocation` rows older than `days`.
 ///
-/// No FK points at `action_invocation`, so nothing cascades and nothing blocks: the row is the
-/// whole record. It is the simplest of the three retention rules, and the highest-volume table.
+/// An invocation cited by a `decision.laya_invocation_id` is the provenance of a laya answer
+/// (0069), so it is evidence and is never pruned: `decision_laya_invocation_fk` would block the
+/// delete anyway, and dropping the citation would make an L1 row unverifiable. Every other row
+/// goes at the retention window — it is an operational trace, not a record.
 pub async fn action_invocation_prune(
     pool: &PgPool,
     tenant: TenantId,
@@ -292,10 +294,13 @@ pub async fn action_invocation_prune(
         let deleted = sqlx::query(
             "DELETE FROM action_invocation
               WHERE id IN (
-                    SELECT id FROM action_invocation
-                     WHERE tenant_id = $1
-                       AND created_at < now() - make_interval(days => $2)
-                     ORDER BY created_at, id
+                    SELECT ai.id FROM action_invocation ai
+                     WHERE ai.tenant_id = $1
+                       AND ai.created_at < now() - make_interval(days => $2)
+                       AND NOT EXISTS (
+                             SELECT 1 FROM decision d
+                              WHERE d.laya_invocation_id = ai.id)
+                     ORDER BY ai.created_at, ai.id
                      LIMIT $3)
              RETURNING id",
         )

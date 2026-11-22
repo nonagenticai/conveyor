@@ -163,6 +163,12 @@ pub struct Pins {
     pub refinement_version: Option<i64>,
     /// The `laya_inference_config.version` it used; `None` for a rule or a human rung.
     pub laya_config_version: Option<i64>,
+    /// The `action_invocation.id` of the verified `laya.classify` call behind a laya answer.
+    ///
+    /// A laya decision is not reproducible from its own numbers: the answer was produced by an
+    /// external call, and the row must name the recorded invocation that made it (§7.2). A
+    /// rule or human rung names none.
+    pub laya_invocation_id: Option<uuid::Uuid>,
 }
 
 /// The reasons the ladder refuses.
@@ -288,7 +294,8 @@ pub fn evaluate(
 /// The fields a decision row must carry for its rung, in the §7.2 order.
 ///
 /// * A rule or laya decision pins the policy version it enforced and a sha256 of the inputs it
-///   consumed; a laya decision pins the laya config, and a refined one pins the refinement.
+///   consumed; a laya decision pins the laya config and the recorded `laya.classify`
+///   invocation that produced its answer, and a refined one pins the refinement.
 /// * A human decision cites the approval it records.
 pub fn missing_pins(rung: Rung, pins: &Pins, approval_id: Option<uuid::Uuid>) -> Vec<&'static str> {
     let mut missing = Vec::new();
@@ -304,6 +311,9 @@ pub fn missing_pins(rung: Rung, pins: &Pins, approval_id: Option<uuid::Uuid>) ->
             }
             if pins.laya_config_version.is_none() {
                 missing.push("laya_config_version");
+            }
+            if pins.laya_invocation_id.is_none() {
+                missing.push("laya_invocation_id");
             }
         }
         Rung::Human => {
