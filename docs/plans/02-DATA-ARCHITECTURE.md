@@ -1366,17 +1366,33 @@ A bound run reuses the existing rows; no table and no migration.
 
 | Row | What the runtime writes |
 |---|---|
-| `run` | the binding pin (`job_binding_id`, `release_hash`, both from 0040), `capability_id`/`capability_agent_id` from the binding, the status path `queued → running → succeeded \| failed` (never `waiting_approval` in this unit) |
+| `run` | the binding pin (`job_binding_id`, `release_hash`, both from 0040), `capability_id`/`capability_agent_id` from the binding, the status path `queued → running → waiting_approval → running → succeeded \| failed` (a handover parks it — §2.25/§3.2) |
 | `run_step` | exactly one row: position 1, attempt 1, action `agent.run`, the pin envelope as `input`, the draft's hash as `output_hash`, and `judge` = the laya pre-check record or `{decision:"no_policy"}` |
 | `document` | the draft: `body` = the model's text, `meta.generated = true` + the prompt/binding/run identity; `card_id` null until `ladder.apply_draft` attaches it |
 | `decision` | one `gate.precheck` row when a policy exists: rung `laya`, option-set version, policy/refinement/laya-config versions, answer, probabilities, confidence, input hash, latency |
 | `inference_call` | one per model turn, naming `prompt_ref`/`prompt_version`/`prompt_sha256` and usage |
 | `tool_call` | one per tool call the loop dispatches through `tools.call` |
-| `approval` | one card-scoped row only when the gate's action is `handover` (no `run_id`; the run is terminal) |
+| `approval` | one card-scoped row only when the gate's action is `handover`: kind `executor`, `run_id`/`card_id` inherited from the run, and `meta` naming the draft; the run stays `waiting_approval` until the decision (§2.25) |
 
 The compiled prompt text is never stored: `inference_call` and the draft's `meta` carry the
 identity and the hash. `run_step.node_id` is nullable (0019), so the same store serves a workflow
 node and this run-level step.
+
+### 2.25 The applying gate — S21 step 5 (0 new tables)
+
+The park, the decision and the application reuse the same rows; no table and no migration.
+
+| Row | What the gate writes |
+|---|---|
+| `approval` | one `executor` row on a `handover`: `run_id`/`card_id` inherited, `gate = gate.precheck`, `meta = {run_id, gate, draft_document_id, prompt_sha256, position: 1, attempt: 1, threshold, policy_id, laya_config_id}`; it stays pending until a person decides it |
+| `decision` | on approval, one L3 row: `rung=human`, `kind=gate.draft_apply`, `outcome=accepted`, `approval_id`, `card_id`, `meta` naming `draft_document_id`/`prompt_sha256`/`run_id`; the L1 `gate.precheck` row already names the draft in its `meta` |
+| `approval_decision` | the person's approve/reject, `decided_by_kind='human'`; the executor gate refuses any other decider kind |
+| `job` | one `run.resume` row on approval, payload `{run_id, approval_id, decision_id}`, dedupe `run.resume:{run_id}:{approval_id}`; it is not in `ANDON_ALLOWED_KINDS` |
+| `document` | the draft gets `card_id` only in the resume transaction; a rejection or expiry leaves it null |
+
+The store's one apply helper (`apply_draft_tx`) is shared by `ladder.apply_draft` and the
+`run.resume` worker, so the decision binding is checked once. The run's `waiting_approval` row is
+live work and holds `uq_run_live` until the decision, the rejection or `approval.expire`.
 
 ## 3. State machines and enforcement
 
@@ -1406,10 +1422,12 @@ duplicates the function. The CHECK constraints below guard *vocabulary*, never *
 | Stored | `run.status`, `started_at`, `finished_at`, `attempt`, `error_class`, `error_message` |
 | Invariant | **a run is a tree (2026-11-09).** Partial unique `(tenant_id, card_id) WHERE parent_run_id IS NULL AND status IN ('queued','running','waiting_approval')` — **one live ROOT run per card**; the project form is `(tenant_id, project_id) WHERE parent_run_id IS NULL AND card_id IS NULL AND status IN (…)`; one live child per `(parent_run_id, step_id)` and one row per `(parent_run_id, step_id, attempt)`. `CHECK (parent_run_id IS NULL OR step_id IS NOT NULL)` and `CHECK (depth BETWEEN 0 AND 3)`. Cancel cascades from a parent to its children; a child's failure does not re-fire the parent's `err.card`. Enforced by the DB even if two API pods race |
 
-**A bound `internal_agent` run (S21 step 4) uses `queued → running → succeeded | failed` only.** Its
-gate pre-check is recorded on the step and, on `handover`, fails the run `gate_requires_approval`
-and opens a card-scoped approval — the run never enters `waiting_approval`, because no worker kind
-resumes a plain run and parking would hold `uq_run_live`. A resume worker is a separate unit.
+**A bound `internal_agent` run (S21 steps 4–5) uses the full path.** Its gate pre-check is recorded
+on the step. On `accepted` it succeeds with the draft; on `handover` it parks in `waiting_approval`
+and opens a card-scoped `executor` approval whose `meta` names the draft (§2.25). A person's
+approval settles it `running` and the `run.resume` job applies the draft and finishes it
+`succeeded`. A rejection cancels it; `approval.expire` cancels a still-waiting run with
+`approval_expired`. The parked run is live work and holds `uq_run_live` until one of those outcomes.
 
 ### 3.3 Approval
 

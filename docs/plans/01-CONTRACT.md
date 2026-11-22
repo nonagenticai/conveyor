@@ -809,18 +809,18 @@ process, so the release's `job_key`, title, charter, `procedure_ref` and authori
 Request source in the existing `process` section; a missing required section refuses
 `capability_not_ready` naming it, before the call. The generation output is an unattached
 `document` with `meta.generated = true`; `documents.update` refuses to re-attach it and
-`ladder.apply_draft` with an accepted decision is the only apply path. Generation never moves a
-card.
+`ladder.apply_draft` with an accepted decision bound to that draft (§23) is the only apply path.
+Generation never moves a card.
 
 **The gate.** The effective kind-wide `gate.precheck` policy is the one question set. No policy →
 no laya call, `run_step.judge = no_policy`, the run succeeds with the draft. A policy → one
 `laya.judge` with the draft as `state` and the policy's authored question/criteria, then one
 `decision` row through `ladder.evaluate` pinning the option-set, policy, refinement and laya-config
 versions, the answer, confidence, latency and input hash. `accepted` → succeed; `refused` →
-`laya_refused`; below threshold per the policy's action (`block`, `annotate`, `handover` →
-`gate_requires_approval` plus a card-scoped approval). An outage follows `fail_policy` through
-`ladder::unavailable` and never records a counterfactual decision; unavailable is never a pass on a
-closed gate.
+`laya_refused`; below threshold per the policy's action (`block`, `annotate`, `handover` → the run
+parks `waiting_approval` and a card-scoped `executor` approval naming the draft is opened, §23). An
+outage follows `fail_policy` through `ladder::unavailable` and never records a counterfactual
+decision; unavailable is never a pass on a closed gate.
 
 **The grant.** The release's `anatomy.grants` is the typed operation allowlist
 `{op, variant, max_side_effect, enabled}`, parsed and refused `422 release.anatomy_invalid` at
@@ -835,3 +835,37 @@ has no op column and cannot widen the grant; the release carries no tool content
 prefix (`turn{N}`, `tool{N}`, `draft`, `judge`, `decision`); every typed refusal is recorded on the
 run and finishes the job. A failure emits one `run.failed` and enqueues the existing `err.card`
 trigger; a success emits one `run.succeeded`.
+
+## 23. The applying gate (added 2026-11-22; S21 step 5, issue #590)
+
+**A handover parks, it does not fail.** The `gate.precheck` handover opens its `executor` approval
+in the same transaction that finishes the step: the run moves `running → waiting_approval` through
+`store::approval::open_gate_with_meta_tx`, the step is `succeeded` with the draft output and its
+judge, and the draft stays unattached. The approval inherits the run's `card_id` and `project_id`
+and carries `meta = {run_id, gate, draft_document_id, prompt_sha256, position, attempt, threshold,
+policy_id, laya_config_id}`. A retried `run.execute` is a no-op: the run has left `queued`.
+
+**An `executor` gate is a person's act.** The one approval writer (`record_decision_tx`) refuses a
+non-human `decided_by_kind` for `approval.kind = 'executor'`, exactly as it does for an eval gate.
+On approval it records one ladder decision in the same transaction: `rung=human`,
+`kind=gate.draft_apply`, `answer="approved"`, `outcome=accepted`, `approval_id`, the run's
+`card_id`, and `meta` naming the same draft. The decision and the `approval_decision` commit
+together or not at all.
+
+**The apply gate.** `ladder.record` refuses `rung=human` unless the actor is a person
+(`actor_kind = "user"`) and, when an approval is cited, that approval is `approved` and has an
+approve `approval_decision`. `ladder.apply_draft` accepts only a generated draft, an accepted
+non-rule decision of `gate.precheck` (L1) or `gate.draft_apply` (L3), and a decision whose `meta`
+names this exact draft (`draft_document_id`; `prompt_sha256` and `run_id` must match when the
+document carries them). A generic accepted decision on the card is refused
+`422 draft_requires_gate`. `documents.update` remains closed to generated drafts, so there is no
+second path.
+
+**The resume.** Approval settles `waiting_approval → running` and enqueues the `run.resume` job
+(`{run_id, approval_id, decision_id}`, dedupe `run.resume:{run_id}:{approval_id}`). The worker calls
+the same `apply_draft_tx` the action uses, attaches the draft to the run's card, finishes the run
+`succeeded`, and emits one `run.succeeded`. It never calls the model: the step already holds the
+draft, the inference call and the hash. A terminal run or a non-approved approval is a quiet no-op;
+inconsistent stored state finishes the run `failed` with `draft_apply_invalid`. A rejection cancels
+the run through the generic approval path; expiry cancels a still-`waiting_approval` run with
+`approval_expired`. Neither records a ladder decision.

@@ -53,9 +53,9 @@ Status: Accepted · Date: 2026-11-22 · Issue: #581 · Resolves: S21 §14, SPEC_
 6. **Generation yields a draft, and only a gate applies it.** The run materialises exactly one
    `run_step` (position 1, attempt 1, `agent.run`) and drives the one loop. The output is an
    unattached `document` with `meta.generated = true`; `documents.update` already refuses to
-   re-attach such a draft, and `ladder.apply_draft` (with an accepted L1/L3 decision on the same
-   card) is the only apply path. A run finishes `succeeded` with the draft or `failed` with a typed
-   class; generation never moves a card, list or board.
+   re-attach such a draft, and `ladder.apply_draft` (with an accepted L1/L3 decision bound to that
+   draft — ADR 0011) is the only apply path. A run finishes `succeeded` with the draft or `failed`
+   with a typed class; generation never moves a card, list or board.
 
 7. **Laya decides the configured pre-check, and only when a policy exists.** The executor reads
    the effective kind-wide `gate.precheck` policy. No policy → no laya call and no decision row;
@@ -65,11 +65,11 @@ Status: Accepted · Date: 2026-11-22 · Issue: #581 · Resolves: S21 §14, SPEC_
    through the ladder's one writer (`ladder.evaluate`), pinning the option-set version, the policy
    and refinement versions, the laya config version, the latency and the input hash. `accepted` →
    the run succeeds; `refused` → `laya_refused`; below threshold per the policy's action: `block`
-   → refused, `annotate` → accepted with the note, `handover` → the run fails
-   `gate_requires_approval` and a card-scoped approval row is opened (applying the draft then
-   needs the human's recorded decision). A laya outage follows `fail_policy` through the ladder's
-   `unavailable`: `closed` → `gate_unavailable`, `open` → the configured action; an outage never
-   records a counterfactual decision and never passes a closed gate.
+   → refused, `annotate` → accepted with the note, `handover` → the run parks `waiting_approval`
+   and a card-scoped `executor` approval naming the draft is opened; the approval applies it
+   (ADR 0011). A laya outage follows `fail_policy` through the ladder's `unavailable`: `closed` →
+   `gate_unavailable`, `open` → the configured action; an outage never records a counterfactual
+   decision and never passes a closed gate.
 
 8. **No second loop, no second compiler, no second tool path.** The executor calls
    `workflow::agent::drive` (the one capped loop, one `inference_call` per model call, one
@@ -98,8 +98,10 @@ the tool half already existed (#556/#568); this unit joins them at the one seam 
 - **Refuse when the release and the live agent row disagree on the model/prompt.** It would force
   an immutable release to track a mutable row and leave the compiled section with no correct
   value. Release-over-row with min caps keeps one truth.
-- **Park a plain run in `waiting_approval` on `handover`.** No worker kind resumes a plain run;
-  parking would hold `uq_run_live` forever. A resume worker is a separate unit.
+- **Park a plain run in `waiting_approval` on `handover` (in step 4).** Deferred, not rejected for
+  good: no worker kind resumed a plain run then, so the run failed instead of holding `uq_run_live`
+  forever. Step 5 (#590) built the park, the human decision and the `run.resume` worker; ADR 0011
+  supersedes this bullet.
 - **Enforce the grant in the broker for direct `tools.call` callers.** The broker's binding ceiling
   already governs a direct caller; the release grant bounds the *agent's choice*, which is decided
   where the surface is projected. A broker change is a separate unit if a direct caller must also
