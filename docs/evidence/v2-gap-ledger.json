@@ -1,9 +1,9 @@
 {
   "schema": "v2-gap-ledger/v1",
-  "lane_pin": "c206bedd",
+  "lane_pin": "864e71c4",
   "generated_from": {
     "artefact_record": {
-      "command": "/opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-artefacts/scripts/generate-standards.py --snapshot /tmp/snap-526-0738/data --outputs-dir /tmp/snap-526-0738/docs --register /tmp/conf-0738/rework.json --data-out /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/v2-gap-ledger-v2pliw0i --findings-out /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/v2-gap-ledger-v2pliw0i/findings.json",
+      "command": "/opt/Homebrew/bin/python3 /Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-artefacts/scripts/generate-standards.py --snapshot /tmp/snap-526-0738/data --outputs-dir /tmp/snap-526-0738/docs --register /tmp/conf-0738/rework.json --data-out /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/v2-gap-ledger-5c_64umk --findings-out /var/folders/by/s966gs5542x02b2s1cnjvf300000gn/T/v2-gap-ledger-5c_64umk/findings.json",
       "summary": {
         "absent": 393,
         "artefacts": 826,
@@ -41,7 +41,7 @@
       },
       {
         "path": "/Users/georgedekker/Movies/nonagenticai/conveyor/.worktrees/issue-526-artefacts/docs/evidence/v1-conformance-findings.json",
-        "sha256": "21a81731891452d146eb67f01389de4dd7ed7e0c1ee7d991cf6e568715c9aaa6",
+        "sha256": "67e12256667f3014eb0e79b377e6125fce3f2684a0009159ba40552339045d89",
         "role": "v1 findings; open ledger"
       },
       {
@@ -79,17 +79,17 @@
     "deploy_bound": "the not-yet-deployed set is migrations 0062-0066 and the authoring.* family 0066 creates"
   },
   "counts": {
-    "rows": 511,
+    "rows": 509,
     "by_kind": {
       "artefact": 393,
       "baseline": 16,
-      "ledger": 102
+      "ledger": 100
     },
     "by_severity": {
-      "P1": 229,
+      "P1": 228,
       "unassigned": 65,
       "P0": 19,
-      "P2": 198
+      "P2": 197
     },
     "by_kind_severity": {
       "artefact": {
@@ -103,18 +103,18 @@
         "P0": 4
       },
       "ledger": {
-        "P1": 72,
-        "P2": 28,
+        "P1": 71,
+        "P2": 27,
         "P0": 2
       }
     },
     "by_deploy_bound": {
-      "false": 511
+      "false": 509
     },
     "by_status": {
       "absent": 393,
       "stale": 16,
-      "open": 102
+      "open": 100
     },
     "artefact_fix_card_resolution": {
       "published_package": 314,
@@ -6259,6 +6259,21 @@
       "deploy_bound": false
     },
     {
+      "key": "ledger:v1-approvals-route-1",
+      "kind": "ledger",
+      "standard": "SPEC",
+      "spec": "§5.4",
+      "subject": "approvals routing / interaction dispatch",
+      "project": "S06",
+      "title": "The multicast offer cannot carry a question's answer or the delegation",
+      "status": "open",
+      "severity": "P1",
+      "owner": "S06",
+      "fix_card": "v1-approvals-route-1",
+      "target_phase": "G",
+      "deploy_bound": false
+    },
+    {
       "key": "ledger:v1-close-1",
       "kind": "ledger",
       "standard": "SPEC",
@@ -7099,21 +7114,6 @@
       "deploy_bound": false
     },
     {
-      "key": "ledger:v1-project-1",
-      "kind": "ledger",
-      "standard": "SPEC",
-      "spec": "§10.4",
-      "subject": "projects / domain events",
-      "project": "PLATFORM",
-      "title": "projects.close writes no domain event",
-      "status": "open",
-      "severity": "P2",
-      "owner": "PLATFORM",
-      "fix_card": "v1-project-1",
-      "target_phase": "Preliminary",
-      "deploy_bound": false
-    },
-    {
       "key": "ledger:v1-s03-2",
       "kind": "ledger",
       "standard": "SPEC",
@@ -7354,21 +7354,6 @@
       "deploy_bound": false
     },
     {
-      "key": "ledger:v1-tr2-2",
-      "kind": "ledger",
-      "standard": "SPEC",
-      "spec": "§8.3",
-      "subject": "T1 plan spine / tranche review",
-      "project": "T1",
-      "title": "A tranche review can be recorded with no snapshot identity",
-      "status": "open",
-      "severity": "P1",
-      "owner": "T1",
-      "fix_card": "v1-tr2-2",
-      "target_phase": "G",
-      "deploy_bound": false
-    },
-    {
       "key": "ledger:v1-u5a-budget-1",
       "kind": "ledger",
       "standard": "SPEC",
@@ -7396,21 +7381,6 @@
       "owner": "T13",
       "fix_card": "v1-u5a-tool-idempotency-publish-1",
       "target_phase": "G",
-      "deploy_bound": false
-    },
-    {
-      "key": "ledger:v1-ui-1",
-      "kind": "ledger",
-      "standard": "SPEC",
-      "spec": "§5.4",
-      "subject": "approvals UI / console destructive flow",
-      "project": "PLATFORM",
-      "title": "The console's destructive-request flow sends no evidence and no waiver",
-      "status": "open",
-      "severity": "P1",
-      "owner": "PLATFORM",
-      "fix_card": "v1-ui-1",
-      "target_phase": "Preliminary",
       "deploy_bound": false
     },
     {
