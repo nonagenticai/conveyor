@@ -1,1 +1,20 @@
-{"input": {"project_id": "01a1d039-0d37-730f-8f8a-2f50e5a0933d", "gate": "projects.close", "kind": "action", "action": "projects.close", "input": {"id": "01a1d039-0d37-730f-8f8a-2f50e5a0933d"}, "proposed_input": {"id": "01a1d039-0d37-730f-8f8a-2f50e5a0933d", "reason": "Rework complete through tr3; closure review published; open items named and not waived."}, "description": "Approve the T13 close under the published closure review (14/16 checks; open items named).", "evidence": [{"kind": "governed_asset", "id": "01a2051f-d60f-7f6c-bf3e-935e8fc43482"}]}}
+{
+ "project_id": "01a1d039-0d37-730f-8f8a-2f50e5a0933d",
+ "gate": "projects.close",
+ "kind": "action",
+ "action": "projects.close",
+ "input": {
+  "id": "01a1d039-0d37-730f-8f8a-2f50e5a0933d"
+ },
+ "proposed_input": {
+  "id": "01a1d039-0d37-730f-8f8a-2f50e5a0933d",
+  "reason": "Rework complete through tr3; closure review published; open items named and not waived."
+ },
+ "description": "Approve the T13 close under the published closure review (14/16 checks; open items named).",
+ "evidence": [
+  {
+   "kind": "governed_asset",
+   "id": "01a2051f-d60f-7f6c-bf3e-935e8fc43482"
+  }
+ ]
+}

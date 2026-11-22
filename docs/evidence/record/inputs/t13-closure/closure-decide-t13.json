@@ -1,1 +1,6 @@
-{"input":{"approval_id":"01a2051f-d614-7c07-a57e-ac31652e51d1","decision":"approve","note":"T13 rework closure: 14/16 checks at snapshot bb38b11e; the open items are named in the published closure review and are not waived.","delegation_ref":"01a2021d-cca2-757c-bfc2-21bd4e4b6d85"}}
+{
+ "approval_id": "01a2051f-d614-7c07-a57e-ac31652e51d1",
+ "decision": "approve",
+ "note": "T13 rework closure: 14/16 checks at snapshot bb38b11e; the open items are named in the published closure review and are not waived.",
+ "delegation_ref": "01a2021d-cca2-757c-bfc2-21bd4e4b6d85"
+}

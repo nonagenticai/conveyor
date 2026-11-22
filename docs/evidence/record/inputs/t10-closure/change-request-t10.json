@@ -1,1 +1,11 @@
-{"input": {"project_id": "01a1d039-0d36-70c1-a5e8-f50956c5e3f9", "baseline_id": "01a20289-7be3-7e47-afe0-f6b1f82f1892", "title": "Complete T10's retrospective lifecycle record", "body": "The retrospective rework records the lifecycle T10 already lived: the charter, the frozen scope baseline, the seven A-D artefacts, the Statement of Architecture Work and delivery contract, the Phase-G compliance review, and the project's declared outputs. It changes no deliverable and no date; it names the out-of-sequence closure as the accepted exception U3-EXC-T10 and records the tranche-4 authorisation the tr4 review carries.", "impact": {"scope": "none: no deliverable changes; the record is completed", "schedule": "none: the frozen baseline's dates stand", "risk": "the record now supports the out-of-sequence closure (U3-EXC-T10) instead of leaving it implicit"}}}
+{
+ "project_id": "01a1d039-0d36-70c1-a5e8-f50956c5e3f9",
+ "baseline_id": "01a20289-7be3-7e47-afe0-f6b1f82f1892",
+ "title": "Complete T10's retrospective lifecycle record",
+ "body": "The retrospective rework records the lifecycle T10 already lived: the charter, the frozen scope baseline, the seven A-D artefacts, the Statement of Architecture Work and delivery contract, the Phase-G compliance review, and the project's declared outputs. It changes no deliverable and no date; it names the out-of-sequence closure as the accepted exception U3-EXC-T10 and records the tranche-4 authorisation the tr4 review carries.",
+ "impact": {
+  "scope": "none: no deliverable changes; the record is completed",
+  "schedule": "none: the frozen baseline's dates stand",
+  "risk": "the record now supports the out-of-sequence closure (U3-EXC-T10) instead of leaving it implicit"
+ }
+}
