@@ -577,9 +577,23 @@ pub async fn snapshot_tx(
     let register_items = rows(
         &mut *conn,
         "SELECT COALESCE(jsonb_agg(to_jsonb(t) ORDER BY t.project_id, t.created_at, t.id), '[]'::jsonb) FROM (
-             SELECT id, project_id, kind, code, title, body, owner_job_id, status, severity,
-                    probability, impact, links, baseline_ref, meta, version, created_at, updated_at
+             SELECT id, project_id, programme_id, kind, code, title, body, owner_job_id, status,
+                    severity, probability, impact, response, review_at, links, baseline_ref, meta,
+                    version, created_at, updated_at
                FROM project_register_item WHERE tenant_id = $1
+         ) t",
+        tenant_id,
+    )
+    .await?;
+    // §8.3 benefit evaluation: the measurements a profile is judged against. One row per reading
+    // (baseline | interim | post), so the pack can compute a variance rather than trusting the two
+    // nullable timestamps on `benefit_transition`.
+    let benefit_measurements = rows(
+        &mut *conn,
+        "SELECT COALESCE(jsonb_agg(to_jsonb(t) ORDER BY t.benefit_id, t.measured_at, t.id), '[]'::jsonb) FROM (
+             SELECT id, benefit_id, programme_id, tranche_id, kind, target_value, actual_value,
+                    unit, method, measured_at, evidence
+               FROM benefit_measurement WHERE tenant_id = $1
          ) t",
         tenant_id,
     )
@@ -951,6 +965,7 @@ pub async fn snapshot_tx(
             "benefit_profiles": benefit_profiles,
             "benefit_links": benefit_links,
             "benefit_transitions": benefit_transitions,
+            "benefit_measurements": benefit_measurements,
             "stakeholder_profiles": stakeholder_profiles,
             "tranches": tranches,
             "tranche_reviews": tranche_reviews,

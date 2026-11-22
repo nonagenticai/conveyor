@@ -273,7 +273,15 @@ mod tests {
                 // v1-w1c-3 (#526): an L1 decision names the verified `laya.classify`
                 // invocation behind its answer and the request/response hashes it was
                 // verified against (0069_ladder_laya_provenance.sql, SPEC_V2 §7.2).
-                (69, "ladder laya provenance".to_owned())
+                (69, "ladder laya provenance".to_owned()),
+                // (0072): a register row belongs to a project OR a programme, and carries its
+                // next review date and response (0072_programme_risk_register.sql, SPEC_V2
+                // §8.3–§8.4).
+                (72, "programme risk register".to_owned()),
+                // (0073): the baseline/interim/post readings a benefit's evaluation reads, and
+                // the seven programme strategy/plan asset kinds
+                // (0073_benefit_measurement.sql, SPEC_V2 §8.3).
+                (73, "benefit measurement".to_owned())
             ],
             "the embedded migration set is {embedded:?}; a wrong sqlx::migrate! path or a \
              file outside the set changes it"

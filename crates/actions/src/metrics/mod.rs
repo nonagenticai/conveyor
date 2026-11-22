@@ -337,6 +337,29 @@ pub struct BenefitMetricOut {
     pub post_measured_at: Option<DateTime<Utc>>,
     /// A profile with a target and a post-measurement transition is realised.
     pub realised: bool,
+    /// `actual - target` of the latest measurement; null when either value is absent.
+    pub variance: Option<f64>,
+    /// `unmeasured | realised | on_track | at_risk`, from the latest `benefit_measurement`:
+    /// no measurement is `unmeasured`; a `post` reading after `enacted_at` is `realised`; any
+    /// other reading is `on_track` when it meets the target in the improvement direction and
+    /// `at_risk` otherwise.
+    pub evaluation_status: String,
+}
+
+/// One programme-level risk row and its review state.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct RiskMetricOut {
+    pub id: String,
+    pub code: String,
+    pub title: String,
+    pub severity: Option<String>,
+    pub probability: Option<String>,
+    pub impact: Option<i32>,
+    pub status: String,
+    pub owner_job_id: Option<String>,
+    pub review_at: Option<NaiveDate>,
+    /// The review date has passed and the risk is not closed.
+    pub overdue: bool,
 }
 
 /// One benefit put at risk by a dependency slip.
@@ -378,6 +401,10 @@ pub struct ProgrammeOut {
     /// `realised / planned`, null when nothing is planned.
     pub benefit_ratio: Option<f64>,
     pub benefit_at_risk: Vec<BenefitAtRiskOut>,
+    /// The programme's operated risk register (0070).
+    pub risks: Vec<RiskMetricOut>,
+    /// Risks whose review date has passed and whose status is not `closed`.
+    pub risks_overdue: i64,
     pub tranches: Vec<TrancheOut>,
     pub gates: Vec<GateOut>,
     /// Every gate in the window with decided approvals and no rejection.
@@ -409,24 +436,55 @@ async fn metrics_programme(
     let (realised, planned) = benefit_totals(&rows);
     let benefits = rows
         .into_iter()
-        .map(|row| BenefitMetricOut {
-            reference: row.reference,
-            status: row.status,
-            baseline_state: if row.baseline.is_some() {
-                "measured"
-            } else {
-                "unmeasured"
+        .map(|row| {
+            let (variance, evaluation_status) = benefit_evaluation(&row);
+            BenefitMetricOut {
+                reference: row.reference,
+                status: row.status,
+                baseline_state: if row.baseline.is_some() {
+                    "measured"
+                } else {
+                    "unmeasured"
+                }
+                .to_owned(),
+                baseline: row.baseline,
+                target: row.target.clone(),
+                post_measured_at: row.post_measured_at,
+                realised: row.target.is_some() && row.post_measured_at.is_some(),
+                variance,
+                evaluation_status,
             }
-            .to_owned(),
-            baseline: row.baseline,
-            target: row.target.clone(),
-            post_measured_at: row.post_measured_at,
-            realised: row.target.is_some() && row.post_measured_at.is_some(),
         })
         .collect();
     let at_risk = store::metrics::benefit_at_risk_tx(&mut *tx, ctx.tenant, input.programme_id)
         .await
         .map_err(|error| metrics_error(error, ctx.action))?;
+    let risk_rows =
+        store::metrics::programme_risk_rows_tx(&mut *tx, ctx.tenant, input.programme_id)
+            .await
+            .map_err(|error| metrics_error(error, ctx.action))?;
+    let today = Utc::now().date_naive();
+    let mut risks = Vec::with_capacity(risk_rows.len());
+    let mut risks_overdue = 0;
+    for row in risk_rows {
+        let overdue =
+            row.status != "closed" && row.review_at.is_some_and(|review_at| review_at < today);
+        if overdue {
+            risks_overdue += 1;
+        }
+        risks.push(RiskMetricOut {
+            id: row.id.to_string(),
+            code: row.code,
+            title: row.title,
+            severity: row.severity,
+            probability: row.probability,
+            impact: row.impact,
+            status: row.status,
+            owner_job_id: row.owner_job_id.map(|id| id.to_string()),
+            review_at: row.review_at,
+            overdue,
+        });
+    }
     let tranches = store::metrics::tranche_rows_tx(&mut *tx, ctx.tenant, input.programme_id)
         .await
         .map_err(|error| metrics_error(error, ctx.action))?;
@@ -474,6 +532,8 @@ async fn metrics_programme(
                 via_project: row.via_project,
             })
             .collect(),
+        risks,
+        risks_overdue,
         tranches: tranches
             .into_iter()
             .map(|row| TrancheOut {
@@ -503,6 +563,46 @@ fn benefit_totals(rows: &[store::metrics::BenefitRow]) -> (i64, i64) {
         }
     }
     (realised, planned)
+}
+
+/// The benefit's latest-reading evaluation (§8.3): `(variance, evaluation_status)`.
+///
+/// A benefit with no `benefit_measurement` row is `unmeasured`; a `post` reading taken after
+/// the transition's `enacted_at` is `realised`; any other reading is `on_track` when it meets
+/// the target in the improvement direction and `at_risk` otherwise. The direction comes from
+/// the latest `baseline` reading (falling back to the profile's baseline value): a target below
+/// the baseline is a reduction, so meeting it means the actual value is at or below the target.
+fn benefit_evaluation(row: &store::metrics::BenefitRow) -> (Option<f64>, String) {
+    let Some(kind) = row.measurement_kind.as_deref() else {
+        return (None, "unmeasured".to_owned());
+    };
+    let variance = match (row.measurement_actual, row.measurement_target) {
+        (Some(actual), Some(target)) => Some(actual - target),
+        _ => None,
+    };
+    if kind == "post"
+        && let (Some(measured_at), Some(enacted_at)) = (row.measurement_measured_at, row.enacted_at)
+        && measured_at > enacted_at
+    {
+        return (variance, "realised".to_owned());
+    }
+    let baseline = row.baseline_actual.or_else(|| {
+        row.baseline
+            .as_ref()
+            .and_then(|value| value.get("value"))
+            .and_then(Value::as_f64)
+    });
+    let on_track = match (row.measurement_actual, row.measurement_target) {
+        (Some(actual), Some(target)) => match baseline {
+            Some(baseline) if target < baseline => actual <= target,
+            _ => actual >= target,
+        },
+        _ => false,
+    };
+    (
+        variance,
+        if on_track { "on_track" } else { "at_risk" }.to_owned(),
+    )
 }
 
 // Keep the reconciliation enum referenced until the P2 action lands on this branch; the state
