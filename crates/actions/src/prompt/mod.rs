@@ -12,14 +12,21 @@
 //! the ref and the missing section. That is the same fail-closed rule the executor already used
 //! when the catalogue did not exist (`prompt_unresolved`).
 
+pub mod recipes;
+
 use conveyor_domain::TenantId;
 use conveyor_domain::capability::PromptRef;
-use conveyor_domain::prompt::{CompiledPrompt, PromptCompileError, PromptFacts, PromptSource};
+use conveyor_domain::prompt::{
+    CompiledPrompt, KnowledgeHit, KnowledgeSelector, MemorySelector, PromptCompileError,
+    PromptFacts, PromptSource,
+};
 use conveyor_store as store;
+use serde_json::Value;
 use sqlx::PgConnection;
 use uuid::Uuid;
 
 use crate::invoke::ActionError;
+use crate::knowledge::retrieval;
 
 /// Why a prompt could not be compiled.
 #[derive(Debug, thiserror::Error)]
@@ -64,6 +71,9 @@ pub enum PromptError {
     /// The catalogue read failed.
     #[error(transparent)]
     Store(#[from] store::prompt::PromptStoreError),
+    /// Knowledge retrieval refused (a required pack is missing or unreachable).
+    #[error(transparent)]
+    Knowledge(#[from] ActionError),
 }
 
 impl PromptError {
@@ -75,6 +85,7 @@ impl PromptError {
                 tracing::error!(%error, action, "the prompt catalogue read failed");
                 ActionError::internal()
             }
+            Self::Knowledge(error) => error,
             Self::BudgetExceeded {
                 reference,
                 section,
@@ -128,15 +139,45 @@ pub async fn compile_for_run(
     let mut tx = store::begin_scoped(pool, tenant)
         .await
         .map_err(store::prompt::PromptStoreError::Db)?;
-    let compiled = compile_for_run_tx(&mut tx, tenant, run_id, run_step_id, reference).await?;
+    let (key, version) = parse_ref(reference)?;
+    let record = resolve(&mut tx, tenant, &key, version, reference).await?;
+    let memory_selector = memory_selector_of(&record.definition)?;
+    let knowledge_selector = knowledge_selector_of(&record.definition)?;
+    let mut facts =
+        store::prompt::facts_for_run_tx(&mut tx, tenant, run_id, run_step_id, &memory_selector)
+            .await?;
+    // Resolve the knowledge targets in the transaction; retrieve after it commits, so no
+    // network call is ever made while a database transaction is open (S21 §4, ADR 0009).
+    let targets = match (&knowledge_selector, facts.capability.as_ref()) {
+        (Some(_), Some(capability)) => Some(
+            retrieval::resolve_targets_tx(&mut tx, tenant, capability.id, "agent.run")
+                .await
+                .map_err(PromptError::Knowledge)?,
+        ),
+        _ => None,
+    };
     tx.commit()
         .await
         .map_err(store::prompt::PromptStoreError::Db)?;
-    Ok(compiled)
+
+    if let (Some(selector), Some(targets)) = (knowledge_selector, targets)
+        && let Some(query) = knowledge_query(&selector, &facts)
+    {
+        let retrieved = retrieval::retrieve("agent.run", &targets, &query, selector.top_k)
+            .await
+            .map_err(PromptError::Knowledge)?;
+        if !retrieved.packs.is_empty() {
+            facts.knowledge.packs = retrieved.packs;
+        }
+        facts.knowledge.hits = knowledge_hits(&retrieved.hits);
+    }
+    compile(record, facts, reference)
 }
 
-/// Compile a run's prompt inside the caller's transaction (the executor already holds one while
-/// it reads the capability agent).
+/// Compile a run's prompt inside the caller's transaction, without knowledge retrieval.
+///
+/// This is the store-only seam for a caller that already holds a transaction; the executor path
+/// is [`compile_for_run`], which resolves the targets, commits, and then retrieves.
 pub async fn compile_for_run_tx(
     conn: &mut PgConnection,
     tenant: TenantId,
@@ -146,8 +187,91 @@ pub async fn compile_for_run_tx(
 ) -> Result<CompiledPrompt, PromptError> {
     let (key, version) = parse_ref(reference)?;
     let record = resolve(conn, tenant, &key, version, reference).await?;
-    let facts = store::prompt::facts_for_run_tx(&mut *conn, tenant, run_id, run_step_id).await?;
+    let memory_selector = memory_selector_of(&record.definition)?;
+    let facts =
+        store::prompt::facts_for_run_tx(&mut *conn, tenant, run_id, run_step_id, &memory_selector)
+            .await?;
     compile(record, facts, reference)
+}
+
+/// The memory selection the recipe declares, or the default when it has no memory section.
+fn memory_selector_of(
+    definition: &conveyor_domain::prompt::PromptDefinition,
+) -> Result<MemorySelector, PromptError> {
+    for section in &definition.sections {
+        if section.source == PromptSource::Memory {
+            return MemorySelector::parse(&section.selector).map_err(|error| {
+                PromptError::Store(store::prompt::PromptStoreError::Selector(error))
+            });
+        }
+    }
+    Ok(MemorySelector::default())
+}
+
+/// The knowledge selection the recipe declares, if it has a knowledge section.
+fn knowledge_selector_of(
+    definition: &conveyor_domain::prompt::PromptDefinition,
+) -> Result<Option<KnowledgeSelector>, PromptError> {
+    for section in &definition.sections {
+        if section.source == PromptSource::Knowledge {
+            return KnowledgeSelector::parse(&section.selector)
+                .map(Some)
+                .map_err(|error| {
+                    PromptError::Store(store::prompt::PromptStoreError::Selector(error))
+                });
+        }
+    }
+    Ok(None)
+}
+
+/// The query a knowledge section asks: the selector's literal, else the card name and description.
+fn knowledge_query(selector: &KnowledgeSelector, facts: &PromptFacts) -> Option<String> {
+    let text = selector.query.clone().or_else(|| {
+        let card = facts.card.as_ref()?;
+        let mut text = card.name.clone();
+        if !card.description.trim().is_empty() {
+            text.push('\n');
+            text.push_str(card.description.trim());
+        }
+        (!text.trim().is_empty()).then_some(text)
+    })?;
+    let capped: String = text.chars().take(2_000).collect();
+    (!capped.trim().is_empty()).then_some(capped)
+}
+
+/// Normalise the upstream hit documents into the text the compiler renders and hashes.
+fn knowledge_hits(hits: &[Value]) -> Vec<KnowledgeHit> {
+    hits.iter()
+        .enumerate()
+        .filter_map(|(index, hit)| {
+            let id = hit
+                .get("id")
+                .map(|value| {
+                    value
+                        .as_str()
+                        .map(str::to_owned)
+                        .unwrap_or_else(|| value.to_string())
+                })
+                .or_else(|| {
+                    hit.get("document_id")
+                        .and_then(Value::as_str)
+                        .map(str::to_owned)
+                })
+                .unwrap_or_else(|| format!("hit-{index}"));
+            let text = hit
+                .get("text")
+                .and_then(Value::as_str)
+                .or_else(|| hit.get("content").and_then(Value::as_str))
+                .or_else(|| hit.get("body").and_then(Value::as_str))
+                .map(str::to_owned)
+                .unwrap_or_else(|| hit.to_string());
+            let text = text.trim();
+            (!text.is_empty()).then(|| KnowledgeHit {
+                id,
+                text: text.to_owned(),
+            })
+        })
+        .collect()
 }
 
 /// Compile the copilot's system message for one conversation (its project facts; no run).

@@ -1,3 +1,15 @@
+---
+slice: S21
+title: Message construction (the compiled prompt)
+status: partial
+depends_on: [S09, S11, S13, S15, S16]
+spec_sections: ["§3 D27", "§8 S21"]
+adds_tables: [prompt, prompt_section]
+adds_actions: [prompt_recipes.create, prompt_recipes.list, prompt_recipes.get, prompt_recipes.activate, prompt_recipes.retire]
+adds_modules: [prompt, memory, knowledge]
+parity_ids: PENDING-S0
+---
+
 # S21 — Message construction (the compiled prompt)
 
 <!-- historical-rbuild -->
@@ -7,9 +19,11 @@
 > `~/.claude/scripts/cargo-guard.py` on m4 for interactive feedback; never a local gate.
 
 
-Programme project: S21 · issues #25
+Programme project: S21 · issues #15
 
-**Status:** `plan written 2026-11-09`; the v1 seam is built (D27), the 2026-2027 design is this document.
+**Status:** `plan written 2026-11-09`; the v1 seam is built (D27) and steps 1–2 are built. Step 3
+(the work-package prompt envelope — recipe authoring, memory selection, knowledge content) is
+**built on issue #15's branch, 2026-11-22**; the design is §12 and the build record is §13.
 **Depends on:** S15 (capability/knowledge), S16 (prompt audit), S13 (agent.run), S11 (procedure steps),
 S09 (`retrieval.query` / `strata` packs).
 **Owner ruling:** George, 2026-11-09 — *a prompt is a run-time compilation from the procedure and the
@@ -21,8 +35,8 @@ other system/tenant/project sources, stored in Postgres; prompt-engineering is 2
 - `prompt` + `prompt_section` (`migrations/0030_prompt_catalogue.sql`): a **recipe**, one active version
   per `(tenant, key)`, exact-pin resolution by `<key>@<version>`.
 - `conveyor_domain::prompt::compile`: pure renderer over `PromptFacts`; sections are `system`,
-  `procedure`, `capability`, `project_card`, `knowledge`; a required section with no source refuses by
-  name; the compiled text's SHA-256 is the provenance key.
+  `process`, `capability`, `role`, `project_card`, `knowledge` (step 3 adds `memory`); a required
+  section with no source refuses by name; the compiled text's SHA-256 is the provenance key.
 - `conveyor_actions::prompt`: three surfaces resolve through it — `agent.run` (resolved path), the
   copilot, and the prompt audit.
 - `inference_call.prompt_ref` / `prompt_version` / `prompt_sha256` record which recipe produced which
@@ -43,7 +57,7 @@ costs tokens and hides the one fact that mattered.
 
 ### 3.1 Procedural — what the agent is doing
 
-Source: the run's `procedure`/`workflow` and its `run_step` (position, action, gate, `on_error`), plus
+Source: the run's `process`/`workflow` and its `run_step` (position, action, gate, `on_error`), plus
 the step's declared intent. Rendered today from the frozen published version, so the procedure the
 agent reads is the procedure the run was started under.
 
@@ -79,12 +93,15 @@ memory digest (`memory.recall`). Two hard rules:
 1. **Select** — the recipe names section *kinds* and a budget; the selector picks concrete sources for
    the run (which packs, which card fields, how many memory items), with a deterministic order.
 2. **Fetch** — one store read per source class, inside the executor's transaction where one exists.
+   The exception is knowledge: its targets are resolved in the transaction, the transaction is
+   committed, and only then is the one retrieval path called with no transaction open (§12).
 3. **Render** — the pure renderer, sections in trust order: instructions → procedure → capability/role
    → knowledge → project/card. Untrusted text never precedes the instruction block.
 4. **Budget** — a token ceiling per section and per prompt; over-budget is a *refusal with the
    measurement*, never silent truncation (the same rule as the loop caps).
-5. **Hash and record** — SHA-256 of the compiled text into `prompt_sha256`, with the source versions in
-   the hash's pre-image so a past call is reproducible.
+5. **Hash and record** — SHA-256 of the compiled text into `prompt_sha256`. Source identities
+   (recipe version, pack `key@version`, memory row ids, knowledge hit ids) are rendered into the
+   text, so they are in the hash's pre-image; a past call is reproducible without storing the text.
 6. **Audit hook** — the compiled text is what S16 audits; a finding names the recipe version and the
    compiled hash it was found against.
 
@@ -140,6 +157,9 @@ check in a way the renderer cannot explain.
    before an edit takes effect? (v1 seeds system recipes only.)
 5. **Planner projection** — is the `plan` projection per-procedure, or computed once per published
    version and stored as a validation artifact?
+
+**Status 2026-11-22:** Q1 and Q2 were decided in §10; Q5 was closed in §11; Q3 and Q4 are built by
+step 3 (#15) and decided in `docs/decisions/0009-prompt-selection-and-recipe-authoring.md`.
 
 ## 9. Acceptance (for the build steps, not this document)
 
@@ -200,9 +220,9 @@ were closed and re-measured before handoff.
 already embedded; the prompt-catalogue session had updated `s07_schema.rs` only. Both ledger lists
 now carry 30 and 31.
 
-**Remaining for S21.** The `plan` projection (§6), tenant-authored recipes (open question 4: an edit
-is a new version, and the CRUD surface + its audit gate are the gate), and memory selection (open
-question 3) — none of them built here.
+**Remaining for S21 (at 2026-11-09).** The `plan` projection (§6), tenant-authored recipes (open
+question 4: an edit is a new version, and the CRUD surface + its audit gate are the gate), and memory
+selection (open question 3). The `plan` projection was built in §11; the other two are step 3 (§12).
 
 ## 11. Build record — step 2: the plan projection and declared step outputs (2026-11-09, lane `train-2026-11-09`)
 
@@ -244,8 +264,8 @@ declaration with the rest of `StepInput`.
   one field error per finding. Nothing is stored and nothing executes: the plan is derived on demand.
 
 **Open questions.** (5) **closed** — the projection is on demand and enforced at publish, never
-stored. (3) memory selection deferred; its shape is selection → processing → `prompt.memory`.
-(4) tenant-authored recipes remain deferred.
+stored. (3) and (4) are step 3 (§12): selection → processing → `prompt.memory`, and the recipe
+CRUD/activation lifecycle.
 
 **Measured (rbuild on the build host, 2026-11-09).** `conveyor-domain` plan **14/14**; `conveyor-store`
 `s11_procedure` **11/11** (including the declared-outputs round-trip) and `s07_schema` **3/3** (the
@@ -285,3 +305,83 @@ finding carries the step-level summary.
 
 **Served-spec lock.** Regenerated over the whole tree: **287 → 297 operations**, `--check-lock` exit
 0. The full list of added/changed operations is in `docs/evidence/S21-PLAN.md`.
+
+## 12. Build plan — step 3: the work-package prompt envelope (2026-11-22, issue #15)
+
+**Why this step.** SPEC_V2 §4.5 names four sources for an internal agent's prompt — knowledge,
+episodic memory, the PDDL request and the curated tool list — and §7.7 requires one compiler for
+all of them. The v1 seam has three: the process/step section is the request, the capability section
+names the allowed actions while the executor passes their closed schemas as the runtime `tools`
+array, and knowledge is a list of pack ids. Memory is absent entirely, and a tenant cannot author a
+recipe. This step closes those three gaps. Laya is not a prompt source: the judge's
+`{model, state, questions}` document is built from the step output and the SOP's acceptance
+criteria in `crates/actions/src/process/judge.rs`, and it stays there.
+
+**P1 — recipe authoring.** Migration `0062_s21_prompt_selection.sql` adds `draft` to
+`prompt.status` (default stays `active`, so seeds and existing rows are unchanged), one draft per
+`(tenant, key)` (`uq_prompt_draft`), `prompt_section.selector jsonb NOT NULL DEFAULT '{}'`, and
+`memory` to the section-kind CHECK. `prompt_recipes.create` computes the next version for the key
+and inserts it `draft` with its sections; `list` and `get` read the catalogue; `activate` retires
+the current active version and activates the target in one transaction (the unique active index
+refuses a race); `retire` moves a non-retired version to `retired`. A new pin resolves only an
+active row, exactly as today. The audit is the existing `action_invocation` row. New scopes are
+`prompts:read` (members) and `prompts:write` (admin).
+
+**P2 — memory selection.** A `memory` source and `PromptFacts.memory` join the domain; the recipe's
+`selector` declares `kinds`, `limit` (default 8, max 32) and `include_digest`. Selection is
+card-scoped and store-only: newest un-consolidated hot rows first (`created_at DESC, id DESC`), and
+only the newest `kind='digest'` row if room remains — hot is never displaced. Rendering is
+oldest-first as `[kind/source#id] body`; the ids make the selection part of the hash. An optional
+section with no rows is absent; a required one refuses by name. The seeded `agent@1` gains an
+optional memory section; existing tenants keep their recipe.
+
+**P3 — knowledge content.** `crates/actions/src/knowledge/retrieval.rs` is extracted from
+`query.rs`: `resolve_targets_tx` (capability, bindings, token) and `retrieve` (pack leaves + query).
+`knowledge.query` reuses both, so there is still one retrieval implementation. `compile_for_run`
+resolves the recipe, facts, memory and knowledge targets in a transaction, commits, then calls
+`retrieve` with **no transaction open**, and only then runs the pure compiler. The query is
+`selector.query`, else the card name + description, capped at 2,000 characters; with no query the
+section renders pack identities only. A missing or failed required pack keeps the existing
+`409 knowledge_degraded` semantics. The compiled text is never stored.
+
+**Out of this step.** The `internal_agent` executor runtime and its dynamic tool grant remain the
+next lane: T0 built the `Executor` contract, and the run path still records a binding without
+dispatching on it. No laya change; no PDDL as storage; no second compiler.
+
+**Acceptance.** `crates/actions/tests/prompt_recipes.rs` (new), `crates/domain/tests/prompt_memory.rs`
+(new), and extensions to `prompt_catalogue`, `prompt_compile` and the memory store test. The
+scenarios are issue #15 P1.1–P1.3, P2.1–P2.3 and P3.1–P3.2; the receipt is
+`docs/evidence/S21-WORKPACKAGE.md`.
+
+## 13. Build record — step 3: the work-package prompt envelope (2026-11-22, issue #15)
+
+**Built.** Migration `0062_s21_prompt_selection.sql` (draft recipes, one draft and one active per
+key, `prompt_section.selector`, the `memory` source kind). `prompt_recipes.create|get|list|activate|retire`
+with `prompts:read|write`; `prompt_recipes.activate` retires the current active version in one
+transaction. `PromptSource::Memory` selects the card's newest un-consolidated hot rows, then one
+digest only if room remains, and renders `[kind/source#id] body`. `knowledge/retrieval.rs` is the
+one retrieval path; `compile_for_run` resolves and commits before retrieving, so no network call
+runs inside a compile transaction. Laya is untouched.
+
+**Found by execution.** The first `0062` draft re-added `prompt_section_source_kind_check` with
+0031's `procedure` spelling, but `0035_process_tree` had renamed it to `process`; every prompt seed
+failed on the new `memory` section before the fix. The constraint now lists
+`system, process, capability, role, project_card, knowledge, memory`.
+
+**Measured at the branch head.** Issue #15's acceptance: `prompt_recipes` **7/7**, domain
+`prompt_memory` **5/5**, store memory selection **1/1**, `prompt_knowledge` **4/4**. Regressions:
+`prompt_compile` **7/7**, `process_agent_resolved` **4/4**, `prompt_catalogue` **4/4**,
+`s07_schema` **3/3**, `registry` **12/12**, and the registry-wide HTTP/MCP parity test **1/1**.
+The receipt is `docs/evidence/S21-WORKPACKAGE.md`.
+
+**Reversal proofs.** Disabling the memory render arm turned the domain render and hash tests red;
+removing the `AlreadyActive` guard made both racing activations answer `200`; dropping the selected
+hits from `compile_for_run` removed the knowledge content from the compiled prompt.
+
+**Generated.** `actions.json` **508** actions; coverage and the programme seed measure S21 **built**;
+the document pack is regenerated; `served-spec.lock.json` is **539** operations. The lock refresh
+also absorbed 12 operations and 20 hashes already missing on `main` (`#508`/`#511`).
+
+**Next lane.** The `internal_agent` executor runtime and its dynamic tool grant. Tools are already
+the executor's `tools` array and are named in the capability section; the runtime that dispatches
+on `executor_kind` is not built here.

@@ -322,7 +322,7 @@ def check_conformance(snapshot_dir: Path) -> tuple[bool, str]:
 
 def check_findings_instrument(ledger: Path) -> tuple[bool, str]:
     code, output = run_command(
-        [sys.executable, str(ROOT / "scripts" / "verify-findings.py"), "--findings", str(ledger)]
+        [sys.executable, str(ROOT / "scripts" / "verify-findings.py"), str(ledger)]
     )
     if code != 0:
         tail = " ".join(output.strip().splitlines()[-3:])

@@ -209,6 +209,39 @@ pub async fn resolve(
     Ok(row.map(ResolvedTool::from))
 }
 
+/// Resolve every published tool the run's grants make callable.
+///
+/// This is the projection's source (SPEC_V2 §4.5: "the curated list of tools bound to this job,
+/// with their closed schemas"). Unlike [`resolve`], it is not scoped to one canonical name; unlike
+/// a per-toolkit read, it applies the same grant rule, so a run-scoped grant wins over a
+/// job-binding grant for the same toolkit. The binding's ceiling travels with the row: the caller
+/// filters ranks for the model's list, and the broker re-checks at call time.
+pub async fn bound_tools(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    run: &RunToolContext,
+) -> Result<Vec<ResolvedTool>, ToolStoreError> {
+    let sql = format!(
+        "SELECT DISTINCT ON (k.key, t.key) {RESOLVED_COLUMNS}
+           FROM tool_binding b
+           JOIN toolkit k ON k.id = b.toolkit_id AND k.tenant_id = b.tenant_id
+           JOIN tool t ON t.toolkit_id = k.id AND t.tenant_id = k.tenant_id
+          WHERE b.tenant_id = $1
+            AND b.enabled
+            AND (b.run_id = $2 OR (b.job_binding_id IS NOT NULL AND b.job_binding_id = $3))
+            AND k.status = 'published'
+            AND t.status = 'published'
+          ORDER BY k.key, t.key, (b.run_id IS NULL) ASC, b.created_at DESC"
+    );
+    let rows: Vec<ResolvedRow> = sqlx::query_as(sqlx::AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(run.run_id)
+        .bind(run.job_binding_id)
+        .fetch_all(conn)
+        .await?;
+    Ok(rows.into_iter().map(ResolvedTool::from).collect())
+}
+
 /// One call to write into the ledger.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct NewToolCall<'a> {

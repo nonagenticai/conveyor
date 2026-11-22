@@ -157,10 +157,12 @@ fn generate_image() -> ActionSpec {
         scopes: &[Scope::CapabilitiesWrite],
         // A replay with the same key returns the first render — one image, one charge.
         idempotent: true,
-        // A render is a diffusion run plus three checkpoint loads. Measured on the host: ~103 s at
-        // 512²/12 steps, ~415 s at 512²/50. The host's own ceiling is 900 s; 600 s covers any
-        // render it can answer and fails fast on one it cannot.
-        timeout_ms: 600_000,
+        // A render is a diffusion run plus three checkpoint loads — and it QUEUES: the host serves
+        // one job at a time for the whole estate. Measured 2026-11-22: a 50-step 512² render took
+        // 647 s, past the 600 s this budget used to be, so the engine abandoned a render the host
+        // then completed and metered. The host's own ceiling is 900 s, so the budget has to sit
+        // above it rather than at it: 1200 s covers a full-length render plus the queue ahead.
+        timeout_ms: 1_200_000,
         // Generation costs the tenant money and deletes nothing (§11.4).
         effect: Effect::Spend,
         confirm: Confirm::None,

@@ -112,25 +112,13 @@ use serde_json::{Value, json};
 /// **#511 (rework path) adds 2 internal**: `projects.charter` (charter an EXISTING project) and
 /// `projects.reopen` (the closed → active transition the retrospective's `rework` verdict
 /// authorises). 500 → **502**.
-/// **#526 adds 1 internal**: `architecture.reviews_get` — the Phase-G review read the verifier
-/// needs; `reviews_record` had no read action. 502 → **503**.
-/// **#524 (U4) adds 1 internal**: `projects.close_request` — the programme's closure request
-/// that opens the closure gate. 503 → **504**.
-/// **#526 (5a) adds 4 internal**: `cadences.credit_demo|credit_list` and `lessons.propose|list`
-/// — the SAFe demo credits and the retro lessons. 504 → **508**.
-/// **#526 (P) adds 2 internal**: `retros.record_findings|close` — inspect-and-adapt had store
-/// functions but no API, so a retro could be opened by the worker and never driven. 508 → **510**.
-/// **#526 (U5c) adds 2 internal**: `cadences.approve_plan` — a person's gate before a PI plan
-/// materialises — and `tranches.resume` — a paused tranche resumes only under its approved
-/// human `tranche.resume` gate naming it. 510 → **512**.
-/// **#526 (V2 shell) adds 5 internal**: the tenant-asset authoring family (SPEC_V2 §5.7/§10.4)
-/// — `authoring.intake`, `authoring.draft`, `authoring.review`, `authoring.publish` and the
-/// `authoring.assets` read. 512 → **517**.
-/// **T5 (#77) adds 10 internal**: the kata loop — `kata.open|observe|analyse|propose|measure|`
-/// `adopt|propagate|close` and the `kata.get|list` reads. 517 → **527**.
 /// **v1-w1c-3 adds 2**: `ladder.prepare` (internal read) and `laya.classify` (external) —
 /// the L1 path's own laya call, whose verified invocation a laya decision cites. 527 → **529**.
-const EXPECTED: [&str; 529] = [
+/// **v1-w1c-4 adds 5 internal**: the authored option set family —
+/// `decision_options.create|update|publish|refine|get`. 529 → **534**.
+/// **#15 (S21 step 3) adds 5 internal**: the `prompt_recipes.create|get|list|activate|retire`
+/// catalogue surface. 534 → **539**.
+const EXPECTED: [&str; 539] = [
     "actions.describe",
     "actions.list",
     "analyse.site",
@@ -273,6 +261,11 @@ const EXPECTED: [&str; 529] = [
     "decisions.transition",
     "decisions.update",
     "decks.render",
+    "decision_options.create",
+    "decision_options.get",
+    "decision_options.publish",
+    "decision_options.refine",
+    "decision_options.update",
     "decision_policies.create",
     "decision_policies.list",
     "decision_policies.update",
@@ -549,6 +542,11 @@ const EXPECTED: [&str; 529] = [
     "prompt_audits.start",
     "prompt_findings.decide",
     "prompt_findings.list",
+    "prompt_recipes.activate",
+    "prompt_recipes.create",
+    "prompt_recipes.get",
+    "prompt_recipes.list",
+    "prompt_recipes.retire",
     "providers.list",
     "publish.start",
     "publish.status",
@@ -750,17 +748,11 @@ fn the_registry_is_exactly_the_declared_set() {
     // external stays 13.
     // #524 (U4) adds one internal action (`projects.close_request`, the programme's closure
     // request that opens the closure gate): 489 -> 490; external stays 13.
-    // #526 adds one internal action (`architecture.reviews_get`, the Phase-G review read):
-    // 490 -> 491; external stays 13.
-    // #526 (5a) adds four internal actions (`cadences.credit_demo|credit_list`,
-    // `lessons.propose|list`): 491 -> 495; external stays 13.
-    // #526 (P) adds two internal actions (`retros.record_findings|close`), the inspect-and-adapt
-    // API that had only store functions; #526 (U5c) adds `cadences.approve_plan` and
-    // `tranches.resume`; #526 (V2 shell) adds the five `authoring.*` actions and T5 adds the ten `kata.*`:
-    // 495 -> 514; external stays 13.
-    // v1-w1c-3 adds `ladder.prepare` (internal read) and `laya.classify` (external): internal
-    // 514 -> 515, external 13 -> 14 — the L1 decision's own laya call.
-    assert_eq!((internal, external), (515, 14));
+    // v1-w1c-4 adds the five `decision_options.*` actions (create/update/publish/refine/get),
+    // all internal: 515 -> 520; external stays 14 — they author this tenant's own options.
+    // #15 (S21 step 3) adds five internal actions (`prompt_recipes.create|get|list|activate|retire`):
+    // 520 -> 525; external stays 14.
+    assert_eq!((internal, external), (525, 14));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),

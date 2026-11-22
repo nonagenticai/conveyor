@@ -1228,7 +1228,7 @@ type PromptSeedSection = (i32, &'static str, bool, &'static str);
 /// `system` sections carry their text; the other kinds are rendered from a run's facts, so their
 /// template is empty. `agent@1` makes the process and capability components required — an
 /// executor that cannot see its step or its capability must refuse before it spends a call — and
-/// leaves the role, card and knowledge optional, because a run may have none of them.
+/// leaves the role, knowledge, memory and card optional, because a run may have none of them.
 const BUILTIN_PROMPTS: &[(&str, i32, &str, &[PromptSeedSection])] = &[
     (
         "copilot_system",
@@ -1254,7 +1254,10 @@ const BUILTIN_PROMPTS: &[(&str, i32, &str, &[PromptSeedSection])] = &[
             // an agent that declares no role compiles exactly as before.
             (4, "role", false, ""),
             (5, "knowledge", false, ""),
-            (6, "project_card", false, ""),
+            // The card's hot memory, then one digest (S21 step 3, ADR 0009). Optional: a card
+            // with no memory compiles exactly as before.
+            (6, "memory", false, ""),
+            (7, "project_card", false, ""),
         ],
     ),
 ];

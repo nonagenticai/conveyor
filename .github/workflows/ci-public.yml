@@ -571,6 +571,15 @@ jobs:
           docker run --rm "$IMG" --version
           out="$(docker run --rm "$IMG" --print-openapi)"
           [[ "$out" == *'"openapi"'* ]]
+          # The committed lock pins the served contract; a binary that disagrees with it must not
+          # publish. The lock lives in the repo, not the image, so mount it where the binary's
+          # default path resolves: `served-spec.lock.json`, relative to the runtime stage's
+          # WORKDIR `/var/lib/app`. Without this gate a forgotten lock refresh merges green —
+          # measured on #574, whose refresh absorbed 12 operations and 20 stale hashes that had
+          # already merged on main via #510/#519/#525.
+          docker run --rm \
+            -v "$PWD/served-spec.lock.json:/var/lib/app/served-spec.lock.json:ro" \
+            "$IMG" --print-openapi --check-lock >/dev/null
 
       # A dispatch on main is a maintainer action, so it may publish too — that is how the first
       # image after the flip can be produced without an empty commit.

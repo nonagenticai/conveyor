@@ -57,9 +57,9 @@ destructive-approval window.
 ## The lifecycle ran against an in-pod snapshot
 
 `scripts/rework-project.py` builds its review snapshot with `$PROGRAMME_RECORD_BIN`, and that build
-fails on the live primary: the branch is at `0063_tool_verify` and the database at
+fails on the live primary: the branch is at `0064_tool_verify` and the database at
 `0061_contract_requester`, so the branch query reads `departments.archetype`, which
-`0062_release_layers` adds. The batch therefore built each snapshot with the **deployed** engine in a
+`0063_release_layers` adds. The batch therefore built each snapshot with the **deployed** engine in a
 one-off pod (`tr2-snapshot`, restricted security context, `emptyDir`, `envFrom conveyor-secrets`),
 copied it out, and ran a local copy of the runner that reads that directory and rebuilds it through
 the same pod command after each write. Nothing was migrated out of band and nothing in `scripts/`
