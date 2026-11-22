@@ -872,7 +872,7 @@ async fn an_approved_handover_applies_the_draft_and_finishes_the_run() {
     let (status, approved) = running
         .invoke(
             "approvals.decide",
-            TOKEN,
+            support::REVIEWER,
             json!({"approval_id": approval, "decision": "approve"}),
             None,
             None,
@@ -976,7 +976,7 @@ async fn a_rejected_handover_cancels_the_run_and_leaves_the_draft() {
     let (status, rejected) = running
         .invoke(
             "approvals.decide",
-            TOKEN,
+            support::REVIEWER,
             json!({"approval_id": approval, "decision": "reject"}),
             None,
             None,
@@ -1024,7 +1024,7 @@ async fn a_reclaimed_resume_is_a_no_op() {
     let (status, approved) = running
         .invoke(
             "approvals.decide",
-            TOKEN,
+            support::REVIEWER,
             json!({"approval_id": approval, "decision": "approve"}),
             None,
             None,
