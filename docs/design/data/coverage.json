@@ -1455,31 +1455,34 @@
     {
       "blocked_by": [],
       "evidence": [
-        "docs/plans/slices/S21-message-construction.md"
+        "crates/actions/src/knowledge",
+        "crates/actions/src/memory",
+        "crates/actions/src/prompt",
+        "migrations/0030_prompt_catalogue.sql"
       ],
-      "gap": "the v1 seam is built; the 2026-2027 design is unbuilt (#25)",
+      "gap": null,
       "key": "S21",
       "measured": {
         "actions": [
-          0,
-          0
+          5,
+          5
         ],
         "modules": [
-          0,
-          0
+          3,
+          3
         ],
         "tables": [
-          0,
-          0
+          2,
+          2
         ]
       },
-      "name": "S21",
+      "name": "Message construction (the compiled prompt)",
       "parallel_with": [
         "S18",
         "S20"
       ],
       "plan": "docs/plans/slices/S21-message-construction.md",
-      "status": "partial",
+      "status": "built",
       "track": "v1",
       "tranche": 9,
       "units": {
@@ -2570,8 +2573,8 @@
       "by_status": {
         "absent": 0,
         "archived": 1,
-        "built": 39,
-        "partial": 2,
+        "built": 40,
+        "partial": 1,
         "planned": 0,
         "proposed": 5,
         "standing": 1
