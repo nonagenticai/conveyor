@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>0013 — The work package's run: the card names the binding, the terminal run records its memory · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0013-work-package-run.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="0013--the-work-packages-run-the-card-names-the-binding-the-terminal-run-records-its-memory">0013 — The work package's run: the card names the binding, the terminal run records its memory</h1>
+<p>Status: Accepted · Date: 2026-11-22 · Issue: #599 · Resolves: S21 §17, SPEC_V2 §4.4, §5.1, §6.6.4, §7.6, rework <code>v1-p66-1</code> (the binding clause)</p>
+<h2 id="decision">Decision</h2>
+<ol type="1">
+<li><p><strong>The card names its job binding; a run inherits it.</strong> <code>cards.create</code> and <code>cards.update</code> accept <code>job_binding_id</code>. The id must resolve inside the caller's tenant and be <code>active</code> — a draft, retired or foreign binding is <code>422 job_binding_unusable</code> and is never written. <code>CardOut</code> exposes the column, so the assignment is readable where the card is read. <code>runs.create</code> resolves the card's binding when its request omits one; an explicit binding that differs from the card's is <code>422 card_binding_mismatch</code>; a card with no binding keeps today's plain-run path. The retired binding and stale-pin checks remain in <code>insert_run_tx</code>, the one writer.</p></li>
+<li><p><strong><code>cards.duplicate</code> does not copy the binding.</strong> A binding is an assignment, not content: a duplicated card is unassigned until someone names a job for it.</p></li>
+<li><p><strong>A terminal root run writes one work-package memory row.</strong> <code>store::run</code>'s terminal hook (<code>enqueue_memory_consolidation</code>) becomes <code>record_run_memory</code>: when a run reaches a terminal state, is card-scoped and is a root (<code>parent_run_id IS NULL</code>), it inserts exactly one <code>work_package_memory</code> row through the existing <code>store::memory::insert_memory_tx</code> — <code>kind=attempt</code>, <code>source=system</code>, <code>run_id</code> set, the body naming the attempt and its outcome, <code>meta</code> carrying the status and error class — and then enqueues the existing <code>memory.consolidate</code> job. The row and the terminal status commit in <strong>one transaction</strong>: a rolled-back finish leaves neither.</p></li>
+<li><p><strong>A child run and a card-less run write no memory.</strong> A child shares its parent's card and its outcome is part of the parent's attempt; writing one row per child would crowd the card's hot rows (the prompt selector reads the newest eight) with fragments of one work package. A card-less run has no work package.</p></li>
+<li><p><strong>The runtime's attempt row is the second sanctioned writer, not an ad-hoc one.</strong> CONTRACT §17 said <code>memory.remember</code> is the only <em>action</em> that writes <code>work_package_memory</code>, with the consolidation job appending the digest. This decision adds one sanctioned runtime writer: the terminal transition's <code>attempt</code> row. It is the system's record of what the run did, written through the same store function; the agent's learned facts still go through <code>memory.remember</code> (the copilot and an <code>agent.run</code> step), and nothing else writes SQL.</p></li>
+<li><p><strong>No migration.</strong> <code>card.job_binding_id</code> exists (<code>migrations/0040_organisation.sql</code>), <code>work_package_memory</code> and its kinds exist, and the terminal transitions already exist.</p></li>
+<li><p><strong>The budget is not this decision.</strong> <code>v1-p75-1</code>/<code>v1-w4a-1</code> are resolved on the <code>#526</code> lane (commit <code>8f1e5770</code>, the invoke precheck and broker spend gate). The token ceiling (<code>ReleaseLimits.max_tokens</code>, recorded-only) is that gate's residual. A second budget mechanism in the loop would be a duplicate writer for one policy, so this unit does not add one.</p></li>
+</ol>
+<h2 id="why">Why</h2>
+<p>Steps 3–5 built the compiled prompt, the <code>internal_agent</code> executor and the applying gate, but the work package itself was still inert. <code>card.job_binding_id</code> existed in the schema and no Rust code read or wrote it, so a card could not name the job that executes it and a run was bound only when its caller happened to pass a binding — the rework finding <code>v1-p66-1</code> describes exactly this. The executor also never called any memory writer while <code>memory.consolidate</code> was already enqueued on every terminal transition, so the digest job consolidated nothing and the prompt's memory section was always empty. SPEC_V2 §4.4 ("a card names a binding"), §5.1 (card → run), §6.6.4 ("memory is written at handoff") and §7.6 (hot rows are the record; the digest is derived) already describe the target; this unit makes the implementation match those sentences.</p>
+<h2 id="alternatives-rejected">Alternatives rejected</h2>
+<ul>
+<li><strong>A new <code>cards.assign</code> action.</strong> The finding's acceptance admits "a binding on create"; extending the existing create/update inputs is a smaller surface (no new action, no new scope) and still gives the card an assignment. A dedicated handoff verb can come with the card-driven entry unit.</li>
+<li><strong>Auto-start a run on a claim or lane move.</strong> The spec says a handoff is a card; it does not say a lane move starts execution. Auto-start would change every board's semantics and is its own unit.</li>
+<li><strong>Write memory through <code>memory.remember</code> from the executor.</strong> The action requires an invoking principal and a separate transaction; the run's terminal transition and its record would then be two commits, and a crash between them would lose the row for a run that already ended. The store writer inside the terminal transaction is atomic and is the same one writer.</li>
+<li><strong>Write the row only for <code>internal_agent</code> runs.</strong> The terminal hook is per-run, not per-executor; a refused or failed run is also an attempt the next run on the card should see. The hook stays in the store, where every terminal path meets.</li>
+<li><strong>One row per child run.</strong> See decision 4.</li>
+<li><strong>Enforce budgets here.</strong> Duplicate of the #526 lane's resolved package.</li>
+</ul>
+<h2 id="consequences">Consequences</h2>
+<ul>
+<li>A card with a binding can no longer be "bound to" a different job by a <code>runs.create</code> caller; the card is the assignment. A caller that previously overrode the card's binding gets a typed <code>422 card_binding_mismatch</code>.</li>
+<li><code>cards.create</code>/<code>cards.update</code>/<code>CardOut</code> and their served schemas gain a field, so the served-spec lock and the action dump move; no action or scope count changes.</li>
+<li>Every terminal root run of a card adds one hot row. The existing consolidation job (per card) drains them; the prompt selector reads the newest eight, so an old row ages out of a prompt before it ages out of the ledger.</li>
+<li>The <code>v1-p66-1</code> acceptance's first clause (a binding on create, exposed, reaching the run) is met; its lane-refusal clause ("moving a delivery card into a work lane without a binding is refused 422") needs a delivery-card marker that does not exist and stays open.</li>
+<li>No new action, scope, route or migration.</li>
+</ul>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/decisions/0013-work-package-run.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>S21 step 6 — the work package's run: card binding, terminal memory, live proof · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S21-RUN.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="s21-step-6--the-work-packages-run-card-binding-terminal-memory-live-proof">S21 step 6 — the work package's run: card binding, terminal memory, live proof</h1>
+<p><strong>Issue:</strong> #599 · <strong>Branch:</strong> <code>issue/599-s21-work-package-run</code> · <strong>Date:</strong> 2026-11-22 · <strong>Baseline:</strong> <code>origin/main@dd1b9b4a</code> (the #597 merge)</p>
+<h2 id="what-was-built">What was built</h2>
+<ul>
+<li><code>cards.create</code> / <code>cards.update</code> accept <code>job_binding_id</code>; the id must resolve in the tenant and be <code>active</code> (<code>422 job_binding_unusable</code> otherwise); <code>CardOut</code> exposes it; <code>cards.duplicate</code> leaves it unset (an assignment is not content).</li>
+<li><code>runs.create</code> inherits the card's binding when the request omits one; an explicit binding that differs is <code>422 card_binding_mismatch</code> before the INSERT; a card with no binding keeps the plain run path. The pin/stale checks stay in <code>insert_run_tx</code>.</li>
+<li>A terminal root run of a card inserts exactly one <code>work_package_memory</code> row (<code>kind=attempt</code>, <code>source=system</code>, <code>run_id</code> set) through the existing store writer, in the same transaction as the terminal status (<code>record_run_memory</code> in <code>crates/store/src/run.rs</code>); the existing per-card <code>memory.consolidate</code> job then has real rows. A child run and a card-less run write none.</li>
+<li>The compiled prompt of the next run on the card carries the prior attempt (the memory selector reads the hot rows; ids make the selection part of the hash).</li>
+</ul>
+<h2 id="not-this-step">Not this step</h2>
+<p>The budget. <code>v1-p75-1</code>/<code>v1-w4a-1</code> are resolved on <code>origin/issue/526-u5a</code> (commit <code>8f1e5770</code>, <code>crates/actions/tests/tool_budget.rs</code> 14 passed, <code>422 budget_missing</code> at run start, an invoke precheck that refuses an unbudgeted capturing call). The token ceiling (<code>ReleaseLimits.max_tokens</code>, recorded-only) is that gate's residual. See ADR 0013.</p>
+<h2 id="measured-at-the-branch-head-2026-11-22">Measured at the branch head (2026-11-22)</h2>
+<table>
+<thead>
+<tr>
+<th>Suite</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>crates/actions/tests/card_binding.rs</code> (new)</td>
+<td><strong>7 passed</strong> (4 scenarios + 3 support)</td>
+</tr>
+<tr>
+<td><code>crates/store/tests/run_memory.rs</code> (new)</td>
+<td><strong>4 passed</strong></td>
+</tr>
+<tr>
+<td><code>internal_agent_runtime.rs</code> (extended)</td>
+<td><strong>16 passed / 1 ignored</strong> (the live proof)</td>
+</tr>
+<tr>
+<td><code>board</code></td>
+<td><strong>15 passed</strong></td>
+</tr>
+<tr>
+<td><code>executor_runtime</code></td>
+<td><strong>8 passed</strong></td>
+</tr>
+<tr>
+<td><code>registry</code></td>
+<td><strong>7 passed</strong></td>
+</tr>
+<tr>
+<td><code>agent_run_resolved</code></td>
+<td><strong>7 passed</strong></td>
+</tr>
+<tr>
+<td><code>decision_ladder</code></td>
+<td><strong>8 passed</strong></td>
+</tr>
+<tr>
+<td><code>draft_apply</code></td>
+<td><strong>12 passed</strong></td>
+</tr>
+<tr>
+<td>server <code>organisation_gate</code> / <code>run_retry</code> / <code>memory_consolidate</code></td>
+<td><strong>1 / 2 / 4 passed</strong></td>
+</tr>
+<tr>
+<td><code>clippy -p conveyor-store -p conveyor-actions -p conveyor-server --all-targets -- -D warnings</code></td>
+<td><strong>exit 0</strong></td>
+</tr>
+<tr>
+<td><code>served-spec.lock.json</code></td>
+<td><strong>10 operations re-hashed</strong> (the card reads/writes and <code>runs.create</code>), <code>--check-lock</code> <strong>exit 0</strong></td>
+</tr>
+</tbody>
+</table>
+<h2 id="reversal-proofs-each-guard-disabled-its-own-test-red-then-restored">Reversal proofs (each guard disabled, its own test red, then restored)</h2>
+<table>
+<thead>
+<tr>
+<th>Guard removed</th>
+<th>Test that turned red</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>the card's binding inherited by <code>runs.create</code></td>
+<td><code>card_binding::a_cards_binding_reaches_its_run</code></td>
+</tr>
+<tr>
+<td>the conflicting-binding refusal</td>
+<td><code>card_binding::a_conflicting_binding_is_refused</code> (the run was created 201)</td>
+</tr>
+<tr>
+<td>the binding's <code>active</code> status check</td>
+<td><code>card_binding::an_unusable_binding_is_refused_on_a_card</code> (the draft was assigned)</td>
+</tr>
+<tr>
+<td>the terminal memory insert</td>
+<td><code>run_memory::a_succeeded_root_run_records_one_attempt</code> (zero rows)</td>
+</tr>
+<tr>
+<td>the root-only filter</td>
+<td><code>run_memory::only_root_card_runs_record_memory</code> (the child wrote a row)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="generated">Generated</h2>
+<ul>
+<li><code>served-spec.lock.json</code> — <code>--print-openapi --write-lock</code>, then <code>--check-lock</code> exit 0.</li>
+<li><code>build-programme-seed.py --check</code> and <code>build-coverage.py --check</code> / <code>build-v2-coverage.py --check</code> current. ⚠️ The S21 <code>issues</code> list in <code>seed/programme.json</code> gains #599 only when the automated issue-registry refresh adds it to <code>docs/design/data/issues.json</code>; the generator's mapping is registry-driven, so hand-adding it makes <code>--check</code> fail. The seeded card-binding column and the attempt rows need no seed row.</li>
+<li><code>docs/design/docs/**</code> regenerated; <code>scripts/ci/board.py --dry-run</code> clean (recorded at the merge point).</li>
+</ul>
+<h2 id="live-proof">Live proof</h2>
+<p><code>internal_agent_runtime::the_live_run_executes_against_the_real_router_and_laya</code> (<code>#[ignore]</code>, env-gated on <code>CONVEYOR_EXTERNAL_INFERENCE_URL</code>, <code>CONVEYOR_EXTERNAL_LAYA_URL</code>, <code>CONVEYOR_LIVE_LAYA_TOKEN</code>, <code>CONVEYOR_LIVE_MODEL</code>). <strong>Pending</strong> — it needs the estate's endpoints and a real laya token; the run and its measured evidence are recorded here when executed. A stub is not the proof.</p>
+<h2 id="residuals-recorded-not-built">Residuals (recorded, not built)</h2>
+<ul>
+<li>The token ceiling (<code>ReleaseLimits.max_tokens</code>) remains recorded-only; it belongs with the #526 budget gate, not a second loop check.</li>
+<li><code>v1-p66-1</code>'s lane-refusal clause ("moving a delivery card into a work lane without a binding is refused 422") needs a delivery-card marker that does not exist.</li>
+<li>Auto-start from a claim or lane move; prior-step memory in the prompt; procedure-process run memory (<code>process_runs.start</code>); <code>run.execute</code>'s retry after a handler DB fault (#581 residual).</li>
+</ul>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/S21-RUN.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>
