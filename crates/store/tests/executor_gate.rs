@@ -16,7 +16,7 @@ use uuid::Uuid;
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn an_executor_gate_refuses_a_machine_decision() {
-    let db = support::Pg::fresh().await;
+    let db = support::TestDb::fresh().await;
     let tenant_id: Uuid = sqlx::query_scalar(
         "INSERT INTO tenant (slug, name) VALUES ('exec-gate', 'Exec Gate') RETURNING id",
     )
