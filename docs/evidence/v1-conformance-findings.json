@@ -5516,6 +5516,30 @@
         "test": "scripts/rework-project.py",
         "evidence": "`decision_payload()` now carries `delegation_ref` on every approvals.decide the recorder makes; `rework-project --self-test` refuses a payload without it. Live audit at 2026-11-22 before the fix: charter rule 1/service 12, baseline 1/12, closure 2/14. Recorder runs for the T4/T9/T10/T13 batches set PROGRAMME_RECORD_LOCAL_BIN to the lane binary, which records rule/via.delegation_ref (proved on documents.delete gate 01a2025a)."
       }
+    },
+    {
+      "id": "v1-change-1",
+      "area": "T3 change control / wbs guard",
+      "standard": "SPEC",
+      "spec": "§5.5",
+      "severity": "P1",
+      "title": "The change guard's only authorised path needs a PM process the tenant has never had",
+      "problem": "After an approved scope baseline, `wbs.update` refuses unless `change_id` names an approved register `change` whose `baseline_ref` is that baseline and whose approval carries `meta.change_id`. The only action that opens such a change is `changes.request`, and its input requires the PM job's active `job_binding_id`. The tenant has no process with key 'pm' and exactly one job_binding in total, so the guard cannot be satisfied: a WBS acceptance after a baseline is permanently refused. Observed at T13 on 2026-11-22: `wbs.update` refused 409 `rebaseline_requires_change` naming baseline 01a20279-854d-79f6-a751-a34d51be7589, while `changes.request` cannot be called at all.",
+      "evidence": [
+        {
+          "path": "crates/actions/src/spine/mod.rs",
+          "line": 1234,
+          "quote": "    let Some(change_id) = change_id else {"
+        },
+        {
+          "path": "crates/actions/src/pm/mod.rs",
+          "line": 990,
+          "quote": "    pub job_binding_id: Uuid,"
+        }
+      ],
+      "failure_scenario": "A project's scope baseline is approved (the recorder's normal order). Its WBS deliverable is then accepted with evidence: the guard refuses 409, the only change-opening action needs a PM job binding that no seed ever created, and the deliverable can never reach accepted, so no demo credit can be recorded for it. The record is frozen at the baseline while the work it describes is complete.",
+      "acceptance": "A tenant with an approved scope baseline can always authorise a WBS acceptance through a provisioned path: either the organisation seed creates the PM process and its binding that `changes.request` requires, or `changes.request` takes the baseline directly and validates it rather than a PM job binding; a test proves a post-baseline WBS acceptance end to end through that path.",
+      "owner_project": "T3"
     }
   ]
 }
