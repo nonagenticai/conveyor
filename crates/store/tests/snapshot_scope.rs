@@ -452,3 +452,74 @@ async fn the_ops_section_carries_only_portfolio_incidents() {
         "the operator narrative text leaked into the public section"
     );
 }
+
+/// A test row is not a programme project (v1-e2e-1). The marker is `meta.test_row = true`; the
+/// two pre-marker e2e keys are named. The row is excluded from `projects` and its board/card
+/// never reach the work sections; the exclusion is visible under `programme.test_projects`.
+#[tokio::test]
+async fn test_rows_are_excluded_and_listed() {
+    let (db, f) = fixture().await;
+    let (marked_project, marked_board, marked_card, ..) =
+        project_tree(&db, f.tenant, None, Some("active"), "MARKED-TEST-ROW").await;
+    {
+        let mut tx = store::begin_scoped(&db.owner, f.tenant)
+            .await
+            .expect("scope");
+        sqlx::query(
+            "UPDATE project SET meta = jsonb_set(meta, '{test_row}', 'true') WHERE id = $1",
+        )
+        .bind(marked_project)
+        .execute(&mut *tx)
+        .await
+        .expect("mark the row");
+        tx.commit().await.expect("commit");
+    }
+    let (legacy_project, legacy_board, legacy_card, ..) = project_tree(
+        &db,
+        f.tenant,
+        None,
+        Some("active"),
+        "AAA-UI-PROOF-285-2026-11-19T07-3-2",
+    )
+    .await;
+
+    let data = snapshot(&db, f.tenant).await;
+    let projects = &data.programme["projects"];
+    assert!(
+        !has(projects, marked_project),
+        "a marked test row is not a programme project: {projects}"
+    );
+    assert!(
+        !has(projects, legacy_project),
+        "a legacy test key is not a programme project: {projects}"
+    );
+    let excluded = data.programme["test_projects"]
+        .as_array()
+        .expect("test_projects is an array");
+    assert!(
+        excluded.iter().any(|row| {
+            row.get("key") == Some(&serde_json::json!("MARKED-TEST-ROW"))
+                && row.get("reason") == Some(&serde_json::json!("meta.test_row is true"))
+        }),
+        "the marked row is listed with its reason: {excluded:?}"
+    );
+    assert!(
+        excluded.iter().any(|row| {
+            row.get("key") == Some(&serde_json::json!("AAA-UI-PROOF-285-2026-11-19T07-3-2"))
+                && row.get("reason")
+                    == Some(&serde_json::json!("a known pre-marker e2e project key"))
+        }),
+        "the legacy row is listed with its reason: {excluded:?}"
+    );
+    for (name, section, id) in [
+        ("board", &data.work["boards"], marked_board),
+        ("card", &data.work["cards"], marked_card),
+        ("board", &data.work["boards"], legacy_board),
+        ("card", &data.work["cards"], legacy_card),
+    ] {
+        assert!(
+            !has(section, id),
+            "the test row's {name} is not public: {section}"
+        );
+    }
+}

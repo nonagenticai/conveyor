@@ -262,6 +262,29 @@ def project_subjects(programme: dict[str, Any], projects: list[dict[str, Any]]) 
     return subjects
 
 
+# A test row is not a programme project. The marker is `meta.test_row = true`; the two known
+# pre-marker e2e keys are named so the existing residue is excluded visibly rather than by a
+# pattern that could swallow a real project. The audit carries the same predicate
+# (`test_row_reason`); the excluded rows are listed in the record's summary, never silently
+# dropped.
+TEST_ROW_MARKER = "test_row"
+LEGACY_TEST_PROJECT_KEYS = frozenset({
+    "AAA-UI-PROOF-285-2026-11-19T07-3-2",
+    "AAA-UI-PROOF-285-2026-11-19T07-4",
+})
+
+
+def test_row_reason(row: dict[str, Any]) -> str | None:
+    """Why this project row is test residue, or None when it is a real project."""
+    meta = row.get("meta")
+    if isinstance(meta, dict) and meta.get(TEST_ROW_MARKER) is True:
+        return f"meta.{TEST_ROW_MARKER} is true"
+    key = str(row.get("key") or "")
+    if key in LEGACY_TEST_PROJECT_KEYS:
+        return "a known pre-marker e2e project key"
+    return None
+
+
 def build_subjects(
     snapshot: dict[str, Any],
     declared_phases: dict[str, str] | None = None,
@@ -269,7 +292,8 @@ def build_subjects(
     declared_phases = declared_phases or {}
     programme_doc = snapshot.get("programme") or {}
     programmes = programme_doc.get("programme") or []
-    projects = programme_doc.get("projects") or []
+    all_projects = programme_doc.get("projects") or []
+    projects = [row for row in all_projects if not test_row_reason(row)]
     if not programmes:
         raise GenerationError("the snapshot carries no programme row")
     programme = programmes[0]
