@@ -130,7 +130,9 @@ use serde_json::{Value, json};
 /// `adopt|propagate|close` and the `kata.get|list` reads. 517 → **527**.
 /// **v1-w1c-3 adds 2**: `ladder.prepare` (internal read) and `laya.classify` (external) —
 /// the L1 path's own laya call, whose verified invocation a laya decision cites. 527 → **529**.
-const EXPECTED: [&str; 529] = [
+/// **v1-w1c-4 adds 5 internal**: the authored option set family —
+/// `decision_options.create|update|publish|refine|get`. 529 → **534**.
+const EXPECTED: [&str; 534] = [
     "actions.describe",
     "actions.list",
     "analyse.site",
@@ -273,6 +275,11 @@ const EXPECTED: [&str; 529] = [
     "decisions.transition",
     "decisions.update",
     "decks.render",
+    "decision_options.create",
+    "decision_options.get",
+    "decision_options.publish",
+    "decision_options.refine",
+    "decision_options.update",
     "decision_policies.create",
     "decision_policies.list",
     "decision_policies.update",
@@ -760,7 +767,9 @@ fn the_registry_is_exactly_the_declared_set() {
     // 495 -> 514; external stays 13.
     // v1-w1c-3 adds `ladder.prepare` (internal read) and `laya.classify` (external): internal
     // 514 -> 515, external 13 -> 14 — the L1 decision's own laya call.
-    assert_eq!((internal, external), (515, 14));
+    // v1-w1c-4 adds the five `decision_options.*` actions (create/update/publish/refine/get),
+    // all internal: 515 -> 520; external stays 14 — they author this tenant's own options.
+    assert_eq!((internal, external), (520, 14));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),

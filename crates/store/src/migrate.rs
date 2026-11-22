@@ -273,7 +273,11 @@ mod tests {
                 // v1-w1c-3 (#526): an L1 decision names the verified `laya.classify`
                 // invocation behind its answer and the request/response hashes it was
                 // verified against (0069_ladder_laya_provenance.sql, SPEC_V2 §7.2).
-                (69, "ladder laya provenance".to_owned())
+                (69, "ladder laya provenance".to_owned()),
+                // v1-w1c-4 (#526): the authored option set, its per-option tenant
+                // refinement and the decision's set pins — options are rows, never a
+                // caller's list (0070_ladder_option_sets.sql, SPEC_V2 §7.2).
+                (70, "ladder option sets".to_owned())
             ],
             "the embedded migration set is {embedded:?}; a wrong sqlx::migrate! path or a \
              file outside the set changes it"
