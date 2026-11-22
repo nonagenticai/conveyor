@@ -414,6 +414,7 @@ async fn grade_and_record(
         action,
         &format!("eval.judge:{run_id}:{case_id}:{rep}"),
         &format!("eval:{run_id}"),
+        Some(run_id),
     )
     .await
     {
@@ -574,6 +575,9 @@ pub(crate) async fn grade_metrics(
     action: &str,
     judge_request_id: &str,
     judge_trace_id: &str,
+    /// The eval run the judge's spend belongs to; `None` for a one-shot `eval.grade` that has no
+    /// run. Without it the judge call is billed but the run's report cannot see it.
+    judge_eval_run_id: Option<Uuid>,
 ) -> Result<MetricGrades, GradeFailure> {
     let mut grades = MetricGrades {
         grade: serde_json::Map::new(),
@@ -646,6 +650,7 @@ pub(crate) async fn grade_metrics(
                     request,
                     judge_request_id,
                     judge_trace_id,
+                    judge_eval_run_id,
                 )
                 .await
                 {
@@ -910,6 +915,7 @@ async fn invoke_judge(
     request: Value,
     request_id: &str,
     trace_id: &str,
+    eval_run_id: Option<Uuid>,
 ) -> Result<Value, FailureClass> {
     let outcome = invoke(
         pool,
@@ -937,9 +943,10 @@ async fn invoke_judge(
                 run_id: None,
                 run_step_id: None,
                 conversation_turn_id: None,
-                // This seam grades one output and has no eval-run id in scope; the call is still
-                // attributed to `CallerKind::Eval` and its spend lands on the ledger.
-                eval_run_id: None,
+                // This seam grades one output. When it grades a run's slot it names that run, so
+                // the judge's spend lands on the same ledger key the report reads; the one-shot
+                // `eval.grade` seam has no run and leaves it empty.
+                eval_run_id,
                 prompt_ref: Some("eval_judge".to_owned()),
                 prompt_version: None,
                 prompt_sha256: None,

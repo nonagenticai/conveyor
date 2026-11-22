@@ -5,15 +5,16 @@
 //! **Nothing here is stored.** There is no rollup column and no maintained counter: the report
 //! reads the run, its declared metrics, every result row and every failed attempt, and derives
 //! the numbers in Rust. The same rows therefore produce the same report twice, and the report
-//! cannot drift from the climb, which prices the same rows with the same arithmetic.
+//! cannot drift from the climb, which prices the same calls from its rows with the same
+//! arithmetic.
 //!
-//! ⚠️ **Cost is priced from the recorded usage, not from `inference_call`.** D23's amendment
-//! (`caller_kind='eval'` plus `inference_call.eval_run_id`) was specified in S19 §9 and is not
-//! built, so the ledger has no eval key; its only link is `action_invocation_id`, which covers
-//! the subject call but not the judge (a separate invocation). Pricing the row's own
-//! `usage`/`judge_usage` and each failed attempt's billed `usage` is the same arithmetic S20's
-//! climb uses, so the two surfaces cannot disagree. When the amendment lands, the ledger becomes
-//! the authority and this note must be removed with it.
+//! ⚠️ **Cost is priced from the inference ledger, never from the rows' copied usage.** The
+//! engine writes every eval model call to `inference_call` with `caller_kind='eval'` and the
+//! run's id (D23's amendment, S19 §9), and [`CostOut`] sums those rows: the subject's calls, the
+//! judge's calls and the billed failed attempts. The same [`price_usage`] arithmetic prices them
+//! as S20's climb uses for the rows it reads, so the two surfaces cannot invent different cents
+//! for the same call. A ledger row the version cannot price — no rates, no token counts, or a
+//! non-token surface — is counted in [`CostOut::unpriced`], never silently treated as free.
 //!
 //! Three rules the numbers obey:
 //!
@@ -30,6 +31,7 @@ use std::collections::{BTreeMap, BTreeSet};
 
 use conveyor_store as store;
 use conveyor_store::eval::{AttemptError, EvalMetric, ResultRow};
+use conveyor_store::inference::InferenceCallRow;
 use serde_json::Value;
 use sqlx::PgConnection;
 use uuid::Uuid;
@@ -120,8 +122,8 @@ pub struct CostOut {
     pub failed: f64,
     /// `subject + judge + failed`.
     pub total: f64,
-    /// Billed usage objects that could not be priced (no rates, or no token counts). Counted,
-    /// never silently treated as free.
+    /// Ledger rows the version could not price (no rates, no token counts, or a non-token
+    /// surface). Counted, never silently treated as free.
     pub unpriced: i64,
 }
 
@@ -365,7 +367,18 @@ async fn report(
         None => (None, None),
     };
 
-    // ── the cost ────────────────────────────────────────────────────────────────────────
+    // ── the cost, from the ledger ───────────────────────────────────────────────────────
+    //
+    // Not from the rows' copied `usage`/`judge_usage`: the engine writes every eval model call
+    // to `inference_call` with the run's id, and that ledger is what `inference_usage.report`
+    // and the audit already read. Pricing the copy would be a second accounting model that can
+    // silently disagree with the ledger it is supposed to be measured by.
+    let calls = store::inference::eval_run_calls_tx(&mut *tx, ctx.tenant, run.id)
+        .await
+        .map_err(|error| {
+            tracing::error!(%error, "read the run's inference ledger");
+            ActionError::internal()
+        })?;
     let priced = price_usage_available(&version.prices);
     let mut cost = CostOut {
         unit: if priced { "cents" } else { "tokens" }.to_owned(),
@@ -375,33 +388,15 @@ async fn report(
         total: 0.0,
         unpriced: 0,
     };
-    let add = |usage: &Value, slot: &mut f64, unpriced: &mut i64| {
-        if usage
-            .as_object()
-            .map(|object| object.is_empty())
-            .unwrap_or(true)
-        {
-            return;
-        }
-        if priced {
-            match price_usage(usage, &version.prices) {
-                Some(cents) => *slot += cents,
-                // A non-empty usage with no rates is not free: it is unpriced.
-                None => *unpriced += 1,
-            }
-        } else {
-            *slot += tokens_of(usage);
-        }
-    };
-    for row in &rows {
-        add(&row.usage, &mut cost.subject, &mut cost.unpriced);
-        if let Some(usage) = row.judge_usage.as_ref() {
-            add(usage, &mut cost.judge, &mut cost.unpriced);
-        }
-    }
-    for attempt in &attempts {
-        if let Some(usage) = attempt.usage.as_ref() {
-            add(usage, &mut cost.failed, &mut cost.unpriced);
+    for call in &calls {
+        match price_call(call, &version.prices, priced) {
+            Some(amount) => match spend_slot(call) {
+                SpendSlot::Subject => cost.subject += amount,
+                SpendSlot::Judge => cost.judge += amount,
+                SpendSlot::Failed => cost.failed += amount,
+            },
+            // A ledger row the version cannot price is not free: it is counted.
+            None => cost.unpriced += 1,
         }
     }
     cost.total = cost.subject + cost.judge + cost.failed;
@@ -434,6 +429,60 @@ async fn report(
 fn price_usage_available(prices: &Value) -> bool {
     prices.get("input").and_then(Value::as_f64).is_some()
         && prices.get("output").and_then(Value::as_f64).is_some()
+}
+
+/// Where one ledger row's spend belongs in the report.
+enum SpendSlot {
+    /// The subject's own call.
+    Subject,
+    /// A judge call: the runner's `eval_judge` seam, or an audit's judge probe attributed to
+    /// the run it audited.
+    Judge,
+    /// A billed call that did not answer `ok` (a refused, errored or timed-out attempt).
+    Failed,
+}
+
+fn spend_slot(call: &InferenceCallRow) -> SpendSlot {
+    if call.outcome != "ok" {
+        return SpendSlot::Failed;
+    }
+    match call.prompt_ref.as_deref() {
+        Some(reference)
+            if reference.starts_with("eval_judge") || reference.starts_with("eval_audit") =>
+        {
+            SpendSlot::Judge
+        }
+        _ => SpendSlot::Subject,
+    }
+}
+
+/// The ledger row as the usage object [`price_usage`] prices.
+fn usage_of(call: &InferenceCallRow) -> Value {
+    serde_json::json!({
+        "prompt_tokens": call.prompt_tokens,
+        "completion_tokens": call.completion_tokens,
+        "total_tokens": call.total_tokens,
+        "cache_creation_input_tokens": call.cache_creation_input_tokens,
+        "cache_read_input_tokens": call.cache_read_input_tokens,
+    })
+}
+
+/// One ledger row's cost, in the unit the version prices in.
+///
+/// `None` means the row cannot be expressed in that unit: the provider returned no usage at all
+/// (`unknown`), the call was a non-token surface, or a priced version has no rate for it.
+/// Cache-class rates are P3's refinement; a cache row still prices today because
+/// `prompt_tokens` is the full-rate count.
+fn price_call(call: &InferenceCallRow, prices: &Value, priced: bool) -> Option<f64> {
+    if call.cache_status == "unknown" || call.usage_unit.is_some() {
+        return None;
+    }
+    let usage = usage_of(call);
+    if priced {
+        price_usage(&usage, prices)
+    } else {
+        Some(tokens_of(&usage))
+    }
 }
 
 // ── the action ──────────────────────────────────────────────────────────────────────────

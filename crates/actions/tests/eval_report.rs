@@ -13,8 +13,11 @@ mod support;
 
 use conveyor_domain::TenantId;
 use conveyor_domain::eval::RunStatus;
+use conveyor_domain::inference::Usage;
 use conveyor_store as store;
 use conveyor_store::begin_scoped;
+use conveyor_store::inference::NewInferenceCall;
+use rust_decimal::Decimal;
 use serde_json::{Value, json};
 use uuid::Uuid;
 
@@ -325,6 +328,49 @@ async fn attempt(
     tx.commit().await.expect("commit");
 }
 
+/// One ledger row for `run_id`, as the engine would have written it.
+async fn call(
+    pg: &support::Pg,
+    tenant: TenantId,
+    run_id: Uuid,
+    prompt_ref: Option<&str>,
+    outcome: &str,
+    usage: Option<Usage>,
+    surface: Option<(&str, Decimal)>,
+) {
+    let mut tx = begin_scoped(&pg.owner, tenant).await.expect("scope");
+    store::inference::insert_call_tx(
+        &mut tx,
+        tenant,
+        &NewInferenceCall {
+            action_invocation_id: None,
+            trace_id: None,
+            correlation_id: None,
+            caller_kind: "eval",
+            run_id: None,
+            run_step_id: None,
+            conversation_turn_id: None,
+            eval_run_id: Some(run_id),
+            prompt_ref,
+            prompt_version: None,
+            prompt_sha256: None,
+            model: "stub-model",
+            served_model: None,
+            usage,
+            // The engine derives this from the response: no usage object at all is `unknown`,
+            // a usage without cache movement is `miss`.
+            cache_status: if usage.is_some() { "miss" } else { "unknown" },
+            usage_unit: surface.map(|(unit, _)| unit),
+            usage_units: surface.map(|(_, units)| units),
+            latency_ms: 3,
+            outcome,
+        },
+    )
+    .await
+    .expect("insert a ledger row");
+    tx.commit().await.expect("commit");
+}
+
 async fn report(running: &support::Running, run_id: Uuid, group_by: Option<&str>) -> (u16, Value) {
     let mut input = json!({ "run_id": run_id });
     if let Some(group_by) = group_by {
@@ -407,39 +453,84 @@ async fn report_recomputes_mean_and_ci_from_raw_rows() {
 }
 
 #[tokio::test]
-async fn cost_follows_the_recorded_usage_and_reports_tokens_when_unpriced() {
+async fn every_amount_is_derived_from_the_ledger_and_the_remainder_is_explicit() {
     let pg = support::Pg::fresh().await;
     let seeded = support::seed(&pg, "dev-a", "alice", "Alice").await;
     let running = support::Running::start(&pg).await;
     let (eval_id, version_id) = instrument(&running, &["triage"]).await;
     let run_id = run_row(&pg, seeded.tenant, &eval_id, &version_id, 1, 1).await;
 
+    // The row's own copied usage is deliberately enormous: the report must price the ledger, so
+    // a wrong source shows up as a huge number rather than a rounding difference.
     let mut slot = Slot::ok(0, 0, 1.0);
-    slot.usage = json!({ "prompt_tokens": 1000, "completion_tokens": 500 });
-    slot.judge_usage = Some(json!({ "prompt_tokens": 200, "completion_tokens": 100 }));
+    slot.usage = json!({ "prompt_tokens": 999_999 });
+    slot.judge_usage = Some(json!({ "prompt_tokens": 999_999 }));
     fill(&pg, seeded.tenant, &version_id, run_id, &[slot]).await;
-    attempt(
+
+    // The ledger, as the runner writes it: the subject's call, its judge call, a billed failed
+    // attempt, a call whose response carried no usage, and a non-token surface.
+    call(
         &pg,
         seeded.tenant,
-        &version_id,
         run_id,
-        0,
-        0,
-        1,
-        "serving",
-        Some(json!({ "prompt_tokens": 10 })),
+        Some("eval:completions.create"),
+        "ok",
+        Some(Usage {
+            prompt_tokens: 1000,
+            completion_tokens: 500,
+            total_tokens: 1500,
+            ..Usage::default()
+        }),
+        None,
     )
     .await;
-    attempt(
+    call(
         &pg,
         seeded.tenant,
-        &version_id,
         run_id,
-        0,
-        0,
-        2,
-        "serving",
-        Some(json!({ "no_tokens": true })),
+        Some("eval_judge"),
+        "ok",
+        Some(Usage {
+            prompt_tokens: 200,
+            completion_tokens: 100,
+            total_tokens: 300,
+            ..Usage::default()
+        }),
+        None,
+    )
+    .await;
+    call(
+        &pg,
+        seeded.tenant,
+        run_id,
+        Some("eval:completions.create"),
+        "timeout",
+        Some(Usage {
+            prompt_tokens: 10,
+            total_tokens: 10,
+            ..Usage::default()
+        }),
+        None,
+    )
+    .await;
+    call(
+        &pg,
+        seeded.tenant,
+        run_id,
+        Some("eval:completions.create"),
+        "ok",
+        None,
+        None,
+    )
+    .await;
+    call(
+        &pg,
+        seeded.tenant,
+        run_id,
+        Some("eval:completions.create"),
+        "ok",
+        Some(Usage::default()),
+        Some(("image", Decimal::new(2, 0))),
     )
     .await;
 
@@ -460,8 +551,8 @@ async fn cost_follows_the_recorded_usage_and_reports_tokens_when_unpriced() {
     assert!(close(&cost["failed"], 0.003), "{cost}"); // (10·3) / 10 000
     assert!(close(&cost["total"], 1.263), "{cost}");
     assert_eq!(
-        cost["unpriced"], 1,
-        "a usage with no token counts is not free"
+        cost["unpriced"], 2,
+        "an unknown usage and a non-token surface are counted, never free: {cost}"
     );
 
     // ── unpriced: tokens, so a version without rates still reports a spend ──
@@ -473,7 +564,8 @@ async fn cost_follows_the_recorded_usage_and_reports_tokens_when_unpriced() {
     assert!(close(&cost["subject"], 1500.0), "{cost}");
     assert!(close(&cost["judge"], 300.0), "{cost}");
     assert!(close(&cost["failed"], 10.0), "{cost}");
-    assert_eq!(cost["unpriced"], 0);
+    assert!(close(&cost["total"], 1810.0), "{cost}");
+    assert_eq!(cost["unpriced"], 2);
 }
 
 #[tokio::test]
