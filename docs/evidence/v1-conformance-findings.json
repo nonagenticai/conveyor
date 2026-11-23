@@ -229,7 +229,12 @@
       ],
       "failure_scenario": "Tenant and job spend exclude tool costs, so reported spend and budget utilisation understate actual consumption.",
       "acceptance": "The usage report derives tool spend at read time and includes it at tenant and run levels; a priced tool_call appears in both totals in tests.",
-      "owner_project": "T11"
+      "owner_project": "T11",
+      "resolved_by": {
+        "commit": "dbbeae4c80daf6af3da3348f8a7d7d32b19ba00c",
+        "test": "crates/store/tests/inference_.rs::tool_spend_is_derived_at_read_time_at_the_tenant_and_run_levels",
+        "evidence": "Tool spend is a read-time CTE over tool_call in usage_rows_tx / usage_by_card_tx / usage_rows_for_bucket_tx; UsageRow gains tool_calls and tool_cost_usd at tenant and run levels; metrics.usage, run_drilldown and conveyor_cost share one TOOL_CALL_PRICE expression. Tests: the priced call appears in the day/project/run buckets and the tenant+run totals; an unpriced call contributes zero; a tool call never moves the inference-only total (inference_ 9/9, metrics 11/11). No stored cost column."
+      }
     },
     {
       "id": "v1-p75-3",
@@ -592,7 +597,12 @@
       ],
       "failure_scenario": "benefits.transition_upsert accepts baseline_measured_at and post_measured_at with evidence [], then benefits.update sets status realized. No post-transition measurement exists, yet the benefit claims improvement.",
       "acceptance": "Completeness rejects empty/whitespace/non-measurement baselines and targets; realized requires a transition with baseline and post measurement values plus evidence, not timestamps alone.",
-      "owner_project": "T10"
+      "owner_project": "T10",
+      "resolved_by": {
+        "commit": "472f23fc343f538b4505e5dea2be27be140341b1",
+        "test": "crates/actions/tests/benefit_lifecycle.rs::a_realized_status_needs_evidence_behind_the_readings",
+        "evidence": "benefits.measure requires a numeric actual_value plus a non-blank, non-placeholder unit (422 benefit_measurement_invalid); migration 0077 adds the CHECK. benefits.update to realized requires the latest baseline and a post reading after enactment, each measured and evidenced (benefit_baseline_missing / benefit_post_measurement_missing / benefit_measurement_evidence_missing); timestamps alone refuse. benefit_lifecycle 17/17, benefit_evaluation 7/7, store benefit_transition 5/5."
+      }
     },
     {
       "id": "v1-p83-3",
@@ -4383,7 +4393,12 @@
       ],
       "failure_scenario": "The sole organisation:write holder publishes release R2 and calls job_bindings.create without a status. The binding is active immediately, runs pin it, and the audit contains no decision, approver or evidence for the activation.",
       "acceptance": "Creating or activating a binding opens a gated decision; only an approved decision flips it to active, and a direct status=active request is refused until then; tests cover the refusal and the approval.",
-      "owner_project": "T0"
+      "owner_project": "T0",
+      "resolved_by": {
+        "commit": "1d939a6a86aad568565a8b537dabe6371f8cf183",
+        "test": "crates/actions/tests/job_binding_gate.rs::the_default_create_is_draft_and_opens_the_activation_gate",
+        "evidence": "job_bindings.create now opens a gate of kind job_binding (gate name job_bindings.create, binding id in meta.job_binding_id) and leaves the binding draft; a direct status=active is refused 409 job_binding_approval_required; an approved decision flips draft->active and bumps the version, a rejection leaves it draft. Tests 8/8 (default gate, explicit inert draft, direct-active refusal, approval, rejection); sop_ingestion 13/13."
+      }
     },
     {
       "id": "v1-p45-1",
