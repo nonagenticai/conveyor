@@ -1345,7 +1345,12 @@
       ],
       "failure_scenario": "A stale or other-tenant image publishes producer B's issue titles and numbers under tenant A's label.",
       "acceptance": "Resolve the registry per target tenant and record its provenance; reject a mismatch.",
-      "owner_project": "PLATFORM"
+      "owner_project": "PLATFORM",
+      "resolved_by": {
+        "commit": "27abea0202f09c621355591066eb567d6f2e4474",
+        "test": "crates/pack/tests/issue_registry.rs::issue_registry_must_name_this_tenant_and_is_hashed",
+        "evidence": "The producer (be8076f5) writes issue-registry/v1 with provenance {tenant, source} and the committed registry carries it; the snapshot's read_issues refuses a missing provenance (IssuesProvenanceMissing) and a foreign tenant (IssuesTenantMismatch naming both) and stamps the accepted registry's issues array with its sha256; apps/server/src/publish.rs surfaces both through its permanent JobFailure mapping. `cargo test -p conveyor-pack --test issue_registry`: 1 passed."
+      }
     },
     {
       "id": "v1-pack-6",
@@ -5709,13 +5714,13 @@
       "evidence": [
         {
           "path": "seed/output-standard.json",
-          "line": 910,
-          "quote": "            \"pointer\": \"/inference/by_project\""
+          "line": 914,
+          "quote": "        \"Investment appraisal and cash flow\": ["
         },
         {
           "path": "seed/output-standard.json",
-          "line": 1090,
-          "quote": "            \"pointer\": \"/compliance_reviews\""
+          "line": 1091,
+          "quote": "        \"Assurance\": ["
         }
       ],
       "failure_scenario": "publish-programme-artefacts.py composes the business case with the 'Investment appraisal and cash flow' heading resolved from zero rows; the body passes validate_body (the heading is present) and the published case carries no quantified appraisal while the board reports only RECORD gaps.",
@@ -5789,13 +5794,13 @@
       "evidence": [
         {
           "path": "seed/output-standard.json",
-          "line": 906,
+          "line": 914,
           "quote": "        \"Investment appraisal and cash flow\": ["
         },
         {
           "path": "seed/output-standard.json",
-          "line": 910,
-          "quote": "            \"pointer\": \"/inference/by_project\""
+          "line": 923,
+          "quote": "            \"pointer\": \"/inference/by_model\""
         }
       ],
       "failure_scenario": "A tranche or sponsor decision approves the programme on a business case whose appraisal section is empty or holds token counts; cost and benefit posture are prose, so no actual can be compared with a plan and a cost regression passes the review unnoticed.",

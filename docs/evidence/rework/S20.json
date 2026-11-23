@@ -165,16 +165,16 @@
     "gate (P0): the gate check 'S20-baseline' did not pass; the gate check 'S20-charter' did not pass; the gate check 'S20-closure-outputs' did not pass; the gate check 'S20-contract' did not pass; the gate check 'S20-review' did not pass; the gate check 'S20-closure-gate' did not pass; the gate check 'S20-pi-cadence' did not pass; the gate check 'S20-pi-plan' did not pass; the gate check 'S20-pi-objectives' did not pass; the gate check 'S20-lessons' did not pass; the gate check 'S20-wsjf' did not pass; the gate check 'S20-demo-credits' did not pass"
   ],
   "gate": "S20 is accepted when its gate is green: one RLS-forced table with `0029` in the ledger and no spend column, no round before the plan is signed, the train/test split immovable by a climb, a grader fix re-grading stored transcripts into a new run, the comparison refusing across versions, graders or splits, the revert rules in the domain machine, a fourth content round refused after a stall, the cost walk's gates registered before round 1, the final report naming the winner, the served surface matching the lock, and `rbuild --gate`.",
-  "generated_at": "2026-11-23T10:17:15.434959+00:00",
+  "generated_at": "2026-11-23T10:37:13.545495+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/S20.toml",
   "name": "Eval hillclimb",
   "project": "S20",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-23T09:41:16.455014+00:00",
-    "git_sha": "c44b23fb1a5f866cabd1697fab977d240a2c6575",
-    "path": "retained-snapshot/c44b23fb1a5f866cabd1697fab977d240a2c6575"
+    "generated_at": "2026-11-23T10:28:30.225766+00:00",
+    "git_sha": "4304be961d76deea9b37b1c3dc5f6ba4abe5a642",
+    "path": "retained-snapshot/4304be961d76deea9b37b1c3dc5f6ba4abe5a642"
   },
   "verdict": "red",
   "warnings": []

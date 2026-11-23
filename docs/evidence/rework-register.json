@@ -10923,82 +10923,6 @@
       "title": "No deploy or live-verify gate; ops.rollback is a kubectl undo"
     },
     {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --deep-review docs/evidence/record-w3/deep-review-findings.json --rework-check v1-pack-5:PLATFORM",
-      "apply_to": "PLATFORM",
-      "artefact": "publication",
-      "baseline": null,
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "Resolve the registry per target tenant and record its provenance; reject a mismatch.",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "evidence": [
-            {
-              "line": 124,
-              "path": "apps/server/src/publish.rs",
-              "quote": "    let issues = pack_root.join(\"data/issues.json\");",
-              "source": "code"
-            },
-            {
-              "line": 226,
-              "path": "crates/pack/src/snapshot.rs",
-              "quote": "        object.insert(\"issue_registry\".to_owned(), issues.clone());",
-              "source": "code"
-            }
-          ],
-          "rule": "v1-pack-5",
-          "source": "audit"
-        }
-      ],
-      "key": "v1-pack-5:PLATFORM",
-      "kind": "CODE",
-      "owner_project": "PLATFORM",
-      "rule": "v1-pack-5",
-      "scope": "PLATFORM",
-      "severity": "P1",
-      "spec": "\u00a710.3",
-      "standard": "SPEC",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "The console publisher reads /srv/site/design/data/issues.json from whichever pack the image carries, with no tenant check, then injects it into the target tenant's programme and manifest. Staleness or a wrong image silently relabels another producer's registry.",
-          "disposition": "rework",
-          "evidence": [
-            {
-              "evidence": [
-                {
-                  "line": 124,
-                  "path": "apps/server/src/publish.rs",
-                  "quote": "    let issues = pack_root.join(\"data/issues.json\");",
-                  "source": "code"
-                },
-                {
-                  "line": 226,
-                  "path": "crates/pack/src/snapshot.rs",
-                  "quote": "        object.insert(\"issue_registry\".to_owned(), issues.clone());",
-                  "source": "code"
-                }
-              ],
-              "rule": "v1-pack-5",
-              "source": "audit"
-            }
-          ],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "PLATFORM"
-        }
-      ],
-      "title": "App publisher labels the image's issue registry as the target tenant's"
-    },
-    {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --deep-review docs/evidence/record-w3/deep-review-findings.json --rework-check v1-s05-1:S05",
       "apply_to": "PLATFORM",
       "artefact": "S05 board",
@@ -78047,12 +77971,12 @@
       "suppressed": 0
     },
     "SPEC": {
-      "findings": 55,
+      "findings": 54,
       "gaps": 22,
       "p0": 0,
       "p1": 3,
       "p2": 19,
-      "packages": 67,
+      "packages": 66,
       "rules": 8,
       "rules_clean": 4,
       "rules_with_gaps": 4,
@@ -78074,30 +77998,30 @@
   "snapshot": "/tmp/u5a-snapshot-r2/data",
   "summary": {
     "by_kind": {
-      "CODE": 72,
+      "CODE": 71,
       "RECORD": 627,
       "STANDARD": 4
     },
     "by_severity": {
       "P0": 27,
-      "P1": 203,
+      "P1": 202,
       "P2": 473
     },
     "by_standard": {
       "MSP": 67,
       "PMP": 121,
       "SAFe": 23,
-      "SPEC": 67,
+      "SPEC": 66,
       "TOGAF": 425
     },
     "by_status": {
-      "open": 703
+      "open": 702
     },
     "duplicates": 0,
-    "open": 703,
-    "packages": 703,
-    "resolved": 122,
-    "subjects": 780,
+    "open": 702,
+    "packages": 702,
+    "resolved": 123,
+    "subjects": 779,
     "suppressed": 0
   }
 }
