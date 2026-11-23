@@ -19,7 +19,7 @@ test("the portfolio renders the tenant's in-flight set, never a fixture", async 
   expect(names).toContain(title);
 
   await page.goto("/portfolio");
-  await expect(page.getByRole("heading", { name: "Portfolio" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Portfolio", exact: true })).toBeVisible();
   await expect(page.getByRole("heading", { name: "L1 · Portfolio" })).toBeVisible();
 
   const table = page.locator("table.table").first();
@@ -52,8 +52,9 @@ test("the delivery view renders L1-L4 and the work package's execution", async (
 
   await expect(page.getByRole("heading", { name: "L3 · Project" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "L4 · Work package" })).toBeVisible();
-  const execution = page.getByRole("link", { name: "Open execution" }).first();
-  await expect(execution).toHaveAttribute("href", `/card/${fixture.card.id}`);
+  // The work package's own execution link is the cockpit route for THAT card; the board may
+  // carry other cards, so target the fixture's href rather than the first link.
+  await expect(page.locator(`a[href="/card/${fixture.card.id}"]`)).toBeVisible();
 });
 
 test("an unpriced row is marked", async ({ page, request }) => {
