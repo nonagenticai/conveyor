@@ -175,7 +175,7 @@
     "closed-on-red (P0): the project is closed on a red manifest"
   ],
   "gate": "S11's gate is author \u2192 publish \u2192 execute a procedure run; \u00a77 adds the gate, refusal, retry and publish-time proofs.",
-  "generated_at": "2026-11-23T10:36:49.411005+00:00",
+  "generated_at": "2026-11-23T21:01:14.296420+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/S11.toml",
   "name": "Processes, steps and SOPs \u2014 executable documentation",
@@ -183,8 +183,8 @@
   "schema": "project-acceptance/v1",
   "snapshot": {
     "generated_at": "2026-11-23T10:28:30.225766+00:00",
-    "git_sha": "4304be961d76deea9b37b1c3dc5f6ba4abe5a642",
-    "path": "retained-snapshot/4304be961d76deea9b37b1c3dc5f6ba4abe5a642"
+    "git_sha": "f3bfa7ab7abf9f520d880e1816b50e6db2b86031",
+    "path": "retained-snapshot/f3bfa7ab7abf9f520d880e1816b50e6db2b86031"
   },
   "verdict": "red",
   "warnings": []

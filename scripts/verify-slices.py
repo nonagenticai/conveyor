@@ -375,7 +375,12 @@ def audit_slice(
     evidence_dir.mkdir(parents=True, exist_ok=True)
     fresh, error = runner(key, manifest_path, snapshot_dir, evidence_dir, timeout)
     if fresh is None:
-        return finish("broken", error or "verify-project produced no evidence", [], manifest)
+        reason = error or "verify-project produced no evidence"
+        # A snapshot without the project row is an absent record, not a crashed instrument:
+        # verify-project exits 2 with "the snapshot has no project '<KEY>'". Counting it as
+        # broken would report an instrument failure where the programme simply has no row.
+        status = "absent" if "the snapshot has no project" in reason else "broken"
+        return finish(status, reason, [], manifest)
 
     fresh_by_id = {str(item.get("id")): item for item in fresh.get("checks", [])}
     checks: list[dict[str, Any]] = []
@@ -690,12 +695,40 @@ def self_test() -> int:
         if "record/generic" not in item_b["reason"]:
             failures.append(f"fixture B: reason {item_b['reason']!r} does not name record/generic")
 
+        # Fixture C: verify-project exits 2 because the snapshot has no project row -> absent,
+        # never broken: a missing record is a programme gap, not a crashed instrument.
+        fixture_c = base / "fixture-c"
+        _fixture(
+            fixture_c,
+            "S02",
+            {"id": "z", "check": "project", "description": "a fixture gate for a missing project"},
+            "a fixture gate whose project row is absent",
+        )
+
+        def missing_project_runner(*_args: object, **_kwargs: object) -> tuple[None, str]:
+            return (
+                None,
+                "verify-project produced no evidence (exit 2): verify-project: "
+                "the snapshot has no project 'S02'",
+            )
+
+        document_c = audit(
+            fixture_c, ["S02"], snapshot / "data", runner=missing_project_runner
+        )
+        item_c = document_c["slices"][0]
+        if item_c["status"] != "absent":
+            failures.append(f"fixture C: status {item_c['status']!r}, expected 'absent'")
+        if "no project" not in item_c["reason"]:
+            failures.append(
+                f"fixture C: reason {item_c['reason']!r} does not name the missing project"
+            )
+
     if failures:
         print("verify-slices: SELF-TEST FAILED")
         for failure in failures:
             print(f"  - {failure}")
         return 1
-    print("verify-slices: self-test OK (fixture A absent, fixture B partial)")
+    print("verify-slices: self-test OK (fixture A absent, fixture B partial, fixture C absent)")
     return 0
 
 

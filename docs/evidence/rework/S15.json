@@ -165,7 +165,7 @@
     "gate (P0): the gate check 'S15-baseline' did not pass; the gate check 'S15-charter' did not pass; the gate check 'S15-closure-outputs' did not pass; the gate check 'S15-contract' did not pass; the gate check 'S15-review' did not pass; the gate check 'S15-closure-gate' did not pass; the gate check 'S15-pi-cadence' did not pass; the gate check 'S15-pi-plan' did not pass; the gate check 'S15-pi-objectives' did not pass; the gate check 'S15-wsjf' did not pass; the gate check 'S15-demo-credits' did not pass; the gate check 'S15-lessons' did not pass"
   ],
   "gate": "At the end, a card's run resolves its capability and executor, the capability's readiness is reported before the run starts, a cited passage is retrieved from a pinned `strata` pack, work-package memory is written, consolidated into `strata_rag`, and recalled by `source_id`.",
-  "generated_at": "2026-11-23T10:36:59.646698+00:00",
+  "generated_at": "2026-11-23T21:01:14.828440+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/S15.toml",
   "name": "Capability, knowledge and memory",
@@ -173,8 +173,8 @@
   "schema": "project-acceptance/v1",
   "snapshot": {
     "generated_at": "2026-11-23T10:28:30.225766+00:00",
-    "git_sha": "4304be961d76deea9b37b1c3dc5f6ba4abe5a642",
-    "path": "retained-snapshot/4304be961d76deea9b37b1c3dc5f6ba4abe5a642"
+    "git_sha": "f3bfa7ab7abf9f520d880e1816b50e6db2b86031",
+    "path": "retained-snapshot/f3bfa7ab7abf9f520d880e1816b50e6db2b86031"
   },
   "verdict": "red",
   "warnings": []
