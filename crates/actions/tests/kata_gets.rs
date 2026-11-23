@@ -36,6 +36,7 @@ async fn the_prediction_is_recorded_before_the_measurement() {
                 "title": "Raise the held-out mean",
                 "target_surface": "procedure",
                 "target_ref": "process:kata-fixture",
+                "instrument_version_id": instrument.version_id,
                 "threshold": 0.05,
             }),
             None,

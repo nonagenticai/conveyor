@@ -223,6 +223,7 @@
     "job_releases.retire",
     "jobs.list",
     "jobs.retry",
+    "kata.adopt",
     "kata.analyse",
     "kata.get",
     "kata.hypothesise",

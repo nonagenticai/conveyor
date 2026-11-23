@@ -221,6 +221,49 @@ pub fn movement(candidate: &[CaseScore], baseline: &[CaseScore]) -> Option<Movem
     })
 }
 
+/// What a measurement's directed movement means against the kata's recorded threshold
+/// (SPEC_V2 §9.3; P2).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum Verdict {
+    /// The metric moved in the better direction: the candidate is a measured improvement and
+    /// may go to the person's adoption gate.
+    Improved,
+    /// The metric did not move, or moved worse by less than the recorded threshold. Nothing is
+    /// adopted (P2.2).
+    Flat,
+    /// The metric moved worse by more than the recorded threshold: the candidate is reverted.
+    Regressed,
+}
+
+impl Verdict {
+    /// The database and wire spelling.
+    pub fn as_str(self) -> &'static str {
+        match self {
+            Self::Improved => "improved",
+            Self::Flat => "flat",
+            Self::Regressed => "regressed",
+        }
+    }
+}
+
+/// Compare a directed delta (`positive` always means better) against the kata's recorded
+/// threshold. The threshold is the regression boundary: a movement worse than `-threshold` is
+/// a regression; any movement worse than zero but within the threshold is flat — it adopts
+/// nothing, and it does not revert either.
+pub fn verdict(directed_delta: f64, threshold: f64) -> Verdict {
+    if !directed_delta.is_finite() || directed_delta == 0.0 {
+        return Verdict::Flat;
+    }
+    if directed_delta > 0.0 {
+        return Verdict::Improved;
+    }
+    if -directed_delta > threshold.abs() {
+        Verdict::Regressed
+    } else {
+        Verdict::Flat
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -256,5 +299,20 @@ mod tests {
         assert!((up.directed_delta("lower") + 0.3).abs() < 1e-12);
         let flat = movement(&[case(1, 0.5)], &[case(1, 0.5)]).expect("comparable");
         assert!(!flat.moved(), "a flat result adopts nothing");
+    }
+
+    #[test]
+    fn the_threshold_is_the_regression_boundary_not_the_adoption_bar() {
+        assert_eq!(verdict(0.4, 0.1), Verdict::Improved);
+        assert_eq!(verdict(0.05, 0.1), Verdict::Improved);
+        assert_eq!(verdict(0.0, 0.1), Verdict::Flat);
+        assert_eq!(verdict(-0.05, 0.1), Verdict::Flat);
+        assert_eq!(
+            verdict(-0.1, 0.1),
+            Verdict::Flat,
+            "at the boundary is not past it"
+        );
+        assert_eq!(verdict(-0.11, 0.1), Verdict::Regressed);
+        assert_eq!(verdict(-0.01, 0.0), Verdict::Regressed);
     }
 }
