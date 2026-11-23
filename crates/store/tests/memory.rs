@@ -176,6 +176,7 @@ async fn the_prompt_selection_is_hot_first_bounded_and_digest_aware() {
             kinds: Vec::new(),
             limit: 4,
             include_digest: true,
+            ..MemorySelector::default()
         },
     )
     .await
@@ -196,6 +197,7 @@ async fn the_prompt_selection_is_hot_first_bounded_and_digest_aware() {
             kinds: vec![MemoryKind::Fact],
             limit: 4,
             include_digest: true,
+            ..MemorySelector::default()
         },
     )
     .await
@@ -212,6 +214,7 @@ async fn the_prompt_selection_is_hot_first_bounded_and_digest_aware() {
             kinds: Vec::new(),
             limit: 2,
             include_digest: true,
+            ..MemorySelector::default()
         },
     )
     .await
@@ -237,6 +240,7 @@ async fn the_prompt_selection_is_hot_first_bounded_and_digest_aware() {
             kinds: Vec::new(),
             limit: 2,
             include_digest: false,
+            ..MemorySelector::default()
         },
     )
     .await
@@ -312,21 +316,34 @@ async fn a_digest_covers_the_unconsolidated_rows_once() {
     let hot = hot_for_card_tx(&mut tx, tenant(&seed), seed.card, 50)
         .await
         .expect("hot rows");
+    // The prompt selector still appends the derived digest when room remains; it is not a hot row.
+    let selected = select_for_prompt_tx(
+        &mut tx,
+        tenant(&seed),
+        seed.card,
+        &MemorySelector::default(),
+    )
+    .await
+    .expect("selection");
     tx.commit().await.expect("commit");
 
-    // Two hot rows plus the digest, newest first.
-    assert_eq!(hot.len(), 3);
-    assert_eq!(hot[0].id, digest_id);
-    assert_eq!(hot[0].kind, MemoryKind::Digest);
-    assert_eq!(hot[0].source, MemorySource::System);
-    assert!(hot[0].consolidated_at.is_some(), "the digest is stamped");
+    // Two hot rows; the digest is derived and never served as hot (S21 step 7, rework v1-p76-2).
+    assert_eq!(hot.len(), 2);
     assert!(
-        hot[0]
-            .body
+        hot.iter().all(|row| row.kind != MemoryKind::Digest),
+        "no digest in hot: {hot:?}"
+    );
+    assert!(hot.iter().all(|row| row.consolidated_at.is_some()));
+    let last = selected
+        .last()
+        .expect("the digest is the last selected line");
+    assert_eq!(last.id, digest_id);
+    assert_eq!(last.kind, MemoryKind::Digest);
+    assert_eq!(last.source, MemorySource::System);
+    assert!(
+        last.body
             .starts_with(&format!("work-package: {}", seed.card))
     );
-    assert!(hot[1].consolidated_at.is_some());
-    assert!(hot[2].consolidated_at.is_some());
 }
 
 /// v1-s15-1 property (d), the half no shipped test carried: the write shares its caller's

@@ -42,8 +42,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/SPEC_V2.html",
       "source": "docs/SPEC_V2.md",
       "section": "Spec",
-      "sha256": "54641394bc00f676f0a0fe4f028488fe2d06dd0407258ee108b9dc5a9d2b5966",
-      "bytes": 179888,
+      "sha256": "a9386790e9ea2bebf9f2335d36be99fae8c48ecfc41c6f510275e968fd1a2df9",
+      "bytes": 179883,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/SPEC_V2.md"
     },
     {
@@ -146,15 +146,6 @@ window.CONVEYOR_DOCUMENTS = {
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0011-applying-gate.md"
     },
     {
-      "title": "0012 — No deferrals; every finding executes",
-      "path": "docs/decisions/0012-no-deferrals.html",
-      "source": "docs/decisions/0012-no-deferrals.md",
-      "section": "Decisions",
-      "sha256": "2b57f4a79a4b4fe3c48d5e9eebadee4ac5453aa1474764bb622a1185ddbfcccc",
-      "bytes": 3961,
-      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0012-no-deferrals.md"
-    },
-    {
       "title": "0013 — The real V2 UI is the app, not the design pack",
       "path": "docs/decisions/0013-real-v2-ui.html",
       "source": "docs/decisions/0013-real-v2-ui.md",
@@ -173,6 +164,15 @@ window.CONVEYOR_DOCUMENTS = {
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0014-work-package-run.md"
     },
     {
+      "title": "0015 — The run's episodic memory: prior steps in the compiled prompt",
+      "path": "docs/decisions/0015-run-episodic-memory.html",
+      "source": "docs/decisions/0015-run-episodic-memory.md",
+      "section": "Decisions",
+      "sha256": "919ba6c1a13514c4555c07aed216ebc3f7d77de17f407fe2f258b521b7535424",
+      "bytes": 5457,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0015-run-episodic-memory.md"
+    },
+    {
       "title": "Programme architecture and benefits realization",
       "path": "docs/design/Program_Architecture_and_Benefits_Realization.html",
       "source": "docs/design/Program_Architecture_and_Benefits_Realization.md",
@@ -186,8 +186,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/design/README.html",
       "source": "docs/design/README.md",
       "section": "Design",
-      "sha256": "385938f37db98b800ef02cfae9b757fe7e9ec0e3c61f59537a93e53ad4ec4ffa",
-      "bytes": 27726,
+      "sha256": "06d0c2b70541870e0a2f72c2e40712e39b54cf816cdeaf4591d785b5db9dd1f0",
+      "bytes": 25352,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/design/README.md"
     },
     {
@@ -195,18 +195,9 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/design/STUDIO-SPEC.html",
       "source": "docs/design/STUDIO-SPEC.md",
       "section": "Design",
-      "sha256": "ec86aa608d7319aa0455fef75343a545acbfbe3079c31e541ff6c20178b5611e",
-      "bytes": 82514,
+      "sha256": "bceb5d63a826ae0e2401707e4175cada58740f922fec7c073ff29caf7524b992",
+      "bytes": 80862,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/design/STUDIO-SPEC.md"
-    },
-    {
-      "title": "MSP/TOGAF conformance gap register",
-      "path": "docs/design/data/conformance.html",
-      "source": "docs/design/data/conformance.md",
-      "section": "Design",
-      "sha256": "37671c0350d52dceb75ed4c31e78e39a4b4fc7e3278899f0753ecd1050e67017",
-      "bytes": 21848,
-      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/design/data/conformance.md"
     },
     {
       "title": "Remaining development work — corrected assessment, 2026-11-10",
@@ -461,6 +452,15 @@ window.CONVEYOR_DOCUMENTS = {
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S21-EXECUTOR.md"
     },
     {
+      "title": "S21 step 7 — the run's episodic memory",
+      "path": "docs/evidence/S21-MEMORY.html",
+      "source": "docs/evidence/S21-MEMORY.md",
+      "section": "Evidence",
+      "sha256": "7c7c32eab5d050917e7839725bcc90e7dc6135cac68c591c901564987d0ef54c",
+      "bytes": 3602,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S21-MEMORY.md"
+    },
+    {
       "title": "S21 step 2 — the plan projection over declared step outputs (receipt)",
       "path": "docs/evidence/S21-PLAN.html",
       "source": "docs/evidence/S21-PLAN.md",
@@ -474,8 +474,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/evidence/S21-RUN.html",
       "source": "docs/evidence/S21-RUN.md",
       "section": "Evidence",
-      "sha256": "d02376ff2af8864e85be31e6bea6b654dec8ec859d63fbc66ef1f9e4c162de8f",
-      "bytes": 7406,
+      "sha256": "bc5bdfb9adfd6b58c11570bfde7fa58cbf9a6b9f3d35aa3fd01a0bb45b2b3327",
+      "bytes": 7430,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S21-RUN.md"
     },
     {
@@ -497,21 +497,12 @@ window.CONVEYOR_DOCUMENTS = {
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/analysis-capture-2026-11-15.md"
     },
     {
-      "title": "Token spend per accepted deliverable — pre-transition baseline",
-      "path": "docs/evidence/benefits/token-spend-baseline.html",
-      "source": "docs/evidence/benefits/token-spend-baseline.md",
-      "section": "Evidence",
-      "sha256": "ab5219fe8f61cc74ed63eff6d44c2ffa0492d6e2ae4cabb898c54614c0198f24",
-      "bytes": 2927,
-      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/benefits/token-spend-baseline.md"
-    },
-    {
       "title": "MSP/TOGAF conformance gap register",
       "path": "docs/evidence/conformance-gap-register.html",
       "source": "docs/evidence/conformance-gap-register.md",
       "section": "Evidence",
-      "sha256": "37671c0350d52dceb75ed4c31e78e39a4b4fc7e3278899f0753ecd1050e67017",
-      "bytes": 21848,
+      "sha256": "aa21da69c78b166169d06e4d2d6ab4c403eecd991339a0bc78b283560d1be7e7",
+      "bytes": 23231,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/conformance-gap-register.md"
     },
     {
@@ -596,318 +587,12 @@ window.CONVEYOR_DOCUMENTS = {
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/produce-capture-2026-11-16.md"
     },
     {
-      "title": "Inspect and Adapt — conveyor buildout, tranche 3",
-      "path": "docs/evidence/record/inputs/safe-tr3/inspect-adapt.html",
-      "source": "docs/evidence/record/inputs/safe-tr3/inspect-adapt.md",
-      "section": "Evidence",
-      "sha256": "886f74f06a74d940f1f14344c652cacad8321dcb56cc5979645009474d3b460e",
-      "bytes": 2654,
-      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/record/inputs/safe-tr3/inspect-adapt.md"
-    },
-    {
-      "title": "PI Objectives — conveyor buildout, tranche 3",
-      "path": "docs/evidence/record/inputs/safe-tr3/pi-objectives.html",
-      "source": "docs/evidence/record/inputs/safe-tr3/pi-objectives.md",
-      "section": "Evidence",
-      "sha256": "36c63fdec345d49ed4670e7a13ae20b428852b748cd85068a7a4306d16fc7711",
-      "bytes": 2377,
-      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/record/inputs/safe-tr3/pi-objectives.md"
-    },
-    {
-      "title": "PI Plan — conveyor buildout, tranche 3",
-      "path": "docs/evidence/record/inputs/safe-tr3/pi-plan.html",
-      "source": "docs/evidence/record/inputs/safe-tr3/pi-plan.md",
-      "section": "Evidence",
-      "sha256": "119b5ddd2d17537a885f81229a0ea430e01eefd873f7544346d9b501ff3edb50",
-      "bytes": 3368,
-      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/record/inputs/safe-tr3/pi-plan.md"
-    },
-    {
-      "title": "System Demo — conveyor buildout, tranche 3",
-      "path": "docs/evidence/record/inputs/safe-tr3/system-demo.html",
-      "source": "docs/evidence/record/inputs/safe-tr3/system-demo.md",
-      "section": "Evidence",
-      "sha256": "598e60361b43f5fa0bff696db4ae4c0cbe30a3ab1499bc38ffdc59a21c753eac",
-      "bytes": 1587,
-      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/record/inputs/safe-tr3/system-demo.md"
-    },
-    {
-      "title": "DESIGN-PUBLISH — retrospective rework note (2026-11-21)",
-      "path": "docs/evidence/rework/DESIGN-PUBLISH.html",
-      "source": "docs/evidence/rework/DESIGN-PUBLISH.md",
-      "section": "Evidence",
-      "sha256": "2a9b17b3ca28bc518dde5f77d2b3cc8bbbcc03a7c2f4eb20188e3c990e15bc6f",
-      "bytes": 1073,
-      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/DESIGN-PUBLISH.md"
-    },
-    {
-      "title": "DESIGN-PUBLISH — retrospective rework acts (2026-11-21)",
-      "path": "docs/evidence/rework/DESIGN-PUBLISH/acts.html",
-      "source": "docs/evidence/rework/DESIGN-PUBLISH/acts.md",
-      "section": "Evidence",
-      "sha256": "3901f1fc89b48ac444cb17656498001ac435dad98e2fedea6c3a350f1100789c",
-      "bytes": 210,
-      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/DESIGN-PUBLISH/acts.md"
-    },
-    {
-      "title": "P0 — retrospective rework note (2026-11-21)",
-      "path": "docs/evidence/rework/P0.html",
-      "source": "docs/evidence/rework/P0.md",
-      "section": "Evidence",
-      "sha256": "476617563b448a2e336ca05b8b5b538c822b5728b59a593d954905ebde9d12f1",
-      "bytes": 1109,
-      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/P0.md"
-    },
-    {
-      "title": "PLATFORM — retrospective rework note (2026-11-21)",
-      "path": "docs/evidence/rework/PLATFORM.html",
-      "source": "docs/evidence/rework/PLATFORM.md",
-      "section": "Evidence",
-      "sha256": "47950a2528083fd6740fd8bfd5708abbeb955196872b9f30e5ba4d317738cacc",
-      "bytes": 823,
-      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/PLATFORM.md"
-    },
-    {
-      "title": "PLATFORM — the standing row's retrospective record (2026-11-21)",
-      "path": "docs/evidence/rework/PLATFORM/acts.html",
-      "source": "docs/evidence/rework/PLATFORM/acts.md",
-      "section": "Evidence",
-      "sha256": "28267762f6593a3b0c20aa110119a8962afa96f772b4ea934239742aab044fb8",
-      "bytes": 490,
-      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/PLATFORM/acts.md"
-    },
-    {
-      "title": "S00 — retrospective rework note (2026-11-21)",
-      "path": "docs/evidence/rework/S00.html",
-      "source": "docs/evidence/rework/S00.md",
-      "section": "Evidence",
-      "sha256": "b2e42b232ae47a156c94a9f9f5ed40a4e8e18c0766b1175e3693236386dd85fd",
-      "bytes": 997,
-      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/S00.md"
-    },
-    {
-      "title": "S00 — retrospective rework acts (2026-11-21)",
-      "path": "docs/evidence/rework/S00/acts.html",
-      "source": "docs/evidence/rework/S00/acts.md",
-      "section": "Evidence",
-      "sha256": "e4ae08cf7d42f5282ceaf52d2e4a0bdd8d815de1a2188129cd2076905c52cbc3",
-      "bytes": 199,
-      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/S00/acts.md"
-    },
-    {
-      "title": "S01 — retrospective rework note (2026-11-21)",
-      "path": "docs/evidence/rework/S01.html",
-      "source": "docs/evidence/rework/S01.md",
-      "section": "Evidence",
-      "sha256": "5a838cba86e1850befbeb4b913b326f4a9ea061c2c6d6dfa82f5d46cc8529755",
-      "bytes": 1138,
-      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/S01.md"
-    },
-    {
-      "title": "S01 — retrospective rework acts (2026-11-21)",
-      "path": "docs/evidence/rework/S01/acts.html",
-      "source": "docs/evidence/rework/S01/acts.md",
-      "section": "Evidence",
-      "sha256": "8200bd9968fc0dc72efde91e0a4e29c830076d9d22a0bdb93152ab7a17b09720",
-      "bytes": 199,
-      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/S01/acts.md"
-    },
-    {
-      "title": "S02 — retrospective rework acts (2026-11-21)",
-      "path": "docs/evidence/rework/S02/acts.html",
-      "source": "docs/evidence/rework/S02/acts.md",
-      "section": "Evidence",
-      "sha256": "e4224027f0a45b55c18c24de92fb901a07b8f63af5dd34af3bb87584de3aab68",
-      "bytes": 208,
-      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/S02/acts.md"
-    },
-    {
-      "title": "S03 — retrospective rework acts (2026-11-21)",
-      "path": "docs/evidence/rework/S03/acts.html",
-      "source": "docs/evidence/rework/S03/acts.md",
-      "section": "Evidence",
-      "sha256": "6f9cac7b549b401d8fe5dc3867ccd05849835d25e60caf7de3d121496045c8e0",
-      "bytes": 114,
-      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/S03/acts.md"
-    },
-    {
-      "title": "SPEC-V2 — retrospective rework note (2026-11-21)",
-      "path": "docs/evidence/rework/SPEC-V2.html",
-      "source": "docs/evidence/rework/SPEC-V2.md",
-      "section": "Evidence",
-      "sha256": "481aaadae294b845de126a4b9ed2a80c7391795ed589b3ad9e7c00aa85704a0b",
-      "bytes": 1059,
-      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/SPEC-V2.md"
-    },
-    {
-      "title": "SPEC-V2 — retrospective rework acts (2026-11-21)",
-      "path": "docs/evidence/rework/SPEC-V2/acts.html",
-      "source": "docs/evidence/rework/SPEC-V2/acts.md",
-      "section": "Evidence",
-      "sha256": "bc63295d14d532022accf9bb60db5e9d293386414eecda2cc5a4dff2cd71293c",
-      "bytes": 203,
-      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/SPEC-V2/acts.md"
-    },
-    {
-      "title": "T0 — retrospective rework note (2026-11-21)",
-      "path": "docs/evidence/rework/T0.html",
-      "source": "docs/evidence/rework/T0.md",
-      "section": "Evidence",
-      "sha256": "e74e602354ff0c787034201a7daeaa3b00d2f71049ed03a6d95f609d923864c4",
-      "bytes": 1140,
-      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/T0.md"
-    },
-    {
-      "title": "T0 — retrospective rework acts (2026-11-21)",
-      "path": "docs/evidence/rework/T0/acts.html",
-      "source": "docs/evidence/rework/T0/acts.md",
-      "section": "Evidence",
-      "sha256": "806b7de781b9c8eed32518898d0654b03dcfbf3ac2b62ac7a03901639a51f29c",
-      "bytes": 198,
-      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/T0/acts.md"
-    },
-    {
-      "title": "T1 — retrospective rework acts (2026-11-21)",
-      "path": "docs/evidence/rework/T1/acts.html",
-      "source": "docs/evidence/rework/T1/acts.md",
-      "section": "Evidence",
-      "sha256": "6959ada52d0dd78f7e217dc380a2045c56285274d6ad92ec2d122df1d06b3698",
-      "bytes": 206,
-      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/T1/acts.md"
-    },
-    {
-      "title": "T10 — retrospective rework acts (2026-11-22)",
-      "path": "docs/evidence/rework/T10/acts.html",
-      "source": "docs/evidence/rework/T10/acts.md",
-      "section": "Evidence",
-      "sha256": "498c85898ed29a8e10f9bb7f790c28761162aec827f8a37a4676fcfc2a0b05ef",
-      "bytes": 934,
-      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/T10/acts.md"
-    },
-    {
-      "title": "T11 — retrospective rework acts (2026-11-21)",
-      "path": "docs/evidence/rework/T11/acts.html",
-      "source": "docs/evidence/rework/T11/acts.md",
-      "section": "Evidence",
-      "sha256": "9dbde481a2c8a7d1ef38bf70131b1eaf3789d40478289911c3d60af15ef772d0",
-      "bytes": 208,
-      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/T11/acts.md"
-    },
-    {
-      "title": "T13 — retrospective rework acts (2026-11-22)",
-      "path": "docs/evidence/rework/T13/acts.html",
-      "source": "docs/evidence/rework/T13/acts.md",
-      "section": "Evidence",
-      "sha256": "86c0a74e3862b0ee47033fff5d2ff6d9ae132e7a5322c0356bb06f753ec86d91",
-      "bytes": 1450,
-      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/T13/acts.md"
-    },
-    {
-      "title": "T2 — retrospective rework acts (2026-11-21)",
-      "path": "docs/evidence/rework/T2/acts.html",
-      "source": "docs/evidence/rework/T2/acts.md",
-      "section": "Evidence",
-      "sha256": "786025e18c85c0704d20dc2212bfd6f36b9f113602881c90cd1926a5338bfc88",
-      "bytes": 113,
-      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/T2/acts.md"
-    },
-    {
-      "title": "T4 — retrospective rework acts (2026-11-22)",
-      "path": "docs/evidence/rework/T4/acts.html",
-      "source": "docs/evidence/rework/T4/acts.md",
-      "section": "Evidence",
-      "sha256": "fd33c15247f2ae9b606254bb6dfc5c98687ef3cf974c5dd0be870143afa393b5",
-      "bytes": 975,
-      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/T4/acts.md"
-    },
-    {
-      "title": "T9 — retrospective rework acts (2026-11-22)",
-      "path": "docs/evidence/rework/T9/acts.html",
-      "source": "docs/evidence/rework/T9/acts.md",
-      "section": "Evidence",
-      "sha256": "f36d1f1268240d7d8094e99be5ccec6f8498c7eb429b36890aac9f01f8ea811b",
-      "bytes": 1041,
-      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/T9/acts.md"
-    },
-    {
-      "title": "The full-fidelity snapshot loop",
-      "path": "docs/evidence/rework/full-fidelity-snapshot.html",
-      "source": "docs/evidence/rework/full-fidelity-snapshot.md",
-      "section": "Evidence",
-      "sha256": "cdcade5af26cc716355263c0e0d3c4af64a549a60aa11e250e1c331e05a52804",
-      "bytes": 7461,
-      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/full-fidelity-snapshot.md"
-    },
-    {
-      "title": "S04 — the Phase-G compliance review's evidence (2026-11-22)",
-      "path": "docs/evidence/rework/s04-phase-g.html",
-      "source": "docs/evidence/rework/s04-phase-g.md",
-      "section": "Evidence",
-      "sha256": "bcdc051e358717417cba1b679a5eb133f512f75b0b1fe74920509611da0acc2e",
-      "bytes": 2443,
-      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/s04-phase-g.md"
-    },
-    {
-      "title": "Tranche-3 SAFe cadences — evidence",
-      "path": "docs/evidence/rework/tr3-cadences.html",
-      "source": "docs/evidence/rework/tr3-cadences.md",
-      "section": "Evidence",
-      "sha256": "bc971218428530a4924787e059f58fccce3194b8a8d2dea4093320aeb2c9ad07",
-      "bytes": 1564,
-      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/tr3-cadences.md"
-    },
-    {
-      "title": "Tranche 0 / PI 0 — the SAFe cadence record (retrospective, 2026-11-21)",
-      "path": "docs/evidence/rework/tranche-0/acts.html",
-      "source": "docs/evidence/rework/tranche-0/acts.md",
-      "section": "Evidence",
-      "sha256": "ae8185dbafc1c1d273f455622a8972513ac29722f69342c257b4ab7eec01f059",
-      "bytes": 2118,
-      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/tranche-0/acts.md"
-    },
-    {
-      "title": "Tranche 1 / PI 1 — the rework record (retrospective, 2026-11-21)",
-      "path": "docs/evidence/rework/tranche-1/acts.html",
-      "source": "docs/evidence/rework/tranche-1/acts.md",
-      "section": "Evidence",
-      "sha256": "6e9d9c19adaf042df7534aa90232d73747763618cddc8d7c3649177dbaecb189",
-      "bytes": 5510,
-      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/tranche-1/acts.md"
-    },
-    {
-      "title": "T2 — the superseding delivery contract and its Phase-G re-review",
-      "path": "docs/evidence/rework/tranche-2/T2-recontract.html",
-      "source": "docs/evidence/rework/tranche-2/T2-recontract.md",
-      "section": "Evidence",
-      "sha256": "afab38bbfac1680bd43f7842ac574baaa3b08610e0e2356273551dad747e7807",
-      "bytes": 3871,
-      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/tranche-2/T2-recontract.md"
-    },
-    {
-      "title": "Tranche 2 / PI 2 — the rework record (2026-11-21)",
-      "path": "docs/evidence/rework/tranche-2/acts.html",
-      "source": "docs/evidence/rework/tranche-2/acts.md",
-      "section": "Evidence",
-      "sha256": "004fbf3c23db7b9448068107194445dc0d38e35053379447f1df5246406f3453",
-      "bytes": 7532,
-      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/tranche-2/acts.md"
-    },
-    {
-      "title": "Tranche 2 — the retro lessons, one per finding",
-      "path": "docs/evidence/rework/tranche-2/lessons.html",
-      "source": "docs/evidence/rework/tranche-2/lessons.md",
-      "section": "Evidence",
-      "sha256": "a63136f8953dd645d439f5b438ee4c0e00d2281c154b4ae149e243e2098228fc",
-      "bytes": 4576,
-      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/rework/tranche-2/lessons.md"
-    },
-    {
       "title": "V1 → SPECV2 coverage",
       "path": "docs/evidence/v2-coverage.html",
       "source": "docs/evidence/v2-coverage.md",
       "section": "Evidence",
-      "sha256": "51cdef94334244015abcb3e76a1d6d063304c7f47ec0650d86e3514bd49729c6",
-      "bytes": 13291,
+      "sha256": "9a55a4da06617c6744ca0893d372a0ecabc3d7818f10bfec0f78e97cbffc4377",
+      "bytes": 12908,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/v2-coverage.md"
     },
     {
@@ -915,8 +600,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/00-INDEX.html",
       "source": "docs/plans/00-INDEX.md",
       "section": "Plans",
-      "sha256": "a2d35832d9795c80438a3505d039999d0b1bfed411e7755746c399d74cdf8af8",
-      "bytes": 255219,
+      "sha256": "fcf0c2d6ac708871232465423d3b41b580576106cbef46de7854e0a67fc61d30",
+      "bytes": 255320,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/00-INDEX.md"
     },
     {
@@ -924,8 +609,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/01-CONTRACT.html",
       "source": "docs/plans/01-CONTRACT.md",
       "section": "Plans",
-      "sha256": "a0663367c870a1edfa8a6121490a62a400ce8ffc8feeaa2f483b61b7783d787e",
-      "bytes": 77290,
+      "sha256": "7368484d48141e46c7553e6857f8cc3d8c46990eaad92b94eb613d3d3ac12c0f",
+      "bytes": 79586,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/01-CONTRACT.md"
     },
     {
@@ -933,8 +618,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/02-DATA-ARCHITECTURE.html",
       "source": "docs/plans/02-DATA-ARCHITECTURE.md",
       "section": "Plans",
-      "sha256": "e02d8f71ec61e14676795c5cc8e969adf73f14c1c0f1ca88f222ab01fd263621",
-      "bytes": 147521,
+      "sha256": "2dcf479e5ad998fdf0cacd9dcce51aa22a1a4085a0361dfd2673f05f15b16244",
+      "bytes": 148948,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/02-DATA-ARCHITECTURE.md"
     },
     {
@@ -1113,8 +798,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/inception/T12/01-inception-analysis.html",
       "source": "docs/plans/inception/T12/01-inception-analysis.md",
       "section": "Plans",
-      "sha256": "dff731d10db43f15985b5c84db029266b6988433c686f8ca7be259cdbbc1aa55",
-      "bytes": 9507,
+      "sha256": "e8ca1399d3dc1a8429ec88e4b99a20468b0a5bf929d7ecb0f336afa14081cb57",
+      "bytes": 9065,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/inception/T12/01-inception-analysis.md"
     },
     {
@@ -1140,8 +825,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/inception/T15/01-inception-analysis.html",
       "source": "docs/plans/inception/T15/01-inception-analysis.md",
       "section": "Plans",
-      "sha256": "f895c183bb6cb18ae889e4613ca14583cdb9c41da2d8ca6f7a2c229d63a992bc",
-      "bytes": 8542,
+      "sha256": "c17ca9fc0b22060b1077d7a6e7e0d803ff0e9c07e141c21888be21f9b7bed730",
+      "bytes": 8364,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/inception/T15/01-inception-analysis.md"
     },
     {
@@ -1167,8 +852,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/inception/T17/01-inception-analysis.html",
       "source": "docs/plans/inception/T17/01-inception-analysis.md",
       "section": "Plans",
-      "sha256": "79bf45414e45ff91d922de559e1c65fde071708d71af593f7e3f94ff70a86f0e",
-      "bytes": 8536,
+      "sha256": "ab364e21781bad8ae1c0ef89fd113d0229469ef64fac21acce9825e94c99a5aa",
+      "bytes": 8179,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/inception/T17/01-inception-analysis.md"
     },
     {
@@ -1194,8 +879,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/inception/T5/01-inception-analysis.html",
       "source": "docs/plans/inception/T5/01-inception-analysis.md",
       "section": "Plans",
-      "sha256": "9f92bd5193def589a00f3db0a8e2b727a411d1eb0395dcd896027941840850f8",
-      "bytes": 8496,
+      "sha256": "41aa3ab11c0019d422f3331d0cc7ae934b96def70b1f0e842aab0616bf814ec9",
+      "bytes": 8283,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/inception/T5/01-inception-analysis.md"
     },
     {
@@ -1221,8 +906,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/inception/T6/01-inception-analysis.html",
       "source": "docs/plans/inception/T6/01-inception-analysis.md",
       "section": "Plans",
-      "sha256": "0cf51afcbee040facc466f695c57a12f4e166f7ae33058df26e0ea32b56a6646",
-      "bytes": 8816,
+      "sha256": "590d7054a62c3a6d84272eaa80b552225590f3792144f7edbfcdbfcad2eb53a6",
+      "bytes": 8299,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/inception/T6/01-inception-analysis.md"
     },
     {
@@ -1266,8 +951,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/slices/S03-domain-schema.html",
       "source": "docs/plans/slices/S03-domain-schema.md",
       "section": "Plans",
-      "sha256": "9a2335a54bf8d155f6ccbda7db2471717b497e9f025bbab0b97c8302839d93c6",
-      "bytes": 16946,
+      "sha256": "efb7fdd749ac7b46ab2e6be92ddf53d95c68f24aa2c87bd555137affc2dbf70b",
+      "bytes": 16774,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S03-domain-schema.md"
     },
     {
@@ -1275,8 +960,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/slices/S04-action-registry.html",
       "source": "docs/plans/slices/S04-action-registry.md",
       "section": "Plans",
-      "sha256": "e1f3896cecea77e4238ddddfb91d73829499c9ad358f7fd124699eaed9be6672",
-      "bytes": 17629,
+      "sha256": "4721e81552ac49eb099c635c1e3163ccad3ba7d36d35139df75c783494f7d85d",
+      "bytes": 16539,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S04-action-registry.md"
     },
     {
@@ -1293,8 +978,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/slices/S06-control-plane.html",
       "source": "docs/plans/slices/S06-control-plane.md",
       "section": "Plans",
-      "sha256": "c13315ed10f9e70528377e93c7ffc958edb36129f827b4f904b5100d13d92a32",
-      "bytes": 18362,
+      "sha256": "b95b74ba3cb050003b6e7e39dffb814480bac966525660af4482b17803b2b94c",
+      "bytes": 17432,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S06-control-plane.md"
     },
     {
@@ -1320,8 +1005,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/slices/S06c-mcp-tasks.html",
       "source": "docs/plans/slices/S06c-mcp-tasks.md",
       "section": "Plans",
-      "sha256": "bb1b382eb97ef286ffd7deecd948b766c97c59651d625c17b52e9d1af54c71e2",
-      "bytes": 15810,
+      "sha256": "566852202066e8d200246af688c232d4190e7322c681a89edb7b73bbcdeefb1a",
+      "bytes": 15409,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S06c-mcp-tasks.md"
     },
     {
@@ -1329,8 +1014,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/slices/S06d-connector-standard.html",
       "source": "docs/plans/slices/S06d-connector-standard.md",
       "section": "Plans",
-      "sha256": "fd5af704226ac75fca1f845e2931bce976c2a1aff7f08a2fc9f55744540fffb4",
-      "bytes": 7402,
+      "sha256": "525f40e88ca51ace2068e7d32f3241ab0abb3fbf422fd49c9ae1e4c6038174ef",
+      "bytes": 7009,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S06d-connector-standard.md"
     },
     {
@@ -1365,8 +1050,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/slices/S10-copilot-ag-ui.html",
       "source": "docs/plans/slices/S10-copilot-ag-ui.md",
       "section": "Plans",
-      "sha256": "8ece4fe88e38fa7e8fc1e4e5bdaaeb24e31b566fa70956547afcec94e51532b3",
-      "bytes": 15964,
+      "sha256": "0c38f565318901ec238886a4a1f5d6dc8981260e20d44daaeb9e28739d3f7dfa",
+      "bytes": 15668,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S10-copilot-ag-ui.md"
     },
     {
@@ -1374,8 +1059,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/slices/S11-procedures.html",
       "source": "docs/plans/slices/S11-procedures.md",
       "section": "Plans",
-      "sha256": "b2772c10d7808e7462a3ec25ef2c7f2f0b062db1d9ceb413a576720f422c9d5d",
-      "bytes": 29001,
+      "sha256": "36eac8d191f4f88ac2783ab9188e531bf8d9a9302d6252fa22f45ed59a648d7d",
+      "bytes": 27293,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S11-procedures.md"
     },
     {
@@ -1401,8 +1086,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/slices/S14-cutover.html",
       "source": "docs/plans/slices/S14-cutover.md",
       "section": "Plans",
-      "sha256": "7a923f572c995f29cf1a9a6f27721a889cfea273c4786a211e4f8670109aa1df",
-      "bytes": 26519,
+      "sha256": "58ed33a4f895ab284e17a7d8894f0066012bb6cfb67ff5fe5fa7006406d341c4",
+      "bytes": 23511,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S14-cutover.md"
     },
     {
@@ -1410,8 +1095,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/slices/S15-capability-knowledge-memory.html",
       "source": "docs/plans/slices/S15-capability-knowledge-memory.md",
       "section": "Plans",
-      "sha256": "9067a85b1b1d9537a588c523d3e41d3ec6ffa23aaf0b96b1cc2a4956e30ec3cd",
-      "bytes": 30282,
+      "sha256": "5f7fa98ce36c52f8b31836e9393725dcdb638dc0fddac586be692e6f91e19bed",
+      "bytes": 27130,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S15-capability-knowledge-memory.md"
     },
     {
@@ -1419,8 +1104,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/slices/S16-inference-audit.html",
       "source": "docs/plans/slices/S16-inference-audit.md",
       "section": "Plans",
-      "sha256": "12069dba85c8f59e3823ffbd23d0cad329ab8c56791a645fd451f8cfd177b695",
-      "bytes": 24524,
+      "sha256": "b5d48d960766805e212a6543cf88539dda6a02ce487e5fcde4269f3f9be28ee5",
+      "bytes": 21382,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S16-inference-audit.md"
     },
     {
@@ -1428,8 +1113,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/slices/S17-benchmark-harness.html",
       "source": "docs/plans/slices/S17-benchmark-harness.md",
       "section": "Plans",
-      "sha256": "457a40697cf3216490bcf0bf718616cfa94c79105495b127a431bb3a08f8d523",
-      "bytes": 16779,
+      "sha256": "d65b5338dc303b5f38b2343ff21592f64e454b8d5df73d3504043a94d32cd859",
+      "bytes": 15479,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S17-benchmark-harness.md"
     },
     {
@@ -1437,8 +1122,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/slices/S18-kata-improvement.html",
       "source": "docs/plans/slices/S18-kata-improvement.md",
       "section": "Plans",
-      "sha256": "93b3fe4b71821936ef4b1766a2d3d2abf9cdcc2d759340567ab14102da36acb8",
-      "bytes": 10151,
+      "sha256": "f9744cbc6cb89604eb0df2bd754edadfdb4206a9d7f973c35736affc68aa8489",
+      "bytes": 9781,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S18-kata-improvement.md"
     },
     {
@@ -1446,8 +1131,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/slices/S19-eval-builder.html",
       "source": "docs/plans/slices/S19-eval-builder.md",
       "section": "Plans",
-      "sha256": "bc3ae71d4d2be786a099497e55a6c81cb31c34969f193bcda8a25c3b899510c9",
-      "bytes": 22950,
+      "sha256": "2f6947dafbc8d9480a7cb908bf4cee1057474922fc10163ee57b74a2c42750f8",
+      "bytes": 21929,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S19-eval-builder.md"
     },
     {
@@ -1455,8 +1140,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/slices/S20-eval-hillclimb.html",
       "source": "docs/plans/slices/S20-eval-hillclimb.md",
       "section": "Plans",
-      "sha256": "d27a21c0cf30bc3d5fe25b4a06f27d39bf94d1f3c7093a7acfcbbc0df7731191",
-      "bytes": 16078,
+      "sha256": "b3fa237121c8a38186c333f826f94e8ee9d21b7ac8774a7c5f933b1bb397e038",
+      "bytes": 15685,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S20-eval-hillclimb.md"
     },
     {
@@ -1464,8 +1149,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/slices/S21-message-construction.html",
       "source": "docs/plans/slices/S21-message-construction.md",
       "section": "Plans",
-      "sha256": "40f53201039af39e6ecbdc1a49e73fc43e93506e529add04ae46a05d34f51f23",
-      "bytes": 42454,
+      "sha256": "7a2f88eef7465399c8f64a5d392c64aff44848e66cf9b032785a54d6592d14c9",
+      "bytes": 45659,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S21-message-construction.md"
     }
   ]

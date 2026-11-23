@@ -16,6 +16,10 @@ use uuid::Uuid;
 
 const TOKEN: &str = "dev:alice";
 
+/// `CONVEYOR_EXTERNAL_INFERENCE_URL` is process-global, so the stub-backed tests must not race
+/// each other's router (the live tests guard the same variable the same way).
+static STUBS: tokio::sync::Mutex<()> = tokio::sync::Mutex::const_new(());
+
 async fn fixture() -> (support::Pg, support::Running, support::Seeded) {
     let pg = support::Pg::fresh().await;
     let seeded = support::seed(&pg, "dev-a", "alice", "Alice").await;
@@ -128,20 +132,29 @@ async fn seed_executor(pg: &support::Pg, seeded: &support::Seeded) -> Uuid {
 }
 
 async fn create_process(running: &support::Running, sop: &str, agent: Uuid) -> String {
+    create_process_with_steps(
+        running,
+        "dev-agent-resolved",
+        json!([{
+            "kind": "agent",
+            "action": "agent.run",
+            "process_agent_id": agent,
+            "procedure_id": sop,
+            "input_template": {"messages": [{"role": "user", "content": "go"}]}
+        }]),
+    )
+    .await
+}
+
+async fn create_process_with_steps(running: &support::Running, key: &str, steps: Value) -> String {
     let (status, body) = running
         .invoke(
             "processes.create",
             TOKEN,
             json!({
-                "key": "dev-agent-resolved",
-                "title": "Process dev-agent-resolved",
-                "steps": [{
-                    "kind": "agent",
-                    "action": "agent.run",
-                    "process_agent_id": agent,
-                    "procedure_id": sop,
-                    "input_template": {"messages": [{"role": "user", "content": "go"}]}
-                }]
+                "key": key,
+                "title": format!("Process {key}"),
+                "steps": steps,
             }),
             None,
             None,
@@ -150,6 +163,176 @@ async fn create_process(running: &support::Running, sop: &str, agent: Uuid) -> S
         .await;
     assert_eq!(status, 201, "{body}");
     text(output(&body), "id")
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_second_step_reads_the_first_steps_output() {
+    let _guard = STUBS.lock().await;
+    let (pg, running, seeded) = fixture().await;
+    let (base, bodies) = stub_router().await;
+    support::set_env("CONVEYOR_EXTERNAL_INFERENCE_URL", &base);
+    let (_project, _board, card) = board_lane_card(&running).await;
+    let agent_id = seed_executor(&pg, &seeded).await;
+    let sop = support::publish_sop(&running, "process-agent-resolved-two").await;
+    let step = |content: &str| {
+        json!({
+            "kind": "agent",
+            "action": "agent.run",
+            "process_agent_id": agent_id,
+            "procedure_id": sop,
+            "input_template": {"messages": [{"role": "user", "content": content}]}
+        })
+    };
+    let process = create_process_with_steps(
+        &running,
+        "dev-agent-resolved",
+        json!([step("first"), step("second")]),
+    )
+    .await;
+    // The run's prompt resolves the capability through the process; without this binding the
+    // compile refuses `capability_not_ready` and no model is called.
+    let mut tx = begin_scoped(&pg.runtime, seeded.tenant)
+        .await
+        .expect("scope");
+    let (capability_id,): (Uuid,) =
+        sqlx::query_as("SELECT capability_id FROM capability_agent WHERE id = $1")
+            .bind(agent_id)
+            .fetch_one(&mut *tx)
+            .await
+            .expect("capability id");
+    sqlx::query("UPDATE process SET capability_id = $1 WHERE id = $2")
+        .bind(capability_id)
+        .bind(Uuid::parse_str(&process).expect("process id"))
+        .execute(&mut *tx)
+        .await
+        .expect("bind the capability");
+    tx.commit().await.expect("commit");
+    publish(&running, &process).await;
+    let run = start(&running, &card).await;
+    let run_id = Uuid::parse_str(&run).expect("run id");
+
+    conveyor_actions::process::step::execute_step(
+        &pg.runtime,
+        seeded.tenant,
+        "conveyor",
+        run_id,
+        1,
+        1,
+    )
+    .await
+    .unwrap_or_else(|failure| panic!("step 1 failed: {}", failure.message));
+    let step_1: (String, Option<String>) = sqlx::query_as(
+        "SELECT status, error FROM run_step
+          WHERE tenant_id = $1 AND run_id = $2 AND position = 1 AND attempt = 1",
+    )
+    .bind(seeded.tenant_id)
+    .bind(run_id)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("step 1 row");
+    assert_eq!(step_1.0, "succeeded", "step 1: {step_1:?}");
+    conveyor_actions::process::step::execute_step(
+        &pg.runtime,
+        seeded.tenant,
+        "conveyor",
+        run_id,
+        2,
+        1,
+    )
+    .await
+    .unwrap_or_else(|failure| panic!("step 2 failed: {}", failure.message));
+    let step_2: (String, Option<String>) = sqlx::query_as(
+        "SELECT status, error FROM run_step
+          WHERE tenant_id = $1 AND run_id = $2 AND position = 2 AND attempt = 1",
+    )
+    .bind(seeded.tenant_id)
+    .bind(run_id)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("step 2 row");
+    assert_eq!(step_2.0, "succeeded", "step 2: {step_2:?}");
+
+    // The second model call's system message carries the first step's outcome as episodic memory.
+    let sent = bodies.lock().expect("bodies").clone();
+    let steps: Vec<(i32, i32, String, Option<String>)> = sqlx::query_as(
+        "SELECT position, attempt, status, error FROM run_step
+          WHERE tenant_id = $1 AND run_id = $2 ORDER BY position, attempt",
+    )
+    .bind(seeded.tenant_id)
+    .bind(run_id)
+    .fetch_all(&pg.super_pool)
+    .await
+    .expect("run steps");
+    let calls: i64 = sqlx::query_scalar(
+        "SELECT count(*) FROM inference_call WHERE tenant_id = $1 AND run_id = $2",
+    )
+    .bind(seeded.tenant_id)
+    .bind(run_id)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("inference calls");
+    assert_eq!(
+        sent.len(),
+        2,
+        "two model calls: sent={sent:?} steps={steps:?} inference_calls={calls}"
+    );
+    let second = sent[1]["messages"]
+        .as_array()
+        .expect("messages")
+        .iter()
+        .find(|message| message["role"] == "system")
+        .expect("the second call's system message");
+    let text = second["content"].as_str().unwrap_or_default();
+    assert!(
+        text.contains("- [step/succeeded#1.1] agent.run succeeded:"),
+        "the first step's line: {text}"
+    );
+    assert!(
+        text.contains("resolved answer"),
+        "the first step's output is in the second prompt: {text}"
+    );
+
+    let status: String = sqlx::query_scalar("SELECT status FROM run WHERE id = $1")
+        .bind(run_id)
+        .fetch_one(&pg.super_pool)
+        .await
+        .expect("run status");
+    assert_eq!(status, "succeeded");
+
+    // P3: the next run on the card reads this process run's attempt in its Memory section. The
+    // writer is #599's; this proves the read, not a second writer.
+    let next = start(&running, &card).await;
+    let next_run = Uuid::parse_str(&next).expect("next run id");
+    let next_step: Uuid = sqlx::query_scalar(
+        "SELECT id FROM run_step
+          WHERE tenant_id = $1 AND run_id = $2 AND position = 1 AND attempt = 1",
+    )
+    .bind(seeded.tenant_id)
+    .bind(next_run)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("the next run's first step");
+    let compiled = conveyor_actions::prompt::compile_for_run(
+        &pg.runtime,
+        seeded.tenant,
+        next_run,
+        Some(next_step),
+        "agent@1",
+    )
+    .await
+    .expect("the next run's prompt");
+    assert!(
+        compiled
+            .text
+            .contains(&format!("run {run_id} attempt 1 succeeded")),
+        "the process attempt is in the next prompt: {}",
+        compiled.text
+    );
+    assert!(
+        compiled.text.contains("[attempt/system#"),
+        "the attempt row's class: {}",
+        compiled.text
+    );
 }
 
 async fn publish(running: &support::Running, process: &str) {
@@ -220,6 +403,7 @@ async fn stub_router() -> (String, Arc<Mutex<Vec<Value>>>) {
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn a_process_step_resolves_its_executor_and_compiles_the_prompt_from_the_run() {
+    let _guard = STUBS.lock().await;
     let (pg, running, seeded) = fixture().await;
     let (base, bodies) = stub_router().await;
     support::set_env("CONVEYOR_EXTERNAL_INFERENCE_URL", &base);
