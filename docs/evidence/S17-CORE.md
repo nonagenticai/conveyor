@@ -242,3 +242,41 @@ SANDBOX_LIVE_IMAGE='swebench/sweb.eval.x86_64.django_1776_django-16493@sha256:43
 SANDBOX_LIVE_TIMEOUT_S=900 \
   ~/.claude/scripts/cargo-guard.py test -p conveyor-server --test sandbox_live -- --ignored --nocapture
 ```
+
+## P4 — the workspace suite (2026-11-22)
+
+The workspace suite ran in this PR's `ci-public` on `36967ab6` (run
+[45021016396](https://github.com/nonagenticai/conveyor/actions/runs/45021016396)). The first
+`checks-shard (1)` run hit the load-sensitive `wait_for("three dispatches")` timeout in
+`apps/server/tests/interaction_dispatch.rs`, a file byte-identical to `main` and untouched by this
+branch; the re-run of that shard is the verdict.
+
+| job | result | evidence |
+|---|---|---|
+| `checks-shard (1)` (re-run) | **1914 passed, 0 failed**, 1713 skipped, 348.4 s | [job 137380614684](https://github.com/nonagenticai/conveyor/actions/runs/45021016396/job/137380614684) |
+| `checks-shard (2)` | **1705 passed, 0 failed**, 1922 skipped, 196.9 s | [job 137380616212](https://github.com/nonagenticai/conveyor/actions/runs/45021016396/job/137380616212) |
+
+Both shards are green at the same head. The only non-pass check on the PR is the duplicate
+push-triggered `preflight` that was cancelled, while the dispatched preflight on the same SHA
+(run `45021016048`) succeeded.
+
+## P2/P3 — the live controls and the verification order
+
+The empty control passed before the fix: run `01a202c4-e8ee-7c99-b5e5-dc21a39116b6`, 50/50 graded,
+0 resolved, `control_ok=true`. The pre-fix gold control was 47/50 with `control_ok=false`; the three
+misses are the suite's only `[pdf]`/`[eps]` instances, refused by Ghostscript 9.55 SAFER. Commit
+`36967ab6` adds the scoped `/bench-bin/gs` shim and mounts it in the sandbox Job.
+
+**Verification order (hold released 2026-11-23).** PR images are not published
+(`publish-service-images` skips on a PR), and the cluster runs the digest Flux resolves from
+`:latest` on `main`. The controls therefore run on the deployed service, in this order:
+
+1. merge #11; Flux resolves the new digest and `kubectl -n conveyor rollout status
+   deploy/conveyor` completes;
+2. re-run the three PDF/EPS instances first (`only`), then the full gold control and the empty
+   control through `conveyor admin action invoke --name benchmark_runs.start` in the deployed pod;
+3. append `control_ok`, counts and run ids here.
+
+The previous deployment digest is the rollback. If the gold control is false, the digest is rolled
+back and #11 is reopened with the failure — the deployment is reversible, the evidence is not
+negotiable.

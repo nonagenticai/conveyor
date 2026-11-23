@@ -321,8 +321,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/evidence/S17-CORE.html",
       "source": "docs/evidence/S17-CORE.md",
       "section": "Evidence",
-      "sha256": "10016bb5a8ae243df7f5fcd0a9e00c0da39502ce28288cefc9217c5c8f5594ab",
-      "bytes": 17928,
+      "sha256": "cb40b63ab1fbe75fa90142a73f723522c6a7cff927b725df8c8f241d49bef66c",
+      "bytes": 20263,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S17-CORE.md"
     },
     {
