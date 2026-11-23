@@ -280,3 +280,20 @@ misses are the suite's only `[pdf]`/`[eps]` instances, refused by Ghostscript 9.
 The previous deployment digest is the rollback. If the gold control is false, the digest is rolled
 back and #11 is reopened with the failure — the deployment is reversible, the evidence is not
 negotiable.
+
+## P5 — the Ghostscript shim, measured in the image (2026-11-23)
+
+Probe `01a20773-06f4-7075-82b0-a56a2ca18a2c` (3 instances, `only`) was 0/3 after the shim merged.
+Read-only pods in `swe-bench` on the three failing images (`matplotlib-23412`, `-23476`, `-24627`;
+digests in `seed/benchmark/images-verified50-v1.lock.json`) show the shim **is** the resolved
+`gs`: `command -v gs` → `/bench-bin/gs`, and there is no `gs` in
+`/opt/miniconda3/envs/testbed/bin` to shadow it. The failure is Ghostscript itself: GPL
+Ghostscript 9.55 refuses every read and write under `/testbed` (`invalidfileaccess`, `Last OS
+error: Permission denied`) with no permit, with `--permit-file-read=/testbed/`,
+`--permit-file-write=/testbed/`, `--permit-file-control=/testbed/`, exact-file permits and globs,
+and with `-dNOSAFER` (this build ignores it). The same binary reads and writes `/tmp` normally,
+and the pod is root writing `/testbed` from Python. This branch's commit replaces the permit shim
+with a relay that mirrors the `/testbed` literals in matplotlib's interactive PostScript stream
+under a private `/tmp` root, runs Ghostscript there, and copies the outputs back before it
+forwards Ghostscript's prompt.
+
