@@ -4,7 +4,8 @@
 `publish-programme-artefacts.py` publishes only externally authored bodies. This factory
 authors the body instead: the standard's skeleton supplies the intent paragraph under each
 required heading, the snapshot supplies the rows, and an incomplete artefact is refused
-with a typed code rather than published with a placeholder.
+with a typed code rather than published with a placeholder. A body with no non-zero fact
+under any required heading is refused `NO_EVIDENCE`: a heading-only document is not evidence.
 
 The generator is imported by path (never copied), so the source resolution the pack pages
 use — `resolve_section`, `skeleton_bodies`, `applies`, `rows_for` — stays the one authority.
@@ -252,6 +253,7 @@ def compose(
     check_placeholders(title, "title")
     body: list[str] = [f"# {title}", ""]
     headings: list[dict[str, Any]] = []
+    fact_blocks = 0
     for heading in required:
         intent = skeleton.get(gen.normalise(heading))
         if intent is None:
@@ -318,12 +320,22 @@ def compose(
                 "rows": sort_rows(rows),
             }
             body.extend(["```json", json.dumps(fact, sort_keys=True, indent=2), "```", ""])
+            fact_blocks += 1
         headings.append({
             "heading": heading,
             "required": True,
             "status": str(section.get("status") or ""),
             "sources": [source_summary(entry, category) for entry in section["sources"]],
         })
+    if fact_blocks == 0:
+        # Every declared source resolved to zero rows. The skeleton's intent paragraphs are not
+        # evidence: publishing this body would put a heading-only document into the record and
+        # the artefact would still be a gap. Refuse, and let the missing row be the finding.
+        refuse(
+            "NO_EVIDENCE",
+            "no required heading resolves to a non-zero fact; headings alone are not evidence",
+            category=category, subject=subject_key,
+        )
     text = "\n".join(body).rstrip("\n") + "\n"
     check_tokens(text, "composed body")
     return {

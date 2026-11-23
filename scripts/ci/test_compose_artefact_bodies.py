@@ -132,6 +132,13 @@ def placeholder_is_refused() -> None:
 
 
 @case
+def no_evidence_is_refused() -> None:
+    # Every source is optional and resolves to zero rows. The skeleton's intent paragraphs are
+    # not evidence: a heading-only body must never become a published artefact.
+    assert_refusal(FIX / "no-evidence-standard.json", "NO_EVIDENCE")
+
+
+@case
 def self_test_passes() -> None:
     proc = subprocess.run(
         [sys.executable, str(SCRIPT), "--self-test"], capture_output=True, text=True,
