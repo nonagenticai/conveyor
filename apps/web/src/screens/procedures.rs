@@ -718,7 +718,7 @@ fn intake_panel<F>(
     submit: F,
 ) -> AnyView
 where
-    F: Fn(IntakeKind) + Copy + 'static,
+    F: Fn(IntakeKind) + Copy + Send + Sync + 'static,
 {
     let needs_process = kind != IntakeKind::Rdf;
     view! {
@@ -800,8 +800,8 @@ fn steps_panel(
     process_detail: RwSignal<Option<Result<Value, ApiError>>>,
     detail_loading: RwSignal<bool>,
     validate_result: RwSignal<Option<Result<Value, String>>>,
-    validate: impl Fn(String) + Copy + 'static,
-    load_detail: impl Fn(String) + Copy + 'static,
+    validate: impl Fn(String) + Copy + Send + Sync + 'static,
+    load_detail: impl Fn(String) + Copy + Send + Sync + 'static,
 ) -> AnyView {
     let Some(process_id) = selected_process.get() else {
         return view! {
@@ -942,8 +942,8 @@ fn pairing_panel(
     process_detail: RwSignal<Option<Result<Value, ApiError>>>,
     detail_loading: RwSignal<bool>,
     review_note: RwSignal<String>,
-    review: impl Fn(String, &'static str) + Copy + 'static,
-    load_detail: impl Fn(String) + Copy + 'static,
+    review: impl Fn(String, &'static str) + Copy + Send + Sync + 'static,
+    load_detail: impl Fn(String) + Copy + Send + Sync + 'static,
 ) -> AnyView {
     let judge = selected_procedure
         .get()
@@ -970,9 +970,7 @@ fn pairing_panel(
                 .get("source_asset_id")
                 .and_then(Value::as_str)
                 .map(str::to_owned);
-            let has_asset = asset.is_some();
             let asset_label = asset.clone().unwrap_or_else(|| "—".to_owned());
-            let review_asset = asset.clone();
             view! {
                 <section class="panel">
                     <div class="ph"><span>"Procedure ↔ knowledge pairing"</span></div>
@@ -983,19 +981,23 @@ fn pairing_panel(
                         <dt>"Recorded approval"</dt><dd class="mono">{text(&process, "approval_id")}</dd>
                         <dt>"Judge procedure"</dt><dd class="mono">{judge.as_ref().map(|row| text(row, "id")).unwrap_or_else(|| "—".to_owned())}</dd>
                     </div>
-                    {has_asset.then(|| view! {
-                        <label class="field"><span>"Review note"</span>
-                            <input class="inp" placeholder="Why the source is accepted or refused"
-                                prop:value=move || review_note.get()
-                                on:input=move |event| review_note.set(input_value(&event))/></label>
-                        <div class="filterbar">
-                            <button class="btn small" on:click=move |_| {
-                                if let Some(asset) = review_asset.clone() { review(asset, "approve"); }
-                            }>"Approve the source"</button>
-                            <button class="btn small danger" on:click=move |_| {
-                                if let Some(asset) = review_asset.clone() { review(asset, "reject"); }
-                            }>"Reject the source"</button>
-                        </div>
+                    {asset.as_ref().map(|asset| {
+                        let approve_asset = asset.clone();
+                        let reject_asset = asset.clone();
+                        view! {
+                            <label class="field"><span>"Review note"</span>
+                                <input class="inp" placeholder="Why the source is accepted or refused"
+                                    prop:value=move || review_note.get()
+                                    on:input=move |event| review_note.set(input_value(&event))/></label>
+                            <div class="filterbar">
+                                <button class="btn small" on:click=move |_| {
+                                    review(approve_asset.clone(), "approve");
+                                }>"Approve the source"</button>
+                                <button class="btn small danger" on:click=move |_| {
+                                    review(reject_asset.clone(), "reject");
+                                }>"Reject the source"</button>
+                            </div>
+                        }
                     })}
                     <p class="hint">
                         "An RDF/OWL document is imported into strata_ingest and its job id is the knowledge pack a converted draft names. A source decision unblocks the derived drafts; it never publishes them."
@@ -1043,9 +1045,9 @@ fn publish_panel(
     selected_procedure: RwSignal<Option<String>>,
     process_detail: RwSignal<Option<Result<Value, ApiError>>>,
     ctx: AppCtx,
-    request_gate: impl Fn(&'static str, Option<String>) + Copy + 'static,
-    decide: impl Fn(String, &'static str) + Copy + 'static,
-    publish: impl Fn(&'static str, String, Option<String>) + Copy + 'static,
+    request_gate: impl Fn(&'static str, Option<String>) + Copy + Send + Sync + 'static,
+    decide: impl Fn(String, &'static str) + Copy + Send + Sync + 'static,
+    publish: impl Fn(&'static str, String, Option<String>) + Copy + Send + Sync + 'static,
 ) -> AnyView {
     let procedure_id = selected_procedure.get();
     let process_id = selected_process.get();

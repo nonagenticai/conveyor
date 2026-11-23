@@ -252,28 +252,41 @@ fn run_detail(run: RunGet) -> AnyView {
                 view! { <pre class="mono">{pretty(&inputs)}</pre> }.into_any()
             }}
             <h3>"Run tree"</h3>
-            <div class="kv">
-                <dt>"Depth"</dt><dd class="mono">{tree.depth.to_string()}</dd>
-                <dt>"Parent"</dt><dd class="mono">{short_id(tree.parent_run_id.as_deref())}</dd>
-            </div>
-            {if tree.children.is_empty() {
-                view! { <p class="muted">"No child runs (a call step starts one)."</p> }.into_any()
-            } else {
-                view! {
-                    <table class="table">
-                        <thead><tr><th>"Child"</th><th>"Step"</th><th>"Status"</th><th>"Depth"</th></tr></thead>
-                        <tbody>
-                            {tree.children.iter().map(|child| view! {
-                                <tr>
-                                    <td class="mono"><A href=format!("/runs/{}", child.id)>{short_id(Some(&child.id))}</A></td>
-                                    <td class="mono">{short_id(child.step_id.as_deref())}</td>
-                                    <td><StatusPill status=child.status.clone()/></td>
-                                    <td class="mono">{child.depth.to_string()}</td>
-                                </tr>
-                            }).collect_view()}
-                        </tbody>
-                    </table>
-                }.into_any()
+            {let depth = tree.depth;
+            let parent = short_id(tree.parent_run_id.as_deref());
+            let children = tree.children;
+            view! {
+                <div class="kv">
+                    <dt>"Depth"</dt><dd class="mono">{depth.to_string()}</dd>
+                    <dt>"Parent"</dt><dd class="mono">{parent}</dd>
+                </div>
+                {if children.is_empty() {
+                    view! { <p class="muted">"No child runs (a call step starts one)."</p> }.into_any()
+                } else {
+                    view! {
+                        <table class="table">
+                            <thead><tr><th>"Child"</th><th>"Step"</th><th>"Status"</th><th>"Depth"</th></tr></thead>
+                            <tbody>
+                                {children.into_iter().map(|child| {
+                                    let id = child.id;
+                                    let href = format!("/runs/{id}");
+                                    let id_short = short_id(Some(&id));
+                                    let step_short = short_id(child.step_id.as_deref());
+                                    let status = child.status;
+                                    let depth = child.depth;
+                                    view! {
+                                        <tr>
+                                            <td class="mono"><A href=href>{id_short}</A></td>
+                                            <td class="mono">{step_short}</td>
+                                            <td><StatusPill status=status/></td>
+                                            <td class="mono">{depth.to_string()}</td>
+                                        </tr>
+                                    }
+                                }).collect_view()}
+                            </tbody>
+                        </table>
+                    }.into_any()
+                }}
             }}
         </section>
     }
