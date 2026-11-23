@@ -122,6 +122,69 @@ async fn a_cancelled_run_records_one_attempt() {
 }
 
 #[tokio::test]
+async fn a_cancel_path_records_one_attempt() {
+    let db = support::TestDb::fresh().await;
+    let seed = support::seed_tenant(&db.super_pool, "run-mem-cancel-path").await;
+
+    // The cancel action (`approvals.decide`, an expiry, a workflow cancel) writes its own
+    // status, outside `transition_run_tx`; the attempt row is still owed.
+    let mut tx = begin_scoped(&db.runtime, tenant(&seed))
+        .await
+        .expect("scope");
+    let cancelled = store::run::cancel_run_tx(&mut tx, tenant(&seed), seed.run, "approval_expired")
+        .await
+        .expect("cancel the run")
+        .expect("the run was live");
+    tx.commit().await.expect("commit");
+
+    let written = rows(&db, &seed, seed.card).await;
+    assert_eq!(written.len(), 1, "one attempt row: {written:?}");
+    let (kind, source, run_id, body) = &written[0];
+    assert_eq!(kind, "attempt");
+    assert_eq!(source, "system");
+    assert_eq!(*run_id, Some(cancelled.id));
+    assert!(body.contains("cancelled"), "{body}");
+    assert!(body.contains("approval_expired"), "{body}");
+}
+
+#[tokio::test]
+async fn a_reaped_run_records_one_attempt() {
+    let db = support::TestDb::fresh().await;
+    let seed = support::seed_tenant(&db.super_pool, "run-mem-reap").await;
+
+    // The driving job died; the sweep fails the queued run with one bulk statement. The attempt
+    // row (and the card's consolidation job) must commit in that same transaction.
+    sqlx::query(
+        "INSERT INTO job (tenant_id, kind, dedupe_key, status, attempts, max_attempts, last_error)
+         VALUES ($1, 'run.execute', 'run:' || $2::text, 'dead', 5, 5, 'boom')",
+    )
+    .bind(seed.tenant)
+    .bind(seed.run)
+    .execute(&db.super_pool)
+    .await
+    .expect("a dead run.execute job");
+
+    let mut tx = begin_scoped(&db.runtime, tenant(&seed))
+        .await
+        .expect("scope");
+    let reaped = store::run::reap_dead_runs_tx(&mut tx, tenant(&seed))
+        .await
+        .expect("the reap sweep");
+    tx.commit().await.expect("commit");
+    assert_eq!(reaped.len(), 1, "the one run: {reaped:?}");
+    assert_eq!(reaped[0].0, seed.run);
+
+    let written = rows(&db, &seed, seed.card).await;
+    assert_eq!(written.len(), 1, "one attempt row: {written:?}");
+    let (kind, source, run_id, body) = &written[0];
+    assert_eq!(kind, "attempt");
+    assert_eq!(source, "system");
+    assert_eq!(*run_id, Some(seed.run));
+    assert!(body.contains("failed"), "{body}");
+    assert!(body.contains("crashed"), "{body}");
+}
+
+#[tokio::test]
 async fn only_root_card_runs_record_memory() {
     let db = support::TestDb::fresh().await;
     let seed = support::seed_tenant(&db.super_pool, "run-mem-scope").await;

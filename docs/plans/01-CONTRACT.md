@@ -901,9 +901,14 @@ un-consolidated hot rows, so the next run's compiled prompt contains the prior a
 (`[attempt/system#<id>] …`) until consolidation stamps it. The compiled text is never stored; the
 row ids are part of the prompt hash, and the digest is derived, never the record.
 
+**Every terminal path records it.** A process run (`process_runs.start`) reaches the same row
+through its own terminal paths — `process.step` finishes through `transition_run_tx`/`fail_run_tx` —
+and both reap sweeps (`run.reap`'s `run.execute` half and its `process.step` half) record their
+reaped runs through `record_run_memory_for_id_tx`; a cancel through `cancel_run_tx` records the
+cancelled run. Succeed, fail, cancel and reap: each writes exactly one row for a card-scoped root.
+
 **Out of this contract.** The budget (cost, tool spend and the token ceiling) is the #526 lane's
 `v1-p75-1`/`v1-w4a-1`, enforced in the invoke precheck and the broker; §24 does not add a second
-gate. Procedure-process runs (`process_runs.start`) do not go through the executor and do not write
-this attempt row. `v1-p66-1`'s lane-refusal clause (a delivery card moved into a work lane without a
-binding) needs a delivery-card marker that does not exist and remains open.
+gate. `v1-p66-1`'s lane-refusal clause (a delivery card moved into a work lane without a binding)
+needs a delivery-card marker that does not exist and remains open.
 

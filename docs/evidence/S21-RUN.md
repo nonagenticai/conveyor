@@ -17,20 +17,25 @@
   `memory.consolidate` job then has real rows. A child run and a card-less run write none.
 - The compiled prompt of the next run on the card carries the prior attempt (the memory selector
   reads the hot rows; ids make the selection part of the hash).
+- The attempt row is written on **every** terminal path, not only the two transition helpers:
+  `cancel_run_tx` records a cancelled run, and both reap sweeps (`run.execute` and `process.step`)
+  record their reaped runs through the same writer, in the same transaction. Found in flight
+  against the first implementation, which covered only `transition_run_tx`/`fail_run_tx`.
 
 ## Not this step
 
 The budget. `v1-p75-1`/`v1-w4a-1` are resolved on `origin/issue/526-u5a`
 (commit `8f1e5770`, `crates/actions/tests/tool_budget.rs` 14 passed, `422 budget_missing` at run
 start, an invoke precheck that refuses an unbudgeted capturing call). The token ceiling
-(`ReleaseLimits.max_tokens`, recorded-only) is that gate's residual. See ADR 0013.
+(`ReleaseLimits.max_tokens`, recorded-only) is that gate's residual. See ADR 0014.
 
 ## Measured at the branch head (2026-11-22)
 
 | Suite | Result |
 |---|---|
 | `crates/actions/tests/card_binding.rs` (new) | **7 passed** (4 scenarios + 3 support) |
-| `crates/store/tests/run_memory.rs` (new) | **4 passed** |
+| `crates/store/tests/run_memory.rs` (new) | **6 passed** (succeeded, failed, cancelled both ways, reaped, root-only) |
+| server `process_reap` (extended) | **3 passed** (the reaped process run records its attempt) |
 | `internal_agent_runtime.rs` (extended) | **16 passed / 2 ignored** (the live proofs) |
 | `board` | **15 passed** |
 | `executor_runtime` | **8 passed** |
@@ -51,6 +56,9 @@ start, an invoke precheck that refuses an unbudgeted capturing call). The token 
 | the binding's `active` status check | `card_binding::an_unusable_binding_is_refused_on_a_card` (the draft was assigned) |
 | the terminal memory insert | `run_memory::a_succeeded_root_run_records_one_attempt` (zero rows) |
 | the root-only filter | `run_memory::only_root_card_runs_record_memory` (the child wrote a row) |
+| the cancel-path write (`cancel_run_tx`) | `run_memory::a_cancel_path_records_one_attempt` (zero rows) |
+| the run reap sweep's write (`reap_dead_runs_tx`) | `run_memory::a_reaped_run_records_one_attempt` (zero rows) |
+| the process reap sweep's write | `process_reap::a_dead_step_job_is_reaped_as_crashed_and_frees_the_card` (zero rows) |
 
 ## Generated
 
@@ -97,5 +105,5 @@ are in the tests' doc comments.
   budget gate, not a second loop check.
 - `v1-p66-1`'s lane-refusal clause ("moving a delivery card into a work lane without a binding is
   refused 422") needs a delivery-card marker that does not exist.
-- Auto-start from a claim or lane move; prior-step memory in the prompt; procedure-process run
-  memory (`process_runs.start`); `run.execute`'s retry after a handler DB fault (#581 residual).
+- Auto-start from a claim or lane move; prior-step memory in the prompt; `run.execute`'s retry
+  after a handler DB fault (#581 residual).

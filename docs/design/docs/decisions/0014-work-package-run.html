@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
     <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
-    <title>0013 — The work package's run: the card names the binding, the terminal run records its memory · conveyor documents</title>
+    <title>0014 — The work package's run: the card names the binding, the terminal run records its memory · conveyor documents</title>
     <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="../../assets/plex-sans.css" />
     <link rel="stylesheet" href="../../assets/plex-mono.css" />
@@ -19,19 +19,19 @@
       <span class="doc-sep">/</span>
       <a href="../../studio.html#documents">Documents</a>
       <span class="doc-grow"></span>
-      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0013-work-package-run.md" target="_blank" rel="noopener"
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0014-work-package-run.md" target="_blank" rel="noopener"
         >source ↗</a
       >
     </header>
-    <main class="doc-body"><h1 id="0013--the-work-packages-run-the-card-names-the-binding-the-terminal-run-records-its-memory">0013 — The work package's run: the card names the binding, the terminal run records its memory</h1>
+    <main class="doc-body"><h1 id="0014--the-work-packages-run-the-card-names-the-binding-the-terminal-run-records-its-memory">0014 — The work package's run: the card names the binding, the terminal run records its memory</h1>
 <p>Status: Accepted · Date: 2026-11-22 · Issue: #599 · Resolves: S21 §17, SPEC_V2 §4.4, §5.1, §6.6.4, §7.6, rework <code>v1-p66-1</code> (the binding clause)</p>
 <h2 id="decision">Decision</h2>
 <ol type="1">
 <li><p><strong>The card names its job binding; a run inherits it.</strong> <code>cards.create</code> and <code>cards.update</code> accept <code>job_binding_id</code>. The id must resolve inside the caller's tenant and be <code>active</code> — a draft, retired or foreign binding is <code>422 job_binding_unusable</code> and is never written. <code>CardOut</code> exposes the column, so the assignment is readable where the card is read. <code>runs.create</code> resolves the card's binding when its request omits one; an explicit binding that differs from the card's is <code>422 card_binding_mismatch</code>; a card with no binding keeps today's plain-run path. The retired binding and stale-pin checks remain in <code>insert_run_tx</code>, the one writer.</p></li>
 <li><p><strong><code>cards.duplicate</code> does not copy the binding.</strong> A binding is an assignment, not content: a duplicated card is unassigned until someone names a job for it.</p></li>
-<li><p><strong>A terminal root run writes one work-package memory row.</strong> <code>store::run</code>'s terminal hook (<code>enqueue_memory_consolidation</code>) becomes <code>record_run_memory</code>: when a run reaches a terminal state, is card-scoped and is a root (<code>parent_run_id IS NULL</code>), it inserts exactly one <code>work_package_memory</code> row through the existing <code>store::memory::insert_memory_tx</code> — <code>kind=attempt</code>, <code>source=system</code>, <code>run_id</code> set, the body naming the attempt and its outcome, <code>meta</code> carrying the status and error class — and then enqueues the existing <code>memory.consolidate</code> job. The row and the terminal status commit in <strong>one transaction</strong>: a rolled-back finish leaves neither.</p></li>
+<li><p><strong>A terminal root run writes one work-package memory row.</strong> <code>store::run</code>'s terminal hook (<code>enqueue_memory_consolidation</code>) becomes <code>record_run_memory</code>: when a run reaches a terminal state, is card-scoped and is a root (<code>parent_run_id IS NULL</code>), it inserts exactly one <code>work_package_memory</code> row through the existing <code>store::memory::insert_memory_tx</code> — <code>kind=attempt</code>, <code>source=system</code>, <code>run_id</code> set, the body naming the attempt and its outcome, <code>meta</code> carrying the status and error class — and then enqueues the existing <code>memory.consolidate</code> job. The row and the terminal status commit in <strong>one transaction</strong>: a rolled-back finish leaves neither. Every terminal path writes it: <code>transition_run_tx</code>/<code>fail_run_tx</code> (the normal finish), <code>cancel_run_tx</code> (an explicit cancel), and both reap sweeps (<code>reap_dead_runs_tx</code> for <code>run.execute</code> and <code>reap_dead_process_runs_tx</code> for <code>process.step</code>) through <code>record_run_memory_for_id_tx</code>. A path that moves a run to a terminal state without the row is a defect.</p></li>
 <li><p><strong>A child run and a card-less run write no memory.</strong> A child shares its parent's card and its outcome is part of the parent's attempt; writing one row per child would crowd the card's hot rows (the prompt selector reads the newest eight) with fragments of one work package. A card-less run has no work package.</p></li>
-<li><p><strong>The runtime's attempt row is the second sanctioned writer, not an ad-hoc one.</strong> CONTRACT §17 said <code>memory.remember</code> is the only <em>action</em> that writes <code>work_package_memory</code>, with the consolidation job appending the digest. This decision adds one sanctioned runtime writer: the terminal transition's <code>attempt</code> row. It is the system's record of what the run did, written through the same store function; the agent's learned facts still go through <code>memory.remember</code> (the copilot and an <code>agent.run</code> step), and nothing else writes SQL.</p></li>
+<li><p><strong>The runtime's attempt row is the second sanctioned writer, not an ad-hoc one.</strong> CONTRACT §17 said <code>memory.remember</code> is the only <em>action</em> that writes <code>work_package_memory</code>, with the consolidation job appending the digest. This decision adds one sanctioned runtime writer: the terminal path's <code>attempt</code> row. It is the system's record of what the run did, written through the same store function; the agent's learned facts still go through <code>memory.remember</code> (the copilot and an <code>agent.run</code> step), and nothing else writes SQL.</p></li>
 <li><p><strong>No migration.</strong> <code>card.job_binding_id</code> exists (<code>migrations/0040_organisation.sql</code>), <code>work_package_memory</code> and its kinds exist, and the terminal transitions already exist.</p></li>
 <li><p><strong>The budget is not this decision.</strong> <code>v1-p75-1</code>/<code>v1-w4a-1</code> are resolved on the <code>#526</code> lane (commit <code>8f1e5770</code>, the invoke precheck and broker spend gate). The token ceiling (<code>ReleaseLimits.max_tokens</code>, recorded-only) is that gate's residual. A second budget mechanism in the loop would be a duplicate writer for one policy, so this unit does not add one.</p></li>
 </ol>
@@ -56,7 +56,7 @@
 </ul>
 </main>
     <footer class="doc-footer">
-      <span>Rendered from <code>docs/decisions/0013-work-package-run.md</code> at build time.</span>
+      <span>Rendered from <code>docs/decisions/0014-work-package-run.md</code> at build time.</span>
       <a href="../../studio.html#documents">All documents</a>
     </footer>
   </body>

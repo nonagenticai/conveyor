@@ -316,6 +316,28 @@ async fn a_process_step_resolves_its_executor_and_compiles_the_prompt_from_the_r
         "the call records a hash: {prompt_sha:?}"
     );
 
+    // S21 step 6: the terminal root run wrote its attempt row after the model call. That row is
+    // in the card's memory *now*, so a post-run recompile would legitimately hash a different
+    // prompt. Assert the row exists — the behaviour under test — then clear the card's memory to
+    // reconstruct the facts the executor actually compiled from. With no hot rows left, a
+    // consolidation that runs afterwards writes no digest, so the comparison is race-free.
+    let attempts: i64 = sqlx::query_scalar(
+        "SELECT count(*) FROM work_package_memory
+          WHERE tenant_id = $1 AND run_id = $2 AND kind = 'attempt'",
+    )
+    .bind(seeded.tenant_id)
+    .bind(run_id)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("the run's attempt row");
+    assert_eq!(attempts, 1, "the terminal run recorded its attempt");
+    sqlx::query("DELETE FROM work_package_memory WHERE tenant_id = $1 AND card_id = $2")
+        .bind(seeded.tenant_id)
+        .bind(Uuid::parse_str(&card).expect("card id"))
+        .execute(&pg.super_pool)
+        .await
+        .expect("clear the post-run memory");
+
     // The compile is live: renaming the card changes the next compiled text and its hash.
     // Compile with the SAME facts the executor used — the run's step, not `None` — so the
     // comparison is against the exact text the model saw.

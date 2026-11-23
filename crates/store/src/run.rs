@@ -682,6 +682,32 @@ async fn record_run_memory(
     Ok(())
 }
 
+/// Write the terminal memory row for a run whose terminal status a **sweep** wrote directly,
+/// outside `transition_run_tx` / `fail_run_tx` / `cancel_run_tx` (S21 step 6).
+///
+/// Both reapers (`run.reap` and the process `process.step` sweep) fail runs with one bulk
+/// statement. The row and its card's consolidation job still belong to the same transaction, so
+/// they read the row back here and reuse the one writer. A run that vanished, is not terminal or
+/// is card-less writes nothing, exactly as the transition helpers behave.
+pub(crate) async fn record_run_memory_for_id_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    run_id: Uuid,
+) -> Result<(), RunStoreError> {
+    let sql = format!("SELECT {COLUMNS} FROM run WHERE tenant_id = $1 AND id = $2");
+    let row: Option<RunRow> = sqlx::query_as(sqlx::AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(run_id)
+        .fetch_optional(&mut *conn)
+        .await?;
+    let Some(row) = row else {
+        return Ok(());
+    };
+    let is_root = row.parent_run_id.is_none();
+    let run: Run = row.try_into()?;
+    record_run_memory(conn, tenant, &run, is_root).await
+}
+
 /// The one-line body of a run's attempt row: what the next run on the card needs to know.
 ///
 /// Kept short on purpose — the hot rows are rendered into the next prompt, so the body is the
@@ -1139,11 +1165,12 @@ pub async fn bind_executor_tx(
 /// write must agree: a run with a live (`pending`/`running`) `run.execute` job is never
 /// touched, and "live" is checked with the same statement that selects the dead ones.
 /// Returns `(run_id, dead_job_id)` so the caller can emit `run.failed` in-tx with the dead
-/// job as its cause; this module never writes an outbox row itself.
+/// job as its cause; this module never writes an outbox row itself. Each reaped run's attempt is
+/// recorded in its card's memory in the same transaction (S21 step 6).
 pub async fn reap_dead_runs_tx(
     conn: &mut PgConnection,
     tenant: TenantId,
-) -> Result<Vec<(Uuid, Uuid)>, sqlx::Error> {
+) -> Result<Vec<(Uuid, Uuid)>, RunStoreError> {
     let rows: Vec<(Uuid, Uuid)> = sqlx::query_as(
         "WITH latest AS (
              SELECT DISTINCT ON (j.dedupe_key) j.dedupe_key, j.id AS job_id, j.status
@@ -1178,6 +1205,9 @@ pub async fn reap_dead_runs_tx(
     .bind(tenant.as_uuid())
     .fetch_all(&mut *conn)
     .await?;
+    for (run_id, _) in &rows {
+        record_run_memory_for_id_tx(conn, tenant, *run_id).await?;
+    }
     Ok(rows)
 }
 
@@ -1497,6 +1527,7 @@ pub async fn cancel_run_tx(
     let Some(row) = row else {
         return Ok(None);
     };
+    let is_root = row.parent_run_id.is_none();
     let run: Run = row.try_into()?;
     if run.status.is_terminal() {
         return Ok(None);
@@ -1520,6 +1551,12 @@ pub async fn cancel_run_tx(
         .fetch_optional(&mut *conn)
         .await?;
     let cancelled = row.map(Run::try_from).transpose()?;
+    // A cancel is a terminal outcome of the work package: the next run must see it. Every other
+    // terminal path goes through `transition_run_tx`/`fail_run_tx`, which write the row; this
+    // function writes its own status, so it owes the same row in the same transaction.
+    if let Some(run) = &cancelled {
+        record_run_memory(conn, tenant, run, is_root).await?;
+    }
     // The run tree is one unit of work: an expired gate (or any caller of this store function)
     // must not leave a live child holding `uq_run_child_live` on a cancelled parent.
     if cancelled.is_some() {

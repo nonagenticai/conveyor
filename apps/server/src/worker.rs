@@ -1099,7 +1099,7 @@ async fn run_reap(pool: &PgPool, tenant: TenantId) -> Result<(), JobFailure> {
     let mut tx = store::begin_scoped(pool, tenant).await.map_err(retryable)?;
     let reaped = store::run::reap_dead_runs_tx(&mut tx, tenant)
         .await
-        .map_err(retryable)?;
+        .map_err(run_failure)?;
     for (run_id, _dead_job_id) in reaped {
         let attempt = match store::run::get_run_tx(&mut tx, tenant, run_id)
             .await
@@ -1134,7 +1134,7 @@ async fn run_reap(pool: &PgPool, tenant: TenantId) -> Result<(), JobFailure> {
     // `running` forever and hold `uq_run_live` on its card.
     let reaped = store::process::reap_dead_process_runs_tx(&mut tx, tenant)
         .await
-        .map_err(retryable)?;
+        .map_err(run_failure)?;
     for reaped in reaped {
         tracing::warn!(
             run = %reaped.run_id,

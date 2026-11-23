@@ -1,4 +1,4 @@
-# 0013 — The work package's run: the card names the binding, the terminal run records its memory
+# 0014 — The work package's run: the card names the binding, the terminal run records its memory
 
 Status: Accepted · Date: 2026-11-22 · Issue: #599 · Resolves: S21 §17, SPEC_V2 §4.4, §5.1, §6.6.4,
 §7.6, rework `v1-p66-1` (the binding clause)
@@ -22,7 +22,11 @@ Status: Accepted · Date: 2026-11-22 · Issue: #599 · Resolves: S21 §17, SPEC_
    `work_package_memory` row through the existing `store::memory::insert_memory_tx` — `kind=attempt`,
    `source=system`, `run_id` set, the body naming the attempt and its outcome, `meta` carrying the
    status and error class — and then enqueues the existing `memory.consolidate` job. The row and the
-   terminal status commit in **one transaction**: a rolled-back finish leaves neither.
+   terminal status commit in **one transaction**: a rolled-back finish leaves neither. Every
+   terminal path writes it: `transition_run_tx`/`fail_run_tx` (the normal finish), `cancel_run_tx`
+   (an explicit cancel), and both reap sweeps (`reap_dead_runs_tx` for `run.execute` and
+   `reap_dead_process_runs_tx` for `process.step`) through `record_run_memory_for_id_tx`. A path
+   that moves a run to a terminal state without the row is a defect.
 
 4. **A child run and a card-less run write no memory.** A child shares its parent's card and its
    outcome is part of the parent's attempt; writing one row per child would crowd the card's hot
@@ -32,7 +36,7 @@ Status: Accepted · Date: 2026-11-22 · Issue: #599 · Resolves: S21 §17, SPEC_
 5. **The runtime's attempt row is the second sanctioned writer, not an ad-hoc one.** CONTRACT §17
    said `memory.remember` is the only *action* that writes `work_package_memory`, with the
    consolidation job appending the digest. This decision adds one sanctioned runtime writer: the
-   terminal transition's `attempt` row. It is the system's record of what the run did, written
+   terminal path's `attempt` row. It is the system's record of what the run did, written
    through the same store function; the agent's learned facts still go through `memory.remember`
    (the copilot and an `agent.run` step), and nothing else writes SQL.
 

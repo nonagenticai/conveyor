@@ -574,8 +574,14 @@ refuses when the endpoints or credentials are unset; a stub is not the proof.
 
 **Out of this step.** No budget mechanism (cost, tool spend or token ceiling — `v1-p75-1` is the
 #526 lane's); no automatic apply of an L1-accepted draft; no new `cards.assign` action; no
-auto-start from a claim or lane move; no prior-step memory in the prompt; no procedure-process run
-memory (`process_runs.start`); no UI; no PDDL storage; no migration.
+auto-start from a claim or lane move; no prior-step memory in the prompt; no UI; no PDDL storage;
+no migration.
+
+**Found and fixed in flight (2026-11-23).** The attempt row was written by
+`transition_run_tx`/`fail_run_tx` only; `cancel_run_tx` and both reap sweeps (`run.execute` and
+`process.step`) moved runs to a terminal state without it. All three now write the row through the
+same `record_run_memory_for_id_tx`, in the same transaction; the store and server tests name each
+path. The process-run clause is therefore no longer out of scope.
 
 **Acceptance.** `crates/actions/tests/card_binding.rs` (new), `crates/store/tests/run_memory.rs`
 (new), `internal_agent_runtime.rs` (extended with the next-run prompt and live scenarios). The
