@@ -234,6 +234,12 @@ mod tests {
                 "message": {"content": "{\"domain\": \"(define (domain d))\"}"}
             }]
         });
+        // The premise: on its own the content parses as a complete draft, so only `finish_reason` can tell
+        // it was cut.
+        let content = document["choices"][0]["message"]["content"]
+            .as_str()
+            .unwrap();
+        serde_json::from_str::<ModelDraft>(content).expect("the content alone parses");
         let error = draft_from_document(&document).unwrap_err();
         assert_eq!(error.status, 422);
         assert_eq!(error.code, "inference-truncated");

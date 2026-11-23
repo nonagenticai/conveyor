@@ -287,6 +287,12 @@ mod tests {
                 "message": {"content": "{\"storyline\": \"a walk\", \"shots\": []}"}
             }]
         });
+        // The premise: on its own the content parses as a complete document, so only `finish_reason` can
+        // tell it was cut.
+        let content = document["choices"][0]["message"]["content"]
+            .as_str()
+            .unwrap();
+        serde_json::from_str::<ModelAnswer>(content).expect("the content alone parses");
         let error = answer_from_document(&document).unwrap_err();
         assert_eq!(error.status, 422);
         assert_eq!(error.code, "inference-truncated");
