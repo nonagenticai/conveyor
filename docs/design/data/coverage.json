@@ -361,9 +361,10 @@
           526,
           545,
           569,
-          572
+          572,
+          604
         ],
-        "open": 16,
+        "open": 17,
         "ready": 5,
         "unknown": 0
       }
@@ -610,6 +611,7 @@
         "T14",
         "T16",
         "T18",
+        "T19",
         "T4",
         "T9"
       ],
@@ -863,6 +865,7 @@
         "T14",
         "T16",
         "T18",
+        "T19",
         "T4",
         "T9"
       ],
@@ -951,6 +954,7 @@
         "T14",
         "T16",
         "T18",
+        "T19",
         "T4",
         "T9"
       ],
@@ -1366,13 +1370,13 @@
       "tranche": 9,
       "units": {
         "blocked": 1,
-        "claimed": 0,
+        "claimed": 1,
         "numbers": [
           12,
           30
         ],
         "open": 2,
-        "ready": 1,
+        "ready": 0,
         "unknown": 0
       }
     },
@@ -1408,12 +1412,12 @@
       "tranche": 8,
       "units": {
         "blocked": 0,
-        "claimed": 1,
+        "claimed": 0,
         "numbers": [
           13,
           31
         ],
-        "open": 2,
+        "open": 1,
         "ready": 1,
         "unknown": 0
       }
@@ -1451,12 +1455,12 @@
       "tranche": 9,
       "units": {
         "blocked": 0,
-        "claimed": 0,
+        "claimed": 1,
         "numbers": [
           14
         ],
         "open": 1,
-        "ready": 1,
+        "ready": 0,
         "unknown": 0
       }
     },
@@ -1496,13 +1500,14 @@
       "tranche": 9,
       "units": {
         "blocked": 0,
-        "claimed": 0,
+        "claimed": 1,
         "numbers": [
           15,
           581,
-          590
+          590,
+          599
         ],
-        "open": 0,
+        "open": 1,
         "ready": 0,
         "unknown": 0
       }
@@ -1670,6 +1675,7 @@
         "T14",
         "T16",
         "T18",
+        "T19",
         "T4",
         "T9"
       ],
@@ -1849,6 +1855,7 @@
         "T10",
         "T16",
         "T18",
+        "T19",
         "T4",
         "T9"
       ],
@@ -1939,6 +1946,7 @@
         "T10",
         "T14",
         "T18",
+        "T19",
         "T4",
         "T9"
       ],
@@ -2032,6 +2040,7 @@
         "T10",
         "T14",
         "T16",
+        "T19",
         "T4",
         "T9"
       ],
@@ -2040,7 +2049,7 @@
       "track": "v2",
       "tranche": 4,
       "units": {
-        "blocked": 5,
+        "blocked": 4,
         "claimed": 1,
         "numbers": [
           559,
@@ -2050,7 +2059,56 @@
           565,
           566
         ],
-        "open": 6,
+        "open": 5,
+        "ready": 0,
+        "unknown": 0
+      }
+    },
+    {
+      "blocked_by": [],
+      "evidence": [
+        "docs/SPEC_V2.md"
+      ],
+      "gap": "table meeting_type, table meeting, table meeting_agenda_item, table meeting_attendance, table meeting_position, action meetings.schedule",
+      "key": "T19",
+      "measured": {
+        "actions": [
+          0,
+          12
+        ],
+        "modules": [
+          0,
+          1
+        ],
+        "tables": [
+          0,
+          5
+        ]
+      },
+      "name": "Decision forums (meetings)",
+      "parallel_with": [
+        "S05",
+        "S07",
+        "S09",
+        "T10",
+        "T14",
+        "T16",
+        "T18",
+        "T4",
+        "T9"
+      ],
+      "plan": "docs/SPEC_V2.md#12",
+      "status": "proposed",
+      "track": "v2",
+      "tranche": 4,
+      "units": {
+        "blocked": 1,
+        "claimed": 1,
+        "numbers": [
+          605,
+          606
+        ],
+        "open": 2,
         "ready": 0,
         "unknown": 0
       }
@@ -2168,6 +2226,7 @@
         "T14",
         "T16",
         "T18",
+        "T19",
         "T9"
       ],
       "plan": "docs/SPEC_V2.md#12",
@@ -2388,6 +2447,7 @@
         "T14",
         "T16",
         "T18",
+        "T19",
         "T4"
       ],
       "plan": "docs/SPEC_V2.md#12",
@@ -2651,13 +2711,13 @@
         "built": 40,
         "partial": 1,
         "planned": 0,
-        "proposed": 6,
+        "proposed": 7,
         "standing": 1
       },
-      "total": 49,
+      "total": 50,
       "uncovered": [],
-      "with_open_units": 19,
-      "without_open_units": 30
+      "with_open_units": 21,
+      "without_open_units": 29
     },
     "screens": {
       "actions_invoked": 39,

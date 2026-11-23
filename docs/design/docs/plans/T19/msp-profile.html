@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>T19 — MSP profile · conveyor documents</title>
+    <link rel="icon" href="../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T19/msp-profile.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="t19--msp-profile">T19 — MSP profile</h1>
+<h2 id="1-business-case-addendum">1. Business case addendum</h2>
+<p><strong>Why now.</strong> V2's high-level work — programme management, architecture, analysis and project management — is decided in cross-department meetings, but only the resulting approval row survives. The programme cannot show the trade-offs, conditions, dissent or commitments that made the decision, and it cannot tell whether the forum that was supposed to decide actually met.</p>
+<p><strong>Options.</strong></p>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>What it buys</th>
+<th>What it costs</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Do nothing — approvals only</td>
+<td>the decision row</td>
+<td>no deliberation, no cross-department positions, no dissent, no commitments; R20 unmitigated</td>
+</tr>
+<tr>
+<td>A chat/transcript room</td>
+<td>conversation</td>
+<td>no typed decision, no quorum, no arithmetic, a second store; rejected by §6.8</td>
+</tr>
+<tr>
+<td><strong>Typed meeting forum (T19)</strong></td>
+<td>decision + deliberation, one decision store, measurable forums</td>
+<td>five tables, twelve actions, one console destination, one participant extension</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Cost and effort.</strong> One delivery slice (D1–D8), one migration set, the <code>meetings.*</code> family and the Meetings destination. The ongoing cost is participant time, metered as participant-hours from attendance × duration in the D52 roll-up. The change is a tenant policy, not a new runtime.</p>
+<p><strong>Investment appraisal.</strong> The benefit is measured by the instruments in §3, not by the capability's existence. The case is accepted provisionally: the baseline is unmeasured until the first meeting rows exist, and the tranche-4 review decides whether the instrument is producing a measurable improvement. An unmeasured baseline is reported <code>unmeasured</code>, never zero.</p>
+<h2 id="2-benefit-profile-b7">2. Benefit profile B7</h2>
+<table>
+<thead>
+<tr>
+<th>Group</th>
+<th>Fields</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Identification and purpose</td>
+<td><strong>reference</strong> B7 · <strong>description</strong> Deliberated cross-department decisions · <strong>category</strong> strategic · <strong>objectives</strong> G1 every multi-position decision carries its positions, conditions and dissent; G2 a meeting never weakens a gate · <strong>observable outcome</strong> a decision that needed several departments has a meeting record with one position per required department, the dissent verbatim and the commitments dated</td>
+</tr>
+<tr>
+<td>Performance</td>
+<td><strong>KPIs</strong> decision latency, agenda conversion, quorum-miss rate, commitment slippage, action closure, person-hours per decision, decisions per meeting · <strong>baseline</strong> <code>unmeasured — no meeting rows exist before T19; the current record is the approval row only</code> · <strong>target</strong> every tranche-4 cross-department decision has a meeting record; quorum-miss and commitment slippage are reported at the tranche review with a target fixed at the first measured cycle · <strong>measurement method</strong> read-time aggregates over <code>meeting</code>, <code>meeting_agenda_item</code>, <code>meeting_attendance</code>, <code>meeting_position</code>, <code>approval_decision</code> and <code>project_dependency</code>; a metric reads rows and writes nothing · <strong>financial value</strong> not expressed; participant-hours are the cost side</td>
+</tr>
+<tr>
+<td>Cost</td>
+<td>the T19 build (D1–D8) and the business change: chairs adopt agendas, departments staff required seats, the owner uses the room or the async queue</td>
+</tr>
+<tr>
+<td>Conditions</td>
+<td><strong>capabilities required</strong> T1 plan spine and registers, T2 ladder and policy, T3 gate routing, T19 meeting forum; <strong>outcomes that must already exist</strong> the approval primitive, <code>app_user</code>, <code>card</code>, <code>governed_asset</code>, <code>project_dependency</code>; <strong>changes to operating practice</strong> decisions that need several positions are convened, not settled in a thread; minutes publish behind the chair</td>
+</tr>
+<tr>
+<td>Uncertainty and dependencies</td>
+<td><strong>risks</strong> R20 meeting theatre; a forum that meets but decides nothing; a required department that never staffs its seat; the T9/T10 binding follows T19; <strong>dependencies outside the programme</strong> none beyond the tenant's department staffing</td>
+</tr>
+<tr>
+<td>Responsibility and attribution</td>
+<td><strong>who realizes it</strong> the programme architect and the delivery team; <strong>benefit owner</strong> BCM; <strong>operational area</strong> programme management, architecture and project management — the areas whose decisions become the record</td>
+</tr>
+</tbody>
+</table>
+<p>The profile is approved only when the BCM and SRO accept it and the baseline is measured while the old practice (approval-only) is still observable. Until then the profile is <code>draft</code> and the benefit is reported unmeasured.</p>
+<h2 id="3-benefits-map">3. Benefits map</h2>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>output_ref</td>
+<td>T19 decision forums</td>
+</tr>
+<tr>
+<td>capability_ref</td>
+<td>multi-party decisions carry their deliberation</td>
+</tr>
+<tr>
+<td>operational_outcome</td>
+<td>O7 Meetings decide with the affected departments</td>
+</tr>
+<tr>
+<td>benefit</td>
+<td>B7</td>
+</tr>
+<tr>
+<td>strategic_objective</td>
+<td>decision ladder (rule → laya → generation → human)</td>
+</tr>
+</tbody>
+</table>
+<p>The edge is one path: T19's output enables the capability; the capability produces O7; O7 is valued as B7 and contributes to the ladder objective. A slip in T19 puts B7 at risk; a missing required department is an O7 risk, not a T19 build failure.</p>
+<h2 id="4-risk-r20--meeting-theatre">4. Risk R20 — meeting theatre</h2>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Cause</td>
+<td>a calendar that grows, decisions claimed in conversation, courteous attendance, minutes that do not match</td>
+</tr>
+<tr>
+<td>Event</td>
+<td>a meeting exists but the decision record is not its product</td>
+</tr>
+<tr>
+<td>Effect</td>
+<td>B7 is not realized; the programme pays participant time for no deliberation</td>
+</tr>
+<tr>
+<td>Owner</td>
+<td>programme manager (operational), BCM (benefit)</td>
+</tr>
+<tr>
+<td>Appetite</td>
+<td>low; the forum's controls are the mitigation, not a tolerance</td>
+</tr>
+<tr>
+<td>Mitigation</td>
+<td>every item resolves a typed object and needs evidence; the closed outcome set; quorum and rule are policy; commitments need owner+date; a minute line must match a row; participant-hours are metered; a decision-free forum is retired (P10)</td>
+</tr>
+<tr>
+<td>Review date</td>
+<td>2026-11-30 (tranche-4 planning) and every tranche review</td>
+</tr>
+</tbody>
+</table>
+<h2 id="5-stakeholder-profiles">5. Stakeholder profiles</h2>
+<table>
+<thead>
+<tr>
+<th>Stakeholder</th>
+<th>Concerns / sensitivities</th>
+<th>Importance</th>
+<th>Influence</th>
+<th>Interest</th>
+<th>Exposure</th>
+<th>Support</th>
+<th>Engagement target</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Owner / sponsoring group</td>
+<td>the decision and dissent are the record; can join any forum</td>
+<td>high</td>
+<td>high</td>
+<td>high</td>
+<td>high</td>
+<td>support</td>
+<td>seat in the room and the async queue; decides items</td>
+</tr>
+<tr>
+<td>Chair</td>
+<td>the agenda is adopted and minutes publish behind its gate</td>
+<td>high</td>
+<td>high</td>
+<td>high</td>
+<td>medium</td>
+<td>support</td>
+<td>chair seat and minutes gate</td>
+</tr>
+<tr>
+<td>Operations</td>
+<td>its position is not outvoted silently; conditions are visible</td>
+<td>high</td>
+<td>high</td>
+<td>high</td>
+<td>high</td>
+<td>support</td>
+<td>required department on operational items</td>
+</tr>
+<tr>
+<td>Security</td>
+<td>evidence and P4 conflict rules are not waived</td>
+<td>high</td>
+<td>high</td>
+<td>high</td>
+<td>high</td>
+<td>support</td>
+<td>required department on security items</td>
+</tr>
+<tr>
+<td>Delivery</td>
+<td>commitments have owners and dates</td>
+<td>high</td>
+<td>medium</td>
+<td>high</td>
+<td>medium</td>
+<td>support</td>
+<td>required department on delivery items</td>
+</tr>
+<tr>
+<td>Job bindings</td>
+<td>their position and evidence are typed</td>
+<td>medium</td>
+<td>medium</td>
+<td>high</td>
+<td>medium</td>
+<td>support</td>
+<td>member/presenter seats</td>
+</tr>
+<tr>
+<td>Observers</td>
+<td>recorded but never counted</td>
+<td>low</td>
+<td>low</td>
+<td>medium</td>
+<td>low</td>
+<td>neutral</td>
+<td>observer seat</td>
+</tr>
+<tr>
+<td>Architecture Board</td>
+<td>board sittings are meetings</td>
+<td>high</td>
+<td>high</td>
+<td>medium</td>
+<td>medium</td>
+<td>support</td>
+<td><code>governance_body</code> convener</td>
+</tr>
+<tr>
+<td>Programme cadence</td>
+<td>PI planning, demo and I&amp;A are meeting instances</td>
+<td>high</td>
+<td>high</td>
+<td>medium</td>
+<td>medium</td>
+<td>support</td>
+<td>cadence agenda source</td>
+</tr>
+</tbody>
+</table>
+<h2 id="6-tranche-authorisation">6. Tranche authorisation</h2>
+<p>T19 is authorised under <strong>tranche 4</strong>. Its entry is the tranche-3 exit (T1, T2, T3 and P0 built); its exit is the §12 T19 gate with the D1–D8 evidence. The tranche review's evidence is the baseline for B7 (unmeasured at entry), the R20 posture, the meeting instruments from D7 and the blueprint alignment from the architecture design. The review decides continue, pause or stop; a re-baseline goes through change control, never through the review.</p>
+<h2 id="7-transition-and-measurement">7. Transition and measurement</h2>
+<p>The old practice is approval-only; the baseline is measured while it is still observable (zero meeting rows, decision latency recorded only on the approval). T19 enacts the new practice: convene the forum, record positions, derive outcomes, publish minutes. Post-transition the BCM measures the seven instruments, reports the delta against the approval-only baseline and keeps measuring until the realization plan names who continues after programme closure. The BCM is the benefit owner; the programme manager is accountable for the forums' operation.</p>
+<h2 id="8-links">8. Links</h2>
+<ul>
+<li>Brief: <code>docs/plans/T19/project-brief.md</code></li>
+<li>Architecture: <code>docs/plans/T19/architecture-design.md</code></li>
+<li>Plan: <code>docs/plans/T19-decision-forums.md</code></li>
+<li>SAFe: <code>docs/plans/T19/safe-epic.md</code></li>
+<li>Seed: <code>seed/programme-definition.json</code> (B7 and the tranche-4 exit)</li>
+<li>Spec: <code>docs/SPEC_V2.md</code> §6.8, §8.3, §12 T19, D66; R20</li>
+</ul>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/plans/T19/msp-profile.md</code> at build time.</span>
+      <a href="../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

@@ -15,8 +15,8 @@
   },
   "counts": {
     "exists": 44,
-    "extend": 6,
-    "new": 12
+    "extend": 7,
+    "new": 18
   },
   "rows": [
     {
@@ -271,6 +271,56 @@
       ]
     },
     {
+      "id": "table:meeting_type",
+      "spec_ref": "§10.3",
+      "kind": "table",
+      "concept": "meeting_type",
+      "verdict": "new",
+      "evidence": [
+        "migrations: no CREATE/ALTER TABLE meeting_type"
+      ]
+    },
+    {
+      "id": "table:meeting",
+      "spec_ref": "§10.3",
+      "kind": "table",
+      "concept": "meeting",
+      "verdict": "new",
+      "evidence": [
+        "migrations: no CREATE/ALTER TABLE meeting"
+      ]
+    },
+    {
+      "id": "table:meeting_agenda_item",
+      "spec_ref": "§10.3",
+      "kind": "table",
+      "concept": "meeting_agenda_item",
+      "verdict": "new",
+      "evidence": [
+        "migrations: no CREATE/ALTER TABLE meeting_agenda_item"
+      ]
+    },
+    {
+      "id": "table:meeting_attendance",
+      "spec_ref": "§10.3",
+      "kind": "table",
+      "concept": "meeting_attendance",
+      "verdict": "new",
+      "evidence": [
+        "migrations: no CREATE/ALTER TABLE meeting_attendance"
+      ]
+    },
+    {
+      "id": "table:meeting_position",
+      "spec_ref": "§10.3",
+      "kind": "table",
+      "concept": "meeting_position",
+      "verdict": "new",
+      "evidence": [
+        "migrations: no CREATE/ALTER TABLE meeting_position"
+      ]
+    },
+    {
       "id": "table:architecture_maturity",
       "spec_ref": "§10.3",
       "kind": "table",
@@ -442,6 +492,17 @@
       "evidence": [
         "actions: approval_policies.* found (approval_policies.get, approval_policies.list, approval_policies.set)",
         "actions: approvals.* found (approvals.decide, approvals.list, approvals.request)"
+      ]
+    },
+    {
+      "id": "actions:meetings",
+      "spec_ref": "§10.4",
+      "kind": "actions",
+      "concept": "meetings",
+      "verdict": "extend",
+      "evidence": [
+        "actions: architecture.* found (architecture.artifacts_approve, architecture.artifacts_create, architecture.artifacts_entries…)",
+        "actions: meetings.* absent"
       ]
     },
     {
@@ -619,6 +680,18 @@
         "docs/design/v2.js: page 'portfolio' — design reference, not implementation"
       ],
       "note": "The V1 boards are the nearest surface; the computed portfolio, shared config, WSJF and cadence are T1/T10."
+    },
+    {
+      "id": "destination:Meetings",
+      "spec_ref": "§10.5",
+      "kind": "destination",
+      "concept": "Meetings",
+      "verdict": "new",
+      "evidence": [
+        "apps/web/src/app.rs: route '/meetings' absent",
+        "apps/web/src/app.rs: route '/meetings/:id' absent",
+        "apps/web/e2e/meetings.spec.ts: absent"
+      ]
     },
     {
       "id": "destination:Programme",

@@ -29,7 +29,7 @@ benefits management strategy and realization plan, reuse map and project briefs.
 the programme it defines, so every artefact in this set is an intermediate output stored on P0 in
 the console and published on the design site.
 
-The programme does not start T1–T17 until this set is accepted. The gate is the programme's, not a
+The programme does not start T1–T19 until this set is accepted. The gate is the programme's, not a
 document's: a delivery project's brief is the contract it is held to, and a benefit's profile is
 the claim its transition is measured against.
 
@@ -190,7 +190,7 @@ is enforced by the engine, not remembered by the session.
   (the first-tranche authorisation above) is the owner's act. The architecture-principles,
   artefact-standard, ADM-profile, maturity and skills categories (§12 T9) were published by #122's
   A7 as "proposed for P0 acceptance"; the typed rows behind them are T9's (#81).
-- The programme plan lists 48 projects (P0 + 47) with tranches and dependencies.
+- The programme plan lists 50 projects (P0 + 49) with tranches and dependencies.
 - Every benefit has a profile with baseline, target, method and owner, and at least one benefits-map
   path to a strategic objective.
 - Every tranche has entry/exit criteria and a review date; the first tranche is authorised.
@@ -201,5 +201,5 @@ is enforced by the engine, not remembered by the session.
   profile, artefact-standard adoption, board charter, maturity and skills baseline.
 - Every architecture artefact in the pack carries the standard's common metadata and at least one
   artefact link; a delivery project whose design gate has no live contract is refused.
-- The Validation page shows P0 at tranche 0 and T1–T17 `blocked_by: [P0]`.
+- The Validation page shows P0 at tranche 0 and T1–T19 `blocked_by: [P0]`.
 - `check-coverage` passes; the seed regen is idempotent; this plan is indexed by `build-docs`.
