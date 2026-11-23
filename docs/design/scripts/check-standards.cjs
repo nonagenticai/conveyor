@@ -66,8 +66,20 @@ function validate(record, documentsRoot, registerKeys) {
     const sections = Array.isArray(artefact.sections) ? artefact.sections : [];
     if (!sections.length) errors.push(`${id}: no sections`);
     const evidenced = sections.filter((section) => section.status === "evidenced").length;
-    const expected =
-      evidenced === sections.length ? "evidenced" : evidenced ? "partial" : "absent";
+    // Row evidence alone is not the artefact: when the published-document section is absent, the
+    // record is absent regardless of how many of its other sections have rows. This is the
+    // generator's own doctrine (`document_missing` in generate-standards.py), and it must be the
+    // verifier's too, or a record can never be honest about a missing document.
+    const documentMissing = sections.some(
+      (section) => section.heading === "Published document" && section.status === "absent"
+    );
+    const expected = documentMissing
+      ? "absent"
+      : evidenced === sections.length
+        ? "evidenced"
+        : evidenced
+          ? "partial"
+          : "absent";
     if (artefact.status !== expected) {
       errors.push(`${id}: status ${artefact.status} but sections say ${expected}`);
     }

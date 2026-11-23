@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Data Entity/Data Component Catalog — T11 Metrics, metering and maturity (Phase C) - artifact document (2026-11-22) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h2>Metadata</h2>
+<ul>
+<li>Artefact: Data Entity/Data Component Catalog — T11 Metrics, metering and maturity (Phase C)</li>
+<li>Phase: c</li>
+<li>Kind: catalog</li>
+<li>Purpose: The two entities T11 adds, the ledger entities it reads, and the deliberate absence of a stored metric.</li>
+<li>Scope: migrations/0059_metrics.sql, the read-model source tables and the snapshot projection.</li>
+</ul>
+<h2>Entries</h2>
+<ul>
+<li><strong>metric_threshold / the C0–C5 threshold configuration</strong> - {"note": "one row per (tenant_id, level, version); level in C0..C5; metrics jsonb over the nine closed evidence names; append-only version; ENABLE and FORCE RLS with tenant_isolation; migrations/0059_metrics.sql", "owner": "metrics", "table": "metric_threshold"}</li>
+<li><strong>metric_reconciliation / the billing comparison verdict</strong> - {"note": "state in matched|difference|unavailable; numeric(18,6) conveyor_usd, billing_usd and delta_usd; one row per tenant and period; shape CHECK; incident_card_id FK to card; ENABLE and FORCE RLS", "owner": "metrics", "table": "metric_reconciliation"}</li>
+<li><strong>inference_call / the call-grain ledger</strong> - {"note": "prompt_tokens, completion_tokens, model, served_model, usage_unit, usage_units, cache class, run and run_step links; prompt and response bodies are never stored", "owner": "control", "table": "inference_call"}</li>
+<li><strong>tool_call / the tool-spend ledger</strong> - {"note": "run and run_step links, tool_key and cost; its cost joins the metering totals", "owner": "tools", "table": "tool_call"}</li>
+<li><strong>run + run_step / attribution and the drill-down</strong> - {"note": "run \u2192 project \u2192 programme and job_binding; run_step position and action; the steps sum to the run", "owner": "control", "tables": "run, run_step"}</li>
+<li><strong>approval / governance and maturity evidence</strong> - {"note": "gate, status, created_at and updated_at for latency; meta.evidence_ref or meta.evidence[] for completeness; decided with zero rejections flags never_refused", "owner": "decision", "table": "approval"}</li>
+<li><strong>card + list + event / the flow rows</strong> - {"note": "WIP counts cards in active/waiting lists; card.moved events with to_list_id give done, queue, block and active spans", "owner": "board", "tables": "card, list, event"}</li>
+<li><strong>job_binding + job_department + department / department attribution</strong> - {"note": "run.job_binding_id \u2192 job_id \u2192 primary job_department \u2192 department; a missing path reports unattributed", "owner": "organisation", "tables": "job_binding, job_department, department"}</li>
+<li><strong>project + programme + project_dependency / roll-ups and benefit risk</strong> - {"note": "the programme's projects form the roll-up; a non-met dependency names the benefits at risk", "owner": "programme", "tables": "project, project_dependency"}</li>
+<li><strong>benefit_profile + benefit_transition + benefit_link / the MSP benefit metrics</strong> - {"note": "baseline, target and post_measured_at; realised = target AND post-measurement; an unmeasured baseline is not zero", "owner": "programme", "tables": "benefit_profile, benefit_transition, benefit_link"}</li>
+<li><strong>commercial_price / the pinned price catalogue</strong> - {"note": "model, unit, input_usd_per_1m, output_usd_per_1m and unit_usd; joined at read time on model and unit", "owner": "billing", "table": "commercial_price"}</li>
+<li><strong>measure.inference / the console's snapshot projection</strong> - {"note": "totals, by_caller and by_model computed from inference_call; at 2026-11-21T18:50:29Z: 609 calls, 9,458,468 tokens, 606 misses, 0 hits, 3 unknown cache classes, 0 non-ok calls; the note states cost is derived and not stored", "owner": "snapshot"}</li>
+<li><strong>No stored metric / absence by design</strong> - {"note": "there is no metric, roll-up or cost table; a metrics read writes no metric row, and migration 0059 adds only configuration and a verdict", "owner": "metrics"}</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Metrics, metering and maturity · conveyor output · published 2026-11-23T09:36:22Z · conveyor-approver</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

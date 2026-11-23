@@ -2263,8 +2263,8 @@
       "evidence": [
         {
           "path": "crates/actions/src/ops/incidents.rs",
-          "line": 703,
-          "quote": "async fn ops_postmortem("
+          "line": 710,
+          "quote": "    if meta.get(META_MITIGATED_AT).is_none() {"
         },
         {
           "path": "crates/actions/src/ops/incidents.rs",
@@ -2273,8 +2273,8 @@
         },
         {
           "path": "crates/actions/src/ops/incidents.rs",
-          "line": 851,
-          "quote": "            \"a resolution follows a mitigation; none has been recorded\","
+          "line": 847,
+          "quote": "    if meta.get(META_MITIGATED_AT).is_none() {"
         },
         {
           "path": "crates/actions/src/ops/incidents.rs",
@@ -2759,8 +2759,8 @@
         },
         {
           "path": "crates/actions/src/metrics/mod.rs",
-          "line": 1121,
-          "quote": "            conveyor_usd: Some(conveyor_usd),"
+          "line": 1115,
+          "quote": "    store::metrics::record_reconciliation_tx("
         }
       ],
       "failure_scenario": "A monthly reconciliation records a growing conveyor-vs-billing delta and opens an incident card each time. No report, dashboard or metric ever queries the reconciliation table, so the trend across periods is invisible; if the incident cards are closed, the delta history is buried in rows nothing reads. If the service is later removed, the table and writer remain as pure dead weight.",

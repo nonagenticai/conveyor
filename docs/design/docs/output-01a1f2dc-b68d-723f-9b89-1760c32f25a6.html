@@ -23,97 +23,24 @@
         >source ↗</a
       >
     </header>
-    <main class="doc-body"><h1>T9 — Architecture design</h1>
-<p>Project: T9 — TOGAF ADM capability · Track: v2 · Tranche: 4 · Plan: docs/SPEC_V2.md §12 / docs/plans/T9-architecture-capability.md
-Unit: #81 · PR #350 (merged c8204432, 2026-11-19)
-Measured at: main@f14b7d36, 2026-11-19 · Project row: closed</p>
+    <main class="doc-body"><h1>Architecture design — T9 TOGAF ADM capability (retrospective, 2026-11-22)</h1>
 <h2>Context and boundary</h2>
-<p>T9 owns the architecture capability as rows in the one store: a typed artefact standard and repository, the Preliminary governance (profile, board, maturity, skills), an <code>architecture</code> project walking Preliminary and A–H, four ADM contract kinds, delivery compliance with waivers, the Phase H outcome, and the console surface that reads them. It turns TOGAF from a document set into state a gate can refuse on: a phase advances only on its approved mandatory artefacts and a live contract.</p>
-<p>Out of boundary: an ArchiMate editor or live metamodel, a renderer that derives diagrams from the model, an automatic conformance verdict, a portfolio optimiser, TOGAF certification. A diagram is a document with typed metadata, not pixels in Postgres. T9 consumes T1's plan spine (<code>wbs_node</code>, <code>project_register_item</code>), T3's gate routing, P0's Preliminary documents and the document aggregate; it rebuilds none, and owns neither T10's tranche reviews nor benefits realisation. No new service, port or store: eleven tables in the one Postgres database, every write one <code>ActionSpec</code> in the one registry (<code>crates/actions/src/lib.rs:architecture</code>).</p>
+<p>This design adds the architecture capability of SPEC_V2 §8.1 to the blueprint: a typed repository, a tailored ADM profile, the Architecture Board, four contract kinds, the compliance review and waiver register, and the two capability assessments. It owns the eleven tables of §10.3 and the 26 <code>architecture.*</code> actions of §10.4. It must not duplicate <code>governed_asset</code> (requirements, principles, ADRs), <code>trace_link</code>, the approval primitive, <code>document</code>, <code>wbs_node</code> or the PM job; plan §2 names each as reused, not rebuilt.</p>
 <h2>Aggregates, tables and actions</h2>
-<table><thead><tr><th>Aggregate</th><th>Table</th><th>Invariants</th><th>Actions (registry)</th></tr></thead><tbody>
-<tr><td>Standard and profile</td><td><code>artifact_type</code>, <code>adm_profile</code></td><td>kinds catalog/matrix/diagram/principles_catalog; phases preliminary and A–H; plateaus psa/hld/sd; ten seeded types; profile status draft/adopted/retired, with requirements per phase and plateau</td><td><code>architecture.profile_tailor</code>, <code>architecture.profile_get</code></td></tr>
-<tr><td>Artefact</td><td><code>architecture_artifact</code></td><td>status draft/in_review/approved/superseded/archived; approved body immutable; supersede writes the next version</td><td><code>architecture.artifacts_list</code>, <code>architecture.artifacts_get</code>, <code>architecture.artifacts_create</code>, <code>architecture.artifacts_update</code>, <code>architecture.artifacts_approve</code>, <code>architecture.artifacts_supersede</code>, <code>architecture.repository_search</code></td></tr>
-<tr><td>Entries</td><td><code>architecture_artifact_entry</code></td><td><code>axis_a</code>, <code>axis_b</code>, <code>value</code> rows; a catalog uses one axis, a matrix two</td><td><code>architecture.artifacts_entries</code></td></tr>
-<tr><td>Links</td><td><code>architecture_artifact_link</code></td><td>derivation, realization, reuse or dependency; no self-link</td><td><code>architecture.artifacts_link</code>, <code>architecture.artifacts_links</code></td></tr>
-<tr><td>Board</td><td><code>governance_body</code></td><td>kind architecture_board; status draft/active/retired; charter, decision limits, members; open is idempotent on the stable key</td><td><code>architecture.board_open</code>, <code>architecture.board_get</code>, <code>architecture.board_decide</code></td></tr>
-<tr><td>Contract</td><td><code>architecture_contract</code></td><td>four kinds; phase code; status draft/live/superseded; one live per project by unique index</td><td><code>architecture.contracts_request</code>, <code>architecture.contracts_get</code>, <code>architecture.contracts_list</code>, <code>architecture.contracts_approve</code>, <code>architecture.contracts_supersede</code></td></tr>
-<tr><td>Phase</td><td><code>wbs_node</code> (reused, <code>migrations/0044_plan_spine.sql:wbs_node</code>)</td><td>Preliminary and A–H as phase nodes; advance needs the approved mandatory set and a live contract</td><td><code>architecture.phases_advance</code></td></tr>
-<tr><td>Compliance review</td><td><code>architecture_compliance_review</code></td><td>exactly one of six levels, with findings and evidence</td><td><code>architecture.reviews_record</code></td></tr>
-<tr><td>Waiver</td><td><code>architecture_waiver</code></td><td>status active/expired/closed; owner and review date mandatory</td><td><code>architecture.reviews_waive</code></td></tr>
-<tr><td>Maturity</td><td><code>architecture_maturity</code></td><td>nine dimensions, score 0–5 per stage</td><td><code>architecture.maturity_assess</code>, <code>architecture.maturity_plan</code></td></tr>
-<tr><td>Skills</td><td><code>architecture_skill_assessment</code></td><td>seven categories, proficiency 0–5 per role</td><td><code>architecture.skills_assess</code></td></tr>
-</tbody></table>
-<p>Every name resolves in <code>migrations/0054_architecture.sql</code> or <code>crates/actions/src/architecture.rs</code>; the phase row reuses T1's table. All 0054 tables force RLS with <code>tenant_isolation</code>. Maturity and skills have write actions only: no read action exists until #385.</p>
-<p><strong>Events.</strong> The plan declares four lifecycle names — <code>architecture_artifact.changed</code>, <code>architecture_phase.closed</code>, <code>compliance_review.recorded</code>, <code>architecture_waiver.granted</code>. None is a literal in the module or the store at main; the only evidence is the header at <code>crates/actions/src/architecture.rs:5</code>. The event contract is declared, not certified.</p>
+<p>The tables are <code>artifact_type</code>, <code>architecture_artifact</code>, <code>architecture_artifact_entry</code>, <code>architecture_artifact_link</code>, <code>adm_profile</code>, <code>architecture_contract</code>, <code>architecture_compliance_review</code>, <code>architecture_waiver</code>, <code>governance_body</code>, <code>architecture_maturity</code> and <code>architecture_skill_assessment</code>. The actions are the 26 <code>architecture.*</code> declarations of §10.4, from <code>artifacts_list</code> to <code>profile_tailor</code>. The events are <code>architecture_artifact.changed</code>, <code>architecture_phase.closed</code>, <code>compliance_review.recorded</code> and <code>architecture_waiver.granted</code>. A phase advance and its contract approval commit in one transaction with their event (plan §7).</p>
 <h2>Decisions</h2>
-<p><strong>D-T9-1 — Artefacts get their own tables, not a widened <code>governed_asset</code>.</strong> Alternative: add kinds to <code>governed_asset</code>, which already carries fifteen. Refused: catalog, matrix and diagram structure, entries, typed links and immutability are more than a definition row expresses. Trace: SPEC_V2 §10.3.</p>
-<p><strong>D-T9-2 — An entry is a row; a diagram is a document plus metadata.</strong> Alternative: a JSON blob or a rendered model. Consequence: entries and reuse answer in SQL, while a diagram's pixels live in the document aggregate and its viewpoint on the artefact row.</p>
-<p><strong>D-T9-3 — The Board is a <code>governance_body</code> row; its decisions are <code>approval</code> rows; the charter is immutable.</strong> <code>board_open</code> is idempotent on the stable key. Known gap: <code>decide_board_tx</code> inserts the approval and leaves <code>governance_body.status</code> untouched, so the live board reads <code>draft</code> (id <code>01a1f2c0-b22a-7e27-a6cc-1a8e48db327e</code>) while an approved decision exists (approval <code>01a1f2c8-e26f-79ce-a082-5526648a47c5</code>). The approval row is the decision record.</p>
-<p><strong>D-T9-4 — The profile tailors a seeded standard; tailoring is data, never code.</strong> <code>seed_standard_tx</code> seeds ten types; P0's profile table names a larger set, and no action adds a type. Consequence: the artefact vocabulary is capped at ten until a new action (not #385, which adds reads only), and a profile can name a requirement nobody can create. This is the design's most visible ceiling.</p>
-<p><strong>D-T9-5 — A phase advances in one transaction on an approved mandatory set and a live contract.</strong> <code>advance_phase_tx</code> refuses naming the missing artefact or the contract's status and writes no contract row. Trace: D3.</p>
-<p><strong>D-T9-6 — A contract change is a new version that re-opens its gate; the approved body is immutable.</strong> The unique live index keeps one governing version per project. Trace: D3.</p>
-<p><strong>D-T9-7 — Phase H records exactly one outcome: a <code>project_register_item(kind='change')</code> or a kata candidate and no change row; a review without a verdict refuses the gate.</strong> A compliance review records one level; a waiver without an owner and date is refused; the delivery design gate resolves only against a live contract. Trace: D4, D5.</p>
+<p>An artefact is a typed row, not a file; a document is its content, not its identity. The profile filters the seeded standard, so a young capability carries fewer mandatory artefacts and the set grows with assessed maturity. A contract is a gate object with a version; the approved body is immutable and a change re-opens the gate. A review records exactly one compliance level, and a waiver must name its owner and reassessment date. Phase H produces exactly one change or kata. The open findings are the places these decisions are not fully enforced.</p>
 <h2>Acceptance</h2>
-<p>The scenarios and Verify commands are the plan's D1–D6; each note says what exists at <code>main@f14b7d36</code>. No test was executed for this design: "exists" means present, not green.</p>
-<p><strong>D1 — the artefact standard and repository.</strong> Entries are rows with metadata; an approved artefact is immutable; a reuse link is searchable across plateaus.
-<code>Verify:</code> <code>cargo test -p conveyor-api --test architecture_artifacts a_catalog_is_queryable_rows</code>
-<code>Verify:</code> <code>crates/api/tests/architecture_artifacts.rs::an_approved_artefact_is_immutable</code>
-<code>Verify:</code> <code>crates/api/tests/architecture_artifacts.rs::reuse_is_searchable_across_plateaus</code>
-All three functions exist.</p>
-<p><strong>D2 — the Preliminary capability.</strong> The profile names the mandatory set by plateau; the board is a governance-body row; maturity carries nine dimensions and skills seven categories.
-<code>Verify:</code> <code>cargo test -p conveyor-api --test architecture_capability the_profile_names_the_mandatory_set</code>
-<code>Verify:</code> <code>crates/api/tests/architecture_capability.rs::a_maturity_assessment_needs_every_dimension</code>
-<code>Verify:</code> <code>crates/api/tests/architecture_capability.rs::a_skills_assessment_names_its_role</code>
-Exist; no read action returns either assessment until #385.</p>
-<p><strong>D3 — the architecture project and phase gates.</strong> An approved set and a live contract advance a phase; a draft artefact refuses naming itself; a contract change re-opens the gate.
-<code>Verify:</code> <code>cargo test -p conveyor-api --test togaf_architecture_phases phases_a_to_f_pass_in_order</code>
-<code>Verify:</code> <code>crates/api/tests/togaf_architecture_phases.rs::a_draft_artefact_refuses_the_contract</code>
-<code>Verify:</code> <code>crates/api/tests/togaf_architecture_phases.rs::a_contract_change_reopens_the_gate</code>
-Exist; unexercised on a real architecture project.</p>
-<p><strong>D4 — delivery compliance.</strong> No live contract refuses design with no approval row; a superseded contract refuses naming its status; one level per review; a waiver without an owner or date is refused.
-<code>Verify:</code> <code>cargo test -p conveyor-api --test togaf_delivery_design_gate</code>
-<code>Verify:</code> <code>crates/api/tests/togaf_delivery_design_gate.rs::a_superseded_contract_refuses_design</code>
-<code>Verify:</code> <code>crates/api/tests/architecture_compliance.rs::one_level_and_a_dated_waiver</code>
-Exist.</p>
-<p><strong>D5 — change management.</strong> A scope change yields a change register row; a systemic finding yields a kata candidate and no change row; no verdict refuses the phase gate.
-<code>Verify:</code> <code>cargo test -p conveyor-api --test togaf_h_change</code>
-<code>Verify:</code> <code>crates/api/tests/togaf_h_change.rs::a_systemic_finding_produces_a_kata_candidate</code>
-<code>Verify:</code> <code>crates/api/tests/togaf_h_change.rs::an_unrecorded_review_refuses_the_gate</code>
-The second selector matches nothing: the kata assertion sits inside <code>a_scope_change_produces_a_change_register_row</code>; the other two functions exist.</p>
-<p><strong>D6 — the console surface and the seed.</strong> Four Architecture tabs render and record state; a regenerated seed carries the §12 gate text.
-<code>Verify:</code> <code>node docs/design/scripts/check-v2.cjs</code>
-<code>Verify:</code> <code>python3 scripts/build-programme-seed.py --check</code>
-The live console is in the tree: <code>apps/web/src/screens/architecture.rs</code> renders the four tabs from the registered actions, records their state and refuses a phase advance naming the missing artefact (route <code>/architecture</code>), merged in <code>c8204432</code>. The design pack's page is a study; #385 renders that page from the published snapshot, so the public window shows the same rows.</p>
+<p>The D1–D4 scenarios are proved by the named tests in <code>architecture_artifacts.rs</code>, <code>architecture_capability.rs</code>, <code>togaf_architecture_phases.rs</code>, <code>togaf_delivery_design_gate.rs</code> and <code>architecture_compliance.rs</code>. The D5 clause is partial: v1-p81-6 and the absent <code>a_systemic_finding_produces_a_kata_candidate</code> are recorded in the review.</p>
 <h2>Architecture artefacts</h2>
-<h3>The PSA set at inception</h3>
-<ul>
-<li><strong>Principles applied.</strong> P1 one model, one store; P2 every mutation an action; P3 structural tenant isolation; P5 versioned, attributable outputs; P7 gates refuse.</li>
-<li><strong>Requirements.</strong> SPEC_V2 §8.1, §10.3, §10.4, §10.5, §12 T9, D63.</li>
-<li><strong>Stakeholder map.</strong> The programme owner, who chairs the board and accepts the capability; the delivery projects the gates govern; the reviewer and audit; the outside contributor reading the public record.</li>
-<li><strong>Driver, goal and objective.</strong> Driver: architecture accountability lived in documents, not rows. Goal: every output a typed row with entries, links and a lifecycle. Objective: the buildout runs under an adopted profile, a live Phase A statement and a board deciding on evidence.</li>
-<li><strong>Solution concept.</strong> A profile tailors ten seeded types; artefacts and links form the repository; a contract closes each phase; reviews and waivers bind delivery; Phase H yields one change or kata.</li>
-</ul>
-<h3>The typed artefact</h3>
-<p><strong>T9-AM-01 — the live Phase A statement of architecture work.</strong> Type: contract (<code>architecture_contract</code>), kind <code>statement_of_architecture_work</code>, phase A, status <code>live</code>, version 2, id <code>01a1f2c2-0e1a-787f-9011-46b424d1ec71</code>. Owner: the programme architect (maintainer sessions under the owner's authority). Reviewer: the Architecture Board, whose approval <code>01a1f2c8-e26f-79ce-a082-5526648a47c5</code> adopted it. Purpose: the assignment, scope, responsibilities and D1–D6 criteria under which the capability was delivered. It governs the architecture project; it does not contain the designs produced under it.</p>
-<p>The Preliminary set: PF-1 (<code>01a1f2c1-5717-75e7-9b3d-1d7707648c09</code>), its derivation (<code>01a1f2c1-94ad-7a92-8aca-57202f48ece9</code>) and its realization (<code>01a1f2c1-9c75-78a2-a2a4-647687dfbe10</code>) are approved at version 2, with both links recorded. The profile <code>conveyor-software-delivery</code> (<code>01a1f2c1-14c1-74c5-a078-eef117c4f82c</code>) is adopted at version 3 and names the board decision; the board <code>conveyor-architecture-board</code> carries the charter, chair and decision limits. The maturity baseline scores nine dimensions; the skills baseline scores seven categories over six roles, two of them unstaffed positions recorded at zero.</p>
+<p>The seven Phase A–D artefacts this rework publishes are the stakeholder map, the driver/goal/objective catalog, the requirements catalog and the solution concept (A), the business capability map (B), the data entity catalog (C) and the technology standards catalog (D), owned by the programme architect and reviewed by the Architecture Board on 2026-11-22.</p>
 <h2>Migration and rollout</h2>
-<ul>
-<li>One additive migration, <code>0054_architecture.sql</code>: eleven tables, no existing column changed, RLS enabled and forced on each.</li>
-<li>One action module (<code>crates/actions/src/lib.rs:architecture</code>) and one store module (<code>crates/store/src/architecture.rs</code>); no new port, no second store.</li>
-<li>Adoption measured 2026-11-19: profile adopted, board opened, three Preliminary artefacts approved, statement of architecture work live at phase A, maturity and skills baselines recorded. Phase advance, compliance review, waiver and the Phase H outcome have no live row yet.</li>
-<li>Rollback is additive: new tables, no existing row changes shape.</li>
-</ul>
+<p>The slice ships one forward-only migration adding the eleven tables; the plan names the tables, not the file, and this rework does not invent a filename. Rollout is the existing binary and schema: no new port (§10.6). The console destination is declared in §10.5.</p>
 <h2>Links</h2>
-<ul>
-<li>Issue: <a href="https://github.com/nonagenticai/conveyor/issues/81">#81</a></li>
-<li>Pull request: <a href="https://github.com/nonagenticai/conveyor/pull/350">#350</a>, merged at <code>c8204432</code></li>
-<li>Plan: <code>docs/plans/T9-architecture-capability.md</code>; spec <code>docs/SPEC_V2.md</code> §8.1, §10.3, §10.4, §10.5, §12 T9, D63</li>
-<li>Sibling: the <code>inception-analysis</code> output, published on this project</li>
-</ul>
+<p><code>docs/plans/T9-architecture-capability.md</code>; <code>docs/SPEC_V2.md</code> §8.1, §8.5 and §10.3–§10.5; <code>acceptance/programme/T9.toml</code>.</p>
 <p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
     <footer class="doc-footer">
-      <span>Rendered from <code>TOGAF ADM capability · conveyor output · published 2026-11-20T11:50:50.848127361+00:00 · FR Test</code> at publish time.</span>
+      <span>Rendered from <code>TOGAF ADM capability · conveyor output · published 2026-11-23T09:36:22Z · FR Test</code> at publish time.</span>
       <a href="../studio.html#documents">All documents</a>
     </footer>
   </body>

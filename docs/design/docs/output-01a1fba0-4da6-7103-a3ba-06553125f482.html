@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Viability triage — 48 verdicts with evidence · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>Viability triage — 48 verdicts with evidence</h1>
+<h2>Context</h2>
+<p>The rework mandate requires an evidence-based verdict per project before any lifecycle is re-run. The evidence is the frozen live snapshot <code>a33e656</code>, the repository at <code>fa03f2aa</code>, and the open issue queue on 2026-11-20. The seed's claimed status is not evidence; the live rows and the open queue are.</p>
+<h2>Decision</h2>
+<p>Every project is <code>rework</code> except S06a, which is <code>fold</code>. No project is <code>close-by-decision</code>: a live surface, an open ready or claimed issue, or a declared-but-unpublished output makes a project rework by definition. The five proposed projects (T5, T6, T12, T15, T17) are rework via inception: artefacts and contract first, then normal delivery.</p>
+<table><thead><tr><th>Project</th><th>Status</th><th style="text-align: right">Tranche</th><th>Verdict</th><th>Evidence</th></tr></thead><tbody>
+<tr><td>DESIGN-PUBLISH</td><td>closed</td><td style="text-align: right">0</td><td>rework</td><td>delivered capability/output on the live record; rework by the book</td></tr>
+<tr><td>P0</td><td>closed</td><td style="text-align: right">0</td><td>rework</td><td>delivered capability/output on the live record; rework by the book</td></tr>
+<tr><td>PLATFORM</td><td>active</td><td style="text-align: right">0</td><td>rework</td><td>delivered capability/output on the live record; rework by the book</td></tr>
+<tr><td>S00</td><td>closed</td><td style="text-align: right">0</td><td>rework</td><td>delivered capability/output on the live record; rework by the book</td></tr>
+<tr><td>S01</td><td>closed</td><td style="text-align: right">0</td><td>rework</td><td>delivered capability/output on the live record; rework by the book</td></tr>
+<tr><td>S02</td><td>active</td><td style="text-align: right">1</td><td>rework</td><td>delivered capability/output on the live record; rework by the book</td></tr>
+<tr><td>S03</td><td>closed</td><td style="text-align: right">2</td><td>rework</td><td>delivered capability/output on the live record; rework by the book</td></tr>
+<tr><td>S04</td><td>active</td><td style="text-align: right">3</td><td>rework</td><td>delivered capability/output on the live record; rework by the book</td></tr>
+<tr><td>S05</td><td>closed</td><td style="text-align: right">4</td><td>rework</td><td>delivered capability/output on the live record; rework by the book</td></tr>
+<tr><td>S06</td><td>active</td><td style="text-align: right">5</td><td>rework</td><td>delivered capability/output on the live record; rework by the book</td></tr>
+<tr><td>S06a</td><td>archived</td><td style="text-align: right">6</td><td>fold</td><td>superseded by S06b; the slice says nothing here is built</td></tr>
+<tr><td>S06b</td><td>closed</td><td style="text-align: right">6</td><td>rework</td><td>delivered capability/output on the live record; rework by the book</td></tr>
+<tr><td>S06c</td><td>closed</td><td style="text-align: right">7</td><td>rework</td><td>delivered capability/output on the live record; rework by the book</td></tr>
+<tr><td>S06d</td><td>closed</td><td style="text-align: right">8</td><td>rework</td><td>delivered capability/output on the live record; rework by the book</td></tr>
+<tr><td>S07</td><td>closed</td><td style="text-align: right">4</td><td>rework</td><td>delivered capability/output on the live record; rework by the book</td></tr>
+<tr><td>S08</td><td>closed</td><td style="text-align: right">5</td><td>rework</td><td>delivered capability/output on the live record; rework by the book</td></tr>
+<tr><td>S09</td><td>closed</td><td style="text-align: right">4</td><td>rework</td><td>delivered capability/output on the live record; rework by the book</td></tr>
+<tr><td>S10</td><td>closed</td><td style="text-align: right">6</td><td>rework</td><td>delivered capability/output on the live record; rework by the book</td></tr>
+<tr><td>S11</td><td>closed</td><td style="text-align: right">6</td><td>rework</td><td>delivered capability/output on the live record; rework by the book</td></tr>
+<tr><td>S12</td><td>active</td><td style="text-align: right">10</td><td>rework</td><td>delivered capability/output on the live record; rework by the book</td></tr>
+<tr><td>S13</td><td>active</td><td style="text-align: right">8</td><td>rework</td><td>delivered capability/output on the live record; rework by the book</td></tr>
+<tr><td>S14</td><td>active</td><td style="text-align: right">11</td><td>rework</td><td>delivered capability/output on the live record; rework by the book</td></tr>
+<tr><td>S15</td><td>active</td><td style="text-align: right">7</td><td>rework</td><td>delivered capability/output on the live record; rework by the book</td></tr>
+<tr><td>S16</td><td>closed</td><td style="text-align: right">7</td><td>rework</td><td>delivered capability/output on the live record; rework by the book</td></tr>
+<tr><td>S17</td><td>active</td><td style="text-align: right">5</td><td>rework</td><td>delivered capability/output on the live record; rework by the book</td></tr>
+<tr><td>S18</td><td>active</td><td style="text-align: right">9</td><td>rework</td><td>delivered capability/output on the live record; rework by the book</td></tr>
+<tr><td>S19</td><td>active</td><td style="text-align: right">8</td><td>rework</td><td>delivered capability/output on the live record; rework by the book</td></tr>
+<tr><td>S20</td><td>active</td><td style="text-align: right">9</td><td>rework</td><td>delivered capability/output on the live record; rework by the book</td></tr>
+<tr><td>S21</td><td>active</td><td style="text-align: right">9</td><td>rework</td><td>delivered capability/output on the live record; rework by the book</td></tr>
+<tr><td>SPEC-V2</td><td>closed</td><td style="text-align: right">0</td><td>rework</td><td>delivered capability/output on the live record; rework by the book</td></tr>
+<tr><td>T0</td><td>closed</td><td style="text-align: right">0</td><td>rework</td><td>delivered capability/output on the live record; rework by the book</td></tr>
+<tr><td>T1</td><td>closed</td><td style="text-align: right">1</td><td>rework</td><td>delivered capability/output on the live record; rework by the book</td></tr>
+<tr><td>T10</td><td>closed</td><td style="text-align: right">4</td><td>rework</td><td>delivered capability/output on the live record; rework by the book</td></tr>
+<tr><td>T11</td><td>active</td><td style="text-align: right">1</td><td>rework</td><td>delivered capability/output on the live record; rework by the book</td></tr>
+<tr><td>T12</td><td>active</td><td style="text-align: right">13</td><td>rework</td><td>proposed project; inception artefacts and contract before delivery</td></tr>
+<tr><td>T13</td><td>closed</td><td style="text-align: right">3</td><td>rework</td><td>delivered capability/output on the live record; rework by the book</td></tr>
+<tr><td>T14</td><td>closed</td><td style="text-align: right">4</td><td>rework</td><td>delivered capability/output on the live record; rework by the book</td></tr>
+<tr><td>T15</td><td>active</td><td style="text-align: right">12</td><td>rework</td><td>proposed project; inception artefacts and contract before delivery</td></tr>
+<tr><td>T16</td><td>active</td><td style="text-align: right">4</td><td>rework</td><td>delivered capability/output on the live record; rework by the book</td></tr>
+<tr><td>T17</td><td>active</td><td style="text-align: right">5</td><td>rework</td><td>proposed project; inception artefacts and contract before delivery</td></tr>
+<tr><td>T2</td><td>closed</td><td style="text-align: right">2</td><td>rework</td><td>delivered capability/output on the live record; rework by the book</td></tr>
+<tr><td>T3</td><td>closed</td><td style="text-align: right">3</td><td>rework</td><td>delivered capability/output on the live record; rework by the book</td></tr>
+<tr><td>T4</td><td>closed</td><td style="text-align: right">4</td><td>rework</td><td>delivered capability/output on the live record; rework by the book</td></tr>
+<tr><td>T5</td><td>active</td><td style="text-align: right">10</td><td>rework</td><td>proposed project; inception artefacts and contract before delivery</td></tr>
+<tr><td>T6</td><td>active</td><td style="text-align: right">11</td><td>rework</td><td>proposed project; inception artefacts and contract before delivery</td></tr>
+<tr><td>T7</td><td>active</td><td style="text-align: right">5</td><td>rework</td><td>delivered capability/output on the live record; rework by the book</td></tr>
+<tr><td>T8</td><td>active</td><td style="text-align: right">11</td><td>rework</td><td>delivered capability/output on the live record; rework by the book</td></tr>
+<tr><td>T9</td><td>closed</td><td style="text-align: right">4</td><td>rework</td><td>delivered capability/output on the live record; rework by the book</td></tr>
+</tbody></table>
+<h2>Consequences</h2>
+<ul>
+<li>Each verdict is written to the project's <code>meta.viability</code> through <code>projects.programme_meta</code>; the table above is the index, the live rows are the record.</li>
+<li><code>projects.reopen</code> reads the verdict: only a closed project with <code>rework</code> may be reopened, citing the mandate's decision reference.</li>
+<li>S06a's fold is a supersession record under S06b's contract; its records are not dropped.</li>
+</ul>
+<h2>Evidence</h2>
+<ul>
+<li><code>docs/design/data/programme.json</code> (live snapshot <code>a33e656</code>) and <code>docs/design/data/issues.json</code>.</li>
+<li><code>seed/programme-definition.json</code> (tranche membership) and the per-project plans under <code>docs/plans/slices/</code>.</li>
+<li>The conformance register: 22 P0 / 131 P1 / 12 P2.</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Programme definition — vision, blueprint, plan and project briefs · conveyor output · published 2026-11-23T09:36:22Z · conveyor-e2e</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

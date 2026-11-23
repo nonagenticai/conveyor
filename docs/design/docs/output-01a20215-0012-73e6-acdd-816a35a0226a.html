@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Requirements Catalog — T1 Plan spine (Phase A) - artifact document (2026-11-22) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h2>Metadata</h2>
+<ul>
+<li>Artefact: Requirements Catalog — T1 Plan spine (Phase A)</li>
+<li>Phase: a</li>
+<li>Kind: catalog</li>
+<li>Purpose: The requirements the T1 gate and its contracts must satisfy, each with an executable acceptance.</li>
+<li>Scope: the ten issue-#72 scenarios and the tenant-scoping invariant of the plan-spine tables.</li>
+</ul>
+<h2>Entries</h2>
+<ul>
+<li><strong>R1 P1.1 / A taken baseline does not move</strong> - {"acceptance": "baselines.take freezes the WBS and register facts; a direct UPDATE after the take does not move the snapshot. crates/actions/tests/plan_spine.rs::a_baseline_does_not_move_when_rows_change.", "priority": "must"}</li>
+<li><strong>R2 P1.2 / A change needs an impact block and the baseline it changes</strong> - {"acceptance": "422 change_impact_missing without either; 201 with a scope/schedule/cost/risk impact block and a baseline_ref. plan_spine.rs::a_change_request_without_impact_is_refused.", "priority": "must"}</li>
+<li><strong>R3 P1.3 / A requester cannot decide their own gate</strong> - {"acceptance": "409 and no approval_decision row when the requester decides; a distinct approver then succeeds. crates/api/tests/approval_dual.rs::the_requester_cannot_decide_their_own_gate; the programme-baseline instance is crates/actions/tests/programme_baseline.rs::the_taker_cannot_approve_their_own_baseline (409 self_approval).", "priority": "must"}</li>
+<li><strong>R4 P2.1 / WSJF recomputes from its inputs and is never stored</strong> - {"acceptance": "editing the four inputs changes the read score from 3.0 to 4.5; information_schema shows no wsjf column on wbs_node. plan_spine.rs::wsjf_recomputes_when_an_input_changes.", "priority": "must"}</li>
+<li><strong>R5 P3.1 / The portfolio lists exactly the in-flight set</strong> - {"acceptance": "active and paused are listed; closed and archived are not; the status set is tenant configuration with default active,paused. plan_spine.rs::the_portfolio_lists_only_the_in_flight_set.", "priority": "must"}</li>
+<li><strong>R6 P4.1 / A two-node dependency cycle is refused</strong> - {"acceptance": "A\u2192B accepted, B\u2192A refused 409 dependency_cycle. plan_spine.rs::a_two_node_dependency_cycle_is_refused.", "priority": "must"}</li>
+<li><strong>R7 P4.2 / A deep cycle is refused and leaves no partial row</strong> - {"acceptance": "a four-node diamond plus D\u2192A is refused 409 and the dependency list is unchanged. plan_spine.rs::a_deep_dependency_cycle_leaves_no_row.", "priority": "must"}</li>
+<li><strong>R8 P5.1 / A benefit profile without baseline, target, method or owner is refused</strong> - {"acceptance": "422 benefit_profile_incomplete and no benefit_profile row. plan_spine.rs::a_benefit_without_baseline_target_method_or_owner_is_refused.", "priority": "must"}</li>
+<li><strong>R9 P5.2 / A benefits-map edge names its five levels</strong> - {"acceptance": "422 benefit_map_incomplete when a level is missing; 201 when output_ref, capability_ref, operational_outcome, benefit and strategic_objective are all present. plan_spine.rs::a_benefit_map_edge_names_its_five_levels.", "priority": "must"}</li>
+<li><strong>R10 P5.3 / A tranche review without evidence is refused</strong> - {"acceptance": "422 tranche_evidence_missing without baselines, benefit status and the risk register; with them the review records continue and the tranche state becomes closed. plan_spine.rs::a_tranche_review_without_evidence_is_refused.", "priority": "must"}</li>
+<li><strong>R11 / Tenant isolation on every plan-spine table</strong> - {"acceptance": "every table in migrations/0044_plan_spine.sql carries tenant_id, ENABLE and FORCE ROW LEVEL SECURITY and the tenant_isolation policy; no V1 table is altered except governed_asset's kind CHECK.", "priority": "must"}</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Plan spine · conveyor output · published 2026-11-23T09:36:22Z · conveyor-approver</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

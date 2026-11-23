@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Evidence — T2 (retrospective, 2026-11-21) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>Evidence — T2 Decision ladder (retrospective, 2026-11-21)</h1>
+<h2>Claim</h2>
+<p>T2 delivered the decision ladder's one row shape across L0, L1 and L3; the policy, refinement and laya-config rows with their version pins; the person-only human rung; the gated <code>draft.apply</code> application; and the generated-class refusal on <code>documents.update</code> — proved by named tests against real Postgres 18. Six findings remain open; v1-t2-1 (a generated draft can be attached by <code>documents.compose</code> with no gate) blocks closure.</p>
+<h2>Evidence</h2>
+<ul>
+<li><strong>Delivery:</strong> commit <code>39363ba8cfb532d415c9ad06b45e86421c5c86b6</code>, 2026-11-17 15:36:58 +0000, "#73 T2 — Decision ladder (#286)"; issue #73 is CLOSED (GitHub updatedAt 2026-11-17T15:37:01Z).</li>
+<li><strong>Schema:</strong> <code>migrations/0046_decision_ladder.sql</code> adds the rung, answer, option-set and policy/refinement/laya-config version pins, <code>actor_kind</code>, <code>actor_id</code> and <code>approval_id</code> to <code>decision</code>; the CHECKs <code>decision_rung_check</code> (rule|laya|human), <code>decision_actor_kind_check</code> (system|user|agent|service) and the three positive-version CHECKs; <code>decision_approval_fk</code>; <code>decision_kind_idx</code> and <code>decision_rung_idx</code>; the one-refinement index and the one-policy-per-case index. The five decision tables are T0's, in <code>migrations/0040_organisation.sql:216–360</code>.</li>
+<li><strong>Tests:</strong> <code>crates/actions/tests/decision_ladder.rs</code> — <code>a_rule_a_laya_and_a_human_decision_share_one_audit_shape</code> (three rows, identical columns), <code>a_refinement_changes_a_threshold_without_a_code_change</code> (0.7 refused at 0.8, accepted at 0.5, refinement pin 1), <code>every_decision_pins_the_refinement_and_laya_config_versions</code> (422 <code>pins_incomplete</code> with no laya config; pins 1/1/1; first row unchanged after policy v2), <code>a_generated_draft_cannot_transition_a_card</code> (refused L1 and accepted L1 are 422 <code>draft_requires_gate</code>; the human <code>draft.apply</code> applies; <code>documents.update</code> attaching the generated class is 409 <code>draft_requires_gate</code>); <code>crates/actions/tests/ladder_human_gate.rs</code> — <code>a_service_principal_cannot_record_a_human_decision</code> (403 <code>person_required</code>), <code>a_human_decision_without_an_approved_human_gate_is_refused</code>, <code>a_pending_approval_cannot_gate_a_draft</code>, <code>only_a_human_draft_apply_decision_can_gate_a_draft</code>, <code>a_human_draft_apply_decision_and_approval_applies_the_draft</code>.</li>
+<li><strong>Action surface:</strong> <code>ladder.record|evaluate|list|apply_draft</code>, <code>decision_policies.create|update|list</code>, <code>refinements.publish|list</code>, <code>laya_configs.create|list</code>; the human check is <code>human_approved_gate_tx</code>, the dedicated gate is <code>DRAFT_APPLY_GATE = "draft.apply"</code>, and every mutation appends <code>decision.changed</code>.</li>
+<li><strong>Governance:</strong> tranche 2 (<code>01a1e9e0-e2ac-786b-ac48-3b8bcdf12188</code>) is <code>planned</code>, with no authorisation review, no <code>authorised_at</code> and no baseline reference; its exit criteria name S03 and T2. T2 closed on 2026-11-17 before that authorisation; the live register records the out-of-sequence closure as the accepted P0 issue <code>U3-EXC-T2</code> (<code>01a1fbac-aeb9-7dea-a079-bf159140344a</code>) under the standing delegation <code>01a1ff1f-e4ba-72dc-9c1a-13049933cf14</code>.</li>
+</ul>
+<h2>Verification</h2>
+<p>An independent reader can read the named test functions and run them against real Postgres 18 in the repository's harness: <code>crates/actions/tests/decision_ladder.rs</code> and <code>crates/actions/tests/ladder_human_gate.rs</code>. The compile/test verdict is the repository's GitHub-hosted <code>preflight.yml</code>; the local gate is <code>cargo fmt --all -- --check</code> and <code>cargo metadata --locked --format-version 1</code> (<code>docs/plans/03-DELIVERY.md</code>). The rework records the acceptance instrument as <code>acceptance/programme/T2.toml</code>; it does not assert a manifest run the facts do not record.</p>
+<h2>Links</h2>
+<ul>
+<li>Issue: https://github.com/nonagenticai/conveyor/issues/73</li>
+<li>Commit: <code>39363ba8cfb532d415c9ad06b45e86421c5c86b6</code></li>
+<li>Specification: <code>docs/SPEC_V2.md</code> §7.1–§7.5 and §12 (T2)</li>
+<li>Schema: <code>migrations/0046_decision_ladder.sql</code></li>
+<li>Tests: <code>crates/actions/tests/decision_ladder.rs</code>, <code>crates/actions/tests/ladder_human_gate.rs</code></li>
+<li>Tranche 2: <code>01a1e9e0-e2ac-786b-ac48-3b8bcdf12188</code></li>
+<li>Standing delegation: <code>01a1ff1f-e4ba-72dc-9c1a-13049933cf14</code></li>
+</ul>
+<h2>Gap</h2>
+<ul>
+<li><strong>v1-t2-1 (P0, blocks closure).</strong> A generated draft can be attached by <code>documents.compose</code>: the action accepts <code>card_id</code> and <code>meta.generated = true</code> and creates an attached document with no <code>draft.apply</code> check; <code>ladder.apply_draft</code> and the <code>documents.update</code> refusal do not cover the create path.</li>
+<li><strong>v1-t2-2.</strong> L1 never calls laya: the answer, confidence, probabilities and latency are caller-supplied; no T2 path issues <code>POST /v1/systemone</code>.</li>
+<li><strong>v1-t2-3.</strong> <code>refinements.publish</code> is ungated: <code>confirm = "none"</code> and no approval, although a refinement change is a gated policy change.</li>
+<li><strong>v1-t2-4.</strong> Options and questions are inline free text: <code>ladder.evaluate</code> takes an <code>options</code> array and a <code>question</code> string; <code>decision_policy</code> has no authored question, <code>fire_when</code> or <code>min_confidence</code>.</li>
+<li><strong>v1-t2-5.</strong> Budget code spelling: §7.5's <code>429 budget_exceeded</code> has no implementation; the only budget refusal is <code>429 tool_budget_exceeded</code> for tool spend.</li>
+<li><strong>v1-t2-6.</strong> A human decision cites any approved approval, not its gate: <code>ladder.record</code> passes <code>None</code> for the gate to <code>human_approved_gate_tx</code>; only <code>ladder.apply_draft</code> checks <code>draft.apply</code>.</li>
+<li>No contemporaneous charter, Statement of Architecture Work, delivery contract or Phase-G review existed at the 2026-11-17 close; this set is retrospective and does not attest contemporaneous intent.</li>
+<li>T2 remains ACTIVE in this pass. The seven A–D artefacts, the charter and this evidence are published; no closure or closure review is authored because v1-t2-1 blocks the fourth gate clause.</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Decision ladder · conveyor output · published 2026-11-23T09:36:22Z · conveyor-e2e</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

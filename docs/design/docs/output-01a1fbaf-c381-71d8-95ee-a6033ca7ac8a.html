@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Conformance baseline v2 — accepted · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>Conformance baseline v2 — accepted</h1>
+<h2>Context</h2>
+<p>The U1 baseline was proposed, not accepted: 76 entries with a severity and an owner but no disposition. The corrected standard measures 22 P0 / 131 P1 / 12 P2, and the re-generated ledger carries 153 entries — 152 <code>rework</code> and 1 <code>fold</code> (S06a), each with an owner and an expiry. The programme needs the accepted version it is managed against before the rework batches start.</p>
+<h2>Decision</h2>
+<p>The delegate accepts baseline v2 at <code>docs/evidence/conformance-baseline.json</code> (sha256 <code>523748a2e0785cb40aca8c821c81135eefca787cb31bc8c28fa9104cdf84d40f</code>) under the standing delegation:</p>
+<ul>
+<li>every entry carries <code>{rule, subject, severity, disposition, owner, expires, reason}</code>;</li>
+<li>the ledger may only shrink: a new fingerprint, a worsened severity, a missing disposition or an expired entry fails strict mode with the entry named;</li>
+<li>the forward plan is re-baselined: tranches 9–13 are managed against the approved <code>management</code> programme baseline through one approved change request; the change and the tranche updates cite each other;</li>
+<li>the 19 out-of-sequence closures and the 47 rework verdicts are the ledger's remedies, not waivers.</li>
+</ul>
+<h2>Consequences</h2>
+<ul>
+<li>Strict publish gating can be turned on for new records from U4; historical entries stay in the ledger until their batch removes them.</li>
+<li>An entry that reaches its expiry becomes a tranche-review finding, never a silent pass.</li>
+<li>The public register and the conformance page derive from the live rows and the ledger; the seed is the plan, not the record.</li>
+</ul>
+<h2>Evidence</h2>
+<ul>
+<li><code>docs/evidence/conformance-baseline.json</code> and <code>docs/evidence/conformance-gap-register.json</code> at the merge SHA.</li>
+<li><code>python3 scripts/audit-programme-conformance.py --self-test</code>, <code>--check-standard</code>, and two byte-identical <code>--snapshot docs/design/data --report</code> runs.</li>
+<li>The triage output (48 verdicts) and the exception output (19 rows), both published under P0.</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Programme definition — vision, blueprint, plan and project briefs · conveyor output · published 2026-11-23T09:36:22Z · conveyor-e2e</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

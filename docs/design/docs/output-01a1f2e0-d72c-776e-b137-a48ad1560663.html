@@ -23,46 +23,18 @@
         >source ↗</a
       >
     </header>
-    <main class="doc-body"><h1>Architecture waiver</h1>
-<p>Project: T9 — TOGAF ADM capability · Tranche: 4 · Plan: <code>docs/SPEC_V2.md</code> §8.1 / <code>docs/plans/T9-architecture-capability.md</code>
-Measured at: main@f14b7d36, 2026-11-19 · Record: the <code>architecture_waiver</code> register · Owner: the programme architect · Reviewer: the Architecture Board</p>
-<p>This document records the waiver register's state, not a proposal to accept a deviation. A waiver is
-a row created by <code>architecture.reviews_waive</code> against a recorded compliance review; the action refuses
-a waiver without an accepting owner and a reassessment date, and the board cannot waive a deviation it
-owns. At this date the register holds no row.</p>
+    <main class="doc-body"><h1>Architecture waiver — T9 TOGAF ADM capability (retrospective, 2026-11-22)</h1>
 <h2>Deviation</h2>
-<p>None accepted at 2026-11-19. No compliance review has yet found a deviation from a live contract: the
-first review — T9's own Phase G review against the live Statement of Architecture Work — is recorded
-after the console unit (#385) lands, because its D6 clause is the one being exercised. Until that
-review records a deviation and an owner accepts it, there is nothing to waive, and inventing a
-deviation to fill this document would be the opposite of a waiver's purpose.</p>
-<p>The capability's known limitations are not waivers. The seeded standard ships ten artefact types and
-no action adds one; phases E–H have no mandatory types; the board row's <code>status</code> stays <code>draft</code> while
-its decision is an approval row; an identical duplicate maturity assessment group exists from a
-read-back. Each is recorded where it belongs — in <code>adm-profile</code>, <code>artifact-standard</code>,
-<code>maturity-assessment</code> and the evidence row — as a gap with the action that would close it, because a
-gap that is disclosed is not a deviation from a contract that never required the missing thing.</p>
+<p>No deviation is waived in this rework. The waiver register for T9 is empty: the Phase-G review records <code>compliant with named deviations</code>, and the six open findings (v1-p81-4, v1-p81-5, v1-p81-6, v1-w2a-3, v1-w2a-4 and v1-w2a-6) are carried as work packages with acceptance clauses rather than accepted as deviations from the T9 delivery contract. The one clause that is not proved, the Phase-H exactly-one rule, is a finding to fix, not a capability the programme chooses to live without.</p>
 <h2>Accepting owner</h2>
-<p>None. No row exists, so no accepting owner is named. When a deviation is accepted, the row names the
-asset owner whose authority covers the deviation — and the board may not accept a deviation it owns
-— with the scope of that authority. A session cannot take this decision: the authority matrix puts
-every gate decision with the human owner, and <code>architecture.reviews_waive</code> records the decision only
-against a review that another seat recorded.</p>
+<p>If a waiver were granted, it would have to name the accepting asset owner and the scope of that owner's authority. None is named here, because no waiver row is created. The Architecture Board (<code>conveyor-architecture-board</code>) is the approving body for the capability, but it is not the accepting owner of a deviation: the waiver rule of SPEC_V2 §8.1 places the acceptance with the asset owner, and the action refuses a waiver without one.</p>
 <h2>Reason and impact</h2>
-<p>None accepted: no additional cost, risk or schedule impact has been signed off through this register.
-When a waiver is granted, the row carries the reason the deviation is needed, the additional cost,
-the risk, and the reassessment date; a deviation without those is refused by the action, not merely
-discouraged by this document.</p>
+<p>No reason or impact is recorded because no deviation is accepted. The impact of not waiving is explicit: the open findings stay visible in the ledger and in the Phase-G findings, and the project closes on the P0-only product gate with the P1/P2 packages still owned. The alternative, a dated waiver for the Phase-H clause, would hide the missing proof behind an acceptance the review cannot honestly support.</p>
 <h2>Reassessment</h2>
-<p>The register is reviewed at each Phase G compliance review and at each tranche review. The next
-scheduled review is T9's Phase G review against the live Statement of Architecture Work — contract
-<code>01a1f2c2-0e1a-787f-9011-46b424d1ec71</code>, status <code>live</code>, version 2 — recorded through
-<code>architecture.reviews_record</code> after #385. A waiver that is in force at a tranche review is re-read
-there: an expired reassessment date ends it, and a deviation that recurs becomes a decision record,
-not a second waiver.</p>
+<p>No reassessment date is set, for the same reason. The rule the empty register enforces is proved by <code>crates/api/tests/architecture_compliance.rs::one_level_and_a_dated_waiver</code>: a waiver without an owner or a review date is refused. When a future review does accept a deviation, it must name the owner, the reason, the additional cost and risk, and the reassessment date; until then this document records the absence.</p>
 <p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
     <footer class="doc-footer">
-      <span>Rendered from <code>TOGAF ADM capability · conveyor output · published 2026-11-20T11:50:50.848127361+00:00 · FR Test</code> at publish time.</span>
+      <span>Rendered from <code>TOGAF ADM capability · conveyor output · published 2026-11-23T09:36:22Z · FR Test</code> at publish time.</span>
       <a href="../studio.html#documents">All documents</a>
     </footer>
   </body>

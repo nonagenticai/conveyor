@@ -334,7 +334,7 @@
       "tranche": 0,
       "units": {
         "blocked": 4,
-        "claimed": 3,
+        "claimed": 4,
         "numbers": [
           17,
           22,
@@ -365,11 +365,10 @@
           604,
           605,
           606,
-          608,
           611
         ],
-        "open": 21,
-        "ready": 7,
+        "open": 20,
+        "ready": 5,
         "unknown": 0
       }
     },
@@ -1501,14 +1500,15 @@
       "tranche": 9,
       "units": {
         "blocked": 0,
-        "claimed": 0,
+        "claimed": 1,
         "numbers": [
           15,
           581,
           590,
-          599
+          599,
+          612
         ],
-        "open": 0,
+        "open": 1,
         "ready": 0,
         "unknown": 0
       }
@@ -2046,8 +2046,8 @@
       "track": "v2",
       "tranche": 4,
       "units": {
-        "blocked": 4,
-        "claimed": 1,
+        "blocked": 3,
+        "claimed": 0,
         "numbers": [
           559,
           562,
@@ -2056,8 +2056,8 @@
           565,
           566
         ],
-        "open": 5,
-        "ready": 0,
+        "open": 4,
+        "ready": 1,
         "unknown": 0
       }
     },
@@ -2662,8 +2662,8 @@
       },
       "total": 49,
       "uncovered": [],
-      "with_open_units": 19,
-      "without_open_units": 30
+      "with_open_units": 20,
+      "without_open_units": 29
     },
     "screens": {
       "actions_invoked": 39,

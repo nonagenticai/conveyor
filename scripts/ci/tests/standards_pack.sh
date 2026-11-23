@@ -29,6 +29,7 @@ build() {
     --snapshot docs/design/data --out "$run/audit" \
     --findings docs/evidence/v1-conformance-findings.json \
     --findings "$run/standards-pass1.json" \
+    --deep-review docs/evidence/record-w3/deep-review-findings.json \
     --rework-out "$run/rework.json" >/dev/null
   # The public register must not carry a private address; redact at the one point every consumer
   # reads, exactly as publish-standards.sh does.

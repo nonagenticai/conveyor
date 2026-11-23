@@ -2560,26 +2560,6 @@
         "cards.comment"
       ],
       "capability_id": "01a1d039-0cfe-7c4b-b583-eaaad074e6ad",
-      "id": "01a1d3ea-809d-729c-9b21-03d3dfef8e66",
-      "key": "test_process_evaluation",
-      "max_iterations": 12,
-      "model_ref": "local-llm",
-      "params": {},
-      "prompt_ref": "agent@1",
-      "role": "process_agent",
-      "status": "active",
-      "timeout_secs": 300,
-      "version": 3
-    },
-    {
-      "allowed_actions": [
-        "documents.compose",
-        "documents.get",
-        "documents.list",
-        "cards.get",
-        "cards.comment"
-      ],
-      "capability_id": "01a1d039-0cfe-7c4b-b583-eaaad074e6ad",
       "id": "01a1d3ea-88ed-7d7a-bada-b22dd60e51b1",
       "key": "testing_evaluation",
       "max_iterations": 12,
@@ -2642,6 +2622,26 @@
       "capability_id": "01a1d039-0cfe-7c4b-b583-eaaad074e6ad",
       "id": "01a1d3ea-a27a-7b43-a8ee-523b0461c50a",
       "key": "testing_strategy",
+      "max_iterations": 12,
+      "model_ref": "local-llm",
+      "params": {},
+      "prompt_ref": "agent@1",
+      "role": "process_agent",
+      "status": "active",
+      "timeout_secs": 300,
+      "version": 3
+    },
+    {
+      "allowed_actions": [
+        "documents.compose",
+        "documents.get",
+        "documents.list",
+        "cards.get",
+        "cards.comment"
+      ],
+      "capability_id": "01a1d039-0cfe-7c4b-b583-eaaad074e6ad",
+      "id": "01a1d3ea-809d-729c-9b21-03d3dfef8e66",
+      "key": "test_process_evaluation",
       "max_iterations": 12,
       "model_ref": "local-llm",
       "params": {},
@@ -5479,7 +5479,7 @@
       "version": 1
     }
   ],
-  "generated_at": "2026-11-20T11:50:50.848127361+00:00",
+  "generated_at": "2026-11-23T09:36:22Z",
   "procedures": [
     {
       "acceptance_criteria": [
@@ -20336,187 +20336,6 @@
       "acceptance_criteria": [
         {
           "name": "every_claim_cites_a_source",
-          "text": "Every observation in process_observed names what it observed and where — the strategy or plan line that sets the practice, the evaluation that shows it happening, or the test tree and pipeline file it was seen in — so no practice is described from how testing usually goes."
-        },
-        {
-          "name": "every_cited_source_exists",
-          "text": "Every source the report cites exists at the revision it read: each upstream card is the released strategy, plan or evaluation of this project, and every test-tree path and pipeline file it names resolves in the repository."
-        }
-      ],
-      "created_at": "2026-11-13T07:56:23.561+00:00",
-      "definition_of_done": {
-        "checks": [
-          "every_claim_cites_a_source",
-          "every_cited_source_exists"
-        ]
-      },
-      "definition_of_ready": {
-        "checks": [
-          "outline_within_card_scope"
-        ]
-      },
-      "description": "",
-      "id": "01a1d3ea-818f-74ac-bbb1-a4a14c501ba6",
-      "inspection": {
-        "kind": "laya",
-        "max_rejects": 2,
-        "threshold": 0.7
-      },
-      "key": "test_process_evaluation.doing",
-      "outputs": [
-        "draft_artifact_id"
-      ],
-      "status": "published",
-      "title": "Test process evaluation — definition of doing",
-      "updated_at": "2026-11-13T07:56:23.561+00:00",
-      "version": 1
-    },
-    {
-      "acceptance_criteria": [
-        {
-          "name": "artifact_is_qa_version",
-          "text": "The evaluation published to the card is the revision QA confirmed: no observation, gap or improvement was added, dropped or reworded after the review, and every source it cites still resolves at the revision the report names."
-        }
-      ],
-      "created_at": "2026-11-13T07:56:23.561+00:00",
-      "definition_of_done": {
-        "checks": [
-          "artifact_is_qa_version"
-        ]
-      },
-      "definition_of_ready": {
-        "checks": [
-          "capability_acceptance_met"
-        ]
-      },
-      "description": "",
-      "id": "01a1d3ea-82c4-7b5a-ad47-6eb7f68f28ea",
-      "inspection": {
-        "kind": "laya",
-        "max_rejects": 2,
-        "threshold": 0.7
-      },
-      "key": "test_process_evaluation.done",
-      "outputs": [
-        "published_artifact_id"
-      ],
-      "status": "published",
-      "title": "Test process evaluation — definition of done",
-      "updated_at": "2026-11-13T07:56:23.561+00:00",
-      "version": 1
-    },
-    {
-      "acceptance_criteria": [
-        {
-          "name": "no_unsupported_claims",
-          "text": "No gap is asserted where the cited evidence shows the practice in place, and no improvement promises an outcome — a faster run, fewer escaped defects — that the strategy, plan, evaluation or repository does not already support."
-        },
-        {
-          "name": "capability_acceptance_met",
-          "text": "The report is true of every acceptance statement the test_process_evaluation card type declares — the outline stays in scope, every claim has a source that exists, and nothing is claimed beyond those sources — judged from the report and its sources, not from the card's wording."
-        },
-        {
-          "name": "process_from_evidence",
-          "text": "process_observed cites the strategy, plan or evaluation it describes, so a reader can reach the card each practice is judged against, instead of describing a test process from assumption."
-        },
-        {
-          "name": "gaps_located",
-          "text": "Every gap names the part of the test process it sits in — the level, the procedure, the ownership or the reporting — together with the evidence that shows it, so a reader knows what to change and where."
-        },
-        {
-          "name": "improvements_address_gaps",
-          "text": "Every improvement names the gap it closes and what changes in the test process to close it, and an improvement the report cannot tie to a named gap is dropped rather than left in."
-        }
-      ],
-      "created_at": "2026-11-13T07:56:23.561+00:00",
-      "definition_of_done": {
-        "checks": [
-          "no_unsupported_claims",
-          "capability_acceptance_met",
-          "process_from_evidence",
-          "gaps_located",
-          "improvements_address_gaps"
-        ]
-      },
-      "definition_of_ready": {
-        "checks": [
-          "every_cited_source_exists"
-        ]
-      },
-      "description": "",
-      "id": "01a1d3ea-8229-7c7a-852b-b27b881f1bbc",
-      "inspection": {
-        "kind": "laya",
-        "max_rejects": 2,
-        "threshold": 0.7
-      },
-      "key": "test_process_evaluation.qa",
-      "outputs": [
-        "report_artifact_id"
-      ],
-      "status": "published",
-      "title": "Test process evaluation — definition of QA",
-      "updated_at": "2026-11-13T07:56:23.561+00:00",
-      "version": 1
-    },
-    {
-      "acceptance_criteria": [
-        {
-          "name": "outline_within_card_scope",
-          "text": "The outline stays inside the card's scope: its sections are process_observed, gaps and improvements for the test process the card names, it names the released testing_strategy, testing_plan and testing_evaluation it will measure that process against, and it plans no test run and no change to a test."
-        }
-      ],
-      "created_at": "2026-11-13T07:56:23.561+00:00",
-      "definition_of_done": {
-        "checks": [
-          "outline_within_card_scope"
-        ]
-      },
-      "definition_of_ready": {
-        "checks": [
-          "strategy_plan_and_evaluation_released"
-        ]
-      },
-      "description": "",
-      "id": "01a1d3ea-80f3-749b-bae6-cdb90a22634d",
-      "inspection": {
-        "kind": "laya",
-        "max_rejects": 2,
-        "threshold": 0.7
-      },
-      "key": "test_process_evaluation.ready",
-      "outputs": [],
-      "status": "published",
-      "title": "Test process evaluation — definition of ready",
-      "updated_at": "2026-11-13T07:56:23.561+00:00",
-      "version": 1
-    },
-    {
-      "acceptance_criteria": [],
-      "created_at": "2026-11-13T07:56:23.561+00:00",
-      "definition_of_done": {
-        "checks": []
-      },
-      "definition_of_ready": {
-        "checks": []
-      },
-      "description": "",
-      "id": "01a1d3ea-8360-7306-9f6f-077e500e85a0",
-      "inspection": {
-        "kind": "checker",
-        "rule": "always"
-      },
-      "key": "test_process_evaluation.system",
-      "outputs": [],
-      "status": "published",
-      "title": "Test process evaluation — a computed move has no quality question",
-      "updated_at": "2026-11-13T07:56:23.561+00:00",
-      "version": 1
-    },
-    {
-      "acceptance_criteria": [
-        {
-          "name": "every_claim_cites_a_source",
           "text": "Every statement in the report names where it comes from — the testing_execution report and run id for a count or a failure, the suite path and test name for a failing case — so no pass rate, failure area or verdict stands on its own."
         },
         {
@@ -21257,6 +21076,187 @@
       "outputs": [],
       "status": "published",
       "title": "Testing strategy — a computed move has no quality question",
+      "updated_at": "2026-11-13T07:56:23.561+00:00",
+      "version": 1
+    },
+    {
+      "acceptance_criteria": [
+        {
+          "name": "every_claim_cites_a_source",
+          "text": "Every observation in process_observed names what it observed and where — the strategy or plan line that sets the practice, the evaluation that shows it happening, or the test tree and pipeline file it was seen in — so no practice is described from how testing usually goes."
+        },
+        {
+          "name": "every_cited_source_exists",
+          "text": "Every source the report cites exists at the revision it read: each upstream card is the released strategy, plan or evaluation of this project, and every test-tree path and pipeline file it names resolves in the repository."
+        }
+      ],
+      "created_at": "2026-11-13T07:56:23.561+00:00",
+      "definition_of_done": {
+        "checks": [
+          "every_claim_cites_a_source",
+          "every_cited_source_exists"
+        ]
+      },
+      "definition_of_ready": {
+        "checks": [
+          "outline_within_card_scope"
+        ]
+      },
+      "description": "",
+      "id": "01a1d3ea-818f-74ac-bbb1-a4a14c501ba6",
+      "inspection": {
+        "kind": "laya",
+        "max_rejects": 2,
+        "threshold": 0.7
+      },
+      "key": "test_process_evaluation.doing",
+      "outputs": [
+        "draft_artifact_id"
+      ],
+      "status": "published",
+      "title": "Test process evaluation — definition of doing",
+      "updated_at": "2026-11-13T07:56:23.561+00:00",
+      "version": 1
+    },
+    {
+      "acceptance_criteria": [
+        {
+          "name": "artifact_is_qa_version",
+          "text": "The evaluation published to the card is the revision QA confirmed: no observation, gap or improvement was added, dropped or reworded after the review, and every source it cites still resolves at the revision the report names."
+        }
+      ],
+      "created_at": "2026-11-13T07:56:23.561+00:00",
+      "definition_of_done": {
+        "checks": [
+          "artifact_is_qa_version"
+        ]
+      },
+      "definition_of_ready": {
+        "checks": [
+          "capability_acceptance_met"
+        ]
+      },
+      "description": "",
+      "id": "01a1d3ea-82c4-7b5a-ad47-6eb7f68f28ea",
+      "inspection": {
+        "kind": "laya",
+        "max_rejects": 2,
+        "threshold": 0.7
+      },
+      "key": "test_process_evaluation.done",
+      "outputs": [
+        "published_artifact_id"
+      ],
+      "status": "published",
+      "title": "Test process evaluation — definition of done",
+      "updated_at": "2026-11-13T07:56:23.561+00:00",
+      "version": 1
+    },
+    {
+      "acceptance_criteria": [
+        {
+          "name": "no_unsupported_claims",
+          "text": "No gap is asserted where the cited evidence shows the practice in place, and no improvement promises an outcome — a faster run, fewer escaped defects — that the strategy, plan, evaluation or repository does not already support."
+        },
+        {
+          "name": "capability_acceptance_met",
+          "text": "The report is true of every acceptance statement the test_process_evaluation card type declares — the outline stays in scope, every claim has a source that exists, and nothing is claimed beyond those sources — judged from the report and its sources, not from the card's wording."
+        },
+        {
+          "name": "process_from_evidence",
+          "text": "process_observed cites the strategy, plan or evaluation it describes, so a reader can reach the card each practice is judged against, instead of describing a test process from assumption."
+        },
+        {
+          "name": "gaps_located",
+          "text": "Every gap names the part of the test process it sits in — the level, the procedure, the ownership or the reporting — together with the evidence that shows it, so a reader knows what to change and where."
+        },
+        {
+          "name": "improvements_address_gaps",
+          "text": "Every improvement names the gap it closes and what changes in the test process to close it, and an improvement the report cannot tie to a named gap is dropped rather than left in."
+        }
+      ],
+      "created_at": "2026-11-13T07:56:23.561+00:00",
+      "definition_of_done": {
+        "checks": [
+          "no_unsupported_claims",
+          "capability_acceptance_met",
+          "process_from_evidence",
+          "gaps_located",
+          "improvements_address_gaps"
+        ]
+      },
+      "definition_of_ready": {
+        "checks": [
+          "every_cited_source_exists"
+        ]
+      },
+      "description": "",
+      "id": "01a1d3ea-8229-7c7a-852b-b27b881f1bbc",
+      "inspection": {
+        "kind": "laya",
+        "max_rejects": 2,
+        "threshold": 0.7
+      },
+      "key": "test_process_evaluation.qa",
+      "outputs": [
+        "report_artifact_id"
+      ],
+      "status": "published",
+      "title": "Test process evaluation — definition of QA",
+      "updated_at": "2026-11-13T07:56:23.561+00:00",
+      "version": 1
+    },
+    {
+      "acceptance_criteria": [
+        {
+          "name": "outline_within_card_scope",
+          "text": "The outline stays inside the card's scope: its sections are process_observed, gaps and improvements for the test process the card names, it names the released testing_strategy, testing_plan and testing_evaluation it will measure that process against, and it plans no test run and no change to a test."
+        }
+      ],
+      "created_at": "2026-11-13T07:56:23.561+00:00",
+      "definition_of_done": {
+        "checks": [
+          "outline_within_card_scope"
+        ]
+      },
+      "definition_of_ready": {
+        "checks": [
+          "strategy_plan_and_evaluation_released"
+        ]
+      },
+      "description": "",
+      "id": "01a1d3ea-80f3-749b-bae6-cdb90a22634d",
+      "inspection": {
+        "kind": "laya",
+        "max_rejects": 2,
+        "threshold": 0.7
+      },
+      "key": "test_process_evaluation.ready",
+      "outputs": [],
+      "status": "published",
+      "title": "Test process evaluation — definition of ready",
+      "updated_at": "2026-11-13T07:56:23.561+00:00",
+      "version": 1
+    },
+    {
+      "acceptance_criteria": [],
+      "created_at": "2026-11-13T07:56:23.561+00:00",
+      "definition_of_done": {
+        "checks": []
+      },
+      "definition_of_ready": {
+        "checks": []
+      },
+      "description": "",
+      "id": "01a1d3ea-8360-7306-9f6f-077e500e85a0",
+      "inspection": {
+        "kind": "checker",
+        "rule": "always"
+      },
+      "key": "test_process_evaluation.system",
+      "outputs": [],
+      "status": "published",
+      "title": "Test process evaluation — a computed move has no quality question",
       "updated_at": "2026-11-13T07:56:23.561+00:00",
       "version": 1
     }
@@ -54164,80 +54164,6 @@
     },
     {
       "capability_id": "01a1d039-0cfe-7c4b-b583-eaaad074e6ad",
-      "card_type_id": "01a1d039-0cec-7576-b1d6-2e2717b547a0",
-      "created_at": "2026-11-13T07:56:23.561+00:00",
-      "description": "",
-      "id": "01a1d3ea-8531-7ca4-8391-ec2795193f33",
-      "key": "test_process_evaluation.DOING",
-      "list_kind": "doing",
-      "outputs": [
-        "draft_artifact_id"
-      ],
-      "owner_user_id": null,
-      "project_type_id": null,
-      "status": "published",
-      "title": "Test process evaluation — doing",
-      "updated_at": "2026-11-13T07:56:23.561+00:00",
-      "version": 1
-    },
-    {
-      "capability_id": "01a1d039-0cfe-7c4b-b583-eaaad074e6ad",
-      "card_type_id": "01a1d039-0cec-7576-b1d6-2e2717b547a0",
-      "created_at": "2026-11-13T07:56:23.561+00:00",
-      "description": "",
-      "id": "01a1d3ea-87d4-76be-b599-ca9040602307",
-      "key": "test_process_evaluation.DONE",
-      "list_kind": "done",
-      "outputs": [
-        "published_artifact_id"
-      ],
-      "owner_user_id": null,
-      "project_type_id": null,
-      "status": "published",
-      "title": "Test process evaluation — done",
-      "updated_at": "2026-11-13T07:56:23.561+00:00",
-      "version": 1
-    },
-    {
-      "capability_id": "01a1d039-0cfe-7c4b-b583-eaaad074e6ad",
-      "card_type_id": "01a1d039-0cec-7576-b1d6-2e2717b547a0",
-      "created_at": "2026-11-13T07:56:23.561+00:00",
-      "description": "",
-      "id": "01a1d3ea-8683-7f1c-b039-9635b3961d3a",
-      "key": "test_process_evaluation.QA",
-      "list_kind": "qa",
-      "outputs": [
-        "report_artifact_id"
-      ],
-      "owner_user_id": null,
-      "project_type_id": null,
-      "status": "published",
-      "title": "Test process evaluation — QA",
-      "updated_at": "2026-11-13T07:56:23.561+00:00",
-      "version": 1
-    },
-    {
-      "capability_id": "01a1d039-0cfe-7c4b-b583-eaaad074e6ad",
-      "card_type_id": "01a1d039-0cec-7576-b1d6-2e2717b547a0",
-      "created_at": "2026-11-13T07:56:23.561+00:00",
-      "description": "",
-      "id": "01a1d3ea-842d-7333-9f77-2b27ca1cb70d",
-      "key": "test_process_evaluation.READY",
-      "list_kind": "ready",
-      "outputs": [
-        "draft_artifact_id",
-        "report_artifact_id",
-        "published_artifact_id"
-      ],
-      "owner_user_id": null,
-      "project_type_id": null,
-      "status": "published",
-      "title": "Test process evaluation — ready",
-      "updated_at": "2026-11-13T07:56:23.561+00:00",
-      "version": 1
-    },
-    {
-      "capability_id": "01a1d039-0cfe-7c4b-b583-eaaad074e6ad",
       "card_type_id": "01a1d039-0cec-7862-a5b9-407ce8c722e2",
       "created_at": "2026-11-13T07:56:23.561+00:00",
       "description": "",
@@ -54531,6 +54457,80 @@
       "title": "Testing strategy — ready",
       "updated_at": "2026-11-13T07:56:23.561+00:00",
       "version": 1
+    },
+    {
+      "capability_id": "01a1d039-0cfe-7c4b-b583-eaaad074e6ad",
+      "card_type_id": "01a1d039-0cec-7576-b1d6-2e2717b547a0",
+      "created_at": "2026-11-13T07:56:23.561+00:00",
+      "description": "",
+      "id": "01a1d3ea-8531-7ca4-8391-ec2795193f33",
+      "key": "test_process_evaluation.DOING",
+      "list_kind": "doing",
+      "outputs": [
+        "draft_artifact_id"
+      ],
+      "owner_user_id": null,
+      "project_type_id": null,
+      "status": "published",
+      "title": "Test process evaluation — doing",
+      "updated_at": "2026-11-13T07:56:23.561+00:00",
+      "version": 1
+    },
+    {
+      "capability_id": "01a1d039-0cfe-7c4b-b583-eaaad074e6ad",
+      "card_type_id": "01a1d039-0cec-7576-b1d6-2e2717b547a0",
+      "created_at": "2026-11-13T07:56:23.561+00:00",
+      "description": "",
+      "id": "01a1d3ea-87d4-76be-b599-ca9040602307",
+      "key": "test_process_evaluation.DONE",
+      "list_kind": "done",
+      "outputs": [
+        "published_artifact_id"
+      ],
+      "owner_user_id": null,
+      "project_type_id": null,
+      "status": "published",
+      "title": "Test process evaluation — done",
+      "updated_at": "2026-11-13T07:56:23.561+00:00",
+      "version": 1
+    },
+    {
+      "capability_id": "01a1d039-0cfe-7c4b-b583-eaaad074e6ad",
+      "card_type_id": "01a1d039-0cec-7576-b1d6-2e2717b547a0",
+      "created_at": "2026-11-13T07:56:23.561+00:00",
+      "description": "",
+      "id": "01a1d3ea-8683-7f1c-b039-9635b3961d3a",
+      "key": "test_process_evaluation.QA",
+      "list_kind": "qa",
+      "outputs": [
+        "report_artifact_id"
+      ],
+      "owner_user_id": null,
+      "project_type_id": null,
+      "status": "published",
+      "title": "Test process evaluation — QA",
+      "updated_at": "2026-11-13T07:56:23.561+00:00",
+      "version": 1
+    },
+    {
+      "capability_id": "01a1d039-0cfe-7c4b-b583-eaaad074e6ad",
+      "card_type_id": "01a1d039-0cec-7576-b1d6-2e2717b547a0",
+      "created_at": "2026-11-13T07:56:23.561+00:00",
+      "description": "",
+      "id": "01a1d3ea-842d-7333-9f77-2b27ca1cb70d",
+      "key": "test_process_evaluation.READY",
+      "list_kind": "ready",
+      "outputs": [
+        "draft_artifact_id",
+        "report_artifact_id",
+        "published_artifact_id"
+      ],
+      "owner_user_id": null,
+      "project_type_id": null,
+      "status": "published",
+      "title": "Test process evaluation — ready",
+      "updated_at": "2026-11-13T07:56:23.561+00:00",
+      "version": 1
     }
   ],
   "prompt_sections": [
@@ -54628,8 +54628,8 @@
       "enabled": true,
       "id": "01a1cfea-9550-726e-8e16-af765f8cf483",
       "kind": "action_invocation.prune",
-      "last_run_at": "2026-11-20T04:05:00.616725+00:00",
-      "next_run_at": "2026-11-21T04:05:00+00:00",
+      "last_run_at": "2026-11-23T04:05:00.865129+00:00",
+      "next_run_at": "2026-11-24T04:05:00+00:00",
       "timezone": "UTC",
       "version": 1
     },
@@ -54638,8 +54638,8 @@
       "enabled": true,
       "id": "01a1cfea-9698-7dad-ba27-08d205cb93de",
       "kind": "approval.closed.emit",
-      "last_run_at": "2026-11-20T11:50:00.481754+00:00",
-      "next_run_at": "2026-11-20T11:51:00+00:00",
+      "last_run_at": "2026-11-23T08:43:01.610117+00:00",
+      "next_run_at": "2026-11-23T08:44:00+00:00",
       "timezone": "UTC",
       "version": 1
     },
@@ -54648,8 +54648,8 @@
       "enabled": true,
       "id": "01a1cfea-9680-7085-b8b1-bc6b4dfc114d",
       "kind": "approval.expire",
-      "last_run_at": "2026-11-20T11:50:00.481754+00:00",
-      "next_run_at": "2026-11-20T11:51:00+00:00",
+      "last_run_at": "2026-11-23T08:43:01.610117+00:00",
+      "next_run_at": "2026-11-23T08:44:00+00:00",
       "timezone": "UTC",
       "version": 1
     },
@@ -54658,8 +54658,8 @@
       "enabled": true,
       "id": "01a1cfea-9714-77f1-a50d-3a9f98814339",
       "kind": "benchmark.reap",
-      "last_run_at": "2026-11-20T11:50:00.481754+00:00",
-      "next_run_at": "2026-11-20T11:55:00+00:00",
+      "last_run_at": "2026-11-23T08:40:02.157009+00:00",
+      "next_run_at": "2026-11-23T08:45:00+00:00",
       "timezone": "UTC",
       "version": 1
     },
@@ -54668,8 +54668,8 @@
       "enabled": true,
       "id": "01a1cfea-95fe-761b-b939-cf0b0f6a56ff",
       "kind": "card.lease_sweep",
-      "last_run_at": "2026-11-20T11:50:00.481754+00:00",
-      "next_run_at": "2026-11-20T11:51:00+00:00",
+      "last_run_at": "2026-11-23T08:43:01.610117+00:00",
+      "next_run_at": "2026-11-23T08:44:00+00:00",
       "timezone": "UTC",
       "version": 1
     },
@@ -54678,8 +54678,8 @@
       "enabled": true,
       "id": "01a1cfea-96fb-7cdc-abe1-4f7bcc24b809",
       "kind": "copilot.proposal.sweep",
-      "last_run_at": "2026-11-20T11:50:00.481754+00:00",
-      "next_run_at": "2026-11-20T11:51:00+00:00",
+      "last_run_at": "2026-11-23T08:43:01.610117+00:00",
+      "next_run_at": "2026-11-23T08:44:00+00:00",
       "timezone": "UTC",
       "version": 1
     },
@@ -54688,8 +54688,8 @@
       "enabled": true,
       "id": "01a1cfea-96e3-7252-a907-0c9e8f8f79e4",
       "kind": "copilot.turn.reap",
-      "last_run_at": "2026-11-20T11:50:00.481754+00:00",
-      "next_run_at": "2026-11-20T11:51:00+00:00",
+      "last_run_at": "2026-11-23T08:43:01.610117+00:00",
+      "next_run_at": "2026-11-23T08:44:00+00:00",
       "timezone": "UTC",
       "version": 1
     },
@@ -54698,8 +54698,8 @@
       "enabled": true,
       "id": "01a1cfea-9581-7e17-a7cc-63ccb799d7d6",
       "kind": "delivery.prune",
-      "last_run_at": "2026-11-20T04:35:00.804761+00:00",
-      "next_run_at": "2026-11-21T04:35:00+00:00",
+      "last_run_at": "2026-11-23T04:35:01.80835+00:00",
+      "next_run_at": "2026-11-24T04:35:00+00:00",
       "timezone": "UTC",
       "version": 1
     },
@@ -54708,8 +54708,8 @@
       "enabled": true,
       "id": "01a1cfea-9667-70a9-a98d-4c19bc47a118",
       "kind": "eval.prune",
-      "last_run_at": "2026-11-20T03:50:01.052151+00:00",
-      "next_run_at": "2026-11-21T03:50:00+00:00",
+      "last_run_at": "2026-11-23T03:50:00.346673+00:00",
+      "next_run_at": "2026-11-24T03:50:00+00:00",
       "timezone": "UTC",
       "version": 1
     },
@@ -54718,8 +54718,8 @@
       "enabled": true,
       "id": "01a1cfea-964e-7242-aa07-9aed9cb19879",
       "kind": "eval.reap",
-      "last_run_at": "2026-11-20T11:50:00.481754+00:00",
-      "next_run_at": "2026-11-20T11:55:00+00:00",
+      "last_run_at": "2026-11-23T08:40:02.157009+00:00",
+      "next_run_at": "2026-11-23T08:45:00+00:00",
       "timezone": "UTC",
       "version": 1
     },
@@ -54728,8 +54728,8 @@
       "enabled": true,
       "id": "01a1cfea-9633-702e-a5fd-e3cc93471bed",
       "kind": "eval.run.tick",
-      "last_run_at": "2026-11-20T11:50:00.481754+00:00",
-      "next_run_at": "2026-11-20T11:51:00+00:00",
+      "last_run_at": "2026-11-23T08:43:01.610117+00:00",
+      "next_run_at": "2026-11-23T08:44:00+00:00",
       "timezone": "UTC",
       "version": 1
     },
@@ -54738,8 +54738,8 @@
       "enabled": true,
       "id": "01a1cfea-951e-72f0-ad9f-bb6b0dd159cc",
       "kind": "event.prune",
-      "last_run_at": "2026-11-20T03:15:00.308264+00:00",
-      "next_run_at": "2026-11-21T03:15:00+00:00",
+      "last_run_at": "2026-11-23T03:15:02.106882+00:00",
+      "next_run_at": "2026-11-24T03:15:00+00:00",
       "timezone": "UTC",
       "version": 1
     },
@@ -54748,8 +54748,8 @@
       "enabled": true,
       "id": "01a1cfea-95cb-7cd7-8695-58af27214381",
       "kind": "idempotency.sweep",
-      "last_run_at": "2026-11-20T11:10:00.563865+00:00",
-      "next_run_at": "2026-11-20T12:10:00+00:00",
+      "last_run_at": "2026-11-23T08:10:00.936259+00:00",
+      "next_run_at": "2026-11-23T09:10:00+00:00",
       "timezone": "UTC",
       "version": 1
     },
@@ -54758,8 +54758,8 @@
       "enabled": true,
       "id": "01a1ee61-89fe-7598-b336-323848c2452e",
       "kind": "inference_call.prune",
-      "last_run_at": "2026-11-20T03:55:00.081209+00:00",
-      "next_run_at": "2026-11-21T03:55:00+00:00",
+      "last_run_at": "2026-11-23T03:55:01.727202+00:00",
+      "next_run_at": "2026-11-24T03:55:00+00:00",
       "timezone": "UTC",
       "version": 1
     },
@@ -54768,8 +54768,8 @@
       "enabled": true,
       "id": "01a1cfea-96ca-7b13-9821-3f041b90bbc4",
       "kind": "interaction.close",
-      "last_run_at": "2026-11-20T11:50:00.481754+00:00",
-      "next_run_at": "2026-11-20T11:51:00+00:00",
+      "last_run_at": "2026-11-23T08:43:01.610117+00:00",
+      "next_run_at": "2026-11-23T08:44:00+00:00",
       "timezone": "UTC",
       "version": 1
     },
@@ -54778,8 +54778,8 @@
       "enabled": true,
       "id": "01a1cfea-96b1-7a01-8554-8dd3ab71dddc",
       "kind": "interaction.dispatch",
-      "last_run_at": "2026-11-20T11:50:00.481754+00:00",
-      "next_run_at": "2026-11-20T11:51:00+00:00",
+      "last_run_at": "2026-11-23T08:43:01.610117+00:00",
+      "next_run_at": "2026-11-23T08:44:00+00:00",
       "timezone": "UTC",
       "version": 1
     },
@@ -54788,8 +54788,8 @@
       "enabled": true,
       "id": "01a1cfea-9537-746f-8e23-60a8ac61c196",
       "kind": "job.prune",
-      "last_run_at": "2026-11-20T03:45:00.541554+00:00",
-      "next_run_at": "2026-11-21T03:45:00+00:00",
+      "last_run_at": "2026-11-23T03:45:00.890023+00:00",
+      "next_run_at": "2026-11-24T03:45:00+00:00",
       "timezone": "UTC",
       "version": 1
     },
@@ -54798,8 +54798,8 @@
       "enabled": true,
       "id": "01a1cfea-95e5-7c26-afa0-541a0cb74e3d",
       "kind": "licence.sync",
-      "last_run_at": "2026-11-20T11:50:00.481754+00:00",
-      "next_run_at": "2026-11-20T11:55:00+00:00",
+      "last_run_at": "2026-11-23T08:40:02.157009+00:00",
+      "next_run_at": "2026-11-23T08:45:00+00:00",
       "timezone": "UTC",
       "version": 1
     },
@@ -54808,8 +54808,8 @@
       "enabled": true,
       "id": "01a1cfea-959a-7ccf-acf0-14b765a3bfc6",
       "kind": "model.prune",
-      "last_run_at": "2026-11-20T03:25:00.686654+00:00",
-      "next_run_at": "2026-11-21T03:25:00+00:00",
+      "last_run_at": "2026-11-23T03:25:00.14874+00:00",
+      "next_run_at": "2026-11-24T03:25:00+00:00",
       "timezone": "UTC",
       "version": 1
     },
@@ -54818,28 +54818,8 @@
       "enabled": true,
       "id": "01a1ee61-8a18-755b-8309-007d6aeb65e8",
       "kind": "prompt_audit.prune",
-      "last_run_at": "2026-11-20T04:10:00.868403+00:00",
-      "next_run_at": "2026-11-21T04:10:00+00:00",
-      "timezone": "UTC",
-      "version": 1
-    },
-    {
-      "cron": "20 4 * * *",
-      "enabled": true,
-      "id": "01a1cfea-9569-707d-8fef-b76e649aca40",
-      "kind": "run.prune",
-      "last_run_at": "2026-11-20T04:20:00.383451+00:00",
-      "next_run_at": "2026-11-21T04:20:00+00:00",
-      "timezone": "UTC",
-      "version": 1
-    },
-    {
-      "cron": "* * * * *",
-      "enabled": true,
-      "id": "01a1cfea-9618-7cbb-bf37-15b3872cf99f",
-      "kind": "run.reap",
-      "last_run_at": "2026-11-20T11:50:00.481754+00:00",
-      "next_run_at": "2026-11-20T11:51:00+00:00",
+      "last_run_at": "2026-11-23T04:10:01.346655+00:00",
+      "next_run_at": "2026-11-24T04:10:00+00:00",
       "timezone": "UTC",
       "version": 1
     },
@@ -54848,8 +54828,28 @@
       "enabled": true,
       "id": "01a1e019-9e2c-705e-9def-ec1b949ab127",
       "kind": "runner.reap",
-      "last_run_at": "2026-11-20T11:45:00.568475+00:00",
-      "next_run_at": "2026-11-20T12:00:00+00:00",
+      "last_run_at": "2026-11-23T08:30:00.721793+00:00",
+      "next_run_at": "2026-11-23T08:45:00+00:00",
+      "timezone": "UTC",
+      "version": 1
+    },
+    {
+      "cron": "20 4 * * *",
+      "enabled": true,
+      "id": "01a1cfea-9569-707d-8fef-b76e649aca40",
+      "kind": "run.prune",
+      "last_run_at": "2026-11-23T04:20:01.28199+00:00",
+      "next_run_at": "2026-11-24T04:20:00+00:00",
+      "timezone": "UTC",
+      "version": 1
+    },
+    {
+      "cron": "* * * * *",
+      "enabled": true,
+      "id": "01a1cfea-9618-7cbb-bf37-15b3872cf99f",
+      "kind": "run.reap",
+      "last_run_at": "2026-11-23T08:43:01.610117+00:00",
+      "next_run_at": "2026-11-23T08:44:00+00:00",
       "timezone": "UTC",
       "version": 1
     },
@@ -54858,8 +54858,8 @@
       "enabled": true,
       "id": "01a1cfea-95b3-7742-9936-fcaa851bf384",
       "kind": "validation.prune",
-      "last_run_at": "2026-11-20T03:35:00.950975+00:00",
-      "next_run_at": "2026-11-21T03:35:00+00:00",
+      "last_run_at": "2026-11-23T03:35:01.520054+00:00",
+      "next_run_at": "2026-11-24T03:35:00+00:00",
       "timezone": "UTC",
       "version": 1
     }

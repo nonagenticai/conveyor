@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Project Brief — T10 (retrospective, 2026-11-22) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>Project brief — T10 SAFe cadence and MSP tranches (retrospective, 2026-11-22)</h1>
+<h2>Outcome</h2>
+<p>The conveyor has the SAFe cadence and the MSP tranche machinery. PI planning drafts cards from the backlog in computed WSJF order within the WIP slots, and only after the plan is approved; a repeated tick creates nothing; backlog refinement flags unscored and aged rows; a deliverable without typed evidence cannot demo; a retro cannot close with an untaught finding; and a benefit transition without a measured baseline cannot claim realization. Eight findings remain open; the tranche-review evidence clause is not proved in substance.</p>
+<h2>Boundary</h2>
+<p>T10 owns the cadence state machine, WSJF materialisation, backlog refinement, the demo credit, the retro lesson requirement, the tranche review and the benefit transition. It does not own the decision ladder (T2), the baseline contract itself (T1), the coach card (T4) except the retro card, metrics and metering (T11), or the one-organisation-loop acceptance (T12). The programme-wide backlog query and the programme closure path are named gaps, not part of this delivery.</p>
+<h2>Reuse sources</h2>
+<p><code>migrations/0056_cadence_tranche.sql</code> and <code>migrations/0044_plan_spine.sql</code>. <code>crates/store/src/spine.rs</code> — the cadence, materialisation, refinement, tranche review and benefit transaction functions. <code>apps/server/src/cadence.rs::tick</code> — the PI job. <code>crates/actions/src/portfolio/programmes.rs</code> — <code>programmes.update</code>. The T1 plan-spine tables (<code>wbs_node</code>, <code>programme_baseline</code>, <code>programme_tranche</code>), the approval primitive, the board card and the benefit tables. The real-Postgres test harness.</p>
+<h2>Inception units</h2>
+<p>No T10-specific inception analysis or architecture design is present in the snapshot; this rework authored none. The inception claim is the SPEC_V2 sections 8.2 and 8.3 text, the T10 row of section 12 and issues #82 and #502. The implementation record is the 0056 migration, the store and server paths and the eight suites.</p>
+<h2>Dependencies</h2>
+<ul>
+<li>blocked-by: T1, T3 and P0 (<code>project.meta.depends_on = [T1, T3, P0]</code>); the cadence reads the plan spine and the board T1 and T3 install.</li>
+<li>blocks: T12 (the one organisation loop), per the section 12 dependency line.</li>
+<li>related: T4 (the coach owns the retro card), T11 (governance metrics read the cadence) and T5 (a retro finding should reach the kata loop).</li>
+</ul>
+<h2>Acceptance</h2>
+<p>The SPEC_V2 section 12 T10 gate: materialisation by WSJF within WIP; a deliverable without evidence cannot demo; retro produces lessons; an end-of-tranche review with no baselines, benefit status or risk evidence is refused; a transition that never measured its baseline cannot report the benefit realized. Clauses 2, 3 and 5 are green by named tests; clause 1 is green for a project backlog and red for the programme-wide backlog (v1-p82-5); clause 4 has a named test but is red in substance (v1-p83-1, v1-p83-4). The rework's acceptance instrument is <code>acceptance/programme/T10.toml</code>.</p>
+<h2>Capabilities</h2>
+<p>Computed WSJF; WIP-bounded materialisation; approved-plan-only materialisation; the idempotent PI tick; backlog refinement flags; the typed demo credit; the retro lesson requirement; the tranche review; the benefit transition and its baseline gate.</p>
+<h2>Plan</h2>
+<p>Held to <code>docs/SPEC_V2.md</code> section 12 (T10) and sections 8.2 and 8.3. The project row's plan pointer is <code>docs/SPEC_V2.md#12</code> with <code>plan_status: draft</code>; no separate plan document exists. The project row is closed in the 2026-11-22 snapshot (version 11); the rework records the lifecycle retrospectively.</p>
+<h2>Risks</h2>
+<ul>
+<li>Tranche authorisation is seeded and review evidence is free text (v1-p83-1): a tranche can start and continue on placeholders.</li>
+<li>Benefit measurement has no typed values (v1-p83-2) and ownership is a role string (v1-p83-3): a realized claim is not comparable.</li>
+<li>Tranche baselines are nullable and unapproved (v1-p83-4).</li>
+<li><code>programmes.update</code> closes a programme without a review or realisation plan (v1-p83-5); PMP closure requires only the scope baseline (v1-p83-6).</li>
+<li>The PI backlog is one project's WBS (v1-p82-5); retro lessons need no evidence and emit no kata candidates (v1-p82-6).</li>
+<li>Tranche 4 is <code>planned</code> with no authorisation, <code>authorised_at</code> or baseline; T10 closed out of sequence.</li>
+</ul>
+<h2>Links</h2>
+<ul>
+<li>Issues: https://github.com/nonagenticai/conveyor/issues/82 and https://github.com/nonagenticai/conveyor/issues/502</li>
+<li>Specification: <code>docs/SPEC_V2.md</code> sections 8.2, 8.3 and section 12 (T10)</li>
+<li>Schema: <code>migrations/0056_cadence_tranche.sql</code>, <code>migrations/0044_plan_spine.sql</code></li>
+<li>Tests: <code>programme_cadence.rs</code>, <code>refinement.rs</code>, <code>demo_gate.rs</code>, <code>retro.rs</code>, <code>tranche_review.rs</code>, <code>benefit_transition.rs</code>, <code>pi_plan_approval.rs</code>, <code>apps/server/tests/cadence_jobs.rs</code></li>
+<li>Tranche 4: <code>01a1e9e0-f4c0-727d-9afb-bb5b1e9783ce</code></li>
+<li>Standing delegation: <code>01a1ff1f-e4ba-72dc-9c1a-13049933cf14</code></li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>SAFe cadence and MSP tranches · conveyor output · published 2026-11-23T09:36:22Z · conveyor-e2e</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

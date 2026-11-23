@@ -23,91 +23,18 @@
         >source ↗</a
       >
     </header>
-    <main class="doc-body"><h1>Architecture artefact</h1>
-<p><strong>Programme:</strong> conveyor buildout · <strong>Record:</strong> <code>01a1f2c1-5717-75e7-9b3d-1d7707648c09</code> · <strong>Decision:</strong> <code>01a1f2c8-e26f-79ce-a082-5526648a47c5</code></p>
-<p>PF-1, the conveyor architecture principles catalogue, as the live repository holds it: read back on 2026-11-19 at main@f14b7d36. This records an approved artefact, not a proposal — one of the three Preliminary-phase artefacts the owner approved in one bundle.</p>
+    <main class="doc-body"><h1>Architecture artefact — T9 TOGAF ADM capability index (retrospective, 2026-11-22)</h1>
 <h2>Metadata</h2>
-<ul>
-<li><strong>Id:</strong> 01a1f2c1-5717-75e7-9b3d-1d7707648c09</li>
-<li><strong>Title:</strong> Conveyor architecture principles — PF-1</li>
-<li><strong>Type:</strong> <code>principles_catalog</code> — one of the ten seeded <code>artifact_type</code> rows; mandatory for Preliminary at the <code>psa</code> plateau under the adopted tailored profile, version 3</li>
-<li><strong>Phase and plateau:</strong> <code>preliminary</code>, <code>psa</code></li>
-<li><strong>Status and version:</strong> <code>approved</code>, version 2</li>
-<li><strong>Author:</strong> programme architect (maintainer sessions)</li>
-<li><strong>Reviewer:</strong> the Architecture Board</li>
-<li><strong>Review date:</strong> <code>pending board decision</code></li>
-<li><strong>Related initiative:</strong> T9 capability adoption</li>
-<li><strong>Purpose:</strong> The principles every delivery project designs under, adopted by the Architecture Board.</li>
-<li><strong>Scope:</strong> The conveyor programme and every project in it; the estate services it absorbs.</li>
-<li><strong>Document:</strong> not set — the publication step below is pending.</li>
-</ul>
-<p>The approval is the owner's bundle decision, recorded through the operator path at his instruction as approval row 01a1f2c8-e26f-79ce-a082-5526648a47c5 (kind <code>architecture_board</code>, status <code>approved</code>, 2026-11-19). It covered the tailored ADM profile, the three Preliminary artefacts, the Phase A Statement of Architecture Work, and the maturity and skills baselines. The session that produced the set did not approve it.</p>
-<p>Two facts are recorded as found, not corrected. The row's inner <code>meta</code> block still reads <code>status: draft for board approval</code>, <code>version: 1</code> and <code>review_date: pending board decision</code> while the row's lifecycle fields read approved version 2; an approved body is immutable, so the stale copy is reported rather than edited. And the seeded standard ships exactly ten types with no action to add one — a new <code>artifact_type</code> is a migration and a seed change, never a runtime operation.</p>
+<p>The project's artefact index carries the seven Phase A–D artefacts this rework publishes, each bound to the adopted standard's <code>artifact_type</code>: the Stakeholder Map (A, PSA, matrix), the Driver/Goal/Objective Catalog (A, PSA, catalog), the Requirements Catalog (A, PSA, catalog), the Solution Concept Diagram (A, PSA, diagram), the Business Capability Map (B, HLD, diagram), the Data Entity/Data Component Catalog (C, HLD, catalog) and the Technology Standards Catalog (D, HLD, catalog). The owner is the programme architect (<code>conveyor-e2e</code>); the reviewer is the Architecture Board (<code>conveyor-architecture-board</code>); the review date is 2026-11-22; the related project is T9.</p>
 <h2>Entries</h2>
-<p>Ten entries, identifiers P1–P10. Each is a row: <code>axis_a</code> is the id, <code>axis_b</code> the item name, and the value carries statement, rationale, implications and evidence. Statements are recorded to their rule and the supporting fields condensed; the published document carries the full wording.</p>
-<p><strong>P1 — One model, one store, one action registry</strong>
-<em>Statement:</em> A programme's work, decisions and evidence are rows in one Postgres database written through one action registry; one table and one action set per concept.
-<em>Rationale:</em> Fragments of one model are the estate's pain; one registry makes permission, audit and replay uniform.
-<em>Implications:</em> A new capability is a table plus actions in this workspace, not a new service; no feature keeps a private file or cache as its record of truth.
-<em>Evidence:</em> <code>crates/actions/src/lib.rs</code>; <code>migrations/*.sql</code>; <code>crates/actions/tests/registry.rs</code></p>
-<p><strong>P2 — Every mutation is an action; the database is not the API</strong>
-<em>Statement:</em> A write goes through an action with its scope, tenant, precondition and event; no handler, UI or script writes rows by SQL.
-<em>Rationale:</em> The action envelope carries RFC 9457 errors, preconditions, revision history and audit.
-<em>Implications:</em> A new write is an action with a schema, a scope and a test; a read-only probe is <code>BEGIN READ ONLY</code>.
-<em>Evidence:</em> <code>crates/actions/src/invoke.rs</code>; the registry test <code>committed_action_dump_matches_the_registry</code></p>
-<p><strong>P3 — Tenant isolation is structural, not a filter</strong>
-<em>Statement:</em> Every tenant-owned table has RLS enabled and forced, and every query runs under the tenant's scope; a cross-tenant id resolves to 404.
-<em>Rationale:</em> <code>begin_scoped</code> is the only path that sets the tenant GUC; a filtered query is one forgotten predicate from a leak.
-<em>Implications:</em> A new table ships with its policy and a foreign-tenant 404 test; no session-level GUC through a pooler.
-<em>Evidence:</em> <code>crates/store/src/scope.rs</code>; the registry test <code>a_foreign_tenant_parent_id_resolves_to_404_never_to_a_write</code></p>
-<p><strong>P4 — Publication is a decision, never a side effect</strong>
-<em>Statement:</em> A row is public only when an admin's publish decision makes it public; author markup is never executable on the public page.
-<em>Rationale:</em> The executor never approves its own work; <code>documents.publish</code> is the only action that moves the public bit.
-<em>Implications:</em> A new public surface filters on the public bit and carries the tenant; preview uses the same renderer as the public page.
-<em>Evidence:</em> <code>crates/actions/src/documents/revisions.rs</code>; <code>crates/render/src/markdown.rs</code></p>
-<p><strong>P5 — Every output is versioned, attributable and reversible</strong>
-<em>Statement:</em> A text output carries its author, a content hash and a revision history; every edit is versioned and a restore copies a version forward.
-<em>Rationale:</em> An output a reviewer cannot trace to author, version and evidence is not auditable.
-<em>Implications:</em> A work-product aggregate reuses the document model or carries the same provenance; deletion is a tombstone.
-<em>Evidence:</em> <code>migrations/0042_document_workflow.sql</code>; <code>crates/store/src/document.rs</code></p>
-<p><strong>P6 — Programme truth is computed, never hand-written</strong>
-<em>Statement:</em> A project's status, units, dependencies and expected outputs come from measured sources and are regenerated by scripts.
-<em>Rationale:</em> A hand-written status is the first thing to rot.
-<em>Implications:</em> A new programme fact gets a generator and a <code>--check</code> gate; a document may explain the truth but may not be its only home.
-<em>Evidence:</em> <code>scripts/build-coverage.py</code>; <code>scripts/build-programme-seed.py</code>; <code>scripts/check-output-standard.py</code></p>
-<p><strong>P7 — Gates refuse; a gate that never refuses is broken</strong>
-<em>Statement:</em> A gate is a refusal with an actionable reason, exercised by a test that proves the refusal.
-<em>Rationale:</em> The programme's publish and dependency gates exist because a publish without evidence happened; a refusal is the product, not an error path.
-<em>Implications:</em> A gate names what is missing and the refusal is covered at the caller's boundary.
-<em>Evidence:</em> <code>crates/actions/tests/authoring_standard.rs</code>; the <code>409 blocked_by</code> gate in <code>crates/actions/src/programme.rs</code></p>
-<p><strong>P8 — Typed dependencies, explicit gates</strong>
-<em>Statement:</em> A dependency between projects is typed and the programme gate enforces the blocking kind.
-<em>Rationale:</em> Untyped coupling hides the order the programme actually needs.
-<em>Implications:</em> A project's inception names its dependencies and the contract it sits under.
-<em>Evidence:</em> <code>migrations/0044_plan_spine.sql</code>; <code>crates/actions/tests/plan_spine.rs</code></p>
-<p><strong>P9 — Secrets never leave their boundary</strong>
-<em>Statement:</em> A secret is write-only; no action returns its value, and no secret or private host enters a public output.
-<em>Rationale:</em> The repository is public, so a leak is permanent.
-<em>Implications:</em> A credential is referenced, never printed; public outputs are scanned before publication.
-<em>Evidence:</em> <code>crates/actions/src/documents/secrets.rs</code>; <code>scripts/ci/no-private-refs.sh</code></p>
-<p><strong>P10 — The estate is one deployable service per concept, absorbed not duplicated</strong>
-<em>Statement:</em> A service the organisation depends on is this workspace's code or an absorbed, contract-tested module behind an action; a second deployment of the same concept is retired.
-<em>Rationale:</em> ADR 0005 fixes the absorption sequence.
-<em>Implications:</em> A new integration adds an action and a client in this workspace; a retired service's data is migrated, not forked.
-<em>Evidence:</em> <code>docs/decisions/0005-absorption-sequence-and-repo-scope.md</code>; <code>crates/actions/src/ops/</code></p>
+<p>The index's per-artefact entries are the artefact rows themselves: nine stakeholder cells, eleven driver/goal rows, twelve requirements, twelve solution-concept components and edges, eleven capability rows, twelve data components and twelve technology standards. Each artefact's own body carries its metadata, entries, links and document sections, and the rows are queryable through the repository actions.</p>
 <h2>Links</h2>
-<p>Two typed edges are recorded on the artefact, with the ids the repository returned:</p>
-<ul>
-<li><strong>Derivation</strong> — <code>from</code> the Principle Derivation Diagram (<code>01a1f2c1-94ad-7a92-8aca-57202f48ece9</code>) <code>to</code> PF-1: the derivation artefact derives this catalogue. Its seven entries map benefits B1, B2, B4, B5 and B6 to principles; no entry names B3 — the gap it exists to show. It is an approved <code>diagram</code> at version 2.</li>
-<li><strong>Realization</strong> — <code>from</code> PF-1 <code>to</code> the Principle Realization Diagram (<code>01a1f2c1-9c75-78a2-a2a4-647687dfbe10</code>): this artefact realizes the realization artefact, whose ten entries name, per principle, the code or gate that enforces it. It is an approved <code>diagram</code> at version 2.</li>
-</ul>
-<p>The catalogue and the two diagrams are the three-artefact Preliminary set the profile requires at the <code>psa</code> plateau; all three are approved at version 2 under the same decision.</p>
+<p>The seven artefacts form one chain: the stakeholder map and the driver catalog derive from SPEC_V2 §8.1 and §12 T9; the requirements catalog realizes the gate clauses; the solution concept realizes the requirements as components and edges; the business capability map derives from the requirements and solution concept; the data entity catalog realizes the solution concept's components; the technology standards catalog fixes the rules the data catalog depends on. The delivery contract governs the set.</p>
 <h2>Document</h2>
-<p>The artefact's <code>document</code> field is empty. The published <code>architecture-principles</code> output of the same ten-principle set will be linked as this artefact's document after publication: its document id is recorded on unit #387 when the publication lands and written to the row with <code>architecture.artifacts_update</code>. That is the pending step, not a completed one — until it lands, PF-1's content lives in the entry rows above and no document is attached.</p>
-<p>One thing to verify when the update lands: the row is approved, and an approved body is immutable. Whether <code>artifacts_update</code> may set the document field on an approved row, or whether the link must arrive as a new version, is not yet exercised on this row. The update action is the mechanism named; the immutability rule is the constraint to test it against.</p>
+<p>Each artefact is published as a typed <code>architecture_artifact</code> row with its body as the document, under the T9 delivery contract and the T9 row of <code>docs/SPEC_V2.md</code> §12. The approval is the Board's; this index is retrospective. Open findings v1-p81-5 (row integrity) and v1-p81-4 (draft Board) bear on the repository these artefacts live in, not on their content.</p>
 <p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
     <footer class="doc-footer">
-      <span>Rendered from <code>TOGAF ADM capability · conveyor output · published 2026-11-20T11:50:50.848127361+00:00 · FR Test</code> at publish time.</span>
+      <span>Rendered from <code>TOGAF ADM capability · conveyor output · published 2026-11-23T09:36:22Z · FR Test</code> at publish time.</span>
       <a href="../studio.html#documents">All documents</a>
     </footer>
   </body>

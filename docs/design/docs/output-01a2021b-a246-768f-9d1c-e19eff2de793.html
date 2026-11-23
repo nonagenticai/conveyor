@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Solution Concept Diagram — T11 Metrics, metering and maturity (Phase A) - artifact document (2026-11-22) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h2>Metadata</h2>
+<ul>
+<li>Artefact: Solution Concept Diagram — T11 Metrics, metering and maturity (Phase A)</li>
+<li>Phase: a</li>
+<li>Kind: diagram</li>
+<li>Purpose: The components and edges that carry a ledger row to a computed metric, a maturity verdict, a reconciliation verdict and the console.</li>
+<li>Scope: The source ledgers, the pure rules, the store read models, the eight actions, the two T11 tables and the snapshot projection.</li>
+</ul>
+<h2>Entries</h2>
+<ul>
+<li><strong>inference_call + tool_call / the call-grain ledgers</strong> - {"kind": "component", "note": "tokens, model, cache class, run and step links; tool cost; the only spend source"}</li>
+<li><strong>run + run_step / attribution and drill-down</strong> - {"kind": "component", "note": "run \u2192 project \u2192 programme and job_binding; run_step position and action"}</li>
+<li><strong>approval / governance and maturity evidence</strong> - {"kind": "component", "note": "gate, status, evidence ref and timestamps; never-refused, approval rate, completeness and latency"}</li>
+<li><strong>card + list + event / the flow family</strong> - {"kind": "component", "note": "WIP from active/waiting lists; card.moved spans give lead, queue, cycle, block and efficiency"}</li>
+<li><strong>benefit_profile + benefit_transition + benefit_link + project_dependency / the MSP benefit metrics</strong> - {"kind": "component", "note": "realised vs planned; an unmeasured baseline is unmeasured; a non-met dependency names the benefits at risk"}</li>
+<li><strong>job_binding + job_department + department / department attribution</strong> - {"kind": "component", "note": "run.job_binding_id \u2192 job \u2192 primary department; a missing path is <code>unattributed</code>"}</li>
+<li><strong>commercial_price / the pinned price catalogue</strong> - {"kind": "component", "note": "joined on model and unit at read time; no price is stored on a call"}</li>
+<li><strong>crates/domain/src/metrics.rs / the pure rules</strong> - {"kind": "component", "note": "nine closed evidence names, C0\u2013C5 ladder, threshold validation, six-decimal reconcile"}</li>
+<li><strong>crates/store/src/metrics.rs / the read models</strong> - {"kind": "component", "note": "gate counts, benefits, tranches, totals, usage by level, drill-down, flow, derived cost"}</li>
+<li><strong>metrics.flow, job, usage, programme, maturity, reconcile, threshold_get, threshold_update / the action surface</strong> - {"kind": "component", "note": "eight ActionSpecs \u2192 HTTP, MCP and OpenAPI; served-spec.lock.json pins them"}</li>
+<li><strong>metric_threshold / the versioned C0–C5 configuration</strong> - {"kind": "component", "note": "one row per tenant, level and version; a level names the version it used"}</li>
+<li><strong>metric_reconciliation / the billing verdict</strong> - {"kind": "component", "note": "matched, difference or unavailable; a difference opens an incident card"}</li>
+<li><strong>billing.summary / the declared read action</strong> - {"kind": "edge", "note": "its attested total is the reconciliation input; an upstream failure is recorded as unavailable"}</li>
+<li><strong>inference_call → metrics.usage → every level / the roll-up edge</strong> - {"kind": "edge", "note": "each level sums to the tenant; no call is dropped"}</li>
+<li><strong>metrics.reconcile → incident card / the divergence edge</strong> - {"kind": "edge", "note": "difference opens the incident with both figures in its meta"}</li>
+<li><strong>measure.inference → Metering screen / the console edge</strong> - {"kind": "edge", "note": "totals, by caller and by model from the published snapshot; no fixture fallback"}</li>
+<li><strong>metrics read / no metric row written</strong> - {"kind": "invariant", "note": "only metric_threshold and metric_reconciliation are written by this family"}</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Metrics, metering and maturity · conveyor output · published 2026-11-23T09:36:22Z · conveyor-approver</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

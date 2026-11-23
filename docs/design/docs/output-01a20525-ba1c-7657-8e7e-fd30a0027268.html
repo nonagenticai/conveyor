@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>T13 — Gap analysis (rework, 2026-11-22) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>Gap Analysis — T13 Tool platform</h1>
+<p>The gap is measured against the T13 gate in SPEC_V2 §12, the architecture design and the
+programme's mandatory artefact standard. The baseline is dated: the pre-T13 estate and the
+2026-11-22 truth board.</p>
+<h2>Baseline</h2>
+<p><strong>Before T13 (the inception analysis's current state).</strong></p>
+<ul>
+<li>A job reaches a backend only through V1's eight external actions — direct dispatch with no
+binding, no pinned version, no effect ceiling and no call ledger.</li>
+<li>No <code>tool</code>, <code>toolkit</code>, <code>tool_binding</code> or <code>tool_call</code> table exists; no <code>tools.*</code> action family.</li>
+<li>Effect classes are declared but barely gated; input validation has no <code>pattern</code>, numeric or
+length bounds and no <code>422 tool_input_invalid</code>.</li>
+<li>Object storage exists for documents only; no job-facing operation and no project/run prefix in
+the key.</li>
+</ul>
+<p><strong>At the 2026-11-22 W1 snapshot (the rework record).</strong></p>
+<ul>
+<li>The tool spine is built to the design: the four tables, the <code>tools.*</code> family, the seven broker
+steps, the effect ceiling, the closed-schema refusal, the ledger and the tenant-prefixed MinIO
+adapter; the scenario table is the acceptance.</li>
+<li>T13's manifest is <strong>11 of 16 checks green</strong>. The five reds are the tranche-3 PI plan, PI
+objectives and retro lesson (the peer's tr3 batch) and the closure gate (the project is <code>active</code>
+after its rework; closure is not yet requested).</li>
+<li>The change-control artefact is evidenced (two approved changes, their decisions and a published
+document). The remaining mandatory artefact sections are partial: project registers (risks,
+assumptions, dependencies, benefits), the artefact links/documents for the A–D instances, and the
+phase-E documents (benefits diagram, candidate solutions, project context diagram, gap analysis).
+The on-demand waiver, statement-of-intent and request-for-architecture-work are not required by
+this project's profile and are not fabricated.</li>
+</ul>
+<h2>Target</h2>
+<ul>
+<li><strong>The T13 gate.</strong> A bound job calls coding through the broker with a pinned version and no direct
+handler; one call is one ledger row with an input hash and no credential; a destructive call
+without the tenant's approvals is refused before the destination and a binding cannot raise its
+ceiling at run time; an undeclared property or bound is refused <code>422 tool_input_invalid</code> with zero
+requests; a job round-trips a tenant-prefixed object and the compiled prompt carries no S3 key.</li>
+<li><strong>The record.</strong> Every mandatory artefact for T13 evidenced by a row and a published document; the
+tr3 PI plan, objectives and retro lesson recorded; the Phase-G review compliant at the snapshot;
+the closure requested and decided by an approver distinct from the requester, then closed through
+<code>projects.close</code>; the declared closure output published.</li>
+<li><strong>The benefit.</strong> B2's baseline measured against the live tool-call ledger before its transition;
+the census names every service a job uses and every toolkit with no calls in a cycle.</li>
+</ul>
+<h2>Gaps and work packages</h2>
+<ul>
+<li><strong>Closed in the T13 batch:</strong> the binding writer (<code>v1-p111-1</code>), the release tool grant
+(<code>v1-p111-2</code>), redaction (<code>v1-p111-3</code>), the job-storage path (<code>v1-p1110-1</code>), zero-use retirement
+(<code>v1-p119-1</code>) and long operations (<code>v1-w4a-5</code>).</li>
+<li><strong>T5:</strong> the schema-drift kata (contract-test instrument class).</li>
+<li><strong>T15:</strong> the BYO tool publication surface (<code>v1-w4a-6</code>).</li>
+<li><strong>P2s:</strong> tool idempotency publish policy (<code>v1-u5a-tool-idempotency-publish-1</code>) and
+<code>tool.output_schema</code> persistence (<code>v1-p118-2</code>).</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Tool platform · conveyor output · published 2026-11-23T09:36:22Z · FR Test</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

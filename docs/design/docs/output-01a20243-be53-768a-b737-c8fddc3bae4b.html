@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Data Entity/Data Component Catalog — T0 Model and contracts (Phase C) - artifact document (2026-11-22) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h2>Metadata</h2>
+<ul>
+<li>Artefact: Data Entity/Data Component Catalog — T0 Model and contracts (Phase C)</li>
+<li>Phase: c</li>
+<li>Kind: catalog</li>
+<li>Purpose: The entities the model adds or extends, with their owner and their one invariant.</li>
+<li>Scope: migrations/0040_organisation.sql and the run pin.</li>
+</ul>
+<h2>Entries</h2>
+<ul>
+<li><strong>action registry / the one declaration surface</strong> - {"component": "crates/actions ActionSpec registry", "note": "one declaration \u2192 manifest, OpenAPI, MCP tool and invocation route; served-spec.lock.json pins the set", "owner": "actions"}</li>
+<li><strong>decision / one L1 decision</strong> - {"note": "probabilities, confidence, policy, latency, input hash; schema and contracts only in T0", "owner": "decision", "table": "decision"}</li>
+<li><strong>decision_option / decision_policy / decision_policy_refinement / options, thresholds and tenant refinements</strong> - {"note": "authored and versioned; T2 evaluates", "owner": "decision", "table": "decision_option, decision_policy, decision_policy_refinement"}</li>
+<li><strong>department / ordered placement</strong> - {"note": "one concept, not a fork; one primary per industry; unique ordinal", "owner": "organisation", "table": "department (+ industry_id, ordinal, is_primary)"}</li>
+<li><strong>industry / the spine's root</strong> - {"note": "tenant-scoped; key ^[a-z][a-z0-9_-]{1,63}$; status active|retired", "owner": "organisation", "table": "industry"}</li>
+<li><strong>job_binding / the pin</strong> - {"note": "tenant-scoped; pins release_hash and release_snapshot; executor_kind open slug; process_id or capability_agent_id", "owner": "organisation", "table": "job_binding"}</li>
+<li><strong>job_catalogue / the position</strong> - {"note": "NOT V1's durable job queue; definition jsonb; status draft|active|retired", "owner": "organisation", "table": "job_catalogue"}</li>
+<li><strong>job_department / the ordered join</strong> - {"note": "contiguous ordinals from 1; exactly one primary", "owner": "organisation", "table": "job_department"}</li>
+<li><strong>job_release / the immutable release</strong> - {"note": "append-only; release_hash is SHA-256 over the canonical snapshot; release_snapshot frozen by grants-runtime.sql", "owner": "organisation", "table": "job_release"}</li>
+<li><strong>job (V1) / the durable work queue</strong> - {"note": "distinct from job_catalogue by design; neither is renamed into the other", "owner": "platform", "table": "job"}</li>
+<li><strong>laya_inference_config / tenant-scoped laya inference</strong> - {"note": "model_ref, params, timeout_ms", "owner": "decision", "table": "laya_inference_config"}</li>
+<li><strong>run / the resolved pin</strong> - {"note": "columns job_binding_id and release_hash; a stale pin never writes a run", "owner": "control", "table": "run"}</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Model and contracts · conveyor output · published 2026-11-23T09:36:22Z · conveyor-approver</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

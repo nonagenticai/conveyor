@@ -59,10 +59,10 @@
 </ul>
 <p><strong>absent.</strong></p>
 <ul>
-<li>Development project (T6, #80): <code>name = "dev\.</code> → 0; no development gate set.</li>
-<li>Lessons (T8, #79): <code>name = "lessons\.</code> → 0 and <code>CREATE TABLE lesson</code> → 0.</li>
-<li>Incident lifecycle (T7, #78): <code>CREATE TABLE incident</code> → 0 and <code>ops.incident|triage|mitigate|resolve|postmortem</code> → 0.</li>
-<li>Architecture capability (T9, #81): <code>CREATE TABLE architecture_artifact</code> → 0.</li>
+<li>Development project (T6, #80): <strong>absent</strong> — no <code>dev.*</code> action family (v1-p91-1); no development gate set.</li>
+<li>Lessons (T8, #79): <strong>partial</strong> — the <code>lesson</code> table exists (<code>migrations/0056_cadence_tranche.sql:10</code>) and <code>lessons.propose|list</code> are registered (<code>docs/design/data/actions.json</code>); the §7.6 promotion mechanism is absent.</li>
+<li>Incident lifecycle (T7, #78): <strong>card-backed</strong> — there is no <code>incident</code> table by design; <code>ops.incident|triage|mitigate|postmortem</code> are registered and the lifecycle lives on the incident card's meta (<code>crates/actions/src/ops/incidents.rs</code>).</li>
+<li>Architecture capability (T9, #81): <strong>built</strong> — <code>migrations/0054_architecture.sql:144</code> creates <code>architecture_artifact</code> and the <code>architecture.*</code> family is registered; the review's named deviations (v1-p81-4..6) remain open work.</li>
 <li>Acceptance harness: <code>apps/server/tests/organisation_loop.rs</code> does not exist (listing → 0). Precedent: <code>apps/server/tests/organisation_gate.rs:1</code>, which proves the T0 wire gate through <code>conveyor_actions::invoke</code>.</li>
 </ul>
 <h2 id="reuse-sources">Reuse sources</h2>

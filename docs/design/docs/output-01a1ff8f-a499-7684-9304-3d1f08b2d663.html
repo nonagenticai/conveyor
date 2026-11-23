@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Project Brief — T11 (retrospective, 2026-11-21) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>Project brief — T11 metrics, metering and maturity</h1>
+<h2>Outcome</h2>
+<p>Every flow, quality, cost and governance figure the conveyor reports is a read-time computation over its own rows; spend rolls up at eight organisational levels; C0–C5 maturity is decided by versioned threshold configuration; and billing reconciles exactly or opens an incident.</p>
+<h2>Boundary</h2>
+<p>Out of scope: charging — <code>billing_service</code> remains the charging system; eval- and benchmark-backed quality metrics (first-pass yield, rework rate, defect escapes, eval score and benchmark delta), whose ledgers belong to S17–S20; knowledge metrics whose ledgers do not exist (T8); and per-tool health and retirement (SPEC_V2 §11.9, the tool platform). The console reads the published snapshot; it never recomputes cost from a stale cache.</p>
+<h2>Reuse sources</h2>
+<ul>
+<li><code>docs/SPEC_V2.md</code> §7.5 (metrics, metering and the ledger), §10.4 (the <code>metrics.*</code> family) and §12 (T11).</li>
+<li><code>crates/domain/src/metrics.rs</code>, <code>crates/store/src/metrics.rs</code> and <code>crates/actions/src/metrics/mod.rs</code> — the pure rules, the read models and the eight actions.</li>
+<li><code>migrations/0059_metrics.sql</code> — the threshold configuration and the reconciliation record.</li>
+<li><code>seed/catalogue.json</code> — the <code>incident</code> card type; <code>served-spec.lock.json</code> — the served contracts.</li>
+<li><code>docs/design/v2.js</code> <code>meteringLive()</code> and the snapshot's <code>measure.inference</code> (#458).</li>
+</ul>
+<h2>Inception units</h2>
+<p>None. T11 is the measurement slice; its inputs are the ledgers and the metric definitions in SPEC_V2 §7.5, not an inception analysis or architecture spike.</p>
+<h2>Dependencies</h2>
+<p>blocked-by: P0 (the programme definition; <code>meta.depends_on</code>). related: S02 and T1, the other tranche-1 projects. blocks: T12 (one organisation loop, which follows all V2 slices per SPEC_V2 §12).</p>
+<h2>Acceptance</h2>
+<p>The SPEC_V2 §12 gate, verbatim: "every metric and every metering level recomputes from rows; the reconciliation with <code>billing_service</code> is exact or opens an incident; a C0–C5 level changes only when the measured evidence crosses its recorded threshold; a gate that never refused is flagged". It is executed by <code>acceptance/programme/T11.toml</code> through <code>scripts/verify-project.py</code> against the published snapshot, together with the governance checks listed in the delivery contract.</p>
+<h2>Capabilities</h2>
+<p>The eight <code>metrics.*</code> actions, the eight metering levels and the run drill-down, the C0–C5 threshold configuration, the billing reconciliation with an incident on divergence, and the console Metering screen over the snapshot's live inference aggregates.</p>
+<h2>Plan</h2>
+<p><code>docs/SPEC_V2.md</code> §12 (T11). Delivered 2026-11-19 (#84, PR #404); the console unit landed 2026-11-20 (#458, PR #499); reworked and re-closed retrospectively 2026-11-21.</p>
+<h2>Risks</h2>
+<ul>
+<li>The snapshot's <code>measure.inference</code> is the ledger at 2026-11-21T18:50:29Z, not a bounded business period; a windowed figure is the API's job, not the screen's.</li>
+<li>This record asserts the threshold mechanism and its tests, not a live calibrated threshold row; no such row is visible in the 2026-11-21 snapshot.</li>
+</ul>
+<h2>Links</h2>
+<ul>
+<li>Issues #84 and #458 (both closed); commits <code>183f5111</code>, <code>f7062f35</code> and <code>0a8a6e95</code>.</li>
+<li><code>acceptance/programme/T11.toml</code>, <code>docs/evidence/v2-coverage.json</code>, <code>docs/evidence/rework/T11.json</code>.</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Metrics, metering and maturity · conveyor output · published 2026-11-23T09:36:22Z · conveyor-e2e</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

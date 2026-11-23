@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Closure review — T2 (retrospective, 2026-11-21) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>Closure review — T2 Decision ladder (retrospective, 2026-11-21)</h1>
+<h2>Outcome vs acceptance</h2>
+<p>T2's §12 gate asks that a rule, a laya decision and a human decision produce the same audit shape; that a tenant refinement changes a threshold without a code change; that every decision pins the refinement and laya config versions; and that a generated draft cannot transition a card. The first three hold at HEAD and were re-read for this review. The fourth did not: <code>documents.compose</code> attached a generated draft to a card with no gate. It now does not, and the gate is proved.</p>
+<h2>Evidence</h2>
+<ul>
+<li><code>acceptance/programme/T2.toml</code> — the project's manifest.</li>
+<li><code>docs/evidence/rework/tranche-2/findings.json</code> — the six findings, every quote verified against the tree.</li>
+<li><code>crates/actions/tests/documents_compose_gate.rs</code> at <code>920a1dcbfa6427b59aada92a63b6c29eb6bdcde6</code> — 4/4, with <code>process_step</code> 20/20.</li>
+<li>the ledger's <code>resolved_by</code> on <code>v1-t2-1</code>.</li>
+</ul>
+<h2>Open items</h2>
+<ul>
+<li><code>v1-t2-3</code> (P1) — <code>refinements.publish</code> is ungated although §7.2 calls a refinement change a gated policy change. Owned by T2, package scheduled behind this tranche.</li>
+<li><code>v1-t2-6</code> (P1) — a human decision may cite any approved approval on the card rather than the gate that posed its question. Owned by T2.</li>
+<li><code>v1-t2-5</code> (P2) — the budget refusal ships as <code>tool_budget_exceeded</code> where §7.5 names <code>budget_exceeded</code>.</li>
+</ul>
+<p>None is waived.</p>
+<h2>Decision</h2>
+<p>Close T2 on the P0-only product gate. Requested by the programme's service actor <code>conveyor-e2e</code> and decided by the distinct approver <code>conveyor-approver</code> under the standing delegation <code>01a1ff1f-e4ba-72dc-9c1a-13049933cf14</code>; the requester is not the approver. The three open items above are carried into the next tranche and must be disposed by a dated decision at the programme's viability review if still open.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Decision ladder · conveyor output · published 2026-11-23T09:36:22Z · conveyor-e2e</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>
