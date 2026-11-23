@@ -4427,6 +4427,11 @@
     },
     {
       "id": "v1-p45-1",
+      "resolved_by": {
+        "commit": "0617dd60e5c6797e83ced8608a4abcfa6997337c",
+        "test": "crates/domain/tests/prompt_memory.rs",
+        "evidence": "#612's merge commit on main renders the Memory source: the run's prior steps, the card's hot rows and one digest; a required memory source with nothing to select still refuses by name. crates/store/tests/prompt_catalogue.rs::the_runs_prior_steps_are_selected_and_isolated proves the prior-step selection. Main's ledger carried this as prose; the receipt replaces it."
+      },
       "area": "\u00a74.5",
       "standard": "SPEC",
       "spec": "\u00a74.5",
@@ -4939,6 +4944,11 @@
     },
     {
       "id": "v1-p76-2",
+      "resolved_by": {
+        "commit": "0617dd60e5c6797e83ced8608a4abcfa6997337c",
+        "test": "crates/store/tests/memory.rs",
+        "evidence": "#612's merge commit on main makes hot_for_card_tx exclude digest rows, so memory.recall's hot set is the record and the digest is reachable only through the prompt selector's include_digest and the cold read. Main's ledger carried this as prose; the receipt replaces it."
+      },
       "area": "\u00a77.6",
       "standard": "SPEC",
       "spec": "\u00a77.6",

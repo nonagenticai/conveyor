@@ -97,8 +97,9 @@ window.ArchitecturePack = (function () {
     WF-->>P: refused before any model call
   else pinned release
     WF->>PC: compile the step
-    PC->>KM: knowledge pins and episodic memory
-    KM-->>PC: selected sources and prompt_sha256
+    PC->>KM: knowledge pins, the run's prior steps, then the card's hot rows and one digest
+    KM-->>PC: selected sources, their ids and prompt_sha256
+    Note over PC,KM: prior steps render as [step/status#position.attempt] with whole bodies;<br/>a measured refusal over budget — never a truncated one
     opt procedure executor
       PC-->>WF: PDDL action
       WF->>BR: tools.call when the step names a tool

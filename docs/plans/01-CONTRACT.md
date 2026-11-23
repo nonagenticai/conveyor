@@ -914,3 +914,38 @@ cancelled run. Succeed, fail, cancel and reap: each writes exactly one row for a
 `v1-p75-1`/`v1-w4a-1`, enforced in the invoke precheck and the broker; §24 does not add a second
 gate. `v1-p66-1`'s lane-refusal clause (a delivery card moved into a work lane without a binding)
 needs a delivery-card marker that does not exist and remains open.
+
+## 25. The run's episodic memory (added 2026-11-23; S21 step 7, issue #612; implements SPEC_V2 §4.5, §7.6, §7.7)
+
+**The Memory source is three classes.** A run's compiled prompt renders, in one `## Memory`
+section, the run's own earlier steps first, then the card's newest un-consolidated hot rows, then
+at most one digest. The spec's four sources are unchanged; the run-scoped class is the one §4.5
+named and the compiler did not read.
+
+**Selection.** Prior steps come from the same `run_id` only; statuses `succeeded` and `failed` only
+(a `queued`/`running` row is future work, a `skipped` row did not execute); a row qualifies when
+its `(position, attempt)` is lexicographically before the current step's; rows are ordered
+`(position, attempt)`; at most `step_limit` of the newest qualify. The memory selector's
+`include_steps` (default true) and `step_limit` (default 8, maximum 32) control the class; unknown
+members are refused. A child run reads only its own rows.
+
+**The line and the hash.** Each row renders as
+`- [step/<status>#<position>.<attempt>] <action> <status>: <body>`. The body is `output->>'text'`
+when the stored output carries it, else the compact output JSON; a failed attempt's body is its
+`error`. The semantic `position.attempt` is in the text, so the selection is part of the prompt
+hash.
+
+**No truncation.** A step body renders whole. An over-budget section refuses `SectionOverBudget`
+with the measured size; the remedy is a larger `budget_chars` or a shorter step output, never a
+silent clip. A prior-step body is **data, not instruction**: it renders in the Memory section,
+below the procedure and capability blocks, under the system section's data rule.
+
+**Recall is honest about hot and digest.** `memory.recall`'s `hot` excludes `digest`; the digest is
+reachable through the prompt selector's `include_digest` and the cold/strata read. Hot is the
+record; the digest is derived.
+
+**What is built vs proved.** The terminal attempt writer is §24's (every path). §25 adds the read
+and proves that a process root run's attempt reaches the next run's prompt. No second writer.
+
+**Out of this contract.** No card-driven run creation; no `memory.remember` write-back at handoff;
+no parent-run steps in a child's prompt; no budget mechanism (§24's note stands); no migration.
