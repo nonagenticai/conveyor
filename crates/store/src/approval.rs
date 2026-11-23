@@ -935,21 +935,51 @@ pub async fn record_decision_tx(
     // This check lives HERE, the one writer every decision path traverses, so `approvals.decide`,
     // `eval_signoffs.decide`, MCP `tasks/update` and a connector reply cannot disagree. An
     // absent, unreadable or corrupt policy row all keep the refusal.
+    //
+    // A decision that NAMES a published owner delegation is the tenant's explicit authorisation
+    // for a `rule` act (§5.4: "a gate that requires a person accepts it only by naming its
+    // delegation"). The actions layer validates the reference before recording it in `via`; the
+    // one writer re-checks the document here, so no other path can forge the reference. This is
+    // the operating model the programme records under: `approval_policies.set` is a destructive
+    // action's policy, and a charter/baseline/change/closure gate has no such action to declare.
     if decision.decided_by_kind != DeciderKind::Human {
-        let allowed = match approval_policy::allows_approver_kind(
-            &mut *conn,
-            tenant,
-            &row.gate,
-            decision.decided_by_kind,
-        )
-        .await
+        let delegated = match decision
+            .via
+            .as_ref()
+            .and_then(|via| via.get("delegation_ref"))
+            .and_then(Value::as_str)
         {
-            Ok(allowed) => allowed,
-            Err(approval_policy::ApprovalPolicyStoreError::Database(error)) => {
-                return Err(error.into());
-            }
-            Err(_) => false,
+            Some(text) => match Uuid::parse_str(text) {
+                Ok(reference) => sqlx::query_scalar::<_, i32>(
+                    "SELECT 1 FROM document
+                          WHERE tenant_id = $1 AND id = $2
+                            AND status = 'active' AND published_at IS NOT NULL
+                            AND category = 'decision'",
+                )
+                .bind(tenant.as_uuid())
+                .bind(reference)
+                .fetch_optional(&mut *conn)
+                .await?
+                .is_some(),
+                Err(_) => false,
+            },
+            None => false,
         };
+        let allowed = delegated
+            || match approval_policy::allows_approver_kind(
+                &mut *conn,
+                tenant,
+                &row.gate,
+                decision.decided_by_kind,
+            )
+            .await
+            {
+                Ok(allowed) => allowed,
+                Err(approval_policy::ApprovalPolicyStoreError::Database(error)) => {
+                    return Err(error.into());
+                }
+                Err(_) => false,
+            };
         if !allowed {
             return Err(ApprovalStoreError::HumanOnlyGate {
                 gate: row.gate.clone(),
