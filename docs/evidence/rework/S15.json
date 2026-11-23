@@ -165,7 +165,7 @@
     "gate (P0): the gate check 'S15-baseline' did not pass; the gate check 'S15-charter' did not pass; the gate check 'S15-closure-outputs' did not pass; the gate check 'S15-contract' did not pass; the gate check 'S15-review' did not pass; the gate check 'S15-closure-gate' did not pass; the gate check 'S15-pi-cadence' did not pass; the gate check 'S15-pi-plan' did not pass; the gate check 'S15-pi-objectives' did not pass; the gate check 'S15-wsjf' did not pass; the gate check 'S15-demo-credits' did not pass; the gate check 'S15-lessons' did not pass"
   ],
   "gate": "At the end, a card's run resolves its capability and executor, the capability's readiness is reported before the run starts, a cited passage is retrieved from a pinned `strata` pack, work-package memory is written, consolidated into `strata_rag`, and recalled by `source_id`.",
-  "generated_at": "2026-11-23T07:48:34.656342+00:00",
+  "generated_at": "2026-11-23T07:53:50.793446+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/S15.toml",
   "name": "Capability, knowledge and memory",

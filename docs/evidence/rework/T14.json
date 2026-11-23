@@ -175,7 +175,7 @@
     "closed-on-red (P0): the project is closed on a red manifest"
   ],
   "gate": "each published toolkit has a probe and one live call; `scientific_processor` is scaled up for its probe and one live call, then scaled back; a zero-use report exists; a backend outage unbinds new runs and in-flight runs finish",
-  "generated_at": "2026-11-23T07:48:35.676650+00:00",
+  "generated_at": "2026-11-23T07:53:51.967813+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T14.toml",
   "name": "Estate toolkits",

@@ -165,7 +165,7 @@
     "gate (P0): the gate check 'T15-baseline' did not pass; the gate check 'T15-charter' did not pass; the gate check 'T15-closure-outputs' did not pass; the gate check 'T15-contract' did not pass; the gate check 'T15-review' did not pass; the gate check 'T15-closure-gate' did not pass; the gate check 'T15-pi-cadence' did not pass; the gate check 'T15-pi-plan' did not pass; the gate check 'T15-pi-objectives' did not pass; the gate check 'T15-wsjf' did not pass; the gate check 'T15-demo-credits' did not pass; the gate check 'T15-lessons' did not pass"
   ],
   "gate": "T15 is NOT built, and its acceptance \u2014 `SPEC_V2` \u00a712: 'a tool generated from a spec is published and called by a job; publication approval defaults to a human and is tenant-configurable; a BYO MCP server is bound, narrowed and audited; a tenant cannot exceed its effect ceiling' \u2014 is the condition on which it may be closed, not a claim that it is met.",
-  "generated_at": "2026-11-23T07:48:35.758462+00:00",
+  "generated_at": "2026-11-23T07:53:52.040942+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T15.toml",
   "name": "Tool authoring and BYO",

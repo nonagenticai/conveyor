@@ -174,7 +174,7 @@
     "closed-on-red (P0): the project is closed on a red manifest"
   ],
   "gate": "The definition set is published; the charter and scope baseline are approved; the closure review and close gate are recorded.",
-  "generated_at": "2026-11-23T07:48:33.205604+00:00",
+  "generated_at": "2026-11-23T07:53:49.347877+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/P0.toml",
   "name": "Programme definition \u2014 vision, blueprint, plan and project briefs",

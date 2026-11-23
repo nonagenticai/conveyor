@@ -175,7 +175,7 @@
     "closed-on-red (P0): the project is closed on a red manifest"
   ],
   "gate": "Green when the process limb passes with the gate parked and resumed and the coach child proving the run tree; the judge proves accept, reject-rerun, the two-reject BLOCK and the outage wait; the bus proves duplicate idempotency, re-delivery after `FLUSHALL` and the DLQ; the default catalogue is exactly 280; the dispositions have no `delta:` row; and with Redis stopped the Postgres-only limb still passes.",
-  "generated_at": "2026-11-23T07:48:34.516335+00:00",
+  "generated_at": "2026-11-23T07:53:50.653887+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/S13.toml",
   "name": "Process engine, judge, map and care-bus \u2014 the process is the executor, the DAG retained as the tool-sequence engine, the 348 flows re-authored",

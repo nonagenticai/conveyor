@@ -172,7 +172,7 @@
     "closed-on-red (P0): the project is closed on a red manifest"
   ],
   "gate": "PM runs a request end to end; cannot approve its own gate; a baseline change requires a change request",
-  "generated_at": "2026-11-23T07:48:36.046792+00:00",
+  "generated_at": "2026-11-23T07:53:52.332115+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T3.toml",
   "name": "PM job",

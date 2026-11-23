@@ -164,7 +164,7 @@
     "closed-on-red (P0): the project is closed on a red manifest"
   ],
   "gate": "The A\u2013D artefacts, the delivery contract, the closure review and the declared outputs exist; the project re-closes through the one gate.",
-  "generated_at": "2026-11-23T07:48:35.299854+00:00",
+  "generated_at": "2026-11-23T07:53:51.592896+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T1.toml",
   "name": "Plan spine \u2014 WBS, baselines, registers, cadence, tranches, benefits",

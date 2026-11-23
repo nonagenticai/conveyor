@@ -155,7 +155,7 @@
     "closed-on-red (P0): the project is closed on a red manifest"
   ],
   "gate": "The A\u2013D artefacts and the delivery contract exist, the brief and the evidence are published, the P2 long-job proof is landed, and the project closes through the one gate.",
-  "generated_at": "2026-11-23T07:48:33.517925+00:00",
+  "generated_at": "2026-11-23T07:53:49.664992+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/S02.toml",
   "name": "Skeleton \u2014 workspace, tenancy, auth, jobs, SSE",

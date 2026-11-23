@@ -175,7 +175,7 @@
     "closed-on-red (P0): the project is closed on a red manifest"
   ],
   "gate": "the feature-list items are green \u2014 a 1 MiB round-trip whose sha256 equals `content_hash` with the object key gone after delete, a 10 MiB upload refused `413`, secrets never returning plaintext, the workers page rendering live rows, every report number equal to its SQL count, `timeout_ms` on every external, and billing with no write action and no metering event",
-  "generated_at": "2026-11-23T07:48:34.228860+00:00",
+  "generated_at": "2026-11-23T07:53:50.367879+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/S09.toml",
   "name": "Documents, repositories, secrets, workers UI, reports/metrics, billing display",

@@ -165,7 +165,7 @@
     "gate (P0): the gate check 'S14-baseline' did not pass; the gate check 'S14-charter' did not pass; the gate check 'S14-closure-outputs' did not pass; the gate check 'S14-contract' did not pass; the gate check 'S14-review' did not pass; the gate check 'S14-closure-gate' did not pass; the gate check 'S14-pi-cadence' did not pass; the gate check 'S14-pi-plan' did not pass; the gate check 'S14-pi-objectives' did not pass; the gate check 'S14-lessons' did not pass; the gate check 'S14-wsjf' did not pass; the gate check 'S14-demo-credits' did not pass"
   ],
   "gate": "S14 is accepted when the native gate passes \u2014 every used id in `parity/native.tsv` resolves to an `action:`, `test:`, `replacement:` or `dropped:` disposition and the check refuses a missing or unknown row \u2014 and the R0\u2013R7 cutover receipts exist; the plan records `docs/cutover/` as absent at HEAD.",
-  "generated_at": "2026-11-23T07:48:34.586610+00:00",
+  "generated_at": "2026-11-23T07:53:50.724884+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/S14.toml",
   "name": "Cutover \u2014 deploy, seed, rehearse, decommission fr / RM / Planka",

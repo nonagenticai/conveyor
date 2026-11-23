@@ -175,7 +175,7 @@
     "closed-on-red (P0): the project is closed on a red manifest"
   ],
   "gate": "S12 is accepted when every spec asserts empty state, error state and happy path \u2014 a spec that only asserts the happy path fails review \u2014 and the coverage table has no orphan.",
-  "generated_at": "2026-11-23T07:48:34.444663+00:00",
+  "generated_at": "2026-11-23T07:53:50.581944+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/S12.toml",
   "name": "UI build-out",

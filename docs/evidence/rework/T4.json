@@ -160,7 +160,7 @@
     "gate (P0): the gate check 'T4-charter' did not pass; the gate check 'T4-review' did not pass; the gate check 'T4-closure-gate' did not pass; the gate check 'T4-pi-plan' did not pass; the gate check 'T4-pi-objectives' did not pass; the gate check 'T4-lessons' did not pass; the gate check 'T4-product' did not pass"
   ],
   "gate": "an injected failure yields exactly one coach card and one remedy; a repeat signature escalates; no coach card about a coach card; a systemic class opens a kata",
-  "generated_at": "2026-11-23T07:48:36.117821+00:00",
+  "generated_at": "2026-11-23T07:53:52.421730+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T4.toml",
   "name": "Kanban coach",

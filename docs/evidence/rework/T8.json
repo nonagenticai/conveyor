@@ -165,7 +165,7 @@
     "gate (P0): the gate check 'T8-baseline' did not pass; the gate check 'T8-charter' did not pass; the gate check 'T8-closure-outputs' did not pass; the gate check 'T8-contract' did not pass; the gate check 'T8-review' did not pass; the gate check 'T8-closure-gate' did not pass; the gate check 'T8-pi-cadence' did not pass; the gate check 'T8-pi-plan' did not pass; the gate check 'T8-pi-objectives' did not pass; the gate check 'T8-wsjf' did not pass; the gate check 'T8-demo-credits' did not pass; the gate check 'T8-lessons' did not pass"
   ],
   "gate": "T8 is NOT built, and its acceptance \u2014 `SPEC_V2` \u00a712: 'a lesson with one evidence ref is refused; two independent refs + review promotes a source draft; a bad run never becomes doctrine' \u2014 is the condition on which it may be closed, not a claim that it is met.",
-  "generated_at": "2026-11-23T07:48:36.406102+00:00",
+  "generated_at": "2026-11-23T07:53:52.712368+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T8.toml",
   "name": "Organisational memory",

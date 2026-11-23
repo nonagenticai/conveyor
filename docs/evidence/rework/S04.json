@@ -158,7 +158,7 @@
     "gate (P0): the gate check 'S04-project' did not pass; the gate check 'S04-charter' did not pass; the gate check 'S04-closure-outputs' did not pass; the gate check 'S04-closure-gate' did not pass; the gate check 'S04-demo-credits' did not pass"
   ],
   "gate": "20 actions identical over HTTP and MCP \u2014 one value in three projections, duplicates fail closed, schema-invalid input returns RFC 9457 with populated `errors[]` and never a 500, an idempotent replay yields one `action_invocation`, and the lock catches drift while breaking ingest is refused",
-  "generated_at": "2026-11-23T07:48:33.658915+00:00",
+  "generated_at": "2026-11-23T07:53:49.806581+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/S04.toml",
   "name": "Action registry \u2014 derive, manifest, OpenAPI, MCP, invocation, external ingest",

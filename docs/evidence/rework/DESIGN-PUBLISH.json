@@ -137,7 +137,7 @@
     "closed-on-red (P0): the project is closed on a red manifest"
   ],
   "gate": "The closure review exists and every declared closure output is published; the project re-closes through the one gate.",
-  "generated_at": "2026-11-23T07:48:33.132264+00:00",
+  "generated_at": "2026-11-23T07:53:49.276083+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/DESIGN-PUBLISH.toml",
   "name": "Publish the SPEC_V2 studio design pack, live",

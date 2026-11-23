@@ -165,7 +165,7 @@
     "gate (P0): the gate check 'S17-baseline' did not pass; the gate check 'S17-charter' did not pass; the gate check 'S17-closure-outputs' did not pass; the gate check 'S17-contract' did not pass; the gate check 'S17-review' did not pass; the gate check 'S17-closure-gate' did not pass; the gate check 'S17-pi-cadence' did not pass; the gate check 'S17-pi-plan' did not pass; the gate check 'S17-pi-objectives' did not pass; the gate check 'S17-wsjf' did not pass; the gate check 'S17-demo-credits' did not pass; the gate check 'S17-lessons' did not pass"
   ],
   "gate": "`conveyor-bench` is absorbed: the conveyor becomes the whole measurement loop \u2014 seed the SWE-bench subset, produce a patch per instance for an arm, run the graded test in a sandbox, parse the log with a ported swebench parser, resolve it, store the verdict, and compare runs.",
-  "generated_at": "2026-11-23T07:48:34.800861+00:00",
+  "generated_at": "2026-11-23T07:53:50.935058+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/S17.toml",
   "name": "Native benchmark harness",
