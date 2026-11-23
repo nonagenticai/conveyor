@@ -653,10 +653,12 @@ async fn decide(
         .get("criteria")
         .cloned()
         .unwrap_or_else(|| json!("the draft satisfies the request"));
+    // The judge sees the same release Request the prompt rendered (S21 step 8, CONTRACT §26):
+    // one builder (`release_request`) feeds both, so L1 and L2 cannot disagree.
     let case_input = json!({
+        "request": conveyor_domain::prompt::release_request(anatomy),
         "run_id": run.id,
         "card_id": run.card_id,
-        "job_key": anatomy.job_key,
         "release_hash": binding.release_hash,
     });
     let request = judge::request(

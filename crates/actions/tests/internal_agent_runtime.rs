@@ -1726,3 +1726,155 @@ async fn the_live_model_executes_the_compiled_prompt() {
     .await;
     assert_eq!(attempts, 1, "the terminal run recorded its attempt");
 }
+
+/// A laya stub answering one accepted score and recording every request body.
+async fn stub_laya_recording() -> (String, Arc<Mutex<Vec<Value>>>) {
+    let bodies: Arc<Mutex<Vec<Value>>> = Arc::new(Mutex::new(Vec::new()));
+    let state = bodies.clone();
+    let app = axum::Router::new().route(
+        "/v1/systemone",
+        axum::routing::post(move |axum::Json(body): axum::Json<Value>| {
+            let state = state.clone();
+            async move {
+                state.lock().expect("laya bodies").push(body);
+                axum::Json(json!({
+                    "answers": {"accept": {"score": 0.9, "reason": "the request is met"}}
+                }))
+            }
+        }),
+    );
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:0")
+        .await
+        .expect("bind laya stub");
+    let base = format!("http://{}", listener.local_addr().expect("addr"));
+    tokio::spawn(async move {
+        let _ = axum::serve(listener, app).await;
+    });
+    (base, bodies)
+}
+
+/// The run-level prompt's Request is the release definition, never the executor envelope
+/// (S21 step 8, ADR 0016). The recompile equals the call the ledger recorded.
+#[tokio::test]
+async fn the_release_request_renders_and_the_envelope_does_not() {
+    let _guard = STUBS.lock().await;
+    let (pg, seeded, running) = fixture().await;
+    let (router, _models) = stub_router().await;
+    support::set_env("CONVEYOR_EXTERNAL_INFERENCE_URL", &router);
+    let (capability, agent) = seed_agent(&pg, &seeded, Some("agent@1"), "router/medium").await;
+    let (job, release) = seed_job(
+        &pg,
+        &seeded,
+        "request_job",
+        json!({"executor_kind": "internal_agent", "prompt_recipe": "agent@1",
+               "model_ref": "router/release", "title": "Draft job", "charter": "write a draft"}),
+    )
+    .await;
+    let binding = bind(&pg, &seeded, job, release, agent, capability).await;
+    let (board, lane) = board_and_lane(&running).await;
+    let card = create_card(&running, &board, &lane).await;
+    let run = start_run(&running, &card, binding).await;
+
+    execute(&pg, &seeded, run).await;
+
+    let (step_id, ledger_hash): (Uuid, Option<String>) = {
+        let mut tx = begin_scoped(&pg.runtime, seeded.tenant)
+            .await
+            .expect("scope");
+        let step_id: Uuid = sqlx::query_scalar(
+            "SELECT id FROM run_step
+              WHERE tenant_id = $1 AND run_id = $2 AND position = 1 AND attempt = 1",
+        )
+        .bind(seeded.tenant.as_uuid())
+        .bind(run)
+        .fetch_one(&mut *tx)
+        .await
+        .expect("run step");
+        let hash: Option<String> = sqlx::query_scalar(
+            "SELECT prompt_sha256 FROM inference_call WHERE tenant_id = $1 AND run_id = $2",
+        )
+        .bind(seeded.tenant.as_uuid())
+        .bind(run)
+        .fetch_one(&mut *tx)
+        .await
+        .expect("inference call");
+        tx.commit().await.expect("commit");
+        (step_id, hash)
+    };
+    let compiled = conveyor_actions::prompt::compile_for_run(
+        &pg.runtime,
+        seeded.tenant,
+        run,
+        Some(step_id),
+        "agent@1",
+    )
+    .await
+    .expect("recompile");
+    assert_eq!(
+        compiled.sha256.as_str(),
+        ledger_hash.as_deref().expect("the ledger's hash"),
+        "the recompile is the call the ledger recorded"
+    );
+    assert!(
+        compiled.text.contains("title: Draft job"),
+        "the release's title is the request: {}",
+        compiled.text
+    );
+    assert!(
+        compiled.text.contains("description: write a draft"),
+        "the release's charter is the request: {}",
+        compiled.text
+    );
+    for absent in ["job_binding_id", "release_hash", "budget_usd"] {
+        assert!(
+            !compiled.text.contains(absent),
+            "the executor envelope's {absent} must never render: {}",
+            compiled.text
+        );
+    }
+}
+
+/// The run-level judge sees the release Request the prompt rendered (S21 step 8, CONTRACT §26).
+#[tokio::test]
+async fn the_judge_state_carries_the_release_request() {
+    let _guard = STUBS.lock().await;
+    let (pg, seeded, running) = fixture().await;
+    let (router, _models) = stub_router().await;
+    let (laya, laya_bodies) = stub_laya_recording().await;
+    support::set_env("CONVEYOR_EXTERNAL_INFERENCE_URL", &router);
+    support::set_env("CONVEYOR_EXTERNAL_LAYA_URL", &laya);
+    seal_laya_token(&pg, &seeded).await;
+    seed_policy(&pg, &seeded, 0.5, "closed", "annotate").await;
+    let (capability, agent) = seed_agent(&pg, &seeded, Some("agent@1"), "router/medium").await;
+    let (job, release) = seed_job(
+        &pg,
+        &seeded,
+        "gated_request_job",
+        json!({"executor_kind": "internal_agent", "prompt_recipe": "agent@1",
+               "model_ref": "router/release", "title": "Gated request job",
+               "charter": "write the gated draft"}),
+    )
+    .await;
+    let binding = bind(&pg, &seeded, job, release, agent, capability).await;
+    let (board, lane) = board_and_lane(&running).await;
+    let card = create_card(&running, &board, &lane).await;
+    let run = start_run(&running, &card, binding).await;
+
+    execute(&pg, &seeded, run).await;
+
+    let sent = laya_bodies.lock().expect("laya bodies").clone();
+    assert_eq!(sent.len(), 1, "one laya call: {sent:?}");
+    let state = sent[0]["state"].as_str().expect("the laya state");
+    assert!(
+        state.contains("\"job_key\":\"gated_request_job\""),
+        "the judge sees the job: {state}"
+    );
+    assert!(
+        state.contains("\"title\":\"Gated request job\""),
+        "the judge sees the title: {state}"
+    );
+    assert!(
+        state.contains("\"charter\":\"write the gated draft\""),
+        "the judge sees the charter: {state}"
+    );
+}
