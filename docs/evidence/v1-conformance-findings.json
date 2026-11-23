@@ -2176,8 +2176,8 @@
         },
         {
           "path": "crates/actions/src/governance/views.rs",
-          "line": 237,
-          "quote": "    /// `governed_asset | card`."
+          "line": 285,
+          "quote": "pub struct TraceLinkCreateIn {"
         }
       ],
       "failure_scenario": "An auditor asks the governance screen which requirement a given run proves and where its evidence is. trace_links.list can only return requirement\u2192card or requirement\u2192project edges; the run, its steps and its artefacts are unreachable from the requirement, and evidence arrays naming a run are silently skipped by the gate effect. The one question \u00a78.5 says the screen answers cannot be answered.",
@@ -5205,6 +5205,11 @@
       ],
       "failure_scenario": "A delivery card whose card_type.definition declares required outputs is moved active to done by cards.move; ensure_move approves the transition from the matrix alone, no acceptance artefact is required, no override row is written, and the coach never sees a reason. The project then closes over work that never met its own definition.",
       "acceptance": "Moving a card into a done list with unmet card_type.definition acceptance refuses 422 with a named error; an approval carrying an override reason permits it and the coach surfaces that reason; tests prove the refusal, the override and the unmet-evidence case.",
+      "resolved_by": {
+        "commit": "c8e0a883061eed92a6e67dc31bf86ab2473d63f8",
+        "test": "crates/actions/tests/card_done_gate.rs::an_approved_gate_with_no_evidence_or_waiver_is_refused",
+        "evidence": "cards.move into a done lane enforces SPEC_V2 5.4: the card type's definition.acceptance is the Definition of Done, satisfied by an approved, card-scoped card_done gate carrying meta.evidence[] or an explicit meta.evidence_waiver. crates/actions/tests/card_done_gate.rs proves the no-gate refusal (422 card_done_criteria_unmet), the empty-gate refusal (422 card_done_evidence_missing), the waiver override (200), and the no-acceptance path (200). The coach reads the recorded waiver and returns it as InterruptionOut.override_reason (crates/actions/tests/coach.rs::the_coach_surfaces_the_definition_of_done_override_reason). Suites: card_done_gate 4 new tests, coach 1 new test; fmt clean."
+      },
       "owner_project": "T1"
     },
     {
