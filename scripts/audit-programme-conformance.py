@@ -83,6 +83,7 @@ def register_acceptance(
     ]
     deep_review = deep_review or [
         "docs/evidence/record-w3/deep-review-findings.json",
+        "docs/evidence/record-w4/deep-review-findings.json",
     ]
     parts = ["python3 scripts/audit-programme-conformance.py", f"--snapshot {snapshot}"]
     parts.extend(f"--findings {path}" for path in findings)

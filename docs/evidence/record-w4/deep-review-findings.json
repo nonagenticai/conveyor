@@ -15,7 +15,7 @@
       "resolved_by": {
         "commit": "e8626660584a7ef7450d88849da3557c89f34bf0",
         "test": "scripts/compose-artefact-bodies.py --self-test",
-        "evidence": "seed/output-standard.json#business-case maps Why now to the issue rows and the programme row, Benefit map to benefit_links and benefit_profiles, Cost and risk posture to the risk register, and Licensing frame to governed_assets kind licensing_frame with a fallback absence naming the record. The composer refuses a heading whose only source is its own document; the business-case body composed at this commit carries facts or the explicit absence, never the document itself."
+        "evidence": "seed/output-standard.json#business-case maps Why now to the issue rows and the programme row, Benefit map to benefit_links and benefit_profiles, Cost and risk posture to the risk register, and Licensing frame to governed_assets kind licensing_frame with a fallback absence naming the record. The compose self-test proves the absence and fallback mechanism and the per-kind baseline; the business case body composed at this commit carries facts or the explicit absence, never the document itself."
       }
     },
     {
