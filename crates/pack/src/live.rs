@@ -27,7 +27,8 @@ use uuid::Uuid;
 
 use crate::outputs::{PublishOutputsError, render_outputs};
 use crate::snapshot::{
-    SnapshotError, feedback_issues, redact_text, section_json, snapshot_generated_at, snapshot_js,
+    SnapshotError, feedback_issues, issue_registry_hash, redact_text, section_json,
+    snapshot_generated_at, snapshot_js,
 };
 
 /// The clock an empty tenant reports: a constant, so the bytes never depend on the request time.
@@ -89,10 +90,12 @@ pub async fn site_view(pool: &PgPool, args: SiteArgs<'_>) -> Result<SiteView, Sn
     let generated_at = snapshot_generated_at(&data);
 
     // The issue registry is a commit-time artefact, not a database row: inject it before the
-    // wrapper is built, exactly as `snapshot::run_with_pool` does.
-    let feedback = feedback_issues(&args.issues);
+    // wrapper is built, exactly as `snapshot::run_with_pool` does — including the provenance
+    // content hash, so the live wrapper and the CLI's stay byte-identical.
+    let issues = issue_registry_hash(args.issues.clone())?;
+    let feedback = feedback_issues(&issues);
     if let Some(object) = data.programme.as_object_mut() {
-        object.insert("issue_registry".to_owned(), args.issues.clone());
+        object.insert("issue_registry".to_owned(), issues);
         object.insert("feedback".to_owned(), Value::Array(feedback));
     }
     // The rework register is a commit-time artefact like the issue registry: it is carried into
