@@ -34,8 +34,7 @@
 </ul>
 <h2 id="not-this-step">Not this step</h2>
 <p>No card-driven run creation, no <code>memory.remember</code> write-back at handoff, no automatic apply of an L1-accepted draft, no budget mechanism (the #526 lane's), no prompt-budget authoring (<code>v1-p77-2</code>), no NULL-hash guard (<code>v1-p77-1</code>), no release pinning (<code>v1-p42-1</code>), no workflow-node request (a <code>run_step</code> with no <code>process_step_id</code>), no parent-run memory in a child's prompt, no UI, no PDDL storage, no second compiler, no migration.</p>
-<h2 id="measured-at-the-branch-head">Measured at the branch head</h2>
-<p><em>To fill at completion.</em> The suites: domain <code>prompt_request</code> (new), domain <code>prompt_memory</code> and <code>prompt_compile</code> (regression), store <code>prompt_catalogue</code>, actions <code>process_agent_resolved</code>, <code>internal_agent_runtime</code>, <code>process_step</code>, and <code>--check-lock</code>.</p>
+<h2 id="measured-at-the-branch-head-a9381a76">Measured at the branch head (a9381a76)</h2>
 <table>
 <thead>
 <tr>
@@ -44,10 +43,35 @@
 </tr>
 </thead>
 <tbody>
+<tr>
+<td><code>crates/domain/tests/prompt_request.rs</code></td>
+<td><strong>4 passed</strong> (the document renders; a synthetic step declares none; the request is in the hash; an over-budget request refuses with the measurement)</td>
+</tr>
+<tr>
+<td><code>crates/store/tests/prompt_catalogue.rs</code></td>
+<td><strong>6 passed</strong> (the 5 existing + <code>only_a_process_step_declares_a_request</code>)</td>
+</tr>
+<tr>
+<td><code>crates/actions/tests/process_agent_resolved.rs</code></td>
+<td><strong>6 passed</strong> (the extended first-step test and <code>the_judge_state_carries_the_step_request</code>)</td>
+</tr>
+<tr>
+<td><code>crates/actions/tests/internal_agent_runtime.rs</code></td>
+<td><strong>18 passed, 2 ignored</strong> (the ignored live model/laya proofs are #599's, unchanged)</td>
+</tr>
+<tr>
+<td><code>served-spec.lock.json</code></td>
+<td>no action, scope or route changed; <code>--check-lock</code> runs in the PR's <code>image</code> job</td>
+</tr>
+<tr>
+<td>preflight</td>
+<td>run 45258289874 on <code>26d8e513</code> <strong>success</strong> (fmt + clippy <code>-D warnings</code>, all targets)</td>
+</tr>
 </tbody>
 </table>
+<p>The two new run-level tests failed once on their first CI run and were fixed on this branch: the post-run recompile now uses the binding's release anatomy (the same pins the executor used) and clears the run's own terminal attempt memory row first (the step-6 technique), and the release anatomy fixture carries <code>job_key</code> — the parser reads it from the job definition, not the job row.</p>
 <h2 id="reversal-proofs">Reversal proofs</h2>
-<p><em>To fill at completion.</em> Each guard is disabled, its test turns red, then restored and re-run green: the input render, the outputs read, the synthetic-envelope exclusion, and the judge's case input.</p>
+<p>Each guard was disabled, its test turned red, then restored and re-run green.</p>
 <table>
 <thead>
 <tr>
@@ -56,10 +80,26 @@
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>A — the resolved input's render (<code>StepFacts::request</code>)</td>
+<td>domain <code>the_declared_step_renders_as_one_request_document</code>, <code>the_request_is_in_the_hash</code></td>
+</tr>
+<tr>
+<td>B — the declared outputs' read (<code>read_step</code>)</td>
+<td>store <code>only_a_process_step_declares_a_request</code> (the declared row's outputs)</td>
+</tr>
+<tr>
+<td>C — the <code>process_step_id</code> gate on the input (the synthetic envelope rendered)</td>
+<td>store <code>only_a_process_step_declares_a_request</code> (the synthetic row's <code>input.is_none()</code>)</td>
+</tr>
+<tr>
+<td>D — the judge's request document (<code>Some(&amp;request_document)</code> → <code>Some(&amp;row.input)</code>)</td>
+<td>actions <code>the_judge_state_carries_the_step_request</code></td>
+</tr>
 </tbody>
 </table>
 <h2 id="generated">Generated</h2>
-<p><em>To fill at completion.</em> The document pack, the served-spec lock (<code>--check-lock</code>), the programme seed and both coverage checks. No action, scope, route or migration changed; the seed's S21 <code>issues</code> list gains #624 when the automated issue-registry refresh adds it to <code>docs/design/data/issues.json</code>.</p>
+<p>Regenerated at the merge point: the document pack (<code>check-docs</code> 12/12), the architecture pack's embedded diagram source (<code>design-pack</code> green), and the programme seed/coverage checks (current). No action, scope, route or migration changed; the seed's S21 <code>issues</code> list gains #624 when the automated issue-registry refresh adds it to <code>docs/design/data/issues.json</code>.</p>
 <h2 id="residuals">Residuals</h2>
 <ul>
 <li>A routinely large resolved input can make the process section refuse. The measured refusal is the contract; the remedy is a larger <code>budget_chars</code> or a shorter step input, never a silent clip.</li>
