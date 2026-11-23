@@ -41,6 +41,11 @@ async fn seed_audit(db: &common::TestDb) -> (TenantId, Uuid) {
 }
 
 async fn stub(answer: String) -> String {
+    stub_with_reason(answer, "stop").await
+}
+
+/// A stub whose answer carries `finish_reason` — `length` is the truncated shape.
+async fn stub_with_reason(answer: String, finish_reason: &'static str) -> String {
     let app = axum::Router::new().route(
         "/api/chat/completions",
         axum::routing::post(move || {
@@ -52,7 +57,7 @@ async fn stub(answer: String) -> String {
                     "choices": [{
                         "index": 0,
                         "message": {"role": "assistant", "content": answer},
-                        "finish_reason": "stop"
+                        "finish_reason": finish_reason
                     }],
                     "usage": {
                         "prompt_tokens": 20,
@@ -161,6 +166,36 @@ async fn a_malformed_answer_fails_the_audit_with_the_error_recorded() {
     assert!(
         error.unwrap_or_default().contains("not JSON"),
         "the parse error is recorded"
+    );
+}
+
+#[tokio::test]
+async fn a_truncated_answer_fails_the_audit_with_the_length_error() {
+    let db = common::TestDb::fresh().await;
+    let (tenant, audit_id) = seed_audit(&db).await;
+    let base = stub_with_reason("{\"findings\": [{\"loc".to_owned(), "length").await;
+    set_router(&base);
+
+    let failure = prompt_audit_run::run(
+        &db.runtime,
+        tenant,
+        "conveyor-test",
+        &json!({"audit_id": audit_id}),
+    )
+    .await
+    .expect_err("a truncated answer must fail the audit");
+    assert!(failure.permanent, "{failure}");
+
+    let (status, error): (String, Option<String>) =
+        sqlx::query_as("SELECT status, error FROM prompt_audit WHERE id = $1")
+            .bind(audit_id)
+            .fetch_one(&db.super_pool)
+            .await
+            .expect("read audit");
+    assert_eq!(status, "failed");
+    assert!(
+        error.unwrap_or_default().contains("finish_reason=length"),
+        "the truncation is recorded"
     );
 }
 

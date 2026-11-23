@@ -272,6 +272,18 @@ fn render_inventory(items: &[scan::SurfaceItem]) -> (Value, bool) {
 /// replacement or a non-array answer fails the audit with a recorded error rather than dropping
 /// findings silently.
 fn parse_findings(output: &Value) -> Result<Vec<FindingDraft>, String> {
+    // The live model spends reasoning tokens on every call and those count against the cap, so a
+    // truncated answer is a real shape. Name it instead of reporting the cut JSON as malformed.
+    if output
+        .get("choices")
+        .and_then(Value::as_array)
+        .and_then(|choices| choices.first())
+        .and_then(|choice| choice.get("finish_reason"))
+        .and_then(Value::as_str)
+        == Some("length")
+    {
+        return Err("the model answer was cut off at max_tokens (finish_reason=length)".to_owned());
+    }
     let content = output
         .get("choices")
         .and_then(Value::as_array)

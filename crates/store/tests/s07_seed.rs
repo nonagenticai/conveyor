@@ -27,8 +27,9 @@ async fn the_catalogue_seed_imports_every_exported_row_and_is_idempotent() {
     // T9 (#81) adds one hand-authored `project_type` row: `architecture`, whose ADM phase
     // nodes are `wbs_node` rows, not catalogue phases (so it declares none and derives no map).
     // T4 (#75) adds the `coach` card type: 74 -> 75. T11 (#84) adds `incident`: 75 -> 76.
+    // S18 P3a (#12) adds `benchmark`: 76 -> 77.
     assert_eq!(export.entries.len(), 40, "the export's catalogue entries");
-    assert_eq!(export.card_types.len(), 76, "the export's card types");
+    assert_eq!(export.card_types.len(), 77, "the export's card types");
     assert_eq!(
         capabilities.capabilities.len(),
         18,

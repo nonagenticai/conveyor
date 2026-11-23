@@ -32,11 +32,12 @@ use chrono::Utc;
 use conveyor_actions::eval::runs::{CASE_JOB_KIND, REGRADE_JOB_KIND};
 use conveyor_actions::invoke::{Authority, HandlerCtx, InvokeRequest, UsageContext, invoke};
 use conveyor_actions::registry::registry;
+use conveyor_actions::workflow::agent::run_step;
 use conveyor_auth::Role;
 use conveyor_domain::TenantId;
 use conveyor_domain::eval::{
-    CaseDeadline, FailureClass, GraderKind, RetryPolicy, SubjectInput, grade_programmatic,
-    served_model_matches, subject_request,
+    CaseDeadline, FailureClass, GraderKind, RetryPolicy, SubjectInput, SubjectKind,
+    grade_programmatic, served_model_matches, subject_request,
 };
 use conveyor_domain::inference::CallerKind;
 use conveyor_store as store;
@@ -133,89 +134,35 @@ pub async fn run_case(
         }
     };
 
-    // ── invoke the subject through the ordinary engine ─────────────────────────────────
-    let outcome = invoke(
-        pool,
-        registry(),
-        tenant,
-        InvokeRequest {
-            action: eval.entry_action.clone(),
-            input: request.clone(),
-            precondition: None,
-            idempotency_key: Some(format!("eval.case.run:{run_id}:{case_id}:{rep}")),
-            approval_id: None,
-            actor_id: Uuid::nil(),
-            actor_kind: "service".to_owned(),
-            role: Role::KataExecutor,
-            policy: Default::default(),
-            authority: Authority::Internal,
-            request_id: Some(format!("eval.case.run:{run_id}:{case_id}:{rep}")),
-            trace_id: Some(format!("eval:{run_id}")),
-            depth: 1,
-            app_key: app_key.to_owned(),
-            // D23's amendment (S19 §9): an eval's model call is attributed to the eval run, so the
-            // ledger and `inference_usage.report` see the instrument that is measuring everything
-            // else. The engine records it only when the subject action captures usage.
-            usage: Some(UsageContext {
-                caller_kind: CallerKind::Eval,
-                run_id: None,
-                run_step_id: None,
-                conversation_turn_id: None,
-                eval_run_id: Some(run_id),
-                prompt_ref: Some(format!("eval:{}", eval.entry_action)),
-                prompt_version: None,
-                prompt_sha256: None,
-                correlation_id: None,
-            }),
-        },
-    )
-    .await;
-
-    let outcome = match outcome {
-        Ok(outcome) => outcome,
-        Err(error) => {
-            let class = FailureClass::from_status(error.status);
-            return fail(
-                pool,
-                tenant,
-                &Slot {
-                    run_id,
-                    case_id,
-                    rep,
-                    attempt,
-                },
-                class,
-                format!("{}: {}", error.code, error.detail),
-                None,
-                None,
-                None,
-                deadline,
-            )
-            .await;
-        }
+    // ── the subject ────────────────────────────────────────────────────────────────────
+    //
+    // `agent_run` runs through the one loop the step executors drive (`run_step`); its handler
+    // deliberately refuses a direct invocation (CONTRACT §17). Every other subject is an
+    // ordinary action and goes through `invoke`.
+    let slot = Slot {
+        run_id,
+        case_id,
+        rep,
+        attempt,
     };
-    if !(200..300).contains(&outcome.status) {
-        let class = FailureClass::from_status(outcome.status);
-        return fail(
-            pool,
-            tenant,
-            &Slot {
-                run_id,
-                case_id,
-                rep,
-                attempt,
-            },
-            class,
-            format!("the subject answered {}", outcome.status),
-            None,
-            None,
-            None,
-            deadline,
-        )
-        .await;
-    }
-
-    let output = outcome.body.get("output").cloned().unwrap_or(Value::Null);
+    let (output, invocation_id, tool_calls) =
+        match call_subject(pool, tenant, app_key, &slot, &eval, &request, deadline).await {
+            Ok(result) => result,
+            Err((class, detail, served)) => {
+                return fail(
+                    pool,
+                    tenant,
+                    &slot,
+                    class,
+                    detail,
+                    served.as_deref(),
+                    None,
+                    None,
+                    deadline,
+                )
+                .await;
+            }
+        };
 
     // ⛔ The model comes from the RESPONSE, never from the config.
     let served = output
@@ -311,11 +258,18 @@ pub async fn run_case(
             output: &output,
             turns: &turns,
             model: &served,
-            stop_reason: output.get("stop_reason").and_then(Value::as_str),
+            // The `completions.create` output is the router's document, whose reason is
+            // `choices[0].finish_reason` (the same shape `count_tool_calls` reads).
+            stop_reason: output
+                .get("choices")
+                .and_then(Value::as_array)
+                .and_then(|choices| choices.first())
+                .and_then(|choice| choice.get("finish_reason"))
+                .and_then(Value::as_str),
             usage: &usage,
             latency_ms,
-            tool_calls: count_tool_calls(&output),
-            action_invocation_id: outcome.invocation_id,
+            tool_calls,
+            action_invocation_id: invocation_id,
             subject_run_id: output
                 .get("run_id")
                 .and_then(Value::as_str)
@@ -325,6 +279,211 @@ pub async fn run_case(
         deadline,
     )
     .await
+}
+
+/// Invoke the subject and return `(output document, action invocation id, tool-call count)`.
+///
+/// The action path is unchanged: the eval's `entry_action` is invoked through the ordinary
+/// engine, and a failure is returned as the class the caller records. The `agent_run` path is the
+/// executor-backed adapter; it returns no action invocation id because the loop's calls are
+/// `agent.run`'s own.
+async fn call_subject(
+    pool: &PgPool,
+    tenant: TenantId,
+    app_key: &str,
+    slot: &Slot,
+    eval: &store::eval::Eval,
+    request: &Value,
+    deadline: CaseDeadline,
+) -> Result<(Value, Option<Uuid>, i32), (FailureClass, String, Option<String>)> {
+    if eval.subject_kind == SubjectKind::AgentRun {
+        return agent_subject(pool, tenant, app_key, slot, eval, request, deadline).await;
+    }
+
+    let outcome = invoke(
+        pool,
+        registry(),
+        tenant,
+        InvokeRequest {
+            action: eval.entry_action.clone(),
+            input: request.clone(),
+            precondition: None,
+            idempotency_key: Some(format!(
+                "eval.case.run:{}:{}:{}",
+                slot.run_id, slot.case_id, slot.rep
+            )),
+            approval_id: None,
+            actor_id: Uuid::nil(),
+            actor_kind: "service".to_owned(),
+            role: Role::KataExecutor,
+            policy: Default::default(),
+            authority: Authority::Internal,
+            request_id: Some(format!(
+                "eval.case.run:{}:{}:{}",
+                slot.run_id, slot.case_id, slot.rep
+            )),
+            trace_id: Some(format!("eval:{}", slot.run_id)),
+            depth: 1,
+            app_key: app_key.to_owned(),
+            // D23's amendment (S19 §9): an eval's model call is attributed to the eval run, so the
+            // ledger and `inference_usage.report` see the instrument that is measuring everything
+            // else. The engine records it only when the subject action captures usage.
+            usage: Some(UsageContext {
+                caller_kind: CallerKind::Eval,
+                run_id: None,
+                run_step_id: None,
+                conversation_turn_id: None,
+                eval_run_id: Some(slot.run_id),
+                prompt_ref: Some(format!("eval:{}", eval.entry_action)),
+                prompt_version: None,
+                prompt_sha256: None,
+                correlation_id: None,
+            }),
+        },
+    )
+    .await;
+
+    let outcome = match outcome {
+        Ok(outcome) => outcome,
+        Err(error) => {
+            return Err((
+                FailureClass::from_status(error.status),
+                format!("{}: {}", error.code, error.detail),
+                None,
+            ));
+        }
+    };
+    if !(200..300).contains(&outcome.status) {
+        return Err((
+            FailureClass::from_status(outcome.status),
+            format!("the subject answered {}", outcome.status),
+            None,
+        ));
+    }
+    let output = outcome.body.get("output").cloned().unwrap_or(Value::Null);
+    let tool_calls = count_tool_calls(&output);
+    Ok((output, outcome.invocation_id, tool_calls))
+}
+
+/// The executor-backed `agent_run` subject (S18 W11).
+///
+/// The loop is `run_step`'s, not `agent.run`'s refusing handler: the case input becomes the user
+/// message, the eval's `model_ref` is the model, and the loop's final text is presented in the
+/// completion shape the graders already read. The served model is read back from the inference
+/// ledger, never copied from the configuration — the eval's own rule.
+async fn agent_subject(
+    pool: &PgPool,
+    tenant: TenantId,
+    app_key: &str,
+    slot: &Slot,
+    eval: &store::eval::Eval,
+    request: &Value,
+    _deadline: CaseDeadline,
+) -> Result<(Value, Option<Uuid>, i32), (FailureClass, String, Option<String>)> {
+    let Some(model) = eval
+        .model_ref
+        .as_deref()
+        .map(str::trim)
+        .filter(|model| !model.is_empty())
+    else {
+        return Err((
+            FailureClass::Harness,
+            "an agent_run eval needs a model_ref".to_owned(),
+            None,
+        ));
+    };
+    let messages = match request.get("messages") {
+        Some(messages @ Value::Array(_)) => messages.clone(),
+        _ => {
+            let content = request
+                .get("input")
+                .cloned()
+                .unwrap_or_else(|| request.clone());
+            json!([{"role": "user", "content": content}])
+        }
+    };
+    let input = json!({
+        "model": model,
+        "messages": messages,
+        "max_turns": 8,
+        "timeout_ms": i64::try_from(EVAL_CASE_TIMEOUT.as_millis()).unwrap_or(i64::MAX),
+    });
+    let prefix = format!(
+        "eval.case.run:{}:{}:{}",
+        slot.run_id, slot.case_id, slot.rep
+    );
+    let out = match run_step(
+        pool,
+        tenant,
+        slot.run_id,
+        None,
+        None,
+        app_key,
+        Some(&prefix),
+        1,
+        &input,
+    )
+    .await
+    {
+        Ok(out) => out,
+        Err(error) => {
+            return Err((
+                FailureClass::from_status(error.status),
+                format!("{}: {}", error.code, error.detail),
+                None,
+            ));
+        }
+    };
+    let Some(served) = served_model(pool, tenant, slot.run_id).await else {
+        return Err((
+            FailureClass::Harness,
+            "the agent loop recorded no served model".to_owned(),
+            None,
+        ));
+    };
+    let calls: Vec<Value> = out
+        .tool_calls
+        .iter()
+        .map(|call| {
+            json!({
+                "id": call.id,
+                "type": "function",
+                "function": {"name": call.name, "arguments": "{}"},
+            })
+        })
+        .collect();
+    let count = i32::try_from(calls.len()).unwrap_or(i32::MAX);
+    let output = json!({
+        "model": served,
+        "choices": [{
+            "index": 0,
+            "message": {
+                "role": "assistant",
+                "content": out.output,
+                "tool_calls": calls,
+            },
+            "finish_reason": "stop",
+        }],
+        "usage": out.usage,
+    });
+    Ok((output, None, count))
+}
+
+/// The model the router actually served for this run's most recent call.
+async fn served_model(pool: &PgPool, tenant: TenantId, run_id: Uuid) -> Option<String> {
+    let mut tx = store::begin_scoped(pool, tenant).await.ok()?;
+    let row: Option<Option<String>> = sqlx::query_scalar(
+        "SELECT served_model FROM inference_call
+          WHERE tenant_id = $1 AND run_id = $2
+          ORDER BY created_at DESC LIMIT 1",
+    )
+    .bind(tenant.as_uuid())
+    .bind(run_id)
+    .fetch_optional(&mut *tx)
+    .await
+    .ok()?;
+    tx.commit().await.ok()?;
+    row.flatten()
 }
 
 /// Everything one slot needs in order to be graded and written.

@@ -15,7 +15,7 @@
       "note": "V1 ships the kata instruments (eval/benchmark/kata-arm tables, S17-S20) but no kata.* action family; the V2 kata workflow is T5."
     },
     "destination:Organisation": {
-      "note": "The mock page is a design study; the app has no /organisation route, and the organisation read/write actions are T0/T2."
+      "note": "The mock page is a design study; the app's /organisation route renders the T0/T2 organisation reads, and the write verbs remain T0/T2's."
     },
     "destination:Procedures": {
       "note": "V1 has the process list/detail and the process map at /build/processes and /build/process-map; V2 adds SOP/RDF/OWL/BPMN intake, PDDL/PKO and the publish gates (T16)."
@@ -27,7 +27,7 @@
       "note": "The V1 boards are the nearest surface; the computed portfolio, shared config, WSJF and cadence are T1/T10."
     },
     "destination:Plan": {
-      "note": "The live Boards tab joins real cards at /boards; WBS, baseline, registers and change control are T1."
+      "note": "The app's /plan route renders the T1 WBS, baselines, registers and change control; the live Boards tab remains at /boards."
     },
     "destination:Improve": {
       "note": "V1 /evals/improvement carries the improvement campaigns; the coach/kata/lessons path is T4/T5."

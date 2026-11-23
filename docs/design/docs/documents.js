@@ -600,8 +600,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/evidence/v2-coverage.html",
       "source": "docs/evidence/v2-coverage.md",
       "section": "Evidence",
-      "sha256": "ef10f3a46dd16b48b8280d4bf0e97b787838865cf77318255a4c96c62ca5a1bb",
-      "bytes": 13951,
+      "sha256": "2543e7b16d80afee1090d8694c1fe11207f955a9f327589c3929a56dfbb0ee20",
+      "bytes": 13992,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/v2-coverage.md"
     },
     {
@@ -1194,8 +1194,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/slices/S18-kata-improvement.html",
       "source": "docs/plans/slices/S18-kata-improvement.md",
       "section": "Plans",
-      "sha256": "f9744cbc6cb89604eb0df2bd754edadfdb4206a9d7f973c35736affc68aa8489",
-      "bytes": 9781,
+      "sha256": "d82a209c37fc298bb416496dd6a86af64342e3cb1da89e017f81edb1467ca461",
+      "bytes": 9778,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S18-kata-improvement.md"
     },
     {

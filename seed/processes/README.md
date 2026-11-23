@@ -2,8 +2,8 @@
 
 The process model (SPEC D6/D20/D22/D28/D29/D30) makes a **process** the executor: an ordered list
 of steps, each judged against its **SOP** (the `procedure` table). This directory is ONE catalogue:
-the 280 per-type processes (70 card types × four list stages) and the 53 named processes (`cap.*`,
-`ask_fr`, `kata.open`) that describe a software-development lifecycle.
+the 280 per-type processes (70 card types × four list stages) and the 55 named processes (`cap.*`,
+`ask_fr`, `kata.open`, `swebench-fix`) that describe a software-development lifecycle.
 
 ⛔ **There is NO universal tenant seed.** A tenant may run accounting, marketing, software
 development, or project management with human members; installing this catalogue into a new
@@ -156,10 +156,10 @@ Per-type content (criteria, outputs, prompts' source material) comes from
 
 ## `named.yaml`
 
-The 51 `cap.<family>.<fn>` processes (five functions — `consult`, `create`, `inspect`, `plan`,
-`unblock` — for nine families, plus the four `project_management.*` and
-`kanban_coach.handle_error`), `ask_fr`, and `kata.open`. Same schema as a type process, with
-`card_type: null` and `list: null`.
+The 52 `cap.<family>.<fn>` processes (five functions — `consult`, `create`, `inspect`, `plan`,
+`unblock` — for nine families, plus the five `project_management.*` and
+`kanban_coach.handle_error` and `.v2`), `ask_fr`, `kata.open`, and the S18 process arm's
+`swebench-fix`. Same schema as a type process, with `card_type: null` and `list: null`.
 
 ## `manifest.yaml` (generated)
 

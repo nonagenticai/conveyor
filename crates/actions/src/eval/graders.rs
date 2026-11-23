@@ -27,9 +27,10 @@ pub const RUBRIC_PROMPT_V1: &str = include_str!("../prompts/eval_judge_rubric_v1
 /// The pairwise judge's system prompt.
 pub const PAIRWISE_PROMPT_V1: &str = include_str!("../prompts/eval_judge_pairwise_v1.md");
 
-/// How many output tokens a judge may spend. Generous for two sentences, small enough that a
-/// runaway judge fails fast rather than burning a run's budget on one case.
-const JUDGE_MAX_TOKENS: u32 = 512;
+/// How many output tokens a judge may spend. Generous for two sentences — and for the ~130
+/// reasoning tokens the local model spends on every call, which count against this cap — small
+/// enough that a runaway judge fails fast rather than burning a run's budget on one case.
+const JUDGE_MAX_TOKENS: u32 = 1024;
 
 /// The judge model a metric declares, if any.
 pub fn judge_model(grader: &Value) -> Option<&str> {
@@ -144,11 +145,24 @@ pub fn judge_request(
 /// with no message content, and content that is not the declared object. The score only reaches
 /// the row once it has been validated.
 pub fn grade_from_judge(outcome_body: &Value) -> Result<Grade, GradingError> {
-    let content = outcome_body
+    let choice = outcome_body
         .get("output")
         .and_then(|output| output.get("choices"))
         .and_then(Value::as_array)
-        .and_then(|choices| choices.first())
+        .and_then(|choices| choices.first());
+    // The live model spends reasoning tokens on every call and those count against the cap, so a
+    // verdict cut at `max_tokens` is a real answer shape. Say so instead of reading its truncated
+    // content as a malformed verdict.
+    if choice
+        .and_then(|choice| choice.get("finish_reason"))
+        .and_then(Value::as_str)
+        == Some("length")
+    {
+        return Err(GradingError::MalformedVerdict {
+            why: "the judge's verdict was cut off at max_tokens (finish_reason=length)",
+        });
+    }
+    let content = choice
         .and_then(|choice| choice.get("message"))
         .and_then(|message| message.get("content"))
         .and_then(Value::as_str)
@@ -270,10 +284,21 @@ mod tests {
     #[test]
     fn a_judge_body_is_parsed_or_refused() {
         let good = json!({"output": {"choices": [{"message": {"content":
-            "{\"score\": 0.5, \"explanation\": \"misses the rubric line\"}"}}]}});
+            "{\"score\": 0.5, \"explanation\": \"misses the rubric line\"}"},
+            "finish_reason": "stop"}]}});
         let grade = grade_from_judge(&good).expect("graded");
         assert_eq!(grade.score, 0.5);
         assert_eq!(grade.detail["explanation"], json!("misses the rubric line"));
+
+        // A verdict cut at the token budget is named, not read as a malformed one.
+        let truncated = json!({"output": {"choices": [{"message": {"content":
+            "{\"score\": 0.5, \"expla"}, "finish_reason": "length"}]}});
+        match grade_from_judge(&truncated) {
+            Err(GradingError::MalformedVerdict { why }) => {
+                assert!(why.contains("finish_reason=length"), "{why}");
+            }
+            other => panic!("{other:?}"),
+        }
 
         for bad in [
             json!({}),

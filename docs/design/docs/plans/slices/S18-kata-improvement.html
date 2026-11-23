@@ -99,7 +99,7 @@ source ~/.cargo/env
 cd $HOME/Movies/conveyor
 
 # the arm refuses before S13/S15 data exists, and runs when it does
-cargo test -p conveyor-server --test benchmark_arm
+cargo test -p conveyor-api --test benchmark_arm
 # two versions of one subject compare with an exact McNemar delta
 cargo test -p conveyor-api --test benchmark_trend
 # the improvement job performs the same calls a person does

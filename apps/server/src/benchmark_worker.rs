@@ -155,13 +155,16 @@ pub async fn poll_with(
     tx.commit().await.map_err(db)?;
 
     if !pending.is_empty() {
-        // **A `conveyor` case is produced before it is graded** (S18 step 1). Production is an
-        // `agent.run`, which is bounded but long, so it can never happen inline in a tick; the
-        // driver enqueues one producer job per case and moves on. Every other arm already holds
-        // its patch, so it goes straight to a grading Job.
+        // **A produced case is produced before it is graded** (S18 step 1): the model arms run
+        // an `agent.run`, and the process arm starts a card-scoped process (S18 P3c). Both are
+        // bounded but long, so neither can happen inline in a tick; the driver enqueues one
+        // producer job per case and moves on. Every other arm already holds its patch, so it
+        // goes straight to a grading Job.
+        let produced_arm =
+            matches!(run.arm.as_str(), "conveyor" | "baseline") || run.subject_kind == "process";
         let (to_grade, to_produce): (Vec<_>, Vec<_>) = pending
             .into_iter()
-            .partition(|case| run.arm != "conveyor" || case.produce_status == "ok");
+            .partition(|case| !produced_arm || case.produce_status == "ok");
         if !to_produce.is_empty() {
             let mut tx = store::begin_scoped(pool, tenant).await.map_err(db)?;
             for case in &to_produce {
