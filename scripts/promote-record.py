@@ -127,6 +127,9 @@ WRITE_ACTIONS = {
     "lessons.propose",
     "tranches.review",
     "tranches.authorise",
+    # The architecture compliance review: one row per contract, and the table is unique per
+    # (project, contract), so the replay reads the row it already wrote before recording one.
+    "architecture.reviews_record",
 }
 
 # The ADR register's 57 source rows are NOT journaled one entry per row: the seed
@@ -184,6 +187,7 @@ WBS_ACCEPT_KEY_RE = re.compile(r"^wbs-accept:([0-9a-f-]{36}):(.+)$")
 # A card's Definition-of-Done decide. The request keys on `approval:card_done/<card>`; the
 # decide carries its own form so the two acts of one gate cannot collide on a natural key.
 CARD_DONE_DECIDE_KEY_RE = re.compile(r"^card-done-decide:([0-9a-f-]{36})$")
+REVIEW_KEY_RE = re.compile(r"^review:([0-9a-f-]{36})$")
 PROJECT_CLOSE_KEY_RE = re.compile(r"^project:close:([0-9a-f-]{36})$")
 CARD_COMMENT_KEY_RE = re.compile(r"^card-comment:([0-9a-f-]{36}):([0-9a-f]{8,64})$")
 CARD_MOVE_KEY_RE = re.compile(r"^card-move:([0-9a-f-]{36}):(intake|active|waiting|done|archive)$")
@@ -249,6 +253,8 @@ class NaturalKey:
             return f"wbs-accept:{self.first}:{self.second}"
         if self.kind == "card_done_decide":
             return f"card-done-decide:{self.first}"
+        if self.kind == "review":
+            return f"review:{self.first}"
         if self.kind == "project_close":
             return f"project:close:{self.first}"
         if self.kind == "card_comment":
@@ -367,6 +373,9 @@ def parse_natural_key(value: str) -> NaturalKey:
     match = CARD_DONE_DECIDE_KEY_RE.match(value)
     if match:
         return NaturalKey("card_done_decide", match.group(1))
+    match = REVIEW_KEY_RE.match(value)
+    if match:
+        return NaturalKey("review", match.group(1))
     match = PROJECT_CLOSE_KEY_RE.match(value)
     if match:
         return NaturalKey("project_close", match.group(1))
@@ -719,6 +728,22 @@ def validate_entries(entries: list[Entry]) -> list[str]:
                             errors.append(
                                 f"line {entry.lineno}: wbs node {index} needs kind and title"
                             )
+        elif entry.action == "architecture.reviews_record":
+            if key.kind != "review":
+                errors.append(
+                    f"line {entry.lineno}: architecture.reviews_record key must be "
+                    "review:<contract id>"
+                )
+                continue
+            if entry.payload.get("contract_id") != key.first:
+                errors.append(
+                    f"line {entry.lineno}: natural key {key.first!r} does not match "
+                    f"input contract_id {entry.payload.get('contract_id')!r}"
+                )
+            if not entry.payload.get("level"):
+                errors.append(f"line {entry.lineno}: a review needs a level")
+            if not entry.payload.get("project_id"):
+                errors.append(f"line {entry.lineno}: a review needs a project_id")
         elif entry.action == "wbs.update":
             if key.kind != "wbs_accept":
                 errors.append(
@@ -1257,6 +1282,9 @@ class State:
     # `card_done` gate when the card's type declares a Definition of Done, and those gates hang
     # on the card, not on a project, so they are read by card id.
     card_gates: dict[str, list[dict]] = field(default_factory=dict)
+    # The architecture compliance reviews, by contract id. (The plain `reviews` field is the
+    # tranche review list; this is the architecture one.)
+    compliance_reviews: dict[str, list[dict]] = field(default_factory=dict)
     # The tr3 record family's production rows: benefits-map edges by benefit.
     links: list[dict] = field(default_factory=list)
     # The document family's production rows, by (project, category) as listed.
@@ -1405,6 +1433,17 @@ def load_state(
             or (entry.action == "approvals.decide" and entry.key.kind == "card_done_decide")
         )
     }
+    review_contracts = {
+        entry.key.first
+        for entry in entries
+        if entry.action == "architecture.reviews_record"
+        and entry.key is not None
+        and entry.key.kind == "review"
+    }
+    for contract_id in sorted(review_contracts):
+        state.compliance_reviews[contract_id] = list_all(
+            client, "architecture.reviews_list", {"contract_id": contract_id}
+        )
     for card_id in sorted(card_gate_cards):
         state.card_gates[card_id] = list_all(
             client, "approvals.list", {"card_id": card_id}
@@ -2112,6 +2151,12 @@ def existing_for(
             ):
                 return link
         return None
+    if entry.action == "architecture.reviews_record":
+        # One review per contract: the row that exists is the act that happened.
+        for row in state.compliance_reviews.get(key.first, []):
+            if row.get("contract_id") == key.first:
+                return row
+        return None
     if entry.action == "projects.close_request":
         return closure_gate(state, key.first)
     if entry.action == "projects.charter":
@@ -2803,6 +2848,19 @@ def readback_entry(
         return gate
     if entry.action == "benefits.measure":
         return readback_measurement(client, state, entry, snapshot, production_id)
+    if entry.action == "architecture.reviews_record":
+        found = rows(client, "architecture.reviews_list", {"contract_id": key.first})
+        state.compliance_reviews[key.first] = found
+        for row in found:
+            if row.get("id") != production_id:
+                continue
+            if row.get("level") != entry.payload.get("level"):
+                raise ReadbackError(
+                    f"architecture.reviews_list: level is {row.get('level')!r}, not "
+                    f"{entry.payload.get('level')!r}"
+                )
+            return row
+        raise ReadbackError("architecture.reviews_list: the review is not readable")
     if entry.action == "wbs.update":
         nodes = rows(client, "wbs.list", {"project_id": key.first})
         for node in nodes:

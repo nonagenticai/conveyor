@@ -2343,6 +2343,32 @@ pub async fn review_for_contract_tx(
         .await?)
 }
 
+/// Every compliance review of a project, or exactly the one a contract carries.
+///
+/// The promotion replay reads the review it already wrote through this: the table is unique per
+/// `(tenant, project, contract)`, so a second `reviews_record` is refused rather than repeated,
+/// and a replay needs a way to see the row and skip.
+pub async fn list_reviews_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    project_id: Option<Uuid>,
+    contract_id: Option<Uuid>,
+) -> Result<Vec<ReviewRecord>, ArchitectureStoreError> {
+    let sql = format!(
+        "SELECT {REVIEW_COLUMNS} FROM architecture_compliance_review
+          WHERE tenant_id = $1
+            AND ($2::uuid IS NULL OR project_id = $2)
+            AND ($3::uuid IS NULL OR contract_id = $3)
+          ORDER BY contract_id, reviewed_at DESC"
+    );
+    Ok(sqlx::query_as(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(project_id)
+        .bind(contract_id)
+        .fetch_all(&mut *conn)
+        .await?)
+}
+
 /// Read one compliance review by id; the waiver path needs its contract, reviewer and evidence.
 pub async fn get_review_tx(
     conn: &mut PgConnection,

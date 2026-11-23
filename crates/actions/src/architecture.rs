@@ -1570,6 +1570,50 @@ fn review_out(record: &ReviewRecord) -> ReviewOut {
     }
 }
 
+/// `architecture.reviews_list`.
+///
+/// A review is unique per `(project, contract)`, so the record's replay needs to read the row it
+/// already wrote before it records one. Filter by project, by contract, or both.
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct ReviewListIn {
+    /// Filter by project.
+    #[serde(default)]
+    pub project_id: Option<Uuid>,
+    /// Filter by contract.
+    #[serde(default)]
+    pub contract_id: Option<Uuid>,
+}
+
+#[crate::action(
+    name = "architecture.reviews_list",
+    version = 1,
+    kind = "internal",
+    scopes = ["projects:read"],
+    idempotent = true,
+    timeout_ms = 30000,
+    effect = "read",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn architecture_reviews_list(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: ReviewListIn,
+) -> Result<HandlerOutput<Page<ReviewOut>>, ActionError> {
+    let rows = store::architecture::list_reviews_tx(
+        &mut *tx,
+        ctx.tenant,
+        input.project_id,
+        input.contract_id,
+    )
+    .await
+    .map_err(|error| arch_error(error, ctx.action))?;
+    Ok(HandlerOutput::ok(Page {
+        items: rows.iter().map(review_out).collect(),
+        next_cursor: None,
+    }))
+}
+
 #[crate::action(
     name = "architecture.reviews_record",
     version = 1,

@@ -1,7 +1,7 @@
 {
   "version": 1,
   "operations": {
-    "GET /api/actions": "9e33785a44f0295b7715a3a2b3ceb01269fa3495725b577fcb05c73dcdcd7c84",
+    "GET /api/actions": "9f1e5540bd4d03e30d7566cbae36824cc9a28665fe8a3b242a50463de77d3e6d",
     "GET /api/boards/{id}": "e1a5ad504ea61c9f6f4c9940f6bce0a13a06587c4545d9d52616852f0e67fa5b",
     "GET /api/boards/{id}/cards": "be3ca9f8fea011aa8b097206310d24ba4641698d2a8d239c5b2df6c48b784502",
     "GET /api/boards/{id}/webhooks": "5b77b802ff044156108b56072acb99bed0e2f9dfb5f2dc667b000af191cffd1b",
@@ -62,6 +62,7 @@
     "POST /api/actions/architecture.profile_tailor/invocations": "38e68c235d7157e6a0be8697c48a89b395763137c2623dbfaad2187ce79334d9",
     "POST /api/actions/architecture.repository_search/invocations": "3c9407602000c80c848015c6372525f10e19fcb1b192a78fdc54a22884bd427e",
     "POST /api/actions/architecture.reviews_get/invocations": "e1a4fb4b69eb973832157da053208f8ee0128d7f4cd4399faa265878e901ce82",
+    "POST /api/actions/architecture.reviews_list/invocations": "c4cb452242246f6285be4b0db6b75aa337f3f3e7856103a725e70b38d1440303",
     "POST /api/actions/architecture.reviews_record/invocations": "919203e498ee65c1c2b6100ba400a90e9248d62b3549045dd09858ddc6ae5127",
     "POST /api/actions/architecture.reviews_waive/invocations": "d8182ef4a3af8db0eacb932c5d188cbabbd6d83c9db14ed6cce8bd0073257b72",
     "POST /api/actions/architecture.skills_assess/invocations": "27c9e6ea637405beaefe71d1c417d09b7c42221343c33db34219ba760432e178",
