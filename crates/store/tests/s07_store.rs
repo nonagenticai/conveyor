@@ -44,8 +44,9 @@ async fn trace_links_read_both_directions_and_resolve_both_ends_in_tenant() {
     let seed = support::seed_tenant(&db.super_pool, "s07-trace").await;
     let tenant = TenantId::from_uuid(seed.tenant).expect("non-nil");
 
-    // The fixture's own trace row uses from_type='requirement' (S03 legacy); the new writer
-    // admits only governed_asset/card, so this edge is distinct from it.
+    // The fixture's own trace row uses from_type='requirement' (S03 legacy); the writer
+    // admits only `END_TYPES` (governed_asset/card/project/document), so this edge is
+    // distinct from it.
     let link = {
         let mut tx = begin_scoped(&db.runtime, tenant).await.expect("scope");
         let link = insert_trace_link_tx(
@@ -199,6 +200,84 @@ async fn trace_links_read_both_directions_and_resolve_both_ends_in_tenant() {
     };
     assert!(deleted, "the first delete removes the row");
     assert!(!deleted_again, "the second delete reports absence");
+}
+
+/// SPEC_V2 §8.5: a published `document` is an addressable trace-link end, so the artefact
+/// factory can trace its output to the project that owns it. The whitelist stays closed: the
+/// S03 `requirement` type is still refused.
+#[tokio::test]
+async fn published_document_is_an_addressable_trace_end() {
+    let db = support::TestDb::fresh().await;
+    let seed = support::seed_tenant(&db.super_pool, "s07-trace-doc").await;
+    let tenant = TenantId::from_uuid(seed.tenant).expect("non-nil");
+
+    // `document` is metadata only: the table's required columns are tenant, kind and title.
+    // Seeded as the superuser so the row exists independent of any tenant scope.
+    let document: Uuid = sqlx::query_scalar(
+        "INSERT INTO document (tenant_id, kind, title)
+         VALUES ($1, 'document', 'Artefact factory output') RETURNING id",
+    )
+    .bind(seed.tenant)
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("seed the published document");
+
+    let mut input = NewTraceLink::new("document", document, "project", seed.project);
+    input.kind = "satisfies".to_owned();
+    let link = {
+        let mut tx = begin_scoped(&db.runtime, tenant).await.expect("scope");
+        let link = insert_trace_link_tx(&mut tx, tenant, &input)
+            .await
+            .expect("a published document is an addressable end");
+        tx.commit().await.expect("commit");
+        link
+    };
+    assert_eq!(link.from_type, "document");
+    assert_eq!(link.from_id, document);
+    assert_eq!(link.to_type, "project");
+    assert_eq!(link.to_id, seed.project);
+    assert_eq!(link.kind, "satisfies");
+
+    // The project screen reads the same row from the to-direction.
+    let mut tx = begin_scoped(&db.runtime, tenant).await.expect("scope");
+    let to_links = list_trace_links_tx(
+        &mut tx,
+        tenant,
+        &TraceFilter {
+            to_type: Some("project".to_owned()),
+            to_id: Some(seed.project),
+            ..TraceFilter::default()
+        },
+        50,
+    )
+    .await
+    .expect("list by the project end");
+    tx.rollback().await.expect("roll back the read");
+    assert_eq!(
+        to_links.len(),
+        1,
+        "the document->project edge: {to_links:?}"
+    );
+    assert_eq!(to_links[0].id, link.id);
+    assert_eq!(to_links[0].from_type, "document");
+    assert_eq!(to_links[0].from_id, document);
+
+    // The whitelist is the store's, not the client's: `requirement` is still unknown.
+    let unknown = {
+        let mut tx = begin_scoped(&db.runtime, tenant).await.expect("scope");
+        let unknown = insert_trace_link_tx(
+            &mut tx,
+            tenant,
+            &NewTraceLink::new("requirement", document, "project", seed.project),
+        )
+        .await;
+        tx.rollback().await.expect("roll back the refusal");
+        unknown
+    };
+    assert!(
+        matches!(unknown, Err(TraceLinkStoreError::UnknownType(ref t)) if t == "requirement"),
+        "unknown end type: {unknown:?}"
+    );
 }
 
 /// S07 §5.4/§5.7: idempotent create, a promoted row is a 409 carrying its project, and
