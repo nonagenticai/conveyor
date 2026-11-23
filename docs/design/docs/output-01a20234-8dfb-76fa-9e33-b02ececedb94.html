@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Stakeholder Map — S02 Skeleton (retrospective, 2026-11-21) - artifact document (2026-11-22) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h2>Metadata</h2>
+<ul>
+<li>Artefact: Stakeholder Map — S02 Skeleton (retrospective, 2026-11-21)</li>
+<li>Phase: a</li>
+<li>Kind: matrix</li>
+<li>Purpose: Name who the S02 tenancy, auth and job surfaces serve, and who can approve or veto them, so the S2 gate (two tenants isolated including RLS; login works) has a recorded owner.</li>
+<li>Scope: The actors named by docs/plans/slices/S02-skeleton.md (§3 scope, §4 source material) and the tenant boundary in migrations/0001_platform.sql; recorded retrospectively on 2026-11-21.</li>
+</ul>
+<h2>Entries</h2>
+<ul>
+<li><strong>Programme owner / The S02 outcome is evidenced, not asserted; the project closes on the two-worker lease proof at d367a4a9 (issue #2 closes with the lane PR)</strong> - {"engagement": "decide", "influence": "high", "interest": "high"}</li>
+<li><strong>Architecture Board (conveyor-architecture-board) / The Statement of Architecture Work and the delivery contract conform; the A–D artefacts are approved</strong> - {"engagement": "approve", "influence": "high", "interest": "high"}</li>
+<li><strong>Programme architect (conveyor-e2e) / The skeleton is the one base every later slice builds on, with no per-slice tenant fork</strong> - {"engagement": "consult", "influence": "high", "interest": "high"}</li>
+<li><strong>Delivery teams (S03–S21) / A typed tenant scope and one action surface they consume unchanged</strong> - {"engagement": "consult", "influence": "medium", "interest": "high"}</li>
+<li><strong>Operators / Health/ready through the runtime pool, metrics, and an SSE stream that resumes by seq</strong> - {"engagement": "inform", "influence": "medium", "interest": "medium"}</li>
+<li><strong>Tenants dev-a and dev-b (dev seed) / Neither tenant can read or forge the other's rows under forced RLS</strong> - {"engagement": "inform", "influence": "low", "interest": "high"}</li>
+<li><strong>S12 UI and S14 estate slices / The declared shell/login surface, the OIDC issuer input and the deploy boundary are stable</strong> - {"engagement": "inform", "influence": "medium", "interest": "medium"}</li>
+<li><strong>Auth and tenancy reviewer (R8) / The highest-bug-surface area is tested as the runtime role with a superuser positive control</strong> - {"engagement": "approve", "influence": "high", "interest": "high"}</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Skeleton — workspace, tenancy, auth, jobs, SSE · conveyor output · published 2026-11-23T09:36:22Z · conveyor-approver</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

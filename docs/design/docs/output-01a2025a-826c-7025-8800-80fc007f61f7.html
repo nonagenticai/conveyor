@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>S04 Business Capability Map - artifact document (2026-11-22) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h2>Metadata</h2>
+<ul>
+<li>Artefact: S04 Business Capability Map</li>
+<li>Phase: b</li>
+<li>Purpose: Name the capabilities S04 establishes and the outcome each delivers.</li>
+<li>Scope: Capabilities delivered by the action registry slice; workflow execution is recorded as deferred.</li>
+</ul>
+<h2>Entries</h2>
+<ul>
+<li><strong>API contract / Action declaration and projection</strong> - {"detail": "One value, three projections, proven by spec_hash equality across manifest, resolved operation and MCP tool.", "objective": "One ActionSpec projects to manifest, operation, MCP tool and route."}</li>
+<li><strong>API contract / Registry consistency</strong> - {"detail": "Compile-time registry with six checks; DB-backed external/workflow registry; one namespace with no precedence.", "objective": "Keep one namespace that fails closed."}</li>
+<li><strong>Service operation / Idempotent invocation</strong> - {"detail": "Mutation, action_invocation and audit_event share one transaction; the loser of an idempotency claim replays the winner.", "objective": "Make retries safe and auditable."}</li>
+<li><strong>Integration / External action ingest</strong> - {"detail": "Hash-pinned specs, refresh diffs, automatic approval of added-optional changes and refusal of breaking changes.", "objective": "Bring external OpenAPI operations under the same invocation contract."}</li>
+<li><strong>Integration / Outbound resilience</strong> - {"detail": "Per-action circuit breaker at five failures in 30 s; timeout, 4xx and 5xx map to RFC 9457 problems.", "objective": "Contain external failures."}</li>
+<li><strong>Interfaces / MCP parity</strong> - {"detail": "rmcp at /mcp with tenant sessions, scope-filtered tools/list and HTTP/MCP behavioural equality.", "objective": "Expose the same actions to MCP clients."}</li>
+<li><strong>Governance / OpenAPI lock</strong> - {"detail": "Per-operation sha256 lock; --check-lock exits 1 naming the changed operation.", "objective": "Catch contract drift before release."}</li>
+<li><strong>Deferred / Workflow actions</strong> - {"detail": "kind: workflow returns 501 until S13.", "objective": "Keep the enum, defer the engine."}</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Action registry — derive, manifest, OpenAPI, MCP, invocation, external ingest · conveyor output · published 2026-11-23T09:36:22Z · conveyor-approver</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

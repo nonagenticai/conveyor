@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>PI plan — tranche 1 (retrospective) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>PI plan — tranche 1 (retrospective)</h1>
+<p><strong>Programme:</strong> conveyor V2 · <strong>Tranche:</strong> 1 (<code>01a1e9e0-d787-7f5c-b5ed-15b05f3dc531</code>, authorised by
+the tranche-0 <code>continue</code> review <code>01a1ed84-e111-7082-9fa8-7fe77ccc9024</code>) · <strong>Period:</strong> <code>tranche-1</code> ·
+<strong>Retrospective record written 2026-11-21.</strong></p>
+<p>This plan is written after the tranche's delivery was recorded. Nothing is backdated: the cadence
+rows, this plan and its objectives are created now and labelled retrospective.</p>
+<h2>Objectives</h2>
+<table><thead><tr><th>#</th><th>Objective</th><th>Project</th><th style="text-align: right">Planned BV</th></tr></thead><tbody>
+<tr><td>1</td><td>The workspace runs with forced RLS, auth, a fail-closed licence gate and a fenced job runner</td><td>S02</td><td style="text-align: right">8</td></tr>
+<tr><td>2</td><td>The plan spine exists as rows and recomputes</td><td>T1</td><td style="text-align: right">8</td></tr>
+<tr><td>3</td><td>Metrics and metering are computed from rows, never stored opinions</td><td>T11</td><td style="text-align: right">5</td></tr>
+</tbody></table>
+<p>The objectives are assessed in the PI objectives published with this plan.</p>
+<h2>Plan</h2>
+<table><thead><tr><th>Project</th><th>Deliverable materialised for this increment</th><th>Acceptance</th></tr></thead><tbody>
+<tr><td>S02</td><td>The workspace skeleton: 11 platform tables with forced RLS, OIDC/dev auth, the licence gate, the fenced job runner and the replaying SSE stream</td><td>its acceptance manifest; stays active (issue #2 open)</td></tr>
+<tr><td>T1</td><td>The plan spine: WBS, baselines, the one six-kind register, dependencies, programme cadence, tranches, benefit profiles and links</td><td>its acceptance manifest</td></tr>
+<tr><td>T11</td><td>Metrics, metering and maturity over rows: flow, quality, cost and governance; C0–C5; roll-ups and drill-down</td><td>its acceptance manifest</td></tr>
+</tbody></table>
+<p>Dependencies as recorded: S02 ← S00; T1 ← T0, P0; T11 ← P0.</p>
+<h2>WSJF order</h2>
+<p>The four typed inputs per deliverable, in the order the plan takes them. The inputs are stored on the
+WBS node; the score is derived, never stored. They were assessed retrospectively from each project's
+recorded scope, dependency position and risk — judgements, not measurements.</p>
+<table><thead><tr><th style="text-align: right">Order</th><th>Deliverable</th><th style="text-align: right">BV</th><th style="text-align: right">TC</th><th style="text-align: right">RR</th><th style="text-align: right">Size</th><th style="text-align: right">WSJF</th></tr></thead><tbody>
+<tr><td style="text-align: right">1</td><td>T1 — plan spine</td><td style="text-align: right">8</td><td style="text-align: right">5</td><td style="text-align: right">8</td><td style="text-align: right">8</td><td style="text-align: right">2.63</td></tr>
+<tr><td style="text-align: right">2</td><td>S02 — workspace skeleton</td><td style="text-align: right">8</td><td style="text-align: right">8</td><td style="text-align: right">8</td><td style="text-align: right">13</td><td style="text-align: right">1.85</td></tr>
+<tr><td style="text-align: right">3</td><td>T11 — metrics, metering and maturity</td><td style="text-align: right">5</td><td style="text-align: right">3</td><td style="text-align: right">5</td><td style="text-align: right">8</td><td style="text-align: right">1.63</td></tr>
+</tbody></table>
+<h2>Capacity and WIP</h2>
+<p>One rework lane (the <code>issue/526-u5a</code> branch), one session, three projects in this increment. The
+tranche's WIP limit is the batch table in issue #526: a project enters only when its predecessor's
+tranche is reviewed. No project starts before its tranche is authorised; tranche 1 was authorised by
+the tranche-0 <code>continue</code> review above.</p>
+<h2>Evidence</h2>
+<table><thead><tr><th>Deliverable</th><th>Evidence</th></tr></thead><tbody>
+<tr><td>S02</td><td><code>acceptance/programme/S02.toml</code> against a fresh live snapshot; the plan's §5 deliverables in the tree</td></tr>
+<tr><td>T1</td><td><code>acceptance/programme/T1.toml</code>; issue #72 closed; the spine tables and actions in the compiled registry</td></tr>
+<tr><td>T11</td><td><code>acceptance/programme/T11.toml</code>; issues #84 and #458 closed; the measure read model</td></tr>
+</tbody></table>
+<h2>Dependencies</h2>
+<table><thead><tr><th>From</th><th>To</th><th>Kind</th></tr></thead><tbody>
+<tr><td>S02</td><td>S00</td><td>needs</td></tr>
+<tr><td>T1</td><td>T0, P0</td><td>needs</td></tr>
+<tr><td>T11</td><td>P0</td><td>needs</td></tr>
+</tbody></table>
+<h2>Links</h2>
+<ul>
+<li>Cadence rows: <code>pi</code> and <code>refinement</code> for period <code>tranche-1</code> (see the tranche-1 acts page).</li>
+<li>Tranche: <code>01a1e9e0-d787-7f5c-b5ed-15b05f3dc531</code>.</li>
+<li>Issue: #526 (U5b).</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Programme definition — vision, blueprint, plan and project briefs · conveyor output · published 2026-11-23T09:36:22Z · FR Test</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

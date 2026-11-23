@@ -344,7 +344,7 @@ def build(source: dict, args, pin: str) -> dict:
 def counts(rows: list[dict], resolution: Counter, declared_absent: list[str] | None = None) -> dict:
     return {
         "rows": len(rows),
-        "by_kind": dict(Counter(row["kind"] for row in rows)),
+        "by_kind": {kind: sum(1 for row in rows if row["kind"] == kind) for kind in KINDS},
         "by_severity": dict(Counter(row["severity"] for row in rows)),
         "by_kind_severity": {
             kind: dict(Counter(row["severity"] for row in rows if row["kind"] == kind))

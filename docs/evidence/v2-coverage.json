@@ -14,9 +14,9 @@
     "new": "neither the route nor an ancestor exists"
   },
   "counts": {
-    "exists": 46,
-    "extend": 11,
-    "new": 5
+    "exists": 54,
+    "extend": 5,
+    "new": 3
   },
   "rows": [
     {
@@ -368,8 +368,8 @@
       "verdict": "extend",
       "evidence": [
         "actions: baselines.* found (baselines.get, baselines.list, baselines.take)",
-        "actions: cadences.* found (cadences.create, cadences.delete, cadences.list…)",
-        "actions: governed_assets.* absent",
+        "actions: cadences.* found (cadences.approve_plan, cadences.create, cadences.credit_demo…)",
+        "actions: governed_assets.* found (governed_assets.approve, governed_assets.compose, governed_assets.get…)",
         "actions: programme_config.* absent",
         "actions: programmes.* found (programmes.baseline, programmes.baseline_approve, programmes.baselines_list…)",
         "actions: project_dependencies.* found (project_dependencies.create, project_dependencies.delete, project_dependencies.list)",
@@ -428,9 +428,9 @@
       "spec_ref": "§10.4",
       "kind": "actions",
       "concept": "authoring",
-      "verdict": "new",
+      "verdict": "exists",
       "evidence": [
-        "actions: authoring.* absent"
+        "actions: authoring.* found (authoring.assets, authoring.draft, authoring.intake…)"
       ]
     },
     {
@@ -452,7 +452,7 @@
       "verdict": "new",
       "evidence": [
         "actions: approvals.* found (approvals.decide, approvals.list, approvals.request)",
-        "actions: decision_options.* absent",
+        "actions: decision_options.* found (decision_options.create, decision_options.get, decision_options.publish…)",
         "actions: decision_policies.* found (decision_policies.create, decision_policies.list, decision_policies.update)",
         "actions: decisions.* found (decisions.create, decisions.get, decisions.list…)",
         "actions: ladder.* found (ladder.apply_draft, ladder.evaluate, ladder.list…)",
@@ -488,7 +488,7 @@
       "concept": "kata",
       "verdict": "new",
       "evidence": [
-        "actions: kata.* absent"
+        "actions: kata.* found (kata.adopt, kata.analyse, kata.close…)"
       ],
       "note": "V1 ships the kata instruments (eval/benchmark/kata-arm tables, S17-S20) but no kata.* action family; the V2 kata workflow is T5."
     },
@@ -540,10 +540,10 @@
       "verdict": "extend",
       "evidence": [
         "actions: tool_authoring.* absent",
-        "actions: tool_bindings.* absent",
+        "actions: tool_bindings.* found (tool_bindings.create, tool_bindings.list, tool_bindings.retire…)",
         "actions: tool_calls.* absent",
         "actions: toolkits.* found (toolkits.publish)",
-        "actions: tools.* found (tools.probe, tools.usage)"
+        "actions: tools.* found (tools.probe, tools.retire, tools.usage)"
       ]
     },
     {
@@ -551,9 +551,9 @@
       "spec_ref": "§10.4",
       "kind": "actions",
       "concept": "memory",
-      "verdict": "new",
+      "verdict": "exists",
       "evidence": [
-        "actions: lessons.* absent"
+        "actions: lessons.* found (lessons.list, lessons.propose)"
       ]
     },
     {
@@ -571,10 +571,10 @@
       "spec_ref": "§10.5",
       "kind": "destination",
       "concept": "Organisation",
-      "verdict": "extend",
+      "verdict": "exists",
       "evidence": [
         "apps/web/src/app.rs: route '/organisation' found",
-        "apps/web/e2e/organisation.spec.ts: absent",
+        "apps/web/e2e/organisation.spec.ts: present",
         "docs/design/v2.js: page 'organisation' — design reference, not implementation"
       ],
       "note": "The mock page is a design study; the app has no /organisation route, and the organisation read/write actions are T0/T2."
@@ -584,10 +584,10 @@
       "spec_ref": "§10.5",
       "kind": "destination",
       "concept": "Procedures",
-      "verdict": "extend",
+      "verdict": "exists",
       "evidence": [
         "apps/web/src/app.rs: route '/procedures' found",
-        "apps/web/e2e/procedures.spec.ts: absent",
+        "apps/web/e2e/procedures.spec.ts: present",
         "apps/web/src/app.rs: V1 ancestor '/build/processes', '/build/process-map' found",
         "docs/design/v2.js: page 'procedures' — design reference, not implementation"
       ],
@@ -598,10 +598,10 @@
       "spec_ref": "§10.5",
       "kind": "destination",
       "concept": "Authoring",
-      "verdict": "extend",
+      "verdict": "exists",
       "evidence": [
         "apps/web/src/app.rs: route '/authoring' found",
-        "apps/web/e2e/authoring.spec.ts: absent",
+        "apps/web/e2e/authoring.spec.ts: present",
         "docs/design/v2.js: page 'authoring' — design reference, not implementation"
       ],
       "note": "No route and no authoring actions; the destination is T17."
@@ -651,10 +651,10 @@
       "spec_ref": "§10.5",
       "kind": "destination",
       "concept": "Plan",
-      "verdict": "extend",
+      "verdict": "exists",
       "evidence": [
         "apps/web/src/app.rs: route '/plan' found",
-        "apps/web/e2e/plan.spec.ts: absent",
+        "apps/web/e2e/plan.spec.ts: present",
         "apps/web/src/app.rs: V1 ancestor '/boards' found",
         "docs/design/v2.js: page 'plan' — design reference, not implementation"
       ],
@@ -665,10 +665,10 @@
       "spec_ref": "§10.5",
       "kind": "destination",
       "concept": "Improve",
-      "verdict": "extend",
+      "verdict": "exists",
       "evidence": [
         "apps/web/src/app.rs: route '/improve' found",
-        "apps/web/e2e/improve.spec.ts: absent",
+        "apps/web/e2e/improve.spec.ts: present",
         "apps/web/src/app.rs: V1 ancestor '/evals/improvement' found",
         "docs/design/v2.js: page 'improve' — design reference, not implementation"
       ],
@@ -679,10 +679,10 @@
       "spec_ref": "§10.5",
       "kind": "destination",
       "concept": "Operations",
-      "verdict": "extend",
+      "verdict": "exists",
       "evidence": [
         "apps/web/src/app.rs: route '/operations' found",
-        "apps/web/e2e/operations.spec.ts: absent",
+        "apps/web/e2e/operations.spec.ts: present",
         "docs/design/v2.js: page 'operations' — design reference, not implementation"
       ],
       "note": "No route and no operations actions; the incident/runbook/postmortem path is T7."

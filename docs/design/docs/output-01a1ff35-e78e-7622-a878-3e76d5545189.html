@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Project Brief — S01 (retrospective, 2026-11-21) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>Project brief — S01 UI spike</h1>
+<h2>Outcome</h2>
+<p>The UI stack is decided by measurement: Leptos CSR/WASM, recorded in ADR 0001.</p>
+<h2>Boundary</h2>
+<p>The spike only; the production UI is S12. The spike workspace (<code>spikes/web</code>) was deleted after the ADR.</p>
+<h2>Reuse sources</h2>
+<p><code>docs/decisions/0001-ui-stack.md</code>; SPEC §5.7; <code>docs/plans/slices/S01-ui-spike.md</code>.</p>
+<h2>Inception units</h2>
+<p>None — the project is a decision spike, closed on the ADR.</p>
+<h2>Dependencies</h2>
+<p>S00 (the parity ids the UI build consumes).</p>
+<h2>Acceptance</h2>
+<p>The decision record states what is observable and marks the rest not recoverable; the project re-closes through the one gate.</p>
+<h2>Capabilities</h2>
+<p>Board (drag + SSE), chat (streaming + tool card) and auth (PKCE), each built twice.</p>
+<h2>Plan</h2>
+<p>Delivered 2026-11-08; reworked retrospectively 2026-11-21.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>UI spike — Leptos CSR vs Leptos SSR · conveyor output · published 2026-11-23T09:36:22Z · conveyor-e2e</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

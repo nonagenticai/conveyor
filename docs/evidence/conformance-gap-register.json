@@ -1,8 +1,8 @@
 {
   "counts": {
     "P0": 14,
-    "P1": 140,
-    "P2": 23,
+    "P1": 135,
+    "P2": 28,
     "P3": 0
   },
   "excluded_test_projects": [],
@@ -405,39 +405,7 @@
       "evidence": null,
       "rule": "compliance_review_missing",
       "severity": "P1",
-      "subject": "T10"
-    },
-    {
-      "detail": "closed delivery project has no Phase-G compliance review",
-      "disposition": "rework",
-      "evidence": null,
-      "rule": "compliance_review_missing",
-      "severity": "P1",
       "subject": "T11"
-    },
-    {
-      "detail": "closed delivery project has no Phase-G compliance review",
-      "disposition": "rework",
-      "evidence": null,
-      "rule": "compliance_review_missing",
-      "severity": "P1",
-      "subject": "T13"
-    },
-    {
-      "detail": "closed delivery project has no Phase-G compliance review",
-      "disposition": "rework",
-      "evidence": null,
-      "rule": "compliance_review_missing",
-      "severity": "P1",
-      "subject": "T2"
-    },
-    {
-      "detail": "closed delivery project has no Phase-G compliance review",
-      "disposition": "rework",
-      "evidence": null,
-      "rule": "compliance_review_missing",
-      "severity": "P1",
-      "subject": "T9"
     },
     {
       "detail": "delivery project has no live architecture contract",
@@ -1013,14 +981,6 @@
       "evidence": null,
       "rule": "seed_live_drift",
       "severity": "P1",
-      "subject": "S21"
-    },
-    {
-      "detail": "seed status 'closed' != live status 'active'",
-      "disposition": "rework",
-      "evidence": null,
-      "rule": "seed_live_drift",
-      "severity": "P1",
       "subject": "T0"
     },
     {
@@ -1248,7 +1208,7 @@
       "subject": "programme"
     },
     {
-      "detail": "the issue registry is not readable",
+      "detail": "the issue registry redacts the body; the derivation claim cannot be checked",
       "disposition": "unprovable",
       "evidence": null,
       "rule": "derivation_missing",
@@ -1286,6 +1246,46 @@
       "rule": "seed_live_drift",
       "severity": "P2",
       "subject": "T14"
+    },
+    {
+      "detail": "coverage says 'proposed', the register says 'active'",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "status_source_drift",
+      "severity": "P2",
+      "subject": "T12"
+    },
+    {
+      "detail": "coverage says 'proposed', the register says 'active'",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "status_source_drift",
+      "severity": "P2",
+      "subject": "T15"
+    },
+    {
+      "detail": "coverage says 'proposed', the register says 'active'",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "status_source_drift",
+      "severity": "P2",
+      "subject": "T17"
+    },
+    {
+      "detail": "coverage says 'proposed', the register says 'active'",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "status_source_drift",
+      "severity": "P2",
+      "subject": "T5"
+    },
+    {
+      "detail": "coverage says 'proposed', the register says 'active'",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "status_source_drift",
+      "severity": "P2",
+      "subject": "T6"
     },
     {
       "detail": "closed without a review date",
@@ -1425,9 +1425,9 @@
     }
   ],
   "snapshot": {
-    "generated_at": "2026-11-23T08:09:50.563209+00:00",
-    "git_sha": "4727213b8c204ec69d825d24129f6b506ebb2a2e",
-    "path": "data",
+    "generated_at": "2026-11-23T09:36:22Z",
+    "git_sha": "2067e01a",
+    "path": "docs/design/data",
     "tenant": "nonagentic"
   },
   "version": 1

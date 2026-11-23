@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Solution Concept Diagram — T0 Model and contracts (Phase A) - artifact document (2026-11-22) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h2>Metadata</h2>
+<ul>
+<li>Artefact: Solution Concept Diagram — T0 Model and contracts (Phase A)</li>
+<li>Phase: a</li>
+<li>Kind: diagram</li>
+<li>Purpose: The components that carry the model and the edges that make the pin enforceable.</li>
+<li>Scope: the organisation spine, the Executor seam and the action contracts.</li>
+</ul>
+<h2>Entries</h2>
+<ul>
+<li><strong>action registry / served-spec.lock.json</strong> - {"kind": "edge", "note": "the contracts are the served operations, pinned by content hash"}</li>
+<li><strong>decision tables / schema and contracts only</strong> - {"kind": "component", "note": "decision, decision_option, decision_policy, decision_policy_refinement, laya_inference_config"}</li>
+<li><strong>department / ordered inside an industry</strong> - {"kind": "component", "note": "one department concept, extended with industry_id, ordinal, is_primary; one primary per industry"}</li>
+<li><strong>Executor trait and Registry / crates/domain/src/executor.rs</strong> - {"kind": "component", "note": "procedure and internal_agent validate their binding; a third kind registers; execution arrives with T2"}</li>
+<li><strong>industry / the spine's root</strong> - {"kind": "component", "note": "one tenant may hold several industries; key format enforced"}</li>
+<li><strong>job_binding / job_release</strong> - {"kind": "edge", "note": "a binding pins one release hash; a new release is a new binding and a gate"}</li>
+<li><strong>job_binding / position → release → executor</strong> - {"kind": "component", "note": "tenant-scoped; pins release_hash and release_snapshot; status draft|active|retired; open executor_kind"}</li>
+<li><strong>job_catalogue / the configured position</strong> - {"kind": "component", "note": "editable definition jsonb; never executed directly"}</li>
+<li><strong>job_release / the immutable compiled release</strong> - {"kind": "component", "note": "append-only; release_hash over the canonical snapshot; a change is a new row"}</li>
+<li><strong>organisation actions / crates/actions/src/organisation.rs</strong> - {"kind": "component", "note": "one ActionSpec per action, projected to HTTP, MCP and OpenAPI"}</li>
+<li><strong>run / job_binding</strong> - {"kind": "edge", "note": "a run names the binding and records the resolved release; a stale pin is 409 before any model call"}</li>
+<li><strong>run / the resolved pin</strong> - {"kind": "component", "note": "records job_binding_id and release_hash; the binding is resolved before the INSERT"}</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Model and contracts · conveyor output · published 2026-11-23T09:36:22Z · conveyor-approver</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

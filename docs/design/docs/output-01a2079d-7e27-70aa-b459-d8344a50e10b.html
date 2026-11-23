@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>T10 — Benefits diagram (rework, 2026-11-22) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>Benefits Diagram — T10 SAFe cadence and MSP tranches</h1>
+<h2>Goals and outcomes</h2>
+<ul>
+<li><strong>Planning that is computed, not asserted.</strong> Cards materialise from the backlog in computed
+WSJF order within the WIP slots, only after the plan is approved, and a repeated tick creates
+nothing (<code>programme_cadence.rs</code>, <code>cadence_jobs.rs::pi_tick_is_idempotent</code>).</li>
+<li><strong>Demos that are earned.</strong> A deliverable without typed evidence cannot demo (<code>demo_gate.rs</code>).</li>
+<li><strong>Retros that teach.</strong> A retro cannot close without a lesson (<code>retro.rs</code>).</li>
+<li><strong>Reviews that see the record.</strong> An end-of-tranche review without baselines, benefit status or
+risk evidence is refused (<code>tranche_review.rs</code>).</li>
+<li><strong>Benefits that are measured.</strong> A transition that never measured its baseline cannot report
+the benefit realised (<code>benefit_transition.rs</code>).</li>
+</ul>
+<h2>Measures</h2>
+<table><thead><tr><th>Measure</th><th>Instrument</th><th>State</th></tr></thead><tbody>
+<tr><td>WSJF materialisation and WIP</td><td><code>programme_cadence.rs::wsjf_is_computed_not_stored</code>, <code>::materialisation_respects_wip_slots</code></td><td>proved</td></tr>
+<tr><td>Idempotent PI tick</td><td><code>apps/server/tests/cadence_jobs.rs::pi_tick_is_idempotent</code></td><td>proved</td></tr>
+<tr><td>Typed demo evidence</td><td><code>demo_gate.rs::a_credit_needs_typed_evidence</code></td><td>proved</td></tr>
+<tr><td>Retro lesson requirement</td><td><code>retro.rs::retro_cannot_close_without_lessons</code></td><td>proved</td></tr>
+<tr><td>Tranche-review evidence</td><td><code>tranche_review.rs::a_review_without_evidence_is_refused</code></td><td>proved</td></tr>
+<tr><td>Baseline before realisation</td><td><code>benefit_transition.rs::a_missing_baseline_cannot_claim_realization</code></td><td>proved</td></tr>
+</tbody></table>
+<h2>Benefits and sub-benefits</h2>
+<p>The cadence is the delivery machinery the programme's benefits are reviewed against (B4/B5).
+Its sub-benefits: predictable PI commitments, an evidence-gated demo, lessons that accumulate,
+tranche reviews that cannot pass on prose, and benefit transitions that cannot precede their
+baseline. T10 owns no benefit profile itself; the profiles and their measurements are U6's.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>SAFe cadence and MSP tranches · conveyor output · published 2026-11-23T09:36:22Z · conveyor-e2e</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

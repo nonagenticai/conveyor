@@ -37,25 +37,131 @@
         <div><dt>Standard</dt><dd>MSP</dd></div>
         <div><dt>Level</dt><dd>programme</dd></div>
         <div><dt>Subject</dt><dd>conveyor buildout</dd></div>
-        <div><dt>Status</dt><dd>absent</dd></div>
+        <div><dt>Status</dt><dd>evidenced</dd></div>
         <div><dt>SPEC</dt><dd>§8.3</dd></div>
         <div><dt>Gate</dt><dd>not recorded</dd></div>
         <div><dt>Package</dt><dd><code>std-msp-blueprint-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM</code></dd></div>
-        <div><dt>Provenance</dt><dd>2026-11-20T11:50:50.848127361+00:00 · a33e6562e80d</dd></div>
+        <div><dt>Provenance</dt><dd>2026-11-23T09:36:22Z · 2067e01a</dd></div>
       </dl>
       <h2>Aggregates and services</h2>
 <p class="std-intent">The bounded contexts, their data ownership and the service boundaries.</p>
-<p class="std-absent">Not evidenced — No row or document satisfies &#x27;Aggregates and services&#x27;; a document exists but lacks the heading (see <code>std-msp-blueprint-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM</code>).</p><h2>Action registry and data model</h2>
+<p class="std-source">Source: <code>config.json#/capabilities</code> — 18 row(s)</p>
+<ul>
+<li>Card types for analysis. <span class="std-state">active</span></li>
+<li>Card types for architecture. <span class="std-state">active</span></li>
+<li>Card types for principle, requirement and decision library statistics. <span class="std-state">active</span></li>
+<li>Card types for behaviour- and test-driven development. <span class="std-state">active</span></li>
+<li>Card types that deal with change management. <span class="std-state">active</span></li>
+<li>Card types for design. <span class="std-state">active</span></li>
+<li>Card types for development. <span class="std-state">active</span></li>
+<li>Card types for flow improvements. <span class="std-state">active</span></li>
+<li>Protector of flow. Any card interruption invokes a card for the kanban coach. Owns all flow-related decisions and fr/human interaction during a phase: blocked cards, comments, human input and answers, in-flow approvals, and rework limit reached (R34). <span class="std-state">active</span></li>
+<li>The continuous-improvement loop: open a kata from a benchmark or eval finding, run the improvement iteration, and report the verdict (SPEC D20/D29, S18). <span class="std-state">active</span></li>
+<li>Card types for procedure improvements for agents. <span class="std-state">active</span></li>
+<li>Card types for prompt improvement in flows. <span class="std-state">active</span></li>
+</ul>
+<p class="std-source">Source: <code>artefacts.json#/documents</code> — 1 row(s)</p>
+<ul>
+<li>Programme Blueprint — conveyor buildout (retrospective, 2026-11-22)</li>
+</ul><h2>Action registry and data model</h2>
 <p class="std-intent">The actions, tables, invariants and events that form the contract.</p>
-<p class="std-absent">Not evidenced — No row or document satisfies &#x27;Action registry and data model&#x27;; a document exists but lacks the heading (see <code>std-msp-blueprint-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM</code>).</p><h2>Deployment estate</h2>
+<p class="std-source">Source: <code>artefacts.json#/documents</code> — 1 row(s)</p>
+<ul>
+<li>Programme Blueprint — conveyor buildout (retrospective, 2026-11-22)</li>
+</ul><h2>Deployment estate</h2>
 <p class="std-intent">Where each service runs and what it depends on.</p>
-<p class="std-absent">Not evidenced — No row or document satisfies &#x27;Deployment estate&#x27;; a document exists but lacks the heading (see <code>std-msp-blueprint-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM</code>).</p><h2>The to-be the projects deliver</h2>
+<p class="std-source">Source: <code>programme.json#/projects</code> — 48 row(s)</p>
+<ul>
+<li>Publish the SPEC_V2 studio design pack, live <span class="std-state">closed</span></li>
+<li>Programme definition — vision, blueprint, plan and project briefs <span class="std-state">closed</span></li>
+<li>CI, runners and platform <span class="std-state">active</span></li>
+<li>Usage inventory → parity/parity.yaml <span class="std-state">closed</span></li>
+<li>UI spike — Leptos CSR vs Leptos SSR <span class="std-state">closed</span></li>
+<li>Skeleton — workspace, tenancy, auth, jobs, SSE <span class="std-state">closed</span></li>
+<li>Domain and schema — aggregates, state machines, baseline domain migration <span class="std-state">closed</span></li>
+<li>Action registry — derive, manifest, OpenAPI, MCP, invocation, external ingest <span class="std-state">active</span></li>
+<li>Board — projects, boards, lists, cards, labels, comments, tasks, custom fields, webhooks, SSE <span class="std-state">closed</span></li>
+<li>Control plane — claims, runs, approvals, andon, comms and notifications <span class="std-state">active</span></li>
+<li>mcp_server signed channel — both directions <span class="std-state">archived</span></li>
+<li>Agent direct interface — the conveyor&#x27;s own MCP surface <span class="std-state">closed</span></li>
+</ul>
+<p class="std-source">Source: <code>organisation.json#/jobs</code> — 22 row(s)</p>
+<ul>
+<li>Architect <span class="std-state">active</span></li>
+<li>Backend engineer <span class="std-state">active</span></li>
+<li>Data engineer <span class="std-state">draft</span></li>
+<li>Frontend engineer <span class="std-state">draft</span></li>
+<li>Incident commander <span class="std-state">draft</span></li>
+<li>Kanban coach <span class="std-state">active</span></li>
+<li>Kata facilitator <span class="std-state">draft</span></li>
+<li>Measurement engineer <span class="std-state">draft</span></li>
+<li>Performance engineer <span class="std-state">draft</span></li>
+<li>Platform engineer <span class="std-state">draft</span></li>
+<li>Platform operator <span class="std-state">draft</span></li>
+<li>PM <span class="std-state">active</span></li>
+</ul><h2>The to-be the projects deliver</h2>
 <p class="std-intent">Each project&#x27;s contribution to this blueprint, and the gap it closes.</p>
-<p class="std-absent">Not evidenced — No row or document satisfies &#x27;The to-be the projects deliver&#x27;; a document exists but lacks the heading (see <code>std-msp-blueprint-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM</code>).</p><h2>Organisation and skills</h2>
+<p class="std-source">Source: <code>programme.json#/projects</code> — 48 row(s)</p>
+<ul>
+<li>Publish the SPEC_V2 studio design pack, live <span class="std-state">closed</span></li>
+<li>Programme definition — vision, blueprint, plan and project briefs <span class="std-state">closed</span></li>
+<li>CI, runners and platform <span class="std-state">active</span></li>
+<li>Usage inventory → parity/parity.yaml <span class="std-state">closed</span></li>
+<li>UI spike — Leptos CSR vs Leptos SSR <span class="std-state">closed</span></li>
+<li>Skeleton — workspace, tenancy, auth, jobs, SSE <span class="std-state">closed</span></li>
+<li>Domain and schema — aggregates, state machines, baseline domain migration <span class="std-state">closed</span></li>
+<li>Action registry — derive, manifest, OpenAPI, MCP, invocation, external ingest <span class="std-state">active</span></li>
+<li>Board — projects, boards, lists, cards, labels, comments, tasks, custom fields, webhooks, SSE <span class="std-state">closed</span></li>
+<li>Control plane — claims, runs, approvals, andon, comms and notifications <span class="std-state">active</span></li>
+<li>mcp_server signed channel — both directions <span class="std-state">archived</span></li>
+<li>Agent direct interface — the conveyor&#x27;s own MCP surface <span class="std-state">closed</span></li>
+</ul><h2>Organisation and skills</h2>
 <p class="std-intent">The organisation, roles and skills the target state requires.</p>
-<p class="std-absent">Not evidenced — No row or document satisfies &#x27;Organisation and skills&#x27;; a document exists but lacks the heading (see <code>std-msp-blueprint-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM</code>).</p><h2>Current, intermediate and target states</h2>
+<p class="std-source">Source: <code>organisation.json#/jobs</code> — 22 row(s)</p>
+<ul>
+<li>Architect <span class="std-state">active</span></li>
+<li>Backend engineer <span class="std-state">active</span></li>
+<li>Data engineer <span class="std-state">draft</span></li>
+<li>Frontend engineer <span class="std-state">draft</span></li>
+<li>Incident commander <span class="std-state">draft</span></li>
+<li>Kanban coach <span class="std-state">active</span></li>
+<li>Kata facilitator <span class="std-state">draft</span></li>
+<li>Measurement engineer <span class="std-state">draft</span></li>
+<li>Performance engineer <span class="std-state">draft</span></li>
+<li>Platform engineer <span class="std-state">draft</span></li>
+<li>Platform operator <span class="std-state">draft</span></li>
+<li>PM <span class="std-state">active</span></li>
+</ul>
+<p class="std-source">Source: <code>organisation.json#/departments</code> — 5 row(s)</p>
+<ul>
+<li>delivery</li>
+<li>verification</li>
+<li>operations</li>
+<li>project office</li>
+<li>improvement</li>
+</ul><h2>Current, intermediate and target states</h2>
 <p class="std-intent">The current, intermediate and target states and what separates them.</p>
-<p class="std-absent">Not evidenced — No row or document satisfies &#x27;Current, intermediate and target states&#x27;; a document exists but lacks the heading (see <code>std-msp-blueprint-01a1d039-0d24-7d16-ae52-4841e96ccfac:PLATFORM</code>).</p>
+<p class="std-source">Source: <code>msp.json#/programme_baselines</code> — 3 row(s)</p>
+<ul>
+<li>01a1fba9-d095-757c-91ed-afd21ecfa960</li>
+<li>01a1fba9-9afd-72e3-b41b-dc4287153c35</li>
+<li>01a1fba9-308c-7cde-9d00-edb7f483f3af</li>
+</ul>
+<p class="std-source">Source: <code>msp.json#/project_baselines</code> — 19 row(s)</p>
+<ul>
+<li>01a1ff39-8d6e-7270-b2ba-9d235eb28b83</li>
+<li>01a1ff31-72ec-766e-8ad3-227d927f64ab</li>
+<li>01a1ff85-faae-7c2e-b897-fe957985ca78</li>
+<li>01a20063-7af8-727b-b092-24de3821d204</li>
+<li>01a20256-44d0-731d-b345-fffc5f3ac9e8</li>
+<li>01a1ff47-5043-73f7-b18d-2fc03832c96a</li>
+<li>01a1ff8a-b4f0-7e6e-9cc7-4231076e1039</li>
+<li>01a2005c-5a4f-7eb5-a004-ccb5545eb6fb</li>
+<li>01a2079d-642b-70f5-8d01-61dd5f4e90d5</li>
+<li>01a2028d-e17b-793d-9ea2-fe4f7f8e2b72</li>
+<li>01a20280-71de-7b06-9086-ae0158bfd36f</li>
+<li>01a20289-7be3-7e47-afe0-f6b1f82f1892</li>
+</ul>
     </main>
   </body>
 </html>

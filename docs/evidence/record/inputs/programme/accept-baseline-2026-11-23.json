@@ -1,0 +1,14 @@
+{
+ "title": "Conformance baseline acceptance \u2014 2026-11-23 (head a2c48db0)",
+ "project_id": "01a1d039-0d39-79ce-84b6-1173b94bc67f",
+ "body": "# Conformance baseline acceptance \u2014 2026-11-23 (head a2c48db0)\n\n## Context\n\nThe programme's conformance baseline was last accepted at snapshot `2a1ff31d` (2026-11-21). The head\nsnapshot `a2c48db0` proves that the Phase-G compliance reviews for T9, T10, T13 and T2 now exist, and\nthat 43 baseline entries no longer have a live gap. A report is not an acceptance; this record is\nthe delegated acceptance of the re-derived baseline.\n\n## Decision\n\nThe baseline is re-derived from the head snapshot `a2c48db0`: 294 snapshot files and 279 published\noutputs, audited against `governance/conformance.json`. Forty-three entries whose gap no longer\nexists are deleted, not re-dated. The three live P1 gaps the snapshot proves are owned with the\nprogramme owner and the 2027-02-18 reassessment date; each is a rework commitment, never a waiver:\n\n- `seed_live_drift S21` \u2014 the plan says closed; the record says active. S21 is in tranches 9\u201311 and\n  closes only after the chain authorises tranche 9.\n- `seed_live_drift T0` \u2014 the plan says closed; the record says active. Tranche 0 is closed, so T0\n  may close through its own chain.\n- `seed_live_drift T4` \u2014 the plan says closed; the record says active. Tranche 4 is authorised, so\n  T4 may close through its own chain.\n\n## Consequences\n\nThe strict gate passes with zero unbaselined P0/P1 and no expired entry. S21 must not be closed\nbefore tranche 9 is authorised; closing it earlier would manufacture the unauthorised-tranche P0.\nThe acceptance is a delegated act under the owner decision\n`01a2021d-cca2-757c-bfc2-21bd4e4b6d85` (published 2026-11-22): the executor is `conveyor-e2e`, the\napprover is `conveyor-approver`, and no human decision is claimed.\n\n## Evidence\n\n- Head snapshot: `a2c48db0`; 294 files; 279 published outputs; the manifest sha256 is recorded in the\n  baseline header.\n- Strict audit: `audit-programme-conformance.py --strict --fail-on P0,P1 --baseline\n  docs/evidence/conformance-baseline.json`.\n- Journal: the acceptance is replayed through `documents.compose` and read back by id.\n",
+ "category": "decision",
+ "publishable": true,
+ "meta": {
+  "sha256": "78deb003d034434b2e371bbe553978a5b19948a7e53bc174b5a755d19f163dfc",
+  "category": "decision",
+  "size_bytes": 2054,
+  "content_type": "text/markdown",
+  "w3_natural_key": "programme-artefact:decision:78deb003d034434b"
+ }
+}

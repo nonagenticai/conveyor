@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>Inspect and Adapt — conveyor buildout, tranche 3 · conveyor documents</title>
+    <link rel="icon" href="../../../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/record/inputs/safe-tr3/inspect-adapt.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="inspect-and-adapt--conveyor-buildout-tranche-3">Inspect and Adapt — conveyor buildout, tranche 3</h1>
+<p>The tranche-3 retro: what went well, what did not, the lessons recorded on the retro cadence, the actions they produce and the kata candidates they raise.</p>
+<h2 id="what-went-well">What went well</h2>
+<ul>
+<li>The three registers are operated, not merely modelled: fourteen risks with owners and review dates, fifty-seven ADR rows seeded through the decisions actions, and B1–B7 baselined with B1/B2/B4/B5/B6 active under approved changes.</li>
+<li>The clean-build discipline produced a trustworthy binary and lock at <code>9ac63b41</code> (548 actions, 579 operations, <code>--check-lock</code> OK) after the shared target had polluted an earlier build.</li>
+<li>The delegated rule path worked on every programme gate it was used on: PI plan, tranche review, change approvals, all recorded <code>rule</code> with a published <code>via.delegation_ref</code>.</li>
+</ul>
+<h2 id="what-did-not">What did not</h2>
+<ul>
+<li>The promotion journal lost its last row when a trim by line count ignored a header object; the <code>--check</code> grammar caught it, but only after the fact.</li>
+<li>The first lock was generated from a binary built against a stale shared target and had to be regenerated from a clean build.</li>
+<li>A benefit baseline edit resets the profile to <code>draft</code>; activation is a second recorded write, which cost an extra version on every profile.</li>
+<li>The schema-drift kata cannot open: a destination 422 has no eval/benchmark instrument, and T5 refuses an unmeasurable kata.</li>
+</ul>
+<h2 id="lessons">Lessons</h2>
+<ul>
+<li><strong>k1.</strong> A clean build before a lock regeneration is the only trustworthy verdict.</li>
+<li><strong>k2.</strong> The promotion journal must be validated after every append.</li>
+<li><strong>k3.</strong> A delegation document's owner project is part of its contract; the guard must accept every owner the delegation actually uses.</li>
+<li><strong>k4.</strong> A measurement change resets a benefit profile to draft; activation is its own write.</li>
+<li><strong>k5.</strong> A defect with no instrument cannot open a kata; re-anchor rather than fabricate.</li>
+</ul>
+<h2 id="actions">Actions</h2>
+<ul>
+<li><code>v1-w4a-5</code> proceeds as a deliberate slice (timeout from <code>timeout_secs</code>, pending + resume_token, a status tool).</li>
+<li><code>promote-record.py</code> gains <code>decisions.create</code>/<code>decisions.transition</code> replay before the deploy-bound promotion.</li>
+<li>The three programme screens (Risk, Decisions, Benefits evaluation) and the per-project factory cards follow in tranche 4.</li>
+</ul>
+<h2 id="kata-candidates">Kata candidates</h2>
+<p>The schema-drift kata is a candidate under T5, contingent on the contract-test instrument class. No kata row is opened until that instrument exists; the finding is re-anchored to T5 and stays open.</p>
+<h2 id="links">Links</h2>
+<ul>
+<li>Retro cadence: <code>01a20281-09ba-709a-b61e-51a22f2ed172</code> (closed; lessons k1–k5 on the record).</li>
+<li>Refinement cadence: <code>01a20280-d52b-7791-a9b1-ebc2a10b5c3d</code>.</li>
+</ul>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/record/inputs/safe-tr3/inspect-adapt.md</code> at build time.</span>
+      <a href="../../../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Solution concept — SPEC-V2 (retrospective, 2026-11-21) - artifact document (2026-11-22) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h2>Metadata</h2>
+<ul>
+<li>Artefact: Solution concept — SPEC-V2 (retrospective, 2026-11-21)</li>
+<li>Phase: a</li>
+<li>Kind: diagram</li>
+<li>Purpose: The delivered model as a picture of its parts and their relations.</li>
+<li>Scope: SPEC_V2.md §2, §4–§11.</li>
+</ul>
+<h2>Entries</h2>
+<ul>
+<li><strong>Job (position) / organisation</strong> - {"kind": "component", "note": "A capability + a procedure + an inference configuration + an authority; a configured position, not a loop (\u00a72, D28)."}</li>
+<li><strong>Job release and job binding / organisation</strong> - {"kind": "component", "note": "The immutable compiled release with a content hash; the binding pins job_key + release_hash + release_snapshot (D38, \u00a74.4)."}</li>
+<li><strong>Card and run / work</strong> - {"kind": "component", "note": "The unit of assigned work and one recorded attempt; the card/run is the unit of work, not the turn (\u00a710.2)."}</li>
+<li><strong>Approval / governance</strong> - {"kind": "component", "note": "The one human-escalation primitive \u2014 a question is an approval; dual control is two or more distinct approvers (\u00a75.4)."}</li>
+<li><strong>Decision ladder / decisions</strong> - {"kind": "flow", "note": "Rule \u2192 laya \u2192 generation \u2192 human; an LLM never selects, routes, classifies or approves, and a generated draft has no path to a state transition (D30, P2)."}</li>
+<li><strong>Work hierarchy / programme</strong> - {"kind": "flow", "note": "Tenant \u2192 portfolio (a computed read model, never a row) \u2192 programme (shared_config + project dependency graph) \u2192 project \u2192 WBS \u2192 card \u2192 run \u2192 step (D29, D49, \u00a75.1)."}</li>
+<li><strong>Tool broker / tooling</strong> - {"kind": "flow", "note": "Resolve the binding and version \u2192 check effect \u2192 validate the closed schema \u2192 resolve the credential by alias \u2192 call the registered destination \u2192 normalise and redact \u2192 record one <code>tool_call</code> (\u00a711.3)."}</li>
+<li><strong>Architecture capability / rigour</strong> - {"kind": "component", "note": "The Preliminary phase establishes the principles, tailored ADM, board, repository and baselines; phases A\u2013H are WBS nodes that close on an approved <code>architecture_contract</code> (D63, \u00a78.1)."}</li>
+<li><strong>Programme cadence and tranches / rigour</strong> - {"kind": "component", "note": "<code>programme_cadence</code> carries PI planning, refinement, demo and retro; <code>programme_tranche</code> is the management unit and its review is an approval (\u00a78.2\u2013\u00a78.3)."}</li>
+<li><strong>Storage / platform</strong> - {"kind": "component", "note": "Document rows plus MinIO written directly under tenant/&lt;tenant_id&gt;/ prefixes with encryption, content hash and a size cap; no <code>artifact_service</code> dependency (D57, \u00a711.10)."}</li>
+<li><strong>Executor seam / platform</strong> - {"kind": "component", "note": "Two live kinds \u2014 <code>procedure</code> and <code>internal_agent</code> \u2014 behind one internal <code>Executor</code> contract with an extensible <code>executor_kind</code>; an external runtime is an explicit non-goal until D61's four conditions hold."}</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>SPEC V2 — the organisational operating model · conveyor output · published 2026-11-23T09:36:22Z · conveyor-approver</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

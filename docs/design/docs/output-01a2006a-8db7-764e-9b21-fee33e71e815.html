@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Tranche review — tranche 2 (2026-11-21) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>Tranche review — tranche 2 (2026-11-21)</h1>
+<h2>Evidence</h2>
+<p>The two projects were taken through the retrospective lifecycle in this tranche and both carry a
+complete record: charter, Statement of Architecture Work, the seven Phase A–D artefacts, a
+board-approved delivery contract, a scope baseline, a Phase-G review, the two expected outputs and
+a closure review. The PI plan and PI objectives for <code>tranche-2</code> are published.</p>
+<p>The acceptance manifests are <strong>not green</strong>. Run at the 23:17Z snapshot
+(<code>7ff27efd65146630e62d9c235458be789fb68c14</code>):</p>
+<table><thead><tr><th>project</th><th>verdict</th><th>failing checks</th></tr></thead><tbody>
+<tr><td>S03</td><td>red, 5</td><td><code>S03-contract</code> (P0) the live contract lacks an approval or a distinct requester/approver; <code>S03-review</code> (P0) the review's <code>delegation_ref</code> is missing or does not resolve to a published output; <code>S03-closure-gate</code> (P0) no approved closure gate; <code>S03-demo-credits</code> (P0) no accepted deliverable to demo; <code>S03-lessons</code> (P1) no tranche-2 retro lesson</td></tr>
+<tr><td>T2</td><td>red, 4</td><td><code>T2-contract</code> (P0) same; <code>T2-review</code> (P0) same; <code>T2-demo-credits</code> (P0) one accepted deliverable has no demo credit with evidence; <code>T2-lessons</code> (P1) no tranche-2 retro lesson</td></tr>
+</tbody></table>
+<p>Both projects are <strong>active</strong>, not closed. The product refuses <code>projects.close</code> while the Phase-G
+review is <code>non_conformant</code> and no active waiver covers it, and neither review has one.</p>
+<p>The tranche's audit produced six admitted findings, every evidence quote verified line by line
+against the tree at <code>7fa223b6</code>: <code>v1-t2-1</code> (P0) and <code>v1-s03-1</code> (P1) are now fixed and resolved
+(<code>920a1dcb</code> with <code>documents_compose_gate</code> 4/4; <code>beaa0404</code> with <code>claim_race</code> 32 distinct principals).
+<code>v1-t2-3</code>, <code>v1-t2-6</code> (P1) and <code>v1-t2-5</code>, <code>v1-s03-2</code> (P2) remain open and owned.</p>
+<h2>Benefit status</h2>
+<p>All six benefit profiles are <code>unmeasured</code>: the programme has no transition row, so no benefit can
+be reported as on track. Tranche 2 contributes no measured benefit; it contributes the evidence base
+the later measurements need.</p>
+<h2>Risk and issue register</h2>
+<ul>
+<li><strong>The programme cannot close a non-conformant project with a human signature.</strong> A waiver needs an
+accepting owner who is neither the contract's requester (<code>conveyor-e2e</code>) nor the reviewer
+(<code>conveyor-approver</code>). The only third identity in the tenant is a test principal. That is a
+governance gap, not a bug, and it blocks every retrospective closure whose review is honest about
+its residuals.</li>
+<li><strong>The branch is two migrations ahead of production</strong> (<code>0062_release_layers</code>,
+<code>0063_tool_verify</code>; live at <code>0061</code>), so the branch binary cannot snapshot the live primary. This
+tranche's lifecycle ran against a snapshot built in-pod by the deployed engine.</li>
+<li><strong>Five open P0 code findings</strong> programme-wide (<code>s06-2</code>, <code>s12-1</code>, <code>s14-1</code>, <code>s15-1</code>, <code>s16-1</code>), each
+blocked on an environment or evidence not on this box.</li>
+<li>Two P1 findings owned by T2 (<code>v1-t2-3</code>, <code>v1-t2-6</code>) and two P2 corrections remain open.</li>
+</ul>
+<h2>Decision</h2>
+<p><strong>Pause.</strong> The tranche's exit criterion — every project meets its acceptance with published
+evidence — is not met: both manifests are red, and the two closures are refused by the product's own
+gate. Continuing to tranche 3 while tranche 2's projects sit open would be the pacing violation the
+programme exists to prevent.</p>
+<p>Conditions to resume: (1) the four P0 manifest failures per project are fixed and the manifests
+re-run green; (2) the two projects close, which requires either a Phase-G review at a conformant
+level or a waiver signed by a real accepting owner; (3) tranche 2's retro records one lesson per
+finding. Authorising tranche 3 before then would be a fabricated <code>continue</code>.</p>
+<h2>Correction (recorded later the same day, 2026-11-21)</h2>
+<p>Two statements above were true when this review was recorded and are no longer true at the branch
+head. They are corrected here rather than rewritten in place.</p>
+<ul>
+<li><code>v1-t2-3</code> (a refinement publish is not a gated policy change) is <strong>resolved</strong> at <code>fcb96fa9</code>
+(<code>decision_ladder</code> 10/10, <code>parity</code> 7/7, served-spec lock regenerated and <code>--check-lock</code> green).</li>
+<li><code>v1-t2-6</code> (a human decision cites any approved approval) is <strong>resolved</strong> at <code>1167127d</code>
+(<code>ladder_human_gate</code> 10/10; the decision now cites its own gate and project).</li>
+<li><code>v1-s12-1</code>, listed in the programme risk register as open, is <strong>resolved</strong> at <code>8f1e5770</code> — the five
+three-state Playwright tests passed locally against a built bundle; the PR's web CI re-runs them,
+so treat it as pending CI rather than open.</li>
+</ul>
+<p>The decision does not change. It rests on two facts that are unaffected: both tranche-2 manifests
+are red at the recorded snapshot, and the product refuses to close a project whose Phase-G review is
+non-conformant without an accepting owner. <code>v1-t2-5</code> and <code>v1-s03-2</code> (P2) remain open. Open P0
+findings programme-wide at this head are <code>s06-2</code>, <code>s14-1</code>, <code>s15-1</code> and <code>s16-1</code>.</p>
+<h2>Correction 2 — the snapshot those verdicts were taken against (same day)</h2>
+<p>The manifest verdicts above were produced by the branch's <code>verify-project.py</code> against a snapshot
+built by the <strong>deployed</strong> engine. That projection is older than the branch's: it does not select
+<code>architecture_contract.requested_by</code>, it does not carry <code>document.published_at</code>, and it returned no
+demo-credit rows at all. Three of the reported failures are therefore artefacts of the snapshot, not
+of the live record:</p>
+<ul>
+<li><strong>contract</strong> — the live row carries <code>approval_id</code>, <code>requested_by</code> (<code>conveyor-e2e</code>) and
+<code>approved_by</code> (<code>conveyor-approver</code>), distinct.</li>
+<li><strong>review</strong> — the live review carries its <code>delegation_ref</code> and the delegation guard accepted it at
+write time.</li>
+<li><strong>demo credit</strong> — <code>cadences.credit_demo</code> succeeded for T2's deliverable with its read-back matched.</li>
+</ul>
+<p>What remains real: S03 has not yet run its closure (no closure gate, no WBS row, no demo credit, no
+retro lesson), and T2's Phase-G review level is <code>non_conformant</code>, which the product refuses to close
+without an accepting owner. The pause decision stands on those two facts. The branch's snapshot
+projection does select all three fields; it cannot be built against the live <code>0061</code> schema, which is
+the same drift recorded above — so the acceptance evidence for this tranche can only be reproduced
+after the lane's migrations are applied.</p>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Programme definition — vision, blueprint, plan and project briefs · conveyor output · published 2026-11-23T09:36:22Z · FR Test</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

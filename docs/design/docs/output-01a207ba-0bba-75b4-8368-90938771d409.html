@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Conformance baseline acceptance v2 — 2026-11-23 (head d7e2e4fb) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>Conformance baseline acceptance v2 — 2026-11-23 (head d7e2e4fb)</h1>
+<h2>Context</h2>
+<p>The baseline was first re-accepted at snapshot <code>a2c48db0</code>. The seed was then regenerated from its
+own sources (the slice plans, the issue registry and the measured coverage), as the repository's
+seed builder requires. The regeneration shows that S21's plan status is <code>active</code>, matching its live
+record; the earlier <code>closed</code> seed status was stale seed data, not an under-delivery. T0 and T4
+remain plan-closed and live-active, and are real rework.</p>
+<h2>Decision</h2>
+<p>The programme's conformance baseline is re-accepted from the head snapshot at <code>d7e2e4fb</code>:</p>
+<ul>
+<li><code>seed_live_drift S21</code> is <strong>deleted</strong> from the baseline: the regenerated seed and the live record
+agree, so there is no live gap. This is a deletion, not a re-dating.</li>
+<li><code>seed_live_drift T0</code> remains owned under the programme owner with the 2027-02-18 reassessment
+date. T0 is in tranche 0, which is closed, so it may close through its own chain.</li>
+<li><code>seed_live_drift T4</code> remains owned under the programme owner with the 2027-02-18 reassessment
+date. T4 is in tranche 4, which is authorised, so it may close through its own chain.</li>
+<li>Every other entry is derived from the live gaps in this snapshot; an entry whose gap is gone is
+deleted, never re-dated, and no disposition is changed to hide a gap.</li>
+</ul>
+<h2>Consequences</h2>
+<p>The strict gate passes with zero unbaselined P0/P1 and no expired entry. The seed is never
+hand-edited to hide a gap; it is regenerated from its sources and this record names the difference.
+T0 and T4 close through their own tranche chains. S21 stays active until its tranche is authorised.</p>
+<h2>Evidence</h2>
+<ul>
+<li>Head snapshot: <code>d7e2e4fb</code>; 295 snapshot files; the manifest sha256 is recorded in the baseline
+header.</li>
+<li>Strict audit: <code>audit-programme-conformance.py --strict --fail-on P0,P1 --baseline docs/evidence/conformance-baseline.json</code>.</li>
+<li>Journal: the acceptance is replayed through <code>documents.compose</code> and read back by id.</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>CI, runners and platform · conveyor output · published 2026-11-23T09:36:22Z · conveyor-e2e</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

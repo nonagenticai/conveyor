@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Driver/Goal/Objective Catalog — T2 Decision ladder (Phase A) - artifact document (2026-11-22) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h2>Metadata</h2>
+<ul>
+<li>Artefact: Driver/Goal/Objective Catalog — T2 Decision ladder (Phase A)</li>
+<li>Phase: a</li>
+<li>Kind: catalog</li>
+<li>Purpose: The drivers behind the decision ladder, the goals it serves, and the objective each mechanism installs or fails to install.</li>
+<li>Scope: one audit shape, version pins, tenant refinement, the human gate, the draft gate, authored options and questions, the laya call and the budget refusal.</li>
+</ul>
+<h2>Entries</h2>
+<ul>
+<li><strong>D1 Three decision rungs read as three different records / G1 One audit shape across L0, L1 and L3</strong> - {"objective": "<code>decision</code> carries rung, answer, option-set version, policy/refinement/laya-config pins, actor, outcome and approval link for every rung; <code>decision_ladder.rs::a_rule_a_laya_and_a_human_decision_share_one_audit_shape</code> asserts the three rows have identical column sets."}</li>
+<li><strong>D2 A threshold change needs a build and a deploy / G2 A tenant refinement changes a threshold as configuration</strong> - {"objective": "<code>decision_policy_refinement</code> overrides the threshold, rule and fail action for one policy; <code>decision_policy_refinement_one_per_policy</code> keeps one live row and bumps its version. <code>decision_ladder.rs::a_refinement_changes_a_threshold_without_a_code_change</code> moves 0.7 from refused to accepted at 0.5."}</li>
+<li><strong>D3 A decision cannot be reproduced after the policy moves / G3 Every decision pins the versions it read</strong> - {"objective": "the decision row records <code>policy_version</code>, <code>refinement_version</code> and <code>laya_config_version</code>; an L1 decision with no config to pin is refused <code>422 pins_incomplete</code>; <code>decision_ladder.rs::every_decision_pins_the_refinement_and_laya_config_versions</code> leaves the first row at version 1 after the policy moves to version 2."}</li>
+<li><strong>D4 A generated draft can move a card / G4 L2 has no transition path; applying a draft is a human gate</strong> - {"objective": "<code>ladder.apply_draft</code> requires an accepted human <code>draft.apply</code> decision backed by an approved <code>draft.apply</code> approval on the same card; <code>documents.update</code> refuses the generated class with <code>409 draft_requires_gate</code>. <code>decision_ladder.rs::a_generated_draft_cannot_transition_a_card</code> and <code>ladder_human_gate.rs::only_a_human_draft_apply_decision_can_gate_a_draft</code> prove the update and apply paths."}</li>
+<li><strong>D5 The create path can still attach a generated draft / G5 Close the <code>documents.compose</code> hole</strong> - {"objective": "OPEN \u2014 v1-t2-1: <code>documents.compose</code> accepts <code>card_id</code> and <code>meta.generated = true</code> and writes an attached document with no gate, so the fourth gate clause is not universally true and T2 stays active."}</li>
+<li><strong>D6 A human decision can cite any approved approval / G6 A human decision cites the gate that posed its question</strong> - {"objective": "OPEN \u2014 v1-t2-6: <code>ladder.record</code> calls <code>human_approved_gate_tx(..., None, card_id)</code>, so the <code>gate</code> field is not compared with <code>approval.gate</code>; only <code>ladder.apply_draft</code> passes <code>Some(DRAFT_APPLY_GATE)</code>. <code>ladder_human_gate.rs::a_human_decision_without_an_approved_human_gate_is_refused</code> checks approval status and human decider, not gate identity."}</li>
+<li><strong>D7 Options and questions are free text in a prompt / G7 Options and questions are authored, versioned rows</strong> - {"objective": "PARTIAL \u2014 v1-t2-4: <code>ladder.evaluate</code> accepts inline <code>options: [{key, label, payload}]</code> and a free <code>question</code> string, and <code>decision_policy</code> carries kind/gate/threshold/fail_policy/action, not an authored question with <code>fire_when</code> and <code>min_confidence</code>."}</li>
+<li><strong>D8 L1 is recorded but never asks laya / G8 The L1 answer comes from the laya client</strong> - {"objective": "OPEN \u2014 v1-t2-2: <code>ladder.evaluate</code> records the caller's <code>answer</code>, <code>confidence</code>, <code>probabilities</code> and <code>latency_ms</code>; <code>laya_configs</code> pins model_ref/params/timeout_ms but no T2 path calls <code>POST /v1/systemone</code>."}</li>
+<li><strong>D9 The generation budget has no §7.5 refusal / G9 Refuse over budget before the next call</strong> - {"objective": "OPEN \u2014 v1-t2-5: SPEC_V2 \u00a77.5 records <code>429 budget_exceeded</code>; T2 enforces no inference budget, and the only budget refusal in the tree is the tool-spend <code>429 tool_budget_exceeded</code> (<code>crates/actions/src/invoke.rs</code>, <code>crates/actions/src/broker.rs</code>, #526)."}</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Decision ladder · conveyor output · published 2026-11-23T09:36:22Z · conveyor-approver</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

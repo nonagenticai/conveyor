@@ -26,7 +26,21 @@
     <main class="doc-body"><h1>T5 — Architecture design</h1>
 <p>Project: T5 — Kata · Track: v2 · Tranche: 10 · Plan: docs/SPEC_V2.md §12
 Unit: #77 (this document is dependency-shaping work; blocked-by T2, S16–S20 and P0)
-Measured at: main@61edfcf8, 2026-11-18 · Project row: active, meta.depends_on = ["T2", "S16", "S17", "S18", "S19", "S20", "P0"]</p>
+Baseline: main@70d31773, 2026-11-21 (content reviewed at main@61edfcf8, 2026-11-18; citations re-verified at this baseline) · Project row: active, meta.depends_on = ["T2", "S16", "S17", "S18", "S19", "S20", "P0"]</p>
+<ul>
+<li><strong>Status:</strong> published</li>
+<li><strong>Version:</strong> 1.0</li>
+<li><strong>Author / date:</strong> conveyor programme session / 2026-11-21</li>
+<li><strong>Reviewer / review date:</strong> #347 independent review / 2026-11-18; owner publication / 2026-11-21</li>
+<li><strong>Related project:</strong> T5 — Kata · issue #77 · live document <code>01a1ee4c-04d8-757b-ad3d-1807a55e0ae1</code></li>
+<li><strong>Rationale:</strong> Define the to-be architecture for Kata: aggregates, tables and actions, decisions, acceptance and the artefact set.</li>
+<li><strong>Published document:</strong> <code>01a1ee4c-04d8-757b-ad3d-1807a55e0ae1</code> — published 2026-11-21</li>
+<li><strong>Contract:</strong> pending</li>
+<li><strong>ADM phase / plateau:</strong> A / PSA for the artefact (project row: G / capability)</li>
+<li><strong>Entries:</strong> context and boundary; aggregate/table/action rows; decisions; acceptance scenarios; PSA set; typed artefacts; rollout.</li>
+<li><strong>Derivation / realization / reuse / dependency:</strong> derived from SPEC_V2 §6.3, §9.3–§9.4, §12 T5 and P0 §5; realized by #77; reuse sources cited below; project dependencies T2, S16–S20, P0.</li>
+<li><strong>Links:</strong> issue #77; SPEC_V2 §12; the sibling inception document; <code>seed/programme.json</code>.</li>
+</ul>
 <h2>Context and boundary</h2>
 <p>T5 is the system-improvement job of §6.3: observe, state the problem with data, choose a candidate, standardise, sustain, propagate. It owns the kata project, the candidate, the measurement contract, the adoption gate, propagation and revert. It is one link of §9.4's single loop, not a parallel loop.</p>
 <p>In scope: the <code>kata</code> job binding, a kata project type, the kata rows, the <code>kata.*</code> actions and events. Out: the instruments (S16–S20), lesson promotion (organisational memory), the development project (T6), the andon cord (S06) and the tool platform (T13). Under D45 the kata is its own tenant; that tenant, its approvals, budget and autonomy policy are absent today (no <code>kata</code> tenant row — the analysis records it), and this design proposes them, never inheriting the target tenant's write scope.</p>
@@ -110,7 +124,7 @@ Measured at: main@61edfcf8, 2026-11-18 · Project row: active, meta.depends_on =
 </ul>
 <p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
     <footer class="doc-footer">
-      <span>Rendered from <code>Kata · conveyor output · published 2026-11-20T11:50:50.848127361+00:00 · FR Test</code> at publish time.</span>
+      <span>Rendered from <code>Kata · conveyor output · published 2026-11-23T09:36:22Z · FR Test</code> at publish time.</span>
       <a href="../studio.html#documents">All documents</a>
     </footer>
   </body>

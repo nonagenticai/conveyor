@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Driver/Goal/Objective Catalog — T0 Model and contracts (Phase A) - artifact document (2026-11-22) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h2>Metadata</h2>
+<ul>
+<li>Artefact: Driver/Goal/Objective Catalog — T0 Model and contracts (Phase A)</li>
+<li>Phase: a</li>
+<li>Kind: catalog</li>
+<li>Purpose: The drivers behind the model and the objectives its contracts satisfy.</li>
+<li>Scope: the organisation spine, the release/binding pin and the executor seam.</li>
+</ul>
+<h2>Entries</h2>
+<ul>
+<li><strong>D1 Fragmented organisation records / G1 One organisation spine</strong> - {"objective": "industry \u2192 ordered departments \u2192 job_catalogue \u2192 immutable job_release \u2192 tenant-scoped job_binding, every row in the conveyor's own Postgres."}</li>
+<li><strong>D2 A concept in two stores (the v4 lesson) / G2 One record per fact (P1)</strong> - {"objective": "job_catalogue is the position and V1's job is the durable work queue; neither is renamed into the other; no manifest is imported from another system."}</li>
+<li><strong>D3 A closed executor enum (D61) / G3 An extensible executor seam</strong> - {"objective": "procedure and internal_agent implement one Executor trait; a third kind is Registry::register plus an implementation, never an edit to the run path."}</li>
+<li><strong>D4 Decisions with no common record / G4 Decision-ladder types before behaviour</strong> - {"objective": "decision, decision_option, decision_policy, decision_policy_refinement and laya_inference_config exist as schema and contracts; T2 owns evaluation."}</li>
+<li><strong>D5 A release rewritten in place (D38) / G5 Immutable releases and pinned bindings</strong> - {"objective": "job_release is append-only; a change is a new release, a new binding and a gate; a retired or mismatched pin is refused 409 job_binding_stale before any model call."}</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Model and contracts · conveyor output · published 2026-11-23T09:36:22Z · conveyor-approver</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

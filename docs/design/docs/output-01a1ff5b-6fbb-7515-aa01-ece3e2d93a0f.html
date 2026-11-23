@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="conveyor publish (apps/server/src/publish_outputs.rs)" />
+    <meta name="description" content="A conveyor platform output, rendered at publish time." />
+    <title>Conformance baseline v4 — acceptance (re-issued, 2026-11-21) · conveyor documents</title>
+    <link rel="icon" href="../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://conveyor.nonagentic.ai/design/" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1>Conformance baseline v4 — acceptance (2026-11-21)</h1>
+<h2>Context</h2>
+<p>The U5a batch reworked the seven tranche-0 projects through the full lifecycle and re-derived the
+ledger from a fresh snapshot of the live record: <code>git_sha</code> <code>d7293f96082dbf2f99f53bb8fd765834dddf6858</code>, generated
+<code>2026-11-21T18:17:55.718331+00:00</code>, 116 published outputs. The committed v3 ledger was
+derived before the batch; the fresh audit reports <strong>196 P0/P1 entries — 30 P0 / 166 P1</strong>.</p>
+<p>This is the re-issue of <code>01a1ff54-eb5c-7581-91c6-4e1ea2cde8c7</code>: its evidence line embedded the operator's snapshot path, which
+must not appear on the product's public surface. The decision, the counts and the entries are
+unchanged.</p>
+<h2>Decision</h2>
+<p><code>conveyor-approver</code> accepts baseline v4 under the U5 delegation <code>01a1ff1f-e4ba-72dc-9c1a-13049933cf14</code>, with
+<code>conveyor-e2e</code> as executor. The twelve tranche-0 entries are <strong>deleted, not re-dated</strong>: the batch
+fixed them. The 62 new entries are the fresh truth the frozen pack understated — 28 SAFe planning
+gaps (13 tranches with no PI cadence or refinement row, and tranche 1's plan and objectives), 3
+closure-review gaps (T1–T3) and 31 declared outputs that are not published. Every entry carries a
+disposition (<code>rework</code>), an owner and an expiry of 2027-02-18.</p>
+<h2>Consequences</h2>
+<p>Strict publish is green against v4: a new or worsened P0/P1, an expired entry, an entry without an
+owner, or a baseline without its acceptance header fails the publish. The burn-down is per batch:
+U5b–U5h delete their entries, U6 measures the benefits, and U7 requires zero unwaived P0/P1 before
+the programme is called viable.</p>
+<h2>Evidence</h2>
+<ul>
+<li>the retained snapshot: <code>git_sha</code> <code>d7293f96082dbf2f99f53bb8fd765834dddf6858</code>, generated <code>2026-11-21T18:17:55.718331+00:00</code>, manifest <code>ba8129181a213aa76e642f9a83673c26ed82dabec3f8eeaa364fe825e18968c4</code>, 116 outputs (the retained directory is named by its SHA, never by an operator path)</li>
+<li><code>docs/evidence/conformance-gap-register.json</code> and <code>.md</code>, derived from the same audit</li>
+<li>the tranche-0 records and the seven green manifests at the same SHA</li>
+</ul>
+<p class="output-feedback"><a href="https://github.com/nonagenticai/conveyor/discussions">Discuss this output ↗</a></p></main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>Programme definition — vision, blueprint, plan and project briefs · conveyor output · published 2026-11-23T09:36:22Z · conveyor-e2e</code> at publish time.</span>
+      <a href="../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>
