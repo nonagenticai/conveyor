@@ -19,7 +19,11 @@ test("the execution room reads the run's provenance and names the missing ledger
   await page.goto("/execution");
   await expect(page.getByRole("heading", { name: "Execution room" })).toBeVisible();
 
-  const row = page.getByTestId("execution-runs").locator("tr", { hasText: short });
+  // Two runs can share the first eight characters of their ULID; address the row by the full
+  // run id in its link instead.
+  const row = page
+    .getByTestId("execution-runs")
+    .locator("tr", { has: page.locator(`a[href="/runs/${run.id}"]`) });
   await expect(row).toBeVisible();
   await expect(row.getByRole("link", { name: "Open" })).toHaveAttribute(
     "href",

@@ -555,8 +555,7 @@ fn ProceduresBody(
                         <Tile label="Published procedures".to_owned() value=fmt_int(published as i64) detail="immutable versions".to_owned()/>
                         <Tile label="Processes".to_owned() value=fmt_int(processes.len() as i64) detail="derived and hand-authored".to_owned()/>
                     </div>
-                    <div class="split">
-                        <section class="panel">
+                    <section class="panel" style="margin-top:12px">
                             <div class="ph">
                                 <span>"Procedures"</span>
                                 <span class="muted">{format!("{} rows", procedures.len())}</span>
@@ -599,7 +598,7 @@ fn ProceduresBody(
                                 "A converted SOP produces a draft judge (procedure) and a draft process; nothing publishes itself."
                             </p>
                         </section>
-                        <section class="panel">
+                        <section class="panel" style="margin-top:12px">
                             <div class="ph">
                                 <span>"Processes"</span>
                                 <span class="muted">{format!("{} rows", processes.len())}</span>
@@ -648,8 +647,7 @@ fn ProceduresBody(
                                 "Select a process to read its steps, its source and its gates."
                             </p>
                         </section>
-                    </div>
-                    <section class="panel">
+                    <section class="panel" style="margin-top:12px">
                         <div class="ph">
                             <span>"Capabilities"</span>
                             <span class="muted">{format!("{} rows", capabilities.len())}</span>
