@@ -172,6 +172,9 @@ pub struct InterruptionOut {
     pub state: String,
     /// The escalation or ask approval.
     pub approval_id: Option<String>,
+    /// The Definition-of-Done override reason the coach read for the interrupted card, if any.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub override_reason: Option<String>,
     /// The kata run a systemic class opened.
     pub kata_candidate_id: Option<String>,
 }
@@ -625,8 +628,40 @@ fn view(interruption: &store::coach::CoachInterruption) -> InterruptionOut {
         narrative: interruption.narrative.clone(),
         state: interruption.state.clone(),
         approval_id: interruption.approval_id.map(|id| id.to_string()),
+        override_reason: None,
         kata_candidate_id: interruption.kata_candidate_id.map(|id| id.to_string()),
     }
+}
+
+/// The interruption view with the card's Definition-of-Done override reason, when one is
+/// recorded. SPEC_V2 §5.4: the coach reads the reason the approval recorded.
+async fn view_with_reason(
+    tx: &mut PgConnection,
+    tenant: TenantId,
+    interruption: &store::coach::CoachInterruption,
+) -> Result<InterruptionOut, ActionError> {
+    let mut out = view(interruption);
+    out.override_reason = store::approval::approved_card_gate_meta_tx(
+        &mut *tx,
+        tenant,
+        interruption.interrupted_card_id,
+        crate::board::CARD_DONE_GATE,
+    )
+    .await
+    .map_err(|error| {
+        tracing::error!(
+            %error,
+            interruption = %interruption.id,
+            "read the Definition-of-Done gate"
+        );
+        ActionError::internal()
+    })?
+    .and_then(|meta| {
+        meta.get("evidence_waiver")
+            .and_then(Value::as_str)
+            .map(str::to_owned)
+    });
+    Ok(out)
 }
 
 // ── coach.interrupt ──────────────────────────────────────────────────────────────────────
@@ -1173,7 +1208,9 @@ async fn coach_triage(
         }),
     )
     .await?;
-    Ok(HandlerOutput::ok(view(&interruption)))
+    Ok(HandlerOutput::ok(
+        view_with_reason(&mut *tx, ctx.tenant, &interruption).await?,
+    ))
 }
 
 // ── coach.remedy ─────────────────────────────────────────────────────────────────────────
@@ -1478,5 +1515,7 @@ async fn coach_escalate(
         json!({ "interruption_id": escalated.id, "approval_id": approval_id, "reason": reason }),
     )
     .await?;
-    Ok(HandlerOutput::ok(view(&escalated)))
+    Ok(HandlerOutput::ok(
+        view_with_reason(&mut *tx, ctx.tenant, &escalated).await?,
+    ))
 }
