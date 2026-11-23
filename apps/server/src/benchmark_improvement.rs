@@ -17,6 +17,7 @@ use conveyor_actions::registry::registry;
 use conveyor_auth::Role;
 use conveyor_domain::TenantId;
 use conveyor_store as store;
+use serde::Deserialize;
 use serde_json::{Value, json};
 use sqlx::PgPool;
 use uuid::Uuid;
@@ -28,12 +29,41 @@ const TICK: ChronoDuration = ChronoDuration::seconds(60);
 /// The significance bar (S18 §10 Q3).
 const ALPHA: f64 = 0.05;
 
-fn want_uuid(payload: &Value, field: &str) -> Result<Uuid, JobFailure> {
-    payload
-        .get(field)
-        .and_then(Value::as_str)
-        .and_then(|raw| Uuid::parse_str(raw).ok())
-        .ok_or_else(|| JobFailure::permanent(format!("the job payload has no {field}")))
+/// The job payload. A caller may hand the loop an already-started candidate (`run_id`) or the
+/// subject to start (`suite_id` + subject + label); both paths end in the same public actions.
+#[derive(Debug, Deserialize)]
+struct Payload {
+    #[serde(default)]
+    run_id: Option<Uuid>,
+    baseline_run_id: Uuid,
+    #[serde(default)]
+    suite_id: Option<Uuid>,
+    #[serde(default)]
+    arm: Option<String>,
+    #[serde(default)]
+    subject_kind: Option<String>,
+    #[serde(default)]
+    capability_agent_id: Option<Uuid>,
+    #[serde(default)]
+    process_id: Option<Uuid>,
+    #[serde(default)]
+    label: Option<String>,
+    #[serde(default)]
+    concurrency: Option<u32>,
+    #[serde(default)]
+    only: Option<Vec<String>>,
+    #[serde(default)]
+    with_failing_test: Option<bool>,
+}
+
+/// The subset of `benchmark_runs.get`'s output the loop decides on.
+#[derive(Debug, Deserialize)]
+struct CandidateView {
+    status: String,
+    #[serde(default)]
+    error: Option<String>,
+    #[serde(default)]
+    improvement_verdict: Option<String>,
 }
 
 /// One call of the loop: observe, or compare and record.
@@ -43,15 +73,19 @@ pub async fn run(
     app_key: &str,
     payload: &Value,
 ) -> Result<(), JobFailure> {
-    let run_id = want_uuid(payload, "run_id")?;
-    let baseline_run_id = want_uuid(payload, "baseline_run_id")?;
+    let payload: Payload = serde_json::from_value(payload.clone()).map_err(|error| {
+        JobFailure::permanent(format!(
+            "the job payload is not an improvement job: {error}"
+        ))
+    })?;
+    let baseline_run_id = payload.baseline_run_id;
 
-    let mut tx = store::begin_scoped(pool, tenant)
-        .await
-        .map_err(|error| JobFailure::retryable(format!("database: {error}")))?;
-    let candidate = store::benchmark::get_run_tx(&mut tx, tenant, run_id)
-        .await
-        .map_err(|error| JobFailure::retryable(format!("database: {error}")))?;
+    // ── 1. the candidate, started through the same action a person calls ────────────────
+    let run_id = match payload.run_id {
+        Some(run_id) => run_id,
+        None => start_candidate(pool, tenant, app_key, &payload).await?,
+    };
+    let candidate = get_candidate(pool, tenant, app_key, run_id).await?;
     if candidate.improvement_verdict.is_some() {
         return Ok(()); // already judged; a re-delivered job writes nothing
     }
@@ -61,28 +95,8 @@ pub async fn run(
     ) {
         // Still measuring: schedule the next look. The key carries the tick so this job's own
         // `running` row does not swallow the next one.
-        store::jobs::enqueue_tx(
-            &mut tx,
-            tenant,
-            conveyor_actions::benchmark::runs::IMPROVEMENT_KIND,
-            &format!(
-                "benchmark:improvement:{run_id}:{}",
-                Utc::now().timestamp_millis()
-            ),
-            json!({"run_id": run_id, "baseline_run_id": baseline_run_id}),
-            Some(Utc::now() + TICK),
-            3,
-        )
-        .await
-        .map_err(|error| JobFailure::retryable(format!("database: {error}")))?;
-        tx.commit()
-            .await
-            .map_err(|error| JobFailure::retryable(format!("database: {error}")))?;
-        return Ok(());
+        return enqueue_tick(pool, tenant, run_id, baseline_run_id).await;
     }
-    tx.commit()
-        .await
-        .map_err(|error| JobFailure::retryable(format!("database: {error}")))?;
 
     // A run that never measured anything has nothing to keep or revert.
     if candidate.status != "succeeded" {
@@ -146,6 +160,112 @@ pub async fn run(
         )
     };
     record(pool, tenant, run_id, baseline_run_id, verdict, &note).await
+}
+
+/// Start the candidate through `benchmark_runs.start` and return its id.
+///
+/// The baseline id is deliberately not sent: this job is the baseline's consumer, and a start
+/// carrying it would enqueue a second improvement job for the same candidate.
+async fn start_candidate(
+    pool: &PgPool,
+    tenant: TenantId,
+    app_key: &str,
+    payload: &Payload,
+) -> Result<Uuid, JobFailure> {
+    let suite_id = payload
+        .suite_id
+        .ok_or_else(|| JobFailure::permanent("the job payload has neither run_id nor suite_id"))?;
+    let subject_kind = payload.subject_kind.as_deref().ok_or_else(|| {
+        JobFailure::permanent("the job payload has no subject_kind to start a candidate")
+    })?;
+    let label = payload.label.as_deref().ok_or_else(|| {
+        JobFailure::permanent("the job payload has no label to start a candidate")
+    })?;
+    let mut input = json!({
+        "suite_id": suite_id,
+        "arm": payload.arm.as_deref().unwrap_or("conveyor"),
+        "subject_kind": subject_kind,
+        "label": label,
+    });
+    if let Some(id) = payload.capability_agent_id {
+        input["capability_agent_id"] = json!(id);
+    }
+    if let Some(id) = payload.process_id {
+        input["process_id"] = json!(id);
+    }
+    if let Some(concurrency) = payload.concurrency {
+        input["concurrency"] = json!(concurrency);
+    }
+    if let Some(only) = &payload.only {
+        input["only"] = json!(only);
+    }
+    if let Some(with_failing_test) = payload.with_failing_test {
+        input["with_failing_test"] = json!(with_failing_test);
+    }
+    let started = invoke_action(
+        pool,
+        tenant,
+        app_key,
+        "benchmark_runs.start",
+        input,
+        "improvement",
+    )
+    .await?;
+    started
+        .get("id")
+        .and_then(Value::as_str)
+        .and_then(|raw| Uuid::parse_str(raw).ok())
+        .ok_or_else(|| JobFailure::permanent("benchmark_runs.start returned no run id"))
+}
+
+/// Observe the candidate through `benchmark_runs.get` — the action a person reading the screen
+/// calls, never a private store read.
+async fn get_candidate(
+    pool: &PgPool,
+    tenant: TenantId,
+    app_key: &str,
+    run_id: Uuid,
+) -> Result<CandidateView, JobFailure> {
+    let view = invoke_action(
+        pool,
+        tenant,
+        app_key,
+        "benchmark_runs.get",
+        json!({"id": run_id}),
+        "improvement",
+    )
+    .await?;
+    serde_json::from_value(view)
+        .map_err(|error| JobFailure::permanent(format!("benchmark_runs.get: {error}")))
+}
+
+/// Schedule the next look at a live candidate.
+async fn enqueue_tick(
+    pool: &PgPool,
+    tenant: TenantId,
+    run_id: Uuid,
+    baseline_run_id: Uuid,
+) -> Result<(), JobFailure> {
+    let mut tx = store::begin_scoped(pool, tenant)
+        .await
+        .map_err(|error| JobFailure::retryable(format!("database: {error}")))?;
+    store::jobs::enqueue_tx(
+        &mut tx,
+        tenant,
+        conveyor_actions::benchmark::runs::IMPROVEMENT_KIND,
+        &format!(
+            "benchmark:improvement:{run_id}:{}",
+            Utc::now().timestamp_millis()
+        ),
+        json!({"run_id": run_id, "baseline_run_id": baseline_run_id}),
+        Some(Utc::now() + TICK),
+        3,
+    )
+    .await
+    .map_err(|error| JobFailure::retryable(format!("database: {error}")))?;
+    tx.commit()
+        .await
+        .map_err(|error| JobFailure::retryable(format!("database: {error}")))
 }
 
 async fn record(
