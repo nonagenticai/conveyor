@@ -104,7 +104,7 @@ fn passthrough_output() -> Schema {
 /// the same service call; what differs is the caller and therefore the ledger's `caller_kind` —
 /// `copilot` for a turn, `agent_run` for the capped loop — and that is carried by the caller's
 /// `UsageContext`, not by the action.
-fn chat_spec(name: &'static str) -> ActionSpec {
+fn chat_spec(name: &'static str, timeout_ms: u32) -> ActionSpec {
     ActionSpec {
         name,
         version: 1,
@@ -115,10 +115,11 @@ fn chat_spec(name: &'static str) -> ActionSpec {
         scopes: &[Scope::ModelWrite],
         // A replay with the same key returns the first body — one turn, one charge.
         idempotent: true,
-        // The ceiling an agent row may declare (`timeout_secs` 1..=300). A shorter bound
-        // here makes the agent's own timeout unreachable: the invocation engine rolls a
-        // slow turn back before the loop can finish it.
-        timeout_ms: 300_000,
+        // The declaration is the deadline the engine grants a caller (`handlers.rs` passes
+        // `spec.timeout_ms` through verbatim); there is no second caller input above it.
+        // S10 §5.5 accepts 60 s for the copilot's call; the workflow loop keeps the agent
+        // row's `timeout_secs` 1..=300 ceiling, which a shorter bound would make unreachable.
+        timeout_ms,
         // An outbound, billable POST: declaring it `read` told every consumer it was free and
         // side-effect-free. When S16 lands it also writes the `inference_call` ledger row.
         effect: Effect::Write,
@@ -145,14 +146,18 @@ fn chat_spec(name: &'static str) -> ActionSpec {
 
 /// The copilot's model call (S10 §5.5).
 fn completions_create() -> ActionSpec {
-    chat_spec("completions.create")
+    // S10 §5.5's accepted bound. `models:invoke` in that plan is not a scope the registry
+    // admits; `model:write` is the admitted scope for this action, so the spec keeps it.
+    chat_spec("completions.create", 60_000)
 }
 
 /// The workflow engine's model call (S13 step 8). A workflow step reaches a model only through the
 /// capped `agent.run` loop, which invokes this action — `validate_publish` refuses a node that names
 /// it directly (`crates/workflow/src/definition.rs`, `DirectModelCall`).
 fn inference_chat() -> ActionSpec {
-    chat_spec("inference.chat")
+    // The agent row's own `timeout_secs` cap (1..=300); S13's loop reaches it through this
+    // declaration, so the bound stays at the cap rather than S10's 60 s turn bound.
+    chat_spec("inference.chat", 300_000)
 }
 
 inventory::submit! { ActionRegistration::new(completions_create) }
@@ -169,7 +174,9 @@ mod tests {
         assert_eq!(spec.name, "completions.create");
         assert_eq!(spec.kind, ActionKind::External);
         assert_eq!(spec.effect, Effect::Write);
-        assert_eq!(spec.timeout_ms, 300_000);
+        assert_eq!(spec.timeout_ms, 60_000, "S10 §5.5's accepted bound");
+        // `models:invoke` is not a `Scope` variant; `model:write` is the scope the registry
+        // admits, and the plan does not introduce a new scope vocabulary.
         assert_eq!(spec.scope_names(), vec!["model:write"]);
         assert!(spec.idempotent);
         match spec.handler {
@@ -187,6 +194,19 @@ mod tests {
                 panic!("completions.create must be a declared external action")
             }
         }
+    }
+
+    #[test]
+    fn a_caller_cannot_exceed_the_accepted_sixty_second_bound() {
+        // The engine grants the caller exactly `spec.timeout_ms` (`handlers.rs` copies it, and
+        // there is no caller-supplied deadline above it). The canonical projection is what every
+        // channel publishes, so a consumer cannot advertise or request a longer turn than S10
+        // §5.5 accepts.
+        let spec = completions_create();
+        assert_eq!(spec.timeout_ms, 60_000);
+        let canonical = spec.canonical();
+        assert_eq!(canonical["timeout_ms"], 60_000);
+        assert_eq!(canonical["scopes"], serde_json::json!(["model:write"]));
     }
 
     #[test]
