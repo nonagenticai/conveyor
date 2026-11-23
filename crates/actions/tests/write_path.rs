@@ -194,8 +194,11 @@ async fn request_contract(running: &support::Running, project: &str) -> Value {
 
 async fn create_board(pg: &support::Pg, tenant: Uuid) -> Uuid {
     sqlx::query_scalar(
-        "INSERT INTO governance_body (tenant_id, kind, key, name)
-         VALUES ($1, 'architecture_board', 'board', 'Conveyor Architecture Board')
+        "INSERT INTO governance_body
+             (tenant_id, kind, key, name, charter, commissioning_authority, members)
+         VALUES ($1, 'architecture_board', 'board', 'Conveyor Architecture Board',
+                 'Approve the delivery contracts', 'P0 programme board',
+                 '[{\"role\": \"chief architect\"}]'::jsonb)
          RETURNING id",
     )
     .bind(tenant)
@@ -512,8 +515,15 @@ async fn legacy_contract_requester_flagged() {
     assert_eq!(status, 409, "{body}");
     assert_eq!(error_code(&body), "board_approval_required", "{body}");
 
-    // The board decision is the independent authority; the row still reads its flag.
+    // The board decision is the independent authority; the row still reads its flag. The board
+    // must be active before it can decide the contract.
     let board = create_board(&pg, seeded.tenant_id).await;
+    sqlx::query("UPDATE governance_body SET status = 'active' WHERE tenant_id = $1 AND id = $2")
+        .bind(seeded.tenant_id)
+        .bind(board)
+        .execute(&pg.super_pool)
+        .await
+        .expect("activate the board");
     let (status, body) = running
         .invoke(
             "architecture.board_decide",
@@ -778,6 +788,12 @@ async fn rejected_board_decision_leaves_it_draft() {
 async fn contract_approval_links_the_board_decision() {
     let (pg, running, seeded) = fixture().await;
     let board = create_board(&pg, seeded.tenant_id).await;
+    sqlx::query("UPDATE governance_body SET status = 'active' WHERE tenant_id = $1 AND id = $2")
+        .bind(seeded.tenant_id)
+        .bind(board)
+        .execute(&pg.super_pool)
+        .await
+        .expect("activate the board");
     let project = create_project(&running, "Board-approved contract", None).await;
     let contract = request_contract(&running, &project).await;
     let contract_id = text(&contract, "id");

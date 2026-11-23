@@ -638,3 +638,127 @@ async fn a_uml_model_accepts_its_own_profile_and_refuses_archimate_kinds() {
         .await;
     assert_eq!(status, 422, "an unknown version has no profile: {body}");
 }
+
+/// Property (g) — a dangling relationship is a `findings` run naming its id, and the run is
+/// post-commit: the graph mutation and the action's own transaction write no run row.
+///
+/// A dangling end cannot come through `model_relationships.create` (the store resolves both
+/// ends), so it arrives the way an import or a hand fixture does: one transaction that inserts
+/// the row, checked for a run row inside itself. The action then queues; the worker is the only
+/// writer, and this test runs the real worker against the tenant's real graph.
+#[tokio::test]
+async fn a_dangling_relationship_is_a_finding_naming_its_id_after_the_mutation_commits() {
+    let pg = support::Pg::fresh().await;
+    let alice = support::seed(&pg, "dev-a", "alice", "Alice").await;
+    let running = support::Running::start(&pg).await;
+
+    let (status, body) = running
+        .invoke(
+            "models.create",
+            "dev:alice",
+            json!({"title": "Dangling", "language": "archimate", "language_version": "3.2"}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "models.create: {body}");
+    let model_id = id_of(output(&body), "id");
+    let model: uuid::Uuid = model_id.parse().expect("the model id");
+
+    let (status, body) = running
+        .invoke(
+            "model_elements.create",
+            "dev:alice",
+            json!({"model_id": model_id, "kind": "application_component", "name": "API"}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "model_elements.create: {body}");
+    let source: uuid::Uuid = id_of(output(&body), "id").parse().expect("the source id");
+
+    // The mutation transaction: a relationship whose target does not exist. Inside it, before
+    // the commit, no validation run is written.
+    let mut mutation = pg.super_pool.begin().await.expect("the mutation tx");
+    let relationship: uuid::Uuid = sqlx::query_scalar(
+        "INSERT INTO model_relationship (tenant_id, model_id, kind, source_id, target_id)
+         VALUES ($1, $2, 'serving', $3, $4) RETURNING id",
+    )
+    .bind(alice.tenant_id)
+    .bind(model)
+    .bind(source)
+    .bind(uuid::Uuid::now_v7())
+    .fetch_one(&mut *mutation)
+    .await
+    .expect("seed the deliberately dangling relationship");
+    let inside: i64 = sqlx::query_scalar(
+        "SELECT count(*) FROM model_validation_run WHERE tenant_id = $1 AND model_id = $2",
+    )
+    .bind(alice.tenant_id)
+    .bind(model)
+    .fetch_one(&mut *mutation)
+    .await
+    .expect("count the runs inside the mutation tx");
+    assert_eq!(inside, 0, "the mutation transaction writes no run row");
+    mutation.commit().await.expect("commit the graph mutation");
+
+    // The action queues a job in its own transaction; it does not validate inside it either.
+    let (status, body) = running
+        .invoke(
+            "models.validate",
+            "dev:alice",
+            json!({"id": model_id}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "models.validate: {body}");
+    assert_eq!(output(&body)["queued"], true, "{body}");
+    let after_action: i64 = sqlx::query_scalar(
+        "SELECT count(*) FROM model_validation_run WHERE tenant_id = $1 AND model_id = $2",
+    )
+    .bind(alice.tenant_id)
+    .bind(model)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("count the runs after the action");
+    assert_eq!(after_action, 0, "the action queues; it does not validate");
+
+    // The worker writes the run: the status is `findings`, and the finding names the id.
+    conveyor_server::worker::run_kind(
+        &pg.runtime,
+        &support::config(&pg),
+        None,
+        alice.tenant,
+        "model.validate",
+        &json!({ "model_id": model_id }),
+    )
+    .await
+    .expect("the worker validates the model");
+
+    let (status, findings): (String, Value) = sqlx::query_as(
+        "SELECT status, findings FROM model_validation_run
+          WHERE tenant_id = $1 AND model_id = $2
+          ORDER BY created_at DESC, id DESC LIMIT 1",
+    )
+    .bind(alice.tenant_id)
+    .bind(model)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("the worker wrote a run");
+    assert_eq!(status, "findings");
+    let finding = findings
+        .as_array()
+        .expect("findings is an array")
+        .iter()
+        .find(|finding| finding["code"] == "dangling_relationship")
+        .unwrap_or_else(|| panic!("no dangling_relationship finding in {findings}"));
+    assert_eq!(
+        finding["relationship_id"],
+        json!(relationship),
+        "the finding must name the dangling relationship"
+    );
+}
