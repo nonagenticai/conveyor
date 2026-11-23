@@ -12,7 +12,7 @@ parity_ids: PENDING-S0
 
 # S21 — Message construction (the compiled prompt)
 
-Programme project: S21 · issues #15, #581, #590, #599
+Programme project: S21 · issues #15, #581, #590, #599, #612
 
 **Status:** `plan written 2026-11-09`; the v1 seam is built (D27) and steps 1–2 are built. Step 3
 (the work-package prompt envelope — recipe authoring, memory selection, knowledge content) is
@@ -20,8 +20,11 @@ Programme project: S21 · issues #15, #581, #590, #599
 `internal_agent` executor runtime and its dynamic tool grant) is **built, #581, 2026-11-22**; the
 design is §14 and the build record is §15. Step 5 (the applying gate) is **built, #590,
 2026-11-22**; the design is §16 and the receipt is `docs/evidence/S21-APPLY.md`. Step 6 (the work
-package's run — the card's binding, the terminal run's memory and the live proof) is **open,
-#599**; the design is §17.
+package's run — the card's binding, the terminal run's memory and the live proof) is **built and
+merged, #599, 2026-11-23**; the design is §17 and the receipt is `docs/evidence/S21-RUN.md` (the
+live proof is recorded blocked on the estate's caller licence). Step 7 (the run's episodic memory —
+the run's prior steps in the compiled prompt, `memory.recall`'s hot/digest separation and the
+process-attempt proof) is **open, #612**; the design is §18.
 **Depends on:** S15 (capability/knowledge), S16 (prompt audit), S13 (agent.run), S11 (procedure steps),
 S09 (`retrieval.query` / `strata` packs).
 **Owner ruling:** George, 2026-11-09 — *a prompt is a run-time compilation from the procedure and the
@@ -586,3 +589,48 @@ path. The process-run clause is therefore no longer out of scope.
 **Acceptance.** `crates/actions/tests/card_binding.rs` (new), `crates/store/tests/run_memory.rs`
 (new), `internal_agent_runtime.rs` (extended with the next-run prompt and live scenarios). The
 scenarios are issue #599 P1–P3; the receipt is `docs/evidence/S21-RUN.md`.
+
+**Next lane.** Step 7 (issue #612, §18): the run's episodic memory — the run's own prior steps in
+the compiled prompt, `memory.recall`'s hot/digest separation and the process-attempt proof. No
+migration, no second compiler, no second memory writer.
+
+## 18. Build plan — step 7: the run's episodic memory (2026-11-23, issue #612)
+
+**Why this step.** Step 3 gave the Memory section the card's hot rows and one digest; steps 4–5
+gave the run an executor, a compiled prompt and a gate; step 6 made the work package bind its job
+and record its terminal attempt. SPEC_V2 §4.5 names the Memory source as three classes — the run's
+prior steps, the card's hot memory and the consolidated digest — and only two are read: `read_step`
+(`crates/store/src/prompt.rs:321`) selects position/action/node_id/on_result and nothing queries
+`run_step` for earlier outputs. A multi-step run re-derives context it already produced, and a retry
+cannot see why the previous attempt failed. Rework `v1-p45-1` names the remainder in its acceptance.
+The adjacent defect `v1-p76-2`: `hot_for_card_tx` (`crates/store/src/memory.rs:221`) has no
+`kind <> 'digest'` filter, so a derived digest is served as a hot row by `memory.recall` while the
+prompt selector already filters it. This step joins them.
+
+**P1 — the run's prior steps reach the prompt.** `PromptFacts` gains the prior-step lines; the
+Memory renderer prepends them before the card's rows, each as
+`[step/<status>#<position>.<attempt>] <action> <status>: <body>`. The store reads the run's own
+`run_step` rows: terminal statuses `succeeded`/`failed`, `(position, attempt)` before the current
+step's (so a retry sees its earlier attempt), ordered, bounded by `step_limit`. The selector gains
+`include_steps` (default true) and `step_limit` (default 8, max 32). Bodies render whole; an
+over-budget section refuses with the measurement, never truncates. A child reads only its own rows.
+
+**P2 — `memory.recall` keeps the digest out of hot.** `hot_for_card_tx` filters `kind <> 'digest'`;
+the digest stays reachable through the prompt selector's `include_digest` and the cold read. The
+existing test that pins three hot rows (digest first) flips to two; the selector's digest append
+stays asserted.
+
+**P3 — the process attempt reaches the next prompt (proof).** #599 writes the terminal attempt on
+every path; this step proves a process root run's attempt is read by the next run's prompt and that
+a child writes none. No writer is added.
+
+**Out of this step.** No card-driven run creation (a claim or lane move starting a run); no
+`memory.remember` write-back at handoff; no automatic apply of an L1-accepted draft; no step
+`input_template`/`outputs` as Request; no budget mechanism (the #526 lane's); no parent-run memory
+in a child's prompt; no UI; no PDDL storage; no second compiler; no migration.
+
+**Acceptance.** `crates/domain/tests/prompt_memory.rs` (extended), `crates/store/tests/prompt_catalogue.rs`
+(prior-step selection) and `crates/store/tests/memory.rs` (the digest/hot flip), and
+`crates/actions/tests/process_agent_resolved.rs` / `crates/store/tests/run_memory.rs` (the process
+attempt reaches the next prompt). The scenarios are issue #612 P1–P3; the receipt is
+`docs/evidence/S21-MEMORY.md`.

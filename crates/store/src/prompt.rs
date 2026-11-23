@@ -11,6 +11,7 @@
 
 use chrono::{DateTime, Utc};
 use conveyor_domain::TenantId;
+use conveyor_domain::memory::StepMemoryLine;
 use conveyor_domain::organisation::ReleaseAnatomy;
 use conveyor_domain::prompt::{
     CapabilityFacts, CardFacts, KnowledgeFacts, MemorySelector, ProcessFacts, ProjectFacts,
@@ -172,6 +173,21 @@ pub async fn facts_for_run_tx(
     } = run;
 
     facts.step = read_step(conn, tenant, run_step_id).await?;
+    // The run's own earlier steps: the Memory source's episodic class (S21 step 7). A plain run
+    // with no current step selects none, and a child run reads only its own `run_step` rows.
+    if memory_selector.include_steps
+        && let Some(step) = &facts.step
+    {
+        facts.prior_steps = read_prior_steps(
+            conn,
+            tenant,
+            run_id,
+            step.position,
+            step.attempt,
+            memory_selector.step_limit,
+        )
+        .await?;
+    }
     facts.process = match process_id {
         Some(id) => read_process(conn, tenant, id).await?,
         None => match workflow_id {
@@ -326,15 +342,15 @@ async fn read_step(
     let Some(id) = run_step_id else {
         return Ok(None);
     };
-    let row: Option<(i32, String, Option<String>)> = sqlx::query_as(
-        "SELECT position, action, node_id FROM run_step
+    let row: Option<(i32, i32, String, Option<String>)> = sqlx::query_as(
+        "SELECT position, attempt, action, node_id FROM run_step
           WHERE tenant_id = $1 AND id = $2",
     )
     .bind(tenant.as_uuid())
     .bind(id)
     .fetch_optional(&mut *conn)
     .await?;
-    let Some((position, action, node_id)) = row else {
+    let Some((position, attempt, action, node_id)) = row else {
         return Ok(None);
     };
     // `on_result` lives on the process step, joined only when this row is process-driven.
@@ -349,10 +365,62 @@ async fn read_step(
     .await?;
     Ok(Some(StepFacts {
         position,
+        attempt,
         action,
         node_id,
         on_result,
     }))
+}
+
+/// The run's own earlier steps, oldest first — the Memory section's episodic class (S21 step 7).
+///
+/// Same `run_id` only: a child run's trace is its own. Terminal statuses only — a `queued` or
+/// `running` row is future work and a `skipped` row did not execute. A row qualifies when its
+/// `(position, attempt)` is lexicographically before the current step's, so a retry sees its own
+/// earlier failed attempt as well as every earlier position. The newest `limit` qualify, then the
+/// selection is re-ordered oldest first. The body is the output's text when it carries one, else
+/// the compact output JSON; a failed attempt's body is its error. Nothing is truncated here: the
+/// section budget refuses with the measured size instead.
+async fn read_prior_steps(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    run_id: Uuid,
+    position: i32,
+    attempt: i32,
+    limit: u32,
+) -> Result<Vec<StepMemoryLine>, PromptStoreError> {
+    let rows: Vec<(i32, i32, String, String, String)> = sqlx::query_as(
+        "SELECT position, attempt, action, status,
+                CASE WHEN status = 'failed' THEN coalesce(error, '')
+                     WHEN output ? 'text' THEN output->>'text'
+                     ELSE output::text END
+           FROM (
+                 SELECT position, attempt, action, status, output, error
+                   FROM run_step
+                  WHERE tenant_id = $1 AND run_id = $2
+                    AND status IN ('succeeded', 'failed')
+                    AND (position, attempt) < ($3, $4)
+                  ORDER BY position DESC, attempt DESC
+                  LIMIT $5
+                ) recent
+          ORDER BY position, attempt",
+    )
+    .bind(tenant.as_uuid())
+    .bind(run_id)
+    .bind(position)
+    .bind(attempt)
+    .bind(i64::from(limit))
+    .fetch_all(&mut *conn)
+    .await?;
+    Ok(rows
+        .into_iter()
+        .map(|(position, attempt, action, status, body)| StepMemoryLine {
+            id: format!("{position}.{attempt}"),
+            action,
+            status,
+            body,
+        })
+        .collect())
 }
 
 async fn read_process(

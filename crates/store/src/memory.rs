@@ -228,6 +228,7 @@ pub async fn hot_for_card_tx(
         "SELECT {COLUMNS}
            FROM work_package_memory
           WHERE tenant_id = $1 AND card_id = $2
+            AND kind <> 'digest'
           ORDER BY created_at DESC, id DESC
           LIMIT $3"
     );

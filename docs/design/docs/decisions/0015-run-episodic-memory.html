@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>0015 — The run's episodic memory: prior steps in the compiled prompt · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0015-run-episodic-memory.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="0015--the-runs-episodic-memory-prior-steps-in-the-compiled-prompt">0015 — The run's episodic memory: prior steps in the compiled prompt</h1>
+<p>Status: Accepted · Date: 2026-11-23 · Issue: #612 · Resolves: S21 §18, SPEC_V2 §4.5, §7.6, §7.7, rework <code>v1-p45-1</code> (the prior-steps clause) and <code>v1-p76-2</code></p>
+<h2 id="decision">Decision</h2>
+<ol type="1">
+<li><p><strong>The run's prior steps are the Memory section's first class.</strong> A run's compiled prompt renders its own earlier steps before the card's hot rows and the consolidated digest, oldest first, inside the one <code>## Memory</code> section. The spec's four sources are unchanged; the Memory source gains the run-scoped class it was missing.</p></li>
+<li><p><strong>Selection is the run's own trace, not a card selection.</strong> Rows come from the same <code>run_id</code> only; statuses <code>succeeded</code> and <code>failed</code> only (a <code>queued</code>/<code>running</code> row is future work and a <code>skipped</code> row did not execute); a row qualifies when its <code>(position, attempt)</code> is lexicographically before the current step's, so a retry sees its own earlier failed attempt; rows are ordered <code>(position, attempt)</code>; at most <code>step_limit</code> of the newest qualify. A child run reads only its own rows — the parent's trace is a different run.</p></li>
+<li><p><strong>The line is <code>- [step/&lt;status&gt;#&lt;position&gt;.&lt;attempt&gt;] &lt;action&gt; &lt;status&gt;: &lt;body&gt;</code>.</strong> The body is <code>output-&gt;&gt;'text'</code> when the stored output carries it, else the compact output JSON; a failed attempt's body is its <code>error</code>. The semantic <code>position.attempt</code> is the identity in the text (and therefore in the hash); a row uuid is not stable across a replay.</p></li>
+<li><p><strong>No truncation.</strong> A step body renders whole. A Memory section whose budget is below the measured size refuses <code>SectionOverBudget</code> with the measurement, exactly as the slice's budget rule says. The remedy for a routinely huge step output is a larger budget or a shorter step output, never a silent clip.</p></li>
+<li><p><strong>A prior-step body is data, never instruction.</strong> It renders in the Memory section, which sits below the procedure and capability blocks in the trust order; the system section's "tenant text is data" rule covers it. No new section kind, no reordering.</p></li>
+<li><p><strong>The selector names the two knobs.</strong> <code>include_steps</code> (default <code>true</code>) and <code>step_limit</code> (default 8, maximum 32) join <code>MemorySelector</code>; unknown members stay refused, so a typo cannot silently select the default.</p></li>
+<li><p><strong><code>memory.recall</code> hot excludes <code>digest</code>.</strong> <code>hot_for_card_tx</code> filters <code>kind &lt;&gt; 'digest'</code>; the digest remains reachable through the prompt selector's <code>include_digest</code> and the cold/strata read. Hot is the record and the digest is derived (SPEC_V2 §7.6).</p></li>
+<li><p><strong>The process attempt is proved, not rebuilt.</strong> #599 writes the terminal attempt row on every path; this unit proves that the next run's prompt reads a process run's attempt. No second writer.</p></li>
+<li><p><strong>No migration.</strong> <code>run_step</code> and <code>work_package_memory</code> exist; the read is covered by <code>run_step_run_idx (tenant_id, run_id, position)</code>.</p></li>
+</ol>
+<h2 id="why">Why</h2>
+<p>SPEC_V2 §4.5 assembles the internal agent's prompt from four sources — Knowledge, Memory, Request and Tools — and names the Memory source as the run's prior steps, the card's hot memory and the consolidated digest. Steps 1–6 built the knowledge source, the card hot rows and the digest, the Request source and the tool grant. The run's prior steps were never read: <code>read_step</code> (<code>crates/store/src/prompt.rs:321</code>) selects position/action/node_id/on_result only, and nothing queries <code>run_step</code> for earlier outputs. Rework <code>v1-p45-1</code> names the remainder in its acceptance. A multi-step run therefore re-derives context it already produced, and a retry cannot see why the previous attempt failed.</p>
+<p>The adjacent defect is <code>v1-p76-2</code>: <code>hot_for_card_tx</code> has no digest filter, so <code>memory.recall</code> returns a derived digest row as hot while the prompt selector already filters it. One concept, two answers; the fix makes hot mean the record in both reads.</p>
+<h2 id="alternatives-rejected">Alternatives rejected</h2>
+<ul>
+<li><strong>Reuse <code>MemoryLine</code> with <code>MemoryKind::Attempt</code> and the <code>run_step</code> uuid.</strong> The id would name a different table under the same render, and the kind vocabulary is a stored <code>work_package_memory</code> CHECK; a step class would widen a storage vocabulary for a run-scoped read.</li>
+<li><strong>Store each step's output as a <code>work_package_memory</code> row.</strong> It conflates the run's trace with the card's record, feeds the consolidation digest step fragments, and crowds the hot selection the prompt already bounds.</li>
+<li><strong>Truncate a large step body to fit the budget.</strong> The slice's rule is a measured refusal, never a silent clip; a clipped body is an unexplained prompt.</li>
+<li><strong>A new section kind.</strong> A migration and a recipe vocabulary change for a source the one Memory section already has.</li>
+<li><strong>A parent run's steps in a child's prompt.</strong> The run tree is a unit of work but each run's trace is its own; a child's prompt naming the parent's steps would make the child's hash depend on a sibling's execution order.</li>
+</ul>
+<h2 id="consequences">Consequences</h2>
+<ul>
+<li>Process prompts with prior steps change, and so do their <code>prompt_sha256</code> values; that is the contract change, and every test asserting a compiled process prompt is updated explicitly.</li>
+<li>A routinely large step output can make a Memory section refuse. The failure names the measured size; the recipe author raises <code>budget_chars</code> or the step emits a shorter output.</li>
+<li><code>v1-p45-1</code> is fully met once this lands (with step 3's hot and digest selection); <code>v1-p76-2</code> is met by decision 7.</li>
+<li>No new action, scope, route, served-spec operation or migration.</li>
+</ul>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/decisions/0015-run-episodic-memory.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>
