@@ -5,7 +5,7 @@
       "title": "fix: completions.create accepts the null replay content an OpenAI client sends",
       "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/620",
-      "updatedAt": "2026-11-23T12:51:20Z",
+      "updatedAt": "2026-11-23T13:19:11Z",
       "labels": [
         {
           "name": "unit",
@@ -89,15 +89,15 @@
       "title": "T19: decision forums \u2014 meetings as the decision forum",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/606",
-      "updatedAt": "2026-11-23T07:28:34Z",
+      "updatedAt": "2026-11-23T12:52:05Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:blocked",
-          "color": "D93F0B"
+          "name": "status:ready",
+          "color": "0E8A16"
         },
         {
           "name": "programme",
@@ -371,7 +371,7 @@
       "title": "conveyor-buildout \u2014 the SPEC_V2 programme",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/569",
-      "updatedAt": "2026-11-23T11:23:21Z",
+      "updatedAt": "2026-11-23T13:36:45Z",
       "labels": [
         {
           "name": "programme",
