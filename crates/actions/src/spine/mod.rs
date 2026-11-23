@@ -310,7 +310,7 @@ fn plan_approval_error(error: store::ApprovalStoreError, action: &str) -> Action
             tracing::error!(%error, action, "decide a PI plan gate");
             ActionError::internal()
         }
-        store::ApprovalStoreError::HumanOnlyGate => ActionError::new(
+        store::ApprovalStoreError::HumanOnlyGate { .. } => ActionError::new(
             403,
             "human_only",
             format!("{action:?}: a PI plan is approved by a person"),

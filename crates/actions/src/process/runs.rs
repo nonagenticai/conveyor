@@ -243,23 +243,16 @@ async fn ensure_start_ready(
     else {
         return Ok(());
     };
-    let readiness = crate::capability::readiness::capability_readiness_tx(
+    // The guard itself is shared with every other run-start seam; this seam only maps its
+    // resolved context onto it.
+    crate::capability::readiness::ensure_run_start_ready_tx(
         &mut *tx,
         tenant,
-        *capability_id,
+        Some(*capability_id),
         bound_agents,
+        ACTION,
     )
-    .await?;
-    if readiness.is_ready() {
-        Ok(())
-    } else {
-        Err(ActionError::new(
-            409,
-            "capability_not_ready",
-            format!("{ACTION}: the capability is not ready to run"),
-        )
-        .with_errors(crate::capability::readiness::readiness_fields(&readiness)))
-    }
+    .await
 }
 
 fn capability_error(error: conveyor_store::capability::CapabilityStoreError) -> ActionError {

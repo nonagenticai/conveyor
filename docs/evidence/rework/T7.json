@@ -176,16 +176,16 @@
     "closed-on-red (P0): the project is closed on a red manifest"
   ],
   "gate": "An injected pod failure is triaged, mitigated by an approved write, resolved and postmortemed; a destructive action without the tenant's configured approvals is refused; restart, scale, rollback and flag-flip are callable.",
-  "generated_at": "2026-11-23T10:18:07.326375+00:00",
+  "generated_at": "2026-11-23T21:01:17.980036+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T7.toml",
   "name": "Operations",
   "project": "T7",
   "schema": "project-acceptance/v1",
   "snapshot": {
-    "generated_at": "2026-11-23T09:41:16.455014+00:00",
-    "git_sha": "c44b23fb1a5f866cabd1697fab977d240a2c6575",
-    "path": "retained-snapshot/c44b23fb1a5f866cabd1697fab977d240a2c6575"
+    "generated_at": "2026-11-23T10:28:30.225766+00:00",
+    "git_sha": "f3bfa7ab7abf9f520d880e1816b50e6db2b86031",
+    "path": "retained-snapshot/f3bfa7ab7abf9f520d880e1816b50e6db2b86031"
   },
   "verdict": "red",
   "warnings": []
