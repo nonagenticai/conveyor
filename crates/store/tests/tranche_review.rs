@@ -715,3 +715,97 @@ async fn seeded_non_planned_tranches_carry_a_review() {
         "the seed does not assert an authorisation without a review"
     );
 }
+
+/// SPEC_V2 §8.3 / T10 — the tranche's own baseline pointer is a citation only when the
+/// baseline is this programme's, approved, and one of the three MSP kinds. An unapproved row
+/// and another programme's row are both refused; an approved management baseline is accepted.
+#[tokio::test]
+async fn a_tranche_baseline_must_be_approved_and_in_its_programme() {
+    let db = support::TestDb::fresh().await;
+    let f = fixture(&db).await;
+    let unapproved: Uuid = sqlx::query_scalar(
+        "INSERT INTO programme_baseline
+             (tenant_id, programme_id, kind, snapshot, taken_by)
+         VALUES ($1, $2, 'governance', '{}'::jsonb, $3) RETURNING id",
+    )
+    .bind(f.tenant.as_uuid())
+    .bind(f.programme)
+    .bind(f.reviewer)
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("insert an unapproved baseline");
+    let foreign_programme: Uuid = sqlx::query_scalar(
+        "INSERT INTO programme (tenant_id, name) VALUES ($1, 'Other') RETURNING id",
+    )
+    .bind(f.tenant.as_uuid())
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("insert the other programme");
+    let foreign: Uuid = sqlx::query_scalar(
+        "INSERT INTO programme_baseline
+             (tenant_id, programme_id, kind, snapshot, taken_by, approved_by)
+         VALUES ($1, $2, 'management', '{}'::jsonb, $3, $3) RETURNING id",
+    )
+    .bind(f.tenant.as_uuid())
+    .bind(foreign_programme)
+    .bind(f.reviewer)
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("insert a foreign approved baseline");
+
+    let mut tx = begin_scoped(&db.owner, f.tenant).await.expect("scope");
+    let tranche = spine::get_tranche_tx(&mut *tx, f.tenant, f.tranche0)
+        .await
+        .expect("read the tranche")
+        .expect("tranche exists");
+    let patch = |baseline: Uuid| TranchePatch {
+        entry_criteria: None,
+        exit_criteria: None,
+        baseline_ref: Some(baseline),
+        review_at: None,
+        change_ref: Some(f.change),
+    };
+
+    let refused = spine::update_tranche_tx(
+        &mut *tx,
+        f.tenant,
+        f.tranche0,
+        tranche.version,
+        &patch(unapproved),
+    )
+    .await;
+    assert!(
+        matches!(
+            refused,
+            Err(PlanStoreError::Illegal(
+                PlanError::TrancheBaselineNotApproved { .. }
+            ))
+        ),
+        "an unapproved baseline must be refused"
+    );
+
+    let refused = spine::update_tranche_tx(
+        &mut *tx,
+        f.tenant,
+        f.tranche0,
+        tranche.version,
+        &patch(foreign),
+    )
+    .await;
+    assert!(
+        matches!(refused, Err(PlanStoreError::NotFound { .. })),
+        "another programme's baseline must be refused"
+    );
+
+    let accepted = spine::update_tranche_tx(
+        &mut *tx,
+        f.tenant,
+        f.tranche0,
+        tranche.version,
+        &patch(f.baseline),
+    )
+    .await
+    .expect("an approved management baseline of this programme is accepted");
+    assert_eq!(accepted.baseline_ref, Some(f.baseline));
+    tx.commit().await.expect("commit");
+}
