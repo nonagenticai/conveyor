@@ -671,14 +671,14 @@ def self_test() -> None:
         ]
         if suppressed:
             raise SystemExit("self-test: a suppressed package entered the plan")
-        receipt = {
+        failure_receipt = {
             "failures": [
                 {"key": "a", "error": "x"},
                 {"key": "b", "error": "y"},
             ]
         }
-        clear_failure(receipt, "a")
-        if [row["key"] for row in receipt["failures"]] != ["b"]:
+        clear_failure(failure_receipt, "a")
+        if [row["key"] for row in failure_receipt["failures"]] != ["b"]:
             raise SystemExit("self-test: a later success did not clear the earlier failure")
         stale = {"applied": {"a": {}}, "failures": [{"key": "a"}, {"key": "b"}]}
         if not prune_failures(stale):
