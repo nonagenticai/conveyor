@@ -1528,8 +1528,11 @@ async fn satisfy_mandatory_set(
 
 async fn board(pg: &support::Pg, tenant: Uuid) -> Uuid {
     sqlx::query_scalar(
-        "INSERT INTO governance_body (tenant_id, kind, key, name)
-         VALUES ($1, 'architecture_board', 'board', 'Conveyor Architecture Board')
+        "INSERT INTO governance_body
+             (tenant_id, kind, key, name, charter, commissioning_authority, members, status)
+         VALUES ($1, 'architecture_board', 'board', 'Conveyor Architecture Board',
+                 'Approve the delivery contracts', 'P0 programme board',
+                 '[{\"role\": \"chief architect\"}]'::jsonb, 'active')
          RETURNING id",
     )
     .bind(tenant)

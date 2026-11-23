@@ -1378,9 +1378,36 @@ pub async fn decide_board_tx(
         }
         _ => {}
     }
-    get_body_tx(&mut *conn, tenant, body_id)
+    let body = get_body_tx(&mut *conn, tenant, body_id)
         .await?
         .ok_or(ArchitectureStoreError::NotFound("governance body"))?;
+    // A body decides only once it is active. The one thing a draft body may do is decide about
+    // itself — its own approval is how it is convened, and a recorded rejection leaves it draft.
+    // Every other decision on a draft body would let a body that was never commissioned approve
+    // the commission that produced it.
+    let self_decision = subject_kind == Some("board");
+    let self_approval = self_decision && decision == "approved";
+    if body.status != "active" && !self_decision {
+        return Err(ArchitectureStoreError::Conflict {
+            what: "board decision",
+            why: "the governance body is not active; only its own approval convenes a draft board",
+        });
+    }
+    // An empty charter, authority or membership is a placeholder, not a convened board: a board
+    // that cannot name what it was commissioned for cannot commission itself.
+    if self_approval
+        && (body.charter.trim().is_empty()
+            || body.commissioning_authority.trim().is_empty()
+            || body
+                .members
+                .as_array()
+                .is_none_or(|members| members.is_empty()))
+    {
+        return Err(ArchitectureStoreError::Conflict {
+            what: "board decision",
+            why: "a board approval needs a charter, a commissioning authority and members",
+        });
+    }
     // A subject that does not exist would make the decision unreferenceable; refuse it here.
     if let (Some(kind), Some(subject)) = (subject_kind, subject_id) {
         let table = match kind {
@@ -1558,17 +1585,21 @@ pub async fn approve_contract_tx(
             why: "a live contract of this kind exists; supersede it first",
         });
     }
-    // A cited board decision must actually be about this contract: an approval row with the
-    // board's gate, an `approved` outcome and this contract as its subject. Without that, the
-    // contract's `approval_id` would name a decision about something else.
+    // A cited board decision must actually be about this contract, recorded by a body that is
+    // still active: the body is resolved from the approval's own meta, not trusted from the
+    // caller, and a decision by a retired board cannot approve a live contract.
     if let Some(approval_id) = approval_id {
         let valid: bool = sqlx::query_scalar(
             "SELECT EXISTS (
-                SELECT 1 FROM approval
-                 WHERE tenant_id = $1 AND id = $2 AND gate = 'architecture_board'
-                   AND status = 'approved'
-                   AND meta->>'subject_kind' = 'contract'
-                   AND meta->>'subject_id' = $3
+                SELECT 1 FROM approval a
+                  JOIN governance_body g
+                    ON g.tenant_id = a.tenant_id
+                   AND g.id::text = a.meta->>'body_id'
+                 WHERE a.tenant_id = $1 AND a.id = $2 AND a.gate = 'architecture_board'
+                   AND a.status = 'approved'
+                   AND a.meta->>'subject_kind' = 'contract'
+                   AND a.meta->>'subject_id' = $3
+                   AND g.status = 'active'
             )",
         )
         .bind(tenant.as_uuid())
