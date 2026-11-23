@@ -16,6 +16,8 @@ use rust_decimal::Decimal;
 use sqlx::PgConnection;
 use uuid::Uuid;
 
+use crate::metrics::TOOL_CALL_PRICE;
+
 /// Why an inference-ledger operation failed.
 #[derive(Debug, thiserror::Error)]
 pub enum InferenceStoreError {
@@ -280,6 +282,8 @@ struct UsageAggregateRow {
     unpriced_calls: i64,
     latency_ms: i64,
     cost_usd: Decimal,
+    tool_calls: i64,
+    tool_cost_usd: Decimal,
     unit: Option<String>,
     units: Option<Decimal>,
 }
@@ -303,6 +307,11 @@ struct UsageAggregateRow {
 /// `unit`/`units` are reported only when every call in it was priced and they share one kind. A
 /// mixed or partially priced bucket keeps an exact USD sum and a NULL unit total — a partial unit
 /// count would be a lie.
+///
+/// Tool spend joins the same bucket from the `tool_call` ledger at read time
+/// ([`TOOL_CALL_PRICE`]). It reaches every dimension the ledger can attribute — day, project,
+/// department, programme, job, run and step — and is zero on the model/caller/cache/prompt
+/// dimensions, which a tool call does not carry. It never changes the inference columns.
 pub async fn usage_rows_tx(
     conn: &mut PgConnection,
     tenant: TenantId,
@@ -310,25 +319,42 @@ pub async fn usage_rows_tx(
     since: DateTime<Utc>,
     until: DateTime<Utc>,
 ) -> Result<Vec<UsageRow>, InferenceStoreError> {
-    let bucket = match group {
-        UsageGroup::Day => {
-            "to_char(date_trunc('day', c.created_at AT TIME ZONE 'UTC'), 'YYYY-MM-DD')"
-        }
-        UsageGroup::Model => "coalesce(c.served_model, c.model)",
-        UsageGroup::CallerKind => "c.caller_kind",
-        UsageGroup::CacheStatus => "c.cache_status",
-        UsageGroup::PromptSha => "coalesce(c.prompt_sha256, '')",
-        UsageGroup::Project => {
+    let (bucket, tool_bucket) = match group {
+        UsageGroup::Day => (
+            "to_char(date_trunc('day', c.created_at AT TIME ZONE 'UTC'), 'YYYY-MM-DD')",
+            Some("to_char(date_trunc('day', tc.created_at AT TIME ZONE 'UTC'), 'YYYY-MM-DD')"),
+        ),
+        UsageGroup::Model => ("coalesce(c.served_model, c.model)", None),
+        UsageGroup::CallerKind => ("c.caller_kind", None),
+        UsageGroup::CacheStatus => ("c.cache_status", None),
+        UsageGroup::PromptSha => ("coalesce(c.prompt_sha256, '')", None),
+        UsageGroup::Project => (
             "CASE WHEN c.caller_kind = 'other' THEN 'unattributed' \
-             ELSE coalesce(c.project_id::text, 'unattributed') END"
-        }
-        UsageGroup::Department => "coalesce(c.department, 'unattributed')",
-        UsageGroup::Programme => "coalesce(c.programme_id::text, 'unattributed')",
-        UsageGroup::Job => "coalesce(c.job_binding_id::text, 'unattributed')",
-        UsageGroup::Run => "coalesce(c.run_id::text, 'unattributed')",
-        UsageGroup::Step => "coalesce(c.run_step_id::text, 'unattributed')",
+             ELSE coalesce(c.project_id::text, 'unattributed') END",
+            Some("coalesce(r.project_id::text, 'unattributed')"),
+        ),
+        UsageGroup::Department => (
+            "coalesce(c.department, 'unattributed')",
+            Some("coalesce(dep.name, 'unattributed')"),
+        ),
+        UsageGroup::Programme => (
+            "coalesce(c.programme_id::text, 'unattributed')",
+            Some("coalesce(p.programme_id::text, 'unattributed')"),
+        ),
+        UsageGroup::Job => (
+            "coalesce(c.job_binding_id::text, 'unattributed')",
+            Some("coalesce(r.job_binding_id::text, 'unattributed')"),
+        ),
+        UsageGroup::Run => (
+            "coalesce(c.run_id::text, 'unattributed')",
+            Some("coalesce(tc.run_id::text, 'unattributed')"),
+        ),
+        UsageGroup::Step => (
+            "coalesce(c.run_step_id::text, 'unattributed')",
+            Some("coalesce(tc.run_step_id::text, 'unattributed')"),
+        ),
     };
-    usage_rows_for_bucket_tx(conn, tenant, bucket, since, until).await
+    usage_rows_for_bucket_tx(conn, tenant, bucket, tool_bucket, since, until).await
 }
 
 /// The same priced bucket grouped by the run's **card**.
@@ -342,18 +368,53 @@ pub async fn usage_by_card_tx(
     since: DateTime<Utc>,
     until: DateTime<Utc>,
 ) -> Result<Vec<UsageRow>, InferenceStoreError> {
-    usage_rows_for_bucket_tx(conn, tenant, "coalesce(c.card_id::text, '')", since, until).await
+    usage_rows_for_bucket_tx(
+        conn,
+        tenant,
+        "coalesce(c.card_id::text, '')",
+        Some("coalesce(tc.card_id::text, '')"),
+        since,
+        until,
+    )
+    .await
 }
 
-/// The one aggregate behind every bucket. `bucket` is a closed expression chosen by an internal
-/// caller — never input text — so the dynamic SQL has no writable surface.
+/// The one aggregate behind every bucket. `bucket` and `tool_bucket` are closed expressions
+/// chosen by an internal caller — never input text — so the dynamic SQL has no writable surface.
+/// `tool_bucket` is `None` on a dimension the tool ledger cannot attribute; that bucket's tool
+/// columns are then zero rather than a guessed attribution.
 async fn usage_rows_for_bucket_tx(
     conn: &mut PgConnection,
     tenant: TenantId,
     bucket: &str,
+    tool_bucket: Option<&str>,
     since: DateTime<Utc>,
     until: DateTime<Utc>,
 ) -> Result<Vec<UsageRow>, InferenceStoreError> {
+    let tool_cte = match tool_bucket {
+        Some(tool_bucket) => format!(
+            ", tools AS (
+                 SELECT {tool_bucket} AS bucket,
+                        count(*)::bigint AS tool_calls,
+                        coalesce(round(sum({TOOL_CALL_PRICE}), 6), 0)::numeric(18,6)
+                            AS tool_cost_usd
+                   FROM tool_call tc
+                   LEFT JOIN run r ON r.id = tc.run_id
+                   LEFT JOIN project p ON p.id = r.project_id
+                   LEFT JOIN job_binding jb ON jb.id = r.job_binding_id
+                   LEFT JOIN job_department jd ON jd.job_id = jb.job_id AND jd.is_primary
+                   LEFT JOIN department dep ON dep.id = jd.department_id
+                  WHERE tc.tenant_id = $1 AND tc.created_at >= $2 AND tc.created_at < $3
+                  GROUP BY 1
+             )"
+        ),
+        None => ", tools AS (
+                 SELECT NULL::text AS bucket, 0::bigint AS tool_calls,
+                        0::numeric(18,6) AS tool_cost_usd
+                  WHERE false
+             )"
+        .to_owned(),
+    };
     let sql = format!(
         "WITH priced AS (
              SELECT ic.*,
@@ -382,29 +443,48 @@ async fn usage_rows_for_bucket_tx(
                LEFT JOIN job_department jd ON jd.job_id = jb.job_id AND jd.is_primary
                LEFT JOIN department dep ON dep.id = jd.department_id
               WHERE ic.tenant_id = $1 AND ic.created_at >= $2 AND ic.created_at < $3
-         )
-         SELECT {bucket} AS bucket,
-                count(*)::bigint AS calls,
-                coalesce(sum(c.prompt_tokens), 0)::bigint AS prompt_tokens,
-                coalesce(sum(c.completion_tokens), 0)::bigint AS completion_tokens,
-                count(*) FILTER (WHERE c.cache_status = 'hit')::bigint AS hits,
-                count(*) FILTER (WHERE c.cache_status = 'write')::bigint AS writes,
-                count(*) FILTER (WHERE c.cache_status = 'miss')::bigint AS misses,
-                count(*) FILTER (WHERE c.cache_status = 'unknown')::bigint AS unknown,
-                count(row_cost)::bigint AS priced_calls,
-                (count(*) - count(row_cost))::bigint AS unpriced_calls,
-                coalesce(sum(c.latency_ms), 0)::bigint AS latency_ms,
-                coalesce(round(sum(row_cost), 6), 0)::numeric(18,6) AS cost_usd,
-                CASE WHEN count(row_cost) = count(*)
-                          AND count(DISTINCT price_unit) = 1
-                          AND max(price_unit) <> 'token'
-                     THEN max(price_unit) END AS unit,
-                CASE WHEN count(row_cost) = count(*)
-                          AND count(DISTINCT price_unit) = 1
-                          AND max(price_unit) <> 'token'
-                     THEN sum(non_token_units) END AS units
-           FROM priced c
-          GROUP BY 1
+         ), inference AS (
+             SELECT {bucket} AS bucket,
+                    count(*)::bigint AS calls,
+                    coalesce(sum(c.prompt_tokens), 0)::bigint AS prompt_tokens,
+                    coalesce(sum(c.completion_tokens), 0)::bigint AS completion_tokens,
+                    count(*) FILTER (WHERE c.cache_status = 'hit')::bigint AS hits,
+                    count(*) FILTER (WHERE c.cache_status = 'write')::bigint AS writes,
+                    count(*) FILTER (WHERE c.cache_status = 'miss')::bigint AS misses,
+                    count(*) FILTER (WHERE c.cache_status = 'unknown')::bigint AS unknown,
+                    count(row_cost)::bigint AS priced_calls,
+                    (count(*) - count(row_cost))::bigint AS unpriced_calls,
+                    coalesce(sum(c.latency_ms), 0)::bigint AS latency_ms,
+                    coalesce(round(sum(row_cost), 6), 0)::numeric(18,6) AS cost_usd,
+                    CASE WHEN count(row_cost) = count(*)
+                              AND count(DISTINCT price_unit) = 1
+                              AND max(price_unit) <> 'token'
+                         THEN max(price_unit) END AS unit,
+                    CASE WHEN count(row_cost) = count(*)
+                              AND count(DISTINCT price_unit) = 1
+                              AND max(price_unit) <> 'token'
+                         THEN sum(non_token_units) END AS units
+               FROM priced c
+              GROUP BY 1
+         ){tool_cte}
+         SELECT coalesce(i.bucket, t.bucket) AS bucket,
+                coalesce(i.calls, 0)::bigint AS calls,
+                coalesce(i.prompt_tokens, 0)::bigint AS prompt_tokens,
+                coalesce(i.completion_tokens, 0)::bigint AS completion_tokens,
+                coalesce(i.hits, 0)::bigint AS hits,
+                coalesce(i.writes, 0)::bigint AS writes,
+                coalesce(i.misses, 0)::bigint AS misses,
+                coalesce(i.unknown, 0)::bigint AS unknown,
+                coalesce(i.priced_calls, 0)::bigint AS priced_calls,
+                coalesce(i.unpriced_calls, 0)::bigint AS unpriced_calls,
+                coalesce(i.latency_ms, 0)::bigint AS latency_ms,
+                coalesce(i.cost_usd, 0)::numeric(18,6) AS cost_usd,
+                coalesce(t.tool_calls, 0)::bigint AS tool_calls,
+                coalesce(t.tool_cost_usd, 0)::numeric(18,6) AS tool_cost_usd,
+                i.unit,
+                i.units
+           FROM inference i
+           FULL OUTER JOIN tools t ON t.bucket = i.bucket
           ORDER BY 1"
     );
     let rows: Vec<UsageAggregateRow> = sqlx::query_as(sqlx::AssertSqlSafe(sql))
@@ -429,6 +509,8 @@ async fn usage_rows_for_bucket_tx(
             priced_calls: row.priced_calls,
             unpriced_calls: row.unpriced_calls,
             latency_ms: row.latency_ms,
+            tool_calls: row.tool_calls,
+            tool_cost_usd: row.tool_cost_usd,
             unit: row.unit,
             units: row.units,
         })

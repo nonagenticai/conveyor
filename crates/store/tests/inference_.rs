@@ -9,6 +9,7 @@ use chrono::{Duration, Utc};
 use conveyor_domain::TenantId;
 use conveyor_domain::inference::{CacheStatus, Usage, UsageGroup};
 use conveyor_store::inference::{ListCalls, NewInferenceCall};
+use conveyor_store::metrics::{self, MeteringLevel};
 use conveyor_store::{begin_scoped, inference};
 use rust_decimal::Decimal;
 use uuid::Uuid;
@@ -657,5 +658,247 @@ async fn the_extended_dimensions_group_by_programme_job_and_run() {
             .expect("run bucket");
         assert_eq!(row.calls, 1);
     }
+    tx.commit().await.expect("commit");
+}
+
+/// One project and its run: the attribution a tool call needs.
+async fn project_and_run(db: &support::TestDb, tenant: TenantId, key: &str) -> (Uuid, Uuid) {
+    let project: Uuid = sqlx::query_scalar(
+        "INSERT INTO project (tenant_id, key, name) VALUES ($1, $2, $2) RETURNING id",
+    )
+    .bind(tenant.as_uuid())
+    .bind(key)
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("seed project");
+    let run: Uuid = sqlx::query_scalar(
+        "INSERT INTO run (tenant_id, project_id, status) VALUES ($1, $2, 'queued') RETURNING id",
+    )
+    .bind(tenant.as_uuid())
+    .bind(project)
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("seed run");
+    (project, run)
+}
+
+/// One toolkit and tool for the ledger's foreign key.
+async fn seed_tool(db: &support::TestDb, tenant: TenantId) -> Uuid {
+    let toolkit: Uuid = sqlx::query_scalar(
+        "INSERT INTO toolkit (tenant_id, key, toolkit_version, title, service, owner)
+         VALUES ($1, 'spend_test', 1, 'Spend test', 'spend_test', 'test') RETURNING id",
+    )
+    .bind(tenant.as_uuid())
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("seed toolkit");
+    sqlx::query_scalar(
+        "INSERT INTO tool (tenant_id, toolkit_id, key, input_schema, effect, handler_action)
+         VALUES ($1, $2, 'call', '{}'::jsonb, 'read', 'tools.probe') RETURNING id",
+    )
+    .bind(tenant.as_uuid())
+    .bind(toolkit)
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("seed tool")
+}
+
+/// One row in the tool ledger; `None` is a call the destination did not price.
+async fn tool_call(
+    db: &support::TestDb,
+    tenant: TenantId,
+    run: Uuid,
+    tool: Uuid,
+    cost: Option<Decimal>,
+) {
+    sqlx::query(
+        "INSERT INTO tool_call
+             (tenant_id, run_id, tool_id, tool_key, toolkit_key, toolkit_version,
+              input_hash, status, latency_ms, cost)
+         VALUES ($1, $2, $3, 'spend_test.call', 'spend_test', 1, repeat('a', 64), 'ok', 5, $4)",
+    )
+    .bind(tenant.as_uuid())
+    .bind(run)
+    .bind(tool)
+    .bind(cost)
+    .execute(&db.super_pool)
+    .await
+    .expect("seed tool call");
+}
+
+#[tokio::test]
+async fn tool_spend_is_derived_at_read_time_at_the_tenant_and_run_levels() {
+    let db = support::TestDb::fresh().await;
+    let tenant = tenant(&db, "s16-tool-spend").await;
+    let (project, run) = project_and_run(&db, tenant, "spend").await;
+    let tool = seed_tool(&db, tenant).await;
+    tool_call(&db, tenant, run, tool, Some(Decimal::new(2_500, 6))).await;
+    tool_call(&db, tenant, run, tool, None).await;
+
+    let now = Utc::now();
+    let (since, until) = (now - Duration::hours(1), now + Duration::hours(1));
+
+    let mut tx = begin_scoped(&db.runtime, tenant).await.expect("scope");
+    let by_day = inference::usage_rows_tx(&mut tx, tenant, UsageGroup::Day, since, until)
+        .await
+        .expect("day report");
+    assert_eq!(by_day.len(), 1, "one day bucket: {by_day:?}");
+    let day = &by_day[0];
+    assert_eq!((day.calls, day.tool_calls), (0, 2));
+    assert_eq!(
+        day.tool_cost_usd,
+        Decimal::new(2_500, 6),
+        "the priced call is summed; the unpriced one contributes zero"
+    );
+    assert_eq!(day.cost_usd, Decimal::ZERO, "no inference calls that day");
+
+    let by_run = inference::usage_rows_tx(&mut tx, tenant, UsageGroup::Run, since, until)
+        .await
+        .expect("run report");
+    let run_row = by_run
+        .iter()
+        .find(|row| row.bucket == run.to_string())
+        .expect("run bucket");
+    assert_eq!((run_row.calls, run_row.tool_calls), (0, 2));
+    assert_eq!(run_row.tool_cost_usd, Decimal::new(2_500, 6));
+
+    let by_project = inference::usage_rows_tx(&mut tx, tenant, UsageGroup::Project, since, until)
+        .await
+        .expect("project report");
+    let project_row = by_project
+        .iter()
+        .find(|row| row.bucket == project.to_string())
+        .expect("project bucket");
+    assert_eq!(project_row.tool_calls, 2);
+    assert_eq!(project_row.tool_cost_usd, Decimal::new(2_500, 6));
+
+    // The model dimension cannot attribute a tool call: the report says zero, never guesses.
+    let by_model = inference::usage_rows_tx(&mut tx, tenant, UsageGroup::Model, since, until)
+        .await
+        .expect("model report");
+    assert!(by_model.is_empty(), "no inference call, no model bucket");
+
+    let tenant_rows =
+        metrics::usage_by_level_tx(&mut tx, tenant, MeteringLevel::Tenant, since, until, None)
+            .await
+            .expect("tenant usage");
+    let tenant_row = tenant_rows
+        .iter()
+        .find(|row| row.key == "tenant")
+        .expect("tenant total");
+    assert_eq!(tenant_row.tool_calls, 2);
+    assert!((tenant_row.tool_cost_usd - 0.0025).abs() < 1e-12);
+
+    let run_rows =
+        metrics::usage_by_level_tx(&mut tx, tenant, MeteringLevel::Run, since, until, None)
+            .await
+            .expect("run usage");
+    let run_metric = run_rows
+        .iter()
+        .find(|row| row.key == run.to_string())
+        .expect("run total");
+    assert_eq!(run_metric.tool_calls, 2);
+    assert!((run_metric.tool_cost_usd - 0.0025).abs() < 1e-12);
+
+    let billing = metrics::conveyor_cost_tx(&mut tx, tenant, since, until)
+        .await
+        .expect("billing derivation");
+    assert!((billing - 0.0025).abs() < 1e-12, "{billing}");
+    tx.commit().await.expect("commit");
+}
+
+#[tokio::test]
+async fn an_unpriced_tool_call_contributes_zero() {
+    let db = support::TestDb::fresh().await;
+    let tenant = tenant(&db, "s16-tool-unpriced").await;
+    let (_, run) = project_and_run(&db, tenant, "unpriced").await;
+    let tool = seed_tool(&db, tenant).await;
+    tool_call(&db, tenant, run, tool, None).await;
+
+    let now = Utc::now();
+    let (since, until) = (now - Duration::hours(1), now + Duration::hours(1));
+    let mut tx = begin_scoped(&db.runtime, tenant).await.expect("scope");
+
+    let by_day = inference::usage_rows_tx(&mut tx, tenant, UsageGroup::Day, since, until)
+        .await
+        .expect("day report");
+    let day = &by_day[0];
+    assert_eq!(day.tool_calls, 1, "the call is counted");
+    assert_eq!(
+        day.tool_cost_usd,
+        Decimal::ZERO,
+        "no price is zero money, never a guessed one"
+    );
+
+    let rows =
+        metrics::usage_by_level_tx(&mut tx, tenant, MeteringLevel::Tenant, since, until, None)
+            .await
+            .expect("tenant usage");
+    let row = rows
+        .iter()
+        .find(|row| row.key == "tenant")
+        .expect("tenant total");
+    assert_eq!(row.tool_calls, 1);
+    assert_eq!(row.tool_cost_usd, 0.0);
+
+    let billing = metrics::conveyor_cost_tx(&mut tx, tenant, since, until)
+        .await
+        .expect("billing derivation");
+    assert_eq!(billing, 0.0);
+    tx.commit().await.expect("commit");
+}
+
+#[tokio::test]
+async fn a_tool_call_does_not_change_the_inference_only_total() {
+    let db = support::TestDb::fresh().await;
+    let tenant = tenant(&db, "s16-tool-inference-total").await;
+    let (_, run) = project_and_run(&db, tenant, "total").await;
+    let tool = seed_tool(&db, tenant).await;
+
+    // `local-llm` is the seeded commercial price: 1M tokens in + 1M out = 0.42 USD.
+    let usage = Usage {
+        prompt_tokens: 1_000_000,
+        completion_tokens: 1_000_000,
+        total_tokens: 2_000_000,
+        ..Usage::default()
+    };
+    let mut tx = begin_scoped(&db.runtime, tenant).await.expect("scope");
+    let mut priced = call("local-llm", None, Some(usage));
+    priced.run_id = Some(run);
+    inference::insert_call_tx(&mut tx, tenant, &priced)
+        .await
+        .expect("insert priced call");
+    tx.commit().await.expect("commit");
+
+    let now = Utc::now();
+    let (since, until) = (now - Duration::hours(1), now + Duration::hours(1));
+    let mut tx = begin_scoped(&db.runtime, tenant).await.expect("scope");
+    let before = inference::usage_rows_tx(&mut tx, tenant, UsageGroup::Day, since, until)
+        .await
+        .expect("day report before");
+    assert_eq!(
+        (
+            before[0].calls,
+            before[0].prompt_tokens,
+            before[0].cost_usd,
+            before[0].tool_calls,
+        ),
+        (1, 1_000_000, Decimal::new(420_000, 6), 0)
+    );
+    tx.commit().await.expect("commit");
+
+    tool_call(&db, tenant, run, tool, Some(Decimal::new(500_000, 6))).await;
+
+    let mut tx = begin_scoped(&db.runtime, tenant).await.expect("scope");
+    let after = inference::usage_rows_tx(&mut tx, tenant, UsageGroup::Day, since, until)
+        .await
+        .expect("day report after");
+    assert_eq!(
+        (after[0].calls, after[0].prompt_tokens, after[0].cost_usd),
+        (1, 1_000_000, Decimal::new(420_000, 6)),
+        "tool spend is its own column and never moves the inference total"
+    );
+    assert_eq!(after[0].tool_calls, 1);
+    assert_eq!(after[0].tool_cost_usd, Decimal::new(500_000, 6));
     tx.commit().await.expect("commit");
 }

@@ -355,6 +355,15 @@ pub struct UsageRow {
     pub unpriced_calls: i64,
     /// Wall time summed — the load side of the same window.
     pub latency_ms: i64,
+    /// Tool calls attributed to the bucket from the `tool_call` ledger. A dimension the ledger
+    /// cannot attribute (model, caller kind, cache status, prompt SHA) reports zero here — the
+    /// tool row carries none of those keys, and guessing a bucket would be a lie.
+    pub tool_calls: i64,
+    /// The tool ledger's spend for the bucket, in USD: each call's recorded price summed at read
+    /// time and rounded to six decimals (SPEC_V2 §7.5, D52). An unpriced call contributes zero
+    /// and is still counted in [`Self::tool_calls`] — "no price" must not render as "free". The
+    /// same derivation feeds `metrics.usage` and `billing.summary`; no roll-up is stored.
+    pub tool_cost_usd: Decimal,
     /// The commercial unit the bucket is priced in, when the bucket is uniformly non-token.
     /// `None` for a token bucket, a mixed bucket, or one with an unpriced call — a partial unit
     /// total would be a lie, so the report leaves it out rather than summing a subset.
