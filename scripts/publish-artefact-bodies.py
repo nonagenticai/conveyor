@@ -121,7 +121,21 @@ def document_hash(row: dict) -> str | None:
     for value in (meta.get("sha256"), row.get("sha256"), meta.get("body_sha256")):
         if value:
             return str(value)
+    # The snapshot does not project `document.meta` (a known projection gap, package pending),
+    # so the publisher's own natural key is the second source: `artefact:<project>:<category>:
+    # <sha16>` carries the first 16 hex of the body hash we wrote.
+    unit = str(row.get("unit") or "")
+    if unit.startswith("artefact:") and unit.count(":") == 3:
+        suffix = unit.rsplit(":", 1)[-1]
+        if len(suffix) == 16 and all(ch in "0123456789abcdef" for ch in suffix):
+            return suffix
     return None
+
+
+def hash_matches(stored: str | None, composed_sha: str | None) -> bool:
+    if not stored or not composed_sha:
+        return False
+    return stored == composed_sha or (len(stored) == 16 and composed_sha.startswith(stored))
 
 
 def snapshot_documents(snapshot: dict) -> list[dict]:
@@ -149,15 +163,17 @@ def published_for(documents: list[dict], project_id: str, category: str) -> list
 def classify(published: list[dict], composed_sha: str | None) -> str:
     if not published:
         return "due"
-    hashes = {document_hash(row) for row in published}
+    hashes = {value for value in (document_hash(row) for row in published) if value}
     if len(hashes) > 1:
         return "ambiguous"
-    return "present" if next(iter(hashes)) == composed_sha else "stale"
+    if len(hashes) == 1 and hash_matches(next(iter(hashes)), composed_sha):
+        return "present"
+    return "stale"
 
 
 def matching_document_id(published: list[dict], composed_sha: str) -> str:
     for row in published:
-        if document_hash(row) == composed_sha:
+        if hash_matches(document_hash(row), composed_sha):
             return str(row.get("id") or "")
     return ""
 
