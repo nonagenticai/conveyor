@@ -14,6 +14,9 @@
 #
 # Usage: scripts/fetch-issues.sh [out]
 #   out defaults to docs/design/data/issues.json
+#   CONVEYOR_TENANT names the tenant the registry belongs to (default: nonagentic) and is
+#   written to the file's `provenance` block, so a snapshot can never relabel another tenant's
+#   registry by carrying a wrong image.
 set -euo pipefail
 
 root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -30,10 +33,12 @@ gh issue list \
 
 python3 - "$tmp" "$out" <<'PY'
 import json
+import os
 import re
 import sys
 
 src, dst = sys.argv[1], sys.argv[2]
+tenant = os.environ.get("CONVEYOR_TENANT") or "nonagentic"
 HOME_PATH = re.compile(r"(?:/Users/[A-Za-z0-9._-]+|/home/[A-Za-z0-9._-]+|~/)[^\s\"']*")
 EMAIL = re.compile(r"[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}")
 TOKEN = re.compile(
@@ -68,8 +73,14 @@ for issue in json.load(open(src, encoding="utf-8")):
         }
     )
 
+registry = {
+    "schema": "issue-registry/v1",
+    "provenance": {"tenant": tenant, "source": "github:nonagenticai/conveyor"},
+    "issues": rows,
+}
+
 with open(dst, "w", encoding="utf-8") as handle:
-    json.dump({"issues": rows}, handle, indent=2)
+    json.dump(registry, handle, indent=2)
     handle.write("\n")
 PY
 
