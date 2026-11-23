@@ -1,0 +1,16 @@
+{
+ "status": "accepted",
+ "evidence": [
+  {
+   "ref": "549 actions served from one registry",
+   "kind": "artifact",
+   "path": "docs/design/data/actions.json"
+  },
+  {
+   "ref": "580 operations, --check-lock green at a9a5f20a",
+   "kind": "lock",
+   "path": "served-spec.lock.json"
+  }
+ ],
+ "change_id": "01a2054b-3f86-7959-b2ad-f1edc5b0bb55"
+}

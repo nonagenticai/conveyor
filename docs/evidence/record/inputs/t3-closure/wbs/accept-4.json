@@ -1,0 +1,16 @@
+{
+ "status": "accepted",
+ "evidence": [
+  {
+   "ref": "closure gate distinct approver",
+   "kind": "test",
+   "path": "crates/actions/tests/closure_gate.rs"
+  },
+  {
+   "ref": "close_request, decision, close",
+   "kind": "test",
+   "path": "crates/actions/tests/programme_close.rs"
+  }
+ ],
+ "change_id": "01a2052e-5648-7350-a30d-06514a69eced"
+}
