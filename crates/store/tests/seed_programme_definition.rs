@@ -205,3 +205,59 @@ async fn a_seeded_tranche_one_project_starts_after_the_continue_review() {
         "a planned tranche cannot start: {refused:?}"
     );
 }
+
+/// T10 — every seeded benefit resolves both job owners, and the governance roles are real
+/// `job_catalogue` rows rather than text in `operational_area`.
+#[tokio::test]
+async fn every_seeded_benefit_resolves_both_job_owners() {
+    let db = support::TestDb::fresh().await;
+    let seeded = support::seed_tenant(&db.super_pool, "msp-jobs").await;
+    seed_programme(&db.super_pool, Some("msp-jobs"))
+        .await
+        .expect("seed");
+
+    let owners: Vec<(String, String, String, bool)> = sqlx::query_as(
+        "SELECT b.reference, owner.job_key, benefit_owner.job_key,
+                b.owner_job_id = b.benefit_owner_job_id
+           FROM benefit_profile b
+           JOIN job_catalogue owner ON owner.id = b.owner_job_id
+           JOIN job_catalogue benefit_owner ON benefit_owner.id = b.benefit_owner_job_id
+          WHERE b.tenant_id = $1
+          ORDER BY b.reference",
+    )
+    .bind(seeded.tenant)
+    .fetch_all(&db.super_pool)
+    .await
+    .expect("every benefit joins both owner jobs");
+    assert_eq!(
+        owners.len(),
+        6,
+        "all six benefits have both owners: {owners:?}"
+    );
+    for (reference, owner, benefit_owner, same) in owners {
+        assert_eq!(owner, "bcm", "{reference} owner is the BCM job");
+        assert_eq!(
+            benefit_owner, "bcm",
+            "{reference} benefit owner is the BCM job"
+        );
+        assert!(
+            same,
+            "{reference} owner and benefit owner resolve the same job id"
+        );
+    }
+
+    let roles: Vec<String> = sqlx::query_scalar(
+        "SELECT job_key FROM job_catalogue
+          WHERE tenant_id = $1 AND job_key IN ('bcm', 'board', 'sro', 'sponsoring_group')
+          ORDER BY job_key",
+    )
+    .bind(seeded.tenant)
+    .fetch_all(&db.super_pool)
+    .await
+    .expect("governance roles");
+    assert_eq!(
+        roles,
+        vec!["bcm", "board", "sponsoring_group", "sro"],
+        "SRO, BCM, sponsoring group and board are seeded as job keys"
+    );
+}
