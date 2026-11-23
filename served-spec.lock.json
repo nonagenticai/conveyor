@@ -1,7 +1,7 @@
 {
   "version": 1,
   "operations": {
-    "GET /api/actions": "38126d398b3a64e0ef9e9cf9a7eaaf769f39a356d56aed3be93c1fc90bd0c0ef",
+    "GET /api/actions": "f822ebf52108aa14d063edbcffa2b5f1216d617ae6e81f17b0b09d34b2a84398",
     "GET /api/boards/{id}": "e1a5ad504ea61c9f6f4c9940f6bce0a13a06587c4545d9d52616852f0e67fa5b",
     "GET /api/boards/{id}/cards": "be3ca9f8fea011aa8b097206310d24ba4641698d2a8d239c5b2df6c48b784502",
     "GET /api/boards/{id}/webhooks": "5b77b802ff044156108b56072acb99bed0e2f9dfb5f2dc667b000af191cffd1b",
@@ -246,6 +246,13 @@
     "POST /api/actions/job_releases.retire/invocations": "0b0a1764d2504c33826ced81961c7d1c47782c31ab7b9fc3f3bdb58c1cb74edb",
     "POST /api/actions/jobs.list/invocations": "5343338e318fa04a1b0ca2a461b9ac760fe097deb006bb33214ff4b7d11aeefd",
     "POST /api/actions/jobs.retry/invocations": "94521ba5ef5002992002a789127957df6ceee5eb67e119ed01cd0f0c10ecd9ca",
+    "POST /api/actions/kata.analyse/invocations": "b252c6f7c6742de4347407a11197486a80424d62c415ebc0baf11339eb185040",
+    "POST /api/actions/kata.get/invocations": "7d53929d637f5604479fc0002e1ba699275e23b4705ee28fafbf1d8e1a124e28",
+    "POST /api/actions/kata.hypothesise/invocations": "978c2615f3c0b3849099fbb3880de79f59591320b03d7e18dbc471ce22b5dfa4",
+    "POST /api/actions/kata.measure/invocations": "7ce1243e8f3e11c3aa9ba0f72c5667cc7c78c38444bf2ac3accae03c7bbd8b3f",
+    "POST /api/actions/kata.observe/invocations": "51abde31461d6c18c7171f35ef5f7db596ac9a9103b06c1276b24b6c1089c946",
+    "POST /api/actions/kata.open/invocations": "03f8a080fe15d071c3e43022d45e101bf791f250de00b2dfe7b2a457139f3db1",
+    "POST /api/actions/kata.propose/invocations": "7da719173cfe39f3d9870d16c15b2ecb5795d85638d37f33dc4a77e59ba6691b",
     "POST /api/actions/knowledge.query/invocations": "1f69d4281b008837ced412628239373057e2d5ec4966a84a3a630b1bec094781",
     "POST /api/actions/labels.create/invocations": "eca5bb2a6198acd5e5916c3aae3532af99fb0a90a507762e68b802d89a4b4cbc",
     "POST /api/actions/labels.delete/invocations": "9a759da9093bdba01d5d79751819145799d6cba39117c62adbb389b76ac3c256",

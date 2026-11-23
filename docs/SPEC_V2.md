@@ -1303,7 +1303,7 @@ in §11.8.
 | decision | `ladder.record\|evaluate\|list\|apply_draft` (the ladder's verbs; a human answer is `approvals.decide` and an escalation opens an approval, not a ladder action), `decision_options.*`, `decision_policies.*`, `refinements.publish\|list`, `laya_configs.*`. ⚠️ `decisions.*` is the **ADR family** (`governance/assets.rs`); the ladder does not reuse it, so the §7 record and an ADR cannot be confused |
 | PM | `pm.charter`, `pm.plan`, `pm.baseline`, `pm.close` |
 | coach | `coach.interrupt`, `coach.triage`, `coach.remedy`, `coach.escalate` |
-| kata | `kata.open\|observe\|analyse\|propose\|measure\|adopt\|propagate\|close` |
+| kata | `kata.open\|observe\|analyse\|hypothesise\|propose\|measure\|adopt\|propagate\|close`, `kata.get` |
 | development | `dev.open\|implement\|verify\|merge\|release\|rollback` (composes coding/git/CI actions) |
 | operations | `ops.incident\|triage\|mitigate\|resolve\|postmortem`, `ops.k8s_*`, `ops.git_*`, `ops.host_*` (§10.4.1) |
 | analysis | `analyse.site`, `analyse.app`, `analyse.video`, `analyse.brand`, `analyse.content`, `analyse.report` |
