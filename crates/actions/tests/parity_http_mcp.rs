@@ -2358,6 +2358,10 @@ async fn prepare(sample: &Sample, pg: &support::Pg, ctx: &Ctx) {
         // T5 (#77): each kata step gets a kata already at the stage it requires. The measurement
         // sample's instrument has no locked split, so its refusal is the held-out gate itself —
         // the successful held-out number is `crates/actions/tests/kata_measure.rs`.
+        "kata.open" => {
+            let instrument = seed_locked_eval_version(pg, ctx).await;
+            ctx.push("kata.open.instrument", instrument);
+        }
         "kata.get" | "kata.observe" => {
             let kata = seed_parity_kata(pg, ctx, "open", &[], None).await;
             ctx.push(sample.name, kata);
@@ -3496,6 +3500,7 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
         // ── T5: the kata on the spine (#77) ──────────────────────────────────────────────
         {
             let mut sample = plain("kata.open", json!({}), None);
+            sample.prepare = true;
             sample.input = Box::new(|ctx: &Ctx| {
                 json!({
                     "job_binding_id": ctx.org_binding_id,
@@ -3503,6 +3508,7 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
                     "title": "Parity kata",
                     "target_surface": "procedure",
                     "target_ref": "process:parity",
+                    "instrument_version_id": ctx.pop("kata.open.instrument"),
                     "threshold": 0.05,
                 })
             });
@@ -3564,6 +3570,14 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
                 })
             });
             expecting(sample, 422)
+        },
+        {
+            // P3's adoption gate: a person's act. The sample names an absent kata, so both
+            // transports return the same 404; the human-only refusal has its own suite
+            // (`kata_adopt.rs`).
+            let mut sample = plain("kata.adopt", json!({}), None);
+            sample.input = Box::new(|_ctx: &Ctx| json!({"kata_id": Uuid::nil(), "note": "parity"}));
+            expecting(sample, 404)
         },
         plain("departments.create", json!({"name": "engineering"}), None),
         plain("audit.list", json!({"limit": 10}), None),

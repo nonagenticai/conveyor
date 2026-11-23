@@ -114,7 +114,7 @@ use serde_json::{Value, json};
 /// authorises). 500 → **502**.
 /// **#15 (S21 step 3) adds 5 internal**: the `prompt_recipes.create|get|list|activate|retire`
 /// catalogue surface. 503 → **508**.
-const EXPECTED: [&str; 520] = [
+const EXPECTED: [&str; 521] = [
     "actions.describe",
     "actions.list",
     "analyse.site",
@@ -341,6 +341,7 @@ const EXPECTED: [&str; 520] = [
     "job_releases.retire",
     "jobs.list",
     "jobs.retry",
+    "kata.adopt",
     "kata.analyse",
     "kata.get",
     "kata.hypothesise",

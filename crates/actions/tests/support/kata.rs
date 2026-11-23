@@ -20,7 +20,7 @@ use conveyor_store::organisation::{
 use serde_json::json;
 use uuid::Uuid;
 
-use super::{Pg, Seeded, seed};
+use super::{Pg, Running, Seeded, seed};
 
 /// The seeded tenant plus its active binding — what `kata.open` requires.
 pub struct Anchor {
@@ -269,4 +269,143 @@ pub async fn instrument(
         baseline_run_id,
         held_out_cases: test_ids.len(),
     }
+}
+
+/// A procedure key with two versions: v1 (retired, the pre-kata state) and v2 (published, the
+/// candidate). Returned as `(baseline, candidate)`.
+pub async fn published_pair(pg: &Pg, seeded: &Seeded, key: &str) -> (Uuid, Uuid) {
+    let mut tx = begin_scoped(&pg.owner, seeded.tenant).await.expect("scope");
+    let baseline: Uuid = sqlx::query_scalar(
+        "INSERT INTO procedure (tenant_id, key, title, status, version)
+         VALUES ($1, $2, 'Kata procedure v1', 'published', 1) RETURNING id",
+    )
+    .bind(seeded.tenant_id)
+    .bind(key)
+    .fetch_one(&mut *tx)
+    .await
+    .expect("the pre-kata procedure version");
+    let candidate: Uuid = sqlx::query_scalar(
+        "INSERT INTO procedure (tenant_id, key, title, status, version)
+         VALUES ($1, $2, 'Kata procedure v2', 'draft', 2) RETURNING id",
+    )
+    .bind(seeded.tenant_id)
+    .bind(key)
+    .fetch_one(&mut *tx)
+    .await
+    .expect("the candidate procedure version");
+    // Publish the candidate the way `procedure::publish_tx` does: retire the previous published
+    // row, then flip this one. The partial unique index permits exactly that order.
+    sqlx::query(
+        "UPDATE procedure SET status = 'retired'
+          WHERE tenant_id = $1 AND id = $2",
+    )
+    .bind(seeded.tenant_id)
+    .bind(baseline)
+    .execute(&mut *tx)
+    .await
+    .expect("retire the pre-kata version");
+    sqlx::query(
+        "UPDATE procedure SET status = 'published'
+          WHERE tenant_id = $1 AND id = $2",
+    )
+    .bind(seeded.tenant_id)
+    .bind(candidate)
+    .execute(&mut *tx)
+    .await
+    .expect("publish the candidate");
+    tx.commit().await.expect("commit the procedure pair");
+    (baseline, candidate)
+}
+
+/// Open a measurable kata (P4's instrument + threshold) and return its id.
+pub async fn open(
+    running: &Running,
+    anchor: &Anchor,
+    instrument_version: Uuid,
+    signature: &str,
+    target_ref: &str,
+    threshold: f64,
+) -> String {
+    let (status, body) = running
+        .invoke(
+            "kata.open",
+            "dev:alice",
+            json!({
+                "job_binding_id": anchor.binding_id,
+                "signature": signature,
+                "title": "Kata fixture",
+                "target_surface": "procedure",
+                "target_ref": target_ref,
+                "instrument_version_id": instrument_version,
+                "threshold": threshold,
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "{body}");
+    body["output"]["id"]
+        .as_str()
+        .expect("the kata id")
+        .to_owned()
+}
+
+/// Record the first four Gets, in the procedure's order.
+pub async fn to_proposed(
+    running: &Running,
+    kata_id: &str,
+    instrument_version: Uuid,
+    candidate_ref: &str,
+) {
+    for (action, input) in [
+        (
+            "kata.observe",
+            json!({"kata_id": kata_id, "observation": "the work and its evidence"}),
+        ),
+        (
+            "kata.analyse",
+            json!({"kata_id": kata_id, "problem_statement": "the problem, with data"}),
+        ),
+        (
+            "kata.hypothesise",
+            json!({
+                "kata_id": kata_id,
+                "prediction": "the candidate raises the held-out mean",
+                "instrument_version_id": instrument_version,
+            }),
+        ),
+        (
+            "kata.propose",
+            json!({"kata_id": kata_id, "candidate_ref": candidate_ref}),
+        ),
+    ] {
+        let (status, body) = running
+            .invoke(action, "dev:alice", input, None, None, None)
+            .await;
+        assert_eq!(status, 200, "{action}: {body}");
+    }
+}
+
+/// Open a kata and drive it to `proposed`, ready to measure.
+pub async fn proposed(
+    running: &Running,
+    anchor: &Anchor,
+    instrument_version: Uuid,
+    signature: &str,
+    target_ref: &str,
+    candidate_ref: &str,
+    threshold: f64,
+) -> String {
+    let kata_id = open(
+        running,
+        anchor,
+        instrument_version,
+        signature,
+        target_ref,
+        threshold,
+    )
+    .await;
+    to_proposed(running, &kata_id, instrument_version, candidate_ref).await;
+    kata_id
 }

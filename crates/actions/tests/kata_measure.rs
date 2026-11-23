@@ -25,6 +25,7 @@ async fn open_and_propose(
                 "title": "Restore the retry rule",
                 "target_surface": "procedure",
                 "target_ref": "process:kata-fixture",
+                "instrument_version_id": instrument_version,
                 "threshold": 0.1,
             }),
             None,

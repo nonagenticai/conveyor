@@ -24,7 +24,8 @@ use uuid::Uuid;
 /// The kata columns every read returns, in one spelling.
 const KATA_COLUMNS: &str = "id, tenant_id, job_binding_id, release_hash, signature, title, \
                             target_surface, target_ref, status, instrument_version_id, prediction, \
-                            threshold, created_by, version, created_at, updated_at";
+                            threshold, baseline_version_id, created_by, version, created_at, \
+                            updated_at";
 
 /// The statuses that still own a signature (the partial unique index's predicate).
 const LIVE_STATUSES: &str =
@@ -48,6 +49,8 @@ pub struct KataRow {
     /// The pre-registered prediction, set by the hypothesis Get.
     pub prediction: Option<String>,
     pub threshold: Option<f64>,
+    /// The procedure version published when the kata opened — what P2's revert restores.
+    pub baseline_version_id: Option<Uuid>,
     pub created_by: Option<Uuid>,
     pub version: i64,
     pub created_at: DateTime<Utc>,
@@ -93,7 +96,46 @@ pub struct NewKata {
     pub target_surface: String,
     pub target_ref: String,
     pub threshold: Option<f64>,
+    /// P4: the named instrument; every measurable kata opens with one.
+    pub instrument_version_id: Option<Uuid>,
+    /// P2: the procedure version that is live when the kata opens.
+    pub baseline_version_id: Option<Uuid>,
     pub created_by: Option<Uuid>,
+}
+
+/// One kata's append-only revert (P2).
+#[derive(Clone, Debug, sqlx::FromRow)]
+pub struct KataRevertRow {
+    pub id: Uuid,
+    pub kata_id: Uuid,
+    pub reason: String,
+    pub baseline_version_id: Option<Uuid>,
+    pub candidate_version_id: Option<Uuid>,
+    /// Whether the target surface was actually put back at its pre-kata version.
+    pub restored: bool,
+    pub evidence: Value,
+    pub reverted_by: Option<Uuid>,
+    pub created_at: DateTime<Utc>,
+}
+
+/// One kata's adoption decision (P3).
+#[derive(Clone, Debug, sqlx::FromRow)]
+pub struct KataAdoptionRow {
+    pub id: Uuid,
+    pub kata_id: Uuid,
+    pub note: String,
+    pub adopted_by: Uuid,
+    pub created_at: DateTime<Utc>,
+}
+
+/// The fields a revert writes.
+pub struct NewRevert {
+    pub reason: String,
+    pub baseline_version_id: Option<Uuid>,
+    pub candidate_version_id: Option<Uuid>,
+    pub restored: bool,
+    pub evidence: Value,
+    pub reverted_by: Option<Uuid>,
 }
 
 /// One instrument read at hypothesis or measurement time.
@@ -149,6 +191,8 @@ pub enum KataStoreError {
     },
     /// The held-out side contributed no graded case: no data, no improvement.
     NoHeldOutCases(Uuid),
+    /// P2's revert cannot name the procedure versions to restore.
+    RevertTarget(String),
 }
 
 impl From<sqlx::Error> for KataStoreError {
@@ -172,8 +216,8 @@ pub async fn open_tx(
     let sql = format!(
         "INSERT INTO kata
              (tenant_id, job_binding_id, release_hash, signature, title, target_surface,
-              target_ref, threshold, created_by)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+              target_ref, threshold, instrument_version_id, baseline_version_id, created_by)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
          RETURNING {KATA_COLUMNS}"
     );
     let result = sqlx::query_as::<_, KataRow>(sqlx::AssertSqlSafe(sql))
@@ -185,6 +229,8 @@ pub async fn open_tx(
         .bind(&new.target_surface)
         .bind(&new.target_ref)
         .bind(new.threshold)
+        .bind(new.instrument_version_id)
+        .bind(new.baseline_version_id)
         .bind(new.created_by)
         .fetch_one(&mut *conn)
         .await;
@@ -530,4 +576,237 @@ pub async fn insert_measurement_tx(
         .fetch_one(&mut *conn)
         .await?;
     Ok((kata, measurement))
+}
+
+/// The kata's append-only revert, when it has one (P2).
+pub async fn revert_of_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    kata_id: Uuid,
+) -> Result<Option<KataRevertRow>, KataStoreError> {
+    let row = sqlx::query_as::<_, KataRevertRow>(
+        "SELECT id, kata_id, reason, baseline_version_id, candidate_version_id, restored,
+                evidence, reverted_by, created_at
+           FROM kata_revert
+          WHERE tenant_id = $1 AND kata_id = $2",
+    )
+    .bind(tenant.as_uuid())
+    .bind(kata_id)
+    .fetch_optional(&mut *conn)
+    .await?;
+    Ok(row)
+}
+
+/// The kata's adoption decision, when a person has made one (P3).
+pub async fn adoption_of_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    kata_id: Uuid,
+) -> Result<Option<KataAdoptionRow>, KataStoreError> {
+    let row = sqlx::query_as::<_, KataAdoptionRow>(
+        "SELECT id, kata_id, note, adopted_by, created_at
+           FROM kata_adoption
+          WHERE tenant_id = $1 AND kata_id = $2",
+    )
+    .bind(tenant.as_uuid())
+    .bind(kata_id)
+    .fetch_optional(&mut *conn)
+    .await?;
+    Ok(row)
+}
+
+/// The candidate reference recorded by the solution Get.
+pub async fn candidate_ref_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    kata_id: Uuid,
+) -> Result<Option<String>, KataStoreError> {
+    let content: Option<Value> = sqlx::query_scalar(
+        "SELECT content FROM kata_get
+          WHERE tenant_id = $1 AND kata_id = $2 AND get_key = 'solution'",
+    )
+    .bind(tenant.as_uuid())
+    .bind(kata_id)
+    .fetch_optional(&mut *conn)
+    .await?;
+    Ok(content.and_then(|value| {
+        value
+            .get("candidate_ref")
+            .and_then(Value::as_str)
+            .map(str::to_owned)
+    }))
+}
+
+/// Put a procedure key back at its pre-kata version: retire whatever version is published now
+/// (the candidate) and publish the baseline row the kata pinned at open.
+///
+/// Both rows are locked here, and the two must be versions of the same key with the baseline
+/// first. The partial unique index (`one published per key`) is what the caller can rely on
+/// after this returns.
+pub async fn restore_procedure_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    baseline_id: Uuid,
+    candidate_id: Uuid,
+) -> Result<(), KataStoreError> {
+    let rows: Vec<(Uuid, String, i64)> = sqlx::query_as(
+        "SELECT id, key, version FROM procedure
+          WHERE tenant_id = $1 AND id = ANY($2)
+          FOR UPDATE",
+    )
+    .bind(tenant.as_uuid())
+    .bind(vec![baseline_id, candidate_id])
+    .fetch_all(&mut *conn)
+    .await?;
+    let baseline = rows.iter().find(|row| row.0 == baseline_id);
+    let candidate = rows.iter().find(|row| row.0 == candidate_id);
+    let (baseline, candidate) = match (baseline, candidate) {
+        (Some(baseline), Some(candidate)) => (baseline, candidate),
+        _ => {
+            return Err(KataStoreError::RevertTarget(format!(
+                "procedure versions {baseline_id} and {candidate_id} do not both exist in this \
+                 tenant"
+            )));
+        }
+    };
+    if baseline.1 != candidate.1 {
+        return Err(KataStoreError::RevertTarget(format!(
+            "procedure versions {baseline_id} and {candidate_id} belong to different keys \
+             ({:?} and {:?})",
+            baseline.1, candidate.1
+        )));
+    }
+    if baseline.2 >= candidate.2 {
+        return Err(KataStoreError::RevertTarget(format!(
+            "the pre-kata version {baseline_id} (v{}) is not older than the candidate {candidate_id} \
+             (v{})",
+            baseline.2, candidate.2
+        )));
+    }
+    // Retire the candidate (or any other published row) before republishing the baseline: the
+    // one-published-per-key index refuses the intermediate state otherwise.
+    sqlx::query(
+        "UPDATE procedure
+            SET status = 'retired', lock_version = lock_version + 1, updated_at = now()
+          WHERE tenant_id = $1 AND key = $2 AND status = 'published' AND id <> $3",
+    )
+    .bind(tenant.as_uuid())
+    .bind(&baseline.1)
+    .bind(baseline_id)
+    .execute(&mut *conn)
+    .await?;
+    sqlx::query(
+        "UPDATE procedure
+            SET status = 'published', lock_version = lock_version + 1, updated_at = now()
+          WHERE tenant_id = $1 AND id = $2 AND status <> 'published'",
+    )
+    .bind(tenant.as_uuid())
+    .bind(baseline_id)
+    .execute(&mut *conn)
+    .await?;
+    Ok(())
+}
+
+/// Write P2's revert and move the kata to `reverted`, atomically.
+pub async fn revert_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    kata_id: Uuid,
+    new: NewRevert,
+) -> Result<(KataRow, KataRevertRow), KataStoreError> {
+    let current: Option<(String,)> =
+        sqlx::query_as("SELECT status FROM kata WHERE tenant_id = $1 AND id = $2 FOR UPDATE")
+            .bind(tenant.as_uuid())
+            .bind(kata_id)
+            .fetch_optional(&mut *conn)
+            .await?;
+    let current = match current {
+        Some((status,)) => status,
+        None => return Err(KataStoreError::NotFound(kata_id)),
+    };
+    if current != "measured" {
+        return Err(KataStoreError::GetOutOfOrder {
+            current,
+            required: "measured".to_owned(),
+        });
+    }
+    let revert = sqlx::query_as::<_, KataRevertRow>(
+        "INSERT INTO kata_revert
+             (tenant_id, kata_id, reason, baseline_version_id, candidate_version_id, restored,
+              evidence, reverted_by)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+         RETURNING id, kata_id, reason, baseline_version_id, candidate_version_id, restored,
+                   evidence, reverted_by, created_at",
+    )
+    .bind(tenant.as_uuid())
+    .bind(kata_id)
+    .bind(&new.reason)
+    .bind(new.baseline_version_id)
+    .bind(new.candidate_version_id)
+    .bind(new.restored)
+    .bind(&new.evidence)
+    .bind(new.reverted_by)
+    .fetch_one(&mut *conn)
+    .await?;
+    let sql = format!(
+        "UPDATE kata
+            SET status = 'reverted', version = version + 1, updated_at = now()
+          WHERE tenant_id = $1 AND id = $2
+          RETURNING {KATA_COLUMNS}"
+    );
+    let kata = sqlx::query_as::<_, KataRow>(sqlx::AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(kata_id)
+        .fetch_one(&mut *conn)
+        .await?;
+    Ok((kata, revert))
+}
+
+/// Record a person's adoption and move the kata to `adopted`, atomically.
+pub async fn adopt_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    kata_id: Uuid,
+    note: &str,
+    adopted_by: Uuid,
+) -> Result<(KataRow, KataAdoptionRow), KataStoreError> {
+    let current: Option<(String,)> =
+        sqlx::query_as("SELECT status FROM kata WHERE tenant_id = $1 AND id = $2 FOR UPDATE")
+            .bind(tenant.as_uuid())
+            .bind(kata_id)
+            .fetch_optional(&mut *conn)
+            .await?;
+    let current = match current {
+        Some((status,)) => status,
+        None => return Err(KataStoreError::NotFound(kata_id)),
+    };
+    if current != "measured" {
+        return Err(KataStoreError::GetOutOfOrder {
+            current,
+            required: "measured".to_owned(),
+        });
+    }
+    let adoption = sqlx::query_as::<_, KataAdoptionRow>(
+        "INSERT INTO kata_adoption (tenant_id, kata_id, note, adopted_by)
+         VALUES ($1, $2, $3, $4)
+         RETURNING id, kata_id, note, adopted_by, created_at",
+    )
+    .bind(tenant.as_uuid())
+    .bind(kata_id)
+    .bind(note)
+    .bind(adopted_by)
+    .fetch_one(&mut *conn)
+    .await?;
+    let sql = format!(
+        "UPDATE kata
+            SET status = 'adopted', version = version + 1, updated_at = now()
+          WHERE tenant_id = $1 AND id = $2
+          RETURNING {KATA_COLUMNS}"
+    );
+    let kata = sqlx::query_as::<_, KataRow>(sqlx::AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(kata_id)
+        .fetch_one(&mut *conn)
+        .await?;
+    Ok((kata, adoption))
 }
