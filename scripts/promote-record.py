@@ -181,6 +181,9 @@ PROJECT_BASELINE_KEY_RE = re.compile(r"^project:baseline:([0-9a-f-]{36})$")
 # A title carries colons ("The PM request-to-plan path: pm.plan writes the WBS"), so the
 # project id is the only fixed delimiter and the title is everything after it.
 WBS_ACCEPT_KEY_RE = re.compile(r"^wbs-accept:([0-9a-f-]{36}):(.+)$")
+# A card's Definition-of-Done decide. The request keys on `approval:card_done/<card>`; the
+# decide carries its own form so the two acts of one gate cannot collide on a natural key.
+CARD_DONE_DECIDE_KEY_RE = re.compile(r"^card-done-decide:([0-9a-f-]{36})$")
 PROJECT_CLOSE_KEY_RE = re.compile(r"^project:close:([0-9a-f-]{36})$")
 CARD_COMMENT_KEY_RE = re.compile(r"^card-comment:([0-9a-f-]{36}):([0-9a-f]{8,64})$")
 CARD_MOVE_KEY_RE = re.compile(r"^card-move:([0-9a-f-]{36}):(intake|active|waiting|done|archive)$")
@@ -244,6 +247,8 @@ class NaturalKey:
             return f"project:baseline:{self.first}"
         if self.kind == "wbs_accept":
             return f"wbs-accept:{self.first}:{self.second}"
+        if self.kind == "card_done_decide":
+            return f"card-done-decide:{self.first}"
         if self.kind == "project_close":
             return f"project:close:{self.first}"
         if self.kind == "card_comment":
@@ -359,6 +364,9 @@ def parse_natural_key(value: str) -> NaturalKey:
         if not title or any(ord(char) < 0x20 for char in title):
             raise PromoteError(f"malformed wbs-accept natural key: {value!r}")
         return NaturalKey("wbs_accept", match.group(1), title)
+    match = CARD_DONE_DECIDE_KEY_RE.match(value)
+    if match:
+        return NaturalKey("card_done_decide", match.group(1))
     match = PROJECT_CLOSE_KEY_RE.match(value)
     if match:
         return NaturalKey("project_close", match.group(1))
@@ -536,6 +544,16 @@ def validate_entries(entries: list[Entry]) -> list[str]:
             if not isinstance(entry.payload.get("title"), str) or not entry.payload["title"]:
                 errors.append(f"line {entry.lineno}: change input has no title")
         elif entry.action == "approvals.decide":
+            if key.kind == "card_done_decide":
+                if entry.payload.get("decision") not in ("approve", "reject"):
+                    errors.append(
+                        f"line {entry.lineno}: approval decision must be approve or reject"
+                    )
+                if not entry.payload.get("approval_id"):
+                    errors.append(
+                        f"line {entry.lineno}: approval input has no approval_id"
+                    )
+                continue
             if key.kind == "tranche_review_decide":
                 if entry.payload.get("decision") not in ("approve", "reject"):
                     errors.append(
@@ -741,6 +759,28 @@ def validate_entries(entries: list[Entry]) -> list[str]:
                 errors.append(
                     f"line {entry.lineno}: approvals.request key must be approval:<gate>/<target>"
                 )
+                continue
+            if key.first == "card_done":
+                # A card's Definition-of-Done gate: the card is the target, and the engine
+                # accepts it with typed evidence or the explicit waiver reason it stores.
+                if entry.payload.get("gate") != "card_done":
+                    errors.append(
+                        f"line {entry.lineno}: a card-done gate must be named 'card_done'"
+                    )
+                if entry.payload.get("card_id") != key.second:
+                    errors.append(
+                        f"line {entry.lineno}: natural key {key.second!r} does not match "
+                        f"input card_id {entry.payload.get('card_id')!r}"
+                    )
+                evidence = entry.payload.get("evidence")
+                waiver = entry.payload.get("evidence_waiver_reason")
+                if not (
+                    isinstance(evidence, list) and evidence
+                ) and not (isinstance(waiver, str) and waiver.strip()):
+                    errors.append(
+                        f"line {entry.lineno}: a card-done gate needs typed evidence or a waiver "
+                        "reason"
+                    )
                 continue
             if not entry.payload.get("gate"):
                 errors.append(f"line {entry.lineno}: approvals.request input has no gate")
@@ -1213,6 +1253,10 @@ class State:
     projects: dict[str, dict] = field(default_factory=dict)
     cards: dict[str, dict] = field(default_factory=dict)
     lists: dict[str, dict] = field(default_factory=dict)
+    # A card's own gates. `cards.move` into a done lane needs an approved, card-scoped
+    # `card_done` gate when the card's type declares a Definition of Done, and those gates hang
+    # on the card, not on a project, so they are read by card id.
+    card_gates: dict[str, list[dict]] = field(default_factory=dict)
     # The tr3 record family's production rows: benefits-map edges by benefit.
     links: list[dict] = field(default_factory=list)
     # The document family's production rows, by (project, category) as listed.
@@ -1312,6 +1356,23 @@ def load_state(
     ):
         seen: set[tuple[str, str]] = set()
         for entry in entries:
+            if entry.action == "documents.publish":
+                # A publish's key names a unit, not a project, so the row it publishes is read
+                # by id: without it the skip test cannot see a document the compose did not
+                # describe (the programme-level publications have no project to list by).
+                document_id = entry.payload.get("id")
+                if not document_id:
+                    raise PromoteError("documents.publish: the input names no id")
+                try:
+                    row = client.invoke("documents.get", {"id": document_id})
+                except PromoteError:
+                    row = None
+                if isinstance(row, dict) and row.get("id"):
+                    if not any(
+                        existing.get("id") == row["id"] for existing in state.documents
+                    ):
+                        state.documents.append(row)
+                continue
             if entry.action != "documents.compose":
                 continue
             project_id = entry.payload.get("project_id")
@@ -1331,6 +1392,23 @@ def load_state(
                     {"project_id": project_id, "category": category},
                 )
             )
+    card_gate_cards = {
+        entry.key.second if entry.key.kind == "approval" else entry.key.first
+        for entry in entries
+        if entry.key is not None
+        and (
+            (
+                entry.action == "approvals.request"
+                and entry.key.kind == "approval"
+                and entry.key.first == "card_done"
+            )
+            or (entry.action == "approvals.decide" and entry.key.kind == "card_done_decide")
+        )
+    }
+    for card_id in sorted(card_gate_cards):
+        state.card_gates[card_id] = list_all(
+            client, "approvals.list", {"card_id": card_id}
+        )
     if any(entry.action == "benefits.link" for entry in entries):
         state.links.extend(
             list_all(client, "benefits.link_list", {"programme_id": programme_id})
@@ -1786,6 +1864,20 @@ def requested_target(payload: dict) -> str | None:
     return None
 
 
+def card_gate(state: State, card_id: str, status: str | None = None) -> dict | None:
+    """The card's `card_done` gate, optionally only when it is in `status`.
+
+    A card-scoped gate has no target to match on: the card is its identity, which is why the
+    state reads the gate by card id and every matcher here names the card.
+    """
+    for gate in state.card_gates.get(card_id, []):
+        if gate.get("gate") != "card_done" or gate.get("status") == "rejected":
+            continue
+        if status is None or gate.get("status") == status:
+            return gate
+    return None
+
+
 def request_gate(state: State, payload: dict) -> dict | None:
     """A gate with the same gate name and target is the request that already happened."""
     gate_name = payload.get("gate")
@@ -1893,6 +1985,14 @@ def existing_for(
         ):
             return tranche
         return None
+    if entry.action == "approvals.request" and key.kind == "approval" and key.first == "card_done":
+        # The request that happened is a skip; the decide after it is what finishes the gate.
+        return card_gate(state, key.second or "")
+    if (
+        entry.action == "approvals.decide"
+        and key.kind == "card_done_decide"
+    ):
+        return card_gate(state, key.first, expected_gate_status(entry.payload))
     if entry.action == "approvals.request" and key.kind == "tranche_review_gate":
         tranche = tranche_by_number(state, key.first)
         return tranche_review_gate(
@@ -1963,6 +2063,19 @@ def existing_for(
                 return row
         return None
     if entry.action == "documents.publish":
+        # A publish whose compose already ran knows the production document exactly; a key whose
+        # third part is a content hash rather than a title (the programme-level publications)
+        # can only be matched this way.
+        staging_id = str(entry.payload.get("id") or "")
+        production = (id_map or {}).get(staging_id)
+        if production:
+            for row in state.documents:
+                if (
+                    row.get("id") == production
+                    and row.get("published_at")
+                    and row.get("status") != "deleted"
+                ):
+                    return row
         parts = key.first.split(":", 2)
         if len(parts) != 3:
             raise PromoteError(
@@ -2604,6 +2717,33 @@ def readback_entry(
     """Read the created row back.  Raises PromoteError when it cannot be read."""
     key = entry.key
     assert key is not None
+    # The card's own gates are read by card id, never by project: they hang on the card, and
+    # the generic decide readback below would find no project for them.
+    if entry.action == "approvals.request" and key.kind == "approval" and key.first == "card_done":
+        gates = list_all(client, "approvals.list", {"card_id": key.second})
+        state.card_gates[key.second or ""] = gates
+        for gate in gates:
+            if gate.get("id") != production_id:
+                continue
+            if gate.get("status") not in ("pending", "approved"):
+                raise ReadbackError(
+                    f"approvals.list: the card-done gate is {gate.get('status')!r}"
+                )
+            return gate
+        raise ReadbackError("approvals.list: the card-done gate is not readable")
+    if entry.action == "approvals.decide" and key.kind == "card_done_decide":
+        gates = list_all(client, "approvals.list", {"card_id": key.first})
+        state.card_gates[key.first] = gates
+        for gate in gates:
+            if gate.get("id") != production_id:
+                continue
+            if gate.get("status") != expected_gate_status(entry.payload):
+                raise ReadbackError(
+                    f"approvals.list: the card-done gate is {gate.get('status')!r}, not "
+                    f"{expected_gate_status(entry.payload)!r}"
+                )
+            return gate
+        raise ReadbackError("approvals.list: the decided card-done gate is not readable")
     if entry.action == "registers.create":
         return readback_register(client, production_id, "risk", code=key.first)
     if entry.action == "benefits.create":
