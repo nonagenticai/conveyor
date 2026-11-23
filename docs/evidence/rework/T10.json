@@ -158,7 +158,7 @@
     "gate (P0): the gate check 'T10-charter' did not pass; the gate check 'T10-pi-plan' did not pass; the gate check 'T10-pi-objectives' did not pass; the gate check 'T10-lessons' did not pass; the gate check 'T10-product' did not pass"
   ],
   "gate": "PI planning materialises cards from the backlog by WSJF within WIP; a deliverable without evidence cannot demo; retro produces lessons; an end-of-tranche review with no baselines, benefit status or risk evidence is refused; a transition that never measured its baseline cannot report the benefit realized",
-  "generated_at": "2026-11-23T07:48:35.370413+00:00",
+  "generated_at": "2026-11-23T07:53:51.664733+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T10.toml",
   "name": "SAFe cadence and MSP tranches",

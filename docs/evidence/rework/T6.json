@@ -165,7 +165,7 @@
     "gate (P0): the gate check 'T6-baseline' did not pass; the gate check 'T6-charter' did not pass; the gate check 'T6-closure-outputs' did not pass; the gate check 'T6-contract' did not pass; the gate check 'T6-review' did not pass; the gate check 'T6-closure-gate' did not pass; the gate check 'T6-pi-cadence' did not pass; the gate check 'T6-pi-plan' did not pass; the gate check 'T6-pi-objectives' did not pass; the gate check 'T6-wsjf' did not pass; the gate check 'T6-demo-credits' did not pass; the gate check 'T6-lessons' did not pass"
   ],
   "gate": "T6 is NOT built, and its acceptance \u2014 `SPEC_V2` \u00a712: 'a real feature lands: lane \u2192 PR \u2192 CI \u2192 review \u2192 merge \u2192 deploy \u2192 live verify; the project cannot change its own gates; rollback tested' \u2014 is the condition on which it may be closed, not a claim that it is met.",
-  "generated_at": "2026-11-23T07:48:36.262503+00:00",
+  "generated_at": "2026-11-23T07:53:52.567898+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T6.toml",
   "name": "Development project",

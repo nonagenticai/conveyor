@@ -150,7 +150,7 @@
     "closed-on-red (P0): the project is closed on a red manifest"
   ],
   "gate": "The decision record states what is observable and marks the rest not recoverable; the project re-closes through the one gate.",
-  "generated_at": "2026-11-23T07:48:33.446222+00:00",
+  "generated_at": "2026-11-23T07:53:49.593665+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/S01.toml",
   "name": "UI spike \u2014 Leptos CSR vs Leptos SSR",

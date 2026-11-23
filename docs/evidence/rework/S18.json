@@ -165,7 +165,7 @@
     "gate (P0): the gate check 'S18-baseline' did not pass; the gate check 'S18-charter' did not pass; the gate check 'S18-closure-outputs' did not pass; the gate check 'S18-contract' did not pass; the gate check 'S18-review' did not pass; the gate check 'S18-closure-gate' did not pass; the gate check 'S18-pi-cadence' did not pass; the gate check 'S18-pi-plan' did not pass; the gate check 'S18-pi-objectives' did not pass; the gate check 'S18-lessons' did not pass; the gate check 'S18-wsjf' did not pass; the gate check 'S18-demo-credits' did not pass"
   ],
   "gate": "The end-to-end proof is one real katas-tenant iteration: a candidate `capability_agent` version, one run, a comparison against the promoted baseline, and a recorded keep/revert \u2014 with the screen showing the same numbers.",
-  "generated_at": "2026-11-23T07:48:34.872588+00:00",
+  "generated_at": "2026-11-23T07:53:51.011075+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/S18.toml",
   "name": "Kata continuous improvement",

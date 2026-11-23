@@ -137,7 +137,7 @@
     "closed-on-red (P0): the project is closed on a red manifest"
   ],
   "gate": "The closure review exists and every declared closure output is published; the project re-closes through the one gate.",
-  "generated_at": "2026-11-23T07:48:35.157916+00:00",
+  "generated_at": "2026-11-23T07:53:51.449453+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/SPEC-V2.toml",
   "name": "SPEC V2 \u2014 the organisational operating model",

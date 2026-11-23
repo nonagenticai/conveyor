@@ -175,7 +175,7 @@
     "closed-on-red (P0): the project is closed on a red manifest"
   ],
   "gate": "Every model call the conveyor makes becomes a durable, tenant-scoped row carrying the prompt's identity, the token counts and the provider's prompt-cache classes, so \"what did this cost and was it cached\" is a query rather than a guess.",
-  "generated_at": "2026-11-23T07:48:34.727725+00:00",
+  "generated_at": "2026-11-23T07:53:50.864226+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/S16.toml",
   "name": "Inference ledger and prompt audit",

@@ -176,7 +176,7 @@
     "closed-on-red (P0): the project is closed on a red manifest"
   ],
   "gate": "An injected pod failure is triaged, mitigated by an approved write, resolved and postmortemed; a destructive action without the tenant's configured approvals is refused; restart, scale, rollback and flag-flip are callable.",
-  "generated_at": "2026-11-23T07:48:36.336334+00:00",
+  "generated_at": "2026-11-23T07:53:52.640008+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T7.toml",
   "name": "Operations",

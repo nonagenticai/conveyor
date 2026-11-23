@@ -127,7 +127,7 @@
     "gate (P0): the gate check 'T0-charter' did not pass"
   ],
   "gate": "The A\u2013D set is approved; the project re-closes through the one gate.",
-  "generated_at": "2026-11-23T07:48:35.229158+00:00",
+  "generated_at": "2026-11-23T07:53:51.522826+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T0.toml",
   "name": "Model and contracts",

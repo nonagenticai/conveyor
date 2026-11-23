@@ -164,7 +164,7 @@
     "closed-on-red (P0): the project is closed on a red manifest"
   ],
   "gate": "proptest on transitions and schema review \u2014 no transition leaves `list.kind` and `archived_at` contradictory, a claim never succeeds twice without release or expiry, one pending approval per (run, gate), and truncate/archive invariants hold",
-  "generated_at": "2026-11-23T07:48:33.587152+00:00",
+  "generated_at": "2026-11-23T07:53:49.735212+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/S03.toml",
   "name": "Domain and schema \u2014 aggregates, state machines, baseline domain migration",

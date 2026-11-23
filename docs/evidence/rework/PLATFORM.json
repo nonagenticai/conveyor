@@ -82,7 +82,7 @@
     "gate (P0): the gate check 'PLATFORM-charter' did not pass"
   ],
   "gate": "The standing platform row carries an approved charter and a baseline; it does not close.",
-  "generated_at": "2026-11-23T07:48:33.275318+00:00",
+  "generated_at": "2026-11-23T07:53:49.419039+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/PLATFORM.toml",
   "name": "CI, runners and platform",
