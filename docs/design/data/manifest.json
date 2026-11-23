@@ -2,10 +2,10 @@
   "feedback_url": "https://github.com/nonagenticai/conveyor/discussions",
   "files": [
     {
-      "bytes": 13497,
+      "bytes": 14044,
       "path": "actions.json",
       "records": 0,
-      "sha256": "b4e4d10bb18106bf5c900644e37db0287292f5063ac62c43d2f86b5641e1fcc2"
+      "sha256": "48281350b961f973127d80864d23a629fc1a123ed4af8ab229a782f5aa745049"
     },
     {
       "bytes": 108957,
@@ -26,16 +26,16 @@
       "sha256": "a8fd56b89802f3d35199cac1b3b75a10e6d1562781fbf15020192791fd7c588c"
     },
     {
-      "bytes": 26657,
+      "bytes": 27296,
       "path": "coverage.js",
       "records": 0,
-      "sha256": "e6e00cfcda1d848b5f398985144c20ff9c9a0477c2a130f2a0c35d86f0cb40ad"
+      "sha256": "505faa42e87ce4676befda0b6618783609e5ee882f5bcb7542c1c46a09c9e20d"
     },
     {
-      "bytes": 48926,
+      "bytes": 50269,
       "path": "coverage.json",
       "records": 0,
-      "sha256": "b9fa76af0d5392b0ac3a4f61a6e55e7539d8a7b20dc17f0ae3b4460b33abb08c"
+      "sha256": "c35a44b13ebe9a54a61472338d249c3a38d1054d0d543e8a5f7402aa5dafc640"
     },
     {
       "bytes": 109,
@@ -50,10 +50,10 @@
       "sha256": "c0dd0d7c535bbdc7ceb958fffa8f3eb7b28893c3a07f64b6524d3bbbf0d89736"
     },
     {
-      "bytes": 125170,
+      "bytes": 136175,
       "path": "issues.json",
       "records": 0,
-      "sha256": "6deda6065b328df8c8d2759e6faea53cc95316c4a1c0f482a9419509e8904611"
+      "sha256": "9feeaf33d0ec09138dfdc928f8e261cc9e9d0ace642d6f01d65d9129e512fbba"
     },
     {
       "bytes": 1349,
@@ -74,10 +74,10 @@
       "sha256": "3807b68e9cb77bd166fbe6f6d4b0e269c8bc0923a8d156f45dba8342786bd2ee"
     },
     {
-      "bytes": 131593,
+      "bytes": 155407,
       "path": "output-standard.js",
       "records": 0,
-      "sha256": "aed452234aaf2fd23c366678c6d6363bcf98a5108605209445a7a06d134a7a27"
+      "sha256": "fcf144b4b81c3a22822349dd3d24f53fde66fa8c58e5e5d3e7233bd327743fb2"
     },
     {
       "bytes": 180846,
@@ -86,10 +86,10 @@
       "sha256": "e868cfc4d87105681c7ec5c022093b37f59223b288ce686d7ec2ce20d4fa58d3"
     },
     {
-      "bytes": 2069893,
+      "bytes": 2069887,
       "path": "rework.js",
       "records": 505,
-      "sha256": "b50fb53c6ffc0327443a39b6d6a274610037da50d11d8687c61de1cd4f9781e6"
+      "sha256": "f8a75050641a1db51eec9d31bb2a0b940ce176105e15aff635c49a6dd6d63766"
     },
     {
       "bytes": 225,
