@@ -1,12 +1,12 @@
 # MSP/TOGAF conformance gap register
 
-Snapshot: `46f79dc4e0cb2774bad337f7fd442a7a2a09bbf7` generated `2026-11-23T07:38:20.287935+00:00` from `snap-r0/data`.
+Snapshot: `8bb124abe9e709308af2aa42fc9f4403411762b7` generated `2026-11-23T07:59:59.287216+00:00` from `snap-r1/data`.
 
 | Severity | Count |
 |---|---:|
 | P0 | 15 |
-| P1 | 146 |
-| P2 | 22 |
+| P1 | 141 |
+| P2 | 23 |
 | P3 | 0 |
 
 ## P0 and P1
@@ -37,13 +37,7 @@ Snapshot: `46f79dc4e0cb2774bad337f7fd442a7a2a09bbf7` generated `2026-11-23T07:38
 | `backlog_refinement_missing` | `tranche 7` | P1 | the tranche has no refinement cadence for its period |
 | `backlog_refinement_missing` | `tranche 8` | P1 | the tranche has no refinement cadence for its period |
 | `backlog_refinement_missing` | `tranche 9` | P1 | the tranche has no refinement cadence for its period |
-| `benefit_baseline_placeholder` | `B1` | P1 | measurement record is missing measured_at, method |
-| `benefit_baseline_placeholder` | `B2` | P1 | measurement record is missing measured_at, method |
 | `benefit_baseline_placeholder` | `B3` | P1 | baseline is a placeholder: 'not measured - no instrument exists (recorded as a kata on the kata project)' |
-| `benefit_baseline_placeholder` | `B4` | P1 | measurement record is missing measured_at, method |
-| `benefit_baseline_placeholder` | `B5` | P1 | measurement record is missing measured_at, method |
-| `benefit_baseline_placeholder` | `B6` | P1 | measurement record is missing measured_at, method |
-| `benefit_baseline_placeholder` | `B7` | P1 | measurement record is missing measured_at, method |
 | `closed_without_closure_review` | `S05` | P1 | project is closed but its closure review is not published |
 | `closed_without_closure_review` | `S06b` | P1 | project is closed but its closure review is not published |
 | `closed_without_closure_review` | `S06c` | P1 | project is closed but its closure review is not published |
@@ -69,8 +63,11 @@ Snapshot: `46f79dc4e0cb2774bad337f7fd442a7a2a09bbf7` generated `2026-11-23T07:38
 | `closure_outputs_undeclared` | `S13` | P1 | project is closed but declares no closure_outputs |
 | `closure_outputs_undeclared` | `S16` | P1 | project is closed but declares no closure_outputs |
 | `compliance_review_missing` | `T1` | P1 | closed delivery project has no Phase-G compliance review |
+| `compliance_review_missing` | `T10` | P1 | closed delivery project has no Phase-G compliance review |
 | `compliance_review_missing` | `T11` | P1 | closed delivery project has no Phase-G compliance review |
+| `compliance_review_missing` | `T13` | P1 | closed delivery project has no Phase-G compliance review |
 | `compliance_review_missing` | `T2` | P1 | closed delivery project has no Phase-G compliance review |
+| `compliance_review_missing` | `T9` | P1 | closed delivery project has no Phase-G compliance review |
 | `contract_missing` | `T12` | P1 | delivery project has no live architecture contract |
 | `contract_missing` | `T14` | P1 | delivery project has no live architecture contract |
 | `contract_missing` | `T15` | P1 | delivery project has no live architecture contract |
@@ -145,9 +142,7 @@ Snapshot: `46f79dc4e0cb2774bad337f7fd442a7a2a09bbf7` generated `2026-11-23T07:38
 | `project_in_unauthorised_tranche` | `T8` | P1 | project is active in tranche 11 whose state is 'planned' |
 | `seed_live_drift` | `S21` | P1 | seed status 'closed' != live status 'active' |
 | `seed_live_drift` | `T0` | P1 | seed status 'closed' != live status 'active' |
-| `seed_live_drift` | `T10` | P1 | seed status 'closed' != live status 'active' |
 | `seed_live_drift` | `T4` | P1 | seed status 'closed' != live status 'active' |
-| `seed_live_drift` | `T9` | P1 | seed status 'closed' != live status 'active' |
 | `unpublished_declared_output` | `S04` | P1 | declared outputs are not published: project-brief |
 | `unpublished_declared_output` | `S05` | P1 | declared outputs are not published: project-brief |
 | `unpublished_declared_output` | `S06` | P1 | declared outputs are not published: project-brief |
@@ -211,10 +206,10 @@ Snapshot: `46f79dc4e0cb2774bad337f7fd442a7a2a09bbf7` generated `2026-11-23T07:38
 | SPEC-V2 | closed | 0 | 0 | 0 | 0 | 0 |
 | T0 | active | 0 | 0 | 2 | 0 | 0 |
 | T1 | closed | 1 | 0 | 2 | 0 | 0 |
-| T10 | active | 4 | 0 | 1 | 0 | 0 |
+| T10 | closed | 4 | 0 | 1 | 0 | 0 |
 | T11 | closed | 1 | 0 | 2 | 0 | 0 |
 | T12 | active | 13 | 0 | 3 | 1 | 0 |
-| T13 | active | 3 | 0 | 0 | 0 | 0 |
+| T13 | closed | 3 | 0 | 1 | 1 | 0 |
 | T14 | closed | 4 | 1 | 3 | 1 | 0 |
 | T15 | active | 12 | 0 | 3 | 1 | 0 |
 | T16 | closed | 4 | 1 | 3 | 0 | 0 |
@@ -226,4 +221,4 @@ Snapshot: `46f79dc4e0cb2774bad337f7fd442a7a2a09bbf7` generated `2026-11-23T07:38
 | T6 | active | 11 | 0 | 3 | 1 | 0 |
 | T7 | closed | 5 | 2 | 3 | 0 | 0 |
 | T8 | active | 11 | 0 | 4 | 1 | 0 |
-| T9 | active | 4 | 0 | 1 | 0 | 0 |
+| T9 | closed | 4 | 0 | 1 | 0 | 0 |
