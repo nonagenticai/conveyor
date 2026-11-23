@@ -1,10 +1,11 @@
 # named.yaml — the catalogue's NAMED processes (schema + rules: seed/processes/README.md).
 #
-# The 53 processes that are not a card type's four list stages: the 51 `cap.<family>.<fn>` capability
-# processes measured in `parity/flow-dispositions.tsv` (`procedure:` rows), `ask_fr`, and `kata.open`
-# (SPEC D20, S13). A named process has no card type and no list stage (`list` is absent — `ProcessSpec`
-# reads a missing `list` as null), so nothing here moves a card: each process runs one agent step
-# against one SOP and returns its answer to the caller, which writes.
+# The named processes that are not a card type's four list stages: the `cap.<family>.<fn>` capability
+# processes measured in `parity/flow-dispositions.tsv` (`procedure:` rows), `ask_fr`, `kata.open`
+# (SPEC D20, S13), and the S18 process arm's `swebench-fix`. A named process has no card type and no
+# list stage (`list` is absent — `ProcessSpec` reads a missing `list` as null), so nothing here moves
+# a card: each process runs one agent step against one SOP and returns its answer to the caller,
+# which writes.
 #
 # ⛔ One agent and one SOP per process, and the agent key EQUALS the process key (the convention the 280
 # type files follow). Each agent carries its own `capability:` because the process's capability override
@@ -79,6 +80,9 @@ agents:
   - {key: cap.development.inspect, capability: development, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 300, allowed_actions: [documents.compose, documents.get, documents.list, cards.get, cards.comment]}
   - {key: cap.development.plan, capability: development, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 300, allowed_actions: [documents.compose, documents.get, documents.list, cards.get, cards.comment]}
   - {key: cap.development.unblock, capability: development, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 300, allowed_actions: [documents.compose, documents.get, documents.list, cards.get, cards.comment]}
+  # S18 P3: the benchmark process arm's one agent. Its answer IS the patch (or NONE), so the
+  # process declares `patch` as its output; the driver collects it, never a private path.
+  - {key: swebench-fix, capability: development, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 300, allowed_actions: [documents.compose, documents.get, documents.list, cards.get, cards.comment]}
   # ── refactoring ─────────────────────────────────────────────────────────────────────
   - {key: cap.refactoring.consult, capability: refactoring, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 300, allowed_actions: [documents.compose, documents.get, documents.list, cards.get, cards.comment]}
   - {key: cap.refactoring.create, capability: refactoring, role: process_agent, prompt: agent, model: claude-sonnet-5-5, max_iterations: 12, timeout_secs: 300, allowed_actions: [documents.compose, documents.get, documents.list, cards.get, cards.comment]}
@@ -864,6 +868,29 @@ sops:
           The flow writes nothing itself: a failed lookup, a failed call or any non-ok answer
           posts no comment and leaves the card BLOCKED exactly as it was, so an unblock can never
           make blocking worse (R239).
+    inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
+    outputs: []
+  # S18 P3: the process arm's contract. The reply is the patch — there is no second parser, and the
+  # sandbox applies it exactly as it applies a stored gold patch. NONE is a legitimate answer.
+  - key: swebench-fix.sop
+    title: SWE-bench fix — the patch contract
+    definition_of_ready: {checks: [instance_id_and_base_commit_pinned]}
+    definition_of_done: {checks: [answer_is_a_patch_or_none]}
+    acceptance_criteria:
+      - name: answer_is_the_patch
+        text: >-
+          The answer is one unified diff in `git diff` format that applies to the base commit the
+          benchmark card pins, and nothing else: no prose, no explanation and no code fence. If the
+          instance cannot be fixed from the material the run was given, the answer is the single
+          word NONE; a patch is never invented around a missing file.
+      - name: patch_changes_only_what_the_issue_needs
+        text: >-
+          The diff changes only the files the issue's fix needs and leaves the test files the case
+          grades untouched, because a patch that edits the graded tests measures nothing.
+      - name: the_run_writes_nothing
+        text: >-
+          The agent edits no repository and writes no card: it answers with the patch, and the
+          benchmark driver records it on the case (S18 §5).
     inspection: {kind: laya, threshold: 0.7, max_rejects: 2}
     outputs: []
   # ── refactoring ─────────────────────────────────────────────────────────────────────
@@ -1656,6 +1683,14 @@ processes:
     outputs: []
     steps:
       - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: cap.development.unblock, sop: cap.development.unblock.sop, on_result: fail, max_attempts: 1, input_template: {function: unblock}}
+  # S18 P3: the process arm's producer. One bounded loop per benchmark card; the declared output
+  # `patch` is the step's own answer, which the driver reads after the run is terminal.
+  - key: swebench-fix
+    title: SWE-bench fix — produce one case's patch
+    capability: development
+    outputs: [patch]
+    steps:
+      - {position: 1, kind: agent, actor: process_agent, action: agent.run, process_agent: swebench-fix, sop: swebench-fix.sop, on_result: fail, max_attempts: 1, input_template: {function: fix}}
   # ── refactoring ─────────────────────────────────────────────────────────────────────
   - key: cap.refactoring.consult
     title: Refactoring consult — the card set one phase needs

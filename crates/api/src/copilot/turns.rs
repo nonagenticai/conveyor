@@ -639,12 +639,26 @@ async fn call_model(
 /// Read the router's OpenAI-compatible answer.
 fn parse_answer(body: &Value) -> Result<Answer, ActionError> {
     let output = &body["output"];
-    let message = &output["choices"][0]["message"];
-    if message.is_null() {
+    let choice = &output["choices"][0];
+    // A `length` finish means the body was cut at the token cap. Its visible tail can parse as a
+    // complete-looking answer or a tool call with partial arguments, so this is the only point that
+    // can stop a truncated turn from being delivered as if it were whole. 422, not 5xx: a failed
+    // turn is not retried, while a 5xx would re-buy the same capped call.
+    if choice["finish_reason"].as_str() == Some("length") {
+        return Err(ActionError::new(
+            422,
+            "inference-truncated",
+            "the router's answer was truncated at its token cap (finish_reason \"length\"); \
+             refusing the partial reply"
+                .to_owned(),
+        ));
+    }
+    let message = &choice["message"];
+    if !message.is_object() {
         return Err(ActionError::new(
             502,
             "inference-shape",
-            "the router returned no choices[0].message",
+            "the router returned no choices[0].message".to_owned(),
         ));
     }
     let content = message["content"].as_str().unwrap_or_default().to_owned();
@@ -652,16 +666,46 @@ fn parse_answer(body: &Value) -> Result<Answer, ActionError> {
     let mut tool_calls = Vec::new();
     if let Some(list) = raw_tool_calls.as_array() {
         for call in list {
+            let name = call["function"]["name"].as_str().unwrap_or_default();
+            if name.is_empty() {
+                return Err(ActionError::new(
+                    422,
+                    "inference-bad-tool-call",
+                    "the router returned a tool call with no function.name; refusing it".to_owned(),
+                ));
+            }
+            let arguments = match &call["function"]["arguments"] {
+                Value::String(raw) if raw.trim().is_empty() => "{}".to_owned(),
+                Value::String(raw) => {
+                    serde_json::from_str::<Value>(raw).map_err(|error| {
+                        ActionError::new(
+                            422,
+                            "inference-bad-tool-arguments",
+                            format!(
+                                "the router returned tool call {name} with arguments that are not \
+                                 valid JSON ({error}); refusing to execute fabricated arguments"
+                            ),
+                        )
+                    })?;
+                    raw.clone()
+                }
+                Value::Null => "{}".to_owned(),
+                other if other.is_object() => other.to_string(),
+                _ => {
+                    return Err(ActionError::new(
+                        422,
+                        "inference-bad-tool-arguments",
+                        format!(
+                            "the router returned tool call {name} with arguments that are not a \
+                             JSON string"
+                        ),
+                    ));
+                }
+            };
             tool_calls.push(CalledTool {
                 id: call["id"].as_str().map(str::to_owned),
-                name: call["function"]["name"]
-                    .as_str()
-                    .unwrap_or_default()
-                    .to_owned(),
-                arguments: call["function"]["arguments"]
-                    .as_str()
-                    .unwrap_or("{}")
-                    .to_owned(),
+                name: name.to_owned(),
+                arguments,
             });
         }
     }

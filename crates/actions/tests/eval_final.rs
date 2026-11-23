@@ -14,8 +14,10 @@ mod support;
 
 use conveyor_domain::TenantId;
 use conveyor_domain::eval::RunStatus;
+use conveyor_domain::inference::Usage;
 use conveyor_store as store;
 use conveyor_store::begin_scoped;
+use conveyor_store::inference::NewInferenceCall;
 use serde_json::{Value, json};
 use uuid::Uuid;
 
@@ -137,6 +139,9 @@ async fn ready_instrument(running: &support::Running) -> (String, String) {
 }
 
 /// Write one result per case at the score its split is given, then finalise the run.
+/// A terminal run: every case at `score`, every case costing 15 tokens on both the result row and
+/// the inference ledger. The ledger is what the climb's spend is summed from — without the ledger
+/// row the report would price every round at zero and the narrative would say nothing about cost.
 async fn finish_run(
     pg: &support::Pg,
     tenant: TenantId,
@@ -184,6 +189,36 @@ async fn finish_run(
             )
             .await
             .expect("insert a result");
+            store::inference::insert_call_tx(
+                &mut tx,
+                tenant,
+                &NewInferenceCall {
+                    action_invocation_id: None,
+                    trace_id: None,
+                    correlation_id: None,
+                    caller_kind: "eval",
+                    run_id: None,
+                    run_step_id: None,
+                    conversation_turn_id: None,
+                    eval_run_id: Some(run_id),
+                    prompt_ref: Some("eval:completions.create"),
+                    prompt_version: None,
+                    prompt_sha256: None,
+                    model: "stub-model",
+                    served_model: None,
+                    usage: Some(Usage {
+                        total_tokens: 15,
+                        ..Usage::default()
+                    }),
+                    cache_status: "miss",
+                    usage_unit: None,
+                    usage_units: None,
+                    latency_ms: 3,
+                    outcome: "ok",
+                },
+            )
+            .await
+            .expect("insert the ledger row the subject call wrote");
         }
     }
     store::eval::transition_run_tx(&mut tx, tenant, run_id, RunStatus::Running)
@@ -449,6 +484,51 @@ async fn a_two_round_climb_keeps_one_round_and_reverts_the_other_with_the_reason
     assert!(
         report.contains("Winner: round 1"),
         "the report names the winner: {report}"
+    );
+
+    // ⭐ P3.1: cost and quality are stated with their sources, from the one accounting model.
+    // Round 1's spend is the same ledger figure `eval_runs.report` prices for that run, the climb
+    // total is every round's ledger summed, and quality is the target's held-out mean — the
+    // number the decision was taken on. The train/test score columns are gone.
+    let (status, body) = running
+        .invoke(
+            "eval_runs.report",
+            TOKEN,
+            json!({ "run_id": round1.to_string() }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{body}");
+    let report_cost = body["output"]["cost"]["total"]
+        .as_f64()
+        .expect("the report's cost total");
+    assert!(
+        (report_cost - 1200.0).abs() < 1e-9,
+        "the ledger prices 20 cases × 4 reps at 15 tokens: {body}"
+    );
+    assert!(
+        report.contains(&format!("{report_cost:.2} tokens")),
+        "the narrative states the report's own figure for round 1: {report}"
+    );
+    assert!(
+        report.contains("Total spend: 2400.00 tokens"),
+        "the climb total is both rounds' ledger spend: {report}"
+    );
+    assert!(
+        report.contains("label_accuracy 0.8000 held-out")
+            && report.contains("label_accuracy 0.8500 held-out"),
+        "quality is the target's held-out mean each round was decided on: {report}"
+    );
+    assert!(
+        report.contains("the same rows `eval_runs.report` prices")
+            && report.contains("the version's held-out split, which was never redrawn"),
+        "the narrative names where cost and quality come from: {report}"
+    );
+    assert!(
+        !report.contains("train") && !report.contains("test"),
+        "the train/test score columns are gone: {report}"
     );
 
     // The decisions are on the runs, not only in the prose.

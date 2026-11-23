@@ -92,6 +92,7 @@ test("the report is the server's; the label and round controls hit their actions
   page,
   request,
 }) => {
+  test.setTimeout(120_000);
   // The seeded eval is named, never `evals.list[0]`: the authoring test above creates evals,
   // and a positional pick would report on the one it just made.
   await page.goto("/evals");
@@ -161,6 +162,100 @@ test("the report is the server's; the label and round controls hit their actions
   await page.getByLabel("What changed").fill("e2e: tighten the grounded rubric");
   await page.getByRole("button", { name: "Record round" }).click();
   await expect(page.locator('.callout[role="status"]')).toContainText(/plan/i);
+
+  // (d) The cost-goal/guardrail controls are `eval_climbs.start`'s own input: the schema takes
+  // `goal{target, direction, hold[]}` (a `cost_usd` target with at least one quality hold) and
+  // `cost_ceiling_cents`. One eval carries one open climb, so the seeded climb stops first.
+  const seededRow = page.locator("table.wtbl tbody tr", { hasText: "correct" });
+  await seededRow.getByRole("button", { name: "Stop" }).click();
+  await expect(seededRow.locator(".pill")).toHaveText("stopped");
+
+  await page.getByLabel("Goal kind").selectOption("cost");
+  await page.getByLabel("Guardrail metric").fill("correct");
+  await page.getByLabel("Guardrail floor").fill("0.5");
+  await page.getByLabel("Spend ceiling (cents)").fill("500");
+  // Six seeded cases split 4/2: the two held-out cases put the floor at 1/sqrt(2) = 0.7071.
+  await page.getByLabel("Noise band").fill("0.75");
+  await page.getByRole("button", { name: "Start climb" }).click();
+
+  const costRow = page.locator("table.wtbl tbody tr", { hasText: "cost_usd" });
+  await expect(costRow).toHaveCount(1);
+  await expect(costRow.locator(".pill")).toHaveText("planned");
+  await expect(costRow).toContainText("correct ≥ 0.50");
+  await expect(costRow).toContainText("spend ≤ $5.00");
+
+  // The start call really carried them: the list is the server's read of the stored goal.
+  const climbs = await invoke<{
+    items: {
+      id: string;
+      target: string;
+      direction: string;
+      goal: { hold: { metric: string; min: number }[] };
+      cost_ceiling_cents: number | null;
+    }[];
+  }>(request, "eval_climbs.list", { eval_id: evalId });
+  const costClimb = climbs.items.find((row) => row.target === "cost_usd");
+  if (!costClimb) {
+    throw new Error("the cost climb was not stored");
+  }
+  expect(costClimb.direction).toBe("lower");
+  expect(costClimb.goal.hold).toEqual([{ metric: "correct", min: 0.5 }]);
+  expect(costClimb.cost_ceiling_cents).toBe(500);
+
+  // The plan gate is round 1's authorisation; a reviewer decides it.
+  const climbGates = await invoke<{
+    items: { id: string; gate: string; eval_id: string | null }[];
+  }>(request, "approvals.list", { status: "pending", limit: 100 });
+  const planGate = climbGates.items.find(
+    (row) => row.gate === "eval_climb_plan" && row.eval_id === evalId,
+  );
+  if (!planGate) {
+    throw new Error("the cost climb's plan gate is not pending");
+  }
+  await decideAsReviewer(request, "eval_signoffs.decide", planGate.id);
+
+  // (e) The round form's `change_md`, `target` and `prediction` reach the action: a prediction
+  // naming a metric other than the goal is refused (so a recorded one was parsed and matched),
+  // the round is recorded, and the per-round table shows it.
+  await costRow.getByRole("button", { name: "Rounds" }).click();
+  await expect(page.getByText("This climb has no rounds yet.")).toBeVisible();
+  await page.getByLabel("Round climb").selectOption(costClimb.id);
+  await page.getByLabel("Round target").fill("prompt:e2e");
+  await page.getByLabel("What changed").fill("e2e: drop the redundant system preamble");
+  await page.getByLabel("Lever").fill("caching_health");
+  await page.getByLabel("Prediction").fill(
+    JSON.stringify({
+      metric: "correct",
+      direction: "lower",
+      interval: [0.75, 0.9],
+      falsifier: "e2e: the wrong hypothesis",
+    }),
+  );
+  await page.getByRole("button", { name: "Record round" }).click();
+  await expect(page.locator('.callout[role="status"]')).toContainText("cost_usd");
+  await page.getByLabel("Prediction").fill(
+    JSON.stringify({
+      metric: "cost_usd",
+      direction: "lower",
+      interval: [0.75, 0.9],
+      falsifier: "e2e: spend does not fall",
+    }),
+  );
+  await page.getByRole("button", { name: "Record round" }).click();
+  await expect(page.locator('.callout[role="status"]')).toContainText("Round 1 recorded");
+
+  // Recording refreshes the instrument's data, which rebuilds the tab; the read gesture is the
+  // climb's own "Rounds" button, and it now carries the round the form just recorded.
+  await costRow.getByRole("button", { name: "Rounds" }).click();
+  const roundRows = page.locator("table.wtbl", { hasText: "Variant" }).locator("tbody tr");
+  await expect(roundRows).toHaveCount(1);
+  await expect(roundRows.first()).toContainText("v1");
+
+  const opened = await invoke<{
+    rounds: { round: number; change_md: string | null; status: string }[];
+  }>(request, "eval_climbs.get", { id: costClimb.id });
+  expect(opened.rounds[0].round).toBe(1);
+  expect(opened.rounds[0].change_md).toBe("e2e: drop the redundant system preamble");
 
   await expect(page.locator(".problem")).toHaveCount(0);
 });

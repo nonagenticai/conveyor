@@ -311,6 +311,8 @@ pub struct StoredResult {
     pub model: String,
     /// The attempt's wall clock.
     pub latency_ms: i32,
+    /// The answer's `finish_reason`, as the router reported it.
+    pub stop_reason: Option<String>,
 }
 
 /// Every result row of the run, in `(case, rep)` order.
@@ -318,8 +320,8 @@ pub async fn results(db: &TestDb, fixture: &Fixture) -> Vec<StoredResult> {
     let mut tx = begin_scoped(&db.owner, fixture.tenant)
         .await
         .expect("scope");
-    let rows: Vec<(String, Value, String, i32)> = sqlx::query_as(
-        "SELECT status, grade, model, latency_ms FROM eval_case_result
+    let rows: Vec<(String, Value, String, i32, Option<String>)> = sqlx::query_as(
+        "SELECT status, grade, model, latency_ms, stop_reason FROM eval_case_result
           WHERE tenant_id = $1 AND eval_run_id = $2
           ORDER BY case_id, rep",
     )
@@ -330,12 +332,15 @@ pub async fn results(db: &TestDb, fixture: &Fixture) -> Vec<StoredResult> {
     .expect("read the results");
     tx.commit().await.expect("commit");
     rows.into_iter()
-        .map(|(status, grade, model, latency_ms)| StoredResult {
-            status,
-            grade,
-            model,
-            latency_ms,
-        })
+        .map(
+            |(status, grade, model, latency_ms, stop_reason)| StoredResult {
+                status,
+                grade,
+                model,
+                latency_ms,
+                stop_reason,
+            },
+        )
         .collect()
 }
 

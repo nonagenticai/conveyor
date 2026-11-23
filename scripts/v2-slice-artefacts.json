@@ -304,6 +304,38 @@
         "apps/web/src/app.rs"
       ],
       "gap": "no V2 route exists in apps/web; the destinations are mock pages only"
+    },
+    "T19": {
+      "status": "proposed",
+      "tables": [
+        "meeting_type",
+        "meeting",
+        "meeting_agenda_item",
+        "meeting_attendance",
+        "meeting_position"
+      ],
+      "actions": [
+        "meetings.schedule",
+        "meetings.open",
+        "meetings.invite",
+        "meetings.respond",
+        "meetings.agenda_add",
+        "meetings.position",
+        "meetings.defer",
+        "meetings.close_item",
+        "meetings.close",
+        "meetings.minutes_publish",
+        "meetings.list",
+        "meetings.get"
+      ],
+      "modules": [
+        "meetings"
+      ],
+      "evidence": [
+        "docs/plans/T19-decision-forums.md",
+        "docs/SPEC_V2.md"
+      ],
+      "gap": "plan and programme artefacts only; no meeting code"
     }
   }
 }

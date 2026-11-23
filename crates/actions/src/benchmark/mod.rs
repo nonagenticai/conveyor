@@ -443,6 +443,9 @@ pub struct RunStartIn {
     pub process_id: Option<Uuid>,
     /// The predictions label (the arm identity is derived from it).
     pub label: String,
+    /// The model a `baseline` run measures. Required for that arm; ignored by the others.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub model: Option<String>,
     /// How many sandbox Jobs one tick may start (1–10, default 5).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub concurrency: Option<u32>,

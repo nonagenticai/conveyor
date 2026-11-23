@@ -37,6 +37,13 @@ registration); it creates the five sequenced delivery units **#562–#566**. Tra
 construction on the spine (T0/T1/T2/T3); each destination's live acceptance waits on its owning
 slice, and the project closes after T12.
 
+**T19 added 2026-11-23.** Decision forums (meetings) are their own slice (`docs/SPEC_V2.md` §12
+T19; `docs/plans/T19-decision-forums.md`): a meeting is a card over approvals with typed
+positions, quorum and the three decision rules, and the owner can decide live or asynchronously.
+**#605** authored the plan and the MSP/TOGAF/SAFe artefact set; **#606** is the implementation
+unit, blocked by #605. T19 is independent of T18 (the UI lane); it consumes T1/T2/T3 and the built
+T9/T10 seams. The meeting ruling is D66 because D64–D65 are the real-UI rulings.
+
 ## Programme `conveyor-buildout`
 
 The whole SPEC_V2 buildout is **one programme**. Every current plan is a **project** in it and the
@@ -44,12 +51,13 @@ registered GitHub issues are its units. `seed/programme.json` is the mapping of 
 `scripts/build-programme-seed.py` regenerates it from these plans and `gh issue list`:
 
 - `S00`–`S21` — the V1 slice plans in `slices/` (including the `S06a`–`S06d` variants);
-- `T0`–`T18` — the SPEC_V2 slices (`docs/SPEC_V2.md` §12); the `T9` row's implementation plan is
+- `T0`–`T19` — the SPEC_V2 slices (`docs/SPEC_V2.md` §12); the `T9` row's implementation plan is
   `docs/plans/T9-architecture-capability.md` (the ADM capability, the artefact standard and the
   phase/contract gates); the `T18` row's is `docs/plans/T18-real-v2-ui.md` (the real UI, its five
-  units and the delivery view);
+  units and the delivery view); the `T19` row's is `docs/plans/T19-decision-forums.md` (the
+  meeting forum, its D1–D8 parts and the programme artefact set);
 - `P0` — the programme definition (`docs/plans/P0-programme-definition.md`), the first project
-  and the gate T1–T18 depend on (issues #120–#122);
+  and the gate T1–T19 depend on (issues #120–#122);
 - `SPEC-V2`, `DESIGN-PUBLISH`, `PLATFORM` — the cross-cutting units.
 
 Each project carries `meta.plan`, `meta.track` and `meta.issues`; each slice plan carries a

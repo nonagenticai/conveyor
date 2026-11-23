@@ -42,7 +42,12 @@ pub struct ChatMessage {
     /// `system`, `user`, `assistant` or `tool`.
     pub role: String,
     /// The message text; `""` for an assistant turn that carries only tool calls.
-    #[serde(default)]
+    ///
+    /// OpenAI-compatible clients send `null` for that assistant turn, and some omit the field
+    /// entirely. Both mean the empty string here: the router accepts null, but a `String` field
+    /// would reject the replay shape this action exists to pass through.
+    #[serde(default, deserialize_with = "null_as_empty")]
+    #[schemars(with = "Option<String>")]
     pub content: String,
     /// The model's tool calls, passed through unchanged (OpenAI shape).
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -81,6 +86,11 @@ pub struct CompletionIn {
     /// A structured-output request, passed through.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub response_format: Option<Value>,
+}
+
+/// A message `content` that is `null` (or absent) is the empty string; a string is itself.
+fn null_as_empty<'de, D: serde::Deserializer<'de>>(deserializer: D) -> Result<String, D::Error> {
+    Ok(Option::<String>::deserialize(deserializer)?.unwrap_or_default())
 }
 
 fn completion_input() -> Schema {
@@ -169,6 +179,29 @@ mod tests {
     use crate::spec::HandlerRef;
 
     #[test]
+    fn a_null_or_absent_message_content_is_the_empty_string() {
+        // The assistant turn that carries only tool calls: OpenAI-compatible callers send null,
+        // some omit the field. Both are the empty string, never a rejected request.
+        let null: ChatMessage = serde_json::from_value(serde_json::json!({
+            "role": "assistant",
+            "content": null,
+            "tool_calls": [{
+                "id": "c1",
+                "type": "function",
+                "function": {"name": "x", "arguments": "{}"}
+            }]
+        }))
+        .expect("the OpenAI replay shape is accepted");
+        assert_eq!(null.content, "");
+        let absent: ChatMessage = serde_json::from_value(serde_json::json!({"role": "assistant"}))
+            .expect("an absent content is empty");
+        assert_eq!(absent.content, "");
+        let text: ChatMessage =
+            serde_json::from_value(serde_json::json!({"role": "user", "content": "hi"})).unwrap();
+        assert_eq!(text.content, "hi", "a string passes through unchanged");
+    }
+
+    #[test]
     fn the_spec_is_a_declared_external_write_with_the_router_timeout() {
         let spec = completions_create();
         assert_eq!(spec.name, "completions.create");
@@ -248,6 +281,35 @@ mod tests {
             required.is_some_and(|names| names.iter().any(|name| name == "messages")),
             "messages must be required: {schema}"
         );
+    }
+
+    #[test]
+    fn a_null_or_absent_replay_content_is_accepted_and_read_as_empty() {
+        let schema = spec_schema();
+        let input = serde_json::json!({
+            "messages": [
+                {"role": "user", "content": "What is the weather?"},
+                {"role": "assistant", "content": null, "tool_calls": [{
+                    "id": "call_1", "type": "function",
+                    "function": {"name": "get_weather", "arguments": "{\"city\":\"Amsterdam\"}"}
+                }]},
+                {"role": "tool", "tool_call_id": "call_1", "content": "{\"temperature_c\": 12}"}
+            ]
+        });
+        assert!(
+            crate::spec::validate_input(&schema, &input).is_empty(),
+            "the schema must accept the OpenAI replay shape it documents: {schema}"
+        );
+        let parsed: CompletionIn = serde_json::from_value(input).expect("null content parses");
+        assert_eq!(parsed.messages[1].content, "", "null is the empty string");
+
+        let absent = serde_json::json!({"messages": [{"role": "assistant"}]});
+        assert!(
+            crate::spec::validate_input(&schema, &absent).is_empty(),
+            "an absent content is the empty string: {schema}"
+        );
+        let parsed: CompletionIn = serde_json::from_value(absent).expect("absent content parses");
+        assert_eq!(parsed.messages[0].content, "");
     }
 
     fn spec_schema() -> Value {

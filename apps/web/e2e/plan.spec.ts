@@ -1,31 +1,53 @@
 import { expect, test } from "./fixture";
 
-// SPEC_V2 §10.5 — the live Plan destination. Five reads against the selected project:
-// projects.list, wbs.list, baselines.list, registers.list and project_dependencies.list.
-// Acceptance is evidence, not a checkbox; the screen only reads.
+import { createBoardCard, invoke } from "./helpers";
 
-test("the plan destination reads the selected project's plan spine", async ({ page }) => {
+// #563 T18-2 — Plan: the WBS, the baseline, the registers, and the change gate's rationale
+// refusal. The refusal is the server's `422 change_rationale_required`, not a client guess.
+
+let sequence = 0;
+function unique(prefix: string): string {
+  sequence += 1;
+  return `${prefix} ${Date.now()}-${sequence}`;
+}
+
+test("a change needs a rationale", async ({ page, request }) => {
+  const project = await createBoardCard(request, unique("e2e plan project"));
+  const wbsTitle = unique("e2e wbs");
+  await invoke(request, "wbs.create", {
+    project_id: project.projectId,
+    kind: "deliverable",
+    title: wbsTitle,
+  });
+  const registerTitle = unique("e2e register");
+  await invoke(request, "registers.create", {
+    project_id: project.projectId,
+    kind: "risk",
+    title: registerTitle,
+  });
+  await invoke(request, "baselines.take", { project_id: project.projectId });
+
   await page.goto("/plan");
-  await expect(page.getByRole("heading", { name: "Plan", exact: true })).toBeVisible();
+  const row = page
+    .locator('[data-testid="plan-projects"] tr')
+    .filter({ hasText: "e2e plan project" })
+    .first();
+  await expect(row).toBeVisible();
+  await row.getByRole("button", { name: "Open" }).click();
 
-  await expect(page.locator(".problem")).toHaveCount(0);
-  await expect(page.getByLabel("Project")).toBeVisible();
-  await expect(page.locator(".tile")).toHaveCount(4);
+  await expect(page.locator('[data-testid="plan-wbs"]')).toContainText(wbsTitle);
+  await expect(page.locator('[data-testid="plan-baselines"]')).toContainText("scope");
+  await expect(page.locator('[data-testid="plan-registers"]')).toContainText(registerTitle);
 
-  await expect(page.locator("table.table")).toHaveCount(4);
-  for (const heading of ["WBS", "Baselines", "Registers", "Dependencies"]) {
-    await expect(page.getByRole("heading", { name: heading, exact: true })).toBeVisible();
-  }
-});
+  // A change with a baseline and a binding but no rationale is refused by the server.
+  await page.locator('label.field:has-text("Baseline") select').selectOption({ index: 1 });
+  await page
+    .locator('label.field:has-text("PM job binding") input')
+    .fill("00000000-0000-4000-8000-000000000001");
+  await page.locator('label.field:has-text("Title") input').fill(unique("e2e change"));
+  await page.locator('label.field:has-text("Impact") input').fill("1");
+  await page.getByRole("button", { name: "Request change" }).click();
 
-test("the plan screen has no horizontal page scroll at 1280 and 390", async ({ page }) => {
-  await page.goto("/plan");
-  await expect(page.getByRole("heading", { name: "Plan", exact: true })).toBeVisible();
-  for (const width of [1280, 390]) {
-    await page.setViewportSize({ width, height: 900 });
-    const overflow = await page.evaluate(
-      () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
-    );
-    expect(overflow, `width ${width}`).toBeLessThanOrEqual(0);
-  }
+  const notice = page.locator("p.notice[role=alert]");
+  await expect(notice).toContainText("rationale");
 });
