@@ -199,18 +199,25 @@ async fn tick(db: &common::TestDb, tenant_id: Uuid, kind: &str, key: &str) {
         .expect("enqueue the sweep job");
 }
 
+/// How long one `wait_for` condition may take. Deliberately generous: the full suite runs many
+/// Postgres containers and workers in parallel, so a loaded runner must be slow, not red.
+const WAIT_DEADLINE: Duration = Duration::from_secs(30);
+
 async fn wait_for<F, Fut>(what: &str, mut check: F)
 where
     F: FnMut() -> Fut,
     Fut: std::future::Future<Output = bool>,
 {
-    for _ in 0..100 {
+    let deadline = tokio::time::Instant::now() + WAIT_DEADLINE;
+    loop {
         if check().await {
             return;
         }
+        if tokio::time::Instant::now() >= deadline {
+            panic!("timed out waiting for {what}");
+        }
         tokio::time::sleep(Duration::from_millis(100)).await;
     }
-    panic!("timed out waiting for {what}");
 }
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
@@ -265,6 +272,16 @@ async fn one_approval_is_multicast_then_the_losers_are_closed() {
             .await
             .expect("count");
     assert_eq!(count, 3, "a replayed dispatch tick inserts nothing");
+
+    // The answer may only race what it can reach: the webhook has to receive the offer before
+    // `interaction.close` expires it. Waiting on the stub, not a sleep, is the precondition this
+    // test actually needs; when the close sweep won this race under load, the final two-sends
+    // wait was unsatisfiable (#604).
+    wait_for("the webhook's request", || {
+        let hits = fixture.stub.hits.clone();
+        async move { hits.load(Ordering::SeqCst) >= 1 }
+    })
+    .await;
 
     // The admin answers; the gate resolves.
     let mut tx = store::begin_scoped(&db.runtime, fixture.tenant)
@@ -326,8 +343,9 @@ async fn one_approval_is_multicast_then_the_losers_are_closed() {
     .await;
 
     // Deterministic supersede: an offer that is still `pending` when the answer lands is
-    // expired with the resolving channel named. (The first wave above races the worker's own
-    // send, so this second wave is seeded without a `delivery.send` job.)
+    // expired with the resolving channel named. The first wave above has been delivered (the
+    // wait before the answer), so this second wave is seeded without a `delivery.send` job to be
+    // deterministically pending.
     let second: Uuid = sqlx::query_scalar(
         "INSERT INTO approval (tenant_id, gate, kind, status, meta)
          VALUES ($1, 'review-2', 'gate', 'pending', $2) RETURNING id",
