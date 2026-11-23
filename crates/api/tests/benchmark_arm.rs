@@ -228,6 +228,46 @@ async fn the_conveyor_arm_refuses_what_it_cannot_measure() {
         json!("the baseline run measured a different suite"),
         "{body}"
     );
+
+    // ── a baseline names its model and starts; without one it is refused ────────────────
+    let (status, body) = running
+        .invoke(
+            "benchmark_runs.start",
+            TOKEN,
+            json!({
+                "suite_id": f.suite,
+                "arm": "baseline",
+                "label": "qwen-oneshot-oracle-files",
+                "model": "claude-sonnet-5-5",
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "{body}");
+    assert_eq!(
+        output(&body)["options"]["model_ref"],
+        json!("claude-sonnet-5-5"),
+        "the baseline's model is pinned on the run: {body}"
+    );
+
+    let (status, body) = running
+        .invoke(
+            "benchmark_runs.start",
+            TOKEN,
+            json!({
+                "suite_id": f.suite,
+                "arm": "baseline",
+                "label": "qwen-oneshot-oracle-files",
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 422, "{body}");
+    assert_eq!(body["errors"][0]["field"], json!("model"), "{body}");
     let _ = f.other_suite;
 }
 

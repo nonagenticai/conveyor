@@ -35,6 +35,20 @@ You are fixing a bug in a repository you cannot see. Answer with a unified diff 
 format) only and nothing else — no prose, no explanation, no code fence. If you cannot produce a \
 patch, answer with the single word NONE.";
 
+/// The baseline's pinned system prompt. It is the direct pipeline: one model call with the
+/// problem statement and the files the fix touches, answering in the same unified-diff contract
+/// the conveyor arm's patch uses.
+const BASELINE_SYSTEM: &str = "\
+You are a software engineer fixing a bug in a repository. You are given the problem statement and \
+the current content of the files the fix is expected to touch. Answer with a unified diff in \
+`git diff` format only — no prose, no explanation, no code fence. If you cannot produce a patch, \
+answer with the single word NONE.";
+/// The baseline's one model call is bounded.
+const BASELINE_TIMEOUT_MS: i64 = 300_000;
+/// The source fetch is bounded, so a huge file cannot become the prompt.
+const MAX_SOURCE_FILES: usize = 8;
+const MAX_SOURCE_BYTES: usize = 64 * 1024;
+
 fn want_uuid(payload: &Value, field: &str) -> Result<Uuid, JobFailure> {
     payload
         .get(field)
@@ -73,31 +87,31 @@ pub async fn produce(
     let run = store::benchmark::get_run_tx(&mut tx, tenant, run_id)
         .await
         .map_err(|error| JobFailure::retryable(format!("database: {error}")))?;
-    if run.arm != "conveyor" {
+    if !matches!(run.arm.as_str(), "conveyor" | "baseline") {
         return Err(JobFailure::permanent(format!(
-            "run {run_id} is arm {}; only a conveyor run is produced",
+            "run {run_id} is arm {}; only the model arms are produced",
             run.arm
         )));
     }
     if matches!(run.status.as_str(), "succeeded" | "failed" | "cancelled") {
         return Ok(());
     }
-    let Some(agent_id) = run.capability_agent_id else {
-        return Err(JobFailure::permanent(
-            "a conveyor run must name the capability agent it measures",
-        ));
-    };
-    // A run started after the snapshot existed executes the pinned configuration, never the
-    // live row. Only a run that predates the snapshot falls back to the agent it names.
-    let agent = if run.options.get("agent_snapshot").is_some() {
-        None
-    } else {
+    // A conveyor run started before the snapshot existed falls back to the agent row it names.
+    // A baseline run never names an agent: its model is on the run options.
+    let agent = if run.arm == "conveyor" && run.options.get("agent_snapshot").is_none() {
+        let Some(agent_id) = run.capability_agent_id else {
+            return Err(JobFailure::permanent(
+                "a conveyor run must name the capability agent it measures",
+            ));
+        };
         Some(
             store::capability::get_agent_tx(&mut tx, tenant, agent_id)
                 .await
                 .map_err(|error| JobFailure::retryable(format!("database: {error}")))?
                 .ok_or_else(|| JobFailure::permanent("the capability agent is gone"))?,
         )
+    } else {
+        None
     };
     let Some(instance) = store::benchmark::producer_instances_tx(
         &mut tx,
@@ -141,60 +155,116 @@ pub async fn produce(
     // configuration the run pinned. `prompt_ref` is not sent: a benchmark run has no
     // run/procedure/capability facts, so the catalogue's `agent@1` cannot be rendered, and
     // the inference ledger must not claim a prompt the loop never applied.
-    let (model, max_iterations, timeout_secs, bound) =
-        match (run.options.get("agent_snapshot"), agent) {
-            (Some(snapshot), _) => {
-                let model = snapshot
-                    .get("model_ref")
-                    .and_then(Value::as_str)
-                    .filter(|model| !model.trim().is_empty())
-                    .ok_or_else(|| {
-                        JobFailure::permanent("the pinned agent snapshot has no model_ref")
-                    })?;
-                let max_iterations = snapshot
-                    .get("max_iterations")
-                    .and_then(Value::as_i64)
-                    .ok_or_else(|| {
-                        JobFailure::permanent("the pinned agent snapshot has no max_iterations")
-                    })?;
-                let timeout_secs = snapshot
-                    .get("timeout_secs")
-                    .and_then(Value::as_i64)
-                    .ok_or_else(|| {
-                        JobFailure::permanent("the pinned agent snapshot has no timeout_secs")
-                    })?;
-                (model.to_owned(), max_iterations, timeout_secs, false)
-            }
-            (None, Some(agent)) => (
-                agent.model_ref,
-                i64::from(agent.max_iterations),
-                i64::from(agent.timeout_secs),
-                true,
-            ),
-            (None, None) => {
+    let (request, bound_agent) = match run.arm.as_str() {
+        "conveyor" => {
+            let Some(agent_id) = run.capability_agent_id else {
                 return Err(JobFailure::permanent(
-                    "the run has neither a pinned agent snapshot nor a live agent row",
+                    "a conveyor run must name the capability agent it measures",
                 ));
+            };
+            let (model, max_iterations, timeout_secs, bound) =
+                match (run.options.get("agent_snapshot"), agent) {
+                    (Some(snapshot), _) => {
+                        let model = snapshot
+                            .get("model_ref")
+                            .and_then(Value::as_str)
+                            .filter(|model| !model.trim().is_empty())
+                            .ok_or_else(|| {
+                                JobFailure::permanent("the pinned agent snapshot has no model_ref")
+                            })?;
+                        let max_iterations = snapshot
+                            .get("max_iterations")
+                            .and_then(Value::as_i64)
+                            .ok_or_else(|| {
+                                JobFailure::permanent(
+                                    "the pinned agent snapshot has no max_iterations",
+                                )
+                            })?;
+                        let timeout_secs = snapshot
+                            .get("timeout_secs")
+                            .and_then(Value::as_i64)
+                            .ok_or_else(|| {
+                                JobFailure::permanent(
+                                    "the pinned agent snapshot has no timeout_secs",
+                                )
+                            })?;
+                        (model.to_owned(), max_iterations, timeout_secs, false)
+                    }
+                    (None, Some(agent)) => (
+                        agent.model_ref,
+                        i64::from(agent.max_iterations),
+                        i64::from(agent.timeout_secs),
+                        true,
+                    ),
+                    (None, None) => {
+                        return Err(JobFailure::permanent(
+                            "the run has neither a pinned agent snapshot nor a live agent row",
+                        ));
+                    }
+                };
+            let mut request = json!({
+                "model": model,
+                "messages": [
+                    { "role": "user", "content": format!("{}\n\n{}", INSTRUCTION, instance.problem_statement) }
+                ],
+                "tools": [],
+                "max_turns": max_iterations,
+                "timeout_ms": timeout_secs * 1000,
+            });
+            if bound {
+                request["capability_agent_id"] = json!(agent_id);
             }
-        };
-    let mut request = json!({
-        "model": model,
-        "messages": [
-            { "role": "user", "content": format!("{}\n\n{}", INSTRUCTION, instance.problem_statement) }
-        ],
-        "tools": [],
-        "max_turns": max_iterations,
-        "timeout_ms": timeout_secs * 1000,
-    });
-    if bound {
-        request["capability_agent_id"] = json!(agent_id);
-    }
+            (request, if bound { Some(agent_id) } else { None })
+        }
+        "baseline" => {
+            let Some(model) = run
+                .options
+                .get("model_ref")
+                .and_then(Value::as_str)
+                .filter(|model| !model.trim().is_empty())
+            else {
+                return record(
+                    pool,
+                    tenant,
+                    case_id,
+                    "no_attempt",
+                    None,
+                    "the baseline run has no model_ref",
+                )
+                .await;
+            };
+            let source = match source_context(&instance).await {
+                Ok(source) => source,
+                Err(note) => {
+                    return record(pool, tenant, case_id, "no_attempt", None, &note).await;
+                }
+            };
+            let request = json!({
+                "model": model,
+                "messages": [
+                    { "role": "system", "content": BASELINE_SYSTEM },
+                    {
+                        "role": "user",
+                        "content": format!(
+                            "{}\n\n## Source files at the base commit\n\n{}",
+                            instance.problem_statement, source
+                        )
+                    }
+                ],
+                "tools": [],
+                "max_turns": 1,
+                "timeout_ms": BASELINE_TIMEOUT_MS,
+            });
+            (request, None)
+        }
+        _ => unreachable!("validated above"),
+    };
     let outcome = run_step(
         pool,
         tenant,
         run_id,
         None,
-        if bound { Some(agent_id) } else { None },
+        bound_agent,
         app_key,
         Some(&format!("benchmark.produce:{case_id}")),
         1,
@@ -256,6 +326,50 @@ pub async fn produce(
         "",
     )
     .await
+}
+
+/// Fetch the instance's source files at its base commit for the baseline prompt.
+///
+/// The base is configurable so a test can serve the files without GitHub; production uses the
+/// raw content host. A fetch failure is `no_attempt`, never a model failure.
+async fn source_context(instance: &store::benchmark::ProducerInstance) -> Result<String, String> {
+    let base = std::env::var("BENCHMARK_SOURCE_BASE")
+        .unwrap_or_else(|_| "https://raw.githubusercontent.com".to_owned());
+    let client = reqwest::Client::builder()
+        .timeout(std::time::Duration::from_secs(30))
+        .build()
+        .map_err(|error| format!("the source client: {error}"))?;
+    let mut files = Vec::new();
+    for path in instance.oracle_files.iter().take(MAX_SOURCE_FILES) {
+        let url = format!(
+            "{}/{}/{}/{}",
+            base.trim_end_matches('/'),
+            instance.repo,
+            instance.base_commit,
+            path.trim_start_matches('/')
+        );
+        let response = client
+            .get(&url)
+            .send()
+            .await
+            .map_err(|error| format!("fetch {path}: {error}"))?;
+        if !response.status().is_success() {
+            return Err(format!("fetch {path}: {}", response.status()));
+        }
+        let text = response
+            .text()
+            .await
+            .map_err(|error| format!("read {path}: {error}"))?;
+        if text.len() > MAX_SOURCE_BYTES {
+            return Err(format!("{path} is over {MAX_SOURCE_BYTES} bytes"));
+        }
+        files.push(format!("### {path}\n```\n{text}\n```"));
+    }
+    if files.is_empty() {
+        Ok(String::from("(the instance names no source files)"))
+    } else {
+        Ok(files.join("\n\n"))
+    }
 }
 
 /// Write the produced outcome and finish the job.

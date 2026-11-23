@@ -23,9 +23,12 @@ mod common;
 
 use std::sync::{Arc, Mutex, OnceLock};
 
-use axum::extract::State;
+use axum::extract::{Path, State};
 use axum::http::StatusCode;
-use axum::{Json, Router, routing::post};
+use axum::{
+    Json, Router,
+    routing::{get, post},
+};
 use conveyor_domain::TenantId;
 use conveyor_server::benchmark_producer::produce;
 use conveyor_store as store;
@@ -68,6 +71,7 @@ fn stub() -> &'static Arc<Stub> {
             runtime.block_on(async move {
                 let app = Router::new()
                     .route("/api/chat/completions", post(answer))
+                    .route("/{*path}", get(source))
                     .with_state(state);
                 let listener = tokio::net::TcpListener::bind("127.0.0.1:0")
                     .await
@@ -84,6 +88,7 @@ fn stub() -> &'static Arc<Stub> {
         // call and nothing here changes it again.
         unsafe {
             std::env::set_var("CONVEYOR_EXTERNAL_INFERENCE_URL", &base);
+            std::env::set_var("BENCHMARK_SOURCE_BASE", &base);
         }
         stub
     })
@@ -124,6 +129,15 @@ async fn answer(
             "usage": {"prompt_tokens": 10, "completion_tokens": 5, "total_tokens": 15},
         })),
     )
+}
+
+/// The baseline's source fetch, served from the stub.
+async fn source(Path(path): Path<String>) -> (StatusCode, String) {
+    if path.ends_with("django/core.py") {
+        (StatusCode::OK, "SOURCE-MARKER\n".to_owned())
+    } else {
+        (StatusCode::NOT_FOUND, String::new())
+    }
 }
 
 fn document(problem: &str) -> SeedDocument {
@@ -537,4 +551,52 @@ async fn an_edit_to_the_agent_row_cannot_change_a_started_run() {
         "the pinned model, never the edited live row: {}",
         calls[before]
     );
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+async fn the_baseline_arm_fetches_the_source_and_records_a_patch() {
+    let _serial = SERIAL.lock().await;
+    let stub = stub();
+    let db = common::TestDb::fresh().await;
+    let fixture = fixture(&db, "The baseline sees the source.").await;
+
+    let mut tx = store::begin_scoped(&db.runtime, fixture.tenant)
+        .await
+        .expect("scoped");
+    sqlx::query(
+        "UPDATE benchmark_run
+            SET arm = 'baseline', subject_kind = 'suite', capability_agent_id = NULL,
+                subject_version = NULL, options = $3::jsonb
+          WHERE tenant_id = $1 AND id = $2",
+    )
+    .bind(fixture.tenant.as_uuid())
+    .bind(fixture.run_id)
+    .bind(json!({"model_ref": "test-model"}).to_string())
+    .execute(&mut *tx)
+    .await
+    .expect("make the run a baseline");
+    tx.commit().await.expect("commit");
+
+    let before = stub.calls.lock().expect("calls").len();
+    produce(&db.runtime, fixture.tenant, "conveyor", &payload(&fixture))
+        .await
+        .expect("produce");
+
+    let calls = stub.calls.lock().expect("calls").clone();
+    assert_eq!(calls.len(), before + 1, "one case is one model call");
+    let text = calls[before].to_string();
+    assert_eq!(calls[before]["model"], json!("test-model"));
+    assert!(
+        text.contains("SOURCE-MARKER"),
+        "the source reached the model: {text}"
+    );
+    assert!(
+        text.contains("## Source files at the base commit"),
+        "the baseline's edit contract reached the model: {text}"
+    );
+
+    let (status, patch, _sha, attempts) = case_row(&db, &fixture).await;
+    assert_eq!(status, "ok");
+    assert_eq!(patch.as_deref(), Some(DIFF.trim()));
+    assert_eq!(attempts, 1);
 }

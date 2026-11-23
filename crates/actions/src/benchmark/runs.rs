@@ -110,17 +110,6 @@ async fn benchmark_runs_start(
             "arm must be gold, empty, baseline or conveyor",
         ));
     }
-    if input.arm == "baseline" {
-        // S17 declares the baseline arm in scope, but its producer (`baseline.py`: the pinned
-        // system prompt, raw.githubusercontent source fetch, the edit contract and the difflib
-        // patch writer) has no build step in the slice plan. Refusing here is honest; a run
-        // that could never produce a patch would fail only in the driver.
-        return Err(ActionError::new(
-            409,
-            "arm_not_ready",
-            "the baseline arm's producer (the baseline.py port) is not built yet",
-        ));
-    }
     let subject_kind = input.subject_kind.as_deref().unwrap_or("suite");
     if !matches!(subject_kind, "suite" | "capability_agent" | "process") {
         return Err(invalid(
@@ -129,6 +118,32 @@ async fn benchmark_runs_start(
             "subject_kind must be suite, capability_agent or process",
         ));
     }
+    // A baseline is the direct pipeline over the suite: it names a model, never an agent or a
+    // process. Its producer is a bounded one-shot, so the model must be named at start.
+    let model_ref = if input.arm == "baseline" {
+        if subject_kind != "suite" {
+            return Err(invalid(
+                "subject_kind",
+                "invalid_value",
+                "a baseline run measures the suite directly; it names no agent or process",
+            ));
+        }
+        let model = input
+            .model
+            .as_deref()
+            .map(str::trim)
+            .filter(|model| !model.is_empty())
+            .ok_or_else(|| {
+                invalid(
+                    "model",
+                    "required",
+                    "a baseline run must name the model it measures",
+                )
+            })?;
+        Some(model.to_owned())
+    } else {
+        None
+    };
     // S18 §3: the run pins the executor version it measured. Resolved here, once, at start — never
     // joined at read time, where an edit would silently relabel a past measurement.
     let (subject_version, capability_agent_id, process_id, agent_snapshot) = match subject_kind {
@@ -265,6 +280,9 @@ async fn benchmark_runs_start(
     });
     if let Some(snapshot) = agent_snapshot {
         options["agent_snapshot"] = snapshot;
+    }
+    if let Some(model) = model_ref {
+        options["model_ref"] = json!(model);
     }
 
     let run = store::benchmark::create_run_tx(
