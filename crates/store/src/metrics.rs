@@ -14,6 +14,13 @@ use serde_json::Value;
 use sqlx::{AssertSqlSafe, PgConnection};
 use uuid::Uuid;
 
+/// The one read-time price of a tool call (SPEC_V2 §7.5, D52): the `tool_call` ledger row's
+/// recorded cost, or zero when the destination priced none. Every tool-spend figure — the
+/// inference usage report, `metrics.usage` and `billing.summary` — sums this expression over the
+/// ledger at read time; none stores a roll-up. The enclosing statement must name `tool_call` as
+/// `tc` and aggregate the values itself.
+pub(crate) const TOOL_CALL_PRICE: &str = "coalesce(tc.cost, 0)";
+
 /// The metrics store's failures.
 #[derive(Debug, thiserror::Error)]
 pub enum MetricsStoreError {
@@ -353,8 +360,10 @@ pub async fn token_totals_tx(
 
 // ── metering levels and the run drill-down (P1.2/P1.3) ───────────────────────────────────
 
-/// One metering row at a level. `cost_usd` is derived at read time; `tool_cost_usd` is the
-/// ledger's recorded tool cost. A call whose attribution is missing lands under `unattributed`.
+/// One metering row at a level. `cost_usd` is derived at read time from `commercial_price`;
+/// `tool_cost_usd` is the same read-time derivation over the `tool_call` ledger (the recorded
+/// per-call price, [`TOOL_CALL_PRICE`], summed — never a stored roll-up). A call whose
+/// attribution is missing lands under `unattributed`.
 #[derive(Debug, Clone, PartialEq)]
 pub struct UsageRow {
     pub key: String,
@@ -546,7 +555,7 @@ pub async fn usage_by_level_tx(
              SELECT tc.id, tc.run_id, tc.run_step_id, r.project_id, r.job_binding_id,
                     p.programme_id,
                     coalesce(dep.name, 'unattributed') AS department,
-                    coalesce(tc.cost, 0)::numeric AS cost
+                    {TOOL_CALL_PRICE}::numeric AS cost
                FROM tool_call tc
                LEFT JOIN run r ON r.id = tc.run_id
                LEFT JOIN project p ON p.id = r.project_id
@@ -675,7 +684,7 @@ pub async fn run_drilldown_tx(
     tenant: TenantId,
     run_id: Uuid,
 ) -> Result<RunDrilldown, MetricsStoreError> {
-    let total = sqlx::query_as::<_, (i64, f64, f64)>(
+    let total = sqlx::query_as::<_, (i64, f64, f64)>(AssertSqlSafe(format!(
         "SELECT coalesce(sum(ic.prompt_tokens + ic.completion_tokens), 0)::bigint,
                 coalesce(round(sum(CASE
                     WHEN pr.model IS NULL THEN NULL
@@ -684,21 +693,22 @@ pub async fn run_drilldown_tx(
                          + ic.completion_tokens::numeric * pr.output_usd_per_1m) / 1000000
                     WHEN ic.usage_units IS NOT NULL THEN ic.usage_units * pr.unit_usd
                     ELSE NULL END), 6), 0)::double precision,
-                coalesce((SELECT round(sum(coalesce(tc.cost, 0)), 6)::double precision
+                coalesce((SELECT round(sum({TOOL_CALL_PRICE}), 6)::double precision
                             FROM tool_call tc
                            WHERE tc.tenant_id = $1 AND tc.run_id = $2), 0)
            FROM inference_call ic
            LEFT JOIN commercial_price pr
                   ON pr.model = coalesce(ic.served_model, ic.model)
                  AND ((pr.unit = 'token' AND ic.usage_unit IS NULL) OR pr.unit = ic.usage_unit)
-          WHERE ic.tenant_id = $1 AND ic.run_id = $2",
-    )
+          WHERE ic.tenant_id = $1 AND ic.run_id = $2"
+    )))
     .bind(tenant.as_uuid())
     .bind(run_id)
     .fetch_one(&mut *conn)
     .await?;
     let steps = sqlx::query_as::<_, (Option<Uuid>, Option<String>, Option<i32>, i64, f64, f64)>(
-        "WITH calls AS (
+        AssertSqlSafe(format!(
+            "WITH calls AS (
              SELECT ic.run_step_id,
                     (ic.prompt_tokens + ic.completion_tokens)::bigint AS tokens,
                     CASE
@@ -715,7 +725,7 @@ pub async fn run_drilldown_tx(
                      AND ((pr.unit = 'token' AND ic.usage_unit IS NULL) OR pr.unit = ic.usage_unit)
               WHERE ic.tenant_id = $1 AND ic.run_id = $2
          ), tools AS (
-             SELECT tc.run_step_id, coalesce(tc.cost, 0)::numeric AS cost
+             SELECT tc.run_step_id, {TOOL_CALL_PRICE}::numeric AS cost
                FROM tool_call tc
               WHERE tc.tenant_id = $1 AND tc.run_id = $2
          )
@@ -729,7 +739,8 @@ pub async fn run_drilldown_tx(
            LEFT JOIN (SELECT run_step_id, sum(cost) AS cost
                         FROM tools GROUP BY run_step_id) t ON t.run_step_id = s.id
           WHERE s.tenant_id = $1 AND s.run_id = $2
-          ORDER BY s.position, s.id",
+          ORDER BY s.position, s.id"
+        )),
     )
     .bind(tenant.as_uuid())
     .bind(run_id)
@@ -884,11 +895,11 @@ pub async fn conveyor_cost_tx(
     .bind(until)
     .fetch_one(&mut *conn)
     .await?;
-    let tools: f64 = sqlx::query_scalar(
-        "SELECT coalesce(round(sum(coalesce(cost, 0)), 6), 0)::double precision
-           FROM tool_call
-          WHERE tenant_id = $1 AND created_at >= $2 AND created_at < $3",
-    )
+    let tools: f64 = sqlx::query_scalar(AssertSqlSafe(format!(
+        "SELECT coalesce(round(sum({TOOL_CALL_PRICE}), 6), 0)::double precision
+           FROM tool_call tc
+          WHERE tc.tenant_id = $1 AND tc.created_at >= $2 AND tc.created_at < $3"
+    )))
     .bind(tenant.as_uuid())
     .bind(since)
     .bind(until)

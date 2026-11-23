@@ -270,7 +270,9 @@ pub struct BindingCreateIn {
     /// `department_scope`, authority, limits override.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub meta: Option<Value>,
-    /// `draft | active`; defaults to `active`.
+    /// `draft`, or omitted to open the activation gate; `active` is refused
+    /// (`409 job_binding_approval_required`). A binding is never born live: only an approved
+    /// decision flips it to active.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub status: Option<String>,
 }
@@ -516,19 +518,47 @@ fn placement_in(input: &[JobDepartmentIn]) -> Vec<store::organisation::Placement
         .collect()
 }
 
-fn status_in(raw: Option<&str>) -> Result<BindingStatus, ActionError> {
-    match raw.unwrap_or("active") {
-        "draft" => Ok(BindingStatus::Draft),
-        "active" => Ok(BindingStatus::Active),
-        "retired" => Err(invalid(
+/// The approval gate kind that authorises a job binding going live (v1-p44-2, SPEC_V2 §4.4).
+pub(crate) const BINDING_GATE_KIND: &str = "job_binding";
+
+/// The activation gate's name: the action whose effect it authorises, so the approvals screen
+/// renders it as that action. §5.4's requester exclusion is unconditional (ledger v1-w4b-4), so
+/// the person who created the binding can never approve its activation.
+pub(crate) const BINDING_GATE: &str = "job_bindings.create";
+
+/// What a `job_bindings.create` request asks for.
+///
+/// A binding is never born live: only an approved decision flips it to `active`, so there are
+/// exactly two shapes — an explicit `draft` (inert, no gate) or no status (a draft plus the
+/// activation gate). An explicit `active` is refused rather than silently downgraded, so a
+/// caller that asks to bypass the gate learns it did not succeed.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum BindingActivation {
+    /// An explicit `draft`: create the binding inert and open no gate.
+    Draft,
+    /// No status: create the binding draft and open the gate that activates it.
+    Gated,
+}
+
+fn status_in(raw: Option<&str>) -> Result<BindingActivation, ActionError> {
+    match raw {
+        None => Ok(BindingActivation::Gated),
+        Some("draft") => Ok(BindingActivation::Draft),
+        Some("active") => Err(ActionError::new(
+            409,
+            "job_binding_approval_required",
+            "a binding goes live only through an approved decision: omit `status` to open the \
+             activation gate and have it decided by another principal",
+        )),
+        Some("retired") => Err(invalid(
             "status",
             "invalid_value",
-            "a new binding is draft or active; retire is its own action",
+            "a new binding is draft; retire is its own action",
         )),
         other => Err(invalid(
             "status",
             "invalid_value",
-            format!("{other:?} is not draft or active"),
+            format!("{other:?} is not draft"),
         )),
     }
 }
@@ -868,7 +898,7 @@ async fn job_bindings_create(
     input: BindingCreateIn,
 ) -> Result<BindingOut, ActionError> {
     let executor_kind = ExecutorKind::parse(input.executor_kind.trim()).map_err(executor_error)?;
-    let status = status_in(input.status.as_deref())?;
+    let activation = status_in(input.status.as_deref())?;
     // T16 P5.1: a binding pins a PUBLISHED process, and a derived one only while its source is
     // reviewed. The existence check lives in the store; these are the two facts a binding must
     // never be able to grant by naming a draft or an unreviewed document's output.
@@ -927,13 +957,96 @@ async fn job_bindings_create(
             capability_agent_id: input.capability_agent_id,
             capability_id: input.capability_id,
             meta: input.meta.unwrap_or_else(|| serde_json::json!({})),
-            status,
+            // v1-p44-2: a binding is never born live. The default create opens the activation
+            // gate below and an approved decision is the only thing that flips this draft to
+            // `active`; an explicit draft create writes no gate because nothing is activated.
+            status: BindingStatus::Draft,
         },
         &Registry::builtin(),
     )
     .await
     .map_err(|error| organisation_error(error, "job_bindings.create"))?;
+    if activation == BindingActivation::Gated {
+        open_binding_activation_gate(&mut *tx, &ctx, &row).await?;
+    }
     Ok(binding_view(&row))
+}
+
+/// Open the gate that authorises `row` going live (v1-p44-2, SPEC_V2 §4.4).
+///
+/// The binding id travels in `meta.job_binding_id` — the only reader is
+/// [`apply_binding_gate_effect_tx`], in the decision's transaction. `requested_by` is the
+/// authenticated person and never a machine identity: §5.4's requester exclusion is what stops
+/// the one `organisation:write` holder approving their own activation.
+async fn open_binding_activation_gate(
+    conn: &mut PgConnection,
+    ctx: &HandlerCtx,
+    row: &store::organisation::BindingRow,
+) -> Result<(), ActionError> {
+    let mut gate = store::approval::NewApproval::new(BINDING_GATE, BINDING_GATE_KIND);
+    gate.requested_by = (ctx.actor_kind == "user").then_some(ctx.actor_id);
+    gate.meta = serde_json::json!({
+        "job_binding_id": row.id.to_string(),
+        "job_id": row.job_id.to_string(),
+        "release_id": row.release_id.to_string(),
+        "release_hash": row.release_hash,
+        "executor_kind": row.executor_kind,
+        "description": format!(
+            "Activate job binding {} — {} on release {}",
+            row.id, row.executor_kind, row.release_hash
+        ),
+    });
+    store::approval::insert_approval_tx(conn, ctx.tenant, &gate)
+        .await
+        .map(|_| ())
+        .map_err(|error| {
+            tracing::error!(%error, binding = %row.id, "open the job binding activation gate");
+            ActionError::internal()
+        })
+}
+
+/// Apply an approved `job_binding` gate: the binding it names flips `draft → active`.
+///
+/// Runs inside `approvals.decide`'s transaction, so a failed flip rolls the decision back. A
+/// rejection writes nothing here and the binding stays draft — a run pinning it is still refused
+/// `409 job_binding_stale`. Retirement wins: a decision that lands after the binding was retired
+/// does not resurrect it.
+pub(crate) async fn apply_binding_gate_effect_tx(
+    conn: &mut PgConnection,
+    tenant: conveyor_domain::TenantId,
+    record: &store::approval::ApprovalRecord,
+) -> Result<(), ActionError> {
+    if record.approval.kind != BINDING_GATE_KIND {
+        return Ok(());
+    }
+    let Some(binding_id) = record
+        .meta
+        .get("job_binding_id")
+        .and_then(Value::as_str)
+        .and_then(|raw| Uuid::parse_str(raw).ok())
+    else {
+        tracing::error!(
+            approval = %record.approval.id,
+            "an approved job_binding gate names no binding"
+        );
+        return Err(ActionError::new(
+            422,
+            "gate_incomplete",
+            "the job_binding gate names no binding",
+        ));
+    };
+    store::organisation::job_binding_activate_tx(conn, tenant, binding_id)
+        .await
+        .map(|_| ())
+        .map_err(|error| {
+            tracing::error!(
+                %error,
+                approval = %record.approval.id,
+                binding = %binding_id,
+                "activate the job binding an approved gate names"
+            );
+            ActionError::internal()
+        })
 }
 
 /// Retire a binding; new runs naming it are refused `409 job_binding_stale`.

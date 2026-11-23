@@ -152,6 +152,15 @@ pub enum PlanError {
     /// A benefit has no measured baseline, so it cannot claim a realized improvement.
     #[error("benefit_baseline_missing")]
     BenefitBaselineMissing,
+    /// A realization record's measurement is not a number with a usable unit.
+    #[error("benefit_measurement_invalid")]
+    BenefitMeasurementInvalid {
+        /// The offending field.
+        field: &'static str,
+    },
+    /// A cited reading carries no evidence behind it.
+    #[error("benefit_measurement_evidence_missing")]
+    BenefitMeasurementEvidenceMissing,
     /// A benefit has no `post` measurement after the transition was enacted, so a realization
     /// claim or a post-transition timestamp is an assertion without a reading.
     #[error("benefit_post_measurement_missing")]
@@ -333,6 +342,58 @@ pub fn benefit_profile_missing(profile: &BenefitProfileFields) -> Vec<&'static s
         missing.push("operational_area");
     }
     missing
+}
+
+/// The unit texts that describe an absent measurement, never a measurement.
+const PLACEHOLDER_UNITS: [&str; 11] = [
+    "not measured",
+    "unmeasured",
+    "not applicable",
+    "n/a",
+    "na",
+    "none",
+    "unknown",
+    "tbd",
+    "tbc",
+    "placeholder",
+    "-",
+];
+
+/// A baseline or post reading is a number and a unit; an interim reading may be qualitative.
+///
+/// `kind` is the stored vocabulary (`baseline | interim | post`). A missing value, a blank unit
+/// or a placeholder unit is not a measurement, so a realized claim built on it would be an
+/// opinion. The `benefit_measurement` CHECK is the second lock.
+pub fn validate_benefit_reading(
+    kind: &str,
+    actual_value: Option<f64>,
+    unit: &str,
+) -> Result<(), PlanError> {
+    if !matches!(kind, "baseline" | "post") {
+        return Ok(());
+    }
+    if actual_value.is_none_or(|value| !value.is_finite()) {
+        return Err(PlanError::BenefitMeasurementInvalid {
+            field: "actual_value",
+        });
+    }
+    let unit = unit.trim();
+    if unit.is_empty() || PLACEHOLDER_UNITS.contains(&unit.to_ascii_lowercase().as_str()) {
+        return Err(PlanError::BenefitMeasurementInvalid { field: "unit" });
+    }
+    Ok(())
+}
+
+/// Evidence behind a reading or a realization: a non-empty object, list or text. A blank
+/// string, `{}` or an empty list is a slot, not evidence.
+pub fn evidence_present(evidence: &Value) -> bool {
+    match evidence {
+        Value::Null => false,
+        Value::String(text) => !text.trim().is_empty(),
+        Value::Array(items) => !items.is_empty(),
+        Value::Object(map) => !map.is_empty(),
+        _ => true,
+    }
 }
 
 /// The subset of a profile the completeness rule reads.

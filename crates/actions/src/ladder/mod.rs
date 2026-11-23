@@ -1978,6 +1978,23 @@ async fn ladder_record(
         )
         .await?;
         if !approved {
+            // Distinguish a gate that exists but has not resolved in this decision's favour
+            // (pending, rejected, wrong gate/card) from an id that names no approval at all.
+            // The first is `approval_not_accepted`; the second is `approval_missing`.
+            let record = store::approval::get_approval_tx(&mut *tx, ctx.tenant, approval_id)
+                .await
+                .map_err(|error| {
+                    tracing::error!(%error, "ladder.record: read the cited approval");
+                    ActionError::internal()
+                })?;
+            if record.is_some_and(|record| record.approval.status != ApprovalStatus::Approved) {
+                return Err(invalid(
+                    "approval_id",
+                    "approval_not_accepted",
+                    "a human decision must cite an approved approval with a human approve \
+                     decision on the same card or project, for the gate the decision answers",
+                ));
+            }
             return Err(invalid(
                 "approval_id",
                 "approval_missing",
