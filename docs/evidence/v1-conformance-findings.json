@@ -5722,6 +5722,31 @@
       "acceptance": "A B7 benefit profile exists with a numeric target and denominator for tokens per accepted deliverable, a baseline reading taken before its transition, and a post reading after enacted_at; the benefit evaluation cites the target and computes the variance; the published benefits registry shows B7.",
       "owner_project": "PLATFORM",
       "kind": "STANDARD"
+    },
+    {
+      "id": "v1-shared-config-writer",
+      "area": "\u00a78.2",
+      "standard": "SAFe",
+      "spec": "\u00a78.2",
+      "severity": "P1",
+      "title": "programme.shared_config has no writer action, so the mandatory safe-art artefact cannot resolve",
+      "problem": "Migration 0070 adds programme.shared_config with a shape constraint and the store reads it, but the served action registry has no action that writes or reads it (grep 'shared_config' in docs/design/data/actions.json is zero). The deep-review finding w3-shared-config-1 is recorded as RECORD, yet no record can be created through the product's actions; the safe-art artefact's Shared configuration and Published document sections therefore stay absent.",
+      "evidence": [
+        {
+          "path": "migrations/0070_programme_shared_config.sql",
+          "line": 8,
+          "quote": "    ADD COLUMN shared_config jsonb NOT NULL DEFAULT '{}'::jsonb;"
+        },
+        {
+          "path": "crates/store/src/portfolio.rs",
+          "line": 184,
+          "quote": "    pub shared_config: Value,"
+        }
+      ],
+      "failure_scenario": "The programme-level SAFe ART artefact (safe-art) is mandatory and stays absent; a programme can never record the shared configuration (iteration length, capacity, WIP limits, demo cadence) that the ART's artefacts resolve against, and the gap is misclassified as a record the operator forgot.",
+      "acceptance": "A served action family writes programme.shared_config scoped by tenant and programme, validating the object shape (values object, locked array) and taking an optimistic version; a read action returns it; a test writes then reads back and refuses a non-object; the safe-art body's Shared configuration section resolves from the row and the published document exists.",
+      "owner_project": "PLATFORM",
+      "kind": "CODE"
     }
   ]
 }
