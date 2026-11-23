@@ -486,6 +486,11 @@ pub struct CardsMoveIn {
     /// Land immediately after this card of the target lane; absent appends.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub after_id: Option<Uuid>,
+    /// Set by `err.card` and the coach's `move` remedy: the engine is moving the card while
+    /// handling an interruption that already exists, so this move is not itself observed as a
+    /// §6.2 flow event. A person's move never sets it (v1-p6-5).
+    #[serde(default)]
+    pub internal_coach: bool,
 }
 
 /// `cards.duplicate`.

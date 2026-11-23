@@ -1014,17 +1014,18 @@ pub async fn expire_due_tx(conn: &mut PgConnection, tenant: TenantId) -> Result<
 /// `run.cancelled` after it. Both are the same status-guarded write, so this is the
 /// id-returning twin rather than a second sweep with a subtly different predicate.
 ///
-/// `run_id` is `None` for a card-level gate; the caller must not invent a run for it.
+/// `run_id` is `None` for a card-level gate; the caller must not invent a run for it. `card_id`
+/// is `None` for a project-scoped gate, which has no card a coach interruption could attach to.
 pub async fn expire_due_ids_tx(
     conn: &mut PgConnection,
     tenant: TenantId,
-) -> Result<Vec<(Uuid, Option<Uuid>)>, sqlx::Error> {
+) -> Result<Vec<(Uuid, Option<Uuid>, Option<Uuid>)>, sqlx::Error> {
     sqlx::query_as(
         "UPDATE approval
             SET status = 'expired', version = version + 1, updated_at = now()
           WHERE tenant_id = $1 AND status = 'pending'
             AND expires_at IS NOT NULL AND expires_at <= now()
-        RETURNING id, run_id",
+        RETURNING id, run_id, card_id",
     )
     .bind(tenant.as_uuid())
     .fetch_all(&mut *conn)

@@ -476,6 +476,21 @@ async fn cards_move(
                 card_json(&current),
             )
             .await?;
+            // §6.2: a move is itself a flow observation — unless the engine is moving the card
+            // while handling an interruption that already exists (`err.card`, the coach's
+            // `move` remedy). A move inside one lane is a reorder, not a flow event (v1-p6-5).
+            if !input.internal_coach && from.list.id != to.list.id {
+                crate::coach::flow_inputs_after_move(
+                    &mut *tx,
+                    ctx,
+                    record.card.id,
+                    from.list.kind,
+                    to.list.kind,
+                    to.list.wip_limit,
+                    to.list.id,
+                )
+                .await;
+            }
             Ok(HandlerOutput::ok(card_out(&record)).with_etag(record.card.version.etag()))
         }
         None => Err(stale_card(tx, ctx.tenant, current.card.id, "cards.move").await?),
