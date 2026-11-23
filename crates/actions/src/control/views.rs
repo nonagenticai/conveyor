@@ -316,6 +316,13 @@ pub struct ApprovalRequestIn {
     /// The run the question belongs to.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub run_id: Option<Uuid>,
+    /// The change request this gate decides (the `change` gate).
+    ///
+    /// Stored in `meta.change_id`; `approved_change_for_baseline_tx` joins an approved gate to
+    /// the change it authorises by this key. Without it a change gate can never be read as the
+    /// approval for a baseline, a benefit measurement or a WBS mutation (v1-change-1).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub change_id: Option<Uuid>,
     /// The gate name.
     pub gate: String,
     /// The gate's kind.

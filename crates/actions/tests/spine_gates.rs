@@ -390,6 +390,64 @@ async fn an_approved_change_gate_advances_the_baseline() {
     assert_eq!(outcome.status, 201, "{}", outcome.body);
 }
 
+/// v1-change-1: the `change` gate requested through the product names the change it decides.
+///
+/// Before the fix `approvals.request` had no `change_id` and wrote no `meta.change_id`, so
+/// `approved_change_for_baseline_tx` could never join an approved gate to its change. This test
+/// drives the request path the earlier tests bypassed with a direct SQL insert.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_change_gate_request_carries_the_change_it_authorises() {
+    let (pg, seeded) = fixture().await;
+    let project = project(&pg, seeded.tenant_id, None, json!({})).await;
+    let baseline = approved_baseline(&pg, seeded.tenant_id, project, seeded.user_id).await;
+    let change: Uuid = sqlx::query_scalar(
+        "INSERT INTO project_register_item
+             (tenant_id, project_id, kind, title, status, baseline_ref, meta)
+         VALUES ($1, $2, 'change', 'Move the gate', 'open', $3,
+                 '{\"impact\": {\"scope\": \"the gate moves\"}}'::jsonb)
+         RETURNING id",
+    )
+    .bind(seeded.tenant_id)
+    .bind(project)
+    .bind(baseline)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("insert the change");
+    let outcome = invoke(
+        &pg.runtime,
+        registry(),
+        seeded.tenant,
+        request(
+            seeded.user_id,
+            "approvals.request",
+            json!({
+                "project_id": project,
+                "gate": "change",
+                "kind": "pm",
+                "change_id": change,
+                "description": "Approve the change",
+            }),
+        ),
+    )
+    .await
+    .expect("a change gate is requested");
+    assert_eq!(outcome.status, 201, "{}", outcome.body);
+    let approval: Uuid = serde_json::from_value(outcome.body["id"].clone())
+        .expect("the request returns the approval id");
+    let meta: Value =
+        sqlx::query_scalar("SELECT meta FROM approval WHERE tenant_id = $1 AND id = $2")
+            .bind(seeded.tenant_id)
+            .bind(approval)
+            .fetch_one(&pg.super_pool)
+            .await
+            .expect("read the gate");
+    assert_eq!(
+        meta.get("change_id").and_then(Value::as_str),
+        Some(change.to_string().as_str()),
+        "the gate must carry the change it authorises: {meta}",
+    );
+}
+
 /// v1-w2c-3, the source — `registers.create` refuses to manufacture `approved` on a change.
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn a_register_cannot_be_born_approved() {

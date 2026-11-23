@@ -519,6 +519,7 @@ async fn approvals_request(
         ("description", input.description),
         ("proposed_answer", input.proposed_answer),
         ("target", target),
+        ("change_id", input.change_id.map(|id| id.to_string())),
     ] {
         if let Some(value) = value {
             meta.insert(key.to_owned(), Value::String(value));
