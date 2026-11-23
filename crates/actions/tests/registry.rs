@@ -10,7 +10,7 @@ mod support;
 use conveyor_actions::ActionKind;
 use conveyor_actions::openapi::operation_json;
 use conveyor_actions::registry::{assert_registry_consistent, registry};
-use conveyor_actions::spec::sha256_hex;
+use conveyor_actions::spec::{sha256_hex, validate_input};
 use conveyor_auth::Role;
 use conveyor_store::begin_scoped;
 use serde_json::{Value, json};
@@ -1248,4 +1248,29 @@ fn committed_action_dump_matches_the_registry() {
         "docs/design/data/actions.json is stale; run \
          `conveyor admin actions dump --json --out docs/design/data/actions.json`"
     );
+}
+
+/// The register read accepts the bare filters the record harness sends.
+///
+/// Regression measured at the post-merge head: every input to `registers.list` was refused
+/// 422 ("the input does not match the action schema"), which blocked the promotion replay and
+/// every check that reads the register.
+#[test]
+fn registers_list_accepts_its_filters() {
+    let spec = registry()
+        .get("registers.list")
+        .expect("registers.list is registered");
+    let schema = spec.input_schema();
+    for input in [
+        json!({}),
+        json!({"programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac"}),
+    ] {
+        let errors = validate_input(&schema, &input);
+        assert!(
+            errors.is_empty(),
+            "input {input} refused: {}",
+            serde_json::to_string_pretty(&serde_json::to_value(&errors).unwrap_or_default())
+                .unwrap_or_default()
+        );
+    }
 }
