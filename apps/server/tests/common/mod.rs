@@ -13,7 +13,7 @@
 
 #![allow(dead_code)]
 
-use std::process::{Command, Stdio};
+use std::process::{Child, Command, Stdio};
 use std::time::Duration;
 
 use sqlx::postgres::PgPoolOptions;
@@ -310,6 +310,58 @@ impl Drop for TestDb {
     }
 }
 
+/// A child `conveyor worker` that is killed on drop, so a failed assertion cannot leave a
+/// poller running against the test database.
+pub struct WorkerChild {
+    child: Child,
+}
+
+impl WorkerChild {
+    /// Spawn `binary` (the caller's `env!("CARGO_BIN_EXE_conveyor")`, which only the integration
+    /// test target defines) against `db` with a short job lease.
+    pub fn spawn(binary: impl AsRef<std::ffi::OsStr>, db: &TestDb) -> Self {
+        let child = Command::new(binary)
+            .arg("worker")
+            .env("APP_ENV", "test")
+            .env("DATABASE_URL", &db.runtime_url)
+            .env("DATABASE_LISTEN_URL", &db.runtime_url)
+            .env("DATABASE_MIGRATE_URL", &db.runtime_url)
+            .env("APP_KEY", "conveyor")
+            .env("JOB_LEASE_SECS", "2")
+            .env("RUST_LOG", "info")
+            .stdout(Stdio::null())
+            .stderr(Stdio::null())
+            .spawn()
+            .expect("spawn the conveyor worker binary");
+        Self { child }
+    }
+}
+
+impl Drop for WorkerChild {
+    fn drop(&mut self) {
+        let _ = self.child.kill();
+        let _ = self.child.wait();
+    }
+}
+
+/// Poll `predicate` until it holds, panicking with `what` when `timeout` runs out.
+pub async fn wait_for<F, Fut>(what: &str, timeout: Duration, mut predicate: F)
+where
+    F: FnMut() -> Fut,
+    Fut: std::future::Future<Output = bool>,
+{
+    let deadline = std::time::Instant::now() + timeout;
+    loop {
+        if predicate().await {
+            return;
+        }
+        if std::time::Instant::now() > deadline {
+            panic!("timed out after {timeout:?} waiting for {what}");
+        }
+        tokio::time::sleep(Duration::from_millis(100)).await;
+    }
+}
+
 /// A small pool that never connects: for routes that must not touch a database.
 pub fn lazy_pool() -> PgPool {
     PgPoolOptions::new()
@@ -318,4 +370,5 @@ pub fn lazy_pool() -> PgPool {
         .expect("lazy pool")
 }
 
+pub mod coach_fixture;
 pub mod process_fixture;

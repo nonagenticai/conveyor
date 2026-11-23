@@ -126,7 +126,7 @@
     "POST /api/actions/cards.ledger_append/invocations": "6b1cedf572a8e390492fa6a97bc4fd780d07c4bfb4ab16f960a08ed0cab0acd5",
     "POST /api/actions/cards.ledger_list/invocations": "eb85519ff992b4e19118df3fd5452d34007e811c5742da262e71d705575747fa",
     "POST /api/actions/cards.list/invocations": "dee303fe0d292184e6bd1e935fdf06aff2834171dcff4954e418922c1cae3f4b",
-    "POST /api/actions/cards.move/invocations": "f19696a296cf0dbcd0286ec7302e95ff345471ce3a78220e3627b60803fc9773",
+    "POST /api/actions/cards.move/invocations": "e8c84e945f45608dc5ea9f37936aea134f927b49b3b6e2b43af5256596ee4669",
     "POST /api/actions/cards.release/invocations": "aedc443ed2eb2ab375704a77b78766857fa7fc05df6932b8378a9f5d50cf8a0d",
     "POST /api/actions/cards.remove_label/invocations": "e4c7c4e3e047a1d86bf658e9ff7dd651342c729937a6b13483c9b64fea407813",
     "POST /api/actions/cards.renew/invocations": "f56143ea569b745e3ccb84cc5b43b366c279c5f2f266f3a471c1be2f8b437e24",
