@@ -74,6 +74,7 @@ def register_acceptance(key: str) -> str:
         "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data "
         "--findings docs/evidence/v1-conformance-findings.json "
         "--findings docs/evidence/standards-findings.json "
+        "--deep-review docs/evidence/record-w3/deep-review-findings.json "
         f"--rework-check {key}"
     )
 PLACEHOLDER = re.compile(
@@ -1872,6 +1873,72 @@ def _subject_record(
     }
 
 
+# A deep-review finding names the artefact it reviewed, not a ledger id: the converter prefixes
+# its key, maps its three kinds onto the register's package kinds, and takes the section from
+# the review. An unknown kind is refused rather than guessed.
+DEEP_REVIEW_KINDS = {"code": "CODE", "record+code": "CODE", "standard": "STANDARD"}
+DEEP_REVIEW_SPEC = {
+    "w3-action-registry-projection-1": "§8.5",
+    "w3-licensing-frame-1": "§8.5",
+    "w3-verdict-t18-1": "§12",
+}
+
+
+def deep_review_findings(path: Path, output_standard: dict[str, Any]) -> list[dict[str, Any]]:
+    """Convert a deep-review sidecar into the findings-ledger shape the register reads.
+
+    The sidecar's `evidence` is one prose paragraph, so it becomes both the ledger `problem`
+    and the single evidence quote. `standard` comes from the artefact's template in
+    `seed/output-standard.json`; an artefact with no template is SPEC. The section derives
+    from the template's standard (MSP → §8.3), except where the review names it, and is §8
+    otherwise.
+    """
+    document = read_json(path)
+    findings = document.get("findings")
+    if not isinstance(findings, list):
+        fail(f"the deep-review sidecar {path} has no findings list")
+    try:
+        evidence_path = path.resolve().relative_to(ROOT).as_posix()
+    except ValueError:
+        evidence_path = str(path)
+    converted: list[dict[str, Any]] = []
+    for finding in findings:
+        if not isinstance(finding, dict):
+            fail(f"the deep-review sidecar {path} contains a non-object finding")
+        key = str(finding.get("key") or "").strip()
+        if not key:
+            fail(f"the deep-review sidecar {path} contains a finding with no key")
+        raw_kind = str(finding.get("kind") or "").strip()
+        kind = DEEP_REVIEW_KINDS.get(raw_kind)
+        if kind is None:
+            fail(
+                f"the deep-review finding {key!r} has unknown kind {raw_kind!r}; "
+                f"expected one of {', '.join(sorted(DEEP_REVIEW_KINDS))}"
+            )
+        _, _, template_key = str(finding.get("artifact") or "").partition("#")
+        template = (output_standard.get("templates") or {}).get(template_key) or {}
+        standard = str(template.get("standard") or "SPEC")
+        spec = DEEP_REVIEW_SPEC.get(key) or ("§8.3" if standard == "MSP" else "§8")
+        evidence = str(finding.get("evidence") or "")
+        converted.append(
+            {
+                "id": f"dr-{key}",
+                "standard": standard,
+                "spec": spec,
+                "severity": finding.get("severity"),
+                "title": finding.get("title"),
+                "problem": evidence,
+                "evidence": [
+                    {"source": "deep-review", "path": evidence_path, "quote": evidence}
+                ],
+                "acceptance": finding.get("acceptance"),
+                "owner_project": finding.get("owner_project"),
+                "kind": kind,
+            }
+        )
+    return converted
+
+
 def build_register(
     gaps: list[dict[str, Any]],
     baseline: dict[str, Any],
@@ -3025,6 +3092,79 @@ def self_test() -> None:
         for package in standard_register["packages"]
     ):
         fail("a generator-declared STANDARD finding did not become a STANDARD package")
+
+    # A deep-review sidecar converts into the ledger shape the register reads: the template
+    # names the standard, the section derives from it, and the sidecar's kind becomes the
+    # package kind. A kind the converter does not know is refused, never guessed.
+    with tempfile.TemporaryDirectory() as sidecar_dir:
+        sidecar = Path(sidecar_dir) / "deep-review-findings.json"
+
+        def write_sidecar(kind: str) -> None:
+            sidecar.write_text(
+                json.dumps(
+                    {
+                        "schema": "w3-deep-review/v1",
+                        "findings": [
+                            {
+                                "key": "x-1",
+                                "kind": kind,
+                                "severity": "P1",
+                                "owner_project": "T1",
+                                "title": "a deep-review title",
+                                "evidence": "a deep-review paragraph",
+                                "acceptance": "a deep-review acceptance",
+                                "artifact": "seed/output-standard.json#mandate",
+                            }
+                        ],
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+        write_sidecar("record+code")
+        converted = deep_review_findings(sidecar, output_standard)
+        if len(converted) != 1:
+            fail(f"a one-finding deep-review sidecar converted to {len(converted)} findings")
+        finding = converted[0]
+        if (
+            finding["id"] != "dr-x-1"
+            or finding["standard"] != "MSP"
+            or finding["spec"] != "§8.3"
+            or finding["kind"] != "CODE"
+            or finding["problem"] != "a deep-review paragraph"
+            or finding["evidence"]
+            != [
+                {
+                    "source": "deep-review",
+                    "path": str(sidecar),
+                    "quote": "a deep-review paragraph",
+                }
+            ]
+        ):
+            fail(f"the deep-review conversion is wrong: {finding}")
+        deep_register = build_register(
+            register_gaps,
+            register_baseline,
+            {"findings": converted},
+            standard,
+            register_data,
+            "fixture",
+        )
+        if not any(
+            package["rule"] == "dr-x-1"
+            and package["kind"] == "CODE"
+            and package["standard"] == "MSP"
+            and package["spec"] == "§8.3"
+            for package in deep_register["packages"]
+        ):
+            fail("a deep-review finding did not become its package with its kind")
+        write_sidecar("prose")
+        try:
+            deep_review_findings(sidecar, output_standard)
+        except SystemExit:
+            pass
+        else:
+            fail("an unknown deep-review kind was accepted")
     if first["scorecard"]["MSP"]["rules"] < 1:
         fail("the scorecard has no MSP rules")
 
@@ -3087,6 +3227,16 @@ def main() -> None:
         ),
     )
     parser.add_argument(
+        "--deep-review",
+        type=Path,
+        action="append",
+        default=None,
+        help=(
+            "a deep-review sidecar whose findings are converted to ledger findings and merged "
+            "into the rework register; repeatable"
+        ),
+    )
+    parser.add_argument(
         "--rework-out",
         type=Path,
         default=None,
@@ -3104,10 +3254,12 @@ def main() -> None:
     parser.add_argument("--check-standard", action="store_true")
     parser.add_argument("--self-test", action="store_true")
     args = parser.parse_args()
-    if args.findings and not (args.rework_out or args.rework_check):
-        parser.error("--findings is only meaningful with --rework-out or --rework-check")
-    if args.rework_check and not args.findings:
-        parser.error("--rework-check needs the findings ledgers via --findings")
+    if (args.findings or args.deep_review) and not (args.rework_out or args.rework_check):
+        parser.error(
+            "--findings and --deep-review are only meaningful with --rework-out or --rework-check"
+        )
+    if args.rework_check and not (args.findings or args.deep_review):
+        parser.error("--rework-check needs the findings ledgers via --findings or --deep-review")
 
     if args.self_test:
         self_test()
@@ -3132,6 +3284,8 @@ def main() -> None:
         for path in args.findings or []:
             ledger = read_json(path)
             merged_findings.extend(ledger.get("findings", []))
+        for path in args.deep_review or []:
+            merged_findings.extend(deep_review_findings(path, dataset.output_standard))
         findings_doc = {"findings": merged_findings}
         register = build_register(
             gaps, baseline_doc, findings_doc, standard, dataset, str(args.snapshot)
