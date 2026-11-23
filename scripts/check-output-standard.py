@@ -38,7 +38,7 @@ DEFAULT_ON_DEMAND = [ON_DEMAND]
 STANDARDS = {"MSP", "TOGAF", "SAFe", "PMP", "SPEC", "Delivery"}
 LEVELS = {"portfolio", "programme", "project", "work_package"}
 SUBJECT_KINDS = {"programme", "project", "tranche", "benefit", "capability", "phase", "artifact", "card"}
-SOURCE_KINDS = {"rows", "documents", "computed", "register"}
+SOURCE_KINDS = {"rows", "documents", "computed", "register", "absence"}
 # SPEC_V2 §8.1, §8.2 and §8.3 name the artefacts each standard requires. The prose is not a
 # parser (the programme seed follows the same rule), so the named lists are data: every named
 # artefact must resolve to a category, and the category must have a template.
@@ -359,6 +359,15 @@ def validate(std: dict, seed: dict, console: dict) -> list[str]:
                     errors.append(
                         f"template {category!r} section {heading!r} computed source has no name"
                     )
+                if source["kind"] == "absence":
+                    if not isinstance(source.get("record"), str) or not source["record"].strip():
+                        errors.append(
+                            f"template {category!r} section {heading!r} absence source has no record"
+                        )
+                    if "fallback" in source and not isinstance(source["fallback"], bool):
+                        errors.append(
+                            f"template {category!r} section {heading!r} absence fallback must be a boolean"
+                        )
         if template.get("mandatory") is True:
             # A mandatory artefact must be resolvable: at least one named source, and the
             # document category the generator falls back to when its rows are empty. Without
@@ -492,6 +501,11 @@ def self_test(std: dict, seed: dict, console: dict) -> int:
     first_heading = bad["templates"]["vision"]["required"][0]
     bad["templates"]["vision"]["sources"] = {first_heading: [{"kind": "not-a-kind"}]}
     cases.append(("an invalid source kind", bad, seed, console))
+
+    bad = copy.deepcopy(std)
+    first_heading = bad["templates"]["vision"]["required"][0]
+    bad["templates"]["vision"]["sources"] = {first_heading: [{"kind": "absence"}]}
+    cases.append(("an absence source without a record", bad, seed, console))
 
     bad = copy.deepcopy(std)
     bad["templates"]["benefit-profile"].pop("subject_kind", None)

@@ -779,23 +779,12 @@
             "kind": "rows",
             "file": "config.json",
             "pointer": "/capabilities"
-          },
-          {
-            "kind": "documents",
-            "file": "artefacts.json",
-            "pointer": "/documents",
-            "match": {
-              "category": "blueprint",
-              "scope": "programme"
-            }
           }
         ],
         "Action registry and data model": [
           {
-            "kind": "rows",
-            "file": "actions.json",
-            "pointer": "/actions",
-            "projection": "live"
+            "kind": "computed",
+            "name": "action_registry"
           }
         ],
         "Deployment estate": [
@@ -838,13 +827,16 @@
         "Current, intermediate and target states": [
           {
             "kind": "rows",
-            "file": "msp.json",
-            "pointer": "/programme_baselines"
+            "file": "artefacts.json",
+            "pointer": "/governed_assets",
+            "match": {
+              "kind": "blueprint-states"
+            }
           },
           {
-            "kind": "rows",
-            "file": "msp.json",
-            "pointer": "/project_baselines"
+            "kind": "absence",
+            "fallback": true,
+            "record": "the blueprint's current, intermediate and target states: a governed asset of kind blueprint-states"
           }
         ]
       },
@@ -873,54 +865,66 @@
       "sources": {
         "Why now": [
           {
-            "kind": "documents",
-            "file": "artefacts.json",
-            "pointer": "/documents",
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/register_items",
             "match": {
-              "category": "business-case",
-              "scope": "programme"
+              "kind": "issue"
             }
-          }
-        ],
-        "Licensing frame": [
+          },
           {
-            "kind": "documents",
-            "file": "artefacts.json",
-            "pointer": "/documents",
-            "match": {
-              "category": "business-case",
-              "scope": "programme"
-            }
+            "kind": "rows",
+            "file": "programme.json",
+            "pointer": "/programme"
           }
         ],
-        "Options, including doing nothing": [
+        "Benefit map": [
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/benefit_links"
+          },
+          {
+            "kind": "rows",
+            "file": "msp.json",
+            "pointer": "/benefit_profiles"
+          }
+        ],
+        "Cost and risk posture": [
           {
             "kind": "rows",
             "file": "msp.json",
             "pointer": "/register_items",
             "match": {
-              "kind": "change"
+              "kind": "risk"
+            }
+          }
+        ],
+        "Licensing frame": [
+          {
+            "kind": "rows",
+            "file": "artefacts.json",
+            "pointer": "/governed_assets",
+            "match": {
+              "kind": "licensing_frame"
             }
           },
           {
-            "kind": "rows",
-            "file": "work.json",
-            "pointer": "/approvals",
-            "match": {
-              "status": "approved"
-            }
+            "kind": "absence",
+            "fallback": true,
+            "record": "the programme's licensing frame: a governed asset of kind licensing_frame stating the public, opt-in and tenant boundary"
+          }
+        ],
+        "Options, including doing nothing": [
+          {
+            "kind": "absence",
+            "record": "the options appraisal: a decision with its options, including doing nothing, and their appraisal"
           }
         ],
         "Investment appraisal and cash flow": [
           {
-            "kind": "rows",
-            "file": "measure.json",
-            "pointer": "/inference/by_project"
-          },
-          {
-            "kind": "rows",
-            "file": "measure.json",
-            "pointer": "/inference/by_model"
+            "kind": "absence",
+            "record": "the programme cost model: the investment appraisal and cash-flow schedule with its basis"
           }
         ],
         "Capabilities the benefits depend on": [
@@ -928,28 +932,6 @@
             "kind": "rows",
             "file": "msp.json",
             "pointer": "/benefit_links"
-          }
-        ],
-        "Benefit map": [
-          {
-            "kind": "documents",
-            "file": "artefacts.json",
-            "pointer": "/documents",
-            "match": {
-              "category": "business-case",
-              "scope": "programme"
-            }
-          }
-        ],
-        "Cost and risk posture": [
-          {
-            "kind": "documents",
-            "file": "artefacts.json",
-            "pointer": "/documents",
-            "match": {
-              "category": "business-case",
-              "scope": "programme"
-            }
           }
         ]
       },
@@ -2289,24 +2271,14 @@
         ],
         "Waivers": [
           {
-            "kind": "rows",
-            "file": "architecture.json",
-            "pointer": "/waivers",
-            "optional": true,
-            "match": {
-              "project_id": "$subject_id"
-            }
+            "kind": "computed",
+            "name": "waiver_status"
           }
         ],
         "Decision": [
           {
-            "kind": "rows",
-            "file": "architecture.json",
-            "pointer": "/compliance_reviews",
-            "optional": true,
-            "match": {
-              "project_id": "$subject_id"
-            }
+            "kind": "computed",
+            "name": "governing_review"
           }
         ]
       },
@@ -2519,17 +2491,8 @@
         ],
         "Cost, timescale and effort": [
           {
-            "kind": "rows",
-            "file": "programme.json",
-            "pointer": "/projects",
-            "match": {
-              "programme_id": "$programme_id"
-            }
-          },
-          {
-            "kind": "rows",
-            "file": "measure.json",
-            "pointer": "/inference/by_project"
+            "kind": "absence",
+            "record": "the programme cost, effort and timescale model: its estimate, basis and cash flow"
           }
         ],
         "Risks and support": [
@@ -2695,15 +2658,6 @@
             "kind": "rows",
             "file": "msp.json",
             "pointer": "/tranche_reviews"
-          },
-          {
-            "kind": "documents",
-            "file": "artefacts.json",
-            "pointer": "/documents",
-            "match": {
-              "category": "refined-vision",
-              "scope": "programme"
-            }
           }
         ],
         "Changes from the mandate": [
@@ -3259,35 +3213,32 @@
       "sources": {
         "Commitments": [
           {
-            "kind": "rows",
-            "file": "architecture.json",
-            "pointer": "/contracts",
-            "match": {
-              "kind": "delivery_contract",
-              "project_id": "$subject_id"
-            }
+            "kind": "computed",
+            "name": "contract_field",
+            "field": "commitments"
+          },
+          {
+            "kind": "absence",
+            "fallback": true,
+            "record": "the contract's commitment list: a commitments field on the delivery contract body"
           }
         ],
         "Compliance method": [
           {
-            "kind": "rows",
-            "file": "architecture.json",
-            "pointer": "/contracts",
-            "match": {
-              "kind": "delivery_contract",
-              "project_id": "$subject_id"
-            }
+            "kind": "computed",
+            "name": "contract_field",
+            "field": "compliance"
+          },
+          {
+            "kind": "absence",
+            "fallback": true,
+            "record": "the contract's compliance method: a compliance field on the delivery contract body"
           }
         ],
         "Approval": [
           {
-            "kind": "rows",
-            "file": "architecture.json",
-            "pointer": "/contracts",
-            "match": {
-              "kind": "delivery_contract",
-              "project_id": "$subject_id"
-            }
+            "kind": "computed",
+            "name": "contract_approval"
           }
         ]
       },
@@ -3457,15 +3408,14 @@
       "sources": {
         "ART charter": [
           {
-            "kind": "rows",
-            "file": "programme.json",
-            "pointer": "/programme"
+            "kind": "computed",
+            "name": "programme_charter"
           }
         ],
         "Solution intent": [
           {
-            "kind": "computed",
-            "name": "programme_summary"
+            "kind": "absence",
+            "record": "the solution-intent record: the ART's intended outcomes, measures and constraints"
           }
         ],
         "Backlog with WSJF": [
@@ -3636,7 +3586,8 @@
             "file": "msp.json",
             "pointer": "/project_baselines",
             "match": {
-              "project_id": "$subject_id"
+              "project_id": "$subject_id",
+              "kind": "scope"
             }
           }
         ],
@@ -3646,8 +3597,14 @@
             "file": "msp.json",
             "pointer": "/project_baselines",
             "match": {
-              "project_id": "$subject_id"
+              "project_id": "$subject_id",
+              "kind": "schedule"
             }
+          },
+          {
+            "kind": "absence",
+            "fallback": true,
+            "record": "the project schedule baseline: a project_baseline row of kind schedule"
           }
         ],
         "Cost": [
@@ -3656,17 +3613,24 @@
             "file": "msp.json",
             "pointer": "/project_baselines",
             "match": {
-              "project_id": "$subject_id"
+              "project_id": "$subject_id",
+              "kind": "cost"
             }
+          },
+          {
+            "kind": "absence",
+            "fallback": true,
+            "record": "the project cost baseline: a project_baseline row of kind cost"
           }
         ],
         "Approval": [
           {
             "kind": "rows",
-            "file": "msp.json",
-            "pointer": "/project_baselines",
+            "file": "work.json",
+            "pointer": "/approvals",
             "match": {
-              "project_id": "$subject_id"
+              "project_id": "$subject_id",
+              "gate": "baseline"
             }
           }
         ]
@@ -3792,9 +3756,8 @@
         ],
         "Impact": [
           {
-            "kind": "rows",
-            "file": "msp.json",
-            "pointer": "/register_items",
+            "kind": "computed",
+            "name": "change_impact",
             "match": {
               "project_id": "$subject_id",
               "kind": "change"
