@@ -526,7 +526,8 @@
           7,
           136,
           179,
-          198
+          198,
+          620
         ],
         "depends_on": [
           "S03",
@@ -746,7 +747,7 @@
       "key": "S20",
       "name": "Eval hillclimb",
       "description": "Plan: docs/plans/slices/S20-eval-hillclimb.md",
-      "status": "active",
+      "status": "closed",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/plans/slices/S20-eval-hillclimb.md",
@@ -1485,6 +1486,43 @@
       }
     },
     {
+      "key": "T19",
+      "name": "Decision forums (meetings)",
+      "description": "SPEC_V2 slice T19 (docs/SPEC_V2.md §12)",
+      "status": "active",
+      "repo_url": "https://github.com/nonagenticai/conveyor",
+      "meta": {
+        "plan": "docs/SPEC_V2.md#12",
+        "track": "v2",
+        "issues": [
+          605,
+          606
+        ],
+        "depends_on": [
+          "T1",
+          "T2",
+          "T3",
+          "P0"
+        ],
+        "plan_status": "draft",
+        "status_source": "github issue state > measured coverage > plan frontmatter",
+        "measured_status": "proposed",
+        "tranche": 4,
+        "expected_outputs": [
+          "project-brief",
+          "inception-analysis",
+          "architecture-design"
+        ],
+        "closure_outputs": [
+          "evidence",
+          "closure-review"
+        ],
+        "adm_phase": "G",
+        "plateau": "capability",
+        "gate": "a three-department board meeting decides its agenda items by recorded majority with a recorded dissent; an item missing a required department is deferred `inquorate` and cannot be decided; a meeting cannot lower a linked approval's dual control or waive its evidence; the owner decides one item in the web meeting room and another asynchronously from the agent front end over MCP, both recorded `via='meeting'`; minutes publish behind the chair's gate and every action becomes a card; a forum with no decision over a cycle is flagged"
+      }
+    },
+    {
       "key": "DESIGN-PUBLISH",
       "name": "Publish the SPEC_V2 studio design pack, live",
       "description": "Programme-level unit (plan: docs/design/STUDIO-SPEC.md)",
@@ -1602,10 +1640,7 @@
           545,
           569,
           572,
-          604,
-          605,
-          606,
-          611
+          604
         ],
         "depends_on": [],
         "plan_status": "active",

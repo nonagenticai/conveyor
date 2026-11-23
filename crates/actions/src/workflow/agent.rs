@@ -1078,6 +1078,24 @@ fn wire_message(message: &Message) -> Value {
 /// Parse the router's answer into the loop's reply.
 fn model_reply(body: &Value) -> Result<ModelReply, ActionError> {
     let doc = body.get("output").unwrap_or(body);
+    // A `length` finish means the body was cut at the token cap. Its visible tail can parse as a
+    // complete-looking reply (or as a tool call with partial arguments), so this is the only
+    // point that can stop a truncated turn from executing as if it were whole. 422, not 5xx:
+    // the workflow tick maps 5xx to `Deferred` and would re-buy the same capped call.
+    if doc
+        .pointer("/choices/0/finish_reason")
+        .and_then(Value::as_str)
+        == Some("length")
+    {
+        return Err(ActionError::new(
+            422,
+            "inference-truncated",
+            format!(
+                "{MODEL_ACTION}: the router's answer was truncated at its token cap \
+                 (finish_reason \"length\"); refusing the partial reply"
+            ),
+        ));
+    }
     let message = doc
         .pointer("/choices/0/message")
         .ok_or_else(|| bad_response("the router's answer has no choices[0].message"))?;
@@ -1091,9 +1109,30 @@ fn model_reply(body: &Value) -> Result<ModelReply, ActionError> {
             let name = call
                 .pointer("/function/name")
                 .and_then(Value::as_str)
-                .ok_or_else(|| bad_response("a tool call has no function.name"))?;
+                .filter(|name| !name.is_empty())
+                .ok_or_else(|| {
+                    ActionError::new(
+                        422,
+                        "inference-bad-tool-call",
+                        format!(
+                            "{MODEL_ACTION}: tool call {index} has no function.name; refusing a \
+                             call that names nothing"
+                        ),
+                    )
+                })?;
             let arguments = match call.pointer("/function/arguments") {
-                Some(Value::String(raw)) => serde_json::from_str(raw).unwrap_or_else(|_| json!({})),
+                Some(Value::String(raw)) if raw.trim().is_empty() => json!({}),
+                Some(Value::String(raw)) => serde_json::from_str(raw).map_err(|error| {
+                    ActionError::new(
+                        422,
+                        "inference-bad-tool-arguments",
+                        format!(
+                            "{MODEL_ACTION}: tool call {index} ({name}) has arguments that are \
+                             not valid JSON ({error}); refusing to execute fabricated arguments"
+                        ),
+                    )
+                })?,
+                Some(Value::Null) => json!({}),
                 Some(value) => value.clone(),
                 None => json!({}),
             };
@@ -1137,24 +1176,117 @@ mod tests {
     fn a_router_answer_becomes_a_reply_with_parsed_arguments() {
         let body = json!({
             "output": {
-                "choices": [{"message": {
-                    "role": "assistant",
-                    "content": null,
-                    "tool_calls": [{
-                        "id": "call-1",
-                        "type": "function",
-                        "function": {"name": "cards.move", "arguments": "{\"card_id\":\"c1\"}"}
-                    }]
-                }}],
+                "choices": [{
+                    "finish_reason": "tool_calls",
+                    "message": {
+                        "role": "assistant",
+                        "content": null,
+                        "tool_calls": [
+                            {
+                                "id": "call-1",
+                                "type": "function",
+                                "function": {"name": "cards.move", "arguments": "{\"card_id\":\"c1\"}"}
+                            },
+                            {
+                                "id": "call-2",
+                                "type": "function",
+                                "function": {"name": "cards.label", "arguments": {"card_id": "c2"}}
+                            }
+                        ]
+                    }
+                }],
                 "usage": {"total_tokens": 7}
             }
         });
         let reply = model_reply(&body).expect("a well-formed answer");
-        assert_eq!(reply.tool_calls.len(), 1);
+        assert_eq!(reply.tool_calls.len(), 2);
         assert_eq!(reply.tool_calls[0].name, "cards.move");
         assert_eq!(reply.tool_calls[0].arguments, json!({"card_id": "c1"}));
+        assert_eq!(reply.tool_calls[1].name, "cards.label");
+        assert_eq!(
+            reply.tool_calls[1].arguments,
+            json!({"card_id": "c2"}),
+            "an arguments object passes through unchanged"
+        );
         assert_eq!(reply.usage, Some(json!({"total_tokens": 7})));
         assert!(reply.content.is_none());
+    }
+
+    #[test]
+    fn a_truncated_router_answer_is_refused_not_executed() {
+        let body = json!({
+            "output": {"choices": [{
+                "finish_reason": "length",
+                "message": {
+                    "role": "assistant",
+                    "content": "the partial answer",
+                    "tool_calls": [{
+                        "id": "call-1",
+                        "type": "function",
+                        "function": {"name": "cards.move", "arguments": "{}"}
+                    }]
+                }
+            }]}
+        });
+        let error = model_reply(&body).expect_err("a truncated answer must not become a reply");
+        assert_eq!(error.code, "inference-truncated");
+        assert_eq!(
+            error.status, 422,
+            "non-retryable: a 5xx would re-buy the capped call"
+        );
+    }
+
+    #[test]
+    fn invalid_tool_argument_json_is_refused_not_replaced_with_an_empty_object() {
+        let body = json!({
+            "output": {"choices": [{
+                "finish_reason": "tool_calls",
+                "message": {"tool_calls": [{
+                    "id": "call-1",
+                    "type": "function",
+                    "function": {"name": "cards.move", "arguments": "{\"card_id\":"}
+                }]}
+            }]}
+        });
+        let error = model_reply(&body).expect_err("a partial argument payload must not execute");
+        assert_eq!(error.code, "inference-bad-tool-arguments");
+        assert_eq!(error.status, 422);
+    }
+
+    #[test]
+    fn a_tool_call_with_no_name_is_a_typed_refusal_not_a_retried_5xx() {
+        let body = json!({
+            "output": {"choices": [{
+                "finish_reason": "tool_calls",
+                "message": {"tool_calls": [{
+                    "id": "call-1",
+                    "type": "function",
+                    "function": {"arguments": "{}"}
+                }]}
+            }]}
+        });
+        let error = model_reply(&body).expect_err("a nameless call must not execute");
+        assert_eq!(error.code, "inference-bad-tool-call");
+        assert_eq!(
+            error.status, 422,
+            "non-retryable: a 5xx would re-buy the call"
+        );
+    }
+
+    #[test]
+    fn empty_tool_arguments_become_an_empty_object() {
+        let body = json!({
+            "output": {"choices": [{
+                "finish_reason": "tool_calls",
+                "message": {"tool_calls": [{
+                    "id": "call-1",
+                    "type": "function",
+                    "function": {"name": "cards.list", "arguments": "   "}
+                }]}
+            }]}
+        });
+        let reply = model_reply(&body).expect("whitespace arguments mean none");
+        assert_eq!(reply.tool_calls[0].arguments, json!({}));
     }
 
     #[test]

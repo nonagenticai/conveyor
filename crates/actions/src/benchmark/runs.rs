@@ -24,6 +24,9 @@ use crate::views::Page;
 /// The arms a run may name. `conveyor` exists in the schema and is refused until S18.
 pub(crate) const ARMS: [&str; 4] = ["gold", "empty", "baseline", "conveyor"];
 
+/// The one named process the process arm measures (S18 §5; `seed/processes/named.yaml`).
+pub const PROCESS_ARM_KEY: &str = "swebench-fix";
+
 /// The job that produces one `conveyor` case's patch (S18 step 1).
 ///
 /// One job per case, like S19's `eval.case.run`: `agent.run` is a bounded but *long* call, so it
@@ -110,17 +113,6 @@ async fn benchmark_runs_start(
             "arm must be gold, empty, baseline or conveyor",
         ));
     }
-    if input.arm == "baseline" {
-        // S17 declares the baseline arm in scope, but its producer (`baseline.py`: the pinned
-        // system prompt, raw.githubusercontent source fetch, the edit contract and the difflib
-        // patch writer) has no build step in the slice plan. Refusing here is honest; a run
-        // that could never produce a patch would fail only in the driver.
-        return Err(ActionError::new(
-            409,
-            "arm_not_ready",
-            "the baseline arm's producer (the baseline.py port) is not built yet",
-        ));
-    }
     let subject_kind = input.subject_kind.as_deref().unwrap_or("suite");
     if !matches!(subject_kind, "suite" | "capability_agent" | "process") {
         return Err(invalid(
@@ -129,9 +121,35 @@ async fn benchmark_runs_start(
             "subject_kind must be suite, capability_agent or process",
         ));
     }
+    // A baseline is the direct pipeline over the suite: it names a model, never an agent or a
+    // process. Its producer is a bounded one-shot, so the model must be named at start.
+    let model_ref = if input.arm == "baseline" {
+        if subject_kind != "suite" {
+            return Err(invalid(
+                "subject_kind",
+                "invalid_value",
+                "a baseline run measures the suite directly; it names no agent or process",
+            ));
+        }
+        let model = input
+            .model
+            .as_deref()
+            .map(str::trim)
+            .filter(|model| !model.is_empty())
+            .ok_or_else(|| {
+                invalid(
+                    "model",
+                    "required",
+                    "a baseline run must name the model it measures",
+                )
+            })?;
+        Some(model.to_owned())
+    } else {
+        None
+    };
     // S18 §3: the run pins the executor version it measured. Resolved here, once, at start — never
     // joined at read time, where an edit would silently relabel a past measurement.
-    let (subject_version, capability_agent_id, process_id) = match subject_kind {
+    let (subject_version, capability_agent_id, process_id, agent_snapshot) = match subject_kind {
         "suite" => {
             if input.arm == "conveyor" {
                 return Err(invalid(
@@ -147,7 +165,7 @@ async fn benchmark_runs_start(
                     "a suite subject carries no capability_agent_id or process_id",
                 ));
             }
-            (None, None, None)
+            (None, None, None, None)
         }
         "capability_agent" => {
             let id = input.capability_agent_id.ok_or_else(|| {
@@ -179,20 +197,42 @@ async fn benchmark_runs_start(
                     ),
                 ));
             }
-            (Some(agent.version), Some(id), None)
+            // S18 §3 / W11: the run measures a **frozen** configuration. The snapshot is taken
+            // once, here, and the producer executes it; editing the agent row mid-run cannot
+            // change what a started benchmark measures.
+            let snapshot = json!({
+                "model_ref": agent.model_ref,
+                "prompt_ref": agent.prompt_ref,
+                "allowed_actions": agent.allowed_actions,
+                "max_iterations": agent.max_iterations,
+                "timeout_secs": agent.timeout_secs,
+                "version": agent.version,
+            });
+            (Some(agent.version), Some(id), None, Some(snapshot))
         }
         "process" => {
-            // S18 §5 allows a `swebench-fix` process as the producer. A process run is
-            // card-scoped (`process_runs.start` takes a card), and a benchmark instance is not a
-            // card, so the process producer needs a mapping that does not exist. Refusing here
-            // is honest and matches S17's `baseline` arm: a run that could never produce a patch
-            // would fail only in the driver, one case at a time.
-            return Err(ActionError::new(
-                409,
-                "arm_not_ready",
-                "the process arm's producer is not built; a capability_agent subject is what \
-                 this build can measure",
-            ));
+            // S18 §5: the process arm's only producer is the catalogue's `swebench-fix` named
+            // process. Resolve the published version once, here, and pin its id and version: the
+            // producer then executes exactly the version the run names, never a later edit.
+            let id = input.process_id.ok_or_else(|| {
+                ActionError::new(
+                    409,
+                    "arm_not_ready",
+                    "a process subject must name the published swebench-fix process",
+                )
+            })?;
+            let record = store::process::get_process_tx(&mut *tx, ctx.tenant, id)
+                .await
+                .map_err(|error| subject_read_error(error, ACTION))?
+                .filter(|record| record.key == PROCESS_ARM_KEY && record.status == "published");
+            let Some(record) = record else {
+                return Err(ActionError::new(
+                    409,
+                    "arm_not_ready",
+                    "the process arm measures only the published swebench-fix process",
+                ));
+            };
+            (Some(record.version), None, Some(record.id), None)
         }
         _ => unreachable!("validated above"),
     };
@@ -247,11 +287,17 @@ async fn benchmark_runs_start(
         .iter()
         .map(|instance| instance.instance_id.clone())
         .collect();
-    let options = json!({
+    let mut options = json!({
         "concurrency": concurrency,
         "only": input.only,
         "with_failing_test": input.with_failing_test,
     });
+    if let Some(snapshot) = agent_snapshot {
+        options["agent_snapshot"] = snapshot;
+    }
+    if let Some(model) = model_ref {
+        options["model_ref"] = json!(model);
+    }
 
     let run = store::benchmark::create_run_tx(
         &mut *tx,

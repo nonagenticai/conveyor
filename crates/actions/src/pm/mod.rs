@@ -1033,6 +1033,17 @@ async fn changes_request(
     ctx: HandlerCtx,
     input: ChangeRequestIn,
 ) -> Result<HandlerOutput<ChangeRequestOut>, ActionError> {
+    // A change without a rationale cannot be judged by its gate: the body is the rationale, and
+    // the refusal is the one SPEC_V2 §8.4 / T18's Plan contract names. Input is refused before
+    // the PM binding is resolved.
+    let rationale = input.body.as_deref().map(str::trim).unwrap_or_default();
+    if rationale.is_empty() {
+        return Err(ActionError::new(
+            422,
+            "change_rationale_required",
+            "a change request needs a rationale in `body`",
+        ));
+    }
     // Two authorities: a PM process run's active binding, or — for a tenant that has no PM
     // process — the project's current approved scope baseline itself (v1-change-1). The direct
     // route validates exactly what the WBS change guard resolves, so the change it opens can

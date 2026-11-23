@@ -66,6 +66,11 @@ async fn a_pilot_writes_one_row_per_case_with_a_transcript_and_a_grade_object() 
             row.model, "eval-model",
             "the model comes from the response, never from the config: {row:?}"
         );
+        assert_eq!(
+            row.stop_reason.as_deref(),
+            Some("stop"),
+            "the finish_reason is recorded, never dropped: {row:?}"
+        );
         assert!(row.latency_ms >= 0, "{row:?}");
     }
     assert_eq!(
@@ -104,6 +109,61 @@ async fn a_pilot_writes_one_row_per_case_with_a_transcript_and_a_grade_object() 
         array[1]["content"], "billing",
         "the second turn is what it answered: {turns}"
     );
+}
+
+#[tokio::test]
+async fn an_agent_run_subject_runs_through_the_executor() {
+    let db = common::TestDb::fresh().await;
+    let _ = fx::stub_base();
+    let fixture = fx::fixture(&db, &["classify: refund"]).await;
+
+    // The loop needs a real principal to act as (CONTRACT §17).
+    let actor: Uuid = sqlx::query_scalar(
+        "INSERT INTO app_user (display_name) VALUES ('eval actor') RETURNING id",
+    )
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("an actor");
+    sqlx::query("INSERT INTO membership (tenant_id, user_id, role) VALUES ($1, $2, 'admin')")
+        .bind(fixture.tenant.as_uuid())
+        .bind(actor)
+        .execute(&db.super_pool)
+        .await
+        .expect("the tenant's actor");
+    sqlx::query(
+        "UPDATE eval SET subject_kind = 'agent_run', entry_action = 'agent.run'
+          WHERE tenant_id = $1 AND id = $2",
+    )
+    .bind(fixture.tenant.as_uuid())
+    .bind(fixture.eval_id)
+    .execute(&db.super_pool)
+    .await
+    .expect("an agent_run eval");
+
+    run_case(
+        &db.runtime,
+        "conveyor",
+        fixture.tenant,
+        fixture.run_id,
+        fixture.cases[0],
+        0,
+    )
+    .await
+    .expect("the agent case ran");
+
+    let rows = fx::results(&db, &fixture).await;
+    assert_eq!(rows.len(), 1, "one row for the one case");
+    assert_eq!(rows[0].status, "ok", "{rows:?}");
+    assert_eq!(
+        rows[0].model, "eval-model",
+        "the served model comes from the ledger, never from the config: {rows:?}"
+    );
+    assert_eq!(
+        rows[0].grade,
+        json!({"label_accuracy": 1.0}),
+        "the agent's answer is graded like any other subject: {rows:?}"
+    );
+    assert_eq!(fx::trace_count(&db, &fixture).await, 1);
 }
 
 #[tokio::test]
