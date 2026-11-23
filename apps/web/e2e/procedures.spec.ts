@@ -62,8 +62,9 @@ test("an unreviewed source cannot publish", async ({ page, request }) => {
   await expect(refusal).toContainText("Publish refused");
   await expect(refusal).toContainText(/human must review/i);
 
-  // The judge stayed draft, and the read never turned into an error panel.
-  await page.getByRole("button", { name: "Workspace" }).click();
+  // The judge stayed draft, and the read never turned into an error panel. The tab bar is a
+  // tablist, so the tab's role is `tab`, not `button`.
+  await page.getByRole("tab", { name: "Workspace" }).click();
   await expect(
     page.getByTestId("procedures-table").locator("tr", { hasText: key }).getByText("draft", { exact: true }),
   ).toBeVisible();
