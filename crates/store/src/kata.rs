@@ -2,7 +2,7 @@
 //! T5 (#77) — the kata loop's queries (SPEC_V2 §6.3, §9.3–§9.4, §12 T5;
 //! `docs/plans/inception/T5/02-architecture-design.md`).
 //!
-//! The family is one lifecycle over four tables (`0068_kata.sql`):
+//! The family is one lifecycle over four tables (`0069_kata.sql`):
 //!
 //! ```text
 //! kata_open ──► kata_observe ──► kata_analyse ──► kata_propose ──► kata_measure

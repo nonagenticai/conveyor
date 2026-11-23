@@ -1,4 +1,4 @@
--- 0074_async_invocation.sql — the async invocation record (#579).
+-- 0062_async_invocation.sql — the async invocation record (#579).
 --
 -- A caller that cannot hold one HTTP response open — anything behind Cloudflare's ~100 s
 -- first-byte cap — submits a long action and polls the invocation id. The ESTATE ALREADY DOES
