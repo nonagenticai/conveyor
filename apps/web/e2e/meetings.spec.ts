@@ -33,6 +33,17 @@ async function seedMeeting(request: APIRequestContext, title: string): Promise<M
     convener_kind: "app_user",
     convener_id: me.principal.id,
   });
+  const risk = await invoke<{ id: string }>(request, "registers.create", {
+    project_id: board.projectId,
+    kind: "risk",
+    title: `${title} risk`,
+  });
+  await invoke(request, "meetings.agenda_add", {
+    meeting_id: meeting.id,
+    resolved_kind: "register_item",
+    resolved_id: risk.id,
+    evidence_refs: [],
+  });
   await invoke(request, "meetings.invite", {
     meeting_id: meeting.id,
     participant_kind: "app_user",
