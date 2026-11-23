@@ -257,15 +257,22 @@ def check_gap_counts(register_path: Path) -> str:
 
 
 def check_manifests(snapshot_dir: Path) -> tuple[bool, str]:
-    code, output = run_command(
-        [
-            sys.executable,
-            str(ROOT / "scripts" / "verify-project.py"),
-            "--all",
-            "--snapshot",
-            str(snapshot_dir),
-        ]
-    )
+    # The check reports the board; it must never write it. A bounded evidence directory
+    # keeps the executed manifests identical while the committed receipts stay untouched —
+    # without this, a viability run without the live transport env would republish every
+    # project's receipt red and then report its own side effect as the project's verdict.
+    with tempfile.TemporaryDirectory() as evidence:
+        code, output = run_command(
+            [
+                sys.executable,
+                str(ROOT / "scripts" / "verify-project.py"),
+                "--all",
+                "--snapshot",
+                str(snapshot_dir),
+                "--evidence-dir",
+                evidence,
+            ]
+        )
     if code == 0:
         return True, "every project manifest is green"
     reds = red_projects(output)
