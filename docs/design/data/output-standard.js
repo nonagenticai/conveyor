@@ -337,7 +337,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
           }
         ]
       },
-      "verifier": "generate-standards.py --check-category project-brief"
+      "verifier": "generate-standards.py --check-category project-brief",
+      "document_authored": true
     },
     "inception-analysis": {
       "required": [
@@ -403,7 +404,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
           }
         ]
       },
-      "verifier": "generate-standards.py --check-category inception-analysis"
+      "verifier": "generate-standards.py --check-category inception-analysis",
+      "document_authored": true
     },
     "architecture-design": {
       "required": [
@@ -481,7 +483,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
           }
         ]
       },
-      "verifier": "generate-standards.py --check-category architecture-design"
+      "verifier": "generate-standards.py --check-category architecture-design",
+      "document_authored": true
     },
     "decision": {
       "required": [
@@ -547,7 +550,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
           }
         ]
       },
-      "verifier": "generate-standards.py --check-category decision"
+      "verifier": "generate-standards.py --check-category decision",
+      "document_authored": true
     },
     "evidence": {
       "required": [
@@ -622,7 +626,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
           }
         ]
       },
-      "verifier": "generate-standards.py --check-category evidence"
+      "verifier": "generate-standards.py --check-category evidence",
+      "document_authored": true
     },
     "closure-review": {
       "required": [
@@ -685,7 +690,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
           }
         ]
       },
-      "verifier": "generate-standards.py --check-category closure-review"
+      "verifier": "generate-standards.py --check-category closure-review",
+      "document_authored": true
     },
     "vision": {
       "required": [
@@ -751,7 +757,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
           }
         ]
       },
-      "verifier": "generate-standards.py --check-category vision"
+      "verifier": "generate-standards.py --check-category vision",
+      "document_authored": true
     },
     "blueprint": {
       "required": [
@@ -1148,7 +1155,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
           }
         ]
       },
-      "verifier": "generate-standards.py --check-category reuse-map"
+      "verifier": "generate-standards.py --check-category reuse-map",
+      "document_authored": true
     },
     "brief-template": {
       "required": [
@@ -1199,7 +1207,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
           }
         ]
       },
-      "verifier": "generate-standards.py --check-category brief-template"
+      "verifier": "generate-standards.py --check-category brief-template",
+      "document_authored": true
     },
     "architecture-analysis": {
       "required": [
@@ -1265,7 +1274,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
           }
         ]
       },
-      "verifier": "generate-standards.py --check-category architecture-analysis"
+      "verifier": "generate-standards.py --check-category architecture-analysis",
+      "document_authored": true
     },
     "spec": {
       "required": [
@@ -1328,7 +1338,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
           }
         ]
       },
-      "verifier": "generate-standards.py --check-category spec"
+      "verifier": "generate-standards.py --check-category spec",
+      "document_authored": true
     },
     "benefit-profile": {
       "required": [
@@ -1784,7 +1795,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
           }
         ]
       },
-      "verifier": "generate-standards.py --check-category benefits-strategy"
+      "verifier": "generate-standards.py --check-category benefits-strategy",
+      "document_authored": true
     },
     "realization-plan": {
       "required": [
@@ -1847,7 +1859,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
           }
         ]
       },
-      "verifier": "generate-standards.py --check-category realization-plan"
+      "verifier": "generate-standards.py --check-category realization-plan",
+      "document_authored": true
     },
     "stakeholder-profiles": {
       "required": [
@@ -1948,7 +1961,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
           }
         ]
       },
-      "verifier": "generate-standards.py --check-category architecture-principles"
+      "verifier": "generate-standards.py --check-category architecture-principles",
+      "document_authored": true
     },
     "adm-profile": {
       "required": [
@@ -2106,7 +2120,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
           }
         ]
       },
-      "verifier": "generate-standards.py --check-category architecture-artifact"
+      "verifier": "generate-standards.py --check-category architecture-artifact",
+      "document_authored": true
     },
     "architecture-artifact-instance": {
       "required": [
@@ -4102,7 +4117,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
           }
         ]
       },
-      "verifier": "generate-standards.py --check-category candidate-solutions"
+      "verifier": "generate-standards.py --check-category candidate-solutions",
+      "document_authored": true
     },
     "project-context-diagram": {
       "required": [
@@ -4153,7 +4169,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
           }
         ]
       },
-      "verifier": "generate-standards.py --check-category project-context-diagram"
+      "verifier": "generate-standards.py --check-category project-context-diagram",
+      "document_authored": true
     },
     "benefits-diagram": {
       "required": [
@@ -4204,7 +4221,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
           }
         ]
       },
-      "verifier": "generate-standards.py --check-category benefits-diagram"
+      "verifier": "generate-standards.py --check-category benefits-diagram",
+      "document_authored": true
     },
     "gap-analysis": {
       "required": [
@@ -4251,7 +4269,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
           }
         ]
       },
-      "verifier": "generate-standards.py --check-category gap-analysis"
+      "verifier": "generate-standards.py --check-category gap-analysis",
+      "document_authored": true
     },
     "phase-e": {
       "required": [
@@ -4626,7 +4645,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
           }
         ]
       },
-      "verifier": "generate-standards.py --check-category pi-plan"
+      "verifier": "generate-standards.py --check-category pi-plan",
+      "document_authored": true
     },
     "pi-objectives": {
       "required": [
@@ -4693,7 +4713,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
           }
         ]
       },
-      "verifier": "generate-standards.py --check-category pi-objectives"
+      "verifier": "generate-standards.py --check-category pi-objectives",
+      "document_authored": true
     },
     "system-demo": {
       "required": [
@@ -4753,7 +4774,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
           }
         ]
       },
-      "verifier": "generate-standards.py --check-category system-demo"
+      "verifier": "generate-standards.py --check-category system-demo",
+      "document_authored": true
     },
     "inspect-adapt": {
       "required": [
@@ -4822,7 +4844,8 @@ window.CONVEYOR_OUTPUT_STANDARD = {
           }
         ]
       },
-      "verifier": "generate-standards.py --check-category inspect-adapt"
+      "verifier": "generate-standards.py --check-category inspect-adapt",
+      "document_authored": true
     }
   },
   "on_demand": [
