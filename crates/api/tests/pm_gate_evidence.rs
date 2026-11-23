@@ -302,10 +302,10 @@ async fn a_live_contract_resolves_the_gate() {
 
     // The trace edge is read back through the action, filtered at the end the gate wrote from.
     // The row itself is asserted on BOTH ends: P4.1 is the asset → project edge, not merely an
-    // edge. The read filters on `from_*` alone because the action's end-type vocabulary
-    // (`END_TYPES`, crates/store/src/trace_link.rs:29) still lists only governed_asset and card
-    // while the writer here uses `project` — a `to_type: "project"` filter is refused 422 until
-    // that constant is widened (reported on the issue; the widening is a source change).
+    // edge. The action's end-type vocabulary is the store's `END_TYPES`
+    // (crates/store/src/trace_link.rs), which admits `governed_asset`, `card`, `project` and a
+    // published `document`; this read filters on `from_*` because that is the end the gate
+    // wrote from.
     let (status, body) = fixture
         .running
         .invoke(

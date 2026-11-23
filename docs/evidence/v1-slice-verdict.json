@@ -1,9 +1,9 @@
 {
   "schema": "verify-slices/v1",
-  "audited_sha": "4727213b8c204ec69d825d24129f6b506ebb2a2e",
+  "audited_sha": "65e1a5e6c6f82aa7ae2d9741bc90f68fb5252cd8",
   "snapshot": {
-    "path": "/tmp/snap-r3/data",
-    "git_sha": "4727213b8c204ec69d825d24129f6b506ebb2a2e",
+    "path": "/tmp/snap-526v7/data",
+    "git_sha": "65e1a5e6c6f82aa7ae2d9741bc90f68fb5252cd8",
     "generated_at": "2026-11-23T08:09:50.563209+00:00"
   },
   "slices": [
@@ -1177,7 +1177,7 @@
           "id": "T9-review",
           "kind": "generic",
           "result": "pass",
-          "detail": "review 01a20284-debf-7149-ba0d-d59c876255f7 (compliant) of the live contract cites the published delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14"
+          "detail": "review 01a207b2-5e83-7b6c-a11e-4f0ee5821d4d (compliant) of the live contract cites the published delegation 01a2021d-cca2-757c-bfc2-21bd4e4b6d85"
         },
         {
           "id": "T9-closure-gate",
@@ -1303,7 +1303,7 @@
           "id": "T10-review",
           "kind": "generic",
           "result": "pass",
-          "detail": "review 01a2028a-3c4e-7a50-8ee9-d59ad0f11396 (compliant) of the live contract cites the published delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14"
+          "detail": "review 01a207b2-5e09-701b-b59d-43bc0f385061 (compliant) of the live contract cites the published delegation 01a2021d-cca2-757c-bfc2-21bd4e4b6d85"
         },
         {
           "id": "T10-closure-gate",
@@ -1681,7 +1681,7 @@
           "id": "T13-review",
           "kind": "generic",
           "result": "pass",
-          "detail": "review 01a2027a-6502-72a6-9ef8-4c1582dbdf36 (compliant) of the live contract cites the published delegation 01a1ff1f-e4ba-72dc-9c1a-13049933cf14"
+          "detail": "review 01a207b2-5d8c-7ecb-a7ad-af815b8fc70c (compliant) of the live contract cites the published delegation 01a2021d-cca2-757c-bfc2-21bd4e4b6d85"
         },
         {
           "id": "T13-closure-gate",

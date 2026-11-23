@@ -19,9 +19,10 @@ use uuid::Uuid;
 ///
 /// The name **is** the table: `governed_asset` covers requirements, principles and ADRs (the
 /// asset's `kind` distinguishes them); `card` is a work item; `project` is the programme
-/// project a gate's evidence traces to (T3). A new end type is a code change
-/// here, never an input.
-pub const END_TYPES: [&str; 3] = ["governed_asset", "card", "project"];
+/// project a gate's evidence traces to (T3); `document` is a published `document` row, so the
+/// artefact factory's output can be trace-linked to its project (SPEC_V2 §8.5). A new end
+/// type is a code change here, never an input.
+pub const END_TYPES: [&str; 4] = ["governed_asset", "card", "project", "document"];
 
 /// The five edge kinds `trace_link_kind_check` admits (0002_domain.sql).
 pub const LINK_KINDS: [&str; 5] = ["traces", "realises", "derives", "satisfies", "conflicts"];
@@ -102,7 +103,9 @@ pub struct TraceFilter {
 #[derive(Debug, thiserror::Error)]
 pub enum TraceLinkStoreError {
     /// An end type outside [`END_TYPES`].
-    #[error("unknown trace end type {0:?}: expected one of governed_asset, card")]
+    #[error(
+        "unknown trace end type {0:?}: expected one of governed_asset, card, project, document"
+    )]
     UnknownType(String),
     /// An edge kind outside [`LINK_KINDS`].
     #[error(
@@ -132,6 +135,7 @@ fn end_table(end_type: &str) -> Option<&'static str> {
         "governed_asset" => Some("governed_asset"),
         "card" => Some("card"),
         "project" => Some("project"),
+        "document" => Some("document"),
         _ => None,
     }
 }
