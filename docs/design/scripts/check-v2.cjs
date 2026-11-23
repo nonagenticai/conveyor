@@ -316,7 +316,13 @@ const shot = (name) => path.join(process.env.CONVEYOR_QA_OUTPUT || os.tmpdir(), 
     );
     await nav("validation");
     const validation = await content();
-    check(validation.includes("49"), "the Validation page carries the measured 49 projects");
+    const measuredTotal = require(
+      path.resolve(__dirname, "../data/coverage.json"),
+    ).summary.projects.total;
+    check(
+      validation.includes(String(measuredTotal)),
+      `the Validation page carries the measured ${measuredTotal} projects`,
+    );
     await nav("contribute");
     check(
       (await content()).includes("No ready unit is published right now"),

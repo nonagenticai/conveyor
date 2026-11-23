@@ -1,8 +1,8 @@
 {
   "counts": {
     "P0": 22,
-    "P1": 132,
-    "P2": 35,
+    "P1": 133,
+    "P2": 37,
     "P3": 0
   },
   "gaps": [
@@ -1180,6 +1180,14 @@
       "evidence": null,
       "rule": "seed_live_drift",
       "severity": "P1",
+      "subject": "S21"
+    },
+    {
+      "detail": "seed status 'closed' != live status 'active'",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "seed_live_drift",
+      "severity": "P1",
       "subject": "T11"
     },
     {
@@ -1269,6 +1277,22 @@
       "rule": "requester_is_approver",
       "severity": "P2",
       "subject": "T9"
+    },
+    {
+      "detail": "seed status 'active' != live status 'closed'",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "seed_live_drift",
+      "severity": "P2",
+      "subject": "T13"
+    },
+    {
+      "detail": "seed status 'active' != live status 'closed'",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "seed_live_drift",
+      "severity": "P2",
+      "subject": "T14"
     },
     {
       "detail": "adm_phase is absent from the live meta for DESIGN-PUBLISH, P0, PLATFORM, S00, S01, S02, S03, S04, S05, S06, S06a, S06b, S06c, S06d, S07, S08, S09, S10, S11, S12, S13, S14, S15, S16, S17, S18, S19, S20, S21, SPEC-V2, T0, T1, T10, T11, T12, T13, T14, T15, T16, T17, T2, T3, T4, T5, T6, T7, T8, T9",

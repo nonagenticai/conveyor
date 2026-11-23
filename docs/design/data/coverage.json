@@ -333,8 +333,8 @@
       "track": "programme",
       "tranche": 0,
       "units": {
-        "blocked": 4,
-        "claimed": 3,
+        "blocked": 3,
+        "claimed": 2,
         "numbers": [
           17,
           22,
@@ -362,11 +362,9 @@
           545,
           569,
           572,
-          604,
-          605,
-          606
+          604
         ],
-        "open": 19,
+        "open": 17,
         "ready": 5,
         "unknown": 0
       }
@@ -613,6 +611,7 @@
         "T14",
         "T16",
         "T18",
+        "T19",
         "T4",
         "T9"
       ],
@@ -866,6 +865,7 @@
         "T14",
         "T16",
         "T18",
+        "T19",
         "T4",
         "T9"
       ],
@@ -954,6 +954,7 @@
         "T14",
         "T16",
         "T18",
+        "T19",
         "T4",
         "T9"
       ],
@@ -1675,6 +1676,7 @@
         "T14",
         "T16",
         "T18",
+        "T19",
         "T4",
         "T9"
       ],
@@ -1854,6 +1856,7 @@
         "T10",
         "T16",
         "T18",
+        "T19",
         "T4",
         "T9"
       ],
@@ -1944,6 +1947,7 @@
         "T10",
         "T14",
         "T18",
+        "T19",
         "T4",
         "T9"
       ],
@@ -2037,6 +2041,7 @@
         "T10",
         "T14",
         "T16",
+        "T19",
         "T4",
         "T9"
       ],
@@ -2056,6 +2061,55 @@
           566
         ],
         "open": 4,
+        "ready": 0,
+        "unknown": 0
+      }
+    },
+    {
+      "blocked_by": [],
+      "evidence": [
+        "docs/SPEC_V2.md"
+      ],
+      "gap": "table meeting_type, table meeting, table meeting_agenda_item, table meeting_attendance, table meeting_position, action meetings.schedule",
+      "key": "T19",
+      "measured": {
+        "actions": [
+          0,
+          12
+        ],
+        "modules": [
+          0,
+          1
+        ],
+        "tables": [
+          0,
+          5
+        ]
+      },
+      "name": "Decision forums (meetings)",
+      "parallel_with": [
+        "S05",
+        "S07",
+        "S09",
+        "T10",
+        "T14",
+        "T16",
+        "T18",
+        "T4",
+        "T9"
+      ],
+      "plan": "docs/SPEC_V2.md#12",
+      "status": "proposed",
+      "track": "v2",
+      "tranche": 4,
+      "units": {
+        "blocked": 1,
+        "claimed": 1,
+        "numbers": [
+          605,
+          606
+        ],
+        "open": 2,
         "ready": 0,
         "unknown": 0
       }
@@ -2173,6 +2227,7 @@
         "T14",
         "T16",
         "T18",
+        "T19",
         "T9"
       ],
       "plan": "docs/SPEC_V2.md#12",
@@ -2393,6 +2448,7 @@
         "T14",
         "T16",
         "T18",
+        "T19",
         "T4"
       ],
       "plan": "docs/SPEC_V2.md#12",
@@ -2656,12 +2712,12 @@
         "built": 40,
         "partial": 1,
         "planned": 0,
-        "proposed": 6,
+        "proposed": 7,
         "standing": 1
       },
-      "total": 49,
+      "total": 50,
       "uncovered": [],
-      "with_open_units": 19,
+      "with_open_units": 20,
       "without_open_units": 30
     },
     "screens": {

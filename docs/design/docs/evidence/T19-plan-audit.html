@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>T19 plan audit — independent verification record · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/T19-plan-audit.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="t19-plan-audit--independent-verification-record">T19 plan audit — independent verification record</h1>
+<p><strong>Scope:</strong> issue #605 · branch <code>issue/605-t19-plan</code> · worktree <code>.worktrees/issue-605</code> <strong>Baseline:</strong> <code>origin/main@b9a6e2933cd50633893d581c8992c06caa043ce7</code>, measured 2026-11-23 <strong>Audited heads:</strong> first audit <code>9f8c4a73</code>; re-audit <code>b36af6be</code></p>
+<p>Verdict: YES</p>
+<h2 id="what-was-audited">What was audited</h2>
+<p>The unit ports the meeting design onto <code>origin/main</code> as <strong>T19</strong> and <strong>D66</strong>, preserving the in-flight T18 UI slice; writes the T9-shape implementation plan and the MSP/TOGAF/SAFe programme artefacts; and registers T19 in the programme seed, coverage, P0, index and docs pack. No Rust, migration, action or console code is in scope; #606 is the implementation issue and stays open.</p>
+<h2 id="first-audit--no">First audit — NO</h2>
+<p>The first independent audit returned NO on two defects:</p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Defect</th>
+<th>Evidence</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><code>docs/design/scripts/check-v2.cjs</code> asserted the Validation page contains the literal <code>49</code>; the programme now has 50 projects, so the design-pack gate failed</td>
+<td><code>check-v2.cjs:319</code>; <code>coverage.json</code> total 50; CI <code>ci-public.yml</code> runs the check</td>
+<td>the check reads <code>coverage.json</code>'s <code>summary.projects.total</code> and asserts that string; the <code>v2.js</code> mandate prose says 50</td>
+</tr>
+<tr>
+<td>2</td>
+<td>issue #605's W4.3 literal <code>grep -q 'T0–T19'</code> failed because the index writes the range as <code>`T0`–`T19`</code></td>
+<td><code>docs/plans/00-INDEX.md:49</code>; W4.3 exit 1</td>
+<td>the issue command now checks <code>T19</code> and <code>T18</code> presence; the index text is unchanged and still names the full range</td>
+</tr>
+</tbody>
+</table>
+<h2 id="re-audit--yes">Re-audit — YES</h2>
+<p>A fresh independent validator re-ran the gates at <code>b36af6be</code>:</p>
+<ul>
+<li><code>check-v2.cjs</code> exit 0, 281 checks, "the Validation page carries the measured 50 projects".</li>
+<li>Non-vacuity proven by two mutants in a throwaway copy: a page rendering 49 with JSON 50, and a JSON total of 51 with the page at 50, both fail the assertion.</li>
+<li>Issue #605 W4.3 exact command exits 0; W5.2's eleven-command static gate exits 0.</li>
+<li>T18 row byte-identical to <code>origin/main</code>; exactly 20 T rows T0–T19; D66 present; D64/D65 remain the real-UI rulings; no meeting sentence calls itself T18 or D64.</li>
+<li>Seed: 50 projects; T19 tranche 4 with <code>depends_on</code> T1/T2/T3/P0; 7 benefits; 8 links.</li>
+<li>Coverage: T19 <code>proposed</code>, measured gap, 2 open units (#605/#606); #606 open and blocked only by #605; no false <code>blocked_by</code> on built T9/T10.</li>
+<li>Docs: <code>documents.json</code> 131 entries including all seven T19 pages; the only deletion is the generated orphan <code>0009-real-v2-ui.html</code> (its source is <code>0013</code>; the registry references it zero times); <code>outputs.js</code>, <code>output-*.html</code> and <code>standards/</code> are unchanged versus the baseline.</li>
+<li>Scope: no <code>crates/</code>, <code>migrations/</code>, <code>apps/</code>, <code>.rs</code> or <code>.sql</code> changes; no T18-lane source change.</li>
+</ul>
+<h2 id="non-blocking-notes-and-disposition">Non-blocking notes and disposition</h2>
+<table>
+<thead>
+<tr>
+<th>Note</th>
+<th>Disposition</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>check-v2.cjs</code> asserts the total over the whole page text, not the Projects cell; non-vacuous at 50, but a future single-digit total could match elsewhere</td>
+<td>accepted for this unit; anchor to the cell if the total ever falls below two digits</td>
+</tr>
+<tr>
+<td>W5.2's <code>git diff --check</code> is vacuous on a clean tree</td>
+<td>the substantive <code>git diff --check origin/main...HEAD</code> also exits 0</td>
+</tr>
+<tr>
+<td>The issue-body edit has no git provenance</td>
+<td>the issue is the contract; its W4.3 command is the executed gate</td>
+</tr>
+<tr>
+<td>No CI run exists at the audited head</td>
+<td>the PR's design-pack run is the final CI gate; the local W5.2 gate and the six Playwright pack checks are green</td>
+</tr>
+</tbody>
+</table>
+<h2 id="reproduce">Reproduce</h2>
+<pre class="bash"><code>cd .worktrees/issue-605
+python3 scripts/build-programme-seed.py --check
+python3 scripts/check-programme-definition.py
+python3 scripts/build-coverage.py --check
+python3 scripts/build-v2-coverage.py --check
+python3 scripts/check-output-standard.py --self-test &amp;&amp; python3 scripts/check-output-standard.py
+python3 scripts/ci/board.py --self-test
+node docs/design/scripts/check-coverage.cjs --self-test &amp;&amp; node docs/design/scripts/check-coverage.cjs
+node docs/design/scripts/check-data.cjs
+node docs/design/scripts/check-docs.cjs
+python3 docs/design/scripts/build-docs.py --check
+node docs/design/scripts/check-console.cjs
+node docs/design/scripts/check-v2.cjs
+node docs/design/scripts/check-studio.cjs
+node docs/design/scripts/check-learning.cjs
+node docs/design/scripts/check-workbench.cjs
+node docs/design/scripts/check-architecture.cjs
+git diff --check origin/main...HEAD</code></pre>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/T19-plan-audit.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

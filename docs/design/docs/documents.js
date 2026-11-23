@@ -42,8 +42,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/SPEC_V2.html",
       "source": "docs/SPEC_V2.md",
       "section": "Spec",
-      "sha256": "a9386790e9ea2bebf9f2335d36be99fae8c48ecfc41c6f510275e968fd1a2df9",
-      "bytes": 179883,
+      "sha256": "eb3dd5dfb95629956ba6b4b23d19b160dec27a72d4ab6af10615664331442482",
+      "bytes": 195885,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/SPEC_V2.md"
     },
     {
@@ -177,8 +177,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/design/Program_Architecture_and_Benefits_Realization.html",
       "source": "docs/design/Program_Architecture_and_Benefits_Realization.md",
       "section": "Design",
-      "sha256": "b04c408f23e99cecc79ab12c285544d533dd7454797a78c000a739826b1f9474",
-      "bytes": 13342,
+      "sha256": "9e458d5cccadbc30db80c08a147cb469ea48a3262df8e8994866afa138de3a1a",
+      "bytes": 16103,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/design/Program_Architecture_and_Benefits_Realization.md"
     },
     {
@@ -488,6 +488,15 @@ window.CONVEYOR_DOCUMENTS = {
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S21-WORKPACKAGE.md"
     },
     {
+      "title": "T19 plan audit — independent verification record",
+      "path": "docs/evidence/T19-plan-audit.html",
+      "source": "docs/evidence/T19-plan-audit.md",
+      "section": "Evidence",
+      "sha256": "74e99f19a2c24033195e63f2e31e30c1cd6f8c8086091c950987a7c418c7d084",
+      "bytes": 4302,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/T19-plan-audit.md"
+    },
+    {
       "title": "The analysis service — capture and drop table (2026-11-15)",
       "path": "docs/evidence/analysis-capture-2026-11-15.html",
       "source": "docs/evidence/analysis-capture-2026-11-15.md",
@@ -501,8 +510,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/evidence/conformance-gap-register.html",
       "source": "docs/evidence/conformance-gap-register.md",
       "section": "Evidence",
-      "sha256": "aa21da69c78b166169d06e4d2d6ab4c403eecd991339a0bc78b283560d1be7e7",
-      "bytes": 23231,
+      "sha256": "4cfd81a55cf9466384497cf43c8caf00e354a15a70fa0f28a1797c47a5a21870",
+      "bytes": 23313,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/conformance-gap-register.md"
     },
     {
@@ -591,8 +600,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/evidence/v2-coverage.html",
       "source": "docs/evidence/v2-coverage.md",
       "section": "Evidence",
-      "sha256": "5afe4d53eba20ee3c412170245724a50746a89c8bf83a34885deedfd2f808d04",
-      "bytes": 12948,
+      "sha256": "2543e7b16d80afee1090d8694c1fe11207f955a9f327589c3929a56dfbb0ee20",
+      "bytes": 13992,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/v2-coverage.md"
     },
     {
@@ -600,8 +609,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/00-INDEX.html",
       "source": "docs/plans/00-INDEX.md",
       "section": "Plans",
-      "sha256": "fcf0c2d6ac708871232465423d3b41b580576106cbef46de7854e0a67fc61d30",
-      "bytes": 255320,
+      "sha256": "3b6fce757ba9b6c942ab074d83a84b4e02df4fde5300bc6caa35e40d252fd300",
+      "bytes": 256009,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/00-INDEX.md"
     },
     {
@@ -708,7 +717,7 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/P0-programme-definition.html",
       "source": "docs/plans/P0-programme-definition.md",
       "section": "Plans",
-      "sha256": "538f4aa69586234a3a03c4adb93a51fb30dac859e0b6dc7681ef04988f18cd50",
+      "sha256": "cd7d2968eee9c16df04adc05d3dd3c79a52ce91d09b58c391d3ce3644b05f3b8",
       "bytes": 13658,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/P0-programme-definition.md"
     },
@@ -747,6 +756,69 @@ window.CONVEYOR_DOCUMENTS = {
       "sha256": "a532c8aab5ef93d8bd5b13d390544ed18050c2fe205ee026fd51e6f0f53b0cc4",
       "bytes": 3462,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T18/project-brief.md"
+    },
+    {
+      "title": "T19 — Decision forums (meetings)",
+      "path": "docs/plans/T19-decision-forums.html",
+      "source": "docs/plans/T19-decision-forums.md",
+      "section": "Plans",
+      "sha256": "8f8c85d67e6cc6928bf174ccf600ed55d1f46ab72764da88a25ed7f79c4cebd4",
+      "bytes": 25846,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T19-decision-forums.md"
+    },
+    {
+      "title": "T19 — Architecture design (PSA and HLD)",
+      "path": "docs/plans/T19/architecture-design.html",
+      "source": "docs/plans/T19/architecture-design.md",
+      "section": "Plans",
+      "sha256": "53c9df699470184dad570edcd6f82e3c09ef3c0fa61a76092ae1b96382240ef0",
+      "bytes": 14788,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T19/architecture-design.md"
+    },
+    {
+      "title": "T19 — Artefact register",
+      "path": "docs/plans/T19/artifact-register.html",
+      "source": "docs/plans/T19/artifact-register.md",
+      "section": "Plans",
+      "sha256": "b047cc7995b3e26f084c656916d71292697d28c453ea46907c5e744e1a2b0f9d",
+      "bytes": 3430,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T19/artifact-register.md"
+    },
+    {
+      "title": "T19 — Inception analysis",
+      "path": "docs/plans/T19/inception-analysis.html",
+      "source": "docs/plans/T19/inception-analysis.md",
+      "section": "Plans",
+      "sha256": "69b54af6f41e775bb59149461d8fb3e642786af83981935f8657f20ad9b95820",
+      "bytes": 6382,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T19/inception-analysis.md"
+    },
+    {
+      "title": "T19 — MSP profile",
+      "path": "docs/plans/T19/msp-profile.html",
+      "source": "docs/plans/T19/msp-profile.md",
+      "section": "Plans",
+      "sha256": "3f4ccfc6d33185e201bb06775a61134e489407aeec9f3f682d3b2c4cbbfa944a",
+      "bytes": 8527,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T19/msp-profile.md"
+    },
+    {
+      "title": "T19 — Project brief",
+      "path": "docs/plans/T19/project-brief.html",
+      "source": "docs/plans/T19/project-brief.md",
+      "section": "Plans",
+      "sha256": "28ff3029a69911da34695a9862f6ae6e9d83c3b84fe55de010a05a38e8bb4c4f",
+      "bytes": 5364,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T19/project-brief.md"
+    },
+    {
+      "title": "T19 — SAFe epic",
+      "path": "docs/plans/T19/safe-epic.html",
+      "source": "docs/plans/T19/safe-epic.md",
+      "section": "Plans",
+      "sha256": "c4cd154bc3d1047bdb8bcfb9aec7f62d96580fcdb99b046305b76ed070a2763b",
+      "bytes": 5420,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T19/safe-epic.md"
     },
     {
       "title": "T9 — TOGAF ADM capability",

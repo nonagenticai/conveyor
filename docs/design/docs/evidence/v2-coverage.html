@@ -42,12 +42,12 @@
 <tr>
 <td><code>extend</code></td>
 <td>a V1 ancestor route exists, or the V2 route exists without its spec</td>
-<td>9</td>
+<td>10</td>
 </tr>
 <tr>
 <td><code>new</code></td>
 <td>neither the route nor an ancestor exists</td>
-<td>5</td>
+<td>11</td>
 </tr>
 </tbody>
 </table>
@@ -265,6 +265,46 @@
 <td>migrations: CREATE TABLE governance_body</td>
 </tr>
 <tr>
+<td><code>table:meeting_type</code></td>
+<td>§10.3</td>
+<td>table</td>
+<td>meeting_type</td>
+<td><code>new</code></td>
+<td>migrations: no CREATE/ALTER TABLE meeting_type</td>
+</tr>
+<tr>
+<td><code>table:meeting</code></td>
+<td>§10.3</td>
+<td>table</td>
+<td>meeting</td>
+<td><code>new</code></td>
+<td>migrations: no CREATE/ALTER TABLE meeting</td>
+</tr>
+<tr>
+<td><code>table:meeting_agenda_item</code></td>
+<td>§10.3</td>
+<td>table</td>
+<td>meeting_agenda_item</td>
+<td><code>new</code></td>
+<td>migrations: no CREATE/ALTER TABLE meeting_agenda_item</td>
+</tr>
+<tr>
+<td><code>table:meeting_attendance</code></td>
+<td>§10.3</td>
+<td>table</td>
+<td>meeting_attendance</td>
+<td><code>new</code></td>
+<td>migrations: no CREATE/ALTER TABLE meeting_attendance</td>
+</tr>
+<tr>
+<td><code>table:meeting_position</code></td>
+<td>§10.3</td>
+<td>table</td>
+<td>meeting_position</td>
+<td><code>new</code></td>
+<td>migrations: no CREATE/ALTER TABLE meeting_position</td>
+</tr>
+<tr>
 <td><code>table:architecture_maturity</code></td>
 <td>§10.3</td>
 <td>table</td>
@@ -393,6 +433,14 @@
 <td>actions: approval_policies.* found (approval_policies.get, approval_policies.list, approval_policies.set)<br>actions: approvals.* found (approvals.decide, approvals.list, approvals.request)</td>
 </tr>
 <tr>
+<td><code>actions:meetings</code></td>
+<td>§10.4</td>
+<td>actions</td>
+<td>meetings</td>
+<td><code>extend</code></td>
+<td>actions: architecture.* found (architecture.artifacts_approve, architecture.artifacts_create, architecture.artifacts_entries…)<br>actions: meetings.* absent</td>
+</tr>
+<tr>
 <td><code>actions:decision</code></td>
 <td>§10.4</td>
 <td>actions</td>
@@ -511,6 +559,14 @@
 <td>Portfolio</td>
 <td><code>exists</code></td>
 <td>apps/web/src/app.rs: route '/portfolio' found<br>apps/web/src/app.rs: route '/portfolio/:programme_id' found<br>apps/web/e2e/portfolio.spec.ts: present<br>docs/design/v2.js: page 'portfolio' — design reference, not implementation<br><em>The V1 boards are the nearest surface; the computed portfolio, shared config, WSJF and cadence are T1/T10.</em></td>
+</tr>
+<tr>
+<td><code>destination:Meetings</code></td>
+<td>§10.5</td>
+<td>destination</td>
+<td>Meetings</td>
+<td><code>new</code></td>
+<td>apps/web/src/app.rs: route '/meetings' absent<br>apps/web/src/app.rs: route '/meetings/:id' absent<br>apps/web/e2e/meetings.spec.ts: absent</td>
 </tr>
 <tr>
 <td><code>destination:Programme</code></td>

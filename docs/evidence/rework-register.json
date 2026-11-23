@@ -7846,9 +7846,9 @@
           "detail": "seed status 'closed' != live status 'active'",
           "disposition": "rework",
           "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
           "subject": "S21"
         },

@@ -26,7 +26,7 @@
     <main class="doc-body"><h1 id="spec-v2--conveyor-the-organisational-operating-model">SPEC V2 — conveyor: the organisational operating model</h1>
 <p><strong>Repo:</strong> <code>nonagenticai/conveyor</code> · <strong>Host:</strong> <code>conveyor.nonagentic.ai</code> · <strong>Port:</strong> 8930 (existing; no new port) <strong>Date:</strong> 2026-11-11 · <strong>Status:</strong> draft for review · no V2 code written <strong>Relationship to <code>SPEC.md</code>:</strong> V1 (2026-11-07) remains the build record and stays binding for the slices it defines. V2 extends it — it adds <strong>the organisation that works the conveyor</strong> and <strong>the work hierarchy that organisation needs</strong>. V1 decisions D1–D27 stand unless a V2 decision explicitly extends or amends them (Appendix B). No V1 slice is re-opened by this document.</p>
 <blockquote>
-<p><strong>In one paragraph.</strong> V2 turns the conveyor from a work system into an organisation. Jobs are configured positions (industry → department → job) that receive cards, decide with rules and laya, generate with LLMs behind gates, and prove their work with runs and instruments. PM, kanban coach, kata, development and operations are jobs, not code. TOGAF/SAFe/PMP artefacts are rows, gates and evidence. Every cluster service a job may call is a versioned, bound, audited tool. The conveyor develops and operates itself under the same gates it imposes on any work. <strong>The conveyor owns its whole model and is as self-contained as possible</strong>: it reuses ideas — and where useful, code — from the agent, w2v, fr and care-bus applications, but holds no runtime dependency on any of them and treats the agent platform only as a user-interaction front end over MCP.</p>
+<p><strong>In one paragraph.</strong> V2 turns the conveyor from a work system into an organisation. Jobs are configured positions (industry → department → job) that receive cards, decide with rules and laya in typed decision forums, generate with LLMs behind gates, and prove their work with runs and instruments. PM, kanban coach, kata, development and operations are jobs, not code. TOGAF/SAFe/PMP artefacts are rows, gates and evidence. Every cluster service a job may call is a versioned, bound, audited tool. The conveyor develops and operates itself under the same gates it imposes on any work. <strong>The conveyor owns its whole model and is as self-contained as possible</strong>: it reuses ideas — and where useful, code — from the agent, w2v, fr and care-bus applications, but holds no runtime dependency on any of them and treats the agent platform only as a user-interaction front end over MCP.</p>
 </blockquote>
 <hr />
 <h2 id="1-context">1. Context</h2>
@@ -119,7 +119,7 @@
 </tr>
 </tbody>
 </table>
-<p>Everything else is a view or an instrument. Departments, programmes and portfolios organise jobs and cards; knowledge, memory and tools configure a job; evals, benchmarks and the inference ledger measure it; TOGAF/SAFe/PMP supply the process grammar. <strong>The differentiator is not multi-agent conversation — it is that every handoff, decision and claim is a durable row with an owner, a state and a proof.</strong></p>
+<p>Everything else is a view or an instrument. Departments, programmes and portfolios organise jobs and cards; knowledge, memory and tools configure a job; evals, benchmarks and the inference ledger measure it; <strong>a meeting is a decision forum over those four units — a card, a set of approvals and typed positions — never a fifth record that decides by itself</strong>; TOGAF/SAFe/PMP supply the process grammar. <strong>The differentiator is not multi-agent conversation — it is that every handoff, decision and claim is a durable row with an owner, a state and a proof.</strong></p>
 <p>First principles the spec is built on:</p>
 <ol type="1">
 <li><strong>An organisation is a decision system, not a chat system.</strong> Agents do not need to talk to each other; they need to exchange typed work products through a governed process.</li>
@@ -826,6 +826,7 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 <li><strong>Memory is written at handoff.</strong> The sender records what the receiver must know (<code>memory.remember</code>), so a job does not depend on a conversation transcript that may be compacted.</li>
 <li><strong>Every card has one live run</strong> (<code>uq_run_live</code>); retries create attempts on the same run where the state machine permits, otherwise a new run with the previous as a link.</li>
 <li><strong>Escalation is bounded</strong>: a card may escalate to its parent WBS owner, then to the PM, then to the programme; the coach can escalate to a human at any point. No unbounded agent-to-agent loops.</li>
+<li><strong>A decision that needs several positions at once is a meeting (§6.8), not a message thread.</strong> Its agenda items resolve existing approvals, each participant records a typed position, and the outcome stays an <code>approval</code> row; the meeting adds the deliberation, the conditions, the commitments and the dissent, never a second decision store.</li>
 </ol>
 <h3 id="67-authority-matrix-defaults-tenant-configurable">6.7 Authority matrix (defaults; tenant-configurable)</h3>
 <table>
@@ -925,6 +926,46 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 </tbody>
 </table>
 <p>The matrix is data (<code>tenant_role_scope</code> and the binding's <code>authority</code>), not branches in code. Every gate's required decisions and approver kinds are tenant-configured policy rows defaulting to human approval (§5.4).</p>
+<h3 id="68-meetings--the-decision-forum">6.8 Meetings — the decision forum</h3>
+<p><strong>Why this exists.</strong> Much of the organisation's high-level work — programme management, architecture, analysis, project management — is conducted in meetings between positions from different departments, and those meetings are where its decisions are made. A single <code>approval</code> row records the decision but not the deliberation around it: the trade-offs between departments, the conditions attached, the dissent and the commitments given. V2 therefore makes the <strong>meeting</strong> a first-class decision forum <strong>over</strong> the existing primitives — never a fifth unit, and never a chat system.</p>
+<p><strong>The four units still hold.</strong> A meeting is a <strong>card</strong> (the convened work package, owned by its chair, under WIP limits and DoD like any card). Its agenda items resolve <strong>approvals</strong>; its participants are <strong>job bindings</strong> or <strong>humans</strong> (<code>app_user</code>); a job's seat is a typed position and the evidence it presents, never a message. Its preparation and its minutes are <strong>runs</strong> and a governed asset. Every decision is still recorded on an <code>approval</code> row, resolved <code>via='meeting'</code>, and the meeting is reached from it through <code>meeting_agenda_item</code>. There is no second decision store. The meeting card's DoD is <em>every agenda item closed with an outcome and the minutes published</em>.</p>
+<table>
+<thead>
+<tr>
+<th>Row</th>
+<th>Holds</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>meeting_type</code></td>
+<td>the forum's policy: purpose, <code>agenda_sources[]</code> (the L0 query the item set comes from), required participation (departments and positions with minimum counts), quorum, decision rule (<code>unanimous | majority | chair</code>), evidence minimum, decision window, timebox and allowed outcome kinds; tenant-scoped and versioned (P11), and who may convene is an authority row, not code</td>
+</tr>
+<tr>
+<td><code>meeting</code></td>
+<td>one instance: <code>card_id</code>, convener (<code>governance_body | job_binding | app_user</code>), <code>meeting_type</code> version, <code>opens_at</code>, <code>decision_window_end</code>; one live instance per cadence slot (<code>uq_meeting_live</code>, the <code>uq_run_live</code> analogue)</td>
+</tr>
+<tr>
+<td><code>meeting_agenda_item</code></td>
+<td>sequence, the resolved object (<code>approval | register_item | asset | cadence</code>), <code>participating_departments[]</code>, evidence refs and the typed outcome</td>
+</tr>
+<tr>
+<td><code>meeting_attendance</code></td>
+<td>participant (<code>job_binding | app_user</code>), seat role (<code>chair | member | presenter | observer | delegate</code>), department, invitation and response state; delegation only where the type allows it</td>
+</tr>
+<tr>
+<td><code>meeting_position</code></td>
+<td>per item per participant: stance (<code>approve | approve_with_conditions | reject | abstain | request_evidence</code>), rationale, conditions, an optional commitment, the surface and the time; one live position per participant per item, immutable once the item closes</td>
+</tr>
+</tbody>
+</table>
+<p><strong>A decision is arithmetic over positions, not a summary of them.</strong> An agenda item that decides names exactly one <code>approval</code>, opened before the meeting with its evidence and its policy — there is no implicit approval. Each qualifying seat is one L3 decision: when the item closes, <code>close_item</code> writes one <code>approval_decision</code> row per qualifying participant (<code>decided_by</code>, <code>via='meeting'</code>), so required decisions and distinct approvers are counted on the decision rows themselves; <code>meeting_position</code> carries the stance, rationale, conditions and commitment and is never a second decision. The item's outcome is derived in that order — the meeting's rule over the decision rows and the attendance quorum first, then the linked approval's policy (required decisions, distinct approvers, evidence, conflict exclusion) — and the stricter result wins. A meeting never lowers dual control, never waives evidence and never bypasses P4: a participant whose own work an item judges is excluded by the same conflict rule, and an <code>observer</code> position never counts. A majority counts cast positions; abstentions count toward quorum, not toward the majority; a tie defers. <code>chair</code> means the chair's position carries once quorum exists and every required department has stated one. Laya may pre-check whether an item is decision-ready (the §7.3 gate pre-check case); it never scores a position.</p>
+<p><strong>Selection is a query; generation is drafting.</strong> The item set is L0 over <code>meeting_type.agenda_sources[]</code> — open approvals for the body, register items of the named kinds, dependency slips and cadence slots — plus explicit <code>meetings.agenda_add</code> actions by a participant with the authority; a job convener selects nothing by judgement and the LLM never selects. The LLM drafts the wording, compiles the pre-read pack from the linked evidence and drafts the minutes from the typed rows; the chair adopts the agenda. It never decides, never infers a position that was not stated, never attributes one and never marks attendance. A live discussion — text, or a transcript from the tenant's own AV channel linked on the meeting — is attached to the item as evidence; no transcript is a position, and a minute line that does not match a recorded row is a defect.</p>
+<p><strong>Cross-department by construction.</strong> <code>meeting_type.required_participation</code> and, per item, <code>participating_departments[]</code> name which departments and positions must be represented. An item whose required department is absent is deferred with reason <code>inquorate</code> — it cannot be decided, and the deferral is visible on the plan. Each department's position is recorded separately, so "operations rejected, security approved with conditions, delivery approved" is a query, not a recollection; dissent is kept verbatim in the minutes even when the item carries.</p>
+<p><strong>The human seat — including the owner.</strong> A human holds a seat like any other, as an ordinary <code>app_user</code> attendance row: chair, member, presenter, observer or delegate. The owner can be invited to any forum, read the agenda and its pre-reads, raise an item, state a position, attach a condition, make a commitment for their seat, delegate it and have dissent recorded. Participation is <strong>live</strong> — the web meeting room shows the agenda, evidence, participants, positions and the rule's running outcome — or <strong>asynchronous</strong>: every deciding item is also an approval with a decision window, answerable from the web UI, Telegram or the agent front end over MCP (§10.2), with <code>via</code> recording the surface and each human's decision recorded once — the first across surfaces. A conversational room over MCP is the agent front end's surface; the conveyor supplies the items and records the positions, so the record does not depend on the room. No calendar system is depended on: <code>meeting_attendance</code> is the record and an ICS feed is a read of it. Absence is recorded as absence, never invented as an approval.</p>
+<p><strong>The closed outcome set.</strong> <code>decision | commitment | action | information | deferred</code>. A <strong>decision</strong> is the approval's recorded result (approved, approved with conditions, or rejected), derived from the decision rows, never entered beside them. A <strong>commitment</strong> names the committing position, the beneficiary, what, by when and its condition; it becomes a <code>project_dependency</code> edge or a card, and a commitment without an owner and a date is refused. An <strong>action</strong> becomes a card (§6.6). An <strong>information</strong> item is typed and counted. An item with no outcome cannot be closed; it is deferred with a reason.</p>
+<p><strong>What a meeting is not.</strong> Not a chat — no transcript is a decision and no thread is a minute. Not a handoff — work is still assigned by cards. Not a gate bypass — the venue changes nothing in a gate's policy. Not unbounded — a <code>meeting_type</code> whose instances produce no decision over a cadence cycle is flagged and retired, exactly as a never-refused gate is flagged (P10). Minutes are a <code>governed_asset(kind='minutes')</code> drafted from the rows and published behind the chair's gate; the rows remain the record.</p>
+<p><strong>Meetings are metered.</strong> Participant-hours derive from attendance × duration and enter the same roll-up as tokens and tool spend at D52's tenant, department, programme, project and job grain, with <code>meeting_attendance</code> as a third source row beside <code>inference_call</code> and <code>tool_call</code>. The instruments: decision latency (item opened → decided), agenda conversion (items decided ÷ items scheduled), quorum-miss rate, commitment slippage, action closure, person-hours per decision and decisions per meeting. The aggregate passes P10: its named procedures are the Architecture Board and Design Board sittings, the programme board and tranche reviews, PI planning, the system demo, inspect &amp; adapt, design review and incident review; the metrics above are what reads it.</p>
 <hr />
 <h2 id="7-the-decision-ladder--laya-first-llm-last">7. The decision ladder — laya first, LLM last</h2>
 <h3 id="71-the-four-rungs">7.1 The four rungs</h3>
@@ -958,8 +999,8 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 </tr>
 <tr>
 <td><strong>L3 Human</strong></td>
-<td>approval</td>
-<td>every gate; every override; every irreversible action</td>
+<td>approval; a meeting (§6.8) is its multi-party form</td>
+<td>every gate; every override; every irreversible action; every forum decision</td>
 <td><code>approval</code> + <code>approval_decision</code></td>
 </tr>
 </tbody>
@@ -1272,8 +1313,8 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 <p><strong>Compliance is a typed review, not a checkbox.</strong> A review records exactly one of the standard's relationships between the project and the architecture specification — <code>irrelevant</code>, <code>consistent</code>, <code>compliant</code>, <code>conformant</code>, <code>fully_conformant</code> or <code>non_conformant</code> — with its findings. A deviation is rejected, mitigated, or accepted for a defined period through a <strong>waiver</strong> naming the accepting asset owner, the reason, the additional cost and risk, and the reassessment date. A waiver without an owner and a review date is refused.</p>
 <p><strong>The contracts are the gate objects.</strong> <code>architecture_contract</code> carries four kinds across the ADM: the <strong>Statement of Architecture Work</strong> (A — assignment, scope, responsibilities, acceptance criteria; distinct from the designs produced under it), the <strong>delivery contract</strong> (after F — delivery commitments and the method for assessing compliance), the <strong>statement of intent / business usage agreement</strong> (at completion — intended use, ownership, measures of effectiveness), and the <strong>Request for Architecture Work</strong> (H — further architecture work, reviewed by the Design Board). A contract change is a new version and re-opens its gate; the approved version's body is immutable.</p>
 <p><strong>Maturity and skills are measured, not asserted.</strong> The <strong>architecture maturity</strong> assessment scores nine dimensions (architecture process; architecture development; business linkage; senior-management involvement; operating-unit participation; architecture communication; IT security; architecture governance; IT investment and acquisition strategy) on 0–5 (none, initial, under development, defined, managed, measured), per stage, with a baseline and milestones. The <strong>Architecture Skills Framework</strong> assesses seven categories (general; business skills and methods; architecture skills; programme/project management; general IT knowledge; technical IT skills; legal environment) at a proficiency level per role. Both are dated rows with evidence; the development plan is a set of milestones a tranche review can hold the capability to.</p>
-<p><strong>The Architecture Board is a position set with authority rows.</strong> It supports the architecture roadmap, assesses proposed changes against it, applies the principles where the roadmap is incomplete, commissions solution architectures, and submits them to the delivery Design Board. Its membership (enterprise architects, the CIO, business-unit leaders), charter, commissioning authority and decision limits are <code>governance_body</code> rows and authority rows, not prose.</p>
-<p>A delivery project cannot pass its design gate without the contract that governs it; the phase-G review is per delivery project, and its compliance level and waivers attach to that delivery's evidence. The conveyor's own buildout runs under this capability: P0 is the Preliminary-phase and programme-definition project, and the delivery slices T1–T17 each sit under the contract that governs them.</p>
+<p><strong>The Architecture Board is a position set with authority rows.</strong> It supports the architecture roadmap, assesses proposed changes against it, applies the principles where the roadmap is incomplete, commissions solution architectures, and submits them to the delivery Design Board. Its membership (enterprise architects, the CIO, business-unit leaders), charter, commissioning authority and decision limits are <code>governance_body</code> rows and authority rows, not prose. Its sittings are meetings (§6.8): the body is the convener and carries the standing <code>meeting_type</code>; <code>architecture.board_open|get|decide</code> are macros over <code>meetings.open|get|close_item</code> for that meeting — <code>board_decide</code> closes one Board agenda item and adds no decision path (the <code>dev.*</code> composition precedent).</p>
+<p>A delivery project cannot pass its design gate without the contract that governs it; the phase-G review is per delivery project, and its compliance level and waivers attach to that delivery's evidence. The conveyor's own buildout runs under this capability: P0 is the Preliminary-phase and programme-definition project, and the delivery slices T1–T19 each sit under the contract that governs them.</p>
 <p>Scope note: this is a <strong>tailored ADM profile</strong> for software delivery, not a claim of TOGAF certification or full conformance. The standard's full catalogue is the reference; the tenant's <code>adm_profile</code> names the mandatory set per phase and plateau, and that set grows with the assessed maturity. The phases, artefacts and gates are the ones the organisation will actually use and measure.</p>
 <h3 id="82-safe-as-the-programme-cadence">8.2 SAFe as the programme cadence</h3>
 <table>
@@ -1314,6 +1355,7 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 </tr>
 </tbody>
 </table>
+<p>Each event in the table is a <strong>meeting instance</strong> (§6.8) of a tenant <code>meeting_type</code>: PI planning's items resolve the plan approval and the capacity commitments, the system demo's items exhibit evidence, and inspect &amp; adapt's items produce lessons and kata candidates. The cadence supplies the schedule; the meeting supplies the record.</p>
 <p><strong>WSJF is arithmetic, not opinion:</strong> <code>(business_value + time_criticality + risk_reduction) / job_size</code>, all four typed integer fields on the backlog/WBS row. The computed score is never stored; the inputs are. An LLM may draft the narrative, never the numbers.</p>
 <h3 id="83-msp-as-the-programme-definition-and-benefits-realization">8.3 MSP as the programme definition and benefits realization</h3>
 <p>SAFe gives the programme its cadence; MSP gives it its <strong>definition and its benefit track</strong>. A programme is not a large project: it is a temporary organisation that exists to deliver benefits through projects, and it is judged on the improvement operations realizes after those projects close. V2 implements that lifecycle as rows and gates, not as a document library.</p>
@@ -1592,7 +1634,7 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 <td>the conveyor broker only (§11.3)</td>
 </tr>
 <tr>
-<td>Programme, project, WBS, board/list/card, run, approval, procedure, capability, requirements/principles/ADRs, architecture artefacts and contracts, compliance reviews and waivers, maturity and skills assessments, evidence, evals/benchmark, inference ledger, decision options/policies, job bindings</td>
+<td>Programme, project, WBS, board/list/card, run, approval, meeting forums and typed positions, procedure, capability, requirements/principles/ADRs, architecture artefacts and contracts, compliance reviews and waivers, maturity and skills assessments, evidence, evals/benchmark, inference ledger, decision options/policies, job bindings</td>
 <td><strong><code>conveyor</code></strong></td>
 <td>humans; the agent front end over <code>/mcp</code></td>
 </tr>
@@ -1683,7 +1725,7 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 </tr>
 <tr>
 <td>any → human</td>
-<td>approval; web, Telegram, an MCP task input request, or the agent front end under its own autonomy configuration</td>
+<td>approval — including a meeting agenda item with its decision window — from the web meeting room, Telegram, an MCP task input request, or the agent front end under its own autonomy configuration</td>
 </tr>
 </tbody>
 </table>
@@ -1816,7 +1858,32 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 <tr>
 <td><code>governance_body</code></td>
 <td>the Architecture Board and other decision forums</td>
-<td>membership, charter, commissioning authority, decision limits</td>
+<td>membership, charter, commissioning authority, decision limits, and its standing <code>meeting_type</code></td>
+</tr>
+<tr>
+<td><code>meeting_type</code></td>
+<td>the forum policy (§6.8)</td>
+<td>required participation by department/position, quorum, decision rule, evidence minimum, decision window, allowed outcomes; tenant-scoped and versioned; who may convene is an authority row</td>
+</tr>
+<tr>
+<td><code>meeting</code></td>
+<td>one convened instance</td>
+<td><code>card_id</code>, convener, <code>meeting_type</code> version, window; one live instance per cadence slot</td>
+</tr>
+<tr>
+<td><code>meeting_agenda_item</code></td>
+<td>one item: the resolved object, participating departments, evidence, typed outcome</td>
+<td>an item that decides requires evidence (<code>422 item_evidence_missing</code>) and names exactly one <code>approval</code></td>
+</tr>
+<tr>
+<td><code>meeting_attendance</code></td>
+<td>participant, seat role, department, invitation/response state</td>
+<td>human seats are <code>app_user</code>; job seats are <code>job_binding</code>; delegation only where the type allows it</td>
+</tr>
+<tr>
+<td><code>meeting_position</code></td>
+<td>one participant's typed stance per item, with conditions and an optional commitment</td>
+<td>one live position per participant per item; immutable once the item closes</td>
 </tr>
 <tr>
 <td><code>architecture_maturity</code></td>
@@ -1865,7 +1932,7 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 </tr>
 </tbody>
 </table>
-<p>Reused, not created: <code>programme</code> (extended with <code>shared_config</code>), <code>project</code>, <code>card</code>, <code>run</code>, <code>approval</code>, <code>governed_asset</code> (extend <code>kind</code> to <code>charter | closure | postmortem | sop_source | mandate | programme_brief | blueprint | business_case | refined_vision | benefits_strategy | benefits_realization_plan | projects_dossier</code>; a programme-level asset is attached to the programme-definition project; the architecture contract has its own table so a phase gate never depends on a generic asset row), <code>trace_link</code>, <code>event</code>, <code>job</code>, <code>audit_event</code>, <code>inference_call</code>, <code>eval*</code>, <code>benchmark*</code>; <code>procedure</code>/<code>procedure_step</code> extend with PDDL action text and the <code>knowledge_pack_ref</code> the procedure pins. New columns only where unavoidable: <code>card.job_binding_id</code>, <code>card.wbs_node_id</code>, <code>run.job_binding_id</code>/<code>release_hash</code>, <code>project.project_type_code</code> (exists). The tool tables (<code>tool</code>, <code>toolkit</code>, <code>tool_binding</code>, <code>tool_call</code>) are specified in §11.8.</p>
+<p>Reused, not created: <code>programme</code> (extended with <code>shared_config</code>), <code>project</code>, <code>card</code>, <code>run</code>, <code>approval</code>, <code>governed_asset</code> (extend <code>kind</code> to <code>charter | closure | postmortem | sop_source | mandate | programme_brief | blueprint | business_case | refined_vision | benefits_strategy | benefits_realization_plan | projects_dossier | minutes</code>; a programme-level asset is attached to the programme-definition project; the architecture contract has its own table so a phase gate never depends on a generic asset row), <code>trace_link</code>, <code>event</code>, <code>job</code>, <code>audit_event</code>, <code>inference_call</code>, <code>eval*</code>, <code>benchmark*</code>; <code>procedure</code>/<code>procedure_step</code> extend with PDDL action text and the <code>knowledge_pack_ref</code> the procedure pins. New columns only where unavoidable: <code>card.job_binding_id</code>, <code>card.wbs_node_id</code>, <code>run.job_binding_id</code>/<code>release_hash</code>, <code>project.project_type_code</code> (exists). The tool tables (<code>tool</code>, <code>toolkit</code>, <code>tool_binding</code>, <code>tool_call</code>) are specified in §11.8.</p>
 <h3 id="104-action-families">10.4 Action families</h3>
 <table>
 <thead>
@@ -1902,6 +1969,10 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 <tr>
 <td>approvals</td>
 <td><code>approval_policies.list|get|set</code>, <code>approvals.request|decide|escalate</code></td>
+</tr>
+<tr>
+<td>meetings</td>
+<td><code>meetings.schedule|open|invite|respond|agenda_add|position|defer|close_item|close|minutes_publish|list|get</code> — <code>close_item</code> writes one <code>approval_decision</code> row per qualifying seat on the linked approval (<code>via='meeting'</code>) and derives the item outcome by the type's rule; <code>meeting_position</code> is the rationale and commitment record, never a decision, so there is no second decision store. <code>architecture.board_open|get|decide</code> compose <code>meetings.open|get|close_item</code> for the Board's standing meeting — <code>decide</code> closes one Board agenda item and adds no decision path (§8.1)</td>
 </tr>
 <tr>
 <td>decision</td>
@@ -2002,6 +2073,13 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 <td><code>portfolio.spec.ts</code></td>
 </tr>
 <tr>
+<td><strong>Meetings</strong></td>
+<td><code>/meetings</code>, <code>/meetings/:id</code></td>
+<td>my invitations and seats; the meeting room (agenda with pre-reads and evidence, participants by department and seat, live positions and the rule's outcome); the asynchronous decision queue; minutes and action items; forum history, decision latency and meeting load</td>
+<td>T19</td>
+<td><code>meetings.spec.ts</code></td>
+</tr>
+<tr>
 <td><strong>Programme</strong></td>
 <td><code>/programme</code></td>
 <td>mandate, brief, blueprint and business case; benefit profiles and the benefits map; projects dossier; tranches and end-of-tranche reviews; stakeholder profiles; transition and realised benefits</td>
@@ -2047,7 +2125,7 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 </table>
 <p>The route cell is the measurement contract: the first path is the V2 route, a <code>V1:</code> path is the ancestor it extends. <code>scripts/build-v2-coverage.py</code> reads this table, <code>apps/web/src/app.rs</code> and <code>apps/web/e2e/*.spec.ts</code>; a destination is <code>exists</code> only when its V2 route <strong>and</strong> its named spec exist. The mock's page is cited as design reference, never as implementation evidence (D65).</p>
 <h4 id="1051-shell-and-route-model">10.5.1 Shell and route model</h4>
-<p>One <code>Router</code> in <code>apps/web/src/app.rs</code>, one sidebar, one top bar. The nav groups are the mock's, trimmed to the destinations that exist: <strong>Portfolio &amp; plan</strong> (Today, Portfolio, Programme, Projects, Outputs, Plan, Validation, Execution, Decisions, Runs), <strong>Organisation</strong> (Organisation, Jobs, Agents, Tools, Project types), <strong>Procedures &amp; authoring</strong> (Procedures, Capabilities, Authoring), <strong>Govern &amp; design</strong> (Assurance, Requirements, Principles, Models, Architecture capability, System architecture, Documents), <strong>Knowledge &amp; memory</strong> (Knowledge design, Sources, Memory), <strong>Measure &amp; improve</strong> (Improve, Evals, Benchmarks, Hillclimb, Usage, Metering), <strong>Operations</strong>. A nav item appears only when the signed-in principal holds the scope for at least one of its actions or read routes; the existing <code>has_action</code> gate is the rule, not a role name. The tenant switcher, command palette, theme control and profile sit in the top bar. A deep link to a destination the principal cannot read is a sign-in or permission gate, not an empty page.</p>
+<p>One <code>Router</code> in <code>apps/web/src/app.rs</code>, one sidebar, one top bar. The nav groups are the mock's, trimmed to the destinations that exist: <strong>Portfolio &amp; plan</strong> (Today, Portfolio, Meetings, Programme, Projects, Outputs, Plan, Validation, Execution, Decisions, Runs), <strong>Organisation</strong> (Organisation, Jobs, Agents, Tools, Project types), <strong>Procedures &amp; authoring</strong> (Procedures, Capabilities, Authoring), <strong>Govern &amp; design</strong> (Assurance, Requirements, Principles, Models, Architecture capability, System architecture, Documents), <strong>Knowledge &amp; memory</strong> (Knowledge design, Sources, Memory), <strong>Measure &amp; improve</strong> (Improve, Evals, Benchmarks, Hillclimb, Usage, Metering), <strong>Operations</strong>. A nav item appears only when the signed-in principal holds the scope for at least one of its actions or read routes; the existing <code>has_action</code> gate is the rule, not a role name. The tenant switcher, command palette, theme control and profile sit in the top bar. A deep link to a destination the principal cannot read is a sign-in or permission gate, not an empty page.</p>
 <h4 id="1052-destination-contracts">10.5.2 Destination contracts</h4>
 <p>Every destination is a contract, not a page. It names its route(s), its screen module, its read path (literal <code>GET</code>s or read actions), its write path (<code>POST /api/actions/{name}/invocations</code>), the permission scope each control needs, its empty/partial/error/denied states, and its Playwright spec. The action families are §10.4's; the UI adds none. A destination whose owning slice is not built renders <strong>not yet live</strong>, names the missing action or slice, and keeps its route so the deep link is honest. The board remains the work surface and the execution canvas remains the run surface; the run inspector keeps the provenance pattern (every stage's input → output is inspectable), gains the tools panel (tool version, credential alias, returned evidence) and drills to step and tool call (D52). Metering panels appear on Portfolio, Organisation and Measure.</p>
 <h4 id="1053-states-and-the-no-fixture-rule">10.5.3 States and the no-fixture rule</h4>
@@ -2446,9 +2524,14 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 <td><strong>The real V2 UI</strong> — every V2 destination is a route in <code>apps/web</code> with its screen module, read/write contract, honest states and a Playwright spec; the shell and navigation; the L1–L4 delivery view; the design pack remains the public programme site and the reviewed reference</td>
 <td>a signed-in tenant drives portfolio → programme → project → work package, organisation → release → binding, procedures intake → publish, tools call → ledger, improve → kata → adoption, operations incident → postmortem, and the ADM phase rail from the app; every destination's spec asserts empty, error, happy and one refusal; the V2 coverage record reports <code>exists</code> only from a real route + spec; no production screen renders a fixture</td>
 </tr>
+<tr>
+<td><strong>T19</strong></td>
+<td><strong>Decision forums (meetings)</strong> — <code>meeting_type</code> policy, <code>meeting</code>, agenda items resolving approvals, attendance and positions, quorum and the three decision rules, the closed outcome set, commitments as dependencies or cards, minutes as a governed asset, human seats with live and asynchronous participation</td>
+<td>a three-department board meeting decides its agenda items by recorded majority with a recorded dissent; an item missing a required department is deferred <code>inquorate</code> and cannot be decided; a meeting cannot lower a linked approval's dual control or waive its evidence; the owner decides one item in the web meeting room and another asynchronously from the agent front end over MCP, both recorded <code>via='meeting'</code>; minutes publish behind the chair's gate and every action becomes a card; a forum with no decision over a cycle is flagged</td>
+</tr>
 </tbody>
 </table>
-<p>Dependencies: T0 → T1 → T2 → T3; T4 after T3; T5 after T2 and V1's S16–S20; T6 after T5 <strong>and T13</strong>; T7 after T2/T4 <strong>and T13</strong>; T9/T10 after T1/T3; T8 after T5; T11 continuous; T12 after all; T13 after T2; T14 after T13; T15 after T13 and T6; T16 after T2 and T13; T17 after T16 and T3. T9 and T10 may run in parallel once T1 and T3 exist. <strong>T18</strong> starts after T0/T1/T2/T3; each destination's live acceptance waits on its owning slice (T4, T5, T7, T9, T10, T11, T13, T16, T17), and T18 closes after T12.</p>
+<p>Dependencies: T0 → T1 → T2 → T3; T4 after T3; T5 after T2 and V1's S16–S20; T6 after T5 <strong>and T13</strong>; T7 after T2/T4 <strong>and T13</strong>; T9/T10 after T1/T3; T8 after T5; T11 continuous; T12 after all; T13 after T2; T14 after T13; T15 after T13 and T6; T16 after T2 and T13; T17 after T16 and T3. T9 and T10 may run in parallel once T1 and T3 exist. <strong>T18</strong> starts after T0/T1/T2/T3; each destination's live acceptance waits on its owning slice (T4, T5, T7, T9, T10, T11, T13, T16, T17), and T18 closes after T12. <strong>T19</strong> starts after T1, T2 and T3; it tests with a <code>job_binding</code> or <code>app_user</code> convener, and the <code>governance_body</code> convener is testable because T9 is built (measured 2026-11-23). T9 and T10 are already built; their board and cadence binding to T19's meeting types is a follow-up integration unit, not a rebuild.</p>
 <p><strong>The first three months of work are T0–T3 plus T13.</strong> They install the organisation spine and the tool spine; everything else is a job that uses them. T16 follows the tool spine and is the first authoring feature built on it; T17 generalises T16 to every tenant asset. The legacy kag and w2v Rust rewrites are governed by <code>docs/SPEC_LEGACY_KAG.md</code> — a separate spec, not a V2 slice; V2 fixes only their direction (D54). A tenant that does not use a V2 aggregate does not ship it (P10).</p>
 <hr />
 <h2 id="13-what-this-buys">13. What this buys</h2>
@@ -2470,6 +2553,11 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 <td>Who does the work</td>
 <td>a person creates a project; agents run runs</td>
 <td>a conveyor-owned catalogue of jobs; PM/coach/kata/development/operations staff the loop</td>
+</tr>
+<tr>
+<td>High-level work</td>
+<td>decisions appear as approvals, without the meeting that produced them</td>
+<td><strong>meetings are the decision forum</strong>: cross-department agendas, typed positions, quorum and decision rules, commitments and dissent on the record — and the owner in the room, live or asynchronous</td>
 </tr>
 <tr>
 <td>Organisation</td>
@@ -2645,12 +2733,17 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 <td><strong>The AHTAPol plan rests on archived kag components</strong> — its service documents assume the kag gateway, <code>karma_service</code>, <code>hirag_service</code> and <code>kag_orchestrator</code>, all archived and undeployed</td>
 <td>re-home each function per <code>SPEC_LEGACY_KAG.md</code> before the AHTAPol slice that needs it; no archived component may be bound as a tool; the slice gates on the re-homed service's probe, never on the old name</td>
 </tr>
+<tr>
+<td>R20</td>
+<td><strong>Meeting theatre</strong> — the calendar grows, decisions are claimed in conversation, attendance is courtesy and the minutes do not match what was decided</td>
+<td>every agenda item resolves a typed object and needs evidence; a closed outcome set; quorum and the decision rule are policy; commitments need an owner and a date; a minute line must match a recorded position; participant-hours are metered and decision-free forums are retired</td>
+</tr>
 </tbody>
 </table>
 <hr />
 <h2 id="15-decisions-and-open-questions">15. Decisions and open questions</h2>
-<h3 id="151-v2-decisions-d28d65-d1d27-of-v1-stand-except-d14-and-d22-as-amended-below">15.1 V2 decisions (D28–D65; D1–D27 of V1 stand, except D14 and D22 as amended below)</h3>
-<p><strong>D28–D65 are this spec's decisions.</strong> They are written as answers because a spec that only lists questions is not reviewable; each can be accepted, amended or rejected as a unit, and the entries carrying an owner ruling are marked with its date. D33, D41, D43 and D45 carry the first review's owner rulings of 2026-11-11; D46–D48 record the procedure/SOP model, the SOP feature and the scope that review produced; <strong>D49–D55 carry the second review's owner rulings of 2026-11-11</strong> (portfolio and programme, tenant configuration, per-case laya config, metering, procedural knowledge, the legacy-kag direction and tenant asset authoring); <strong>D56–D60 carry the third review's rulings of 2026-11-11</strong> (discovery, live-estate classification and direct MinIO storage, the tool monorepo, the permanently separate agent tool path, and the AHTAPol/w2v tenant scope); <strong>D61 records the independent runtime review's recommendation</strong> — executor seam to be built in T0, external runtime deferred — and is proposed for acceptance with the rest. <strong>D62–D63 carry the programme-definition and ADM rulings of 2026-11-16; D64–D65 carry the real-UI rulings of 2026-11-22.</strong></p>
+<h3 id="151-v2-decisions-d28d66-d1d27-of-v1-stand-except-d14-and-d22-as-amended-below">15.1 V2 decisions (D28–D66; D1–D27 of V1 stand, except D14 and D22 as amended below)</h3>
+<p><strong>D28–D66 are this spec's decisions.</strong> They are written as answers because a spec that only lists questions is not reviewable; each can be accepted, amended or rejected as a unit, and the entries carrying an owner ruling are marked with its date. D33, D41, D43 and D45 carry the first review's owner rulings of 2026-11-11; D46–D48 record the procedure/SOP model, the SOP feature and the scope that review produced; <strong>D49–D55 carry the second review's owner rulings of 2026-11-11</strong> (portfolio and programme, tenant configuration, per-case laya config, metering, procedural knowledge, the legacy-kag direction and tenant asset authoring); <strong>D56–D60 carry the third review's rulings of 2026-11-11</strong> (discovery, live-estate classification and direct MinIO storage, the tool monorepo, the permanently separate agent tool path, and the AHTAPol/w2v tenant scope); <strong>D61 records the independent runtime review's recommendation</strong> — executor seam to be built in T0, external runtime deferred — and is proposed for acceptance with the rest. <strong>D62–D63 carry the programme-definition and ADM rulings of 2026-11-16; D64–D65 carry the real-UI rulings of 2026-11-22; D66 records the owner's ruling of 2026-11-22</strong> — meetings are the decision forum.</p>
 <table>
 <thead>
 <tr>
@@ -2850,6 +2943,11 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 <td><strong>Measure the real routes, not the mock</strong></td>
 <td>The V2 coverage instrument (<code>scripts/build-v2-coverage.py</code>) resolves each §10.5 destination against <code>apps/web/src/app.rs</code> and its named Playwright spec. <code>exists</code> requires the real route <strong>and</strong> the spec; a V1 ancestor route may justify <code>extend</code>, never <code>exists</code>; the mock's page is cited as design reference only. A destination's verdict is therefore independent of the pack's page registry (proposed 2026-11-22, from the real-UI review)</td>
 </tr>
+<tr>
+<td><strong>D66</strong></td>
+<td><strong>Meetings are the decision forum</strong></td>
+<td>Much of the organisation's high-level work — programme management, architecture, analysis, project management — is done in meetings between positions from different departments, and those meetings make the decisions. V2 models a meeting as a <strong>card</strong> (never a fifth unit and never a chat) whose agenda items resolve existing <code>approval</code> rows; <code>meeting_type</code> policy rows declare <code>agenda_sources[]</code>, required cross-department participation, quorum, the decision rule (<code>unanimous | majority | chair</code>), the evidence minimum, the decision window and the closed outcome set (<code>decision | commitment | action | information | deferred</code>); participants are <code>job_binding</code>s or humans with a typed position per item; each qualifying seat writes one <code>approval_decision</code> row (<code>via='meeting'</code>) on the linked approval, the item outcome derives from those rows by the type's rule, and the stricter of the meeting's rule and the approval's policy wins. Commitments become dependency edges or cards; actions become cards; minutes are a chaired <code>governed_asset(kind='minutes')</code> drafted from the rows. <strong>The owner, and any human, holds a seat like any other</strong> — invited, briefed, able to raise items, state positions, attach conditions, make a commitment for their seat, delegate it and record dissent, live in the meeting room or asynchronously from the web UI, Telegram or the agent front end over MCP. The LLM drafts agendas, pre-read packs and minutes; it never selects, decides, infers a position or marks attendance. Meetings are metered in participant-hours as a third D52 source, and a forum that produces no decision over a cycle is retired (owner, 2026-11-22)</td>
+</tr>
 </tbody>
 </table>
 <h3 id="152-open-questions-at-review">15.2 Open questions at review</h3>
@@ -2927,6 +3025,21 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 <td><strong>Approval</strong></td>
 <td>a decision/gate; a question is an approval</td>
 <td>a comment, a notification</td>
+</tr>
+<tr>
+<td><strong>Meeting</strong></td>
+<td>the decision forum: a card whose agenda items resolve approvals, with typed participants and positions</td>
+<td>a chat, a kanban board, a single approval</td>
+</tr>
+<tr>
+<td><strong>Position</strong></td>
+<td>a participant's recorded stance on an agenda item, with rationale, conditions and an optional commitment</td>
+<td>a comment, a vote count</td>
+</tr>
+<tr>
+<td><strong>Commitment</strong></td>
+<td>a promise made by a position in a meeting — what, by whom, by when, under what condition — turned into a dependency edge or a card</td>
+<td>an action (assigned work), an approval (a decision)</td>
 </tr>
 <tr>
 <td><strong>Binding</strong></td>
@@ -3076,7 +3189,7 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 </tr>
 <tr>
 <td>No V1 decision is superseded <strong>by V2</strong></td>
-<td>D18 was superseded by V1's own D19; D6 is clarified (V1's in-app engine is the executor; the n8n product is reference only); D14 is amended by D57; V2 adds D28–D65 and does not re-open the V1 build</td>
+<td>D18 was superseded by V1's own D19; D6 is clarified (V1's in-app engine is the executor; the n8n product is reference only); D14 is amended by D57; V2 adds D28–D66 and does not re-open the V1 build</td>
 </tr>
 </tbody>
 </table>
