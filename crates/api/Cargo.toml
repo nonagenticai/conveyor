@@ -45,3 +45,7 @@ tower = { workspace = true }
 # included by path), so they need the same client the server is tested with.
 reqwest = { workspace = true }
 rust_decimal = { workspace = true }
+# S08 property (g): the dangling-relationship proof runs the real worker (the queue → run
+# path) from this crate's model test. The cycle server → api and api → server (dev) is legal,
+# exactly like the actions crate's api dev-dependency.
+conveyor-server = { path = "../../apps/server" }
