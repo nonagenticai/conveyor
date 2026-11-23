@@ -66,6 +66,60 @@
       "card_id": "01a207ef-88e4-7995-afea-f3f1ff0e23c2",
       "severity": "P2"
     },
+    "dr-w4-prog-blueprint-registry:PLATFORM": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-23T10:51:47+00:00",
+      "card_id": "01a20808-8a38-7a29-856c-bf9b63333016",
+      "severity": "P1"
+    },
+    "dr-w4-prog-blueprint-states:PLATFORM": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-23T10:51:47+00:00",
+      "card_id": "01a20808-8a77-7285-82ba-083b4ef22034",
+      "severity": "P1"
+    },
+    "dr-w4-prog-brief-cost:PLATFORM": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-23T10:51:47+00:00",
+      "card_id": "01a20808-8ab5-7109-aa69-0cd53e5a6a23",
+      "severity": "P1"
+    },
+    "dr-w4-prog-business-case-options:PLATFORM": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-23T10:51:47+00:00",
+      "card_id": "01a20808-8af2-767a-ac00-d540dd1eb18f",
+      "severity": "P1"
+    },
+    "dr-w4-prog-business-case-sources:PLATFORM": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-23T10:51:47+00:00",
+      "card_id": "01a20808-8b2e-7f34-bb79-ac43947d9104",
+      "severity": "P1"
+    },
+    "dr-w4-prog-safe-art-intent:PLATFORM": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-23T10:51:47+00:00",
+      "card_id": "01a20808-8bf6-7c5e-a8e4-30955d11bd53",
+      "severity": "P2"
+    },
+    "dr-w4-proj-baseline-scope-repeats:T13": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-23T10:51:47+00:00",
+      "card_id": "01a20808-8b6e-7063-990f-d8a6e80e29c5",
+      "severity": "P1"
+    },
+    "dr-w4-proj-change-control-impact:PLATFORM": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-23T10:51:47+00:00",
+      "card_id": "01a20808-8bae-7915-99a5-c79e0501cf83",
+      "severity": "P2"
+    },
+    "dr-w4-proj-delivery-contract-commitments:T13": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-23T10:51:47+00:00",
+      "card_id": "01a20808-8c33-7f4c-848c-0ff6e38e058f",
+      "severity": "P2"
+    },
     "pi_plan_missing:tranche-2": {
       "apply_to": "PLATFORM",
       "at": "2026-11-21T21:01:52+00:00",
@@ -705,10 +759,16 @@
     "v1-s10-2:S10",
     "dr-w3-gov-assets-1:T10",
     "v1-p81-4:T9",
-    "v1-s08-1:S08"
+    "v1-s08-1:S08",
+    "v1-outputs-1:PLATFORM",
+    "v1-p45-1:T0",
+    "v1-p6-3:T11",
+    "v1-p76-2:PLATFORM",
+    "v1-pack-5:PLATFORM",
+    "v1-shared-config-writer:PLATFORM"
   ],
   "failures": [],
   "schema": "conveyor-rework-apply/v1",
   "tenant": "nonagentic",
-  "updated_at": "2026-11-23T10:24:30+00:00"
+  "updated_at": "2026-11-23T10:51:47+00:00"
 }
