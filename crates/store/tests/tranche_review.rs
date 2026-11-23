@@ -754,7 +754,7 @@ async fn a_tranche_baseline_must_be_approved_and_in_its_programme() {
     .expect("insert a foreign approved baseline");
 
     let mut tx = begin_scoped(&db.owner, f.tenant).await.expect("scope");
-    let tranche = spine::get_tranche_tx(&mut *tx, f.tenant, f.tranche0)
+    let tranche = spine::get_tranche_tx(&mut tx, f.tenant, f.tranche0)
         .await
         .expect("read the tranche")
         .expect("tranche exists");
@@ -767,7 +767,7 @@ async fn a_tranche_baseline_must_be_approved_and_in_its_programme() {
     };
 
     let refused = spine::update_tranche_tx(
-        &mut *tx,
+        &mut tx,
         f.tenant,
         f.tranche0,
         tranche.version,
@@ -785,7 +785,7 @@ async fn a_tranche_baseline_must_be_approved_and_in_its_programme() {
     );
 
     let refused = spine::update_tranche_tx(
-        &mut *tx,
+        &mut tx,
         f.tenant,
         f.tranche0,
         tranche.version,
@@ -798,7 +798,7 @@ async fn a_tranche_baseline_must_be_approved_and_in_its_programme() {
     );
 
     let accepted = spine::update_tranche_tx(
-        &mut *tx,
+        &mut tx,
         f.tenant,
         f.tranche0,
         tranche.version,
