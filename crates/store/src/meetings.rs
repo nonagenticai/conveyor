@@ -671,7 +671,7 @@ pub async fn materialise_agenda_tx(
         .ok_or(MeetingStoreError::NotFound("meeting type"))?;
 
     let mut next_sequence: i32 = sqlx::query_scalar(
-        "SELECT COALESCE(max(sequence), 0) FROM meeting_agenda_item
+        "SELECT COALESCE(max(sequence), 0) + 1 FROM meeting_agenda_item
           WHERE tenant_id = $1 AND meeting_id = $2",
     )
     .bind(tenant.as_uuid())
@@ -713,7 +713,7 @@ pub async fn materialise_agenda_tx(
                     if evidence_count(&meta) < i64::from(ty.evidence_minimum) {
                         continue;
                     }
-                    if insert_agenda_item(
+                    insert_agenda_item(
                         &mut *conn,
                         tenant,
                         meeting_id,
@@ -723,11 +723,7 @@ pub async fn materialise_agenda_tx(
                         &[],
                         &evidence,
                     )
-                    .await?
-                    .is_some()
-                    {
-                        // inserted
-                    }
+                    .await?;
                 }
             }
             "register_item" => {
@@ -743,7 +739,7 @@ pub async fn materialise_agenda_tx(
                 };
                 let rows: Vec<(Uuid,)> = sqlx::query_as(
                     "SELECT id FROM project_register_item
-                      WHERE tenant_id = $1 AND kind = ANY($2) AND status <> 'closed'
+                      WHERE tenant_id = $1 AND kind = ANY($2::text[]) AND status <> 'closed'
                       ORDER BY created_at, id LIMIT $3",
                 )
                 .bind(tenant.as_uuid())
@@ -773,7 +769,7 @@ pub async fn materialise_agenda_tx(
                 };
                 let rows: Vec<(Uuid,)> = sqlx::query_as(
                     "SELECT id FROM governed_asset
-                      WHERE tenant_id = $1 AND kind = ANY($2) AND status IN ('draft', 'in_review')
+                      WHERE tenant_id = $1 AND kind = ANY($2::text[]) AND status IN ('draft', 'in_review')
                       ORDER BY updated_at DESC, id LIMIT $3",
                 )
                 .bind(tenant.as_uuid())
@@ -809,7 +805,7 @@ pub async fn materialise_agenda_tx(
                 } else {
                     sqlx::query_as(
                         "SELECT id FROM programme_cadence
-                          WHERE tenant_id = $1 AND state = 'planned' AND kind = ANY($2)
+                          WHERE tenant_id = $1 AND state = 'planned' AND kind = ANY($2::text[])
                           ORDER BY created_at, id LIMIT $3",
                     )
                     .bind(tenant.as_uuid())
