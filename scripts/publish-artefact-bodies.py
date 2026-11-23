@@ -19,9 +19,10 @@ Readiness, per programme project x template whose `subject_kind` is `project` an
 Modes:
   --check     read-only; exit 1 when any due/stale/ambiguous row exists, 0 when all present
   --dry-run   compose every due/stale body and write it under --bodies-out; no actions
-  --apply     compose, then for each due/stale pair: documents.compose, documents.publish,
-              then trace_links.create (document -> project, kind `satisfies`), each call
-              proven by its read action through `programme-record.py`.
+  --apply     compose, then for each due pair: documents.compose, documents.publish, then
+              trace_links.create (document -> project, kind `satisfies`), each call proven by
+              its read action through `programme-record.py`. A stale pair is left in place
+              unless --republish-stale is given: it is a published, authored document, not a gap.
 
 Every action payload of an apply is appended to docs/evidence/record-w4/replay.jsonl, one
 JSON object per line ({natural_key, action, payload, read_action, read_input,
@@ -455,6 +456,12 @@ def apply_rows(
         if row["state"] == "present":
             skipped.append(public_row(row))
             continue
+        if row["state"] == "stale" and not getattr(args, "republish_stale", False):
+            # A published document with a different body is not a gap: it was authored and
+            # accepted. Replacing it with a composed body would lose that content and create a
+            # second published row for the same pair. Only an explicit --republish-stale does.
+            skipped.append(public_row(row))
+            continue
         if row.get("refusal"):
             entry = public_row(row)
             entry["refusal"] = row["refusal"]
@@ -602,7 +609,11 @@ def build_parser() -> argparse.ArgumentParser:
                         help="every project, every applicable project template")
     parser.add_argument("--check", action="store_true", help="read-only readiness report")
     parser.add_argument("--dry-run", action="store_true", help="compose bodies; no actions")
-    parser.add_argument("--apply", action="store_true", help="publish the due/stale bodies")
+    parser.add_argument("--apply", action="store_true", help="publish the due bodies; stale ones only with --republish-stale")
+    parser.add_argument(
+        "--republish-stale", action="store_true",
+        help="also replace a published document whose body hash differs (default: leave it in place)",
+    )
     parser.add_argument("--local-bin", default=os.environ.get("PROGRAMME_RECORD_BIN", ""))
     parser.add_argument("--actor-id", default=os.environ.get("PROGRAMME_ACTOR", DEFAULT_ACTOR))
     parser.add_argument("--journal", type=Path, default=DEFAULT_JOURNAL)
@@ -966,9 +977,22 @@ def self_test() -> int:
     reset_log()
     if journal.exists():
         journal.unlink()
+    default_bodies = base / "bodies-default"
+    code, stdout, stderr, _ = run_cli(common([
+        "--project", "PY", "--category", "A", "--apply", "--bodies-out", str(default_bodies),
+    ]))
+    expect("stale-left-in-place-by-default",
+           code == 0 and not calls()
+           and json.loads(stdout).get("skipped", [{}])[0].get("state") == "stale",
+           (code, stderr[-300:], [c["action"] for c in calls()]))
+
+    reset_log()
+    if journal.exists():
+        journal.unlink()
     bodies = base / "bodies-apply"
     code, _, stderr, _ = run_cli(common([
-        "--project", "PY", "--category", "A", "--apply", "--bodies-out", str(bodies),
+        "--project", "PY", "--category", "A", "--apply", "--republish-stale",
+        "--bodies-out", str(bodies),
     ]))
     recorded = calls()
     natural_key = f"artefact:PY:A:{py_a['body_sha256'][:16]}"
@@ -1053,7 +1077,7 @@ def self_test() -> int:
         "status": "draft", "version": 1, "meta": {"sha256": py_a["body_sha256"]},
     }])
     code, _, stderr, _ = run_cli(common([
-        "--project", "PY", "--category", "A", "--apply",
+        "--project", "PY", "--category", "A", "--apply", "--republish-stale",
         "--bodies-out", str(base / "bodies-conflict"),
         "--journal", str(conflict_journal),
     ]))
