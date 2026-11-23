@@ -730,7 +730,9 @@ fn the_registry_is_exactly_the_declared_set() {
     // 490 -> 495; external stays 13.
     // #560 (T14) adds five external reads — `scientific_stats.meta_analysis|confidence_interval|`
     // `trend` and `scientific_formal.translate|verify`: internal stays 495, external 13 -> 18.
-    assert_eq!((internal, external), (502, 18));
+    // T5 (#77) adds eight internal actions — P1's `kata.open|get|observe|analyse|hypothesise|`
+    // `propose|measure` (495 -> 502) and P2–P4's `kata.adopt` (502 -> 503); external stays 18.
+    assert_eq!((internal, external), (503, 18));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),
