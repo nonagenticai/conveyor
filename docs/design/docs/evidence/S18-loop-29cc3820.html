@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>S18-loop-29cc3820 — the real improvement loop at one deployed revision · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S18-loop-29cc3820.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="s18-loop-29cc3820--the-real-improvement-loop-at-one-deployed-revision">S18-loop-29cc3820 — the real improvement loop at one deployed revision</h1>
+<p>Issue #30 P6.1. Session 2026-11-23, branch <code>issue/30-s18-live</code>, worktree <code>.worktrees/issue-30</code>. The loop ran against the deployed service, not a test harness; every number below was read from the live database or from the public actions on the deployed pods.</p>
+<h2 id="deployed-revision-one-revision-both-processes">Deployed revision (one revision, both processes)</h2>
+<table>
+<thead>
+<tr>
+<th>item</th>
+<th>value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>CONVEYOR_GIT_SHA</code></td>
+<td><code>29cc382034a6a0967ef64c79154d3bcf2e7512c0</code> (both <code>deploy/conveyor</code> and <code>deploy/conveyor-worker</code>)</td>
+</tr>
+<tr>
+<td>image</td>
+<td><code>ghcr.io/nonagenticai/conveyor:latest@sha256:c8b1b513664bb5c99eece9ee66b59e4c8fc70abd8e1adc1974e8aede212101bf</code></td>
+</tr>
+<tr>
+<td>pods</td>
+<td><code>conveyor-75fcb9b884-9rt5v</code> (hp1), <code>conveyor-75fcb9b884-c57hv</code> (mf1), <code>conveyor-worker-f654d94b9-nkphf</code> (hp1)</td>
+</tr>
+<tr>
+<td>revision content</td>
+<td><code>origin/main</code> tip at the run; includes #12 (<code>0006854e</code>, PR #617) and #611 (<code>87de8e2e</code>, PR #614)</td>
+</tr>
+<tr>
+<td>tenant</td>
+<td><code>nonagentic</code> (<code>01a1cf6d-23af-7e0e-8b07-89c8f06bafb4</code>)</td>
+</tr>
+<tr>
+<td>sandbox</td>
+<td><code>SANDBOX_NAMESPACE=swe-bench</code>, <code>SANDBOX_NODE_SELECTOR=conveyor.ai/grading=hp1</code> on both deployments</td>
+</tr>
+</tbody>
+</table>
+<p><code>CONVEYOR_GIT_SHA</code> was read from the running containers (<code>printenv</code>), not from the manifest.</p>
+<h2 id="suite-and-inputs">Suite and inputs</h2>
+<table>
+<thead>
+<tr>
+<th>item</th>
+<th>value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>suite</td>
+<td><code>verified50-v1</code> · <code>01a1d039-0d04-7568-98ab-457e1d84fab0</code> (the only live suite; 50 instances)</td>
+</tr>
+<tr>
+<td>dataset</td>
+<td><code>SWE-bench/SWE-bench_Verified</code> @ <code>78f471bf655a3137b2e8a75af1501690ec009ec3</code></td>
+</tr>
+<tr>
+<td>hashes</td>
+<td><code>seed_sha256 27421012ad8bbd712228c8a0be14a02bf82093d8777cf88a1c72b7ec2118ea0a</code> · <code>image_lock_sha256 ed5d1fabc5b835012a4969a7e4df7a1bbd947860dbb3aa99e6ab0ca89e8cb8f6</code></td>
+</tr>
+<tr>
+<td>subset</td>
+<td>same <code>only</code> list on both runs (12 django instances), <code>concurrency=6</code>: <code>django__django-{10880,11149,11163,11451,11490,11848,11880,13112,13158,13401,13512,14500}</code></td>
+</tr>
+<tr>
+<td>subject</td>
+<td>capability agent <code>development_source_security_patch</code> · <code>01a1d3e9-5ac3-7bac-90f6-d3fb266147f6</code> · model <code>local-llm</code></td>
+</tr>
+<tr>
+<td>label</td>
+<td><code>conveyor-oracle-files+failing-test</code> on both runs (oracle and prompt therefore agree; the pipeline is the comparison)</td>
+</tr>
+</tbody>
+</table>
+<p>The full 50-instance pairing is the plan's ideal. This proof used a 12-instance <code>only</code> subset of the one live suite to fit the session; the subset is recorded here and was identical on both runs. Cases are paired by instance id, so a subset cannot inflate the delta — it only shrinks the denominator.</p>
+<h2 id="the-loop">The loop</h2>
+<h3 id="1-baseline-run-conveyor-arm-promoted">1. Baseline run (conveyor arm, promoted)</h3>
+<table>
+<thead>
+<tr>
+<th>item</th>
+<th>value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>run</td>
+<td><code>01a20a08-eeb7-7559-b0f5-879564f9fc21</code></td>
+</tr>
+<tr>
+<td>arm / subject</td>
+<td><code>conveyor</code> / <code>capability_agent</code>, <code>subject_version=3</code> (pinned at start)</td>
+</tr>
+<tr>
+<td>status</td>
+<td><code>succeeded</code> · n=12 · graded=2 · resolved=1 · no_attempt=6</td>
+</tr>
+<tr>
+<td>started / finished</td>
+<td>2026-11-23T20:11:28Z / 2026-11-23T20:17:52Z</td>
+</tr>
+</tbody>
+</table>
+<p>Promotion is a person's act, not the job's:</p>
+<pre class="text"><code>conveyor admin action invoke --tenant nonagentic --name benchmark_runs.promote \
+  --input /dev/stdin &lt;&lt;&lt; &#39;{&quot;id&quot;:&quot;01a20a08-eeb7-7559-b0f5-879564f9fc21&quot;}&#39;
+→ SuiteView.baseline_run_id = 01a20a08-eeb7-7559-b0f5-879564f9fc21   (2026-11-23T20:18:03Z)</code></pre>
+<h3 id="2-candidate-run-new-version-against-the-promoted-baseline">2. Candidate run (new version, against the promoted baseline)</h3>
+<p>The candidate is a real version change: <code>capability_agents.update</code> (<code>--if-match 3</code>) set <code>max_iterations</code> 12 → 11 and returned <strong>version 4</strong>; the start pinned it.</p>
+<table>
+<thead>
+<tr>
+<th>item</th>
+<th>value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>run</td>
+<td><code>01a20a0f-109a-76ee-8a37-7ad1ce778f95</code></td>
+</tr>
+<tr>
+<td>arm / subject</td>
+<td><code>conveyor</code> / <code>capability_agent</code>, <code>subject_version=4</code> (pinned at start)</td>
+</tr>
+<tr>
+<td>baseline</td>
+<td><code>baseline_run_id=01a20a08-eeb7-7559-b0f5-879564f9fc21</code> — this is what enqueues the improvement job</td>
+</tr>
+<tr>
+<td>status</td>
+<td><code>succeeded</code> · n=12 · graded=2 · resolved=1 · no_attempt=5</td>
+</tr>
+<tr>
+<td>started / finished</td>
+<td>2026-11-23T20:18:10Z / 2026-11-23T20:26:27Z</td>
+</tr>
+</tbody>
+</table>
+<h3 id="3-the-improvement-job">3. The improvement job</h3>
+<p>Kind <code>benchmark.improvement.run</code>, enqueued by <code>benchmark_runs.start</code> in the same transaction as the candidate. It made 11 ticks (<code>benchmark_runs.get</code> every 60 s, actor <code>00000000-0000-0000-0000-000000000000</code>, all <code>ok</code>), then judged with <code>benchmark_runs.compare</code> and recorded the verdict. The terminal job that wrote the verdict is <code>01a20a16-9fce-71e6-9787-fe96930839c3</code> (<code>succeeded</code>). The job never starts a second candidate and never promotes.</p>
+<h3 id="4-the-comparison-authoritative-action-output">4. The comparison (authoritative action output)</h3>
+<p><code>benchmark_runs.compare {a_run_id: 01a20a0f-…, b_run_id: 01a20a08-…}</code> (a = candidate, b = baseline):</p>
+<pre class="json"><code>{&quot;comparable&quot;: true, &quot;both&quot;: 1, &quot;neither&quot;: 1, &quot;a_only&quot;: 0, &quot;b_only&quot;: 0,
+ &quot;discordant&quot;: 0, &quot;p_value&quot;: 1.0, &quot;missing_in_one&quot;: 0}</code></pre>
+<p>Per-instance pairs: <code>django__django-11451</code> resolved/resolved; <code>django__django-11880</code> unresolved/unresolved. Nine candidate cases and six baseline cases were <code>no_attempt</code> (withheld from the graded denominator by construction), so the paired map is two instances.</p>
+<p><strong>Delta:</strong> 0 discordant (candidate-only 0, baseline-only 0). <strong>Exact McNemar p = 1.0.</strong></p>
+<h3 id="5-the-verdict">5. The verdict</h3>
+<pre class="text"><code>improvement_verdict   = inconclusive
+improvement_of_run_id = 01a20a08-eeb7-7559-b0f5-879564f9fc21
+improvement_note      = &quot;p = 1.0000 is not below 0.05: the candidate has not moved the result&quot;</code></pre>
+<p><code>p &gt;= 0.05</code> takes the record-only branch (S18 §10 Q3); <code>inconclusive</code> is the instrument's decision, not a failure. At this graded denominator a <code>keep</code>/<code>revert</code> is statistically unreachable — the significant branches require at least six one-direction discordant pairs.</p>
+<p><code>benchmark_runs.trend</code> returns the candidate point with <code>direction = "unchanged"</code> and the identical <code>vs_baseline</code> document; that is the number the improvement screen renders.</p>
+<h2 id="no-promotion-observed-not-asserted">No promotion (observed, not asserted)</h2>
+<ul>
+<li><code>benchmark_suite.baseline_run_id</code> before the candidate: <code>01a20a08-…</code>; after the verdict: <strong>still <code>01a20a08-…</code></strong> (<code>benchmark_suites.list</code> re-read after the verdict).</li>
+<li>The service actor's action ledger for the loop contains only <code>benchmark_runs.get</code> (11 ticks) and the final <code>benchmark_runs.compare</code>; there is <strong>no</strong> <code>benchmark_runs.promote</code> row by <code>00000000-0000-0000-0000-000000000000</code>. The one <code>promote</code> row is the session's own act at 20:18:03Z, before the candidate started.</li>
+<li>Code: the module's only writes are the next-tick enqueue and <code>set_improvement_tx</code> (<code>apps/server/src/benchmark_improvement.rs</code>).</li>
+</ul>
+<h2 id="ledger-rows">Ledger rows</h2>
+<table>
+<thead>
+<tr>
+<th>ledger</th>
+<th>rows</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>inference_call</code></td>
+<td>baseline run: 12 rows <code>caller_kind=agent_run</code>, <code>model=local-llm</code>, <code>outcome=ok</code>; candidate run: 11 rows, same shape</td>
+</tr>
+<tr>
+<td><code>job</code></td>
+<td>11 <code>benchmark.improvement.run</code> rows (all <code>succeeded</code>), 10 <code>benchmark.run.poll</code> rows, 12 <code>benchmark.case.produce</code> rows</td>
+</tr>
+<tr>
+<td><code>action_invocation</code></td>
+<td>the 11 <code>benchmark_runs.get</code> ticks + the <code>benchmark_runs.compare</code> judgement, by the service actor</td>
+</tr>
+</tbody>
+</table>
+<h2 id="blocker-found-and-recorded-the-baseline-arm-cannot-complete-at-this-revision">Blocker found and recorded: the <code>baseline</code> arm cannot complete at this revision</h2>
+<p>The S17 one-shot <code>arm="baseline"</code> run was attempted first: <code>01a20a04-fc66-7c36-a4d6-6ce6c86317ff</code> (12 instances, model <code>local-llm</code>). The producer <strong>is</strong> built and produced patches (<code>benchmark.case.produce</code> → <code>ok</code>, one context-cap <code>no_attempt</code>, inference-524 retries), but the run driver still hard-refuses every produced baseline patch:</p>
+<pre class="text"><code>apps/server/src/benchmark_worker.rs:240-244
+&quot;baseline&quot; =&gt; return Err(JobFailure::permanent(
+    &quot;the baseline producer (the baseline.py port) is not built yet&quot;))</code></pre>
+<p>The run was cancelled and the reaper failed it (<code>status=failed</code>, 0 graded). This is stale S17 code that #12's P2 producer did not update; it is a code fix plus a new deploy, deliberately <strong>not</strong> made inside #30 (whose scope is the proof and its receipt). The loop's baseline therefore had to be a succeeded <code>conveyor</code> run promoted explicitly — exactly the S18 plan §9.2 semantics for a capability baseline. A live <code>baseline</code>-arm comparison is a follow-up issue.</p>
+<h2 id="gate">Gate</h2>
+<table>
+<thead>
+<tr>
+<th>check</th>
+<th>result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>cargo fmt --all -- --check</code></td>
+<td>clean</td>
+</tr>
+<tr>
+<td><code>cargo metadata --locked --format-version 1</code></td>
+<td>exit 0</td>
+</tr>
+<tr>
+<td><code>git diff --check</code></td>
+<td>clean</td>
+</tr>
+</tbody>
+</table>
+<p>No Rust source, migration or served-spec file changed; the lock was not regenerated.</p>
+<h2 id="evidence-at-completion">Evidence at completion</h2>
+<table>
+<thead>
+<tr>
+<th>Scenario</th>
+<th>Command / test</th>
+<th>Result</th>
+<th>SHA</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>P6.1 deployed revision</td>
+<td><code>printenv CONVEYOR_GIT_SHA</code> in both deployments</td>
+<td><code>29cc3820…</code> on both</td>
+<td><code>29cc3820</code></td>
+</tr>
+<tr>
+<td>P6.1 promoted baseline</td>
+<td><code>benchmark_runs.promote {id: 01a20a08-…}</code></td>
+<td><code>SuiteView.baseline_run_id=01a20a08-…</code></td>
+<td><code>29cc3820</code></td>
+</tr>
+<tr>
+<td>P6.1 candidate vs baseline</td>
+<td><code>benchmark_runs.compare {a: 01a20a0f-…, b: 01a20a08-…}</code></td>
+<td>comparable, 1 both, 1 neither, 0/0 discordant, <strong>p = 1.0</strong></td>
+<td><code>29cc3820</code></td>
+</tr>
+<tr>
+<td>P6.1 verdict recorded</td>
+<td><code>improvement_verdict</code> on the candidate</td>
+<td><code>inconclusive</code>, of <code>01a20a08-…</code>, note <code>p = 1.0000 is not below 0.05</code></td>
+<td><code>29cc3820</code></td>
+</tr>
+<tr>
+<td>P6.1 no automatic promotion</td>
+<td>suite re-read after verdict</td>
+<td><code>baseline_run_id</code> unchanged; no service <code>benchmark_runs.promote</code> row</td>
+<td><code>29cc3820</code></td>
+</tr>
+<tr>
+<td>Trend parity</td>
+<td><code>benchmark_runs.trend {suite_id: 01a1d039-…, arm: conveyor}</code></td>
+<td>candidate point <code>direction=unchanged</code>, <code>vs_baseline</code> identical to compare</td>
+<td><code>29cc3820</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="residuals">Residuals</h2>
+<ul>
+<li>The tool-less <code>conveyor</code> arm (S18-B's recorded limitation) produced a patch for only 3 of 12 instances; the graded denominator is 2. The verdict is honest at that denominator and cannot be significant. A keep/revert needs a real candidate over a larger produced/graded set.</li>
+<li>The <code>baseline</code> arm's grading refusal above.</li>
+<li>The full 50-instance pairing remains the plan's ideal and was not run in this session.</li>
+</ul>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/S18-loop-29cc3820.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>
