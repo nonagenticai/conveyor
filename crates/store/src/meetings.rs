@@ -59,7 +59,11 @@ const MEETING_COLUMNS: &str = "m.id, m.card_id, m.convener_kind, m.convener_id,
     t.key AS meeting_type_key, t.name AS meeting_type_name, t.decision_rule,
     EXTRACT(EPOCH FROM t.decision_window)::bigint AS decision_window_seconds,
     m.cadence_slot, m.opens_at, m.decision_window_end, m.closed_at, m.status, m.version,
-    c.name AS card_name";
+    c.name AS card_name,
+    (m.status = 'closed' AND NOT EXISTS (
+        SELECT 1 FROM meeting_agenda_item i
+         WHERE i.tenant_id = m.tenant_id AND i.meeting_id = m.id
+           AND i.outcome = 'decision')) AS retirement_candidate";
 
 const AGENDA_COLUMNS: &str = "id, meeting_id, sequence, resolved_kind, resolved_id,
     participating_departments, evidence_refs, outcome, outcome_ref, defer_reason, closed_at,
@@ -110,6 +114,8 @@ pub struct MeetingRecord {
     pub status: String,
     pub version: i64,
     pub card_name: String,
+    /// A closed forum whose instances produced no decision: eligible for retirement (P10).
+    pub retirement_candidate: bool,
 }
 
 #[derive(Clone, Debug, sqlx::FromRow)]
@@ -159,6 +165,21 @@ pub struct PositionRecord {
     pub version: i64,
 }
 
+#[derive(Clone, Debug, Default)]
+pub struct MeetingInstruments {
+    pub decisions: i64,
+    pub items: i64,
+    pub open_items: i64,
+    pub decision_latency_seconds: Option<i64>,
+    pub agenda_conversion: f64,
+    pub quorum_miss_rate: f64,
+    pub commitment_slippage: i64,
+    pub action_closure: f64,
+    pub participant_hours: f64,
+    pub person_hours_per_decision: f64,
+    pub decisions_per_meeting: f64,
+}
+
 #[derive(Clone, Debug)]
 pub struct MeetingDetail {
     pub meeting: MeetingRecord,
@@ -166,6 +187,7 @@ pub struct MeetingDetail {
     pub agenda: Vec<AgendaItemRecord>,
     pub attendance: Vec<AttendanceRecord>,
     pub positions: Vec<PositionRecord>,
+    pub instruments: MeetingInstruments,
 }
 
 /// The acting principal, as the action layer names it. Authorization is the action scope's;
@@ -1239,12 +1261,18 @@ pub async fn detail_tx(
     let meeting_type = get_meeting_type_tx(&mut *conn, tenant, meeting.meeting_type_id)
         .await?
         .ok_or(MeetingStoreError::NotFound("meeting type"))?;
+    let agenda = list_agenda_tx(&mut *conn, tenant, meeting_id).await?;
+    let attendance = list_attendance_tx(&mut *conn, tenant, meeting_id).await?;
+    let positions = list_positions_tx(&mut *conn, tenant, meeting_id).await?;
+    let instruments =
+        instruments_tx(&mut *conn, tenant, &meeting, &meeting_type, &attendance).await?;
     Ok(Some(MeetingDetail {
         meeting,
         meeting_type,
-        agenda: list_agenda_tx(&mut *conn, tenant, meeting_id).await?,
-        attendance: list_attendance_tx(&mut *conn, tenant, meeting_id).await?,
-        positions: list_positions_tx(&mut *conn, tenant, meeting_id).await?,
+        agenda,
+        attendance,
+        positions,
+        instruments,
     }))
 }
 
@@ -1771,6 +1799,106 @@ pub async fn minutes_publish_tx(
     )
     .await?;
     Ok(asset)
+}
+
+/// The seven inspect-and-adapt instruments, recomputed from rows (never stored).
+async fn instruments_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    meeting: &MeetingRecord,
+    meeting_type: &MeetingTypeRecord,
+    attendance: &[AttendanceRecord],
+) -> Result<MeetingInstruments> {
+    let row: (i64, i64, i64, i64, i64, i64, i64, Option<DateTime<Utc>>) = sqlx::query_as(
+        "SELECT count(*) FILTER (WHERE i.outcome = 'decision')::bigint,
+                count(*)::bigint,
+                count(*) FILTER (WHERE i.outcome IS NULL)::bigint,
+                count(*) FILTER (WHERE i.outcome = 'deferred'
+                                  AND i.defer_reason = 'inquorate')::bigint,
+                count(*) FILTER (WHERE i.outcome = 'commitment')::bigint,
+                count(*) FILTER (WHERE i.outcome = 'action')::bigint,
+                count(*) FILTER (WHERE i.outcome IN ('commitment', 'action')
+                                  AND ol.kind = 'done')::bigint,
+                min(i.closed_at) FILTER (WHERE i.outcome = 'decision')
+           FROM meeting_agenda_item i
+           LEFT JOIN card oi ON oi.id = i.outcome_ref AND oi.tenant_id = i.tenant_id
+           LEFT JOIN list ol ON ol.id = oi.list_id AND ol.tenant_id = oi.tenant_id
+          WHERE i.tenant_id = $1 AND i.meeting_id = $2",
+    )
+    .bind(tenant.as_uuid())
+    .bind(meeting.id)
+    .fetch_one(&mut *conn)
+    .await?;
+    let (
+        decisions,
+        items,
+        open_items,
+        inquorate,
+        commitments,
+        actions,
+        closed_outcomes,
+        first_decision,
+    ) = row;
+    let slipped: i64 = sqlx::query_scalar(
+        "SELECT count(*) FROM meeting_agenda_item i
+           JOIN card oi ON oi.id = i.outcome_ref AND oi.tenant_id = i.tenant_id
+           LEFT JOIN list ol ON ol.id = oi.list_id AND ol.tenant_id = oi.tenant_id
+          WHERE i.tenant_id = $1 AND i.meeting_id = $2
+            AND i.outcome IN ('commitment', 'action')
+            AND oi.due_at IS NOT NULL AND oi.due_at < now()
+            AND (ol.kind IS NULL OR ol.kind <> 'done')",
+    )
+    .bind(tenant.as_uuid())
+    .bind(meeting.id)
+    .fetch_one(&mut *conn)
+    .await?;
+    let accepted = attendance
+        .iter()
+        .filter(|row| row.response_state == "accepted" && row.seat != "observer")
+        .count() as f64;
+    let hours = match (meeting.opens_at, meeting.closed_at) {
+        (Some(opens), Some(closed)) => {
+            let seconds = (closed - opens).num_seconds().max(0) as f64;
+            let capped = seconds.min(meeting_type.timebox_seconds.max(0) as f64);
+            accepted * capped / 3600.0
+        }
+        _ => 0.0,
+    };
+    let latency = meeting
+        .opens_at
+        .and_then(|opens| first_decision.map(|first| (first - opens).num_seconds().max(0)));
+    let conversion = if items > 0 {
+        decisions as f64 / items as f64
+    } else {
+        0.0
+    };
+    let quorum_miss = if items > 0 {
+        inquorate as f64 / items as f64
+    } else {
+        0.0
+    };
+    let action_closure = if commitments + actions > 0 {
+        closed_outcomes as f64 / (commitments + actions) as f64
+    } else {
+        0.0
+    };
+    Ok(MeetingInstruments {
+        decisions,
+        items,
+        open_items,
+        decision_latency_seconds: latency,
+        agenda_conversion: conversion,
+        quorum_miss_rate: quorum_miss,
+        commitment_slippage: slipped,
+        action_closure,
+        participant_hours: hours,
+        person_hours_per_decision: if decisions > 0 {
+            hours / decisions as f64
+        } else {
+            0.0
+        },
+        decisions_per_meeting: decisions as f64,
+    })
 }
 
 // ── authority ──────────────────────────────────────────────────────────────────────────

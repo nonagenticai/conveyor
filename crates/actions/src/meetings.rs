@@ -184,6 +184,8 @@ pub struct MeetingOut {
     pub decision_window_end: Option<DateTime<Utc>>,
     pub closed_at: Option<DateTime<Utc>>,
     pub version: i64,
+    /// A closed forum with no decision: eligible for retirement (P10).
+    pub retirement_candidate: bool,
 }
 
 impl From<MeetingRecord> for MeetingOut {
@@ -204,6 +206,7 @@ impl From<MeetingRecord> for MeetingOut {
             decision_window_end: record.decision_window_end,
             closed_at: record.closed_at,
             version: record.version,
+            retirement_candidate: record.retirement_candidate,
         }
     }
 }
@@ -351,12 +354,28 @@ impl From<PositionRecord> for PositionOut {
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct MeetingInstrumentsOut {
+    pub decisions: i64,
+    pub items: i64,
+    pub open_items: i64,
+    pub decision_latency_seconds: Option<i64>,
+    pub agenda_conversion: f64,
+    pub quorum_miss_rate: f64,
+    pub commitment_slippage: i64,
+    pub action_closure: f64,
+    pub participant_hours: f64,
+    pub person_hours_per_decision: f64,
+    pub decisions_per_meeting: f64,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 pub struct MeetingDetailOut {
     pub meeting: MeetingOut,
     pub meeting_type: MeetingTypeOut,
     pub agenda: Vec<AgendaItemOut>,
     pub attendance: Vec<AttendanceOut>,
     pub positions: Vec<PositionOut>,
+    pub instruments: MeetingInstrumentsOut,
 }
 
 impl From<MeetingDetail> for MeetingDetailOut {
@@ -367,6 +386,19 @@ impl From<MeetingDetail> for MeetingDetailOut {
             agenda: detail.agenda.into_iter().map(Into::into).collect(),
             attendance: detail.attendance.into_iter().map(Into::into).collect(),
             positions: detail.positions.into_iter().map(Into::into).collect(),
+            instruments: MeetingInstrumentsOut {
+                decisions: detail.instruments.decisions,
+                items: detail.instruments.items,
+                open_items: detail.instruments.open_items,
+                decision_latency_seconds: detail.instruments.decision_latency_seconds,
+                agenda_conversion: detail.instruments.agenda_conversion,
+                quorum_miss_rate: detail.instruments.quorum_miss_rate,
+                commitment_slippage: detail.instruments.commitment_slippage,
+                action_closure: detail.instruments.action_closure,
+                participant_hours: detail.instruments.participant_hours,
+                person_hours_per_decision: detail.instruments.person_hours_per_decision,
+                decisions_per_meeting: detail.instruments.decisions_per_meeting,
+            },
         }
     }
 }
