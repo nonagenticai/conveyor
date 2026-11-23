@@ -128,7 +128,7 @@ use serde_json::{Value, json};
 /// and `tools.resume|retire`. 546 → **554**.
 /// **#526 (w3-gov-assets-1) adds 5 internal**: `governed_assets.compose|get|list|submit|approve` —
 /// the generic surface for the MSP programme-artefact kinds. 554 → **559**.
-const EXPECTED: [&str; 559] = [
+const EXPECTED: [&str; 560] = [
     "actions.describe",
     "actions.list",
     "analyse.site",
@@ -171,6 +171,7 @@ const EXPECTED: [&str; 559] = [
     "architecture.profile_tailor",
     "architecture.repository_search",
     "architecture.reviews_get",
+    "architecture.reviews_list",
     "architecture.reviews_record",
     "architecture.reviews_waive",
     "architecture.skills_assess",
