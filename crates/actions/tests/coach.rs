@@ -1672,3 +1672,92 @@ async fn a_move_past_the_wip_limit_opens_one_breach_interruption() {
         "a breach pre-empts the board event: one move, one interruption"
     );
 }
+
+/// v1-p6-5: `internal_coach` is the engine's marker for a move made while an existing
+/// interruption is handled — never a caller's switch. A role-token move that names it is
+/// refused at the invocation boundary and writes nothing; the same move without it is the
+/// ordinary §6.2 board event. The served schema does not advertise the member.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_public_move_cannot_hide_itself_from_the_coach() {
+    let schema = serde_json::to_string(
+        &conveyor_actions::registry::registry()
+            .get("cards.move")
+            .expect("cards.move is registered")
+            .input_schema(),
+    )
+    .expect("serialise the input schema");
+    assert!(
+        !schema.contains("internal_coach"),
+        "the engine's marker is not part of the public input contract: {schema}"
+    );
+
+    let (pg, running, seeded) = fixture().await;
+    publish_processes(&running).await;
+    let (board, active, waiting) = board_lanes(&pg, &seeded).await;
+    let card = create_card(&running, &board, &active, "feature", "not hidden").await;
+    let card_id = Uuid::parse_str(&card).expect("card");
+
+    let (status, body) = running
+        .invoke(
+            "cards.move",
+            TOKEN,
+            json!({
+                "id": card,
+                "list_id": waiting,
+                "_version": 1,
+                "internal_coach": true,
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 422, "{body}");
+    assert_eq!(body["type"], json!("engine_only_input"), "{body}");
+
+    let (lane, version): (Uuid, i64) =
+        sqlx::query_as("SELECT list_id, version FROM card WHERE tenant_id = $1 AND id = $2")
+            .bind(seeded.tenant_id)
+            .bind(card_id)
+            .fetch_one(&pg.super_pool)
+            .await
+            .expect("read the refused card");
+    assert_eq!(lane, Uuid::parse_str(&active).expect("active"));
+    assert_eq!(version, 1, "the refused move wrote nothing");
+    let hidden: i64 = sqlx::query_scalar(
+        "SELECT count(*) FROM coach_interruption
+          WHERE tenant_id = $1 AND interrupted_card_id = $2",
+    )
+    .bind(seeded.tenant_id)
+    .bind(card_id)
+    .fetch_one(&pg.super_pool)
+    .await
+    .expect("count the interruptions");
+    assert_eq!(hidden, 0, "a refused move opens no interruption");
+
+    // The same move, without the engine's marker, is the ordinary flow event.
+    let (status, body) = running
+        .invoke(
+            "cards.move",
+            TOKEN,
+            json!({ "id": card, "list_id": waiting, "_version": 1 }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{body}");
+    let rows: Vec<(String, String)> = sqlx::query_as(
+        "SELECT trigger_kind, signature FROM coach_interruption
+          WHERE tenant_id = $1 AND interrupted_card_id = $2",
+    )
+    .bind(seeded.tenant_id)
+    .bind(card_id)
+    .fetch_all(&pg.super_pool)
+    .await
+    .expect("the interruptions");
+    assert_eq!(rows.len(), 1, "one move, one interruption: {rows:?}");
+    assert_eq!(rows[0].0, "board_event");
+    assert_eq!(rows[0].1, format!("board_event|card.moved|to:{waiting}"));
+    assert_eq!(count_cards_of_type(&pg, &seeded, &board, "coach").await, 1);
+}

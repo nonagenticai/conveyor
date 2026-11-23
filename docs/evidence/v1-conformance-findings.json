@@ -848,7 +848,12 @@
       ],
       "failure_scenario": "A board exceeds its WIP limit or a lease goes stale for days; no interruption, triage or remedy exists, and the Measure views show the block only after a downstream failure.",
       "acceptance": "Each \u00a76.2 input kind (WIP breach, stale lease, gate timeout, board event) invokes coach.interrupt through a tested producer carrying its own signature.",
-      "owner_project": "T4"
+      "owner_project": "T4",
+      "resolved_by": {
+        "commit": "fc020437f8046cf974ee45bb3db59d5f52324bc3",
+        "test": "apps/server/tests/approval_expire.rs::a_card_scoped_gate_timeout_opens_one_interruption",
+        "evidence": "Both remaining producers are proven end to end at the worker. A card-scoped gate that expires unanswered opens exactly one interruption (trigger_kind=gate_timeout, failed_run_id NULL, signature gate_timeout|approval:<id>) with one coach card and one coach run, while a project-scoped gate opens none; a claim whose lease expires opens exactly one stale_lease interruption (signature stale_lease|card:<id>), clears assignee/expiry/token, and a second sweep adds none (apps/server/tests/lease_sweep.rs::a_stale_lease_opens_one_interruption). Each test fails with its producer loop removed \u2014 'one expired card gate, one interruption: []' and 'one cleared lease, one interruption: []' (left 0, right 1) \u2014 and passes with it. The caller bypass is closed too: cards.move refuses internal_coach from any non-engine authority with 422 engine_only_input and the member is absent from the served schema (crates/actions/tests/coach.rs::a_public_move_cannot_hide_itself_from_the_coach). Suites: coach 27, approval_expire 2, lease_sweep 1 passed; clippy -D warnings."
+      }
     },
     {
       "id": "v1-p6-6",

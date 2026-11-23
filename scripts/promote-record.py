@@ -101,6 +101,15 @@ WRITE_ACTIONS = {
     "projects.close",
     "cards.comment",
     "cards.move",
+    # The T3 record-construction family: the retrospective rework charters a project that
+    # already exists (`projects.charter`), then plans it (`projects.baseline` writes the WBS,
+    # the scope baseline and the gate that freezes it). Without these two the change that
+    # accepts T3's deliverables has no approved scope baseline to cite.
+    "projects.charter",
+    "projects.baseline",
+    # A rework deliverable the record accepted, with its typed evidence: the demo credit that
+    # follows it is refused until the WBS row is `accepted` and carries evidence.
+    "wbs.update",
     # The tr3 record family: a register risk edited in place, a benefits-map edge, and the
     # architecture decision register's rows.
     "registers.update",
@@ -167,6 +176,11 @@ APPROVAL_KEY_RE = re.compile(r"^approval:([^/:]+)[/:](.+)$")
 DOCUMENT_KEY_RE = re.compile(r"^document:(.+)$")
 DOCUMENT_PUBLISH_KEY_RE = re.compile(r"^document-publish:(.+)$")
 PROJECT_CLOSURE_KEY_RE = re.compile(r"^project:closure:([0-9a-f-]{36})$")
+PROJECT_CHARTER_KEY_RE = re.compile(r"^project:charter:([0-9a-f-]{36})$")
+PROJECT_BASELINE_KEY_RE = re.compile(r"^project:baseline:([0-9a-f-]{36})$")
+# A title carries colons ("The PM request-to-plan path: pm.plan writes the WBS"), so the
+# project id is the only fixed delimiter and the title is everything after it.
+WBS_ACCEPT_KEY_RE = re.compile(r"^wbs-accept:([0-9a-f-]{36}):(.+)$")
 PROJECT_CLOSE_KEY_RE = re.compile(r"^project:close:([0-9a-f-]{36})$")
 CARD_COMMENT_KEY_RE = re.compile(r"^card-comment:([0-9a-f-]{36}):([0-9a-f]{8,64})$")
 CARD_MOVE_KEY_RE = re.compile(r"^card-move:([0-9a-f-]{36}):(intake|active|waiting|done|archive)$")
@@ -224,6 +238,12 @@ class NaturalKey:
             return f"document-publish:{self.first}"
         if self.kind == "project_closure":
             return f"project:closure:{self.first}"
+        if self.kind == "project_charter":
+            return f"project:charter:{self.first}"
+        if self.kind == "project_baseline":
+            return f"project:baseline:{self.first}"
+        if self.kind == "wbs_accept":
+            return f"wbs-accept:{self.first}:{self.second}"
         if self.kind == "project_close":
             return f"project:close:{self.first}"
         if self.kind == "card_comment":
@@ -327,6 +347,18 @@ def parse_natural_key(value: str) -> NaturalKey:
     match = PROJECT_CLOSURE_KEY_RE.match(value)
     if match:
         return NaturalKey("project_closure", match.group(1))
+    match = PROJECT_CHARTER_KEY_RE.match(value)
+    if match:
+        return NaturalKey("project_charter", match.group(1))
+    match = PROJECT_BASELINE_KEY_RE.match(value)
+    if match:
+        return NaturalKey("project_baseline", match.group(1))
+    match = WBS_ACCEPT_KEY_RE.match(value)
+    if match:
+        title = match.group(2).strip()
+        if not title or any(ord(char) < 0x20 for char in title):
+            raise PromoteError(f"malformed wbs-accept natural key: {value!r}")
+        return NaturalKey("wbs_accept", match.group(1), title)
     match = PROJECT_CLOSE_KEY_RE.match(value)
     if match:
         return NaturalKey("project_close", match.group(1))
@@ -630,6 +662,60 @@ def validate_entries(entries: list[Entry]) -> list[str]:
                 errors.append(
                     f"line {entry.lineno}: natural key {key.first!r} does not match "
                     f"input id {entry.payload.get('id')!r}"
+                )
+        elif entry.action in ("projects.charter", "projects.baseline"):
+            wanted = "project_charter" if entry.action == "projects.charter" else "project_baseline"
+            shape = (
+                "project:charter:<project id>"
+                if entry.action == "projects.charter"
+                else "project:baseline:<project id>"
+            )
+            if key.kind != wanted:
+                errors.append(
+                    f"line {entry.lineno}: {entry.action} key must be {shape}"
+                )
+                continue
+            if entry.payload.get("project_id") != key.first:
+                errors.append(
+                    f"line {entry.lineno}: natural key {key.first!r} does not match "
+                    f"input project_id {entry.payload.get('project_id')!r}"
+                )
+            if entry.action == "projects.charter":
+                if not isinstance(entry.payload.get("charter"), str) or not entry.payload[
+                    "charter"
+                ].strip():
+                    errors.append(
+                        f"line {entry.lineno}: a charter input needs non-empty charter text"
+                    )
+            else:
+                wbs = entry.payload.get("wbs")
+                if not isinstance(wbs, list) or not wbs:
+                    errors.append(
+                        f"line {entry.lineno}: a baseline input needs a non-empty wbs list"
+                    )
+                else:
+                    for index, node in enumerate(wbs):
+                        if not isinstance(node, dict) or not node.get("kind") or not node.get(
+                            "title"
+                        ):
+                            errors.append(
+                                f"line {entry.lineno}: wbs node {index} needs kind and title"
+                            )
+        elif entry.action == "wbs.update":
+            if key.kind != "wbs_accept":
+                errors.append(
+                    f"line {entry.lineno}: wbs.update key must be "
+                    "wbs-accept:<project id>:<deliverable title>"
+                )
+                continue
+            if entry.payload.get("status") != "accepted":
+                errors.append(
+                    f"line {entry.lineno}: a rework WBS update records `accepted`"
+                )
+            evidence = entry.payload.get("evidence")
+            if not isinstance(evidence, list) or not evidence:
+                errors.append(
+                    f"line {entry.lineno}: an accepted deliverable needs typed evidence"
                 )
         elif entry.action == "approvals.request":
             if key.kind == "tranche_review_gate":
@@ -1279,9 +1365,7 @@ def load_state(
             card_id = entry.payload.get("id")
             if not card_id:
                 raise PromoteError(f"{entry.action}: the input names no card id")
-            card = client.invoke("cards.get", {"id": card_id})
-            if not isinstance(card, dict):
-                raise PromoteError(f"cards.get: no card {card_id}")
+            card = read_card(client, card_id)
             for comment in card.get("comments") or []:
                 body = comment.get("body") if isinstance(comment, dict) else None
                 if isinstance(body, str):
@@ -1289,9 +1373,16 @@ def load_state(
             state.cards[card_id] = card
             board_id = card.get("board_id")
             if board_id:
-                for row in list_all(client, "lists.list", {"board_id": board_id}):
-                    if row.get("id"):
-                        state.lists[row["id"]] = row
+                try:
+                    for row in list_all(client, "lists.list", {"board_id": board_id}):
+                        if row.get("id"):
+                            state.lists[row["id"]] = row
+                except PromoteError:
+                    # No action lists a board's lanes (the board slice has never needed one
+                    # from an agent). The journal's lane ids are restored rows and therefore
+                    # identical in both targets; a move falls back to the recorded id and the
+                    # readback proves the landing.
+                    pass
         # A projects.close replay needs the project's gates even when no change entry does.
         for project_id in sorted(project_ids):
             if not any(row.get("project_id") == project_id for row in state.approvals):
@@ -1325,7 +1416,9 @@ def load_state(
         "tranches.review",
         "tranches.authorise",
     }
-    if any(entry.action in cadence_actions for entry in entries):
+    if any(
+        entry.action in cadence_actions or entry.action == "wbs.update" for entry in entries
+    ):
         for scope in sorted(programme_ids):
             state.cadences.extend(
                 rows(client, "cadences.list", {"programme_id": scope})
@@ -1360,6 +1453,13 @@ def load_state(
                 for entry in entries
                 if entry.action == "cadences.credit_demo"
                 and entry.meta.get("project_id")
+            }
+            | {
+                entry.key.first
+                for entry in entries
+                if entry.action == "wbs.update"
+                and entry.key is not None
+                and entry.key.kind == "wbs_accept"
             }
         ):
             state.wbs[project_id] = rows(
@@ -1455,7 +1555,17 @@ def review_for(
 
 
 def wbs_deliverable(state: State, project_id: str | None, title: str) -> dict | None:
+    """The project's DELIVERABLE row with this title.
+
+    A WBS node is not always a deliverable: a summary/group row with the same title carries no
+    deliverable id, and passing one to `cadences.credit_demo` is a 422 on the id field rather
+    than a named refusal. Only a row the credit action can accept is returned here.
+    """
     for row in state.wbs.get(project_id or "", []):
+        if row.get("kind") != "deliverable":
+            continue
+        if row.get("id") is None:
+            continue
         if row.get("title") == title:
             return row
     return None
@@ -1643,6 +1753,24 @@ def closure_gate(state: State, project_id: str) -> dict | None:
     return None
 
 
+def project_gate(state: State, project_id: str, name: str) -> dict | None:
+    """A named project gate in whatever state — the act that opened it is a skip.
+
+    A second `projects.charter` is refused by the engine (`charter_approved`) and a second
+    `projects.baseline` would create a second baseline, so the skip test keys on the gate's
+    existence rather than on its status: the decide entry after it is what finishes the act.
+    """
+    newest: dict | None = None
+    for gate in state.approvals:
+        if gate.get("gate") != name or gate.get("project_id") != project_id:
+            continue
+        if newest is None or str(gate.get("created_at") or "") > str(
+            newest.get("created_at") or ""
+        ):
+            newest = gate
+    return newest
+
+
 def requested_target(payload: dict) -> str | None:
     """The engine's target for an `approvals.request` payload, where it is derivable."""
     if payload.get("target"):
@@ -1784,7 +1912,12 @@ def existing_for(
         return baseline_measurement(state, key.first)
     if entry.action == "changes.request":
         return change_row(state, key, entry.payload)
-    if entry.action == "approvals.decide" and key.first in ("closure", "projects.close"):
+    if entry.action == "approvals.decide" and key.first in (
+        "closure",
+        "projects.close",
+        "charter",
+        "baseline",
+    ):
         # The closure chain's decides: the key names the gate and the project, not a change.
         for gate in state.approvals:
             if gate.get("gate") != key.first or gate.get("project_id") != key.second:
@@ -1868,6 +2001,18 @@ def existing_for(
         return None
     if entry.action == "projects.close_request":
         return closure_gate(state, key.first)
+    if entry.action == "projects.charter":
+        # The act is done once the project's charter gate exists at all: a pending gate still
+        # needs its decide, an approved one needs nothing, and a second charter is refused.
+        return project_gate(state, key.first, "charter")
+    if entry.action == "projects.baseline":
+        # Same shape: a baseline gate means the plan ran; the decide entry approves the row.
+        return project_gate(state, key.first, "baseline")
+    if entry.action == "wbs.update":
+        node = wbs_deliverable(state, key.first, key.second or "")
+        if node is None or node.get("status") != entry.payload.get("status"):
+            return None
+        return node
     if entry.action == "approvals.request":
         return request_gate(state, entry.payload)
     if entry.action == "projects.close":
@@ -1880,7 +2025,20 @@ def existing_for(
         return card_comment(card, key.second) if card is not None else None
     if entry.action == "cards.move":
         card = state.cards.get(key.first)
-        if card is not None and lane_kind(state, card.get("list_id")) == key.second:
+        if card is None:
+            return None
+        if lane_kind(state, card.get("list_id")) == key.second:
+            return card
+        # The lanes are not readable as rows (no action lists a board's lanes), so the two
+        # id-based signals carry the skip test: the card is already in the lane the entry
+        # names, or it has already moved on from that lane.
+        if str(card.get("list_id") or "") == str(entry.payload.get("list_id") or ""):
+            return card
+        # A card that has already moved ON from this entry's lane has nothing left to do here:
+        # the journal records intake→active→done, and a second pass sees the card in `done`
+        # with `active` behind it. Without this the replay asks for a done→active move and the
+        # engine refuses it (409) — a correct refusal of a wrong request.
+        if str(card.get("prev_list_id") or "") == str(entry.payload.get("list_id") or ""):
             return card
         return None
     return None
@@ -1962,6 +2120,18 @@ def read_row(client: Any, action: str, row_id: str) -> dict:
             f"{action}: readback returned id {output.get('id')!r}, expected {row_id!r}"
         )
     return output
+
+
+def read_card(client: Any, card_id: str) -> dict:
+    """`cards.get` answers `{card: {…}}`; every other read answers the row itself."""
+    try:
+        output = client.invoke("cards.get", {"id": card_id})
+    except PromoteError as error:
+        raise ReadbackError(str(error)) from None
+    card = output.get("card") if isinstance(output, dict) else None
+    if not isinstance(card, dict) or card.get("id") != card_id:
+        raise ReadbackError(f"cards.get: no card {card_id}")
+    return card
 
 
 def readback_register(
@@ -2156,6 +2326,35 @@ def remap_payload(
                 "create or find it first"
             )
         payload["id"] = production
+    elif entry.action in ("projects.charter", "projects.baseline"):
+        project_id = payload.get("project_id")
+        if not project_id:
+            raise PromoteError(f"{entry.action}: the input names no project_id")
+        # A project the rework reopens is the same row in both targets, but the map is the
+        # rule everywhere else and a stale id here would charter the wrong project.
+        payload["project_id"] = id_map.get(str(project_id), str(project_id))
+        if entry.action == "projects.baseline":
+            # The WBS carries titles and WSJF inputs, never an id: the plan is what the
+            # entry creates, so there is nothing to remap inside it.
+            if not isinstance(payload.get("wbs"), list) or not payload["wbs"]:
+                raise PromoteError(f"{entry.action}: the input names no wbs")
+    elif entry.action == "wbs.update":
+        node = wbs_deliverable(state, key.first, key.second or "")
+        if node is None:
+            raise PromoteError(
+                f"wbs-accept: no production deliverable {key.second!r} in project "
+                f"{key.first!r}; the baseline entry must create it first"
+            )
+        payload["id"] = node["id"]
+        change_id = payload.get("change_id")
+        if change_id:
+            production_change = id_map.get(str(change_id))
+            if not production_change:
+                raise PromoteError(
+                    f"wbs-accept: change_id {change_id!r} has no production mapping; "
+                    "the change entry must create or find it first"
+                )
+            payload["change_id"] = production_change
     elif entry.action == "cards.move":
         card = state.cards.get(key.first)
         target_id = payload.get("list_id")
@@ -2172,6 +2371,13 @@ def remap_payload(
         if resolved is None:
             if lane_kind(state, target_id) == key.second:
                 resolved = target_id
+        if resolved is None and not any(
+            lane.get("board_id") == (card or {}).get("board_id")
+            for lane in state.lists.values()
+        ):
+            # The lanes are unreadable (no action lists them). A restored board's lane ids are
+            # the same rows in both targets, and the readback proves the card landed there.
+            resolved = target_id
         if resolved is None:
             raise PromoteError(f"cards.move: no {key.second!r} lane on the card's board")
         payload["list_id"] = resolved
@@ -2351,6 +2557,18 @@ def output_id_for(action: str, output: Any) -> tuple[str, str | None]:
         if not change_id:
             raise PromoteError("changes.request: output has no change_id")
         return str(change_id), str(approval_id) if approval_id else None
+    if action == "projects.charter":
+        approval_id = output.get("approval_id")
+        if not approval_id:
+            raise PromoteError("projects.charter: output has no approval_id")
+        # The act's output is the gate it opened; the decide entry keys off it.
+        return str(approval_id), None
+    if action == "projects.baseline":
+        approval_id = output.get("approval_id")
+        baseline_id = output.get("baseline_id")
+        if not approval_id or not baseline_id:
+            raise PromoteError("projects.baseline: output has no baseline_id/approval_id")
+        return str(approval_id), str(baseline_id)
     if action == "projects.close_request":
         project_id = output.get("project_id")
         if not project_id:
@@ -2445,6 +2663,38 @@ def readback_entry(
         return gate
     if entry.action == "benefits.measure":
         return readback_measurement(client, state, entry, snapshot, production_id)
+    if entry.action == "wbs.update":
+        nodes = rows(client, "wbs.list", {"project_id": key.first})
+        for node in nodes:
+            if node.get("id") != production_id:
+                continue
+            if node.get("status") != entry.payload.get("status"):
+                raise ReadbackError(
+                    f"wbs.list: status is {node.get('status')!r}, not "
+                    f"{entry.payload.get('status')!r}"
+                )
+            if not node.get("evidence"):
+                raise ReadbackError("wbs.list: the accepted node carries no evidence")
+            state.wbs[key.first] = nodes
+            return node
+        raise ReadbackError("wbs.list: the updated node is not readable")
+    if entry.action in ("projects.charter", "projects.baseline"):
+        gate = readback_gate(client, key.first, production_id)
+        if not any(item.get("id") == production_id for item in state.approvals):
+            state.approvals.append(gate)
+        if entry.action == "projects.baseline":
+            # The plan's own rows are what the change after it cites; a gate over an empty
+            # plan would replay the change with no deliverable behind it.
+            baselines = rows(client, "baselines.list", {"project_id": key.first})
+            if not any(row.get("kind") == "scope" for row in baselines):
+                raise ReadbackError(
+                    "baselines.list: no scope baseline after projects.baseline"
+                )
+            state.baselines[key.first] = baselines
+            # The plan's rows are what the acceptances and the change after it resolve
+            # against; a stale WBS map would make the very next entry fail.
+            state.wbs[key.first] = rows(client, "wbs.list", {"project_id": key.first})
+        return gate
     if entry.action == "projects.close_request":
         project_id = entry.payload.get("id")
         if not project_id:
@@ -2487,7 +2737,7 @@ def readback_entry(
         state.projects[production_id] = project
         return project
     if entry.action == "cards.comment":
-        card = read_row(client, "cards.get", key.first)
+        card = read_card(client, key.first)
         for comment in card.get("comments") or []:
             body = comment.get("body") if isinstance(comment, dict) else None
             if isinstance(body, str):
@@ -2498,9 +2748,13 @@ def readback_entry(
                     return comment
         raise ReadbackError("cards.get: the comment is not on the card")
     if entry.action == "cards.move":
-        card = read_row(client, "cards.get", key.first)
+        card = read_card(client, key.first)
         kind = lane_kind(state, card.get("list_id"))
-        if kind != key.second:
+        if kind is None:
+            previous = state.cards.get(key.first) or {}
+            if not card.get("list_id") or card.get("list_id") == previous.get("list_id"):
+                raise ReadbackError("cards.get: the card did not move")
+        elif kind != key.second:
             raise ReadbackError(
                 f"cards.get: the card is in a {kind!r} lane, not {key.second!r}"
             )
@@ -2720,11 +2974,19 @@ def apply_entries(
                         f"tranche-review:{key.first}: no production gate to review under"
                     )
             if entry.action == "cards.move":
-                current = read_row(client, "cards.get", str(payload["id"]))
+                current = read_card(client, str(payload["id"]))
                 version = current.get("version")
                 if not isinstance(version, int):
                     raise PromoteError(
                         f"cards.get: {payload['id']} has no version for If-Match"
+                    )
+                output = client.invoke(entry.action, payload, if_match=version, actor=actor)
+            elif entry.action == "wbs.update":
+                current = read_row(client, "wbs.get", str(payload["id"]))
+                version = current.get("version")
+                if not isinstance(version, int):
+                    raise PromoteError(
+                        f"wbs.get: {payload['id']} has no version for If-Match"
                     )
                 output = client.invoke(entry.action, payload, if_match=version, actor=actor)
             elif entry.action == "documents.publish":
@@ -3124,6 +3386,11 @@ class FakeClient:
                         )
                     gate["status"] = expected_gate_status(payload)
                     gate["version"] += 1
+                    if gate["status"] == "approved" and gate.get("gate") == "baseline":
+                        # The engine's gate effect approves the baseline the gate names.
+                        for row in self.state.baselines.get(gate.get("project_id"), []):
+                            if row.get("approved_by") is None:
+                                row["approved_by"] = "approver"
                     return copy.deepcopy(gate)
             raise PromoteError(f"approvals.decide: no gate {payload.get('approval_id')}")
         if action == "benefits.update":
@@ -3153,7 +3420,8 @@ class FakeClient:
             card = self.state.cards.get(payload.get("id"))
             if card is None:
                 return None
-            return copy.deepcopy(card)
+            # The product answers `{card: {…}}`; the fake must not be kinder than the engine.
+            return {"card": copy.deepcopy(card)}
         if action == "projects.close_request":
             asset = self._id("closure")
             gate = {
@@ -3437,6 +3705,60 @@ class FakeClient:
                 "items": copy.deepcopy(self.state.wbs.get(payload.get("project_id"), [])),
                 "next_cursor": None,
             }
+        if action == "wbs.get":
+            for row in self.state.wbs.values():
+                for node in row:
+                    if node.get("id") == payload.get("id"):
+                        return copy.deepcopy(node)
+            return None
+        if action == "wbs.update":
+            for rows in self.state.wbs.values():
+                for node in rows:
+                    if node.get("id") != payload.get("id"):
+                        continue
+                    if if_match != node.get("version"):
+                        raise PromoteError("wbs.update: If-Match is stale")
+                    for name in ("status", "evidence", "title", "body"):
+                        if name in payload:
+                            node[name] = payload[name]
+                    node["version"] = int(node.get("version") or 0) + 1
+                    return copy.deepcopy(node)
+            raise PromoteError(f"wbs.update: no node {payload.get('id')}")
+        if action == "projects.charter":
+            project_id = payload.get("project_id")
+            gate_id = self._id("charter-gate")
+            self.state.approvals.append({
+                "id": gate_id, "gate": "charter", "status": "pending",
+                "project_id": project_id, "target": None,
+                "description": "Approve the charter", "version": 1,
+                "created_at": "2026-11-22T00:00:00Z",
+            })
+            return {"project_id": project_id,
+                    "charter_asset_id": self._id("charter-asset"),
+                    "approval_id": gate_id}
+        if action == "projects.baseline":
+            project_id = payload.get("project_id")
+            gate_id = self._id("baseline-gate")
+            baseline_id = self._id("baseline")
+            nodes = []
+            for node in payload.get("wbs") or []:
+                row = {"id": self._id("wbs"), "project_id": project_id,
+                       "kind": node.get("kind"), "title": node.get("title"),
+                       "status": "open", "evidence": [], "version": 1}
+                nodes.append(row)
+                self.state.wbs.setdefault(project_id, []).append(row)
+            self.state.baselines.setdefault(project_id, []).append({
+                "id": baseline_id, "project_id": project_id,
+                "kind": payload.get("baseline_kind") or "scope", "approved_by": None})
+            self.state.approvals.append({
+                "id": gate_id, "gate": "baseline", "status": "pending",
+                "project_id": project_id, "target": None,
+                "description": "Approve the scope baseline", "version": 1,
+                "created_at": "2026-11-22T00:00:01Z",
+            })
+            return {"baseline_id": baseline_id,
+                    "wbs_ids": [node["id"] for node in nodes],
+                    "approval_id": gate_id}
         if action == "cards.list":
             rows = [
                 copy.deepcopy(row)
@@ -4214,7 +4536,8 @@ def self_test() -> int:
              "programme_id": programme, "state": "planned"},
         ])
         state.wbs[project] = [
-            {"id": "c1", "project_id": project, "title": "The accepted deliverable"}
+            {"id": "c1", "project_id": project, "kind": "deliverable",
+             "title": "The accepted deliverable"}
         ]
         client = FakeClient(state)
         id_map, outcomes = apply_entries(client, entries, state, None)
@@ -4331,6 +4654,85 @@ def self_test() -> int:
         == '{"input":{"gate":"g","input":{"id":"x"}}}\n',
         "an input carrying its own input key is wrapped for the CLI",
     )
+
+    # 12. the T3 construction chain: the rework charters a project that already exists, plans
+    # it, freezes the plan behind its own gate and accepts the deliverables the demo credits
+    # then name. Each act opens the gate its decide resolves; a second pass skips all five.
+    with tempfile.TemporaryDirectory(prefix="promote-record-chain-") as tmp:
+        chain_dir = Path(tmp)
+        chain_project = "01a1d039-0d33-7915-8833-75f4dc31cc07"
+        charter_gate = "01a2052d-d77d-7415-bc64-8289f1cb6139"
+        baseline_gate = "01a2052e-0621-78fd-b0ef-8af02b8bc715"
+        (chain_dir / "charter.json").write_text(
+            json.dumps({"project_id": chain_project, "charter": "# The T3 charter"}),
+            encoding="utf-8",
+        )
+        (chain_dir / "decide-charter.json").write_text(
+            json.dumps({"approval_id": charter_gate, "decision": "approve"}),
+            encoding="utf-8",
+        )
+        (chain_dir / "baseline.json").write_text(
+            json.dumps({
+                "project_id": chain_project,
+                "baseline_kind": "scope",
+                "wbs": [{"kind": "deliverable", "title": "The accepted deliverable",
+                         "business_value": 8, "time_criticality": 8,
+                         "risk_reduction": 5, "job_size": 3}],
+            }),
+            encoding="utf-8",
+        )
+        (chain_dir / "decide-baseline.json").write_text(
+            json.dumps({"approval_id": baseline_gate, "decision": "approve"}),
+            encoding="utf-8",
+        )
+        (chain_dir / "accept.json").write_text(
+            json.dumps({"status": "accepted",
+                        "evidence": [{"ref": "the gate", "kind": "test",
+                                      "path": "crates/actions/tests/spine_gates.rs"}]}),
+            encoding="utf-8",
+        )
+        chain_raw = [
+            {"action": "projects.charter", "input": str(chain_dir / "charter.json"),
+             "natural_key": f"project:charter:{chain_project}",
+             "output_id": charter_gate, "approval_id": charter_gate},
+            {"action": "approvals.decide", "input": str(chain_dir / "decide-charter.json"),
+             "natural_key": f"approval:charter/{chain_project}", "output_id": charter_gate},
+            {"action": "projects.baseline", "input": str(chain_dir / "baseline.json"),
+             "natural_key": f"project:baseline:{chain_project}",
+             "output_id": baseline_gate, "approval_id": baseline_gate},
+            {"action": "approvals.decide", "input": str(chain_dir / "decide-baseline.json"),
+             "natural_key": f"approval:baseline/{chain_project}", "output_id": baseline_gate},
+            {"action": "wbs.update", "input": str(chain_dir / "accept.json"),
+             "natural_key": f"wbs-accept:{chain_project}:The accepted deliverable",
+             "output_id": "staging-wbs"},
+        ]
+        chain_entries, chain_errors = build_entries(
+            [(index + 2, raw) for index, raw in enumerate(chain_raw)]
+        )
+        ok(not chain_errors, f"the construction chain parses: {chain_errors}")
+        ok(not validate_entries(chain_entries), "the construction chain validates")
+        chain_state = State()
+        _, chain_first = apply_entries(FakeClient(chain_state), chain_entries, chain_state, None)
+        ok(
+            [outcome.verdict for outcome in chain_first] == ["created"] * 5,
+            f"the construction chain applies: "
+            f"{[(o.entry.natural_key, o.verdict, o.detail) for o in chain_first]}",
+        )
+        ok(
+            any(row.get("approved_by") for row in chain_state.baselines[chain_project]),
+            "the baseline gate's decide approves the baseline it names",
+        )
+        ok(
+            chain_state.wbs[chain_project][0].get("status") == "accepted"
+            and chain_state.wbs[chain_project][0].get("evidence"),
+            "the acceptance lands with its typed evidence",
+        )
+        _, chain_second = apply_entries(FakeClient(chain_state), chain_entries, chain_state, None)
+        ok(
+            [outcome.verdict for outcome in chain_second] == ["skipped"] * 5,
+            f"a replay skips the whole construction chain: "
+            f"{[(o.entry.natural_key, o.verdict, o.detail) for o in chain_second]}",
+        )
 
     print(f"self-test: {checks} checks passed (offline; no network, no database)")
     return 0

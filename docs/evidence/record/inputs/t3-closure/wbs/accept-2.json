@@ -1,0 +1,16 @@
+{
+ "status": "accepted",
+ "evidence": [
+  {
+   "ref": "a distinct approver on every gate",
+   "kind": "test",
+   "path": "crates/actions/tests/spine_gates.rs"
+  },
+  {
+   "ref": "self-approval refused",
+   "kind": "test",
+   "path": "crates/actions/tests/approval_standalone.rs"
+  }
+ ],
+ "change_id": "01a2052e-5648-7350-a30d-06514a69eced"
+}

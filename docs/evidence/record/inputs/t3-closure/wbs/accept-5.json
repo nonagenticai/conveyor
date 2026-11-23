@@ -1,0 +1,11 @@
+{
+ "status": "accepted",
+ "evidence": [
+  {
+   "ref": "the manifest's checks execute against the live rows",
+   "kind": "script",
+   "path": "scripts/verify-project.py"
+  }
+ ],
+ "change_id": "01a2052e-5648-7350-a30d-06514a69eced"
+}

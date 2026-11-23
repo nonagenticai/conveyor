@@ -7,7 +7,6 @@
 
 mod common;
 
-use std::process::{Child, Command, Stdio};
 use std::time::Duration;
 
 use chrono::{Duration as ChronoDuration, Utc};
@@ -19,38 +18,6 @@ use uuid::Uuid;
 
 const EXPIRED: &str = "approval.expired";
 const APPROVED: &str = "approval.approved";
-
-/// A child worker that is killed on drop, so a failed assertion cannot leave a poller running
-/// against the test database.
-struct WorkerChild {
-    child: Child,
-}
-
-impl WorkerChild {
-    fn spawn(db: &common::TestDb) -> Self {
-        let child = Command::new(env!("CARGO_BIN_EXE_conveyor"))
-            .arg("worker")
-            .env("APP_ENV", "test")
-            .env("DATABASE_URL", &db.runtime_url)
-            .env("DATABASE_LISTEN_URL", &db.runtime_url)
-            .env("DATABASE_MIGRATE_URL", &db.runtime_url)
-            .env("APP_KEY", "conveyor")
-            .env("JOB_LEASE_SECS", "2")
-            .env("RUST_LOG", "info")
-            .stdout(Stdio::null())
-            .stderr(Stdio::null())
-            .spawn()
-            .expect("spawn the conveyor worker binary");
-        Self { child }
-    }
-}
-
-impl Drop for WorkerChild {
-    fn drop(&mut self) {
-        let _ = self.child.kill();
-        let _ = self.child.wait();
-    }
-}
 
 #[derive(Clone, Debug)]
 struct Fixture {
@@ -93,15 +60,57 @@ async fn seed(db: &common::TestDb) -> Fixture {
     }
 }
 
-/// A `running` run with one pending gate whose `expires_at` has already passed.
-async fn seed_due_gate(db: &common::TestDb, fixture: &Fixture) -> (Uuid, Uuid) {
+/// A board with one active lane and one card — the card a gate timeout must be able to coach.
+async fn seed_card(db: &common::TestDb, fixture: &Fixture) -> Uuid {
+    let board: Uuid = sqlx::query_scalar(
+        "INSERT INTO board (tenant_id, project_id, name) VALUES ($1, $2, 'Board') RETURNING id",
+    )
+    .bind(fixture.tenant_id)
+    .bind(fixture.project)
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("seed a board");
+    let lane: Uuid = sqlx::query_scalar(
+        "INSERT INTO list (tenant_id, board_id, name, position, kind)
+         VALUES ($1, $2, 'Active', 1, 'active') RETURNING id",
+    )
+    .bind(fixture.tenant_id)
+    .bind(board)
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("seed a lane");
+    let card_type: Uuid = sqlx::query_scalar(
+        "INSERT INTO card_type (tenant_id, code, label)
+         VALUES ($1, 'feature', 'Feature')
+         ON CONFLICT (tenant_id, code) DO UPDATE SET label = excluded.label
+         RETURNING id",
+    )
+    .bind(fixture.tenant_id)
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("seed a card type");
+    sqlx::query_scalar(
+        "INSERT INTO card (tenant_id, board_id, list_id, card_type_id, name, position)
+         VALUES ($1, $2, $3, $4, 'Card', 1) RETURNING id",
+    )
+    .bind(fixture.tenant_id)
+    .bind(board)
+    .bind(lane)
+    .bind(card_type)
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("seed a card")
+}
+
+/// A `running` run — on `card` when it names one — with one pending gate already past due.
+async fn seed_due_gate(db: &common::TestDb, fixture: &Fixture, card: Option<Uuid>) -> (Uuid, Uuid) {
     let mut tx = store::begin_scoped(&db.runtime, fixture.tenant)
         .await
         .expect("scope the seed");
     let run = store::run::insert_run_tx(
         &mut tx,
         fixture.tenant,
-        &store::run::NewRun::new(fixture.project, None),
+        &store::run::NewRun::new(fixture.project, card),
     )
     .await
     .expect("insert the run");
@@ -216,39 +225,22 @@ async fn decide(
     }
 }
 
-async fn wait_for<F, Fut>(what: &str, timeout: Duration, mut predicate: F)
-where
-    F: FnMut() -> Fut,
-    Fut: std::future::Future<Output = bool>,
-{
-    let deadline = std::time::Instant::now() + timeout;
-    loop {
-        if predicate().await {
-            return;
-        }
-        if std::time::Instant::now() > deadline {
-            panic!("timed out after {timeout:?} waiting for {what}");
-        }
-        tokio::time::sleep(Duration::from_millis(100)).await;
-    }
-}
-
 #[tokio::test(flavor = "multi_thread")]
 async fn the_expiry_resolves_a_due_gate_once_and_the_losing_decision_writes_nothing() {
     let db = common::TestDb::fresh().await;
     let fixture = seed(&db).await;
-    let (due_gate, due_run) = seed_due_gate(&db, &fixture).await;
+    let (due_gate, due_run) = seed_due_gate(&db, &fixture, None).await;
     enqueue_expire(&db, &fixture, "expire-1").await;
-    let _worker = WorkerChild::spawn(&db);
+    let _worker = common::WorkerChild::spawn(env!("CARGO_BIN_EXE_conveyor"), &db);
 
     // ── the expiry wins: expired, one event, no decision ────────────────────────────────
-    wait_for(
+    common::wait_for(
         "the due gate to expire",
         Duration::from_secs(15),
         || async { approval_status(&db, due_gate).await == "expired" },
     )
     .await;
-    wait_for(
+    common::wait_for(
         "the expire job to finish",
         Duration::from_secs(10),
         || async { job_status(&db, "expire-1").await.as_deref() == Some("succeeded") },
@@ -276,6 +268,17 @@ async fn the_expiry_resolves_a_due_gate_once_and_the_losing_decision_writes_noth
     assert_eq!(payload.0, due_gate.to_string());
     assert_eq!(payload.1, due_run.to_string());
 
+    let coached: i64 =
+        sqlx::query_scalar("SELECT count(*) FROM coach_interruption WHERE tenant_id = $1")
+            .bind(fixture.tenant_id)
+            .fetch_one(&db.super_pool)
+            .await
+            .expect("count the interruptions");
+    assert_eq!(
+        coached, 0,
+        "a project-scoped gate carries no card, so its timeout cannot open an interruption"
+    );
+
     // ── the decide that lost: 409, no decision row, no approved event ───────────────────
     let (status, detail) = decide(&db, &fixture, due_gate)
         .await
@@ -293,7 +296,7 @@ async fn the_expiry_resolves_a_due_gate_once_and_the_losing_decision_writes_noth
     );
 
     // ── the decision wins: the expiry that runs afterwards changes nothing ──────────────
-    let (live_gate, _) = seed_due_gate(&db, &fixture).await;
+    let (live_gate, _) = seed_due_gate(&db, &fixture, None).await;
     decide(&db, &fixture, live_gate)
         .await
         .expect("the decision is recorded before the expiry job runs");
@@ -301,7 +304,7 @@ async fn the_expiry_resolves_a_due_gate_once_and_the_losing_decision_writes_noth
     assert_eq!(decision_count(&db, live_gate).await, 1);
 
     enqueue_expire(&db, &fixture, "expire-2").await;
-    wait_for(
+    common::wait_for(
         "the second expire job to finish",
         Duration::from_secs(15),
         || async { job_status(&db, "expire-2").await.as_deref() == Some("succeeded") },
@@ -326,4 +329,81 @@ async fn the_expiry_resolves_a_due_gate_once_and_the_losing_decision_writes_noth
         1,
         "exactly one terminal event for the gate"
     );
+}
+
+/// v1-p6-5: a gate that expires unanswered on a CARD-scoped run is a §6.2 flow input. The
+/// producer opens one interruption through `coach.interrupt` after the sweep's commit, naming
+/// the card and the approval's own repeat key.
+#[tokio::test(flavor = "multi_thread")]
+async fn a_card_scoped_gate_timeout_opens_one_interruption() {
+    let db = common::TestDb::fresh().await;
+    let fixture = seed(&db).await;
+    let card = seed_card(&db, &fixture).await;
+    common::coach_fixture::seed_coach_handle_error(&db, fixture.tenant_id, fixture.user).await;
+    let (due_gate, _) = seed_due_gate(&db, &fixture, Some(card)).await;
+    enqueue_expire(&db, &fixture, "expire-card").await;
+    let _worker = common::WorkerChild::spawn(env!("CARGO_BIN_EXE_conveyor"), &db);
+
+    common::wait_for(
+        "the due gate to expire",
+        Duration::from_secs(15),
+        || async { approval_status(&db, due_gate).await == "expired" },
+    )
+    .await;
+    common::wait_for(
+        "the expire job to finish",
+        Duration::from_secs(15),
+        || async { job_status(&db, "expire-card").await.as_deref() == Some("succeeded") },
+    )
+    .await;
+
+    let rows: Vec<(String, Option<Uuid>, String, Uuid)> = sqlx::query_as(
+        "SELECT trigger_kind, failed_run_id, signature, coach_card_id
+           FROM coach_interruption
+          WHERE tenant_id = $1 AND interrupted_card_id = $2",
+    )
+    .bind(fixture.tenant_id)
+    .bind(card)
+    .fetch_all(&db.super_pool)
+    .await
+    .expect("read the interruptions");
+    assert_eq!(
+        rows.len(),
+        1,
+        "one expired card gate, one interruption: {rows:?}"
+    );
+    assert_eq!(rows[0].0, "gate_timeout");
+    assert_eq!(rows[0].1, None, "a flow input carries no failed run");
+    assert_eq!(rows[0].2, format!("gate_timeout|approval:{due_gate}"));
+
+    let coach_card = rows[0].3;
+    let (code, lane): (String, Uuid) = sqlx::query_as(
+        "SELECT ct.code, c.list_id FROM card c
+           JOIN card_type ct ON ct.tenant_id = c.tenant_id AND ct.id = c.card_type_id
+          WHERE c.tenant_id = $1 AND c.id = $2",
+    )
+    .bind(fixture.tenant_id)
+    .bind(coach_card)
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("read the coach card");
+    assert_eq!(code, "coach");
+    let interrupted_lane: Uuid = sqlx::query_scalar("SELECT list_id FROM card WHERE id = $1")
+        .bind(card)
+        .fetch_one(&db.super_pool)
+        .await
+        .expect("read the interrupted card's lane");
+    assert_eq!(
+        lane, interrupted_lane,
+        "the coach card lands in the interrupted card's lane"
+    );
+
+    let runs: i64 =
+        sqlx::query_scalar("SELECT count(*) FROM run WHERE tenant_id = $1 AND card_id = $2")
+            .bind(fixture.tenant_id)
+            .bind(coach_card)
+            .fetch_one(&db.super_pool)
+            .await
+            .expect("count the coach runs");
+    assert_eq!(runs, 1, "the interruption starts exactly one coach run");
 }
