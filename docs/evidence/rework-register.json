@@ -23193,11 +23193,75 @@
       "title": "the product snapshot does not project the licensing frame"
     },
     {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot /tmp/u5a-v12/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --deep-review docs/evidence/record-w3/deep-review-findings.json --deep-review docs/evidence/record-w4/deep-review-findings.json --rework-check dr-w3-standard-register-fields-1:PLATFORM",
+      "acceptance_command": "python3 -I scripts/generate-standards.py --self-test",
       "apply_to": "PLATFORM",
       "artefact": "code",
       "baseline": null,
       "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "python3 -I scripts/generate-standards.py --self-test",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "path": "docs/evidence/record-w3/deep-review-findings.json",
+              "quote": "information_schema for project_register_item has kind, severity, probability, impact, response, review_at, links, meta and no category or escalation column; the published register states the absence rather than inventing values.",
+              "source": "deep-review"
+            }
+          ],
+          "rule": "dr-w3-standard-register-fields-1-code",
+          "source": "audit"
+        }
+      ],
+      "key": "dr-w3-standard-register-fields-1-code:PLATFORM",
+      "kind": "CODE",
+      "owner_project": "PLATFORM",
+      "rule": "dr-w3-standard-register-fields-1-code",
+      "scope": "PLATFORM",
+      "severity": "P2",
+      "spec": "\u00a78.3",
+      "standard": "MSP",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "the code artefact seed/output-standard.json#programme-risk-register must carry the fix, not only the record: information_schema for project_register_item has kind, severity, probability, impact, response, review_at, links, meta and no category or escalation column; the published register states the absence rather than inventing values.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "path": "docs/evidence/record-w3/deep-review-findings.json",
+                  "quote": "information_schema for project_register_item has kind, severity, probability, impact, response, review_at, links, meta and no category or escalation column; the published register states the absence rather than inventing values.",
+                  "source": "deep-review"
+                }
+              ],
+              "rule": "dr-w3-standard-register-fields-1-code",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "PLATFORM"
+        }
+      ],
+      "title": "code: programme-risk-register requires Categories and Escalations, which project_register_item does not carry"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot /tmp/u5a-v12/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --deep-review docs/evidence/record-w3/deep-review-findings.json --deep-review docs/evidence/record-w4/deep-review-findings.json --rework-check dr-w3-standard-register-fields-1:PLATFORM",
+      "apply_to": "PLATFORM",
+      "artefact": "code",
+      "baseline": null,
+      "depends_on": [
+        "dr-w3-standard-register-fields-1-code"
+      ],
       "disposition": "rework",
       "dod": [
         {
@@ -89209,7 +89273,7 @@
       "p0": 14,
       "p1": 65,
       "p2": 4,
-      "packages": 82,
+      "packages": 83,
       "rules": 13,
       "rules_clean": 7,
       "rules_with_gaps": 6,
@@ -89267,30 +89331,30 @@
   "snapshot": "/tmp/u5a-v12/data",
   "summary": {
     "by_kind": {
-      "CODE": 66,
+      "CODE": 67,
       "RECORD": 709,
       "STANDARD": 4
     },
     "by_severity": {
       "P0": 21,
       "P1": 207,
-      "P2": 551
+      "P2": 552
     },
     "by_standard": {
-      "MSP": 82,
+      "MSP": 83,
       "PMP": 169,
       "SAFe": 26,
       "SPEC": 63,
       "TOGAF": 439
     },
     "by_status": {
-      "open": 779
+      "open": 780
     },
     "duplicates": 0,
-    "open": 779,
-    "packages": 779,
+    "open": 780,
+    "packages": 780,
     "resolved": 138,
-    "subjects": 859,
+    "subjects": 860,
     "suppressed": 0
   }
 }
