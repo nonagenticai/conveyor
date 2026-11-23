@@ -51,7 +51,7 @@ STANDARD_PATH = ROOT / "seed/output-standard.json"
 DEFAULT_JOURNAL = ROOT / "docs/evidence/record-w4/replay.jsonl"
 DEFAULT_ACTOR = "01a1efd4-c3e5-7b74-b32b-1b15683a8c4e"
 SCHEMA = "artefact-publication/v1"
-STATES = ("due", "present", "stale", "ambiguous")
+STATES = ("due", "present", "missing-edge", "stale", "ambiguous")
 PUBLISHED_STATUSES = {"published", "live", "approved"}
 NATURAL_KEY = "artefact:{project}:{category}:{sha16}"
 
@@ -155,6 +155,13 @@ def classify(published: list[dict], composed_sha: str | None) -> str:
     return "present" if next(iter(hashes)) == composed_sha else "stale"
 
 
+def matching_document_id(published: list[dict], composed_sha: str) -> str:
+    for row in published:
+        if document_hash(row) == composed_sha:
+            return str(row.get("id") or "")
+    return ""
+
+
 # ── readiness ──────────────────────────────────────────────────────────────────────────
 
 
@@ -194,8 +201,16 @@ def readiness(
     project_keys: set[str] | None = None,
     mandatory_only: bool = False,
     compose_due: bool = True,
+    verify_edges: bool = False,
+    actor: str = "",
+    local_bin: str = "",
 ) -> list[dict]:
-    """One row per (project, applicable category) with its record state."""
+    """One row per (project, applicable category) with its record state.
+
+    With `verify_edges`, a published document whose `document -> project satisfies` trace edge
+    does not read back is `missing-edge`, not `present`: the artefact's trace chain is part of
+    the record (SPEC_V2 §8.5), and an unpublished link is a gap the check must not hide.
+    """
     categories = list(categories or [])
     projects_map = composer.programme_projects(snapshot)
     templates = std.get("templates") or {}
@@ -260,6 +275,13 @@ def readiness(
                 raise
             row["_summary"] = summary
             row["state"] = classify(published, summary["body_sha256"])
+            if row["state"] == "present" and verify_edges:
+                document_id = matching_document_id(published, summary["body_sha256"])
+                row["_document_id"] = document_id
+                if not document_id or not trace_edge(
+                    subject["id"], document_id, actor=actor, local_bin=local_bin,
+                ):
+                    row["state"] = "missing-edge"
             rows.append(row)
     rows.sort(key=lambda item: (item["project_key"], item["category"]))
     return rows
@@ -453,6 +475,56 @@ def apply_rows(
     refused: list[dict] = []
     actor, local_bin = args.actor_id, args.local_bin
     for row in rows:
+        if row["state"] == "missing-edge":
+            document_id = str(row.get("_document_id") or "")
+            if not document_id:
+                refuse(
+                    "MISSING_EDGE_NO_DOCUMENT",
+                    f"{row['project_key']}:{row['category']}: the published document has no id",
+                )
+            note = bodies_out / "_edges" / f"{row['project_key']}-{row['category']}.md"
+            note.parent.mkdir(parents=True, exist_ok=True)
+            note.write_text(
+                f"# Trace edge — {row['project_key']} / {row['category']}\n\n"
+                f"document {document_id} -> project {row['project_id']} (satisfies)\n",
+                encoding="utf-8",
+            )
+            link = {
+                "from_type": "document", "from_id": document_id,
+                "to_type": "project", "to_id": row["project_id"], "kind": "satisfies",
+            }
+            _, error = write_action(
+                "trace_links.create", link,
+                read_action="trace_links.list",
+                read_input={"to_type": "project", "to_id": row["project_id"]},
+                read_match=("from_type=document", f"from_id={document_id}", "kind=satisfies"),
+                evidence=note, actor=actor, local_bin=local_bin,
+            )
+            if error is not None and not trace_edge(
+                row["project_id"], document_id, actor=actor, local_bin=local_bin,
+            ):
+                refuse(
+                    "TRACE_UNVERIFIED",
+                    f"{row['project_key']}:{row['category']}: trace_links.create failed and "
+                    f"the edge does not read back: {error.strip()[:400]}",
+                )
+            journal_line(
+                args.journal, natural_key=f"edge:{row['project_key']}:{row['category']}",
+                action="trace_links.create", payload=link,
+                read_action="trace_links.list",
+                read_input={"to_type": "project", "to_id": row["project_id"]},
+                reads_back_by=(
+                    f"trace_links.list:to_type=project,to_id={row['project_id']}"
+                ),
+            )
+            applied.append({
+                "project_key": row["project_key"],
+                "project_id": row["project_id"],
+                "category": row["category"],
+                "document_id": document_id,
+                "edge_repaired": True,
+            })
+            continue
         if row["state"] == "present":
             skipped.append(public_row(row))
             continue
@@ -670,12 +742,18 @@ def main(argv: list[str] | None = None) -> int:
         fail(f"--project {args.project}: no such programme project in the snapshot")
 
     guard_journal(args.journal)
+    verify_edges = bool(args.check or args.apply)
+    if verify_edges and not args.local_bin:
+        fail("--check/--apply verify the trace edge and need --local-bin (or PROGRAMME_RECORD_BIN)")
     rows = readiness(
         gen, composer, std, snapshot, args.snapshot,
         categories=args.category,
         project_keys={args.project} if args.project else None,
         mandatory_only=bool(args.all_projects),
         compose_due=not args.check,
+        verify_edges=verify_edges,
+        actor=args.actor_id,
+        local_bin=args.local_bin or "",
     )
     counts = count_states(rows)
 
@@ -685,7 +763,9 @@ def main(argv: list[str] | None = None) -> int:
             "counts": counts,
             "rows": [public_row(row) for row in rows[:20]],
         }, indent=2))
-        return 1 if any(counts[state] for state in ("due", "stale", "ambiguous")) else 0
+        return 1 if any(
+            counts[state] for state in ("due", "stale", "ambiguous", "missing-edge")
+        ) else 0
 
     if args.dry_run:
         assert args.bodies_out is not None
@@ -778,10 +858,15 @@ elif action == "documents.list":
     ]
     print(json.dumps({"items": rows}))
 elif action == "trace_links.list":
-    print(json.dumps({"items": [{
-        "id": "edge-1", "from_type": "document", "from_id": "doc-new",
-        "to_type": "project", "to_id": payload.get("to_id"), "kind": "satisfies",
-    }]}))
+    if os.environ.get("STUB_NO_EDGES"):
+        print(json.dumps({"items": []}))
+    else:
+        edges = json.loads(os.environ.get("STUB_EDGES") or "{}")
+        from_id = edges.get(str(payload.get("to_id")) or "") or "doc-new"
+        print(json.dumps({"items": [{
+            "id": "edge-1", "from_type": "document", "from_id": from_id,
+            "to_type": "project", "to_id": payload.get("to_id"), "kind": "satisfies",
+        }]}))
 elif action == "trace_links.create":
     print(json.dumps({"id": "edge-1"}))
 else:
@@ -898,6 +983,7 @@ def self_test() -> int:
     journal = base / "replay.jsonl"
     log = base / "calls.jsonl"
     os.environ["STUB_LOG"] = str(log)
+    os.environ["STUB_EDGES"] = json.dumps({"proj-px": "doc-px-a", "proj-py": "doc-py-a"})
 
     def common(extra: list[str]) -> list[str]:
         return [
@@ -951,7 +1037,8 @@ def self_test() -> int:
            and payload.get("counts", {}).get("due", 0) >= 1,
            payload.get("counts"))
     expect("check-exit", code == 1, code)
-    expect("check-read-only", not check_journal.exists() and not log.exists(), stderr[-300:])
+    writes = [call["action"] for call in calls() if call["action"] != "trace_links.list"]
+    expect("check-read-only", not check_journal.exists() and not writes, stderr[-300:])
 
     reset_log()
     _, _, stderr, refusal = run_cli(common([
@@ -1062,9 +1149,34 @@ def self_test() -> int:
     after = len([
         line for line in journal.read_text(encoding="utf-8").splitlines() if line.strip()
     ]) if journal.exists() else 0
+    writes = [call["action"] for call in calls() if call["action"] != "trace_links.list"]
     expect("skip-present",
-           code == 0 and not calls() and payload.get("applied") == [] and after == before,
+           code == 0 and not writes and payload.get("applied") == [] and after == before,
            (code, [call["action"] for call in calls()], stderr[-300:]))
+
+    reset_log()
+    os.environ["STUB_NO_EDGES"] = "1"
+    code, stdout, stderr, _ = run_cli(common([
+        "--project", "PY", "--category", "A", "--check",
+    ]))
+    payload = json.loads(stdout) if stdout.strip().startswith("{") else {}
+    writes = [call["action"] for call in calls() if call["action"] != "trace_links.list"]
+    expect("check-missing-edge",
+           code == 1 and payload.get("counts", {}).get("missing-edge") == 1
+           and not writes,
+           (code, payload.get("counts"), stderr[-300:]))
+    code, stdout, stderr, _ = run_cli(common([
+        "--project", "PY", "--category", "A", "--apply", "--bodies-out", str(bodies),
+    ]))
+    payload = json.loads(stdout) if stdout.strip().startswith("{") else {}
+    recorded = calls()
+    writes = [call["action"] for call in recorded if call["action"] != "trace_links.list"]
+    expect("apply-repairs-edge",
+           code == 0
+           and writes == ["trace_links.create"]
+           and (payload.get("applied") or [{}])[0].get("edge_repaired") is True,
+           (code, [call["action"] for call in recorded], stderr[-300:]))
+    os.environ.pop("STUB_NO_EDGES", None)
 
     reset_log()
     write_documents(baseline_documents)
