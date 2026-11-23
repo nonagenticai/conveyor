@@ -165,7 +165,7 @@
     "gate (P0): the gate check 'T5-baseline' did not pass; the gate check 'T5-charter' did not pass; the gate check 'T5-closure-outputs' did not pass; the gate check 'T5-contract' did not pass; the gate check 'T5-review' did not pass; the gate check 'T5-closure-gate' did not pass; the gate check 'T5-pi-cadence' did not pass; the gate check 'T5-pi-plan' did not pass; the gate check 'T5-pi-objectives' did not pass; the gate check 'T5-wsjf' did not pass; the gate check 'T5-demo-credits' did not pass; the gate check 'T5-lessons' did not pass"
   ],
   "gate": "T5 is NOT built, and its acceptance \u2014 `SPEC_V2` \u00a712: 'a procedure change is measured on a held-out instrument; a regression is reverted; self-approval refused; an unmeasurable kata is not opened' \u2014 is the condition on which it may be closed, not a claim that it is met.",
-  "generated_at": "2026-11-23T08:10:28.743527+00:00",
+  "generated_at": "2026-11-23T09:20:25.672930+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T5.toml",
   "name": "Kata",
@@ -173,8 +173,8 @@
   "schema": "project-acceptance/v1",
   "snapshot": {
     "generated_at": "2026-11-23T08:09:50.563209+00:00",
-    "git_sha": "4727213b8c204ec69d825d24129f6b506ebb2a2e",
-    "path": "retained-snapshot/4727213b8c204ec69d825d24129f6b506ebb2a2e"
+    "git_sha": "65e1a5e6c6f82aa7ae2d9741bc90f68fb5252cd8",
+    "path": "retained-snapshot/65e1a5e6c6f82aa7ae2d9741bc90f68fb5252cd8"
   },
   "verdict": "red",
   "warnings": []
