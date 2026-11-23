@@ -540,6 +540,11 @@ mod tests {
         ChatCompletionRequest {
             enable_reasoning: false,
             frequency_penalty: None,
+            presence_penalty: None,
+            stop: None,
+            parallel_tool_calls: None,
+            chat_template_kwargs: None,
+            top_p: None,
             max_tokens: Some(8),
             messages: vec![ChatMessage {
                 content: json!("attributed"),
