@@ -283,7 +283,8 @@ async fn a_failover_bills_each_attempt_with_its_own_tokens() {
 
     let failing = failing_stub_provider().await;
     let serving = stub_provider().await;
-    // No alias for the requested model, so the route is the whole chain and a failure fails over.
+    // The router-pick sentinel walks the whole chain, so a failure fails over. (A name no provider
+    // declares would be a 404 by contract, which is a different test.)
     let catalog = Catalog::from_yaml(&format!(
         "providers:\n  - name: stub-fail\n    enabled: true\n    customer_eligible: true\n    protocol: openai\n    endpoint: http://{failing}/v1\n    model: stub-model\n  - name: stub-openai\n    enabled: true\n    customer_eligible: true\n    protocol: openai\n    endpoint: http://{serving}/v1\n    model: stub-model\ndefault_chain: [stub-fail, stub-openai]\n"
     ))
@@ -303,7 +304,7 @@ async fn a_failover_bills_each_attempt_with_its_own_tokens() {
 
     let body = Body::from(
         json!({
-            "model": "unaliased-model",
+            "model": "default",
             "messages": [{"role": "user", "content": "failover"}],
             "max_tokens": 8
         })
