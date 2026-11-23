@@ -28,7 +28,7 @@
 <p><strong>Track:</strong> programme · <strong>Capabilities:</strong> architecture, programme management, project management, business analysis · <strong>Gate:</strong> the definition set is published and adopted; no V2 delivery project starts before it.</p>
 <h2 id="1-objective">1. Objective</h2>
 <p>Design the programme that delivers the full conveyor, following MSP's <em>Defining a Programme</em> and <em>Realizing the Benefits</em>: the mandate, programme brief, blueprint, business case, benefit profiles and benefits map, projects dossier, programme plan and tranches, governance, stakeholder profiles, benefits management strategy and realization plan, reuse map and project briefs. P0 is a project of the programme it defines, so every artefact in this set is an intermediate output stored on P0 in the console and published on the design site.</p>
-<p>The programme does not start T1–T17 until this set is accepted. The gate is the programme's, not a document's: a delivery project's brief is the contract it is held to, and a benefit's profile is the claim its transition is measured against.</p>
+<p>The programme does not start T1–T19 until this set is accepted. The gate is the programme's, not a document's: a delivery project's brief is the contract it is held to, and a benefit's profile is the claim its transition is measured against.</p>
 <h2 id="2-starting-state-measured-at-the-p0-baseline">2. Starting state (measured at the P0 baseline)</h2>
 <ul>
 <li>V1 is far implemented: 25 measured-built slices, 2 partial (S14, S21); the Rust workspace, the action registry, the board/card/run/approval/document aggregates and the public design pack.</li>
@@ -148,13 +148,13 @@
 <h2 id="8-acceptance">8. Acceptance</h2>
 <ul>
 <li>The definition set is published as documents on P0: the P0 class carries <strong>21 categories</strong> (<code>seed/output-standard.json</code>, #221/#262). Measured 2026-11-17: 20 are published; <code>tranche-review</code> (the first-tranche authorisation above) is the owner's act. The architecture-principles, artefact-standard, ADM-profile, maturity and skills categories (§12 T9) were published by #122's A7 as "proposed for P0 acceptance"; the typed rows behind them are T9's (#81).</li>
-<li>The programme plan lists 48 projects (P0 + 47) with tranches and dependencies.</li>
+<li>The programme plan lists 50 projects (P0 + 49) with tranches and dependencies.</li>
 <li>Every benefit has a profile with baseline, target, method and owner, and at least one benefits-map path to a strategic objective.</li>
 <li>Every tranche has entry/exit criteria and a review date; the first tranche is authorised.</li>
 <li>Every delivery brief carries reuse sources and the two inception units, names the ADM phase and plateau its architecture inception must satisfy, and names the live <code>architecture_contract</code> it operates under.</li>
 <li>The architecture capability baseline (§3.14) is published on P0: principles catalog, tailored ADM profile, artefact-standard adoption, board charter, maturity and skills baseline.</li>
 <li>Every architecture artefact in the pack carries the standard's common metadata and at least one artefact link; a delivery project whose design gate has no live contract is refused.</li>
-<li>The Validation page shows P0 at tranche 0 and T1–T17 <code>blocked_by: [P0]</code>.</li>
+<li>The Validation page shows P0 at tranche 0 and T1–T19 <code>blocked_by: [P0]</code>.</li>
 <li><code>check-coverage</code> passes; the seed regen is idempotent; this plan is indexed by <code>build-docs</code>.</li>
 </ul>
 </main>

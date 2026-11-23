@@ -185,16 +185,14 @@ async fn eval_runs_start(
         .await
         .map_err(|error| eval_error(error, ctx.action))?;
 
-    if eval.subject_kind == SubjectKind::AgentRun {
-        // Declared so the vocabulary is stable; no action executes one yet (S13/S15).
-        return Err(ActionError::new(
-            409,
-            "subject_not_ready",
-            format!(
-                "{}: an agent_run subject has no executing action yet; use completions, copilot, \
-                 process or external",
-                ctx.action
-            ),
+    if eval.subject_kind == SubjectKind::AgentRun && eval.entry_action != "agent.run" {
+        // The agent_run subject is executed by the agent loop itself, not by an action the
+        // caller names. A version pointing anywhere else would silently measure a different
+        // flow, so the mismatch is refused before a run exists.
+        return Err(invalid(
+            "entry_action",
+            "invalid_value",
+            "an agent_run subject must name agent.run as its entry_action",
         ));
     }
 

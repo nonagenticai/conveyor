@@ -7013,6 +7013,7 @@ fn pm_samples() -> Vec<Sample> {
                     "project_id": ctx.pop("changes.request"),
                     "baseline_id": ctx.pop("changes.request.baseline"),
                     "title": "Parity change",
+                    "body": "Parity change rationale",
                     "impact": {"scope": "the parity change moves one deliverable"},
                 })
             });

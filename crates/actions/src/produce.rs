@@ -249,9 +249,67 @@ async fn ask_the_model(
         .json()
         .await
         .map_err(|_| ActionError::upstream_failed(SERVICE, 502))?;
-    let content = document["choices"][0]["message"]["content"]
+    answer_from_document(&document)
+}
+
+/// The model's answer from the router's OpenAI-shaped document.
+///
+/// A `length` finish is refused **before** the content is read: its visible tail can look like a complete
+/// JSON document. 422, not 5xx — the workflow tick maps 5xx to `Deferred` and would re-buy the same capped
+/// call.
+fn answer_from_document(document: &serde_json::Value) -> Result<ModelAnswer, ActionError> {
+    let choice = &document["choices"][0];
+    if choice["finish_reason"].as_str() == Some("length") {
+        return Err(ActionError::new(
+            422,
+            "inference-truncated",
+            "produce.script: the router's answer was truncated at its token cap (finish_reason \
+             \"length\"); refusing the partial document",
+        ));
+    }
+    let content = choice["message"]["content"]
         .as_str()
         .ok_or_else(|| ActionError::upstream_failed(SERVICE, 502))?;
     serde_json::from_str::<ModelAnswer>(content)
         .map_err(|_| ActionError::upstream_failed(SERVICE, 502))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn a_truncated_answer_is_refused_before_it_is_parsed() {
+        // The content is a complete-looking JSON document; only `finish_reason` says it was cut.
+        let document = serde_json::json!({
+            "choices": [{
+                "finish_reason": "length",
+                "message": {"content": "{\"storyline\": \"a walk\", \"shots\": []}"}
+            }]
+        });
+        // The premise: on its own the content parses as a complete document, so only `finish_reason` can
+        // tell it was cut.
+        let content = document["choices"][0]["message"]["content"]
+            .as_str()
+            .unwrap();
+        serde_json::from_str::<ModelAnswer>(content).expect("the content alone parses");
+        let error = answer_from_document(&document).unwrap_err();
+        assert_eq!(error.status, 422);
+        assert_eq!(error.code, "inference-truncated");
+    }
+
+    #[test]
+    fn a_complete_answer_parses() {
+        let document = serde_json::json!({
+            "choices": [{
+                "finish_reason": "stop",
+                "message": {"content":
+                    "{\"storyline\": \"a walk\", \"shots\": [{\"id\": \"s1\", \"description\": \"a\"}]}"}
+            }]
+        });
+        let answer = answer_from_document(&document).unwrap();
+        assert_eq!(answer.storyline, "a walk");
+        assert_eq!(answer.shots.len(), 1);
+        assert_eq!(answer.shots[0].description, "a");
+    }
 }
