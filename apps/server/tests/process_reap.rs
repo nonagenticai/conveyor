@@ -74,6 +74,21 @@ async fn a_dead_step_job_is_reaped_as_crashed_and_frees_the_card() {
             .expect("the failed step's error");
     assert_eq!(error.as_deref(), Some("the process.step job died"));
 
+    // S21 step 6: the reaped process run is terminal, so its attempt is in the card's memory.
+    let memory: Vec<(String, Option<uuid::Uuid>, String)> = sqlx::query_as(
+        "SELECT kind, run_id, body FROM work_package_memory
+          WHERE tenant_id = $1 AND card_id = $2 ORDER BY created_at, id",
+    )
+    .bind(graph.tenant.as_uuid())
+    .bind(graph.card)
+    .fetch_all(&db.super_pool)
+    .await
+    .expect("the card's work-package memory");
+    assert_eq!(memory.len(), 1, "one attempt row: {memory:?}");
+    assert_eq!(memory[0].0, "attempt");
+    assert_eq!(memory[0].1, Some(graph.run));
+    assert!(memory[0].2.contains("crashed"), "{}", memory[0].2);
+
     // Both step transitions and the run failure are on the run's topic.
     let events: Vec<(String, String)> = sqlx::query_as(
         "SELECT type, coalesce(payload->>'status', payload->>'error_class')

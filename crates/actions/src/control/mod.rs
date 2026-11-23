@@ -185,6 +185,12 @@ pub fn run_error(error: store::RunStoreError, action: &str) -> ActionError {
             tracing::error!(%error, action, "the run's step bookkeeping failed");
             ActionError::internal()
         }
+        // S21 step 6: the terminal attempt row could not be written; the whole transition rolls
+        // back with it (one transaction), so this is a database failure, not a business refusal.
+        store::RunStoreError::Memory(error) => {
+            tracing::error!(%error, action, "the run's terminal memory row failed");
+            ActionError::internal()
+        }
         store::RunStoreError::Database(error) => store_error(error, action),
     }
 }

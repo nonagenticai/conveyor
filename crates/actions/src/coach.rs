@@ -471,6 +471,7 @@ async fn coach_interrupt(
             card_type_code: store::coach::COACH_CARD_TYPE.to_owned(),
             due_at: None,
             parent_card_id: None,
+            job_binding_id: None,
             meta: Some(json!({ "interrupted_card_id": interrupted_card_id })),
         },
     )
