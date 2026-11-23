@@ -1020,8 +1020,8 @@ pub async fn position_tx(
             why: format!("a {status} meeting takes no positions"),
         });
     }
-    let item: Option<(Option<String>,)> = sqlx::query_as(
-        "SELECT outcome FROM meeting_agenda_item
+    let item: Option<(Option<String>, String, Uuid)> = sqlx::query_as(
+        "SELECT outcome, resolved_kind, resolved_id FROM meeting_agenda_item
           WHERE tenant_id = $1 AND id = $2 AND meeting_id = $3",
     )
     .bind(tenant.as_uuid())
@@ -1029,12 +1029,53 @@ pub async fn position_tx(
     .bind(meeting_id)
     .fetch_optional(&mut *conn)
     .await?;
-    let (outcome,) = item.ok_or(MeetingStoreError::NotFound("agenda item"))?;
+    let (outcome, resolved_kind, resolved_id) =
+        item.ok_or(MeetingStoreError::NotFound("agenda item"))?;
     if outcome.is_some() {
         return Err(MeetingStoreError::Illegal {
             what: "agenda item",
             why: "the item is closed; its positions are immutable".into(),
         });
+    }
+    if resolved_kind == "approval" {
+        // First decision wins: once the linked approval holds this seat's decision, no
+        // position may replace it, whichever surface arrives second.
+        let gate: Option<(String,)> =
+            sqlx::query_as("SELECT status FROM approval WHERE tenant_id = $1 AND id = $2")
+                .bind(tenant.as_uuid())
+                .bind(resolved_id)
+                .fetch_optional(&mut *conn)
+                .await?;
+        let (status,) = gate.ok_or(MeetingStoreError::NotFound("approval"))?;
+        if status != "pending" {
+            return Err(MeetingStoreError::Refused {
+                code: "decision_already_recorded",
+                detail: format!("the linked approval is {status}; the first decision wins"),
+            });
+        }
+        let (decision_kind, column) = if new.participant_kind == "job_binding" {
+            ("job", "job_binding_id")
+        } else {
+            ("human", "approver_id")
+        };
+        let sql = format!(
+            "SELECT count(*) FROM approval_decision
+              WHERE tenant_id = $1 AND approval_id = $2 AND participant_kind = $3
+                AND {column} = $4"
+        );
+        let decided: i64 = sqlx::query_scalar(AssertSqlSafe(sql))
+            .bind(tenant.as_uuid())
+            .bind(resolved_id)
+            .bind(decision_kind)
+            .bind(new.participant_id)
+            .fetch_one(&mut *conn)
+            .await?;
+        if decided > 0 {
+            return Err(MeetingStoreError::Refused {
+                code: "decision_already_recorded",
+                detail: "this seat already decided; the first decision wins".into(),
+            });
+        }
     }
     let attending: Option<(Uuid,)> = sqlx::query_as(
         "SELECT id FROM meeting_attendance

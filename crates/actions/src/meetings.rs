@@ -539,8 +539,11 @@ async fn meetings_invite(
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 pub struct RespondIn {
     pub meeting_id: Uuid,
-    pub participant_kind: String,
-    pub participant_id: Uuid,
+    /// Absent on a human channel: the caller answers for their own seat.
+    #[serde(default)]
+    pub participant_kind: Option<String>,
+    #[serde(default)]
+    pub participant_id: Option<Uuid>,
     pub response: String,
 }
 
@@ -560,12 +563,16 @@ async fn meetings_respond(
     ctx: HandlerCtx,
     input: RespondIn,
 ) -> Result<HandlerOutput<AttendanceOut>, ActionError> {
+    let participant_kind = input
+        .participant_kind
+        .unwrap_or_else(|| "app_user".to_owned());
+    let participant_id = input.participant_id.unwrap_or(ctx.actor_id);
     let record = store::meetings::respond_tx(
         &mut *tx,
         ctx.tenant,
         input.meeting_id,
-        &input.participant_kind,
-        input.participant_id,
+        &participant_kind,
+        participant_id,
         &input.response,
     )
     .await
@@ -636,8 +643,11 @@ async fn meetings_agenda_add(
 pub struct PositionIn {
     pub meeting_id: Uuid,
     pub agenda_item_id: Uuid,
-    pub participant_kind: String,
-    pub participant_id: Uuid,
+    /// Absent on a human channel: the position is the caller's own seat.
+    #[serde(default)]
+    pub participant_kind: Option<String>,
+    #[serde(default)]
+    pub participant_id: Option<Uuid>,
     pub stance: String,
     #[serde(default)]
     pub rationale: String,
@@ -674,14 +684,28 @@ async fn meetings_position(
     } else {
         input.conditions
     };
+    let participant_kind = input
+        .participant_kind
+        .unwrap_or_else(|| "app_user".to_owned());
+    let participant_id = match input.participant_id {
+        Some(id) => id,
+        None if participant_kind == "app_user" => ctx.actor_id,
+        None => {
+            return Err(invalid(
+                "participant_id",
+                "required",
+                "a job-binding seat must name its binding",
+            ));
+        }
+    };
     let record = store::meetings::position_tx(
         &mut *tx,
         ctx.tenant,
         input.meeting_id,
         &NewPosition {
             agenda_item_id: input.agenda_item_id,
-            participant_kind: &input.participant_kind,
-            participant_id: input.participant_id,
+            participant_kind: &participant_kind,
+            participant_id,
             stance: &input.stance,
             rationale: &input.rationale,
             conditions: &conditions,
