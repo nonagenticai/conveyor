@@ -12,20 +12,26 @@ use crate::api::{ApiError, Manifest};
 use crate::auth;
 use crate::palette::Palette;
 use crate::screens::admin::AdminScreen;
+use crate::screens::agents::AgentsScreen;
 use crate::screens::approvals::Approvals;
 use crate::screens::architecture::ArchitectureScreen;
 use crate::screens::benchmarks::{BenchmarkRunDetail, Benchmarks};
 use crate::screens::boards::{BoardIndex, BoardScreen};
 use crate::screens::cockpit::Cockpit;
 use crate::screens::copilot::CopilotScreen;
+use crate::screens::decision_inbox::DecisionInboxScreen;
 use crate::screens::evals::{EvalDetail, Evals};
 use crate::screens::improvement::Improvement;
 use crate::screens::inference::InferenceEndpoint;
+use crate::screens::jobs::JobsScreen;
 use crate::screens::members::Members;
 use crate::screens::models::{ModelDetail, ModelsScreen};
+use crate::screens::organisation::OrganisationScreen;
+use crate::screens::plan::PlanScreen;
 use crate::screens::platform::Platform;
 use crate::screens::process_map::{ProcessMapDetail, ProcessMapList};
 use crate::screens::processes::{ProcessDetail, ProcessesScreen};
+use crate::screens::project_types::ProjectTypesScreen;
 use crate::screens::prompt_audit::PromptAuditScreen;
 use crate::screens::requirements::{RequirementDetail, RequirementsScreen};
 use crate::screens::roles::Roles;
@@ -36,9 +42,10 @@ use crate::screens::sign_in::SignIn;
 use crate::screens::today::Today;
 use crate::screens::usage::Usage;
 use crate::screens::v2::{
-    AdmGate, AuthoringGate, ImproveGate, KnowledgeGate, OperationsGate, OrganisationGate, PlanGate,
-    PortfolioScreen, ProceduresGate, ProgrammeScreen, ToolsGate,
+    AdmGate, AuthoringGate, ImproveGate, KnowledgeGate, OperationsGate, PortfolioScreen,
+    ProceduresGate, ProgrammeScreen, ToolsGate,
 };
+use crate::screens::validation::ValidationScreen;
 use crate::state::AppCtx;
 
 async fn run_boot(ctx: AppCtx) -> Result<(), ApiError> {
@@ -174,10 +181,15 @@ fn Shell() -> impl IntoView {
                             <Route path=path!("/portfolio") view=PortfolioScreen/>
                             <Route path=path!("/portfolio/:programme_id") view=PortfolioScreen/>
                             <Route path=path!("/programme") view=ProgrammeScreen/>
-                            <Route path=path!("/organisation") view=OrganisationGate/>
+                            <Route path=path!("/organisation") view=OrganisationScreen/>
+                            <Route path=path!("/jobs") view=JobsScreen/>
+                            <Route path=path!("/agents") view=AgentsScreen/>
+                            <Route path=path!("/decisions") view=DecisionInboxScreen/>
+                            <Route path=path!("/project-types") view=ProjectTypesScreen/>
                             <Route path=path!("/procedures") view=ProceduresGate/>
                             <Route path=path!("/authoring") view=AuthoringGate/>
-                            <Route path=path!("/plan") view=PlanGate/>
+                            <Route path=path!("/plan") view=PlanScreen/>
+                            <Route path=path!("/validation") view=ValidationScreen/>
                             <Route path=path!("/improve") view=ImproveGate/>
                             <Route path=path!("/operations") view=OperationsGate/>
                             <Route path=path!("/tools") view=ToolsGate/>

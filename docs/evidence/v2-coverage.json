@@ -14,8 +14,8 @@
     "new": "neither the route nor an ancestor exists"
   },
   "counts": {
-    "exists": 46,
-    "extend": 11,
+    "exists": 48,
+    "extend": 9,
     "new": 5
   },
   "rows": [
@@ -571,13 +571,13 @@
       "spec_ref": "§10.5",
       "kind": "destination",
       "concept": "Organisation",
-      "verdict": "extend",
+      "verdict": "exists",
       "evidence": [
         "apps/web/src/app.rs: route '/organisation' found",
-        "apps/web/e2e/organisation.spec.ts: absent",
+        "apps/web/e2e/organisation.spec.ts: present",
         "docs/design/v2.js: page 'organisation' — design reference, not implementation"
       ],
-      "note": "The mock page is a design study; the app has no /organisation route, and the organisation read/write actions are T0/T2."
+      "note": "The mock page is a design study; the app's /organisation route renders the T0/T2 organisation reads, and the write verbs remain T0/T2's."
     },
     {
       "id": "destination:Procedures",
@@ -651,14 +651,14 @@
       "spec_ref": "§10.5",
       "kind": "destination",
       "concept": "Plan",
-      "verdict": "extend",
+      "verdict": "exists",
       "evidence": [
         "apps/web/src/app.rs: route '/plan' found",
-        "apps/web/e2e/plan.spec.ts: absent",
+        "apps/web/e2e/plan.spec.ts: present",
         "apps/web/src/app.rs: V1 ancestor '/boards' found",
         "docs/design/v2.js: page 'plan' — design reference, not implementation"
       ],
-      "note": "The live Boards tab joins real cards at /boards; WBS, baseline, registers and change control are T1."
+      "note": "The app's /plan route renders the T1 WBS, baselines, registers and change control; the live Boards tab remains at /boards."
     },
     {
       "id": "destination:Improve",

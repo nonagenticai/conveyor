@@ -37,12 +37,12 @@
 <tr>
 <td><code>exists</code></td>
 <td>the real route and its Playwright spec exist</td>
-<td>46</td>
+<td>48</td>
 </tr>
 <tr>
 <td><code>extend</code></td>
 <td>a V1 ancestor route exists, or the V2 route exists without its spec</td>
-<td>11</td>
+<td>9</td>
 </tr>
 <tr>
 <td><code>new</code></td>
@@ -485,8 +485,8 @@
 <td>§10.5</td>
 <td>destination</td>
 <td>Organisation</td>
-<td><code>extend</code></td>
-<td>apps/web/src/app.rs: route '/organisation' found<br>apps/web/e2e/organisation.spec.ts: absent<br>docs/design/v2.js: page 'organisation' — design reference, not implementation<br><em>The mock page is a design study; the app has no /organisation route, and the organisation read/write actions are T0/T2.</em></td>
+<td><code>exists</code></td>
+<td>apps/web/src/app.rs: route '/organisation' found<br>apps/web/e2e/organisation.spec.ts: present<br>docs/design/v2.js: page 'organisation' — design reference, not implementation<br><em>The mock page is a design study; the app's /organisation route renders the T0/T2 organisation reads, and the write verbs remain T0/T2's.</em></td>
 </tr>
 <tr>
 <td><code>destination:Procedures</code></td>
@@ -533,8 +533,8 @@
 <td>§10.5</td>
 <td>destination</td>
 <td>Plan</td>
-<td><code>extend</code></td>
-<td>apps/web/src/app.rs: route '/plan' found<br>apps/web/e2e/plan.spec.ts: absent<br>apps/web/src/app.rs: V1 ancestor '/boards' found<br>docs/design/v2.js: page 'plan' — design reference, not implementation<br><em>The live Boards tab joins real cards at /boards; WBS, baseline, registers and change control are T1.</em></td>
+<td><code>exists</code></td>
+<td>apps/web/src/app.rs: route '/plan' found<br>apps/web/e2e/plan.spec.ts: present<br>apps/web/src/app.rs: V1 ancestor '/boards' found<br>docs/design/v2.js: page 'plan' — design reference, not implementation<br><em>The app's /plan route renders the T1 WBS, baselines, registers and change control; the live Boards tab remains at /boards.</em></td>
 </tr>
 <tr>
 <td><code>destination:Improve</code></td>
