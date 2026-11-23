@@ -34,6 +34,33 @@ DEFAULT_SNAPSHOT = ROOT / "docs" / "design" / "data"
 DEFAULT_STANDARD = ROOT / "governance" / "conformance.json"
 DEFAULT_BASELINE = ROOT / "docs" / "evidence" / "conformance-baseline.json"
 DEFAULT_OUT = ROOT / "docs" / "evidence"
+# The two findings ledgers are part of the register's provenance: a --rework-check that omits
+# one proves nothing about the findings it carries. They are the default inputs when the caller
+# passes no --findings at all.
+DEFAULT_FINDINGS = (
+    ROOT / "docs" / "evidence" / "v1-conformance-findings.json",
+    ROOT / "docs" / "evidence" / "standards-findings.json",
+)
+# A standard finding whose artifact is one of these is a code defect, not only a template
+# wording defect. It must also produce a CODE sibling with an executable acceptance test, so a
+# record-only repair cannot close the work package while the code change is open.
+CODE_OWNED_ARTIFACT_PREFIXES = (
+    "seed/output-standard.json#",
+    "crates/store/src/snapshot.rs",
+    "scripts/compose-artefact-bodies.py",
+    "scripts/generate-standards.py",
+)
+# An acceptance_test is a command, not prose. The first token must be one of the runners this
+# repository actually uses, so a review cannot satisfy the code loop with a sentence.
+EXECUTABLE_TEST_PREFIXES = (
+    "cargo ",
+    "cargo-guard.py ",
+    "python3 ",
+    "gh ",
+    "bash ",
+    "sh ",
+    "./",
+)
 SEVERITY_ORDER = {"P0": 0, "P1": 1, "P2": 2, "P3": 3}
 REGISTER_SCHEMA = "conveyor-rework/v1"
 REGISTER_STANDARDS = ("MSP", "TOGAF", "SAFe", "PMP", "SPEC")
@@ -68,6 +95,7 @@ def register_acceptance(
     snapshot: str = "docs/design/data",
     findings: list[str] | None = None,
     deep_review: list[str] | None = None,
+    acceptance_test: str | None = None,
 ) -> str:
     """The command that proves one package is closed, not a whole-programme report.
 
@@ -76,7 +104,18 @@ def register_acceptance(
     1 while the key is still open. The command must mirror the inputs the register was built
     from — the snapshot and every findings ledger and deep-review sidecar. A sidecar omitted
     here makes its keys invisible to the check, which then exits 0 without proving anything.
+
+    A code sibling carries its own executable test instead: prose is refused, because a record
+    repair alone cannot evidence a code change.
     """
+    if acceptance_test is not None:
+        test = acceptance_test.strip()
+        if not test.startswith(EXECUTABLE_TEST_PREFIXES):
+            fail(
+                f"the code-owned package {key!r} has an acceptance_test that is not an "
+                f"executable command: {test!r}"
+            )
+        return test
     findings = findings or [
         "docs/evidence/v1-conformance-findings.json",
         "docs/evidence/standards-findings.json",
@@ -1947,7 +1986,7 @@ def deep_review_findings(path: Path, output_standard: dict[str, Any]) -> list[di
         standard = str(template.get("standard") or "SPEC")
         spec = DEEP_REVIEW_SPEC.get(key) or ("§8.3" if standard == "MSP" else "§8")
         evidence = str(finding.get("evidence") or "")
-        converted.append(
+        converted_finding = (
             {
                 "id": f"dr-{key}",
                 "standard": standard,
@@ -1967,6 +2006,33 @@ def deep_review_findings(path: Path, output_standard: dict[str, Any]) -> list[di
                 "resolved_by": finding.get("resolved_by"),
             }
         )
+        artifact = str(finding.get("artifact") or "")
+        if (
+            kind == "STANDARD"
+            and artifact.startswith(CODE_OWNED_ARTIFACT_PREFIXES)
+            and not finding.get("resolved_by")
+        ):
+            acceptance_test = str(finding.get("acceptance_test") or "").strip()
+            if not acceptance_test.startswith(EXECUTABLE_TEST_PREFIXES):
+                fail(
+                    f"the code-owned standard finding {key!r} must declare an executable "
+                    f"acceptance_test; a record-only repair cannot close it"
+                )
+            sibling = dict(converted_finding)
+            sibling["id"] = f"dr-{key}-code"
+            sibling["kind"] = "CODE"
+            sibling["title"] = f"code: {converted_finding['title']}"
+            sibling["problem"] = (
+                f"the code artefact {artifact} must carry the fix, not only the record: {evidence}"
+            )
+            sibling["acceptance"] = acceptance_test
+            sibling["acceptance_test"] = acceptance_test
+            sibling["depends_on"] = []
+            converted_finding["depends_on"] = [sibling["id"]]
+            converted.append(converted_finding)
+            converted.append(sibling)
+        else:
+            converted.append(converted_finding)
     return converted
 
 
@@ -2106,6 +2172,8 @@ def build_register(
                 finding.get("kind")
                 or ("CODE" if identifier.startswith("v1-") else "RECORD")
             ),
+            "depends_on": list(finding.get("depends_on") or []),
+            "acceptance_test": finding.get("acceptance_test"),
             "scope": "project" if owner in dataset.by_key else "programme",
             "owner_project": owner,
             "rework": {
@@ -2200,9 +2268,13 @@ def build_register(
                     "dod": [{"item": str(item), "met": False} for item in dod],
                     "owner_project": owner,
                     "apply_to": apply_to,
-                    "depends_on": [],
+                    "depends_on": list(row.get("depends_on") or []),
                     "acceptance_command": register_acceptance(
-                        key, snapshot_label, findings_paths, deep_review_paths
+                        key,
+                        snapshot_label,
+                        findings_paths,
+                        deep_review_paths,
+                        row.get("acceptance_test"),
                     ),
                     "baseline": None
                     if group["finding"]
@@ -3194,6 +3266,52 @@ def self_test() -> None:
             for package in deep_register["packages"]
         ):
             fail("a deep-review finding did not become its package with its kind")
+        # A standard finding on a code-owned artefact also produces a CODE sibling with an
+        # executable test; the record package depends on it. A code-owned finding with no
+        # acceptance_test is refused: a record-only repair cannot close a code change.
+        write_sidecar(
+            "standard",
+            acceptance_test=(
+                "cargo-guard.py test -p conveyor-actions --test registry "
+                "registers_list_accepts_its_filters"
+            ),
+        )
+        converted_code = deep_review_findings(sidecar, output_standard)
+        by_id = {finding["id"]: finding for finding in converted_code}
+        if set(by_id) != {"dr-x-1", "dr-x-1-code"}:
+            fail(f"a code-owned standard finding did not produce its sibling: {sorted(by_id)}")
+        if by_id["dr-x-1"]["kind"] != "STANDARD" or by_id["dr-x-1-code"]["kind"] != "CODE":
+            fail("the code-owned standard finding or its sibling has the wrong kind")
+        if "dr-x-1-code" not in by_id["dr-x-1"].get("depends_on", []):
+            fail("the record package does not depend on its code sibling")
+        code_register = build_register(
+            register_gaps,
+            register_baseline,
+            {"findings": converted_code},
+            standard,
+            register_data,
+            "fixture",
+        )
+        code_packages = {package["rule"]: package for package in code_register["packages"]}
+        if code_packages.get("dr-x-1", {}).get("kind") != "STANDARD":
+            fail("the code-owned standard finding is not a STANDARD package")
+        if code_packages.get("dr-x-1", {}).get("depends_on") != ["dr-x-1-code"]:
+            fail("the STANDARD package does not carry the sibling dependency")
+        sibling_package = code_packages.get("dr-x-1-code") or {}
+        if sibling_package.get("kind") != "CODE":
+            fail("the code sibling is not a CODE package")
+        if sibling_package.get("acceptance_command") != (
+            "cargo-guard.py test -p conveyor-actions --test registry "
+            "registers_list_accepts_its_filters"
+        ):
+            fail("the code sibling's acceptance command is not its executable test")
+        write_sidecar("standard")
+        try:
+            deep_review_findings(sidecar, output_standard)
+        except SystemExit:
+            pass
+        else:
+            fail("a code-owned standard finding without acceptance_test was admitted")
         # A resolved deep-review finding is closed by the same rule as a ledger finding:
         # its receipt survives the conversion and the register neither emits a package for
         # it nor loses the resolution count.
@@ -3331,11 +3449,15 @@ def main() -> None:
     parser.add_argument("--check-standard", action="store_true")
     parser.add_argument("--self-test", action="store_true")
     args = parser.parse_args()
+    # The two findings ledgers are the register's default provenance. An explicit --findings
+    # list replaces them; omission must not silently drop the standards findings, or a
+    # --rework-check built from this command proves nothing about the standards packages.
+    findings_paths = args.findings or [path for path in DEFAULT_FINDINGS if path.exists()]
     if (args.findings or args.deep_review) and not (args.rework_out or args.rework_check):
         parser.error(
             "--findings and --deep-review are only meaningful with --rework-out or --rework-check"
         )
-    if args.rework_check and not (args.findings or args.deep_review):
+    if args.rework_check and not (findings_paths or args.deep_review):
         parser.error("--rework-check needs the findings ledgers via --findings or --deep-review")
 
     if args.self_test:
@@ -3358,7 +3480,7 @@ def main() -> None:
             read_json(args.baseline) if args.baseline.exists() else {"version": 1, "entries": []}
         )
         merged_findings: list[Any] = []
-        for path in args.findings or []:
+        for path in findings_paths:
             ledger = read_json(path)
             merged_findings.extend(ledger.get("findings", []))
         for path in args.deep_review or []:
@@ -3371,7 +3493,7 @@ def main() -> None:
             standard,
             dataset,
             str(args.snapshot),
-            [str(path) for path in (args.findings or [])],
+            [str(path) for path in findings_paths],
             [str(path) for path in (args.deep_review or [])],
         )
     if args.rework_out and register is not None:
