@@ -311,7 +311,14 @@ pub async fn run_case(
             output: &output,
             turns: &turns,
             model: &served,
-            stop_reason: output.get("stop_reason").and_then(Value::as_str),
+            // The `completions.create` output is the router's document, whose reason is
+            // `choices[0].finish_reason` (the same shape `count_tool_calls` reads).
+            stop_reason: output
+                .get("choices")
+                .and_then(Value::as_array)
+                .and_then(|choices| choices.first())
+                .and_then(|choice| choice.get("finish_reason"))
+                .and_then(Value::as_str),
             usage: &usage,
             latency_ms,
             tool_calls: count_tool_calls(&output),
