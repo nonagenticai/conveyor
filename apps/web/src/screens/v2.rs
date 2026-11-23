@@ -181,6 +181,11 @@ fn plan_label(project: &ProjectOut) -> String {
 fn spend_label(spend: Option<&Spend>) -> (String, String) {
     match spend {
         None => ("—*".to_owned(), "no priced call".to_owned()),
+        // The report may carry a zero row for a project with no calls; it is not an unpriced
+        // count, it is the same honest "no priced call" as an absent row.
+        Some(spend) if spend.priced == 0 && spend.unpriced == 0 => {
+            ("—*".to_owned(), "no priced call".to_owned())
+        }
         Some(spend) if spend.priced == 0 => {
             ("—*".to_owned(), format!("{} unpriced", spend.unpriced))
         }
