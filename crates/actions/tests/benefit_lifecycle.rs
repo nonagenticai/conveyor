@@ -153,6 +153,7 @@ async fn measure(
         "unit": "hours",
         "method": "median of the weekly run timestamps",
         "measured_at": measured_at,
+        "evidence": {"ref": format!("{kind}-reading")},
     });
     if let Some(tranche) = tranche {
         input["tranche_id"] = json!(tranche);
@@ -614,6 +615,187 @@ async fn a_realized_status_needs_a_complete_transition() {
 
     // A post reading taken after the enactment realises the benefit.
     let (status, body) = measure(&running, &benefit, "post", "2026-11-21T00:00:00Z", None).await;
+    assert_eq!(status, 201, "{body}");
+    let (status, body) = running
+        .invoke(
+            "benefits.update",
+            TOKEN,
+            json!({"id": benefit, "status": "realized"}),
+            Some("\"1\""),
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{body}");
+    assert_eq!(output(&body)["status"], "realized", "{body}");
+}
+
+/// v1-p83-2 — two timestamps are not a measurement. A transition carrying
+/// `baseline_measured_at` and `post_measured_at` but no readings cannot claim realization; the
+/// refusal is the lane's named measurement code, never a silent acceptance.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_realized_status_is_refused_on_timestamps_alone() {
+    let (pg, running, seeded) = fixture().await;
+    let programme = create_programme(&running, "Timestamp programme").await;
+    let owner = owner_job(&pg, &seeded).await;
+    let (benefit, version) =
+        create_benefit(&running, &programme, None, "BEN-01", "active", owner).await;
+    // Written directly: the action's own gate refuses a post timestamp with no reading, so this
+    // reproduces the legacy row the finding names.
+    sqlx::query(
+        "INSERT INTO benefit_transition
+             (tenant_id, benefit_id, baseline_measured_at, enacted_at, post_measured_at)
+         VALUES ($1, $2::uuid, now() - interval '2 days', now() - interval '1 day', now())",
+    )
+    .bind(seeded.tenant_id)
+    .bind(&benefit)
+    .execute(&pg.super_pool)
+    .await
+    .expect("transition row");
+
+    let (status, body) = running
+        .invoke(
+            "benefits.update",
+            TOKEN,
+            json!({"id": benefit, "status": "realized"}),
+            Some("\"1\""),
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 422, "{body}");
+    assert_eq!(
+        body["errors"][0]["code"], "benefit_baseline_missing",
+        "timestamps alone never realise a benefit: {body}"
+    );
+    let unchanged = get_benefit(&running, &benefit).await;
+    assert_eq!(unchanged["status"], "active", "{unchanged}");
+    assert_eq!(unchanged["version"].as_i64(), Some(version), "{unchanged}");
+}
+
+/// v1-p83-2 — a baseline or post reading is a number and a unit: a missing value, a blank unit
+/// and a placeholder unit are refused with the named code, and the refusals write no reading.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_placeholder_measurement_is_refused() {
+    let (pg, running, seeded) = fixture().await;
+    let programme = create_programme(&running, "Placeholder programme").await;
+    let owner = owner_job(&pg, &seeded).await;
+    let (benefit, _) = create_benefit(&running, &programme, None, "BEN-01", "active", owner).await;
+
+    for (value, unit, field) in [
+        (Value::Null, "hours", "actual_value"),
+        (json!(14.0), "   ", "unit"),
+        (json!(14.0), "not measured", "unit"),
+    ] {
+        let (status, body) = running
+            .invoke(
+                "benefits.measure",
+                TOKEN,
+                json!({
+                    "benefit_id": benefit,
+                    "kind": "baseline",
+                    "target_value": 8.0,
+                    "actual_value": value,
+                    "unit": unit,
+                    "method": "median of the weekly run timestamps",
+                    "measured_at": "2026-11-01T00:00:00Z",
+                }),
+                None,
+                None,
+                None,
+            )
+            .await;
+        assert_eq!(status, 422, "{body}");
+        assert_eq!(
+            body["errors"][0]["code"], "benefit_measurement_invalid",
+            "{body}"
+        );
+        assert_eq!(body["errors"][0]["field"], field, "{body}");
+    }
+
+    let (status, body) = running
+        .invoke(
+            "benefits.measurement_list",
+            TOKEN,
+            json!({"benefit_id": benefit}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{body}");
+    assert!(
+        output(&body)["items"].as_array().is_some_and(Vec::is_empty),
+        "refused readings must not be stored: {body}"
+    );
+}
+
+/// v1-p83-2 — values are necessary, evidence is too: the readings a realized claim cites must
+/// each carry the evidence behind them. Once the latest baseline and post readings carry
+/// evidence, the same claim succeeds.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_realized_status_needs_evidence_behind_the_readings() {
+    let (pg, running, seeded) = fixture().await;
+    let programme = create_programme(&running, "Evidence programme").await;
+    let owner = owner_job(&pg, &seeded).await;
+    let (benefit, _) = create_benefit(&running, &programme, None, "BEN-01", "active", owner).await;
+    let (status, body) = running
+        .invoke(
+            "benefits.transition_upsert",
+            TOKEN,
+            json!({"benefit_id": benefit, "enacted_at": "2026-11-20T00:00:00Z"}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{body}");
+
+    // Both readings are measured values but carry no evidence.
+    for (kind, measured_at) in [
+        ("baseline", "2026-11-01T00:00:00Z"),
+        ("post", "2026-11-21T00:00:00Z"),
+    ] {
+        let (status, body) = running
+            .invoke(
+                "benefits.measure",
+                TOKEN,
+                json!({
+                    "benefit_id": benefit,
+                    "kind": kind,
+                    "target_value": 8.0,
+                    "actual_value": if kind == "baseline" { 14.0 } else { 9.0 },
+                    "unit": "hours",
+                    "method": "median of the weekly run timestamps",
+                    "measured_at": measured_at,
+                }),
+                None,
+                None,
+                None,
+            )
+            .await;
+        assert_eq!(status, 201, "{body}");
+    }
+
+    let (status, body) = running
+        .invoke(
+            "benefits.update",
+            TOKEN,
+            json!({"id": benefit, "status": "realized"}),
+            Some("\"1\""),
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 422, "{body}");
+    assert_eq!(
+        body["errors"][0]["code"], "benefit_measurement_evidence_missing",
+        "a reading with no evidence cannot realise a benefit: {body}"
+    );
+
+    // The same readings, re-taken with evidence behind them, realise the benefit.
+    measure(&running, &benefit, "baseline", "2026-11-02T00:00:00Z", None).await;
+    let (status, body) = measure(&running, &benefit, "post", "2026-11-22T00:00:00Z", None).await;
     assert_eq!(status, 201, "{body}");
     let (status, body) = running
         .invoke(

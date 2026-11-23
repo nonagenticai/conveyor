@@ -13,7 +13,8 @@
 use chrono::{DateTime, NaiveDate, Utc};
 use conveyor_domain::spine::{
     BenefitMapFields, BenefitProfileFields, PlanError, WsjfInputs, benefit_map_missing,
-    benefit_profile_missing, tranche_review_has_evidence, validate_change,
+    benefit_profile_missing, evidence_present, tranche_review_has_evidence,
+    validate_benefit_reading, validate_change,
 };
 use conveyor_domain::{Approval, TenantId};
 use serde_json::Value;
@@ -2273,34 +2274,36 @@ pub async fn update_benefit_tx(
     }
     if patch.status.as_deref() == Some("realized") {
         // §8.3: a benefit whose baseline was never measured cannot claim an improvement, and a
-        // realization is proved by a `post` measurement taken after the transition was enacted.
-        // A timestamp on the transition is an assertion; the `benefit_measurement` row is the
-        // reading the sponsor compares with the baseline.
+        // realization is proved by readings, not timestamps. The claim must cite a measured
+        // baseline and a measured post reading taken after the transition was enacted, and each
+        // reading must carry the evidence behind it.
+        let baseline = latest_measurement_tx(&mut *conn, tenant, id, "baseline")
+            .await?
+            .ok_or(PlanStoreError::Illegal(PlanError::BenefitBaselineMissing))?;
+        validate_benefit_reading(&baseline.kind, baseline.actual_value, &baseline.unit)
+            .map_err(PlanStoreError::Illegal)?;
+        if !evidence_present(&baseline.evidence) {
+            return Err(PlanStoreError::Illegal(
+                PlanError::BenefitMeasurementEvidenceMissing,
+            ));
+        }
         let enacted_at = get_transition_tx(&mut *conn, tenant, id)
             .await?
             .and_then(|transition| transition.enacted_at);
-        let baseline_measured: bool = sqlx::query_scalar(
-            "SELECT EXISTS (
-                SELECT 1 FROM benefit_measurement
-                 WHERE tenant_id = $1 AND benefit_id = $2 AND kind = 'baseline'
-            )",
-        )
-        .bind(tenant.as_uuid())
-        .bind(id)
-        .fetch_one(&mut *conn)
-        .await?;
-        if !baseline_measured {
-            return Err(PlanStoreError::Illegal(PlanError::BenefitBaselineMissing));
-        }
-        let post_measured = match enacted_at {
+        let post = match enacted_at {
             Some(enacted_at) => {
-                post_measurement_after_tx(&mut *conn, tenant, id, enacted_at).await?
+                latest_post_measurement_after_tx(&mut *conn, tenant, id, enacted_at).await?
             }
-            None => false,
-        };
-        if !post_measured {
+            None => None,
+        }
+        .ok_or(PlanStoreError::Illegal(
+            PlanError::BenefitPostMeasurementMissing,
+        ))?;
+        validate_benefit_reading(&post.kind, post.actual_value, &post.unit)
+            .map_err(PlanStoreError::Illegal)?;
+        if !evidence_present(&post.evidence) {
             return Err(PlanStoreError::Illegal(
-                PlanError::BenefitPostMeasurementMissing,
+                PlanError::BenefitMeasurementEvidenceMissing,
             ));
         }
     }
@@ -2969,6 +2972,11 @@ pub async fn insert_benefit_measurement_tx(
     tenant: TenantId,
     new: &NewBenefitMeasurement,
 ) -> Result<BenefitMeasurementRecord, PlanStoreError> {
+    // §8.3: a baseline or post reading is a number and a unit. Prose, a missing value, a blank
+    // unit and a placeholder unit are refused here; the `benefit_measurement` CHECK is the
+    // second lock.
+    validate_benefit_reading(&new.kind, new.actual_value, &new.unit)
+        .map_err(PlanStoreError::Illegal)?;
     let programme_id: Option<Uuid> = sqlx::query_scalar(
         "SELECT programme_id FROM benefit_profile WHERE tenant_id = $1 AND id = $2",
     )
@@ -3063,6 +3071,46 @@ pub async fn post_measurement_after_tx(
     .bind(enacted_at)
     .fetch_one(&mut *conn)
     .await
+}
+
+/// The benefit's latest reading of one kind, when one exists.
+pub async fn latest_measurement_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    benefit_id: Uuid,
+    kind: &str,
+) -> Result<Option<BenefitMeasurementRecord>, sqlx::Error> {
+    let sql = format!(
+        "SELECT {BENEFIT_MEASUREMENT_COLUMNS} FROM benefit_measurement
+          WHERE tenant_id = $1 AND benefit_id = $2 AND kind = $3
+          ORDER BY measured_at DESC, id DESC LIMIT 1"
+    );
+    sqlx::query_as(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(benefit_id)
+        .bind(kind)
+        .fetch_optional(&mut *conn)
+        .await
+}
+
+/// The benefit's latest `post` reading taken strictly after `enacted_at`, when one exists.
+pub async fn latest_post_measurement_after_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    benefit_id: Uuid,
+    enacted_at: DateTime<Utc>,
+) -> Result<Option<BenefitMeasurementRecord>, sqlx::Error> {
+    let sql = format!(
+        "SELECT {BENEFIT_MEASUREMENT_COLUMNS} FROM benefit_measurement
+          WHERE tenant_id = $1 AND benefit_id = $2 AND kind = 'post' AND measured_at > $3
+          ORDER BY measured_at DESC, id DESC LIMIT 1"
+    );
+    sqlx::query_as(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(benefit_id)
+        .bind(enacted_at)
+        .fetch_optional(&mut *conn)
+        .await
 }
 
 // ── programme_cadence ───────────────────────────────────────────────────────────────────
