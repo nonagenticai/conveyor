@@ -7777,7 +7777,7 @@
       "baseline": {
         "disposition": "mixed",
         "earliest_expires": "2027-02-18",
-        "entries": 8,
+        "entries": 9,
         "owners": [
           "programme owner"
         ]
@@ -7802,6 +7802,7 @@
           "subjects": [
             "S12",
             "S13",
+            "S21",
             "T11",
             "T16",
             "T7",
@@ -7819,7 +7820,7 @@
       "spec": "\u00a75.3",
       "standard": "SPEC",
       "status": "open",
-      "subject_count": 8,
+      "subject_count": 9,
       "subjects": [
         {
           "detail": "seed status 'closed' != live status 'active'",
@@ -7840,6 +7841,16 @@
           "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
           "subject": "S13"
+        },
+        {
+          "detail": "seed status 'closed' != live status 'active'",
+          "disposition": "rework",
+          "evidence": [],
+          "expires": "2027-02-18",
+          "owner": "programme owner",
+          "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
+          "severity": "P1",
+          "subject": "S21"
         },
         {
           "detail": "seed status 'closed' != live status 'active'",
@@ -29728,9 +29739,9 @@
     },
     "SPEC": {
       "findings": 88,
-      "gaps": 40,
+      "gaps": 41,
       "p0": 0,
-      "p1": 5,
+      "p1": 6,
       "p2": 35,
       "packages": 109,
       "rules": 8,
@@ -29773,7 +29784,7 @@
     "open": 328,
     "packages": 331,
     "resolved": 12,
-    "subjects": 431,
+    "subjects": 432,
     "suppressed": 3
   }
 }

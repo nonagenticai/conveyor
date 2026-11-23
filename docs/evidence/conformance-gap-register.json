@@ -1,7 +1,7 @@
 {
   "counts": {
     "P0": 22,
-    "P1": 132,
+    "P1": 133,
     "P2": 37,
     "P3": 0
   },
@@ -1173,6 +1173,14 @@
       "rule": "seed_live_drift",
       "severity": "P1",
       "subject": "S13"
+    },
+    {
+      "detail": "seed status 'closed' != live status 'active'",
+      "disposition": "rework",
+      "evidence": null,
+      "rule": "seed_live_drift",
+      "severity": "P1",
+      "subject": "S21"
     },
     {
       "detail": "seed status 'closed' != live status 'active'",

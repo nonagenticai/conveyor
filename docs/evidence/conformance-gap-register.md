@@ -5,7 +5,7 @@ Snapshot: `a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b` generated `2026-11-20T11:50
 | Severity | Count |
 |---|---:|
 | P0 | 22 |
-| P1 | 132 |
+| P1 | 133 |
 | P2 | 37 |
 | P3 | 0 |
 
@@ -159,6 +159,7 @@ Snapshot: `a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b` generated `2026-11-20T11:50
 | `project_in_unauthorised_tranche` | `T8` | P1 | project is active in tranche 11 whose state is 'planned' |
 | `seed_live_drift` | `S12` | P1 | seed status 'closed' != live status 'active' |
 | `seed_live_drift` | `S13` | P1 | seed status 'closed' != live status 'active' |
+| `seed_live_drift` | `S21` | P1 | seed status 'closed' != live status 'active' |
 | `seed_live_drift` | `T11` | P1 | seed status 'closed' != live status 'active' |
 | `seed_live_drift` | `T16` | P1 | seed status 'closed' != live status 'active' |
 | `seed_live_drift` | `T7` | P1 | seed status 'closed' != live status 'active' |
@@ -200,7 +201,7 @@ Snapshot: `a33e6562e80deabdb3ae0b3e85b031fdac5ccf8b` generated `2026-11-20T11:50
 | S18 | active | 9 | 0 | 2 | 1 | 0 |
 | S19 | active | 8 | 0 | 2 | 1 | 0 |
 | S20 | active | 9 | 0 | 2 | 1 | 0 |
-| S21 | active | 9 | 0 | 2 | 1 | 0 |
+| S21 | active | 9 | 0 | 3 | 1 | 0 |
 | SPEC-V2 | closed | 0 | 0 | 2 | 0 | 0 |
 | T0 | closed | 0 | 0 | 1 | 0 | 0 |
 | T1 | closed | 1 | 1 | 2 | 0 | 0 |

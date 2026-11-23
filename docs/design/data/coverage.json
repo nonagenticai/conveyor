@@ -362,10 +362,12 @@
           545,
           569,
           572,
-          604
+          604,
+          608,
+          611
         ],
-        "open": 17,
-        "ready": 5,
+        "open": 19,
+        "ready": 7,
         "unknown": 0
       }
     },
@@ -1328,8 +1330,8 @@
       "track": "v1",
       "tranche": 5,
       "units": {
-        "blocked": 0,
-        "claimed": 1,
+        "blocked": 1,
+        "claimed": 0,
         "numbers": [
           11
         ],
@@ -1500,14 +1502,14 @@
       "tranche": 9,
       "units": {
         "blocked": 0,
-        "claimed": 1,
+        "claimed": 0,
         "numbers": [
           15,
           581,
           590,
           599
         ],
-        "open": 1,
+        "open": 0,
         "ready": 0,
         "unknown": 0
       }
@@ -2716,8 +2718,8 @@
       },
       "total": 50,
       "uncovered": [],
-      "with_open_units": 21,
-      "without_open_units": 29
+      "with_open_units": 20,
+      "without_open_units": 30
     },
     "screens": {
       "actions_invoked": 39,

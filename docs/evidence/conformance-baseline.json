@@ -1318,6 +1318,15 @@
     },
     {
       "rule": "seed_live_drift",
+      "subject": "S21",
+      "severity": "P1",
+      "disposition": "rework",
+      "owner": "programme owner",
+      "expires": "2027-02-18",
+      "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit"
+    },
+    {
+      "rule": "seed_live_drift",
       "subject": "T11",
       "severity": "P1",
       "disposition": "rework",
