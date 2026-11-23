@@ -180,6 +180,28 @@ pub struct MeetingInstruments {
     pub decisions_per_meeting: f64,
 }
 
+#[derive(Debug, sqlx::FromRow)]
+struct AgendaLockRow {
+    outcome: Option<String>,
+    resolved_kind: String,
+    resolved_id: Uuid,
+    evidence_refs: Value,
+    participating_departments: Vec<Uuid>,
+}
+
+#[derive(Debug, sqlx::FromRow)]
+struct GateRow {
+    id: Uuid,
+    status: String,
+    required_decisions: i32,
+    meta: Value,
+    requested_by: Option<Uuid>,
+    gate: String,
+    card_assignee: Option<Uuid>,
+    card_job: Option<Uuid>,
+    run_job: Option<Uuid>,
+}
+
 #[derive(Clone, Debug)]
 pub struct MeetingDetail {
     pub meeting: MeetingRecord,
@@ -460,13 +482,13 @@ pub async fn schedule_tx(
             .fetch_optional(&mut *conn)
             .await?;
     let board_id = board_id.ok_or(MeetingStoreError::NotFound("list"))?;
-    if let Some(given) = new.board_id {
-        if given != board_id {
-            return Err(MeetingStoreError::Illegal {
-                what: "meeting",
-                why: "the list is not on the given board".into(),
-            });
-        }
+    if let Some(given) = new.board_id
+        && given != board_id
+    {
+        return Err(MeetingStoreError::Illegal {
+            what: "meeting",
+            why: "the list is not on the given board".into(),
+        });
     }
 
     let card_type_id: Option<Uuid> = sqlx::query_scalar(
@@ -548,10 +570,10 @@ pub async fn open_tx(
     .await?;
     let (_, status, version, meeting_type_id) =
         row.ok_or(MeetingStoreError::NotFound("meeting"))?;
-    if let Some(expected) = expected_version {
-        if expected != version {
-            return Err(MeetingStoreError::Stale("meeting"));
-        }
+    if let Some(expected) = expected_version
+        && expected != version
+    {
+        return Err(MeetingStoreError::Stale("meeting"));
     }
     match status.as_str() {
         "scheduled" => {}
@@ -618,23 +640,27 @@ pub async fn open_tx(
 
 // ── attendance ──────────────────────────────────────────────────────────────────────────
 
+pub struct NewAttendance<'a> {
+    pub participant_kind: &'a str,
+    pub participant_id: Uuid,
+    pub seat: &'a str,
+    pub department_id: Option<Uuid>,
+    pub delegated_from: Option<Uuid>,
+}
+
 pub async fn invite_tx(
     conn: &mut PgConnection,
     tenant: TenantId,
     meeting_id: Uuid,
-    participant_kind: &str,
-    participant_id: Uuid,
-    seat: &str,
-    department_id: Option<Uuid>,
-    delegated_from: Option<Uuid>,
+    new: &NewAttendance<'_>,
 ) -> Result<AttendanceRecord> {
-    if !PARTICIPANT_KINDS.contains(&participant_kind) {
+    if !PARTICIPANT_KINDS.contains(&new.participant_kind) {
         return Err(MeetingStoreError::Unprocessable {
             code: "invalid_participant_kind",
             detail: format!("participant_kind must be one of {PARTICIPANT_KINDS:?}"),
         });
     }
-    if !SEATS.contains(&seat) {
+    if !SEATS.contains(&new.seat) {
         return Err(MeetingStoreError::Unprocessable {
             code: "invalid_seat",
             detail: format!("seat must be one of {SEATS:?}"),
@@ -653,8 +679,8 @@ pub async fn invite_tx(
             why: format!("a {status} meeting takes no invitations"),
         });
     }
-    ensure_participant_tx(&mut *conn, tenant, participant_kind, participant_id).await?;
-    if let Some(from) = delegated_from {
+    ensure_participant_tx(&mut *conn, tenant, new.participant_kind, new.participant_id).await?;
+    if let Some(from) = new.delegated_from {
         let same: Option<(Uuid,)> = sqlx::query_as(
             "SELECT id FROM meeting_attendance WHERE tenant_id = $1 AND id = $2 AND meeting_id = $3",
         )
@@ -680,11 +706,11 @@ pub async fn invite_tx(
     sqlx::query_as::<_, AttendanceRecord>(AssertSqlSafe(sql))
         .bind(tenant.as_uuid())
         .bind(meeting_id)
-        .bind(participant_kind)
-        .bind(participant_id)
-        .bind(seat)
-        .bind(department_id)
-        .bind(delegated_from)
+        .bind(new.participant_kind)
+        .bind(new.participant_id)
+        .bind(new.seat)
+        .bind(new.department_id)
+        .bind(new.delegated_from)
         .fetch_one(&mut *conn)
         .await
         .map_err(MeetingStoreError::from)
@@ -1001,6 +1027,8 @@ pub async fn agenda_add_tx(
     }
 }
 
+// The helper takes the row's fields directly; grouping them would only move the tuple.
+#[allow(clippy::too_many_arguments)]
 async fn insert_agenda_item(
     conn: &mut PgConnection,
     tenant: TenantId,
@@ -1988,22 +2016,22 @@ async fn ensure_convener_tx(
                     why: format!("the governance body is {status}; only an active body convenes"),
                 });
             }
-            if let Some(items) = members.as_array() {
-                if !items.is_empty() {
-                    let actor_id = actor.id.to_string();
-                    let member = items.iter().any(|item| match item {
-                        Value::String(id) => id == &actor_id,
-                        Value::Object(map) => ["id", "user_id", "app_user_id"]
-                            .iter()
-                            .any(|key| map.get(*key).and_then(Value::as_str) == Some(&actor_id)),
-                        _ => false,
+            if let Some(items) = members.as_array()
+                && !items.is_empty()
+            {
+                let actor_id = actor.id.to_string();
+                let member = items.iter().any(|item| match item {
+                    Value::String(id) => id == &actor_id,
+                    Value::Object(map) => ["id", "user_id", "app_user_id"]
+                        .iter()
+                        .any(|key| map.get(*key).and_then(Value::as_str) == Some(&actor_id)),
+                    _ => false,
+                });
+                if !member {
+                    return Err(MeetingStoreError::Illegal {
+                        what: "convener",
+                        why: "the caller is not a member of the governance body".into(),
                     });
-                    if !member {
-                        return Err(MeetingStoreError::Illegal {
-                            what: "convener",
-                            why: "the caller is not a member of the governance body".into(),
-                        });
-                    }
                 }
             }
         }
@@ -2165,7 +2193,7 @@ pub async fn close_item_tx(
         .await?
         .ok_or(MeetingStoreError::NotFound("meeting type"))?;
 
-    let item: Option<(Option<String>, String, Uuid, Value, Vec<Uuid>)> = sqlx::query_as(
+    let item: Option<AgendaLockRow> = sqlx::query_as(
         "SELECT outcome, resolved_kind, resolved_id, evidence_refs, participating_departments
            FROM meeting_agenda_item
           WHERE tenant_id = $1 AND id = $2 AND meeting_id = $3 FOR UPDATE",
@@ -2175,8 +2203,12 @@ pub async fn close_item_tx(
     .bind(meeting_id)
     .fetch_optional(&mut *conn)
     .await?;
-    let (outcome, resolved_kind, resolved_id, item_evidence, item_departments) =
-        item.ok_or(MeetingStoreError::NotFound("agenda item"))?;
+    let locked = item.ok_or(MeetingStoreError::NotFound("agenda item"))?;
+    let outcome = locked.outcome;
+    let resolved_kind = locked.resolved_kind;
+    let resolved_id = locked.resolved_id;
+    let item_evidence = locked.evidence_refs;
+    let item_departments = locked.participating_departments;
     if outcome.is_some() {
         return Err(MeetingStoreError::Illegal {
             what: "agenda item",
@@ -2589,17 +2621,7 @@ async fn load_gate_tx(
     tenant: TenantId,
     approval_id: Uuid,
 ) -> Result<ApprovalGate> {
-    let row: Option<(
-        Uuid,
-        String,
-        i32,
-        Value,
-        Option<Uuid>,
-        String,
-        Option<Uuid>,
-        Option<Uuid>,
-        Option<Uuid>,
-    )> = sqlx::query_as(
+    let row: Option<GateRow> = sqlx::query_as(
         "SELECT a.id, a.status, a.required_decisions, a.meta, a.requested_by, a.gate,
                 c.assignee_id AS card_assignee, c.job_binding_id AS card_job,
                 r.job_binding_id AS run_job
@@ -2612,27 +2634,17 @@ async fn load_gate_tx(
     .bind(approval_id)
     .fetch_optional(&mut *conn)
     .await?;
-    let (
-        id,
-        status,
-        required_decisions,
-        meta,
-        requested_by,
-        gate,
-        card_assignee,
-        card_job,
-        run_job,
-    ) = row.ok_or(MeetingStoreError::NotFound("approval"))?;
+    let row = row.ok_or(MeetingStoreError::NotFound("approval"))?;
     Ok(ApprovalGate {
-        id,
-        status,
-        required_decisions,
-        meta,
-        requested_by,
-        gate,
-        card_assignee,
-        card_job,
-        run_job,
+        id: row.id,
+        status: row.status,
+        required_decisions: row.required_decisions,
+        meta: row.meta,
+        requested_by: row.requested_by,
+        gate: row.gate,
+        card_assignee: row.card_assignee,
+        card_job: row.card_job,
+        run_job: row.run_job,
     })
 }
 

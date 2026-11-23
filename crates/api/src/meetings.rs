@@ -29,7 +29,7 @@ pub async fn ics(
             return internal();
         }
     };
-    let detail = match conveyor_store::meetings::detail_tx(&mut *tx, caller.tenant, id).await {
+    let detail = match conveyor_store::meetings::detail_tx(&mut tx, caller.tenant, id).await {
         Ok(Some(detail)) => detail,
         Ok(None) => {
             let _ = tx.rollback().await;

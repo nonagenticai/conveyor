@@ -11,6 +11,8 @@ mod support;
 use serde_json::{Value, json};
 use uuid::Uuid;
 
+type DecisionRow = (String, Option<Uuid>, Option<Uuid>, String, String);
+
 fn policy_with(required: Value, quorum: i64, rule: &str) -> Value {
     json!({
         "name": "Board",
@@ -118,7 +120,7 @@ async fn majority_records_each_seat_and_keeps_dissent() {
     assert_eq!(result["approval_status"], "approved", "{result}");
     assert_eq!(result["decisions_written"], 3, "{result}");
 
-    let rows: Vec<(String, Option<Uuid>, Option<Uuid>, String, String)> = sqlx::query_as(
+    let rows: Vec<DecisionRow> = sqlx::query_as(
         "SELECT decision, approver_id, job_binding_id, participant_kind,
                 via->>'surface'
            FROM approval_decision

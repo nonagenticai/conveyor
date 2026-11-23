@@ -25,8 +25,6 @@ struct MeetingRow {
     #[serde(default)]
     card_name: String,
     #[serde(default)]
-    meeting_type: String,
-    #[serde(default)]
     meeting_type_name: String,
     #[serde(default)]
     decision_rule: String,
@@ -34,8 +32,6 @@ struct MeetingRow {
     status: String,
     #[serde(default)]
     opens_at: Option<String>,
-    #[serde(default)]
-    version: i64,
     #[serde(default)]
     retirement_candidate: bool,
 }
@@ -59,8 +55,6 @@ struct AgendaRow {
 #[derive(Clone, Debug, Default, Deserialize)]
 struct AttendanceRow {
     #[serde(default)]
-    id: String,
-    #[serde(default)]
     participant_kind: String,
     #[serde(default)]
     participant_id: String,
@@ -74,8 +68,6 @@ struct AttendanceRow {
 struct PositionRow {
     #[serde(default)]
     participant_kind: String,
-    #[serde(default)]
-    participant_id: String,
     #[serde(default)]
     stance: String,
     #[serde(default)]

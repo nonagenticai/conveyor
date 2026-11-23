@@ -557,11 +557,13 @@ async fn meetings_invite(
         &mut *tx,
         ctx.tenant,
         input.meeting_id,
-        &input.participant_kind,
-        input.participant_id,
-        &input.seat,
-        input.department_id,
-        input.delegated_from,
+        &store::meetings::NewAttendance {
+            participant_kind: &input.participant_kind,
+            participant_id: input.participant_id,
+            seat: &input.seat,
+            department_id: input.department_id,
+            delegated_from: input.delegated_from,
+        },
     )
     .await
     .map_err(|error| meeting_error(error, ctx.action))?;
@@ -972,14 +974,14 @@ async fn meetings_list(
     ctx: HandlerCtx,
     input: ListIn,
 ) -> Result<HandlerOutput<Page<MeetingOut>>, ActionError> {
-    if let Some(status) = input.status.as_deref() {
-        if !matches!(status, "scheduled" | "live" | "closed" | "cancelled") {
-            return Err(invalid(
-                "status",
-                "invalid_value",
-                "status must be scheduled, live, closed or cancelled",
-            ));
-        }
+    if let Some(status) = input.status.as_deref()
+        && !matches!(status, "scheduled" | "live" | "closed" | "cancelled")
+    {
+        return Err(invalid(
+            "status",
+            "invalid_value",
+            "status must be scheduled, live, closed or cancelled",
+        ));
     }
     let rows = store::meetings::list_meetings_tx(
         &mut *tx,
