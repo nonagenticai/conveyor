@@ -39,14 +39,19 @@ test("a change needs a rationale", async ({ page, request }) => {
   await expect(page.locator('[data-testid="plan-baselines"]')).toContainText("scope");
   await expect(page.locator('[data-testid="plan-registers"]')).toContainText(registerTitle);
 
-  // A change with a baseline and a binding but no rationale is refused by the server.
-  await page.locator('label.field:has-text("Baseline") select').selectOption({ index: 1 });
-  await page
+  // A change with a baseline and a binding but no rationale is refused by the server. The WBS
+  // and register forms carry their own Title/Baseline fields, so scope every fill to the change
+  // panel that owns the Request change button.
+  const changeForm = page.locator(".panel").filter({
+    has: page.getByRole("button", { name: "Request change" }),
+  });
+  await changeForm.locator('label.field:has-text("Baseline") select').selectOption({ index: 1 });
+  await changeForm
     .locator('label.field:has-text("PM job binding") input')
     .fill("00000000-0000-4000-8000-000000000001");
-  await page.locator('label.field:has-text("Title") input').fill(unique("e2e change"));
-  await page.locator('label.field:has-text("Impact") input').fill("1");
-  await page.getByRole("button", { name: "Request change" }).click();
+  await changeForm.locator('label.field:has-text("Title") input').fill(unique("e2e change"));
+  await changeForm.locator('label.field:has-text("Impact") input').fill("1");
+  await changeForm.getByRole("button", { name: "Request change" }).click();
 
   const notice = page.locator("p.notice[role=alert]");
   await expect(notice).toContainText("rationale");
