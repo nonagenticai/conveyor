@@ -553,6 +553,306 @@ async fn an_edit_to_the_agent_row_cannot_change_a_started_run() {
     );
 }
 
+struct ProcessFixture {
+    tenant: TenantId,
+    run_id: Uuid,
+    case_id: Uuid,
+    instance_id: String,
+    process_id: Uuid,
+    problem: String,
+}
+
+/// One tenant with the published `swebench-fix` process (its capability, its process agent and
+/// one agent step), the `benchmark` card type, one seeded suite and one `process`-subject
+/// benchmark run. `agent_status` is the process agent's status, so a test can make the process
+/// unready without touching anything else.
+async fn process_fixture(db: &common::TestDb, problem: &str, agent_status: &str) -> ProcessFixture {
+    let slug = format!("producer-{}", Uuid::now_v7());
+    let tenant_id: Uuid =
+        sqlx::query_scalar("INSERT INTO tenant (slug, name) VALUES ($1, $1) RETURNING id")
+            .bind(&slug)
+            .fetch_one(&db.super_pool)
+            .await
+            .expect("tenant");
+    let tenant = TenantId::from_uuid(tenant_id).expect("non-nil tenant");
+    let actor: Uuid = sqlx::query_scalar(
+        "INSERT INTO app_user (display_name) VALUES ('benchmark actor') RETURNING id",
+    )
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("actor");
+    sqlx::query("INSERT INTO membership (tenant_id, user_id, role) VALUES ($1, $2, 'admin')")
+        .bind(tenant_id)
+        .bind(actor)
+        .execute(&db.super_pool)
+        .await
+        .expect("the tenant's actor");
+
+    let mut tx = store::begin_scoped(&db.runtime, tenant)
+        .await
+        .expect("scoped");
+    let capability: Uuid = sqlx::query_scalar(
+        "INSERT INTO capability (tenant_id, code, label, status)
+         VALUES ($1, 'development', 'Development', 'active') RETURNING id",
+    )
+    .bind(tenant_id)
+    .fetch_one(&mut *tx)
+    .await
+    .expect("capability");
+    // 0035 makes a `process_agent` name its process; a NULL prompt_ref keeps readiness to the
+    // facts this test owns (the prompt catalogue is not the process arm's problem).
+    let agent: Uuid = sqlx::query_scalar(
+        "INSERT INTO capability_agent
+             (tenant_id, capability_id, key, role, process_key, status, model_ref,
+              max_iterations, timeout_secs)
+         VALUES ($1, $2, 'swebench-fix', 'process_agent', 'swebench-fix', $3, 'test-model', 12, 300)
+         RETURNING id",
+    )
+    .bind(tenant_id)
+    .bind(capability)
+    .bind(agent_status)
+    .fetch_one(&mut *tx)
+    .await
+    .expect("process agent");
+    let process: Uuid = sqlx::query_scalar(
+        "INSERT INTO process (tenant_id, key, title, status, version, capability_id)
+         VALUES ($1, 'swebench-fix', 'SWE-bench fix', 'published', 1, $2) RETURNING id",
+    )
+    .bind(tenant_id)
+    .bind(capability)
+    .fetch_one(&mut *tx)
+    .await
+    .expect("the published swebench-fix process");
+    sqlx::query(
+        "INSERT INTO process_step
+             (tenant_id, process_id, position, action, input_template, kind, actor,
+              process_agent_id, on_result, max_attempts)
+         VALUES ($1, $2, 1, 'agent.run', '{\"function\":\"fix\"}'::jsonb, 'agent',
+                 'process_agent', $3, 'fail', 1)",
+    )
+    .bind(tenant_id)
+    .bind(process)
+    .bind(agent)
+    .execute(&mut *tx)
+    .await
+    .expect("the process's one agent step");
+    sqlx::query(
+        "INSERT INTO card_type (tenant_id, code, label, definition)
+         VALUES ($1, 'benchmark', 'Benchmark', '{}'::jsonb)",
+    )
+    .bind(tenant_id)
+    .execute(&mut *tx)
+    .await
+    .expect("the benchmark card type");
+
+    let (suite, _) = store::benchmark::seed_suite_tx(&mut tx, tenant, &document(problem))
+        .await
+        .expect("suite");
+    let instance_ids = vec!["repo__i-0".to_owned()];
+    let run = store::benchmark::create_run_tx(
+        &mut tx,
+        tenant,
+        &NewRun {
+            suite_id: suite.id,
+            arm: "conveyor",
+            subject_kind: "process",
+            capability_agent_id: None,
+            process_id: Some(process),
+            subject_version: Some(1),
+            label: "process-proof",
+            options: &json!({}),
+            instance_ids: &instance_ids,
+        },
+    )
+    .await
+    .expect("run");
+    let case_id: Uuid = sqlx::query_scalar(
+        "SELECT id FROM benchmark_case
+          WHERE tenant_id = $1 AND benchmark_run_id = $2 AND instance_id = $3",
+    )
+    .bind(tenant_id)
+    .bind(run.id)
+    .bind("repo__i-0")
+    .fetch_one(&mut *tx)
+    .await
+    .expect("case");
+    tx.commit().await.expect("commit");
+
+    ProcessFixture {
+        tenant,
+        run_id: run.id,
+        case_id,
+        instance_id: "repo__i-0".to_owned(),
+        process_id: process,
+        problem: problem.to_owned(),
+    }
+}
+
+fn process_payload(fixture: &ProcessFixture) -> Value {
+    json!({
+        "run_id": fixture.run_id.to_string(),
+        "instance_id": fixture.instance_id,
+    })
+}
+
+/// `(produce_status, attempts)` of a process fixture's case.
+async fn process_case_row(db: &common::TestDb, fixture: &ProcessFixture) -> (String, i32) {
+    let mut tx = store::begin_scoped(&db.runtime, fixture.tenant)
+        .await
+        .expect("scoped");
+    let row = sqlx::query_as(
+        "SELECT produce_status, attempts
+           FROM benchmark_case WHERE tenant_id = $1 AND id = $2",
+    )
+    .bind(fixture.tenant.as_uuid())
+    .bind(fixture.case_id)
+    .fetch_one(&mut *tx)
+    .await
+    .expect("case row");
+    tx.commit().await.expect("commit");
+    row
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+async fn the_process_arm_starts_the_pinned_process_on_the_case_card_and_waits() {
+    let _serial = SERIAL.lock().await;
+    let db = common::TestDb::fresh().await;
+    let fixture = process_fixture(
+        &db,
+        "The ordering endpoint returns the wrong total.",
+        "active",
+    )
+    .await;
+    let input = process_payload(&fixture);
+
+    produce(&db.runtime, fixture.tenant, "conveyor", &input)
+        .await
+        .expect("the start tick");
+
+    let mut tx = store::begin_scoped(&db.runtime, fixture.tenant)
+        .await
+        .expect("scoped");
+    // The host is the run's own project/board/list, keyed by the run id.
+    let project: Uuid =
+        sqlx::query_scalar("SELECT id FROM project WHERE tenant_id = $1 AND key = $2")
+            .bind(fixture.tenant.as_uuid())
+            .bind(format!("benchmark-{}", fixture.run_id))
+            .fetch_one(&mut *tx)
+            .await
+            .expect("the host project");
+    let board: Uuid =
+        sqlx::query_scalar("SELECT id FROM board WHERE tenant_id = $1 AND project_id = $2")
+            .bind(fixture.tenant.as_uuid())
+            .bind(project)
+            .fetch_one(&mut *tx)
+            .await
+            .expect("the host board");
+    let (card_id, code, name, description, meta): (Uuid, String, String, String, Value) =
+        sqlx::query_as(
+            "SELECT c.id, t.code, c.name, c.description, c.meta
+               FROM card c
+               JOIN card_type t ON t.tenant_id = c.tenant_id AND t.id = c.card_type_id
+              WHERE c.tenant_id = $1 AND c.board_id = $2
+              ORDER BY c.position, c.id",
+        )
+        .bind(fixture.tenant.as_uuid())
+        .bind(board)
+        .fetch_one(&mut *tx)
+        .await
+        .expect("the case card");
+    assert_eq!(code, "benchmark", "the process arm's card type is P3a's");
+    assert_eq!(name, fixture.instance_id);
+    assert_eq!(
+        description, fixture.problem,
+        "the problem statement is the model's material"
+    );
+    assert_eq!(meta["instance_id"], json!(fixture.instance_id));
+    assert_eq!(meta["base_commit"], json!("0".repeat(40)));
+    assert!(
+        !meta.to_string().contains("GOLD-ANSWER"),
+        "the answer key must never reach the card: {meta}"
+    );
+    let (status, process_id, process_version): (String, Uuid, i64) = sqlx::query_as(
+        "SELECT status, process_id, process_version FROM run
+          WHERE tenant_id = $1 AND card_id = $2 AND parent_run_id IS NULL",
+    )
+    .bind(fixture.tenant.as_uuid())
+    .bind(card_id)
+    .fetch_one(&mut *tx)
+    .await
+    .expect("the process run");
+    assert_eq!(
+        process_id, fixture.process_id,
+        "the run pins the process the benchmark run measured"
+    );
+    assert_eq!(
+        process_version, 1,
+        "the pinned version is the published one"
+    );
+    assert_eq!(status, "running");
+    tx.commit().await.expect("commit");
+
+    let (produce_status, attempts) = process_case_row(&db, &fixture).await;
+    assert_eq!(
+        produce_status, "pending",
+        "P3c collects nothing; P3d reads the run's typed output"
+    );
+    assert_eq!(attempts, 1, "the start tick is the one attempt");
+
+    // A second tick is a WAIT: the live process starts nothing and spends nothing.
+    produce(&db.runtime, fixture.tenant, "conveyor", &input)
+        .await
+        .expect("the wait tick");
+    let mut tx = store::begin_scoped(&db.runtime, fixture.tenant)
+        .await
+        .expect("scoped");
+    let cards: i64 =
+        sqlx::query_scalar("SELECT count(*) FROM card WHERE tenant_id = $1 AND board_id = $2")
+            .bind(fixture.tenant.as_uuid())
+            .bind(board)
+            .fetch_one(&mut *tx)
+            .await
+            .expect("cards");
+    let runs: i64 =
+        sqlx::query_scalar("SELECT count(*) FROM run WHERE tenant_id = $1 AND card_id = $2")
+            .bind(fixture.tenant.as_uuid())
+            .bind(card_id)
+            .fetch_one(&mut *tx)
+            .await
+            .expect("runs");
+    tx.commit().await.expect("commit");
+    assert_eq!(cards, 1, "one case is one card");
+    assert_eq!(runs, 1, "one case is one process run");
+    let (_, attempts) = process_case_row(&db, &fixture).await;
+    assert_eq!(attempts, 1, "waiting spends no producer attempt");
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 4)]
+async fn a_not_ready_process_is_no_attempt_not_a_retried_job() {
+    let _serial = SERIAL.lock().await;
+    let db = common::TestDb::fresh().await;
+    let fixture = process_fixture(&db, "The process cannot start.", "retired").await;
+
+    produce(
+        &db.runtime,
+        fixture.tenant,
+        "conveyor",
+        &process_payload(&fixture),
+    )
+    .await
+    .expect("a typed refusal finishes the job");
+
+    let (produce_status, attempts) = process_case_row(&db, &fixture).await;
+    assert_eq!(
+        produce_status, "no_attempt",
+        "an unready binding is withheld, never graded"
+    );
+    assert_eq!(
+        attempts, 1,
+        "the start attempt was spent before the refusal"
+    );
+}
+
 #[tokio::test(flavor = "multi_thread", worker_threads = 4)]
 async fn the_baseline_arm_fetches_the_source_and_records_a_patch() {
     let _serial = SERIAL.lock().await;
