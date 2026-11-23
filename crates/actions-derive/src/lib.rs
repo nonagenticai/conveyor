@@ -253,6 +253,10 @@ fn variant_path(kind: &str, value: &str) -> syn::Result<String> {
         // administration like `departments:write`.
         ("scope", "organisation:read") => "OrganisationRead",
         ("scope", "organisation:write") => "OrganisationWrite",
+        // T5. The kata's pair: a read is open, a write is work on the tenant's own improvement
+        // record (member and the kata executor) — adoption stays P3's separate human gate.
+        ("scope", "kata:read") => "KataRead",
+        ("scope", "kata:write") => "KataWrite",
         (kind, other) => {
             return Err(syn::Error::new(
                 proc_macro2::Span::call_site(),

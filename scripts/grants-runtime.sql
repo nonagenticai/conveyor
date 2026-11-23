@@ -71,3 +71,8 @@ REVOKE UPDATE, DELETE ON tool_call FROM conveyor_runtime;
 -- never erased (the card and the interruption carry the history). UPDATE and DELETE are withheld
 -- from the runtime role, so an application bug cannot rewrite what the coach decided.
 REVOKE UPDATE, DELETE ON coach_remedy FROM conveyor_runtime;
+
+-- T5 (0064): the six Gets and the held-out measurement are the kata's evidence. A Get is written
+-- once and the measurement is the number a person adopts against; UPDATE and DELETE are withheld
+-- so an application bug cannot rewrite either (the `kata` row carries the mutable stage).
+REVOKE UPDATE, DELETE ON kata_get, kata_measurement FROM conveyor_runtime;

@@ -304,11 +304,18 @@ pub enum Scope {
     OrganisationRead,
     /// Create and change industries, jobs, releases and bindings.
     OrganisationWrite,
+    // T5 (SPEC_V2 §6.3, §9.3–§9.4; issue #77): the kata. A read is open; a write is work on the
+    // tenant's own improvement record (a member's and the kata executor's), not platform
+    // administration — adoption is P3's separate, human-only gate.
+    /// Read a kata, its six Gets and its measurement.
+    KataRead,
+    /// Open a kata and record its Gets and its held-out measurement.
+    KataWrite,
 }
 
 impl Scope {
     /// Every scope this build knows.
-    pub const ALL: [Scope; 70] = [
+    pub const ALL: [Scope; 72] = [
         Scope::ActionsRead,
         Scope::ActionsWrite,
         Scope::MeRead,
@@ -378,6 +385,8 @@ impl Scope {
         Scope::CapabilitiesWrite,
         Scope::OrganisationRead,
         Scope::OrganisationWrite,
+        Scope::KataRead,
+        Scope::KataWrite,
         Scope::OpsWrite,
     ];
 
@@ -454,6 +463,8 @@ impl Scope {
             Self::CapabilitiesWrite => "capabilities:write",
             Self::OrganisationRead => "organisation:read",
             Self::OrganisationWrite => "organisation:write",
+            Self::KataRead => "kata:read",
+            Self::KataWrite => "kata:write",
         }
     }
 
@@ -511,7 +522,8 @@ impl Scope {
             | Self::WorkflowsRead
             | Self::CapabilitiesRead
             | Self::ToolsRead
-            | Self::OrganisationRead => true,
+            | Self::OrganisationRead
+            | Self::KataRead => true,
             Self::RunsWrite
             | Self::ApprovalsWrite
             | Self::AndonWrite
@@ -530,7 +542,8 @@ impl Scope {
             | Self::EvalsRead
             | Self::EvalsWrite
             | Self::WorkflowsWrite
-            | Self::CapabilitiesWrite => member,
+            | Self::CapabilitiesWrite
+            | Self::KataWrite => member,
             Self::ChannelsWrite
             | Self::CataloguesWrite
             | Self::ActionsWrite
@@ -1057,7 +1070,7 @@ mod tests {
         assert_eq!(Scope::OrganisationRead.as_str(), "organisation:read");
         assert_eq!(Scope::OrganisationWrite.as_str(), "organisation:write");
         assert_eq!(Scope::OpsWrite.as_str(), "ops:write");
-        assert_eq!(Scope::ALL.len(), 70);
+        assert_eq!(Scope::ALL.len(), 72);
     }
 
     #[test]
