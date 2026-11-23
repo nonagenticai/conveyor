@@ -634,3 +634,58 @@ in a child's prompt; no UI; no PDDL storage; no second compiler; no migration.
 `crates/actions/tests/process_agent_resolved.rs` / `crates/store/tests/run_memory.rs` (the process
 attempt reaches the next prompt). The scenarios are issue #612 P1–P3; the receipt is
 `docs/evidence/S21-MEMORY.md`.
+
+## 19. Build record — step 7: the run's episodic memory (2026-11-23, issue #612)
+
+**Built and merged.** PR #615 merged as `0617dd60`: the run's own prior steps render in the one
+Memory section before the card's hot rows and the digest
+(`[step/<status>#<position>.<attempt>]`, whole bodies, a measured refusal over budget);
+`memory.recall`'s hot excludes `digest`; the process attempt is proved to reach the next run's
+prompt (the writer is #599's). ADR 0015, CONTRACT §25, DATA-ARCH §2.27; receipt
+`docs/evidence/S21-MEMORY.md`. Measured at the head: domain `prompt_memory` **8**, store
+`prompt_catalogue` **5**, store `memory` **4**, actions `process_agent_resolved` **5**; regressions
+`internal_agent_runtime` 16 (+2 ignored), `prompt_compile` 7, `prompt_recipes` 7,
+`agent_run_resolved` 15, `process_step` 20, `decision_ladder` 7, `draft_apply` 7, `s11_process` 14;
+three reversal proofs fired; `--check-lock` exit 0. Rework `v1-p45-1` and `v1-p76-2` are cleared.
+**No migration.**
+
+## 20. Build plan — step 8: the Request source (2026-11-23, issue #624)
+
+**Why this step.** §4.5's four sources are Knowledge, Memory, Request and Tools; steps 3–7 built
+Knowledge, Memory and Tools, and the **Request is still synthesized rather than declared**.
+`read_step` (`crates/store/src/prompt.rs`) selects position/attempt/action/node_id and joins
+`on_result` only, so the resolved `run_step.input`, the frozen `process_step.outputs` and
+`action_text`, and the step's gate never reach the prompt. The model reads `current step: N
+(agent.run)` and is never told the arguments it must act on or the artifact it must produce; laya's
+case input on the process path sees the resolved input but not the declaration, and on the run-level
+path sees no request at all. This step makes the declared step one **request document** for both
+consumers.
+
+**P1 — the request facts and their render.** `StepFacts` gains `action_text`, `input` (resolved),
+`outputs` (declared) and `gate`; one pure `step_request` builds
+`{step, action, action_text, input, outputs, on_result, gate}` and the process section renders it as
+labelled data after the current-step line. The store reads `run_step.input` and the joined
+`process_step` columns in one read; only a process-driven step contributes them — a synthetic
+run-level `agent.run` step contributes none of its executor envelope and keeps the release
+definition as its request. Whole values; the section budget refuses with the measurement. No
+migration: `run_step.input` is written at claim and `process_step.outputs`/`action_text` exist.
+
+**P2 — the judge receives the same document.** The process judge passes the request document as its
+`case_input` (today only `row.input`), and the run-level `internal_agent` judge gains the release
+request built by one shared helper with `request_facts`. L1 and L2 cannot disagree about what was
+asked.
+
+**P3 — provenance.** The request is inside the compiled text, so `prompt_sha256` covers it; a change
+to the resolved input alone moves the hash and the `inference_call` records it; identical facts
+compile byte-identically.
+
+**Out of this step.** No card-driven run creation; no `memory.remember` write-back; no automatic
+apply of an L1-accepted draft; no budget mechanism (the #526 lane's); no prompt-budget authoring
+(`v1-p77-2`); no NULL-hash guard (`v1-p77-1`); no release pinning (`v1-p42-1`); no workflow-node
+request (a `run_step` with no `process_step_id`); no parent-run memory; no UI; no PDDL storage; no
+second compiler; no migration.
+
+**Acceptance.** New `crates/domain/tests/prompt_request.rs`; extended
+`crates/store/tests/prompt_catalogue.rs`, `crates/actions/tests/process_agent_resolved.rs` and
+`crates/actions/tests/internal_agent_runtime.rs`. The scenarios are issue #624 P1–P3; the receipt is
+`docs/evidence/S21-REQUEST.md`.

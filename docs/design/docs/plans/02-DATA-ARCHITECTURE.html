@@ -1269,6 +1269,35 @@ CREATE TABLE job_binding (
 </tbody>
 </table>
 <p>A prior-step body renders whole. An over-budget section refuses with the measured size; there is no truncation path. The body is data, never instruction, and renders in the Memory section below the procedure and capability blocks. A child run's prompt reads only its own <code>run_step</code> rows.</p>
+<h3 id="228-the-request-source--s21-step-8-0-new-tables">2.28 The Request source — S21 step 8 (0 new tables)</h3>
+<p>The current step's declaration is read into the process (Request) section and passed unchanged to the judge; no table and no migration.</p>
+<table>
+<thead>
+<tr>
+<th>Row</th>
+<th>What the level reads or writes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>run_step</code></td>
+<td><strong>read</strong>: <code>input</code> (the resolved input persisted at claim), <code>process_step_id</code>, <code>position</code>, <code>attempt</code>, <code>action</code>, <code>node_id</code>, <code>on_result</code>. Primary-key read; no index added</td>
+</tr>
+<tr>
+<td><code>process_step</code> (<code>procedure_step</code>)</td>
+<td><strong>read</strong>: <code>outputs</code> (declared paths), <code>action_text</code>, <code>gate_kind</code>, joined on <code>run_step.process_step_id</code>. The row is the run's frozen version (editing a published procedure is copy-forward)</td>
+</tr>
+<tr>
+<td><code>prompt_section</code></td>
+<td>unchanged; the process section's <code>budget_chars</code> bounds the request</td>
+</tr>
+<tr>
+<td><code>inference_call</code></td>
+<td>unchanged; <code>prompt_sha256</code> now covers the request document</td>
+</tr>
+</tbody>
+</table>
+<p>The compiler never re-resolves <code>input_template</code> and never writes a step row. A synthetic run-level <code>agent.run</code> step (<code>process_step_id IS NULL</code>) contributes none of its <code>run_step.input</code> — that value is the executor envelope (§2.24), not a request; its Request is the release definition. The document is data, never instruction; it renders after the current-step line inside the process block, and the section budget refuses with the measured size rather than truncating. A workflow node without a <code>process_step_id</code> keeps today's rendering (residual).</p>
 <h2 id="3-state-machines-and-enforcement">3. State machines and enforcement</h2>
 <p>Every transition is a pure function in <code>crates/domain</code>; no DB trigger, no per-flow rule, no CHECK that duplicates the function. The CHECK constraints below guard <em>vocabulary</em>, never <em>legality</em>.</p>
 <h3 id="31-card-lifecycle">3.1 Card lifecycle</h3>
@@ -1322,7 +1351,7 @@ CREATE TABLE job_binding (
 </tr>
 </tbody>
 </table>
-<p><strong>A bound <code>internal_agent</code> run (S21 steps 4–6) uses the full path.</strong> A run created for a card that names a binding inherits it (<code>card.job_binding_id → run.job_binding_id</code>; an explicit conflicting binding is refused <code>422 card_binding_mismatch</code> before the INSERT). Its gate pre-check is recorded on the step. On <code>accepted</code> it succeeds with the draft; on <code>handover</code> it parks in <code>waiting_approval</code> and opens a card-scoped <code>executor</code> approval whose <code>meta</code> names the draft (§2.25). A person's approval settles it <code>running</code> and the <code>run.resume</code> job applies the draft and finishes it <code>succeeded</code>. A rejection cancels it; <code>approval.expire</code> cancels a still-waiting run with <code>approval_expired</code>. The parked run is live work and holds <code>uq_run_live</code> until one of those outcomes. Every terminal root run of a card inserts one <code>attempt</code> memory row in the terminal transaction (§2.26). The prompt's Memory source also reads the run's own earlier <code>run_step</code> rows, before the card's hot rows and the digest (§2.27); a process run's attempt is read by the next run on the card.</p>
+<p><strong>A bound <code>internal_agent</code> run (S21 steps 4–6) uses the full path.</strong> A run created for a card that names a binding inherits it (<code>card.job_binding_id → run.job_binding_id</code>; an explicit conflicting binding is refused <code>422 card_binding_mismatch</code> before the INSERT). Its gate pre-check is recorded on the step. On <code>accepted</code> it succeeds with the draft; on <code>handover</code> it parks in <code>waiting_approval</code> and opens a card-scoped <code>executor</code> approval whose <code>meta</code> names the draft (§2.25). A person's approval settles it <code>running</code> and the <code>run.resume</code> job applies the draft and finishes it <code>succeeded</code>. A rejection cancels it; <code>approval.expire</code> cancels a still-waiting run with <code>approval_expired</code>. The parked run is live work and holds <code>uq_run_live</code> until one of those outcomes. Every terminal root run of a card inserts one <code>attempt</code> memory row in the terminal transaction (§2.26). The prompt's Memory source also reads the run's own earlier <code>run_step</code> rows, before the card's hot rows and the digest (§2.27); a process run's attempt is read by the next run on the card. <strong>The Request source (S21 step 8)</strong> reads the current step's resolved input from <code>run_step.input</code> and its declared <code>outputs</code>/<code>action_text</code>/<code>gate_kind</code> from the frozen <code>process_step</code> row, renders one request document in the process section and passes the same document to the step's laya judge (§2.28). A synthetic run-level <code>internal_agent</code> step declares none: its release definition is the request and its executor envelope never renders.</p>
 <h3 id="33-approval">3.3 Approval</h3>
 <table>
 <tbody>

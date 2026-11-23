@@ -96,10 +96,10 @@ window.ArchitecturePack = (function () {
     B-->>WF: 409 job_binding_stale / unknown_executor_kind
     WF-->>P: refused before any model call
   else pinned release
-    WF->>PC: compile the step
+    WF->>PC: compile the step with its declaration (action, action_text, resolved input, outputs, gate)
     PC->>KM: knowledge pins, the run's prior steps, then the card's hot rows and one digest
     KM-->>PC: selected sources, their ids and prompt_sha256
-    Note over PC,KM: prior steps render as [step/status#position.attempt] with whole bodies;<br/>a measured refusal over budget — never a truncated one
+    Note over PC,KM: the Request is one document, rendered after the current step and passed<br/>unchanged to laya — prior steps render with whole bodies, a measured refusal over budget
     opt procedure executor
       PC-->>WF: PDDL action
       WF->>BR: tools.call when the step names a tool
@@ -108,7 +108,7 @@ window.ArchitecturePack = (function () {
     opt internal_agent executor
       PC-->>R: generation over the compiled envelope
       R-->>WF: unattached draft artefact
-      WF->>L: gate.precheck over the draft
+      WF->>L: gate.precheck over the draft, with the same request document as case input
       L-->>WF: answer and confidence
     end
     opt gate requires approval
@@ -125,7 +125,8 @@ window.ArchitecturePack = (function () {
     WF->>KM: one attempt hot row, in the terminal transaction (root card runs)
     WF->>EV: run, step, tool_call and inference_call rows
     WF-->>P: terminal result
-  end`,
+  end
+  `,
     "broker-sequence": `sequenceDiagram
   autonumber
   participant EX as Executor
