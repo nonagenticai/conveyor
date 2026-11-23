@@ -483,8 +483,8 @@ async fn tranche_review_persists_decision_and_evidence() {
     // #283: the gate fires before the handler, so the refusal under test is reached through one.
     let (status, refused) = running
         .invoke_gated(
-            &_pg,
-            _seeded.tenant,
+            &pg,
+            seeded.tenant,
             "tranches.delete",
             "dev:alice",
             json!({"id": tranche}),
