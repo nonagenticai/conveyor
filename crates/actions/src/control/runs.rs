@@ -154,10 +154,29 @@ async fn runs_create(
     input: RunCreateIn,
 ) -> Result<HandlerOutput<RunOut>, ActionError> {
     let action = "runs.create";
-    let card = store::card::get_card_tx(&mut *tx, ctx.tenant, input.card_id)
+    let record = store::card::get_card_record_tx(&mut *tx, ctx.tenant, input.card_id)
         .await
         .map_err(|error| store_error(error, action))?
         .ok_or_else(|| ActionError::resource_not_found("card"))?;
+    let card = record.card;
+    // SPEC_V2 §4.4 / S21 step 6: the card names the job. A run created for a bound card
+    // executes under that binding; a request that names a different binding is refused rather
+    // than silently overriding the assignment.
+    let job_binding_id = match (input.job_binding_id, record.job_binding_id) {
+        (Some(requested), Some(on_card)) if requested != on_card => {
+            return Err(ActionError::new(
+                422,
+                "card_binding_mismatch",
+                format!(
+                    "card {} is assigned to job binding {on_card}; the run request names \
+                     {requested} — a run executes under its card's assignment",
+                    card.id
+                ),
+            ));
+        }
+        (Some(requested), _) => Some(requested),
+        (None, on_card) => on_card,
+    };
     let board = store::board::get_board_tx(&mut *tx, ctx.tenant, card.board_id)
         .await
         .map_err(|error| store_error(error, action))?
@@ -225,8 +244,9 @@ async fn runs_create(
             process_version: 1,
             // T0: a run may name the organisation binding (and the release it claims) it
             // executes under. The store refuses a retired binding or a stale pin 409 before
-            // the INSERT (SPEC_V2 §4.4).
-            job_binding_id: input.job_binding_id,
+            // the INSERT (SPEC_V2 §4.4). S21 step 6: a card's own binding is inherited when
+            // the request omits one.
+            job_binding_id,
             release_hash: input.release_hash.clone(),
         },
     )

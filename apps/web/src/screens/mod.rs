@@ -31,3 +31,4 @@ pub mod search;
 pub mod sign_in;
 pub mod today;
 pub mod usage;
+pub mod v2;

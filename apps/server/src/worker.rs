@@ -1099,7 +1099,7 @@ async fn run_reap(pool: &PgPool, tenant: TenantId) -> Result<(), JobFailure> {
     let mut tx = store::begin_scoped(pool, tenant).await.map_err(retryable)?;
     let reaped = store::run::reap_dead_runs_tx(&mut tx, tenant)
         .await
-        .map_err(retryable)?;
+        .map_err(run_failure)?;
     for (run_id, _dead_job_id) in reaped {
         let attempt = match store::run::get_run_tx(&mut tx, tenant, run_id)
             .await
@@ -1134,7 +1134,7 @@ async fn run_reap(pool: &PgPool, tenant: TenantId) -> Result<(), JobFailure> {
     // `running` forever and hold `uq_run_live` on its card.
     let reaped = store::process::reap_dead_process_runs_tx(&mut tx, tenant)
         .await
-        .map_err(retryable)?;
+        .map_err(run_failure)?;
     for reaped in reaped {
         tracing::warn!(
             run = %reaped.run_id,
@@ -2613,6 +2613,12 @@ fn process_gate_failure(failure: conveyor_actions::process::step::StepFailure) -
 fn run_failure(error: store::run::RunStoreError) -> JobFailure {
     match error {
         store::run::RunStoreError::Database(error) => {
+            JobFailure::retryable(format!("database: {error}"))
+        }
+        // The terminal memory insert commits in the same transaction as the terminal status.
+        // A transient database refusal there must retry the whole sweep, not permanently fail
+        // it and strand the run live (holding `uq_run_live`) with no row.
+        store::run::RunStoreError::Memory(store::memory::MemoryStoreError::Database(error)) => {
             JobFailure::retryable(format!("database: {error}"))
         }
         other => JobFailure::permanent(other.to_string()),
