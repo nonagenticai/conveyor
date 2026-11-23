@@ -36,11 +36,35 @@
       "card_id": "01a1ffe9-557f-7390-bc56-8d70f35106c5",
       "severity": "P0"
     },
+    "dr-w3-action-registry-projection-1:PLATFORM": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-23T10:24:27+00:00",
+      "card_id": "01a207ef-8746-7bf5-90bf-8e4c9f9ba7a7",
+      "severity": "P2"
+    },
     "dr-w3-gov-assets-1:T10": {
       "apply_to": "PLATFORM",
       "at": "2026-11-23T09:24:59+00:00",
       "card_id": "01a207b9-12c6-7e14-a2b8-86b7771ab0d8",
       "severity": "P1"
+    },
+    "dr-w3-licensing-frame-1:PLATFORM": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-23T10:24:28+00:00",
+      "card_id": "01a207ef-878a-7b15-90c9-a61cda068cf7",
+      "severity": "P2"
+    },
+    "dr-w3-standard-register-fields-1:PLATFORM": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-23T10:24:28+00:00",
+      "card_id": "01a207ef-87ce-7ab6-b60f-bc85f8dc8d55",
+      "severity": "P2"
+    },
+    "dr-w3-verdict-t18-1:programme": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-23T10:24:28+00:00",
+      "card_id": "01a207ef-88e4-7995-afea-f3f1ff0e23c2",
+      "severity": "P2"
     },
     "pi_plan_missing:tranche-2": {
       "apply_to": "PLATFORM",
@@ -102,6 +126,18 @@
       "card_id": "01a207b9-148b-76ef-b1a8-a2e383d9036c",
       "severity": "P1"
     },
+    "v1-p102-1:T2": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-23T10:24:28+00:00",
+      "card_id": "01a207ef-8928-7c72-af39-9bdc179a24b6",
+      "severity": "P2"
+    },
+    "v1-p102-2:T7": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-23T10:24:28+00:00",
+      "card_id": "01a207ef-896c-7097-9bf3-f716a1a861dd",
+      "severity": "P2"
+    },
     "v1-p112-1:PLATFORM": {
       "apply_to": "PLATFORM",
       "at": "2026-11-23T09:24:59+00:00",
@@ -114,6 +150,18 @@
       "card_id": "01a207b9-150a-7092-8d04-06e34b5ef782",
       "severity": "P1"
     },
+    "v1-p118-1:PLATFORM": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-23T10:24:28+00:00",
+      "card_id": "01a207ef-89be-701c-9bec-44bda396b75f",
+      "severity": "P2"
+    },
+    "v1-p118-2:T13": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-23T10:24:28+00:00",
+      "card_id": "01a207ef-8a04-77b7-9af2-2e69b40f593d",
+      "severity": "P2"
+    },
     "v1-p119-1:T5": {
       "apply_to": "T5",
       "at": "2026-11-23T09:24:59+00:00",
@@ -125,6 +173,12 @@
       "at": "2026-11-23T09:25:00+00:00",
       "card_id": "01a207b9-166e-7eea-8092-99970253a994",
       "severity": "P1"
+    },
+    "v1-p46-1:T0": {
+      "apply_to": "T0",
+      "at": "2026-11-23T10:24:28+00:00",
+      "card_id": "01a207ef-8ac2-7846-9cdf-a5b87ef22dd6",
+      "severity": "P2"
     },
     "v1-p5-1:PLATFORM": {
       "apply_to": "PLATFORM",
@@ -156,6 +210,30 @@
       "card_id": "01a207b9-1731-7571-9735-c61717e8a2c2",
       "severity": "P1"
     },
+    "v1-p55-1:T1": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-23T10:24:28+00:00",
+      "card_id": "01a207ef-8b06-79d1-95f4-72265275a703",
+      "severity": "P2"
+    },
+    "v1-p56-1:T16": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-23T10:24:29+00:00",
+      "card_id": "01a207ef-8b49-7230-a019-14e34508562e",
+      "severity": "P2"
+    },
+    "v1-p56-2:T16": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-23T10:24:29+00:00",
+      "card_id": "01a207ef-8b8f-7613-a9c9-a998abf36e7d",
+      "severity": "P2"
+    },
+    "v1-p57-1:T17": {
+      "apply_to": "T17",
+      "at": "2026-11-23T10:24:29+00:00",
+      "card_id": "01a207ef-8c81-7147-8a55-0fbb7829d237",
+      "severity": "P2"
+    },
     "v1-p6-1:T4": {
       "apply_to": "PLATFORM",
       "at": "2026-11-21T21:01:55+00:00",
@@ -173,6 +251,12 @@
       "at": "2026-11-23T09:25:00+00:00",
       "card_id": "01a207b9-1771-7cdc-88a9-848659b82976",
       "severity": "P1"
+    },
+    "v1-p61-2:T3": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-23T10:24:29+00:00",
+      "card_id": "01a207ef-8cc3-7602-8412-76a94b8e713a",
+      "severity": "P2"
     },
     "v1-p66-1:T0": {
       "apply_to": "T0",
@@ -192,11 +276,29 @@
       "card_id": "01a207b9-17f4-73f9-bad7-6284f90be6f1",
       "severity": "P1"
     },
+    "v1-p75-6:T11": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-23T10:24:29+00:00",
+      "card_id": "01a207ef-8d06-7602-a861-70d69f0efc1f",
+      "severity": "P2"
+    },
     "v1-p76-1:PLATFORM": {
       "apply_to": "PLATFORM",
       "at": "2026-11-23T09:25:00+00:00",
       "card_id": "01a207b9-1834-7fcc-afc2-ab938883ec84",
       "severity": "P1"
+    },
+    "v1-p76-2:PLATFORM": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-23T10:24:29+00:00",
+      "card_id": "01a207ef-8d4a-719a-8edb-9bac4658f763",
+      "severity": "P2"
+    },
+    "v1-p77-2:PLATFORM": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-23T10:24:29+00:00",
+      "card_id": "01a207ef-8db9-7b33-9e86-dbc1b2e7e335",
+      "severity": "P2"
     },
     "v1-p81-1:T9": {
       "apply_to": "PLATFORM",
@@ -228,11 +330,29 @@
       "card_id": "01a207b9-2094-7170-9b51-0dabf24a9c44",
       "severity": "P1"
     },
+    "v1-p81-6:T9": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-23T10:24:30+00:00",
+      "card_id": "01a207ef-9028-7516-bef7-7cf930ce300d",
+      "severity": "P2"
+    },
     "v1-p82-1:T10": {
       "apply_to": "PLATFORM",
       "at": "2026-11-21T21:01:59+00:00",
       "card_id": "01a1ffea-79b1-79e3-bfef-b22726135492",
       "severity": "P0"
+    },
+    "v1-p82-5:T10": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-23T10:24:28+00:00",
+      "card_id": "01a207ef-8858-74c5-a084-a3235605ceb3",
+      "severity": "P2"
+    },
+    "v1-p82-6:T10": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-23T10:24:28+00:00",
+      "card_id": "01a207ef-889d-7cf9-8ffe-a7e45b4cefd7",
+      "severity": "P2"
     },
     "v1-p83-1:T10": {
       "apply_to": "PLATFORM",
@@ -257,6 +377,12 @@
       "at": "2026-11-23T09:24:59+00:00",
       "card_id": "01a207b9-13c6-7846-9963-ccc68d7acf79",
       "severity": "P1"
+    },
+    "v1-p83-6:T10": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-23T10:24:28+00:00",
+      "card_id": "01a207ef-8813-7d94-81c6-6abb0c69e942",
+      "severity": "P2"
     },
     "v1-p91-1:T6": {
       "apply_to": "T6",
@@ -287,6 +413,12 @@
       "at": "2026-11-21T21:02:27+00:00",
       "card_id": "01a1ffea-e7c0-7e2f-b3c0-ecf72a9eb689",
       "severity": "P0"
+    },
+    "v1-s03-2:S03": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-23T10:24:29+00:00",
+      "card_id": "01a207ef-8e08-77ca-933a-8d3757372a5e",
+      "severity": "P2"
     },
     "v1-s05-1:S05": {
       "apply_to": "PLATFORM",
@@ -354,11 +486,23 @@
       "card_id": "01a207ba-2418-7549-9037-6126bb368854",
       "severity": "P1"
     },
+    "v1-std-investment-appraisal:PLATFORM": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-23T10:24:27+00:00",
+      "card_id": "01a207ef-86ff-717f-a30d-e70e86a9e82c",
+      "severity": "P1"
+    },
     "v1-std-token-kpi:PLATFORM": {
       "apply_to": "PLATFORM",
       "at": "2026-11-23T09:26:09+00:00",
       "card_id": "01a207ba-245e-7a5d-bb34-2305f0823167",
       "severity": "P1"
+    },
+    "v1-u5a-tool-idempotency-publish-1:T13": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-23T10:24:29+00:00",
+      "card_id": "01a207ef-8e4b-7d69-9e2b-e3f25c84f3d4",
+      "severity": "P2"
     },
     "v1-w1a-2:T0": {
       "apply_to": "T0",
@@ -402,6 +546,18 @@
       "card_id": "01a1ffeb-1c16-76f9-be67-5dea3016b303",
       "severity": "P0"
     },
+    "v1-w1c-5:T2": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-23T10:24:29+00:00",
+      "card_id": "01a207ef-8e92-795b-b6f7-d2b0d9d5367b",
+      "severity": "P2"
+    },
+    "v1-w1c-6:T11": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-23T10:24:29+00:00",
+      "card_id": "01a207ef-8ed4-753c-a8f0-43ea749a1d96",
+      "severity": "P2"
+    },
     "v1-w2a-3:T9": {
       "apply_to": "PLATFORM",
       "at": "2026-11-23T09:25:02+00:00",
@@ -413,6 +569,12 @@
       "at": "2026-11-23T09:25:02+00:00",
       "card_id": "01a207b9-2116-7024-abf2-2392ba34112f",
       "severity": "P1"
+    },
+    "v1-w2a-6:T9": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-23T10:24:30+00:00",
+      "card_id": "01a207ef-906d-767a-b85d-0d360edb0657",
+      "severity": "P2"
     },
     "v1-w2b-2:T10": {
       "apply_to": "PLATFORM",
@@ -456,6 +618,12 @@
       "card_id": "01a207b9-1e66-74f6-8101-cb358390553a",
       "severity": "P1"
     },
+    "v1-w3b-6:PLATFORM": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-23T10:24:29+00:00",
+      "card_id": "01a207ef-8f17-7dfe-a9d6-4fd32d02f4c5",
+      "severity": "P2"
+    },
     "v1-w3c-2:T14": {
       "apply_to": "PLATFORM",
       "at": "2026-11-23T09:25:02+00:00",
@@ -467,6 +635,12 @@
       "at": "2026-11-23T09:25:02+00:00",
       "card_id": "01a207b9-1f94-71be-a639-cdb9de27e989",
       "severity": "P1"
+    },
+    "v1-w3c-6:T3": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-23T10:24:30+00:00",
+      "card_id": "01a207ef-8f5c-7f78-bb22-994bd449ee72",
+      "severity": "P2"
     },
     "v1-w4a-1:T13": {
       "apply_to": "PLATFORM",
@@ -491,6 +665,18 @@
       "at": "2026-11-23T09:25:02+00:00",
       "card_id": "01a207b9-2013-7ed9-a6eb-ed90f51b87f6",
       "severity": "P1"
+    },
+    "v1-w4b-5:T11": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-23T10:24:30+00:00",
+      "card_id": "01a207ef-8f9e-7404-8998-80d60d7f2fb0",
+      "severity": "P2"
+    },
+    "v1-w4b-6:T11": {
+      "apply_to": "PLATFORM",
+      "at": "2026-11-23T10:24:30+00:00",
+      "card_id": "01a207ef-8fdf-7883-a106-59d8fb2638d6",
+      "severity": "P2"
     }
   },
   "cleared": [
@@ -516,10 +702,13 @@
     "v1-w4a-1:T13",
     "v1-w4a-2:T13",
     "v1-p83-3:T10",
-    "v1-s10-2:S10"
+    "v1-s10-2:S10",
+    "dr-w3-gov-assets-1:T10",
+    "v1-p81-4:T9",
+    "v1-s08-1:S08"
   ],
   "failures": [],
   "schema": "conveyor-rework-apply/v1",
   "tenant": "nonagentic",
-  "updated_at": "2026-11-23T09:42:50+00:00"
+  "updated_at": "2026-11-23T10:24:30+00:00"
 }

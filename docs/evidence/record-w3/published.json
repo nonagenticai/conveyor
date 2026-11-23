@@ -91,6 +91,13 @@
       "version": 1,
       "title": "SAFe Portfolio \u2014 conveyor buildout (retrospective, 2026-11-22)",
       "applied_at": "2026-11-22T20:25:14.184368+00:00"
+    },
+    "safe-art": {
+      "document_id": "01a207f3-38dc-71e6-88d3-69e848360b1e",
+      "body_sha256": "f0e05de25a854eb0ebb69e59fbeb5bad4a3801ee915b7ec7c9ed29338a045a0a",
+      "version": 1,
+      "title": "SAFe ART \u2014 conveyor buildout (retrospective, 2026-11-23)",
+      "applied_at": "2026-11-23T10:28:30.301061+00:00"
     }
   }
 }
