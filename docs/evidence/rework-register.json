@@ -4285,6 +4285,440 @@
       "title": "Declare and publish the project's closure outputs"
     },
     {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --deep-review docs/evidence/record-w3/deep-review-findings.json --rework-check dr-w4-prog-blueprint-registry:PLATFORM",
+      "apply_to": "PLATFORM",
+      "artefact": "code",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "The action registry and data model section resolves from a projected registry (the served actions, tables, invariants and events) or the standard names the record that would satisfy it; the published blueprint carries counts and names, not a bare statement of absence.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "path": "docs/evidence/record-w4/deep-review-findings.json",
+              "quote": "The section says the record carries no items and cites no source; actions, tables, invariants and events are absent from a mandatory TOGAF artefact. The served action registry is not projected into the snapshot the template reads.",
+              "source": "deep-review"
+            }
+          ],
+          "rule": "dr-w4-prog-blueprint-registry",
+          "source": "audit"
+        }
+      ],
+      "key": "dr-w4-prog-blueprint-registry:PLATFORM",
+      "kind": "STANDARD",
+      "owner_project": "PLATFORM",
+      "rule": "dr-w4-prog-blueprint-registry",
+      "scope": "PLATFORM",
+      "severity": "P1",
+      "spec": "\u00a78.3",
+      "standard": "MSP",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The section says the record carries no items and cites no source; actions, tables, invariants and events are absent from a mandatory TOGAF artefact. The served action registry is not projected into the snapshot the template reads.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "path": "docs/evidence/record-w4/deep-review-findings.json",
+                  "quote": "The section says the record carries no items and cites no source; actions, tables, invariants and events are absent from a mandatory TOGAF artefact. The served action registry is not projected into the snapshot the template reads.",
+                  "source": "deep-review"
+                }
+              ],
+              "rule": "dr-w4-prog-blueprint-registry",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P1",
+          "subject": "PLATFORM"
+        }
+      ],
+      "title": "The blueprint's Action registry and data model section has no source"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --deep-review docs/evidence/record-w3/deep-review-findings.json --rework-check dr-w4-prog-blueprint-states:PLATFORM",
+      "apply_to": "PLATFORM",
+      "artefact": "code",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "The states heading resolves from a state description or an explicit absence naming the record; baseline metadata is never presented as the states.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "path": "docs/evidence/record-w4/deep-review-findings.json",
+              "quote": "The heading renders 21 baseline-metadata rows and describes no current, intermediate or target state. A metadata list is not a state description, and the mapping selects the wrong source.",
+              "source": "deep-review"
+            }
+          ],
+          "rule": "dr-w4-prog-blueprint-states",
+          "source": "audit"
+        }
+      ],
+      "key": "dr-w4-prog-blueprint-states:PLATFORM",
+      "kind": "STANDARD",
+      "owner_project": "PLATFORM",
+      "rule": "dr-w4-prog-blueprint-states",
+      "scope": "PLATFORM",
+      "severity": "P1",
+      "spec": "\u00a78.3",
+      "standard": "MSP",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The heading renders 21 baseline-metadata rows and describes no current, intermediate or target state. A metadata list is not a state description, and the mapping selects the wrong source.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "path": "docs/evidence/record-w4/deep-review-findings.json",
+                  "quote": "The heading renders 21 baseline-metadata rows and describes no current, intermediate or target state. A metadata list is not a state description, and the mapping selects the wrong source.",
+                  "source": "deep-review"
+                }
+              ],
+              "rule": "dr-w4-prog-blueprint-states",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P1",
+          "subject": "PLATFORM"
+        }
+      ],
+      "title": "The blueprint's Current, intermediate and target states section renders baseline metadata only"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --deep-review docs/evidence/record-w3/deep-review-findings.json --rework-check dr-w4-prog-brief-cost:PLATFORM",
+      "apply_to": "PLATFORM",
+      "artefact": "code",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "The heading resolves from a cost/effort/timescale record (or an explicit absence naming it); card counts are not presented as a cost or timescale.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "path": "docs/evidence/record-w4/deep-review-findings.json",
+              "quote": "The heading renders per-project card counts plus one P0 token-ledger row; no programme cost, effort estimate or timescale is stated. The mapping selects operational counts.",
+              "source": "deep-review"
+            }
+          ],
+          "rule": "dr-w4-prog-brief-cost",
+          "source": "audit"
+        }
+      ],
+      "key": "dr-w4-prog-brief-cost:PLATFORM",
+      "kind": "STANDARD",
+      "owner_project": "PLATFORM",
+      "rule": "dr-w4-prog-brief-cost",
+      "scope": "PLATFORM",
+      "severity": "P1",
+      "spec": "\u00a78.3",
+      "standard": "MSP",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The heading renders per-project card counts plus one P0 token-ledger row; no programme cost, effort estimate or timescale is stated. The mapping selects operational counts.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "path": "docs/evidence/record-w4/deep-review-findings.json",
+                  "quote": "The heading renders per-project card counts plus one P0 token-ledger row; no programme cost, effort estimate or timescale is stated. The mapping selects operational counts.",
+                  "source": "deep-review"
+                }
+              ],
+              "rule": "dr-w4-prog-brief-cost",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P1",
+          "subject": "PLATFORM"
+        }
+      ],
+      "title": "The programme brief's Cost, timescale and effort section renders card counts, not cost, effort or timescale"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --deep-review docs/evidence/record-w3/deep-review-findings.json --rework-check dr-w4-prog-business-case-options:PLATFORM",
+      "apply_to": "PLATFORM",
+      "artefact": "code",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "The Options heading maps to an option record (or an explicit absence naming the record that would satisfy it), never to change/approval counts presented as options.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "path": "docs/evidence/record-w4/deep-review-findings.json",
+              "quote": "The Options, including doing nothing heading renders 17 change plus 94 approval rows and states no option set and no doing-nothing case. The source mapping selects operational rows the heading does not describe.",
+              "source": "deep-review"
+            }
+          ],
+          "rule": "dr-w4-prog-business-case-options",
+          "source": "audit"
+        }
+      ],
+      "key": "dr-w4-prog-business-case-options:PLATFORM",
+      "kind": "STANDARD",
+      "owner_project": "PLATFORM",
+      "rule": "dr-w4-prog-business-case-options",
+      "scope": "PLATFORM",
+      "severity": "P1",
+      "spec": "\u00a78.3",
+      "standard": "MSP",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The Options, including doing nothing heading renders 17 change plus 94 approval rows and states no option set and no doing-nothing case. The source mapping selects operational rows the heading does not describe.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "path": "docs/evidence/record-w4/deep-review-findings.json",
+                  "quote": "The Options, including doing nothing heading renders 17 change plus 94 approval rows and states no option set and no doing-nothing case. The source mapping selects operational rows the heading does not describe.",
+                  "source": "deep-review"
+                }
+              ],
+              "rule": "dr-w4-prog-business-case-options",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P1",
+          "subject": "PLATFORM"
+        }
+      ],
+      "title": "The business case's Options section renders change and approval rows, not options"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --deep-review docs/evidence/record-w3/deep-review-findings.json --rework-check dr-w4-prog-business-case-sources:PLATFORM",
+      "apply_to": "PLATFORM",
+      "artefact": "code",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Each of the four headings maps to a named non-empty source (a benefit row, a cost/risk register item, the programme's licensing frame) and the published body carries its facts; the composer refuses the heading when the source resolves to zero rows.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "path": "docs/evidence/record-w4/deep-review-findings.json",
+              "quote": "Each of the four required headings resolves to the business case document itself (01a1e006) and states that the facts carry no further fields, benefit rows or cost/risk rows. A published section that cites no source row is a heading without evidence, and the template's source mapping is what allowed it.",
+              "source": "deep-review"
+            }
+          ],
+          "rule": "dr-w4-prog-business-case-sources",
+          "source": "audit"
+        }
+      ],
+      "key": "dr-w4-prog-business-case-sources:PLATFORM",
+      "kind": "STANDARD",
+      "owner_project": "PLATFORM",
+      "rule": "dr-w4-prog-business-case-sources",
+      "scope": "PLATFORM",
+      "severity": "P1",
+      "spec": "\u00a78.3",
+      "standard": "MSP",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "Each of the four required headings resolves to the business case document itself (01a1e006) and states that the facts carry no further fields, benefit rows or cost/risk rows. A published section that cites no source row is a heading without evidence, and the template's source mapping is what allowed it.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "path": "docs/evidence/record-w4/deep-review-findings.json",
+                  "quote": "Each of the four required headings resolves to the business case document itself (01a1e006) and states that the facts carry no further fields, benefit rows or cost/risk rows. A published section that cites no source row is a heading without evidence, and the template's source mapping is what allowed it.",
+                  "source": "deep-review"
+                }
+              ],
+              "rule": "dr-w4-prog-business-case-sources",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P1",
+          "subject": "PLATFORM"
+        }
+      ],
+      "title": "The business case's Why now, Benefit map, Cost and risk posture and Licensing frame headings publish empty pointers"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --deep-review docs/evidence/record-w3/deep-review-findings.json --rework-check dr-w4-prog-mandate-probe-row:PLATFORM",
+      "apply_to": "PLATFORM",
+      "artefact": "code",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "The probe row is retired or replaced by a real driver with severity, owner and detail in the live record; the mandate and programme-strategies bodies no longer carry it; a query over accepted drivers refuses an empty detail/owner at read time.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "path": "docs/evidence/record-w4/deep-review-findings.json",
+              "quote": "The mandate's Drivers section publishes the row 'schema probe \u2014 delete me' as an accepted driver with no severity, owner or detail, and the same row recurs in programme-strategies / Issue strategy. Test data has reached a published governance artefact.",
+              "source": "deep-review"
+            }
+          ],
+          "rule": "dr-w4-prog-mandate-probe-row",
+          "source": "audit"
+        }
+      ],
+      "key": "dr-w4-prog-mandate-probe-row:PLATFORM",
+      "kind": "RECORD",
+      "owner_project": "PLATFORM",
+      "rule": "dr-w4-prog-mandate-probe-row",
+      "scope": "PLATFORM",
+      "severity": "P1",
+      "spec": "\u00a78.3",
+      "standard": "MSP",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The mandate's Drivers section publishes the row 'schema probe \u2014 delete me' as an accepted driver with no severity, owner or detail, and the same row recurs in programme-strategies / Issue strategy. Test data has reached a published governance artefact.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "path": "docs/evidence/record-w4/deep-review-findings.json",
+                  "quote": "The mandate's Drivers section publishes the row 'schema probe \u2014 delete me' as an accepted driver with no severity, owner or detail, and the same row recurs in programme-strategies / Issue strategy. Test data has reached a published governance artefact.",
+                  "source": "deep-review"
+                }
+              ],
+              "rule": "dr-w4-prog-mandate-probe-row",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P1",
+          "subject": "PLATFORM"
+        }
+      ],
+      "title": "A published driver is the test row 'schema probe \u2014 delete me'"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --deep-review docs/evidence/record-w3/deep-review-findings.json --rework-check dr-w4-prog-risk-owners:PLATFORM",
+      "apply_to": "PLATFORM",
+      "artefact": "code",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every risk row carries an owner and a next-review date, or the row is refused at creation; the published register's Owners and review dates section resolves from those fields with no empty row.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "path": "docs/evidence/record-w4/deep-review-findings.json",
+              "quote": "The programme risk register states that an uncoded risk is refused, yet three risk rows carry no owner and no review date. The register's own rule is not enforced on its rows.",
+              "source": "deep-review"
+            }
+          ],
+          "rule": "dr-w4-prog-risk-owners",
+          "source": "audit"
+        }
+      ],
+      "key": "dr-w4-prog-risk-owners:PLATFORM",
+      "kind": "RECORD",
+      "owner_project": "PLATFORM",
+      "rule": "dr-w4-prog-risk-owners",
+      "scope": "PLATFORM",
+      "severity": "P1",
+      "spec": "\u00a78.3",
+      "standard": "MSP",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The programme risk register states that an uncoded risk is refused, yet three risk rows carry no owner and no review date. The register's own rule is not enforced on its rows.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "path": "docs/evidence/record-w4/deep-review-findings.json",
+                  "quote": "The programme risk register states that an uncoded risk is refused, yet three risk rows carry no owner and no review date. The register's own rule is not enforced on its rows.",
+                  "source": "deep-review"
+                }
+              ],
+              "rule": "dr-w4-prog-risk-owners",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P1",
+          "subject": "PLATFORM"
+        }
+      ],
+      "title": "Three uncoded risks have neither an owner nor a review date"
+    },
+    {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --deep-review docs/evidence/record-w3/deep-review-findings.json --rework-check project_in_unauthorised_tranche:tranche-11",
       "apply_to": "S14",
       "artefact": "tranche_review",
@@ -22920,6 +23354,68 @@
       "title": "programme-risk-register requires Categories and Escalations, which project_register_item does not carry"
     },
     {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --deep-review docs/evidence/record-w3/deep-review-findings.json --rework-check dr-w4-prog-refined-vision-count:PLATFORM",
+      "apply_to": "PLATFORM",
+      "artefact": "code",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "The section's distinct-reference count is computed over distinct ids and equals the distinct set it lists; a unit test asserts the count for a fixture with repeated ids.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "path": "docs/evidence/record-w4/deep-review-findings.json",
+              "quote": "The Changes from the mandate section claims 'fifteen distinct baseline references' while the 17 rows hold 14 distinct ids (01a20279, 01a1fdd8 and 01a1fbb1 each repeat). The distinct-count arithmetic counts rows, not distinct references.",
+              "source": "deep-review"
+            }
+          ],
+          "rule": "dr-w4-prog-refined-vision-count",
+          "source": "audit"
+        }
+      ],
+      "key": "dr-w4-prog-refined-vision-count:PLATFORM",
+      "kind": "RECORD",
+      "owner_project": "PLATFORM",
+      "rule": "dr-w4-prog-refined-vision-count",
+      "scope": "PLATFORM",
+      "severity": "P2",
+      "spec": "\u00a78.3",
+      "standard": "MSP",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The Changes from the mandate section claims 'fifteen distinct baseline references' while the 17 rows hold 14 distinct ids (01a20279, 01a1fdd8 and 01a1fbb1 each repeat). The distinct-count arithmetic counts rows, not distinct references.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "path": "docs/evidence/record-w4/deep-review-findings.json",
+                  "quote": "The Changes from the mandate section claims 'fifteen distinct baseline references' while the 17 rows hold 14 distinct ids (01a20279, 01a1fdd8 and 01a1fbb1 each repeat). The distinct-count arithmetic counts rows, not distinct references.",
+                  "source": "deep-review"
+                }
+              ],
+              "rule": "dr-w4-prog-refined-vision-count",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "PLATFORM"
+        }
+      ],
+      "title": "The refined vision claims fifteen distinct baseline references from fourteen distinct ids"
+    },
+    {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --deep-review docs/evidence/record-w3/deep-review-findings.json --rework-check std-msp-benefit-evaluation-b1:PLATFORM",
       "apply_to": "PLATFORM",
       "artefact": "benefit-evaluation",
@@ -39230,6 +39726,192 @@
         }
       ],
       "title": "PMP enforcement is partial: closure requires only the scope baseline"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --deep-review docs/evidence/record-w3/deep-review-findings.json --rework-check dr-w4-prog-safe-art-intent:PLATFORM",
+      "apply_to": "PLATFORM",
+      "artefact": "code",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "The ART charter resolves from a charter record with an owner, and the solution intent resolves from a solution-intent record (or an explicit absence naming it); neither heading publishes the skeleton sentence as its content.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "path": "docs/evidence/record-w4/deep-review-findings.json",
+              "quote": "Both headings carry the literal skeleton sentence plus raw JSON; the solution intent is a programme summary whose 28 closed plus 19 active equals 47 of 48 projects, and the charter's owner is null. A skeleton sentence beside a JSON block is not evidence of an ART charter or a solution intent.",
+              "source": "deep-review"
+            }
+          ],
+          "rule": "dr-w4-prog-safe-art-intent",
+          "source": "audit"
+        }
+      ],
+      "key": "dr-w4-prog-safe-art-intent:PLATFORM",
+      "kind": "STANDARD",
+      "owner_project": "PLATFORM",
+      "rule": "dr-w4-prog-safe-art-intent",
+      "scope": "PLATFORM",
+      "severity": "P2",
+      "spec": "\u00a78",
+      "standard": "SAFe",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "Both headings carry the literal skeleton sentence plus raw JSON; the solution intent is a programme summary whose 28 closed plus 19 active equals 47 of 48 projects, and the charter's owner is null. A skeleton sentence beside a JSON block is not evidence of an ART charter or a solution intent.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "path": "docs/evidence/record-w4/deep-review-findings.json",
+                  "quote": "Both headings carry the literal skeleton sentence plus raw JSON; the solution intent is a programme summary whose 28 closed plus 19 active equals 47 of 48 projects, and the charter's owner is null. A skeleton sentence beside a JSON block is not evidence of an ART charter or a solution intent.",
+                  "source": "deep-review"
+                }
+              ],
+              "rule": "dr-w4-prog-safe-art-intent",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "PLATFORM"
+        }
+      ],
+      "title": "The safe-art ART charter and Solution intent sections publish the skeleton sentence and a programme summary"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --deep-review docs/evidence/record-w3/deep-review-findings.json --rework-check dr-w4-prog-safe-cadence-pi:PLATFORM",
+      "apply_to": "PLATFORM",
+      "artefact": "code",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "The cadence record carries one PI interval per authorised/planned tranche, or the section states the intervals it actually has and why the rest are absent; the body's count equals its rows.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "path": "docs/evidence/record-w4/deep-review-findings.json",
+              "quote": "The PI plan states 'one per tranche' yet five cadence intervals cover only tranches 0-4 of the programme's 14 tranches (4 closed, 1 authorised, 9 planned). The record holds five cadence rows, not the fourteen the statement claims.",
+              "source": "deep-review"
+            }
+          ],
+          "rule": "dr-w4-prog-safe-cadence-pi",
+          "source": "audit"
+        }
+      ],
+      "key": "dr-w4-prog-safe-cadence-pi:PLATFORM",
+      "kind": "RECORD",
+      "owner_project": "PLATFORM",
+      "rule": "dr-w4-prog-safe-cadence-pi",
+      "scope": "PLATFORM",
+      "severity": "P2",
+      "spec": "\u00a78",
+      "standard": "SAFe",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The PI plan states 'one per tranche' yet five cadence intervals cover only tranches 0-4 of the programme's 14 tranches (4 closed, 1 authorised, 9 planned). The record holds five cadence rows, not the fourteen the statement claims.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "path": "docs/evidence/record-w4/deep-review-findings.json",
+                  "quote": "The PI plan states 'one per tranche' yet five cadence intervals cover only tranches 0-4 of the programme's 14 tranches (4 closed, 1 authorised, 9 planned). The record holds five cadence rows, not the fourteen the statement claims.",
+                  "source": "deep-review"
+                }
+              ],
+              "rule": "dr-w4-prog-safe-cadence-pi",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "PLATFORM"
+        }
+      ],
+      "title": "The safe cadence's PI plan covers five tranches of fourteen"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --deep-review docs/evidence/record-w3/deep-review-findings.json --rework-check dr-w4-prog-safe-portfolio-count:PLATFORM",
+      "apply_to": "PLATFORM",
+      "artefact": "code",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Every count on the canvas is derived from the same rows and sums exactly (archived included in the total and in its own status bucket), and the section names its source; a unit test asserts the sum equals the total for a fixture with an archived project.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "path": "docs/evidence/record-w4/deep-review-findings.json",
+              "quote": "The canvas names 48 projects but 26 closed plus 21 active equals 47; the archived project is omitted from the status breakdown and the canvas states it names no source for any count.",
+              "source": "deep-review"
+            }
+          ],
+          "rule": "dr-w4-prog-safe-portfolio-count",
+          "source": "audit"
+        }
+      ],
+      "key": "dr-w4-prog-safe-portfolio-count:PLATFORM",
+      "kind": "RECORD",
+      "owner_project": "PLATFORM",
+      "rule": "dr-w4-prog-safe-portfolio-count",
+      "scope": "PLATFORM",
+      "severity": "P2",
+      "spec": "\u00a78",
+      "standard": "SAFe",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "The canvas names 48 projects but 26 closed plus 21 active equals 47; the archived project is omitted from the status breakdown and the canvas states it names no source for any count.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "path": "docs/evidence/record-w4/deep-review-findings.json",
+                  "quote": "The canvas names 48 projects but 26 closed plus 21 active equals 47; the archived project is omitted from the status breakdown and the canvas states it names no source for any count.",
+                  "source": "deep-review"
+                }
+              ],
+              "rule": "dr-w4-prog-safe-portfolio-count",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "PLATFORM"
+        }
+      ],
+      "title": "The portfolio canvas states 48 projects while its own status counts sum to 47"
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --deep-review docs/evidence/record-w3/deep-review-findings.json --rework-check v1-p82-5:T10",
@@ -77712,7 +78394,7 @@
       "p0": 14,
       "p1": 65,
       "p2": 4,
-      "packages": 67,
+      "packages": 75,
       "rules": 13,
       "rules_clean": 7,
       "rules_with_gaps": 6,
@@ -77736,7 +78418,7 @@
       "p0": 0,
       "p1": 18,
       "p2": 0,
-      "packages": 22,
+      "packages": 25,
       "rules": 8,
       "rules_clean": 6,
       "rules_with_gaps": 2,
@@ -77771,29 +78453,29 @@
   "summary": {
     "by_kind": {
       "CODE": 68,
-      "RECORD": 627,
-      "STANDARD": 4
+      "RECORD": 632,
+      "STANDARD": 10
     },
     "by_severity": {
       "P0": 27,
-      "P1": 200,
-      "P2": 472
+      "P1": 207,
+      "P2": 476
     },
     "by_standard": {
-      "MSP": 67,
+      "MSP": 75,
       "PMP": 121,
-      "SAFe": 22,
+      "SAFe": 25,
       "SPEC": 64,
       "TOGAF": 425
     },
     "by_status": {
-      "open": 699
+      "open": 710
     },
     "duplicates": 0,
-    "open": 699,
-    "packages": 699,
+    "open": 710,
+    "packages": 710,
     "resolved": 126,
-    "subjects": 776,
+    "subjects": 787,
     "suppressed": 0
   }
 }
