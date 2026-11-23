@@ -265,7 +265,20 @@ test("a label, a lane and an unarchive round-trip through the UI", async ({ page
   await page.getByLabel("Label name").fill(label);
   await page.getByLabel("Label color").fill("teal");
   await page.getByRole("button", { name: "Create label" }).click();
-  await expect(page.locator(".label", { hasText: label })).toBeVisible();
+  // Prove the label on the board's own read before waiting on the screen; the refetch can be
+  // delayed past the default DOM wait under the full suite.
+  await expect
+    .poll(
+      async () => {
+        const board = await request
+          .get(`/api/boards/${fixture.boardId}`)
+          .then((r) => r.json());
+        return (board.labels ?? []).map((entry: { name: string }) => entry.name);
+      },
+      { timeout: 30_000 },
+    )
+    .toContain(label);
+  await expect(page.locator(".label", { hasText: label })).toBeVisible({ timeout: 30_000 });
 
   // The panel's per-card rows, scoped to the labels panel: an unscoped `div` filter reaches the
   // card's own selects first.
