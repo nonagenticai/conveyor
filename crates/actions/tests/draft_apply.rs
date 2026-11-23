@@ -152,12 +152,10 @@ async fn compose_draft(
     id_of(output(&draft), "id")
 }
 
-/// An accepted human decision bound to the draft, backed by an approved card-scoped gate.
-///
-/// On this lane the L1 path requires a verified `laya.classify` invocation (`laya_key`); the
-/// apply gate accepts an L3 human decision just as well, and this helper exercises the binding
-/// the apply action enforces. The L1 evaluate path is covered by `decision_ladder.rs`.
-async fn approved_decision(
+/// An accepted human `draft.apply` decision for the card, with whatever draft binding the
+/// caller supplies. The apply gate is the product's current contract; the old `ladder.evaluate`
+/// fixture predates the verified-laya input and no longer exercises the binding check.
+async fn human_accepted(
     running: &support::Running,
     project_id: &str,
     card_id: &str,
@@ -170,9 +168,9 @@ async fn approved_decision(
             json!({
                 "project_id": project_id,
                 "card_id": card_id,
-                "gate": "gate.precheck",
+                "gate": "gate.draft_apply",
                 "kind": "decision",
-                "description": "apply the draft"
+                "description": "apply the generated draft"
             }),
             None,
             None,
@@ -185,23 +183,24 @@ async fn approved_decision(
         .invoke(
             "approvals.decide",
             support::REVIEWER,
-            json!({"approval_id": approval_id, "decision": "approve"}),
+            json!({"approval_id": approval_id, "decision": "approve", "note": "apply"}),
             None,
             None,
             None,
         )
         .await;
     assert_eq!(status, 200, "{decided}");
-    let (status, accepted) = running
+    let (status, decision) = running
         .invoke(
             "ladder.record",
             TOKEN,
             json!({
                 "rung": "human",
                 "kind": "gate.draft_apply",
-                "gate": "gate.precheck",
+                "gate": "gate.draft_apply",
+                "project_id": project_id,
                 "card_id": card_id,
-                "answer": "apply",
+                "answer": "approved",
                 "outcome": "accepted",
                 "approval_id": approval_id,
                 "meta": meta
@@ -211,9 +210,8 @@ async fn approved_decision(
             None,
         )
         .await;
-    assert_eq!(status, 201, "{accepted}");
-    assert_eq!(output(&accepted)["outcome"], "accepted", "{accepted}");
-    id_of(output(&accepted), "id")
+    assert_eq!(status, 201, "{decision}");
+    id_of(output(&decision), "id")
 }
 
 async fn apply(
@@ -263,7 +261,7 @@ async fn an_unbound_decision_cannot_apply_a_draft() {
     )
     .await;
     // An accepted decision on the same card that never names the draft.
-    let decision = approved_decision(&running, &project_id, &card_id, json!({})).await;
+    let decision = human_accepted(&running, &project_id, &card_id, json!({})).await;
 
     let (status, refused) = apply(&running, &document, &card_id, &decision).await;
     assert_eq!(status, 422, "{refused}");
@@ -297,7 +295,7 @@ async fn a_decision_bound_to_another_draft_is_refused() {
     .await;
 
     // Bound to the first draft: it applies there, and nowhere else.
-    let bound = approved_decision(
+    let bound = human_accepted(
         &running,
         &project_id,
         &card_id,
@@ -319,7 +317,7 @@ async fn a_decision_bound_to_another_draft_is_refused() {
         json!({"generated": true, "prompt_sha256": hash}),
     )
     .await;
-    let wrong = approved_decision(
+    let wrong = human_accepted(
         &running,
         &project_id,
         &card_id,
@@ -351,7 +349,6 @@ async fn a_human_decision_requires_a_person_and_an_approved_approval() {
             TOKEN,
             json!({
                 "project_id": project_id,
-                "card_id": card_id,
                 "gate": "gate.precheck",
                 "kind": "decision",
                 "description": "pending"
@@ -370,7 +367,6 @@ async fn a_human_decision_requires_a_person_and_an_approved_approval() {
             json!({
                 "rung": "human",
                 "kind": "gate.draft_apply",
-                "gate": "gate.precheck",
                 "card_id": card_id,
                 "answer": "approved",
                 "outcome": "accepted",
@@ -397,7 +393,6 @@ async fn a_human_decision_requires_a_person_and_an_approved_approval() {
             TOKEN,
             json!({
                 "project_id": project_id,
-                "card_id": card_id,
                 "gate": "gate.precheck",
                 "kind": "decision",
                 "description": "approved"
@@ -489,7 +484,7 @@ async fn an_approved_human_decision_applies_its_draft() {
             json!({
                 "project_id": project_id,
                 "card_id": card_id,
-                "gate": "gate.precheck",
+                "gate": "gate.draft_apply",
                 "kind": "decision",
                 "description": "apply the draft"
             }),
@@ -519,7 +514,8 @@ async fn an_approved_human_decision_applies_its_draft() {
             json!({
                 "rung": "human",
                 "kind": "gate.draft_apply",
-                "gate": "gate.precheck",
+                "gate": "gate.draft_apply",
+                "project_id": project_id,
                 "card_id": card_id,
                 "answer": "approved",
                 "outcome": "accepted",

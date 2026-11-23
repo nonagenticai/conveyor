@@ -13,7 +13,7 @@
 //! Every mutation writes exactly one `event` row in the same transaction (CONTRACT §7).
 
 use chrono::Utc;
-use conveyor_domain::{ArchiveError, Card, ListKind, Version};
+use conveyor_domain::{ArchiveError, Card, CardType, ListKind, TenantId, Version};
 use conveyor_store as store;
 use conveyor_store::card::{CardRecord, CardUpdate, NewCard};
 use sqlx::PgConnection;
@@ -33,6 +33,59 @@ use crate::board::{etag_of, invalid, require_precondition_with, row_version, sto
 use crate::invoke::{ActionError, HandlerCtx};
 use crate::spec::HandlerOutput;
 use crate::views::Page;
+
+use super::CARD_DONE_GATE;
+
+/// A card may enter a `done` lane only through an approved `card_done` gate.
+///
+/// The card type's `definition.acceptance` is the Definition of Done; a type that declares no
+/// acceptance has none to enforce. An approved gate satisfies it with typed evidence
+/// (`meta.evidence`), or with the explicit waiver reason the approval stored
+/// (`meta.evidence_waiver`); a gate carrying neither is refused. The gate is card-scoped, so it
+/// cannot be borrowed from another card.
+async fn assert_card_done_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    card: &Card,
+    card_type: &CardType,
+) -> Result<(), ActionError> {
+    let acceptance = card_type
+        .definition
+        .get("acceptance")
+        .and_then(serde_json::Value::as_array)
+        .map_or(0, Vec::len);
+    if acceptance == 0 {
+        return Ok(());
+    }
+    let meta =
+        store::approval::approved_card_gate_meta_tx(&mut *conn, tenant, card.id, CARD_DONE_GATE)
+            .await
+            .map_err(|error| store_error(error, "cards.move"))?;
+    let Some(meta) = meta else {
+        return Err(ActionError::new(
+            422,
+            "card_done_criteria_unmet",
+            "the card type declares a Definition of Done; entering done needs an approved card_done gate",
+        ));
+    };
+    let evidence = meta
+        .get("evidence")
+        .and_then(serde_json::Value::as_array)
+        .map_or(0, Vec::len);
+    let waiver = meta
+        .get("evidence_waiver")
+        .and_then(serde_json::Value::as_str)
+        .map(str::trim)
+        .unwrap_or("");
+    if evidence == 0 && waiver.is_empty() {
+        return Err(ActionError::new(
+            422,
+            "card_done_evidence_missing",
+            "the Definition-of-Done gate carries no evidence and no waiver reason",
+        ));
+    }
+    Ok(())
+}
 
 use super::events::card_event;
 
@@ -410,6 +463,9 @@ async fn cards_move(
                 .ok_or_else(|| ActionError::resource_not_found("card type"))?;
         let rules = matrix::rules_tx(&mut *tx, ctx.tenant, &card_type, &project_type_code).await?;
         matrix::ensure_move(&current.card, from.list.kind, to.list.kind, &rules)?;
+        if to.list.kind == ListKind::Done {
+            assert_card_done_tx(&mut *tx, ctx.tenant, &current.card, &card_type).await?;
+        }
     }
 
     store::position::lock_board_tx(&mut *tx, ctx.tenant, current.card.board_id)

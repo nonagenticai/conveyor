@@ -1552,6 +1552,88 @@ async fn a_flow_input_opens_an_interruption_without_a_run() {
     );
 }
 
+/// v1-p54-1: the coach reads the card's Definition-of-Done override reason and surfaces it.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn the_coach_surfaces_the_definition_of_done_override_reason() {
+    let (pg, running, seeded) = fixture().await;
+    publish_processes(&running).await;
+    let (board, active, _waiting) = board_lanes(&pg, &seeded).await;
+    let card = create_card(&running, &board, &active, "feature", "dod override").await;
+
+    // The card's card_done gate carries an explicit waiver: the approval the move reads.
+    let (status, gate) = running
+        .invoke(
+            "approvals.request",
+            TOKEN,
+            json!({
+                "card_id": card,
+                "gate": "card_done",
+                "kind": "card_dod",
+                "require_evidence": true,
+                "evidence_waiver_reason": "the acceptance was verified by inspection",
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{gate}");
+    let gate_id = text(output(&gate), "id");
+    let (status, decided) = running
+        .invoke(
+            "approvals.decide",
+            support::REVIEWER,
+            json!({
+                "approval_id": gate_id,
+                "decision": "approve",
+                "note": "verified by inspection",
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{decided}");
+
+    let (status, body) = running
+        .invoke(
+            "coach.interrupt",
+            TOKEN,
+            json!({
+                "card_id": card,
+                "trigger_kind": "wip_breach",
+                "signature": "wip_breach|active|limit:1",
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 201, "{body}");
+    let interruption = text(output(&body), "interruption_id");
+    let (status, triaged) = running
+        .invoke(
+            "coach.triage",
+            TOKEN,
+            json!({
+                "interruption_id": interruption,
+                "triage_class": "project_decision",
+                "confidence": 0.9,
+                "narrative": "the card's DoD was waived explicitly",
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{triaged}");
+    assert_eq!(
+        output(&triaged)["override_reason"],
+        json!("the acceptance was verified by inspection"),
+        "{triaged}"
+    );
+}
+
 /// An interruption names exactly one cause, and a flow cause carries its own repeat key.
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn a_flow_input_must_name_its_cause_and_signature() {
