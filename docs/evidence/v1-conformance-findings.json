@@ -669,12 +669,22 @@
         },
         {
           "path": "crates/store/src/spine.rs",
-          "line": 1520,
-          "quote": "            \"SELECT EXISTS (SELECT 1 FROM programme_baseline WHERE tenant_id = $1 AND id = $2)\","
+          "line": 1718,
+          "quote": "        let row: Option<(Uuid, String, Option<Uuid>)> = sqlx::query_as("
+        },
+        {
+          "path": "crates/store/src/spine.rs",
+          "line": 1736,
+          "quote": "        if approved_by.is_none()"
         }
       ],
       "failure_scenario": "A tranche with baseline_ref NULL is reviewed continue and authorises the next tranche; alternatively it cites an unapproved management baseline. The management/governance/boundary trio is never recorded against the work it governs.",
       "acceptance": "A tranche cannot be authorised without cited baselines of the required kinds, each approved_by set; review evidence resolves to those ids.",
+      "resolved_by": {
+        "commit": "45fa3eef7cea35f4352ce3d4b1b6f17aebf1ff14",
+        "test": "crates/store/tests/tranche_review.rs::a_tranche_baseline_must_be_approved_and_in_its_programme",
+        "evidence": "cargo-guard.py test -p conveyor-store --test tranche_review: 14 passed"
+      },
       "owner_project": "T10"
     },
     {
