@@ -1667,7 +1667,7 @@ pub struct ReapedProcessRun {
 pub async fn reap_dead_process_runs_tx(
     conn: &mut PgConnection,
     tenant: TenantId,
-) -> Result<Vec<ReapedProcessRun>, sqlx::Error> {
+) -> Result<Vec<ReapedProcessRun>, crate::run::RunStoreError> {
     let candidates: Vec<(Uuid, Uuid, String, Option<String>)> = sqlx::query_as(
         "SELECT DISTINCT ON (r.id) r.id, j.id, j.dedupe_key, j.last_error
            FROM run r
@@ -1726,6 +1726,9 @@ pub async fn reap_dead_process_runs_tx(
             // The run moved between the candidate read and this write; it is not ours to fail.
             continue;
         };
+        // The run is terminal now. Record it in the card's work-package memory in this
+        // transaction, through the same writer every other terminal path uses (S21 step 6).
+        crate::run::record_run_memory_for_id_tx(&mut *conn, tenant, run_id).await?;
 
         // The step the dead job names. The dedupe key carries a per-transition suffix —
         // `<run>:<pos>:<attempt>`, `…:wait:<n>` for a judge park, `…:gate` for a resume,
@@ -1792,9 +1795,7 @@ pub async fn reap_dead_process_runs_tx(
 
         // A reaped run that started children must not leave them live: they are separate runs
         // with their own jobs and would hold `uq_run_child_live` under a failed parent.
-        crate::run::cancel_descendants_tx(&mut *conn, tenant, run_id)
-            .await
-            .map_err(|error| sqlx::Error::Protocol(error.to_string()))?;
+        crate::run::cancel_descendants_tx(&mut *conn, tenant, run_id).await?;
 
         reaped.push(ReapedProcessRun {
             run_id,

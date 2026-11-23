@@ -364,6 +364,7 @@ async fn ops_incident(
             card_type_code: INCIDENT_CARD_TYPE.to_owned(),
             due_at: None,
             parent_card_id: None,
+            job_binding_id: None,
             meta: Some(json!({
                 META_SERVICE: service,
                 META_SEVERITY: severity,

@@ -490,10 +490,13 @@ kind (`mcp` for the agent's licence principal), never a hard-coded name list.
   `409 capability_not_ready` with `blocking[]`, **before** the first step. `knowledge_degraded` remains the mid-run
   equivalent for a pack that disappears after start. `capabilities.get` returns the same `{ready, blocking[]}`
   projection.
-- **One memory writer.** `memory.remember` is the only **action** that writes `work_package_memory`; the
-  `memory.consolidate` job may append one `kind='digest'` row and stamp `consolidated_at`, and nothing else. A copilot
-  turn or an `agent.run` step records what it learned through `memory.remember`, never by SQL. Hot rows are the
-  record; the digest is derived.
+- **One memory writer, with one sanctioned runtime exception.** `memory.remember` is the only **action** that
+  writes `work_package_memory`; the `memory.consolidate` job may append one `kind='digest'` row and stamp
+  `consolidated_at`; and the run's terminal transition may append one `kind='attempt'`, `source='system'` row for a
+  terminal root run of a card (the runtime's record of the attempt, written through
+  `store::memory::insert_memory_tx` in the same transaction — S21 step 6, CONTRACT §24). Nothing else writes SQL. A
+  copilot turn or an `agent.run` step records what it learned through `memory.remember`, never by SQL. Hot rows are
+  the record; the digest is derived.
 - **The copilot is not a work executor.** S10's turn runner is an interactive, user-scoped loop over the same action
   surface. It uses the tenant default model via `completions.create`, records model/tool calls on
   `conversation_turn.meta`, and needs no `capability_agent`. A card-scoped turn may read the card's capability for
@@ -869,3 +872,42 @@ draft, the inference call and the hash. A terminal run or a non-approved approva
 inconsistent stored state finishes the run `failed` with `draft_apply_invalid`. A rejection cancels
 the run through the generic approval path; expiry cancels a still-`waiting_approval` run with
 `approval_expired`. Neither records a ladder decision.
+
+## 24. The work package's run (added 2026-11-22; S21 step 6, issue #599; implements SPEC_V2 §4.4, §5.1, §6.6.4, §7.6)
+
+**The card names its binding.** `card.job_binding_id` (the column from `0040_organisation`) is the
+work package's assignment. `cards.create` and `cards.update` accept it: the id must resolve in the
+caller's tenant and be `active`, or the write is refused `422 job_binding_unusable`. `CardOut` and
+every card read expose it. `cards.duplicate` does not copy it — an assignment is not content.
+
+**A run inherits the card's binding.** `runs.create` uses the request's `job_binding_id` when it is
+present; when it is absent and the card names one, the card's binding is used. A request naming a
+different binding than the card's is refused `422 card_binding_mismatch` before the INSERT. A card
+with no binding keeps the plain-run path, and `projects.execute` (card-less) is untouched. The
+retired-binding and stale-pin checks stay in `insert_run_tx`, the one writer — inheritance adds no
+second check path.
+
+**The terminal root run records its memory.** When a run reaches a terminal state and is
+card-scoped and a root (`parent_run_id IS NULL`), the terminal transition inserts exactly one
+`work_package_memory` row in the same transaction: `kind='attempt'`, `source='system'`, `run_id`
+set, the body naming the attempt and its outcome, and `meta` carrying the status and error class.
+The existing `memory.consolidate` job is then enqueued per card, so the digest is built from real
+hot rows. A child run and a card-less run write none: a child shares its parent's card and is part
+of the parent's attempt, and a card-less run has no work package. This is the sanctioned runtime
+writer named in §17; `memory.remember` remains the one **action** that writes memory.
+
+**What a card's run reads back.** The prompt's memory source selects the card's newest
+un-consolidated hot rows, so the next run's compiled prompt contains the prior attempt
+(`[attempt/system#<id>] …`) until consolidation stamps it. The compiled text is never stored; the
+row ids are part of the prompt hash, and the digest is derived, never the record.
+
+**Every terminal path records it.** A process run (`process_runs.start`) reaches the same row
+through its own terminal paths — `process.step` finishes through `transition_run_tx`/`fail_run_tx` —
+and both reap sweeps (`run.reap`'s `run.execute` half and its `process.step` half) record their
+reaped runs through `record_run_memory_for_id_tx`; a cancel through `cancel_run_tx` records the
+cancelled run. Succeed, fail, cancel and reap: each writes exactly one row for a card-scoped root.
+
+**Out of this contract.** The budget (cost, tool spend and the token ceiling) is the #526 lane's
+`v1-p75-1`/`v1-w4a-1`, enforced in the invoke precheck and the broker; §24 does not add a second
+gate. `v1-p66-1`'s lane-refusal clause (a delivery card moved into a work lane without a binding)
+needs a delivery-card marker that does not exist and remains open.

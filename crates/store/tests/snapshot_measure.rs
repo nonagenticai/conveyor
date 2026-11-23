@@ -94,6 +94,7 @@ async fn project_tree(
             due_at: None,
             assignee_id: None,
             created_by: None,
+            job_binding_id: None,
             meta: serde_json::json!({}),
         },
     )
@@ -113,6 +114,7 @@ async fn project_tree(
             due_at: None,
             assignee_id: None,
             created_by: None,
+            job_binding_id: None,
             meta: serde_json::json!({}),
         },
     )
@@ -132,6 +134,7 @@ async fn project_tree(
                 due_at: None,
                 assignee_id: None,
                 created_by: None,
+                job_binding_id: None,
                 meta: serde_json::json!({}),
             },
         )
@@ -711,6 +714,7 @@ async fn a_card_publishes_its_rework_keys_and_absent_meta_is_null() {
             due_at: None,
             assignee_id: None,
             created_by: None,
+            job_binding_id: None,
             meta: serde_json::json!({
                 "rework_key": "RW-1",
                 "rule": "rule-x",

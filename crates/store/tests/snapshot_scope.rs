@@ -88,6 +88,7 @@ async fn project_tree(
             due_at: None,
             assignee_id: None,
             created_by: None,
+            job_binding_id: None,
             meta: serde_json::json!({}),
         },
     )
@@ -160,6 +161,7 @@ async fn project_tree(
             due_at: None,
             assignee_id: None,
             created_by: None,
+            job_binding_id: None,
             meta: serde_json::json!({
                 "service": "conveyor",
                 "severity": "sev2",
