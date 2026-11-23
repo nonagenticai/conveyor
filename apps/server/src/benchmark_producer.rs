@@ -379,7 +379,7 @@ async fn produce_process(
     let existing =
         card_for_case_tx(&mut tx, tenant, board_id, list_id, &instance.instance_id).await?;
     if let Some(card_id) = existing
-        && let Some(state) = root_run_status_tx(&mut *tx, tenant, card_id).await?
+        && let Some(state) = root_run_status_tx(&mut tx, tenant, card_id).await?
     {
         // Live: wait for the next tick. Terminal: P3d collects; either way nothing is spent.
         tracing::debug!(case = %case_id, %card_id, state, "benchmark process arm waits");
@@ -472,7 +472,7 @@ async fn produce_process(
             // `uq_run_live` may have lost the card's slot to a concurrent start: wait, never
             // record a refusal for a process that did start.
             let mut tx = store::begin_scoped(pool, tenant).await.map_err(db)?;
-            let running = root_run_status_tx(&mut *tx, tenant, card_id).await?;
+            let running = root_run_status_tx(&mut tx, tenant, card_id).await?;
             tx.commit().await.map_err(db)?;
             if running.is_some() {
                 return Ok(());
