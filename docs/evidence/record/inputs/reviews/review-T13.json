@@ -1,0 +1,16 @@
+{
+ "project_id": "01a1d039-0d37-730f-8f8a-2f50e5a0933d",
+ "contract_id": "01a20271-2a37-7329-b159-28031ddcb966",
+ "level": "compliant",
+ "findings": [
+  {
+   "verdict": "pass",
+   "statement": "The T13 Statement of Architecture Work is delivered as written: its scope items are the project's approved artefacts and its approach is the lifecycle the retrospective closure review records; the contract is live and approved by a distinct approver, with no deviation a waiver would cover."
+  }
+ ],
+ "evidence": {
+  "manifest": "acceptance/programme/T13.toml",
+  "closure_review": "01a2051f-afd8-7749-9087-e99d1116edeb"
+ },
+ "delegation_ref": "01a2021d-cca2-757c-bfc2-21bd4e4b6d85"
+}
