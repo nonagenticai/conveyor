@@ -19,6 +19,7 @@ Guarantees:
 Usage:
     python3 scripts/materialise-rework.py --register /tmp/rework.json --data /tmp/draft
     DATABASE_URL=postgres://… python3 scripts/materialise-rework.py --apply --severity P0
+    DATABASE_URL=postgres://… python3 scripts/materialise-rework.py --apply --severity P1 --kind CODE
     python3 scripts/materialise-rework.py --self-test
 """
 
@@ -43,6 +44,7 @@ SCHEMA = "conveyor-rework-apply/v1"
 LIST_NAME = "Conformance rework"
 LIST_KIND = "intake"
 SEVERITIES = ("P0", "P1", "P2", "P3")
+KINDS = ("CODE", "RECORD", "STANDARD")
 CARD_TYPES = {
     "closed_without_closure_review": "project_closure",
     "TOGAF": "architecture_task",
@@ -226,11 +228,25 @@ def parse_severities(raw: str) -> set[str]:
     return values
 
 
+def parse_kinds(raw: str | None) -> set[str] | None:
+    """The kinds to materialise; None (the default) means every kind."""
+    if raw is None:
+        return None
+    values = {item.strip().upper() for item in raw.split(",") if item.strip()}
+    if not values:
+        return None
+    unknown = values - set(KINDS)
+    if unknown:
+        raise SystemExit(f"materialise-rework: unknown kind {sorted(unknown)}")
+    return values
+
+
 def select(
     register: dict[str, Any],
     snapshot: Snapshot,
     receipt: dict[str, Any],
     severities: set[str],
+    kinds: set[str] | None,
     limit: int | None,
     reapply: set[str],
 ) -> list[Item]:
@@ -241,6 +257,8 @@ def select(
         if package.get("status") != "open":
             continue
         if str(package.get("severity")) not in severities:
+            continue
+        if kinds is not None and str(package.get("kind")) not in kinds:
             continue
         if key in receipt["applied"] and key not in reapply:
             items.append(Item(package, "existing", "already in the receipt"))
@@ -292,6 +310,9 @@ def invoke(
         command += ["--actor-id", actor_id]
     environment = os.environ.copy()
     environment["DATABASE_URL"] = database_url
+    # `admin action invoke` opens its pool on the migration role (direct, not the pooler), so a
+    # URL passed once must reach both variables or the CLI falls back to its compose default.
+    environment["DATABASE_MIGRATE_URL"] = database_url
     try:
         completed = subprocess.run(
             command, capture_output=True, text=True, env=environment, timeout=120
@@ -506,6 +527,7 @@ def self_test() -> None:
                     "artefact": "architecture_contract",
                     "title": "Put the project under an approved architecture contract",
                     "severity": "P1",
+                    "kind": "RECORD",
                     "status": "open",
                     "scope": "tranche-1",
                     "subjects": [
@@ -526,6 +548,7 @@ def self_test() -> None:
                     "artefact": "benefit_profile.baseline",
                     "title": "Measure the benefit baselines",
                     "severity": "P1",
+                    "kind": "RECORD",
                     "status": "suppressed",
                     "scope": "programme",
                     "subjects": [],
@@ -544,6 +567,7 @@ def self_test() -> None:
                     "artefact": "code",
                     "title": "Fix the loop",
                     "severity": "P0",
+                    "kind": "CODE",
                     "status": "open",
                     "scope": "T1",
                     "subjects": [
@@ -576,6 +600,7 @@ def self_test() -> None:
                     "artefact": "closure_review",
                     "title": "Publish the closure review",
                     "severity": "P0",
+                    "kind": "RECORD",
                     "status": "open",
                     "scope": "T2",
                     "subjects": [],
@@ -591,7 +616,7 @@ def self_test() -> None:
         snapshot = Snapshot(data)
         receipt = empty_receipt("test")
         receipt["applied"]["already:done"] = {"card_id": "c0"}
-        items = select(register, snapshot, receipt, {"P0", "P1"}, None, set())
+        items = select(register, snapshot, receipt, {"P0", "P1"}, None, None, set())
         actions = [item.action for item in items]
         if actions != ["create", "create", "skipped"]:
             raise SystemExit(f"self-test: expected two creates and one skipped, got {actions}")
@@ -609,16 +634,39 @@ def self_test() -> None:
         ]
         if mandatory != ["v1-x-1:T1"]:
             raise SystemExit(f"self-test: the P0 plan was {mandatory}")
-        missing = [item for item in select(register, snapshot, receipt, {"P0"}, None, set())]
+        missing = [
+            item
+            for item in select(register, snapshot, receipt, {"P0"}, None, None, set())
+        ]
         if any(item.action == "create" and item.package["apply_to"] == "T2" for item in missing):
             raise SystemExit("self-test: a closed project's package was not skipped")
         suppressed = [
             item
-            for item in select(register, snapshot, receipt, {"P1"}, None, set())
+            for item in select(register, snapshot, receipt, {"P1"}, None, None, set())
             if item.package["key"].startswith("benefit_baseline_placeholder")
         ]
         if suppressed:
             raise SystemExit("self-test: a suppressed package entered the plan")
+        code_keys = [
+            item.package["key"]
+            for item in select(
+                register, snapshot, receipt, {"P0"}, parse_kinds("CODE"), None, set()
+            )
+        ]
+        if code_keys != ["v1-x-1:T1"]:
+            raise SystemExit(f"self-test: --kind CODE planned {code_keys}")
+        record_keys = [
+            item.package["key"]
+            for item in select(
+                register, snapshot, receipt, {"P0"}, parse_kinds("RECORD"), None, set()
+            )
+        ]
+        if "v1-x-1:T1" in record_keys:
+            raise SystemExit("self-test: --kind RECORD kept a CODE package")
+        if "closed_without_closure_review:T2" not in record_keys:
+            raise SystemExit("self-test: --kind RECORD dropped a RECORD package")
+        if parse_kinds(None) is not None:
+            raise SystemExit("self-test: an absent --kind must select every kind")
     print("materialise-rework: self-test OK")
 
 
@@ -635,6 +683,11 @@ def main(argv: list[str]) -> int:
     parser.add_argument("--conveyor", default=os.environ.get("CONVEYOR_BIN", "conveyor"))
     parser.add_argument("--actor-id", default=None)
     parser.add_argument("--severity", default="P0,P1,P2,P3")
+    parser.add_argument(
+        "--kind",
+        default=None,
+        help="comma list of package kinds to materialise (CODE, RECORD, STANDARD); default all",
+    )
     parser.add_argument("--limit", type=int, default=None)
     parser.add_argument("--reapply", action="append", default=[])
     parser.add_argument("--apply", action="store_true", help="write; without it this is a dry run")
@@ -657,6 +710,7 @@ def main(argv: list[str]) -> int:
         snapshot,
         receipt,
         parse_severities(args.severity),
+        parse_kinds(args.kind),
         args.limit,
         set(args.reapply),
     )
