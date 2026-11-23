@@ -83,6 +83,8 @@ python3 "$root/scripts/audit-programme-conformance.py" "${audit_args[@]}" \
   --findings "$root/docs/evidence/v1-conformance-findings.json" \
   --findings "$tmp/conformance/standards-findings.json" \
   --deep-review "$root/docs/evidence/record-w3/deep-review-findings.json" \
+  --deep-review "$root/docs/evidence/record-w4/deep-review-findings.json" \
+  --deep-review "$root/docs/evidence/record-w5/deep-review-findings.json" \
   --report --rework-out "$tmp/conformance/rework.json"
 test -f "$tmp/conformance/rework.json" || {
   echo "publish-data: the audit produced no rework register" >&2

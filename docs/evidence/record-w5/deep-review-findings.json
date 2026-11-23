@@ -12,6 +12,16 @@
       "evidence": "At lane head 3c13c4bd, invoking registers.list with {} and with a valid programme_id both return 422 'the input does not match the action schema'. crates/actions/src/spine/mod.rs:699-708 declares RegisterListIn with three Option fields and no #[serde(default)]; the same omission is on RegisterCreateIn (:631-665) and RegisterUpdateIn (:668-696). schemars 1.2.3 derives requiredness from the field's default/option rule (schemars_derive schema_exprs.rs:728-739), so the generated input marks those fields required. The red-first test crates/actions/tests/registry.rs::registers_list_accepts_its_filters was committed at 5d51531a and fails at this head. The defect blocked scripts/promote-record.py --apply against the staging record and every checker that lists a register.",
       "acceptance": "cargo-guard.py test -p conveyor-actions --test registry registers_list_accepts_its_filters exits 0; the generated schema carries no required entry for the register filter inputs; conveyor admin actions dump is regenerated and served-spec.lock.json --check-lock exits 0; a journal entry's input validates against its action schema.",
       "artifact": "crates/actions/src/spine/mod.rs#registers-list"
+    },
+    {
+      "key": "v1-publish-sidecars-1",
+      "kind": "code",
+      "severity": "P1",
+      "owner_project": "DESIGN-PUBLISH",
+      "title": "The publish paths omit the W4 and W5 deep-review sidecars, so those findings never reach the public register",
+      "evidence": "docs/design/scripts/publish-data.sh:85 and docs/design/scripts/publish-standards.sh:67 passed only docs/evidence/record-w3/deep-review-findings.json to audit-programme-conformance.py. The audit takes --deep-review repeatably and converts each sidecar into packages; its own audit_command docstring says an omitted sidecar makes its keys invisible to the check, which then exits 0 without proving anything. Every publish therefore dropped the ten record-w4 RECORD findings and any record-w5 finding from the published docs/design/data/rework.json, so the artefact findings the owner requires to become rework packages were absent from the public register.",
+      "acceptance": "Both publish scripts pass the record-w3, record-w4 and record-w5 sidecars; bash -n on each exits 0; a publish's docs/design/data/rework.json contains at least one dr-w4-* key; python3 scripts/audit-programme-conformance.py --self-test exits 0.",
+      "artifact": "docs/design/scripts/publish-data.sh#deep-review"
     }
   ]
 }
