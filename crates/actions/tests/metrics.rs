@@ -770,15 +770,15 @@ async fn run_row(
 async fn rework_rate_is_a_read_time_ratio_over_runs_and_approvals() {
     let (pg, running, seeded) = fixture().await;
     let programme = programme(&pg, &seeded).await;
-    let project = project(&pg, &seeded, programme, "REWORK").await;
+    let rework_project = project(&pg, &seeded, programme, "REWORK").await;
     // Five runs, two of them rework: a first attempt that failed and was never retried is a
     // failure, not rework; a second attempt is; a rejected approval returns the card; an
     // approval that passed does not.
-    run_row(&pg, &seeded, project, 1, "succeeded").await;
-    run_row(&pg, &seeded, project, 1, "failed").await;
-    run_row(&pg, &seeded, project, 2, "succeeded").await;
-    let returned = run_row(&pg, &seeded, project, 1, "failed").await;
-    let approved = run_row(&pg, &seeded, project, 1, "succeeded").await;
+    run_row(&pg, &seeded, rework_project, 1, "succeeded").await;
+    run_row(&pg, &seeded, rework_project, 1, "failed").await;
+    run_row(&pg, &seeded, rework_project, 2, "succeeded").await;
+    let returned = run_row(&pg, &seeded, rework_project, 1, "failed").await;
+    let approved = run_row(&pg, &seeded, rework_project, 1, "succeeded").await;
     sqlx::query(
         "INSERT INTO approval (tenant_id, run_id, gate, kind, status)
          VALUES ($1, $2, 'quality_gate', 'gate', 'rejected'),
@@ -795,7 +795,7 @@ async fn rework_rate_is_a_read_time_ratio_over_runs_and_approvals() {
         .invoke(
             "metrics.flow",
             TOKEN,
-            json!({"project_id": project}),
+            json!({"project_id": rework_project}),
             None,
             None,
             None,
@@ -809,12 +809,12 @@ async fn rework_rate_is_a_read_time_ratio_over_runs_and_approvals() {
     assert!((rate - 0.4).abs() < 1e-12, "rate {rate}");
 
     // A second read recomputes from the rows: the ratio is never a stored counter.
-    run_row(&pg, &seeded, project, 2, "succeeded").await;
+    run_row(&pg, &seeded, rework_project, 2, "succeeded").await;
     let (status, body) = running
         .invoke(
             "metrics.flow",
             TOKEN,
-            json!({"project_id": project}),
+            json!({"project_id": rework_project}),
             None,
             None,
             None,
@@ -827,7 +827,7 @@ async fn rework_rate_is_a_read_time_ratio_over_runs_and_approvals() {
     let rate = flow["rework_rate"].as_f64().expect("the ratio");
     assert!((rate - 0.5).abs() < 1e-12, "rate {rate}");
 
-    // The tenant-wide read applies no project filter: the same rows, unscoped.
+    // The tenant-wide read applies no rework_project filter: the same rows, unscoped.
     let (status, body) = running
         .invoke("metrics.flow", TOKEN, json!({}), None, None, None)
         .await;
@@ -836,7 +836,7 @@ async fn rework_rate_is_a_read_time_ratio_over_runs_and_approvals() {
     assert_eq!(flow["total_count"], 6, "{flow}");
     assert_eq!(flow["rework_count"], 3, "{flow}");
 
-    // Zero denominator: a project with no runs reports null, never NaN or zero.
+    // Zero denominator: a rework_project with no runs reports null, never NaN or zero.
     let empty = project(&pg, &seeded, programme, "EMPTY").await;
     let (status, body) = running
         .invoke(
