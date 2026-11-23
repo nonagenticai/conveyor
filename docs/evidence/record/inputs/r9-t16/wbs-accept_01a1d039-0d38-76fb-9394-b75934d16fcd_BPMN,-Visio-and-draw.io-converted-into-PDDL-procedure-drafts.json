@@ -1,0 +1,18 @@
+{
+ "_version": 1,
+ "change_id": "01a20a86-0892-7ddb-9033-881937f87ee1",
+ "evidence": [
+  {
+   "kind": "test",
+   "path": "crates/actions/tests/sop_ingestion.rs",
+   "ref": "sop_ingestion::a_bpmn_diagram_becomes_a_procedure_draft"
+  },
+  {
+   "kind": "document",
+   "path": "/tmp/u5a-v14/evidence/T16-acceptance.md",
+   "ref": "T16 acceptance transcript"
+  }
+ ],
+ "id": "01a20a84-b2fb-7ee9-9e09-708de10292b9",
+ "status": "accepted"
+}

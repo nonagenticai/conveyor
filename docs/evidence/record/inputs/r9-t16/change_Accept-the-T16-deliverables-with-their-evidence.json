@@ -1,0 +1,9 @@
+{
+ "baseline_id": "01a20a84-b302-7bc0-a542-03eca40ca384",
+ "body": "The six T16 deliverables are complete against the frozen scope baseline. This change authorises recording their acceptance and evidence on the WBS rows, which the baseline gate otherwise refuses.",
+ "impact": {
+  "scope": "WBS deliverables 1-6: status accepted, evidence refs, no scope change"
+ },
+ "project_id": "01a1d039-0d38-76fb-9394-b75934d16fcd",
+ "title": "Accept the T16 deliverables with their evidence"
+}
