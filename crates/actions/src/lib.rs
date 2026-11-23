@@ -62,6 +62,8 @@ pub mod media;
 pub mod produce;
 // S15: work-package memory — remember (the only writing action) and recall.
 pub mod memory;
+// T19 (SPEC_V2 §6.8, D66; issue #606): the meetings family — the decision forum's typed record.
+pub mod meetings;
 // T11 (SPEC_V2 §7.5, §11.9; issue #84): the metrics family — recompute-from-rows reads, the
 // versioned threshold configuration and the programme's MSP/governance metrics.
 pub mod metrics;

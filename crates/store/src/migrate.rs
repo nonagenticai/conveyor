@@ -254,7 +254,11 @@ mod tests {
                 (63, "async invocation".to_owned()),
                 // T17 (#87): the tenant asset authoring intake, drafts, review gate and the
                 // one-published-row-per-(kind, key) catalogue (0064_authoring.sql, SPEC_V2 §5.7).
-                (64, "authoring".to_owned())
+                (64, "authoring".to_owned()),
+                // T19 (#606): the decision forum — meeting types, meetings, agenda items,
+                // attendance, positions and the participant extension (0065_meetings.sql,
+                // SPEC_V2 §6.8, D66).
+                (65, "meetings".to_owned())
             ],
             "the embedded migration set is {embedded:?}; a wrong sqlx::migrate! path or a \
              file outside the set changes it"

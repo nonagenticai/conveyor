@@ -1,0 +1,1359 @@
+//! T19 decision forums — the meeting aggregate (SPEC_V2 §6.8, D66).
+//!
+//! A meeting is a card plus a typed record: agenda items resolve existing objects, positions are
+//! the deliberation, and `close_item` derives the outcome by arithmetic over those positions and
+//! the linked approval's stricter policy. This module owns the rows and their invariants; the
+//! action family in `conveyor-actions` validates input and maps refusals.
+//!
+//! Store conventions are the same as every other module: every function takes the caller's
+//! scoped transaction, every query carries `tenant_id`, and a policy/row change is a version
+//! bump. The meeting's own decision rows are written through
+//! [`crate::approval::record_meeting_decisions_tx`], never as a second decision store.
+
+use chrono::{DateTime, Utc};
+use conveyor_domain::TenantId;
+use serde_json::{Value, json};
+use sqlx::{AssertSqlSafe, PgConnection};
+use uuid::Uuid;
+
+use crate::card::NewCard;
+use crate::outbox::{self, NewEvent};
+
+#[derive(Debug, thiserror::Error)]
+pub enum MeetingStoreError {
+    #[error(transparent)]
+    Database(#[from] sqlx::Error),
+    #[error("the {0} does not exist in this tenant")]
+    NotFound(&'static str),
+    #[error("the {0} moved; the caller's version is stale")]
+    Stale(&'static str),
+    #[error("the {what}: {why}")]
+    Conflict { what: &'static str, why: String },
+    #[error("the {what} is not permitted: {why}")]
+    Illegal { what: &'static str, why: String },
+    #[error("{detail}")]
+    Unprocessable { code: &'static str, detail: String },
+    #[error(transparent)]
+    Card(#[from] crate::card::CardStoreError),
+    #[error(transparent)]
+    Outbox(#[from] crate::outbox::OutboxError),
+}
+
+type Result<T> = std::result::Result<T, MeetingStoreError>;
+
+const MEETING_TYPE_COLUMNS: &str = "id, key, name, purpose, agenda_sources,
+    required_participation, quorum, decision_rule, evidence_minimum,
+    EXTRACT(EPOCH FROM decision_window)::bigint AS decision_window_seconds,
+    EXTRACT(EPOCH FROM timebox)::bigint AS timebox_seconds,
+    allowed_outcomes, convener_authority, status, version";
+
+const MEETING_COLUMNS: &str = "m.id, m.card_id, m.convener_kind, m.convener_id,
+    m.convener_governance_body_id, m.meeting_type_id, m.meeting_type_version,
+    t.key AS meeting_type_key, t.name AS meeting_type_name, t.decision_rule,
+    EXTRACT(EPOCH FROM t.decision_window)::bigint AS decision_window_seconds,
+    m.cadence_slot, m.opens_at, m.decision_window_end, m.closed_at, m.status, m.version,
+    c.name AS card_name";
+
+const AGENDA_COLUMNS: &str = "id, meeting_id, sequence, resolved_kind, resolved_id,
+    participating_departments, evidence_refs, outcome, defer_reason, closed_at, version";
+
+const ATTENDANCE_COLUMNS: &str = "id, meeting_id, participant_kind, participant_id, seat,
+    department_id, invitation_state, response_state, delegated_from, version";
+
+const POSITION_COLUMNS: &str = "id, meeting_id, agenda_item_id, participant_kind, participant_id,
+    stance, rationale, conditions, commitment, surface, superseded_at, recorded_at, version";
+
+#[derive(Clone, Debug, sqlx::FromRow)]
+pub struct MeetingTypeRecord {
+    pub id: Uuid,
+    pub key: String,
+    pub name: String,
+    pub purpose: String,
+    pub agenda_sources: Value,
+    pub required_participation: Value,
+    pub quorum: i32,
+    pub decision_rule: String,
+    pub evidence_minimum: i32,
+    pub decision_window_seconds: i64,
+    pub timebox_seconds: i64,
+    pub allowed_outcomes: Vec<String>,
+    pub convener_authority: Value,
+    pub status: String,
+    pub version: i64,
+}
+
+#[derive(Clone, Debug, sqlx::FromRow)]
+pub struct MeetingRecord {
+    pub id: Uuid,
+    pub card_id: Uuid,
+    pub convener_kind: String,
+    pub convener_id: Uuid,
+    pub convener_governance_body_id: Option<Uuid>,
+    pub meeting_type_id: Uuid,
+    pub meeting_type_version: i64,
+    pub meeting_type_key: String,
+    pub meeting_type_name: String,
+    pub decision_rule: String,
+    pub decision_window_seconds: i64,
+    pub cadence_slot: Option<Uuid>,
+    pub opens_at: Option<DateTime<Utc>>,
+    pub decision_window_end: Option<DateTime<Utc>>,
+    pub closed_at: Option<DateTime<Utc>>,
+    pub status: String,
+    pub version: i64,
+    pub card_name: String,
+}
+
+#[derive(Clone, Debug, sqlx::FromRow)]
+pub struct AgendaItemRecord {
+    pub id: Uuid,
+    pub meeting_id: Uuid,
+    pub sequence: i32,
+    pub resolved_kind: String,
+    pub resolved_id: Uuid,
+    pub participating_departments: Vec<Uuid>,
+    pub evidence_refs: Value,
+    pub outcome: Option<String>,
+    pub defer_reason: Option<String>,
+    pub closed_at: Option<DateTime<Utc>>,
+    pub version: i64,
+}
+
+#[derive(Clone, Debug, sqlx::FromRow)]
+pub struct AttendanceRecord {
+    pub id: Uuid,
+    pub meeting_id: Uuid,
+    pub participant_kind: String,
+    pub participant_id: Uuid,
+    pub seat: String,
+    pub department_id: Option<Uuid>,
+    pub invitation_state: String,
+    pub response_state: String,
+    pub delegated_from: Option<Uuid>,
+    pub version: i64,
+}
+
+#[derive(Clone, Debug, sqlx::FromRow)]
+pub struct PositionRecord {
+    pub id: Uuid,
+    pub meeting_id: Uuid,
+    pub agenda_item_id: Uuid,
+    pub participant_kind: String,
+    pub participant_id: Uuid,
+    pub stance: String,
+    pub rationale: String,
+    pub conditions: Value,
+    pub commitment: Option<Value>,
+    pub surface: String,
+    pub superseded_at: Option<DateTime<Utc>>,
+    pub recorded_at: DateTime<Utc>,
+    pub version: i64,
+}
+
+#[derive(Clone, Debug)]
+pub struct MeetingDetail {
+    pub meeting: MeetingRecord,
+    pub meeting_type: MeetingTypeRecord,
+    pub agenda: Vec<AgendaItemRecord>,
+    pub attendance: Vec<AttendanceRecord>,
+    pub positions: Vec<PositionRecord>,
+}
+
+/// The acting principal, as the action layer names it. Authorization is the action scope's;
+/// this is the per-forum authority row's input, never a second gate.
+#[derive(Clone, Copy, Debug)]
+pub struct MeetingActor<'a> {
+    pub id: Uuid,
+    pub role: &'a str,
+}
+
+pub struct NewMeetingType<'a> {
+    pub key: &'a str,
+    pub name: &'a str,
+    pub purpose: &'a str,
+    pub agenda_sources: &'a Value,
+    pub required_participation: &'a Value,
+    pub quorum: i32,
+    pub decision_rule: &'a str,
+    pub evidence_minimum: i32,
+    pub decision_window_seconds: i64,
+    pub timebox_seconds: i64,
+    pub allowed_outcomes: &'a [String],
+    pub convener_authority: &'a Value,
+}
+
+pub struct NewMeeting<'a> {
+    pub meeting_type_key: &'a str,
+    /// Present only when the key does not exist yet. A change to an existing policy is the
+    /// versioned governance route, not a schedule.
+    pub policy: Option<&'a NewMeetingType<'a>>,
+    pub title: &'a str,
+    pub description: &'a str,
+    pub list_id: Uuid,
+    pub board_id: Option<Uuid>,
+    pub convener_kind: &'a str,
+    pub convener_id: Uuid,
+    pub cadence_slot: Option<Uuid>,
+}
+
+pub struct NewAgendaItem<'a> {
+    pub resolved_kind: &'a str,
+    pub resolved_id: Uuid,
+    pub participating_departments: &'a [Uuid],
+    pub evidence_refs: &'a Value,
+}
+
+pub struct NewPosition<'a> {
+    pub agenda_item_id: Uuid,
+    pub participant_kind: &'a str,
+    pub participant_id: Uuid,
+    pub stance: &'a str,
+    pub rationale: &'a str,
+    pub conditions: &'a Value,
+    pub commitment: Option<&'a Value>,
+    pub surface: &'a str,
+}
+
+/// Vocabulary shared with the database CHECK constraints; the action layer produces the same
+/// values, so a typo is a 422 at the door rather than a 500 from Postgres.
+pub const CONVENER_KINDS: [&str; 3] = ["governance_body", "job_binding", "app_user"];
+pub const PARTICIPANT_KINDS: [&str; 2] = ["job_binding", "app_user"];
+pub const SEATS: [&str; 5] = ["chair", "member", "presenter", "observer", "delegate"];
+pub const STANCES: [&str; 5] = [
+    "approve",
+    "approve_with_conditions",
+    "reject",
+    "abstain",
+    "request_evidence",
+];
+pub const SURFACES: [&str; 3] = ["web", "telegram", "mcp"];
+pub const OUTCOMES: [&str; 5] = [
+    "decision",
+    "commitment",
+    "action",
+    "information",
+    "deferred",
+];
+pub const RESOLVED_KINDS: [&str; 4] = ["approval", "register_item", "asset", "cadence"];
+
+fn is_unique_on(error: &sqlx::Error, constraint: &str) -> bool {
+    matches!(
+        error.as_database_error().and_then(|e| e.constraint()),
+        Some(name) if name == constraint
+    )
+}
+
+fn evidence_count(meta: &Value) -> i64 {
+    match meta.get("evidence") {
+        Some(Value::Array(items)) => items.len() as i64,
+        Some(Value::Null) | None => 0,
+        Some(_) => 1,
+    }
+}
+
+fn evidence_value(meta: &Value) -> Value {
+    match meta.get("evidence") {
+        Some(Value::Array(items)) => Value::Array(items.clone()),
+        Some(Value::Null) | None => json!([]),
+        Some(other) => json!([other]),
+    }
+}
+
+// ── meeting_type ────────────────────────────────────────────────────────────────────────
+
+pub async fn create_meeting_type_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    new: &NewMeetingType<'_>,
+) -> Result<MeetingTypeRecord> {
+    if new.allowed_outcomes.is_empty() {
+        return Err(MeetingStoreError::Illegal {
+            what: "meeting type",
+            why: "allowed_outcomes must name at least one outcome".into(),
+        });
+    }
+    let sql = format!(
+        "INSERT INTO meeting_type (tenant_id, key, name, purpose, agenda_sources,
+             required_participation, quorum, decision_rule, evidence_minimum, decision_window,
+             timebox, allowed_outcomes, convener_authority, status, version)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9,
+                 make_interval(secs => $10::double precision),
+                 make_interval(secs => $11::double precision), $12, $13, 'active',
+                 COALESCE((SELECT max(version) FROM meeting_type
+                            WHERE tenant_id = $1 AND key = $2), 0) + 1)
+         RETURNING {MEETING_TYPE_COLUMNS}"
+    );
+    sqlx::query_as::<_, MeetingTypeRecord>(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(new.key)
+        .bind(new.name)
+        .bind(new.purpose)
+        .bind(new.agenda_sources)
+        .bind(new.required_participation)
+        .bind(new.quorum)
+        .bind(new.decision_rule)
+        .bind(new.evidence_minimum)
+        .bind(new.decision_window_seconds)
+        .bind(new.timebox_seconds)
+        .bind(new.allowed_outcomes)
+        .bind(new.convener_authority)
+        .fetch_one(&mut *conn)
+        .await
+        .map_err(MeetingStoreError::from)
+}
+
+pub async fn latest_meeting_type_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    key: &str,
+) -> Result<Option<MeetingTypeRecord>> {
+    let sql = format!(
+        "SELECT {MEETING_TYPE_COLUMNS} FROM meeting_type
+          WHERE tenant_id = $1 AND key = $2 AND status <> 'retired'
+          ORDER BY version DESC LIMIT 1"
+    );
+    sqlx::query_as::<_, MeetingTypeRecord>(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(key)
+        .fetch_optional(&mut *conn)
+        .await
+        .map_err(MeetingStoreError::from)
+}
+
+pub async fn get_meeting_type_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    id: Uuid,
+) -> Result<Option<MeetingTypeRecord>> {
+    let sql =
+        format!("SELECT {MEETING_TYPE_COLUMNS} FROM meeting_type WHERE tenant_id = $1 AND id = $2");
+    sqlx::query_as::<_, MeetingTypeRecord>(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(id)
+        .fetch_optional(&mut *conn)
+        .await
+        .map_err(MeetingStoreError::from)
+}
+
+// ── schedule / open ─────────────────────────────────────────────────────────────────────
+
+pub async fn schedule_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    actor: MeetingActor<'_>,
+    new: &NewMeeting<'_>,
+) -> Result<MeetingRecord> {
+    if !CONVENER_KINDS.contains(&new.convener_kind) {
+        return Err(MeetingStoreError::Unprocessable {
+            code: "invalid_convener_kind",
+            detail: format!("convener_kind must be one of {CONVENER_KINDS:?}"),
+        });
+    }
+    let meeting_type = match latest_meeting_type_tx(&mut *conn, tenant, new.meeting_type_key)
+        .await?
+    {
+        Some(existing) => {
+            if new.policy.is_some() {
+                return Err(MeetingStoreError::Conflict {
+                    what: "meeting type",
+                    why: "this key already exists; a policy change is a new version through the governance route, not a schedule".into(),
+                });
+            }
+            existing
+        }
+        None => {
+            let policy = new.policy.ok_or_else(|| MeetingStoreError::Unprocessable {
+                code: "meeting_type_policy_required",
+                detail: "the meeting type does not exist; supply its policy to create version 1"
+                    .into(),
+            })?;
+            create_meeting_type_tx(&mut *conn, tenant, policy).await?
+        }
+    };
+    ensure_convener_tx(
+        &mut *conn,
+        tenant,
+        &meeting_type,
+        new.convener_kind,
+        new.convener_id,
+        actor,
+    )
+    .await?;
+
+    let board_id: Option<Uuid> =
+        sqlx::query_scalar("SELECT board_id FROM list WHERE tenant_id = $1 AND id = $2")
+            .bind(tenant.as_uuid())
+            .bind(new.list_id)
+            .fetch_optional(&mut *conn)
+            .await?;
+    let board_id = board_id.ok_or(MeetingStoreError::NotFound("list"))?;
+    if let Some(given) = new.board_id {
+        if given != board_id {
+            return Err(MeetingStoreError::Illegal {
+                what: "meeting",
+                why: "the list is not on the given board".into(),
+            });
+        }
+    }
+
+    let card_type_id: Option<Uuid> = sqlx::query_scalar(
+        "SELECT id FROM card_type WHERE tenant_id = $1 AND code = 'meeting' AND is_active",
+    )
+    .bind(tenant.as_uuid())
+    .fetch_optional(&mut *conn)
+    .await?;
+    let card_type_id = card_type_id.ok_or_else(|| MeetingStoreError::Conflict {
+        what: "meeting card type",
+        why: "no `meeting` card type is installed in this tenant; seed the catalogue first".into(),
+    })?;
+
+    crate::position::lock_board_tx(&mut *conn, tenant, board_id).await?;
+    let position =
+        crate::position::next_card_position_tx(&mut *conn, tenant, board_id, new.list_id).await?;
+    let card = crate::card::insert_card_tx(
+        &mut *conn,
+        tenant,
+        &NewCard {
+            list_id: new.list_id,
+            card_type_id,
+            name: new.title.to_owned(),
+            description: new.description.to_owned(),
+            position,
+            parent_card_id: None,
+            due_at: None,
+            assignee_id: None,
+            created_by: Some(actor.id),
+            job_binding_id: None,
+            meta: json!({
+                "meeting_type": meeting_type.key,
+                "meeting_type_version": meeting_type.version,
+            }),
+        },
+    )
+    .await?;
+
+    let convener_body = if new.convener_kind == "governance_body" {
+        Some(new.convener_id)
+    } else {
+        None
+    };
+    let meeting_id: Uuid = sqlx::query_scalar(
+        "INSERT INTO meeting (tenant_id, card_id, convener_kind, convener_id,
+             convener_governance_body_id, meeting_type_id, meeting_type_version, cadence_slot)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+         RETURNING id",
+    )
+    .bind(tenant.as_uuid())
+    .bind(card.id)
+    .bind(new.convener_kind)
+    .bind(new.convener_id)
+    .bind(convener_body)
+    .bind(meeting_type.id)
+    .bind(meeting_type.version)
+    .bind(new.cadence_slot)
+    .fetch_one(&mut *conn)
+    .await?;
+
+    get_meeting_tx(&mut *conn, tenant, meeting_id)
+        .await?
+        .ok_or(MeetingStoreError::NotFound("meeting"))
+}
+
+pub async fn open_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    id: Uuid,
+    expected_version: Option<i64>,
+) -> Result<MeetingRecord> {
+    let row: Option<(Uuid, String, i64, Uuid)> = sqlx::query_as(
+        "SELECT id, status, version, meeting_type_id FROM meeting
+          WHERE tenant_id = $1 AND id = $2 FOR UPDATE",
+    )
+    .bind(tenant.as_uuid())
+    .bind(id)
+    .fetch_optional(&mut *conn)
+    .await?;
+    let (_, status, version, meeting_type_id) =
+        row.ok_or(MeetingStoreError::NotFound("meeting"))?;
+    if let Some(expected) = expected_version {
+        if expected != version {
+            return Err(MeetingStoreError::Stale("meeting"));
+        }
+    }
+    match status.as_str() {
+        "scheduled" => {}
+        "live" => {
+            return Err(MeetingStoreError::Conflict {
+                what: "meeting",
+                why: "this meeting is already live".into(),
+            });
+        }
+        _ => {
+            return Err(MeetingStoreError::Illegal {
+                what: "meeting",
+                why: format!("a {status} meeting cannot be opened"),
+            });
+        }
+    }
+    let meeting_type = get_meeting_type_tx(&mut *conn, tenant, meeting_type_id)
+        .await?
+        .ok_or(MeetingStoreError::NotFound("meeting type"))?;
+    let updated = sqlx::query(
+        "UPDATE meeting
+            SET status = 'live', opens_at = now(),
+                decision_window_end = now() + make_interval(secs => $3::double precision),
+                updated_at = now(), version = version + 1
+          WHERE tenant_id = $1 AND id = $2",
+    )
+    .bind(tenant.as_uuid())
+    .bind(id)
+    .bind(meeting_type.decision_window_seconds)
+    .execute(&mut *conn)
+    .await;
+    if let Err(error) = updated {
+        if is_unique_on(&error, "uq_meeting_live") {
+            return Err(MeetingStoreError::Conflict {
+                what: "cadence slot",
+                why: "another live meeting already occupies this slot".into(),
+            });
+        }
+        return Err(error.into());
+    }
+    materialise_agenda_tx(&mut *conn, tenant, id).await?;
+    outbox::append(
+        &mut *conn,
+        tenant,
+        &NewEvent {
+            topic: format!("meeting:{id}"),
+            event_type: "meeting.opened".into(),
+            aggregate_type: "meeting".into(),
+            aggregate_id: id,
+            payload: json!({
+                "meeting_id": id,
+                "meeting_type": meeting_type.key,
+                "meeting_type_version": meeting_type.version,
+            }),
+            correlation_id: None,
+            causation_id: None,
+        },
+    )
+    .await?;
+    get_meeting_tx(&mut *conn, tenant, id)
+        .await?
+        .ok_or(MeetingStoreError::NotFound("meeting"))
+}
+
+// ── attendance ──────────────────────────────────────────────────────────────────────────
+
+pub async fn invite_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    meeting_id: Uuid,
+    participant_kind: &str,
+    participant_id: Uuid,
+    seat: &str,
+    department_id: Option<Uuid>,
+    delegated_from: Option<Uuid>,
+) -> Result<AttendanceRecord> {
+    if !PARTICIPANT_KINDS.contains(&participant_kind) {
+        return Err(MeetingStoreError::Unprocessable {
+            code: "invalid_participant_kind",
+            detail: format!("participant_kind must be one of {PARTICIPANT_KINDS:?}"),
+        });
+    }
+    if !SEATS.contains(&seat) {
+        return Err(MeetingStoreError::Unprocessable {
+            code: "invalid_seat",
+            detail: format!("seat must be one of {SEATS:?}"),
+        });
+    }
+    let meeting: Option<(String,)> =
+        sqlx::query_as("SELECT status FROM meeting WHERE tenant_id = $1 AND id = $2")
+            .bind(tenant.as_uuid())
+            .bind(meeting_id)
+            .fetch_optional(&mut *conn)
+            .await?;
+    let (status,) = meeting.ok_or(MeetingStoreError::NotFound("meeting"))?;
+    if !matches!(status.as_str(), "scheduled" | "live") {
+        return Err(MeetingStoreError::Illegal {
+            what: "meeting",
+            why: format!("a {status} meeting takes no invitations"),
+        });
+    }
+    ensure_participant_tx(&mut *conn, tenant, participant_kind, participant_id).await?;
+    if let Some(from) = delegated_from {
+        let same: Option<(Uuid,)> = sqlx::query_as(
+            "SELECT id FROM meeting_attendance WHERE tenant_id = $1 AND id = $2 AND meeting_id = $3",
+        )
+        .bind(tenant.as_uuid())
+        .bind(from)
+        .bind(meeting_id)
+        .fetch_optional(&mut *conn)
+        .await?;
+        if same.is_none() {
+            return Err(MeetingStoreError::NotFound("delegated seat"));
+        }
+    }
+    let sql = format!(
+        "INSERT INTO meeting_attendance (tenant_id, meeting_id, participant_kind, participant_id,
+             seat, department_id, delegated_from)
+         VALUES ($1, $2, $3, $4, $5, $6, $7)
+         ON CONFLICT (meeting_id, participant_kind, participant_id) DO UPDATE
+            SET seat = EXCLUDED.seat, department_id = EXCLUDED.department_id,
+                delegated_from = EXCLUDED.delegated_from, invitation_state = 'invited',
+                updated_at = now(), version = meeting_attendance.version + 1
+         RETURNING {ATTENDANCE_COLUMNS}"
+    );
+    sqlx::query_as::<_, AttendanceRecord>(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(meeting_id)
+        .bind(participant_kind)
+        .bind(participant_id)
+        .bind(seat)
+        .bind(department_id)
+        .bind(delegated_from)
+        .fetch_one(&mut *conn)
+        .await
+        .map_err(MeetingStoreError::from)
+}
+
+pub async fn respond_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    meeting_id: Uuid,
+    participant_kind: &str,
+    participant_id: Uuid,
+    response: &str,
+) -> Result<AttendanceRecord> {
+    if !matches!(response, "accepted" | "declined" | "tentative") {
+        return Err(MeetingStoreError::Unprocessable {
+            code: "invalid_response",
+            detail: "response must be accepted, declined or tentative".into(),
+        });
+    }
+    let sql = format!(
+        "UPDATE meeting_attendance
+            SET response_state = $4, invitation_state = $4, updated_at = now(),
+                version = version + 1
+          WHERE tenant_id = $1 AND meeting_id = $2 AND participant_kind = $3
+            AND participant_id = $5
+          RETURNING {ATTENDANCE_COLUMNS}"
+    );
+    sqlx::query_as::<_, AttendanceRecord>(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(meeting_id)
+        .bind(participant_kind)
+        .bind(response)
+        .bind(participant_id)
+        .fetch_optional(&mut *conn)
+        .await?
+        .ok_or(MeetingStoreError::NotFound("attendance"))
+}
+
+// ── agenda ──────────────────────────────────────────────────────────────────────────────
+
+pub async fn materialise_agenda_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    meeting_id: Uuid,
+) -> Result<Vec<AgendaItemRecord>> {
+    let row: Option<(Uuid, Uuid, i64)> = sqlx::query_as(
+        "SELECT id, meeting_type_id, meeting_type_version FROM meeting
+          WHERE tenant_id = $1 AND id = $2",
+    )
+    .bind(tenant.as_uuid())
+    .bind(meeting_id)
+    .fetch_optional(&mut *conn)
+    .await?;
+    let (_, meeting_type_id, _) = row.ok_or(MeetingStoreError::NotFound("meeting"))?;
+    let ty = get_meeting_type_tx(&mut *conn, tenant, meeting_type_id)
+        .await?
+        .ok_or(MeetingStoreError::NotFound("meeting type"))?;
+
+    let mut next_sequence: i32 = sqlx::query_scalar(
+        "SELECT COALESCE(max(sequence), 0) FROM meeting_agenda_item
+          WHERE tenant_id = $1 AND meeting_id = $2",
+    )
+    .bind(tenant.as_uuid())
+    .bind(meeting_id)
+    .fetch_one(&mut *conn)
+    .await?;
+
+    let sources = ty.agenda_sources.as_array().cloned().unwrap_or_default();
+    for source in &sources {
+        let kind = source.get("kind").and_then(Value::as_str).unwrap_or("");
+        let limit = source
+            .get("limit")
+            .and_then(Value::as_i64)
+            .unwrap_or(20)
+            .clamp(1, 100);
+        let kinds: Vec<String> = source
+            .get("kinds")
+            .and_then(Value::as_array)
+            .map(|items| {
+                items
+                    .iter()
+                    .filter_map(|item| item.as_str().map(str::to_owned))
+                    .collect()
+            })
+            .unwrap_or_default();
+        match kind {
+            "approval" => {
+                let rows: Vec<(Uuid, Value)> = sqlx::query_as(
+                    "SELECT id, meta FROM approval
+                      WHERE tenant_id = $1 AND status = 'pending'
+                      ORDER BY created_at, id LIMIT $2",
+                )
+                .bind(tenant.as_uuid())
+                .bind(limit)
+                .fetch_all(&mut *conn)
+                .await?;
+                for (approval_id, meta) in rows {
+                    let evidence = evidence_value(&meta);
+                    if evidence_count(&meta) < i64::from(ty.evidence_minimum) {
+                        continue;
+                    }
+                    if insert_agenda_item(
+                        &mut *conn,
+                        tenant,
+                        meeting_id,
+                        &mut next_sequence,
+                        "approval",
+                        approval_id,
+                        &[],
+                        &evidence,
+                    )
+                    .await?
+                    .is_some()
+                    {
+                        // inserted
+                    }
+                }
+            }
+            "register_item" => {
+                let wanted = if kinds.is_empty() {
+                    vec![
+                        "risk".to_owned(),
+                        "issue".to_owned(),
+                        "assumption".to_owned(),
+                        "dependency".to_owned(),
+                    ]
+                } else {
+                    kinds
+                };
+                let rows: Vec<(Uuid,)> = sqlx::query_as(
+                    "SELECT id FROM project_register_item
+                      WHERE tenant_id = $1 AND kind = ANY($2) AND status <> 'closed'
+                      ORDER BY created_at, id LIMIT $3",
+                )
+                .bind(tenant.as_uuid())
+                .bind(&wanted)
+                .bind(limit)
+                .fetch_all(&mut *conn)
+                .await?;
+                for (id,) in rows {
+                    insert_agenda_item(
+                        &mut *conn,
+                        tenant,
+                        meeting_id,
+                        &mut next_sequence,
+                        "register_item",
+                        id,
+                        &[],
+                        &json!([]),
+                    )
+                    .await?;
+                }
+            }
+            "asset" => {
+                let wanted = if kinds.is_empty() {
+                    vec!["waiver".to_owned(), "compliance_review".to_owned()]
+                } else {
+                    kinds
+                };
+                let rows: Vec<(Uuid,)> = sqlx::query_as(
+                    "SELECT id FROM governed_asset
+                      WHERE tenant_id = $1 AND kind = ANY($2) AND status IN ('draft', 'in_review')
+                      ORDER BY updated_at DESC, id LIMIT $3",
+                )
+                .bind(tenant.as_uuid())
+                .bind(&wanted)
+                .bind(limit)
+                .fetch_all(&mut *conn)
+                .await?;
+                for (id,) in rows {
+                    insert_agenda_item(
+                        &mut *conn,
+                        tenant,
+                        meeting_id,
+                        &mut next_sequence,
+                        "asset",
+                        id,
+                        &[],
+                        &json!([]),
+                    )
+                    .await?;
+                }
+            }
+            "cadence" => {
+                let rows: Vec<(Uuid,)> = if kinds.is_empty() {
+                    sqlx::query_as(
+                        "SELECT id FROM programme_cadence
+                          WHERE tenant_id = $1 AND state = 'planned'
+                          ORDER BY created_at, id LIMIT $2",
+                    )
+                    .bind(tenant.as_uuid())
+                    .bind(limit)
+                    .fetch_all(&mut *conn)
+                    .await?
+                } else {
+                    sqlx::query_as(
+                        "SELECT id FROM programme_cadence
+                          WHERE tenant_id = $1 AND state = 'planned' AND kind = ANY($2)
+                          ORDER BY created_at, id LIMIT $3",
+                    )
+                    .bind(tenant.as_uuid())
+                    .bind(&kinds)
+                    .bind(limit)
+                    .fetch_all(&mut *conn)
+                    .await?
+                };
+                for (id,) in rows {
+                    insert_agenda_item(
+                        &mut *conn,
+                        tenant,
+                        meeting_id,
+                        &mut next_sequence,
+                        "cadence",
+                        id,
+                        &[],
+                        &json!([]),
+                    )
+                    .await?;
+                }
+            }
+            "" => {}
+            other => {
+                return Err(MeetingStoreError::Illegal {
+                    what: "agenda source",
+                    why: format!("unknown source kind {other:?}"),
+                });
+            }
+        }
+    }
+
+    list_agenda_tx(&mut *conn, tenant, meeting_id).await
+}
+
+pub async fn agenda_add_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    meeting_id: Uuid,
+    new: &NewAgendaItem<'_>,
+) -> Result<AgendaItemRecord> {
+    if !RESOLVED_KINDS.contains(&new.resolved_kind) {
+        return Err(MeetingStoreError::Unprocessable {
+            code: "invalid_resolved_kind",
+            detail: format!("resolved_kind must be one of {RESOLVED_KINDS:?}"),
+        });
+    }
+    let row: Option<(String, Uuid)> = sqlx::query_as(
+        "SELECT status, meeting_type_id FROM meeting WHERE tenant_id = $1 AND id = $2",
+    )
+    .bind(tenant.as_uuid())
+    .bind(meeting_id)
+    .fetch_optional(&mut *conn)
+    .await?;
+    let (status, meeting_type_id) = row.ok_or(MeetingStoreError::NotFound("meeting"))?;
+    if !matches!(status.as_str(), "scheduled" | "live") {
+        return Err(MeetingStoreError::Illegal {
+            what: "meeting",
+            why: format!("a {status} meeting takes no agenda items"),
+        });
+    }
+    let ty = get_meeting_type_tx(&mut *conn, tenant, meeting_type_id)
+        .await?
+        .ok_or(MeetingStoreError::NotFound("meeting type"))?;
+
+    if new.resolved_kind == "approval" {
+        let approval: Option<(String, Value)> =
+            sqlx::query_as("SELECT status, meta FROM approval WHERE tenant_id = $1 AND id = $2")
+                .bind(tenant.as_uuid())
+                .bind(new.resolved_id)
+                .fetch_optional(&mut *conn)
+                .await?;
+        let (approval_status, meta) = approval.ok_or(MeetingStoreError::NotFound("approval"))?;
+        if approval_status != "pending" {
+            return Err(MeetingStoreError::Conflict {
+                what: "approval",
+                why: format!(
+                    "the approval is {approval_status}; a deciding item names a pending approval"
+                ),
+            });
+        }
+        let fresh = evidence_count(new.evidence_refs);
+        let existing = evidence_count(&meta);
+        if fresh.max(existing) < i64::from(ty.evidence_minimum) {
+            return Err(MeetingStoreError::Unprocessable {
+                code: "item_evidence_missing",
+                detail: format!(
+                    "the meeting type requires at least {} evidence refs",
+                    ty.evidence_minimum
+                ),
+            });
+        }
+    }
+
+    let mut sequence: i32 = sqlx::query_scalar(
+        "SELECT COALESCE(max(sequence), 0) + 1 FROM meeting_agenda_item
+          WHERE tenant_id = $1 AND meeting_id = $2",
+    )
+    .bind(tenant.as_uuid())
+    .bind(meeting_id)
+    .fetch_one(&mut *conn)
+    .await?;
+    let inserted = insert_agenda_item(
+        &mut *conn,
+        tenant,
+        meeting_id,
+        &mut sequence,
+        new.resolved_kind,
+        new.resolved_id,
+        new.participating_departments,
+        new.evidence_refs,
+    )
+    .await?;
+    match inserted {
+        Some(item) => Ok(item),
+        None => Err(MeetingStoreError::Conflict {
+            what: "agenda item",
+            why: "this object is already on the agenda".into(),
+        }),
+    }
+}
+
+async fn insert_agenda_item(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    meeting_id: Uuid,
+    next_sequence: &mut i32,
+    resolved_kind: &str,
+    resolved_id: Uuid,
+    participating_departments: &[Uuid],
+    evidence_refs: &Value,
+) -> Result<Option<AgendaItemRecord>> {
+    let sql = format!(
+        "INSERT INTO meeting_agenda_item (tenant_id, meeting_id, sequence, resolved_kind,
+             resolved_id, participating_departments, evidence_refs)
+         VALUES ($1, $2, $3, $4, $5, $6, $7)
+         ON CONFLICT (meeting_id, resolved_kind, resolved_id) DO NOTHING
+         RETURNING {AGENDA_COLUMNS}"
+    );
+    let row = sqlx::query_as::<_, AgendaItemRecord>(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(meeting_id)
+        .bind(*next_sequence)
+        .bind(resolved_kind)
+        .bind(resolved_id)
+        .bind(participating_departments)
+        .bind(evidence_refs)
+        .fetch_optional(&mut *conn)
+        .await?;
+    if row.is_some() {
+        *next_sequence += 1;
+    }
+    Ok(row)
+}
+
+// ── positions ───────────────────────────────────────────────────────────────────────────
+
+pub async fn position_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    meeting_id: Uuid,
+    new: &NewPosition<'_>,
+) -> Result<PositionRecord> {
+    if !PARTICIPANT_KINDS.contains(&new.participant_kind) {
+        return Err(MeetingStoreError::Unprocessable {
+            code: "invalid_participant_kind",
+            detail: format!("participant_kind must be one of {PARTICIPANT_KINDS:?}"),
+        });
+    }
+    if !STANCES.contains(&new.stance) {
+        return Err(MeetingStoreError::Unprocessable {
+            code: "invalid_stance",
+            detail: format!("stance must be one of {STANCES:?}"),
+        });
+    }
+    if !SURFACES.contains(&new.surface) {
+        return Err(MeetingStoreError::Unprocessable {
+            code: "invalid_surface",
+            detail: format!("surface must be one of {SURFACES:?}"),
+        });
+    }
+    let meeting: Option<(String,)> =
+        sqlx::query_as("SELECT status FROM meeting WHERE tenant_id = $1 AND id = $2")
+            .bind(tenant.as_uuid())
+            .bind(meeting_id)
+            .fetch_optional(&mut *conn)
+            .await?;
+    let (status,) = meeting.ok_or(MeetingStoreError::NotFound("meeting"))?;
+    if status != "live" {
+        return Err(MeetingStoreError::Illegal {
+            what: "meeting",
+            why: format!("a {status} meeting takes no positions"),
+        });
+    }
+    let item: Option<(Option<String>,)> = sqlx::query_as(
+        "SELECT outcome FROM meeting_agenda_item
+          WHERE tenant_id = $1 AND id = $2 AND meeting_id = $3",
+    )
+    .bind(tenant.as_uuid())
+    .bind(new.agenda_item_id)
+    .bind(meeting_id)
+    .fetch_optional(&mut *conn)
+    .await?;
+    let (outcome,) = item.ok_or(MeetingStoreError::NotFound("agenda item"))?;
+    if outcome.is_some() {
+        return Err(MeetingStoreError::Illegal {
+            what: "agenda item",
+            why: "the item is closed; its positions are immutable".into(),
+        });
+    }
+    let attending: Option<(Uuid,)> = sqlx::query_as(
+        "SELECT id FROM meeting_attendance
+          WHERE tenant_id = $1 AND meeting_id = $2 AND participant_kind = $3
+            AND participant_id = $4",
+    )
+    .bind(tenant.as_uuid())
+    .bind(meeting_id)
+    .bind(new.participant_kind)
+    .bind(new.participant_id)
+    .fetch_optional(&mut *conn)
+    .await?;
+    if attending.is_none() {
+        return Err(MeetingStoreError::Illegal {
+            what: "position",
+            why: "the participant is not attending this meeting".into(),
+        });
+    }
+
+    sqlx::query(
+        "UPDATE meeting_position SET superseded_at = now(), updated_at = now(),
+                version = version + 1
+          WHERE tenant_id = $1 AND agenda_item_id = $2 AND participant_kind = $3
+            AND participant_id = $4 AND superseded_at IS NULL",
+    )
+    .bind(tenant.as_uuid())
+    .bind(new.agenda_item_id)
+    .bind(new.participant_kind)
+    .bind(new.participant_id)
+    .execute(&mut *conn)
+    .await?;
+
+    let sql = format!(
+        "INSERT INTO meeting_position (tenant_id, meeting_id, agenda_item_id, participant_kind,
+             participant_id, stance, rationale, conditions, commitment, surface)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+         RETURNING {POSITION_COLUMNS}"
+    );
+    sqlx::query_as::<_, PositionRecord>(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(meeting_id)
+        .bind(new.agenda_item_id)
+        .bind(new.participant_kind)
+        .bind(new.participant_id)
+        .bind(new.stance)
+        .bind(new.rationale)
+        .bind(new.conditions)
+        .bind(new.commitment)
+        .bind(new.surface)
+        .fetch_one(&mut *conn)
+        .await
+        .map_err(MeetingStoreError::from)
+}
+
+// ── reads ──────────────────────────────────────────────────────────────────────────────
+
+pub async fn get_meeting_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    id: Uuid,
+) -> Result<Option<MeetingRecord>> {
+    let sql = format!(
+        "SELECT {MEETING_COLUMNS}
+           FROM meeting m
+           JOIN meeting_type t ON t.id = m.meeting_type_id AND t.tenant_id = m.tenant_id
+           JOIN card c ON c.id = m.card_id AND c.tenant_id = m.tenant_id
+          WHERE m.tenant_id = $1 AND m.id = $2"
+    );
+    sqlx::query_as::<_, MeetingRecord>(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(id)
+        .fetch_optional(&mut *conn)
+        .await
+        .map_err(MeetingStoreError::from)
+}
+
+pub async fn list_meetings_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    status: Option<&str>,
+    limit: i64,
+) -> Result<Vec<MeetingRecord>> {
+    let sql = format!(
+        "SELECT {MEETING_COLUMNS}
+           FROM meeting m
+           JOIN meeting_type t ON t.id = m.meeting_type_id AND t.tenant_id = m.tenant_id
+           JOIN card c ON c.id = m.card_id AND c.tenant_id = m.tenant_id
+          WHERE m.tenant_id = $1 AND ($2::text IS NULL OR m.status = $2)
+          ORDER BY COALESCE(m.opens_at, m.created_at) DESC, m.id DESC
+          LIMIT $3"
+    );
+    sqlx::query_as::<_, MeetingRecord>(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(status)
+        .bind(limit.clamp(1, 100))
+        .fetch_all(&mut *conn)
+        .await
+        .map_err(MeetingStoreError::from)
+}
+
+pub async fn list_agenda_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    meeting_id: Uuid,
+) -> Result<Vec<AgendaItemRecord>> {
+    let sql = format!(
+        "SELECT {AGENDA_COLUMNS} FROM meeting_agenda_item
+          WHERE tenant_id = $1 AND meeting_id = $2 ORDER BY sequence"
+    );
+    sqlx::query_as::<_, AgendaItemRecord>(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(meeting_id)
+        .fetch_all(&mut *conn)
+        .await
+        .map_err(MeetingStoreError::from)
+}
+
+pub async fn list_attendance_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    meeting_id: Uuid,
+) -> Result<Vec<AttendanceRecord>> {
+    let sql = format!(
+        "SELECT {ATTENDANCE_COLUMNS} FROM meeting_attendance
+          WHERE tenant_id = $1 AND meeting_id = $2 ORDER BY seat, participant_kind, participant_id"
+    );
+    sqlx::query_as::<_, AttendanceRecord>(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(meeting_id)
+        .fetch_all(&mut *conn)
+        .await
+        .map_err(MeetingStoreError::from)
+}
+
+pub async fn list_positions_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    meeting_id: Uuid,
+) -> Result<Vec<PositionRecord>> {
+    let sql = format!(
+        "SELECT {POSITION_COLUMNS} FROM meeting_position
+          WHERE tenant_id = $1 AND meeting_id = $2 AND superseded_at IS NULL
+          ORDER BY agenda_item_id, recorded_at, id"
+    );
+    sqlx::query_as::<_, PositionRecord>(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(meeting_id)
+        .fetch_all(&mut *conn)
+        .await
+        .map_err(MeetingStoreError::from)
+}
+
+pub async fn detail_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    meeting_id: Uuid,
+) -> Result<Option<MeetingDetail>> {
+    let Some(meeting) = get_meeting_tx(&mut *conn, tenant, meeting_id).await? else {
+        return Ok(None);
+    };
+    let meeting_type = get_meeting_type_tx(&mut *conn, tenant, meeting.meeting_type_id)
+        .await?
+        .ok_or(MeetingStoreError::NotFound("meeting type"))?;
+    Ok(Some(MeetingDetail {
+        meeting,
+        meeting_type,
+        agenda: list_agenda_tx(&mut *conn, tenant, meeting_id).await?,
+        attendance: list_attendance_tx(&mut *conn, tenant, meeting_id).await?,
+        positions: list_positions_tx(&mut *conn, tenant, meeting_id).await?,
+    }))
+}
+
+// ── authority ──────────────────────────────────────────────────────────────────────────
+
+async fn ensure_convener_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    ty: &MeetingTypeRecord,
+    convener_kind: &str,
+    convener_id: Uuid,
+    actor: MeetingActor<'_>,
+) -> Result<()> {
+    let authority = &ty.convener_authority;
+    let listed = |field: &str, value: &str| -> bool {
+        match authority.get(field).and_then(Value::as_array) {
+            Some(items) if !items.is_empty() => {
+                items.iter().any(|item| item.as_str() == Some(value))
+            }
+            _ => true,
+        }
+    };
+    if !listed("kinds", convener_kind) {
+        return Err(MeetingStoreError::Illegal {
+            what: "convener",
+            why: format!("this meeting type does not permit a {convener_kind} convener"),
+        });
+    }
+    if !listed("ids", &convener_id.to_string()) {
+        return Err(MeetingStoreError::Illegal {
+            what: "convener",
+            why: "this convener is not named by the type's authority row".into(),
+        });
+    }
+    if !listed("roles", actor.role) {
+        return Err(MeetingStoreError::Illegal {
+            what: "convener",
+            why: format!("role {} may not convene this type", actor.role),
+        });
+    }
+    match convener_kind {
+        "governance_body" => {
+            let body: Option<(String, Value)> = sqlx::query_as(
+                "SELECT status, members FROM governance_body WHERE tenant_id = $1 AND id = $2",
+            )
+            .bind(tenant.as_uuid())
+            .bind(convener_id)
+            .fetch_optional(&mut *conn)
+            .await?;
+            let (status, members) = body.ok_or(MeetingStoreError::NotFound("governance body"))?;
+            if status != "active" {
+                return Err(MeetingStoreError::Illegal {
+                    what: "convener",
+                    why: format!("the governance body is {status}; only an active body convenes"),
+                });
+            }
+            if let Some(items) = members.as_array() {
+                if !items.is_empty() {
+                    let actor_id = actor.id.to_string();
+                    let member = items.iter().any(|item| match item {
+                        Value::String(id) => id == &actor_id,
+                        Value::Object(map) => ["id", "user_id", "app_user_id"]
+                            .iter()
+                            .any(|key| map.get(*key).and_then(Value::as_str) == Some(&actor_id)),
+                        _ => false,
+                    });
+                    if !member {
+                        return Err(MeetingStoreError::Illegal {
+                            what: "convener",
+                            why: "the caller is not a member of the governance body".into(),
+                        });
+                    }
+                }
+            }
+        }
+        "job_binding" => {
+            let binding: Option<(Value, String)> = sqlx::query_as(
+                "SELECT meta, status FROM job_binding WHERE tenant_id = $1 AND id = $2",
+            )
+            .bind(tenant.as_uuid())
+            .bind(convener_id)
+            .fetch_optional(&mut *conn)
+            .await?;
+            let (meta, status) = binding.ok_or(MeetingStoreError::NotFound("job binding"))?;
+            if status != "active" {
+                return Err(MeetingStoreError::Illegal {
+                    what: "convener",
+                    why: format!("the job binding is {status}; only an active binding convenes"),
+                });
+            }
+            let allowed = meta.get("authority");
+            let permitted = match allowed {
+                Some(Value::String(value)) => value == "*" || value == &ty.key,
+                Some(Value::Array(items)) => {
+                    items.iter().any(|item| item.as_str() == Some(&ty.key))
+                }
+                _ => false,
+            };
+            if !permitted {
+                return Err(MeetingStoreError::Illegal {
+                    what: "convener",
+                    why: "the job binding's meta.authority does not name this meeting type".into(),
+                });
+            }
+        }
+        "app_user" => {
+            // `app_user` is global; the tenant link is `membership`.
+            let user: Option<(Uuid,)> = sqlx::query_as(
+                "SELECT u.id FROM app_user u
+                   JOIN membership m ON m.user_id = u.id AND m.tenant_id = $1
+                  WHERE u.id = $2",
+            )
+            .bind(tenant.as_uuid())
+            .bind(convener_id)
+            .fetch_optional(&mut *conn)
+            .await?;
+            if user.is_none() {
+                return Err(MeetingStoreError::NotFound("app user"));
+            }
+            let membership: Option<(Uuid,)> =
+                sqlx::query_as("SELECT id FROM membership WHERE tenant_id = $1 AND user_id = $2")
+                    .bind(tenant.as_uuid())
+                    .bind(actor.id)
+                    .fetch_optional(&mut *conn)
+                    .await?;
+            if membership.is_none() {
+                return Err(MeetingStoreError::Illegal {
+                    what: "convener",
+                    why: "the caller is not a member of this tenant".into(),
+                });
+            }
+        }
+        _ => {}
+    }
+    Ok(())
+}
+
+async fn ensure_participant_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    kind: &str,
+    id: Uuid,
+) -> Result<()> {
+    let found: Option<(Uuid,)> =
+        match kind {
+            "job_binding" => sqlx::query_as(
+                "SELECT id FROM job_binding WHERE tenant_id = $1 AND id = $2 AND status = 'active'",
+            )
+            .bind(tenant.as_uuid())
+            .bind(id)
+            .fetch_optional(&mut *conn)
+            .await?,
+            "app_user" => {
+                sqlx::query_as(
+                    "SELECT u.id FROM app_user u
+                   JOIN membership m ON m.user_id = u.id AND m.tenant_id = $1
+                  WHERE u.id = $2",
+                )
+                .bind(tenant.as_uuid())
+                .bind(id)
+                .fetch_optional(&mut *conn)
+                .await?
+            }
+            _ => None,
+        };
+    found
+        .map(|_| ())
+        .ok_or(MeetingStoreError::NotFound("participant"))
+}
