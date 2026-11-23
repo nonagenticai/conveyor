@@ -573,6 +573,39 @@ async fn delete_jobs(sandbox: &Sandbox, names: &[String]) {
     }
 }
 
+fn db(error: sqlx::Error) -> JobFailure {
+    JobFailure::retryable(format!("database: {error}"))
+}
+
+fn store_failure(error: BenchmarkStoreError) -> JobFailure {
+    match error {
+        BenchmarkStoreError::Database(error) => JobFailure::retryable(format!("database: {error}")),
+        other => JobFailure::permanent(other.to_string()),
+    }
+}
+
+fn document_failure(error: store::document::DocumentStoreError) -> JobFailure {
+    match error {
+        store::document::DocumentStoreError::Database(error) => {
+            JobFailure::retryable(format!("database: {error}"))
+        }
+        other => JobFailure::permanent(other.to_string()),
+    }
+}
+
+fn want_uuid(payload: &Value, field: &str, kind: &str) -> Result<Uuid, JobFailure> {
+    payload
+        .get(field)
+        .and_then(Value::as_str)
+        .and_then(|raw| Uuid::parse_str(raw).ok())
+        .ok_or_else(|| JobFailure::permanent(format!("{kind} payload has no usable {field}")))
+}
+
+fn sha256_hex(text: &str) -> String {
+    let digest = Sha256::digest(text.as_bytes());
+    digest.iter().map(|byte| format!("{byte:02x}")).collect()
+}
+
 #[cfg(test)]
 mod tests {
     use super::produced_patch;
@@ -614,37 +647,4 @@ mod tests {
         assert!(error.permanent);
         assert!(error.message.contains("gold"), "{}", error.message);
     }
-}
-
-fn db(error: sqlx::Error) -> JobFailure {
-    JobFailure::retryable(format!("database: {error}"))
-}
-
-fn store_failure(error: BenchmarkStoreError) -> JobFailure {
-    match error {
-        BenchmarkStoreError::Database(error) => JobFailure::retryable(format!("database: {error}")),
-        other => JobFailure::permanent(other.to_string()),
-    }
-}
-
-fn document_failure(error: store::document::DocumentStoreError) -> JobFailure {
-    match error {
-        store::document::DocumentStoreError::Database(error) => {
-            JobFailure::retryable(format!("database: {error}"))
-        }
-        other => JobFailure::permanent(other.to_string()),
-    }
-}
-
-fn want_uuid(payload: &Value, field: &str, kind: &str) -> Result<Uuid, JobFailure> {
-    payload
-        .get(field)
-        .and_then(Value::as_str)
-        .and_then(|raw| Uuid::parse_str(raw).ok())
-        .ok_or_else(|| JobFailure::permanent(format!("{kind} payload has no usable {field}")))
-}
-
-fn sha256_hex(text: &str) -> String {
-    let digest = Sha256::digest(text.as_bytes());
-    digest.iter().map(|byte| format!("{byte:02x}")).collect()
 }
