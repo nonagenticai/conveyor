@@ -3,9 +3,10 @@
 //! gated (conveyor#282, SPEC_V2 §10.4).
 //!
 //! The mechanism lives in [`super::approvals::enforce_destructive_gate`]; this family is the only
-//! way a tenant changes what that gate does. Two settings per action, and nothing else:
-//! whether an approval is required at all, and whether the person who asked for a gate may decide
-//! it. Both defaults are the strict §11.4 / §5.4 rule, so a tenant that never calls `set` is
+//! way a tenant changes what that gate does. Three settings per action, and nothing else:
+//! whether an approval is required at all, whether the person who asked for a gate may decide
+//! it, and which approver kind (human by default) the tenant declares non-governance for the
+//! gate. Every default is the strict §11.4 / §5.4 rule, so a tenant that never calls `set` is
 //! already correct.
 //!
 //! ⛔ A policy can only ever **lower** a requirement for one named action. It cannot grant a
@@ -14,6 +15,7 @@
 
 use std::str::FromStr;
 
+use conveyor_domain::DeciderKind;
 use conveyor_store as store;
 use conveyor_store::approval_policy::{ApprovalPolicy, ApprovalRequirement, SelfApproval};
 use sqlx::PgConnection;
@@ -30,6 +32,7 @@ impl From<&ApprovalPolicy> for ApprovalPolicyOut {
             action: policy.action.clone(),
             approval: policy.approval.as_str().to_owned(),
             self_approval: policy.self_approval.as_str().to_owned(),
+            approver_kind: policy.approver_kind.as_str().to_owned(),
         }
     }
 }
@@ -46,6 +49,23 @@ fn known_action(name: &str) -> Result<&'static crate::spec::ActionSpec, ActionEr
             format!("no action named {name:?}"),
         )
     })
+}
+
+/// The approver kind a `set` may declare. `human` is the default; every other accepted value is
+/// the tenant's explicit non-governance declaration for this gate (SPEC_V2 §5.4).
+fn parse_approver_kind(text: &str) -> Result<DeciderKind, ActionError> {
+    match text {
+        "human" => Ok(DeciderKind::Human),
+        "triage_agent" => Ok(DeciderKind::TriageAgent),
+        "rule" => Ok(DeciderKind::Rule),
+        "agent" => Ok(DeciderKind::Agent),
+        "service" => Ok(DeciderKind::Service),
+        _ => Err(invalid(
+            "approver_kind",
+            "invalid_value",
+            "must be `human`, `triage_agent`, `rule`, `agent` or `service`",
+        )),
+    }
 }
 
 /// `approval_policies.list` — every policy this tenant has set, by action name.
@@ -143,10 +163,12 @@ async fn approval_policies_set(
             "must be `forbidden` or `allowed`",
         )
     })?;
+    let approver_kind = parse_approver_kind(&input.approver_kind)?;
     let policy = ApprovalPolicy {
         action: spec.name.to_owned(),
         approval,
         self_approval,
+        approver_kind,
     };
     store::approval_policy::set(&mut *tx, ctx.tenant, &policy, Some(ctx.actor_id))
         .await

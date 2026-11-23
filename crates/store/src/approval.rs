@@ -110,9 +110,13 @@ pub enum ApprovalStoreError {
     /// The run transition that opens the gate was refused (absent, or not `running`).
     #[error(transparent)]
     Run(#[from] RunStoreError),
-    /// An eval gate was offered a machine decision (S06d / W1). A sign-off is a person's act.
-    #[error("an eval sign-off must be decided by a human, not a machine")]
-    HumanOnlyGate,
+    /// A gate was offered a non-human decision it did not declare (SPEC_V2 §5.4). Human is
+    /// the default; a tenant must name the approver kind in its gate-policy row.
+    #[error("gate {gate:?} must be decided by a human, not a machine")]
+    HumanOnlyGate {
+        /// The gate that refused the decision, named for the caller.
+        gate: String,
+    },
     /// An `executor` gate was offered a machine decision (S21 step 5, ADR 0011). It is L3.
     #[error("an executor gate must be decided by a human, not a machine")]
     ExecutorGateHumanOnly,
@@ -889,29 +893,51 @@ pub async fn record_decision_tx(
             ));
         }
     }
-    // W1 (S06d): an eval gate is a person's act, and only a person holding `evals:approve` may
-    // decide it. This check lives HERE — the one writer every decision path traverses — so
-    // `approvals.decide`, `eval_signoffs.decide`, MCP `tasks/update` and a connector reply
-    // cannot disagree. `eval_id` is not in `COLUMNS`; it is read under the same row lock.
+    // S21 step 5: an `executor` gate is a person's act (SPEC_V2 §7.1). Like the eval gate, the
+    // refusal lives in the one writer every decision path traverses, so `approvals.decide`, MCP
+    // and a connector reply cannot disagree. Unconditional: an L3 gate is not a tenant's to
+    // declare non-governance.
+    if row.kind == "executor" && decision.decided_by_kind != DeciderKind::Human {
+        return Err(ApprovalStoreError::ExecutorGateHumanOnly);
+    }
+    // SPEC_V2 §5.4: a human approver is the DEFAULT for every gate, not only an eval gate. A
+    // tenant may authorise a non-human approver (job/agent/service/rule) only for a gate it
+    // explicitly declares non-governance — by naming that approver kind in its gate-policy row.
+    // This check lives HERE, the one writer every decision path traverses, so `approvals.decide`,
+    // `eval_signoffs.decide`, MCP `tasks/update` and a connector reply cannot disagree. An
+    // absent, unreadable or corrupt policy row all keep the refusal.
+    if decision.decided_by_kind != DeciderKind::Human {
+        let allowed = match approval_policy::allows_approver_kind(
+            &mut *conn,
+            tenant,
+            &row.gate,
+            decision.decided_by_kind,
+        )
+        .await
+        {
+            Ok(allowed) => allowed,
+            Err(approval_policy::ApprovalPolicyStoreError::Database(error)) => {
+                return Err(error.into());
+            }
+            Err(_) => false,
+        };
+        if !allowed {
+            return Err(ApprovalStoreError::HumanOnlyGate {
+                gate: row.gate.clone(),
+            });
+        }
+    }
+    // An eval sign-off additionally needs the caller to hold `evals:approve` (S06d / W1). The
+    // eval gate's human-only rule is the general rule above, not a special case. `eval_id` is
+    // not in `COLUMNS`; it is read under the same row lock.
     let eval_gate: Option<Uuid> =
         sqlx::query_scalar("SELECT eval_id FROM approval WHERE tenant_id = $1 AND id = $2")
             .bind(tenant.as_uuid())
             .bind(approval_id)
             .fetch_one(&mut *conn)
             .await?;
-    if eval_gate.is_some() {
-        if decision.decided_by_kind != DeciderKind::Human {
-            return Err(ApprovalStoreError::HumanOnlyGate);
-        }
-        if !eval_authorized {
-            return Err(ApprovalStoreError::EvalScopeRequired);
-        }
-    }
-    // S21 step 5: an `executor` gate is a person's act (SPEC_V2 §7.1). Like the eval gate, the
-    // refusal lives in the one writer every decision path traverses, so `approvals.decide`, MCP
-    // and a connector reply cannot disagree.
-    if row.kind == "executor" && decision.decided_by_kind != DeciderKind::Human {
-        return Err(ApprovalStoreError::ExecutorGateHumanOnly);
+    if eval_gate.is_some() && !eval_authorized {
+        return Err(ApprovalStoreError::EvalScopeRequired);
     }
 
     let prior: i64 = sqlx::query_scalar(

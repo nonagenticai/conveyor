@@ -227,10 +227,10 @@ pub fn approval_error(error: store::ApprovalStoreError, action: &str) -> ActionE
         }
         store::ApprovalStoreError::Parent(parent) => parent_error(parent, action),
         store::ApprovalStoreError::Run(error) => run_error(error, action),
-        store::ApprovalStoreError::HumanOnlyGate => ActionError::new(
+        store::ApprovalStoreError::HumanOnlyGate { gate } => ActionError::new(
             403,
-            "signoff_requires_human",
-            format!("{action:?}: an eval sign-off must be decided by a person"),
+            "human_only_gate",
+            format!("{action:?}: gate {gate:?} must be decided by a human, not a machine"),
         ),
         store::ApprovalStoreError::ExecutorGateHumanOnly => ActionError::new(
             403,

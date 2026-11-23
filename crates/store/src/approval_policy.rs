@@ -1,10 +1,13 @@
 #![forbid(unsafe_code)]
 //! How a tenant wants its destructive actions gated (conveyor#282, SPEC_V2 §10.4 / §11.4 / §5.4).
 //!
-//! Two questions per (tenant, action), and nothing else:
+//! Three questions per (tenant, action), and nothing else:
 //!
 //! * `approval` — `required` (the default, and §11.4's rule) or `waived` (this tenant's opt-out);
-//! * `self_approval` — `forbidden` (the default, and §5.4's rule) or `allowed`.
+//! * `self_approval` — `forbidden` (the default, and §5.4's rule) or `allowed`;
+//! * `approver_kind` — `human` (the default, and §5.4's rule) or the one non-human kind
+//!   (`triage_agent`, `rule`, `agent`, `service`) this tenant explicitly declares
+//!   non-governance for the gate.
 //!
 //! ⛔ **An absent row is the safe default, never "no policy".** Every reader in this module
 //! answers with `required` / `forbidden` when the row is missing, so a tenant that has decided
@@ -16,7 +19,7 @@
 
 use std::str::FromStr;
 
-use conveyor_domain::TenantId;
+use conveyor_domain::{DeciderKind, TenantId};
 use sqlx::PgConnection;
 use uuid::Uuid;
 
@@ -115,6 +118,9 @@ pub struct ApprovalPolicy {
     pub approval: ApprovalRequirement,
     /// Whether its requester may decide its gate.
     pub self_approval: SelfApproval,
+    /// The approver kind this tenant authorises for the gate. `Human` is the default and the
+    /// §5.4 rule; a non-human kind is an explicit non-governance declaration for this gate.
+    pub approver_kind: DeciderKind,
 }
 
 impl ApprovalPolicy {
@@ -124,6 +130,7 @@ impl ApprovalPolicy {
             action: action.to_owned(),
             approval: ApprovalRequirement::Required,
             self_approval: SelfApproval::Forbidden,
+            approver_kind: DeciderKind::Human,
         }
     }
 }
@@ -133,6 +140,7 @@ struct PolicyRow {
     action: String,
     approval: String,
     self_approval: String,
+    approver_kind: String,
 }
 
 impl PolicyRow {
@@ -140,12 +148,30 @@ impl PolicyRow {
         Ok(ApprovalPolicy {
             approval: ApprovalRequirement::from_str(&self.approval)?,
             self_approval: SelfApproval::from_str(&self.self_approval)?,
+            approver_kind: parse_approver_kind(&self.approver_kind)?,
             action: self.action,
         })
     }
 }
 
-const COLUMNS: &str = "action, approval, self_approval";
+/// The stored `approval_policy.approver_kind`, in the domain's `DeciderKind` spelling.
+///
+/// A value outside the migration's CHECK vocabulary is a typed error, never a coerced default.
+fn parse_approver_kind(text: &str) -> Result<DeciderKind, ApprovalPolicyStoreError> {
+    match text {
+        "human" => Ok(DeciderKind::Human),
+        "triage_agent" => Ok(DeciderKind::TriageAgent),
+        "rule" => Ok(DeciderKind::Rule),
+        "agent" => Ok(DeciderKind::Agent),
+        "service" => Ok(DeciderKind::Service),
+        other => Err(ApprovalPolicyStoreError::Vocabulary {
+            what: "approval_policy.approver_kind",
+            value: other.to_owned(),
+        }),
+    }
+}
+
+const COLUMNS: &str = "action, approval, self_approval, approver_kind";
 
 /// The tenant's policy for one action, or `None` when it has set none.
 ///
@@ -186,11 +212,13 @@ pub async fn set(
     updated_by: Option<Uuid>,
 ) -> Result<ApprovalPolicy, ApprovalPolicyStoreError> {
     sqlx::query(
-        "INSERT INTO approval_policy (tenant_id, action, approval, self_approval, updated_by)
-         VALUES ($1, $2, $3, $4, $5)
+        "INSERT INTO approval_policy (tenant_id, action, approval, self_approval, approver_kind,
+                                      updated_by)
+         VALUES ($1, $2, $3, $4, $5, $6)
          ON CONFLICT (tenant_id, action) DO UPDATE
             SET approval = excluded.approval,
                 self_approval = excluded.self_approval,
+                approver_kind = excluded.approver_kind,
                 updated_by = excluded.updated_by,
                 updated_at = now()",
     )
@@ -198,6 +226,7 @@ pub async fn set(
     .bind(&policy.action)
     .bind(policy.approval.as_str())
     .bind(policy.self_approval.as_str())
+    .bind(policy.approver_kind.as_str())
     .bind(updated_by)
     .execute(conn)
     .await?;
@@ -231,6 +260,29 @@ pub async fn allows_self_approval(
 ) -> Result<bool, ApprovalPolicyStoreError> {
     match get(conn, tenant, action).await {
         Ok(Some(policy)) => Ok(policy.self_approval == SelfApproval::Allowed),
+        Ok(None) => Ok(false),
+        Err(ApprovalPolicyStoreError::Vocabulary { .. }) => Ok(false),
+        Err(error) => Err(error),
+    }
+}
+
+/// Whether `approver` may decide a gate on `action`. **The decide path's human-default read.**
+///
+/// A human approver is always admitted (§5.4's default). A non-human kind is admitted only when
+/// the tenant's row for this gate names that exact kind — the explicit non-governance
+/// declaration. A missing row, an unreadable row or a corrupt value all keep `false`: a machine
+/// decision is never admitted because the policy could not be read.
+pub async fn allows_approver_kind(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    action: &str,
+    approver: DeciderKind,
+) -> Result<bool, ApprovalPolicyStoreError> {
+    if approver == DeciderKind::Human {
+        return Ok(true);
+    }
+    match get(conn, tenant, action).await {
+        Ok(Some(policy)) => Ok(policy.approver_kind == approver),
         Ok(None) => Ok(false),
         Err(ApprovalPolicyStoreError::Vocabulary { .. }) => Ok(false),
         Err(error) => Err(error),

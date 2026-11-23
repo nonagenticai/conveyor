@@ -831,6 +831,9 @@ pub struct ApprovalPolicyOut {
     pub approval: String,
     /// `forbidden` — the requester cannot decide its own gate (§5.4); `allowed` — they may.
     pub self_approval: String,
+    /// `human` — a person decides the gate (§5.4's default); a non-human kind is this tenant's
+    /// explicit non-governance declaration for the gate.
+    pub approver_kind: String,
 }
 
 /// `approval_policies.get` input.
@@ -841,10 +844,15 @@ pub struct ApprovalPolicyGetIn {
     pub action: String,
 }
 
+/// The approver a gate gets when the tenant names none: `human`, SPEC_V2 §5.4's default.
+fn default_approver_kind() -> String {
+    "human".to_owned()
+}
+
 /// `approval_policies.set` input — the complete decision for one action.
 ///
-/// Both settings are required: a `set` replaces the whole policy, so leaving one out would mean
-/// silently resetting it to the default rather than leaving it alone.
+/// `approval` and `self_approval` are required: a `set` replaces the whole policy, so leaving one
+/// out would silently reset it. `approver_kind` defaults to `human`, the strict §5.4 rule.
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
 #[serde(deny_unknown_fields)]
 pub struct ApprovalPolicySetIn {
@@ -854,4 +862,8 @@ pub struct ApprovalPolicySetIn {
     pub approval: String,
     /// `forbidden` or `allowed`.
     pub self_approval: String,
+    /// `human` (the default) or the non-human kind this tenant authorises for the gate:
+    /// `triage_agent`, `rule`, `agent` or `service`.
+    #[serde(default = "default_approver_kind")]
+    pub approver_kind: String,
 }
