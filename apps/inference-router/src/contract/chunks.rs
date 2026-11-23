@@ -8,6 +8,12 @@
 //! intermediate chunk carries `"tool_calls":null` and `"usage":null`; a serde `Option` with no
 //! `skip_serializing_if` reproduces that. The golden stream compares byte-for-byte after the
 //! normaliser sorts keys.
+//!
+//! `ChunkDelta::reasoning_content` is the ONE exception, and the exception is what parity
+//! requires: the oracle's captured stream (`contract/golden/completion_stream.body`) predates
+//! the reasoning channel, so a chunk carrying no reasoning must serialise exactly as it always
+//! has. A chunk that DOES carry reasoning gains the field; that is strictly additive, and it is
+//! the only way a streaming caller can see the model's thinking at all.
 
 use serde::{Deserialize, Serialize};
 
@@ -32,6 +38,14 @@ pub struct ChunkDelta {
     pub role: Option<String>,
     #[serde(default)]
     pub content: Option<String>,
+    /// The model's thinking for this step, when the upstream exposes it.
+    ///
+    /// The OpenAI-compatible spelling; vLLM streams it as `reasoning`, and the provider's
+    /// parser normalises both onto this field (see `reasoning_text`). The derive path knows
+    /// only this spelling on purpose: an alias would make a frame carrying both keys a
+    /// `duplicate field` error.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub reasoning_content: Option<String>,
     #[serde(default)]
     pub tool_calls: Option<Vec<ToolCallDelta>>,
 }
@@ -70,5 +84,36 @@ impl ChatCompletionChunk {
             "data: {}\n\n",
             serde_json::to_string(self).expect("a chunk always serialises")
         )
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use serde_json::Value;
+
+    use super::*;
+
+    #[test]
+    fn a_delta_without_reasoning_omits_the_key_entirely() {
+        let delta = ChunkDelta {
+            content: Some("hi".to_owned()),
+            ..ChunkDelta::default()
+        };
+        let value = serde_json::to_value(&delta).expect("serialises");
+        assert_eq!(value["content"], "hi");
+        assert!(value.get("reasoning_content").is_none());
+        // Every other delta field keeps the pydantic convention: present, and null.
+        assert!(value.get("tool_calls").is_some_and(Value::is_null));
+    }
+
+    #[test]
+    fn the_chunk_type_exposes_the_contract_spelling_only() {
+        let delta = ChunkDelta {
+            reasoning_content: Some("thinking".to_owned()),
+            ..ChunkDelta::default()
+        };
+        let value = serde_json::to_value(&delta).expect("serialises");
+        assert_eq!(value["reasoning_content"], "thinking");
+        assert!(value.get("reasoning").is_none());
     }
 }

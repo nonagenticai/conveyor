@@ -18,6 +18,7 @@
 
 use std::str::FromStr;
 
+use chrono::Utc;
 use conveyor_domain::{
     Approval, ApprovalError, ApprovalStatus, DeciderKind, Decision, DecisionKind, RunStatus,
     TenantId,
@@ -219,6 +220,108 @@ async fn approvals_decide(
                             ActionError::internal()
                         })?;
                     }
+                    cancel_run_for_rejection(&mut *tx, &ctx, run_id).await?;
+                }
+                _ => {}
+            }
+        } else if approval.kind == "executor" {
+            // S21 step 5: an `executor` gate decides a generated draft. A person's approval
+            // records the bound L3 decision in this transaction, settles the run and enqueues the
+            // one apply worker; a rejection cancels and leaves the draft unattached.
+            match approval.status {
+                ApprovalStatus::Approved => {
+                    let meta = store::approval::approval_meta_tx(&mut *tx, ctx.tenant, approval.id)
+                        .await
+                        .map_err(|error| {
+                            tracing::error!(
+                                %error,
+                                approval_id = %approval.id,
+                                "read the executor gate"
+                            );
+                            ActionError::internal()
+                        })?
+                        .unwrap_or(Value::Null);
+                    let document_id = meta
+                        .get("draft_document_id")
+                        .and_then(Value::as_str)
+                        .and_then(|raw| Uuid::parse_str(raw).ok())
+                        .ok_or_else(|| {
+                            ActionError::new(
+                                422,
+                                "gate_incomplete",
+                                "the executor gate names no draft document",
+                            )
+                        })?;
+                    let decision = store::ladder::record_decision_tx(
+                        &mut *tx,
+                        ctx.tenant,
+                        &store::ladder::NewDecision {
+                            kind: crate::ladder::DRAFT_APPLY_GATE.to_owned(),
+                            rung: conveyor_domain::ladder::Rung::Human,
+                            project_id: approval.project_id,
+                            card_id: approval.card_id,
+                            question: "Apply the generated draft?".to_owned(),
+                            answer: "approved".to_owned(),
+                            option_set_version: None,
+                            probabilities: serde_json::json!({}),
+                            confidence: None,
+                            input_hash: None,
+                            policy_id: None,
+                            policy_version: None,
+                            policy_refinement_id: None,
+                            refinement_version: None,
+                            laya_config_id: None,
+                            laya_config_version: None,
+                            actor_kind: ctx.actor_kind.clone(),
+                            actor_id: Some(ctx.actor_id),
+                            approval_id: Some(approval.id),
+                            latency_ms: None,
+                            outcome: conveyor_domain::ladder::Outcome::Accepted,
+                            decided_at: Some(Utc::now()),
+                            meta: serde_json::json!({
+                                "run_id": run_id,
+                                "draft_document_id": document_id,
+                                "prompt_sha256": meta.get("prompt_sha256").cloned().unwrap_or(Value::Null),
+                                "approval_id": approval.id,
+                            }),
+                            options: Vec::new(),
+                        },
+                    )
+                    .await
+                    .map_err(|error| {
+                        tracing::error!(
+                            %error,
+                            approval_id = %approval.id,
+                            "record the L3 draft decision"
+                        );
+                        ActionError::internal()
+                    })?;
+                    if settle_run(&mut *tx, ctx.tenant, run_id, RunStatus::Running).await? {
+                        store::jobs::enqueue_tx(
+                            &mut *tx,
+                            ctx.tenant,
+                            "run.resume",
+                            &format!("run.resume:{run_id}:{}", approval.id),
+                            serde_json::json!({
+                                "run_id": run_id,
+                                "approval_id": approval.id,
+                                "decision_id": decision.id,
+                            }),
+                            None,
+                            5,
+                        )
+                        .await
+                        .map_err(|error| {
+                            tracing::error!(
+                                %error,
+                                approval_id = %approval.id,
+                                "enqueue run.resume"
+                            );
+                            ActionError::internal()
+                        })?;
+                    }
+                }
+                ApprovalStatus::Rejected => {
                     cancel_run_for_rejection(&mut *tx, &ctx, run_id).await?;
                 }
                 _ => {}

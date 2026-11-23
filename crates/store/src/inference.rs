@@ -115,6 +115,11 @@ pub struct InferenceCallRow {
     pub latency_ms: i32,
     /// The outcome.
     pub outcome: String,
+    /// The commercial unit for a non-token surface (`image | character | second`); `None` for a
+    /// token call.
+    pub usage_unit: Option<String>,
+    /// The surface's unit count; `None` when the surface could not measure one.
+    pub usage_units: Option<Decimal>,
     /// When the call was recorded.
     pub created_at: DateTime<Utc>,
 }
@@ -123,7 +128,8 @@ const CALL_COLUMNS: &str =
     "id, action_invocation_id, trace_id, correlation_id, caller_kind, run_id,
     run_step_id, conversation_turn_id, eval_run_id, prompt_ref, prompt_version, prompt_sha256,
     model, served_model, prompt_tokens, completion_tokens, total_tokens, cache_creation_input_tokens,
-    cache_read_input_tokens, cache_status, latency_ms, outcome, created_at";
+    cache_read_input_tokens, cache_status, latency_ms, outcome, usage_unit, usage_units,
+    created_at";
 
 /// Insert one call in the caller's scoped transaction.
 pub async fn insert_call_tx(
@@ -230,6 +236,31 @@ pub async fn list_calls_tx(
         .bind(filter.before.map(|(_, id)| id))
         .bind(filter.limit)
         .bind(filter.eval_run_id)
+        .fetch_all(&mut *conn)
+        .await?;
+    Ok(rows)
+}
+
+/// Every ledger row attributed to one eval run, oldest first.
+///
+/// The eval runner writes `caller_kind = 'eval'` with the run's id for the subject call, its
+/// judge calls and (when the provider answered before the failure) billed failed attempts, so
+/// this is the one read a cost surface needs. No page: a report prices the whole run or none of
+/// it, and a truncated ledger would silently understate spend.
+pub async fn eval_run_calls_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    eval_run_id: Uuid,
+) -> Result<Vec<InferenceCallRow>, InferenceStoreError> {
+    let sql = format!(
+        "SELECT {CALL_COLUMNS}
+           FROM inference_call
+          WHERE tenant_id = $1 AND eval_run_id = $2
+          ORDER BY created_at, id"
+    );
+    let rows: Vec<InferenceCallRow> = sqlx::query_as(sqlx::AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(eval_run_id)
         .fetch_all(&mut *conn)
         .await?;
     Ok(rows)

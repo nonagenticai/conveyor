@@ -2314,12 +2314,8 @@ async fn seed_parity_laya(pg: &support::Pg, ctx: &Ctx) -> Uuid {
     id
 }
 
-/// Seed the human `draft.apply` decision the application sample names (§7.4).
-///
-/// The gate is approved by alice through the store — `requested_by: None` keeps the requester
-/// exclusion out of the fixture — and the decision cites it: a generated draft is applied only
-/// through a human `draft.apply` decision backed by an approved gate on the card.
-async fn seed_parity_decision(pg: &support::Pg, ctx: &Ctx, card: Uuid) -> Uuid {
+/// Seed an accepted L1 decision bound to the draft the sample applies.
+async fn seed_parity_decision(pg: &support::Pg, ctx: &Ctx, card: Uuid, document: Uuid) -> Uuid {
     let mut tx = begin_scoped(&pg.owner, ctx.tenant).await.expect("scope");
     let approval = store::approval::insert_approval_tx(
         &mut tx,
@@ -2351,14 +2347,13 @@ async fn seed_parity_decision(pg: &support::Pg, ctx: &Ctx, card: Uuid) -> Uuid {
     .await
     .expect("approve the draft.apply gate");
     let id: Uuid = sqlx::query_scalar(
-        "INSERT INTO decision (tenant_id, kind, rung, actor_kind, card_id, outcome, answer,
-                               approval_id)
-         VALUES ($1, 'draft.apply', 'human', 'user', $2, 'accepted', 'apply', $3)
-         RETURNING id",
+        "INSERT INTO decision (tenant_id, kind, rung, actor_kind, card_id, outcome, meta)
+         VALUES ($1, 'gate.precheck', 'laya', 'system', $2, 'accepted',
+                 jsonb_build_object('draft_document_id', $3::text)) RETURNING id",
     )
     .bind(ctx.tenant_id)
     .bind(card)
-    .bind(approval.id)
+    .bind(document.to_string())
     .fetch_one(&mut *tx)
     .await
     .expect("insert decision");
@@ -2925,8 +2920,8 @@ async fn prepare(sample: &Sample, pg: &support::Pg, ctx: &Ctx) {
         }
         "ladder.apply_draft" => {
             let card = seed_card(pg, ctx, "active").await;
-            let decision = seed_parity_decision(pg, ctx, card).await;
             let document = seed_parity_document(pg, ctx).await;
+            let decision = seed_parity_decision(pg, ctx, card, document).await;
             ctx.push("ladder.apply_draft.card", card);
             ctx.push("ladder.apply_draft.decision", decision);
             ctx.push("ladder.apply_draft.document", document);
@@ -5158,6 +5153,14 @@ fn samples(ctx: &Ctx) -> Vec<Sample> {
         plain("coding_jobs.create", json!({}), None),
         plain("coding_jobs.get", json!({}), None),
         plain("retrieval.query", json!({}), None),
+        // T14 (#560): the scientific reads. An empty body is refused by the closed input schema on
+        // both transports (422 / `isError`), which is the parity property a declared external has
+        // when its service is a draft and no call should leave the process.
+        plain("scientific_stats.meta_analysis", json!({}), None),
+        plain("scientific_stats.confidence_interval", json!({}), None),
+        plain("scientific_stats.trend", json!({}), None),
+        plain("scientific_formal.translate", json!({}), None),
+        plain("scientific_formal.verify", json!({}), None),
         // S10: the copilot's model call. The stub's catch-all answers the router's path, so the two
         // transports receive the same document — this proves the declaration, not a model.
         plain(

@@ -233,6 +233,11 @@ pub fn approval_error(error: store::ApprovalStoreError, action: &str) -> ActionE
             "signoff_requires_human",
             format!("{action:?}: an eval sign-off must be decided by a person"),
         ),
+        store::ApprovalStoreError::ExecutorGateHumanOnly => ActionError::new(
+            403,
+            "executor_gate_requires_human",
+            format!("{action:?}: an executor gate must be decided by a person"),
+        ),
         store::ApprovalStoreError::EvalScopeRequired => ActionError::new(
             403,
             "eval_signoff_scope_required",

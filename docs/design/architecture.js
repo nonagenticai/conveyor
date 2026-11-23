@@ -110,8 +110,15 @@ window.ArchitecturePack = (function () {
       L-->>WF: answer and confidence
     end
     opt gate requires approval
-      WF->>G: request the gate
-      G-->>WF: approval and approval_decision
+      WF->>G: park the run (waiting_approval) and request the gate
+      G-->>P: pending approval naming the draft
+      P->>G: approve or reject
+      alt approved
+        G->>WF: record the L3 decision and enqueue run.resume
+        WF->>WF: apply the draft, no second model call
+      else rejected or expired
+        G->>WF: cancel the run, draft unattached
+      end
     end
     WF->>EV: run, step, tool_call and inference_call rows
     WF-->>P: terminal result

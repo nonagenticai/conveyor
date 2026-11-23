@@ -1961,54 +1961,111 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 </ol>
 <p>Until T7 lands that mechanism, <code>ops.host_*</code> operations do not exist and a procedure must not claim them.</p>
 <h3 id="105-ui-additions">10.5 UI additions</h3>
-<p>V1's nine destinations stand (Today, Board, Runs, Build, Design, Measure, Evals, Govern, Channels). V2 adds:</p>
+<p><strong>The real UI is the app.</strong> Every V2 destination is a route in <code>apps/web</code> — one Leptos CSR/WASM application served by the same binary on the same port (8930). The design pack in <code>docs/design/</code> remains two things and only two: the <strong>public programme site</strong> served at <code>/design/</code> from the same image, and the <strong>reviewed design reference</strong> whose pages (<code>studio.html</code>, <code>v2.js</code>) are evidence of intent. A page in the pack is never the implementation of a destination, and no production screen renders a fixture row (D64). The V1 routes stand (Today, boards, cockpit, runs, approvals, procedures, requirements, models, evals, usage, settings, search, copilot, platform); V2 adds the destinations below and rehomes the operator navigation around them.</p>
 <table>
 <thead>
 <tr>
 <th>Destination</th>
+<th>Route (app)</th>
 <th>Screens</th>
+<th>Owning slice</th>
+<th>Spec</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><strong>Organisation</strong></td>
-<td>departments/jobs, job catalogue + release, authority matrix, approval policies, decision-policy refinements, laya config, job performance and metering</td>
+<td><code>/organisation</code></td>
+<td>departments/jobs, the job catalogue + release, bindings, the authority matrix, approval policies, decision-policy refinements, laya config, job performance and metering</td>
+<td>T0, T2</td>
+<td><code>organisation.spec.ts</code></td>
 </tr>
 <tr>
 <td><strong>Procedures</strong></td>
-<td>capability/procedure workspace, SOP intake (single/batch), RDF/OWL and BPMN/Visio/draw.io intake, PDDL step editor, knowledge-pack pairing (the <code>knowledge_pack_ref</code> a procedure pins), publish</td>
+<td><code>/procedures</code> (V1: <code>/build/processes</code>, <code>/build/process-map</code>)</td>
+<td>capability → procedure → step, SOP intake (single/batch), RDF/OWL and BPMN/Visio/draw.io intake, the PDDL step editor, the PKO workspace, knowledge-pack pairing, the process map, publish</td>
+<td>T16</td>
+<td><code>procedures.spec.ts</code></td>
 </tr>
 <tr>
 <td><strong>Authoring</strong></td>
+<td><code>/authoring</code></td>
 <td>intake queue (chat + documents), asset draft catalogue, review/publish, asset dependency status</td>
+<td>T17</td>
+<td><code>authoring.spec.ts</code></td>
 </tr>
 <tr>
 <td><strong>Portfolio</strong></td>
-<td>portfolio view (in-flight projects + programmes), programme shared config + dependency graph, backlog + WSJF, cadence (PI planning, demo, retro), capacity, metering per project</td>
+<td><code>/portfolio</code>, <code>/portfolio/:programme_id</code></td>
+<td>the in-flight set, programme shared config + dependency graph, WSJF backlog, cadence, capacity, per-project metering; the L1/L2 delivery view</td>
+<td>T1, T10</td>
+<td><code>portfolio.spec.ts</code></td>
 </tr>
 <tr>
 <td><strong>Programme</strong></td>
-<td>mandate, brief, blueprint and business case; benefit profiles and the benefits map; projects dossier; tranches and end-of-tranche reviews; stakeholder profiles; transition and realized benefits</td>
+<td><code>/programme</code></td>
+<td>mandate, brief, blueprint and business case; benefit profiles and the benefits map; projects dossier; tranches and end-of-tranche reviews; stakeholder profiles; transition and realised benefits</td>
+<td>T10</td>
+<td><code>programme.spec.ts</code></td>
 </tr>
 <tr>
 <td><strong>Architecture</strong></td>
-<td>Preliminary capability (principles, tailored ADM, board charter, maturity and skills); ADM phases A–H with their artefact sets and contracts; the artefact repository (catalog/matrix/diagram, plateau filter, trace and reuse); compliance reviews and waivers; the Statement of Architecture Work and the Request for Architecture Work</td>
+<td><code>/design/adm</code></td>
+<td>Preliminary capability, ADM phases A–H with their artefact sets and contracts, the artefact repository, compliance reviews and waivers, the Statement of Architecture Work and the Request for Architecture Work</td>
+<td>T9</td>
+<td><code>adm.spec.ts</code></td>
 </tr>
 <tr>
 <td><strong>Plan</strong></td>
-<td>WBS, baseline vs forecast, registers, change control</td>
+<td><code>/plan</code> (V1: <code>/boards</code>)</td>
+<td>WBS, baseline vs forecast, registers, change control; the Boards tab joins the project's GitHub issues</td>
+<td>T1</td>
+<td><code>plan.spec.ts</code></td>
 </tr>
 <tr>
 <td><strong>Improve</strong></td>
-<td>kata queue, six-Gets workspace, lesson review, adoption</td>
+<td><code>/improve</code> (V1: <code>/evals/improvement</code>)</td>
+<td>coach triage, the kata queue and six Gets, lessons, adoption</td>
+<td>T4, T5</td>
+<td><code>improve.spec.ts</code></td>
 </tr>
 <tr>
 <td><strong>Operations</strong></td>
-<td>incidents, on-call, runbooks, postmortems, andon</td>
+<td><code>/operations</code></td>
+<td>incidents, on-call, runbooks, dry-run and gated writes, postmortems, andon</td>
+<td>T7</td>
+<td><code>operations.spec.ts</code></td>
+</tr>
+<tr>
+<td><strong>Tools</strong></td>
+<td><code>/tools</code></td>
+<td>toolkit versions, bindings and grants, effect ceilings, the call ledger, probes, BYO, authoring, the MinIO adapter, credential profiles</td>
+<td>T13–T15</td>
+<td><code>tools.spec.ts</code></td>
 </tr>
 </tbody>
 </table>
-<p>A <strong>Tools</strong> screen under Organisation lists toolkit versions, bindings, effect ceilings, health probes and recent calls; the run inspector gains a tools panel (which tool version was called, with which credential alias, what it returned). The board remains the work surface; the execution canvas remains the run surface, keeping the provenance inspector pattern from <code>w2v_frontend</code> (<code>StageIOInspector</code>: every stage's input → output is inspectable). Metering panels appear on Portfolio (per project and programme), Organisation (per job and department) and Measure (tenant roll-up); the run inspector drills to step and tool call (D52). The org chart is not a new runtime.</p>
+<p>The route cell is the measurement contract: the first path is the V2 route, a <code>V1:</code> path is the ancestor it extends. <code>scripts/build-v2-coverage.py</code> reads this table, <code>apps/web/src/app.rs</code> and <code>apps/web/e2e/*.spec.ts</code>; a destination is <code>exists</code> only when its V2 route <strong>and</strong> its named spec exist. The mock's page is cited as design reference, never as implementation evidence (D65).</p>
+<h4 id="1051-shell-and-route-model">10.5.1 Shell and route model</h4>
+<p>One <code>Router</code> in <code>apps/web/src/app.rs</code>, one sidebar, one top bar. The nav groups are the mock's, trimmed to the destinations that exist: <strong>Portfolio &amp; plan</strong> (Today, Portfolio, Programme, Projects, Outputs, Plan, Validation, Execution, Decisions, Runs), <strong>Organisation</strong> (Organisation, Jobs, Agents, Tools, Project types), <strong>Procedures &amp; authoring</strong> (Procedures, Capabilities, Authoring), <strong>Govern &amp; design</strong> (Assurance, Requirements, Principles, Models, Architecture capability, System architecture, Documents), <strong>Knowledge &amp; memory</strong> (Knowledge design, Sources, Memory), <strong>Measure &amp; improve</strong> (Improve, Evals, Benchmarks, Hillclimb, Usage, Metering), <strong>Operations</strong>. A nav item appears only when the signed-in principal holds the scope for at least one of its actions or read routes; the existing <code>has_action</code> gate is the rule, not a role name. The tenant switcher, command palette, theme control and profile sit in the top bar. A deep link to a destination the principal cannot read is a sign-in or permission gate, not an empty page.</p>
+<h4 id="1052-destination-contracts">10.5.2 Destination contracts</h4>
+<p>Every destination is a contract, not a page. It names its route(s), its screen module, its read path (literal <code>GET</code>s or read actions), its write path (<code>POST /api/actions/{name}/invocations</code>), the permission scope each control needs, its empty/partial/error/denied states, and its Playwright spec. The action families are §10.4's; the UI adds none. A destination whose owning slice is not built renders <strong>not yet live</strong>, names the missing action or slice, and keeps its route so the deep link is honest. The board remains the work surface and the execution canvas remains the run surface; the run inspector keeps the provenance pattern (every stage's input → output is inspectable), gains the tools panel (tool version, credential alias, returned evidence) and drills to step and tool call (D52). Metering panels appear on Portfolio, Organisation and Measure.</p>
+<h4 id="1053-states-and-the-no-fixture-rule">10.5.3 States and the no-fixture rule</h4>
+<p>Loading, empty, partial, denied and error are states of the <strong>server's</strong> rows. <code>apps/web</code> carries no fixture array; a screen with no data says what would create it, which slice owns it and which action is missing. A client-side refusal (403/404/409/422) is surfaced with its action code and the server's message; a toast never claims a success the server did not return. A mock page is design evidence; a fixture value that reaches a production screen is a defect, not a demo.</p>
+<h4 id="1054-writes-approvals-and-gates">10.5.4 Writes, approvals and gates</h4>
+<p>Writes are action invocations; reads are literal <code>GET</code>s. Requests carry the bearer, the tenant, <code>If-Match</code> on an update, <code>Idempotency-Key</code> on a create, and the approval id on a gated decision. The UI never decides an approval on the user's behalf: dual control is the server's refusal, shown with the missing second approver, and the signed-in principal is the deciding human. After a write the screen refetches the read model; there is no optimistic mutation. A disabled gate names the server's reason (missing artefact, stale binding, unpublished pack); the UI does not pre-empt a gate with a rule of its own.</p>
+<h4 id="1055-read-models-pagination-and-live-updates">10.5.5 Read models, pagination and live updates</h4>
+<p>Lists use the action's <code>next_cursor</code>; a table pages rather than silently truncating. SSE topics (board, card, run, approval) drive live updates where they exist; a screen without a topic polls explicitly and says so. The published snapshot (<code>docs/design/data/*.json</code>) is the public pack's source; it is not the app's source. A screen's data load is cancellable on navigation.</p>
+<h4 id="1056-design-system-accessibility-and-responsive">10.5.6 Design system, accessibility and responsive</h4>
+<p>The app's single stylesheet and its tokens are the design system; the mock's CSS is a reference, not a dependency. Focus is visible and returned after a dialog; tables and dialogs are keyboard operable; contrast meets WCAG 2.2 AA; reduced motion is honoured; a skip link precedes the shell; the mobile layout keeps a 16px gutter and never scrolls horizontally as a page.</p>
+<h4 id="1057-performance">10.5.7 Performance</h4>
+<p>The WASM bundle stays within the budget the web workflow measures; tables virtualise above 200 rows; a screen makes one load request plus its SSE stream, not one request per row; a route's work is abandoned on navigation. The binary, port and Postgres are unchanged (§10.6).</p>
+<h4 id="1058-verification">10.5.8 Verification</h4>
+<p>One Playwright spec per destination, asserting empty, error, happy and one refusal; <code>web.yml</code> runs the suite on <code>apps/web/**</code> and is the browser gate. The design-pack checks are separate and do not stand in for the browser suite. A screen ships with its spec or it does not ship. The V2 coverage record is the programme's measure of the real routes; the PR's <code>web.yml</code> is the proof they work.</p>
+<h4 id="1059-the-delivery-view">10.5.9 The delivery view</h4>
+<p>The work model is drawn at four levels from one read model: <strong>L1</strong> the portfolio Gantt of programmes and standalone change initiatives, <strong>L2</strong> a programme's projects grouped by tranche with the benefit and capability rails, <strong>L3</strong> a project's kanban of work packages and loose cards, and <strong>L4</strong> a work package's own board (<code>/projects/:project_id/wp/:card_id</code>). A bar is <strong>actuals</strong> — first observed card or run activity to completion, or to the snapshot time while in flight — and a planned window is a dashed track only when the project records both dates; a row with no dated activity says so. Spend is the ledger's tokens plus the pinned commercial price; an unpriced row renders <code>—*</code> with its count, never <code>$0</code>. The public boundary is the tenant portfolio; the app shows the signed-in tenant's rows. The read model is the same derived <code>work</code>/<code>measure</code>/programme sections the public site publishes, exposed through the owning slices' read actions.</p>
+<h4 id="10510-what-is-not-claimed">10.5.10 What is not claimed</h4>
+<p>No SSR, no second router, no mobile application, no design tool and no retirement of the design pack. A PR does not invent a live tenant row; the app does not add a table or an action of its own. Where a backend capability is absent the destination says so and waits, typed, on its owning slice.</p>
 <h3 id="106-deployment-and-scale">10.6 Deployment and scale</h3>
 <ul>
 <li>Same binary, same Postgres, same namespace, <strong>no new port</strong> (8930). New tables/actions only.</li>
@@ -2384,9 +2441,14 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 <td><strong>Tenant asset authoring</strong> — chat + document intake producing drafts of every tenant asset (organisation, jobs, procedures, packs, policies, templates, tool requests), the review queue, publication</td>
 <td>a tenant supplies a short brief plus documents, and a reviewed catalogue of departments, jobs, procedures and policies is published; no asset can publish itself or widen a tool grant</td>
 </tr>
+<tr>
+<td><strong>T18</strong></td>
+<td><strong>The real V2 UI</strong> — every V2 destination is a route in <code>apps/web</code> with its screen module, read/write contract, honest states and a Playwright spec; the shell and navigation; the L1–L4 delivery view; the design pack remains the public programme site and the reviewed reference</td>
+<td>a signed-in tenant drives portfolio → programme → project → work package, organisation → release → binding, procedures intake → publish, tools call → ledger, improve → kata → adoption, operations incident → postmortem, and the ADM phase rail from the app; every destination's spec asserts empty, error, happy and one refusal; the V2 coverage record reports <code>exists</code> only from a real route + spec; no production screen renders a fixture</td>
+</tr>
 </tbody>
 </table>
-<p>Dependencies: T0 → T1 → T2 → T3; T4 after T3; T5 after T2 and V1's S16–S20; T6 after T5 <strong>and T13</strong>; T7 after T2/T4 <strong>and T13</strong>; T9/T10 after T1/T3; T8 after T5; T11 continuous; T12 after all; T13 after T2; T14 after T13; T15 after T13 and T6; T16 after T2 and T13; T17 after T16 and T3. T9 and T10 may run in parallel once T1 and T3 exist.</p>
+<p>Dependencies: T0 → T1 → T2 → T3; T4 after T3; T5 after T2 and V1's S16–S20; T6 after T5 <strong>and T13</strong>; T7 after T2/T4 <strong>and T13</strong>; T9/T10 after T1/T3; T8 after T5; T11 continuous; T12 after all; T13 after T2; T14 after T13; T15 after T13 and T6; T16 after T2 and T13; T17 after T16 and T3. T9 and T10 may run in parallel once T1 and T3 exist. <strong>T18</strong> starts after T0/T1/T2/T3; each destination's live acceptance waits on its owning slice (T4, T5, T7, T9, T10, T11, T13, T16, T17), and T18 closes after T12.</p>
 <p><strong>The first three months of work are T0–T3 plus T13.</strong> They install the organisation spine and the tool spine; everything else is a job that uses them. T16 follows the tool spine and is the first authoring feature built on it; T17 generalises T16 to every tenant asset. The legacy kag and w2v Rust rewrites are governed by <code>docs/SPEC_LEGACY_KAG.md</code> — a separate spec, not a V2 slice; V2 fixes only their direction (D54). A tenant that does not use a V2 aggregate does not ship it (P10).</p>
 <hr />
 <h2 id="13-what-this-buys">13. What this buys</h2>
@@ -2587,8 +2649,8 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 </table>
 <hr />
 <h2 id="15-decisions-and-open-questions">15. Decisions and open questions</h2>
-<h3 id="151-v2-decisions-d28d61-d1d27-of-v1-stand-except-d14-and-d22-as-amended-below">15.1 V2 decisions (D28–D61; D1–D27 of V1 stand, except D14 and D22 as amended below)</h3>
-<p><strong>D28–D61 are this spec's decisions.</strong> They are written as answers because a spec that only lists questions is not reviewable; each can be accepted, amended or rejected as a unit, and the entries carrying an owner ruling are marked with its date. D33, D41, D43 and D45 carry the first review's owner rulings of 2026-11-11; D46–D48 record the procedure/SOP model, the SOP feature and the scope that review produced; <strong>D49–D55 carry the second review's owner rulings of 2026-11-11</strong> (portfolio and programme, tenant configuration, per-case laya config, metering, procedural knowledge, the legacy-kag direction and tenant asset authoring); <strong>D56–D60 carry the third review's rulings of 2026-11-11</strong> (discovery, live-estate classification and direct MinIO storage, the tool monorepo, the permanently separate agent tool path, and the AHTAPol/w2v tenant scope); <strong>D61 records the independent runtime review's recommendation</strong> — executor seam to be built in T0, external runtime deferred — and is proposed for acceptance with the rest.</p>
+<h3 id="151-v2-decisions-d28d65-d1d27-of-v1-stand-except-d14-and-d22-as-amended-below">15.1 V2 decisions (D28–D65; D1–D27 of V1 stand, except D14 and D22 as amended below)</h3>
+<p><strong>D28–D65 are this spec's decisions.</strong> They are written as answers because a spec that only lists questions is not reviewable; each can be accepted, amended or rejected as a unit, and the entries carrying an owner ruling are marked with its date. D33, D41, D43 and D45 carry the first review's owner rulings of 2026-11-11; D46–D48 record the procedure/SOP model, the SOP feature and the scope that review produced; <strong>D49–D55 carry the second review's owner rulings of 2026-11-11</strong> (portfolio and programme, tenant configuration, per-case laya config, metering, procedural knowledge, the legacy-kag direction and tenant asset authoring); <strong>D56–D60 carry the third review's rulings of 2026-11-11</strong> (discovery, live-estate classification and direct MinIO storage, the tool monorepo, the permanently separate agent tool path, and the AHTAPol/w2v tenant scope); <strong>D61 records the independent runtime review's recommendation</strong> — executor seam to be built in T0, external runtime deferred — and is proposed for acceptance with the rest. <strong>D62–D63 carry the programme-definition and ADM rulings of 2026-11-16; D64–D65 carry the real-UI rulings of 2026-11-22.</strong></p>
 <table>
 <thead>
 <tr>
@@ -2777,6 +2839,16 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 <td><strong>D63</strong></td>
 <td><strong>TOGAF ADM as an artefact-typed architecture capability</strong></td>
 <td>The ADM is a capability before it is a project. The <strong>Preliminary phase</strong> establishes the architecture principles, the tailored <code>adm_profile</code>, the artefact standard and repository, the Architecture Board (<code>governance_body</code> with a charter and decision limits), governance and contracts, and the maturity and skills baseline. An <code>architecture</code> project walks phases A–H as WBS nodes; each phase's mandatory artefact set comes from the standard filtered by the profile, and each phase closes on an approved <code>architecture_contract</code> (Statement of Architecture Work, delivery contract, statement of intent, Request for Architecture Work). Every artefact is a typed row — <strong>catalog, matrix or diagram</strong>, with the common metadata, a phase and a plateau (PSA / HLD / SD) — whose entries and artefact-to-artefact links are rows, so the repository answers derivation, realization and reuse. The Requirements Catalog is continuous, with requirements typed <code>condition | constraint | assumption | delta</code>. A compliance review records exactly one of the six standard levels, and a deviation is rejected, mitigated or waived with a named accepting owner and a reassessment date. A delivery project cannot pass design without the live contract that governs it; a phase-H review produces exactly one change request or kata candidate. Maturity (nine dimensions, 0–5) and skills (seven categories) are dated assessments, not assertions. No ArchiMate tool and no full conformance are claimed (proposed 2026-11-16, from the TOGAF ADM and architecture-artefact standards review)</td>
+</tr>
+<tr>
+<td><strong>D64</strong></td>
+<td><strong>The real UI is the app; the pack is the public site and the reference</strong></td>
+<td>Every V2 destination is a route in <code>apps/web</code> — Leptos CSR in the same binary on port 8930 — not a page in the design pack. The pack stays the public programme site at <code>/design/</code> and the reviewed design reference; a mock page is evidence of intent, never of implementation. Production screens read live rows and write only through registered actions; no fixture data ships. The V1 routes stand and the V2 destinations are added around them (proposed 2026-11-22, from the real-UI review)</td>
+</tr>
+<tr>
+<td><strong>D65</strong></td>
+<td><strong>Measure the real routes, not the mock</strong></td>
+<td>The V2 coverage instrument (<code>scripts/build-v2-coverage.py</code>) resolves each §10.5 destination against <code>apps/web/src/app.rs</code> and its named Playwright spec. <code>exists</code> requires the real route <strong>and</strong> the spec; a V1 ancestor route may justify <code>extend</code>, never <code>exists</code>; the mock's page is cited as design reference only. A destination's verdict is therefore independent of the pack's page registry (proposed 2026-11-22, from the real-UI review)</td>
 </tr>
 </tbody>
 </table>
@@ -3004,7 +3076,7 @@ region?  ── optional sub-layer of any layer (folds immediately after its par
 </tr>
 <tr>
 <td>No V1 decision is superseded <strong>by V2</strong></td>
-<td>D18 was superseded by V1's own D19; D6 is clarified (V1's in-app engine is the executor; the n8n product is reference only); D14 is amended by D57; V2 adds D28–D61 and does not re-open the V1 build</td>
+<td>D18 was superseded by V1's own D19; D6 is clarified (V1's in-app engine is the executor; the n8n product is reference only); D14 is amended by D57; V2 adds D28–D65 and does not re-open the V1 build</td>
 </tr>
 </tbody>
 </table>

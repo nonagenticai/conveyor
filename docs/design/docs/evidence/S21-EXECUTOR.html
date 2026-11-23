@@ -149,7 +149,7 @@
 </ul>
 <h2 id="residuals-recorded-not-built">Residuals (recorded, not built)</h2>
 <ul>
-<li>A run-resume worker kind for a <code>handover</code> gate (a plain run fails <code>gate_requires_approval</code> and opens a card-scoped approval of kind <code>executor</code>; the draft is applied after a human decision).</li>
+<li>A run-resume worker kind for a <code>handover</code> gate — <strong>built in S21 step 5 (#590)</strong>: the run parks in <code>waiting_approval</code>, the person's approval records the bound L3 decision, and <code>run.resume</code> applies the draft. See <code>docs/evidence/S21-APPLY.md</code>.</li>
 <li>Mid-loop token/cost budget refusal (§7.5): the caps are validated and recorded, not enforced.</li>
 <li>A <code>tool_binding</code> provisioning action: tests insert raw rows; a live job needs an operator row.</li>
 <li>Broker-side grant enforcement for a direct <code>tools.call</code> caller (the agent surface is bounded; a direct caller is governed by the binding ceiling).</li>

@@ -125,3 +125,16 @@ Every number above is reproducible without cluster access:
 
 If a count disagrees with this document, the document is stale — correct it in the same PR that
 changes the count, not later.
+
+## 7. Corrections measured 2026-11-22 (#558)
+
+The measurements in §§1–4 are dated 2026-11-15. Three claims are now stale and are corrected here,
+in the PR that measured them:
+
+- `produce.script` is registered; the production family is not "zero `produce.*` actions".
+- The deck action is `decks.render` (`crates/deck`), not the planned `produce.deck`.
+- `analyse.site` and `analyse.video` are registered; the analysis library is on `main`, not "in
+  flight".
+
+The machine-readable capability diff and its gate are `seed/tool_provenance.json`,
+`crates/actions/tests/tool_provenance.rs` and `docs/plans/06-TOOL-PROVENANCE.md`.

@@ -1145,7 +1145,7 @@ CREATE TABLE job_binding (
 <tbody>
 <tr>
 <td><code>run</code></td>
-<td>the binding pin (<code>job_binding_id</code>, <code>release_hash</code>, both from 0040), <code>capability_id</code>/<code>capability_agent_id</code> from the binding, the status path <code>queued → running → succeeded | failed</code> (never <code>waiting_approval</code> in this unit)</td>
+<td>the binding pin (<code>job_binding_id</code>, <code>release_hash</code>, both from 0040), <code>capability_id</code>/<code>capability_agent_id</code> from the binding, the status path <code>queued → running → waiting_approval → running → succeeded | failed</code> (a handover parks it — §2.25/§3.2)</td>
 </tr>
 <tr>
 <td><code>run_step</code></td>
@@ -1169,11 +1169,44 @@ CREATE TABLE job_binding (
 </tr>
 <tr>
 <td><code>approval</code></td>
-<td>one card-scoped row only when the gate's action is <code>handover</code> (no <code>run_id</code>; the run is terminal)</td>
+<td>one card-scoped row only when the gate's action is <code>handover</code>: kind <code>executor</code>, <code>run_id</code>/<code>card_id</code> inherited from the run, and <code>meta</code> naming the draft; the run stays <code>waiting_approval</code> until the decision (§2.25)</td>
 </tr>
 </tbody>
 </table>
 <p>The compiled prompt text is never stored: <code>inference_call</code> and the draft's <code>meta</code> carry the identity and the hash. <code>run_step.node_id</code> is nullable (0019), so the same store serves a workflow node and this run-level step.</p>
+<h3 id="225-the-applying-gate--s21-step-5-0-new-tables">2.25 The applying gate — S21 step 5 (0 new tables)</h3>
+<p>The park, the decision and the application reuse the same rows; no table and no migration.</p>
+<table>
+<thead>
+<tr>
+<th>Row</th>
+<th>What the gate writes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>approval</code></td>
+<td>one <code>executor</code> row on a <code>handover</code>: <code>run_id</code>/<code>card_id</code> inherited, <code>gate = gate.precheck</code>, <code>meta = {run_id, gate, draft_document_id, prompt_sha256, position: 1, attempt: 1, threshold, policy_id, laya_config_id}</code>; it stays pending until a person decides it</td>
+</tr>
+<tr>
+<td><code>decision</code></td>
+<td>on approval, one L3 row: <code>rung=human</code>, <code>kind=gate.draft_apply</code>, <code>outcome=accepted</code>, <code>approval_id</code>, <code>card_id</code>, <code>meta</code> naming <code>draft_document_id</code>/<code>prompt_sha256</code>/<code>run_id</code>; the L1 <code>gate.precheck</code> row already names the draft in its <code>meta</code></td>
+</tr>
+<tr>
+<td><code>approval_decision</code></td>
+<td>the person's approve/reject, <code>decided_by_kind='human'</code>; the executor gate refuses any other decider kind</td>
+</tr>
+<tr>
+<td><code>job</code></td>
+<td>one <code>run.resume</code> row on approval, payload <code>{run_id, approval_id, decision_id}</code>, dedupe <code>run.resume:{run_id}:{approval_id}</code>; it is not in <code>ANDON_ALLOWED_KINDS</code></td>
+</tr>
+<tr>
+<td><code>document</code></td>
+<td>the draft gets <code>card_id</code> only in the resume transaction; a rejection or expiry leaves it null</td>
+</tr>
+</tbody>
+</table>
+<p>The store's one apply helper (<code>apply_draft_tx</code>) is shared by <code>ladder.apply_draft</code> and the <code>run.resume</code> worker, so the decision binding is checked once. The run's <code>waiting_approval</code> row is live work and holds <code>uq_run_live</code> until the decision, the rejection or <code>approval.expire</code>.</p>
 <h2 id="3-state-machines-and-enforcement">3. State machines and enforcement</h2>
 <p>Every transition is a pure function in <code>crates/domain</code>; no DB trigger, no per-flow rule, no CHECK that duplicates the function. The CHECK constraints below guard <em>vocabulary</em>, never <em>legality</em>.</p>
 <h3 id="31-card-lifecycle">3.1 Card lifecycle</h3>
@@ -1227,7 +1260,7 @@ CREATE TABLE job_binding (
 </tr>
 </tbody>
 </table>
-<p><strong>A bound <code>internal_agent</code> run (S21 step 4) uses <code>queued → running → succeeded | failed</code> only.</strong> Its gate pre-check is recorded on the step and, on <code>handover</code>, fails the run <code>gate_requires_approval</code> and opens a card-scoped approval — the run never enters <code>waiting_approval</code>, because no worker kind resumes a plain run and parking would hold <code>uq_run_live</code>. A resume worker is a separate unit.</p>
+<p><strong>A bound <code>internal_agent</code> run (S21 steps 4–5) uses the full path.</strong> Its gate pre-check is recorded on the step. On <code>accepted</code> it succeeds with the draft; on <code>handover</code> it parks in <code>waiting_approval</code> and opens a card-scoped <code>executor</code> approval whose <code>meta</code> names the draft (§2.25). A person's approval settles it <code>running</code> and the <code>run.resume</code> job applies the draft and finishes it <code>succeeded</code>. A rejection cancels it; <code>approval.expire</code> cancels a still-waiting run with <code>approval_expired</code>. The parked run is live work and holds <code>uq_run_live</code> until one of those outcomes.</p>
 <h3 id="33-approval">3.3 Approval</h3>
 <table>
 <tbody>

@@ -295,6 +295,15 @@
         "docs/SPEC_V2.md"
       ],
       "gap": "no tenant asset authoring intake or review queue"
+    },
+    "T18": {
+      "status": "proposed",
+      "evidence": [
+        "docs/plans/T18-real-v2-ui.md",
+        "docs/SPEC_V2.md",
+        "apps/web/src/app.rs"
+      ],
+      "gap": "no V2 route exists in apps/web; the destinations are mock pages only"
     }
   }
 }

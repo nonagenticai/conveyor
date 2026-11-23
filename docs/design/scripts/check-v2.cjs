@@ -318,7 +318,7 @@ const shot = (name) => path.join(process.env.CONVEYOR_QA_OUTPUT || os.tmpdir(), 
     );
     await nav("validation");
     const validation = await content();
-    check(validation.includes("48"), "the Validation page carries the measured 48 projects");
+    check(validation.includes("49"), "the Validation page carries the measured 49 projects");
     await nav("contribute");
     check(
       (await content()).includes("No ready unit is published right now"),
