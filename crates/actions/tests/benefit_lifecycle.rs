@@ -810,6 +810,9 @@ async fn a_realized_status_needs_evidence_behind_the_readings() {
     assert_eq!(status, 200, "{body}");
     assert_eq!(output(&body)["status"], "realized", "{body}");
 }
+
+/// P1.3 — a reading names the tranche it is attributed to, and the read-back lists the
+/// measurements by benefit and by programme.
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn a_measurement_names_its_tranche_and_is_listed() {
     let (pg, running, seeded) = fixture().await;
