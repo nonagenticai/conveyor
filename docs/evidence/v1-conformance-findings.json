@@ -5973,6 +5973,25 @@
    "failure_scenario": "An operator closes a project; a transient failure leaves a second pending projects.close gate. Every later decide on it returns 500 with an unrelated aborted-transaction message, and no action removes the gate.",
    "acceptance": "A decision on a duplicate/stale gate returns a typed refusal (or a clean no-op) and writes no abort; the masked board-event error cannot replace the real cause.",
    "owner_project": "PLATFORM"
+  },
+  {
+   "id": "v1-promotion-contract-actions-1",
+   "area": "\u00a78.1",
+   "standard": "SPEC",
+   "spec": "\u00a78.1",
+   "severity": "P1",
+   "title": "The promotion journal cannot replay an architecture contract or its board decision",
+   "problem": "promote-record.py's WRITE_ACTIONS set has no architecture.contracts_request, architecture.board_decide or architecture.contracts_approve. A chain that records a delivery contract and its Board decision cannot journal those acts: the checker refuses them as 'unreplayable_input: unknown action', so the post-deploy replay would produce projects without the contracts that govern them.",
+   "evidence": [
+    {
+     "path": "scripts/promote-record.py",
+     "line": 89,
+     "quote": "WRITE_ACTIONS = {"
+    }
+   ],
+   "failure_scenario": "A retrospective chain journals its contract request, Board decision and approval. promote-record.py --check refuses the journal ('unknown action architecture.board_decide'); dropping the rows leaves production without the live contract, so a replayed project fails its contract gate.",
+   "acceptance": "The journal replays architecture.contracts_request/board_decide/contracts_approve idempotently with their natural keys, proven by the self-test and a dry-run over the T16 chain.",
+   "owner_project": "PLATFORM"
   }
  ]
 }

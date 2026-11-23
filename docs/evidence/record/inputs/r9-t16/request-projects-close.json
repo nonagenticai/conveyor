@@ -1,0 +1,20 @@
+{
+ "project_id": "01a1d039-0d38-76fb-9394-b75934d16fcd",
+ "gate": "projects.close",
+ "kind": "action",
+ "action": "projects.close",
+ "input": {
+  "id": "01a1d039-0d38-76fb-9394-b75934d16fcd"
+ },
+ "proposed_input": {
+  "id": "01a1d039-0d38-76fb-9394-b75934d16fcd",
+  "reason": "Close T16 after the retrospective record completed against its manifest"
+ },
+ "description": "Close T16 against its approved baseline, live contract, compliant Phase-G review and published closure review",
+ "evidence": [
+  {
+   "kind": "governed_asset",
+   "id": "01a20a8d-75fd-7aff-aa62-59aa568157d0"
+  }
+ ]
+}
