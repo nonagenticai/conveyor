@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Check the standards-coverage map (WP11): every audit rule's category, source and verifier.
+"""Check the standards-coverage map (WP11): every audit rule and output category is covered.
 
 `governance/standards-coverage.json` is the chain between a governance rule and the thing that
 proves it: the output-standard category its artefact is rendered in, the snapshot collection (or
@@ -8,9 +8,17 @@ live action) the rule reads, and the check that refuses a gap — a **registry**
 **manifest clause** (the `<project>-<clause>` id every `acceptance/programme/<key>.toml` check
 carries).
 
+The file's `categories` object carries the same chain for every output-standard **category**, so
+the "all standards are covered" claim holds for the whole output standard and not only where a
+rule happens to name a category. A category's check names the committed record's own verifier,
+`generate-standards.py --check#<category>` — never an invented instrument.
+
 The checker refuses exactly what the map exists to prevent:
 
   - an **orphan rule**: a rule in the matrix with no coverage entry, or an entry for no rule;
+  - an **unmapped category**: an output-standard category with no `categories` entry, an entry
+    for no category, a standard/spec that differs from its template, or a check that is not
+    `generate-standards.py --check#<category>`;
   - an **unknown verifier**: a registry name in neither registry, or a clause no manifest carries;
   - a **source absent from the schema it claims**: a committed snapshot pointer that does not
     resolve, an action the registry dump does not serve, a live-only projection that is marked
@@ -20,7 +28,7 @@ The checker refuses exactly what the map exists to prevent:
     define (a non-SPEC rule must name at least one).
 
 Usage:
-    python3 scripts/check-standards-coverage.py
+    python3 scripts/check-standards-coverage.py [--check]
     python3 scripts/check-standards-coverage.py --self-test
 """
 
@@ -124,7 +132,8 @@ def check(
 ) -> list[str]:
     problems: list[str] = []
     rules = standard.get("rules") or {}
-    templates = set((output_standard.get("templates") or {}).keys())
+    templates = output_standard.get("templates") or {}
+    template_categories = set(templates)
     actions = actions if actions is not None else action_names()
     registry = registry if registry is not None else registry_names(standard)
     clauses = clauses if clauses is not None else manifest_clauses()
@@ -158,7 +167,7 @@ def check(
             problems.append(f"{name}: categories must be a list")
         else:
             for category in categories:
-                if category not in templates:
+                if category not in template_categories:
                     problems.append(f"{name}: unknown category {category!r}")
             if not categories and rule.get("standard") != "SPEC":
                 problems.append(f"{name}: a non-SPEC rule must name at least one category")
@@ -205,6 +214,42 @@ def check(
                 problems.append(f"{name}: unknown manifest clause {verifier.get('clause')!r}")
         else:
             problems.append(f"{name}: verifier kind must be registry or manifest")
+
+    # Every output-standard category is covered in its own right; the rule map above only proves
+    # the categories some rule happens to name.
+    category_map = coverage.get("categories")
+    if not isinstance(category_map, dict) or not category_map:
+        problems.append("coverage.categories must be a non-empty object")
+        category_map = {}
+    unmapped = sorted(template_categories - set(category_map))
+    unknown_categories = sorted(set(category_map) - template_categories)
+    if unmapped:
+        problems.append(f"output-standard categor(y/ies) with no coverage entry: {unmapped}")
+    if unknown_categories:
+        problems.append(
+            f"category coverage entr(y/ies) for no output-standard category: {unknown_categories}"
+        )
+    for name in sorted(set(category_map) & template_categories):
+        entry = category_map[name]
+        template = templates[name] if isinstance(templates[name], dict) else {}
+        if not isinstance(entry, dict):
+            problems.append(f"category {name}: the entry is not an object")
+            continue
+        if entry.get("standard") != template.get("standard"):
+            problems.append(
+                f"category {name}: standard {entry.get('standard')!r} "
+                f"!= template {template.get('standard')!r}"
+            )
+        if entry.get("spec") != template.get("spec"):
+            problems.append(
+                f"category {name}: spec {entry.get('spec')!r} != template {template.get('spec')!r}"
+            )
+        expected = f"generate-standards.py --check#{name}"
+        if entry.get("check") != expected:
+            problems.append(
+                f"category {name}: check {entry.get('check')!r} != {expected!r} "
+                "(the existing verifier)"
+            )
     return problems
 
 
@@ -225,43 +270,73 @@ def self_test() -> int:
 
     def mutate(change) -> list[str]:
         variant = copy.deepcopy(coverage)
-        change(variant["entries"])
+        change(variant)
         return check(variant, standard, output_standard, snapshot, actions, registry, clauses)
 
     baseline = check(coverage, standard, output_standard, snapshot, actions, registry, clauses)
     assert not baseline, f"the committed coverage must pass: {baseline}"
 
-    def drop(entries):
-        entries.pop(sorted(entries)[0])
+    def drop(variant):
+        variant["entries"].pop(sorted(variant["entries"])[0])
 
-    def add_unknown(entries):
-        entries["not_a_rule"] = copy.deepcopy(next(iter(entries.values())))
+    def add_unknown(variant):
+        variant["entries"]["not_a_rule"] = copy.deepcopy(
+            next(iter(variant["entries"].values()))
+        )
 
-    def unknown_registry(entries):
-        entries["programme_outputs"]["verifier"] = {"kind": "registry", "name": "nope_nope"}
+    def unknown_registry(variant):
+        variant["entries"]["programme_outputs"]["verifier"] = {
+            "kind": "registry", "name": "nope_nope",
+        }
 
-    def unknown_clause(entries):
-        entries["wsjf_inputs_missing"]["verifier"] = {"kind": "manifest", "clause": "nope-clause"}
+    def unknown_clause(variant):
+        variant["entries"]["wsjf_inputs_missing"]["verifier"] = {
+            "kind": "manifest", "clause": "nope-clause",
+        }
 
-    def absent_source(entries):
-        entries["programme_outputs"]["source"] = {"file": "programme.json", "pointer": "/nope"}
+    def absent_source(variant):
+        variant["entries"]["programme_outputs"]["source"] = {
+            "file": "programme.json", "pointer": "/nope",
+        }
 
-    def stale_live(entries):
-        entries["demo_credit_missing"]["source"] = {
+    def stale_live(variant):
+        variant["entries"]["demo_credit_missing"]["source"] = {
             "file": "msp.json", "pointer": "/cadences", "available": "live", "reason": "test",
         }
 
-    def unknown_action(entries):
-        entries["programme_outputs"]["source"] = {"action": "nope.nope"}
+    def unknown_action(variant):
+        variant["entries"]["programme_outputs"]["source"] = {"action": "nope.nope"}
 
-    def unknown_category(entries):
-        entries["programme_outputs"]["categories"] = ["nope-category"]
+    def unknown_category(variant):
+        variant["entries"]["programme_outputs"]["categories"] = ["nope-category"]
 
-    def standard_mismatch(entries):
-        entries["programme_outputs"]["standard"] = "PMP"
+    def standard_mismatch(variant):
+        variant["entries"]["programme_outputs"]["standard"] = "PMP"
 
-    def spec_mismatch(entries):
-        entries["programme_outputs"]["spec"] = "§9.9"
+    def spec_mismatch(variant):
+        variant["entries"]["programme_outputs"]["spec"] = "§9.9"
+
+    def drop_category(variant):
+        variant["categories"].pop("mandate")
+
+    def add_unknown_category(variant):
+        variant["categories"]["not-a-category"] = {
+            "standard": "SPEC",
+            "spec": "§5",
+            "check": "generate-standards.py --check#not-a-category",
+        }
+
+    def category_standard_mismatch(variant):
+        variant["categories"]["mandate"]["standard"] = "PMP"
+
+    def category_spec_mismatch(variant):
+        variant["categories"]["mandate"]["spec"] = "§9.9"
+
+    def invented_category_check(variant):
+        variant["categories"]["mandate"]["check"] = "scripts/invented-linter.py --all"
+
+    def absent_category_map(variant):
+        variant.pop("categories")
 
     cases = {
         "an orphan rule fails": (drop, "no coverage entry"),
@@ -274,6 +349,12 @@ def self_test() -> int:
         "an unknown category fails": (unknown_category, "unknown category"),
         "a standard mismatch fails": (standard_mismatch, "!= matrix"),
         "a spec mismatch fails": (spec_mismatch, "!= matrix"),
+        "a missing category fails": (drop_category, "'mandate'"),
+        "a category entry for no template fails": (add_unknown_category, "for no output-standard"),
+        "a category standard mismatch fails": (category_standard_mismatch, "!= template"),
+        "a category spec mismatch fails": (category_spec_mismatch, "!= template"),
+        "an invented category verifier fails": (invented_category_check, "--check#mandate"),
+        "a missing category map fails": (absent_category_map, "coverage.categories"),
     }
     for label, (change, needle) in cases.items():
         problems = mutate(change)
@@ -285,7 +366,8 @@ def self_test() -> int:
 
     print(
         f"standards-coverage: self-test OK ({len(coverage['entries'])} rules, "
-        f"{len(clauses)} manifest clauses, {len(registry)} registry checks)"
+        f"{len(coverage['categories'])} categories, {len(clauses)} manifest clauses, "
+        f"{len(registry)} registry checks)"
     )
     return 0
 
@@ -300,6 +382,9 @@ def main() -> int:
     parser.add_argument("--actions", type=Path, default=ACTIONS)
     parser.add_argument("--manifests", type=Path, default=MANIFESTS)
     parser.add_argument("--verify-project", type=Path, default=VERIFY_PROJECT)
+    parser.add_argument(
+        "--check", action="store_true", help="verify the committed map (the default action)"
+    )
     parser.add_argument("--self-test", action="store_true")
     args = parser.parse_args()
 
@@ -328,6 +413,7 @@ def main() -> int:
             if (entry.get("source") or {}).get("available") == "live"]
     print(
         f"standards-coverage: {len(coverage['entries'])} rules covered; "
+        f"{len(coverage['categories'])} output-standard categories covered; "
         f"{len(live)} live-only source(s){': ' + ', '.join(sorted(live)) if live else ''}"
     )
     return 0

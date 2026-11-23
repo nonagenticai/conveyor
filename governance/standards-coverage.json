@@ -1,6 +1,378 @@
 {
   "actions": "docs/design/data/actions.json",
-  "description": "Every audit rule's output category, live source and verifier (WP11). The checker enforces: no orphan rule, a known verifier name, and a source that resolves (or an explicitly live-only projection that is still absent from the committed pack).",
+  "categories": {
+    "adm-profile": {
+      "check": "generate-standards.py --check#adm-profile",
+      "spec": "\u00a78.1",
+      "standard": "TOGAF"
+    },
+    "adr-register": {
+      "check": "generate-standards.py --check#adr-register",
+      "spec": "\u00a78.1",
+      "standard": "TOGAF"
+    },
+    "architecture-analysis": {
+      "check": "generate-standards.py --check#architecture-analysis",
+      "spec": "\u00a78.1",
+      "standard": "TOGAF"
+    },
+    "architecture-artifact": {
+      "check": "generate-standards.py --check#architecture-artifact",
+      "spec": "\u00a78.1",
+      "standard": "TOGAF"
+    },
+    "architecture-artifact-instance": {
+      "check": "generate-standards.py --check#architecture-artifact-instance",
+      "spec": "\u00a78.1",
+      "standard": "TOGAF"
+    },
+    "architecture-capability": {
+      "check": "generate-standards.py --check#architecture-capability",
+      "spec": "\u00a78.1",
+      "standard": "TOGAF"
+    },
+    "architecture-design": {
+      "check": "generate-standards.py --check#architecture-design",
+      "spec": "\u00a78.1",
+      "standard": "TOGAF"
+    },
+    "architecture-governance-log": {
+      "check": "generate-standards.py --check#architecture-governance-log",
+      "spec": "\u00a78.1",
+      "standard": "TOGAF"
+    },
+    "architecture-principles": {
+      "check": "generate-standards.py --check#architecture-principles",
+      "spec": "\u00a78.1",
+      "standard": "TOGAF"
+    },
+    "artifact-standard": {
+      "check": "generate-standards.py --check#artifact-standard",
+      "spec": "\u00a78.1",
+      "standard": "TOGAF"
+    },
+    "benefit-evaluation": {
+      "check": "generate-standards.py --check#benefit-evaluation",
+      "spec": "\u00a78.3",
+      "standard": "MSP"
+    },
+    "benefit-profile": {
+      "check": "generate-standards.py --check#benefit-profile",
+      "spec": "\u00a78.3",
+      "standard": "MSP"
+    },
+    "benefit-transition": {
+      "check": "generate-standards.py --check#benefit-transition",
+      "spec": "\u00a78.3",
+      "standard": "MSP"
+    },
+    "benefits-diagram": {
+      "check": "generate-standards.py --check#benefits-diagram",
+      "spec": "\u00a78.1",
+      "standard": "TOGAF"
+    },
+    "benefits-map": {
+      "check": "generate-standards.py --check#benefits-map",
+      "spec": "\u00a78.3",
+      "standard": "MSP"
+    },
+    "benefits-registry": {
+      "check": "generate-standards.py --check#benefits-registry",
+      "spec": "\u00a78.3",
+      "standard": "MSP"
+    },
+    "benefits-strategy": {
+      "check": "generate-standards.py --check#benefits-strategy",
+      "spec": "\u00a78.3",
+      "standard": "MSP"
+    },
+    "blueprint": {
+      "check": "generate-standards.py --check#blueprint",
+      "spec": "\u00a78.3",
+      "standard": "MSP"
+    },
+    "brief-template": {
+      "check": "generate-standards.py --check#brief-template",
+      "spec": "\u00a78.3",
+      "standard": "MSP"
+    },
+    "business-case": {
+      "check": "generate-standards.py --check#business-case",
+      "spec": "\u00a78.3",
+      "standard": "MSP"
+    },
+    "candidate-solutions": {
+      "check": "generate-standards.py --check#candidate-solutions",
+      "spec": "\u00a78.1",
+      "standard": "TOGAF"
+    },
+    "change-control": {
+      "check": "generate-standards.py --check#change-control",
+      "spec": "\u00a78.4",
+      "standard": "PMP"
+    },
+    "closure-review": {
+      "check": "generate-standards.py --check#closure-review",
+      "spec": "\u00a78.4",
+      "standard": "PMP"
+    },
+    "compliance-review": {
+      "check": "generate-standards.py --check#compliance-review",
+      "spec": "\u00a78.1",
+      "standard": "TOGAF"
+    },
+    "decision": {
+      "check": "generate-standards.py --check#decision",
+      "spec": "\u00a710.4",
+      "standard": "SPEC"
+    },
+    "delivery-contract": {
+      "check": "generate-standards.py --check#delivery-contract",
+      "spec": "\u00a78.1",
+      "standard": "TOGAF"
+    },
+    "evidence": {
+      "check": "generate-standards.py --check#evidence",
+      "spec": "\u00a78.5",
+      "standard": "Delivery"
+    },
+    "gap-analysis": {
+      "check": "generate-standards.py --check#gap-analysis",
+      "spec": "\u00a78.1",
+      "standard": "TOGAF"
+    },
+    "governance": {
+      "check": "generate-standards.py --check#governance",
+      "spec": "\u00a78.3",
+      "standard": "MSP"
+    },
+    "inception-analysis": {
+      "check": "generate-standards.py --check#inception-analysis",
+      "spec": "\u00a78.4",
+      "standard": "PMP"
+    },
+    "inspect-adapt": {
+      "check": "generate-standards.py --check#inspect-adapt",
+      "spec": "\u00a78.2",
+      "standard": "SAFe"
+    },
+    "mandate": {
+      "check": "generate-standards.py --check#mandate",
+      "spec": "\u00a78.3",
+      "standard": "MSP"
+    },
+    "maturity-assessment": {
+      "check": "generate-standards.py --check#maturity-assessment",
+      "spec": "\u00a78.1",
+      "standard": "TOGAF"
+    },
+    "phase-a": {
+      "check": "generate-standards.py --check#phase-a",
+      "spec": "\u00a78.1",
+      "standard": "TOGAF"
+    },
+    "phase-b": {
+      "check": "generate-standards.py --check#phase-b",
+      "spec": "\u00a78.1",
+      "standard": "TOGAF"
+    },
+    "phase-c": {
+      "check": "generate-standards.py --check#phase-c",
+      "spec": "\u00a78.1",
+      "standard": "TOGAF"
+    },
+    "phase-d": {
+      "check": "generate-standards.py --check#phase-d",
+      "spec": "\u00a78.1",
+      "standard": "TOGAF"
+    },
+    "phase-e": {
+      "check": "generate-standards.py --check#phase-e",
+      "spec": "\u00a78.1",
+      "standard": "TOGAF"
+    },
+    "phase-f": {
+      "check": "generate-standards.py --check#phase-f",
+      "spec": "\u00a78.1",
+      "standard": "TOGAF"
+    },
+    "phase-g": {
+      "check": "generate-standards.py --check#phase-g",
+      "spec": "\u00a78.1",
+      "standard": "TOGAF"
+    },
+    "phase-h": {
+      "check": "generate-standards.py --check#phase-h",
+      "spec": "\u00a78.1",
+      "standard": "TOGAF"
+    },
+    "phase-preliminary": {
+      "check": "generate-standards.py --check#phase-preliminary",
+      "spec": "\u00a78.1",
+      "standard": "TOGAF"
+    },
+    "pi-objectives": {
+      "check": "generate-standards.py --check#pi-objectives",
+      "spec": "\u00a78.2",
+      "standard": "SAFe"
+    },
+    "pi-plan": {
+      "check": "generate-standards.py --check#pi-plan",
+      "spec": "\u00a78.2",
+      "standard": "SAFe"
+    },
+    "programme-baselines": {
+      "check": "generate-standards.py --check#programme-baselines",
+      "spec": "\u00a78.3",
+      "standard": "MSP"
+    },
+    "programme-brief": {
+      "check": "generate-standards.py --check#programme-brief",
+      "spec": "\u00a78.3",
+      "standard": "MSP"
+    },
+    "programme-plan": {
+      "check": "generate-standards.py --check#programme-plan",
+      "spec": "\u00a78.3",
+      "standard": "MSP"
+    },
+    "programme-report": {
+      "check": "generate-standards.py --check#programme-report",
+      "spec": "\u00a78.3",
+      "standard": "MSP"
+    },
+    "programme-risk-register": {
+      "check": "generate-standards.py --check#programme-risk-register",
+      "spec": "\u00a78.3",
+      "standard": "MSP"
+    },
+    "programme-strategies": {
+      "check": "generate-standards.py --check#programme-strategies",
+      "spec": "\u00a78.3",
+      "standard": "MSP"
+    },
+    "project-baseline": {
+      "check": "generate-standards.py --check#project-baseline",
+      "spec": "\u00a78.4",
+      "standard": "PMP"
+    },
+    "project-brief": {
+      "check": "generate-standards.py --check#project-brief",
+      "spec": "\u00a78.4",
+      "standard": "PMP"
+    },
+    "project-context-diagram": {
+      "check": "generate-standards.py --check#project-context-diagram",
+      "spec": "\u00a78.1",
+      "standard": "TOGAF"
+    },
+    "project-registers": {
+      "check": "generate-standards.py --check#project-registers",
+      "spec": "\u00a78.4",
+      "standard": "PMP"
+    },
+    "project-wbs": {
+      "check": "generate-standards.py --check#project-wbs",
+      "spec": "\u00a78.4",
+      "standard": "PMP"
+    },
+    "projects-dossier": {
+      "check": "generate-standards.py --check#projects-dossier",
+      "spec": "\u00a78.3",
+      "standard": "MSP"
+    },
+    "realization-plan": {
+      "check": "generate-standards.py --check#realization-plan",
+      "spec": "\u00a78.3",
+      "standard": "MSP"
+    },
+    "refined-vision": {
+      "check": "generate-standards.py --check#refined-vision",
+      "spec": "\u00a78.3",
+      "standard": "MSP"
+    },
+    "request-for-architecture-work": {
+      "check": "generate-standards.py --check#request-for-architecture-work",
+      "spec": "\u00a78.1",
+      "standard": "TOGAF"
+    },
+    "requirements-catalog": {
+      "check": "generate-standards.py --check#requirements-catalog",
+      "spec": "\u00a78.1",
+      "standard": "TOGAF"
+    },
+    "reuse-map": {
+      "check": "generate-standards.py --check#reuse-map",
+      "spec": "\u00a78.1",
+      "standard": "TOGAF"
+    },
+    "safe-art": {
+      "check": "generate-standards.py --check#safe-art",
+      "spec": "\u00a78.2",
+      "standard": "SAFe"
+    },
+    "safe-cadence": {
+      "check": "generate-standards.py --check#safe-cadence",
+      "spec": "\u00a78.2",
+      "standard": "SAFe"
+    },
+    "safe-portfolio": {
+      "check": "generate-standards.py --check#safe-portfolio",
+      "spec": "\u00a78.2",
+      "standard": "SAFe"
+    },
+    "skills-assessment": {
+      "check": "generate-standards.py --check#skills-assessment",
+      "spec": "\u00a78.1",
+      "standard": "TOGAF"
+    },
+    "spec": {
+      "check": "generate-standards.py --check#spec",
+      "spec": "\u00a75",
+      "standard": "SPEC"
+    },
+    "stakeholder-profiles": {
+      "check": "generate-standards.py --check#stakeholder-profiles",
+      "spec": "\u00a78.3",
+      "standard": "MSP"
+    },
+    "statement-of-architecture-work": {
+      "check": "generate-standards.py --check#statement-of-architecture-work",
+      "spec": "\u00a78.1",
+      "standard": "TOGAF"
+    },
+    "statement-of-intent": {
+      "check": "generate-standards.py --check#statement-of-intent",
+      "spec": "\u00a78.1",
+      "standard": "TOGAF"
+    },
+    "system-demo": {
+      "check": "generate-standards.py --check#system-demo",
+      "spec": "\u00a78.2",
+      "standard": "SAFe"
+    },
+    "tranche-plan": {
+      "check": "generate-standards.py --check#tranche-plan",
+      "spec": "\u00a78.3",
+      "standard": "MSP"
+    },
+    "tranche-review": {
+      "check": "generate-standards.py --check#tranche-review",
+      "spec": "\u00a78.3",
+      "standard": "MSP"
+    },
+    "vision": {
+      "check": "generate-standards.py --check#vision",
+      "spec": "\u00a78.3",
+      "standard": "MSP"
+    },
+    "waiver": {
+      "check": "generate-standards.py --check#waiver",
+      "spec": "\u00a78.1",
+      "standard": "TOGAF"
+    }
+  },
+  "description": "Every audit rule's output category, live source and verifier, and every output-standard category's standard, spec and verifier (WP11). The checker enforces: no orphan rule or category, a known verifier (a registry name, a manifest clause, or generate-standards.py --check for a category), a standard/spec that matches its source, and a source that resolves (or an explicitly live-only projection that is still absent from the committed pack).",
   "entries": {
     "backlog_refinement_missing": {
       "categories": [
