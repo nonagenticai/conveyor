@@ -1943,6 +1943,10 @@ def deep_review_findings(path: Path, output_standard: dict[str, Any]) -> list[di
                 "acceptance": finding.get("acceptance"),
                 "owner_project": finding.get("owner_project"),
                 "kind": kind,
+                # A deep-review finding closes by the same rule as a ledger finding: the
+                # sidecar names the commit, the test and the evidence, and the register
+                # counts it resolved instead of emitting a package nobody can discharge.
+                "resolved_by": finding.get("resolved_by"),
             }
         )
     return converted
@@ -3108,7 +3112,7 @@ def self_test() -> None:
     with tempfile.TemporaryDirectory() as sidecar_dir:
         sidecar = Path(sidecar_dir) / "deep-review-findings.json"
 
-        def write_sidecar(kind: str) -> None:
+        def write_sidecar(kind: str, **extra: object) -> None:
             sidecar.write_text(
                 json.dumps(
                     {
@@ -3123,6 +3127,7 @@ def self_test() -> None:
                                 "evidence": "a deep-review paragraph",
                                 "acceptance": "a deep-review acceptance",
                                 "artifact": "seed/output-standard.json#mandate",
+                                **extra,
                             }
                         ],
                     }
@@ -3167,6 +3172,33 @@ def self_test() -> None:
             for package in deep_register["packages"]
         ):
             fail("a deep-review finding did not become its package with its kind")
+        # A resolved deep-review finding is closed by the same rule as a ledger finding:
+        # its receipt survives the conversion and the register neither emits a package for
+        # it nor loses the resolution count.
+        receipt = {
+            "commit": "0" * 40,
+            "test": "crates/x/tests/y.rs::z",
+            "evidence": "the test proves it",
+        }
+        write_sidecar("record+code", resolved_by=receipt)
+        converted_resolved = deep_review_findings(sidecar, output_standard)
+        if converted_resolved[0].get("resolved_by") != receipt:
+            fail("a resolved deep-review finding lost its resolved_by")
+        resolved_register = build_register(
+            register_gaps,
+            register_baseline,
+            {"findings": converted_resolved},
+            standard,
+            register_data,
+            "fixture",
+        )
+        if any(
+            package["rule"] == "dr-x-1"
+            for package in resolved_register["packages"]
+        ):
+            fail("a resolved deep-review finding still produced a package")
+        if resolved_register["summary"]["resolved"] != 1:
+            fail("a resolved deep-review finding was not counted as resolved")
         write_sidecar("prose")
         try:
             deep_review_findings(sidecar, output_standard)
