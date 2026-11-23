@@ -1896,3 +1896,70 @@ async fn a_delegated_rule_decision_resumes_under_a_published_decision() {
     assert_eq!(kind, "rule", "a delegated decision is a rule, never human");
     assert_eq!(via["delegation_ref"], json!(document.to_string()));
 }
+
+/// SPEC_V2 §5.4 read with the programme's operating model: a machine decision that NAMES a
+/// published owner delegation is a `rule` decision and is accepted on a human-default gate —
+/// "a gate that requires a person accepts it only by naming its delegation". The same decision
+/// with no delegation is refused (covered by `approval_policies`). This is the path the
+/// retrospective programme record uses through the operator CLI, which records `actor_kind =
+/// "service"` for the named member; it was untested, and the one writer ignored the delegation.
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+async fn a_rule_decision_under_a_published_delegation_is_accepted_on_a_human_gate() {
+    let (pg, running, seeded) = running_fixture().await;
+    let delegation = support::delegation_ref(&running, "dev:alice").await;
+    let reviewer = support::reviewer_id(&pg).await;
+
+    // A pending governance gate requested by alice; the reviewer is a distinct member.
+    let mut tx = conveyor_store::scope::begin_scoped(&pg.runtime, seeded.tenant)
+        .await
+        .expect("scope the gate");
+    let approval = conveyor_store::approval::insert_approval_tx(
+        &mut tx,
+        seeded.tenant,
+        &conveyor_store::approval::NewApproval {
+            run_id: None,
+            card_id: None,
+            project_id: None,
+            eval_id: None,
+            gate: "charter".to_owned(),
+            kind: "gate".to_owned(),
+            required_decisions: 1,
+            requested_by: Some(seeded.user_id),
+            expires_at: None,
+            callback_url: None,
+            correlation_id: None,
+            meta: json!({}),
+        },
+    )
+    .await
+    .expect("insert the gate");
+    tx.commit().await.expect("commit the gate");
+
+    let mut machine = request(
+        reviewer,
+        "approvals.decide",
+        json!({
+            "approval_id": approval.id,
+            "decision": "approve",
+            "note": "Rule approval under the published standing delegation",
+            "delegation_ref": delegation,
+        }),
+    );
+    machine.actor_kind = "service".to_owned();
+    // The operator CLI's own authority: the named member acts as the internal machine role.
+    machine.authority = Authority::Internal;
+    machine.role = Role::KataExecutor;
+    let decided = invoke(&pg.runtime, registry(), seeded.tenant, machine)
+        .await
+        .expect("a published delegation authorises the rule decision on a human-default gate");
+    assert_eq!(output(&decided.body)["status"], json!("approved"));
+
+    let (kind, via): (String, Value) =
+        sqlx::query_as("SELECT decided_by_kind, via FROM approval_decision WHERE approval_id = $1")
+            .bind(approval.id)
+            .fetch_one(&pg.super_pool)
+            .await
+            .expect("read the delegated decision");
+    assert_eq!(kind, "rule", "a delegated decision is a rule, never human");
+    assert_eq!(via["delegation_ref"], json!(delegation));
+}
