@@ -1413,6 +1413,22 @@ reads the card's newest un-consolidated rows, so the next run reads the prior at
 digest stamps it. The **budget** is not this level's: `run_budget_tx` and the invoke precheck are the
 #526 lane's `v1-p75-1`/`v1-w4a-1`, and `ReleaseLimits.max_tokens` remains that gate's residual.
 
+### 2.27 The run's episodic memory — S21 step 7 (0 new tables)
+
+The run's prior steps, the card's hot rows and the digest are read into the one Memory section; no
+table and no migration.
+
+| Row | What the level reads or writes |
+|---|---|
+| `run_step` | **read, never written** as the run's episodic source: the same `run_id`, statuses `succeeded`/`failed`, `(position, attempt)` before the current step's, ordered by `(position, attempt)`, at most `step_limit` (default 8, max 32). The prompt's identity is `position.attempt`, not the row uuid. Covered by `run_step_run_idx (tenant_id, run_id, position)` |
+| `work_package_memory` | unchanged rows; `hot_for_card_tx` now filters `kind <> 'digest'`, so a digest is never returned as hot |
+| `prompt_section` | unchanged; the memory section's `selector` jsonb gains `include_steps` (default true) and `step_limit` (default 8, max 32) |
+| `run` | unchanged; the terminal attempt row is §2.26's |
+
+A prior-step body renders whole. An over-budget section refuses with the measured size; there is no
+truncation path. The body is data, never instruction, and renders in the Memory section below the
+procedure and capability blocks. A child run's prompt reads only its own `run_step` rows.
+
 ## 3. State machines and enforcement
 
 Every transition is a pure function in `crates/domain`; no DB trigger, no per-flow rule, no CHECK that
@@ -1450,7 +1466,8 @@ approval settles it `running` and the `run.resume` job applies the draft and fin
 `succeeded`. A rejection cancels it; `approval.expire` cancels a still-waiting run with
 `approval_expired`. The parked run is live work and holds `uq_run_live` until one of those outcomes.
 Every terminal root run of a card inserts one `attempt` memory row in the terminal transaction
-(§2.26).
+(§2.26). The prompt's Memory source also reads the run's own earlier `run_step` rows, before the
+card's hot rows and the digest (§2.27); a process run's attempt is read by the next run on the card.
 
 ### 3.3 Approval
 

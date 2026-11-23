@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>S21 step 7 — the run's episodic memory · conveyor documents</title>
+    <link rel="icon" href="../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S21-MEMORY.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="s21-step-7--the-runs-episodic-memory">S21 step 7 — the run's episodic memory</h1>
+<p><strong>Issue:</strong> #612 · <strong>Branch:</strong> <code>issue/612-s21-run-memory</code> · <strong>Date:</strong> 2026-11-23 · <strong>Baseline:</strong> <code>origin/main@d1bdf569</code> (the #599 merge)</p>
+<h2 id="what-this-step-builds">What this step builds</h2>
+<ul>
+<li>The run's own prior steps render in the one Memory section, ahead of the card's hot rows and the digest: <code>[step/&lt;status&gt;#&lt;position&gt;.&lt;attempt&gt;] &lt;action&gt; &lt;status&gt;: &lt;body&gt;</code>. Selection is the run's own <code>run_step</code> rows (<code>succeeded</code>/<code>failed</code>, <code>(position, attempt)</code> before the current step), bounded by the selector's <code>step_limit</code> (default 8, max 32) with <code>include_steps</code> (default true).</li>
+<li>Bodies render whole; an over-budget section refuses with the measured size. No truncation path.</li>
+<li><code>memory.recall</code>'s <code>hot</code> excludes <code>digest</code>; the digest stays reachable through the prompt selector's <code>include_digest</code> and the cold read.</li>
+<li>The process run's terminal attempt is proved to reach the next run's prompt (the writer is #599's; this step adds no second writer).</li>
+</ul>
+<h2 id="not-this-step">Not this step</h2>
+<p>No card-driven run creation, no <code>memory.remember</code> write-back at handoff, no automatic apply of an L1-accepted draft, no step <code>input_template</code>/<code>outputs</code> as Request, no budget mechanism (the #526 lane's), no parent-run memory in a child's prompt, no UI, no PDDL storage, no second compiler, no migration.</p>
+<h2 id="measured-at-the-branch-head">Measured at the branch head</h2>
+<p><em>Filled at completion.</em></p>
+<table>
+<thead>
+<tr>
+<th>Suite</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+</tbody>
+</table>
+<h2 id="reversal-proofs">Reversal proofs</h2>
+<p><em>Filled at completion.</em></p>
+<table>
+<thead>
+<tr>
+<th>Guard removed</th>
+<th>Test that turned red</th>
+</tr>
+</thead>
+<tbody>
+</tbody>
+</table>
+<h2 id="generated">Generated</h2>
+<p><em>Filled at completion.</em></p>
+<h2 id="residuals">Residuals</h2>
+<p><em>Filled at completion.</em></p>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/evidence/S21-MEMORY.md</code> at build time.</span>
+      <a href="../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>

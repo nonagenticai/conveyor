@@ -164,6 +164,15 @@ window.CONVEYOR_DOCUMENTS = {
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0014-work-package-run.md"
     },
     {
+      "title": "0015 — The run's episodic memory: prior steps in the compiled prompt",
+      "path": "docs/decisions/0015-run-episodic-memory.html",
+      "source": "docs/decisions/0015-run-episodic-memory.md",
+      "section": "Decisions",
+      "sha256": "919ba6c1a13514c4555c07aed216ebc3f7d77de17f407fe2f258b521b7535424",
+      "bytes": 5457,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/decisions/0015-run-episodic-memory.md"
+    },
+    {
       "title": "Programme architecture and benefits realization",
       "path": "docs/design/Program_Architecture_and_Benefits_Realization.html",
       "source": "docs/design/Program_Architecture_and_Benefits_Realization.md",
@@ -443,6 +452,15 @@ window.CONVEYOR_DOCUMENTS = {
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S21-EXECUTOR.md"
     },
     {
+      "title": "S21 step 7 — the run's episodic memory",
+      "path": "docs/evidence/S21-MEMORY.html",
+      "source": "docs/evidence/S21-MEMORY.md",
+      "section": "Evidence",
+      "sha256": "52bd32e5c0fa4158655138ed4f24325eddd8fe66593049df6ca02e36b52f3f59",
+      "bytes": 1558,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S21-MEMORY.md"
+    },
+    {
       "title": "S21 step 2 — the plan projection over declared step outputs (receipt)",
       "path": "docs/evidence/S21-PLAN.html",
       "source": "docs/evidence/S21-PLAN.md",
@@ -582,8 +600,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/00-INDEX.html",
       "source": "docs/plans/00-INDEX.md",
       "section": "Plans",
-      "sha256": "acf37822d54df5153da5c57464f4e1bd496ae6b89e4b1a9d7efc61499688630f",
-      "bytes": 254852,
+      "sha256": "fcf0c2d6ac708871232465423d3b41b580576106cbef46de7854e0a67fc61d30",
+      "bytes": 255320,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/00-INDEX.md"
     },
     {
@@ -591,8 +609,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/01-CONTRACT.html",
       "source": "docs/plans/01-CONTRACT.md",
       "section": "Plans",
-      "sha256": "85fe038c0ab33a2d2fe7edb48318a9668e4f8cd3fcf75f20fa1b2ecdf2a42cc0",
-      "bytes": 77277,
+      "sha256": "7368484d48141e46c7553e6857f8cc3d8c46990eaad92b94eb613d3d3ac12c0f",
+      "bytes": 79586,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/01-CONTRACT.md"
     },
     {
@@ -600,8 +618,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/02-DATA-ARCHITECTURE.html",
       "source": "docs/plans/02-DATA-ARCHITECTURE.md",
       "section": "Plans",
-      "sha256": "e02d8f71ec61e14676795c5cc8e969adf73f14c1c0f1ca88f222ab01fd263621",
-      "bytes": 147521,
+      "sha256": "2dcf479e5ad998fdf0cacd9dcce51aa22a1a4085a0361dfd2673f05f15b16244",
+      "bytes": 148948,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/02-DATA-ARCHITECTURE.md"
     },
     {
@@ -1131,8 +1149,8 @@ window.CONVEYOR_DOCUMENTS = {
       "path": "docs/plans/slices/S21-message-construction.html",
       "source": "docs/plans/slices/S21-message-construction.md",
       "section": "Plans",
-      "sha256": "a5cbb76e65c766ad4848e3451838b0df51c5272ef41f13755c8868e37b62f990",
-      "bytes": 42061,
+      "sha256": "7a2f88eef7465399c8f64a5d392c64aff44848e66cf9b032785a54d6592d14c9",
+      "bytes": 45659,
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/plans/slices/S21-message-construction.md"
     }
   ]

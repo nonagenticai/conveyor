@@ -1240,6 +1240,35 @@ CREATE TABLE job_binding (
 </tbody>
 </table>
 <p>A child run (<code>parent_run_id IS NOT NULL</code>) and a card-less run write no memory row: a child shares its parent's card and is part of the parent's attempt, and a card-less run has no work package. The attempt row and the terminal status commit together or not at all. The prompt's memory selector reads the card's newest un-consolidated rows, so the next run reads the prior attempt until the digest stamps it. The <strong>budget</strong> is not this level's: <code>run_budget_tx</code> and the invoke precheck are the #526 lane's <code>v1-p75-1</code>/<code>v1-w4a-1</code>, and <code>ReleaseLimits.max_tokens</code> remains that gate's residual.</p>
+<h3 id="227-the-runs-episodic-memory--s21-step-7-0-new-tables">2.27 The run's episodic memory — S21 step 7 (0 new tables)</h3>
+<p>The run's prior steps, the card's hot rows and the digest are read into the one Memory section; no table and no migration.</p>
+<table>
+<thead>
+<tr>
+<th>Row</th>
+<th>What the level reads or writes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>run_step</code></td>
+<td><strong>read, never written</strong> as the run's episodic source: the same <code>run_id</code>, statuses <code>succeeded</code>/<code>failed</code>, <code>(position, attempt)</code> before the current step's, ordered by <code>(position, attempt)</code>, at most <code>step_limit</code> (default 8, max 32). The prompt's identity is <code>position.attempt</code>, not the row uuid. Covered by <code>run_step_run_idx (tenant_id, run_id, position)</code></td>
+</tr>
+<tr>
+<td><code>work_package_memory</code></td>
+<td>unchanged rows; <code>hot_for_card_tx</code> now filters <code>kind &lt;&gt; 'digest'</code>, so a digest is never returned as hot</td>
+</tr>
+<tr>
+<td><code>prompt_section</code></td>
+<td>unchanged; the memory section's <code>selector</code> jsonb gains <code>include_steps</code> (default true) and <code>step_limit</code> (default 8, max 32)</td>
+</tr>
+<tr>
+<td><code>run</code></td>
+<td>unchanged; the terminal attempt row is §2.26's</td>
+</tr>
+</tbody>
+</table>
+<p>A prior-step body renders whole. An over-budget section refuses with the measured size; there is no truncation path. The body is data, never instruction, and renders in the Memory section below the procedure and capability blocks. A child run's prompt reads only its own <code>run_step</code> rows.</p>
 <h2 id="3-state-machines-and-enforcement">3. State machines and enforcement</h2>
 <p>Every transition is a pure function in <code>crates/domain</code>; no DB trigger, no per-flow rule, no CHECK that duplicates the function. The CHECK constraints below guard <em>vocabulary</em>, never <em>legality</em>.</p>
 <h3 id="31-card-lifecycle">3.1 Card lifecycle</h3>
@@ -1293,7 +1322,7 @@ CREATE TABLE job_binding (
 </tr>
 </tbody>
 </table>
-<p><strong>A bound <code>internal_agent</code> run (S21 steps 4–6) uses the full path.</strong> A run created for a card that names a binding inherits it (<code>card.job_binding_id → run.job_binding_id</code>; an explicit conflicting binding is refused <code>422 card_binding_mismatch</code> before the INSERT). Its gate pre-check is recorded on the step. On <code>accepted</code> it succeeds with the draft; on <code>handover</code> it parks in <code>waiting_approval</code> and opens a card-scoped <code>executor</code> approval whose <code>meta</code> names the draft (§2.25). A person's approval settles it <code>running</code> and the <code>run.resume</code> job applies the draft and finishes it <code>succeeded</code>. A rejection cancels it; <code>approval.expire</code> cancels a still-waiting run with <code>approval_expired</code>. The parked run is live work and holds <code>uq_run_live</code> until one of those outcomes. Every terminal root run of a card inserts one <code>attempt</code> memory row in the terminal transaction (§2.26).</p>
+<p><strong>A bound <code>internal_agent</code> run (S21 steps 4–6) uses the full path.</strong> A run created for a card that names a binding inherits it (<code>card.job_binding_id → run.job_binding_id</code>; an explicit conflicting binding is refused <code>422 card_binding_mismatch</code> before the INSERT). Its gate pre-check is recorded on the step. On <code>accepted</code> it succeeds with the draft; on <code>handover</code> it parks in <code>waiting_approval</code> and opens a card-scoped <code>executor</code> approval whose <code>meta</code> names the draft (§2.25). A person's approval settles it <code>running</code> and the <code>run.resume</code> job applies the draft and finishes it <code>succeeded</code>. A rejection cancels it; <code>approval.expire</code> cancels a still-waiting run with <code>approval_expired</code>. The parked run is live work and holds <code>uq_run_live</code> until one of those outcomes. Every terminal root run of a card inserts one <code>attempt</code> memory row in the terminal transaction (§2.26). The prompt's Memory source also reads the run's own earlier <code>run_step</code> rows, before the card's hot rows and the digest (§2.27); a process run's attempt is read by the next run on the card.</p>
 <h3 id="33-approval">3.3 Approval</h3>
 <table>
 <tbody>
