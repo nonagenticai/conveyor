@@ -16,11 +16,16 @@ the rows it resolved, or the fixed line naming the record that would satisfy it.
 
 Usage:
     python3 scripts/generate-standards.py --check            # verify the committed record
+    python3 scripts/generate-standards.py --check-category KEY  # verify one category (repeatable)
     python3 scripts/generate-standards.py --data-out DIR --html-out DIR --findings-out FILE
     python3 scripts/generate-standards.py --self-test
 
 Exit 0 = the record was generated (or the committed one is current); exit 1 = drift or a
-defect. The publish pipeline runs pass 1 (findings) before the audit and pass 2 (data + HTML,
+defect. `--check-category` exits 0 = every applicable instance has a published document whose
+body covers the template's required headings and the composer composes it; 1 = a document is
+absent, incomplete, stale or composition refuses; 2 = the category is unknown or has no
+instance row (an untriggered on-demand category prints `on-demand untriggered: <key>` and
+exits 0). The publish pipeline runs pass 1 (findings) before the audit and pass 2 (data + HTML,
 with the register) after the strict gate.
 """
 
@@ -30,10 +35,12 @@ import argparse
 import copy
 import hashlib
 import html
+import importlib.util
 import json
 import re
 import sys
 import tempfile
+import types
 from pathlib import Path
 from typing import Any, Iterable
 
@@ -2555,6 +2562,226 @@ def self_test() -> int:
     return 0
 
 
+# --- per-category verification ---------------------------------------------------------------
+
+COMPOSE_PATH = ROOT / "scripts" / "compose-artefact-bodies.py"
+MD_HEADING = re.compile(r"^\s{0,3}#{1,6}\s+(.+?)\s*#*\s*$")
+
+
+def load_composer():
+    """The body composer, imported by path as `publish-programme-artefacts.py` imports us."""
+    spec = importlib.util.spec_from_file_location("compose_artefact_bodies", COMPOSE_PATH)
+    if spec is None or spec.loader is None:
+        raise GenerationError(f"cannot load {COMPOSE_PATH}")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def generator_api() -> types.SimpleNamespace:
+    """The resolver surface `compose()` calls, so the verifier runs the one authority."""
+    return types.SimpleNamespace(
+        applies=applies,
+        rows_for=rows_for,
+        substitute=substitute,
+        skeleton_bodies=skeleton_bodies,
+        normalise=normalise,
+        resolve_section=resolve_section,
+    )
+
+
+def snapshot_document_rows(snapshot: dict[str, Any]) -> list[dict[str, Any]]:
+    """Every document row the snapshot carries, in either published shape."""
+    rows: list[dict[str, Any]] = []
+    artefacts = snapshot.get("artefacts") or {}
+    for row in artefacts.get("documents") or []:
+        if isinstance(row, dict):
+            rows.append(row)
+    documents_file = snapshot.get("documents") or {}
+    for row in documents_file.get("documents") or []:
+        if isinstance(row, dict):
+            rows.append(row)
+    return rows
+
+
+def is_published(document: dict[str, Any]) -> bool:
+    # #537 made publication a timestamp; the old flag is still read for older snapshots.
+    if "published_at" in document:
+        return bool(document.get("published_at"))
+    return bool(document.get("publishable", True))
+
+
+def document_text(document: dict[str, Any]) -> str | None:
+    meta = document.get("meta") if isinstance(document.get("meta"), dict) else {}
+    for value in (document.get("body"), meta.get("body")):
+        if isinstance(value, str) and value.strip():
+            return value
+    return None
+
+
+def text_headings(text: str) -> set[str]:
+    if re.search(r"<h[1-6]\b", text, re.IGNORECASE):
+        return {normalise(TAG.sub("", body)) for _level, body in HEADING.findall(text)}
+    found: set[str] = set()
+    for line in text.splitlines():
+        match = MD_HEADING.match(line)
+        if match:
+            found.add(normalise(match.group(1)))
+    return found
+
+
+def document_heading_set(document: dict[str, Any]) -> set[str] | None:
+    """The document body's headings, or None when the snapshot carries no body to read."""
+    meta = document.get("meta") if isinstance(document.get("meta"), dict) else {}
+    for value in (document.get("headings"), meta.get("headings")):
+        if isinstance(value, list):
+            return {normalise(str(item)) for item in value}
+    text = document_text(document)
+    if text is None:
+        return None
+    return text_headings(text)
+
+
+def instance_documents(
+    snapshot: dict[str, Any],
+    template: dict[str, Any],
+    category: str,
+    subject: dict[str, Any],
+) -> list[dict[str, Any]]:
+    """The published documents that belong to one instance, newest last."""
+    wanted = str(template.get("document_category") or category)
+    kind = str(subject.get("kind") or "")
+    allowed: set[str] | None = None
+    if kind == "programme":
+        allowed = set()
+        for project in ((snapshot.get("programme") or {}).get("projects") or []):
+            if (isinstance(project, dict)
+                    and str(project.get("programme_id")) == str(subject.get("id"))):
+                allowed.add(str(project.get("id")))
+    elif kind == "project":
+        allowed = {str(subject.get("id"))}
+    selected: list[dict[str, Any]] = []
+    for document in snapshot_document_rows(snapshot):
+        if str(document.get("category") or "") != wanted or not is_published(document):
+            continue
+        if kind == "programme" and str(document.get("programme_id") or "") == str(subject.get("id")):
+            selected.append(document)
+            continue
+        if allowed is not None and str(document.get("project_id") or "") not in allowed:
+            continue
+        selected.append(document)
+    return sorted(
+        selected,
+        key=lambda item: (str(item.get("created_at") or ""), str(item.get("id") or "")),
+    )
+
+
+def check_instance(
+    gen: types.SimpleNamespace,
+    composer,
+    std: dict[str, Any],
+    template: dict[str, Any],
+    category: str,
+    instance: dict[str, Any],
+    snapshot: dict[str, Any],
+    snapshot_dir: Path,
+) -> list[str]:
+    subject = instance.get("subject") or {}
+    where = str(instance.get("id") or "")
+    documents = instance_documents(snapshot, template, category, subject)
+    if not documents:
+        wanted = str(template.get("document_category") or category)
+        return [f"{where}: no published {wanted} document in the snapshot"]
+    document = documents[-1]
+    headings = document_heading_set(document)
+    if headings is None:
+        return [
+            f"{where}: document {document.get('id')} carries no body or headings; "
+            "required-heading coverage cannot be confirmed"
+        ]
+    missing = [
+        str(heading) for heading in (template.get("required") or [])
+        if normalise(str(heading)) not in headings
+    ]
+    if missing:
+        return [
+            f"{where}: document {document.get('id')} misses required heading(s): "
+            f"{', '.join(missing)}"
+        ]
+    kind = str(subject.get("kind") or "")
+    key = str(subject.get("key") or subject.get("id") or "")
+    try:
+        composed = composer.compose(gen, std, snapshot, snapshot_dir, category, kind, key)
+    except (composer.Refusal, composer.Abort) as exc:
+        return [f"{where}: composition refused ({exc.code}): {exc.message}"]
+    meta = document.get("meta") if isinstance(document.get("meta"), dict) else {}
+    recorded = meta.get("sha256")
+    if not isinstance(recorded, str) or not recorded:
+        recorded = document.get("sha256")
+    if isinstance(recorded, str) and recorded and recorded != composed["body_sha256"]:
+        return [
+            f"{where}: stale document {document.get('id')}: composed body_sha256 "
+            f"{composed['body_sha256']} differs from the recorded {recorded}"
+        ]
+    return []
+
+
+def check_category(
+    category: str,
+    std: dict[str, Any],
+    snapshot: dict[str, Any],
+    snapshot_dir: Path,
+    outputs_dir: Path,
+) -> tuple[int, list[str], list[str]]:
+    """One category's verdict: (exit code, result lines, problem lines). Reads only."""
+    categories = list(std.get("categories") or [])
+    templates = std.get("templates") or {}
+    if category not in templates or (categories and category not in categories):
+        return 2, [], [f"check-category {category}: unknown category"]
+    try:
+        instances, _ = build_instances(
+            std, snapshot, outputs_dir, load_declared_phases(), register=None,
+        )
+    except GenerationError as exc:
+        return 2, [], [f"check-category {category}: the record cannot be built: {exc}"]
+    rows = [item for item in instances if item.get("category") == category]
+    if not rows:
+        if category in (std.get("on_demand") or []):
+            return 0, [f"on-demand untriggered: {category}"], []
+        return 2, [], [f"check-category {category}: no instance row or trigger exists"]
+    try:
+        composer = load_composer()
+    except GenerationError as exc:
+        return 2, [], [f"check-category {category}: {exc}"]
+    gen = generator_api()
+    template = templates[category]
+    problems: list[str] = []
+    for instance in rows:
+        problems.extend(check_instance(
+            gen, composer, std, template, category, instance, snapshot, snapshot_dir,
+        ))
+    if problems:
+        return 1, [], [f"check-category {category}: {problem}" for problem in problems]
+    return 0, [f"check-category {category}: ok ({len(rows)} instance(s))"], []
+
+
+def check_categories(
+    keys: list[str],
+    std: dict[str, Any],
+    snapshot_dir: Path,
+    outputs_dir: Path,
+) -> int:
+    """Run the repeatable check; the process exits with the worst category verdict."""
+    snapshot = load_snapshot(snapshot_dir)
+    worst = 0
+    for key in keys:
+        code, lines, problems = check_category(key, std, snapshot, snapshot_dir, outputs_dir)
+        for line in lines + problems:
+            print(line)
+        worst = max(worst, code)
+    return worst
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--snapshot", type=Path, default=ROOT / "docs/design/data")
@@ -2568,12 +2795,20 @@ def main() -> int:
     parser.add_argument("--html-out", type=Path)
     parser.add_argument("--findings-out", type=Path)
     parser.add_argument("--check", action="store_true")
+    parser.add_argument(
+        "--check-category", action="append", default=[], metavar="KEY",
+        help="verify one standard category (repeatable); exits 0 clean, 1 defect, 2 absent",
+    )
     parser.add_argument("--self-test", action="store_true")
     args = parser.parse_args()
 
     std = json.loads(args.standard.read_text(encoding="utf-8"))
     if args.self_test:
         return self_test()
+    if args.check_category:
+        return check_categories(
+            args.check_category, std, args.snapshot, args.outputs_dir,
+        )
     snapshot = load_snapshot(args.snapshot)
     declared_phases = load_declared_phases()
     for problem in pointer_problems(std, snapshot):
