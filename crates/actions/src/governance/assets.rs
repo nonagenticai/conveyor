@@ -1,5 +1,6 @@
 #![forbid(unsafe_code)]
-//! `requirements.*`, `principles.*`, `decisions.*` — one lifecycle, three declarations.
+//! `requirements.*`, `principles.*`, `decisions.*` — one lifecycle, three declarations — plus
+//! the generic `governed_assets.*` family for the MSP programme artefacts.
 //!
 //! Every family shares ONE implementation ([`create_asset`], [`get_asset`], [`update_asset`],
 //! [`transition_asset`], [`list_assets`], [`compare_asset`]) parameterised by an
@@ -7,6 +8,17 @@
 //! (S07 §5.2). The binding is enforced on every read, not only on create: an id that resolves
 //! to another kind is a `404` in this family, so `requirements.*` cannot reach a principle
 //! through an id any more than through a body field.
+//!
+//! **The generic family is the one deliberate exception.** SPEC_V2 §8.3 maps the MSP programme
+//! artefacts (mandate, programme brief, blueprint, business case, refined vision, benefits
+//! strategy, benefits realization plan, projects dossier) to `governed_asset` kinds that no
+//! fixed family owns, and §10.4 names the served surface `governed_assets.compose|submit|
+//! approve`. `compose` parses its `kind` into the domain's closed vocabulary — an unknown value
+//! is a `422 unknown_kind` — and then passes it into the SAME [`create_asset`]/[`insert_asset_tx`]
+//! path, so the table's kind CHECK still binds. `submit` and `approve` are the two fixed
+//! lifecycle steps (`draft → in_review`, `in_review → approved`); they run through the same
+//! status-guarded [`transition_asset`] the family `transition` uses, so the domain's approval
+//! guard is neither bypassed nor weakened.
 //!
 //! **Key derivation.** An absent `key` is derived from the title: lower-case it, collapse
 //! every run of characters outside `[a-z0-9]` to one `_`, trim `_`, cap at
@@ -51,10 +63,10 @@ use crate::invoke::{ActionError, HandlerCtx};
 use crate::spec::HandlerOutput;
 
 use super::{
-    AssetCompareIn, AssetCreateIn, AssetDetailOut, AssetListIn, AssetOut, AssetTransitionIn,
-    AssetUpdateIn, ConflictDismissIn, ConflictListIn, ConflictOut, FieldChangeOut, IdIn, Page,
-    RevisionDiffOut, RevisionMetaOut, etag_of, invalid, parent_error, require_precondition_with,
-    store_error,
+    AssetCompareIn, AssetComposeIn, AssetCreateIn, AssetDetailOut, AssetListIn, AssetOut,
+    AssetTransitionIn, AssetUpdateIn, ConflictDismissIn, ConflictListIn, ConflictOut,
+    FieldChangeOut, GovernedAssetListIn, IdIn, Page, RevisionDiffOut, RevisionMetaOut, etag_of,
+    invalid, parent_error, require_precondition_with, store_error,
 };
 
 /// `requirements.*` acts on requirements, and on nothing else.
@@ -215,18 +227,21 @@ fn is_key_conflict(error: &sqlx::Error) -> bool {
 ///
 /// An id that resolves to another kind is not a governance asset of this family: it is
 /// invisible here exactly as another tenant's id is, which is what makes "the kind is never an
-/// input" true of the id the caller *does* supply.
+/// input" true of the id the caller *does* supply. `None` is the generic family, which accepts
+/// every kind.
 async fn read_asset(
     conn: &mut PgConnection,
     ctx: &HandlerCtx,
-    kind: AssetKind,
+    kind: Option<AssetKind>,
     id: uuid::Uuid,
 ) -> Result<GovernedAssetRecord, ActionError> {
     let record = get_asset_record_tx(&mut *conn, ctx.tenant, id)
         .await
         .map_err(|error| governance_error(error, ctx.action))?
         .ok_or_else(|| ActionError::resource_not_found("governed asset"))?;
-    if record.kind != kind {
+    if let Some(expected) = kind
+        && record.kind != expected
+    {
         return Err(ActionError::resource_not_found("governed asset"));
     }
     Ok(record)
@@ -490,7 +505,7 @@ async fn create_asset(
 async fn get_asset(
     conn: &mut PgConnection,
     ctx: &HandlerCtx,
-    kind: AssetKind,
+    kind: Option<AssetKind>,
     id: uuid::Uuid,
 ) -> Result<HandlerOutput<AssetDetailOut>, ActionError> {
     let record = read_asset(conn, ctx, kind, id).await?;
@@ -521,7 +536,7 @@ async fn update_asset(
     let action = ctx.action;
     // Read first: the precondition's `412` must carry the representation the caller should be
     // looking at, and the pre-mutation snapshot is what `changed[]` is computed against.
-    let before = read_asset(conn, ctx, kind, input.id).await?;
+    let before = read_asset(conn, ctx, Some(kind), input.id).await?;
     let expected = require_precondition_with(ctx, action, asset_json(&before))?;
 
     let title = match input.title {
@@ -610,7 +625,7 @@ async fn update_asset(
 async fn transition_asset(
     conn: &mut PgConnection,
     ctx: &HandlerCtx,
-    kind: AssetKind,
+    kind: Option<AssetKind>,
     input: AssetTransitionIn,
 ) -> Result<HandlerOutput<AssetOut>, ActionError> {
     let action = ctx.action;
@@ -702,7 +717,7 @@ async fn transition_asset(
 async fn list_assets(
     conn: &mut PgConnection,
     ctx: &HandlerCtx,
-    kind: AssetKind,
+    kind: Option<AssetKind>,
     input: AssetListIn,
 ) -> Result<Page<AssetOut>, ActionError> {
     let status = match input
@@ -719,7 +734,7 @@ async fn list_assets(
     };
     let limit = store::actions::clamp_limit(input.page.limit);
     let filter = AssetFilter {
-        kind: Some(kind),
+        kind,
         status,
         project_id: input.project_id,
     };
@@ -771,7 +786,7 @@ async fn compare_asset(
     kind: AssetKind,
     input: AssetCompareIn,
 ) -> Result<RevisionDiffOut, ActionError> {
-    let asset = read_asset(conn, ctx, kind, input.id).await?;
+    let asset = read_asset(conn, ctx, Some(kind), input.id).await?;
     let from = read_revision(conn, ctx, asset.id, input.from).await?;
     let to = read_revision(conn, ctx, asset.id, input.to).await?;
     Ok(diff_out(&diff(&from.content, &to.content)))
@@ -878,7 +893,7 @@ async fn requirements_get(
     ctx: HandlerCtx,
     input: IdIn,
 ) -> Result<HandlerOutput<AssetDetailOut>, ActionError> {
-    get_asset(&mut *tx, &ctx, REQUIREMENT, input.id).await
+    get_asset(&mut *tx, &ctx, Some(REQUIREMENT), input.id).await
 }
 
 /// Edit a requirement; `If-Match` is required and a stale version writes nothing.
@@ -918,7 +933,7 @@ async fn requirements_transition(
     ctx: HandlerCtx,
     input: AssetTransitionIn,
 ) -> Result<HandlerOutput<AssetOut>, ActionError> {
-    transition_asset(&mut *tx, &ctx, REQUIREMENT, input).await
+    transition_asset(&mut *tx, &ctx, Some(REQUIREMENT), input).await
 }
 
 /// One page of requirements.
@@ -938,7 +953,7 @@ async fn requirements_list(
     ctx: HandlerCtx,
     input: AssetListIn,
 ) -> Result<Page<AssetOut>, ActionError> {
-    list_assets(&mut *tx, &ctx, REQUIREMENT, input).await
+    list_assets(&mut *tx, &ctx, Some(REQUIREMENT), input).await
 }
 
 /// Diff two revisions of a requirement.
@@ -1000,7 +1015,7 @@ async fn principles_get(
     ctx: HandlerCtx,
     input: IdIn,
 ) -> Result<HandlerOutput<AssetDetailOut>, ActionError> {
-    get_asset(&mut *tx, &ctx, PRINCIPLE, input.id).await
+    get_asset(&mut *tx, &ctx, Some(PRINCIPLE), input.id).await
 }
 
 /// Edit a principle; `If-Match` is required and a stale version writes nothing.
@@ -1040,7 +1055,7 @@ async fn principles_transition(
     ctx: HandlerCtx,
     input: AssetTransitionIn,
 ) -> Result<HandlerOutput<AssetOut>, ActionError> {
-    transition_asset(&mut *tx, &ctx, PRINCIPLE, input).await
+    transition_asset(&mut *tx, &ctx, Some(PRINCIPLE), input).await
 }
 
 /// One page of principles.
@@ -1060,7 +1075,7 @@ async fn principles_list(
     ctx: HandlerCtx,
     input: AssetListIn,
 ) -> Result<Page<AssetOut>, ActionError> {
-    list_assets(&mut *tx, &ctx, PRINCIPLE, input).await
+    list_assets(&mut *tx, &ctx, Some(PRINCIPLE), input).await
 }
 
 /// One page of persisted principle-conflict verdicts.
@@ -1142,7 +1157,7 @@ async fn decisions_get(
     ctx: HandlerCtx,
     input: IdIn,
 ) -> Result<HandlerOutput<AssetDetailOut>, ActionError> {
-    get_asset(&mut *tx, &ctx, DECISION, input.id).await
+    get_asset(&mut *tx, &ctx, Some(DECISION), input.id).await
 }
 
 /// Edit a decision record; `If-Match` is required and a stale version writes nothing.
@@ -1182,7 +1197,7 @@ async fn decisions_transition(
     ctx: HandlerCtx,
     input: AssetTransitionIn,
 ) -> Result<HandlerOutput<AssetOut>, ActionError> {
-    transition_asset(&mut *tx, &ctx, DECISION, input).await
+    transition_asset(&mut *tx, &ctx, Some(DECISION), input).await
 }
 
 /// One page of decision records.
@@ -1202,5 +1217,199 @@ async fn decisions_list(
     ctx: HandlerCtx,
     input: AssetListIn,
 ) -> Result<Page<AssetOut>, ActionError> {
-    list_assets(&mut *tx, &ctx, DECISION, input).await
+    list_assets(&mut *tx, &ctx, Some(DECISION), input).await
+}
+
+// ── governed_assets.* (the generic family; SPEC_V2 §8.3/§10.4) ────────────────────────────
+//
+// The MSP programme artefacts — mandate, programme brief, blueprint, business case, refined
+// vision, benefits strategy, benefits realization plan, projects dossier — are governed-asset
+// kinds with no fixed family of their own. This family serves them WITHOUT a second lifecycle:
+// `kind` is parsed here and passed into the same store functions the three declarations use,
+// and the table's kind CHECK still binds the value that reaches the row.
+
+/// Parse the generic family's `kind` into the domain's closed vocabulary.
+///
+/// An unknown value is a `422 unknown_kind` naming the field; it never reaches the store, so
+/// the composite type is the only second vocabulary and the table's CHECK is never asked to
+/// forgive a string this function refused.
+fn parse_asset_kind(raw: &str) -> Result<AssetKind, ActionError> {
+    AssetKind::from_str(raw.trim())
+        .map_err(|error| invalid("kind", "unknown_kind", error.to_string()))
+}
+
+/// Create one asset of the kind the caller names.
+async fn compose_asset(
+    conn: &mut PgConnection,
+    ctx: &HandlerCtx,
+    input: AssetComposeIn,
+) -> Result<HandlerOutput<AssetOut>, ActionError> {
+    let kind = parse_asset_kind(&input.kind)?;
+    // Everything except `kind` is the family create's document; the parsed kind goes into the
+    // SAME checked INSERT, so there is no raw-SQL path around the vocabulary.
+    let create = AssetCreateIn {
+        key: None,
+        title: input.title,
+        body: input.body,
+        acceptance: None,
+        project_id: input.project_id,
+        owner_user_id: None,
+        phase_code: None,
+        links: None,
+        lens: None,
+        meta: input.meta,
+    };
+    create_asset(conn, ctx, kind, create).await
+}
+
+/// One generic page: every kind, or the caller's parsed `kind` filter.
+async fn list_governed_assets(
+    conn: &mut PgConnection,
+    ctx: &HandlerCtx,
+    input: GovernedAssetListIn,
+) -> Result<Page<AssetOut>, ActionError> {
+    let kind = match input
+        .kind
+        .as_deref()
+        .map(str::trim)
+        .filter(|raw| !raw.is_empty())
+    {
+        Some(raw) => Some(parse_asset_kind(raw)?),
+        None => None,
+    };
+    let filter = AssetListIn {
+        status: input.status,
+        project_id: input.project_id,
+        page: input.page,
+    };
+    list_assets(conn, ctx, kind, filter).await
+}
+
+/// Move an asset of any kind one fixed lifecycle step, through the family transition's
+/// status-guarded store call (the domain's approval guard is the one that decides).
+async fn step_governed_asset(
+    conn: &mut PgConnection,
+    ctx: &HandlerCtx,
+    id: uuid::Uuid,
+    to: AssetStatus,
+) -> Result<HandlerOutput<AssetOut>, ActionError> {
+    transition_asset(
+        conn,
+        ctx,
+        None,
+        AssetTransitionIn {
+            id,
+            to: to.as_str().to_owned(),
+            superseded_by: None,
+        },
+    )
+    .await
+}
+
+/// Compose one MSP programme artefact; the kind is an input, the lifecycle is not.
+#[crate::action(
+    name = "governed_assets.compose",
+    version = 1,
+    kind = "internal",
+    scopes = ["governance:write"],
+    idempotent = false,
+    timeout_ms = 30000,
+    effect = "write",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn governed_assets_compose(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: AssetComposeIn,
+) -> Result<HandlerOutput<AssetOut>, ActionError> {
+    compose_asset(&mut *tx, &ctx, input).await
+}
+
+/// Read one governed asset of any kind and its revision history.
+#[crate::action(
+    name = "governed_assets.get",
+    version = 1,
+    kind = "internal",
+    scopes = ["governance:read"],
+    idempotent = true,
+    timeout_ms = 30000,
+    effect = "read",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn governed_assets_get(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: IdIn,
+) -> Result<HandlerOutput<AssetDetailOut>, ActionError> {
+    get_asset(&mut *tx, &ctx, None, input.id).await
+}
+
+/// One page of governed assets: every kind, or the caller's kind filter.
+#[crate::action(
+    name = "governed_assets.list",
+    version = 1,
+    kind = "internal",
+    scopes = ["governance:read"],
+    idempotent = true,
+    timeout_ms = 30000,
+    effect = "read",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn governed_assets_list(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: GovernedAssetListIn,
+) -> Result<Page<AssetOut>, ActionError> {
+    list_governed_assets(&mut *tx, &ctx, input).await
+}
+
+/// Submit one governed asset for review: `draft → in_review`.
+///
+/// The domain stores the submitted state as `in_review` — there is no sixth status, and this
+/// action invents none. Any other starting status is refused by the same transition table that
+/// guards `requirements.transition`.
+#[crate::action(
+    name = "governed_assets.submit",
+    version = 1,
+    kind = "internal",
+    scopes = ["governance:write"],
+    idempotent = false,
+    timeout_ms = 30000,
+    effect = "write",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn governed_assets_submit(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: IdIn,
+) -> Result<HandlerOutput<AssetOut>, ActionError> {
+    step_governed_asset(&mut *tx, &ctx, input.id, AssetStatus::InReview).await
+}
+
+/// Approve one governed asset: `in_review → approved`.
+///
+/// Approval is the same guarded step `requirements.transition` takes. It does NOT bypass the
+/// guard: an asset still in `draft` is a `409` here exactly as it is there, because the
+/// decision is the domain state machine's, not this handler's.
+#[crate::action(
+    name = "governed_assets.approve",
+    version = 1,
+    kind = "internal",
+    scopes = ["governance:write"],
+    idempotent = false,
+    timeout_ms = 30000,
+    effect = "write",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn governed_assets_approve(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: IdIn,
+) -> Result<HandlerOutput<AssetOut>, ActionError> {
+    step_governed_asset(&mut *tx, &ctx, input.id, AssetStatus::Approved).await
 }
