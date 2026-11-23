@@ -87,6 +87,9 @@ test("an unpriced row is marked", async ({ page, request }) => {
   // similar title.
   const row = page.locator(`tr[data-project-id="${fixture.projectId}"]`);
   await expect(row.getByText("—*")).toBeVisible();
-  await expect(row.getByText("no priced call")).toBeVisible();
+  // The project can already have unpriced calls from the board's start-process jobs; the honest
+  // note is either "no priced call" (zero calls) or "N unpriced". The invariant is the marker
+  // and the absence of a dollar figure.
+  await expect(row.getByText(/no priced call|\d+ unpriced/)).toBeVisible();
   await expect(row.getByText("$0")).toHaveCount(0);
 });
