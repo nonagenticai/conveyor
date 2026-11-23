@@ -251,6 +251,46 @@ async fn runs_create(
         ));
     }
 
+    // S15's run wiring: a plain run executes under the capability its card's type binds — the
+    // same resolution `process_runs.start` uses. A card type that binds nothing is the
+    // explicit-input path: the run declares no capability, so there is nothing to check. The
+    // shared readiness guard runs before the run row, so a required pack nobody published
+    // refuses `409 capability_not_ready` with zero run rows rather than a `capability_id: None`.
+    let capability =
+        store::capability::capability_for_card_type_tx(&mut *tx, ctx.tenant, card.card_type_id)
+            .await
+            .map_err(|error| {
+                tracing::error!(%error, action, "resolve the card type's capability");
+                ActionError::internal()
+            })?;
+    let (capability_id, capability_agent_id) = match capability {
+        Some(capability) => {
+            let agents =
+                store::capability::list_agents_tx(&mut *tx, ctx.tenant, Some(capability.id), 100)
+                    .await
+                    .map_err(|error| {
+                        tracing::error!(%error, action, "list the capability's executors");
+                        ActionError::internal()
+                    })?;
+            let active: Vec<_> = agents
+                .into_iter()
+                .filter(|agent| agent.status == "active")
+                .collect();
+            let agent_id = (active.len() == 1).then(|| active[0].id);
+            (Some(capability.id), agent_id)
+        }
+        None => (None, None),
+    };
+    let bound_agents: Vec<Uuid> = capability_agent_id.into_iter().collect();
+    crate::capability::readiness::ensure_run_start_ready_tx(
+        &mut *tx,
+        ctx.tenant,
+        capability_id,
+        &bound_agents,
+        action,
+    )
+    .await?;
+
     let attempt = store::run::next_attempt_for_card_tx(&mut *tx, ctx.tenant, card.id)
         .await
         .map_err(|error| store_error(error, action))?;
@@ -258,7 +298,7 @@ async fn runs_create(
     // v1-p44-1 (SPEC_V2 §4.4): a ROOT run's executor is the agent its binding pins. `runs.create`
     // has no process to resolve an agent from, so the binding is authoritative; a binding that
     // pins no agent, or no binding at all, records `None`.
-    let mut capability_agent_id: Option<Uuid> = None;
+    let mut capability_agent_id = capability_agent_id;
     if let Some(binding_id) = input.job_binding_id {
         let binding = store::organisation::job_binding_get_tx(&mut *tx, ctx.tenant, binding_id)
             .await
@@ -289,7 +329,7 @@ async fn runs_create(
             correlation_id: input.correlation_id,
             process_id: None,
             inputs: serde_json::Value::Object(serde_json::Map::new()),
-            capability_id: None,
+            capability_id,
             capability_agent_id,
             // `runs.create` is a ROOT: a plain run has no parent, no step and pins no process.
             parent_run_id: None,

@@ -1,5 +1,110 @@
 {
+  "schema": "issue-registry/v1",
+  "provenance": {
+    "tenant": "nonagentic",
+    "source": "github:nonagenticai/conveyor"
+  },
   "issues": [
+    {
+      "number": 630,
+      "title": "T18-3c: the run inspector's executor kind, binding pin and tools panel",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/630",
+      "updatedAt": "2026-11-23T20:16:33Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:blocked",
+          "color": "D93F0B"
+        },
+        {
+          "name": "T13",
+          "color": "6E7781"
+        },
+        {
+          "name": "programme",
+          "color": "5319E7"
+        },
+        {
+          "name": "T18",
+          "color": "6E7781"
+        }
+      ]
+    },
+    {
+      "number": 629,
+      "title": "T18-3b: the Authoring destination live over T17's authoring.* actions",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/629",
+      "updatedAt": "2026-11-23T20:16:31Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:blocked",
+          "color": "D93F0B"
+        },
+        {
+          "name": "T17",
+          "color": "6E7781"
+        },
+        {
+          "name": "programme",
+          "color": "5319E7"
+        },
+        {
+          "name": "T18",
+          "color": "6E7781"
+        }
+      ]
+    },
+    {
+      "number": 626,
+      "title": "fix: the router refuses unknown models, forwards the OpenAI knobs it documents, and every conveyor client honours Retry-After",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/626",
+      "updatedAt": "2026-11-23T19:58:58Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        },
+        {
+          "name": "S13",
+          "color": "6E7781"
+        }
+      ]
+    },
+    {
+      "number": 624,
+      "title": "add: the Request source \u2014 the declared step in the compiled prompt and the laya judge",
+      "state": "OPEN",
+      "url": "https://github.com/nonagenticai/conveyor/issues/624",
+      "updatedAt": "2026-11-23T20:30:12Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        },
+        {
+          "name": "S21",
+          "color": "6E7781"
+        }
+      ]
+    },
     {
       "number": 620,
       "title": "fix: completions.create accepts the null replay content an OpenAI client sends",
@@ -89,7 +194,7 @@
       "title": "T19: decision forums \u2014 meetings as the decision forum",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/606",
-      "updatedAt": "2026-11-23T12:52:05Z",
+      "updatedAt": "2026-11-23T19:53:42Z",
       "labels": [
         {
           "name": "unit",
@@ -139,11 +244,23 @@
       "title": "bug: the multicast approval test times out at 10 s under full-suite load",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/604",
-      "updatedAt": "2026-11-23T12:02:35Z",
+      "updatedAt": "2026-11-23T19:57:29Z",
       "labels": [
         {
           "name": "bug",
           "color": "d73a4a"
+        },
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:claimed",
+          "color": "FBCA04"
+        },
+        {
+          "name": "S06",
+          "color": "6E7781"
         }
       ]
     },
@@ -371,7 +488,7 @@
       "title": "conveyor-buildout \u2014 the SPEC_V2 programme",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/569",
-      "updatedAt": "2026-11-23T14:10:38Z",
+      "updatedAt": "2026-11-23T20:12:26Z",
       "labels": [
         {
           "name": "programme",
@@ -434,15 +551,15 @@
       "title": "T18-3: Procedures, Capabilities, Authoring, Execution and Run history",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/564",
-      "updatedAt": "2026-11-23T11:23:36Z",
+      "updatedAt": "2026-11-23T20:21:29Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:ready",
-          "color": "0E8A16"
+          "name": "status:claimed",
+          "color": "FBCA04"
         },
         {
           "name": "programme",
@@ -782,7 +899,7 @@
       "title": "#526 programme: the retrospective rework \u2014 tranche 0, all remaining tranches, benefits and the viability gate (U5a\u2013U5h, U6, U7)",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/526",
-      "updatedAt": "2026-11-23T10:51:40Z",
+      "updatedAt": "2026-11-23T20:23:41Z",
       "labels": [
         {
           "name": "unit",
@@ -4206,15 +4323,15 @@
       "title": "T17 \u2014 Tenant asset authoring",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/87",
-      "updatedAt": "2026-11-22T22:31:35Z",
+      "updatedAt": "2026-11-23T20:22:17Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:ready",
-          "color": "0E8A16"
+          "name": "status:claimed",
+          "color": "FBCA04"
         },
         {
           "name": "T17",
@@ -4416,15 +4533,15 @@
       "title": "T5 \u2014 Kata",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/77",
-      "updatedAt": "2026-11-23T11:44:31Z",
+      "updatedAt": "2026-11-23T20:29:33Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:blocked",
-          "color": "D93F0B"
+          "name": "status:claimed",
+          "color": "FBCA04"
         },
         {
           "name": "T5",
@@ -4924,15 +5041,15 @@
       "title": "S18: the real improvement-loop proof at one deployed revision",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/30",
-      "updatedAt": "2026-11-23T11:44:30Z",
+      "updatedAt": "2026-11-23T20:29:26Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:blocked",
-          "color": "D93F0B"
+          "name": "status:claimed",
+          "color": "FBCA04"
         },
         {
           "name": "S18",
@@ -5277,9 +5394,9 @@
     {
       "number": 11,
       "title": "S17 \u2014 live sandbox lifecycle and the gold/empty controls",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/11",
-      "updatedAt": "2026-11-23T10:59:31Z",
+      "updatedAt": "2026-11-23T19:48:55Z",
       "labels": [
         {
           "name": "unit",
