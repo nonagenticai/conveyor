@@ -223,6 +223,28 @@
       }
     },
     {
+      "code": "benchmark",
+      "label": "Benchmark",
+      "definition": {
+        "rules": [
+          "repo_write"
+        ],
+        "inputs": [
+          "instance_id",
+          "base_commit"
+        ],
+        "outputs": [
+          "patch"
+        ],
+        "acceptance": [
+          "READY: instance_id_and_base_commit_pinned",
+          "DOING: patch_is_one_unified_diff_against_the_base_commit",
+          "DONE: patch_collected"
+        ],
+        "human_task": false
+      }
+    },
+    {
       "code": "bug_analysis",
       "label": "Bug analysis",
       "definition": {

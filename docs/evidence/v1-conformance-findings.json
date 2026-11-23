@@ -1,7 +1,7 @@
 {
   "schema": "conveyor-v1-findings/v1",
   "audited_sha": "2a1ff31df668b8fc456dcac2640f29f44cafcf16",
-  "audited_at": "2026-11-21",
+  "audited_at": "2026-11-23",
   "method": "Fresh auditors read SPEC_V2 section by section against the tree in four waves; every evidence quote is the raw line at the cited path and is re-verified by scripts/verify-findings.py before admission.",
   "findings": [
     {
@@ -5852,6 +5852,30 @@
         "test": "scripts/verify-viability.py",
         "evidence": "python3 scripts/verify-viability.py --self-test is green; the invariance proof is `find docs/evidence/rework -name '*.json' -exec shasum -a 256 {} + | sort | shasum -a 256` unchanged (1bf343a10fd858bc) across a run with CONVEYOR_SSH_KEY/CONVEYOR_HOST unset while that run reported 5 of 6 checks missing. The manifests check now runs verify-project --all --evidence-dir <temp> (scripts/verify-viability.py:264-273)."
       }
+    },
+    {
+      "id": "v1-meetings-1",
+      "area": "§6.8",
+      "standard": "SPEC",
+      "spec": "§6.8",
+      "severity": "P1",
+      "title": "The meetings decision forum is normative and has no construction",
+      "problem": "SPEC_V2 §6.8 (merged via #607) makes the meeting a first-class decision forum over approvals: meeting_type policy, meeting instances, agenda items resolving approvals, attendance for job bindings or humans, typed positions, quorum and decision rules, and minutes as a governed asset. The T19 plan measures every meeting table, action, event, card type and route as ABSENT; no migration, action-registry entry, module or /meetings route exists. The clause is an unbuilt construction obligation, not an evidenced capability.",
+      "evidence": [
+        {
+          "path": "docs/SPEC_V2.md",
+          "line": 646,
+          "quote": "### 6.8 Meetings — the decision forum"
+        },
+        {
+          "path": "docs/plans/T19-decision-forums.md",
+          "line": 40,
+          "quote": "| Meeting tables and actions | ABSENT | `git grep -n 'meeting_type\\|meeting_position\\|meetings\\.' -- migrations crates apps` → 0 |"
+        }
+      ],
+      "failure_scenario": "A tenant governing a programme or architecture through a meeting cannot convene one: there is no meeting_type to select, no meeting card to open, no agenda item resolving an approval, no participant position or quorum arithmetic, and no minutes asset. The decision survives only as the approval row §6.8 says is insufficient.",
+      "acceptance": "The T19 tables, actions, events, module and /meetings route exist; a three-department meeting decides by recorded majority with a recorded dissent; an inquorate item is deferred and cannot be decided; minutes publish behind the chair's gate; every action becomes a card.",
+      "owner_project": "T19"
     }
   ]
 }

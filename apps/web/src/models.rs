@@ -1008,6 +1008,9 @@ pub struct EvalClimb {
     pub off_limits: Vec<String>,
     #[serde(default)]
     pub approve_each_round: bool,
+    /// The spend ceiling in cents, when the start form set one.
+    #[serde(default)]
+    pub cost_ceiling_cents: Option<i32>,
     #[serde(default)]
     pub narrative_md: Option<String>,
     #[serde(default)]

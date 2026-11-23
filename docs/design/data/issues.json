@@ -1,16 +1,32 @@
 {
-  "schema": "issue-registry/v1",
-  "provenance": {
-    "tenant": "nonagentic",
-    "source": "github:nonagenticai/conveyor"
-  },
   "issues": [
+    {
+      "number": 620,
+      "title": "fix: completions.create accepts the null replay content an OpenAI client sends",
+      "state": "CLOSED",
+      "url": "https://github.com/nonagenticai/conveyor/issues/620",
+      "updatedAt": "2026-11-23T13:19:11Z",
+      "labels": [
+        {
+          "name": "unit",
+          "color": "1D76DB"
+        },
+        {
+          "name": "status:ready",
+          "color": "0E8A16"
+        },
+        {
+          "name": "S13",
+          "color": "6E7781"
+        }
+      ]
+    },
     {
       "number": 612,
       "title": "add: the run's episodic memory \u2014 prior steps in the compiled prompt and honest hot/digest",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/612",
-      "updatedAt": "2026-11-23T08:56:11Z",
+      "updatedAt": "2026-11-23T10:20:45Z",
       "labels": [
         {
           "name": "unit",
@@ -29,9 +45,9 @@
     {
       "number": 611,
       "title": "bug: the S17 Ghostscript shim is ignored \u2014 the post-deploy gold control is still false",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/611",
-      "updatedAt": "2026-11-23T08:56:44Z",
+      "updatedAt": "2026-11-23T10:59:33Z",
       "labels": [
         {
           "name": "bug",
@@ -73,15 +89,15 @@
       "title": "T19: decision forums \u2014 meetings as the decision forum",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/606",
-      "updatedAt": "2026-11-23T07:28:34Z",
+      "updatedAt": "2026-11-23T12:52:05Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:blocked",
-          "color": "D93F0B"
+          "name": "status:ready",
+          "color": "0E8A16"
         },
         {
           "name": "programme",
@@ -96,9 +112,9 @@
     {
       "number": 605,
       "title": "T19-0: plan and programme artefacts for decision forums (meetings)",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/605",
-      "updatedAt": "2026-11-23T08:41:11Z",
+      "updatedAt": "2026-11-23T12:51:20Z",
       "labels": [
         {
           "name": "unit",
@@ -123,7 +139,7 @@
       "title": "bug: the multicast approval test times out at 10 s under full-suite load",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/604",
-      "updatedAt": "2026-11-23T07:04:47Z",
+      "updatedAt": "2026-11-23T12:02:35Z",
       "labels": [
         {
           "name": "bug",
@@ -355,7 +371,7 @@
       "title": "conveyor-buildout \u2014 the SPEC_V2 programme",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/569",
-      "updatedAt": "2026-11-23T09:04:06Z",
+      "updatedAt": "2026-11-23T13:36:45Z",
       "labels": [
         {
           "name": "programme",
@@ -418,15 +434,15 @@
       "title": "T18-3: Procedures, Capabilities, Authoring, Execution and Run history",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/564",
-      "updatedAt": "2026-11-22T07:12:02Z",
+      "updatedAt": "2026-11-23T11:23:36Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:blocked",
-          "color": "D93F0B"
+          "name": "status:ready",
+          "color": "0E8A16"
         },
         {
           "name": "programme",
@@ -441,17 +457,17 @@
     {
       "number": 563,
       "title": "T18-2: Organisation, Jobs, Agents, Decisions, Project types, Plan and Validation",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/563",
-      "updatedAt": "2026-11-23T09:00:42Z",
+      "updatedAt": "2026-11-23T11:22:58Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:ready",
-          "color": "0E8A16"
+          "name": "status:claimed",
+          "color": "FBCA04"
         },
         {
           "name": "programme",
@@ -766,7 +782,7 @@
       "title": "#526 programme: the retrospective rework \u2014 tranche 0, all remaining tranches, benefits and the viability gate (U5a\u2013U5h, U6, U7)",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/526",
-      "updatedAt": "2026-11-23T09:25:06Z",
+      "updatedAt": "2026-11-23T10:51:40Z",
       "labels": [
         {
           "name": "unit",
@@ -4400,7 +4416,7 @@
       "title": "T5 \u2014 Kata",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/77",
-      "updatedAt": "2026-11-23T08:34:37Z",
+      "updatedAt": "2026-11-23T11:44:31Z",
       "labels": [
         {
           "name": "unit",
@@ -4908,7 +4924,7 @@
       "title": "S18: the real improvement-loop proof at one deployed revision",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/30",
-      "updatedAt": "2026-11-23T08:34:35Z",
+      "updatedAt": "2026-11-23T11:44:30Z",
       "labels": [
         {
           "name": "unit",
@@ -5198,9 +5214,9 @@
     {
       "number": 14,
       "title": "S20 \u2014 the climb cost/quality narrative and the cost-goal controls",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/14",
-      "updatedAt": "2026-11-23T07:44:56Z",
+      "updatedAt": "2026-11-23T11:23:15Z",
       "labels": [
         {
           "name": "unit",
@@ -5240,9 +5256,9 @@
     {
       "number": 12,
       "title": "S18 \u2014 executor-backed producers and the real improvement loop",
-      "state": "OPEN",
+      "state": "CLOSED",
       "url": "https://github.com/nonagenticai/conveyor/issues/12",
-      "updatedAt": "2026-11-23T08:07:10Z",
+      "updatedAt": "2026-11-23T11:23:15Z",
       "labels": [
         {
           "name": "unit",
@@ -5263,15 +5279,15 @@
       "title": "S17 \u2014 live sandbox lifecycle and the gold/empty controls",
       "state": "OPEN",
       "url": "https://github.com/nonagenticai/conveyor/issues/11",
-      "updatedAt": "2026-11-23T08:19:28Z",
+      "updatedAt": "2026-11-23T10:59:31Z",
       "labels": [
         {
           "name": "unit",
           "color": "1D76DB"
         },
         {
-          "name": "status:blocked",
-          "color": "D93F0B"
+          "name": "status:ready",
+          "color": "0E8A16"
         },
         {
           "name": "S17",

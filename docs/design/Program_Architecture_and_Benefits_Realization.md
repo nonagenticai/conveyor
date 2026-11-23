@@ -121,7 +121,7 @@ certification or full conformance; what is claimed is testable: the artefacts an
 organisation uses are rows, the process runs, and a deviation is a decision record rather than a
 silent fork.
 
-## 5. The buildout under its own capability — measured 2026-11-19
+## 5. The buildout under its own capability — measured 2026-11-23
 
 The programme does not only describe MSP and TOGAF; it runs under them. Measured on the live
 programme at the stated date:
@@ -132,9 +132,15 @@ programme at the stated date:
   on 2026-11-17; tranches 1–13 are planned. Tranche 1's exit set is S02, T1 and T11.
 - **The delivery projects carry published briefs and inception outputs**; the inception gate
   refuses a build run until a project's analysis and architecture are published.
-- **The six live benefit profiles (B1–B6) are `draft`, with their baselines `not measured`** and a
-  measurement method recorded; the tranche-0 review evidence lists them unmeasured and records
-  that the BCM is unstaffed as a risk. That is the honest state, not a zero.
+- **The benefit profiles are `draft`, with their baselines `not measured`** and a measurement
+  method recorded; the tranche-0 review evidence lists them unmeasured and records that the BCM is
+  unstaffed as a risk. That is the honest state, not a zero. The seed now carries **seven**
+  profiles: B1–B6 and **B7 Deliberated cross-department decisions** (T19); the published snapshot
+  still shows the six it was exported with, and B7 appears after the next export.
+- **T19 (decision forums) is proposed at tranche 4** — plan and programme artefacts at #605,
+  implementation at #606; the T18 UI lane (#562–#566) is in flight and independent. The programme
+  seed is 50 projects, and T19's coverage row is `proposed` with the five tables and twelve actions
+  measured absent.
 - **Architecture contracts are the largest open gap.** Only T9's project has a contract row, and it
   is not yet approved; the other delivery projects have none. The board's approval is the
   authority act, and it is tracked separately from this study.
@@ -144,6 +150,33 @@ The units that close the gaps are themselves rows in the programme: T11's metric
 map, tranches and per-project ADM phase/plateau — is a pending unit; the board's contract
 approvals are a pending unit; and the closure and retirement gates (#302, #303) make a project's
 close and a profile's retirement evidence-bound.
+
+### 5.1 Decision forums — where MSP, TOGAF and SAFe meet
+
+The meeting is the one mechanism all three frameworks name. A programme board and a tranche review
+are MSP's decision and review forums; the Architecture Board and the Design Board are TOGAF's
+governing bodies; PI planning, the system demo and inspect & adapt are SAFe's cadence events. V2
+models each as a `meeting_type` over the same rows — the convener supplies the schedule, the
+meeting supplies the record (D66).
+
+| Framework | Named procedure | Convener | Agenda sources | Decision rule | Outcome |
+|---|---|---|---|---|---|
+| MSP | programme board | sponsoring group / SRO | programme register, benefit-at-risk, tranche decisions | chair (type policy) | decision / commitment |
+| MSP | tranche review | sponsoring group | baselines, benefit status, risk register | unanimous or chair (type policy) | continue / pause / stop |
+| TOGAF | Architecture Board sitting | `governance_body` | architecture contracts, compliance reviews, waivers, change requests | majority | decision / action |
+| TOGAF | Design Board sitting | `governance_body` | solution designs, design gate, deviations | majority | decision / action |
+| SAFe | PI planning | programme manager | backlog by WSJF, capacity, plan approval | majority | decision / commitment |
+| SAFe | system demo | programme manager | completed deliverables and evidence | chair | information / decision |
+| SAFe | inspect & adapt | coach | retro findings, lessons, kata candidates | majority | action / commitment |
+| Operations | incident review | incident commander | incident, postmortem, runbook findings | chair | decision / action |
+
+T19's set is the executable form of this table: `docs/plans/T19-decision-forums.md` (the delivery
+plan), `docs/plans/T19/project-brief.md` and `inception-analysis.md` (the project's inception),
+`docs/plans/T19/architecture-design.md` (the PSA and HLD set), `docs/plans/T19/msp-profile.md`
+(B7, R20 and the tranche-4 evidence), `docs/plans/T19/safe-epic.md` (features, enablers, WSJF and
+PI objectives) and `docs/plans/T19/artifact-register.md` (the typed catalogue). The
+`governance_body` and `programme_cadence` rows are the consumer seams; their binding to T19's
+meeting types follows the slice.
 
 ## 6. The measurement and refusal discipline
 

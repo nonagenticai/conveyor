@@ -155,6 +155,10 @@ T_DEPENDS_ON = {
     "T16": ["T2", "T13", "P0"],
     "T17": ["T16", "T3", "P0"],
     "T18": ["T0", "T1", "T2", "T3", "P0"],
+    # T19 (meetings) is independent of T18 (the real UI). T9/T10 are already built, so their
+    # board/cadence binding to T19 is a follow-up integration, not a dependency edge that would
+    # mark a built slice blocked by a proposed one.
+    "T19": ["T1", "T2", "T3", "P0"],
 }
 
 # SPEC_V2 §12, kept here until `docs/SPEC_V2.md` is on main (issue #24). The parser below
@@ -179,6 +183,7 @@ T_SLICES = [
     ("T16", "SOP, RDF/OWL and process-document ingestion"),
     ("T17", "Tenant asset authoring"),
     ("T18", "The real V2 UI"),
+    ("T19", "Decision forums (meetings)"),
 ]
 
 FRONTMATTER = re.compile(r"^---\n(.*?)\n---\n", re.S)

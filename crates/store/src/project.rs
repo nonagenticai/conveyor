@@ -251,6 +251,27 @@ pub async fn get_project_tx(
     Ok(row.map(Into::into))
 }
 
+/// Read one project by its tenant-unique key inside the caller's scoped transaction.
+///
+/// A caller that names a project by a key it computes (never by an id it was given) needs the
+/// same tenant-scoped lookup [`get_project_tx`] gives an id; the unique index is the read.
+pub async fn get_project_by_key_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    key: &str,
+) -> Result<Option<Project>, sqlx::Error> {
+    let row: Option<ProjectRow> = sqlx::query_as(
+        "SELECT id, key, name, description, status, programme_id, project_type_code,
+                phase_code, owner_user_id, repo_url, meta, version
+           FROM project WHERE tenant_id = $1 AND key = $2",
+    )
+    .bind(tenant.as_uuid())
+    .bind(key)
+    .fetch_optional(&mut *conn)
+    .await?;
+    Ok(row.map(Into::into))
+}
+
 /// Edit a project's own fields at the caller's version.
 ///
 /// The version guard is in the UPDATE, not only in the read: two callers that read the same version
