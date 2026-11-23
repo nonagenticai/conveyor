@@ -364,12 +364,10 @@
           572,
           604,
           605,
-          606,
-          608,
-          611
+          606
         ],
-        "open": 21,
-        "ready": 7,
+        "open": 19,
+        "ready": 5,
         "unknown": 0
       }
     },
@@ -1329,13 +1327,13 @@
       "track": "v1",
       "tranche": 5,
       "units": {
-        "blocked": 1,
+        "blocked": 0,
         "claimed": 0,
         "numbers": [
           11
         ],
         "open": 1,
-        "ready": 0,
+        "ready": 1,
         "unknown": 0
       }
     },
@@ -1506,7 +1504,8 @@
           15,
           581,
           590,
-          599
+          599,
+          612
         ],
         "open": 0,
         "ready": 0,
@@ -2046,7 +2045,7 @@
       "track": "v2",
       "tranche": 4,
       "units": {
-        "blocked": 4,
+        "blocked": 3,
         "claimed": 1,
         "numbers": [
           559,
@@ -2056,7 +2055,7 @@
           565,
           566
         ],
-        "open": 5,
+        "open": 4,
         "ready": 0,
         "unknown": 0
       }
