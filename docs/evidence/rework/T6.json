@@ -165,7 +165,7 @@
     "gate (P0): the gate check 'T6-baseline' did not pass; the gate check 'T6-charter' did not pass; the gate check 'T6-closure-outputs' did not pass; the gate check 'T6-contract' did not pass; the gate check 'T6-review' did not pass; the gate check 'T6-closure-gate' did not pass; the gate check 'T6-pi-cadence' did not pass; the gate check 'T6-pi-plan' did not pass; the gate check 'T6-pi-objectives' did not pass; the gate check 'T6-wsjf' did not pass; the gate check 'T6-demo-credits' did not pass; the gate check 'T6-lessons' did not pass"
   ],
   "gate": "T6 is NOT built, and its acceptance \u2014 `SPEC_V2` \u00a712: 'a real feature lands: lane \u2192 PR \u2192 CI \u2192 review \u2192 merge \u2192 deploy \u2192 live verify; the project cannot change its own gates; rollback tested' \u2014 is the condition on which it may be closed, not a claim that it is met.",
-  "generated_at": "2026-11-23T09:44:11.794043+00:00",
+  "generated_at": "2026-11-23T10:18:04.543731+00:00",
   "kind": "all",
   "manifest": "acceptance/programme/T6.toml",
   "name": "Development project",
@@ -173,8 +173,8 @@
   "schema": "project-acceptance/v1",
   "snapshot": {
     "generated_at": "2026-11-23T09:41:16.455014+00:00",
-    "git_sha": "b208c54b9b48f06c6cb9aa06f47cb0da89b8679b",
-    "path": "retained-snapshot/b208c54b9b48f06c6cb9aa06f47cb0da89b8679b"
+    "git_sha": "c44b23fb1a5f866cabd1697fab977d240a2c6575",
+    "path": "retained-snapshot/c44b23fb1a5f866cabd1697fab977d240a2c6575"
   },
   "verdict": "red",
   "warnings": []
