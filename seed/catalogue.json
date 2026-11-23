@@ -1899,6 +1899,27 @@
         "human_task": true,
         "definition_of_done": "agenda_closed_and_minutes_published"
       }
+    },
+    {
+      "code": "meeting_action",
+      "label": "Meeting action",
+      "definition": {
+        "rules": [],
+        "inputs": [
+          "meeting_id",
+          "agenda_item_id"
+        ],
+        "outputs": [
+          "card_id"
+        ],
+        "acceptance": [
+          "READY: owner_and_due_named",
+          "QA: closed_with_evidence",
+          "DONE: card_closed"
+        ],
+        "human_task": true,
+        "definition_of_done": "card_closed"
+      }
     }
   ],
   "entries": [

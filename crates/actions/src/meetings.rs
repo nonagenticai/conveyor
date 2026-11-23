@@ -36,6 +36,7 @@ fn meeting_error(error: store::meetings::MeetingStoreError, action: &str) -> Act
         }
         E::Unprocessable { code, detail } => ActionError::new(422, code, detail),
         E::Stricter { detail } => ActionError::new(409, "meeting_approval_stricter", detail),
+        E::Refused { code, detail } => ActionError::new(409, code, detail),
         E::Card(error) => card_error(error, action),
         E::Outbox(store::outbox::OutboxError::Database(error)) => store_error(error, action),
         E::Outbox(error) => {
@@ -258,6 +259,7 @@ pub struct AgendaItemOut {
     pub participating_departments: Vec<Uuid>,
     pub evidence_refs: Value,
     pub outcome: Option<String>,
+    pub outcome_ref: Option<Uuid>,
     pub defer_reason: Option<String>,
     pub closed_at: Option<DateTime<Utc>>,
     pub version: i64,
@@ -274,6 +276,7 @@ impl From<AgendaItemRecord> for AgendaItemOut {
             participating_departments: record.participating_departments,
             evidence_refs: record.evidence_refs,
             outcome: record.outcome,
+            outcome_ref: record.outcome_ref,
             defer_reason: record.defer_reason,
             closed_at: record.closed_at,
             version: record.version,
@@ -697,6 +700,14 @@ async fn meetings_position(
 pub struct CloseItemIn {
     pub meeting_id: Uuid,
     pub agenda_item_id: Uuid,
+    /// For a non-decision item: `commitment | action | information`. A deciding item derives
+    /// its outcome from the seats and must leave this absent.
+    #[serde(default)]
+    pub outcome: Option<String>,
+    #[serde(default)]
+    pub commitment: Option<Value>,
+    #[serde(default)]
+    pub action: Option<Value>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
@@ -724,11 +735,20 @@ async fn meetings_close_item(
     ctx: HandlerCtx,
     input: CloseItemIn,
 ) -> Result<HandlerOutput<CloseItemOut>, ActionError> {
+    let non_decision = input
+        .outcome
+        .as_deref()
+        .map(|outcome| store::meetings::NonDecision {
+            outcome,
+            commitment: input.commitment.as_ref(),
+            action: input.action.as_ref(),
+        });
     let result = store::meetings::close_item_tx(
         &mut *tx,
         ctx.tenant,
         input.meeting_id,
         input.agenda_item_id,
+        non_decision.as_ref(),
     )
     .await
     .map_err(|error| meeting_error(error, ctx.action))?;
@@ -738,6 +758,135 @@ async fn meetings_close_item(
         decisions_written: result.decisions_written,
         counted_positions: result.counted_positions,
         quorum: result.quorum,
+    }))
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct DeferIn {
+    pub meeting_id: Uuid,
+    pub agenda_item_id: Uuid,
+    pub reason: String,
+}
+
+#[crate::action(
+    name = "meetings.defer",
+    version = 1,
+    kind = "internal",
+    scopes = ["projects:write"],
+    idempotent = false,
+    timeout_ms = 30000,
+    effect = "write",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn meetings_defer(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: DeferIn,
+) -> Result<HandlerOutput<AgendaItemOut>, ActionError> {
+    let item = store::meetings::defer_agenda_item_tx(
+        &mut *tx,
+        ctx.tenant,
+        input.meeting_id,
+        input.agenda_item_id,
+        &input.reason,
+    )
+    .await
+    .map_err(|error| meeting_error(error, ctx.action))?;
+    Ok(HandlerOutput::ok(item.into()))
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct CloseMeetingIn {
+    pub meeting_id: Uuid,
+}
+
+#[crate::action(
+    name = "meetings.close",
+    version = 1,
+    kind = "internal",
+    scopes = ["projects:write"],
+    idempotent = false,
+    timeout_ms = 30000,
+    effect = "write",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn meetings_close(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: CloseMeetingIn,
+) -> Result<HandlerOutput<MeetingOut>, ActionError> {
+    let record = store::meetings::close_meeting_tx(&mut *tx, ctx.tenant, input.meeting_id)
+        .await
+        .map_err(|error| meeting_error(error, ctx.action))?;
+    let version = record.version;
+    Ok(HandlerOutput::ok(record.into()).with_etag(version.to_string()))
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct MinutesLineIn {
+    pub agenda_item_id: Uuid,
+    pub text: String,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct MinutesPublishIn {
+    pub meeting_id: Uuid,
+    /// The chair's approval: approved, and naming this meeting (its card or its meta).
+    pub approval_id: Uuid,
+    pub title: String,
+    #[serde(default)]
+    pub lines: Vec<MinutesLineIn>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize, JsonSchema)]
+pub struct MinutesOut {
+    pub asset_id: Uuid,
+    pub status: String,
+    pub title: String,
+}
+
+#[crate::action(
+    name = "meetings.minutes_publish",
+    version = 1,
+    kind = "internal",
+    scopes = ["projects:write"],
+    idempotent = false,
+    timeout_ms = 30000,
+    effect = "write",
+    confirm = "none",
+    tenancy = "tenant"
+)]
+async fn meetings_minutes_publish(
+    tx: &mut PgConnection,
+    ctx: HandlerCtx,
+    input: MinutesPublishIn,
+) -> Result<HandlerOutput<MinutesOut>, ActionError> {
+    if input.title.trim().is_empty() {
+        return Err(invalid("title", "invalid_value", "minutes need a title"));
+    }
+    let lines: Vec<(Uuid, String)> = input
+        .lines
+        .iter()
+        .map(|line| (line.agenda_item_id, line.text.clone()))
+        .collect();
+    let asset = store::meetings::minutes_publish_tx(
+        &mut *tx,
+        ctx.tenant,
+        input.meeting_id,
+        &store::meetings::NewMinutes {
+            approval_id: input.approval_id,
+            title: &input.title,
+            lines: &lines,
+        },
+    )
+    .await
+    .map_err(|error| meeting_error(error, ctx.action))?;
+    Ok(HandlerOutput::created(MinutesOut {
+        asset_id: asset,
+        status: "approved".into(),
+        title: input.title,
     }))
 }
 

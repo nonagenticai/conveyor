@@ -35,6 +35,9 @@ pub enum MeetingStoreError {
     /// decisions, evidence, P4). No decision rows are written.
     #[error("{detail}")]
     Stricter { detail: String },
+    /// A named state refusal with its own wire code (minutes gating, open items, a closed forum).
+    #[error("{detail}")]
+    Refused { code: &'static str, detail: String },
     #[error("{detail}")]
     Unprocessable { code: &'static str, detail: String },
     #[error(transparent)]
@@ -59,7 +62,8 @@ const MEETING_COLUMNS: &str = "m.id, m.card_id, m.convener_kind, m.convener_id,
     c.name AS card_name";
 
 const AGENDA_COLUMNS: &str = "id, meeting_id, sequence, resolved_kind, resolved_id,
-    participating_departments, evidence_refs, outcome, defer_reason, closed_at, version";
+    participating_departments, evidence_refs, outcome, outcome_ref, defer_reason, closed_at,
+    version";
 
 const ATTENDANCE_COLUMNS: &str = "id, meeting_id, participant_kind, participant_id, seat,
     department_id, invitation_state, response_state, delegated_from, version";
@@ -118,6 +122,7 @@ pub struct AgendaItemRecord {
     pub participating_departments: Vec<Uuid>,
     pub evidence_refs: Value,
     pub outcome: Option<String>,
+    pub outcome_ref: Option<Uuid>,
     pub defer_reason: Option<String>,
     pub closed_at: Option<DateTime<Utc>>,
     pub version: i64,
@@ -216,6 +221,14 @@ pub struct NewPosition<'a> {
     pub conditions: &'a Value,
     pub commitment: Option<&'a Value>,
     pub surface: &'a str,
+}
+
+/// The outcome a non-decision item closes with. A commitment and an action both become a card;
+/// information is typed and counted only. `deferred` has its own action.
+pub struct NonDecision<'a> {
+    pub outcome: &'a str,
+    pub commitment: Option<&'a Value>,
+    pub action: Option<&'a Value>,
 }
 
 /// Vocabulary shared with the database CHECK constraints; the action layer produces the same
@@ -991,6 +1004,9 @@ pub async fn position_tx(
             detail: format!("surface must be one of {SURFACES:?}"),
         });
     }
+    if let Some(commitment) = new.commitment {
+        validate_commitment(commitment)?;
+    }
     let meeting: Option<(String,)> =
         sqlx::query_as("SELECT status FROM meeting WHERE tenant_id = $1 AND id = $2")
             .bind(tenant.as_uuid())
@@ -1189,6 +1205,531 @@ pub async fn detail_tx(
         attendance: list_attendance_tx(&mut *conn, tenant, meeting_id).await?,
         positions: list_positions_tx(&mut *conn, tenant, meeting_id).await?,
     }))
+}
+
+// ── outcomes, minutes and the forum's close ────────────────────────────────────────────
+
+/// A commitment names its owner and its due date; without both it is not recordable.
+fn validate_commitment(commitment: &Value) -> Result<()> {
+    let owner = commitment
+        .get("owner")
+        .and_then(Value::as_str)
+        .is_some_and(|value| !value.trim().is_empty());
+    let due = commitment
+        .get("by")
+        .or_else(|| commitment.get("due"))
+        .and_then(Value::as_str)
+        .is_some_and(|value| !value.trim().is_empty());
+    if !owner || !due {
+        return Err(MeetingStoreError::Unprocessable {
+            code: "commitment_needs_owner_and_date",
+            detail: "a commitment names an owner and a due date".into(),
+        });
+    }
+    Ok(())
+}
+
+fn parse_due(value: Option<&Value>) -> Result<Option<DateTime<Utc>>> {
+    let Some(raw) = value.and_then(Value::as_str) else {
+        return Ok(None);
+    };
+    if let Ok(parsed) = DateTime::parse_from_rfc3339(raw) {
+        return Ok(Some(parsed.with_timezone(&Utc)));
+    }
+    if let Ok(date) = chrono::NaiveDate::parse_from_str(raw, "%Y-%m-%d") {
+        return Ok(Some(date.and_hms_opt(0, 0, 0).expect("midnight").and_utc()));
+    }
+    Err(MeetingStoreError::Unprocessable {
+        code: "invalid_due_date",
+        detail: format!("{raw:?} is not an RFC 3339 instant or a YYYY-MM-DD date"),
+    })
+}
+
+async fn outcome_card_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    meeting_id: Uuid,
+    agenda_item_id: Uuid,
+    title: &str,
+    due_at: Option<DateTime<Utc>>,
+    meta: Value,
+) -> Result<Uuid> {
+    let card: Option<(Uuid, Uuid)> = sqlx::query_as(
+        "SELECT c.list_id, c.board_id
+           FROM meeting m
+           JOIN card c ON c.id = m.card_id AND c.tenant_id = m.tenant_id
+          WHERE m.tenant_id = $1 AND m.id = $2",
+    )
+    .bind(tenant.as_uuid())
+    .bind(meeting_id)
+    .fetch_optional(&mut *conn)
+    .await?;
+    let (list_id, board_id) = card.ok_or(MeetingStoreError::NotFound("meeting card"))?;
+    let card_type_id: Option<Uuid> = sqlx::query_scalar(
+        "SELECT id FROM card_type
+          WHERE tenant_id = $1 AND code = 'meeting_action' AND is_active",
+    )
+    .bind(tenant.as_uuid())
+    .fetch_optional(&mut *conn)
+    .await?;
+    let card_type_id = card_type_id.ok_or_else(|| MeetingStoreError::Conflict {
+        what: "meeting action card type",
+        why: "no `meeting_action` card type is installed in this tenant; seed the catalogue first"
+            .into(),
+    })?;
+    crate::position::lock_board_tx(&mut *conn, tenant, board_id).await?;
+    let position =
+        crate::position::next_card_position_tx(&mut *conn, tenant, board_id, list_id).await?;
+    let created = crate::card::insert_card_tx(
+        &mut *conn,
+        tenant,
+        &NewCard {
+            list_id,
+            card_type_id,
+            name: title.to_owned(),
+            description: String::new(),
+            position,
+            parent_card_id: None,
+            due_at,
+            assignee_id: None,
+            created_by: None,
+            job_binding_id: None,
+            meta: json!({
+                "meeting_id": meeting_id,
+                "agenda_item_id": agenda_item_id,
+                "source": meta,
+            }),
+        },
+    )
+    .await?;
+    Ok(created.id)
+}
+
+async fn close_non_decision_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    meeting_id: Uuid,
+    agenda_item_id: Uuid,
+    ty: &MeetingTypeRecord,
+    non_decision: &NonDecision<'_>,
+) -> Result<CloseItemResult> {
+    let outcome = non_decision.outcome;
+    if !matches!(outcome, "commitment" | "action" | "information") {
+        return Err(MeetingStoreError::Unprocessable {
+            code: "invalid_outcome",
+            detail: "a non-decision item closes as commitment, action or information".into(),
+        });
+    }
+    if !ty.allowed_outcomes.iter().any(|allowed| allowed == outcome) {
+        return Err(MeetingStoreError::Unprocessable {
+            code: "outcome_not_allowed",
+            detail: format!("this meeting type does not allow the {outcome} outcome"),
+        });
+    }
+    let outcome_ref = match outcome {
+        "commitment" => {
+            let commitment = non_decision
+                .commitment
+                .ok_or(MeetingStoreError::Unprocessable {
+                    code: "commitment_required",
+                    detail: "a commitment outcome names its commitment".into(),
+                })?;
+            validate_commitment(commitment)?;
+            let title = commitment
+                .get("what")
+                .or_else(|| commitment.get("title"))
+                .and_then(Value::as_str)
+                .filter(|value| !value.trim().is_empty())
+                .ok_or(MeetingStoreError::Unprocessable {
+                    code: "commitment_required",
+                    detail: "a commitment names what is committed".into(),
+                })?;
+            let due = parse_due(commitment.get("by").or_else(|| commitment.get("due")))?;
+            Some(
+                outcome_card_tx(
+                    &mut *conn,
+                    tenant,
+                    meeting_id,
+                    agenda_item_id,
+                    title,
+                    due,
+                    json!({"kind": "commitment", "commitment": commitment}),
+                )
+                .await?,
+            )
+        }
+        "action" => {
+            let action = non_decision
+                .action
+                .ok_or(MeetingStoreError::Unprocessable {
+                    code: "action_required",
+                    detail: "an action outcome names its action".into(),
+                })?;
+            let title = action
+                .get("title")
+                .or_else(|| action.get("what"))
+                .and_then(Value::as_str)
+                .filter(|value| !value.trim().is_empty())
+                .ok_or(MeetingStoreError::Unprocessable {
+                    code: "action_required",
+                    detail: "an action names what must be done".into(),
+                })?;
+            let due = parse_due(action.get("by").or_else(|| action.get("due")))?;
+            Some(
+                outcome_card_tx(
+                    &mut *conn,
+                    tenant,
+                    meeting_id,
+                    agenda_item_id,
+                    title,
+                    due,
+                    json!({"kind": "action", "action": action}),
+                )
+                .await?,
+            )
+        }
+        _ => None,
+    };
+    let item = close_item_row_tx(
+        &mut *conn,
+        tenant,
+        agenda_item_id,
+        outcome,
+        outcome_ref,
+        None,
+    )
+    .await?;
+    outbox::append(
+        &mut *conn,
+        tenant,
+        &NewEvent {
+            topic: format!("meeting:{meeting_id}"),
+            event_type: "meeting_item.closed".into(),
+            aggregate_type: "meeting".into(),
+            aggregate_id: meeting_id,
+            payload: json!({
+                "meeting_id": meeting_id,
+                "agenda_item_id": agenda_item_id,
+                "outcome": outcome,
+                "outcome_ref": outcome_ref,
+            }),
+            correlation_id: None,
+            causation_id: None,
+        },
+    )
+    .await?;
+    Ok(CloseItemResult {
+        item,
+        approval_status: None,
+        decisions_written: 0,
+        counted_positions: 0,
+        quorum: 0,
+    })
+}
+
+pub async fn defer_agenda_item_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    meeting_id: Uuid,
+    agenda_item_id: Uuid,
+    reason: &str,
+) -> Result<AgendaItemRecord> {
+    if reason.trim().is_empty() {
+        return Err(MeetingStoreError::Unprocessable {
+            code: "defer_reason_required",
+            detail: "a deferral names its reason".into(),
+        });
+    }
+    let meeting: Option<(String,)> =
+        sqlx::query_as("SELECT status FROM meeting WHERE tenant_id = $1 AND id = $2 FOR UPDATE")
+            .bind(tenant.as_uuid())
+            .bind(meeting_id)
+            .fetch_optional(&mut *conn)
+            .await?;
+    let (status,) = meeting.ok_or(MeetingStoreError::NotFound("meeting"))?;
+    if status != "live" {
+        return Err(MeetingStoreError::Illegal {
+            what: "meeting",
+            why: format!("a {status} meeting cannot defer an item"),
+        });
+    }
+    let item: Option<(Option<String>,)> = sqlx::query_as(
+        "SELECT outcome FROM meeting_agenda_item
+          WHERE tenant_id = $1 AND id = $2 AND meeting_id = $3 FOR UPDATE",
+    )
+    .bind(tenant.as_uuid())
+    .bind(agenda_item_id)
+    .bind(meeting_id)
+    .fetch_optional(&mut *conn)
+    .await?;
+    let (outcome,) = item.ok_or(MeetingStoreError::NotFound("agenda item"))?;
+    if outcome.is_some() {
+        return Err(MeetingStoreError::Illegal {
+            what: "agenda item",
+            why: "the item is already closed".into(),
+        });
+    }
+    let item = close_item_row_tx(
+        &mut *conn,
+        tenant,
+        agenda_item_id,
+        "deferred",
+        None,
+        Some(reason),
+    )
+    .await?;
+    outbox::append(
+        &mut *conn,
+        tenant,
+        &NewEvent {
+            topic: format!("meeting:{meeting_id}"),
+            event_type: "meeting_item.closed".into(),
+            aggregate_type: "meeting".into(),
+            aggregate_id: meeting_id,
+            payload: json!({
+                "meeting_id": meeting_id,
+                "agenda_item_id": agenda_item_id,
+                "outcome": "deferred",
+                "defer_reason": reason,
+            }),
+            correlation_id: None,
+            causation_id: None,
+        },
+    )
+    .await?;
+    Ok(item)
+}
+
+pub async fn close_meeting_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    meeting_id: Uuid,
+) -> Result<MeetingRecord> {
+    let meeting: Option<(String, Uuid)> = sqlx::query_as(
+        "SELECT status, card_id FROM meeting
+          WHERE tenant_id = $1 AND id = $2 FOR UPDATE",
+    )
+    .bind(tenant.as_uuid())
+    .bind(meeting_id)
+    .fetch_optional(&mut *conn)
+    .await?;
+    let (status, card_id) = meeting.ok_or(MeetingStoreError::NotFound("meeting"))?;
+    if status != "live" {
+        return Err(MeetingStoreError::Illegal {
+            what: "meeting",
+            why: format!("a {status} meeting cannot be closed"),
+        });
+    }
+    let open: i64 = sqlx::query_scalar(
+        "SELECT count(*) FROM meeting_agenda_item
+          WHERE tenant_id = $1 AND meeting_id = $2 AND outcome IS NULL",
+    )
+    .bind(tenant.as_uuid())
+    .bind(meeting_id)
+    .fetch_one(&mut *conn)
+    .await?;
+    if open > 0 {
+        return Err(MeetingStoreError::Refused {
+            code: "meeting_items_open",
+            detail: format!("{open} agenda item(s) have no outcome"),
+        });
+    }
+    let minutes: i64 = sqlx::query_scalar(
+        "SELECT count(*) FROM governed_asset
+          WHERE tenant_id = $1 AND kind = 'minutes' AND meta->>'meeting_id' = $2",
+    )
+    .bind(tenant.as_uuid())
+    .bind(meeting_id.to_string())
+    .fetch_one(&mut *conn)
+    .await?;
+    if minutes == 0 {
+        return Err(MeetingStoreError::Refused {
+            code: "minutes_not_published",
+            detail: "the meeting DoD requires published minutes".into(),
+        });
+    }
+    sqlx::query(
+        "UPDATE meeting
+            SET status = 'closed', closed_at = now(), updated_at = now(), version = version + 1
+          WHERE tenant_id = $1 AND id = $2",
+    )
+    .bind(tenant.as_uuid())
+    .bind(meeting_id)
+    .execute(&mut *conn)
+    .await?;
+    outbox::append(
+        &mut *conn,
+        tenant,
+        &NewEvent {
+            topic: format!("meeting:{meeting_id}"),
+            event_type: "meeting.closed".into(),
+            aggregate_type: "meeting".into(),
+            aggregate_id: meeting_id,
+            payload: json!({"meeting_id": meeting_id, "card_id": card_id}),
+            correlation_id: None,
+            causation_id: None,
+        },
+    )
+    .await?;
+    get_meeting_tx(&mut *conn, tenant, meeting_id)
+        .await?
+        .ok_or(MeetingStoreError::NotFound("meeting"))
+}
+
+pub struct NewMinutes<'a> {
+    pub approval_id: Uuid,
+    pub title: &'a str,
+    pub lines: &'a [(Uuid, String)],
+}
+
+pub async fn minutes_publish_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    meeting_id: Uuid,
+    new: &NewMinutes<'_>,
+) -> Result<Uuid> {
+    let meeting: Option<(String, Uuid)> =
+        sqlx::query_as("SELECT status, card_id FROM meeting WHERE tenant_id = $1 AND id = $2")
+            .bind(tenant.as_uuid())
+            .bind(meeting_id)
+            .fetch_optional(&mut *conn)
+            .await?;
+    let (status, meeting_card) = meeting.ok_or(MeetingStoreError::NotFound("meeting"))?;
+    if !matches!(status.as_str(), "live" | "closed") {
+        return Err(MeetingStoreError::Illegal {
+            what: "meeting",
+            why: format!("a {status} meeting has no minutes"),
+        });
+    }
+    let chair: Option<(String, Uuid)> = sqlx::query_as(
+        "SELECT participant_kind, participant_id FROM meeting_attendance
+          WHERE tenant_id = $1 AND meeting_id = $2 AND seat = 'chair'
+          LIMIT 1",
+    )
+    .bind(tenant.as_uuid())
+    .bind(meeting_id)
+    .fetch_optional(&mut *conn)
+    .await?;
+    let (chair_kind, chair_id) = chair.ok_or(MeetingStoreError::Refused {
+        code: "minutes_need_chair_approval",
+        detail: "the meeting has no chair seat to approve the minutes".into(),
+    })?;
+    let approval: Option<(String, Option<Uuid>, Value)> = sqlx::query_as(
+        "SELECT status, card_id, meta FROM approval WHERE tenant_id = $1 AND id = $2",
+    )
+    .bind(tenant.as_uuid())
+    .bind(new.approval_id)
+    .fetch_optional(&mut *conn)
+    .await?;
+    let (approval_status, approval_card, approval_meta) =
+        approval.ok_or(MeetingStoreError::NotFound("minutes approval"))?;
+    let meeting_text = meeting_id.to_string();
+    let references_meeting = approval_card == Some(meeting_card)
+        || approval_meta.get("meeting_id").and_then(Value::as_str) == Some(meeting_text.as_str());
+    if approval_status != "approved" || !references_meeting {
+        return Err(MeetingStoreError::Refused {
+            code: "minutes_need_chair_approval",
+            detail: "publication needs an approved approval that names this meeting".into(),
+        });
+    }
+    let (decision_kind, approver_column) = if chair_kind == "job_binding" {
+        ("job", "job_binding_id")
+    } else {
+        ("human", "approver_id")
+    };
+    let sql = format!(
+        "SELECT count(*) FROM approval_decision
+          WHERE tenant_id = $1 AND approval_id = $2 AND participant_kind = $3
+            AND {approver_column} = $4"
+    );
+    let chair_decided: i64 = sqlx::query_scalar(AssertSqlSafe(sql))
+        .bind(tenant.as_uuid())
+        .bind(new.approval_id)
+        .bind(decision_kind)
+        .bind(chair_id)
+        .fetch_one(&mut *conn)
+        .await?;
+    if chair_decided == 0 {
+        return Err(MeetingStoreError::Refused {
+            code: "minutes_need_chair_approval",
+            detail: "the chair has not decided the publication approval".into(),
+        });
+    }
+    let mut sequence = 0_i64;
+    let mut body = format!("# {}\n\n", new.title);
+    for (agenda_item_id, text) in new.lines {
+        if text.trim().is_empty() {
+            return Err(MeetingStoreError::Unprocessable {
+                code: "minute_line_empty",
+                detail: "a minute line needs text".into(),
+            });
+        }
+        let belongs: i64 = sqlx::query_scalar(
+            "SELECT count(*) FROM meeting_agenda_item
+              WHERE tenant_id = $1 AND meeting_id = $2 AND id = $3",
+        )
+        .bind(tenant.as_uuid())
+        .bind(meeting_id)
+        .bind(agenda_item_id)
+        .fetch_one(&mut *conn)
+        .await?;
+        if belongs == 0 {
+            return Err(MeetingStoreError::Unprocessable {
+                code: "minute_line_unmatched",
+                detail: format!("{agenda_item_id} is not an item of this meeting"),
+            });
+        }
+        sequence += 1;
+        body.push_str(&format!("- ({sequence}) {text}\n"));
+    }
+    let asset: Uuid = sqlx::query_scalar(
+        "INSERT INTO governed_asset (tenant_id, kind, key, title, body, status, project_id,
+             meta)
+         SELECT $1, 'minutes', $2, $3, $4, 'approved', b.project_id, $5
+           FROM meeting m
+           JOIN card c ON c.id = m.card_id AND c.tenant_id = m.tenant_id
+           JOIN board b ON b.id = c.board_id
+          WHERE m.tenant_id = $1 AND m.id = $6
+         RETURNING id",
+    )
+    .bind(tenant.as_uuid())
+    .bind(format!("minutes-{meeting_id}"))
+    .bind(new.title)
+    .bind(&body)
+    .bind(json!({"meeting_id": meeting_id, "approval_id": new.approval_id}))
+    .bind(meeting_id)
+    .fetch_optional(&mut *conn)
+    .await
+    .map_err(|error| {
+        if is_unique_on(&error, "governed_asset_tenant_kind_key_key") {
+            MeetingStoreError::Refused {
+                code: "minutes_already_published",
+                detail: "this meeting's minutes are already published".into(),
+            }
+        } else {
+            error.into()
+        }
+    })?
+    .ok_or(MeetingStoreError::NotFound("meeting card"))?;
+    outbox::append(
+        &mut *conn,
+        tenant,
+        &NewEvent {
+            topic: format!("meeting:{meeting_id}"),
+            event_type: "meeting_minutes.published".into(),
+            aggregate_type: "meeting".into(),
+            aggregate_id: meeting_id,
+            payload: json!({
+                "meeting_id": meeting_id,
+                "asset_id": asset,
+                "approval_id": new.approval_id,
+            }),
+            correlation_id: None,
+            causation_id: None,
+        },
+    )
+    .await?;
+    Ok(asset)
 }
 
 // ── authority ──────────────────────────────────────────────────────────────────────────
@@ -1399,6 +1940,7 @@ pub async fn close_item_tx(
     tenant: TenantId,
     meeting_id: Uuid,
     agenda_item_id: Uuid,
+    non_decision: Option<&NonDecision<'_>>,
 ) -> Result<CloseItemResult> {
     let meeting: Option<(String, Uuid)> = sqlx::query_as(
         "SELECT status, meeting_type_id FROM meeting
@@ -1436,6 +1978,29 @@ pub async fn close_item_tx(
         return Err(MeetingStoreError::Illegal {
             what: "agenda item",
             why: "the item is already closed".into(),
+        });
+    }
+    if resolved_kind != "approval" {
+        let non_decision = non_decision.ok_or(MeetingStoreError::Unprocessable {
+            code: "outcome_required",
+            detail: "a non-decision item closes with an outcome: commitment, action or information"
+                .into(),
+        })?;
+        return close_non_decision_tx(
+            &mut *conn,
+            tenant,
+            meeting_id,
+            agenda_item_id,
+            &ty,
+            non_decision,
+        )
+        .await;
+    }
+    if non_decision.is_some_and(|other| other.outcome != "decision") {
+        return Err(MeetingStoreError::Unprocessable {
+            code: "invalid_outcome",
+            detail: "a deciding item closes as a decision; its result is derived from the seats"
+                .into(),
         });
     }
 
@@ -1713,7 +2278,8 @@ pub async fn close_item_tx(
         None
     };
 
-    let item = close_item_row_tx(&mut *conn, tenant, agenda_item_id, "decision", None).await?;
+    let item =
+        close_item_row_tx(&mut *conn, tenant, agenda_item_id, "decision", None, None).await?;
     outbox::append(
         &mut *conn,
         tenant,
@@ -1752,8 +2318,15 @@ async fn defer_item_tx(
     quorum: usize,
     approval_status: Option<String>,
 ) -> Result<CloseItemResult> {
-    let item =
-        close_item_row_tx(&mut *conn, tenant, agenda_item_id, "deferred", Some(reason)).await?;
+    let item = close_item_row_tx(
+        &mut *conn,
+        tenant,
+        agenda_item_id,
+        "deferred",
+        None,
+        Some(reason),
+    )
+    .await?;
     outbox::append(
         &mut *conn,
         tenant,
@@ -1787,12 +2360,13 @@ async fn close_item_row_tx(
     tenant: TenantId,
     agenda_item_id: Uuid,
     outcome: &str,
+    outcome_ref: Option<Uuid>,
     defer_reason: Option<&str>,
 ) -> Result<AgendaItemRecord> {
     let sql = format!(
         "UPDATE meeting_agenda_item
-            SET outcome = $3, defer_reason = $4, closed_at = now(), updated_at = now(),
-                version = version + 1
+            SET outcome = $3, outcome_ref = $4, defer_reason = $5, closed_at = now(),
+                updated_at = now(), version = version + 1
           WHERE tenant_id = $1 AND id = $2
           RETURNING {AGENDA_COLUMNS}"
     );
@@ -1800,6 +2374,7 @@ async fn close_item_row_tx(
         .bind(tenant.as_uuid())
         .bind(agenda_item_id)
         .bind(outcome)
+        .bind(outcome_ref)
         .bind(defer_reason)
         .fetch_one(&mut *conn)
         .await

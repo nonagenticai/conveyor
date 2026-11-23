@@ -118,6 +118,9 @@ CREATE TABLE meeting_agenda_item (
     evidence_refs            jsonb NOT NULL DEFAULT '[]'::jsonb,
     outcome                  text CHECK (outcome IN ('decision', 'commitment', 'action',
                                                      'information', 'deferred')),
+    -- The row a non-decision outcome produced: a card for a commitment/action, the governed
+    -- asset for minutes. NULL for information and for a deciding item (the approval is the ref).
+    outcome_ref              uuid,
     defer_reason             text,
     closed_at                timestamptz,
     version                  bigint NOT NULL DEFAULT 1,
