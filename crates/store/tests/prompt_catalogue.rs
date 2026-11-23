@@ -17,9 +17,11 @@
 mod support;
 
 use conveyor_domain::TenantId;
+use conveyor_domain::prompt::MemorySelector;
 use conveyor_store::begin_scoped;
-use conveyor_store::prompt::get_prompt_tx;
+use conveyor_store::prompt::{facts_for_run_tx, get_prompt_tx};
 use conveyor_store::seed::prompts_for_tenant;
+use serde_json::json;
 use uuid::Uuid;
 
 fn tenant(seeded: &support::Seeded) -> TenantId {
@@ -286,4 +288,188 @@ async fn a_prompt_is_invisible_to_another_tenant() {
     .await;
     assert!(forged.is_err(), "a forged tenant_id must be refused");
     let _ = tx.rollback().await;
+}
+
+/// Insert one attempt of a run's step and return its id.
+#[allow(clippy::too_many_arguments)]
+async fn insert_step(
+    pool: &sqlx::PgPool,
+    tenant: Uuid,
+    run: Uuid,
+    position: i32,
+    attempt: i32,
+    status: &str,
+    output: serde_json::Value,
+    error: Option<&str>,
+) -> Uuid {
+    sqlx::query_scalar(
+        "INSERT INTO run_step
+             (tenant_id, run_id, position, attempt, action, status, input, output, error)
+         VALUES ($1, $2, $3, $4, 'agent.run', $5, '{}'::jsonb, $6, $7)
+         RETURNING id",
+    )
+    .bind(tenant)
+    .bind(run)
+    .bind(position)
+    .bind(attempt)
+    .bind(status)
+    .bind(output)
+    .bind(error)
+    .fetch_one(pool)
+    .await
+    .expect("run_step")
+}
+
+#[tokio::test]
+async fn the_runs_prior_steps_are_selected_and_isolated() {
+    let db = support::TestDb::fresh().await;
+    let seeded = support::seed_tenant(&db.super_pool, "prompt-prior").await;
+
+    // Position 1 succeeded with text; the current position 2 attempt 2 has an earlier failed
+    // attempt; a queued position 3 is future work and must never render.
+    insert_step(
+        &db.super_pool,
+        seeded.tenant,
+        seeded.run,
+        1,
+        1,
+        "succeeded",
+        json!({"text": "the draft plan"}),
+        None,
+    )
+    .await;
+    insert_step(
+        &db.super_pool,
+        seeded.tenant,
+        seeded.run,
+        2,
+        1,
+        "failed",
+        json!({}),
+        Some("the format was invalid"),
+    )
+    .await;
+    let current = insert_step(
+        &db.super_pool,
+        seeded.tenant,
+        seeded.run,
+        2,
+        2,
+        "running",
+        json!({}),
+        None,
+    )
+    .await;
+    insert_step(
+        &db.super_pool,
+        seeded.tenant,
+        seeded.run,
+        3,
+        1,
+        "queued",
+        json!({}),
+        None,
+    )
+    .await;
+
+    let mut tx = begin_scoped(&db.runtime, tenant(&seeded))
+        .await
+        .expect("scope");
+    let facts = facts_for_run_tx(
+        &mut tx,
+        tenant(&seeded),
+        seeded.run,
+        Some(current),
+        &MemorySelector::default(),
+        None,
+    )
+    .await
+    .expect("facts");
+    assert_eq!(facts.prior_steps.len(), 2, "{:?}", facts.prior_steps);
+    assert_eq!(facts.prior_steps[0].id, "1.1");
+    assert_eq!(facts.prior_steps[0].action, "agent.run");
+    assert_eq!(facts.prior_steps[0].status, "succeeded");
+    assert_eq!(facts.prior_steps[0].body, "the draft plan");
+    assert_eq!(facts.prior_steps[1].id, "2.1");
+    assert_eq!(facts.prior_steps[1].status, "failed");
+    assert_eq!(facts.prior_steps[1].body, "the format was invalid");
+
+    // The selector can switch the class off entirely.
+    let off = MemorySelector {
+        include_steps: false,
+        ..MemorySelector::default()
+    };
+    let facts = facts_for_run_tx(
+        &mut tx,
+        tenant(&seeded),
+        seeded.run,
+        Some(current),
+        &off,
+        None,
+    )
+    .await
+    .expect("facts without steps");
+    assert!(facts.prior_steps.is_empty());
+    tx.commit().await.expect("commit");
+
+    // A child run reads only its own trace: its earlier positions are none, so the parent's
+    // position 1 must not leak into the child's prompt.
+    let process: Uuid = sqlx::query_scalar(
+        "INSERT INTO process (tenant_id, key, title) VALUES ($1, 'prior', 'Prior') RETURNING id",
+    )
+    .bind(seeded.tenant)
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("process");
+    let process_step: Uuid = sqlx::query_scalar(
+        "INSERT INTO process_step (tenant_id, process_id, position, kind)
+         VALUES ($1, $2, 1, 'call') RETURNING id",
+    )
+    .bind(seeded.tenant)
+    .bind(process)
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("process step");
+    let child: Uuid = sqlx::query_scalar(
+        "INSERT INTO run (tenant_id, card_id, project_id, status, parent_run_id, step_id, depth)
+         VALUES ($1, $2, $3, 'queued', $4, $5, 1) RETURNING id",
+    )
+    .bind(seeded.tenant)
+    .bind(seeded.card)
+    .bind(seeded.project)
+    .bind(seeded.run)
+    .bind(process_step)
+    .fetch_one(&db.super_pool)
+    .await
+    .expect("child run");
+    let child_current = insert_step(
+        &db.super_pool,
+        seeded.tenant,
+        child,
+        2,
+        1,
+        "running",
+        json!({}),
+        None,
+    )
+    .await;
+    let mut tx = begin_scoped(&db.runtime, tenant(&seeded))
+        .await
+        .expect("scope");
+    let facts = facts_for_run_tx(
+        &mut tx,
+        tenant(&seeded),
+        child,
+        Some(child_current),
+        &MemorySelector::default(),
+        None,
+    )
+    .await
+    .expect("child facts");
+    tx.commit().await.expect("commit");
+    assert!(
+        facts.prior_steps.is_empty(),
+        "a child must not read its parent's steps: {:?}",
+        facts.prior_steps
+    );
 }

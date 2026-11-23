@@ -5,7 +5,7 @@
 //! content is absent while a required one refuses by name; and the same recipe + facts produce
 //! the same bytes and hash while a changed selection changes the hash.
 
-use conveyor_domain::memory::{MemoryKind, MemoryLine, MemorySource};
+use conveyor_domain::memory::{MemoryKind, MemoryLine, MemorySource, StepMemoryLine};
 use conveyor_domain::prompt::{
     KnowledgeFacts, KnowledgeHit, KnowledgeSelector, MemorySelector, PromptCompileError,
     PromptDefinition, PromptFacts, PromptSection, PromptSource, compile,
@@ -153,12 +153,98 @@ fn the_memory_selector_is_closed_and_bounded() {
             kinds: vec![MemoryKind::Fact, MemoryKind::Decision],
             limit: 4,
             include_digest: false,
+            include_steps: true,
+            step_limit: 8,
+        }
+    );
+    assert_eq!(
+        MemorySelector::parse(&json!({"include_steps": false, "step_limit": 3}))
+            .expect("step knobs"),
+        MemorySelector {
+            include_steps: false,
+            step_limit: 3,
+            ..MemorySelector::default()
         }
     );
     assert!(MemorySelector::parse(&json!({"limit": 0})).is_err());
     assert!(MemorySelector::parse(&json!({"limit": 33})).is_err());
+    assert!(MemorySelector::parse(&json!({"step_limit": 0})).is_err());
+    assert!(MemorySelector::parse(&json!({"step_limit": 33})).is_err());
     assert!(MemorySelector::parse(&json!({"kinds": ["digest"]})).is_err());
     assert!(MemorySelector::parse(&json!({"unknown": true})).is_err());
+}
+
+fn step(position: i32, attempt: i32, status: &str, body: &str) -> StepMemoryLine {
+    StepMemoryLine {
+        id: format!("{position}.{attempt}"),
+        action: "agent.run".to_owned(),
+        status: status.to_owned(),
+        body: body.to_owned(),
+    }
+}
+
+#[test]
+fn the_runs_prior_steps_render_before_the_card_rows() {
+    let mut facts = facts();
+    facts.prior_steps = vec![
+        step(1, 1, "succeeded", "the draft plan"),
+        step(2, 1, "failed", "the format was invalid"),
+    ];
+    let compiled = compile(&recipe(false), &facts).expect("compile");
+    let memory = compiled
+        .text
+        .split("## Memory")
+        .nth(1)
+        .expect("memory section");
+    let first = memory
+        .find("- [step/succeeded#1.1] agent.run succeeded: the draft plan")
+        .expect("step 1");
+    let second = memory
+        .find("- [step/failed#2.1] agent.run failed: the format was invalid")
+        .expect("step 2");
+    let card = memory.find("- [fact/human#").expect("card row");
+    assert!(
+        first < second && second < card,
+        "prior steps precede the card rows: {memory}"
+    );
+}
+
+#[test]
+fn prior_steps_are_deterministic_and_hashed() {
+    let mut facts = facts();
+    facts.prior_steps = vec![step(1, 1, "succeeded", "the draft plan")];
+    let first = compile(&recipe(false), &facts).expect("first");
+    let second = compile(&recipe(false), &facts).expect("second");
+    assert_eq!(first.text, second.text);
+    assert_eq!(first.sha256, second.sha256);
+    facts.prior_steps[0].body = "a different plan".to_owned();
+    let third = compile(&recipe(false), &facts).expect("third");
+    assert_ne!(first.sha256, third.sha256);
+
+    // The semantic id is in the text, so the same body under another attempt is another hash.
+    let mut other = facts.clone();
+    other.prior_steps[0].id = "9.3".to_owned();
+    let fourth = compile(&recipe(false), &other).expect("fourth");
+    assert_ne!(third.sha256, fourth.sha256);
+}
+
+#[test]
+fn a_prior_step_over_budget_refuses_with_the_measurement() {
+    let mut facts = facts();
+    facts.prior_steps = vec![step(1, 1, "succeeded", &"x".repeat(400))];
+    let mut recipe = recipe(false);
+    recipe.sections[2].budget_chars = Some(64);
+    match compile(&recipe, &facts).expect_err("over budget") {
+        PromptCompileError::SectionOverBudget {
+            kind,
+            measured,
+            limit,
+        } => {
+            assert_eq!(kind, PromptSource::Memory);
+            assert!(measured > limit, "{measured} > {limit}");
+        }
+        other => panic!("unexpected error: {other:?}"),
+    }
 }
 
 #[test]

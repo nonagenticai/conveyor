@@ -22,7 +22,7 @@ use serde_json::Value;
 use sha2::{Digest, Sha256};
 use uuid::Uuid;
 
-use crate::memory::{MemoryKind, MemoryLine};
+use crate::memory::{MemoryKind, MemoryLine, StepMemoryLine};
 
 /// What a section is rendered FROM.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
@@ -147,6 +147,8 @@ pub struct ProcessFacts {
 pub struct StepFacts {
     /// `run_step.position` (process) — `0` when the surface has no position.
     pub position: i32,
+    /// `run_step.attempt` — `1` when the surface has no attempt.
+    pub attempt: i32,
     /// `run_step.action` (for a workflow node, the node's action).
     pub action: String,
     /// The node id, for a workflow-driven run.
@@ -219,6 +221,8 @@ pub struct PromptFacts {
     pub card: Option<CardFacts>,
     /// The capability's bound packs and the hits selected for this compile.
     pub knowledge: KnowledgeFacts,
+    /// The run's own earlier steps, oldest first — the Memory section's episodic class.
+    pub prior_steps: Vec<StepMemoryLine>,
     /// The card's selected memory, oldest first — hot rows first, then one digest.
     pub memory: Vec<MemoryLine>,
 }
@@ -250,6 +254,10 @@ pub struct MemorySelector {
     pub limit: u32,
     /// Whether one digest row may follow when room remains.
     pub include_digest: bool,
+    /// Whether the run's own earlier steps render (default true).
+    pub include_steps: bool,
+    /// The maximum number of prior steps (1–32, default 8).
+    pub step_limit: u32,
 }
 
 impl Default for MemorySelector {
@@ -258,6 +266,8 @@ impl Default for MemorySelector {
             kinds: Vec::new(),
             limit: 8,
             include_digest: true,
+            include_steps: true,
+            step_limit: 8,
         }
     }
 }
@@ -270,7 +280,10 @@ impl MemorySelector {
             return Err(SelectorError::new("the memory selector must be an object"));
         };
         for key in object.keys() {
-            if !matches!(key.as_str(), "kinds" | "limit" | "include_digest") {
+            if !matches!(
+                key.as_str(),
+                "kinds" | "limit" | "include_digest" | "include_steps" | "step_limit"
+            ) {
                 return Err(SelectorError::new(format!(
                     "unknown memory selector member {key:?}"
                 )));
@@ -311,10 +324,26 @@ impl MemorySelector {
                 .as_bool()
                 .ok_or_else(|| SelectorError::new("include_digest must be a boolean"))?,
         };
+        let include_steps = match object.get("include_steps") {
+            None => true,
+            Some(value) => value
+                .as_bool()
+                .ok_or_else(|| SelectorError::new("include_steps must be a boolean"))?,
+        };
+        let step_limit = match object.get("step_limit") {
+            None => 8,
+            Some(value) => value
+                .as_u64()
+                .filter(|limit| (1..=32).contains(limit))
+                .and_then(|limit| u32::try_from(limit).ok())
+                .ok_or_else(|| SelectorError::new("memory selector step_limit must be 1–32"))?,
+        };
         Ok(Self {
             kinds,
             limit,
             include_digest,
+            include_steps,
+            step_limit,
         })
     }
 }
@@ -612,10 +641,22 @@ fn render(source: PromptSource, section: &PromptSection, facts: &PromptFacts) ->
             (!out.trim().is_empty()).then_some(out)
         }
         PromptSource::Memory => {
-            if facts.memory.is_empty() {
+            if facts.prior_steps.is_empty() && facts.memory.is_empty() {
                 None
             } else {
                 let mut out = String::new();
+                // The run's own trace first: it is the newest context the work produced, and a
+                // retry's earlier attempt is why the step is running again.
+                for step in &facts.prior_steps {
+                    out.push_str(&format!(
+                        "- [step/{}#{}] {} {}: {}\n",
+                        step.status,
+                        step.id,
+                        step.action,
+                        step.status,
+                        step.body.trim()
+                    ));
+                }
                 for line in &facts.memory {
                     out.push_str(&format!(
                         "- [{}/{}#{}] {}\n",
@@ -703,6 +744,7 @@ mod tests {
             }),
             step: Some(StepFacts {
                 position: 1,
+                attempt: 1,
                 action: "cards.get".to_owned(),
                 node_id: None,
                 on_result: Some("fail".to_owned()),

@@ -168,6 +168,19 @@ pub struct MemoryLine {
     pub created_at: DateTime<Utc>,
 }
 
+/// One earlier step of a run, as the Memory section renders it (S21 step 7).
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct StepMemoryLine {
+    /// The semantic identity `<position>.<attempt>` — stable across a replay, unlike the row uuid.
+    pub id: String,
+    /// `run_step.action`.
+    pub action: String,
+    /// `succeeded` or `failed` — the only statuses an earlier step can carry here.
+    pub status: String,
+    /// The stored output's text, its compact JSON, or the error.
+    pub body: String,
+}
+
 /// The digest a consolidation job ingests, and the row facts the caller records.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Digest {
