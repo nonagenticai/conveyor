@@ -152,21 +152,52 @@ async fn compose_draft(
     id_of(output(&draft), "id")
 }
 
-/// An accepted L1 decision for the card, with whatever draft binding the caller supplies.
-async fn evaluate_accepted(running: &support::Running, card_id: &str, meta: Value) -> String {
-    let (status, accepted) = running
+/// An accepted human decision bound to the draft, backed by an approved card-scoped gate.
+///
+/// On this lane the L1 path requires a verified `laya.classify` invocation (`laya_key`); the
+/// apply gate accepts an L3 human decision just as well, and this helper exercises the binding
+/// the apply action enforces. The L1 evaluate path is covered by `decision_ladder.rs`.
+async fn approved_decision(running: &support::Running, card_id: &str, meta: Value) -> String {
+    let (status, approval) = running
         .invoke(
-            "ladder.evaluate",
+            "approvals.request",
             TOKEN,
             json!({
-                "kind": "gate.precheck",
-                "gate": "capability_ready",
                 "card_id": card_id,
-                "question": "Is the draft safe to apply?",
-                "answer": "pass",
-                "confidence": 0.9,
-                "latency_ms": 1,
-                "input": {"card": card_id},
+                "gate": "gate.precheck",
+                "kind": "decision",
+                "description": "apply the draft"
+            }),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{approval}");
+    let approval_id = id_of(output(&approval), "id");
+    let (status, decided) = running
+        .invoke(
+            "approvals.decide",
+            support::REVIEWER,
+            json!({"approval_id": approval_id, "decision": "approve"}),
+            None,
+            None,
+            None,
+        )
+        .await;
+    assert_eq!(status, 200, "{decided}");
+    let (status, accepted) = running
+        .invoke(
+            "ladder.record",
+            TOKEN,
+            json!({
+                "rung": "human",
+                "kind": "gate.draft_apply",
+                "gate": "gate.precheck",
+                "card_id": card_id,
+                "answer": "apply",
+                "outcome": "accepted",
+                "approval_id": approval_id,
                 "meta": meta
             }),
             None,
@@ -226,7 +257,7 @@ async fn an_unbound_decision_cannot_apply_a_draft() {
     )
     .await;
     // An accepted decision on the same card that never names the draft.
-    let decision = evaluate_accepted(&running, &card_id, json!({})).await;
+    let decision = approved_decision(&running, &card_id, json!({})).await;
 
     let (status, refused) = apply(&running, &document, &card_id, &decision).await;
     assert_eq!(status, 422, "{refused}");
@@ -260,7 +291,7 @@ async fn a_decision_bound_to_another_draft_is_refused() {
     .await;
 
     // Bound to the first draft: it applies there, and nowhere else.
-    let bound = evaluate_accepted(&running, &card_id, json!({"draft_document_id": first})).await;
+    let bound = approved_decision(&running, &card_id, json!({"draft_document_id": first})).await;
     let (status, refused) = apply(&running, &second, &card_id, &bound).await;
     assert_eq!(status, 422, "{refused}");
     assert_eq!(output(&refused)["type"], "draft_requires_gate", "{refused}");
@@ -276,7 +307,7 @@ async fn a_decision_bound_to_another_draft_is_refused() {
         json!({"generated": true, "prompt_sha256": hash}),
     )
     .await;
-    let wrong = evaluate_accepted(
+    let wrong = approved_decision(
         &running,
         &card_id,
         json!({"draft_document_id": hashed, "prompt_sha256": "b".repeat(64)}),
@@ -306,7 +337,7 @@ async fn a_human_decision_requires_a_person_and_an_approved_approval() {
             "approvals.request",
             TOKEN,
             json!({
-                "project_id": project_id,
+                "card_id": card_id,
                 "gate": "gate.precheck",
                 "kind": "decision",
                 "description": "pending"
@@ -325,6 +356,7 @@ async fn a_human_decision_requires_a_person_and_an_approved_approval() {
             json!({
                 "rung": "human",
                 "kind": "gate.draft_apply",
+                "gate": "gate.precheck",
                 "card_id": card_id,
                 "answer": "approved",
                 "outcome": "accepted",
@@ -350,7 +382,7 @@ async fn a_human_decision_requires_a_person_and_an_approved_approval() {
             "approvals.request",
             TOKEN,
             json!({
-                "project_id": project_id,
+                "card_id": card_id,
                 "gate": "gate.precheck",
                 "kind": "decision",
                 "description": "approved"
@@ -385,7 +417,10 @@ async fn a_human_decision_requires_a_person_and_an_approved_approval() {
             card_id: Some(Uuid::parse_str(&card_id).expect("uuid")),
             question: "Apply the draft?".to_owned(),
             answer: "approved".to_owned(),
+            option_set_id: None,
             option_set_version: None,
+            option_set_hash: None,
+            option_refinement_hashes: Vec::new(),
             probabilities: json!({}),
             confidence: None,
             input_hash: None,
@@ -395,6 +430,9 @@ async fn a_human_decision_requires_a_person_and_an_approved_approval() {
             refinement_version: None,
             laya_config_id: None,
             laya_config_version: None,
+            laya_invocation_id: None,
+            laya_request_hash: None,
+            laya_response_hash: None,
             actor_kind: "service".to_owned(),
             actor_id: Some(seeded.user_id),
             approval_id: Some(Uuid::parse_str(&approved).expect("uuid")),
@@ -434,7 +472,7 @@ async fn an_approved_human_decision_applies_its_draft() {
             "approvals.request",
             TOKEN,
             json!({
-                "project_id": project_id,
+                "card_id": card_id,
                 "gate": "gate.precheck",
                 "kind": "decision",
                 "description": "apply the draft"
@@ -465,6 +503,7 @@ async fn an_approved_human_decision_applies_its_draft() {
             json!({
                 "rung": "human",
                 "kind": "gate.draft_apply",
+                "gate": "gate.precheck",
                 "card_id": card_id,
                 "answer": "approved",
                 "outcome": "accepted",
