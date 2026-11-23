@@ -388,11 +388,42 @@ pub async fn schedule_tx(
             detail: format!("convener_kind must be one of {CONVENER_KINDS:?}"),
         });
     }
-    let meeting_type = match latest_meeting_type_tx(&mut *conn, tenant, new.meeting_type_key)
-        .await?
-    {
+    // A governance body's standing meeting names no type: the body's key is the standing type
+    // (the SPEC's "the body carries the standing meeting_type", resolved by key, never code).
+    let meeting_type_key = if new.meeting_type_key.trim().is_empty() {
+        if new.convener_kind != "governance_body" {
+            return Err(MeetingStoreError::Unprocessable {
+                code: "meeting_type_required",
+                detail: "only a governance body has a standing meeting type".into(),
+            });
+        }
+        let key: Option<String> =
+            sqlx::query_scalar("SELECT key FROM governance_body WHERE tenant_id = $1 AND id = $2")
+                .bind(tenant.as_uuid())
+                .bind(new.convener_id)
+                .fetch_optional(&mut *conn)
+                .await?;
+        key.ok_or(MeetingStoreError::NotFound("governance body"))?
+    } else {
+        new.meeting_type_key.to_owned()
+    };
+    let policy = new.policy.map(|policy| NewMeetingType {
+        key: &meeting_type_key,
+        name: policy.name,
+        purpose: policy.purpose,
+        agenda_sources: policy.agenda_sources,
+        required_participation: policy.required_participation,
+        quorum: policy.quorum,
+        decision_rule: policy.decision_rule,
+        evidence_minimum: policy.evidence_minimum,
+        decision_window_seconds: policy.decision_window_seconds,
+        timebox_seconds: policy.timebox_seconds,
+        allowed_outcomes: policy.allowed_outcomes,
+        convener_authority: policy.convener_authority,
+    });
+    let meeting_type = match latest_meeting_type_tx(&mut *conn, tenant, &meeting_type_key).await? {
         Some(existing) => {
-            if new.policy.is_some() {
+            if policy.is_some() {
                 return Err(MeetingStoreError::Conflict {
                     what: "meeting type",
                     why: "this key already exists; a policy change is a new version through the governance route, not a schedule".into(),
@@ -401,11 +432,14 @@ pub async fn schedule_tx(
             existing
         }
         None => {
-            let policy = new.policy.ok_or_else(|| MeetingStoreError::Unprocessable {
-                code: "meeting_type_policy_required",
-                detail: "the meeting type does not exist; supply its policy to create version 1"
-                    .into(),
-            })?;
+            let policy = policy
+                .as_ref()
+                .ok_or_else(|| MeetingStoreError::Unprocessable {
+                    code: "meeting_type_policy_required",
+                    detail:
+                        "the meeting type does not exist; supply its policy to create version 1"
+                            .into(),
+                })?;
             create_meeting_type_tx(&mut *conn, tenant, policy).await?
         }
     };

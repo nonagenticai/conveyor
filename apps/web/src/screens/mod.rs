@@ -14,6 +14,7 @@ pub mod execution;
 pub mod improvement;
 pub mod inference;
 pub mod jobs;
+pub mod meetings;
 pub mod members;
 pub mod models;
 pub mod organisation;

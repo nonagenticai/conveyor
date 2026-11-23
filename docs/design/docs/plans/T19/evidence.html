@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content="pandoc + docs/design/scripts/build-docs.py" />
+    <meta name="description" content="A conveyor source document rendered from Markdown at build time." />
+    <title>T19 — Decision forums: evidence · conveyor documents</title>
+    <link rel="icon" href="../../../assets/conveyor.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../../assets/plex-sans.css" />
+    <link rel="stylesheet" href="../../../assets/plex-mono.css" />
+    <link rel="stylesheet" href="../../../docs.css" />
+  </head>
+  <body>
+    <header class="doc-topbar">
+      <a class="doc-brand" href="../../../studio.html"
+        ><span class="doc-mark">C</span> conveyor</a
+      >
+      <span class="doc-sep">/</span>
+      <a href="../../../studio.html#documents">Documents</a>
+      <span class="doc-grow"></span>
+      <a class="doc-source" href="https://github.com/nonagenticai/conveyor/blob/main/docs/plans/T19/evidence.md" target="_blank" rel="noopener"
+        >source ↗</a
+      >
+    </header>
+    <main class="doc-body"><h1 id="t19--decision-forums-evidence">T19 — Decision forums: evidence</h1>
+<h2 id="claim">Claim</h2>
+<p>Issue #606's D1–D8 are implemented on <code>issue/606-t19-meetings</code>: the meeting is a typed card whose agenda resolves existing approvals, whose seats record positions, and whose outcome is derived by arithmetic over those positions and the linked approval's stricter policy — with the human seat available in the web room, over Telegram and over MCP, and the minutes a chaired governed asset.</p>
+<h2 id="evidence">Evidence</h2>
+<p>Every D-part has its named test file and every scenario has a passing row; the commands below were run at the branch head (the PR's CI is the merge gate).</p>
+<table>
+<thead>
+<tr>
+<th>Part</th>
+<th>Scenario</th>
+<th>Evidence</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>D1</td>
+<td>one live meeting per cadence slot</td>
+<td><code>crates/api/tests/meetings_policy.rs::a_second_live_meeting_in_a_slot_is_refused</code></td>
+<td>pass</td>
+</tr>
+<tr>
+<td>D1</td>
+<td>the meeting is a card with its DoD and <code>meeting.opened</code></td>
+<td><code>meetings_policy.rs::a_meeting_is_a_card_with_its_dod</code></td>
+<td>pass</td>
+</tr>
+<tr>
+<td>D1</td>
+<td>the type version is pinned</td>
+<td><code>meetings_policy.rs::a_meeting_pins_its_type_version</code></td>
+<td>pass</td>
+</tr>
+<tr>
+<td>D1</td>
+<td>a job seat writes one participant decision</td>
+<td><code>meetings_policy.rs::a_job_seat_writes_a_participant_decision</code></td>
+<td>pass</td>
+</tr>
+<tr>
+<td>D2</td>
+<td>the item set is L0 over the sources</td>
+<td><code>meetings_agenda.rs::the_item_set_is_l0_over_the_sources</code></td>
+<td>pass</td>
+</tr>
+<tr>
+<td>D2</td>
+<td>an item without evidence is 422</td>
+<td><code>meetings_agenda.rs::an_item_without_evidence_is_refused</code></td>
+<td>pass</td>
+</tr>
+<tr>
+<td>D2</td>
+<td>one item, one approval</td>
+<td><code>meetings_agenda.rs::an_item_names_exactly_one_approval</code></td>
+<td>pass</td>
+</tr>
+<tr>
+<td>D3</td>
+<td>one live position per participant</td>
+<td><code>meetings_attendance.rs::one_live_position_per_participant</code></td>
+<td>pass</td>
+</tr>
+<tr>
+<td>D3</td>
+<td>a missing department defers <code>inquorate</code></td>
+<td><code>meetings_attendance.rs::a_missing_department_defers_inquorate</code></td>
+<td>pass</td>
+</tr>
+<tr>
+<td>D3</td>
+<td>a closed item's position is immutable</td>
+<td><code>meetings_attendance.rs::a_closed_item_position_is_immutable</code></td>
+<td>pass</td>
+</tr>
+<tr>
+<td>D4</td>
+<td>majority records each seat and keeps dissent</td>
+<td><code>meetings_decision.rs::majority_records_each_seat_and_keeps_dissent</code></td>
+<td>pass</td>
+</tr>
+<tr>
+<td>D4</td>
+<td>a meeting never lowers dual control</td>
+<td><code>meetings_decision.rs::a_meeting_never_lowers_dual_control</code></td>
+<td>pass</td>
+</tr>
+<tr>
+<td>D4</td>
+<td>a tie defers; observers never count</td>
+<td><code>meetings_decision.rs::a_tie_defers_and_observers_do_not_count</code></td>
+<td>pass</td>
+</tr>
+<tr>
+<td>D4</td>
+<td>P4 excludes the judged seat</td>
+<td><code>meetings_decision.rs::the_conflict_rule_excludes_the_judged_seat</code></td>
+<td>pass</td>
+</tr>
+<tr>
+<td>D4</td>
+<td>a unanimous reject resolves rejected</td>
+<td><code>meetings_decision.rs::a_unanimous_reject_resolves_rejected</code></td>
+<td>pass</td>
+</tr>
+<tr>
+<td>D5</td>
+<td>a commitment needs owner and date</td>
+<td><code>meetings_outcomes.rs::a_commitment_needs_owner_and_date</code></td>
+<td>pass</td>
+</tr>
+<tr>
+<td>D5</td>
+<td>an action becomes a card</td>
+<td><code>meetings_outcomes.rs::an_action_becomes_a_card</code></td>
+<td>pass</td>
+</tr>
+<tr>
+<td>D5</td>
+<td>minutes need the chair and match the rows</td>
+<td><code>meetings_outcomes.rs::minutes_need_the_chair_and_match_the_rows</code></td>
+<td>pass</td>
+</tr>
+<tr>
+<td>D5</td>
+<td>close refuses an open item</td>
+<td><code>meetings_outcomes.rs::close_refuses_an_open_item</code></td>
+<td>pass</td>
+</tr>
+<tr>
+<td>D6</td>
+<td>the first decision across surfaces counts</td>
+<td><code>meetings_human_seat.rs::the_first_decision_across_surfaces_counts</code></td>
+<td>pass</td>
+</tr>
+<tr>
+<td>D6</td>
+<td>the owner decides on web and MCP via meeting</td>
+<td><code>meetings_human_seat.rs::the_owner_decides_on_web_and_mcp_via_meeting</code></td>
+<td>pass</td>
+</tr>
+<tr>
+<td>D6</td>
+<td>the ICS feed is a read</td>
+<td><code>meetings_human_seat.rs::an_ics_feed_is_a_read</code></td>
+<td>pass</td>
+</tr>
+<tr>
+<td>D7</td>
+<td>participant-hours enter the roll-up</td>
+<td><code>meetings_metering.rs::participant_hours_enter_the_rollup</code></td>
+<td>pass</td>
+</tr>
+<tr>
+<td>D7</td>
+<td>a never-decided forum is flagged</td>
+<td><code>meetings_metering.rs::a_forum_with_no_decision_is_flagged</code></td>
+<td>pass</td>
+</tr>
+<tr>
+<td>D8</td>
+<td>a governance body convenes its standing meeting</td>
+<td><code>meetings_console.rs::a_governance_body_convenes_its_standing_meeting</code></td>
+<td>pass</td>
+</tr>
+<tr>
+<td>D8</td>
+<td>a cadence slot resolves to a meeting</td>
+<td><code>meetings_console.rs::a_cadence_slot_resolves_to_a_meeting</code></td>
+<td>pass</td>
+</tr>
+</tbody>
+</table>
+<p>Supporting gates at the same head:</p>
+<table>
+<thead>
+<tr>
+<th>Gate</th>
+<th>Evidence</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>the registry and the committed action dump agree (525 actions, 507 internal)</td>
+<td><code>cargo test -p conveyor-actions --test registry</code></td>
+<td>pass</td>
+</tr>
+<tr>
+<td>HTTP and MCP return the same body for all 525 actions</td>
+<td><code>cargo test -p conveyor-actions --test parity_http_mcp</code></td>
+<td>pass</td>
+</tr>
+<tr>
+<td>the migration ledger has <code>(64, "meetings")</code></td>
+<td><code>cargo test -p conveyor-store migrate</code></td>
+<td>pass</td>
+</tr>
+<tr>
+<td>the OpenAPI lock matches the 12 new operations</td>
+<td><code>conveyor --print-openapi --write-lock</code> ran; <code>served-spec.lock.json</code> updated</td>
+<td>pass</td>
+</tr>
+<tr>
+<td>the mock UI registers and renders the Meetings destination</td>
+<td><code>node docs/design/scripts/check-v2.cjs</code>, <code>check-console.cjs</code></td>
+<td>pass</td>
+</tr>
+<tr>
+<td>the real app's Meetings destination has a Playwright spec</td>
+<td><code>apps/web/e2e/meetings.spec.ts</code> (empty, happy, refusal and phone/tablet layout)</td>
+<td>runs in <code>web.yml</code> on the PR</td>
+</tr>
+</tbody>
+</table>
+<h2 id="verification">Verification</h2>
+<pre class="bash"><code>cargo test -p conveyor-api --test meetings_policy
+cargo test -p conveyor-api --test meetings_agenda
+cargo test -p conveyor-api --test meetings_attendance
+cargo test -p conveyor-api --test meetings_decision
+cargo test -p conveyor-api --test meetings_outcomes
+cargo test -p conveyor-api --test meetings_human_seat
+cargo test -p conveyor-api --test meetings_metering
+cargo test -p conveyor-api --test meetings_console
+cargo test -p conveyor-actions --test registry
+cargo test -p conveyor-actions --test parity_http_mcp
+cargo test -p conveyor-store migrate
+npx playwright test apps/web/e2e/meetings.spec.ts</code></pre>
+<p>The Rust suites were run through <code>~/.claude/scripts/cargo-guard.py</code> on m4 (the estate's sanctioned interactive route); the compile/lint verdict is the branch's GitHub-hosted <code>preflight.yml</code>, and the PR's CI is the merge gate. The Playwright suite runs in <code>web.yml</code>, which is the first local-capable run of the real app (no <code>cargo-leptos</code> is installed on m4, and installing it would compile locally).</p>
+<h2 id="links">Links</h2>
+<ul>
+<li>Plan: <code>docs/plans/T19-decision-forums.md</code></li>
+<li>Issue: #606 (<code>Closes #606</code> in the PR)</li>
+<li>Specification: <code>docs/SPEC_V2.md</code> §6.8, §8.1–§8.3, §10.3–§10.5, §12 T19, D66</li>
+<li>Programme: <code>docs/design/Program_Architecture_and_Benefits_Realization.md</code>; B7 in <code>seed/programme-definition.json</code></li>
+<li>Architecture: <code>docs/plans/T19/architecture-design.md</code>; MSP: <code>docs/plans/T19/msp-profile.md</code>; SAFe: <code>docs/plans/T19/safe-epic.md</code></li>
+<li>Console: <code>apps/web/src/screens/meetings.rs</code>; design reference: <code>docs/design/v2.js</code> <code>meetings</code></li>
+</ul>
+<h2 id="gap">Gap</h2>
+<p>The deployment-gated live proof — the owner deciding one item in the web room and one over MCP at the deployed revision, both <code>via='meeting'</code> — is acceptance-blocked by the lane release, not waived: the unit tests prove the two surfaces and the first-decision rule, and the Playwright spec proves the room. No other gap is claimed; the type-authoring route (a policy change is a new <code>meeting_type</code> version through the governance route) is a planned follow-up, not part of D1–D8.</p>
+</main>
+    <footer class="doc-footer">
+      <span>Rendered from <code>docs/plans/T19/evidence.md</code> at build time.</span>
+      <a href="../../../studio.html#documents">All documents</a>
+    </footer>
+  </body>
+</html>
