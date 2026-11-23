@@ -10,7 +10,7 @@ mod support;
 use conveyor_actions::ActionKind;
 use conveyor_actions::openapi::operation_json;
 use conveyor_actions::registry::{assert_registry_consistent, registry};
-use conveyor_actions::spec::sha256_hex;
+use conveyor_actions::spec::{sha256_hex, validate_input};
 use conveyor_auth::Role;
 use conveyor_store::begin_scoped;
 use serde_json::{Value, json};
@@ -787,8 +787,9 @@ fn the_registry_is_exactly_the_declared_set() {
     // `trend` and `scientific_formal.translate|verify`. #556/#590 add eight internal actions
     // (`storage.get|put`, `tool_bindings.create|list|retire|update`, `tools.resume|retire`).
     // #526 (w3-gov-assets-1) adds five internal actions (`governed_assets.compose|get|list|submit|
-    // approve`). The merged registry is 559: 540 internal, 19 external.
-    assert_eq!((internal, external), (540, 19));
+    // approve`). The promotion replay adds one internal read (`architecture.reviews_list`).
+    // The merged registry is 560: 541 internal, 19 external.
+    assert_eq!((internal, external), (541, 19));
     println!(
         "registry: {} actions ({} internal, {} external), all consistent",
         registry.len(),
@@ -1248,5 +1249,98 @@ fn committed_action_dump_matches_the_registry() {
         committed, expected,
         "docs/design/data/actions.json is stale; run \
          `conveyor admin actions dump --json --out docs/design/data/actions.json`"
+    );
+}
+
+/// The register read accepts the bare filters the record harness sends.
+///
+/// Regression measured at the post-merge head: every input to `registers.list` was refused
+/// 422 ("the input does not match the action schema"), which blocked the promotion replay and
+/// every check that reads the register.
+#[test]
+fn registers_list_accepts_its_filters() {
+    let spec = registry()
+        .get("registers.list")
+        .expect("registers.list is registered");
+    let schema = spec.input_schema();
+    for input in [
+        json!({}),
+        json!({"programme_id": "01a1d039-0d24-7d16-ae52-4841e96ccfac"}),
+    ] {
+        let errors = validate_input(&schema, &input);
+        assert!(
+            errors.is_empty(),
+            "input {input} refused: {}",
+            serde_json::to_string_pretty(&serde_json::to_value(&errors).unwrap_or_default())
+                .unwrap_or_default()
+        );
+    }
+}
+
+/// Every recorded governance input still matches its action's schema.
+///
+/// The promotion journal is the replay source for the programme record. An action whose
+/// schema starts refusing a recorded input breaks the replay without any test noticing —
+/// the 2026-11-23 register regression did exactly that (`registers.list` refused every
+/// filter, and the replay could not read the register back). This walks the committed
+/// journal, validates each entry's input file against the action's input schema, and
+/// fails with the action and file named.
+#[test]
+fn journal_inputs_match_their_action_schemas() {
+    let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../..");
+    let journal = root.join("docs/evidence/record/journal.jsonl");
+    let text = std::fs::read_to_string(&journal)
+        .unwrap_or_else(|error| panic!("read {}: {error}", journal.display()));
+    let mut checked = 0usize;
+    let mut refused: Vec<String> = Vec::new();
+    for (index, line) in text.lines().enumerate() {
+        let line = line.trim();
+        if line.is_empty() {
+            continue;
+        }
+        let entry: Value = serde_json::from_str(line)
+            .unwrap_or_else(|error| panic!("journal line {}: {error}", index + 1));
+        let Some(action) = entry.get("action").and_then(Value::as_str) else {
+            // The first record is the journal header, not an act.
+            continue;
+        };
+        let input_path = entry
+            .get("input")
+            .and_then(Value::as_str)
+            .unwrap_or_else(|| panic!("journal line {}: {action} has no input path", index + 1));
+        let path = root.join(input_path);
+        let raw = std::fs::read_to_string(&path)
+            .unwrap_or_else(|error| panic!("read {}: {error}", path.display()));
+        let mut input: Value = serde_json::from_str(&raw)
+            .unwrap_or_else(|error| panic!("parse {}: {error}", path.display()));
+        // The promotion replay resolves a `wbs.update` node from the entry's natural key
+        // (`wbs-accept:<project id>:<title>`) and injects the id before invoking the action
+        // (`scripts/promote-record.py`, `remap_payload`). The journal therefore stores the
+        // human's input, not the resolved payload; the test supplies the placeholder the
+        // replay would resolve, so the schema is still checked against every other field.
+        if action == "wbs.update" && input.get("id").is_none() {
+            input["id"] = json!("00000000-0000-0000-0000-000000000000");
+        }
+        let spec = registry()
+            .get(action)
+            .unwrap_or_else(|| panic!("journal names unregistered action {action}"));
+        let errors = validate_input(&spec.input_schema(), &input);
+        if !errors.is_empty() {
+            refused.push(format!(
+                "{action} refuses {input_path}: {}",
+                serde_json::to_string(&errors).unwrap_or_default()
+            ));
+        }
+        checked += 1;
+    }
+    assert!(
+        checked > 200,
+        "expected the full journal (250 acts), validated {checked}"
+    );
+    assert!(
+        refused.is_empty(),
+        "{} recorded inputs are refused by their action schema:\n{}",
+        refused.len(),
+        refused.join("\n")
     );
 }
