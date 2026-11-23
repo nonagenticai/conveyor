@@ -7388,6 +7388,192 @@
       "title": "The benefit profiles carry no comparative target for token spend per accepted deliverable"
     },
     {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --deep-review docs/evidence/record-w3/deep-review-findings.json --rework-check dr-w4-proj-baseline-scope-repeats:T13",
+      "apply_to": "PLATFORM",
+      "artefact": "code",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Each baseline heading maps to rows of its own kind (schedule/cost/approval) or an explicit absence naming the record; a fixture with one row per kind asserts each heading receives only its kind.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "path": "docs/evidence/record-w4/deep-review-findings.json",
+              "quote": "T13's baseline artefact publishes the same two kind=scope baseline rows under Schedule, Cost and Approval; no schedule, cost or approval baseline is present. The template's per-heading source does not filter by baseline kind.",
+              "source": "deep-review"
+            }
+          ],
+          "rule": "dr-w4-proj-baseline-scope-repeats",
+          "source": "audit"
+        }
+      ],
+      "key": "dr-w4-proj-baseline-scope-repeats:T13",
+      "kind": "STANDARD",
+      "owner_project": "T13",
+      "rule": "dr-w4-proj-baseline-scope-repeats",
+      "scope": "T13",
+      "severity": "P1",
+      "spec": "\u00a78",
+      "standard": "PMP",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "T13's baseline artefact publishes the same two kind=scope baseline rows under Schedule, Cost and Approval; no schedule, cost or approval baseline is present. The template's per-heading source does not filter by baseline kind.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "path": "docs/evidence/record-w4/deep-review-findings.json",
+                  "quote": "T13's baseline artefact publishes the same two kind=scope baseline rows under Schedule, Cost and Approval; no schedule, cost or approval baseline is present. The template's per-heading source does not filter by baseline kind.",
+                  "source": "deep-review"
+                }
+              ],
+              "rule": "dr-w4-proj-baseline-scope-repeats",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P1",
+          "subject": "T13"
+        }
+      ],
+      "title": "Schedule, Cost and Approval baseline headings all publish the same two kind=scope rows"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --deep-review docs/evidence/record-w3/deep-review-findings.json --rework-check dr-w4-proj-probe-row:PLATFORM",
+      "apply_to": "PLATFORM",
+      "artefact": "code",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "The probe row is retired from the live record (or replaced by a real row with a code); no published baseline or change-control body contains the probe title; a read-time query refuses a published register row whose code is empty.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "path": "docs/evidence/record-w4/deep-review-findings.json",
+              "quote": "A frozen baseline publishes a register row titled 'schema probe \u2014 delete me' with code '', and the same probe block repeats under Scope, Schedule, Cost and Approval in P0 and other projects. Test data has reached published governance artefacts, and a published row with an empty code is admitted.",
+              "source": "deep-review"
+            }
+          ],
+          "rule": "dr-w4-proj-probe-row",
+          "source": "audit"
+        }
+      ],
+      "key": "dr-w4-proj-probe-row:PLATFORM",
+      "kind": "RECORD",
+      "owner_project": "PLATFORM",
+      "rule": "dr-w4-proj-probe-row",
+      "scope": "PLATFORM",
+      "severity": "P1",
+      "spec": "\u00a78",
+      "standard": "PMP",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "A frozen baseline publishes a register row titled 'schema probe \u2014 delete me' with code '', and the same probe block repeats under Scope, Schedule, Cost and Approval in P0 and other projects. Test data has reached published governance artefacts, and a published row with an empty code is admitted.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "path": "docs/evidence/record-w4/deep-review-findings.json",
+                  "quote": "A frozen baseline publishes a register row titled 'schema probe \u2014 delete me' with code '', and the same probe block repeats under Scope, Schedule, Cost and Approval in P0 and other projects. Test data has reached published governance artefacts, and a published row with an empty code is admitted.",
+                  "source": "deep-review"
+                }
+              ],
+              "rule": "dr-w4-proj-probe-row",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P1",
+          "subject": "PLATFORM"
+        }
+      ],
+      "title": "A retired test row 'schema probe \u2014 delete me' is published across baselines and change-control sections"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --deep-review docs/evidence/record-w3/deep-review-findings.json --rework-check dr-w4-proj-wbs-empty:PLATFORM",
+      "apply_to": "PLATFORM",
+      "artefact": "code",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "A published work package carries a non-empty acceptance and at least one evidence reference, or the WBS row is refused at creation; the body never renders a zero-row block as its acceptance content.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "path": "docs/evidence/record-w4/deep-review-findings.json",
+              "quote": "PLATFORM's five WBS nodes carry acceptance [] and evidence [] with body '', and the same zero-row block is presented under both Acceptance and Work packages. Empty arrays are not acceptance evidence.",
+              "source": "deep-review"
+            }
+          ],
+          "rule": "dr-w4-proj-wbs-empty",
+          "source": "audit"
+        }
+      ],
+      "key": "dr-w4-proj-wbs-empty:PLATFORM",
+      "kind": "RECORD",
+      "owner_project": "PLATFORM",
+      "rule": "dr-w4-proj-wbs-empty",
+      "scope": "PLATFORM",
+      "severity": "P1",
+      "spec": "\u00a78",
+      "standard": "PMP",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "PLATFORM's five WBS nodes carry acceptance [] and evidence [] with body '', and the same zero-row block is presented under both Acceptance and Work packages. Empty arrays are not acceptance evidence.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "path": "docs/evidence/record-w4/deep-review-findings.json",
+                  "quote": "PLATFORM's five WBS nodes carry acceptance [] and evidence [] with body '', and the same zero-row block is presented under both Acceptance and Work packages. Empty arrays are not acceptance evidence.",
+                  "source": "deep-review"
+                }
+              ],
+              "rule": "dr-w4-proj-wbs-empty",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P1",
+          "subject": "PLATFORM"
+        }
+      ],
+      "title": "Every published work package carries empty acceptance and evidence arrays presented as content"
+    },
+    {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --deep-review docs/evidence/record-w3/deep-review-findings.json --rework-check std-pmp-project-brief-p0:P0",
       "apply_to": "P0",
       "artefact": "project-brief",
@@ -13322,6 +13508,130 @@
         }
       ],
       "title": "Put the project under an approved architecture contract"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --deep-review docs/evidence/record-w3/deep-review-findings.json --rework-check dr-w4-proj-compliance-decision:T2",
+      "apply_to": "PLATFORM",
+      "artefact": "code",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Each published review carries a typed outcome and its conditions; the Decision heading selects the governing review (the latest per project) and names it; a read-time query refuses a review row with a null outcome.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "path": "docs/evidence/record-w4/deep-review-findings.json",
+              "quote": "T2's Decision section publishes non_conformant and compliant reviews together, each with outcome null, no conditions, and no statement of which decision governs. A review with no outcome cannot govern a phase.",
+              "source": "deep-review"
+            }
+          ],
+          "rule": "dr-w4-proj-compliance-decision",
+          "source": "audit"
+        }
+      ],
+      "key": "dr-w4-proj-compliance-decision:T2",
+      "kind": "RECORD",
+      "owner_project": "T2",
+      "rule": "dr-w4-proj-compliance-decision",
+      "scope": "T2",
+      "severity": "P1",
+      "spec": "\u00a78",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "T2's Decision section publishes non_conformant and compliant reviews together, each with outcome null, no conditions, and no statement of which decision governs. A review with no outcome cannot govern a phase.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "path": "docs/evidence/record-w4/deep-review-findings.json",
+                  "quote": "T2's Decision section publishes non_conformant and compliant reviews together, each with outcome null, no conditions, and no statement of which decision governs. A review with no outcome cannot govern a phase.",
+                  "source": "deep-review"
+                }
+              ],
+              "rule": "dr-w4-proj-compliance-decision",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P1",
+          "subject": "T2"
+        }
+      ],
+      "title": "Compliance review Decision publishes non_conformant and compliant reviews with no governing outcome"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --deep-review docs/evidence/record-w3/deep-review-findings.json --rework-check dr-w4-proj-compliance-waivers:T2",
+      "apply_to": "PLATFORM",
+      "artefact": "code",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "The Waivers heading resolves from the project's waiver rows with their reason and reassessment date, or states an explicit 'none' with the count that proves it; the composer refuses a heading whose source list is empty unless the template declares an explicit-none form.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "path": "docs/evidence/record-w4/deep-review-findings.json",
+              "quote": "Required heading Waivers carries no JSON block and no waiver statement in every sampled compliance review. The composer published a heading with no facts because the waiver source resolved to an empty list presented as content.",
+              "source": "deep-review"
+            }
+          ],
+          "rule": "dr-w4-proj-compliance-waivers",
+          "source": "audit"
+        }
+      ],
+      "key": "dr-w4-proj-compliance-waivers:T2",
+      "kind": "RECORD",
+      "owner_project": "T2",
+      "rule": "dr-w4-proj-compliance-waivers",
+      "scope": "T2",
+      "severity": "P1",
+      "spec": "\u00a78",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "Required heading Waivers carries no JSON block and no waiver statement in every sampled compliance review. The composer published a heading with no facts because the waiver source resolved to an empty list presented as content.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "path": "docs/evidence/record-w4/deep-review-findings.json",
+                  "quote": "Required heading Waivers carries no JSON block and no waiver statement in every sampled compliance review. The composer published a heading with no facts because the waiver source resolved to an empty list presented as content.",
+                  "source": "deep-review"
+                }
+              ],
+              "rule": "dr-w4-proj-compliance-waivers",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P1",
+          "subject": "T2"
+        }
+      ],
+      "title": "The Waivers heading in all twelve sampled compliance reviews is the template sentence only"
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --deep-review docs/evidence/record-w3/deep-review-findings.json --rework-check mandatory_artefacts:tranche-0",
@@ -24282,6 +24592,130 @@
         }
       ],
       "title": "Complete the tranche plan"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --deep-review docs/evidence/record-w3/deep-review-findings.json --rework-check dr-w4-proj-change-control-impact:PLATFORM",
+      "apply_to": "PLATFORM",
+      "artefact": "code",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "The change-control heading maps to the field that carries the impact (meta.impact) or the row carries a typed impact column; a fixture with meta.impact set asserts the body shows it.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "path": "docs/evidence/record-w4/deep-review-findings.json",
+              "quote": "Four of five change rows publish impact:null while meta.impact holds the text; the same block repeats under Change requests and Decisions. The source projection reads the column, not the meta field the record actually uses.",
+              "source": "deep-review"
+            }
+          ],
+          "rule": "dr-w4-proj-change-control-impact",
+          "source": "audit"
+        }
+      ],
+      "key": "dr-w4-proj-change-control-impact:PLATFORM",
+      "kind": "STANDARD",
+      "owner_project": "PLATFORM",
+      "rule": "dr-w4-proj-change-control-impact",
+      "scope": "PLATFORM",
+      "severity": "P2",
+      "spec": "\u00a78",
+      "standard": "PMP",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "Four of five change rows publish impact:null while meta.impact holds the text; the same block repeats under Change requests and Decisions. The source projection reads the column, not the meta field the record actually uses.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "path": "docs/evidence/record-w4/deep-review-findings.json",
+                  "quote": "Four of five change rows publish impact:null while meta.impact holds the text; the same block repeats under Change requests and Decisions. The source projection reads the column, not the meta field the record actually uses.",
+                  "source": "deep-review"
+                }
+              ],
+              "rule": "dr-w4-proj-change-control-impact",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "PLATFORM"
+        }
+      ],
+      "title": "Change-control Impact publishes impact null although meta.impact carries the text"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --deep-review docs/evidence/record-w3/deep-review-findings.json --rework-check dr-w4-proj-change-control-placeholder:P0",
+      "apply_to": "P0",
+      "artefact": "code",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "The B1-B6 benefit profiles carry measured baselines with complete groups, or the change record names the missing measurement as an open action; no published body states that its own data is a placeholder.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "path": "docs/evidence/record-w4/deep-review-findings.json",
+              "quote": "P0's change-control body states 'B1-B6 carry a placeholder baseline and incomplete groups' and the B4 row publishes body:'' and code:''. Placeholder baseline data is published as change content.",
+              "source": "deep-review"
+            }
+          ],
+          "rule": "dr-w4-proj-change-control-placeholder",
+          "source": "audit"
+        }
+      ],
+      "key": "dr-w4-proj-change-control-placeholder:P0",
+      "kind": "RECORD",
+      "owner_project": "P0",
+      "rule": "dr-w4-proj-change-control-placeholder",
+      "scope": "P0",
+      "severity": "P2",
+      "spec": "\u00a78",
+      "standard": "PMP",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "P0's change-control body states 'B1-B6 carry a placeholder baseline and incomplete groups' and the B4 row publishes body:'' and code:''. Placeholder baseline data is published as change content.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "path": "docs/evidence/record-w4/deep-review-findings.json",
+                  "quote": "P0's change-control body states 'B1-B6 carry a placeholder baseline and incomplete groups' and the B4 row publishes body:'' and code:''. Placeholder baseline data is published as change content.",
+                  "source": "deep-review"
+                }
+              ],
+              "rule": "dr-w4-proj-change-control-placeholder",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "P0"
+        }
+      ],
+      "title": "A published change row admits that B1-B6 carry a placeholder baseline"
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --deep-review docs/evidence/record-w3/deep-review-findings.json --rework-check std-pmp-change-control-s06:S06",
@@ -42392,6 +42826,68 @@
         }
       ],
       "title": "Plan the project's WBS"
+    },
+    {
+      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --deep-review docs/evidence/record-w3/deep-review-findings.json --rework-check dr-w4-proj-delivery-contract-commitments:T13",
+      "apply_to": "PLATFORM",
+      "artefact": "code",
+      "baseline": null,
+      "depends_on": [],
+      "disposition": "rework",
+      "dod": [
+        {
+          "item": "Each commitment heading maps to its own field (commitments, conditions, acceptance criteria) or an explicit absence; the published contract names its commitments, not a repeated contract row.",
+          "met": false
+        }
+      ],
+      "evidence": [
+        {
+          "evidence": [
+            {
+              "path": "docs/evidence/record-w4/deep-review-findings.json",
+              "quote": "T13's delivery contract publishes one contract record under all three required headings; its body has no commitments field or commitment text, so the headings duplicate the row.",
+              "source": "deep-review"
+            }
+          ],
+          "rule": "dr-w4-proj-delivery-contract-commitments",
+          "source": "audit"
+        }
+      ],
+      "key": "dr-w4-proj-delivery-contract-commitments:T13",
+      "kind": "STANDARD",
+      "owner_project": "T13",
+      "rule": "dr-w4-proj-delivery-contract-commitments",
+      "scope": "T13",
+      "severity": "P2",
+      "spec": "\u00a78",
+      "standard": "TOGAF",
+      "status": "open",
+      "subject_count": 1,
+      "subjects": [
+        {
+          "detail": "T13's delivery contract publishes one contract record under all three required headings; its body has no commitments field or commitment text, so the headings duplicate the row.",
+          "disposition": "rework",
+          "evidence": [
+            {
+              "evidence": [
+                {
+                  "path": "docs/evidence/record-w4/deep-review-findings.json",
+                  "quote": "T13's delivery contract publishes one contract record under all three required headings; its body has no commitments field or commitment text, so the headings duplicate the row.",
+                  "source": "deep-review"
+                }
+              ],
+              "rule": "dr-w4-proj-delivery-contract-commitments",
+              "source": "audit"
+            }
+          ],
+          "expires": null,
+          "owner": null,
+          "reason": null,
+          "severity": "P2",
+          "subject": "T13"
+        }
+      ],
+      "title": "All three delivery-contract commitment headings publish the identical contract record"
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --deep-review docs/evidence/record-w3/deep-review-findings.json --rework-check std-togaf-architecture-artifact-design-publish:DESIGN-PUBLISH",
@@ -78406,7 +78902,7 @@
       "p0": 0,
       "p1": 0,
       "p2": 0,
-      "packages": 121,
+      "packages": 126,
       "rules": 0,
       "rules_clean": 0,
       "rules_with_gaps": 0,
@@ -78442,7 +78938,7 @@
       "p0": 0,
       "p1": 51,
       "p2": 0,
-      "packages": 425,
+      "packages": 428,
       "rules": 9,
       "rules_clean": 6,
       "rules_with_gaps": 3,
@@ -78453,29 +78949,29 @@
   "summary": {
     "by_kind": {
       "CODE": 68,
-      "RECORD": 632,
-      "STANDARD": 10
+      "RECORD": 637,
+      "STANDARD": 13
     },
     "by_severity": {
       "P0": 27,
-      "P1": 207,
-      "P2": 476
+      "P1": 212,
+      "P2": 479
     },
     "by_standard": {
       "MSP": 75,
-      "PMP": 121,
+      "PMP": 126,
       "SAFe": 25,
       "SPEC": 64,
-      "TOGAF": 425
+      "TOGAF": 428
     },
     "by_status": {
-      "open": 710
+      "open": 718
     },
     "duplicates": 0,
-    "open": 710,
-    "packages": 710,
+    "open": 718,
+    "packages": 718,
     "resolved": 126,
-    "subjects": 787,
+    "subjects": 795,
     "suppressed": 0
   }
 }
