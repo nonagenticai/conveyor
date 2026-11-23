@@ -1107,7 +1107,17 @@ fn model_reply(body: &Value) -> Result<ModelReply, ActionError> {
             let name = call
                 .pointer("/function/name")
                 .and_then(Value::as_str)
-                .ok_or_else(|| bad_response("a tool call has no function.name"))?;
+                .filter(|name| !name.is_empty())
+                .ok_or_else(|| {
+                    ActionError::new(
+                        422,
+                        "inference-bad-tool-call",
+                        format!(
+                            "{MODEL_ACTION}: tool call {index} has no function.name; refusing a \
+                             call that names nothing"
+                        ),
+                    )
+                })?;
             let arguments = match call.pointer("/function/arguments") {
                 Some(Value::String(raw)) if raw.trim().is_empty() => json!({}),
                 Some(Value::String(raw)) => serde_json::from_str(raw).map_err(|error| {
@@ -1239,6 +1249,26 @@ mod tests {
         let error = model_reply(&body).expect_err("a partial argument payload must not execute");
         assert_eq!(error.code, "inference-bad-tool-arguments");
         assert_eq!(error.status, 422);
+    }
+
+    #[test]
+    fn a_tool_call_with_no_name_is_a_typed_refusal_not_a_retried_5xx() {
+        let body = json!({
+            "output": {"choices": [{
+                "finish_reason": "tool_calls",
+                "message": {"tool_calls": [{
+                    "id": "call-1",
+                    "type": "function",
+                    "function": {"arguments": "{}"}
+                }]}
+            }]}
+        });
+        let error = model_reply(&body).expect_err("a nameless call must not execute");
+        assert_eq!(error.code, "inference-bad-tool-call");
+        assert_eq!(
+            error.status, 422,
+            "non-retryable: a 5xx would re-buy the call"
+        );
     }
 
     #[test]

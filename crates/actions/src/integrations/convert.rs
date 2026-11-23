@@ -196,9 +196,59 @@ pub async fn convert(request: &ConvertRequest<'_>) -> Result<ModelDraft, ActionE
         .json()
         .await
         .map_err(|_| ActionError::upstream_failed(SERVICE, 502))?;
-    let content = document["choices"][0]["message"]["content"]
+    draft_from_document(&document)
+}
+
+/// The model's draft from the router's OpenAI-shaped document.
+///
+/// A `length` finish is refused **before** the content is read: its visible tail can look like a complete
+/// JSON document. 422, not 5xx — the workflow tick maps 5xx to `Deferred` and would re-buy the same capped
+/// call.
+fn draft_from_document(document: &serde_json::Value) -> Result<ModelDraft, ActionError> {
+    let choice = &document["choices"][0];
+    if choice["finish_reason"].as_str() == Some("length") {
+        return Err(ActionError::new(
+            422,
+            "inference-truncated",
+            "procedures.ingest_sop: the router's answer was truncated at its token cap \
+             (finish_reason \"length\"); refusing the partial document",
+        ));
+    }
+    let content = choice["message"]["content"]
         .as_str()
         .ok_or_else(|| ActionError::upstream_failed(SERVICE, 502))?;
     serde_json::from_str::<ModelDraft>(content)
         .map_err(|_| ActionError::upstream_failed(SERVICE, 502))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn a_truncated_answer_is_refused_before_it_is_parsed() {
+        // The content is a complete-looking JSON document; only `finish_reason` says it was cut.
+        let document = serde_json::json!({
+            "choices": [{
+                "finish_reason": "length",
+                "message": {"content": "{\"domain\": \"(define (domain d))\"}"}
+            }]
+        });
+        let error = draft_from_document(&document).unwrap_err();
+        assert_eq!(error.status, 422);
+        assert_eq!(error.code, "inference-truncated");
+    }
+
+    #[test]
+    fn a_complete_answer_parses() {
+        let document = serde_json::json!({
+            "choices": [{
+                "finish_reason": "stop",
+                "message": {"content": "{\"domain\": \"(define (domain d))\", \"init\": [\"ready\"]}"}
+            }]
+        });
+        let draft = draft_from_document(&document).unwrap();
+        assert_eq!(draft.domain, "(define (domain d))");
+        assert_eq!(draft.init, vec!["ready".to_owned()]);
+    }
 }
