@@ -627,6 +627,13 @@ pub struct FlowOut {
     pub queue_time_seconds: Option<f64>,
     pub block_time_seconds: Option<f64>,
     pub flow_efficiency: Option<f64>,
+    /// Runs in the window that were rework: a retry (`run.attempt > 1`) or a run an approval
+    /// returned (`approval.status = 'rejected'`).
+    pub rework_count: i64,
+    /// Every run in the window — the ratio's denominator.
+    pub total_count: i64,
+    /// `rework_count / total_count`, null when the window had no runs (never NaN).
+    pub rework_rate: Option<f64>,
     pub unavailable: Vec<UnavailableOut>,
 }
 
@@ -650,6 +657,10 @@ async fn metrics_flow(
     let flow = store::metrics::flow_tx(&mut *tx, ctx.tenant, input.project_id, since, until)
         .await
         .map_err(|error| metrics_error(error, ctx.action))?;
+    let rework =
+        store::metrics::rework_totals_tx(&mut *tx, ctx.tenant, input.project_id, since, until)
+            .await
+            .map_err(|error| metrics_error(error, ctx.action))?;
     Ok(FlowOut {
         wip: flow.wip,
         throughput: flow.throughput,
@@ -658,6 +669,13 @@ async fn metrics_flow(
         queue_time_seconds: flow.queue_time_seconds,
         block_time_seconds: flow.block_time_seconds,
         flow_efficiency: flow.flow_efficiency,
+        rework_count: rework.rework,
+        total_count: rework.total,
+        rework_rate: if rework.total == 0 {
+            None
+        } else {
+            Some(rework.rework as f64 / rework.total as f64)
+        },
         unavailable: vec![
             UnavailableOut {
                 metric: "knowledge.lesson_promotion_rate".to_owned(),

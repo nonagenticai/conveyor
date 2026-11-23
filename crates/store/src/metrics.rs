@@ -264,6 +264,52 @@ pub async fn run_totals_tx(
     )
 }
 
+/// Rework counts over `[since, until)`: the terms of the rework rate.
+#[derive(Debug, Clone, Copy, sqlx::FromRow)]
+pub struct ReworkTotals {
+    /// Every run in the window — the ratio's denominator.
+    pub total: i64,
+    /// The runs that were rework: a retry, or a run an approval returned.
+    pub rework: i64,
+}
+
+/// Rework is derived at read time from the run and approval rows, never stored (D37).
+///
+/// A run is rework when the card was executed again on a later attempt (`run.attempt > 1`, the
+/// sequence [`super::run::next_attempt_for_card_tx`] derives) or when an [`approval`] on it has
+/// `status = 'rejected'` — the card was returned. Both counts are returned beside each other so a
+/// caller can expose the ratio with its own terms; the rate itself is the caller's division.
+pub async fn rework_totals_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    project_id: Option<Uuid>,
+    since: DateTime<Utc>,
+    until: DateTime<Utc>,
+) -> Result<ReworkTotals, MetricsStoreError> {
+    let row = sqlx::query_as::<_, ReworkTotals>(
+        "SELECT count(*)::bigint AS total,
+                count(*) FILTER (
+                    WHERE r.attempt > 1
+                       OR EXISTS (
+                           SELECT 1
+                             FROM approval a
+                            WHERE a.tenant_id = r.tenant_id
+                              AND a.run_id = r.id
+                              AND a.status = 'rejected'
+                       ))::bigint AS rework
+           FROM run r
+          WHERE r.tenant_id = $1 AND r.created_at >= $2 AND r.created_at < $3
+            AND ($4::uuid IS NULL OR r.project_id = $4)",
+    )
+    .bind(tenant.as_uuid())
+    .bind(since)
+    .bind(until)
+    .bind(project_id)
+    .fetch_one(&mut *conn)
+    .await?;
+    Ok(row)
+}
+
 /// Tokens recorded in the inference ledger over `[since, until)`.
 pub async fn token_totals_tx(
     conn: &mut PgConnection,
