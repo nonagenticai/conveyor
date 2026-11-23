@@ -6,7 +6,21 @@
 
 mod support;
 
+use conveyor_store::begin_scoped;
 use serde_json::json;
+
+/// Count the tenant's katas INSIDE its scope. Under FORCE RLS an unscoped `pg.owner` count is
+/// zero for every tenant, so an unscoped assertion would pass vacuously.
+async fn kata_count(pg: &support::Pg, seeded: &support::Seeded) -> i64 {
+    let mut tx = begin_scoped(&pg.owner, seeded.tenant).await.expect("scope");
+    let count: i64 = sqlx::query_scalar("SELECT count(*) FROM kata WHERE tenant_id = $1")
+        .bind(seeded.tenant_id)
+        .fetch_one(&mut *tx)
+        .await
+        .expect("count katas");
+    tx.commit().await.expect("commit");
+    count
+}
 
 #[tokio::test]
 async fn a_kata_without_an_instrument_is_not_opened() {
@@ -70,11 +84,7 @@ async fn a_kata_without_an_instrument_is_not_opened() {
         "the refusal names the missing threshold: {body}"
     );
 
-    let count: i64 = sqlx::query_scalar("SELECT count(*) FROM kata WHERE tenant_id = $1")
-        .bind(anchor.seeded.tenant_id)
-        .fetch_one(&pg.owner)
-        .await
-        .expect("count katas");
+    let count = kata_count(&pg, &anchor.seeded).await;
     assert_eq!(count, 0, "no kata exists");
 
     running.shutdown().await;
@@ -125,11 +135,7 @@ async fn a_second_kata_for_an_open_signature_is_refused() {
         "the refusal names the existing kata {first}: {body}"
     );
 
-    let count: i64 = sqlx::query_scalar("SELECT count(*) FROM kata WHERE tenant_id = $1")
-        .bind(anchor.seeded.tenant_id)
-        .fetch_one(&pg.owner)
-        .await
-        .expect("count katas");
+    let count = kata_count(&pg, &anchor.seeded).await;
     assert_eq!(count, 1, "one signature owns one open kata");
 
     running.shutdown().await;

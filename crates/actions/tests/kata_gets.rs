@@ -7,6 +7,7 @@
 
 mod support;
 
+use conveyor_store::begin_scoped;
 use serde_json::json;
 use uuid::Uuid;
 
@@ -80,14 +81,21 @@ async fn the_prediction_is_recorded_before_the_measurement() {
         body["type"], "prediction_missing",
         "the refusal names the missing pre-registration: {body}"
     );
+    // The count runs INSIDE the tenant's scope: `kata_measurement` has FORCE ROW LEVEL
+    // SECURITY, so an unscoped `pg.owner` count is zero for every tenant and would prove
+    // nothing.
+    let mut tx = begin_scoped(&pg.owner, anchor.seeded.tenant)
+        .await
+        .expect("scope");
     let measurements: i64 = sqlx::query_scalar(
         "SELECT count(*) FROM kata_measurement WHERE tenant_id = $1 AND kata_id = $2",
     )
     .bind(anchor.seeded.tenant_id)
     .bind(Uuid::parse_str(&kata_id).expect("kata uuid"))
-    .fetch_one(&pg.owner)
+    .fetch_one(&mut *tx)
     .await
     .expect("count measurements");
+    tx.commit().await.expect("commit");
     assert_eq!(measurements, 0, "the refused measurement wrote no row");
 
     // ── the Gets, in the procedure's order ────────────────────────────────────────────

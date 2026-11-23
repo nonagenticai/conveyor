@@ -160,14 +160,20 @@ async fn a_flat_or_incomparable_result_adopts_nothing() {
         json!(null),
         "a flat result is not a regression: nothing is reverted"
     );
+    // Inside the tenant's scope: `kata_revert` has FORCE ROW LEVEL SECURITY, so an unscoped
+    // `pg.owner` count is zero whether or not a row exists.
+    let mut tx = conveyor_store::begin_scoped(&pg.owner, anchor.seeded.tenant)
+        .await
+        .expect("scope");
     let reverted: i64 = sqlx::query_scalar(
         "SELECT count(*) FROM kata_revert WHERE tenant_id = $1 AND kata_id = $2",
     )
     .bind(anchor.seeded.tenant_id)
     .bind(Uuid::parse_str(&kata_id).expect("kata uuid"))
-    .fetch_one(&pg.owner)
+    .fetch_one(&mut *tx)
     .await
     .expect("count reverts");
+    tx.commit().await.expect("commit");
     assert_eq!(reverted, 0, "no revert row");
     assert_eq!(
         procedure_statuses(&pg, &anchor.seeded, "flat-rule").await,
