@@ -164,6 +164,30 @@ def source_summary(entry: dict[str, Any], category: str) -> dict[str, Any]:
     }
 
 
+def source_is_self_document(
+    source: dict[str, Any],
+    template: dict[str, Any],
+    subject: dict[str, Any],
+    category: str,
+    gen,
+) -> bool:
+    """Does this source cite the artefact's own document category?"""
+    if str(source.get("kind") or "") != "documents":
+        return False
+    own = str(template.get("document_category") or "")
+    if not own:
+        return False
+    wanted = str(
+        gen.substitute(
+            (source.get("match") or {}).get("category", "$category"),
+            subject,
+            own or category,
+            subject.get("phase"),
+        )
+    )
+    return wanted == own
+
+
 def source_count(
     gen,
     template: dict[str, Any],
@@ -270,6 +294,27 @@ def compose(
                 "MISSING_SOURCE",
                 f"required heading {heading!r} declares no source",
                 heading=heading,
+            )
+        # A heading that cites only its own document is a heading without facts — the business
+        # case's four headings that published the business case itself. A template whose body is
+        # authored directly (project brief, vision, …) declares `document_authored`, and only
+        # then may the document carry the heading.
+        active = [source for source in declared if not source.get("optional")]
+        if (
+            active
+            and template.get("document_authored") is not True
+            and all(
+                source_is_self_document(source, template, subject, category, gen)
+                for source in active
+            )
+        ):
+            refuse(
+                "SELF_REFERENCE",
+                f"required heading {heading!r} cites only its own document "
+                f"{template.get('document_category')!r}; declare the template "
+                "`document_authored` if the document body carries the facts",
+                heading=heading,
+                category=str(template.get("document_category") or ""),
             )
         absences: list[str] = []
         fallback_absences: list[str] = []
@@ -389,9 +434,13 @@ def self_test_compose(gen) -> None:
                 "programme": [{"id": "pg1", "name": "Fixture", "status": "active"}],
                 "projects": [{
                     "id": "p1", "key": "P1", "programme_id": "pg1", "status": "active",
-                    "meta": {"measured_status": "active"},
+                    "meta": {"measured_status": "active", "expected_outputs": ["vision"]},
                 }],
             },
+            "artefacts": {"documents": [{
+                "id": "d1", "category": "vision", "project_id": "p1",
+                "publishable": True, "created_at": "2026-11-20T00:00:00Z", "title": "Vision",
+            }]},
             "msp": {
                 "register_items": [{"id": "i1", "kind": "issue", "title": "One issue", "status": "open"}],
                 "project_baselines": [
@@ -406,6 +455,9 @@ def self_test_compose(gen) -> None:
         }
         for name, document in snapshot.items():
             (root / f"{name}.json").write_text(json.dumps(document), encoding="utf-8")
+        (root / "output-d1.html").write_text(
+            "<h1>Vision</h1><h2>Purpose</h2>", encoding="utf-8"
+        )
         standard = {"templates": {
             "probe": {
                 "required": ["Alpha", "Beta"],
@@ -457,6 +509,29 @@ def self_test_compose(gen) -> None:
             assert exc.code == "NO_EVIDENCE", exc.code
         else:
             raise AssertionError("an all-absence body must refuse NO_EVIDENCE")
+        # A self-document heading is refused unless the template declares itself authored. The
+        # fixture's d1 vision page carries `Purpose`, so the flagged template composes and the
+        # unflagged one must refuse: the mutant that deletes the guard dies here.
+        vision = {
+            "required": ["Purpose"],
+            "skeleton": "# Vision\n\n## Purpose\n\nP.\n",
+            "standard": "MSP", "level": "project", "subject_kind": "project",
+            "mandatory": True, "spec": "§8.3", "document_category": "vision",
+            "sources": {"Purpose": [{
+                "kind": "documents", "file": "artefacts.json", "pointer": "/documents",
+                "match": {"category": "vision"},
+            }]},
+        }
+        standard["templates"]["vision"] = dict(vision)
+        try:
+            compose(gen, standard, snapshot, root, "vision", "project", "p1")
+        except Refusal as exc:
+            assert exc.code == "SELF_REFERENCE", exc.code
+        else:
+            raise AssertionError("an authored template must declare document_authored")
+        standard["templates"]["vision"]["document_authored"] = True
+        summary = compose(gen, standard, snapshot, root, "vision", "project", "p1")
+        assert "## Purpose" in summary["body"], summary["body"]
         def section_text(body: str, heading: str) -> str:
             parts: list[str] = []
             current = ""

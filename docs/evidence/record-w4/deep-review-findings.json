@@ -15,7 +15,7 @@
       "resolved_by": {
         "commit": "e8626660584a7ef7450d88849da3557c89f34bf0",
         "test": "scripts/compose-artefact-bodies.py --self-test",
-        "evidence": "seed/output-standard.json#business-case maps Why now to the issue rows and the programme row, Benefit map to benefit_links and benefit_profiles, Cost and risk posture to the risk register, and Licensing frame to governed_assets kind licensing_frame with a fallback absence naming the record. The compose self-test proves the absence and fallback mechanism and the per-kind baseline; the business case body composed at this commit carries facts or the explicit absence, never the document itself."
+        "evidence": "seed/output-standard.json#business-case maps Why now to the issue rows and the programme row, Benefit map to benefit_links and benefit_profiles, Cost and risk posture to the risk register, and Licensing frame to governed_assets kind licensing_frame with a fallback absence naming the record. The compose self-test proves the absence and fallback mechanism and the per-kind baseline; the business case body composed at this commit carries facts or the explicit absence, never the document itself. The composer refuses a self-document heading unless the template declares document_authored; the 23 authored templates declare it and the business case does not."
       }
     },
     {
@@ -60,7 +60,7 @@
       "resolved_by": {
         "commit": "e8626660584a7ef7450d88849da3557c89f34bf0",
         "test": "scripts/compose-artefact-bodies.py --self-test",
-        "evidence": "The Current, intermediate and target states heading maps to governed_assets kind blueprint-states with a fallback absence naming the record; baseline metadata is no longer presented as the states."
+        "evidence": "The Current, intermediate and target states heading maps to governed_assets kind blueprint-states with a fallback absence naming the record; baseline metadata is no longer presented as the states. Composed against docs/design/data at this commit, the states heading renders the explicit absence and no baseline metadata."
       }
     },
     {
@@ -235,7 +235,7 @@
       "resolved_by": {
         "commit": "e8626660584a7ef7450d88849da3557c89f34bf0",
         "test": "scripts/compose-artefact-bodies.py --self-test",
-        "evidence": "Commitments and Compliance method map to contract_field with fallback absences naming the fields, and Approval maps to contract_approval by the contract's own approval_id; the T13 body no longer repeats one contract row under all three headings."
+        "evidence": "Commitments and Compliance method map to contract_field with fallback absences naming the fields, and Approval maps to contract_approval by the contract's own approval_id; the T13 body no longer repeats one contract row under all three headings. Composed for T13 against docs/design/data at this commit, Commitments and Compliance method render their explicit absences and Approval resolves by the contract's own approval_id."
       }
     }
   ]
