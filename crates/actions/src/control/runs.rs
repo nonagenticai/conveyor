@@ -298,7 +298,7 @@ async fn runs_create(
     // v1-p44-1 (SPEC_V2 §4.4): a ROOT run's executor is the agent its binding pins. `runs.create`
     // has no process to resolve an agent from, so the binding is authoritative; a binding that
     // pins no agent, or no binding at all, records `None`.
-    let mut capability_agent_id: Option<Uuid> = None;
+    let mut capability_agent_id = capability_agent_id;
     if let Some(binding_id) = input.job_binding_id {
         let binding = store::organisation::job_binding_get_tx(&mut *tx, ctx.tenant, binding_id)
             .await
