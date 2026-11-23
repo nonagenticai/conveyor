@@ -1,0 +1,20 @@
+{
+  "id": "01a1e9df-1e42-7199-87e1-23c577c62f8e",
+  "baseline": {
+    "definition": "one ownership matrix home at 2026-11-22",
+    "value": 1,
+    "unit": "model stores",
+    "measured_at": "2026-11-22",
+    "method": "the ownership matrix's one home",
+    "evidence": {
+      "detail": {
+        "gate": "T0 manifest",
+        "stores": 1
+      },
+      "instrument": "the ownership matrix's one home",
+      "reference": "B5",
+      "value": 1.0
+    }
+  },
+  "change_id": "01a2076b-1440-7e1a-9abd-1bf16c7e152c"
+}

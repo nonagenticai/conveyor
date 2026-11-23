@@ -438,7 +438,8 @@ def check_benefit_baseline(
         missing = [
             field
             for field in ("value", "unit", "measured_at", "method", "evidence")
-            if not baseline.get(field)
+            if baseline.get(field) is None
+            or (isinstance(baseline.get(field), str) and not baseline.get(field).strip())
         ]
         if missing:
             return False, f"benefit {profile.get('id')} baseline is missing {', '.join(missing)}"
@@ -1572,6 +1573,9 @@ severity = "P0"
             )
 
     safe_case("ok", base_msp, base_outputs, True)
+    zero_baseline = copy.deepcopy(base_msp)
+    zero_baseline["benefit_profiles"][0]["baseline"]["value"] = 0
+    safe_case("zero-baseline", zero_baseline, copy.deepcopy(base_outputs), True)
 
     def mutate(name: str, change) -> None:
         msp = copy.deepcopy(base_msp)
