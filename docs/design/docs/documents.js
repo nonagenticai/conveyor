@@ -452,6 +452,15 @@ window.CONVEYOR_DOCUMENTS = {
       "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/S21-WORKPACKAGE.md"
     },
     {
+      "title": "T19 plan audit — independent verification record",
+      "path": "docs/evidence/T19-plan-audit.html",
+      "source": "docs/evidence/T19-plan-audit.md",
+      "section": "Evidence",
+      "sha256": "74e99f19a2c24033195e63f2e31e30c1cd6f8c8086091c950987a7c418c7d084",
+      "bytes": 4302,
+      "source_url": "https://github.com/nonagenticai/conveyor/blob/main/docs/evidence/T19-plan-audit.md"
+    },
+    {
       "title": "The analysis service — capture and drop table (2026-11-15)",
       "path": "docs/evidence/analysis-capture-2026-11-15.html",
       "source": "docs/evidence/analysis-capture-2026-11-15.md",
