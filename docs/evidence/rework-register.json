@@ -60,226 +60,6 @@
       "title": "Publish the project's closure review"
     },
     {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check closed_without_closure_review:T0",
-      "apply_to": "PLATFORM",
-      "artefact": "closure_review",
-      "baseline": {
-        "disposition": "rework",
-        "earliest_expires": null,
-        "entries": 1,
-        "owners": []
-      },
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "A closure review output is published for the project",
-          "met": false
-        },
-        {
-          "item": "The audit reports no closed_without_closure_review gap for the project",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "file": "programme.json",
-          "rule": "closed_without_closure_review",
-          "source": "snapshot",
-          "subjects": [
-            "T0"
-          ]
-        }
-      ],
-      "key": "closed_without_closure_review:T0",
-      "owner_project": "T0",
-      "rule": "closed_without_closure_review",
-      "scope": "T0",
-      "severity": "P0",
-      "spec": "\u00a78.4",
-      "standard": "MSP",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "project is closed but its closure review is not published",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P0",
-          "subject": "T0"
-        }
-      ],
-      "title": "Publish the project's closure review"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check closed_without_closure_review:T1",
-      "apply_to": "PLATFORM",
-      "artefact": "closure_review",
-      "baseline": {
-        "disposition": "rework",
-        "earliest_expires": null,
-        "entries": 1,
-        "owners": []
-      },
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "A closure review output is published for the project",
-          "met": false
-        },
-        {
-          "item": "The audit reports no closed_without_closure_review gap for the project",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "file": "programme.json",
-          "rule": "closed_without_closure_review",
-          "source": "snapshot",
-          "subjects": [
-            "T1"
-          ]
-        }
-      ],
-      "key": "closed_without_closure_review:T1",
-      "owner_project": "T1",
-      "rule": "closed_without_closure_review",
-      "scope": "T1",
-      "severity": "P0",
-      "spec": "\u00a78.4",
-      "standard": "MSP",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "project is closed but its closure review is not published",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P0",
-          "subject": "T1"
-        }
-      ],
-      "title": "Publish the project's closure review"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check closed_without_closure_review:T10",
-      "apply_to": "PLATFORM",
-      "artefact": "closure_review",
-      "baseline": {
-        "disposition": "rework",
-        "earliest_expires": null,
-        "entries": 1,
-        "owners": []
-      },
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "A closure review output is published for the project",
-          "met": false
-        },
-        {
-          "item": "The audit reports no closed_without_closure_review gap for the project",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "file": "programme.json",
-          "rule": "closed_without_closure_review",
-          "source": "snapshot",
-          "subjects": [
-            "T10"
-          ]
-        }
-      ],
-      "key": "closed_without_closure_review:T10",
-      "owner_project": "T10",
-      "rule": "closed_without_closure_review",
-      "scope": "T10",
-      "severity": "P0",
-      "spec": "\u00a78.4",
-      "standard": "MSP",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "project is closed but its closure review is not published",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P0",
-          "subject": "T10"
-        }
-      ],
-      "title": "Publish the project's closure review"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check closed_without_closure_review:T13",
-      "apply_to": "PLATFORM",
-      "artefact": "closure_review",
-      "baseline": {
-        "disposition": "rework",
-        "earliest_expires": null,
-        "entries": 1,
-        "owners": []
-      },
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "A closure review output is published for the project",
-          "met": false
-        },
-        {
-          "item": "The audit reports no closed_without_closure_review gap for the project",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "file": "programme.json",
-          "rule": "closed_without_closure_review",
-          "source": "snapshot",
-          "subjects": [
-            "T13"
-          ]
-        }
-      ],
-      "key": "closed_without_closure_review:T13",
-      "owner_project": "T13",
-      "rule": "closed_without_closure_review",
-      "scope": "T13",
-      "severity": "P0",
-      "spec": "\u00a78.4",
-      "standard": "MSP",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "project is closed but its closure review is not published",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P0",
-          "subject": "T13"
-        }
-      ],
-      "title": "Publish the project's closure review"
-    },
-    {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check closed_without_closure_review:T14",
       "apply_to": "PLATFORM",
       "artefact": "closure_review",
@@ -332,226 +112,6 @@
           "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P0",
           "subject": "T14"
-        }
-      ],
-      "title": "Publish the project's closure review"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check closed_without_closure_review:T2",
-      "apply_to": "PLATFORM",
-      "artefact": "closure_review",
-      "baseline": {
-        "disposition": "rework",
-        "earliest_expires": null,
-        "entries": 1,
-        "owners": []
-      },
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "A closure review output is published for the project",
-          "met": false
-        },
-        {
-          "item": "The audit reports no closed_without_closure_review gap for the project",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "file": "programme.json",
-          "rule": "closed_without_closure_review",
-          "source": "snapshot",
-          "subjects": [
-            "T2"
-          ]
-        }
-      ],
-      "key": "closed_without_closure_review:T2",
-      "owner_project": "T2",
-      "rule": "closed_without_closure_review",
-      "scope": "T2",
-      "severity": "P0",
-      "spec": "\u00a78.4",
-      "standard": "MSP",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "project is closed but its closure review is not published",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P0",
-          "subject": "T2"
-        }
-      ],
-      "title": "Publish the project's closure review"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check closed_without_closure_review:T3",
-      "apply_to": "PLATFORM",
-      "artefact": "closure_review",
-      "baseline": {
-        "disposition": "rework",
-        "earliest_expires": null,
-        "entries": 1,
-        "owners": []
-      },
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "A closure review output is published for the project",
-          "met": false
-        },
-        {
-          "item": "The audit reports no closed_without_closure_review gap for the project",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "file": "programme.json",
-          "rule": "closed_without_closure_review",
-          "source": "snapshot",
-          "subjects": [
-            "T3"
-          ]
-        }
-      ],
-      "key": "closed_without_closure_review:T3",
-      "owner_project": "T3",
-      "rule": "closed_without_closure_review",
-      "scope": "T3",
-      "severity": "P0",
-      "spec": "\u00a78.4",
-      "standard": "MSP",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "project is closed but its closure review is not published",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P0",
-          "subject": "T3"
-        }
-      ],
-      "title": "Publish the project's closure review"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check closed_without_closure_review:T4",
-      "apply_to": "PLATFORM",
-      "artefact": "closure_review",
-      "baseline": {
-        "disposition": "rework",
-        "earliest_expires": null,
-        "entries": 1,
-        "owners": []
-      },
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "A closure review output is published for the project",
-          "met": false
-        },
-        {
-          "item": "The audit reports no closed_without_closure_review gap for the project",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "file": "programme.json",
-          "rule": "closed_without_closure_review",
-          "source": "snapshot",
-          "subjects": [
-            "T4"
-          ]
-        }
-      ],
-      "key": "closed_without_closure_review:T4",
-      "owner_project": "T4",
-      "rule": "closed_without_closure_review",
-      "scope": "T4",
-      "severity": "P0",
-      "spec": "\u00a78.4",
-      "standard": "MSP",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "project is closed but its closure review is not published",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P0",
-          "subject": "T4"
-        }
-      ],
-      "title": "Publish the project's closure review"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check closed_without_closure_review:T9",
-      "apply_to": "PLATFORM",
-      "artefact": "closure_review",
-      "baseline": {
-        "disposition": "rework",
-        "earliest_expires": null,
-        "entries": 1,
-        "owners": []
-      },
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "A closure review output is published for the project",
-          "met": false
-        },
-        {
-          "item": "The audit reports no closed_without_closure_review gap for the project",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "file": "programme.json",
-          "rule": "closed_without_closure_review",
-          "source": "snapshot",
-          "subjects": [
-            "T9"
-          ]
-        }
-      ],
-      "key": "closed_without_closure_review:T9",
-      "owner_project": "T9",
-      "rule": "closed_without_closure_review",
-      "scope": "T9",
-      "severity": "P0",
-      "spec": "\u00a78.4",
-      "standard": "MSP",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "project is closed but its closure review is not published",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P0",
-          "subject": "T9"
         }
       ],
       "title": "Publish the project's closure review"
@@ -2953,61 +2513,6 @@
       "title": "Complete the benefit profiles"
     },
     {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check closed_without_closure_review:P0",
-      "apply_to": "PLATFORM",
-      "artefact": "closure_review",
-      "baseline": {
-        "disposition": "rework",
-        "earliest_expires": null,
-        "entries": 1,
-        "owners": []
-      },
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "A closure review output is published for the project",
-          "met": false
-        },
-        {
-          "item": "The audit reports no closed_without_closure_review gap for the project",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "file": "programme.json",
-          "rule": "closed_without_closure_review",
-          "source": "snapshot",
-          "subjects": [
-            "P0"
-          ]
-        }
-      ],
-      "key": "closed_without_closure_review:P0",
-      "owner_project": "P0",
-      "rule": "closed_without_closure_review",
-      "scope": "P0",
-      "severity": "P1",
-      "spec": "\u00a78.4",
-      "standard": "MSP",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "project is closed but its closure review is not published",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "P0"
-        }
-      ],
-      "title": "Publish the project's closure review"
-    },
-    {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check closed_without_closure_review:S00",
       "apply_to": "PLATFORM",
       "artefact": "closure_review",
@@ -4370,325 +3875,6 @@
         }
       ],
       "title": "Take and approve the programme baselines"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check programme_outputs:programme#1",
-      "apply_to": "PLATFORM",
-      "artefact": "programme_brief",
-      "baseline": {
-        "disposition": "rework",
-        "earliest_expires": null,
-        "entries": 20,
-        "owners": []
-      },
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "All 21 p0 output categories are published under the programme project",
-          "met": false
-        },
-        {
-          "item": "The audit reports zero programme_outputs gaps",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "file": "programme.json",
-          "rule": "programme_outputs",
-          "source": "snapshot",
-          "subjects": [
-            "P0:adm-profile",
-            "P0:architecture-analysis",
-            "P0:architecture-principles",
-            "P0:artifact-standard",
-            "P0:benefit-profile",
-            "P0:benefits-map",
-            "P0:benefits-strategy",
-            "P0:blueprint",
-            "P0:brief-template",
-            "P0:business-case",
-            "P0:governance",
-            "P0:maturity-assessment",
-            "P0:programme-plan",
-            "P0:projects-dossier",
-            "P0:realization-plan",
-            "P0:reuse-map",
-            "P0:skills-assessment",
-            "P0:stakeholder-profiles",
-            "P0:tranche-plan",
-            "P0:tranche-review"
-          ]
-        }
-      ],
-      "key": "programme_outputs:programme#1",
-      "owner_project": "P0",
-      "rule": "programme_outputs",
-      "scope": "programme",
-      "severity": "P1",
-      "spec": "\u00a78.3",
-      "standard": "MSP",
-      "status": "open",
-      "subject_count": 20,
-      "subjects": [
-        {
-          "detail": "declared programme output is not published",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "P0:adm-profile"
-        },
-        {
-          "detail": "declared programme output is not published",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "P0:architecture-analysis"
-        },
-        {
-          "detail": "declared programme output is not published",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "P0:architecture-principles"
-        },
-        {
-          "detail": "declared programme output is not published",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "P0:artifact-standard"
-        },
-        {
-          "detail": "declared programme output is not published",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "P0:benefit-profile"
-        },
-        {
-          "detail": "declared programme output is not published",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "P0:benefits-map"
-        },
-        {
-          "detail": "declared programme output is not published",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "P0:benefits-strategy"
-        },
-        {
-          "detail": "declared programme output is not published",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "P0:blueprint"
-        },
-        {
-          "detail": "declared programme output is not published",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "P0:brief-template"
-        },
-        {
-          "detail": "declared programme output is not published",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "P0:business-case"
-        },
-        {
-          "detail": "declared programme output is not published",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "P0:governance"
-        },
-        {
-          "detail": "declared programme output is not published",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "P0:maturity-assessment"
-        },
-        {
-          "detail": "declared programme output is not published",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "P0:programme-plan"
-        },
-        {
-          "detail": "declared programme output is not published",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "P0:projects-dossier"
-        },
-        {
-          "detail": "declared programme output is not published",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "P0:realization-plan"
-        },
-        {
-          "detail": "declared programme output is not published",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "P0:reuse-map"
-        },
-        {
-          "detail": "declared programme output is not published",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "P0:skills-assessment"
-        },
-        {
-          "detail": "declared programme output is not published",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "P0:stakeholder-profiles"
-        },
-        {
-          "detail": "declared programme output is not published",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "P0:tranche-plan"
-        },
-        {
-          "detail": "declared programme output is not published",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "P0:tranche-review"
-        }
-      ],
-      "title": "Publish the complete programme-definition output set"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check programme_outputs:programme#2",
-      "apply_to": "PLATFORM",
-      "artefact": "programme_brief",
-      "baseline": {
-        "disposition": "rework",
-        "earliest_expires": null,
-        "entries": 1,
-        "owners": []
-      },
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "All 21 p0 output categories are published under the programme project",
-          "met": false
-        },
-        {
-          "item": "The audit reports zero programme_outputs gaps",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "file": "programme.json",
-          "rule": "programme_outputs",
-          "source": "snapshot",
-          "subjects": [
-            "P0:vision"
-          ]
-        }
-      ],
-      "key": "programme_outputs:programme#2",
-      "owner_project": "P0",
-      "rule": "programme_outputs",
-      "scope": "programme",
-      "severity": "P1",
-      "spec": "\u00a78.3",
-      "standard": "MSP",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "declared programme output is not published",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "P0:vision"
-        }
-      ],
-      "title": "Publish the complete programme-definition output set"
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check project_in_unauthorised_tranche:tranche-10",
@@ -6822,7 +6008,7 @@
       "baseline": {
         "disposition": "rework",
         "earliest_expires": "2027-02-18",
-        "entries": 7,
+        "entries": 1,
         "owners": [
           "programme owner"
         ]
@@ -6845,13 +6031,7 @@
           "rule": "unpublished_declared_output",
           "source": "snapshot",
           "subjects": [
-            "DESIGN-PUBLISH",
-            "P0",
-            "PLATFORM",
-            "S00",
-            "S01",
-            "SPEC-V2",
-            "T0"
+            "DESIGN-PUBLISH"
           ]
         }
       ],
@@ -6863,10 +6043,10 @@
       "spec": "\u00a78.3",
       "standard": "MSP",
       "status": "open",
-      "subject_count": 7,
+      "subject_count": 1,
       "subjects": [
         {
-          "detail": "declared outputs are not published: closure-review, evidence, project-brief",
+          "detail": "declared outputs are not published: closure-review",
           "disposition": "rework",
           "evidence": [],
           "expires": "2027-02-18",
@@ -6874,66 +6054,6 @@
           "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
           "subject": "DESIGN-PUBLISH"
-        },
-        {
-          "detail": "declared outputs are not published: adm-profile, architecture-analysis, architecture-principles, artifact-standard, benefit-profile, benefits-map, benefits-strategy, blueprint, brief-template, business-case, governance, maturity-assessment, programme-plan, projects-dossier, realization-plan, reuse-map, skills-assessment, stakeholder-profiles, tranche-plan, tranche-review, vision",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "P0"
-        },
-        {
-          "detail": "declared outputs are not published: evidence, project-brief",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "PLATFORM"
-        },
-        {
-          "detail": "declared outputs are not published: evidence, project-brief",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "S00"
-        },
-        {
-          "detail": "declared outputs are not published: evidence, project-brief",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "S01"
-        },
-        {
-          "detail": "declared outputs are not published: spec",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "SPEC-V2"
-        },
-        {
-          "detail": "declared outputs are not published: closure-review, evidence, project-brief",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "T0"
         }
       ],
       "title": "Publish every output the project declares"
@@ -6945,7 +6065,7 @@
       "baseline": {
         "disposition": "rework",
         "earliest_expires": "2027-02-18",
-        "entries": 3,
+        "entries": 1,
         "owners": [
           "programme owner"
         ]
@@ -6968,8 +6088,6 @@
           "rule": "unpublished_declared_output",
           "source": "snapshot",
           "subjects": [
-            "S02",
-            "T1",
             "T11"
           ]
         }
@@ -6982,30 +6100,10 @@
       "spec": "\u00a78.3",
       "standard": "MSP",
       "status": "open",
-      "subject_count": 3,
+      "subject_count": 1,
       "subjects": [
         {
-          "detail": "declared outputs are not published: evidence, project-brief",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "S02"
-        },
-        {
-          "detail": "declared outputs are not published: closure-review, evidence, project-brief",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "T1"
-        },
-        {
-          "detail": "declared outputs are not published: evidence, project-brief",
+          "detail": "declared outputs are not published: evidence",
           "disposition": "rework",
           "evidence": [],
           "expires": "2027-02-18",
@@ -7018,409 +6116,13 @@
       "title": "Publish every output the project declares"
     },
     {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check unpublished_declared_output:tranche-10",
-      "apply_to": "S12",
-      "artefact": "published_output",
-      "baseline": {
-        "disposition": "rework",
-        "earliest_expires": null,
-        "entries": 2,
-        "owners": []
-      },
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "Every category in expected_outputs and closure_outputs resolves to a published output",
-          "met": false
-        },
-        {
-          "item": "The audit reports no unpublished_declared_output gap for the project",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "file": "programme.json",
-          "rule": "unpublished_declared_output",
-          "source": "snapshot",
-          "subjects": [
-            "S12",
-            "T5"
-          ]
-        }
-      ],
-      "key": "unpublished_declared_output:tranche-10",
-      "owner_project": "S12",
-      "rule": "unpublished_declared_output",
-      "scope": "tranche-10",
-      "severity": "P1",
-      "spec": "\u00a78.3",
-      "standard": "MSP",
-      "status": "open",
-      "subject_count": 2,
-      "subjects": [
-        {
-          "detail": "declared outputs are not published: evidence, project-brief",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "S12"
-        },
-        {
-          "detail": "declared outputs are not published: architecture-design, inception-analysis, project-brief",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "T5"
-        }
-      ],
-      "title": "Publish every output the project declares"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check unpublished_declared_output:tranche-11",
-      "apply_to": "S14",
-      "artefact": "published_output",
-      "baseline": {
-        "disposition": "rework",
-        "earliest_expires": null,
-        "entries": 3,
-        "owners": []
-      },
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "Every category in expected_outputs and closure_outputs resolves to a published output",
-          "met": false
-        },
-        {
-          "item": "The audit reports no unpublished_declared_output gap for the project",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "file": "programme.json",
-          "rule": "unpublished_declared_output",
-          "source": "snapshot",
-          "subjects": [
-            "S14",
-            "T6",
-            "T8"
-          ]
-        }
-      ],
-      "key": "unpublished_declared_output:tranche-11",
-      "owner_project": "S14",
-      "rule": "unpublished_declared_output",
-      "scope": "tranche-11",
-      "severity": "P1",
-      "spec": "\u00a78.3",
-      "standard": "MSP",
-      "status": "open",
-      "subject_count": 3,
-      "subjects": [
-        {
-          "detail": "declared outputs are not published: evidence, project-brief",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "S14"
-        },
-        {
-          "detail": "declared outputs are not published: architecture-design, inception-analysis, project-brief",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "T6"
-        },
-        {
-          "detail": "declared outputs are not published: evidence, project-brief",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "T8"
-        }
-      ],
-      "title": "Publish every output the project declares"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check unpublished_declared_output:tranche-12",
-      "apply_to": "T15",
-      "artefact": "published_output",
-      "baseline": {
-        "disposition": "rework",
-        "earliest_expires": null,
-        "entries": 1,
-        "owners": []
-      },
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "Every category in expected_outputs and closure_outputs resolves to a published output",
-          "met": false
-        },
-        {
-          "item": "The audit reports no unpublished_declared_output gap for the project",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "file": "programme.json",
-          "rule": "unpublished_declared_output",
-          "source": "snapshot",
-          "subjects": [
-            "T15"
-          ]
-        }
-      ],
-      "key": "unpublished_declared_output:tranche-12",
-      "owner_project": "T15",
-      "rule": "unpublished_declared_output",
-      "scope": "tranche-12",
-      "severity": "P1",
-      "spec": "\u00a78.3",
-      "standard": "MSP",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "declared outputs are not published: architecture-design, inception-analysis, project-brief",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "T15"
-        }
-      ],
-      "title": "Publish every output the project declares"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check unpublished_declared_output:tranche-13",
-      "apply_to": "T12",
-      "artefact": "published_output",
-      "baseline": {
-        "disposition": "rework",
-        "earliest_expires": null,
-        "entries": 1,
-        "owners": []
-      },
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "Every category in expected_outputs and closure_outputs resolves to a published output",
-          "met": false
-        },
-        {
-          "item": "The audit reports no unpublished_declared_output gap for the project",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "file": "programme.json",
-          "rule": "unpublished_declared_output",
-          "source": "snapshot",
-          "subjects": [
-            "T12"
-          ]
-        }
-      ],
-      "key": "unpublished_declared_output:tranche-13",
-      "owner_project": "T12",
-      "rule": "unpublished_declared_output",
-      "scope": "tranche-13",
-      "severity": "P1",
-      "spec": "\u00a78.3",
-      "standard": "MSP",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "declared outputs are not published: architecture-design, inception-analysis, project-brief",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "T12"
-        }
-      ],
-      "title": "Publish every output the project declares"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check unpublished_declared_output:tranche-2",
-      "apply_to": "PLATFORM",
-      "artefact": "published_output",
-      "baseline": {
-        "disposition": "rework",
-        "earliest_expires": null,
-        "entries": 2,
-        "owners": []
-      },
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "Every category in expected_outputs and closure_outputs resolves to a published output",
-          "met": false
-        },
-        {
-          "item": "The audit reports no unpublished_declared_output gap for the project",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "file": "programme.json",
-          "rule": "unpublished_declared_output",
-          "source": "snapshot",
-          "subjects": [
-            "S03",
-            "T2"
-          ]
-        }
-      ],
-      "key": "unpublished_declared_output:tranche-2",
-      "owner_project": "PLATFORM",
-      "rule": "unpublished_declared_output",
-      "scope": "tranche-2",
-      "severity": "P1",
-      "spec": "\u00a78.3",
-      "standard": "MSP",
-      "status": "open",
-      "subject_count": 2,
-      "subjects": [
-        {
-          "detail": "declared outputs are not published: evidence, project-brief",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "S03"
-        },
-        {
-          "detail": "declared outputs are not published: closure-review, evidence, project-brief",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "T2"
-        }
-      ],
-      "title": "Publish every output the project declares"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check unpublished_declared_output:tranche-3",
-      "apply_to": "S04",
-      "artefact": "published_output",
-      "baseline": {
-        "disposition": "rework",
-        "earliest_expires": null,
-        "entries": 3,
-        "owners": []
-      },
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "Every category in expected_outputs and closure_outputs resolves to a published output",
-          "met": false
-        },
-        {
-          "item": "The audit reports no unpublished_declared_output gap for the project",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "file": "programme.json",
-          "rule": "unpublished_declared_output",
-          "source": "snapshot",
-          "subjects": [
-            "S04",
-            "T13",
-            "T3"
-          ]
-        }
-      ],
-      "key": "unpublished_declared_output:tranche-3",
-      "owner_project": "S04",
-      "rule": "unpublished_declared_output",
-      "scope": "tranche-3",
-      "severity": "P1",
-      "spec": "\u00a78.3",
-      "standard": "MSP",
-      "status": "open",
-      "subject_count": 3,
-      "subjects": [
-        {
-          "detail": "declared outputs are not published: evidence, project-brief",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "S04"
-        },
-        {
-          "detail": "declared outputs are not published: closure-review, evidence, project-brief",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "T13"
-        },
-        {
-          "detail": "declared outputs are not published: closure-review, evidence, project-brief",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "T3"
-        }
-      ],
-      "title": "Publish every output the project declares"
-    },
-    {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check unpublished_declared_output:tranche-4",
       "apply_to": "T16",
       "artefact": "published_output",
       "baseline": {
         "disposition": "rework",
         "earliest_expires": "2027-02-18",
-        "entries": 8,
+        "entries": 2,
         "owners": [
           "programme owner"
         ]
@@ -7443,14 +6145,8 @@
           "rule": "unpublished_declared_output",
           "source": "snapshot",
           "subjects": [
-            "S05",
-            "S07",
-            "S09",
-            "T10",
             "T14",
-            "T16",
-            "T4",
-            "T9"
+            "T16"
           ]
         }
       ],
@@ -7462,50 +6158,10 @@
       "spec": "\u00a78.3",
       "standard": "MSP",
       "status": "open",
-      "subject_count": 8,
+      "subject_count": 2,
       "subjects": [
         {
-          "detail": "declared outputs are not published: evidence, project-brief",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "S05"
-        },
-        {
-          "detail": "declared outputs are not published: evidence, project-brief",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "S07"
-        },
-        {
-          "detail": "declared outputs are not published: evidence, project-brief",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "S09"
-        },
-        {
-          "detail": "declared outputs are not published: closure-review, evidence, project-brief",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "T10"
-        },
-        {
-          "detail": "declared outputs are not published: closure-review, evidence, project-brief",
+          "detail": "declared outputs are not published: closure-review, evidence",
           "disposition": "rework",
           "evidence": [],
           "expires": "2027-02-18",
@@ -7515,7 +6171,7 @@
           "subject": "T14"
         },
         {
-          "detail": "declared outputs are not published: evidence, project-brief",
+          "detail": "declared outputs are not published: evidence",
           "disposition": "rework",
           "evidence": [],
           "expires": "2027-02-18",
@@ -7523,26 +6179,6 @@
           "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
           "subject": "T16"
-        },
-        {
-          "detail": "declared outputs are not published: closure-review, evidence, project-brief",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "T4"
-        },
-        {
-          "detail": "declared outputs are not published: adm-profile, architecture-artifact, architecture-design, architecture-principles, artifact-standard, closure-review, compliance-review, evidence, inception-analysis, maturity-assessment, project-brief, skills-assessment, statement-of-architecture-work, waiver",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "T9"
         }
       ],
       "title": "Publish every output the project declares"
@@ -7554,7 +6190,7 @@
       "baseline": {
         "disposition": "rework",
         "earliest_expires": "2027-02-18",
-        "entries": 5,
+        "entries": 1,
         "owners": [
           "programme owner"
         ]
@@ -7577,10 +6213,6 @@
           "rule": "unpublished_declared_output",
           "source": "snapshot",
           "subjects": [
-            "S06",
-            "S08",
-            "S17",
-            "T17",
             "T7"
           ]
         }
@@ -7593,50 +6225,10 @@
       "spec": "\u00a78.3",
       "standard": "MSP",
       "status": "open",
-      "subject_count": 5,
+      "subject_count": 1,
       "subjects": [
         {
-          "detail": "declared outputs are not published: evidence, project-brief",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "S06"
-        },
-        {
-          "detail": "declared outputs are not published: evidence, project-brief",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "S08"
-        },
-        {
-          "detail": "declared outputs are not published: evidence, project-brief",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "S17"
-        },
-        {
-          "detail": "declared outputs are not published: architecture-design, inception-analysis, project-brief",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "T17"
-        },
-        {
-          "detail": "declared outputs are not published: evidence, project-brief",
+          "detail": "declared outputs are not published: evidence",
           "disposition": "rework",
           "evidence": [],
           "expires": "2027-02-18",
@@ -7644,314 +6236,6 @@
           "reason": "proposed at the U1 baseline; accepted or amended in the authority-repair unit",
           "severity": "P1",
           "subject": "T7"
-        }
-      ],
-      "title": "Publish every output the project declares"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check unpublished_declared_output:tranche-6",
-      "apply_to": "PLATFORM",
-      "artefact": "published_output",
-      "baseline": {
-        "disposition": "rework",
-        "earliest_expires": null,
-        "entries": 3,
-        "owners": []
-      },
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "Every category in expected_outputs and closure_outputs resolves to a published output",
-          "met": false
-        },
-        {
-          "item": "The audit reports no unpublished_declared_output gap for the project",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "file": "programme.json",
-          "rule": "unpublished_declared_output",
-          "source": "snapshot",
-          "subjects": [
-            "S06b",
-            "S10",
-            "S11"
-          ]
-        }
-      ],
-      "key": "unpublished_declared_output:tranche-6",
-      "owner_project": "PLATFORM",
-      "rule": "unpublished_declared_output",
-      "scope": "tranche-6",
-      "severity": "P1",
-      "spec": "\u00a78.3",
-      "standard": "MSP",
-      "status": "open",
-      "subject_count": 3,
-      "subjects": [
-        {
-          "detail": "declared outputs are not published: evidence, project-brief",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "S06b"
-        },
-        {
-          "detail": "declared outputs are not published: evidence, project-brief",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "S10"
-        },
-        {
-          "detail": "declared outputs are not published: evidence, project-brief",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "S11"
-        }
-      ],
-      "title": "Publish every output the project declares"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check unpublished_declared_output:tranche-7",
-      "apply_to": "S15",
-      "artefact": "published_output",
-      "baseline": {
-        "disposition": "rework",
-        "earliest_expires": null,
-        "entries": 3,
-        "owners": []
-      },
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "Every category in expected_outputs and closure_outputs resolves to a published output",
-          "met": false
-        },
-        {
-          "item": "The audit reports no unpublished_declared_output gap for the project",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "file": "programme.json",
-          "rule": "unpublished_declared_output",
-          "source": "snapshot",
-          "subjects": [
-            "S06c",
-            "S15",
-            "S16"
-          ]
-        }
-      ],
-      "key": "unpublished_declared_output:tranche-7",
-      "owner_project": "S15",
-      "rule": "unpublished_declared_output",
-      "scope": "tranche-7",
-      "severity": "P1",
-      "spec": "\u00a78.3",
-      "standard": "MSP",
-      "status": "open",
-      "subject_count": 3,
-      "subjects": [
-        {
-          "detail": "declared outputs are not published: evidence, project-brief",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "S06c"
-        },
-        {
-          "detail": "declared outputs are not published: evidence, project-brief",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "S15"
-        },
-        {
-          "detail": "declared outputs are not published: evidence, project-brief",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "S16"
-        }
-      ],
-      "title": "Publish every output the project declares"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check unpublished_declared_output:tranche-8",
-      "apply_to": "S13",
-      "artefact": "published_output",
-      "baseline": {
-        "disposition": "rework",
-        "earliest_expires": null,
-        "entries": 3,
-        "owners": []
-      },
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "Every category in expected_outputs and closure_outputs resolves to a published output",
-          "met": false
-        },
-        {
-          "item": "The audit reports no unpublished_declared_output gap for the project",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "file": "programme.json",
-          "rule": "unpublished_declared_output",
-          "source": "snapshot",
-          "subjects": [
-            "S06d",
-            "S13",
-            "S19"
-          ]
-        }
-      ],
-      "key": "unpublished_declared_output:tranche-8",
-      "owner_project": "S13",
-      "rule": "unpublished_declared_output",
-      "scope": "tranche-8",
-      "severity": "P1",
-      "spec": "\u00a78.3",
-      "standard": "MSP",
-      "status": "open",
-      "subject_count": 3,
-      "subjects": [
-        {
-          "detail": "declared outputs are not published: evidence, project-brief",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "S06d"
-        },
-        {
-          "detail": "declared outputs are not published: evidence, project-brief",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "S13"
-        },
-        {
-          "detail": "declared outputs are not published: evidence, project-brief",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "S19"
-        }
-      ],
-      "title": "Publish every output the project declares"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --rework-check unpublished_declared_output:tranche-9",
-      "apply_to": "S18",
-      "artefact": "published_output",
-      "baseline": {
-        "disposition": "rework",
-        "earliest_expires": null,
-        "entries": 3,
-        "owners": []
-      },
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "Every category in expected_outputs and closure_outputs resolves to a published output",
-          "met": false
-        },
-        {
-          "item": "The audit reports no unpublished_declared_output gap for the project",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "file": "programme.json",
-          "rule": "unpublished_declared_output",
-          "source": "snapshot",
-          "subjects": [
-            "S18",
-            "S20",
-            "S21"
-          ]
-        }
-      ],
-      "key": "unpublished_declared_output:tranche-9",
-      "owner_project": "S18",
-      "rule": "unpublished_declared_output",
-      "scope": "tranche-9",
-      "severity": "P1",
-      "spec": "\u00a78.3",
-      "standard": "MSP",
-      "status": "open",
-      "subject_count": 3,
-      "subjects": [
-        {
-          "detail": "declared outputs are not published: evidence, project-brief",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "S18"
-        },
-        {
-          "detail": "declared outputs are not published: evidence, project-brief",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "S20"
-        },
-        {
-          "detail": "declared outputs are not published: evidence, project-brief",
-          "disposition": "rework",
-          "evidence": [],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "S21"
         }
       ],
       "title": "Publish every output the project declares"
@@ -31419,14 +29703,14 @@
   "scorecard": {
     "MSP": {
       "findings": 8,
-      "gaps": 160,
-      "p0": 30,
-      "p1": 129,
+      "gaps": 88,
+      "p0": 22,
+      "p1": 65,
       "p2": 1,
-      "packages": 87,
+      "packages": 66,
       "rules": 12,
-      "rules_clean": 3,
-      "rules_with_gaps": 9,
+      "rules_clean": 4,
+      "rules_with_gaps": 8,
       "suppressed": 0
     },
     "PMP": {
@@ -31481,26 +29765,26 @@
   "snapshot": "docs/design/data",
   "summary": {
     "by_severity": {
-      "P0": 34,
-      "P1": 163,
+      "P0": 26,
+      "P1": 150,
       "P2": 155
     },
     "by_standard": {
-      "MSP": 87,
+      "MSP": 66,
       "PMP": 49,
       "SAFe": 16,
       "SPEC": 109,
       "TOGAF": 91
     },
     "by_status": {
-      "open": 349,
+      "open": 328,
       "suppressed": 3
     },
     "duplicates": 0,
-    "open": 349,
-    "packages": 352,
+    "open": 328,
+    "packages": 331,
     "resolved": 12,
-    "subjects": 504,
+    "subjects": 432,
     "suppressed": 3
   }
 }
