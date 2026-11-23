@@ -345,6 +345,11 @@ async fn seed_definition(
         counts.links += inserted as i64;
     }
     for tranche in &definition.tranches {
+        // A tranche is authorised by a review, never by the seed. The definition's state is the
+        // intended plan; the row starts `planned` until the sponsoring group's review writes
+        // the authorisation and its review row. A seeded `authorised` with no review is the
+        // assertion this rule forbids, so the seed does not make it.
+        let state = "planned";
         let inserted = sqlx::query(
             "INSERT INTO programme_tranche
                 (tenant_id, programme_id, number, state, entry_criteria, exit_criteria, review_at)
@@ -356,7 +361,7 @@ async fn seed_definition(
         .bind(tenant_id)
         .bind(programme_id)
         .bind(tranche.number)
-        .bind(&tranche.state)
+        .bind(state)
         .bind(Value::String(tranche.entry.clone()))
         .bind(Value::String(tranche.exit.clone()))
         .bind(tranche.review_at)

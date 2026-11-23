@@ -1138,6 +1138,126 @@ pub async fn list_tranches_tx(
         .await?)
 }
 
+/// The ids a validated evidence class cites.
+fn tranche_evidence_ids(evidence: &Value, class: &str) -> Vec<Uuid> {
+    evidence
+        .get(class)
+        .and_then(Value::as_array)
+        .map(|ids| {
+            ids.iter()
+                .filter_map(Value::as_str)
+                .filter_map(|text| Uuid::parse_str(text).ok())
+                .collect()
+        })
+        .unwrap_or_default()
+}
+
+/// Refuse review evidence that names no live row of the reviewed tranche's programme.
+///
+/// A UUID in the evidence is a citation only when it resolves: a baseline is an approved
+/// management/governance/boundary baseline of the programme, a risk is a `risk` register item
+/// of a project in the programme, and a benefit status is a benefit row of the programme. A
+/// well-formed id that names nothing is an assertion dressed as evidence, which is exactly what
+/// this rule refuses.
+async fn resolve_tranche_review_evidence_tx(
+    conn: &mut PgConnection,
+    tenant: TenantId,
+    programme_id: Uuid,
+    evidence: &Value,
+) -> Result<(), PlanStoreError> {
+    for id in tranche_evidence_ids(evidence, "baselines") {
+        let row: Option<(String, Option<Uuid>)> = sqlx::query_as(
+            "SELECT kind, approved_by FROM programme_baseline
+              WHERE tenant_id = $1 AND programme_id = $2 AND id = $3",
+        )
+        .bind(tenant.as_uuid())
+        .bind(programme_id)
+        .bind(id)
+        .fetch_optional(&mut *conn)
+        .await?;
+        let Some((kind, approved_by)) = row else {
+            return Err(PlanStoreError::Illegal(
+                PlanError::TrancheReviewEvidenceUnresolved { class: "baselines" },
+            ));
+        };
+        if approved_by.is_none()
+            || !matches!(kind.as_str(), "management" | "governance" | "boundary")
+        {
+            return Err(PlanStoreError::Illegal(
+                PlanError::TrancheBaselineNotApproved { kind },
+            ));
+        }
+    }
+    for id in tranche_evidence_ids(evidence, "risk_register") {
+        let resolves: bool = sqlx::query_scalar(
+            "SELECT EXISTS (
+                SELECT 1
+                  FROM project_register_item r
+                  JOIN project p ON p.tenant_id = r.tenant_id AND p.id = r.project_id
+                 WHERE r.tenant_id = $1 AND r.id = $2 AND r.kind = 'risk'
+                   AND p.programme_id = $3
+            )",
+        )
+        .bind(tenant.as_uuid())
+        .bind(id)
+        .bind(programme_id)
+        .fetch_one(&mut *conn)
+        .await?;
+        if !resolves {
+            return Err(PlanStoreError::Illegal(
+                PlanError::TrancheReviewEvidenceUnresolved {
+                    class: "risk_register",
+                },
+            ));
+        }
+    }
+    let benefits = tranche_evidence_ids(evidence, "benefit_status");
+    if !benefits.is_empty() {
+        // A measurement row is history behind a profile; a deployment without the measurement
+        // table cites profiles only.
+        let has_measurements: bool =
+            sqlx::query_scalar("SELECT to_regclass('benefit_measurement') IS NOT NULL")
+                .fetch_one(&mut *conn)
+                .await?;
+        for id in benefits {
+            let profile: bool = sqlx::query_scalar(
+                "SELECT EXISTS (
+                    SELECT 1 FROM benefit_profile
+                     WHERE tenant_id = $1 AND programme_id = $2 AND id = $3
+                )",
+            )
+            .bind(tenant.as_uuid())
+            .bind(programme_id)
+            .bind(id)
+            .fetch_one(&mut *conn)
+            .await?;
+            let measurement = if has_measurements {
+                sqlx::query_scalar::<_, bool>(
+                    "SELECT EXISTS (
+                        SELECT 1 FROM benefit_measurement
+                         WHERE tenant_id = $1 AND programme_id = $2 AND id = $3
+                    )",
+                )
+                .bind(tenant.as_uuid())
+                .bind(programme_id)
+                .bind(id)
+                .fetch_one(&mut *conn)
+                .await?
+            } else {
+                false
+            };
+            if !profile && !measurement {
+                return Err(PlanStoreError::Illegal(
+                    PlanError::TrancheReviewEvidenceUnresolved {
+                        class: "benefit_status",
+                    },
+                ));
+            }
+        }
+    }
+    Ok(())
+}
+
 /// Record a tranche review decision, refusing an evidence-less review (D-T1-10).
 ///
 /// The review is an MSP record, not a status: the decision and the evidence are inserted before
@@ -1180,6 +1300,8 @@ pub async fn review_tranche_tx(
         .fetch_optional(&mut *conn)
         .await?
         .ok_or(PlanStoreError::NotFound { what: "tranche" })?;
+    // Evidence is citation, not prose: every id must resolve inside the reviewed programme.
+    resolve_tranche_review_evidence_tx(&mut *conn, tenant, reviewed.programme_id, evidence).await?;
     // A tranche close has one review. The check runs before the state guard so a second review
     // of a row the first review closed reports "already reviewed", not "not reviewable".
     let already: bool = sqlx::query_scalar(
@@ -3182,7 +3304,8 @@ pub async fn close_retro_tx(
 ///
 /// The rule is the domain's (`PlanError::TrancheNotAuthorised`); the action maps it to
 /// `409 tranche_not_authorised`. A project outside a programme, or in a programme with no
-/// tranche rows, is unchanged.
+/// tranche rows, is unchanged. An authorised-looking state is only an authorisation when the
+/// row names the review that set it and that review is a review of this tranche.
 pub async fn assert_project_tranche_authorised_tx(
     conn: &mut PgConnection,
     tenant: TenantId,
@@ -3190,10 +3313,40 @@ pub async fn assert_project_tranche_authorised_tx(
 ) -> Result<(), PlanStoreError> {
     match project_tranche_state_tx(&mut *conn, tenant, project_id).await? {
         None => Ok(()),
-        Some((_number, state))
+        Some((number, state))
             if matches!(state.as_str(), "authorised" | "in_review" | "closed") =>
         {
-            Ok(())
+            let row: Option<(Uuid, Option<Uuid>)> = sqlx::query_as(
+                "SELECT t.id, t.authorisation_review_id
+                   FROM programme_tranche t
+                   JOIN project p
+                     ON p.tenant_id = t.tenant_id AND p.programme_id = t.programme_id
+                  WHERE p.tenant_id = $1 AND p.id = $2 AND t.number = $3",
+            )
+            .bind(tenant.as_uuid())
+            .bind(project_id)
+            .bind(number)
+            .fetch_optional(&mut *conn)
+            .await?;
+            let Some((tranche_id, Some(review_id))) = row else {
+                return Err(PlanStoreError::Illegal(PlanError::TrancheNotAuthorised));
+            };
+            let linked: bool = sqlx::query_scalar(
+                "SELECT EXISTS (
+                    SELECT 1 FROM programme_tranche_review
+                     WHERE tenant_id = $1 AND id = $2 AND tranche_id = $3
+                )",
+            )
+            .bind(tenant.as_uuid())
+            .bind(review_id)
+            .bind(tranche_id)
+            .fetch_one(&mut *conn)
+            .await?;
+            if linked {
+                Ok(())
+            } else {
+                Err(PlanStoreError::Illegal(PlanError::TrancheNotAuthorised))
+            }
         }
         Some((_number, _state)) => Err(PlanStoreError::Illegal(PlanError::TrancheNotAuthorised)),
     }
