@@ -22,7 +22,7 @@ async fn seed_programme_is_idempotent() {
     assert_eq!(first.len(), 1, "one tenant targeted");
     let (slug, counts) = &first[0];
     assert_eq!(slug, "prog");
-    assert_eq!(counts.created, 50, "the programme and its 49 projects");
+    assert_eq!(counts.created, 51, "the programme and its 50 projects");
     assert_eq!(counts.updated, 0);
     assert_eq!(counts.skipped, 0);
 
@@ -32,7 +32,7 @@ async fn seed_programme_is_idempotent() {
     let counts = second[0].1;
     assert_eq!(counts.created, 0, "a second run creates nothing");
     assert_eq!(counts.updated, 0, "a second run updates nothing");
-    assert_eq!(counts.skipped, 50);
+    assert_eq!(counts.skipped, 51);
 
     let programmes: i64 = sqlx::query_scalar(
         "SELECT count(*) FROM programme WHERE tenant_id = $1 AND name = 'conveyor buildout'",
@@ -51,7 +51,7 @@ async fn seed_programme_is_idempotent() {
     .fetch_one(&db.super_pool)
     .await
     .expect("count projects");
-    assert_eq!(projects, 49);
+    assert_eq!(projects, 50);
 
     let versions: i64 = sqlx::query_scalar(
         "SELECT count(*) FROM project
@@ -191,7 +191,7 @@ async fn seed_programme_preserves_meta_the_seed_does_not_own() {
         second[0].1.updated, 0,
         "the seed does not rewrite its own rows"
     );
-    assert_eq!(second[0].1.skipped, 50);
+    assert_eq!(second[0].1.skipped, 51);
 
     let (plan, note): (Option<String>, Option<String>) = sqlx::query_as(
         "SELECT meta ->> 'plan', meta ->> 'owner_note'
@@ -224,7 +224,7 @@ async fn seed_programme_tx_is_idempotent_and_rolls_back_whole() {
         .await
         .expect("scoped tx");
     let first = seed_programme_tx(&mut tx, tenant).await.expect("first run");
-    assert_eq!(first.created, 50, "the programme and its 49 projects");
+    assert_eq!(first.created, 51, "the programme and its 50 projects");
     assert_eq!(first.skipped, 0);
     tx.commit().await.expect("commit");
 
@@ -236,7 +236,7 @@ async fn seed_programme_tx_is_idempotent_and_rolls_back_whole() {
         .expect("second run");
     assert_eq!(second.created, 0, "a second run creates nothing");
     assert_eq!(second.updated, 0, "a second run updates nothing");
-    assert_eq!(second.skipped, 50);
+    assert_eq!(second.skipped, 51);
     tx.commit().await.expect("commit");
 
     // A rollback publishes nothing: the caller owns the transaction.
@@ -253,7 +253,7 @@ async fn seed_programme_tx_is_idempotent_and_rolls_back_whole() {
     let pending = seed_programme_tx(&mut tx, other_tenant)
         .await
         .expect("pending run");
-    assert_eq!(pending.created, 50);
+    assert_eq!(pending.created, 51);
     tx.rollback().await.expect("rollback");
     let after: i64 = sqlx::query_scalar("SELECT count(*) FROM project WHERE tenant_id = $1")
         .bind(other.tenant)
