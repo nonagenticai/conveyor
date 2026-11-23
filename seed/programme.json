@@ -173,7 +173,8 @@
         "plan": "docs/plans/slices/S06-control-plane.md",
         "track": "v1",
         "issues": [
-          4
+          4,
+          604
         ],
         "depends_on": [
           "S03",
@@ -517,7 +518,7 @@
       "key": "S13",
       "name": "Process engine, judge, map and care-bus — the process is the executor, the DAG retained as the tool-sequence engine, the 348 flows re-authored",
       "description": "Plan: docs/plans/slices/S13-n8n-engine.md",
-      "status": "closed",
+      "status": "active",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/plans/slices/S13-n8n-engine.md",
@@ -527,7 +528,8 @@
           136,
           179,
           198,
-          620
+          620,
+          626
         ],
         "depends_on": [
           "S03",
@@ -655,7 +657,8 @@
         "plan": "docs/plans/slices/S17-benchmark-harness.md",
         "track": "v1",
         "issues": [
-          11
+          11,
+          635
         ],
         "depends_on": [
           "S02",
@@ -680,7 +683,7 @@
       "key": "S18",
       "name": "Kata continuous improvement",
       "description": "Plan: docs/plans/slices/S18-kata-improvement.md",
-      "status": "active",
+      "status": "closed",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/plans/slices/S18-kata-improvement.md",
@@ -775,7 +778,7 @@
       "key": "S21",
       "name": "Message construction (the compiled prompt)",
       "description": "Plan: docs/plans/slices/S21-message-construction.md",
-      "status": "closed",
+      "status": "active",
       "repo_url": "https://github.com/nonagenticai/conveyor",
       "meta": {
         "plan": "docs/plans/slices/S21-message-construction.md",
@@ -785,7 +788,8 @@
           581,
           590,
           599,
-          612
+          612,
+          624
         ],
         "depends_on": [
           "S09",
@@ -1282,7 +1286,8 @@
         "issues": [
           76,
           556,
-          557
+          557,
+          630
         ],
         "depends_on": [
           "T2",
@@ -1418,7 +1423,8 @@
         "plan": "docs/SPEC_V2.md#12",
         "track": "v2",
         "issues": [
-          87
+          87,
+          629
         ],
         "depends_on": [
           "T16",
@@ -1640,7 +1646,7 @@
           545,
           569,
           572,
-          604
+          637
         ],
         "depends_on": [],
         "plan_status": "active",
