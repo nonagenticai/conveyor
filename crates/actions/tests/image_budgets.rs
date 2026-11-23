@@ -62,8 +62,10 @@ fn a_budget_never_exceeds_the_cap_its_own_callers_enforce() {
     // The tool version's own timeout is 1..=300 s: a larger action budget could never be reached,
     // because the destination gives up first.
     assert_eq!(budget("tools.call"), 300_000);
-    // The agent row's `timeout_secs` is 1..=300, and #270 raised this bound to that cap on purpose.
-    assert_eq!(budget("completions.create"), 300_000);
+    // S10 §5.5's accepted bound: the copilot's model call is 60 s.
+    assert_eq!(budget("completions.create"), 60_000);
+    // The agent row's `timeout_secs` is 1..=300; the workflow loop's `inference.chat` stays at
+    // that cap (#270), so its caller's own timeout remains reachable.
     assert_eq!(budget("inference.chat"), 300_000);
     // S09 §5.5: an external read is 5 s, a dispatch is 30 s.
     assert_eq!(budget("retrieval.query"), 5_000);

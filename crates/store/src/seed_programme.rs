@@ -86,6 +86,9 @@ pub struct DefinitionExport {
     /// The programme the definition belongs to (the seed resolves it by name).
     #[serde(default)]
     pub programme: Option<ProgrammeSeed>,
+    /// The programme's governance roles, seeded as `job_catalogue` rows.
+    #[serde(default)]
+    pub jobs: Vec<JobDefinition>,
     /// The benefits, each with the six field groups' definition values.
     pub benefits: Vec<BenefitDefinition>,
     /// The benefits-map edges.
@@ -107,8 +110,24 @@ pub struct BenefitDefinition {
     pub baseline: String,
     pub measurement_method: String,
     pub owner_role: String,
+    /// The `job_catalogue.job_key` that owns the profile's delivery.
+    pub owner_job_key: String,
+    /// The `job_catalogue.job_key` accountable for the benefit (the BCM).
+    pub benefit_owner_job_key: String,
     #[serde(default)]
     pub project_key: Option<String>,
+}
+
+/// One governance role the definition names, seeded into `job_catalogue`.
+#[derive(Debug, Deserialize)]
+pub struct JobDefinition {
+    /// Stable key (`^[a-z][a-z0-9_]{1,63}$`).
+    pub key: String,
+    /// Display title.
+    pub title: String,
+    /// The job family.
+    #[serde(default)]
+    pub family: String,
 }
 
 /// One benefits-map edge; `benefit` is the profile's reference.
@@ -274,6 +293,7 @@ async fn seed_definition(
     definition: &DefinitionExport,
     counts: &mut ProgrammeCounts,
 ) -> Result<(), SeedError> {
+    let job_ids = seed_definition_jobs(conn, tenant_id, definition).await?;
     for benefit in &definition.benefits {
         let project_id: Option<Uuid> = match &benefit.project_key {
             Some(key) => {
@@ -285,11 +305,20 @@ async fn seed_definition(
             }
             None => None,
         };
+        let owner_job_id = job_ids
+            .get(&benefit.owner_job_key)
+            .copied()
+            .ok_or_else(|| SeedError::Missing("job", "benefit owner job key"))?;
+        let benefit_owner_job_id = job_ids
+            .get(&benefit.benefit_owner_job_key)
+            .copied()
+            .ok_or_else(|| SeedError::Missing("job", "benefit owner job key"))?;
         let inserted = sqlx::query(
             "INSERT INTO benefit_profile
                 (tenant_id, programme_id, project_id, reference, description, category,
-                 target, baseline, measurement_method, operational_area, status)
-             SELECT $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, 'draft'
+                 target, baseline, measurement_method, owner_job_id, benefit_owner_job_id,
+                 operational_area, status)
+             SELECT $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, 'draft'
               WHERE NOT EXISTS (
                   SELECT 1 FROM benefit_profile
                    WHERE tenant_id = $1 AND programme_id = $2 AND reference = $4)",
@@ -303,7 +332,11 @@ async fn seed_definition(
         .bind(Value::String(benefit.target.clone()))
         .bind(Value::String(benefit.baseline.clone()))
         .bind(&benefit.measurement_method)
-        .bind(&benefit.owner_role)
+        .bind(owner_job_id)
+        .bind(benefit_owner_job_id)
+        // The document names no separate operational area; the category is its own placement
+        // value, and the role now lives in the job columns, not in this text field.
+        .bind(&benefit.category)
         .execute(&mut *conn)
         .await?
         .rows_affected();
@@ -366,6 +399,76 @@ async fn seed_definition(
         counts.tranches += inserted as i64;
     }
     Ok(())
+}
+
+/// Seed the definition's governance roles as `job_catalogue` rows and return key → id.
+///
+/// `benefit_profile.owner_job_id` and `.benefit_owner_job_id` are foreign keys to
+/// `job_catalogue`. The draft seed wrote the role name into `operational_area` and left both
+/// columns NULL, so every seeded benefit was ownerless. The roles are programme vocabulary
+/// (`seed/programme-definition.json`), not the design site's organisation fixtures, so this
+/// seed owns them and the industry row they are placed in. Idempotent by
+/// `(tenant, job_catalogue.job_key)` and `(tenant, industry.key)`.
+async fn seed_definition_jobs(
+    conn: &mut PgConnection,
+    tenant_id: Uuid,
+    definition: &DefinitionExport,
+) -> Result<std::collections::BTreeMap<String, Uuid>, SeedError> {
+    let mut job_ids = std::collections::BTreeMap::new();
+    if definition.jobs.is_empty() {
+        return Ok(job_ids);
+    }
+    let industry_id: Uuid = match sqlx::query_scalar::<_, Uuid>(
+        "INSERT INTO industry (tenant_id, key, name)
+         SELECT $1, 'programme_governance', 'Programme governance'
+          WHERE NOT EXISTS (
+              SELECT 1 FROM industry WHERE tenant_id = $1 AND key = 'programme_governance')
+         RETURNING id",
+    )
+    .bind(tenant_id)
+    .fetch_optional(&mut *conn)
+    .await?
+    {
+        Some(id) => id,
+        None => {
+            sqlx::query_scalar::<_, Uuid>(
+                "SELECT id FROM industry WHERE tenant_id = $1 AND key = 'programme_governance'",
+            )
+            .bind(tenant_id)
+            .fetch_one(&mut *conn)
+            .await?
+        }
+    };
+    for job in &definition.jobs {
+        let id: Uuid = match sqlx::query_scalar::<_, Uuid>(
+            "INSERT INTO job_catalogue (tenant_id, job_key, industry_id, family, title, status)
+             SELECT $1, $2, $3, $4, $5, 'active'
+              WHERE NOT EXISTS (
+                  SELECT 1 FROM job_catalogue WHERE tenant_id = $1 AND job_key = $2)
+             RETURNING id",
+        )
+        .bind(tenant_id)
+        .bind(&job.key)
+        .bind(industry_id)
+        .bind(&job.family)
+        .bind(&job.title)
+        .fetch_optional(&mut *conn)
+        .await?
+        {
+            Some(id) => id,
+            None => {
+                sqlx::query_scalar::<_, Uuid>(
+                    "SELECT id FROM job_catalogue WHERE tenant_id = $1 AND job_key = $2",
+                )
+                .bind(tenant_id)
+                .bind(&job.key)
+                .fetch_one(&mut *conn)
+                .await?
+            }
+        };
+        job_ids.insert(job.key.clone(), id);
+    }
+    Ok(job_ids)
 }
 
 /// The same target resolution `seed_catalogue` uses: one explicit slug, or every active tenant.
