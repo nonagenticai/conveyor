@@ -1,6 +1,6 @@
 {
   "schema": "verify-slices/v1",
-  "audited_sha": "8ecf1255dd5689ad8f803194b17bbe76e8cdebc1",
+  "audited_sha": "a463f0eacd00069b595af86673c348a2a69edbc6",
   "snapshot": {
     "path": "/tmp/u5a-snapshot-r2/data",
     "git_sha": "4304be961d76deea9b37b1c3dc5f6ba4abe5a642",

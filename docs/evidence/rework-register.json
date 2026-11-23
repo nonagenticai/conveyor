@@ -6742,15 +6742,15 @@
         {
           "evidence": [
             {
-              "line": 910,
+              "line": 914,
               "path": "seed/output-standard.json",
-              "quote": "            \"pointer\": \"/inference/by_project\"",
+              "quote": "        \"Investment appraisal and cash flow\": [",
               "source": "code"
             },
             {
-              "line": 1090,
+              "line": 1091,
               "path": "seed/output-standard.json",
-              "quote": "            \"pointer\": \"/compliance_reviews\"",
+              "quote": "        \"Assurance\": [",
               "source": "code"
             }
           ],
@@ -6776,15 +6776,15 @@
             {
               "evidence": [
                 {
-                  "line": 910,
+                  "line": 914,
                   "path": "seed/output-standard.json",
-                  "quote": "            \"pointer\": \"/inference/by_project\"",
+                  "quote": "        \"Investment appraisal and cash flow\": [",
                   "source": "code"
                 },
                 {
-                  "line": 1090,
+                  "line": 1091,
                   "path": "seed/output-standard.json",
-                  "quote": "            \"pointer\": \"/compliance_reviews\"",
+                  "quote": "        \"Assurance\": [",
                   "source": "code"
                 }
               ],
@@ -6818,15 +6818,15 @@
         {
           "evidence": [
             {
-              "line": 906,
+              "line": 914,
               "path": "seed/output-standard.json",
               "quote": "        \"Investment appraisal and cash flow\": [",
               "source": "code"
             },
             {
-              "line": 910,
+              "line": 923,
               "path": "seed/output-standard.json",
-              "quote": "            \"pointer\": \"/inference/by_project\"",
+              "quote": "            \"pointer\": \"/inference/by_model\"",
               "source": "code"
             }
           ],
@@ -6852,15 +6852,15 @@
             {
               "evidence": [
                 {
-                  "line": 906,
+                  "line": 914,
                   "path": "seed/output-standard.json",
                   "quote": "        \"Investment appraisal and cash flow\": [",
                   "source": "code"
                 },
                 {
-                  "line": 910,
+                  "line": 923,
                   "path": "seed/output-standard.json",
-                  "quote": "            \"pointer\": \"/inference/by_project\"",
+                  "quote": "            \"pointer\": \"/inference/by_model\"",
                   "source": "code"
                 }
               ],
@@ -9498,70 +9498,6 @@
       "title": "Give every carrying tranche a PI cadence"
     },
     {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --deep-review docs/evidence/record-w3/deep-review-findings.json --rework-check v1-p6-3:T11",
-      "apply_to": "PLATFORM",
-      "artefact": "\u00a77.5",
-      "baseline": null,
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "A read-time rework-rate derivation over run/approval rows is exposed by the metrics family (or declared unavailable with a real reason); unit/integration test asserts the arithmetic.",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "evidence": [
-            {
-              "line": 306,
-              "path": "crates/actions/src/metrics/mod.rs",
-              "quote": "    evidence.insert(\"runs.failed\".to_owned(), runs.failed as f64);",
-              "source": "code"
-            }
-          ],
-          "rule": "v1-p6-3",
-          "source": "audit"
-        }
-      ],
-      "key": "v1-p6-3:T11",
-      "kind": "CODE",
-      "owner_project": "T11",
-      "rule": "v1-p6-3",
-      "scope": "T11",
-      "severity": "P1",
-      "spec": "\u00a77.5",
-      "standard": "SAFe",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "The quality family requires rework rate from run/approval/eval rows. metrics.flow and evidence_tx expose only approvals, run totals, benefits and flow figures; FlowOut has no rework or first-pass-yield field, and rework is not even listed as unavailable. No rework computation exists in crates or apps.",
-          "disposition": "rework",
-          "evidence": [
-            {
-              "evidence": [
-                {
-                  "line": 306,
-                  "path": "crates/actions/src/metrics/mod.rs",
-                  "quote": "    evidence.insert(\"runs.failed\".to_owned(), runs.failed as f64);",
-                  "source": "code"
-                }
-              ],
-              "rule": "v1-p6-3",
-              "source": "audit"
-            }
-          ],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "T11"
-        }
-      ],
-      "title": "Rework rate is not computed anywhere"
-    },
-    {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --deep-review docs/evidence/record-w3/deep-review-findings.json --rework-check seed_live_drift:programme",
       "apply_to": "PLATFORM",
       "artefact": "seed_reconciliation",
@@ -10013,82 +9949,6 @@
         }
       ],
       "title": "Zero-use tools are flagged but never retired, and a schema drift opens no kata"
-    },
-    {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --deep-review docs/evidence/record-w3/deep-review-findings.json --rework-check v1-p45-1:T0",
-      "apply_to": "T0",
-      "artefact": "\u00a74.5",
-      "baseline": null,
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "The prompt compiler gains a Memory source fed by memory.recall (hot rows plus digest) and the run's prior steps; a test compiles a prompt for a card with a hot row and asserts the text contains it, and an absent memory source is a named refusal.",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "evidence": [
-            {
-              "line": 42,
-              "path": "crates/domain/src/prompt.rs",
-              "quote": "    Knowledge,",
-              "source": "code"
-            },
-            {
-              "line": 2,
-              "path": "crates/actions/src/memory/recall.rs",
-              "quote": "//! `memory.recall` \u2014 hot rows first, then the semantic digest derived from them.",
-              "source": "code"
-            }
-          ],
-          "rule": "v1-p45-1",
-          "source": "audit"
-        }
-      ],
-      "key": "v1-p45-1:T0",
-      "kind": "CODE",
-      "owner_project": "T0",
-      "rule": "v1-p45-1",
-      "scope": "T0",
-      "severity": "P1",
-      "spec": "\u00a74.5",
-      "standard": "SPEC",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "\u00a74.5 assembles the agent prompt from Knowledge, Memory, Request and Tools, but PromptSource has no memory variant and no memory section is rendered, so hot rows and digests never reach an agent.",
-          "disposition": "rework",
-          "evidence": [
-            {
-              "evidence": [
-                {
-                  "line": 42,
-                  "path": "crates/domain/src/prompt.rs",
-                  "quote": "    Knowledge,",
-                  "source": "code"
-                },
-                {
-                  "line": 2,
-                  "path": "crates/actions/src/memory/recall.rs",
-                  "quote": "//! `memory.recall` \u2014 hot rows first, then the semantic digest derived from them.",
-                  "source": "code"
-                }
-              ],
-              "rule": "v1-p45-1",
-              "source": "audit"
-            }
-          ],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P1",
-          "subject": "T0"
-        }
-      ],
-      "title": "The compiled prompt has no Memory source"
     },
     {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --deep-review docs/evidence/record-w3/deep-review-findings.json --rework-check v1-p5-5:T1",
@@ -40558,94 +40418,6 @@
       "title": "Unpriced calls become zero in the billing/reconciliation figure"
     },
     {
-      "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --deep-review docs/evidence/record-w3/deep-review-findings.json --rework-check v1-p76-2:PLATFORM",
-      "apply_to": "PLATFORM",
-      "artefact": "\u00a77.6",
-      "baseline": null,
-      "depends_on": [],
-      "disposition": "rework",
-      "dod": [
-        {
-          "item": "The hot query or recall excludes kind digest; a test consolidates a card and asserts the hot list carries no digest row or body and that the digest is read only from the cold store.",
-          "met": false
-        }
-      ],
-      "evidence": [
-        {
-          "evidence": [
-            {
-              "line": 438,
-              "path": "crates/store/src/memory.rs",
-              "quote": "         VALUES ($1, $2, $3, 'digest', 'system', $4, now(), $5)",
-              "source": "code"
-            },
-            {
-              "line": 453,
-              "path": "crates/store/src/memory.rs",
-              "quote": "          WHERE tenant_id = $1 AND card_id = $2",
-              "source": "code"
-            },
-            {
-              "line": 20,
-              "path": "crates/actions/src/memory/mod.rs",
-              "quote": "/// One memory row as an action returns it. Never carries a digest body: that is read from strata.",
-              "source": "code"
-            }
-          ],
-          "rule": "v1-p76-2",
-          "source": "audit"
-        }
-      ],
-      "key": "v1-p76-2:PLATFORM",
-      "kind": "CODE",
-      "owner_project": "PLATFORM",
-      "rule": "v1-p76-2",
-      "scope": "PLATFORM",
-      "severity": "P2",
-      "spec": "\u00a77.6",
-      "standard": "SPEC",
-      "status": "open",
-      "subject_count": 1,
-      "subjects": [
-        {
-          "detail": "\u00a77.6 separates hot rows from the cold digest; consolidation writes the digest into work_package_memory as kind digest and the hot query has no kind filter, so recall returns a derived digest body as a hot row.",
-          "disposition": "rework",
-          "evidence": [
-            {
-              "evidence": [
-                {
-                  "line": 438,
-                  "path": "crates/store/src/memory.rs",
-                  "quote": "         VALUES ($1, $2, $3, 'digest', 'system', $4, now(), $5)",
-                  "source": "code"
-                },
-                {
-                  "line": 453,
-                  "path": "crates/store/src/memory.rs",
-                  "quote": "          WHERE tenant_id = $1 AND card_id = $2",
-                  "source": "code"
-                },
-                {
-                  "line": 20,
-                  "path": "crates/actions/src/memory/mod.rs",
-                  "quote": "/// One memory row as an action returns it. Never carries a digest body: that is read from strata.",
-                  "source": "code"
-                }
-              ],
-              "rule": "v1-p76-2",
-              "source": "audit"
-            }
-          ],
-          "expires": null,
-          "owner": null,
-          "reason": null,
-          "severity": "P2",
-          "subject": "PLATFORM"
-        }
-      ],
-      "title": "memory.recall serves the consolidated digest inside the hot rows"
-    },
-    {
       "acceptance_command": "python3 scripts/audit-programme-conformance.py --snapshot docs/design/data --findings docs/evidence/v1-conformance-findings.json --findings docs/evidence/standards-findings.json --deep-review docs/evidence/record-w3/deep-review-findings.json --rework-check v1-p77-2:PLATFORM",
       "apply_to": "PLATFORM",
       "artefact": "\u00a77.7",
@@ -41360,9 +41132,9 @@
               "source": "code"
             },
             {
-              "line": 1115,
+              "line": 1034,
               "path": "crates/actions/src/metrics/mod.rs",
-              "quote": "    store::metrics::record_reconciliation_tx(",
+              "quote": "    name = \"metrics.reconcile\",",
               "source": "code"
             }
           ],
@@ -41406,9 +41178,9 @@
                   "source": "code"
                 },
                 {
-                  "line": 1115,
+                  "line": 1034,
                   "path": "crates/actions/src/metrics/mod.rs",
-                  "quote": "    store::metrics::record_reconciliation_tx(",
+                  "quote": "    name = \"metrics.reconcile\",",
                   "source": "code"
                 }
               ],
@@ -77959,24 +77731,24 @@
       "suppressed": 0
     },
     "SAFe": {
-      "findings": 3,
+      "findings": 2,
       "gaps": 18,
       "p0": 0,
       "p1": 18,
       "p2": 0,
-      "packages": 23,
+      "packages": 22,
       "rules": 8,
       "rules_clean": 6,
       "rules_with_gaps": 2,
       "suppressed": 0
     },
     "SPEC": {
-      "findings": 54,
+      "findings": 52,
       "gaps": 22,
       "p0": 0,
       "p1": 3,
       "p2": 19,
-      "packages": 66,
+      "packages": 64,
       "rules": 8,
       "rules_clean": 4,
       "rules_with_gaps": 4,
@@ -77998,30 +77770,30 @@
   "snapshot": "/tmp/u5a-snapshot-r2/data",
   "summary": {
     "by_kind": {
-      "CODE": 71,
+      "CODE": 68,
       "RECORD": 627,
       "STANDARD": 4
     },
     "by_severity": {
       "P0": 27,
-      "P1": 202,
-      "P2": 473
+      "P1": 200,
+      "P2": 472
     },
     "by_standard": {
       "MSP": 67,
       "PMP": 121,
-      "SAFe": 23,
-      "SPEC": 66,
+      "SAFe": 22,
+      "SPEC": 64,
       "TOGAF": 425
     },
     "by_status": {
-      "open": 702
+      "open": 699
     },
     "duplicates": 0,
-    "open": 702,
-    "packages": 702,
-    "resolved": 123,
-    "subjects": 779,
+    "open": 699,
+    "packages": 699,
+    "resolved": 126,
+    "subjects": 776,
     "suppressed": 0
   }
 }
